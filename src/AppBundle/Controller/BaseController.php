@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 use Pagerfanta\Pagerfanta;
 use Pagerfanta\Adapter\DoctrineODMMongoDBAdapter;
+use Pagerfanta\Adapter\ArrayAdapter;
 
 use AppBundle\Document\User;
 use AppBundle\Document\Policy;
@@ -246,6 +247,25 @@ abstract class BaseController extends Controller
     protected function pager(Request $request, $qb, $maxPerPage = 50)
     {
         $adapter = new DoctrineODMMongoDBAdapter($qb);
+        $pagerfanta = new Pagerfanta($adapter);
+        $pagerfanta->setMaxPerPage($maxPerPage);
+        $pagerfanta->setCurrentPage($request->get('page') ? $request->get('page') : 1);
+
+        return $pagerfanta;
+    }
+
+    /**
+     * Page results
+     *
+     * @param Request $request
+     * @param         $qb
+     * @param integer $maxPerPage
+     *
+     * @return Pagerfanta
+     */
+    protected function arrayPager(Request $request, $array, $maxPerPage = 50)
+    {
+        $adapter = new ArrayAdapter($array);
         $pagerfanta = new Pagerfanta($adapter);
         $pagerfanta->setMaxPerPage($maxPerPage);
         $pagerfanta->setCurrentPage($request->get('page') ? $request->get('page') : 1);
@@ -723,7 +743,16 @@ abstract class BaseController extends Controller
             }
         }
 
-        $pager = $this->pager($request, $policiesQb);
+        if ($status == Policy::STATUS_UNPAID) {
+            $policies = $policiesQb->getQuery()->execute()->toArray();
+            // sort older to more recent
+            usort($policies, function ($a, $b) {
+                return $a->getPolicyExpirationDate() > $b->getPolicyExpirationDate();
+            });
+            $pager = $this->arrayPager($request, $policies);
+        } else {
+            $pager = $this->pager($request, $policiesQb);
+        }
 
         return [
             'policies' => $pager->getCurrentPageResults(),
