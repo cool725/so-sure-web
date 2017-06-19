@@ -34,6 +34,11 @@ $(function(){
     return this.optional(element) || /[-/\\s]*([0-9][-/\\s]*){15,17}/.test(value);
     }, "Please enter a valid IMEI Number");
 
+    // Alphanumeric check
+    jQuery.validator.addMethod("alphanumeric", function(value, element) {
+            return this.optional(element) || /^[a-zA-Z0-9]+$/.test(value);
+    });
+
     // Over 18 Check
     jQuery.validator.addMethod("check_date_of_birth", function (value, element) {
         if (this.optional(element)) {

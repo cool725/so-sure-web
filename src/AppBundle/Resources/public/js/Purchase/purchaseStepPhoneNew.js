@@ -39,6 +39,7 @@ $(function(){
                 },
                 "purchase_form[serialNumber]" : {
                     required: true,
+                    alphanumeric: true
                 }
             },
             messages: {
@@ -49,6 +50,7 @@ $(function(){
                 },
                 "purchase_form[serialNumber]" : {
                     required:'Please enter a valid serial number',
+                    alphanumeric: 'Please enter a valid serial number',
                 }
             },
 
