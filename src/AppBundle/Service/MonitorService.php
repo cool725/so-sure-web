@@ -24,29 +24,37 @@ class MonitorService
 
     protected $redis;
 
+    /** @var IntercomService */
     protected $intercom;
 
+    /** @var MixpanelService */
     protected $mixpanel;
+
+    /** @var JudopayService */
+    protected $judopay;
 
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
      * @param                 $redis
-     * @param                 $intercom
-     * @param                 $mixpanel
+     * @param IntercomService $intercom
+     * @param MixpanelService $mixpanel
+     * @param JudopayService  $judopay
      */
     public function __construct(
         DocumentManager  $dm,
         LoggerInterface $logger,
         $redis,
         $intercom,
-        $mixpanel
+        $mixpanel,
+        $judopay
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->redis = $redis;
         $this->intercom = $intercom;
         $this->mixpanel = $mixpanel;
+        $this->judopay = $judopay;
     }
 
     public function run($name)
@@ -202,6 +210,22 @@ class MonitorService
                     ));
                 }
             }
+        }
+    }
+
+    public function judopayReceipts()
+    {
+        $results = $this->judopay->getTransactions(50, false);
+        if (count($results['additional-payments']) > 0) {
+            throw new \Exception(sprintf(
+                'Judopay is recording more than 1 payment against a policy that indicates a scheduled payment issue. %s',
+                json_encode($results['additional-payments'])
+            ));
+        } elseif (count($result['missing']) > 0) {
+            throw new \Exception(sprintf(
+                'Judopay is missing database payment records that indices a mobile payment was received, but not recorded. %s',
+                json_encode($results['missing'])
+            ));
         }
     }
 }
