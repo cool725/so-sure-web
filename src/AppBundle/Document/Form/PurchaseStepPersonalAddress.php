@@ -17,7 +17,7 @@ class PurchaseStepPersonalAddress
 
     /**
      * @var string
-     * @Assert\Email(strict=true)
+     * @Assert\Email(strict=false)
      * @Assert\NotNull(message="This value is required.")
      */
     protected $email;
