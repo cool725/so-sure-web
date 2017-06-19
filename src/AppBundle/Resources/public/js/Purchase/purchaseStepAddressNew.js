@@ -79,8 +79,10 @@ $(function(){
     });
 
     // Reveal form when first field is valid
-    $('#purchase_form_name').focusout(function() {
-        if ($('#purchase_form_name').valid() == true) {
+    $('#purchase_form_email').on('keyup', function() {
+
+        if ($('#purchase_form_name').valid() == true && $('#purchase_form_email').valid() == true) {
+            console.log('Name & Email valid');
             $('.step--hide').show();
             $('#step--one-controls').hide();
         }
