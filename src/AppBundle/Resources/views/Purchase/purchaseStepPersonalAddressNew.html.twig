@@ -6,6 +6,9 @@
 {% set new_stylesheet = 1 %}
 {% set distraction_free = 1 %}
 
+{% set showAddress = purchase_form.addressLine1.vars.data | length > 0 or purchase_form.postcode.vars.data | length > 0 %}
+{% set showDOB = purchase_form.name.vars.data | length > 0 and purchase_form.email.vars.data | length > 0 %}
+
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets output='css/*.css'
@@ -123,7 +126,7 @@
                             {{ form_widget(purchase_form.email, {'attr':{'class':'form-control', 'placeholder': 'Email'}}) }}
                             <div class="help-block with-errors">{{ form_errors(purchase_form.email) }}</div>
                         </div>
-                        <div id="step--one-controls" class="form-group form-controls {% if app and app.user and app.user.email|length > 0 and app.user.name|length > 0 %}step--hide{% endif %}">
+                        <div id="step--one-controls" class="form-group form-controls {% if showDOB %}step--hide{% endif %}">
                             <a href="#" id="step--validate" class="btn btn-green btn-block btn-pad" data-csrf="{{ lead_csrf }}" data-lead="{{ path('lead', {'source': 'purchase-flow'}) }}">
                                 Continue
                             </a>
@@ -139,7 +142,7 @@
                         </div>
                     </div>
 
-                    <div class="form-step {% if app and app.user and app.user.email|length > 0 and app.user.name|length > 0 %}{%else%}step--hide{% endif %}">
+                    <div class="form-step {% if not showDOB %}step--hide{% endif %}">
                         <div class="form-group {% if form_errors(purchase_form.birthday) %}has-error{% endif %} text-left">
                             {{ form_label(purchase_form.birthday, 'Date of Birth:', { 'label_attr': {'class': 'sr-only'} }) }}
                             {{ form_widget(purchase_form.birthday, {'attr':{'class': 'birthday form-control dob', 'placeholder': 'Date of birth (DD/MM/YYYY)'}}) }}
