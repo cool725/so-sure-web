@@ -96,9 +96,10 @@ $(function(){
 
     // Click check validate form?
     // Case: user clicks continue before filling in any fields
-    $('#step--validate').click(function() {
+    $('#step--validate, #address-manual').click(function() {
 
         if (form.valid() == true){
+            showAddress();
             return true;
         } else {
             return false;
@@ -139,10 +140,10 @@ $(function(){
         }
     }
 
-    $('#address-manual').click(function(e) {
-        e.preventDefault();
-        showAddress();
-    });
+    // $('#address-manual').click(function(e) {
+    //     e.preventDefault();
+    //     showAddress();
+    // });
 
     var capture = new Bloodhound({
       datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),

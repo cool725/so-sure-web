@@ -25,17 +25,16 @@ $(function(){
 
     // UK Postcode
     jQuery.validator.addMethod("postcodeUK", function(value, element) {
-    return this.optional(element) || /^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([AZa-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z])))) [0-9][A-Za-z]{2})$/.test(value);
+    return this.optional(element) || /^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2}) |(([AZa-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z])))) [0-9][A-Za-z]{2})$/.test(value);
     }, "Please specify a valid Postcode");
 
     // IMEI Number
     // jQuery.validator.addMethod("imei", function(value, element) {
-
     //     return this.optional(element) ||
     //     element.value === element.defaultValue ||
     //     $.validator.methods.creditcard.call(this, value, element);
-
-    // }, "Please enter a valid IMEI Number");
+    // // }, "Please enter a valid IMEI Number");
+    // }, "Testing");
 
     // Alphanumeric check
     jQuery.validator.addMethod("alphanumeric", function(value, element) {
