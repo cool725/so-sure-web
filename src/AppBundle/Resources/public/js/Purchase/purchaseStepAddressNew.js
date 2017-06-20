@@ -1,105 +1,126 @@
-$(function(){
+var sosure = sosure || {};
 
-    // Mask date input and add picker
-    $('.dob').mask('00/00/0000');
-    // $('.phone').mask('077-555-0000');
+sosure.purchaseStepAddress = (function() {
+    var self = {};
+    self.form = null;
 
-    // $('.dob').focus(function() {
-    //     $(this).daterangepicker({
-    //         singleDatePicker: true,
-    //         showDropdowns: true,
-    //         linkedCalendars: false,
-    //         // autoUpdateInput: false,
-    //         showCustomRangeLabel: false,
-    //         // startDate: 06/09/2017,
-    //         // endDate: 06/15/2017,
-    //         opens: 'center',
-    //         drops: 'up',
-    //         parentEl: ''
-    //     });
-    // });
+    self.init = function() {
+        self.form = $('.validate-form');
+        self.dobMask();
+        self.addValidation();
+    }
 
-    // Validate form
-    var form = $('.validate-form');
+    self.dobMask = function () {
+        // Mask date input and add picker
+        $('.dob').mask('00/00/0000');        
+    }
 
-    form.validate({
-        debug: true,
-        onfocusout: function(element) {
-            this.element(element);
-            // console.log('onfocusout fired');
-        },
-        validClass: 'has-success',
-        rules: {
-            "purchase_form[name]" : {
-                required: true,
-                fullName: true
+    self.addValidation = function() {
+        self.form.validate({
+            debug: true,
+            onfocusout: function(element) {
+                this.element(element);
+                // console.log('onfocusout fired');
             },
-            "purchase_form[email]" : {
-                required: true,
-                email: true
+            validClass: 'has-success',
+            rules: {
+                "purchase_form[name]" : {
+                    required: true,
+                    fullName: true
+                },
+                "purchase_form[email]" : {
+                    required: true,
+                    email: true
+                },
+                "purchase_form[birthday]" : {
+                    required: true,
+                    validDate: true,
+                    checkDateOfBirth: true
+                },
+                "purchase_form[mobileNumber]" : {
+                    required: true,
+                    phoneUK: true
+                },
+                "purchase_form[addressLine1]" : {
+                    required: true
+                },
+                "purchase_form[city]" :  {
+                    required: true
+                },
+                "purchase_form[postcode]" : {
+                    required: true,
+                    postcodeUK: true
+                }
             },
-            "purchase_form[birthday]" : {
-                required: true,
-                validDate: true,
-                checkDateOfBirth: true
+            messages: {
+                "purchase_form[name]": {
+                    required: 'Please enter your full name',
+                    fullName: 'Please enter your first and last name'
+                },
+                "purchase_form[email]" : {
+                    required: 'Please enter your email address'
+                },
+                "purchase_form[birthday]" : {
+                    required: 'Please enter a valid date in the format DD/MM/YYYY',
+                    check_date_of_birth: 'Sorry, only persons over the age of 18 can be covered',
+                },
+                "purchase_form[mobileNumber]" : 'Valid UK Mobile Number (Sorry for those outside the UK, but for now, we can only insure UK residents)',
+                "purchase_form[addressLine1]" : 'Please enter the first line of your address',
+                "purchase_form[city]" : 'Please enter your City',
+                "purchase_form[postcode]" : 'Please enter a valid UK postcode'
             },
-            "purchase_form[mobileNumber]" : {
-                required: true,
-                phoneUK: true
-            },
-            "purchase_form[addressLine1]" : {
-                required: true
-            },
-            "purchase_form[city]" :  {
-                required: true
-            },
-            "purchase_form[postcode]" : {
-                required: true,
-                postcodeUK: true
+
+            submitHandler: function(form) {
+                form.submit();
             }
-        },
-        messages: {
-            "purchase_form[name]": {
-                required: 'Please enter your full name',
-                fullName: 'Please enter your first and last name'
-            },
-            "purchase_form[email]" : {
-                required: 'Please enter your email address'
-            },
-            "purchase_form[birthday]" : {
-                required: 'Please enter a valid date in the format DD/MM/YYYY',
-                check_date_of_birth: 'Sorry, only persons over the age of 18 can be covered',
-            },
-            "purchase_form[mobileNumber]" : 'Valid UK Mobile Number (Sorry for those outside the UK, but for now, we can only insure UK residents)',
-            "purchase_form[addressLine1]" : 'Please enter the first line of your address',
-            "purchase_form[city]" : 'Please enter your City',
-            "purchase_form[postcode]" : 'Please enter a valid UK postcode'
-        },
 
-        submitHandler: function(form) {
-            form.submit();
-        }
+        });
+    }
 
-    });
-
-    // Reveal form when first two fields are valid
-    $('#purchase_form_email').on('keyup', function() {
+    self.step_one_continue = function() {
         if ($('#purchase_form_name').valid() == true && $('#purchase_form_email').valid() == true) {
-            // console.log('Name & Email valid');
             $('.step--hide').show();
             $('#step--one-controls').hide();
-        }
-    });
+            var data = {
+                name: $('#purchase_form_name').val(),
+                email: $('#purchase_form_email').val(),
+                csrf: $('#step--validate').data('csrf')
+            };
 
-    // Click check validate form?
-    // Case: user clicks continue before filling in any fields
-    $('#step--validate').click(function() {
+            var url = $('#step--validate').data('lead');
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+            });
 
-        if (form.valid() == true){
             return true;
         } else {
             return false;
         }
+    }
+
+    return self;
+})();
+
+$(function(){
+    sosure.purchaseStepAddress.init();
+});
+
+$(function(){
+
+    // Reveal form when first two fields are valid
+    $('#purchase_form_email').on('blur', function() {
+        sosure.purchaseStepAddress.step_one_continue();
+    });
+
+    // Click check validate form?
+    // Case: user clicks continue before filling in any fields
+    $('#step--validate').on('click', function(e) {
+        e.preventDefault();
+        return sosure.purchaseStepAddress.step_one_continue();
     });
 
     var maxAddresses = 50; // more than 50 causes the find api to returns an error 'unrecognised country code'

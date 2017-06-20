@@ -12,11 +12,14 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 
+use AppBundle\Classes\ApiErrorCode;
+
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Payment;
 use AppBundle\Document\User;
+use AppBundle\Document\Lead;
 use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Document\Form\Purchase;
 use AppBundle\Document\Form\PurchaseStepPersonalAddress;
@@ -206,12 +209,16 @@ class PurchaseController extends BaseController
             }
         }
 
+        /** @var \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface $csrf */
+        $csrf = $this->get('security.csrf.token_manager');
+
         $data = array(
             'purchase_form' => $purchaseForm->createView(),
             'step' => 1,
             'phone' => $phone,
             'is_postback' => 'POST' === $request->getMethod(),
             'quote_url' => $session ? $session->get('quote_url') : null,
+            'lead_csrf' => $csrf->refreshToken('lead'),
         );
 
         $alternative = $request->get('force_result');
@@ -625,5 +632,43 @@ class PurchaseController extends BaseController
             // would expect 1 of the 2 above - default back to user home just in case
             return $this->redirectToRoute('user_home');
         }
+    }
+
+    /**
+     * @Route("/lead/{source}", name="lead")
+     */
+    public function leadAction(Request $request, $source)
+    {
+        $data = json_decode($request->getContent(), true);
+        if (!$this->validateFields(
+            $data,
+            ['email', 'name', 'csrf']
+        )) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+        }
+
+        if (!$this->isCsrfTokenValid('lead', $data['csrf'])) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, 'Invalid csrf', 422);
+        }
+
+        $email = $this->getDataString($data, 'email');
+        $name = $this->getDataString($data, 'name');
+
+        $dm = $this->getManager();
+        $userRepo = $dm->getRepository(User::class);
+        $leadRepo = $dm->getRepository(Lead::class);
+        $existingLead = $leadRepo->findOneBy(['email' => strtolower($email)]);
+        $existingUser = $userRepo->findOneBy(['emailCanonical' => strtolower($email)]);
+
+        if (!$existingLead && !$existingUser) {
+            $lead = new Lead();
+            $lead->setSource($source);
+            $lead->setEmail($email);
+            $lead->setName($name);
+            $dm->persist($lead);
+            $dm->flush();
+        }
+
+        return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'OK', 200);
     }
 }

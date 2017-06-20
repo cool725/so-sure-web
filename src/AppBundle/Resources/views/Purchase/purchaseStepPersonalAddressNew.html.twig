@@ -107,7 +107,7 @@
                             <div class="help-block with-errors">{{ form_errors(purchase_form.email) }}</div>
                         </div>
                         <div id="step--one-controls" class="form-group form-controls {% if app and app.user and app.user.email|length > 0 and app.user.name|length > 0 %}step--hide{% endif %}">
-                            <a href="#" id="step--validate" class="btn btn-green btn-block btn-pad">
+                            <a href="#" id="step--validate" class="btn btn-green btn-block btn-pad" data-csrf="{{ lead_csrf }}" data-lead="{{ path('lead', {'source': 'purchase-flow'}) }}">
                                 Continue
                             </a>
                             <div class="text-break text-grey">
