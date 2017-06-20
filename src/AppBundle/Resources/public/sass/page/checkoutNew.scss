@@ -24,6 +24,16 @@
             cursor: pointer;
         }
 
+        .memory-dropdown-list {
+            display: inline;
+
+            a {
+                &:hover, &:focus, &:active {
+                    text-decoration: none;
+                }
+            }
+        }
+
         .title-price {
             font-size: 20px;
         }
@@ -47,6 +57,15 @@
     }
 
 }
+
+.memory-dropdown {
+    font-family: $avenir-book;
+
+    @include breakpoint(mobileishup) {
+        right: 0 !important;
+    }
+}
+
 
 .checkout--step {
     padding: 15px 0 140px;

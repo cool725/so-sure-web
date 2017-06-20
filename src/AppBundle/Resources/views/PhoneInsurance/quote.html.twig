@@ -52,13 +52,20 @@
         <h1 class="h2">
             Insurance for your
             <div class="dropdown memory-dropdown-list">
-                <a href="#" class="dropdown-toggle text-white" type="button" id="memoryDropdownList" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                    {{ phone }} <i class="fa fa-caret-down" aria-hidden="true"></i>
+                <a href="#"
+                   class="dropdown-toggle text-white"
+                   type="button"
+                   id="memoryDropdownList"
+                   data-toggle="dropdown"
+                   aria-haspopup="true"
+                   aria-expanded="true">
+                    {{ phone }}
+                    <i class="fa fa-caret-down" aria-hidden="true"></i>
                 </a>
 
                 <ul class="dropdown-menu memory-dropdown" aria-labelledby="memoryDropdownList">
-                    <li class="dropdown-header">Select alternate model</li>
                     {% if phones | length > 1 %}
+                        <li class="dropdown-header">Select alternate model</li>
                         {% for phone_mem in phones if phone_mem.id != phone.id %}
                             <li>
                                 <a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class=""> {{ phone.model }} - {{ phone_mem.memory }}GB</a>

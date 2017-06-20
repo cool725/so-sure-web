@@ -25,16 +25,32 @@
     <div class="checkout--top">
         <div class="container">
             <h1>
-                <span class="title-top-all">Cover details</span>
+                <span class="title-top">Insurance for your</span>
+                <br class="visible-xs">
+                <div class="dropdown memory-dropdown-list title-phone text-nowrap">
+                    <a href="#"
+                       class="dropdown-toggle"
+                       type="button"
+                       id="memoryDropdownList"
+                       data-toggle="dropdown"
+                       aria-haspopup="true"
+                       aria-expanded="true">
+                        <span class="title-phone text-blue text-nowrap">
+                            {{ phone.make }} {{ phone.model }}
+                            {% if phone.memory %}
+                                {{ phone.memory }}GB</span>
+                            {% endif %}
+                            <i class="fa fa-caret-down" aria-hidden="true"></i>
+                        </span>
+                    </a>
+                    <ul class="dropdown-menu memory-dropdown"aria-labelledby="memoryDropdownList">
+                        <li class="dropdown-header">Select alternate model</li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="#" data-toggle="modal" data-target="#quoteModel"> I have a different phone</a></li>
+                    </ul>
+                </div>
                 <br>
-                <span class="title-phone text-blue text-nowrap"
-                      data-toggle="modal"
-                      data-target="#quoteModel"
-                      title="Change phone">{{ phone.make }} {{ phone.model }}
-                {% if phone.memory %}
-                    {{ phone.memory }}GB</span>
-                {% endif %}
-                </span>
+                <span class="title-price">for just <span class="text-blue">£{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}</span> a month</span>
             </h1>
             <ul class="list-unstyled benefits--review-mobile visible-xs">
                 <li class="h4">
@@ -157,6 +173,12 @@
                        id="step--validate"
                        class="btn btn-green btn-block btn-pad">
                         Continue
+                    </a>
+                </div>
+                <div class="form-group">
+                    <a href="{{ path('purchase_step_personal') }}"
+                       class="btn btn-grey btn-block btn-pad">
+                        Back
                     </a>
                 </div>
                 <div class="modal modal-purchase fade"
