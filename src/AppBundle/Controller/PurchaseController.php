@@ -15,6 +15,9 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 use AppBundle\Classes\ApiErrorCode;
 
+use AppBundle\Document\DateTrait;
+use AppBundle\Document\CurrencyTrait;
+
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
@@ -28,7 +31,6 @@ use AppBundle\Document\Form\PurchaseStepPersonal;
 use AppBundle\Document\Form\PurchaseStepAddress;
 use AppBundle\Document\Form\PurchaseStepPhone;
 use AppBundle\Document\Form\PurchaseStepPhoneNoPhone;
-use AppBundle\Document\CurrencyTrait;
 
 use AppBundle\Form\Type\BasicUserType;
 use AppBundle\Form\Type\PhoneType;
@@ -60,6 +62,7 @@ use AppBundle\Exception\ProcessedException;
 class PurchaseController extends BaseController
 {
     use CurrencyTrait;
+    use DateTrait;
 
     /**
      * Note that any changes to actual path routes need to be reflected in the Google Analytics Goals
@@ -509,6 +512,9 @@ class PurchaseController extends BaseController
             }
         }
 
+        $now = new \DateTime();
+        $billingDate = $this->adjustDayForBilling($now);
+
         $data = array(
             'phone' => $phone,
             'purchase_form' => $purchaseForm->createView(),
@@ -521,6 +527,7 @@ class PurchaseController extends BaseController
                 ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
                 ['memory' => 'asc']
             ) : null,
+            'billing_date' => $billingDate,
         );
 
         if ($alternative == SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL) {

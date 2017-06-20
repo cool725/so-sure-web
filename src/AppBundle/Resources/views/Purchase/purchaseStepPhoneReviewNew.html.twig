@@ -110,8 +110,8 @@
                     <span class="billed visible-xs">Monthly <br></span>
                     <span class="amount">£{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}
                     <span class="hidden-xs">a month</span><br></span>
-                    <small class="visible-xs">Billed on this day of each month</small>
-                    <small class="hidden-xs">You will be billed on this day of each month</small>
+                    <small class="visible-xs">Billed on {{ billing_date|date('jS') }} of each month</small>
+                    <small class="hidden-xs">You will be billed on the {{ billing_date|date('jS') }}  of each month</small>
                 </div>
             </div>
             {% endif %}
