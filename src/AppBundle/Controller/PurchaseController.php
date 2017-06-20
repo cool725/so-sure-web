@@ -87,6 +87,7 @@ class PurchaseController extends BaseController
         }
 
         $dm = $this->getManager();
+        $phoneRepo = $dm->getRepository(Phone::class);
         $phone = $this->getSessionQuotePhone($request);
 
         $purchase = new PurchaseStepPersonalAddress();
@@ -219,6 +220,10 @@ class PurchaseController extends BaseController
             'is_postback' => 'POST' === $request->getMethod(),
             'quote_url' => $session ? $session->get('quote_url') : null,
             'lead_csrf' => $csrf->refreshToken('lead'),
+            'phones' => $phone ? $phoneRepo->findBy(
+                ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
+                ['memory' => 'asc']
+            ) : null,
         );
 
         $alternative = $request->get('force_result');
@@ -244,6 +249,9 @@ class PurchaseController extends BaseController
     */
     public function purchaseStepPhoneNoPhoneAction(Request $request)
     {
+        $dm = $this->getManager();
+        $phoneRepo = $dm->getRepository(Phone::class);
+
         $user = $this->getUser();
         if (!$user) {
             return $this->redirectToRoute('purchase');
@@ -263,6 +271,10 @@ class PurchaseController extends BaseController
             'purchase_no_phone_form' => $purchaseNoPhoneForm->createView(),
             'is_postback' => 'POST' === $request->getMethod(),
             'step' => 2,
+            'phones' => $phone ? $phoneRepo->findBy(
+                ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
+                ['memory' => 'asc']
+            ) : null,
         );
 
         $alternative = $request->get('force_result');
@@ -318,6 +330,7 @@ class PurchaseController extends BaseController
         }
 
         $dm = $this->getManager();
+        $phoneRepo = $dm->getRepository(Phone::class);
 
         $phone = $this->getSessionQuotePhone($request);
 
@@ -503,6 +516,10 @@ class PurchaseController extends BaseController
             'webpay_action' => $webpay ? $webpay['post_url'] : null,
             'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
             'policy_key' => $this->getParameter('policy_key'),
+            'phones' => $phone ? $phoneRepo->findBy(
+                ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
+                ['memory' => 'asc']
+            ) : null,
         );
 
         if ($alternative == SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL) {
