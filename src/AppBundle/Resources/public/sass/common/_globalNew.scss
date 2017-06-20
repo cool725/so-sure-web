@@ -1,6 +1,9 @@
 // global.scss
 
 // Control the type for the site
+html, body {
+	height: 100% !important;
+}
 
 body {
 	font-family: $avenir-light;

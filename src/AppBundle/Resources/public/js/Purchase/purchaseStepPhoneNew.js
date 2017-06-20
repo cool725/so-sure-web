@@ -34,7 +34,7 @@ sosure.purchaseStepPhone = (function() {
 
     self.addValidation = function() {
         $.validator.addMethod(
-            "imei", 
+            "imei",
             function(value, element) {
                 var imei = value; //$('#purchase_form_imei').val();
                 imei = imei.replace('/', '');
@@ -126,6 +126,7 @@ $(function(){
     });
 
     if ($.trim($('#Reference').val()).length > 0) {
+        $('#loading-overlay--spinner').show();
         $('#webpay-form').submit();
     }
 });
