@@ -74,12 +74,12 @@
                         <div class="col-sm-6">
                             <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-loss.svg" alt="Loss" title="Loss">
                             <h4 class="h-light">Loss</h4>
-                            <p><small>Including unauthorised use &amp; accessories</small></p>
+                            <p><small>including up to £1,000 of unauthorised network charges</small></p>
                         </div>
                         <div class="col-sm-6">
                             <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-theft.svg" alt="Theft" title="Theft">
                             <h4 class="h-light">Theft</h4>
-                            <p><small>Including unauthorised use &amp; accessories</small></p>
+                            <p><small>Including accessories up to £100 inc. VAT</small></p>
                         </div>
                     </div>
                     <div class="row">
@@ -91,10 +91,10 @@
                         <div class="col-sm-6">
                             <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-breakdown.svg" alt="Out of warranty breakdown" title="Out of warranty breakdown">
                             <h4 class="h-light">Out of warranty breakdown</h4>
-                            <p><small>Some text.....</small></p>
+                            <p><small>including faults of mobile phone</small></p>
                         </div>
                     </div>
-                    <h4 class="text-center">All this including worldwide cover for 90 days</h4>
+                    <h4 class="text-center">Plus a worldwide cover on trips not exceeding 90 days</h4>
                 </div>
             </div>
         </div>
@@ -105,7 +105,7 @@
             <h4>How would you like to pay?<br>
             <small>(Select an option below)</small></h4>
             {% if app.user.allowedMonthlyPayments %}
-            <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two {% endif %} {% if purchase_form.vars.value.amount == phone.currentPhonePrice.monthlyPremiumPrice %}payment--btn-selected{% endif %}" id="payment--monthly" data-value="{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}">
+            <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two payment--btn-left {% endif %} {% if purchase_form.vars.value.amount == phone.currentPhonePrice.monthlyPremiumPrice %}payment--btn-selected{% endif %}" id="payment--monthly" data-value="{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}">
                 <div class="payment--btn-inner">
                     <span class="billed visible-xs">Monthly <br></span>
                     <span class="amount">£{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}
@@ -121,7 +121,7 @@
             </div>
             {% endif %}
             {% if app.user.allowedYearlyPayments %}
-            <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two {% endif %} {% if purchase_form.vars.value.amount == phone.currentPhonePrice.yearlyPremiumPrice %}payment--btn-selected{% endif %}" id="payment--yearly" data-value="{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}">
+            <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two payment--btn-right {% endif %} {% if purchase_form.vars.value.amount == phone.currentPhonePrice.yearlyPremiumPrice %}payment--btn-selected{% endif %}" id="payment--yearly" data-value="{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}">
                 <div class="payment--btn-inner">
                     <span class="billed visible-xs">Yearly <br></span>
                     <span class="amount">£{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}
