@@ -289,6 +289,9 @@ class IntercomService
         if (strlen($lead->getName()) > 0) {
             $data['name'] = $lead->getName();
         }
+        if (strlen($lead->getSource()) > 0) {
+            $data['custom_attributes']['source'] = $lead->getSource();
+        }
         if ($lead->getIntercomId()) {
             $data['id'] = $lead->getIntercomId();
         }
