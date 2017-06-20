@@ -28,7 +28,7 @@ $(function(){
             rules: {
                 "purchase_form[imei]" : {
                     required: true,
-                    minlength: 15,
+                    // minlength: 15,
                     creditcard: true,
                     normalizer: function(el) {
 
