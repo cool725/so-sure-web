@@ -1,10 +1,17 @@
 // forms.scss
 
 // Overides
+
+.form-group {
+    z-index: 2;
+    position: relative;
+}
+
 .form-control {
     height: 52px;
     font-size: 16px;
     border-color: $grey;
+    z-index: 2;
 
     &:focus {
         box-shadow: none;
