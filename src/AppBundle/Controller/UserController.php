@@ -69,6 +69,7 @@ class UserController extends BaseController
         if (!$policy) {
             throw $this->createNotFoundException('Policy not found');
         }
+        $this->denyAccessUnlessGranted('view', $policy);
 
         $scode = null;
         if ($session = $this->get('session')) {
@@ -427,6 +428,10 @@ class UserController extends BaseController
             );
             $this->addFlash('success', $message);
         }
+        $this->addFlash('error', sprintf(
+            'Is your phone already damaged? <a href="%s">Click here</a>',
+            $this->generateUrl('purchase_cancel', ['id' => $user->getLatestPolicy()->getId()])
+        ));
 
         return array(
             'policy_key' => $this->getParameter('policy_key'),

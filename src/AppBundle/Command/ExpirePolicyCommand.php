@@ -41,40 +41,15 @@ class ExpirePolicyCommand extends ContainerAwareCommand
         $prefix = $input->getOption('prefix');
 
         $policyService = $this->getContainer()->get('app.policy');
-        $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $policyRepo = $dm->getRepository(Policy::class);
-
-        $policies = $policyRepo->findBy(['status' => Policy::STATUS_UNPAID]);
-        $count = 0;
-        foreach ($policies as $policy) {
-            if ($policy->shouldExpirePolicy($prefix)) {
-                if (!$dryRun) {
-                    try {
-                        $policyService->cancel($policy, Policy::CANCELLED_UNPAID);
-                        $output->writeln(sprintf(
-                            'Cancelled Policy %s / %s',
-                            $policy->getPolicyNumber(),
-                            $policy->getId()
-                        ));
-                        $count++;
-                    } catch (\Exception $e) {
-                        $output->writeln(sprintf(
-                            'Error Cancelling Policy %s / %s. Ex: %s',
-                            $policy->getPolicyNumber(),
-                            $policy->getId(),
-                            $e->getMessage()
-                        ));
-                    }
-                } else {
-                    $output->writeln(sprintf(
-                        'Dry-Run - Should Cancel Policy %s / %s',
-                        $policy->getPolicyNumber(),
-                        $policy->getId()
-                    ));
-                }
-            }
+        $cancelled = $policyService->cancelUnpaidPolicies($prefix, $dryRun);
+        $copy = 'Cancelled Policy';
+        if ($dryRun) {
+            $copy = 'Dry Run - Should cancel Policy';
+        }
+        foreach ($cancelled as $id => $number) {
+            $output->writeln(sprintf('%s %s / %s', $copy, $number, $id));
         }
 
-        $output->writeln(sprintf('Finished. %s policies cancelled', $count));
+        $output->writeln(sprintf('Finished. %s policies processed', count($cancelled)));
     }
 }

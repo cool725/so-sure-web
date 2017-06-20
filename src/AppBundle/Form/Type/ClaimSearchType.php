@@ -44,6 +44,7 @@ class ClaimSearchType extends AbstractType
                     Claim::STATUS_WITHDRAWN => Claim::STATUS_WITHDRAWN,
                     Claim::STATUS_DECLINED => Claim::STATUS_DECLINED,
                     Claim::STATUS_SETTLED => Claim::STATUS_SETTLED,
+                    Claim::STATUS_PENDING_CLOSED => Claim::STATUS_PENDING_CLOSED,
                 ],
                 'data' => [Claim::STATUS_INREVIEW, Claim::STATUS_APPROVED],
             ])

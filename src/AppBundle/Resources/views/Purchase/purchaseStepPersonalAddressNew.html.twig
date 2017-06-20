@@ -52,7 +52,7 @@
                                 <li class="dropdown-header">Select alternate model</li>
                                 {% for phone_mem in phones if phone_mem.id != phone.id %}
                                     <li>
-                                        <a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class=""> {{ phone.model }} - {{ phone_mem.memory }}GB</a>
+                                        <a href="{{ path('select_phone_make_type_id', {'type': 'purchase-change', 'id': phone_mem.id}) }}" class=""> {{ phone.model }} - {{ phone_mem.memory }}GB</a>
                                     </li>
                                 {% endfor %}
                                 <li role="separator" class="divider"></li>
@@ -237,7 +237,7 @@
 
 {# Page Modals #}
 
-{% include 'AppBundle::Default/modalQuote.html.twig' %}
+{% include 'AppBundle::Default/modalQuote.html.twig' with {'selectPhoneMakeType': 'purchase-select'} %}
 
 {# End Page Modals #}
 

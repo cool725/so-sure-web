@@ -319,4 +319,44 @@ class UserControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', '/user/invalid');
         self::verifyResponse(200);
     }
+
+    public function testUserAccessDenied()
+    {
+        $emailA = self::generateEmail('testUserAccessDenied-A', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $userA = self::createUser(
+            self::$userManager,
+            $emailA,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $policyA = self::initPolicy($userA, self::$dm, $phone, null, true, true);
+        $policyA->setStatus(Policy::STATUS_ACTIVE);
+
+        $emailB = self::generateEmail('testUserAccessDenied-B', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $userB = self::createUser(
+            self::$userManager,
+            $emailB,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $policyB = self::initPolicy($userB, self::$dm, $phone, null, true, true);
+        $policyB->setStatus(Policy::STATUS_ACTIVE);
+        self::$dm->flush();
+
+        $this->assertTrue($policyA->getUser()->hasActivePolicy());
+        $this->assertTrue($policyB->getUser()->hasActivePolicy());
+        $this->login($emailA, $password, 'user/');
+
+        $crawler = self::$client->request('GET', sprintf('/user/%s', $policyA->getId()));
+        self::verifyResponse(200);
+
+        $crawler = self::$client->request('GET', sprintf('/user/%s', $policyB->getId()));
+        self::verifyResponse(403);
+    }
 }

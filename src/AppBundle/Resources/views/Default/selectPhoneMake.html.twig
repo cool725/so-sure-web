@@ -1,18 +1,18 @@
 <div id="select-phone-data" data-phones='{{ phones|json_encode|raw }}'>
     {% if type is defined and type == 'purchase-select' %}
         {% set buttonText = 'Select Phone' %}
-        {% set class = "device-select-block" %}
+        {% set basePath = '/select-phone/purchase-select/' %}
     {% elseif type is defined and type == 'purchase-change' %}
         {% set buttonText = 'Select Phone' %}
-        {% set class = "device-select-block" %}
+        {% set basePath = '/select-phone/purchase-change/' %}
     {% else %}
         {% set buttonText = 'Quote me' %}
-        {% set class = "text-center" %}
+        {% set basePath = '/phone-insurance/' %}
     {% endif %}
     {% if type == 'homepage' %}
-        <form method="get" id="search-phone-form" {% if phone %}action="{{ path('quote_phone', {'id': phone.id }) }}"{% endif %}>
+        <form method="get" id="search-phone-form" {% if phone %}action="{{ path('quote_phone', {'id': phone.id }) }}"{% endif %} data-base-path="{{ basePath }}">
             <input type="text" class="required search-phone-text" id="search-phone" placeholder="Find your phone e.g. iPhone 7" value="{% if phone %}{{ phone }}{% endif %}" />
-            <button type="submit" class="btn btn-success btn-get-quote btn-lg">Quote me</button>
+            <button type="submit" class="btn btn-success btn-get-quote btn-lg">{{ buttonText }}</button>
             <a id="find-out-more"
                href="#" class="btn btn-link-white scroll-to"
                data-scroll-to-anchor="#why-so-sure">
@@ -20,11 +20,11 @@
             </a>
         </form>
     {% else %}
-        <form method="get" id="search-phone-form" {% if phone %}action="{{ path('quote_phone', {'id': phone.id }) }}"{% endif %}>
+        <form method="get" id="search-phone-form" {% if phone %}action="{{ path('quote_phone', {'id': phone.id }) }}"{% endif %} data-base-path="{{ basePath }}">
             <div class="form-group">
                 <input type="text" class="required search-phone-text" id="search-phone" placeholder="Find your phone e.g. iPhone 7" value="{% if phone %}{{ phone }}{% endif %}" />
             </div>
-            <button type="submit" class="btn btn-green btn-block btn-pad">Quote me</button>
+            <button type="submit" class="btn btn-green btn-block btn-pad">{{ buttonText }}</button>
         </form>
     {% endif %}
 

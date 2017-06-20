@@ -19,7 +19,7 @@ class IntercomService
 {
     const KEY_INTERCOM_QUEUE = 'queue:intercom';
 
-    const TAG_DONT_CONTACT = "Don't Contact (Temp)";
+    const TAG_DONT_CONTACT = "Don't Contact (Duplicate)";
 
     const SECURE_WEB = 'web';
     const SECURE_ANDROID = 'android';
@@ -288,6 +288,9 @@ class IntercomService
         $data['email'] = $lead->getEmail();
         if (strlen($lead->getName()) > 0) {
             $data['name'] = $lead->getName();
+        }
+        if (strlen($lead->getSource()) > 0) {
+            $data['custom_attributes']['source'] = $lead->getSource();
         }
         if ($lead->getIntercomId()) {
             $data['id'] = $lead->getIntercomId();

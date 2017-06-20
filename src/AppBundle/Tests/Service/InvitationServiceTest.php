@@ -1515,6 +1515,7 @@ class InvitationServiceTest extends WebTestCase
             $policyInvitee,
             Policy::CANCELLED_ACTUAL_FRAUD,
             false,
+            false,
             new \DateTime('2016-04-03')
         );
 

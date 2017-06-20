@@ -10,7 +10,8 @@ sosure.selectPhoneMake = (function() {
       threshold: 0.4,
     }
     self.delayTimer = null;
-    
+    self.sentMixpanel = false;
+
     self.init = function() {
         // make sure we always have a fuse to query against, even if no data
         self.fuse = new Fuse([], self.fuse_options);
@@ -26,6 +27,10 @@ sosure.selectPhoneMake = (function() {
             });
             //console.log(page);
         }, 1000);
+        if (!self.sentMixpanel) {
+            self.sentMixpanel = true;
+            sosuretrack('Start Search');
+        }
     }
 
     self.load_fuse = function() {
@@ -104,7 +109,11 @@ $(function(){
     });
 
     $('#search-phone').bind('typeahead:select', function(ev, suggestion) {
-        $('#search-phone-form').attr('action', '/phone-insurance/' + suggestion.id);
+        var base_path = $('#search-phone-form').data('base-path');
+        if (!base_path) {
+            base_path = '/phone-insurance/';
+        }
+        $('#search-phone-form').attr('action', base_path + suggestion.id);
     });
 
 });

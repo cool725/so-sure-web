@@ -6,9 +6,13 @@ use Facebook\FacebookSession;
 use AppBundle\Document\User;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use GuzzleHttp\Client;
+use AppBundle\Document\PhoneTrait;
 
 class FacebookService
 {
+    use PhoneTrait;
+
     /** @var LoggerInterface */
     protected $logger;
 
@@ -23,18 +27,23 @@ class FacebookService
     /** @var Facebook */
     protected $fb;
 
+    /** @var string */
+    protected $accountKitSecret;
+
     /**
      * @param LoggerInterface $logger
      * @param                 $router
      * @param string          $appId
      * @param string          $secret
+     * @param string          $accountKitSecret
      */
-    public function __construct(LoggerInterface $logger, $router, $appId, $secret)
+    public function __construct(LoggerInterface $logger, $router, $appId, $secret, $accountKitSecret)
     {
         $this->logger = $logger;
         $this->router = $router;
         $this->appId = $appId;
         $this->secret = $secret;
+        $this->accountKitSecret = $accountKitSecret;
     }
 
     /**
@@ -195,5 +204,73 @@ class FacebookService
         }
 
         return $arr;
+    }
+
+    public function getAccountKitMobileNumber($authorizationCode)
+    {
+        $userData = $this->getAccountKitUserData($authorizationCode);
+
+        return $this->getAccountKitMobileNumberFromUserData($userData);
+    }
+
+    public function getAccountKitUserData($authorizationCode)
+    {
+        $accessToken = $this->getAccountKitAccessToken($authorizationCode);
+
+        return $this->getAccountKitUserDataFromToken($accessToken);
+    }
+
+    public function getAccountKitAccessToken($authorizationCode)
+    {
+        // @codingStandardsIgnoreStart
+        $url = sprintf(
+            'https://graph.accountkit.com/v1.2/access_token?grant_type=authorization_code&code=%s&access_token=AA|%s|%s',
+            $authorizationCode,
+            $this->appId,
+            $this->accountKitSecret
+        );
+        // @codingStandardsIgnoreEnd
+
+        $client = new Client();
+        $res = $client->request('GET', $url);
+
+        // @codingStandardsIgnoreStart
+        // { "id" : <account_kit_user_id>, "access_token" : <account_access_token>, "token_refresh_interval_sec" : <refresh_interval> }
+        // @codingStandardsIgnoreEnd
+        $body = (string) $res->getBody();
+        $this->logger->info(sprintf('Account Kit response: %s', $body));
+        $data = json_decode($body, true);
+
+        return $data['access_token'];
+    }
+
+    public function getAccountKitUserDataFromToken($accessToken)
+    {
+        $appSecretProof = hash_hmac('sha256', $accessToken, $this->accountKitSecret);
+        $url = sprintf(
+            'https://graph.accountkit.com/v1.2/me?access_token=%s&appsecret_proof=%s',
+            $accessToken,
+            $appSecretProof
+        );
+        $client = new Client();
+        $res = $client->request('GET', $url);
+
+        // @codingStandardsIgnoreStart
+        // {  "id":"12345", "phone":{  "number":"+15551234567", "country_prefix": "1", "national_number": "5551234567" } }
+        // @codingStandardsIgnoreEnd
+        $body = (string) $res->getBody();
+        $this->logger->info(sprintf('Account Kit response: %s', $body));
+        $data = json_decode($body, true);
+
+        return $data;
+    }
+
+    public function getAccountKitMobileNumberFromUserData($userData)
+    {
+        if (isset($userData['phone']['number'])) {
+            return $this->normalizeUkMobile($userData['phone']['number']);
+        }
+
+        return null;
     }
 }

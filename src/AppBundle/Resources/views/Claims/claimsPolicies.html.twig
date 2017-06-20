@@ -84,11 +84,11 @@
 
     </div>
     {{ form_end(form) }}
-    <h2>{{ policies.count }} Results</h2>
+    <h2>{{ policies|length }} Results</h2>
     <p>
       <em>Tip: Simply click on the policy number to view that person's details.</em>
     </p>
-    {% if policies.count == 0 %}
+    {% if policies|length == 0 %}
     <div class="row-fluid">
         <h2>No policies found</h2>
     </div>
@@ -157,7 +157,7 @@
     {% endif %}
     </form>
 
-    {% if policies.count > 0 %}
+    {% if policies|length > 0 %}
     <div class="pagerfanta text-center">
         {{ pagerfanta(pager, 'twitter_bootstrap3') }}
     </div>

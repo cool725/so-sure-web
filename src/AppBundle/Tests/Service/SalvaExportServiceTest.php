@@ -422,6 +422,39 @@ class SalvaExportServiceTest extends WebTestCase
         $this->validateStaticPolicyData($data2, $updatedPolicy);
     }
 
+    public function testVeryShortExportPolicies()
+    {
+        $policy = $this->createPolicy('testVeryShortExportPolicies', new \DateTime('2017-05-23T18:29:00'));
+
+        // bump the salva policies
+        static::$salva->setEnvironment('prod');
+        static::$salva->incrementPolicyNumber($policy, new \DateTime('2017-05-24T14:39:00'));
+
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+
+        $lines = $this->exportPolicies($updatedPolicy->getPolicyNumber());
+        $this->assertEquals(2, count($lines));
+        $data1 = explode('","', trim($lines[0], '"'));
+        $data2 = explode('","', trim($lines[1], '"'));
+
+        //print $data[0];
+        //print_r($data1);
+        //print_r($data2);
+
+        $this->validatePolicyData($data1, $updatedPolicy, 1, Policy::STATUS_CANCELLED, 0);
+        $this->validatePolicyPayments($data1, $updatedPolicy, 1);
+        $this->validateProratedPolicyAmounts($data1, $updatedPolicy, 2, 365);
+        //$this->validatePartialYearPolicyAmounts($data1, $updatedPolicy, 1);
+        $this->validateStaticPolicyData($data1, $updatedPolicy);
+
+        $this->validatePolicyData($data2, $updatedPolicy, 2, Policy::STATUS_ACTIVE, 0);
+        $this->validatePolicyPayments($data2, $updatedPolicy, 0);
+        // 365 - 2 = 363
+        $this->validateProratedPolicyAmounts($data2, $updatedPolicy, 363, 365);
+        //$this->validateRemainingYearPolicyAmounts($data2, $updatedPolicy, 11);
+        $this->validateStaticPolicyData($data2, $updatedPolicy);
+    }
+
     private function exportPolicies($policyNumber)
     {
         $lines = [];
@@ -442,7 +475,7 @@ class SalvaExportServiceTest extends WebTestCase
         static::$policyService->setDispatcher(null);
 
         // finally cancel policy
-        static::$policyService->cancel($policy, $reason, false, $date);
+        static::$policyService->cancel($policy, $reason, false, false, $date);
 
         // but as not using judopay, need to add a refund
         $refundAmount = $policy->getRefundAmount($date);
