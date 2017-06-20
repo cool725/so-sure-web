@@ -12,7 +12,6 @@
             </div>
             <div class="modal-body">
                 {% if selectPhoneMakeType is defined and selectPhoneMakeType %}
-                    {{ selectPhoneMakeType }}
                     {{ render(controller('AppBundle:Default:selectPhoneMake', {'type': selectPhoneMakeType})) }}
                 {% else %}
                     {{ render(controller('AppBundle:Default:selectPhoneMake')) }}
