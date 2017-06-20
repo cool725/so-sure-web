@@ -17,7 +17,7 @@ sosure.purchaseStepAddress = (function() {
 
     self.addValidation = function() {
         self.form.validate({
-            debug: true,
+            debug: false,
             onfocusout: function(element) {
                 this.element(element);
                 // console.log('onfocusout fired');
