@@ -50,25 +50,25 @@
                     <div class="row">
                         <div class="col-sm-6">
                             <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-loss.svg" alt="Loss" title="Loss">
-                            <h4>Loss</h4>
-                            <p>Including unauthorised use &amp; accessories</p>
+                            <h4 class="h-light">Loss</h4>
+                            <p><small>Including unauthorised use &amp; accessories</small></p>
                         </div>
                         <div class="col-sm-6">
                             <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-theft.svg" alt="Theft" title="Theft">
-                            <h4>Theft</h4>
-                            <p>Including unauthorised use &amp; accessories</p>
+                            <h4 class="h-light">Theft</h4>
+                            <p><small>Including unauthorised use &amp; accessories</small></p>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-sm-6">
                             <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-water-damage.svg" alt="Accidental Damage" title="Accidental damage">
-                            <h4>Accidental damage</h4>
-                            <p>Including cracked screen &amp; water damage</p>
+                            <h4 class="h-light">Accidental damage</h4>
+                            <p><small>Including cracked screen &amp; water damage</small></p>
                         </div>
                         <div class="col-sm-6">
                             <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-breakdown.svg" alt="Out of warranty breakdown" title="Out of warranty breakdown">
-                            <h4>Out of warranty breakdown</h4>
-                            <p>Some text.....</p>
+                            <h4 class="h-light">Out of warranty breakdown</h4>
+                            <p><small>Some text.....</small></p>
                         </div>
                     </div>
                     <h4 class="text-center">All this including worldwide cover for 90 days</h4>
@@ -140,7 +140,7 @@
                        onclick="sosuretrack('Clicked Upload Imei');Intercom('trackEvent', 'clicked upload imei');Intercom('showNewMessage', 'Hi, I want to take a screenshot of my IMEI number to send to you. Can you let me know what to do? 🙂')">Send us a screenshot of your IMEI</a><br>
                 </div>
                 {% if purchase_form.serialNumber is defined %}
-                    <div class="form-group {% if form_errors(purchase_form.serialNumber) %}has-error{% endif %}">
+                    <div class="form-group-break form-group {% if form_errors(purchase_form.serialNumber) %}has-error{% endif %}">
                         {{ form_label(purchase_form.serialNumber, 'Serial Number:', { 'label_attr': {'class': 'sr-only'} }) }}
                         {{ form_widget(purchase_form.serialNumber, {'attr':{'class':'form-control',  'pattern': '[a-zA-Z0-9]{5,32}', 'title': 'Enter a valid serial number', 'placeholder':'Serial Number'}}) }}
                         <div class="help-block with-errors">{{ form_errors(purchase_form.serialNumber) }}</div>
@@ -273,15 +273,6 @@
 
 {# End Page Modals #}
 
-{% endblock %}
-
-{% block footer %}
-<!-- Analytics -->
-    <div id="fb-root"></div>
-    <div id="ss-root" data-fb-id="{{ fb_appid }}"
-       data-fb-redirect="{{ url("hwi_oauth_service_redirect", {service: "facebook"}) }}"
-       {% if use_pca is defined %}data-pca-key="{{ pca_webkey }}"{% endif %}
-       ></div>
 {% endblock %}
 
 {% block javascripts %}

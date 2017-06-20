@@ -29,9 +29,10 @@ $(function(){
                 "purchase_form[imei]" : {
                     required: true,
                     minlength: 15,
-                    // creditcard: true // Extend
-                    // imei: true
-                    // remote: We can use this option to lookup imei
+                    normalizer: function(value) {
+
+                        // return imei;
+                    },
                 },
                 "purchase_form[amount]" : {
                     required: true
@@ -44,8 +45,7 @@ $(function(){
             messages: {
                 "purchase_form[imei]" : {
                     required: 'Please enter a valid IMEI Number',
-                    // digits: 'Only digits are valid for an IMEI Number',
-                    // creditcard: 'Please enter a valid IMEI Number'
+
                 },
                 "purchase_form[serialNumber]" : {
                     required: 'Please enter a valid serial number',
