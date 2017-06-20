@@ -157,7 +157,7 @@
             color: $white;
 
             .payment--btn-inner {
-                background: $primary-blue url('https://cdn.so-sure.com/images/library_benefits/so-sure_cover-tick.svg') center no-repeat;
+                background: $primary-blue;
             }
         }
 
@@ -225,8 +225,13 @@
         background-color: $primary-blue;
 
         .payment--btn-inner {
-            background: $primary-blue url('https://cdn.so-sure.com/images/library_benefits/so-sure_cover-tick.svg') center no-repeat;
+            background: transparent url('https://cdn.so-sure.com/images/library_benefits/so-sure_cover-tick.svg') center no-repeat;
             color: $white;
+
+            // &:hover, &:focus {
+            //     background: $primary-blue url('https://cdn.so-sure.com/images/library_benefits/so-sure_cover-tick.svg') center no-repeat;
+            //     color: $white;
+            }
         }
     }
 }
