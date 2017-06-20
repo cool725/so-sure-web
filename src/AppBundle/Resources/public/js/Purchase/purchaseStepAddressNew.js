@@ -3,6 +3,9 @@ var sosure = sosure || {};
 sosure.purchaseStepAddress = (function() {
     var self = {};
     self.form = null;
+    self.delayTimer = null;
+    self.focusTimer = null;
+    self.name_email_changed = null;
 
     self.init = function() {
         self.form = $('.validate-form');
@@ -77,24 +80,34 @@ sosure.purchaseStepAddress = (function() {
         });
     }
 
+    self.step_one_change = function() {
+        self.name_email_changed = true;
+    }
+
     self.step_one_continue = function() {
         if ($('#purchase_form_name').valid() == true && $('#purchase_form_email').valid() == true) {
             $('.step--hide').show();
             $('#step--one-controls').hide();
-            var data = {
-                name: $('#purchase_form_name').val(),
-                email: $('#purchase_form_email').val(),
-                csrf: $('#step--validate').data('csrf')
-            };
 
-            var url = $('#step--validate').data('lead');
-            $.ajax({
-                url: url,
-                type: 'POST',
-                data: JSON.stringify(data),
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-            });
+            clearTimeout(self.delayTimer);
+            if (self.name_email_changed) {
+                self.name_email_changed = false;
+                self.delayTimer = setTimeout(function() {
+                    var data = {
+                        name: $('#purchase_form_name').val(),
+                        email: $('#purchase_form_email').val(),
+                        csrf: $('#step--validate').data('csrf')
+                    };
+                    var url = $('#step--validate').data('lead');
+                    $.ajax({
+                        url: url,
+                        type: 'POST',
+                        data: JSON.stringify(data),
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                    });
+                }, 5000);
+            }
 
             return true;
         } else {
@@ -121,6 +134,13 @@ sosure.purchaseStepAddress = (function() {
         }
     }
 
+    self.focusBirthday = function() {
+        clearTimeout(self.focusTimer);
+        self.focusTimer = setTimeout(function() {
+            $('#purchase_form_birthday').focus();
+        }, 300);
+    }
+
     return self;
 })();
 
@@ -129,13 +149,24 @@ $(function(){
 });
 
 $(function(){
-    // Reveal form when first two fields are valid
+    $('#purchase_form_name').on('change', function() {
+        sosure.purchaseStepAddress.step_one_change();
+    });
+
     $('#purchase_form_name').on('blur', function() {
         sosure.purchaseStepAddress.step_one_continue();
     });
 
-    $('#purchase_form_email').on('blur', function() {
+    $('#purchase_form_email').on('change', function() {
+        sosure.purchaseStepAddress.step_one_change();
+    });
+
+    $('#purchase_form_email').on('blur', function(e) {
+        var was_hidden = $('#step--one-controls').is(":visible");
         sosure.purchaseStepAddress.step_one_continue();
+        if (was_hidden) {
+            sosure.purchaseStepAddress.focusBirthday();
+        }
     });
 
     // Click check validate form?
