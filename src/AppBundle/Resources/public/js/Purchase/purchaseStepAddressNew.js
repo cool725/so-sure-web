@@ -102,6 +102,25 @@ sosure.purchaseStepAddress = (function() {
         }
     }
 
+    self.step_address_continue = function() {
+        if (self.form.valid()) {
+            self.showAddress();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    self.showAddress = function(err) {
+        $('.address-search').hide();
+        $('.typeahead').removeAttr('required');
+        $('.address-show').show();
+        if (err) {
+            $('.address-show-error').show();
+            $('.address-show-error-text').text(err);
+        }
+    }
+
     return self;
 })();
 
@@ -110,8 +129,11 @@ $(function(){
 });
 
 $(function(){
-
     // Reveal form when first two fields are valid
+    $('#purchase_form_name').on('blur', function() {
+        sosure.purchaseStepAddress.step_one_continue();
+    });
+
     $('#purchase_form_email').on('blur', function() {
         sosure.purchaseStepAddress.step_one_continue();
     });
@@ -123,18 +145,13 @@ $(function(){
         return sosure.purchaseStepAddress.step_one_continue();
     });
 
+    $('#address-manual').click(function(e) {
+        e.preventDefault();
+        return sosure.purchaseStepAddress.step_address_continue();
+    });
+
     var maxAddresses = 50; // more than 50 causes the find api to returns an error 'unrecognised country code'
     var key = $('#ss-root').data('pca-key');
-
-    var showAddress = function(err) {
-        $('.address-search').hide();
-        $('.typeahead').removeAttr('required');
-        $('.address-show').show();
-        if (err) {
-            $('.address-show-error').show();
-            $('.address-show-error-text').text(err);
-        }
-    }
 
     var setAddress = function(addr) {
         if (!addr) {
@@ -157,11 +174,6 @@ $(function(){
         }
     }
 
-    $('#address-manual').click(function(e) {
-        e.preventDefault();
-        showAddress();
-    });
-
     var capture = new Bloodhound({
       datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
       queryTokenizer: Bloodhound.tokenizers.whitespace,
@@ -169,7 +181,7 @@ $(function(){
         url: "https://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Find/v2.10/json3.ws",
         prepare: function (query, settings) {
             if (query && (query.toLowerCase() == "bx11lt" || query.toLowerCase() == "bx1 1lt")) {
-                showAddress();
+                sosure.purchaseStepAddress.showAddress();
                 setAddress({'Line1': '123 test', 'City': 'Unknown', 'PostalCode': 'bx1 1lt'});
             }
             settings.type = "POST";
@@ -183,7 +195,7 @@ $(function(){
         },
         transform: function (response) {
             if (response.Items && response.Items.length > 0 && response.Items[0].Error) {
-                showAddress("Sorry, there's an error with our address lookup. Please type in manually below.");
+                sosure.purchaseStepAddress.showAddress("Sorry, there's an error with our address lookup. Please type in manually below.");
             }
             return response.Items;
         }
@@ -197,7 +209,7 @@ $(function(){
       limit: 100 // below 100 typeahead stops showing results for less than 4 characters entered
     });
     $('.typeahead').bind('typeahead:select', function(ev, suggestion) {
-        showAddress();
+        sosure.purchaseStepAddress.showAddress();
         $.ajax({
             method: "POST",
             url: "https://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Retrieve/v2.10/json3.ws",
