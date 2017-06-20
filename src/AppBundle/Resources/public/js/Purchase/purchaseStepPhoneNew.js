@@ -29,10 +29,19 @@ $(function(){
                 "purchase_form[imei]" : {
                     required: true,
                     minlength: 15,
-                    normalizer: function(value) {
+                    creditcard: true,
+                    normalizer: function(el) {
 
-                        // return imei;
-                    },
+                        var creditcard = el.value;
+
+                        console.log('Original: ' + creditcard);
+
+                        var creditcard = creditcard.replace(/\D/g,'').substring(0, 15);
+
+                        console.log('Modified: ' + creditcard);
+
+                        return creditcard;
+                    }
                 },
                 "purchase_form[amount]" : {
                     required: true
@@ -45,6 +54,7 @@ $(function(){
             messages: {
                 "purchase_form[imei]" : {
                     required: 'Please enter a valid IMEI Number',
+                    creditcard: 'Please enter a valid IMEI Number CC'
 
                 },
                 "purchase_form[serialNumber]" : {
