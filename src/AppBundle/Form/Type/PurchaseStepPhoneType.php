@@ -69,7 +69,7 @@ class PurchaseStepPhoneType extends AbstractType
                         'placeholder' => false,
                         'expanded' => 'true',
                         'required' => $this->required,
-                        'disabled' => $purchase->isAgreed() ? true : false,
+                        'disabled' => $purchase->allowedAmountChange() ? false : true,
                     ]);
                 }
 

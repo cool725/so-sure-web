@@ -81,26 +81,31 @@
         <div class="payment--step-inner clearfix">
             <h4>How would you like to pay?<br>
             <small>(Select an option below)</small></h4>
-            <div class="payment--btn" id="payment--monthly" data-target="#purchase_form_amount_0">
+            {% if app.user.allowedMonthlyPayments %}
+            <div class="payment--btn {% if purchase_form.vars.value.amount == phone.currentPhonePrice.monthlyPremiumPrice %}payment--btn-selected{% endif %}" id="payment--monthly" data-value="{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}">
                 <span class="billed visible-xs">Monthly <br></span>
                 <span class="amount">£{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}
                 <span class="hidden-xs">a month</span><br></span>
-                <small class="visible-xs">Billed 2nd of each month</small>
-                <small class="hidden-xs">You will be billed the 2nd of each month</small>
+                <small class="visible-xs">Billed on this day of each month</small>
+                <small class="hidden-xs">You will be billed on this day of each month</small>
             </div>
+            {% endif %}
+            {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %}
             <div class="payment--btn-or">
                 OR
             </div>
-            <div class="payment--btn" id="payment--yearly" data-target="#purchase_form_amount_1">
+            {% endif %}
+            {% if app.user.allowedYearlyPayments %}
+            <div class="payment--btn {% if purchase_form.vars.value.amount == phone.currentPhonePrice.yearlyPremiumPrice %}payment--btn-selected{% endif %}" id="payment--yearly" data-value="{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}">
                 <span class="billed visible-xs">Yearly <br></span>
                 <span class="amount">£{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}
                 <span class="hidden-xs">a year</span><br></span>
                 <small class="visible-xs">Billed on date of purchase</small>
                 <small class="hidden-xs">You will be billed for the year on purchase</small>
             </div>
+            {% endif %}
         </div>
     </div>
-
     <div class="checkout--step">
         <div class="container">
 
@@ -171,10 +176,8 @@
                                     <li>I have read &amp; understood the so-sure policy document.</li>
                                 </ol>
                                 <p>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</p>
-                                {# TODO hidden input or cta changes hidden input #}
-                                <p class="text-center">{{ form_widget(purchase_form.agreed, {'label': ' I confirm the above is correct'}) }}</p>
+                                <p class="text-center" style="display: none">{{ form_widget(purchase_form.agreed, {'label': ' I confirm the above is correct', 'value': 'checked'}) }}</p>
                                 {% if app.user.hasValidPaymentMethod %}
-                                    {# TODO We need to think how we'll show this??? #}
                                     <div class="form-group">
                                         {{ form_widget(purchase_form.existing, {'label': 'Pay with card on file', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
                                     </div>

@@ -7,10 +7,8 @@ $(function(){
         .siblings()
         .removeClass('payment--btn-selected');
 
-        var radio = $(this).data('target');
-
-        $(radio).prop('checked', true);
-
+        var value = $(this).data('value');
+        $("input[name=purchase_form[amount]][value=" + value + "]").prop('checked', true);
     });
 
     // Validate step
@@ -32,7 +30,7 @@ $(function(){
                     required: true,
                     minlength: 15,
                     // creditcard: true // Extend
-                    imei: true
+                    // imei: true
                     // remote: We can use this option to lookup imei
                 },
                 "purchase_form[amount]" : {
@@ -77,4 +75,7 @@ $(function(){
         }
     });
 
+    if ($.trim($('#Reference').val()).length > 0) {
+        $('#webpay-form').submit();
+    }
 });

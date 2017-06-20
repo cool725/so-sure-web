@@ -54,6 +54,8 @@ class PurchaseStepPhone
      */
     protected $agreed;
 
+    protected $new;
+
     public function getPhone()
     {
         return $this->phone;
@@ -102,6 +104,16 @@ class PurchaseStepPhone
         }
     }
 
+    public function getNew()
+    {
+        return $this->new;
+    }
+
+    public function setNew($new)
+    {
+        $this->new = $new;
+    }
+
     public function getSerialNumber()
     {
         return $this->serialNumber;
@@ -120,6 +132,15 @@ class PurchaseStepPhone
     public function isAgreed()
     {
         return $this->agreed;
+    }
+
+    public function allowedAmountChange()
+    {
+        if ($this->getNew()) {
+            return true;
+        }
+
+        return !$this->isAgreed();
     }
 
     public function toApiArray()

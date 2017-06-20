@@ -150,9 +150,9 @@ $(function(){
       remote: {
         url: "https://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Find/v2.10/json3.ws",
         prepare: function (query, settings) {
-            if (query && query.toLowerCase() == "bx11lt") {
+            if (query && (query.toLowerCase() == "bx11lt" || query.toLowerCase() == "bx1 1lt")) {
                 showAddress();
-                setAddress({'Line1': '123 test', 'City': 'Unknown', 'PostalCode': 'bx11lt'});
+                setAddress({'Line1': '123 test', 'City': 'Unknown', 'PostalCode': 'bx1 1lt'});
             }
             settings.type = "POST";
             settings.data = {
