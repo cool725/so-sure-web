@@ -427,6 +427,7 @@ class SalvaPhonePolicyTest extends WebTestCase
             $policy,
             SalvaPhonePolicy::CANCELLED_USER_REQUESTED,
             false,
+            false,
             new \DateTime('2016-10-19 12:10', $tz)
         );
         $dispatcher = static::$container->get('event_dispatcher');

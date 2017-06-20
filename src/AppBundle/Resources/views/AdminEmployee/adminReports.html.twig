@@ -93,9 +93,9 @@
                             <td>{{ data.totalActiveYearlyPolicies }}</td>
                         </tr>
                         <tr>
-                            <td>New Policies</td>
-                            <td>{{ data.newPolicies }}</td>
-                            <td>{{ data.totalPolicies }}</td>
+                            <td>New Policies (adjusted for upgrades)</td>
+                            <td>{{ data.newPoliciesAdjUpgrade }}</td>
+                            <td>{{ data.totalPoliciesAdjUpgrade }}</td>
                         </tr>
                         <tr>
                             <td style="padding-left: 30px">New Policies (Direct)
@@ -121,11 +121,19 @@
                             <td>{{ data.newSCodePolicies }}</td>
                             <td>{{ data.totalSCodePolicies }}</td>
                         </tr>
+                        <tr>
+                            <td>Policy Upgrades
+        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
+           title="Cancellation data only" data-content="Assumed that if cancelled due to upgrade, a new police will be put in place"></i>
+                            </td>
+                            <td>{{ data.endingUpgradePolicies }}</td>
+                            <td>{{ data.totalUpgradePolicies }}</td>
+                        </tr>
 
                         <tr>
-                            <td>Ending/Cancelled Policies</td>
-                            <td>{{ data.endingEndingPolicies }}</td>
-                            <td>{{ data.totalEndingPolicies }}</td>
+                            <td>Ending/Cancelled Policies (adjusted for upgrades)</td>
+                            <td>{{ data.endingEndingPoliciesAdjUpgrade }}</td>
+                            <td>{{ data.totalEndingPoliciesAdjUpgrade }}</td>
                         </tr>
                         <tr>
                             <td style="padding-left: 30px">Cancelled Unpaid Policies
@@ -150,14 +158,6 @@
                             </td>
                             <td>{{ data.endingUserRequestedPolicies }}</td>
                             <td>{{ data.totalUserRequestedPolicies }}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding-left: 30px">Cancelled Policy Upgrades
-        <i style="cursor: pointer" class="fa fa-warning" data-toggle="popover" data-placement="bottom" data-html="true"
-           title="Cancellation data only" data-content="Currently, this only affect the cancellation data shown and not the new policies"></i>
-                            </td>
-                            <td>{{ data.endingUpgradePolicies }}</td>
-                            <td>{{ data.totalUpgradePolicies }}</td>
                         </tr>
                         <tr>
                             <td style="padding-left: 30px">Cancelled Cooloff Policies

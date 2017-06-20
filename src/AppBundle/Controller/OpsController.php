@@ -184,6 +184,9 @@ class OpsController extends BaseController
                 's3.amazonaws.com',
                 'junglenet-a.akamaihd.net',
                 'del.icio.us',
+                'loadingpages.me',
+                'savingsslider-a.akamaihd.net',
+                'cdncache-a.akamaihd.net',
             ])) {
                 $logger->debug(sprintf('Content-Security-Policy called with ignore host: %s', $host));
 
@@ -194,6 +197,8 @@ class OpsController extends BaseController
             if (in_array($scheme, [
                 'ms-appx-web',
                 'none',
+                'about',
+                'asset',
             ])) {
                 $logger->debug(sprintf('Content-Security-Policy called with ignore scheme: %s', $scheme));
 

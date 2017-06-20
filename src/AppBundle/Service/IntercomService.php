@@ -19,7 +19,7 @@ class IntercomService
 {
     const KEY_INTERCOM_QUEUE = 'queue:intercom';
 
-    const TAG_DONT_CONTACT = "Don't Contact (Temp)";
+    const TAG_DONT_CONTACT = "Don't Contact (Duplicate)";
 
     const SECURE_WEB = 'web';
     const SECURE_ANDROID = 'android';

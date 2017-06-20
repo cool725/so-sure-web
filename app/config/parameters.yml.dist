@@ -34,6 +34,7 @@ parameters:
     fb_secret: changeme
     fb_pixel_id:
     fb_og_namespace: 'wearesosure-dev'
+    account_kit_secret: changeme
 
     mailchimp_apikey: bad-mailchimp # exception thrown if - not present in param
     mailchimp_prelaunch_list:

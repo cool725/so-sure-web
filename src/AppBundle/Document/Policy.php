@@ -1665,12 +1665,31 @@ abstract class Policy
 
     public function isCancelledWithUserDeclined()
     {
-        return $this->getStatus() == self::STATUS_CANCELLED && in_array($this->getCancelledReason(), [
+        // Not cancelled, obviously false
+        if ($this->getStatus() != self::STATUS_CANCELLED) {
+            return false;
+        }
+        // Fraud/bad risk will always be user declined to purchase additional
+        if (in_array($this->getCancelledReason(), [
             self::CANCELLED_ACTUAL_FRAUD,
             self::CANCELLED_SUSPECTED_FRAUD,
-            self::CANCELLED_UNPAID,
-            self::CANCELLED_BADRISK
-        ]);
+            self::CANCELLED_BADRISK,
+        ])) {
+            return true;
+        }
+
+        // upgrade is a pre-approved user accepted - upgraded policy should be used for status
+        if ($this->getCancelledReason() == self::CANCELLED_UPGRADE) {
+            return false;
+        }
+
+        // other cases (unpaid, user cancelled, cooloff) should rely on basic rule - based entirely on any user claims
+        // TODO: Dispossession/wreckage are currently included in this calculation, but perhaps should be under bad risk
+        if (count($this->getClaims()) > 0) {
+            return true;
+        }
+
+        return false;
     }
 
     public function isCooloffCancelled()

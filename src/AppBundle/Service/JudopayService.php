@@ -125,8 +125,9 @@ class JudopayService
         $this->environment = $environment;
     }
 
-    public function getTransactions($pageSize)
+    public function getTransactions($pageSize, $logMissing = true)
     {
+        $policies = [];
         $repo = $this->dm->getRepository(JudoPayment::class);
         $transactions = $this->apiClient->getModel('Transaction');
         $data = array(
@@ -137,11 +138,25 @@ class JudopayService
         $details = $transactions->all(0, $pageSize);
         $result = [
             'validated' => 0,
-            'missing' => 0,
+            'missing' => [],
             'non-payment' => 0,
             'skipped' => 0,
+            'additional-payments' => []
         ];
         foreach ($details['results'] as $receipt) {
+            $policyId = null;
+            if (isset($receipt['yourPaymentMetaData']) && isset($receipt['yourPaymentMetaData']['policy_id'])) {
+                $policyId = $receipt['yourPaymentMetaData']['policy_id'];
+                if (!isset($policies[$policyId])) {
+                    $policies[$policyId] = true;
+                } else {
+                    if (!isset($result['additional-payments'][$policyId])) {
+                        $result['additional-payments'][$policyId] = 0;
+                    }
+                    //$result['additional-payments'][$policyId]++;
+                    $result['additional-payments'][$policyId] = json_encode($receipt);
+                }
+            }
             $created = new \DateTime($receipt['createdAt']);
             $now = new \DateTime();
             $diff = $now->getTimestamp() - $created->getTimestamp();
@@ -149,18 +164,23 @@ class JudopayService
             if ($diff < 300) {
                 $result['skipped']++;
             } elseif ($receipt['type'] == 'Payment') {
-                $payment = $repo->findOneBy(['receipt' => $receipt['receiptId']]);
+                $receiptId = $receipt['receiptId'];
+                $payment = $repo->findOneBy(['receipt' => $receiptId]);
                 if (!$payment) {
                     // Only need to be concerned about successful payments
                     if ($receipt['result'] == JudoPayment::RESULT_SUCCESS) {
-                        $this->logger->warning(sprintf(
-                            'Missing judo payment item for receipt %s on %s [%s]',
-                            $receipt['receiptId'],
-                            $receipt['createdAt'],
-                            json_encode($receipt)
-                        ));
+                        if ($logMissing) {
+                            $this->logger->warning(sprintf(
+                                'Missing judo payment item for receipt %s on %s [%s]',
+                                $receiptId,
+                                $receipt['createdAt'],
+                                json_encode($receipt)
+                            ));
+                        }
+                        $result['missing'][$receiptId] = isset($receipt['yourPaymentReference']) ?
+                            $receipt['yourPaymentReference'] :
+                            null;
                     }
-                    $result['missing']++;
                 } else {
                     $result['validated']++;
                 }
@@ -586,6 +606,7 @@ class JudopayService
             ));
         }
 
+        $payment = null;
         $policy = $scheduledPayment->getPolicy();
         $paymentMethod = $policy->getUser()->getPaymentMethod();
         if (!$paymentMethod || !$paymentMethod instanceof JudoPaymentMethod) {
@@ -595,20 +616,30 @@ class JudopayService
             ));
         }
         try {
+            if (!$paymentMethod || !$paymentMethod instanceof JudoPaymentMethod) {
+                throw new \Exception(sprintf(
+                    'Payment method not valid for scheduled payment %s',
+                    $scheduledPayment->getId()
+                ));
+            }
+
             $payment = $this->tokenPay($policy, $scheduledPayment->getAmount(), $scheduledPayment->getType());
-            $this->processScheduledPaymentResult($scheduledPayment, $payment);
-            $this->dm->flush(null, array('w' => 'majority', 'j' => true));
         } catch (\Exception $e) {
+            // TODO: Nicer handling if Judo has an issue
             $this->logger->error(sprintf(
                 'Error running scheduled payment %s. Ex: %s',
                 $scheduledPayment->getId(),
                 $e->getMessage()
             ));
+
+            /* processScheduledPaymentResult will set result to failed as payment will not exist or be failed
             $scheduledPayment->setStatus(ScheduledPayment::STATUS_FAILED);
             $this->dm->flush(null, array('w' => 'majority', 'j' => true));
-
-            throw $e;
+            */
         }
+
+        $this->processScheduledPaymentResult($scheduledPayment, $payment);
+        $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
         return $scheduledPayment;
     }
@@ -638,9 +669,12 @@ class JudopayService
     public function processScheduledPaymentResult($scheduledPayment, $payment, \DateTime $date = null)
     {
         $policy = $scheduledPayment->getPolicy();
-        $scheduledPayment->setPayment($payment);
-        if ($payment->getResult() == JudoPayment::RESULT_SUCCESS) {
+        if ($payment) {
+            $scheduledPayment->setPayment($payment);
+        }
+        if ($payment && $payment->getResult() == JudoPayment::RESULT_SUCCESS) {
             $scheduledPayment->setStatus(ScheduledPayment::STATUS_SUCCESS);
+
             // will only be sent if card is expiring
             $this->cardExpiringEmail($policy, $date);
 

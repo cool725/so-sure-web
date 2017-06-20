@@ -36,7 +36,7 @@ $black-opaque: rgba(0, 0, 0, 0.8);
 
 // Gradients
 .brand-gradient {
-	 @include linear-gradient(294deg, rgba(3, 189, 254, 0.55), #4481eb);
+     @include linear-gradient(294deg, rgba(3, 189, 254, 0.55), #4481eb);
 }
 
 // Others

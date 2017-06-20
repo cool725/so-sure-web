@@ -14,12 +14,9 @@ Cancel your policy now if your phone already has a cracked screen.
 
 We take fraud very seriously and do prosecute. When you purchased your policy, you confirmed that your phone was in full working condition and without a cracked screen. If you failed to disclose the state of your phone accurately, we may exercise our right to cancel the policy and will report any instance of fraud to the police.
 
-If you think you might have purchased your policy by mistake, email us at support@wearesosure.com today and we cancel the policy and refund your premium. If you are in any doubt, please email us at info@wearesosure.com.
+If you think you might have purchased your policy by mistake, please go to the following url today to cancel your policy and receive a full refund of your premium.
 
-Given this notice, if you think you have purchased this policy by mistake, please email us today.
+{{ url('purchase_cancel', {'id': policy.id }) }}
 
-To: support@wearesosure.com
-Subject: Please cancel {{ policy.policyNumber }} as my phone was damaged prior to purchase
-
-We will then cancel the policy and refund you the full amount.
+If you are in any doubt, please email us at info@wearesosure.com.
 {% endblock body %}

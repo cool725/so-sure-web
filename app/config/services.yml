@@ -31,10 +31,11 @@ services:
     app.facebook:
         class: AppBundle\Service\FacebookService
         arguments:
-            logger:    "@logger"
-            router:    "@router"
-            fb_appid:  "%fb_appid%"
-            fb_secret: "%fb_secret%"
+            logger:             "@logger"
+            router:             "@router"
+            fb_appid:           "%fb_appid%"
+            fb_secret:          "%fb_secret%"
+            account_kit_secret: "%account_kit_secret%"
 
     app.mailchimp.prelaunch:
         class: AppBundle\Service\MailchimpService
@@ -471,6 +472,7 @@ services:
             redis:    "@snc_redis.default"
             intercom: "@app.intercom"
             mixpanel: "@app.mixpanel"
+            judopay:  "@app.judopay"
 
     app.annie:
         class: AppBundle\Service\AppAnnieService
@@ -730,6 +732,12 @@ services:
     app.form.type.phonesearch:
         class: AppBundle\Form\Type\PhoneSearchType
         arguments: ["@request_stack"]
+        tags:
+            - { name: form.type }
+
+    app.form.type.renew:
+        class: AppBundle\Form\Type\RenewType
+        arguments: ["@request_stack", "%form_required%"]
         tags:
             - { name: form.type }
 

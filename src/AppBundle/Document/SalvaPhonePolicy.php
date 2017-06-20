@@ -285,11 +285,6 @@ class SalvaPhonePolicy extends PhonePolicy
             $endDate = clone $this->getStaticEnd();
         }
 
-        // special case to count first day, if versioned on first day
-        if ($this->getStart()->diff($endDate)->days == 0 && $version == 1) {
-            return 1;
-        }
-
         // same day versioning
         if ($endDate < $startDate) {
             return 0;
@@ -313,6 +308,12 @@ class SalvaPhonePolicy extends PhonePolicy
         print $endDate->format(\DateTime::ATOM) . PHP_EOL;
         print_r($diff);
         */
+
+        // special case to count first day, if versioned on first day
+        if ($days == 0 && $version == 1) {
+            $days = 1;
+            // print 'special adjustment for 0 days' . PHP_EOL;
+        }
 
         return $days;
     }
