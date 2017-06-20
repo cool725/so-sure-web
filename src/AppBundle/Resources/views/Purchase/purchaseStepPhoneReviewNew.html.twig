@@ -105,7 +105,7 @@
             <h4>How would you like to pay?<br>
             <small>(Select an option below)</small></h4>
             {% if app.user.allowedMonthlyPayments %}
-            <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two {% endif %} {% if purchase_form.vars.value.amount == phone.currentPhonePrice.monthlyPremiumPrice %}payment--btn-selected{% endif %}" id="payment--monthly" data-value="{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}">
+            <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two payment--btn-left {% endif %} {% if purchase_form.vars.value.amount == phone.currentPhonePrice.monthlyPremiumPrice %}payment--btn-selected{% endif %}" id="payment--monthly" data-value="{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}">
                 <div class="payment--btn-inner">
                     <span class="billed visible-xs">Monthly <br></span>
                     <span class="amount">£{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}
@@ -121,7 +121,7 @@
             </div>
             {% endif %}
             {% if app.user.allowedYearlyPayments %}
-            <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two {% endif %} {% if purchase_form.vars.value.amount == phone.currentPhonePrice.yearlyPremiumPrice %}payment--btn-selected{% endif %}" id="payment--yearly" data-value="{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}">
+            <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two payment--btn-right {% endif %} {% if purchase_form.vars.value.amount == phone.currentPhonePrice.yearlyPremiumPrice %}payment--btn-selected{% endif %}" id="payment--yearly" data-value="{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}">
                 <div class="payment--btn-inner">
                     <span class="billed visible-xs">Yearly <br></span>
                     <span class="amount">£{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}
