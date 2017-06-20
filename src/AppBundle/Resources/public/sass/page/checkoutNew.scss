@@ -140,8 +140,6 @@
 
     .payment--btn {
         padding: 15px 0;
-        // width: 50%;
-        // float: left;
         background-color: $off-white;
         border-top: 1px solid $pale-grey;
 
@@ -190,7 +188,7 @@
             margin-left: -20px;
 
             @include breakpoint(tablet) {
-                bottom: 20px;
+                bottom: 35px;
             }
         }
     }
@@ -204,6 +202,7 @@
 
         .payment--btn-inner {
             max-width: 350px;
+            padding: 10px 0;
         }
 
         .payment--btn-left {
