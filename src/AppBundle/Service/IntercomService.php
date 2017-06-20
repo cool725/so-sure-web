@@ -286,6 +286,9 @@ class IntercomService
             $data = [];
         }
         $data['email'] = $lead->getEmail();
+        if (strlen($lead->getName()) > 0) {
+            $data['name'] = $lead->getName();
+        }
         if ($lead->getIntercomId()) {
             $data['id'] = $lead->getIntercomId();
         }
