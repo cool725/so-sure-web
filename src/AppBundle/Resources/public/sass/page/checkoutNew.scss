@@ -118,7 +118,13 @@
 .payment--step {
     background-color: $off-white;
     border-top: 1px solid $pale-grey;
+    border-bottom: 1px solid $pale-grey;
     text-align: center;
+    margin-bottom: 30px;
+
+    @include breakpoint(tablet) {
+        margin-bottom: 60px;
+    }
 
     &-inner {
         position: relative;
