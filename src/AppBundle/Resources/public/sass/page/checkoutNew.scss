@@ -57,6 +57,21 @@
     form {
         max-width: 345px;
         margin: 0 auto;
+
+        .form-group-break {
+            position: relative;
+            margin-top: 30px;
+
+            &:after {
+                content: '';
+                position: absolute;
+                top: -25px;
+                margin-left: -1000px;
+                width: 3000px; height: 1px;
+                background-color: $pale-grey;
+                z-index: 10;
+            }
+        }
     }
 
     @include breakpoint(tablet) {
@@ -162,26 +177,37 @@
 .owl-carousel {
 
     .item {
+        // width: 180px;
         text-align: center;
 
         img {
-            width: 135px; height: 135px;
+            width: 100px; height: 100px;
             display: block;
-            margin: 0 auto;
+            margin: 0 auto 15px;
         }
     }
 
 }
 
+.owl-theme .owl-nav.disabled+.owl-dots {
+    display: none;
+}
+
 .cover-list {
+    text-align: center;
+
+    li {
+        width: 130px;
+    }
 
     img {
+        width: 100px; height: 100px;
         display: block;
         margin: 0 auto 15px;
     }
 
-    h4 {
-        text-align: center;
+    h5 {
+        // text-align: center;
     }
 }
 
@@ -196,20 +222,29 @@
     }
 }
 
+#purchase-step-review {
+
+    @include breakpoint(tablet) {
+        .checkout--top {
+            background: url('https://cdn.so-sure.com/images/library_benefits/so-sure_cover-globe-large.svg') no-repeat;
+            background-position: right -180px bottom 0px;
+        }
+    }
+}
+
 .benefits--review-desktop {
     padding-bottom: 30px;
-    background: url('https://cdn.so-sure.com/images/library_benefits/so-sure_cover-globe.svg') no-repeat;
-    background-position: right top;
 
     .benefits--inner {
         width: 700px;
         margin: 0 auto;
 
         h4 {
-            margin: 20px 0 10px;
+            margin: 10px 0 5px;
         }
 
         img {
+            width: 100px; height: 100px;
             float: left;
             margin-right: 15px;
         }

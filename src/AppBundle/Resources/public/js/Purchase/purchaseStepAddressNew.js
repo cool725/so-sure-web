@@ -75,7 +75,7 @@ $(function(){
             "purchase_form[city]" : 'Please enter your City',
             "purchase_form[postcode]" : {
                 required: 'Please enter a valid UK postcode',
-                postcodeUK: 'postcodeUK'
+                postcodeUK: 'Please enter a valid UK postcode'
             }
         },
 
