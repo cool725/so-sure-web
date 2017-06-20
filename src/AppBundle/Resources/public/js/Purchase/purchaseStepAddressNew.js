@@ -73,7 +73,10 @@ $(function(){
             "purchase_form[mobileNumber]" : 'Valid UK Mobile Number (Sorry for those outside the UK, but for now, we can only insure UK residents)',
             "purchase_form[addressLine1]" : 'Please enter the first line of your address',
             "purchase_form[city]" : 'Please enter your City',
-            "purchase_form[postcode]" : 'Please enter a valid UK postcode'
+            "purchase_form[postcode]" : {
+                required: 'Please enter a valid UK postcode',
+                postcodeUK: 'postcodeUK'
+            }
         },
 
         submitHandler: function(form) {
