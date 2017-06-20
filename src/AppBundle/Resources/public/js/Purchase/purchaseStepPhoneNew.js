@@ -46,7 +46,7 @@ sosure.purchaseStepPhone = (function() {
             }
         );
         self.form.validate({
-            debug: true,
+            debug: false,
             onfocusout: function(element) {
                 this.element(element);
                 // console.log('onfocusout fired');
@@ -116,7 +116,7 @@ $(function(){
         .removeClass('payment--btn-selected');
 
         var value = $(this).data('value');
-        $("input[name=purchase_form[amount]][value=" + value + "]").prop('checked', true);
+        $('input[name="purchase_form[amount]"][value="' + value + '"]').prop('checked', true);
     });
 
     // Validate step
