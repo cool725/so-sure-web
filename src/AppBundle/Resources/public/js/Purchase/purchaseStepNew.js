@@ -3,7 +3,7 @@ $(function(){
     // Init carousel
     $('.owl-carousel').owlCarousel({
         margin: 30,
-        stagePadding: 80,
+        stagePadding: 70,
         items: 2,
         loop: true
     });

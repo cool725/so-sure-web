@@ -132,11 +132,6 @@
     border-top: 1px solid $pale-grey;
     border-bottom: 1px solid $pale-grey;
     text-align: center;
-    // margin-bottom: 30px;
-
-    @include breakpoint(tablet) {
-        // margin-bottom: 60px;
-    }
 
     &-inner {
         position: relative;
@@ -167,10 +162,6 @@
         &:hover, &:focus {
             background-color: $primary-blue;
             color: $white;
-
-            .payment--btn-inner {
-                background: $primary-blue;
-            }
         }
 
         .billed {
@@ -247,7 +238,6 @@
 .owl-carousel {
 
     .item {
-        // width: 180px;
         text-align: center;
 
         img {
@@ -255,6 +245,10 @@
             display: block;
             margin: 0 auto 15px;
         }
+    }
+
+    h5 {
+        line-height: 1.5;
     }
 
 }
