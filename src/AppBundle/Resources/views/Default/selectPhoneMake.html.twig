@@ -19,6 +19,11 @@
                 <i class="fa fa-graduation-cap" aria-hidden="true"></i> LEARN MORE
             </a>
         </form>
+    {% elseif type == 'invalid' %}
+        <form method="get" id="search-phone-form" {% if phone %}action="{{ path('quote_phone', {'id': phone.id }) }}"{% endif %} data-base-path="{{ basePath }}">
+            <input type="text" class="required search-phone-text" id="search-phone" placeholder="Find your phone e.g. iPhone 7" value="{% if phone %}{{ phone }}{% endif %}" />
+            <button type="submit" class="btn btn-success btn-get-quote btn-lg">{{ buttonText }}</button>
+        </form>
     {% else %}
         <form method="get" id="search-phone-form" {% if phone %}action="{{ path('quote_phone', {'id': phone.id }) }}"{% endif %} data-base-path="{{ basePath }}">
             <div class="form-group">
