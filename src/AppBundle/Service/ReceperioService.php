@@ -646,11 +646,19 @@ class ReceperioService extends BaseImeiService
         try {
             return $this->runCheckSerial($phone, $serialNumber, $user, $warnMismatch);
         } catch (ReciperoManualProcessException $e) {
+            $this->logger->error(
+                sprintf("Unable to check serial number '%s'", $serialNumber),
+                ['exception' => $e]
+            );
             // If apple serial number doesn't work, try imei to get a non-memory match
             if ($phone->getMake() == 'Apple' && $imei) {
                 try {
                     return $this->runCheckSerial($phone, $imei, $user, $warnMismatch);
                 } catch (ReciperoManualProcessException $e) {
+                    $this->logger->error(
+                        sprintf("Unable to recheck iPhone using imei as serial number '%s'", $imei),
+                        ['exception' => $e]
+                    );
                     return true;
                 }
             }
