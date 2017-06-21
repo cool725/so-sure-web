@@ -50,9 +50,6 @@
 			padding: 10px 10px 10px 30px;
 			margin-bottom: 30px;
 
-		    max-height: 150px;
-		    overflow: scroll;
-
 		    border: 1px solid $pale-grey;;
 
 			li {
@@ -62,13 +59,6 @@
 				padding: 7px 0;
 			}
 
-			@include breakpoint(tablet) {
-				padding: 0 0 0 20px;
-				max-height: none;
-				overflow: normal;
-
-				border: none;
-			}
 		}
 	}
 }
