@@ -19,7 +19,7 @@ $(function(){
 
     jQuery.validator.addMethod('emaildomain', function(value, element) {
         return this.optional(element) || value.match(/^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/);
-    }, 'Please enter your email address');
+    }, 'Please enter a valid email address.');
 
     // UK mobile number
     jQuery.validator.addMethod('phoneUK', function(phone_number, element) {

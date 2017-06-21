@@ -67,7 +67,7 @@ sosure.purchaseStepAddress = (function() {
                     fullName: 'Please enter your first and last name'
                 },
                 "purchase_form[email]" : {
-                    required: 'Please enter your email address'
+                    required: 'Please enter a valid email address.'
                 },
                 "purchase_form[birthday]" : {
                     required: 'Please enter a valid date in the format DD/MM/YYYY',
