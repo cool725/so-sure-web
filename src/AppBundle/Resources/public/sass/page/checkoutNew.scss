@@ -68,7 +68,7 @@
 
 
 .checkout--step {
-    padding: 15px 0 140px;
+    padding: 20px 0 140px;
     background-color: $off-white;
     border-top: 1px solid $pale-grey;
     border-bottom: 1px solid $pale-grey;
@@ -86,17 +86,13 @@
                 position: absolute;
                 top: -25px;
                 margin-left: -1000px;
-                width: 3000px; height: 300px;
+                width: 3000px; height: 275px;
                 background-color: $off-white;
                 border-top: 1px solid $pale-grey;
                 border-bottom: 1px solid $pale-grey;
                 z-index: -1;
             }
         }
-    }
-
-    @include breakpoint(tablet) {
-        padding: 30px 0 140px;
     }
 
     .radio {
@@ -110,13 +106,9 @@
 }
 
 .checkout--step-payment {
-    padding: 15px 0 0;
+    padding: 20px 0;
     background-color: $white;
     border-color: transparent;
-
-    @include breakpoint(tablet) {
-        padding: 30px 0 0;
-    }
 }
 
 .step {
@@ -277,7 +269,7 @@
 
 .benefits--review-mobile {
     margin: 0 -15px;
-    padding: 0 30px 30px;
+    padding: 0 30px 20px;
     background: url('https://cdn.so-sure.com/images/library_benefits/so-sure_cover-globe.svg') no-repeat;
     background-position: right -110px bottom -22px;
 
@@ -297,7 +289,7 @@
 }
 
 .benefits--review-desktop {
-    padding-bottom: 30px;
+    padding-bottom: 20px;
 
     .benefits--inner {
         width: 700px;
