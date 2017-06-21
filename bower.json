@@ -35,7 +35,9 @@
     "bootstrap-sass": "^3.3.7",
     "jquery_lazyload": "jquery.lazyload#^1.9.7",
     "owl.carousel": "^2.2.1",
-    "fuse.js": "^3.0.4"
+    "fuse.js": "^3.0.4",
+    "jquery-mask-plugin": "^1.14.11",
+    "parsleyjs": "^2.7.2"
   },
   "install": {
     "path": "web/components",
@@ -45,6 +47,12 @@
       ],
       "jquery_lazyload": [
         "bower_components/jquery_lazyload/jquery.lazyload.js"
+      ],
+      "jquery-mask-plugin": [
+        "bower_components/jquery-mask-plugin/dist/jquery.mask.min.js"
+      ],
+      "parsleyjs": [
+        "bower_components/parsleyjs/dist/parsley.min.js"
       ],
       "owl.carousel": [
         "bower_components/owl.carousel/dist/owl.carousel.min.js",

@@ -109,7 +109,11 @@ $(function(){
     });
 
     $('#search-phone').bind('typeahead:select', function(ev, suggestion) {
-        $('#search-phone-form').attr('action', '/phone-insurance/' + suggestion.id);
+        var base_path = $('#search-phone-form').data('base-path');
+        if (!base_path) {
+            base_path = '/phone-insurance/';
+        }
+        $('#search-phone-form').attr('action', base_path + suggestion.id);
     });
 
 });

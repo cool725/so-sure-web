@@ -64,6 +64,15 @@
 	@include btn($green, $white, $white);
 }
 
+.btn-facebook {
+	@include btn($facebook, $white, $white);
+}
+
+.btn-pad {
+	padding-top: 15px;
+	padding-bottom: 15px;
+}
+
 // Others
 
 .btn-arrow-right {

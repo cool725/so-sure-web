@@ -1,0 +1,62 @@
+// modal.scss
+
+// Standards
+
+.modal {
+	background-color: $black-opaque;
+	overflow: hidden;
+
+	.modal-content {
+		border: 0;
+		@include border-radius(0);
+		box-shadow: none;
+	}
+
+	.modal-header {
+		border-bottom: none;
+		padding: 30px 30px 15px;
+
+		@include breakpoint(tablet) {
+			padding: 60px 60px 30px;
+		}
+
+		h2, h3, h4, h5 {
+			margin: 0;
+		}
+
+		.close {
+			opacity: 1;
+			color: $primary-blue;
+			font-weight: bold;
+		}
+	}
+
+	.modal-body {
+		padding: 0 30px 30px;
+
+		@include breakpoint(tablet) {
+			padding: 0 60px 60px;
+		}
+	}
+
+	.modal-footer {}
+}
+
+.modal-purchase {
+
+	.modal-body {
+
+		ol {
+			padding: 10px 10px 10px 30px;
+			margin-bottom: 30px;
+
+			li {
+				font-family: $avenir-heavy;
+				font-size: 16px;
+				line-height: 1.5;
+				padding: 7px 0;
+			}
+
+		}
+	}
+}

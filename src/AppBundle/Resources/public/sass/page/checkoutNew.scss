@@ -1,0 +1,318 @@
+// checkout.scss
+
+@import "../mixins";
+@import "../common/type";
+@import "../common/paletteNew";
+@import "checkoutNavNew";
+
+.checkout {
+
+    h1 {
+        text-align: center;
+        line-height: 30px;
+
+        .title-top {
+            font-size: 18px;
+        }
+
+        .title-top-all {
+            font-size: 18px;
+        }
+
+        .title-phone {
+            font-size: 25px;
+            cursor: pointer;
+        }
+
+        .memory-dropdown-list {
+            display: inline;
+
+            a {
+                &:hover, &:focus, &:active {
+                    text-decoration: none;
+                }
+            }
+        }
+
+        .title-price {
+            font-size: 20px;
+        }
+
+        @include breakpoint(tablet) {
+            line-height: inherit;
+
+            .title-top,
+            .title-phone {
+                font-size: inherit;
+            }
+
+            .title-top-all {
+                font-size: 24px;
+            }
+
+            .title-price {
+                font-size: 28px;
+            }
+        }
+    }
+
+}
+
+.memory-dropdown {
+    font-family: $avenir-book;
+
+    @include breakpoint(mobileishup) {
+        right: 0 !important;
+    }
+}
+
+
+.checkout--step {
+    padding: 20px 0 140px;
+    background-color: $off-white;
+    border-top: 1px solid $pale-grey;
+    border-bottom: 1px solid $pale-grey;
+
+    form {
+        max-width: 345px;
+        margin: 0 auto;
+
+        .form-group-break {
+            position: relative;
+            margin-top: 30px;
+
+            &:after {
+                content: '';
+                position: absolute;
+                top: -25px;
+                margin-left: -1000px;
+                width: 3000px; height: 275px;
+                background-color: $off-white;
+                border-top: 1px solid $pale-grey;
+                border-bottom: 1px solid $pale-grey;
+                z-index: -1;
+            }
+        }
+    }
+
+    .radio {
+        position:absolute;
+        left:-10000px;
+        top:auto;
+        width:1px;
+        height:1px;
+        overflow:hidden;
+    }
+}
+
+.checkout--step-payment {
+    padding: 20px 0;
+    background-color: $white;
+    border-color: transparent;
+}
+
+.step {
+
+    &--hide {
+        display: none;
+    }
+
+}
+
+.payment--step {
+    background-color: $off-white;
+    border-top: 1px solid $pale-grey;
+    border-bottom: 1px solid $pale-grey;
+    text-align: center;
+
+    &-inner {
+        position: relative;
+        margin: 0 auto;
+        padding: 10px 0 0;
+        border-left: 1px solid $pale-grey;
+        border-right: 1px solid $pale-grey;
+
+        h4 {
+            margin: 0 0 10px;
+        }
+    }
+
+    .payment--btn {
+        padding: 15px 0;
+        background-color: $off-white;
+        border-top: 1px solid $pale-grey;
+
+        cursor: pointer;
+
+        font-family: $avenir-heavy;
+        color: $dark-grey;
+
+        &:first-of-type {
+            border-right: 1px solid $pale-grey;
+        }
+
+        &:hover, &:focus {
+            background-color: $primary-blue;
+            color: $white;
+        }
+
+        .billed {
+            font-size: 16px;
+        }
+
+        .amount {
+            font-size: 24px;
+        }
+
+        small {
+            font-size: 12px;
+            font-family: $avenir-book;
+        }
+
+        &-or {
+            width: 40px; height: 40px;
+            @include border-radius(50%);
+            font-weight: bold;
+            line-height: 25px;
+            padding: 8px;
+            color: $primary-blue;
+            background-color: $white;
+            border: 1px solid $primary-blue;
+            position: absolute;
+            left: 50%; bottom: 30px;
+            margin-left: -20px;
+
+            @include breakpoint(tablet) {
+                bottom: 35px;
+            }
+        }
+    }
+
+    .payment--btn-two {
+        width: 50%;
+        float: left;
+    }
+
+    @include breakpoint(tablet) {
+
+        .payment--btn-inner {
+            max-width: 350px;
+            padding: 10px 0;
+        }
+
+        .payment--btn-left {
+            .payment--btn-inner {
+                float: right;
+                margin-right: 50px;
+            }
+        }
+
+        .payment--btn-right {
+            .payment--btn-inner {
+                float: left;
+                margin-left: 50px;
+            }
+        }
+
+    }
+
+    .payment--btn-inner-single {
+        margin: 0 auto;
+    }
+
+    .payment--btn-selected {
+        background-color: $primary-blue;
+
+        .payment--btn-inner {
+            background: transparent url('https://cdn.so-sure.com/images/library_benefits/so-sure_cover-tick.svg') center no-repeat;
+            color: $white;
+        }
+    }
+}
+
+// Cover / Benefits
+.owl-carousel {
+
+    .item {
+        text-align: center;
+
+        img {
+            width: 100px; height: 100px;
+            display: block;
+            margin: 0 auto 15px;
+        }
+    }
+
+    h5 {
+        line-height: 1.5;
+    }
+
+}
+
+.owl-theme .owl-nav.disabled+.owl-dots {
+    display: none;
+}
+
+.cover-list {
+    text-align: center;
+
+    li {
+        width: 130px;
+    }
+
+    img {
+        width: 100px; height: 100px;
+        display: block;
+        margin: 0 auto 15px;
+    }
+
+    h5 {
+        // text-align: center;
+    }
+}
+
+.benefits--review-mobile {
+    margin: 0 -15px;
+    padding: 0 30px 20px;
+    background: url('https://cdn.so-sure.com/images/library_benefits/so-sure_cover-globe.svg') no-repeat;
+    background-position: right -110px bottom -22px;
+
+    li {
+        margin: 15px 0;
+    }
+}
+
+#purchase-step-review {
+
+    @include breakpoint(tablet) {
+        .checkout--top {
+            background: url('https://cdn.so-sure.com/images/library_benefits/so-sure_cover-globe-large.svg') no-repeat;
+            background-position: right -180px bottom 0px;
+        }
+    }
+}
+
+.benefits--review-desktop {
+    padding-bottom: 20px;
+
+    .benefits--inner {
+        width: 700px;
+        margin: 0 auto;
+
+        h4 {
+            margin: 10px 0 5px;
+        }
+
+        img {
+            width: 100px; height: 100px;
+            float: left;
+            margin-right: 15px;
+        }
+
+        .row {
+            margin-bottom: 30px;
+        }
+
+    }
+}
+

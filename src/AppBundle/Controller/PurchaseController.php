@@ -13,11 +13,17 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
+use AppBundle\Classes\ApiErrorCode;
+
+use AppBundle\Document\DateTrait;
+use AppBundle\Document\CurrencyTrait;
+
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Payment;
 use AppBundle\Document\User;
+use AppBundle\Document\Lead;
 use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Document\Form\Purchase;
 use AppBundle\Document\Form\PurchaseStepPersonalAddress;
@@ -25,7 +31,6 @@ use AppBundle\Document\Form\PurchaseStepPersonal;
 use AppBundle\Document\Form\PurchaseStepAddress;
 use AppBundle\Document\Form\PurchaseStepPhone;
 use AppBundle\Document\Form\PurchaseStepPhoneNoPhone;
-use AppBundle\Document\CurrencyTrait;
 
 use AppBundle\Form\Type\BasicUserType;
 use AppBundle\Form\Type\PhoneType;
@@ -36,6 +41,7 @@ use AppBundle\Form\Type\PurchaseStepPhoneType;
 use AppBundle\Form\Type\PurchaseStepPhoneNoPhoneType;
 
 use AppBundle\Service\MixpanelService;
+use AppBundle\Service\SixpackService;
 
 use AppBundle\Security\UserVoter;
 
@@ -56,6 +62,7 @@ use AppBundle\Exception\ProcessedException;
 class PurchaseController extends BaseController
 {
     use CurrencyTrait;
+    use DateTrait;
 
     /**
      * Note that any changes to actual path routes need to be reflected in the Google Analytics Goals
@@ -84,6 +91,7 @@ class PurchaseController extends BaseController
         }
 
         $dm = $this->getManager();
+        $phoneRepo = $dm->getRepository(Phone::class);
         $phone = $this->getSessionQuotePhone($request);
 
         $purchase = new PurchaseStepPersonalAddress();
@@ -206,15 +214,37 @@ class PurchaseController extends BaseController
             }
         }
 
+        /** @var \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface $csrf */
+        $csrf = $this->get('security.csrf.token_manager');
+
         $data = array(
             'purchase_form' => $purchaseForm->createView(),
             'step' => 1,
             'phone' => $phone,
             'is_postback' => 'POST' === $request->getMethod(),
             'quote_url' => $session ? $session->get('quote_url') : null,
+            'lead_csrf' => $csrf->refreshToken('lead'),
+            'phones' => $phone ? $phoneRepo->findBy(
+                ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
+                ['memory' => 'asc']
+            ) : null,
         );
 
-        return $data;
+        $alternative = $request->get('force_result');
+        if (!$alternative) {
+            $alternative = $this->getSessionSixpackTest(
+                $request,
+                SixpackService::EXPERIMENT_PURCHASE_FLOW,
+                // [SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL, SixpackService::ALTERNATIVES_PURCHASE_FLOW_NEW]
+                [SixpackService::ALTERNATIVES_PURCHASE_FLOW_NEW, SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL]
+            );
+        }
+
+        if ($alternative == SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL) {
+            return $this->render('AppBundle:Purchase:purchaseStepPersonalAddress.html.twig', $data);
+        } else {
+            return $this->render('AppBundle:Purchase:purchaseStepPersonalAddressNew.html.twig', $data);
+        }
     }
 
     /**
@@ -223,6 +253,9 @@ class PurchaseController extends BaseController
     */
     public function purchaseStepPhoneNoPhoneAction(Request $request)
     {
+        $dm = $this->getManager();
+        $phoneRepo = $dm->getRepository(Phone::class);
+
         $user = $this->getUser();
         if (!$user) {
             return $this->redirectToRoute('purchase');
@@ -242,9 +275,27 @@ class PurchaseController extends BaseController
             'purchase_no_phone_form' => $purchaseNoPhoneForm->createView(),
             'is_postback' => 'POST' === $request->getMethod(),
             'step' => 2,
+            'phones' => $phone ? $phoneRepo->findBy(
+                ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
+                ['memory' => 'asc']
+            ) : null,
         );
 
-        return $data;
+        $alternative = $request->get('force_result');
+        if (!$alternative) {
+            $alternative = $this->getSessionSixpackTest(
+                $request,
+                SixpackService::EXPERIMENT_PURCHASE_FLOW,
+                // [SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL, SixpackService::ALTERNATIVES_PURCHASE_FLOW_NEW]
+                [SixpackService::ALTERNATIVES_PURCHASE_FLOW_NEW, SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL]
+            );
+        }
+
+        if ($alternative == SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL) {
+            return $this->render('AppBundle:Purchase:purchaseStepPhoneNoPhone.html.twig', $data);
+        } else {
+            return $this->render('AppBundle:Purchase:purchaseStepPhoneNoPhoneNew.html.twig', $data);
+        }
     }
 
     /**
@@ -272,7 +323,18 @@ class PurchaseController extends BaseController
             return $this->redirectToRoute('purchase_step_personal');
         }
 
+        $alternative = $request->get('force_result');
+        if (!$alternative) {
+            $alternative = $this->getSessionSixpackTest(
+                $request,
+                SixpackService::EXPERIMENT_PURCHASE_FLOW,
+                // [SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL, SixpackService::ALTERNATIVES_PURCHASE_FLOW_NEW]
+                [SixpackService::ALTERNATIVES_PURCHASE_FLOW_NEW, SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL]
+            );
+        }
+
         $dm = $this->getManager();
+        $phoneRepo = $dm->getRepository(Phone::class);
 
         $phone = $this->getSessionQuotePhone($request);
 
@@ -290,6 +352,19 @@ class PurchaseController extends BaseController
 
         if ($phone) {
             $purchase->setPhone($phone);
+            // Default to monthly payment
+            if ('GET' === $request->getMethod()) {
+                if ($user->allowedMonthlyPayments()) {
+                    $purchase->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+                } elseif ($user->allowedYearlyPayments()) {
+                    $purchase->setAmount($phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
+                }
+            }
+        }
+
+        if ($alternative == SixpackService::ALTERNATIVES_PURCHASE_FLOW_NEW) {
+            $purchase->setAgreed(true);
+            $purchase->setNew(true);
         }
 
         $purchaseForm = $this->get('form.factory')
@@ -437,6 +512,9 @@ class PurchaseController extends BaseController
             }
         }
 
+        $now = new \DateTime();
+        $billingDate = $this->adjustDayForBilling($now);
+
         $data = array(
             'phone' => $phone,
             'purchase_form' => $purchaseForm->createView(),
@@ -445,9 +523,18 @@ class PurchaseController extends BaseController
             'webpay_action' => $webpay ? $webpay['post_url'] : null,
             'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
             'policy_key' => $this->getParameter('policy_key'),
+            'phones' => $phone ? $phoneRepo->findBy(
+                ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
+                ['memory' => 'asc']
+            ) : null,
+            'billing_date' => $billingDate,
         );
 
-        return $data;
+        if ($alternative == SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL) {
+            return $this->render('AppBundle:Purchase:purchaseStepPhoneReview.html.twig', $data);
+        } else {
+            return $this->render('AppBundle:Purchase:purchaseStepPhoneReviewNew.html.twig', $data);
+        }
     }
 
     /**
@@ -570,6 +657,44 @@ class PurchaseController extends BaseController
             // would expect 1 of the 2 above - default back to user home just in case
             return $this->redirectToRoute('user_home');
         }
+    }
+
+    /**
+     * @Route("/lead/{source}", name="lead")
+     */
+    public function leadAction(Request $request, $source)
+    {
+        $data = json_decode($request->getContent(), true);
+        if (!$this->validateFields(
+            $data,
+            ['email', 'name', 'csrf']
+        )) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+        }
+
+        if (!$this->isCsrfTokenValid('lead', $data['csrf'])) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, 'Invalid csrf', 422);
+        }
+
+        $email = $this->getDataString($data, 'email');
+        $name = $this->getDataString($data, 'name');
+
+        $dm = $this->getManager();
+        $userRepo = $dm->getRepository(User::class);
+        $leadRepo = $dm->getRepository(Lead::class);
+        $existingLead = $leadRepo->findOneBy(['email' => strtolower($email)]);
+        $existingUser = $userRepo->findOneBy(['emailCanonical' => strtolower($email)]);
+
+        if (!$existingLead && !$existingUser) {
+            $lead = new Lead();
+            $lead->setSource($source);
+            $lead->setEmail($email);
+            $lead->setName($name);
+            $dm->persist($lead);
+            $dm->flush();
+        }
+
+        return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'OK', 200);
     }
 
     /**

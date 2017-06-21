@@ -1,0 +1,54 @@
+// forms.scss
+
+// Overides
+
+.form-group {
+    z-index: 2;
+    position: relative;
+}
+
+.form-control {
+    height: 52px;
+    font-size: 16px;
+    border-color: $grey;
+    z-index: 2;
+
+    &:focus {
+        box-shadow: none;
+        outline: none;
+        border-color: $blue-lighter;
+    }
+}
+
+.help-block {
+    font-size: 14px;
+}
+
+.error {
+    color: $red;
+}
+
+.error.form-control {
+    border-color: $red;
+
+    &:focus {
+        box-shadow: none;
+        outline: none;
+        border-color: $red;
+    }
+}
+
+.has-success {
+    border-color: $green;
+}
+
+label {
+    font-size: 15px;
+    font-family: $avenir-book;
+    font-weight: normal;
+    margin-bottom: 5px;
+
+    .req {
+        color: $blue;
+    }
+}

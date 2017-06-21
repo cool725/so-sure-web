@@ -169,63 +169,19 @@ class DefaultController extends BaseController
     {
         $dm = $this->getManager();
         $phoneRepo = $dm->getRepository(Phone::class);
-        $phoneMake = new PhoneMake();
         $phone = null;
-        if ($request->getMethod() == "GET") {
-            if ($id) {
-                $phone = $phoneRepo->find($id);
-            }
+        if ($id) {
+            $phone = $phoneRepo->find($id);
         }
-        $post = $this->generateUrl('select_phone_make');
-        if ($type) {
-            $post = $this->generateUrl('select_phone_make_type', ['type' => $type]);
-        }
-        $formPhone = $this->get('form.factory')
-            ->createNamedBuilder('launch_phone', PhoneMakeType::class, $phoneMake, [
-                'action' => $post,
-            ])
-            ->getForm();
-        if ('POST' === $request->getMethod()) {
-            if ($request->request->has('launch_phone')) {
-                // handle request / isvalid doesn't really work well with jquery form adjustment
-                // $formPhone->handleRequest($request);
-                $phoneMake->setPhoneId($request->get('launch_phone')['phoneId']);
-                if ($phoneMake->getPhoneId()) {
-                    $phone = $phoneRepo->find($phoneMake->getPhoneId());
-                    if ($type == 'purchase-select' || $type == 'purchase-change') {
-                        $session = $request->getSession();
-                        $session->set('quote', $phone->getId());
 
-                        return $this->redirectToRoute('purchase_step_policy');
-                    } else {
-                        if (!$phone) {
-                            // TODO: Would be better to redirect to a make page instead
-                            $this->addFlash('warning', 'Please ensure you select a model as well');
-                            if ($this->getReferer($request)) {
-                                return new RedirectResponse($this->getReferer($request));
-                            } else {
-                                return $this->redirectToRoute('homepage');
-                            }
-                        }
-                        if ($phone->getMemory()) {
-                            return $this->redirectToRoute('quote_make_model_memory', [
-                                'make' => $phone->getMake(),
-                                'model' => $phone->getEncodedModel(),
-                                'memory' => $phone->getMemory(),
-                            ]);
-                        } else {
-                            return $this->redirectToRoute('quote_make_model', [
-                                'make' => $phone->getMake(),
-                                'model' => $phone->getEncodedModel(),
-                            ]);
-                        }
-                    }
-                }
-            }
+        if ($phone && in_array($type, ['purchase-select', 'purchase-change'])) {
+            $session = $request->getSession();
+            $session->set('quote', $phone->getId());
+
+            return $this->redirectToRoute('purchase_step_policy');
         }
 
         return [
-            'form_phone' => $formPhone->createView(),
             'phones' => $this->getPhonesArray(),
             'type' => $type,
             'phone' => $phone,

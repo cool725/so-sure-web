@@ -675,6 +675,20 @@ abstract class BaseController extends Controller
         return $phone;
     }
 
+    protected function getSessionSixpackTest(Request $request, $experiment, $alternatives)
+    {
+        $session = $request->getSession();
+
+        $sessionName = sprintf('sixpack:%s', $experiment);
+        $alternative = $session->get($sessionName);
+        if (!$alternative) {
+            $alternative = $this->get('app.sixpack')->participate($experiment, $alternatives, true);
+            $session->set($sessionName, $alternative);
+        }
+
+        return $alternative;
+    }
+
     protected function searchPolicies(Request $request, $includeInvalidPolicies = null)
     {
         $dm = $this->getManager();

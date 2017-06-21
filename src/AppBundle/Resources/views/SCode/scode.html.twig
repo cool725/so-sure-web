@@ -39,8 +39,8 @@
     <section id="scode" class="section--pad">
         <div class="container">
             <div class="row">
-                <div class="col-md-12">
-                    <h1 class="text-center text-white">
+                <div class="col-md-10 col-md-offset-1 text-center">
+                    <h1 class="text-white">
                         {% if scode is defined and scode and scode.policy %}
                             Insure your phone with {{scode.policy.user.name}}.
                         {% elseif scode is defined and scode and scode.reward %}
@@ -53,9 +53,9 @@
                         <br>
                         <span class="h2 text-white">Get up to 80% of your money back.</span>
                     </h1>
-                    <p class="lead text-center text-white" id="hero-description">Introducing so-sure, a better kind of phone insurance that allows you to get up to 80% of your money back when you connect with those you trust &amp; none of you claim.</p>
+                    <p class="lead text-white" id="hero-description">Introducing so-sure, a better kind of phone insurance that allows you to get up to 80% of your money back when you connect with those you trust &amp; none of you claim.</p>
 
-                    <div class="text-center">{{ render(controller('AppBundle:Default:selectPhoneMake')) }}</div>
+                    {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':'other_pages'})) }}
 
                 </div>
             </div>

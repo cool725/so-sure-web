@@ -52,13 +52,20 @@
         <h1 class="h2">
             Insurance for your
             <div class="dropdown memory-dropdown-list">
-                <a href="#" class="dropdown-toggle text-white" type="button" id="memoryDropdownList" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                    {{ phone }} <i class="fa fa-caret-down" aria-hidden="true"></i>
+                <a href="#"
+                   class="dropdown-toggle text-white"
+                   type="button"
+                   id="memoryDropdownList"
+                   data-toggle="dropdown"
+                   aria-haspopup="true"
+                   aria-expanded="true">
+                    {{ phone }}
+                    <i class="fa fa-caret-down" aria-hidden="true"></i>
                 </a>
 
                 <ul class="dropdown-menu memory-dropdown" aria-labelledby="memoryDropdownList">
-                    <li class="dropdown-header">Select alternate model</li>
                     {% if phones | length > 1 %}
+                        <li class="dropdown-header">Select alternate model</li>
                         {% for phone_mem in phones if phone_mem.id != phone.id %}
                             <li>
                                 <a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class=""> {{ phone.model }} - {{ phone_mem.memory }}GB</a>
@@ -401,10 +408,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">
-                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
-                        <span class="sr-only">Close</span>
-                    </button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h3>So-Sure Policy Terms</h3>
                 </div>
                 <div class="modal-body modal-policy">
@@ -423,10 +427,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">
-                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
-                        <span class="sr-only">Close</span>
-                    </button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h3>Theft &amp; Loss</h3>
                 </div>
                 <div class="modal-body">
@@ -447,10 +448,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">
-                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
-                        <span class="sr-only">Close</span>
-                    </button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h3>Accidental Damage</h3>
                 </div>
                 <div class="modal-body">
@@ -469,10 +467,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">
-                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
-                        <span class="sr-only">Close</span>
-                    </button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h3>Worldwide Coverage</h3>
                 </div>
                 <div class="modal-body">
@@ -491,10 +486,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">
-                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
-                        <span class="sr-only">Close</span>
-                    </button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h3>Calculation Details</h3>
                 </div>
                 <div class="modal-body">
@@ -517,14 +509,12 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">
-                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
-                        <span class="sr-only">Close</span>
-                    </button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     <h3 class="text-center">Select a different phone</h3>
                 </div>
                 <div class="modal-body text-center">
-                    {{ render(controller('AppBundle:Default:selectPhoneMake')) }}
+                    {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':'other_pages'})) }}
+                    <br><br>
                 </div>
             </div>
         </div>

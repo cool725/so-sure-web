@@ -28,10 +28,10 @@ $(function(){
 
     if(jQuery().lazyload) {
         // Lazy load images
-        $('img.lazy').show().lazyload({
-            threshold : 200,
-            effect: 'fadeIn'
-        });
+        // $('img.lazy').show().lazyload({
+        //     threshold : 200,
+        //     effect: 'fadeIn'
+        // });
     }
 
     // ???

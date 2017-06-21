@@ -1,4 +1,7 @@
 $(function(){
+
+    $('.dob').mask('00/00/0000');
+
     $("#purchase_form_mobileNumber").intlTelInput({
         preferredCountries: ['gb'],
         //onlyCountries: ['gb'],
@@ -9,10 +12,10 @@ $(function(){
         setTimeout(function() {
             var country = $("#purchase_form_mobileNumber").intlTelInput("getSelectedCountryData");
             if (country.length == 0 || country.iso2 != 'gb') {
-                $(".mobile-err").html("<ul><li>Sorry, we currently only support UK Residents</li></ul>"); 
+                $(".mobile-err").html("<ul><li>Sorry, we currently only support UK Residents</li></ul>");
             } else {
-                $(".mobile-err").html(""); 
-            }            
+                $(".mobile-err").html("");
+            }
         }, 1500);
     });
 
@@ -67,9 +70,9 @@ $(function(){
             }
             settings.type = "POST";
             settings.data = {
-				Key: key,
-				SearchTerm: query,
-				Country : "GBR",
+                Key: key,
+                SearchTerm: query,
+                Country : "GBR",
                 MaxSuggestions: maxAddresses
             };
             return settings;
@@ -94,9 +97,9 @@ $(function(){
         $.ajax({
             method: "POST",
             url: "https://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Retrieve/v2.10/json3.ws",
-            data: { 
-				Key: key,
-				Id: suggestion.Id,
+            data: {
+                Key: key,
+                Id: suggestion.Id,
             }
           })
             .done(function( msg ) {

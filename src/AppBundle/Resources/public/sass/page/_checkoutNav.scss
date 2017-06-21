@@ -13,10 +13,10 @@
 		    min-width: 33.3333333333%;
 		    font-size: 13px;
 		    display: block;
-		    float: left;    
+		    float: left;
 		    padding: 10px 0;
 		    font-weight: bold;
-		    color: $white;			
+		    color: $white;
 		}
 
 		.step-active {
@@ -26,7 +26,7 @@
 
 		.step-inactive {
 		    background-color: $grey;
-		}    	
+		}
 
 		@include breakpoint(tablet) {
 	        padding: 30px 0;
@@ -40,7 +40,7 @@
 		        background-color: transparent;
 		        font-size: 20px;
 		        font-weight: bold;
-		        padding: 0 20px;	        	
+		        padding: 0 20px;
 	        }
 
 	        .fa {
@@ -55,7 +55,7 @@
 			.step-inactive {
 			    background-color: $white;
 			    color: $grey;
-			}    	        
-		}	
+			}
+		}
 	}
 }

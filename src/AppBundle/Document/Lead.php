@@ -18,6 +18,7 @@ class Lead
     const SOURCE_LAUNCH_USA = 'launch-usa';
     const SOURCE_BUY = 'buy';
     const SOURCE_SAVE_QUOTE = 'save-quote';
+    const SOURCE_PURCHASE_FLOW = 'purchase-flow';
 
     // Lead Source is used in User & Policy
     const LEAD_SOURCE_INVITATION = 'invitation';
@@ -47,7 +48,15 @@ class Lead
     protected $email;
 
     /**
-     * @Assert\Choice({"text-me", "launch-usa", "buy", "save-quote"}, strict=true)
+     * @var string
+     * @AppAssert\FullName()
+     * @Assert\Length(min="1", max="100")
+     * @MongoDB\Field(type="string")
+     */
+    protected $name;
+
+    /**
+     * @Assert\Choice({"text-me", "launch-usa", "buy", "save-quote", "purchase-flow"}, strict=true)
      * @MongoDB\Field(type="string")
      */
     protected $source;
@@ -87,6 +96,16 @@ class Lead
     public function setEmail($email)
     {
         $this->email = strtolower($email);
+    }
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function setName($name)
+    {
+        $this->name = $name;
     }
 
     public function getSource()

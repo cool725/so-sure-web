@@ -1,25 +1,35 @@
 <div id="select-phone-data" data-phones='{{ phones|json_encode|raw }}'>
     {% if type is defined and type == 'purchase-select' %}
         {% set buttonText = 'Select Phone' %}
-        {% set class = "device-select-block" %}
+        {% set basePath = '/select-phone/purchase-select/' %}
     {% elseif type is defined and type == 'purchase-change' %}
         {% set buttonText = 'Select Phone' %}
-        {% set class = "device-select-block" %}
+        {% set basePath = '/select-phone/purchase-change/' %}
     {% else %}
         {% set buttonText = 'Quote me' %}
-        {% set class = "text-center" %}
+        {% set basePath = '/phone-insurance/' %}
     {% endif %}
-    <form method="get" id="search-phone-form" {% if phone %}action="{{ path('quote_phone', {'id': phone.id }) }}"{% endif %}>
-        <input type="text" class="required search-phone-text" id="search-phone" placeholder="Find your phone e.g. iPhone 7" value="{% if phone %}{{ phone }}{% endif %}" />
-        <button type="submit" class="btn btn-success btn-get-quote btn-lg">Quote me</button>
-        {% if type == 'homepage' %}
-            <a id="find-out-more"
-               href="#" class="btn btn-link-white scroll-to"
-               data-scroll-to-anchor="#why-so-sure">
-                <i class="fa fa-graduation-cap" aria-hidden="true"></i> LEARN MORE
-            </a>
-        {% endif %}
-    </form>
+    {% if type == 'homepage' or type == 'other_pages' %}
+        <form method="get" id="search-phone-form" {% if phone %}action="{{ path('quote_phone', {'id': phone.id }) }}"{% endif %} data-base-path="{{ basePath }}">
+            <input type="text" class="required search-phone-text" id="search-phone" placeholder="Find your phone e.g. iPhone 7" value="{% if phone %}{{ phone }}{% endif %}" />
+            <button type="submit" class="btn btn-success btn-get-quote btn-lg">{{ buttonText }}</button>
+            {% if type == 'homepage' %}
+                <a id="find-out-more"
+                   href="#" class="btn btn-link-white scroll-to"
+                   data-scroll-to-anchor="#why-so-sure">
+                    <i class="fa fa-graduation-cap" aria-hidden="true"></i> LEARN MORE
+                </a>
+            {% endif %}
+        </form>
+    {% else %}
+        <form method="get" id="search-phone-form" {% if phone %}action="{{ path('quote_phone', {'id': phone.id }) }}"{% endif %} data-base-path="{{ basePath }}">
+            <div class="form-group">
+                <input type="text" class="required search-phone-text" id="search-phone" placeholder="Find your phone e.g. iPhone 7" value="{% if phone %}{{ phone }}{% endif %}" />
+            </div>
+            <button type="submit" class="btn btn-green btn-block btn-pad">{{ buttonText }}</button>
+        </form>
+    {% endif %}
+
     {% if type is not defined or not type  %}
         <p><a href="mailto:hello@wearesosure.com" class="btn btn-link text-black open-intercom"><i class="fa fa-comments"></i> Don't see your device? Let us know.</a></p>
     {% endif %}

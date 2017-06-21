@@ -1,6 +1,9 @@
 // global.scss
 
 // Control the type for the site
+html, body {
+	height: 100% !important;
+}
 
 body {
 	font-family: $avenir-light;
@@ -107,9 +110,14 @@ hr {
 		color: $blue !important;
 	}
 
-	.text-light-blue {
-		color: $blue-lightest !important;
+	.text-lightest-blue {
+		color: $lightest-blue !important;
 	}
+
+	.text-light-blue {
+		color: $light-blue !important;
+	}
+
 
 	.text-grey-blue {
 		color: $blue-grey !important;
