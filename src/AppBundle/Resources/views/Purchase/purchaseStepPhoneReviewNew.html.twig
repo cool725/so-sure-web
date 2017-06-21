@@ -122,7 +122,7 @@
             {% endif %}
             {% if app.user.allowedYearlyPayments %}
             <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two payment--btn-right {% endif %} {% if purchase_form.vars.value.amount == phone.currentPhonePrice.yearlyPremiumPrice %}payment--btn-selected{% endif %}" id="payment--yearly" data-value="{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}">
-                <div class="payment--btn-inner {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-inner payment--btn-inner-single {% endif %}">
+                <div class="payment--btn-inner {% if not app.user.allowedMonthlyPayments or not app.user.allowedYearlyPayments %} payment--btn-inner-single{% endif %}">
                     <span class="billed visible-xs">Yearly <br></span>
                     <span class="amount">£{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}
                     <span class="hidden-xs">a year</span><br></span>
