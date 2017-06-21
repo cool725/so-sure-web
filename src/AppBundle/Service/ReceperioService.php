@@ -649,12 +649,12 @@ class ReceperioService extends BaseImeiService
 
         try {
             return $this->runCheckSerial($phone, $serialNumber, $user, $warnMismatch);
-        } catch(ReciperoManualProcessException $e) {
+        } catch (ReciperoManualProcessException $e) {
             // If apple serial number doesn't work, try imei to get a non-memory match
             if ($phone->getMake() == 'Apple' && $imei) {
                 try {
                     return $this->runCheckSerial($phone, $imei, $user, $warnMismatch);
-                } catch(ReciperoManualProcessException $e) {
+                } catch (ReciperoManualProcessException $e) {
                     return true;
                 }
             }

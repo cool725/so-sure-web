@@ -525,7 +525,12 @@ class AdminEmployeeController extends BaseController
                         if (!$serialNumber) {
                             $serialNumber= $policy->getImei();
                         }
-                        $imeiService->checkSerial($policy->getPhone(), $serialNumber, $policy->getImei(), $policy->getUser());
+                        $imeiService->checkSerial(
+                            $policy->getPhone(),
+                            $serialNumber,
+                            $policy->getImei(),
+                            $policy->getUser()
+                        );
                         $policy->addCheckmendSerialData($imeiService->getResponseData());
                         $dm->flush();
                         $this->addFlash(
