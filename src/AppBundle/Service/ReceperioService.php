@@ -287,7 +287,7 @@ class ReceperioService extends BaseImeiService
             return null;
         }
 
-        $result = $this->checkSerial($phone, $serialNumber, $user);
+        $result = $this->checkSerial($phone, $serialNumber, null, $user);
         $policy->addCheckmendSerialData($this->getResponseData());
         $this->dm->flush();
         if (!$result) {
@@ -617,6 +617,7 @@ class ReceperioService extends BaseImeiService
      *
      * @param Phone       $phone
      * @param string      $serialNumber
+     * @param string      $imei
      * @param User        $user
      * @param IdentityLog $identityLog
      * @param boolean     $warnMismatch For web, we don't need to warn on mismatch as probably user issue
@@ -626,6 +627,7 @@ class ReceperioService extends BaseImeiService
     public function checkSerial(
         Phone $phone,
         $serialNumber,
+        $imei,
         User $user = null,
         IdentityLog $identityLog = null,
         $warnMismatch = true
@@ -639,18 +641,41 @@ class ReceperioService extends BaseImeiService
                 throw new RateLimitException();
             }
         }
+        
 
         if (!$this->runMakeModelCheck($serialNumber, $user)) {
             return false;
         }
 
         try {
-            return $this->validateSamePhone($phone, $serialNumber, $this->responseData, $warnMismatch);
+            return $this->runCheckSerial($phone, $serialNumber, $user, $warnMismatch);
         } catch(ReciperoManualProcessException $e) {
+            // If apple serial number doesn't work, try imei to get a non-memory match
+            if ($phone->getMake() == 'Apple' && $imei) {
+                try {
+                    return $this->runCheckSerial($phone, $imei, $user, $warnMismatch);
+                } catch(ReciperoManualProcessException $e) {
+                    return true;
+                }
+            }
+
             return true;
         }
     }
-    
+
+    private function runCheckSerial(
+        Phone $phone,
+        $serialNumber,
+        User $user = null,
+        $warnMismatch = true
+    ) {
+        if (!$this->runMakeModelCheck($serialNumber, $user)) {
+            return false;
+        }
+
+        return $this->validateSamePhone($phone, $serialNumber, $this->responseData, $warnMismatch);
+    }
+
     public function runMakeModelCheck(
         $serialNumber,
         User $user = null
@@ -798,48 +823,35 @@ class ReceperioService extends BaseImeiService
         }
     }
 
-    public function validateSamePhone(Phone $phone, $serialNumber, $data, $warnMismatch = true)
+    private function isSameNonApplePhone(Phone $phone, $serialNumber, $modelData, $data, $warnMismatch = true)
     {
-        $isImei = $this->isImei($serialNumber);
-        $this->validateMakeModelResponseMakes($serialNumber, $data);
-
-        $makeData = $data['makes'][0];
-        $make = strtolower($makeData['make']);
-        $isApple = $make == 'apple';
-
-        $this->validateMakeModeResponseModels($serialNumber, $makeData, $data, $isApple);
-
-        $modelData = $makeData['models'][0];
-        $model = $modelData['name'];
-
-        $this->validateMakeModeResponseModel($serialNumber, $modelData, $data, $isApple);
-
         // Non apple devices rely on on the modelreference special mapping
         // we give reciperio and it really just a make/model check
-        if (!$isApple) {
-            $device = $modelData['modelreference'];
-            // Devices are cased as not sure what google will do in the future
-            // but recipero usually upper cases modelreference
-            if (in_array(strtoupper($device), $phone->getDevicesAsUpper())) {
-                return true;
+        $device = $modelData['modelreference'];
+        // Devices are cased as not sure what google will do in the future
+        // but recipero usually upper cases modelreference
+        if (in_array(strtoupper($device), $phone->getDevicesAsUpper())) {
+            return true;
+        } else {
+            $this->statsd->increment('recipero.makeModelMismatch');
+            $errMessage = sprintf(
+                "Mismatching devices %s for serial number %s. Data: %s",
+                json_encode($phone->getDevicesAsUpper()),
+                $serialNumber,
+                json_encode($data)
+            );
+            if ($warnMismatch) {
+                $this->logger->warning($errMessage);
             } else {
-                $this->statsd->increment('recipero.makeModelMismatch');
-                $errMessage = sprintf(
-                    "Mismatching devices %s for serial number %s. Data: %s",
-                    json_encode($phone->getDevices()),
-                    $serialNumber,
-                    json_encode($data)
-                );
-                if ($warnMismatch) {
-                    $this->logger->warning($errMessage);
-                } else {
-                    $this->logger->info($errMessage);
-                }
-
-                return false;
+                $this->logger->info($errMessage);
             }
-        }
 
+            return false;
+        }
+    }
+
+    public function isSameApplePhone(Phone $phone, $serialNumber, $modelData, $data, $warnMismatch = true)
+    {
         if (strtolower($model) != strtolower($phone->getModel())) {
             $this->statsd->increment('recipero.makeModelMismatch');
             $errMessage = sprintf(
@@ -857,8 +869,8 @@ class ReceperioService extends BaseImeiService
             return false;
         }
 
-        // For Apple Imei, model check is all we can validate
-        if ($isImei) {
+        // For Apple Imei, model check is all we can validate - memory check does not make sense
+        if ($this->isImei($serialNumber)) {
             return true;
         }
 
@@ -874,6 +886,41 @@ class ReceperioService extends BaseImeiService
 
             return false;
         }
+    }
+
+    public function validateSamePhone(Phone $phone, $serialNumber, $data, $warnMismatch = true)
+    {
+        $this->validateMakeModelResponseMakes($serialNumber, $data);
+
+        $makeData = $data['makes'][0];
+        $make = strtolower($makeData['make']);
+        $isApple = $make == 'apple';
+
+        $this->validateMakeModeResponseModels($serialNumber, $makeData, $data, $isApple);
+
+        $modelData = $makeData['models'][0];
+        $model = $modelData['name'];
+
+        $this->validateMakeModeResponseModel($serialNumber, $modelData, $data, $isApple);
+
+        if ($isApple) {
+            return $this->isSameApplePhone(
+                $phone,
+                $serialNumber,
+                $modelData,
+                $data,
+                $warnMismatch
+            );
+        } else {
+            return $this->isSameNonApplePhone(
+                $phone,
+                $serialNumber,
+                $modelData,
+                $data,
+                $warnMismatch
+            );
+        }
+
     }
 
     public function areSameModel($models, $checkMemory)
