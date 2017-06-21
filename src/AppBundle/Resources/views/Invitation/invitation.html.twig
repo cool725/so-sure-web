@@ -42,12 +42,13 @@
                         <span class="h2 text-white">Get up to 80% of your money back.</span>
                     </h1>
                     <div class="text-center">
-                        {{ render(controller('AppBundle:Default:selectPhoneMake')) }}
+                        {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':'other_pages'})) }}
                     </div>
                     {% if invitation %}
+                        <br>
                         <div class="text-center">
                             {{ form_start(form) }}
-                            {{ form_widget(form) }}
+                                {{ form_widget(form) }}
                             {{ form_end(form) }}
                         </div>
                     {% endif %}
