@@ -22,6 +22,7 @@ class ReceperioService extends BaseImeiService
     const FORCES_CACHE_TIME = 84600;
     const TEST_INVALID_IMEI = "352000067704506";
     const TEST_INVALID_SERIAL = "111111";
+    const TEST_MANUAL_PROCESS_SERIAL = "111112";
     const PARTNER_ID = 415;
     const BASE_URL = "http://gapi.checkmend.com";
 
@@ -641,11 +642,6 @@ class ReceperioService extends BaseImeiService
                 throw new RateLimitException();
             }
         }
-        
-
-        if (!$this->runMakeModelCheck($serialNumber, $user)) {
-            return false;
-        }
 
         try {
             return $this->runCheckSerial($phone, $serialNumber, $user, $warnMismatch);
@@ -682,6 +678,9 @@ class ReceperioService extends BaseImeiService
     ) {
         if ($serialNumber == self::TEST_INVALID_SERIAL) {
             return false;
+        }
+        if ($serialNumber == self::TEST_MANUAL_PROCESS_SERIAL) {
+            throw new ReciperoManualProcessException('Manual process test');
         }
 
         if ($this->getEnvironment() != 'prod') {
@@ -791,7 +790,7 @@ class ReceperioService extends BaseImeiService
         }
     }
 
-    private function validateMakeModeResponseModel($serialNumber, $modelData, $data, $isApple)
+    private function validateMakeModeResponseModel(Phone $phone, $serialNumber, $modelData, $data, $isApple)
     {
         if ($isApple) {
             // we can run make/model checks on apple. if its a serial number, then storage will match,
@@ -852,7 +851,7 @@ class ReceperioService extends BaseImeiService
 
     public function isSameApplePhone(Phone $phone, $serialNumber, $modelData, $data, $warnMismatch = true)
     {
-        if (strtolower($model) != strtolower($phone->getModel())) {
+        if (strtolower($modelData['name']) != strtolower($phone->getModel())) {
             $this->statsd->increment('recipero.makeModelMismatch');
             $errMessage = sprintf(
                 "Mismatching model %s for serial number %s. Data: %s",
@@ -890,7 +889,7 @@ class ReceperioService extends BaseImeiService
 
     public function validateSamePhone(Phone $phone, $serialNumber, $data, $warnMismatch = true)
     {
-        $this->validateMakeModelResponseMakes($serialNumber, $data);
+        $this->validateMakeModeResponseMakes($serialNumber, $data);
 
         $makeData = $data['makes'][0];
         $make = strtolower($makeData['make']);
@@ -901,7 +900,7 @@ class ReceperioService extends BaseImeiService
         $modelData = $makeData['models'][0];
         $model = $modelData['name'];
 
-        $this->validateMakeModeResponseModel($serialNumber, $modelData, $data, $isApple);
+        $this->validateMakeModeResponseModel($phone, $serialNumber, $modelData, $data, $isApple);
 
         if ($isApple) {
             return $this->isSameApplePhone(
