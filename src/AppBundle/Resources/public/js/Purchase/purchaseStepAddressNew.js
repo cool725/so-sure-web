@@ -15,7 +15,7 @@ sosure.purchaseStepAddress = (function() {
 
     self.dobMask = function () {
         // Mask date input and add picker
-        $('.dob').mask('00/00/0000');        
+        $('.dob').mask('00/00/0000');
     }
 
     self.addValidation = function() {
@@ -32,8 +32,14 @@ sosure.purchaseStepAddress = (function() {
                     fullName: true
                 },
                 "purchase_form[email]" : {
-                    required: true,
-                    email: true
+                    required: {
+                        depends:function(){
+                            $(this).val($.trim($(this).val()));
+                            return true;
+                        }
+                    },
+                    email: true,
+                    emaildomain: true
                 },
                 "purchase_form[birthday]" : {
                     required: true,

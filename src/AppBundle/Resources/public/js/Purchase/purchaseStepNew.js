@@ -14,8 +14,12 @@ $(function(){
 
     // Full name
     jQuery.validator.addMethod('fullName', function(value, element) {
-    return this.optional(element) || value.match(/\w+\s+\w+/);
+        return this.optional(element) || value.match(/\w+\s+\w+/);
     }, 'Please enter your full name');
+
+    jQuery.validator.addMethod('emaildomain', function(value, element) {
+        return this.optional(element) || value.match(/^\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/);
+    }, 'Please enter your email address');
 
     // UK mobile number
     jQuery.validator.addMethod('phoneUK', function(phone_number, element) {
@@ -27,14 +31,6 @@ $(function(){
     jQuery.validator.addMethod("postcodeUK", function(value, element) {
     return this.optional(element) || /^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z])))) [0-9][A-Za-z]{2})$/.test(value);
     }, "Please specify a valid Postcode");
-
-    // IMEI Number
-    // jQuery.validator.addMethod("imei", function(value, element) {
-    //     return this.optional(element) ||
-    //     element.value === element.defaultValue ||
-    //     $.validator.methods.creditcard.call(this, value, element);
-    // // }, "Please enter a valid IMEI Number");
-    // }, "Testing");
 
     // Alphanumeric check
     jQuery.validator.addMethod("alphanumeric", function(value, element) {
