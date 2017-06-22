@@ -145,16 +145,22 @@ class JudopayService
         ];
         foreach ($details['results'] as $receipt) {
             $policyId = null;
+            $result = isset($reciept['result']) ? $reciept['result'] : null;
             if (isset($receipt['yourPaymentMetaData']) && isset($receipt['yourPaymentMetaData']['policy_id'])) {
-                $policyId = $receipt['yourPaymentMetaData']['policy_id'];
-                if (!isset($policies[$policyId])) {
-                    $policies[$policyId] = true;
-                } else {
-                    if (!isset($result['additional-payments'][$policyId])) {
-                        $result['additional-payments'][$policyId] = 0;
+                // Non-token payments (eg. user) may be tried several times in a row
+                // Ideally would seperate out the user/token payments, but for now
+                // use success as a proxy for that
+                if ($result == JudoPayment::RESULT_SUCCESS) {
+                    $policyId = $receipt['yourPaymentMetaData']['policy_id'];
+                    if (!isset($policies[$policyId])) {
+                        $policies[$policyId] = true;
+                    } else {
+                        if (!isset($result['additional-payments'][$policyId])) {
+                            $result['additional-payments'][$policyId] = 0;
+                        }
+                        //$result['additional-payments'][$policyId]++;
+                        $result['additional-payments'][$policyId] = json_encode($receipt);
                     }
-                    //$result['additional-payments'][$policyId]++;
-                    $result['additional-payments'][$policyId] = json_encode($receipt);
                 }
             }
             $created = new \DateTime($receipt['createdAt']);
