@@ -1692,6 +1692,14 @@ abstract class Policy
         return false;
     }
 
+    public function hasCorrectIptRate()
+    {
+        return $this->areEqualToTwoDp(
+            $this->getPremium()->getIptRate(),
+            $this->getCurrentIptRate($this->getStart())
+        );
+    }
+
     public function isCooloffCancelled()
     {
         return $this->isCancelled() && $this->getCancelledReason() == self::CANCELLED_COOLOFF;
