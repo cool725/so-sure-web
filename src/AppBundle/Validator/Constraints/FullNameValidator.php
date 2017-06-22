@@ -9,6 +9,11 @@ class FullNameValidator extends ConstraintValidator
 {
     public function validate($value, Constraint $constraint)
     {
+        // allow blank string - different validations should be used for null/not null
+        if (strlen(trim($value)) == 0) {
+            return;
+        }
+
         // Expected 1 space
         $parts = explode(" ", trim($value));
         if (!preg_match($this->getRegex(), $value, $matches) || count($parts) != 2) {
