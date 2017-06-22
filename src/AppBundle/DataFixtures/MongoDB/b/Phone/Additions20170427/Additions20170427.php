@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\DataFixtures\MongoDB\b\Phone\Additions20161128;
+namespace AppBundle\DataFixtures\MongoDB\b\Phone\Additions20170427;
 
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
