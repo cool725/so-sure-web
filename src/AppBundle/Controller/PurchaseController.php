@@ -551,18 +551,41 @@ class PurchaseController extends BaseController
         ));
         $user = $this->getUser();
         $dm = $this->getManager();
+        $judo = $this->get('app.judopay');
         $repo = $dm->getRepository(Payment::class);
         $payment = $repo->findOneBy(['reference' => $request->get('Reference')]);
         if (!$payment) {
             throw new \Exception('Unable to locate payment');
         }
+        $policy = $payment->getPolicy();
+
+        // If there's not a user, it may be a payment for the remainder of the policy - go ahead and credit
+        if (!$user) {
+            try {
+                $judo->add(
+                    $policy,
+                    $request->get('ReceiptId'),
+                    null,
+                    $request->get('CardToken'),
+                    Payment::SOURCE_WEB,
+                    JudoPaymentMethod::DEVICE_DNA_NOT_PRESENT
+                );
+            } catch (ProcessedException $e) {
+                if (!$policy->isValidPolicy($policy->getPolicyPrefix($this->getParameter('kernel.environment')))) {
+                    throw $e;
+                }
+                $this->get('logger')->warning(sprintf(
+                    'Duplicate re-use of judo receipt. Possible refresh issue, so ignoring and continuing',
+                    ['exception' => $e]
+                ));
+            }
+
+            return $this->redirectToRoute('purchase_remainder_policy', ['id' => $policy->getId()]);
+        }
 
         if ($payment->getUser()->getId() != $this->getUser()->getId()) {
             throw new AccessDeniedException('Unknown user');
         }
-
-        $judo = $this->get('app.judopay');
-        $policy = $payment->getPolicy();
 
         // If there's no policy on the payment, then it's a card update
         if (!$policy) {
@@ -642,8 +665,14 @@ class PurchaseController extends BaseController
         if (!$payment) {
             throw new \Exception('Unable to locate payment');
         }
+        $policy = $payment->getPolicy();
 
-        if (!$this->getUser() || $payment->getUser()->getId() != $this->getUser()->getId()) {
+        // If there's not a user, it may be a payment for the remainder of the policy
+        if (!$this->getUser()) {
+            return $this->redirectToRoute('purchase_remainder_policy', ['id' => $policy->getId()]);
+        }
+
+        if ($payment->getUser()->getId() != $this->getUser()->getId()) {
             throw new AccessDeniedException('Unknown user');
         }
 
@@ -752,5 +781,39 @@ class PurchaseController extends BaseController
             'policy' => $policy,
             'cancel_form' => $cancelForm->createView(),
         ];
+    }
+
+    /**
+     * @Route("/remainder/{id}", name="purchase_remainder_policy")
+     * @Template
+     */
+    public function purchaseRemainderPolicyAction(Request $request, $id)
+    {
+        $policyRepo = $this->getManager()->getRepository(Policy::class);
+        $policy = $policyRepo->find($id);
+        if (!$policy) {
+            throw $this->createNotFoundException('Unknown policy');
+        }
+
+        $totalPaid = $policy->getTotalSuccessfulPayments();
+        $yearlyPremium = $policy->getPremium()->getYearlyPremiumPrice();
+        $amount = $this->toTwoDp($yearlyPremium - $totalPaid);
+
+        $webpay = $this->get('app.judopay')->webpay(
+            $policy,
+            $amount,
+            $request->getClientIp(),
+            $request->headers->get('User-Agent')
+        );
+
+        $data = [
+            'phone' => $policy->getPhone(),
+            'webpay_action' => $webpay ? $webpay['post_url'] : null,
+            'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
+            'amount' => $amount,
+            'policy' => $policy,
+        ];
+
+        return $data;
     }
 }
