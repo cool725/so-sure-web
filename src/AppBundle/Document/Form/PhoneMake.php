@@ -11,7 +11,7 @@ class PhoneMake
 {
     /**
      * @var string
-     * @Assert\NotNull()
+     * @Assert\NotBlank()
      */
     protected $make;
 

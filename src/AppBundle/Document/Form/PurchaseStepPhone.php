@@ -34,7 +34,7 @@ class PurchaseStepPhone
     /**
      * @var string
      * @AppAssert\Imei()
-     * @Assert\NotNull(message="IMEI is required.")
+     * @Assert\NotBlank(message="IMEI is required.")
      */
     protected $imei;
 
@@ -44,7 +44,7 @@ class PurchaseStepPhone
      * @Assert\Length(min="5", max="32",
      *  minMessage="This doesn't appear to be a valid serial number",
      *  maxMessage="This doesn't appear to be a valid serial number")
-     * @Assert\NotNull(message="Serial Number is required.")
+     * @Assert\NotBlank(message="Serial Number is required.")
      */
     protected $serialNumber;
 

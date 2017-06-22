@@ -18,7 +18,7 @@ class PurchaseStepPersonalAddress
     /**
      * @var string
      * @Assert\Email(strict=false)
-     * @Assert\NotNull(message="This value is required.")
+     * @Assert\NotBlank(message="This value is required.")
      */
     protected $email;
 
@@ -26,7 +26,7 @@ class PurchaseStepPersonalAddress
      * @var string
      * @AppAssert\Alphanumeric()
      * @Assert\Length(min="1", max="50")
-     * @Assert\NotNull(message="This value is required.")
+     * @Assert\NotBlank(message="This value is required.")
      */
     protected $firstName;
 
@@ -34,7 +34,7 @@ class PurchaseStepPersonalAddress
      * @var string
      * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="1", max="50")
-     * @Assert\NotNull(message="This value is required.")
+     * @Assert\NotBlank(message="This value is required.")
      */
     protected $lastName;
 
@@ -42,14 +42,14 @@ class PurchaseStepPersonalAddress
      * @var string
      * @AppAssert\FullName()
      * @Assert\Length(min="1", max="100")
-     * @Assert\NotNull(message="This value is required.")
+     * @Assert\NotBlank(message="This value is required.")
      */
     protected $name;
 
     /**
      * @var string
      * @AppAssert\UkMobile()
-     * @Assert\NotNull(message="This value is required.")
+     * @Assert\NotBlank(message="This value is required.")
      */
     protected $mobileNumber;
 
@@ -57,7 +57,7 @@ class PurchaseStepPersonalAddress
      * @var \DateTime
      * @Assert\DateTime()
      * @AppAssert\Age()
-     * @Assert\NotNull(message="Date of Birth is required.")
+     * @Assert\NotBlank(message="Date of Birth is required.")
      */
     protected $birthday;
 
@@ -65,7 +65,7 @@ class PurchaseStepPersonalAddress
      * @var string
      * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="1", max="250")
-     * @Assert\NotNull(message="Address is required.")
+     * @Assert\NotBlank(message="Address is required.")
      */
     protected $addressLine1;
 
@@ -87,7 +87,7 @@ class PurchaseStepPersonalAddress
      * @var string
      * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="1", max="250")
-     * @Assert\NotNull(message="City is required.")
+     * @Assert\NotBlank(message="City is required.")
      */
     protected $city;
 
@@ -96,7 +96,7 @@ class PurchaseStepPersonalAddress
      * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="1", max="50")
      * @AppAssert\Postcode()
-     * @Assert\NotNull(message="Postcode is required.")
+     * @Assert\NotBlank(message="Postcode is required.")
      */
     protected $postcode;
 
