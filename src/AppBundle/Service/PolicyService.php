@@ -216,6 +216,7 @@ class PolicyService
         if (!$this->imeiValidator->checkSerial(
             $phone,
             $serialNumber,
+            $imei,
             $user,
             $identityLog,
             $this->warnMakeModelMismatch

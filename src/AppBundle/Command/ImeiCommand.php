@@ -147,7 +147,7 @@ class ImeiCommand extends ContainerAwareCommand
                     print sprintf("Serial %s failed validation\n", $serial);
                 }
             } else {
-                if ($imeiService->checkSerial($phone, $serial)) {
+                if ($imeiService->checkSerial($phone, $serial, $imei)) {
                     print sprintf("Serial %s is good\n", $serial);
                 } else {
                     print sprintf("Serial %s failed validation\n", $serial);

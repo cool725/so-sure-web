@@ -525,7 +525,12 @@ class AdminEmployeeController extends BaseController
                         if (!$serialNumber) {
                             $serialNumber= $policy->getImei();
                         }
-                        $imeiService->checkSerial($policy->getPhone(), $serialNumber, $policy->getUser());
+                        $imeiService->checkSerial(
+                            $policy->getPhone(),
+                            $serialNumber,
+                            $policy->getImei(),
+                            $policy->getUser()
+                        );
                         $policy->addCheckmendSerialData($imeiService->getResponseData());
                         $dm->flush();
                         $this->addFlash(
@@ -700,6 +705,7 @@ class AdminEmployeeController extends BaseController
                     $imeiValidator->checkSerial(
                         $phone,
                         $makeModelForm->getData()['serial'],
+                        null,
                         $policy->getUser(),
                         null,
                         false
@@ -881,6 +887,7 @@ class AdminEmployeeController extends BaseController
                     $imeiValidator->checkSerial(
                         $phone,
                         $makeModelForm->getData()['serial'],
+                        null,
                         $user,
                         null,
                         false
