@@ -217,7 +217,8 @@ class OpsController extends BaseController
             }
         }
 
-        $logger->warning(
+        $this->get('snc_redis.default')->rpush('csp', json_encode($violationReport));
+        $logger->debug(
             'Content-Security-Policy Violation Reported',
             $violationReport
         );
