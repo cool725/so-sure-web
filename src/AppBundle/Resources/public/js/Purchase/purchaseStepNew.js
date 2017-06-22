@@ -84,7 +84,7 @@ $(function(){
         birthdate.setFullYear(year, month - 1, day);
 
         var maxAge = new Date();
-        maxAge.setYear(maxAge.getYear() - 110);
+        maxAge.setFullYear(maxAge.getFullYear() - 150);
 
         if (maxAge > birthdate) {
             return false;

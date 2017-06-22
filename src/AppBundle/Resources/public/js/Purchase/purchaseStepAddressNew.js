@@ -44,7 +44,8 @@ sosure.purchaseStepAddress = (function() {
                 "purchase_form[birthday]" : {
                     required: true,
                     validDate: true,
-                    checkDateOfBirth: true
+                    checkDateOfBirth: true,
+                    checkDateIsValid: true
                 },
                 "purchase_form[mobileNumber]" : {
                     required: true,
