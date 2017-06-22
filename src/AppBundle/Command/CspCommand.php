@@ -24,7 +24,7 @@ class CspCommand extends ContainerAwareCommand
     {
         $redis = $this->getContainer()->get('snc_redis.default');
         $items = [];
-        while (($item = $this->redis->lpop('csp')) != null) {
+        while (($item = $redis->lpop('csp')) != null) {
             $items[] = $item;
         }
 

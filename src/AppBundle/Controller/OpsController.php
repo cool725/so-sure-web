@@ -217,6 +217,10 @@ class OpsController extends BaseController
             }
         }
 
+        // we can work out the original policy
+        if (isset($violationReport['csp-report']['original-policy'])) {
+            unset($violationReport['csp-report']['original-policy']);
+        }
         $this->get('snc_redis.default')->rpush('csp', json_encode($violationReport));
         $logger->debug(
             'Content-Security-Policy Violation Reported',
