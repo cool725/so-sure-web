@@ -59,12 +59,12 @@ class ReceperioServicePaidTest extends WebTestCase
         self::$imei->setEnvironment('prod');
 
         // Patrick's serial
-        $this->assertTrue(self::$imei->checkSerial($iphone6s, "C77QMB7SGRY9"));
+        $this->assertTrue(self::$imei->checkSerial($iphone6s, "C77QMB7SGRY9", null));
         $responseData = self::$imei->getResponseData();
         $this->assertTrue(self::$imei->validateSamePhone($iphone6s, "C77QMB7SGRY9", $responseData));
 
         // GALAXY S4 GT-I9500
-        $this->assertTrue(self::$imei->checkSerial($galaxy, "35516705720382"));
+        $this->assertTrue(self::$imei->checkSerial($galaxy, "35516705720382", null));
         $responseData = self::$imei->getResponseData();
         $this->assertTrue(self::$imei->validateSamePhone($galaxy, "35516705720382", $responseData));
 

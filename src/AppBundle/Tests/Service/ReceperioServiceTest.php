@@ -7,6 +7,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\Phone;
 use GeoJson\Geometry\Point;
 use AppBundle\Document\Claim;
+use AppBundle\Service\ReceperioService;
 
 /**
  * @group functional-nonet
@@ -74,20 +75,23 @@ class ReceperioServiceTest extends WebTestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException AppBundle\Exception\ReciperoManualProcessException
      */
     public function testValidateSamePhoneMissingData()
     {
         self::$imei->validateSamePhone(static::$phoneA, '123', []);
     }
 
+    /**
+     * @expectedException AppBundle\Exception\ReciperoManualProcessException
+     */
     public function testValidateSamePhoneNoData()
     {
         $this->assertTrue(self::$imei->validateSamePhone(static::$phoneA, '123', ['makes' => []]));
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException AppBundle\Exception\ReciperoManualProcessException
      */
     public function testValidateSamePhoneMissingModel()
     {
@@ -130,11 +134,14 @@ class ReceperioServiceTest extends WebTestCase
         $this->assertFalse(self::$imei->validateSamePhone(static::$phoneB, '123', $data));
     }
 
+    /**
+     * @expectedException AppBundle\Exception\ReciperoManualProcessException
+     */
     public function testValidateSamePhoneAndroidMissingModelRef()
     {
         $models[] = ['name' => 'A', 'storage' => '64GB'];
         $data['makes'][] = ['make' => 'A', 'models' => $models];
-        $this->assertTrue(self::$imei->validateSamePhone(static::$phoneB, '123', $data));
+        self::$imei->validateSamePhone(static::$phoneB, '123', $data);
     }
 
     public function testValidateSamePhoneAndroidMultipleMemory()
@@ -146,7 +153,7 @@ class ReceperioServiceTest extends WebTestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException AppBundle\Exception\ReciperoManualProcessException
      */
     public function testValidateSamePhoneAndroidDifferentModelMem()
     {
@@ -157,7 +164,7 @@ class ReceperioServiceTest extends WebTestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException AppBundle\Exception\ReciperoManualProcessException
      */
     public function testValidateSamePhoneAppleMultipleMemory()
     {
@@ -168,7 +175,7 @@ class ReceperioServiceTest extends WebTestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException AppBundle\Exception\ReciperoManualProcessException
      */
     public function testValidateSamePhoneAppleDifferentModel()
     {
@@ -180,8 +187,8 @@ class ReceperioServiceTest extends WebTestCase
 
     public function testValidateSamePhoneAppleDifferentColours()
     {
-        $models[] = ['name' => 'iPhone 5', 'storage' => '16GB', 'color' => 'white'];
-        $models[] = ['name' => 'iPhone 5', 'storage' => '16GB', 'color' => 'black'];
+        $models[] = ['name' => 'iPhone 5', 'storage' => '64GB', 'color' => 'white'];
+        $models[] = ['name' => 'iPhone 5', 'storage' => '64GB', 'color' => 'black'];
         $data['makes'][] = ['make' => 'Apple', 'models' => $models];
         $this->assertTrue(self::$imei->validateSamePhone(static::$phoneA, '123', $data));
     }
@@ -193,8 +200,22 @@ class ReceperioServiceTest extends WebTestCase
         $this->assertFalse(self::$imei->validateSamePhone(static::$phoneA, '123', $data));
     }
 
+    public function testValidateSamePhoneAppleIncorrectMemory()
+    {
+        $models[] = ['name' => 'iPhone 5', 'storage' => '16GB', 'color' => 'white'];
+        $data['makes'][] = ['make' => 'Apple', 'models' => $models];
+        $this->assertFalse(self::$imei->validateSamePhone(static::$phoneA, '123', $data));
+    }
+
+    public function testValidateSamePhoneAppleImeiSkipsMemory()
+    {
+        $models[] = ['name' => 'iPhone 5', 'storage' => '16GB', 'color' => 'white'];
+        $data['makes'][] = ['make' => 'Apple', 'models' => $models];
+        $this->assertTrue(self::$imei->validateSamePhone(static::$phoneA, $this->generateRandomImei(), $data));
+    }
+
     /**
-     * @expectedException \Exception
+     * @expectedException AppBundle\Exception\ReciperoManualProcessException
      */
     public function testValidateSamePhoneAppleMissingStorage()
     {
@@ -219,5 +240,27 @@ class ReceperioServiceTest extends WebTestCase
         $claim->setRecordedDate($yesterday);
         $policy->setImeiReplacementDate($now);
         self::$imei->policyClaim($policy, Claim::TYPE_DAMAGE, $claim);
+    }
+
+    public function testAppleManulProcessSerialRetry()
+    {
+        $this->assertFalse(self::$imei->runMakeModelCheck(ReceperioService::TEST_INVALID_SERIAL));
+        self::$imei->checkSerial(
+            static::$phoneA,
+            ReceperioService::TEST_MANUAL_PROCESS_SERIAL,
+            $this->generateRandomImei()
+        );
+        $this->assertEquals('serial', self::$imei->getResponseData());
+    }
+
+    public function testAppleInvalidSerialNoRetry()
+    {
+        $this->assertFalse(self::$imei->runMakeModelCheck(ReceperioService::TEST_INVALID_SERIAL));
+        self::$imei->checkSerial(
+            static::$phoneA,
+            ReceperioService::TEST_INVALID_SERIAL,
+            null
+        );
+        $this->assertNotEquals('serial', self::$imei->getResponseData());
     }
 }
