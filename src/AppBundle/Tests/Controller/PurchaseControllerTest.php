@@ -460,7 +460,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     private function setPhone($phone, $imei = null, $agreed = 1)
     {
-        $crawler = self::$client->request('GET', '/purchase/step-policy');
+        $crawler = self::$client->request('GET', '/purchase/step-policy?force_result=original');
         $form = $crawler->selectButton('purchase_form[next]')->form();
         if (!$imei) {
             $imei = self::generateRandomImei();
@@ -468,7 +468,11 @@ class PurchaseControllerTest extends BaseControllerTest
         $form['purchase_form[imei]'] = $imei;
         $form['purchase_form[amount]'] = $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice();
         if ($agreed) {
-            $form['purchase_form[agreed]'] = $agreed;
+            try {
+                $form['purchase_form[agreed]'] = $agreed;
+            } catch (\Exception $e) {
+                $form['purchase_form[agreed]'] = 'checked';
+            }
         }
         if ($phone->getMake() == "Apple") {
             // use a different number in case we're testing /, -, etc
@@ -484,14 +488,12 @@ class PurchaseControllerTest extends BaseControllerTest
         if (!$mobile) {
             $mobile = self::generateRandomMobile();
         }
-        $crawler = self::$client->request('GET', '/purchase/');
+        $crawler = self::$client->request('GET', '/purchase/?force_result=original');
         self::verifyResponse(200);
         $form = $crawler->selectButton('purchase_form[next]')->form();
         $form['purchase_form[email]'] = $email;
         $form['purchase_form[name]'] = $name;
-        $form['purchase_form[birthday][day]'] = sprintf("%d", $birthday->format('d'));
-        $form['purchase_form[birthday][month]'] = sprintf("%d", $birthday->format('m'));
-        $form['purchase_form[birthday][year]'] = $birthday->format('Y');
+        $form['purchase_form[birthday]'] = sprintf("%s", $birthday->format('d/m/Y'));
         $form['purchase_form[mobileNumber]'] = $mobile;
         $form['purchase_form[addressLine1]'] = '123 Foo St';
         $form['purchase_form[city]'] = 'Unknown';
