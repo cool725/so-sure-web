@@ -101,6 +101,14 @@ abstract class Policy
     protected $user;
 
     /**
+     * Secondary access to policy - not insured but allowed to access
+     *
+     * @MongoDB\ReferenceOne(targetDocument="User", inversedBy="namedPolicies")
+     * @Gedmo\Versioned
+     */
+    protected $namedUser;
+
+    /**
      * @MongoDB\ReferenceOne(targetDocument="Company", inversedBy="policies")
      * @Gedmo\Versioned
      */
@@ -466,6 +474,16 @@ abstract class Policy
     public function setUser(User $user)
     {
         $this->user = $user;
+    }
+
+    public function getNamedUser()
+    {
+        return $this->namedUser;
+    }
+
+    public function setNamedUser(User $namedUser)
+    {
+        $this->namedUser = $namedUser;
     }
 
     public function getPayer()

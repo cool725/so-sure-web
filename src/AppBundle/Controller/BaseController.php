@@ -753,7 +753,8 @@ abstract class BaseController extends Controller
                 }
             );
             if ($ids !== null) {
-                $policiesQb->addAnd($policiesQb->expr()->field('user.id')->in($ids));
+                $policiesQb->addOr($policiesQb->expr()->field('user.id')->in($ids));
+                $policiesQb->addOr($policiesQb->expr()->field('namedUser.id')->in($ids));
             }
         }
 

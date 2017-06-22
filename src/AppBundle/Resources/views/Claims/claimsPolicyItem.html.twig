@@ -446,6 +446,7 @@
             {% endif %}
         </div>
         <div role="tabpanel" class="tab-pane active" id="user">
+            <h2>Insured User</h2>
             <table class="table table-striped">
                 <tr>
                     <td>User Id</td>
@@ -484,6 +485,27 @@
                     <td>{{ policy.user.latestAttribution }}</td>
                 </tr>
             </table>
+            {% if policy.namedUser %}
+            <h2>Additional Named User</h2>
+            <table class="table table-striped">
+                <tr>
+                    <td>User Id</td>
+                    <td>{{ policy.namedUser.id }}</td>
+                </tr>
+                <tr>
+                    <td>Name</td>
+                    <td>{{ policy.namedUser.name }}</td>
+                </tr>
+                <tr>
+                    <td>Email</td>
+                    <td>{{ policy.namedUser.email }}</td>
+                </tr>
+                <tr>
+                    <td>Mobile</td>
+                    <td>{{ policy.namedUser.mobileNumber }}</td>
+                </tr>
+            </table>
+            {% endif %}
         </div>
         <div role="tabpanel" class="tab-pane" id="history">
             {% if is_granted('ROLE_EMPLOYEE') %}

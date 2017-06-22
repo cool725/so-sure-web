@@ -211,6 +211,13 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     protected $policies;
 
     /**
+     * Secondary access to policy - not insured but allowed to access
+     *
+     * @MongoDB\ReferenceMany(targetDocument="Policy", mappedBy="namedUser")
+     */
+    protected $namedPolicies;
+
+    /**
      * @MongoDB\ReferenceMany(targetDocument="Policy", mappedBy="payer")
      */
     protected $payerPolicies;
@@ -288,6 +295,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $this->sentInvitations = new \Doctrine\Common\Collections\ArrayCollection();
         $this->receivedInvitations = new \Doctrine\Common\Collections\ArrayCollection();
         $this->policies = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->namedPolicies = new \Doctrine\Common\Collections\ArrayCollection();
         $this->multipays = new \Doctrine\Common\Collections\ArrayCollection();
         $this->created = new \DateTime();
         $this->resetToken();
@@ -427,6 +435,11 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         }
 
         return $policies;
+    }
+
+    public function getNamedPolicies()
+    {
+        return $this->namedPolicies;
     }
 
     public function getUnInitPolicies()
