@@ -109,6 +109,11 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 $lines[] = $this->failureStatusMessage($policy, $prefix, $validateDate);
             }
 
+            $valid = $policy->hasCorrectIptRate();
+            if ($valid === false) {
+                $lines[] = $this->failureIptRateMessage($policy);
+            }
+
             $valid = $policy->isPotValueCorrect();
             $lines[] = sprintf(
                 '%s pot value',
@@ -181,6 +186,10 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 if ($policy->isPotValueCorrect() === false) {
                     $this->header($policy, $policies, $lines);
                     $lines[] = $this->failurePotValueMessage($policy);
+                }
+                if ($policy->hasCorrectIptRate() === false) {
+                    $this->header($policy, $policies, $lines);
+                    $lines[] = $this->failureIptRateMessage($policy);
                 }
                 if ($policy->arePolicyScheduledPaymentsCorrect($prefix, $validateDate) === false) {
                     $this->header($policy, $policies, $lines);
@@ -276,6 +285,15 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             'Paid £%0.2f Expected £%0.2f',
             $totalPaid,
             $expectedPaid
+        );
+    }
+
+    private function failureIptRateMessage($policy)
+    {
+        return sprintf(
+            'Unexpected ipt rate %0.2f (Expected %0.2f',
+            $this->getPremium()->getIptRate(),
+            $this->getCurrentIptRate($policy->getStart())
         );
     }
 
