@@ -684,6 +684,9 @@ class ReceperioService extends BaseImeiService
         $serialNumber,
         User $user = null
     ) {
+        $this->certId = null;
+        $this->responseData = null;
+
         if ($serialNumber == self::TEST_INVALID_SERIAL) {
             return false;
         }
