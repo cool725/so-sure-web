@@ -33,7 +33,7 @@ class AgeValidator extends ConstraintValidator
             $diff = $now->diff($birthday);
         }
 
-        if (!$diff || $diff->y < self::MIN_AGE) {
+        if (!$diff || $diff->y < self::MIN_AGE || $diff->y > self::MAX_AGE) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('%string%', $birthday ? $birthday->format(\DateTime::ATOM) : 'not present')
                 ->addViolation();
