@@ -149,7 +149,7 @@ class ReceperioServiceTest extends WebTestCase
         $models[] = ['name' => 'A', 'storage' => '64GB', 'modelreference' => 'A0001'];
         $models[] = ['name' => 'A', 'storage' => '16GB', 'modelreference' => 'A0001'];
         $data['makes'][] = ['make' => 'A', 'models' => $models];
-        $this->assertTrue(self::$imei->validateSamePhone(static::$phoneB, '123', $data));
+        $this->assertTrue(self::$imei->validateSamePhone(static::$phoneB, $this->generateRandomImei(), $data));
     }
 
     /**

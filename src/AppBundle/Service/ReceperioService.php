@@ -782,7 +782,7 @@ class ReceperioService extends BaseImeiService
         }
     }
 
-    private function validateMakeModeResponseModels($serialNumber, $makeData, $data, $isApple)
+    private function validateMakeModeResponseModels($serialNumber, $makeData, $data)
     {
         if (!isset($makeData['models']) || count($makeData['models']) == 0) {
             throw new ReciperoManualProcessException(sprintf(
@@ -792,7 +792,7 @@ class ReceperioService extends BaseImeiService
             ));
         }
 
-        if (!$this->areSameModel($makeData['models'], $isApple)) {
+        if (!$this->areSameModel($makeData['models'], !$this->isImei($serialNumber))) {
             throw new ReciperoManualProcessException(sprintf(
                 "Unable to check serial number (multiple models) %s. Data: %s",
                 $serialNumber,
@@ -906,7 +906,7 @@ class ReceperioService extends BaseImeiService
         $make = strtolower($makeData['make']);
         $isApple = $make == 'apple';
 
-        $this->validateMakeModeResponseModels($serialNumber, $makeData, $data, $isApple);
+        $this->validateMakeModeResponseModels($serialNumber, $makeData, $data);
 
         $modelData = $makeData['models'][0];
         $model = $modelData['name'];
