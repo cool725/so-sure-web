@@ -4,7 +4,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-12">
-                    <h3>Pay the Remainder of Your Policy</h3>
+                    <h3>Pay the Remainder of Your Policy Premium</h3>
                     {% if webpay_action and webpay_reference and amount > 0 %}
                     <p class="lead">Click below to pay the remainder (£{{ amount|number_format(2, '.', ',') }}) of your annual premium.</p>
                     <form action="{{ webpay_action }}" method="post" id="webpay-form">
@@ -16,7 +16,7 @@
                         </div>
                     </form>
                   {% elseif amount == 0 %}
-                    <h3>Your policy has been paid for the year.</h3>
+                    <h3>Your annual policy premium has been paid.</h3>
                   {% endif %}
                 </div>
             </div>

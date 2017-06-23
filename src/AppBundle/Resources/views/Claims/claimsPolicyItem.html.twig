@@ -674,6 +674,14 @@
                       {{ form_end(facebook_form) }}
                     </td>
                 </tr>
+                <tr>
+                    <td>
+                        Pay remainder of policy link
+                    </td>
+                    <td>
+                        {{ url('purchase_remainder_policy', {'id': policy.id })}}
+                    </td>
+                </tr>
               {% if is_granted('ROLE_ADMIN') %}
                 <tr>
                     <td><i class="fa fa-lock" title="Admin only"></i> Imei</td>
