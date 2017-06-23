@@ -6,7 +6,7 @@
                 <div class="col-md-12">
                     <h3>Pay the Remainder of Your Policy</h3>
                     {% if webpay_action and webpay_reference and amount > 0 %}
-                    <p class="lead">Click below to pay the remainder (£{{ amount|number_format(2, '.', ',') }}) of your policy for the year.</p>
+                    <p class="lead">Click below to pay the remainder (£{{ amount|number_format(2, '.', ',') }}) of your annual premium.</p>
                     <form action="{{ webpay_action }}" method="post" id="webpay-form">
                         <div class="row">
                             <div class="form-group col-sm-12">
