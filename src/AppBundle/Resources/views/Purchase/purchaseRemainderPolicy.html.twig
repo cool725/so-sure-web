@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3>Pay the Remainder of Your Policy Premium</h3>
+                    {% if webpay_action and webpay_reference and amount > 0 %}
+                    <p class="lead">Click below to pay the remainder (£{{ amount|number_format(2, '.', ',') }}) of your annual premium.</p>
+                    <form action="{{ webpay_action }}" method="post" id="webpay-form">
+                        <div class="row">
+                            <div class="form-group col-sm-12">
+                                <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
+                                <input type="submit" class="btn btn-success " value="Proceed to payment">
+                            </div>
+                        </div>
+                    </form>
+                  {% elseif amount == 0 %}
+                    <h3>Your annual policy premium has been paid.</h3>
+                  {% endif %}
+                </div>
+            </div>
+        </div>
+{% endblock %}
