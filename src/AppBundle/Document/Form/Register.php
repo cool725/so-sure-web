@@ -12,7 +12,7 @@ class Register
     /**
      * @var string
      * @Assert\Email(strict=true)
-     * @Assert\NotNull()
+     * @Assert\NotBlank()
      */
     protected $email;
 
