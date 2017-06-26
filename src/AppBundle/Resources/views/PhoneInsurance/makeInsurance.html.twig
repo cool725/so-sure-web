@@ -68,9 +68,6 @@
                             {% set first = true %}
                             {% for phone in phones %}
 
-                                {# Probably a better way to do this? #}
-                                {% set img_url = phone.model|replace({' ': '-', '+': "-Plus"}) %}
-
                                 <div class="col-sm-4 col-md-4 col-centered">
                                     {% if phone.mem|length <= 1 %}
                                         {% for mem, url in phone.mem %}
