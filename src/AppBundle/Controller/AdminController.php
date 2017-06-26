@@ -252,37 +252,6 @@ class AdminController extends BaseController
     }
 
     /**
-     * @Route("/phone/{id}/higlight", name="admin_phone_highlight")
-     * @Method({"POST"})
-     */
-    public function phoneHighlightAction(Request $request, $id)
-    {
-        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
-            throw new \InvalidArgumentException('Invalid csrf token');
-        }
-
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Phone::class);
-        $phone = $repo->find($id);
-        if ($phone) {
-            if ($phone->isHighlight()) {
-                $phone->setHighlight(false);
-                $message = 'Phone is no longer highlighted';
-            } else {
-                $phone->setHighlight(true);
-                $message = 'Phone is now highlighted';
-            }
-            $dm->flush();
-            $this->addFlash(
-                'notice',
-                $message
-            );
-        }
-
-        return new RedirectResponse($this->generateUrl('admin_phones'));
-    }
-
-    /**
      * @Route("/phone/{id}", name="admin_phone_delete")
      * @Method({"DELETE"})
      */
