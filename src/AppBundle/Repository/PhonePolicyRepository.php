@@ -193,8 +193,20 @@ class PhonePolicyRepository extends PolicyRepository
     /**
      * All policies that are 'ending' (e.g. cancelled) during time period (excluding so-sure test ones)
      */
-    public function findAllEndingPolicies($cancellationReason, \DateTime $startDate = null, \DateTime $endDate = null)
+    public function countAllEndingPolicies($cancellationReason, \DateTime $startDate = null, \DateTime $endDate = null)
     {
+        return $this->findAllEndingPolicies($cancellationReason, false, $startDate, $endDate)->count();
+    }
+
+    /**
+     * All policies that are 'ending' (e.g. cancelled) during time period (excluding so-sure test ones)
+     */
+    public function findAllEndingPolicies(
+        $cancellationReason,
+        $onlyWithFNOL = false,
+        \DateTime $startDate = null,
+        \DateTime $endDate = null
+    ) {
         if (!$endDate) {
             $endDate = new \DateTime();
         }
@@ -216,9 +228,17 @@ class PhonePolicyRepository extends PolicyRepository
             $this->addExcludedPolicyQuery($qb, 'id');
         }
 
-        return $qb->getQuery()
+        if (!$onlyWithFNOL) {
+            return $qb->getQuery()->execute();
+        }
+
+        $data = $qb->getQuery()
             ->execute()
-            ->count();
+            ->toArray();
+
+        return array_filter($data, function($policy) {
+            return count($policy->getAllClaims()) > 0;
+        });
     }
 
     public function getAllPoliciesForExport(\DateTime $date, $environment)
