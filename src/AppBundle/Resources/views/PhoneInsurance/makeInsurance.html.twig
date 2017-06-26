@@ -189,27 +189,7 @@
 
     {# Page Modals #}
 
-    <div class="modal fade"
-         id="quoteModal"
-         tabindex="-1"
-         role="dialog"
-         aria-labelledby="quoteModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">
-                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
-                        <span class="sr-only">Close</span>
-                    </button>
-                    <h3 class="text-center">Select a different phone</h3>
-                </div>
-                <div class="modal-body text-center">
-                    {{ render(controller('AppBundle:Default:selectPhoneMake')) }}
-                </div>
-            </div>
-        </div>
-    </div>
+    {% include 'AppBundle::Default/modalQuote.html.twig' with {'selectPhoneMakeType': ''} %}
 
     {# End Page Modals #}
 
