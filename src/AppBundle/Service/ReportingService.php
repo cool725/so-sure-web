@@ -166,7 +166,9 @@ class ReportingService
                 $start,
                 $end
             );
-            $data[sprintf('total%sFNOLPolicies', $key)] = count($policyRepo->findAllEndingPolicies($cancellationReason, true));
+            $data[sprintf('total%sFNOLPolicies', $key)] = count(
+                $policyRepo->findAllEndingPolicies($cancellationReason, true)
+            );
             $data[sprintf('ending%sFNOLPolicies', $key)] = count($policyRepo->findAllEndingPolicies(
                 $cancellationReason,
                 true,
@@ -177,7 +179,8 @@ class ReportingService
         $data['totalEndingPoliciesAdjUpgrade'] = $data['totalEndingPolicies'] - $data['totalUpgradePolicies'];
         $data['endingEndingPoliciesAdjUpgrade'] = $data['endingEndingPolicies'] - $data['endingUpgradePolicies'];
         $data['totalEndingFNOLPoliciesAdjUpgrade'] = $data['totalEndingFNOLPolicies'] - $data['totalUpgradePolicies'];
-        $data['endingEndingFNOLPoliciesAdjUpgrade'] = $data['endingEndingFNOLPolicies'] - $data['endingUpgradePolicies'];
+        $data['endingEndingFNOLPoliciesAdjUpgrade'] = $data['endingEndingFNOLPolicies'] -
+            $data['endingUpgradePolicies'];
 
         $data['newPolicies'] = $policyRepo->countAllNewPolicies($end, $start);
         $data['newPoliciesAdjUpgrade'] = $data['newPolicies'] - $data['endingUpgradePolicies'];
