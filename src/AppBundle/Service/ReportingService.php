@@ -178,9 +178,9 @@ class ReportingService
         }
         $data['totalEndingPoliciesAdjUpgrade'] = $data['totalEndingPolicies'] - $data['totalUpgradePolicies'];
         $data['endingEndingPoliciesAdjUpgrade'] = $data['endingEndingPolicies'] - $data['endingUpgradePolicies'];
-        $data['totalEndingFNOLPoliciesAdjUpgrade'] = $data['totalEndingFNOLPolicies'] - $data['totalUpgradePolicies'];
+        $data['totalEndingFNOLPoliciesAdjUpgrade'] = $data['totalEndingFNOLPolicies'] - $data['totalUpgradeFNOLPolicies'];
         $data['endingEndingFNOLPoliciesAdjUpgrade'] = $data['endingEndingFNOLPolicies'] -
-            $data['endingUpgradePolicies'];
+            $data['endingUpgradeFNOLPolicies'];
 
         $data['newPolicies'] = $policyRepo->countAllNewPolicies($end, $start);
         $data['newPoliciesAdjUpgrade'] = $data['newPolicies'] - $data['endingUpgradePolicies'];
