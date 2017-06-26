@@ -71,8 +71,8 @@
                                 <a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class=""> {{ phone.model }} - {{ phone_mem.memory }}GB</a>
                             </li>
                         {% endfor %}
+                        <li role="separator" class="divider"></li>
                     {% endif %}
-                    <li role="separator" class="divider"></li>
                     <li><a href="#" data-toggle="modal" data-target="#quote-model"> I have a different phone</a></li>
                 </ul>
             </div>
