@@ -237,7 +237,7 @@ class PhonePolicyRepository extends PolicyRepository
             ->toArray();
 
         return array_filter($data, function ($policy) {
-            return count($policy->getAllClaims()) > 0;
+            return count($policy->getClaims()) > 0;
         });
     }
 
