@@ -21,6 +21,9 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function tearDown()
     {
+        self::$client->request('GET', '/logout');
+        self::$client->followRedirect();
+        self::$client->getCookieJar()->clear();
     }
 
     public function testPurchaseOk()
@@ -92,19 +95,13 @@ class PurchaseControllerTest extends BaseControllerTest
         );
 
         self::verifyResponse(302);
-        print $crawler->html();
+        //print $crawler->html();
         $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-missing-phone'));
     }
 
     public function testPurchaseUserPhoneSpaceNew()
     {
-        $phone = self::getRandomPhone(self::$dm);
-        // set phone in session
-        $crawler = self::$client->request(
-            'GET',
-            self::$router->generate('quote_phone', ['id' => $phone->getId()])
-        );
-        $crawler = self::$client->followRedirect();
+        $phone = $this->setRandomPhone();
 
         $crawler = $this->createPurchaseNew(
             self::generateEmail('testPurchaseUserPhoneSpaceNew', $this),
@@ -133,6 +130,8 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testPurchaseExistingUserDiffDetailsNew()
     {
+        $phone = $this->setRandomPhone();
+
         $user = self::createUser(
             self::$userManager,
             self::generateEmail('testPurchaseExistingUserDiffDetailsNew', $this),
@@ -203,6 +202,13 @@ class PurchaseControllerTest extends BaseControllerTest
     public function testPurchaseExistingUserSameDetailsWithPartialPolicyNew()
     {
         $phone = self::getRandomPhone(self::$dm);
+        // set phone in session
+        $crawler = self::$client->request(
+            'GET',
+            self::$router->generate('quote_phone', ['id' => $phone->getId()])
+        );
+        $crawler = self::$client->followRedirect();
+
         $user = self::createUser(
             self::$userManager,
             self::generateEmail('testPurchaseExistingUserSameDetailsWithPartialPolicyNew', $this),
@@ -231,13 +237,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testPurchaseAddressNew()
     {
-        $phone = self::getRandomPhone(self::$dm);
-        // set phone in session
-        $crawler = self::$client->request(
-            'GET',
-            self::$router->generate('quote_phone', ['id' => $phone->getId()])
-        );
-        $crawler = self::$client->followRedirect();
+        $phone = $this->setRandomPhone();
 
         $crawler = $this->createPurchaseNew(
             self::generateEmail('testPurchaseAddressNew', $this),
@@ -251,14 +251,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testPurchasePhone()
     {
-        $phone = self::getRandomPhone(static::$dm);
-
-        // set phone in session
-        $crawler = self::$client->request(
-            'GET',
-            self::$router->generate('quote_phone', ['id' => $phone->getId()])
-        );
-        $crawler = self::$client->followRedirect();
+        $phone = $this->setRandomPhone();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhone', $this),
@@ -276,14 +269,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testPurchasePhoneNew()
     {
-        $phone = self::getRandomPhone(static::$dm);
-
-        // set phone in session
-        $crawler = self::$client->request(
-            'GET',
-            self::$router->generate('quote_phone', ['id' => $phone->getId()])
-        );
-        $crawler = self::$client->followRedirect();
+        $phone = $this->setRandomPhone();
 
         $crawler = $this->createPurchaseNew(
             self::generateEmail('testPurchasePhoneNew', $this),
@@ -359,14 +345,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testPurchasePhoneImeiSpace()
     {
-        $phone = self::getRandomPhone(static::$dm);
-
-        // set phone in session
-        $crawler = self::$client->request(
-            'GET',
-            self::$router->generate('quote_phone', ['id' => $phone->getId()])
-        );
-        $crawler = self::$client->followRedirect();
+        $phone = $this->setRandomPhone();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneImeiSpace', $this),
@@ -386,14 +365,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testPurchasePhoneImeiSpaceNew()
     {
-        $phone = self::getRandomPhone(static::$dm);
-
-        // set phone in session
-        $crawler = self::$client->request(
-            'GET',
-            self::$router->generate('quote_phone', ['id' => $phone->getId()])
-        );
-        $crawler = self::$client->followRedirect();
+        $phone = $this->setRandomPhone();
 
         $crawler = $this->createPurchaseNew(
             self::generateEmail('testPurchasePhoneImeiSpaceNew', $this),
@@ -413,14 +385,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testPurchasePhoneImeiDash()
     {
-        $phone = self::getRandomPhone(static::$dm);
-
-        // set phone in session
-        $crawler = self::$client->request(
-            'GET',
-            self::$router->generate('quote_phone', ['id' => $phone->getId()])
-        );
-        $crawler = self::$client->followRedirect();
+        $phone = $this->setRandomPhone();
 
         $crawler = $this->createPurchase(
             self::generateEmail('testPurchasePhoneImeiDash', $this),
@@ -896,5 +861,18 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = self::$client->submit($form);
 
         return $crawler;
+    }
+
+    private function setRandomPhone()
+    {
+        $phone = self::getRandomPhone(self::$dm);
+        // set phone in session
+        $crawler = self::$client->request(
+            'GET',
+            self::$router->generate('quote_phone', ['id' => $phone->getId()])
+        );
+        $crawler = self::$client->followRedirect();
+
+        return $phone;
     }
 }
