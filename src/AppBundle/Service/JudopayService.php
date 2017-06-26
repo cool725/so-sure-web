@@ -615,12 +615,6 @@ class JudopayService
         $payment = null;
         $policy = $scheduledPayment->getPolicy();
         $paymentMethod = $policy->getUser()->getPaymentMethod();
-        if (!$paymentMethod || !$paymentMethod instanceof JudoPaymentMethod) {
-            throw new \Exception(sprintf(
-                'Payment method not valid for scheduled payment %s',
-                $scheduledPayment->getId()
-            ));
-        }
         try {
             if (!$paymentMethod || !$paymentMethod instanceof JudoPaymentMethod) {
                 throw new \Exception(sprintf(
