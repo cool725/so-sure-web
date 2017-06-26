@@ -12,12 +12,11 @@
 .navbar-default .navbar-collapse {
 	background-color: $white;
 	border-top: 2px solid $grey-light;
-	border-bottom: 2px solid $grey-light;	
+	border-bottom: 2px solid $grey-light;
 }
 
 .navbar-default .navbar-nav > li > a {
     font-size: 14px;
-    padding-top: 20px;
     color: $blue;
 
     &:hover {
@@ -63,7 +62,7 @@
 }
 
 @include breakpoint(laptop) {
-	
+
 	.navbar-nav > li {
 		margin: 0 5px;
 		padding: 0 5px;
