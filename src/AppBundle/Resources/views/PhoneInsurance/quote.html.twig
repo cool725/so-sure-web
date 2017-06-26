@@ -73,7 +73,8 @@
                         {% endfor %}
                         <li role="separator" class="divider"></li>
                     {% endif %}
-                    <li><a href="#" data-toggle="modal" data-target="#quote-model"> I have a different phone</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a href="#" data-toggle="modal" data-target="#quoteModal"> I have a different phone</a></li>
                 </ul>
             </div>
         </h1>
@@ -499,26 +500,7 @@
         </div>
     </div>
 
-
-    <div class="modal fade"
-         id="quote-model"
-         tabindex="-1"
-         role="dialog"
-         aria-labelledby="quoteModelLabel"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h3 class="text-center">Select a different phone</h3>
-                </div>
-                <div class="modal-body text-center">
-                    {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':'other_pages'})) }}
-                    <br><br>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% include 'AppBundle::Default/modalQuote.html.twig' with {'selectPhoneMakeType': 'other_pages'} %}
     {# End Page Modals #}
 
 {% endblock %}
