@@ -570,6 +570,19 @@ class PurchaseController extends BaseController
                     Payment::SOURCE_WEB,
                     JudoPaymentMethod::DEVICE_DNA_NOT_PRESENT
                 );
+                $body = sprintf(
+                    'Remainder (likely) payment was received. Policy %s (Total payments received £%0.2f of £%0.2f).',
+                    $policy->getPolicyNumber(),
+                    $policy->getPremiumPaid(),
+                    $policy->getPremium()->getYearlyPremiumPrice()
+                );
+                $message = \Swift_Message::newInstance()
+                    ->setSubject('Remainder Payment received')
+                    ->setFrom('tech@so-sure.com')
+                    ->setTo('dylan@so-sure.com')
+                    ->setCc('patrick@so-sure.com')
+                    ->setBody($body, 'text/html');
+                $this->get('mailer')->send($message);
             } catch (ProcessedException $e) {
                 if (!$policy->isValidPolicy($policy->getPolicyPrefix($this->getParameter('kernel.environment')))) {
                     throw $e;
