@@ -64,51 +64,53 @@
             <div class="landing-phones hidden-xs">
                 <div class="row">
                     <div class="col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
-                        {% set first = true %}
-                        {% for phone in phones %}
+                        <div class="row row-centered">
+                            {% set first = true %}
+                            {% for phone in phones %}
 
-                            {# Probably a better way to do this? #}
-                            {% set img_url = phone.model|replace({' ': '-', '+': "-Plus"}) %}
+                                {# Probably a better way to do this? #}
+                                {% set img_url = phone.model|replace({' ': '-', '+': "-Plus"}) %}
 
-                            <div class="col-sm-4 col-md-4">
-                                {% if phone.mem|length <= 1 %}
-                                    {% for mem, url in phone.mem %}
-                                        <a href="{{ url }}">
-                                            <div class="phone thumbnail">
-                                                <div class="phone-hover">
-                                                    <div class="phone-hover--inner">
-                                                        <div class="one-btn">
-                                                            <h4>Click for a quote</h4>
+                                <div class="col-sm-4 col-md-4 col-centered">
+                                    {% if phone.mem|length <= 1 %}
+                                        {% for mem, url in phone.mem %}
+                                            <a href="{{ url }}">
+                                                <div class="phone thumbnail">
+                                                    <div class="phone-hover">
+                                                        <div class="phone-hover--inner">
+                                                            <div class="one-btn">
+                                                                <h4>Click for a quote</h4>
+                                                            </div>
                                                         </div>
                                                     </div>
+                                                    <img src="{{ phone.imageUrlWithFallback }}" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance" class="lazy">
+                                                    <div class="caption">
+                                                        <h2 class="h4">{{ phone.model }}</h2>
+                                                    </div>
                                                 </div>
-                                                <img src="{{ phone.imageUrlWithFallback }}" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance" class="lazy">
-                                                <div class="caption">
-                                                    <h2 class="h4">{{ phone.model }}</h2>
+                                            </a>
+                                        {% endfor %}
+                                    {% else %}
+                                        <div class="phone thumbnail">
+                                            <div class="phone-hover">
+                                                <div class="phone-hover--inner">
+                                                    <div class="mem-btns">
+                                                        <h4>Select for a quote</h4>
+                                                        {% for mem, url in phone.mem %}
+                                                            <a href="{{ url }}" class="btn btn-blue btn-block">{{ mem }}GB</a>
+                                                        {% endfor %}
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </a>
-                                    {% endfor %}
-                                {% else %}
-                                    <div class="phone thumbnail">
-                                        <div class="phone-hover">
-                                            <div class="phone-hover--inner">
-                                                <div class="mem-btns">
-                                                    <h4>Select for a quote</h4>
-                                                    {% for mem, url in phone.mem %}
-                                                        <a href="{{ url }}" class="btn btn-blue btn-block">{{ mem }}GB</a>
-                                                    {% endfor %}
-                                                </div>
+                                            <img src="{{ phone.imageUrlWithFallback }}" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance" class="lazy">
+                                            <div class="caption">
+                                                <h2 class="h4">{{ phone.model }}</h2>
                                             </div>
                                         </div>
-                                        <img src="{{ phone.imageUrlWithFallback }}" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance" class="lazy">
-                                        <div class="caption">
-                                            <h2 class="h4">{{ phone.model }}</h2>
-                                        </div>
-                                    </div>
-                                {% endif %}
-                            </div>
-                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
             </div>
