@@ -20,7 +20,19 @@ class ExcelService
         $this->logger = $logger;
     }
 
-    public function getFileType($inFile)
+    public function getExtensionFileType($inFile)
+    {
+        $extension = pathinfo($inFile, PATHINFO_EXTENSION);
+        if ($extension == 'xls') {
+            return self::FILETYPE_XLS;
+        } elseif ($extension == 'xlsx') {
+            return self::FILETYPE_XLSX;
+        }
+
+        return null;
+    }
+
+    public function getMimeFileType($inFile)
     {
         $mimeType = mime_content_type($inFile);
 
@@ -57,14 +69,22 @@ class ExcelService
         }
     }
 
-    public function convertToCsv($inFile, $outFile, $sheetName = null)
+    public function convertToCsv($inFile, $outFile, $sheetName = null, $useMime = true)
     {
         try {
             $cacheMethod = \PHPExcel_CachedObjectStorageFactory::cache_to_phpTemp;
             $cacheSettings = array('memoryCacheSize' => self::CACHE_SIZE);
             \PHPExcel_Settings::setCacheStorageMethod($cacheMethod, $cacheSettings);
 
-            $reader = \PHPExcel_IOFactory::createReader($this->getFileType($inFile));
+            if ($useMime) {
+                $fileType = $this->getMimeFileType($inFile);
+            } else {
+                $fileType = $this->getExtensionFileType($inFile);
+            }
+            if (!$fileType) {
+                throw new \Exception('Unknown file type');
+            }
+            $reader = \PHPExcel_IOFactory::createReader($fileType);
             $reader->setReadDataOnly(true);
 
             if ($sheetName) {

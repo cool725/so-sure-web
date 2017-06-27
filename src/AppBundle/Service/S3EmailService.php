@@ -95,7 +95,7 @@ abstract class S3EmailService
     abstract public function getColumnsFromSheetName($sheetName);
     abstract public function createLineObject($line, $columns);
 
-    public function import($sheetName)
+    public function import($sheetName, $useMime = true)
     {
         $lines = [];
         $keys = $this->listS3();
@@ -106,7 +106,7 @@ abstract class S3EmailService
             try {
                 $emailFile = $this->downloadEmail($key);
                 if ($excelFile = $this->extractExcelFromEmail($emailFile)) {
-                    $data = $this->parseExcel($excelFile, $sheetName);
+                    $data = $this->parseExcel($excelFile, $sheetName, $useMime);
                     $processed = $this->processExcelData($key, $data);
                 } else {
                     throw new \Exception('Unable to locate excel file in email message');
@@ -137,13 +137,13 @@ abstract class S3EmailService
         return $lines;
     }
 
-    public function importFile($file, $sheetName)
+    public function importFile($file, $sheetName, $useMime = true)
     {
         $lines = [];
         $lines[] = sprintf('Processing %s', $file);
         $processed = false;
         try {
-            $data = $this->parseExcel($file, $sheetName);
+            $data = $this->parseExcel($file, $sheetName, $useMime);
             $processed = $this->processExcelData($file, $data);
         } catch (\Exception $e) {
             $processed = false;
@@ -268,10 +268,10 @@ abstract class S3EmailService
         return $excelFile;
     }
 
-    public function parseExcel($filename, $sheetName)
+    public function parseExcel($filename, $sheetName, $useMime = true)
     {
         $tempFile = $this->generateTempFile();
-        $this->excel->convertToCsv($filename, $tempFile, $sheetName);
+        $this->excel->convertToCsv($filename, $tempFile, $sheetName, $useMime);
         $lines = array_map('str_getcsv', file($tempFile));
         unlink($tempFile);
 
