@@ -30,96 +30,107 @@
 
 {% block body %}
 
-    <section class="section--pad">
-        <div class="container">
+    <section class="section-landing section-landing--title">
+        <div class="container text-center">
+            <div class="row">
+                <div class="col-md-12">
 
-            <div class="landing-title text-center">
-                <div class="row">
-                    <div class="col-md-12">
+                    <h1 class="text-blue">
+                        {{ make|capitalize }} {{ make_extra }} Insurance
+                    </h1>
 
-                        <h1 class="text-blue">
-                            {{ make|capitalize }} {{ make_extra }} Insurance
-                        </h1>
+                    <p class="lead">Select your model to get a quote</p>
 
-                        <p class="lead">Select your model to get a quote</p>
-
-                    </div>
                 </div>
             </div>
-
-            <div class="owl-carousel owl-theme visible-xs">
-            {% for phone in phones %}
-                <div class="item">
-                    <div class="item-inner">
-                        <img src="{{ phone.imageUrlWithFallback }}" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance">
-                        <h2 class="h5 text-center">{{ phone.model }}</h2>
-                        {% for mem, url in phone.mem %}
-                            <a href="{{ url }}" class="btn btn-blue btn-30">{{ mem }}GB</a>
-                        {% endfor %}
-                    </div>
-                </div>
-
-
-            {% endfor %}
-            </div>
-
-            <div class="landing-phones hidden-xs">
-                <div class="row">
-                    <div class="col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
-                        <div class="row row-centered">
-                            {% set first = true %}
-                            {% for phone in phones %}
-
-                                <div class="col-sm-4 col-md-4 col-centered">
-                                    {% if phone.mem|length <= 1 %}
-                                        {% for mem, url in phone.mem %}
-                                            <a href="{{ url }}">
-                                                <div class="phone thumbnail">
-                                                    <div class="phone-hover">
-                                                        <div class="phone-hover--inner">
-                                                            <div class="one-btn">
-                                                                <h4>Click for a quote</h4>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <img src="{{ phone.imageUrlWithFallback }}" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance" class="lazy">
-                                                    <div class="caption">
-                                                        <h2 class="h4">{{ phone.model }}</h2>
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        {% endfor %}
-                                    {% else %}
-                                        <div class="phone thumbnail">
-                                            <div class="phone-hover">
-                                                <div class="phone-hover--inner">
-                                                    <div class="mem-btns">
-                                                        <h4>Select for a quote</h4>
-                                                        {% for mem, url in phone.mem %}
-                                                            <a href="{{ url }}" class="btn btn-blue btn-block">{{ mem }}GB</a>
-                                                        {% endfor %}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <img src="{{ phone.imageUrlWithFallback }}" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance" class="lazy">
-                                            <div class="caption">
-                                                <h2 class="h4">{{ phone.model }}</h2>
-                                            </div>
-                                        </div>
-                                    {% endif %}
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <p class="lead text-center">Can't find your phone? <a href="#" data-toggle="modal" data-target="#quoteModal">Click here</a></p>
-
         </div>
     </section>
 
-    <section class="">
+    <section class="section-landing section-landing--top">
+        <div class="container">
+
+            <div class="owl-carousel owl-theme visible-xs">
+                {% for phone in phones %}
+                    <div class="item">
+                        <div class="item-inner">
+                            <img src="{{ phone.imageUrlWithFallback }}" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance">
+                            <h2 class="h5 text-center">{{ phone.model }}</h2>
+                            {% for mem, url in phone.mem %}
+                                <a href="{{ url }}" class="btn btn-blue btn-30">{{ mem }}GB</a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="landing-phones hidden-xs">
+                <div class="landing-panel">
+                    <div class="row row-centered">
+                        {% set first = true %}
+                        {% for phone in phones %}
+
+                            <div class="col-sm-4 col-md-4 col-centered">
+                                {% if phone.mem|length <= 1 %}
+                                    {% for mem, url in phone.mem %}
+                                        <a href="{{ url }}">
+                                            <div class="phone thumbnail">
+                                                <div class="phone-hover">
+                                                    <div class="phone-hover--inner">
+                                                        <div class="one-btn">
+                                                            <h4>Click for a quote</h4>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <img src="{{ phone.imageUrlWithFallback }}" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance" class="lazy">
+                                                <div class="caption">
+                                                    <h2 class="h4">{{ phone.model }}</h2>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="phone thumbnail">
+                                        <div class="phone-hover">
+                                            <div class="phone-hover--inner">
+                                                <div class="mem-btns">
+                                                    <h4>Select for a quote</h4>
+                                                    {% for mem, url in phone.mem %}
+                                                        <a href="{{ url }}" class="btn btn-blue btn-block">{{ mem }}GB</a>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <img src="{{ phone.imageUrlWithFallback }}" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance" class="lazy">
+                                        <div class="caption">
+                                            <h2 class="h4">{{ phone.model }}</h2>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        {# Curve #}
+        <svg class="curved-background hidden-xs" viewBox="0 0 500 150" preserveAspectRatio="xMinYMin meet">
+            <path d="M0,100 C150,200 350,0 500,100 L500,00 L0,0 Z" style="stroke: none; fill:#f6f7fb;"></path>
+        </svg>
+        {# End Curve #}
+    </section>
+
+    <section class="section--pad section-landing section-landing--search">
+        <div class="container text-center">
+            <h2 class="text-blue">Can't find your phone?</h2>
+            <div class="search--box text-center">
+                        {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':'inline'})) }}
+                </div>
+            </div>
+        </div>
+    </section>
+{#
+    <section class="section-landing--bottom">
         <div class="container">
 
            {% if make == "Samsung" %}
@@ -136,40 +147,33 @@
 
         </div>
     </section>
-
-    <section class="section--pad text-center">
+ #}
+    <section class="section-landing--bottom text-center">
         <div class="container">
-
-            <div class="row">
-                <div class="col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
-                    {# <hr> #}
-
-                    <div class="row">
-                        <div class="col-sm-6 col-md-3">
-                            <img src="{{ cdn_url }}/images/library_benefits/so-sure_next-working-day.svg" width="150" height="150" alt="so-sure - Next working day repair/replacement">
-                            <h4 class="h-light">Next working day replacement or repair</h4>
-                        </div>
-                        <div class="col-sm-6 col-md-3">
-                            <img src="{{ cdn_url }}/images/library_benefits/so-sure_connections.svg" width="150" height="150" alt="so-sure - Cash back when you and your friends don’t claim">
-                            <h4 class="h-light">Cash back when you and your friends don’t claim</h4>
-                        </div>
-                        <div class="col-sm-6 col-md-3">
-                            <img src="{{ cdn_url }}/images/library_benefits/so-sure_call-center-staff.svg" width="150" height="150" alt="so-sure - 24/7 Live Support">
-                            <h4 class="h-light">24/7 Live Support</h4>
-                        </div>
-                        <div class="col-sm-6 col-md-3">
-                            <img src="{{ cdn_url }}/images/library_benefits/so-sure_instant-cover.svg" width="150" height="150" alt="so-sure - Instant cover when you buy your policy">
-                            <h4 class="h-light">Instant cover when you buy your policy</h4>
-                        </div>
+            <div class="landing-panel">
+                <div class="row">
+                    <div class="col-sm-6 col-md-3">
+                        <img src="{{ cdn_url }}/images/library_benefits/so-sure_next-working-day.svg" width="150" height="150" alt="so-sure - Next working day repair/replacement">
+                        <h4 class="h-light">Next working day replacement or repair</h4>
                     </div>
-
+                    <div class="col-sm-6 col-md-3">
+                        <img src="{{ cdn_url }}/images/library_benefits/so-sure_connections.svg" width="150" height="150" alt="so-sure - Cash back when you and your friends don’t claim">
+                        <h4 class="h-light">Cash back when you and your friends don’t claim</h4>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <img src="{{ cdn_url }}/images/library_benefits/so-sure_call-center-staff.svg" width="150" height="150" alt="so-sure - 24/7 Live Support">
+                        <h4 class="h-light">24/7 Live Support</h4>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <img src="{{ cdn_url }}/images/library_benefits/so-sure_instant-cover.svg" width="150" height="150" alt="so-sure - Instant cover when you buy your policy">
+                        <h4 class="h-light">Instant cover when you buy your policy</h4>
+                    </div>
                 </div>
             </div>
-
         </div>
     </section>
 
-    <section class="section--pad text-center">
+    <section class="section--pad section-landing--bottom text-center">
         <div class="container">
 
             <div class="row">

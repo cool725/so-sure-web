@@ -22,11 +22,11 @@
             {% endif %}
         </form>
     {% else %}
-        <form method="get" id="search-phone-form" {% if phone %}action="{{ path('quote_phone', {'id': phone.id }) }}"{% endif %} data-base-path="{{ basePath }}">
+        <form {% if type == 'inline' %} class="form-inline" {% endif %}  method="get" id="search-phone-form" {% if phone %}action="{{ path('quote_phone', {'id': phone.id }) }}"{% endif %} data-base-path="{{ basePath }}">
             <div class="form-group">
                 <input type="text" class="required search-phone-text" id="search-phone" placeholder="Find your phone e.g. iPhone 7" value="{% if phone %}{{ phone }}{% endif %}" />
             </div>
-            <button type="submit" class="btn btn-green btn-block btn-pad">{{ buttonText }}</button>
+            <button type="submit" class="btn btn-green {% if type != 'inline' %} btn-block {% endif %}   btn-pad">{{ buttonText }}</button>
         </form>
     {% endif %}
 
