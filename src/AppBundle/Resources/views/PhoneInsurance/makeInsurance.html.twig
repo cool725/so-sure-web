@@ -44,23 +44,21 @@
         </div>
     </section>
 
-    <section class="section-landing section-landing--top">
+    <section class="section--pad  section-landing section-landing--top">
         <div class="container">
 
             <div class="owl-carousel owl-theme visible-xs">
-            {% for phone in phones %}
-                <div class="item">
-                    <div class="item-inner">
-                        <img src="{{ phone.imageUrlWithFallback }}" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance">
-                        <h2 class="h5 text-center">{{ phone.model }}</h2>
-                        {% for mem, url in phone.mem %}
-                            <a href="{{ url }}" class="btn btn-blue btn-30">{{ mem }}GB</a>
-                        {% endfor %}
+                {% for phone in phones %}
+                    <div class="item">
+                        <div class="item-inner">
+                            <img src="{{ phone.imageUrlWithFallback }}" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance">
+                            <h2 class="h5 text-center">{{ phone.model }}</h2>
+                            {% for mem, url in phone.mem %}
+                                <a href="{{ url }}" class="btn btn-blue btn-30">{{ mem }}GB</a>
+                            {% endfor %}
+                        </div>
                     </div>
-                </div>
-
-
-            {% endfor %}
+                {% endfor %}
             </div>
 
             <div class="landing-phones hidden-xs">
@@ -120,7 +118,7 @@
         {# End Curve #}
     </section>
 
-    <section class="section-landing section-landing--search">
+    <section class="section--pad section-landing section-landing--search background-white">
         <div class="container text-center">
             <h2 class="text-blue">Can't find your phone?</h2>
             <div class="search--box text-center">
@@ -148,7 +146,7 @@
         </div>
     </section>
  #}
-    <section class="section-landing--bottom text-center">
+    <section class="section--pad section-landing--bottom text-center">
         <div class="container">
             <div class="landing-panel">
                 <div class="row">
