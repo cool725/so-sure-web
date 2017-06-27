@@ -66,17 +66,8 @@ class ReportingService
         $scheduledPaymentRepo->setExcludedPolicyIds($invalidPoliciesIds);
         $data['scheduledPayments'] = $scheduledPaymentRepo->getMonthlyValues();
 
-        $excludedPolicyIds = [];
-        $excludedPolicies = [];
-        if (!$isKpi) {
-            foreach ($this->excludedPolicyIds as $excludedPolicyId) {
-                $excludedPolicyIds[] = new \MongoId($excludedPolicyId);
-                $policy = $policyRepo->find($excludedPolicyId);
-                if ($policy) {
-                    $excludedPolicies[] = $policy;
-                }
-            }
-        }
+        $excludedPolicyIds = $this->getExcludedPolicyIds($isKpi);
+        $excludedPolicies = $this->getExcludedPolicies($isKpi);
 
         $policyRepo->setExcludedPolicyIds($excludedPolicyIds);
         $invitationRepo->setExcludedPolicyIds($excludedPolicyIds);
@@ -255,7 +246,61 @@ class ReportingService
             $data['totalSCodeInvitations'] / $data['totalSCodePolicies'] :
             'n/a';
 
-        $data['policyConnections']['total'] = $data['totalPolicies'] + count($excludedPolicyIds);
+        $data['totalAvgHoursToConnect'] = $connectionRepo->avgHoursToConnect();
+
+        $data['totalRunRate'] = Policy::sumYearlyPremiumPrice($newToDateDirectPolicies, null, true) +
+            Policy::sumYearlyPremiumPrice($newToDateInvitationPolicies, null, true) +
+            Policy::sumYearlyPremiumPrice($newToDateSCodePolicies, null, true);
+
+        return [
+            'start' => $start,
+            'end' => $end,
+            'data' => $data,
+            'excluded_policies' => $excludedPolicies,
+            'claims' => $claimsTotals,
+            'approvedClaims' => $approvedClaimsTotals,
+            'closedClaims' => $closedClaimsTotals,
+        ];
+    }
+
+    private function getExcludedPolicies($isKpi)
+    {
+        $policyRepo = $this->dm->getRepository(PhonePolicy::class);
+        $excludedPolicies = [];
+        if (!$isKpi) {
+            foreach ($this->getExcludedPolicyIds($isKpi) as $excludedPolicyId) {
+                if ($policy = $policyRepo->find($excludedPolicyId->__toString())) {
+                    $excludedPolicies[] = $policy;
+                }
+            }
+        }
+
+        return $excludedPolicies;
+    }
+
+    private function getExcludedPolicyIds($isKpi)
+    {
+        $excludedPolicyIds = [];
+        if (!$isKpi) {
+            foreach ($this->excludedPolicyIds as $excludedPolicyId) {
+                $excludedPolicyIds[] = new \MongoId($excludedPolicyId);
+            }
+        }
+
+        return $excludedPolicyIds;
+    }
+
+    public function connectionReport($start, $end)
+    {
+        $policyRepo = $this->dm->getRepository(PhonePolicy::class);
+        $connectionRepo = $this->dm->getRepository(StandardConnection::class);
+        $totalEnd = null;
+
+        $data = [];
+        $data['totalPolicies'] = $policyRepo->countAllNewPolicies();
+        $data['totalTotalConnections'] = $connectionRepo->count(null, $totalEnd, null) / 2;
+
+        $data['policyConnections']['total'] = $data['totalPolicies'] + count($this->getExcludedPolicyIds(false));
         $data['policyConnections'][0] = $data['policyConnections']['total'];
         $data['policyConnections']['10+'] = 0;
         for ($i = 1; $i <= 30; $i++) {
@@ -280,21 +325,8 @@ class ReportingService
         } else {
             $data['totalWeightedAvgConnections'] = null;
         }
-        $data['totalAvgHoursToConnect'] = $connectionRepo->avgHoursToConnect();
 
-        $data['totalRunRate'] = Policy::sumYearlyPremiumPrice($newToDateDirectPolicies, null, true) +
-            Policy::sumYearlyPremiumPrice($newToDateInvitationPolicies, null, true) +
-            Policy::sumYearlyPremiumPrice($newToDateSCodePolicies, null, true);
-
-        return [
-            'start' => $start,
-            'end' => $end,
-            'data' => $data,
-            'excluded_policies' => $excludedPolicies,
-            'claims' => $claimsTotals,
-            'approvedClaims' => $approvedClaimsTotals,
-            'closedClaims' => $closedClaimsTotals,
-        ];
+        return $data;
     }
 
     public function sumTotalPoliciesPerWeek(\DateTime $end = null)
