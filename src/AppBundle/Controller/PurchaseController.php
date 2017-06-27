@@ -55,6 +55,7 @@ use AppBundle\Exception\ImeiBlacklistedException;
 use AppBundle\Exception\ImeiPhoneMismatchException;
 use AppBundle\Exception\RateLimitException;
 use AppBundle\Exception\ProcessedException;
+use AppBundle\Exception\ValidationException;
 
 /**
  * @Route("/purchase")
@@ -732,6 +733,15 @@ class PurchaseController extends BaseController
             $lead->setSource($source);
             $lead->setEmail($email);
             $lead->setName($name);
+
+            // Having some validation exceptions for Lead Names - check if its going to fail
+            // validation and remove name if its not working. Hopefully the name will be updated later on
+            try {
+                $this->validateObject($lead);
+            } catch (ValidationException $e) {
+                $lead->setName(null);
+            }
+
             $dm->persist($lead);
             $dm->flush();
         }

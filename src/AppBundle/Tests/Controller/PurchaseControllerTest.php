@@ -10,6 +10,7 @@ use AppBundle\Document\JudoPayment;
 use AppBundle\Document\CurrencyTrait;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use AppBundle\Classes\Salva;
+use AppBundle\Classes\ApiErrorCode;
 
 /**
  * @group functional-net
@@ -749,6 +750,120 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertTrue(self::$client->getResponse()->isRedirect($redirectUrl));
         $crawler = self::$client->followRedirect();
         self::verifyResponse(200);
+    }
+
+    public function testLeadSource()
+    {
+        $email = self::generateEmail('testLeadSource', $this);
+        $this->setRandomPhone();
+        $crawler = self::$client->request('GET', '/purchase/?force_result=new');
+        self::verifyResponse(200);
+
+        $link = $crawler->filter('#step--validate');
+        $csrfToken = $link->attr('data-csrf');
+
+        $crawler = self::$client->request(
+            'POST',
+            '/purchase/lead/buy',
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json'),
+            json_encode([
+                'email' => $email,
+                'name' => 'foo bar',
+                'csrf' => $csrfToken,
+            ])
+        );
+        self::verifyResponse(200);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $leadRepo = $dm->getRepository(Lead::class);
+        $lead = $leadRepo->findOneBy(['email' => strtolower($email)]);
+        $this->assertNotNull($lead);
+        $this->assertEquals(strtolower($email), $lead->getEmail());
+        $this->assertEquals('foo bar', $lead->getName());
+    }
+
+    public function testLeadSourceMissingParam()
+    {
+        $email = self::generateEmail('testLeadSourceMissingParam', $this);
+
+        $this->setRandomPhone();
+        $crawler = self::$client->request('GET', '/purchase/?force_result=new');
+        self::verifyResponse(200);
+
+        $link = $crawler->filter('#step--validate');
+        $csrfToken = $link->attr('data-csrf');
+
+        $crawler = self::$client->request(
+            'POST',
+            '/purchase/lead/buy',
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json'),
+            json_encode([
+                'email' => $email,
+                'name' => 'foo bar',
+            ])
+        );
+        self::verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+    }
+
+    public function testLeadSourceInvalidCsrf()
+    {
+        $email = self::generateEmail('testLeadSourceInvalidCsrf', $this);
+        $this->setRandomPhone();
+        $crawler = self::$client->request('GET', '/purchase/?force_result=new');
+        self::verifyResponse(200);
+
+        $link = $crawler->filter('#step--validate');
+        $csrfToken = $link->attr('data-csrf') + '.';
+
+        $crawler = self::$client->request(
+            'POST',
+            '/purchase/lead/buy',
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json'),
+            json_encode([
+                'email' => $email,
+                'name' => 'foo bar',
+                'csrf' => $csrfToken,
+            ])
+        );
+        self::verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+    }
+
+    public function testLeadSourceBadName()
+    {
+        $email = self::generateEmail('testLeadSource', $this);
+        $this->setRandomPhone();
+        $crawler = self::$client->request('GET', '/purchase/?force_result=new');
+        self::verifyResponse(200);
+
+        $link = $crawler->filter('#step--validate');
+        $csrfToken = $link->attr('data-csrf');
+
+        $crawler = self::$client->request(
+            'POST',
+            '/purchase/lead/buy',
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json'),
+            json_encode([
+                'email' => $email,
+                'name' => 'foo bar bar',
+                'csrf' => $csrfToken,
+            ])
+        );
+        self::verifyResponse(200);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $leadRepo = $dm->getRepository(Lead::class);
+        $lead = $leadRepo->findOneBy(['email' => strtolower($email)]);
+        $this->assertNotNull($lead);
+        $this->assertEquals(strtolower($email), $lead->getEmail());
+        $this->assertNull($lead->getName());
     }
 
     private function createPurchaseUser($user, $name, $birthday)
