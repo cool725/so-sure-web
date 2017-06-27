@@ -22,8 +22,8 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function tearDown()
     {
-        self::$client->request('GET', '/logout');
-        self::$client->followRedirect();
+        //self::$client->request('GET', '/logout');
+        //self::$client->followRedirect();
         self::$client->getCookieJar()->clear();
     }
 
@@ -836,7 +836,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testLeadSourceBadName()
     {
-        $email = self::generateEmail('testLeadSource', $this);
+        $email = self::generateEmail('testLeadSourceBadName', $this);
         $this->setRandomPhone();
         $crawler = self::$client->request('GET', '/purchase/?force_result=new');
         self::verifyResponse(200);
