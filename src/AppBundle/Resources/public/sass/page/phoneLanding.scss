@@ -4,7 +4,10 @@
 @import "../common/paletteNew";
 
 body {
-    background-color: $white;
+
+    @include breakpoint(tablet) {
+        background-color: $lightest-blue;
+    }
 }
 
 a {
@@ -15,6 +18,60 @@ a {
 
 .navbar {
     background-color: $white;
+}
+
+.section-landing {
+    position: relative;
+}
+
+.section-landing--title {
+    @include breakpoint(tablet) {
+        background-color: $off-white;
+    }
+}
+
+.section-landing--search {
+    position: relative;
+    z-index: 4;
+}
+
+.curved-background {
+    display: inline-block;
+    position: absolute;
+    top: 0; left: 0;
+    z-index: 2;
+}
+
+.curved-background-top {
+    top: 0;
+}
+
+.panel {
+    @include border-radius(10px);
+    border: none;
+    box-shadow: none;
+
+    @include breakpoint(tablet) {
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
+    }
+
+    h2 {
+        margin-top: 0;
+    }
+}
+
+.panel-pad {
+    padding: 30px;
+    position: relative;
+    z-index: 3;
+
+    @include breakpoint(tablet) {
+        padding: 30px;
+    }
+
+    @include breakpoint(laptop) {
+        padding: 50px;
+    }
 }
 
 .phone {
