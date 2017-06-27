@@ -300,6 +300,35 @@ class ReportingService
         $data['totalPolicies'] = $policyRepo->countAllNewPolicies();
         $data['totalTotalConnections'] = $connectionRepo->count(null, $totalEnd, null) / 2;
 
+        $policies = $policyRepo->findAll();
+        for ($i = 0; $i <= 10; $i++) {
+            $data['policyConnections'][$i]['total'] = 0;
+            $data['policyConnections'][$i]['1claim'] = 0;
+            $data['policyConnections'][$i]['2+claims'] = 0;
+        }
+        $data['policyConnections']['total']['total'] = 0;
+        $data['policyConnections']['total']['1claim'] = 0;
+        $data['policyConnections']['total']['2+claims'] = 0;
+        foreach ($policies as $policy) {
+            $connections = count($policy->getConnections());
+            if ($connections > 10) {
+                $connections = 10;
+            }
+
+            $data['policyConnections'][$connections]['total']++;
+            $data['policyConnections']['total']['total']++;
+
+            $claims = count($policy->getMonetaryClaimed(false));
+            if ($claims == 1) {
+                $data['policyConnections'][$connections]['1claim']++;
+                $data['policyConnections']['total']['1claim']++;
+            } elseif ($claims > 1) {
+                $data['policyConnections'][$connections]['2+claims']++;
+                $data['policyConnections']['total']['2+claims']++;
+            }
+        }
+
+        /*
         $data['policyConnections']['total'] = $data['totalPolicies'] + count($this->getExcludedPolicyIds(false));
         $data['policyConnections'][0] = $data['policyConnections']['total'];
         $data['policyConnections']['10+'] = 0;
@@ -310,18 +339,19 @@ class ReportingService
                 $data['policyConnections']['10+'] += $data['policyConnections'][$i];
             }
         }
-        if ($data['policyConnections']['total'] != 0) {
-            $data['totalAvgConnections'] = $data['totalTotalConnections'] / $data['policyConnections']['total'];
+        */
+        if ($data['policyConnections']['total']['total'] != 0) {
+            $data['totalAvgConnections'] = $data['totalTotalConnections'] / $data['policyConnections']['total']['total'];
         } else {
             $data['totalAvgConnections'] = null;
         }
 
         $weighted = 0;
         for ($i = 0; $i < 10; $i++) {
-            $weighted += $i * $data['policyConnections'][$i];
+            $weighted += $i * $data['policyConnections'][$i]['total'];
         }
         if ($data['policyConnections']['total'] != 0) {
-            $data['totalWeightedAvgConnections'] = $weighted / $data['policyConnections']['total'];
+            $data['totalWeightedAvgConnections'] = $weighted / $data['policyConnections']['total']['total'];
         } else {
             $data['totalWeightedAvgConnections'] = null;
         }
