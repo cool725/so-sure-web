@@ -219,24 +219,24 @@ class DaviesClaim extends DaviesExcel
     public function isOpen($includeReOpened = false)
     {
         if ($includeReOpened) {
-            return in_array($this->status, [
-                self::STATUS_OPEN,
-                self::STATUS_REOPENED
+            return in_array(strtolower($this->status), [
+                strtolower(self::STATUS_OPEN),
+                strtolower(self::STATUS_REOPENED)
             ]);
         } else {
-            return in_array($this->status, [self::STATUS_OPEN]);
+            return in_array(strtolower($this->status), [strtolower(self::STATUS_OPEN)]);
         }
     }
 
     public function isClosed($includeReClosed = false)
     {
         if ($includeReClosed) {
-            return in_array($this->status, [
-                self::STATUS_CLOSED,
-                self::STATUS_RECLOSED,
+            return in_array(strtolower($this->status), [
+                strtolower(self::STATUS_CLOSED),
+                strtolower(self::STATUS_RECLOSED),
             ]);
         } else {
-            return in_array($this->status, [self::STATUS_CLOSED]);
+            return in_array(strtolower($this->status), [strtolower(self::STATUS_CLOSED)]);
         }
     }
 
@@ -329,11 +329,11 @@ class DaviesClaim extends DaviesExcel
                 $this->risk = $this->nullIfBlank($data[++$i]);
             }
 
-            if (!in_array($this->status, [
-                self::STATUS_OPEN,
-                self::STATUS_CLOSED,
-                self::STATUS_REOPENED,
-                self::STATUS_RECLOSED,
+            if (!in_array(strtolower($this->status), [
+                strtolower(self::STATUS_OPEN),
+                strtolower(self::STATUS_CLOSED),
+                strtolower(self::STATUS_REOPENED),
+                strtolower(self::STATUS_RECLOSED),
             ])) {
                 throw new \Exception('Unknown claim status');
             }

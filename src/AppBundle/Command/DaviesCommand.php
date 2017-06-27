@@ -30,6 +30,12 @@ class DaviesCommand extends ContainerAwareCommand
                 'Use a local file instead of s3'
             )
             ->addOption(
+                'use-extension',
+                null,
+                InputOption::VALUE_NONE,
+                'Use file extension to determine file type instead of mime'
+            )
+            ->addOption(
                 'sheetName',
                 null,
                 InputOption::VALUE_REQUIRED,
@@ -41,6 +47,7 @@ class DaviesCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $isDaily = true === $input->getOption('daily');
+        $useMime = true !== $input->getOption('use-extension');
         $file = $input->getOption('file');
         $sheetName = $input->getOption('sheetName');
         if (!$sheetName) {
@@ -58,10 +65,10 @@ class DaviesCommand extends ContainerAwareCommand
             $count = $davies->claimsDailyEmail();
             $output->writeln(sprintf('%d outstanding claims. Email report sent.', $count));
         } elseif ($file) {
-            $lines = $davies->importFile($file, $sheetName);
+            $lines = $davies->importFile($file, $sheetName, $useMime);
             $output->writeln(implode(PHP_EOL, $lines));
         } else {
-            $lines = $davies->import($sheetName);
+            $lines = $davies->import($sheetName, $useMime);
             $output->writeln(implode(PHP_EOL, $lines));
         }
         $output->writeln('Finished');
