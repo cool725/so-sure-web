@@ -17,7 +17,7 @@ a {
 }
 
 .navbar {
-    background-color: $white;
+    background-color: $off-white;
 }
 
 .section-landing {
@@ -46,33 +46,25 @@ a {
     top: 0;
 }
 
-.panel {
+.landing-panel {
+    padding: 30px;
     @include border-radius(10px);
     border: none;
     box-shadow: none;
-
-    @include breakpoint(tablet) {
-        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
-    }
-
-    h2 {
-        margin-top: 0;
-    }
-}
-
-.panel-pad {
-    padding: 30px;
     position: relative;
     z-index: 3;
 
     @include breakpoint(tablet) {
-        padding: 30px;
-    }
-
-    @include breakpoint(laptop) {
-        padding: 50px;
+        background-color: $white;
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
     }
 }
+
+.search--box {
+    max-width: 320px;
+    margin: 0 auto;
+}
+
 
 .phone {
     text-align: center;

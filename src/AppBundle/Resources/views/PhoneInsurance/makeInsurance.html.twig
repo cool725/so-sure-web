@@ -65,8 +65,8 @@
 
             <div class="landing-phones hidden-xs">
                 <div class="row">
-                    <div class="col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
-                        <div class="panel panel-pad">
+                    <div class="col-md-10 col-md-offset-1 col-lg-10 col-lg-offset-1">
+                        <div class="landing-panel">
                             <div class="row row-centered">
                                 {% set first = true %}
                                 {% for phone in phones %}
@@ -125,13 +125,10 @@
     </section>
 
     <section class="section-landing section-landing--search">
-        <div class="container">
-            <div class="text-center">
-                <h2 class="text-blue">Can't find your phone?</h2>
-                <div class="row">
-                    <div class="col-md-4 col-md-offset-4">
+        <div class="container text-center">
+            <h2 class="text-blue">Can't find your phone?</h2>
+            <div class="search--box text-center">
                         {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':''})) }}
-                    </div>
                 </div>
             </div>
         </div>
@@ -159,8 +156,8 @@
         <div class="container">
 
             <div class="row">
-                <div class="col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
-                    <div class="panel panel-pad">
+                <div class="col-md-10 col-md-offset-1 col-lg-10 col-lg-offset-1">
+                    <div class="landing-panel">
                         <div class="row">
                             <div class="col-sm-6 col-md-3">
                                 <img src="{{ cdn_url }}/images/library_benefits/so-sure_next-working-day.svg" width="150" height="150" alt="so-sure - Next working day repair/replacement">
@@ -192,7 +189,7 @@
 
             <div class="row">
                 <div class="col-md-12">
-                    <img src="{{ cdn_url }}/images/library_phones/{{ make }}/{{ make }}-logo-so-sure.png"
+                    <img src="{{ cdn_url }}/images/library_phones/{{ make }}/{{ make }}-logo-so-sure.svg"
                          width="170"
                          height="60"
                          alt="so-sure - {{ make|capitalize }} {{ make_extra }} Insurance">
