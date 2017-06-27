@@ -27,16 +27,20 @@ class ReportingService
 
     protected $excludedPolicyIds;
 
+    protected $environment;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
      * @param string          $excludedPolicyIds
+     * @parma strign          $environment
      */
-    public function __construct(DocumentManager $dm, LoggerInterface $logger, $excludedPolicyIds)
+    public function __construct(DocumentManager $dm, LoggerInterface $logger, $excludedPolicyIds, $environment)
     {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->excludedPolicyIds = $excludedPolicyIds;
+        $this->environment = $environment;
     }
 
     public function report($start, $end, $isKpi = false)
@@ -297,10 +301,9 @@ class ReportingService
         $totalEnd = null;
 
         $data = [];
-        $data['totalPolicies'] = $policyRepo->countAllNewPolicies();
         $data['totalTotalConnections'] = $connectionRepo->count(null, $totalEnd, null) / 2;
 
-        $policies = $policyRepo->findAll();
+        $policies = $policyRepo->findAllPolicies($this->environment);
         for ($i = 0; $i <= 10; $i++) {
             $data['policyConnections'][$i]['total'] = 0;
             $data['policyConnections'][$i]['1claim'] = 0;

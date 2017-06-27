@@ -488,6 +488,7 @@ services:
             dm:                "@doctrine_mongodb.odm.default_document_manager"
             logger:            "@logger"
             excludedPolicyIds: "%report_excluded_policy_ids%"
+            environment:       "%kernel.environment%"
 
     app.mixpanel:
         class: AppBundle\Service\MixpanelService
