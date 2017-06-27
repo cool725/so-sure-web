@@ -341,7 +341,8 @@ class ReportingService
         }
         */
         if ($data['policyConnections']['total']['total'] != 0) {
-            $data['totalAvgConnections'] = $data['totalTotalConnections'] / $data['policyConnections']['total']['total'];
+            $data['totalAvgConnections'] = $data['totalTotalConnections'] /
+                $data['policyConnections']['total']['total'];
         } else {
             $data['totalAvgConnections'] = null;
         }
