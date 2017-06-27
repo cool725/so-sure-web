@@ -26,4 +26,4 @@ if [ ! -d $FOLDER ]; then
 fi
 
 echo "Reloading db for $ENV environment"
-sudo app/console --env=$ENV doctrine:mongodb:fixtures:load  --append --fixtures=$FOLDER
+sudo -u www-data app/console --env=$ENV doctrine:mongodb:fixtures:load  --append --fixtures=$FOLDER
