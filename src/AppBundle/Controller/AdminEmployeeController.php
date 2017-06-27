@@ -1000,7 +1000,11 @@ class AdminEmployeeController extends BaseController
             $end = new \DateTime($end, new \DateTimeZone(SoSure::TIMEZONE));
         }
 
-        return $this->get('app.reporting')->report($start, $end);
+        $reporting = $this->get('app.reporting');
+        $report = $reporting->report($start, $end);
+        $report['data'] = array_merge($report['data'], $reporting->connectionReport());
+
+        return $report;
     }
 
     /**

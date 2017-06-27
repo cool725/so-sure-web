@@ -27,16 +27,20 @@ class ReportingService
 
     protected $excludedPolicyIds;
 
+    protected $environment;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
      * @param string          $excludedPolicyIds
+     * @parma strign          $environment
      */
-    public function __construct(DocumentManager $dm, LoggerInterface $logger, $excludedPolicyIds)
+    public function __construct(DocumentManager $dm, LoggerInterface $logger, $excludedPolicyIds, $environment)
     {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->excludedPolicyIds = $excludedPolicyIds;
+        $this->environment = $environment;
     }
 
     public function report($start, $end, $isKpi = false)
@@ -66,17 +70,8 @@ class ReportingService
         $scheduledPaymentRepo->setExcludedPolicyIds($invalidPoliciesIds);
         $data['scheduledPayments'] = $scheduledPaymentRepo->getMonthlyValues();
 
-        $excludedPolicyIds = [];
-        $excludedPolicies = [];
-        if (!$isKpi) {
-            foreach ($this->excludedPolicyIds as $excludedPolicyId) {
-                $excludedPolicyIds[] = new \MongoId($excludedPolicyId);
-                $policy = $policyRepo->find($excludedPolicyId);
-                if ($policy) {
-                    $excludedPolicies[] = $policy;
-                }
-            }
-        }
+        $excludedPolicyIds = $this->getExcludedPolicyIds($isKpi);
+        $excludedPolicies = $this->getExcludedPolicies($isKpi);
 
         $policyRepo->setExcludedPolicyIds($excludedPolicyIds);
         $invitationRepo->setExcludedPolicyIds($excludedPolicyIds);
@@ -255,31 +250,6 @@ class ReportingService
             $data['totalSCodeInvitations'] / $data['totalSCodePolicies'] :
             'n/a';
 
-        $data['policyConnections']['total'] = $data['totalPolicies'] + count($excludedPolicyIds);
-        $data['policyConnections'][0] = $data['policyConnections']['total'];
-        $data['policyConnections']['10+'] = 0;
-        for ($i = 1; $i <= 30; $i++) {
-            $data['policyConnections'][$i] = $connectionRepo->countByConnection($i, $start, $end);
-            $data['policyConnections'][0] -= $data['policyConnections'][$i];
-            if ($i >= 10) {
-                $data['policyConnections']['10+'] += $data['policyConnections'][$i];
-            }
-        }
-        if ($data['policyConnections']['total'] != 0) {
-            $data['totalAvgConnections'] = $data['totalTotalConnections'] / $data['policyConnections']['total'];
-        } else {
-            $data['totalAvgConnections'] = null;
-        }
-
-        $weighted = 0;
-        for ($i = 0; $i < 10; $i++) {
-            $weighted += $i * $data['policyConnections'][$i];
-        }
-        if ($data['policyConnections']['total'] != 0) {
-            $data['totalWeightedAvgConnections'] = $weighted / $data['policyConnections']['total'];
-        } else {
-            $data['totalWeightedAvgConnections'] = null;
-        }
         $data['totalAvgHoursToConnect'] = $connectionRepo->avgHoursToConnect();
 
         $data['totalRunRate'] = Policy::sumYearlyPremiumPrice($newToDateDirectPolicies, null, true) +
@@ -295,6 +265,102 @@ class ReportingService
             'approvedClaims' => $approvedClaimsTotals,
             'closedClaims' => $closedClaimsTotals,
         ];
+    }
+
+    private function getExcludedPolicies($isKpi)
+    {
+        $policyRepo = $this->dm->getRepository(PhonePolicy::class);
+        $excludedPolicies = [];
+        if (!$isKpi) {
+            foreach ($this->getExcludedPolicyIds($isKpi) as $excludedPolicyId) {
+                if ($policy = $policyRepo->find($excludedPolicyId->__toString())) {
+                    $excludedPolicies[] = $policy;
+                }
+            }
+        }
+
+        return $excludedPolicies;
+    }
+
+    private function getExcludedPolicyIds($isKpi)
+    {
+        $excludedPolicyIds = [];
+        if (!$isKpi) {
+            foreach ($this->excludedPolicyIds as $excludedPolicyId) {
+                $excludedPolicyIds[] = new \MongoId($excludedPolicyId);
+            }
+        }
+
+        return $excludedPolicyIds;
+    }
+
+    public function connectionReport()
+    {
+        $policyRepo = $this->dm->getRepository(PhonePolicy::class);
+        $connectionRepo = $this->dm->getRepository(StandardConnection::class);
+        $totalEnd = null;
+
+        $data = [];
+        $data['totalTotalConnections'] = $connectionRepo->count(null, $totalEnd, null) / 2;
+
+        $policies = $policyRepo->findAllPolicies($this->environment);
+        for ($i = 0; $i <= 10; $i++) {
+            $data['policyConnections'][$i]['total'] = 0;
+            $data['policyConnections'][$i]['1claim'] = 0;
+            $data['policyConnections'][$i]['2+claims'] = 0;
+        }
+        $data['policyConnections']['total']['total'] = 0;
+        $data['policyConnections']['total']['1claim'] = 0;
+        $data['policyConnections']['total']['2+claims'] = 0;
+        foreach ($policies as $policy) {
+            $connections = count($policy->getConnections());
+            if ($connections > 10) {
+                $connections = 10;
+            }
+
+            $data['policyConnections'][$connections]['total']++;
+            $data['policyConnections']['total']['total']++;
+
+            $claims = count($policy->getMonetaryClaimed(false));
+            if ($claims == 1) {
+                $data['policyConnections'][$connections]['1claim']++;
+                $data['policyConnections']['total']['1claim']++;
+            } elseif ($claims > 1) {
+                $data['policyConnections'][$connections]['2+claims']++;
+                $data['policyConnections']['total']['2+claims']++;
+            }
+        }
+
+        /*
+        $data['policyConnections']['total'] = $data['totalPolicies'] + count($this->getExcludedPolicyIds(false));
+        $data['policyConnections'][0] = $data['policyConnections']['total'];
+        $data['policyConnections']['10+'] = 0;
+        for ($i = 1; $i <= 30; $i++) {
+            $data['policyConnections'][$i] = $connectionRepo->countByConnection($i, $start, $end);
+            $data['policyConnections'][0] -= $data['policyConnections'][$i];
+            if ($i >= 10) {
+                $data['policyConnections']['10+'] += $data['policyConnections'][$i];
+            }
+        }
+        */
+        if ($data['policyConnections']['total']['total'] != 0) {
+            $data['totalAvgConnections'] = $data['totalTotalConnections'] /
+                $data['policyConnections']['total']['total'];
+        } else {
+            $data['totalAvgConnections'] = null;
+        }
+
+        $weighted = 0;
+        for ($i = 0; $i < 10; $i++) {
+            $weighted += $i * $data['policyConnections'][$i]['total'];
+        }
+        if ($data['policyConnections']['total'] != 0) {
+            $data['totalWeightedAvgConnections'] = $weighted / $data['policyConnections']['total']['total'];
+        } else {
+            $data['totalWeightedAvgConnections'] = null;
+        }
+
+        return $data;
     }
 
     public function sumTotalPoliciesPerWeek(\DateTime $end = null)

@@ -369,24 +369,26 @@
                         <tr>
                             <th></th>
                             <th>Total</th>
+                            <th>w/1 settled claim</th>
+                            <th>w/2+ settled claims</th>
                         </tr>
                     </thead>
                     <tbody>
 
                         <tr>
                             <td>Policies with X Connection</td>
-                            <td>{{ data.policyConnections.total }}</td>
+                            <td>{{ data.policyConnections['total']['total'] }}</td>
+                            <td>{{ data.policyConnections['total']['1claim'] }}</td>
+                            <td>{{ data.policyConnections['total']['2+claims'] }}</td>
                         </tr>
-                        {% for i in 0..9 %}
+                        {% for i in 0..10 %}
                             <tr>
-                                <td style="padding-left: 30px">Policies with {{ i }} Connection(s)</td>
-                                <td>{{ data.policyConnections[i] }}</td>
+                                <td style="padding-left: 30px">Policies with {{ i }}{% if i == 10 %}+{% endif %} Connection(s)</td>
+                                <td>{{ data.policyConnections[i]['total'] }}</td>
+                                <td>{{ data.policyConnections[i]['1claim'] }}</td>
+                                <td>{{ data.policyConnections[i]['2+claims'] }}</td>
                             </tr>
                         {% endfor %}
-                        <tr>
-                            <td style="padding-left: 30px">Policies with 10+ Connection(s)</td>
-                            <td>{{ data.policyConnections['10+'] }}</td>
-                        </tr>
                         <tr>
                             <td>Avg Connections / Policy</td>
                             <td>{{ data.totalAvgConnections|number_format(2, '.', ',') }}</td>

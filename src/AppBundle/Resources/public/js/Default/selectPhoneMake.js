@@ -8,6 +8,7 @@ sosure.selectPhoneMake = (function() {
       keys: ['name'],
       shouldSort: true,
       threshold: 0.4,
+      tokenize: true
     }
     self.delayTimer = null;
     self.sentMixpanel = false;
