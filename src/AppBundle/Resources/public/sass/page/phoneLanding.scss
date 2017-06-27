@@ -38,6 +38,10 @@ a {
     h2 {
         margin-top: 0;
     }
+
+    @include breakpoint(tablet) {
+        margin: 40px 0;
+    }
 }
 
 .curved-background {
@@ -81,6 +85,7 @@ a {
     position: relative;
     border-color: transparent;
     padding-top: 30px;
+    margin-bottom: 0;
 
     > img {
         display: inline;
