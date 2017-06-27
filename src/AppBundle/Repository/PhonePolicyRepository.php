@@ -306,4 +306,19 @@ class PhonePolicyRepository extends PolicyRepository
 
         return $qb->getQuery()->execute();
     }
+
+    public function findAllPolicies($environment)
+    {
+        $policy = new PhonePolicy();
+        $qb = $this->createQueryBuilder();
+        if ($environment == "prod") {
+            $prodPolicyRegEx = new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix()));
+            $qb->field('policyNumber')->equals($prodPolicyRegEx);
+        } else {
+            $qb->field('policyNumber')->notEqual(null);
+        }
+
+        return $qb->getQuery()
+            ->execute();
+    }
 }
