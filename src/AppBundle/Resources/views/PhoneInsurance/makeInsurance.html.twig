@@ -64,41 +64,20 @@
             </div>
 
             <div class="landing-phones hidden-xs">
-                <div class="row">
-                    <div class="col-md-10 col-md-offset-1 col-lg-10 col-lg-offset-1">
-                        <div class="landing-panel">
-                            <div class="row row-centered">
-                                {% set first = true %}
-                                {% for phone in phones %}
+                <div class="landing-panel">
+                    <div class="row row-centered">
+                        {% set first = true %}
+                        {% for phone in phones %}
 
-                                    <div class="col-sm-4 col-md-4 col-centered">
-                                        {% if phone.mem|length <= 1 %}
-                                            {% for mem, url in phone.mem %}
-                                                <a href="{{ url }}">
-                                                    <div class="phone thumbnail">
-                                                        <div class="phone-hover">
-                                                            <div class="phone-hover--inner">
-                                                                <div class="one-btn">
-                                                                    <h4>Click for a quote</h4>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <img src="{{ phone.imageUrlWithFallback }}" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance" class="lazy">
-                                                        <div class="caption">
-                                                            <h2 class="h4">{{ phone.model }}</h2>
-                                                        </div>
-                                                    </div>
-                                                </a>
-                                            {% endfor %}
-                                        {% else %}
+                            <div class="col-sm-4 col-md-4 col-centered">
+                                {% if phone.mem|length <= 1 %}
+                                    {% for mem, url in phone.mem %}
+                                        <a href="{{ url }}">
                                             <div class="phone thumbnail">
                                                 <div class="phone-hover">
                                                     <div class="phone-hover--inner">
-                                                        <div class="mem-btns">
-                                                            <h4>Select for a quote</h4>
-                                                            {% for mem, url in phone.mem %}
-                                                                <a href="{{ url }}" class="btn btn-blue btn-block">{{ mem }}GB</a>
-                                                            {% endfor %}
+                                                        <div class="one-btn">
+                                                            <h4>Click for a quote</h4>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -107,11 +86,28 @@
                                                     <h2 class="h4">{{ phone.model }}</h2>
                                                 </div>
                                             </div>
-                                        {% endif %}
+                                        </a>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="phone thumbnail">
+                                        <div class="phone-hover">
+                                            <div class="phone-hover--inner">
+                                                <div class="mem-btns">
+                                                    <h4>Select for a quote</h4>
+                                                    {% for mem, url in phone.mem %}
+                                                        <a href="{{ url }}" class="btn btn-blue btn-block">{{ mem }}GB</a>
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <img src="{{ phone.imageUrlWithFallback }}" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance" class="lazy">
+                                        <div class="caption">
+                                            <h2 class="h4">{{ phone.model }}</h2>
+                                        </div>
                                     </div>
-                                {% endfor %}
+                                {% endif %}
                             </div>
-                        </div>
+                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -154,33 +150,26 @@
  #}
     <section class="section--pad section-landing--bottom text-center">
         <div class="container">
-
-            <div class="row">
-                <div class="col-md-10 col-md-offset-1 col-lg-10 col-lg-offset-1">
-                    <div class="landing-panel">
-                        <div class="row">
-                            <div class="col-sm-6 col-md-3">
-                                <img src="{{ cdn_url }}/images/library_benefits/so-sure_next-working-day.svg" width="150" height="150" alt="so-sure - Next working day repair/replacement">
-                                <h4 class="h-light">Next working day replacement or repair</h4>
-                            </div>
-                            <div class="col-sm-6 col-md-3">
-                                <img src="{{ cdn_url }}/images/library_benefits/so-sure_connections.svg" width="150" height="150" alt="so-sure - Cash back when you and your friends don’t claim">
-                                <h4 class="h-light">Cash back when you and your friends don’t claim</h4>
-                            </div>
-                            <div class="col-sm-6 col-md-3">
-                                <img src="{{ cdn_url }}/images/library_benefits/so-sure_call-center-staff.svg" width="150" height="150" alt="so-sure - 24/7 Live Support">
-                                <h4 class="h-light">24/7 Live Support</h4>
-                            </div>
-                            <div class="col-sm-6 col-md-3">
-                                <img src="{{ cdn_url }}/images/library_benefits/so-sure_instant-cover.svg" width="150" height="150" alt="so-sure - Instant cover when you buy your policy">
-                                <h4 class="h-light">Instant cover when you buy your policy</h4>
-                            </div>
-                        </div>
+            <div class="landing-panel">
+                <div class="row">
+                    <div class="col-sm-6 col-md-3">
+                        <img src="{{ cdn_url }}/images/library_benefits/so-sure_next-working-day.svg" width="150" height="150" alt="so-sure - Next working day repair/replacement">
+                        <h4 class="h-light">Next working day replacement or repair</h4>
                     </div>
-
+                    <div class="col-sm-6 col-md-3">
+                        <img src="{{ cdn_url }}/images/library_benefits/so-sure_connections.svg" width="150" height="150" alt="so-sure - Cash back when you and your friends don’t claim">
+                        <h4 class="h-light">Cash back when you and your friends don’t claim</h4>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <img src="{{ cdn_url }}/images/library_benefits/so-sure_call-center-staff.svg" width="150" height="150" alt="so-sure - 24/7 Live Support">
+                        <h4 class="h-light">24/7 Live Support</h4>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <img src="{{ cdn_url }}/images/library_benefits/so-sure_instant-cover.svg" width="150" height="150" alt="so-sure - Instant cover when you buy your policy">
+                        <h4 class="h-light">Instant cover when you buy your policy</h4>
+                    </div>
                 </div>
             </div>
-
         </div>
     </section>
 

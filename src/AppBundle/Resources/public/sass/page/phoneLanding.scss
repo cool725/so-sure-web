@@ -47,6 +47,8 @@ a {
 }
 
 .landing-panel {
+    max-width: 860px;
+    margin: 0 auto;
     padding: 30px;
     @include border-radius(10px);
     border: none;
