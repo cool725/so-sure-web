@@ -21,11 +21,10 @@
 }
 
 .help-block {
-    font-size: 14px;
-}
 
-.error {
-    color: $red;
+    ul {
+        list-style: none;
+    }
 }
 
 .error.form-control {
@@ -42,7 +41,7 @@
     border-color: $green;
 }
 
-label {
+label, .help-block li {
     font-size: 15px;
     font-family: $avenir-book;
     font-weight: normal;
@@ -51,4 +50,12 @@ label {
     .req {
         color: $blue;
     }
+}
+
+.help-block.with-errors li {
+    color: $red;
+}
+
+.error {
+    color: $red;
 }
