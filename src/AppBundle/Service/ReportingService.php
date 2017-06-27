@@ -290,7 +290,7 @@ class ReportingService
         return $excludedPolicyIds;
     }
 
-    public function connectionReport($start, $end)
+    public function connectionReport()
     {
         $policyRepo = $this->dm->getRepository(PhonePolicy::class);
         $connectionRepo = $this->dm->getRepository(StandardConnection::class);

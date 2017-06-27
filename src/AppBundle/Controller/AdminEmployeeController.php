@@ -1002,7 +1002,7 @@ class AdminEmployeeController extends BaseController
 
         $reporting = $this->get('app.reporting');
         $report = $reporting->report($start, $end);
-        $report['data'] = array_merge($report['data'], $reporting->connectionReport($start, $end));
+        $report['data'] = array_merge($report['data'], $reporting->connectionReport());
 
         return $report;
     }
