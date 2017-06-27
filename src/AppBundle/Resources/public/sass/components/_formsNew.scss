@@ -52,3 +52,26 @@ label {
         color: $blue;
     }
 }
+
+// TT
+
+.form-inline {
+
+    @include breakpoint(tablet) {
+        .twitter-typeahead {
+            width: 260px;
+
+            .tt-input {
+                height: 52px;
+            }
+        }
+
+        .btn {
+            margin-top: -10px;
+        }
+    }
+}
+
+.search-phone-text {
+    border-color: $grey;
+}

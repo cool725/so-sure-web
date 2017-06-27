@@ -31,8 +31,13 @@ a {
 }
 
 .section-landing--search {
+    background-color: $off-white;
     position: relative;
     z-index: 4;
+
+    h2 {
+        margin-top: 0;
+    }
 }
 
 .curved-background {
@@ -63,7 +68,7 @@ a {
 }
 
 .search--box {
-    max-width: 320px;
+    max-width: 400px;
     margin: 0 auto;
 }
 

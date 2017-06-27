@@ -118,11 +118,11 @@
         {# End Curve #}
     </section>
 
-    <section class="section--pad section-landing section-landing--search background-white">
+    <section class="section--pad section-landing section-landing--search">
         <div class="container text-center">
             <h2 class="text-blue">Can't find your phone?</h2>
             <div class="search--box text-center">
-                        {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':''})) }}
+                        {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':'inline'})) }}
                 </div>
             </div>
         </div>
@@ -176,7 +176,7 @@
 
             <div class="row">
                 <div class="col-md-12">
-                    <img src="{{ cdn_url }}/images/library_phones/{{ make }}/{{ make }}-logo-so-sure.svg"
+                    <img src="{{ cdn_url }}/images/library_phones/{{ make }}/{{ make }}-logo-so-sure.png"
                          width="170"
                          height="60"
                          alt="so-sure - {{ make|capitalize }} {{ make_extra }} Insurance">
