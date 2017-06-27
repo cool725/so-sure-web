@@ -8,13 +8,13 @@ html, body {
 
 // Sections
 .section--pad {
-    padding: 20px 0;
+    padding: 40px 0;
 }
 
 @include breakpoint(mobileonly) {
 
 	.section--pad {
-	    padding: 30px 0;
+	    padding: 20px 0;
 	}
 
 }
