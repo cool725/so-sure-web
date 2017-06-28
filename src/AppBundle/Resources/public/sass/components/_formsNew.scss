@@ -61,7 +61,8 @@ label {
         .twitter-typeahead {
             width: 320px;
 
-            .tt-input {
+            .tt-input,
+            .tt-hint {
                 height: 52px;
             }
         }
