@@ -191,7 +191,7 @@ class DaviesService extends S3EmailService
             }
             similar_text(strtolower($claim->getPolicy()->getUser()->getName()), $daviesInsuredName, $percent);
 
-            if ($percent < 50) {
+            if ($percent < 50 && !$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_DAVIES_NAME_MATCH)) {
                 throw new \Exception(sprintf(
                     'Claim %s: %s does not match expected insuredName %s (match %0.1f)',
                     $daviesClaim->claimNumber,
@@ -199,7 +199,7 @@ class DaviesService extends S3EmailService
                     $claim->getPolicy()->getUser()->getName(),
                     $percent
                 ));
-            } elseif ($percent < 75) {
+            } elseif ($percent < 75 && !$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_DAVIES_NAME_MATCH)) {
                 $msg = sprintf(
                     'Claim %s: %s does not match expected insuredName %s (match %0.1f)',
                     $daviesClaim->claimNumber,
@@ -214,7 +214,7 @@ class DaviesService extends S3EmailService
             if ($daviesClaim->riskPostCode && !$this->postcodeCompare(
                 $claim->getPolicy()->getUser()->getBillingAddress()->getPostCode(),
                 $daviesClaim->riskPostCode
-            )) {
+            ) && !$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_DAVIES_POSTCODE)) {
                 $msg = sprintf(
                     'Claim %s: %s does not match expected postcode %s',
                     $daviesClaim->claimNumber,

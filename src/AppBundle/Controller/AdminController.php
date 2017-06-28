@@ -43,6 +43,7 @@ use AppBundle\Document\File\LloydsFile;
 use AppBundle\Document\Form\Cancel;
 use AppBundle\Form\Type\CancelPolicyType;
 use AppBundle\Form\Type\ClaimType;
+use AppBundle\Form\Type\ClaimFlagsType;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\ImeiType;
 use AppBundle\Form\Type\NoteType;
@@ -175,7 +176,8 @@ class AdminController extends BaseController
             $price = new PhonePrice();
             $price->setGwp($request->get('gwp'));
             $price->setValidFrom($from);
-            $price->setNotes($request->get('notes'));
+            $notes = $this->conformAlphanumericSpaceDot($this->getRequestString($request, 'notes'));
+            $price->setNotes($notes);
             if ($request->get('to')) {
                 $price->setValidTo($to);
             }
@@ -719,5 +721,46 @@ class AdminController extends BaseController
         }
 
         return new RedirectResponse($this->generateUrl('admin_feature_flags'));
+    }
+
+    /**
+     * @Route("/claim/flag/{id}", name="admin_claim_flags")
+     * @Method({"POST"})
+     */
+    public function adminClaimFlagsAction(Request $request, $id)
+    {
+        $formData = $request->get('claimflags');
+        if (!isset($formData['_token'])) {
+            throw new \InvalidArgumentException('Missing parameters');
+        }
+        /*
+        if (!$this->isCsrfTokenValid('default', $formData['_token'])) {
+            throw new \InvalidArgumentException('Invalid csrf token');
+        }
+        */
+
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Claim::class);
+        $claim = $repo->find($id);
+        if (!$claim) {
+            throw $this->createNotFoundException('Claim not found');
+        }
+
+        $formData = $request->get('claimflags');
+        $claim->clearIgnoreWarningFlags();
+        // may be empty if all unchecked
+        if (isset($formData['ignoreWarningFlags'])) {
+            foreach($formData['ignoreWarningFlags'] as $flag) {
+                $claim->setIgnoreWarningFlags($flag);
+            }
+        }
+        $dm->flush();
+
+        $this->addFlash(
+            'success',
+            'Claim flags updated'
+        );
+
+        return new RedirectResponse($this->generateUrl('admin_policy', ['id' => $claim->getPolicy()->getId()]));
     }
 }

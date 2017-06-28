@@ -19,6 +19,7 @@ use AppBundle\Form\Type\NoteType;
 use AppBundle\Form\Type\ClaimType;
 use AppBundle\Form\Type\ClaimCrimeRefType;
 use AppBundle\Form\Type\ClaimsCheckType;
+use AppBundle\Form\Type\ClaimFlagsType;
 use AppBundle\Form\Type\UserSearchType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -124,6 +125,9 @@ class ClaimsController extends BaseController
         $noteForm = $this->get('form.factory')
             ->createNamedBuilder('note_form', NoteType::class)
             ->getForm();
+        $claimFlags = $this->get('form.factory')
+            ->createNamedBuilder('claimflags', ClaimFlagsType::class, $claim)
+            ->getForm();
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('claim')) {
                 $formClaim->handleRequest($request);
@@ -215,6 +219,7 @@ class ClaimsController extends BaseController
             'formClaim' => $formClaim->createView(),
             'formClaimsCheck' => $formClaimsCheck->createView(),
             'formCrimeRef' => $formCrimeRef->createView(),
+            'formClaimFlags' => $claimFlags->createView(),
             'note_form' => $noteForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'claims_policy',
