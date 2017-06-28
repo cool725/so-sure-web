@@ -989,7 +989,9 @@ class ReceperioService extends BaseImeiService
         } catch (\Exception $e) {
             $this->logger->error('Unable to query claimscheck forces', ['exception' => $e]);
 
-            throw $e;
+            if ($this->environment == 'prod') {
+                throw $e;
+            }
         }
     }
 

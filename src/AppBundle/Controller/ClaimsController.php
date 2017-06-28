@@ -51,7 +51,9 @@ class ClaimsController extends BaseController
             return $this->redirectToRoute('admin_policies');
         }
 
-        $data = $this->searchPolicies($request, false);
+        $includeInvalid = $this->getParameter('kernel.environment') != 'prod';
+
+        $data = $this->searchPolicies($request, $includeInvalid);
         return array_merge($data, [
             'policy_route' => 'claims_policy'
         ]);
@@ -261,7 +263,8 @@ class ClaimsController extends BaseController
         $dm = $this->getManager();
         $repo = $dm->getRepository(Claim::class);
         $claim = $repo->find($id);
-        $claim->setNotes($request->get('notes'));
+        $notes = $this->conformAlphanumericSpaceDot($this->getRequestString($request, 'notes'), 500);
+        $claim->setNotes($notes);
 
         $dm->flush();
         $this->addFlash(
