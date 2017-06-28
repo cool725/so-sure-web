@@ -31,6 +31,7 @@ class DaviesExcel
             }
 
             if (!is_numeric($days)) {
+                $days = str_replace("\\", "", $days);
                 // unfortunately davies is incapable of formatting dates
                 // so may be an excel date or may be a d/m/Y formatted string
                 $date = \DateTime::createFromFormat('d/m/Y', $days);

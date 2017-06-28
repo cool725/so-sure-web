@@ -74,7 +74,7 @@ class DaviesService extends S3EmailService
             try {
                 $this->saveClaim($daviesClaim);
             } catch (\Exception $e) {
-                $success = false;
+                //$success = false;
                 $this->errors[$daviesClaim->claimNumber][] = $e->getMessage();
                 $this->logger->error(sprintf('Error processing file %s', $key), ['exception' => $e]);
             }

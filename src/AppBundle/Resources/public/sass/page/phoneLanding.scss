@@ -4,7 +4,10 @@
 @import "../common/paletteNew";
 
 body {
-    background-color: $white;
+
+    @include breakpoint(tablet) {
+        background-color: $lightest-blue;
+    }
 }
 
 a {
@@ -17,6 +20,63 @@ a {
     background-color: $white;
 }
 
+.section-landing {
+    position: relative;
+}
+
+.section-landing--title {
+    @include breakpoint(tablet) {
+        background-color: $off-white;
+    }
+}
+
+.section-landing--search {
+    background-color: $off-white;
+    position: relative;
+    z-index: 4;
+
+    h2 {
+        margin-top: 0;
+    }
+
+    @include breakpoint(tablet) {
+        margin: 40px 0;
+    }
+}
+
+.curved-background {
+    display: inline-block;
+    position: absolute;
+    top: 0; left: 0;
+    z-index: 2;
+}
+
+.curved-background-top {
+    top: 0;
+}
+
+.landing-panel {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 30px;
+    @include border-radius(10px);
+    border: none;
+    box-shadow: none;
+    position: relative;
+    z-index: 3;
+
+    @include breakpoint(tablet) {
+        background-color: $white;
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
+    }
+}
+
+.search--box {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+
 .phone {
     text-align: center;
 }
@@ -25,6 +85,7 @@ a {
     position: relative;
     border-color: transparent;
     padding-top: 30px;
+    margin-bottom: 0;
 
     > img {
         display: inline;
