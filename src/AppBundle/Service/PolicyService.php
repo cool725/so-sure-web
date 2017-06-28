@@ -806,6 +806,7 @@ class PolicyService
     public function resendPolicyEmail(Policy $policy)
     {
         $files = [];
+        // TODO: Refactor to use getPolicyScheduleFiles & getPolicyTermsFiles
         // make sure we get the most recent version of each file type as there may be more than 1 if regenerated
         foreach ($policy->getPolicyFiles() as $file) {
             $add = false;

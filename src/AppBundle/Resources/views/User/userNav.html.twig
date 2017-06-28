@@ -50,6 +50,12 @@
                     <li role="presentation" class="{% if app.request.get('_route') == 'user_home' or app.request.get('_route')  == 'user_policy' %}active{% endif %}"><a href="{{ path('user_home') }}">Home</a></li>
                     {# <li role="presentation"><a href="#">Personal Info</a></li> #}
                     <li role="presentation" class="{% if app.request.get('_route') == 'user_card_details' %}active{% endif %}"><a href="{{ path('user_card_details') }}">Payment Details</a></li>
+                    {% if policy.getPolicyTermsFiles|length > 0 %}
+                        <li role="presentation"><a href="{{ s3DownloadLink(policy.getPolicyTermsFiles[0].bucket, policy.getPolicyTermsFiles[0].key) }}"><i class="fa fa-download"></i> Policy Terms</a></li>
+                    {% endif %}
+                    {% if policy.getPolicyScheduleFiles|length > 0 %}
+                        <li role="presentation"><a href="{{ s3DownloadLink(policy.getPolicyScheduleFiles[0].bucket, policy.getPolicyScheduleFiles[0].key) }}"><i class="fa fa-download"></i> Policy Schedule</a></li>
+                    {% endif %}
                 </ul>
             </nav>
         </div>
