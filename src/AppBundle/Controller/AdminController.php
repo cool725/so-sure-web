@@ -750,7 +750,7 @@ class AdminController extends BaseController
         $claim->clearIgnoreWarningFlags();
         // may be empty if all unchecked
         if (isset($formData['ignoreWarningFlags'])) {
-            foreach($formData['ignoreWarningFlags'] as $flag) {
+            foreach ($formData['ignoreWarningFlags'] as $flag) {
                 $claim->setIgnoreWarningFlags($flag);
             }
         }
