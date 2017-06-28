@@ -73,6 +73,7 @@ use AppBundle\Form\Type\PendingPolicyCancellationType;
 use AppBundle\Form\Type\UserDetailType;
 use AppBundle\Form\Type\UserEmailType;
 use AppBundle\Form\Type\UserPermissionType;
+use AppBundle\Form\Type\ClaimFlagsType;
 use AppBundle\Exception\RedirectException;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -420,6 +421,11 @@ class AdminEmployeeController extends BaseController
             ->add('serial', TextType::class)
             ->add('check', SubmitType::class)
             ->getForm();
+        $claim = new Claim();
+        $claim->setPolicy($policy);
+        $claimFlags = $this->get('form.factory')
+            ->createNamedBuilder('claimflags', ClaimFlagsType::class, $claim)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('cancel_form')) {
@@ -729,6 +735,7 @@ class AdminEmployeeController extends BaseController
             'note_form' => $noteForm->createView(),
             'imei_form' => $imeiForm->createView(),
             'phone_form' => $phoneForm->createView(),
+            'formClaimFlags' => $claimFlags->createView(),
             'facebook_form' => $facebookForm->createView(),
             'receperio_form' => $receperioForm->createView(),
             'bacs_form' => $bacsForm->createView(),

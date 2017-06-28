@@ -56,3 +56,19 @@ $('#claimsModal').on('show.bs.modal', function (event) {
     modal.find('#claims-detail-incurred').text('');
   }
 });
+
+$('#flagsModal').on('show.bs.modal', function (event) {
+  var button = $(event.relatedTarget) // Button that triggered the modal
+  var flags = button.data('flags');
+  var update = button.data('update');
+  var modal = $(this);
+  if (flags) {
+    $('form[name="claimflags"]').attr('action', update);
+    $.each(flags, function(item) {
+      $('#claimflags_ignoreWarningFlags').find($("input[value='" + item + "']")).prop('checked', flags[item]);
+    });
+  } else {
+    $('#claimFlags').attr('action', null);
+    $('#claimflags_ignoreWarningFlags').find($("input[value='" + item + "']")).prop('checked', false);
+  }
+});
