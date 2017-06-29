@@ -135,7 +135,7 @@
     <div class="checkout--step checkout--step-payment">
         <div class="container">
 
-            {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form'}}) }}
+            {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'data-client-validation': form_client_validation }}) }}
                 <div class="form-group payment-options {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
                     {{ form_label(purchase_form.amount, 'Payment Options:', { 'label_attr': {'class': 'sr-only'} }) }}
                     {{ form_widget(purchase_form.amount) }}

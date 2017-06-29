@@ -112,7 +112,7 @@
         <div class="checkout--step">
             <div class="container">
 
-                {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form'}}) }}
+                {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'data-client-validation': form_client_validation}}) }}
 
                     <div class="form-step">
                         <div class="form-group {% if form_errors(purchase_form.firstName) %}has-error{% endif %}">
