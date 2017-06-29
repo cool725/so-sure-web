@@ -12,6 +12,8 @@ use AppBundle\Classes\Salva;
 use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\Connection\StandardConnection;
+use AppBundle\Document\File\PolicyTermsFile;
+use AppBundle\Document\File\PolicyScheduleFile;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PolicyRepository")
@@ -992,6 +994,33 @@ abstract class Policy
     public function getPolicyFiles()
     {
         return $this->policyFiles;
+    }
+
+    public function getPolicyFilesByType($type)
+    {
+        $files = [];
+        foreach ($this->getPolicyFiles() as $file) {
+            if ($file instanceof $type) {
+                $files[] = $file;
+            }
+        }
+
+        // sort more recent to older
+        usort($files, function ($a, $b) {
+            return $a->getCreated() < $b->getCreated();
+        });
+
+        return $files;
+    }
+
+    public function getPolicyScheduleFiles()
+    {
+        return $this->getPolicyFilesByType(PolicyScheduleFile::class);
+    }
+
+    public function getPolicyTermsFiles()
+    {
+        return $this->getPolicyFilesByType(PolicyTermsFile::class);
     }
 
     public function addPolicyFile(S3File $file)
