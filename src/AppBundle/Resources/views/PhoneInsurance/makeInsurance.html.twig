@@ -46,7 +46,7 @@
         </div>
     </section>
 
-    <section class="section-landing section-landing--top">
+    <section class="section-landing">
         <div class="container">
 
             <div class="owl-carousel owl-theme visible-xs">
@@ -129,26 +129,8 @@
             </div>
         </div>
     </section>
-{#
-    <section class="section-landing--bottom">
-        <div class="container">
 
-           {% if make == "Samsung" %}
-            <div class="landing-copy">
-                <div class="row">
-                    <div class="col-md-8 col-md-offset-2">
-                        <p>Samsung didn’t start getting serious about smartphones until they released the Samsung Galaxy S in 2010. While they had released earlier models - this was the first to really capture the imagination. The new phone used the Android operating system, had a top of the range processor and even a good quality camera.</p>
-                        <p>The phone has a devoted following and there are often clashes between them and fans of the iPhone. The two companies have had a heated rivalry over the past few years and are certainly intertwined.</p>
-                        <p>The Samsung Galaxy is a hugely reliable phone which offers you (nearly) all the features of the Apple iPhone. Synonymous with quality - Samsung always manufacture high-quality goods and the Galaxy series is no different.</p>
-                    </div>
-                </div>
-            </div>
-            {% endif %}
-
-        </div>
-    </section>
- #}
-    <section class="section-landing--bottom text-center">
+    <section class="text-center">
         <div class="container">
             <div class="landing-panel">
                 <div class="row">
@@ -173,11 +155,34 @@
         </div>
     </section>
 
-    <section class="section--pad section-landing--bottom text-center">
+    <section class="section--pad">
         <div class="container">
 
+           {% if make == "Samsung" %}
+            <div class="landing-copy">
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2">
+                        <p>Samsung didn’t start getting serious about smartphones until they released the Samsung Galaxy S in 2010. While they had released earlier models - this was the first to really capture the imagination. The new phone used the Android operating system, had a top of the range processor and even a good quality camera.</p>
+                        <p>The phone has a devoted following and there are often clashes between them and fans of the iPhone. The two companies have had a heated rivalry over the past few years and are certainly intertwined.</p>
+                        <p>The Samsung Galaxy is a hugely reliable phone which offers you (nearly) all the features of the Apple iPhone. Synonymous with quality - Samsung always manufacture high-quality goods and the Galaxy series is no different.</p><br>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+           {% if make == "Apple" %}
+            <div class="landing-copy">
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2">
+                        <p>The first edition of the Apple iPhone was released in 2007. The brainchild of former Apple genius Steve Jobs, the phone was the result of years of top-secret work which all began when Jobs commissioned the incredibly evocative ‘Project Purple’. Steve’s idea was to create a device that combined the mobility of the phone with all the best parts of the computer and they did just that.</p>
+                        <p>The iPhone has been massively popular since day one with over 800 million sold since 2007. While the mobile phone isn’t the world's most popular device (that title belongs to the Samsung Galaxy), it is certainly the most iconic - with most mobile apps and tech being almost synonymous with the ubiquitous iPhone.</p>
+                        <p>The invention of the iPhone was a watershed moment in the history of mobile phones and is credited with ushering in a new era of mobile technology as well as introducing the potential of the smartphone to a worldwide audience. It’s easy to take it for granted now but prior to the iPhone, phones were well….just phones! These magical devices play such a huge part in our day-to-day lives and we simply couldn’t live without them (hence why we started with mobile phone insurance).</p><br>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-12 text-center">
                     <img src="{{ cdn_url }}/images/library_phones/{{ make }}/{{ make }}-logo-so-sure.png"
                          width="170"
                          height="60"
@@ -188,9 +193,9 @@
                          alt="so-sure - mobile phone insurance">
                 </div>
             </div>
-
         </div>
     </section>
+
 
     {# Page Modals #}
 
