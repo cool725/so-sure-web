@@ -52,8 +52,42 @@ sosure.selectPhoneMake = (function() {
             //console.log(results);
             sync(results);
         } else {
-            alert('no fuse');
+            sync(null);
         }
+    }
+
+    self.searchExact = function (q, sync) {
+        if (typeof self.fuse !== 'undefined') {
+            results = self.fuse.search(q);
+            if (results.length > 0 && results[0].name == q) {
+                sync(results[0]);
+            } else {
+                sync(null);
+            }
+        } else {
+            sync(null);
+        }
+    }
+
+    self.setFormAction = function (id) {
+        var base_path = $('#search-phone-form').data('base-path');
+        if (!base_path) {
+            base_path = '/phone-insurance/';
+        }
+        $('#search-phone-form').attr('action', base_path + id);
+    }
+
+    self.setFormActionVal = function () {
+        if ($('#search-phone-form').attr('action')) {
+            return;
+        }
+        var q = $('#search-phone').val();
+        sosure.selectPhoneMake.searchExact(q, function(result) {
+            if (result && result.id) {
+                sosure.selectPhoneMake.setFormAction(result.id);
+                $('#search-phone-form').unbind('submit', sosure.selectPhoneMake.preventDefault);
+            }
+        });
     }
 
     // Twitter Typeahead
@@ -73,6 +107,7 @@ $(function(){
     // If the form action is already defined, then allow the form to submit
     if (!$('#search-phone-form').attr('action')) {
         $('#search-phone-form').bind('submit', sosure.selectPhoneMake.preventDefault);
+        setTimeout(function () { sosure.selectPhoneMake.setFormActionVal(); }, 3000);
     }
 
     $('#search-phone').typeahead({
@@ -110,11 +145,11 @@ $(function(){
     });
 
     $('#search-phone').bind('typeahead:select', function(ev, suggestion) {
-        var base_path = $('#search-phone-form').data('base-path');
-        if (!base_path) {
-            base_path = '/phone-insurance/';
-        }
-        $('#search-phone-form').attr('action', base_path + suggestion.id);
+        sosure.selectPhoneMake.setFormAction(suggestion.id);
     });
 
+    $('#search-phone').bind('typeahead:change', function(ev, suggestion) {
+        sosure.selectPhoneMake.setFormActionVal();
+    });
+    
 });

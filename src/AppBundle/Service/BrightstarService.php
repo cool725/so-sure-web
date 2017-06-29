@@ -86,7 +86,7 @@ class BrightstarService extends S3EmailService
         $policy = $claim->getPolicy();
         $user = $policy->getUser();
         similar_text(strtolower($user->getName()), $brightstar->name, $percent);
-        if ($percent < 50) {
+        if ($percent < 50 && !$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_BRIGHTSTAR_NAME_MATCH)) {
             throw new \Exception(sprintf(
                 'Brightstar Claim %s: %s does not match expected insuredName %s (match %0.1f)',
                 $brightstar->claimNumber,
@@ -94,7 +94,7 @@ class BrightstarService extends S3EmailService
                 $user->getName(),
                 $percent
             ));
-        } elseif ($percent < 75) {
+        } elseif ($percent < 75 && !$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_BRIGHTSTAR_NAME_MATCH)) {
             $msg = sprintf(
                 'Brightstar Claim %s: %s does not match expected insuredName %s (match %0.1f)',
                 $brightstar->claimNumber,
@@ -111,7 +111,7 @@ class BrightstarService extends S3EmailService
         if ($brightstar->postcode && !$this->postcodeCompare(
             $user->getBillingAddress()->getPostCode(),
             $brightstar->postcode
-        )) {
+        ) && !$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_BRIGHTSTAR_POSTCODE)) {
             $msg = sprintf(
                 'Brightstar Claim %s: %s (%s) does not match expected postcode %s (%s)',
                 $brightstar->claimNumber,
