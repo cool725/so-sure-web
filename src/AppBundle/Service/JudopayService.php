@@ -217,14 +217,18 @@ class JudopayService
         \DateTime $date = null
     ) {
         $this->statsd->startTiming("judopay.add");
-        // doesn't make sense to add payments for cancelled or expired policies
-        if (in_array($policy->getStatus(), [PhonePolicy::STATUS_CANCELLED, PhonePolicy::STATUS_EXPIRED])) {
+        // doesn't make sense to add payments for expired policies
+        if ($policy->getStatus() == PhonePolicy::STATUS_EXPIRED) {
             throw new \Exception('Unable to apply payment to cancelled/expired policy');
-        }
-
-        // A bit strange for payment to be applied to an active policy
-        // but make sure we credit that policy anyway
-        if ($policy->getStatus() == PhonePolicy::STATUS_ACTIVE) {
+        } elseif ($policy->getStatus() == PhonePolicy::STATUS_CANCELLED) {
+            // a bit unusual, but for remainder payments w/claim it could occur
+            $this->logger->warning(sprintf(
+                'Payment is being applied to a cancelled policy %s',
+                $policy->getId()
+            ));
+        } elseif ($policy->getStatus() == PhonePolicy::STATUS_ACTIVE) {
+            // shouldn't really happen as policy should be in unpaid status
+            // but seems to occur on occasion - make sure we credit that policy anyway
             $this->logger->warning(sprintf(
                 'Non-token payment is being applied to active policy %s',
                 $policy->getId()
