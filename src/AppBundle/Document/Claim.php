@@ -29,6 +29,18 @@ class Claim
     // Temporary status to allow the system to suggest closing a claim, as the policy is about to be cancelled
     const STATUS_PENDING_CLOSED = 'pending-closed';
 
+    const WARNING_FLAG_DAVIES_NAME_MATCH = 'davies-name-match';
+    const WARNING_FLAG_DAVIES_POSTCODE = 'davies-postcode';
+    const WARNING_FLAG_BRIGHTSTAR_NAME_MATCH = 'brightstar-name-match';
+    const WARNING_FLAG_BRIGHTSTAR_POSTCODE = 'brighstar-postcode';
+
+    public static $warningFlags = [
+        self::WARNING_FLAG_DAVIES_NAME_MATCH => self::WARNING_FLAG_DAVIES_NAME_MATCH,
+        self::WARNING_FLAG_DAVIES_POSTCODE => self::WARNING_FLAG_DAVIES_POSTCODE,
+        self::WARNING_FLAG_BRIGHTSTAR_NAME_MATCH => self::WARNING_FLAG_BRIGHTSTAR_NAME_MATCH,
+        self::WARNING_FLAG_BRIGHTSTAR_POSTCODE => self::WARNING_FLAG_BRIGHTSTAR_POSTCODE,
+    ];
+
     /**
      * @MongoDB\Id(strategy="auto")
      */
@@ -296,6 +308,11 @@ class Claim
      * @MongoDB\ReferenceMany(targetDocument="Charge", mappedBy="claim", cascade={"persist"})
      */
     protected $charges = array();
+
+    /**
+     * @MongoDB\Field(type="collection")
+     */
+    protected $ignoreWarningFlags = array();
 
     public function __construct()
     {
@@ -830,6 +847,31 @@ class Claim
     public function isOwnershipTransferClaim()
     {
         return in_array($this->getType(), [self::TYPE_LOSS, self::TYPE_THEFT]);
+    }
+
+    public function getIgnoreWarningFlags()
+    {
+        $data = [];
+        foreach (static::$warningFlags as $key => $value) {
+            $data[$key] = $this->isIgnoreWarningFlagSet($key);
+        }
+
+        return $data;
+    }
+
+    public function setIgnoreWarningFlags($flag)
+    {
+        $this->ignoreWarningFlags[] = $flag;
+    }
+
+    public function isIgnoreWarningFlagSet($flag)
+    {
+        return in_array($flag, $this->ignoreWarningFlags);
+    }
+
+    public function clearIgnoreWarningFlags()
+    {
+        $this->ignoreWarningFlags = array();
     }
 
     public static function sumClaims($claims)

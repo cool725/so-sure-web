@@ -356,6 +356,13 @@
                                     data-toggle="modal" data-target="#notesModal"
                                 data-update="{{ path('claims_notes', {'id': claim.id}) }}"
                                 data-notes="{{ claim.notes }}"><i class="fa fa-edit"></i></button>
+                              {% if is_granted('ROLE_ADMIN') %}
+                            <button title="Flags" type="button" class="btn btn-primary"
+                                    data-toggle="modal" data-target="#flagsModal"
+                                    data-flags="{{ claim.ignoreWarningFlags|json_encode }}"
+                                    data-update="{{ path('admin_claim_flags', {'id': claim.id}) }}"
+                            ><i class="fa fa-flag"></i></button>
+                            {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
@@ -880,6 +887,34 @@
       </div>
     </div>
 
+    {% if is_granted('ROLE_ADMIN') %}
+    <div class="modal fade" id="flagsModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document" style="width: 60%;">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Claim Ignore Flags</h4>
+          </div>
+            {{ form_start(formClaimFlags )}}
+          <div class="modal-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        {{ form_label(formClaimFlags.ignoreWarningFlags) }}
+                        {{ form_errors(formClaimFlags.ignoreWarningFlags) }}
+                        {{ form_widget(formClaimFlags.ignoreWarningFlags) }}
+                    </div>
+                </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+                {{ form_widget(formClaimFlags.update, {'label': 'Update Flags', 'attr': {'class': 'btn btn-success'}}) }}
+          </div>
+            {{ form_end(formClaimFlags )}}
+        </div>
+      </div>
+    </div>
+    {% endif %}
 {% include 'AppBundle::Claims/claimsModal.html.twig' %}
     {% if is_granted('ROLE_ADMIN') %}
     <div class="modal fade" id="bacsModal" tabindex="-1" role="dialog">
