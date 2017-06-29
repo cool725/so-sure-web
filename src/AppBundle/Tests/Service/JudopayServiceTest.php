@@ -652,6 +652,71 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals(4, $repo->countUnpaidScheduledPayments($policy));
     }
 
+    public function testRemainderPaymentCancelledPolicy()
+    {
+        $user = $this->createValidUser(static::generateEmail('testRemainderPaymentCancelledPolicy', $this));
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone);
+        static::$dm->persist($policy);
+
+        $details = self::$judopay->testPayDetails(
+            $user,
+            $policy->getId(),
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
+        );
+        if (!isset($details['cardDetails']) || !isset($details['cardDetails']['cardToken'])) {
+            throw new \Exception('Payment failed');
+        }
+
+        // @codingStandardsIgnoreStart
+        self::$judopay->add(
+            $policy,
+            $details['receiptId'],
+            $details['consumer']['consumerToken'],
+            $details['cardDetails']['cardToken'],
+            Payment::SOURCE_WEB_API,
+            "{\"clientDetails\":{\"OS\":\"Android OS 6.0.1\",\"kDeviceID\":\"da471ee402afeb24\",\"vDeviceID\":\"03bd3e3c-66d0-4e46-9369-cc45bb078f5f\",\"culture_locale\":\"en_GB\",\"deviceModel\":\"Nexus 5\",\"countryCode\":\"826\"}}"
+        );
+        // @codingStandardsIgnoreEnd
+
+        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
+        $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
+        $this->assertEquals(11, count($policy->getScheduledPayments()));
+        $this->assertEquals(self::$JUDO_TEST_CARD_LAST_FOUR, $policy->getPayments()[0]->getCardLastFour());
+
+        $policy->cancel(Policy::CANCELLED_COOLOFF);
+        static::$dm->flush();
+
+        $details = self::$judopay->testPayDetails(
+            $user,
+            sprintf('%sUP', $policy->getId()),
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice() * 11,
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
+        );
+
+        // @codingStandardsIgnoreStart
+        self::$judopay->add(
+            $policy,
+            $details['receiptId'],
+            $details['consumer']['consumerToken'],
+            $details['cardDetails']['cardToken'],
+            Payment::SOURCE_WEB_API,
+            "{\"clientDetails\":{\"OS\":\"Android OS 6.0.1\",\"kDeviceID\":\"da471ee402afeb24\",\"vDeviceID\":\"03bd3e3c-66d0-4e46-9369-cc45bb078f5f\",\"culture_locale\":\"en_GB\",\"deviceModel\":\"Nexus 5\",\"countryCode\":\"826\"}}"
+        );
+        // @codingStandardsIgnoreEnd
+
+        //\Doctrine\Common\Util\Debug::dump($policy);
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $repo->find($policy->getId());
+        $this->assertEquals(0, $updatedPolicy->getOutstandingPremium());
+    }
+
     public function testFailedProcessScheduledPaymentResult()
     {
         $this->clearEmail(static::$container);
