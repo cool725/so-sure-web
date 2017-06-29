@@ -107,6 +107,10 @@ class PhoneInsuranceController extends BaseController
             ['make' => $make, 'active' => true, 'highlight' => true],
             ['releaseDate' => 'desc', 'initialPrice' => 'desc']
         );
+        if (count($phones) == 0) {
+            throw $this->createNotFoundException('No phones with make are available');
+        }
+
         $phonesMem = [];
         foreach ($phones as $phone) {
             if (!isset($phonesMem[$phone->getName()])) {
