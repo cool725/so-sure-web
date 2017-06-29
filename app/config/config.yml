@@ -68,6 +68,7 @@ twig:
         davies_ip: "%davies_ip%"
         environment: "%kernel.environment%"
         digits_consumer_key: "%digits_consumer_key%"
+        form_client_validation: true
 
 doctrine_mongodb:
     connections:

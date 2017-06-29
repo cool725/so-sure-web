@@ -6,7 +6,9 @@ sosure.purchaseStepPhone = (function() {
 
     self.init = function() {
         self.form = $('.validate-form');
-        self.addValidation();
+        if (self.form.data('client-validation')) {
+            self.addValidation();
+        }
     }
 
     self.valid_credit_card = function(value) {

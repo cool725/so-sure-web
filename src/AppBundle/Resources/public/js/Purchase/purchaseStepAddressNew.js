@@ -10,7 +10,9 @@ sosure.purchaseStepAddress = (function() {
     self.init = function() {
         self.form = $('.validate-form');
         self.dobMask();
-        self.addValidation();
+        if (self.form.data('client-validation')) {
+            self.addValidation();
+        }
     }
 
     self.dobMask = function () {
