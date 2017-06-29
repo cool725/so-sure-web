@@ -62,6 +62,7 @@ class ExcelService
             "application/vnd.ms-office",
             "application/CDFV2-unknown",
             "application/octet-stream",
+            "application/x-msexcel",
         ])) {
             return self::FILETYPE_XLS;
         } else {
