@@ -26,9 +26,9 @@
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav navbar-right text-center">
                     {% if app.request.get('_route') == 'mobile_phone_insurance_for_your_company' %}
-                        <li><a href="{{ path('homepage') }}">Insurance for personal phones</a></li>
+                        <li><a href="{{ path('homepage') }}">Personal phones</a></li>
                     {% else %}
-                        <li><a href="{{ path('mobile_phone_insurance_for_your_company') }}">Insurance for your company</a></li>
+                        <li><a href="{{ path('mobile_phone_insurance_for_your_company') }}">Company phones</a></li>
                     {% endif %}
                     {% if app.user is not null and app.user %}
                         {% if is_granted('ROLE_ADMIN') %}
