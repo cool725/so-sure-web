@@ -111,6 +111,8 @@ class DaviesService extends S3EmailService
         }
 
         $claim->setDaviesStatus($daviesClaim->status);
+        // TODO: May want to normalize the davies status as well, but then would want an additional column
+        // $claim->setDaviesStatus($daviesClaim->getDaviesStatus());
 
         $claim->setExcess($daviesClaim->excess);
         $claim->setIncurred($daviesClaim->incurred);

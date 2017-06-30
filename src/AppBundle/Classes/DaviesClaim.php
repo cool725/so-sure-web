@@ -21,7 +21,9 @@ class DaviesClaim extends DaviesExcel
     const STATUS_OPEN = 'Open';
     const STATUS_CLOSED = 'Closed';
     const STATUS_REOPENED = 'Re-Opened';
+    const STATUS_REOPENED_ALT = 'ReOpened';
     const STATUS_RECLOSED = 'Re-Closed';
+    const STATUS_RECLOSED_ALT = 'ReClosed';
 
     const MISTATUS_SETTLED = 'Settled';
     const MISTATUS_WITHDRAWN = 'Withdrawn';
@@ -222,7 +224,8 @@ class DaviesClaim extends DaviesExcel
         if ($includeReOpened) {
             return in_array(strtolower($this->status), [
                 strtolower(self::STATUS_OPEN),
-                strtolower(self::STATUS_REOPENED)
+                strtolower(self::STATUS_REOPENED),
+                strtolower(self::STATUS_REOPENED_ALT),
             ]);
         } else {
             return in_array(strtolower($this->status), [strtolower(self::STATUS_OPEN)]);
@@ -235,10 +238,36 @@ class DaviesClaim extends DaviesExcel
             return in_array(strtolower($this->status), [
                 strtolower(self::STATUS_CLOSED),
                 strtolower(self::STATUS_RECLOSED),
+                strtolower(self::STATUS_RECLOSED_ALT),
             ]);
         } else {
             return in_array(strtolower($this->status), [strtolower(self::STATUS_CLOSED)]);
         }
+    }
+
+    public function getDaviesStatus()
+    {
+        if (in_array(strtolower($this->status), [
+                strtolower(self::STATUS_OPEN),
+            ])) {
+            return self::STATUS_OPEN;
+        } elseif (in_array(strtolower($this->status), [
+                strtolower(self::STATUS_CLOSED),
+            ])) {
+            return self::STATUS_CLOSED;
+        } elseif (in_array(strtolower($this->status), [
+                strtolower(self::STATUS_REOPENED),
+                strtolower(self::STATUS_REOPENED_ALT),
+            ])) {
+            return self::STATUS_REOPENED;
+        } elseif (in_array(strtolower($this->status), [
+                strtolower(self::STATUS_RECLOSED),
+                strtolower(self::STATUS_RECLOSED_ALT),
+            ])) {
+            return self::STATUS_RECLOSED;
+        }
+
+        return null;
     }
 
     public function getClaimStatus()
@@ -334,7 +363,9 @@ class DaviesClaim extends DaviesExcel
                 strtolower(self::STATUS_OPEN),
                 strtolower(self::STATUS_CLOSED),
                 strtolower(self::STATUS_REOPENED),
+                strtolower(self::STATUS_REOPENED_ALT),
                 strtolower(self::STATUS_RECLOSED),
+                strtolower(self::STATUS_RECLOSED_ALT),
             ])) {
                 throw new \Exception('Unknown claim status');
             }
