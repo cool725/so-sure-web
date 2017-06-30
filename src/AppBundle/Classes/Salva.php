@@ -40,21 +40,6 @@ class Salva
         }
     }
 
-    public function getTotalCommission(Policy $policy)
-    {
-        if ($policy->getPremiumPlan() == Policy::PLAN_MONTHLY) {
-            if ($policy->isFinalMonthlyPayment()) {
-                return self::FINAL_MONTHLY_TOTAL_COMMISSION;
-            } else {
-                return self::MONTHLY_TOTAL_COMMISSION;
-            }
-        } elseif ($policy->getPremiumPlan() == Policy::PLAN_YEARLY) {
-            return self::YEARLY_TOTAL_COMMISSION;
-        } else {
-            return null;
-        }
-    }
-
     public function getProrataSplit($commission)
     {
         $rate = $commission / self::YEARLY_TOTAL_COMMISSION;
