@@ -22,7 +22,9 @@ sosure.purchaseStepAddress = (function() {
 
     self.addValidation = function() {
         self.form.validate({
-            debug: true,
+            debug: false,
+            onkeyup: false,
+            focusCleanup: true,
             validClass: 'has-success',
             rules: {
                 "purchase_form[name]" : {
