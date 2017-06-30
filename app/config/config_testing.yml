@@ -71,7 +71,7 @@ swiftmailer:
     default_mailer: default
     mailers:
         default:
-            delivery_address: "tech+envmail@so-sure.com"
+            delivery_address: "non-prod-web@so-sure.com"
 
 staffim_rollbar:
     # Rollbar access token
