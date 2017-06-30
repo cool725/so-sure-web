@@ -799,6 +799,8 @@ class JudopayServiceTest extends WebTestCase
             $payment = new JudoPayment();
             $payment->setResult(JudoPayment::RESULT_SUCCESS);
             $payment->setAmount($scheduledPayment->getAmount());
+            $policy->addPayment($payment);
+
             self::$judopay->setCommission($policy, $payment);
 
             self::$judopay->processScheduledPaymentResult(
@@ -806,7 +808,6 @@ class JudopayServiceTest extends WebTestCase
                 $payment,
                 clone $scheduledPayment->getScheduled()
             );
-            $policy->addPayment($payment);
             $this->assertEquals(ScheduledPayment::STATUS_SUCCESS, $scheduledPayment->getStatus());
             $this->assertEquals(
                 Salva::MONTHLY_TOTAL_COMMISSION,
@@ -814,11 +815,16 @@ class JudopayServiceTest extends WebTestCase
             );
         }
 
-        $this->assertTrue($policy->isFinalMonthlyPayment());
         $scheduledPayment = $policy->getNextScheduledPayment();
+
+        $this->assertTrue($policy->isFinalMonthlyPayment());
+        $this->assertEquals($policy->getOutstandingPremium(), $scheduledPayment->getAmount());
+
         $payment = new JudoPayment();
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $payment->setAmount($scheduledPayment->getAmount());
+        $policy->addPayment($payment);
+
         self::$judopay->setCommission($policy, $payment);
 
         self::$judopay->processScheduledPaymentResult(
@@ -826,7 +832,6 @@ class JudopayServiceTest extends WebTestCase
             $payment,
             clone $scheduledPayment->getScheduled()
         );
-        $policy->addPayment($payment);
         self::$dm->flush();
         $this->assertEquals(ScheduledPayment::STATUS_SUCCESS, $scheduledPayment->getStatus());
         $this->assertEquals(
