@@ -117,7 +117,7 @@
                     <div class="form-step">
                         <div class="form-group {% if form_errors(purchase_form.firstName) %}has-error{% endif %}">
                             {{ form_label(purchase_form.name, 'Full Name:', { 'label_attr': {'class': 'sr-only'} }) }}
-                            {{ form_widget(purchase_form.name, {'attr':{'class':'form-control', 'placeholder': 'Full Name'}}) }}
+                            {{ form_widget(purchase_form.name, {'attr':{'class':'form-control', 'placeholder': 'Full Name', 'autofocus': 'autofocus'}}) }}
                             <div class="help-block with-errors">{{ form_errors(purchase_form.name) }}</div>
                         </div>
 
