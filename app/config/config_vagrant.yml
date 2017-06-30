@@ -63,7 +63,7 @@ swiftmailer:
     default_mailer: default
     mailers:
         default:
-            delivery_address: "tech+envmail@so-sure.com"
+            delivery_address: "non-prod-web@so-sure.com"
 
 snc_redis:
     profiler_storage:

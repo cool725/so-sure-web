@@ -201,15 +201,16 @@ class DaviesClaim extends DaviesExcel
 
     public function getClaimType()
     {
-        if (stripos($this->lossType, self::TYPE_LOSS) !== false) {
+        $lossType = strtolower($this->lossType);
+        if (stripos($lossType, strtolower(self::TYPE_LOSS)) !== false) {
             return Claim::TYPE_LOSS;
-        } elseif (stripos($this->lossType, self::TYPE_THEFT) !== false) {
+        } elseif (stripos($lossType, strtolower(self::TYPE_THEFT)) !== false) {
             return Claim::TYPE_THEFT;
-        } elseif (stripos($this->lossType, self::TYPE_DAMAGE) !== false) {
+        } elseif (stripos($lossType, strtolower(self::TYPE_DAMAGE)) !== false) {
             return Claim::TYPE_DAMAGE;
-        } elseif (stripos($this->lossType, self::TYPE_EXTENDED_WARRANTY) !== false) {
+        } elseif (stripos($lossType, strtolower(self::TYPE_EXTENDED_WARRANTY)) !== false) {
             return Claim::TYPE_EXTENDED_WARRANTY;
-        } elseif (stripos($this->lossType, self::TYPE_WARRANTY) !== false) {
+        } elseif (stripos($lossType, strtolower(self::TYPE_WARRANTY)) !== false) {
             return Claim::TYPE_WARRANTY;
         } else {
             return null;
