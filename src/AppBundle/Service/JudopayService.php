@@ -533,7 +533,7 @@ class JudopayService
                 'ADJUSTMENT NEEDED!! Expected %f or %f (or maybe %f), not %f for payment id: %s',
                 $premium->getMonthlyPremiumPrice(),
                 $premium->getYearlyPremiumPrice(),
-                $policy->getOutstandingPremium(),
+                $payment->getPolicy()->getOutstandingPremium(),
                 $payment->getAmount(),
                 $payment->getId()
             );
