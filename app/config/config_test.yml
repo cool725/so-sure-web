@@ -29,4 +29,4 @@ swiftmailer:
     mailers:
         default:
             transport:  null
-            delivery_address: "tech+envmail@so-sure.com"
+            delivery_address: "non-prod-web@so-sure.com"
