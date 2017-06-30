@@ -2,7 +2,7 @@
 
 // Overides
 .form-control {
-    border: 2px solid $grey-light;
+    border: 1px solid $grey-light;
     box-shadow: none;
 
     margin-bottom: 5px;
@@ -51,7 +51,7 @@ label {
 	min-width: 100%;
 	padding: 10px 15px;
 	background-color: $white;
-	border: 2px solid $grey-light;
+	border: 1px solid $grey-light;
 	@include border-radius(4px);
 	box-shadow: none;
 	color: $black;
@@ -76,7 +76,7 @@ label {
     max-height: 176px;
     margin: -2px 0 0;
     background-color: $white;
-    border: 2px solid $grey-light;
+    border: 1px solid $grey-light;
     @include border-bottom-radius(4px);
     overflow-y: scroll;
     cursor: pointer;
