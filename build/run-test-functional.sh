@@ -52,7 +52,7 @@ if [ -f  app/logs/test.log ]; then
 fi
 
 if [ -d /dev/shm/cache/test ]; then
-  sudo rm -rf /dev/shm/cache/test/
+  rm -rf /dev/shm/cache/test/
 fi
 
 function init {
