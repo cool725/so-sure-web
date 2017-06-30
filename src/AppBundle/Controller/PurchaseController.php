@@ -231,21 +231,7 @@ class PurchaseController extends BaseController
             ) : null,
         );
 
-        $alternative = $request->get('force_result');
-        if (!$alternative) {
-            $alternative = $this->getSessionSixpackTest(
-                $request,
-                SixpackService::EXPERIMENT_PURCHASE_FLOW,
-                // [SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL, SixpackService::ALTERNATIVES_PURCHASE_FLOW_NEW]
-                [SixpackService::ALTERNATIVES_PURCHASE_FLOW_NEW, SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL]
-            );
-        }
-
-        if ($alternative == SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL) {
-            return $this->render('AppBundle:Purchase:purchaseStepPersonalAddress.html.twig', $data);
-        } else {
-            return $this->render('AppBundle:Purchase:purchaseStepPersonalAddressNew.html.twig', $data);
-        }
+        return $this->render('AppBundle:Purchase:purchaseStepPersonalAddressNew.html.twig', $data);
     }
 
     /**
@@ -282,21 +268,7 @@ class PurchaseController extends BaseController
             ) : null,
         );
 
-        $alternative = $request->get('force_result');
-        if (!$alternative) {
-            $alternative = $this->getSessionSixpackTest(
-                $request,
-                SixpackService::EXPERIMENT_PURCHASE_FLOW,
-                // [SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL, SixpackService::ALTERNATIVES_PURCHASE_FLOW_NEW]
-                [SixpackService::ALTERNATIVES_PURCHASE_FLOW_NEW, SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL]
-            );
-        }
-
-        if ($alternative == SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL) {
-            return $this->render('AppBundle:Purchase:purchaseStepPhoneNoPhone.html.twig', $data);
-        } else {
-            return $this->render('AppBundle:Purchase:purchaseStepPhoneNoPhoneNew.html.twig', $data);
-        }
+        return $this->render('AppBundle:Purchase:purchaseStepPhoneNoPhoneNew.html.twig', $data);
     }
 
     /**
@@ -322,16 +294,6 @@ class PurchaseController extends BaseController
         $this->denyAccessUnlessGranted(UserVoter::ADD_POLICY, $user);
         if (!$user->hasValidBillingDetails()) {
             return $this->redirectToRoute('purchase_step_personal');
-        }
-
-        $alternative = $request->get('force_result');
-        if (!$alternative) {
-            $alternative = $this->getSessionSixpackTest(
-                $request,
-                SixpackService::EXPERIMENT_PURCHASE_FLOW,
-                // [SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL, SixpackService::ALTERNATIVES_PURCHASE_FLOW_NEW]
-                [SixpackService::ALTERNATIVES_PURCHASE_FLOW_NEW, SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL]
-            );
         }
 
         $dm = $this->getManager();
@@ -363,10 +325,8 @@ class PurchaseController extends BaseController
             }
         }
 
-        if ($alternative == SixpackService::ALTERNATIVES_PURCHASE_FLOW_NEW) {
-            $purchase->setAgreed(true);
-            $purchase->setNew(true);
-        }
+        $purchase->setAgreed(true);
+        $purchase->setNew(true);
 
         $purchaseForm = $this->get('form.factory')
             ->createNamedBuilder('purchase_form', PurchaseStepPhoneType::class, $purchase)
@@ -531,11 +491,7 @@ class PurchaseController extends BaseController
             'billing_date' => $billingDate,
         );
 
-        if ($alternative == SixpackService::ALTERNATIVES_PURCHASE_FLOW_ORIGINAL) {
-            return $this->render('AppBundle:Purchase:purchaseStepPhoneReview.html.twig', $data);
-        } else {
-            return $this->render('AppBundle:Purchase:purchaseStepPhoneReviewNew.html.twig', $data);
-        }
+        return $this->render('AppBundle:Purchase:purchaseStepPhoneReviewNew.html.twig', $data);
     }
 
     /**

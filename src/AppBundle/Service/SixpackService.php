@@ -17,13 +17,9 @@ class SixpackService
     const EXPERIMENT_LANDING_HOME = 'landing-or-home';
     const EXPERIMENT_CPC_QUOTE_MANUFACTURER = 'cpc-quote-or-manufacturer';
     const EXPERIMENT_SHARE_MESSAGE = 'share-message';
-    const EXPERIMENT_PURCHASE_FLOW = 'purchase-flow';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_SHARE_MESSAGE_ORIGINAL = 'original';
-
-    const ALTERNATIVES_PURCHASE_FLOW_ORIGINAL = 'original';
-    const ALTERNATIVES_PURCHASE_FLOW_NEW = 'new';
 
     // Completed test - SW-45
     // const EXPERIMENT_QUOTE_CALC_LOWER = 'quote-calc-lower';
