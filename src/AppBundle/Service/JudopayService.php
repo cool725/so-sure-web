@@ -910,9 +910,8 @@ class JudopayService
             // Yearly broker will include the final monthly calc in the total
             $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
         } elseif ($evenlyDivisbile) {
-            // TODO: has payment been credited at this point?
-            $outstanding = $policy->getOutstandingPremium();
-            $includeFinal = $this->areEqualToTwoDp($outstanding, $payment->getAmount());
+            // payment should already be credited at this point
+            $includeFinal = $this->areEqualToTwoDp(0, $policy->getOutstandingPremium());
             $numPayments = round($divisible, 0);
             $commission = Salva::MONTHLY_TOTAL_COMMISSION * $numPayments;
             if ($includeFinal) {

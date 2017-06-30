@@ -938,4 +938,95 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $updatedPolicy3->getStatus());
         $this->assertGreaterThan(5, strlen($updatedPolicy3->getPolicyNumber()));
     }
+
+    public function testJudoCommissionAmounts()
+    {
+        $user = $this->createValidUser(static::generateEmail('testJudoCommissionAmounts', $this));
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
+        $payment = new JudoPayment();
+        $payment->setAmount($policy->getPremium()->getYearlyPremiumPrice());
+        self::$judopay->setCommission($policy, $payment);
+        $this->assertEquals(
+            Salva::YEARLY_TOTAL_COMMISSION,
+            $payment->getTotalCommission()
+        );
+
+        $payment = new JudoPayment();
+        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
+        self::$judopay->setCommission($policy, $payment);
+        $this->assertEquals(
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            $payment->getTotalCommission()
+        );
+
+        $payment = new JudoPayment();
+        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice() * 3);
+        self::$judopay->setCommission($policy, $payment);
+        $this->assertEquals(
+            Salva::MONTHLY_TOTAL_COMMISSION * 3,
+            $payment->getTotalCommission()
+        );
+
+        $payment = new JudoPayment();
+        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice() * 1.5);
+        self::$judopay->setCommission($policy, $payment);
+        $this->assertNull($payment->getTotalCommission());
+    }
+
+    public function testJudoCommissionActual()
+    {
+        $user = $this->createValidUser(static::generateEmail('testJudoCommissionActual', $this));
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
+
+        $details = self::$judopay->testPayDetails(
+            $user,
+            $policy->getId(),
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
+        );
+        static::$policyService->setEnvironment('prod');
+        self::$judopay->add(
+            $policy,
+            $details['receiptId'],
+            $details['consumer']['consumerToken'],
+            $details['cardDetails']['cardToken'],
+            Payment::SOURCE_WEB_API
+        );
+        static::$policyService->setEnvironment('test');
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $repo->find($policy->getId());
+
+        $amount = $updatedPolicy->getPremium()->getMonthlyPremiumPrice() * 11;
+        $this->assertEquals($updatedPolicy->getOutstandingPremium(), $amount);
+
+        $details = self::$judopay->testPayDetails(
+            $user,
+            sprintf('%sR', $policy->getId()),
+            $amount,
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
+        );
+        static::$policyService->setEnvironment('prod');
+        self::$judopay->add(
+            $updatedPolicy,
+            $details['receiptId'],
+            $details['consumer']['consumerToken'],
+            $details['cardDetails']['cardToken'],
+            Payment::SOURCE_WEB_API
+        );
+        static::$policyService->setEnvironment('test');
+
+        $payment = $updatedPolicy->getLastSuccessfulPaymentCredit();
+        $this->assertEquals(
+            Salva::MONTHLY_TOTAL_COMMISSION * 10 + Salva::FINAL_MONTHLY_TOTAL_COMMISSION,
+            $payment->getTotalCommission()
+        );
+    }
 }
