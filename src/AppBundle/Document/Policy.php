@@ -2500,6 +2500,16 @@ abstract class Policy
             $this->getPromoPotValue() == $this->calculatePotValue(true);
     }
 
+    public function hasCorrectCommissionPayments(\DateTime $date = null)
+    {
+        $salva = new Salva();
+        $premium = $this->getPremium();
+        $numPayments = $premium->getNumberOfMonthlyPayments($this->getTotalSuccessfulPayments($date));
+        $expectedCommission = $salva->sumBrokerFee($numPayments, $numPayments == 12);
+
+        return $this->areEqualToTwoDp($this->getTotalCommissionPaid($date), $expectedCommission);
+    }
+
     public function getPremiumPayments()
     {
         return [

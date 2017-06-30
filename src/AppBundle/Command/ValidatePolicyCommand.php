@@ -109,6 +109,11 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 $lines[] = $this->failureStatusMessage($policy, $prefix, $validateDate);
             }
 
+            $valid = $policy->hasCorrectCommissionPayments($validateDate);
+            if ($valid === false) {
+                $lines[] = $this->failureCommissionMessage($policy, $prefix, $validateDate);
+            }
+
             $valid = $policy->hasCorrectIptRate();
             if ($valid === false) {
                 $lines[] = $this->failureIptRateMessage($policy);
@@ -205,6 +210,11 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     $warnClaim = true;
                     $lines[] = $this->failureStatusMessage($policy, $prefix, $validateDate);
                 }
+                if ($policy->hasCorrectCommissionPayments($validateDate) === false) {
+                    $this->header($policy, $policies, $lines);
+                    $warnClaim = true;
+                    $lines[] = $this->failureCommissionMessage($policy, $prefix, $validateDate);
+                }
                 if ($warnClaim && $policy->hasOpenClaim()) {
                     $this->header($policy, $policies, $lines);
                     $lines[] = sprintf(
@@ -271,9 +281,17 @@ class ValidatePolicyCommand extends ContainerAwareCommand
     private function failureStatusMessage($policy, $prefix, $date)
     {
         return sprintf(
-            'Unexpected status %s',
+            'Unexpected status %s %s',
             $policy->getPolicyNumber() ? $policy->getPolicyNumber() : $policy->getId(),
             $policy->getStatus()
+        );
+    }
+
+    private function failureCommissionMessage($policy, $prefix, $date)
+    {
+        return sprintf(
+            'Unexpected commission for policy %s',
+            $policy->getPolicyNumber() ? $policy->getPolicyNumber() : $policy->getId()
         );
     }
 
