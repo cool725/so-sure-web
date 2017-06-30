@@ -902,21 +902,19 @@ class JudopayService
 
     public function setCommission($policy, $payment)
     {
-        $divisible = $payment->getAmount() / $policy->getPremium()->getMonthlyPremiumPrice();
-        $evenlyDivisbile = $this->areEqualToFourDp(0, $divisible - floor($divisible)) ||
-            $this->areEqualToFourDp(0, ceil($divisible) - $divisible);
+        $salva = new Salva();
+        $premium = $policy->getPremium();
+
         // Only set broker fees if we know the amount
         if ($this->areEqualToFourDp($payment->getAmount(), $policy->getPremium()->getYearlyPremiumPrice())) {
-            // Yearly broker will include the final monthly calc in the total
-            $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
-        } elseif ($evenlyDivisbile) {
+            $commission = $salva->sumBrokerFee(12, true);
+            $payment->setTotalCommission($commission);
+        } elseif ($premium->isEvenlyDivisible($payment->getAmount())) {
             // payment should already be credited at this point
             $includeFinal = $this->areEqualToTwoDp(0, $policy->getOutstandingPremium());
-            $numPayments = round($divisible, 0);
-            $commission = Salva::MONTHLY_TOTAL_COMMISSION * $numPayments;
-            if ($includeFinal) {
-                $commission += Salva::FINAL_MONTHLY_TOTAL_COMMISSION - Salva::MONTHLY_TOTAL_COMMISSION;
-            }
+
+            $numPayments = $premium->getNumberOfMonthlyPayments($payment->getAmount());
+            $commission = $salva->sumBrokerFee($numPayments, $includeFinal);
             $payment->setTotalCommission($commission);
         } else {
             $this->logger->error(sprintf(

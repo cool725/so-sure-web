@@ -104,4 +104,25 @@ abstract class Premium
     {
         return $this->getYearlyGwpActual() * $this->getIptRate();
     }
+
+    public function isEvenlyDivisible($amount)
+    {
+        $divisible = $amount / $this->getMonthlyPremiumPrice();
+        $evenlyDivisbile = $this->areEqualToFourDp(0, $divisible - floor($divisible)) ||
+                    $this->areEqualToFourDp(0, ceil($divisible) - $divisible);
+
+        return $evenlyDivisbile;
+    }
+
+    public function getNumberOfMonthlyPayments($amount)
+    {
+        if (!$this->isEvenlyDivisible($amount)) {
+            return null;
+        }
+
+        $divisible = $amount / $this->getMonthlyPremiumPrice();
+        $numPayments = round($divisible, 0);
+
+        return $numPayments;
+    }
 }
