@@ -70,44 +70,4 @@ class SalvaTest extends \PHPUnit_Framework_TestCase
         $salva = new Salva();
         $salva->getProrataSplit(10.73);
     }
-
-    public function testTotalCommission()
-    {
-        $salva = new Salva();
-
-        $policy = new SalvaPhonePolicy();
-        $policy->setPremium(new PhonePremium());
-        $this->assertEquals(null, $salva->getTotalCommission($policy));
-
-        $policy->setPremiumInstallments(1);
-        $this->assertEquals(Salva::YEARLY_TOTAL_COMMISSION, $salva->getTotalCommission($policy));
-
-        $policy->setPremiumInstallments(12);
-        $this->assertEquals(Salva::MONTHLY_TOTAL_COMMISSION, $salva->getTotalCommission($policy));
-    }
-
-    public function testTotalCommissionFinalMonth()
-    {
-        $salva = new Salva();
-
-        $policy = new SalvaPhonePolicy();
-        $policy->setPremiumInstallments(12);
-        $policy->setStatus(SalvaPhonePolicy::STATUS_PENDING);
-
-        $phonePrice = new PhonePrice();
-        $phonePrice->setMonthlyPremiumPrice(1);
-
-        $premium = $phonePrice->createPremium();
-        $policy->setPremium($premium);
-        for ($i = 1; $i <= 11; $i++) {
-            $payment = new JudoPayment();
-            $payment->setAmount(1);
-            $payment->setResult(JudoPayment::RESULT_SUCCESS);
-            $policy->addPayment($payment);
-        }
-        //\Doctrine\Common\Util\Debug::dump($policy, 3);
-        $this->assertTrue($policy->isPolicy());
-        $this->assertTrue($policy->isFinalMonthlyPayment());
-        $this->assertEquals(Salva::FINAL_MONTHLY_TOTAL_COMMISSION, $salva->getTotalCommission($policy));
-    }
 }

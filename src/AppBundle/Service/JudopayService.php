@@ -515,20 +515,7 @@ class JudopayService
             throw new PaymentDeclinedException();
         }
 
-        // Only set broker fees if we know the amount
-        if ($this->areEqualToFourDp($payment->getAmount(), $policy->getPremium()->getYearlyPremiumPrice())) {
-            // Yearly broker will include the final monthly calc in the total
-            $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
-        } elseif ($this->areEqualToFourDp($payment->getAmount(), $policy->getPremium()->getMonthlyPremiumPrice())) {
-            // This is always the first payment, so shouldn't have to worry about the final one
-            $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
-        } else {
-            $this->logger->error(sprintf(
-                'Failed set correct commission for %f (policy %s)',
-                $payment->getAmount(),
-                $policy->getId()
-            ));
-        }
+        $this->setCommission($policy, $payment);
 
         return $payment;
     }
@@ -540,11 +527,13 @@ class JudopayService
         if (!in_array($this->toTwoDp($payment->getAmount()), [
                 $this->toTwoDp($premium->getMonthlyPremiumPrice()),
                 $this->toTwoDp($premium->getYearlyPremiumPrice()),
+                $this->toTwoDp($payment->getPolicy()->getOutstandingPremium()),
             ])) {
             $errMsg = sprintf(
-                'ADJUSTMENT NEEDED!! Expected %f or %f, not %f for payment id: %s',
+                'ADJUSTMENT NEEDED!! Expected %f or %f (or maybe %f), not %f for payment id: %s',
                 $premium->getMonthlyPremiumPrice(),
                 $premium->getYearlyPremiumPrice(),
+                $payment->getPolicy()->getOutstandingPremium(),
                 $payment->getAmount(),
                 $payment->getId()
             );
@@ -890,7 +879,9 @@ class JudopayService
 
         // Ensure the correct amount is paid
         $this->validatePaymentAmount($payment);
-
+        
+        // TODO: Validate receipt does not set commission on failed payments, but token does
+        // make consistent
         $this->setCommission($policy, $payment);
 
         // Primarily used to allow tests to avoid triggering policy events
@@ -911,9 +902,29 @@ class JudopayService
 
     public function setCommission($policy, $payment)
     {
-        // TODO: Should this only be for success payments?
-        $salva = new Salva();
-        $payment->setTotalCommission($salva->getTotalCommission($policy));
+        $divisible = $payment->getAmount() / $policy->getPremium()->getMonthlyPremiumPrice();
+        $evenlyDivisbile = $this->areEqualToFourDp(0, $divisible - floor($divisible)) ||
+            $this->areEqualToFourDp(0, ceil($divisible) - $divisible);
+        // Only set broker fees if we know the amount
+        if ($this->areEqualToFourDp($payment->getAmount(), $policy->getPremium()->getYearlyPremiumPrice())) {
+            // Yearly broker will include the final monthly calc in the total
+            $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
+        } elseif ($evenlyDivisbile) {
+            // payment should already be credited at this point
+            $includeFinal = $this->areEqualToTwoDp(0, $policy->getOutstandingPremium());
+            $numPayments = round($divisible, 0);
+            $commission = Salva::MONTHLY_TOTAL_COMMISSION * $numPayments;
+            if ($includeFinal) {
+                $commission += Salva::FINAL_MONTHLY_TOTAL_COMMISSION - Salva::MONTHLY_TOTAL_COMMISSION;
+            }
+            $payment->setTotalCommission($commission);
+        } else {
+            $this->logger->error(sprintf(
+                'Failed set correct commission for %f (policy %s)',
+                $payment->getAmount(),
+                $policy->getId()
+            ));
+        }
     }
 
     /**
