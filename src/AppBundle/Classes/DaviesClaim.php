@@ -29,6 +29,18 @@ class DaviesClaim extends DaviesExcel
     const MISTATUS_WITHDRAWN = 'Withdrawn';
     const MISTATUS_REPUDIATED = 'Repudiated';
 
+    const MISTATUS_ADJUSTER_CORREPONDENCE = "Adjuster Correspondence";
+    const MISTATUS_ADJUSTER_FEE = "Adjuster Fee";
+    const MISTATUS_CLAIMANT_CORRESPONDENCE = "Claimant Correspondence";
+    const MISTATUS_CONTRIBUTION = "Contribution";
+    const MISTATUS_RECOVERY = "Recovery";
+    const MISTATUS_RETURNED_CHEQUE = "Returned Cheque";
+    const MISTATUS_SUPPLIER_CORRESPONDENCE = "Supplier Correspondence";
+    const MISTATUS_SUPPLIER_FEE = "Supplier Fee";
+    const MISTATUS_ERROR = "DMS Error";
+    const MISTATUS_COMPLAINT = "Complaint";
+    const MISTATUS_INSURER = "Contact from insurer";
+
     const TYPE_LOSS = 'Loss';
     const TYPE_THEFT = 'Theft';
     const TYPE_DAMAGE = 'Damage';
@@ -370,10 +382,21 @@ class DaviesClaim extends DaviesExcel
                 throw new \Exception('Unknown claim status');
             }
 
-            if ($this->miStatus !== null && !in_array($this->miStatus, [
-                self::MISTATUS_SETTLED,
-                self::MISTATUS_WITHDRAWN,
-                self::MISTATUS_REPUDIATED,
+            if ($this->miStatus !== null && !in_array(strtolower($this->miStatus), [
+                strtolower(self::MISTATUS_SETTLED),
+                strtolower(self::MISTATUS_WITHDRAWN),
+                strtolower(self::MISTATUS_REPUDIATED),
+                strtolower(self::MISTATUS_ADJUSTER_CORREPONDENCE),
+                strtolower(self::MISTATUS_ADJUSTER_FEE),
+                strtolower(self::MISTATUS_CLAIMANT_CORRESPONDENCE),
+                strtolower(self::MISTATUS_CONTRIBUTION),
+                strtolower(self::MISTATUS_RECOVERY),
+                strtolower(self::MISTATUS_RETURNED_CHEQUE),
+                strtolower(self::MISTATUS_SUPPLIER_CORRESPONDENCE),
+                strtolower(self::MISTATUS_SUPPLIER_FEE),
+                strtolower(self::MISTATUS_ERROR),
+                strtolower(self::MISTATUS_COMPLAINT),
+                strtolower(self::MISTATUS_INSURER),
             ])) {
                 throw new \Exception('Unknown claim detail status');
             }
