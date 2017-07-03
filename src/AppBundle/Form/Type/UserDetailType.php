@@ -27,7 +27,7 @@ class UserDetailType extends AbstractType
         $builder
             ->add('firstName', TextType::class)
             ->add('lastName', TextType::class)
-            ->add('birthday', DateType::class)
+            ->add('birthday', DateType::class, ['years' => $years])
             ->add('mobileNumber', TextType::class)
             ->add('update', SubmitType::class)
         ;
