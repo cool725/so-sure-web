@@ -100,7 +100,8 @@ body {
     }
 
     @include breakpoint(desktop) {
-        margin: 0 auto -20px;
+        margin: 0 auto;
+        top: 20px;
     }
 }
 
