@@ -703,6 +703,9 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                 }
             }
             $data['numberPolicies']++;
+            if ($policy instanceof PhonePolicy) {
+                $data['devices'][] = $policy->getPhone()->__toString();
+            }
         }
         $data['firstPolicy'] = [];
         $data['firstPolicy']['promoCode'] = null;
