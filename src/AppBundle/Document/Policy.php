@@ -329,6 +329,20 @@ abstract class Policy
      */
     protected $notes = array();
 
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
+    protected $viewedCancellationPage;
+
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
+    protected $requestedCancellation;
+
     public function __construct()
     {
         $this->created = new \DateTime();
@@ -1175,6 +1189,36 @@ abstract class Policy
         }
 
         $this->setLeadSource($this->getUser()->getLeadSource());
+    }
+
+    public function setViewedCancellationPage($viewedCancellationPage)
+    {
+        $this->viewedCancellationPage = $viewedCancellationPage;
+    }
+
+    public function getViewedCancellationPage()
+    {
+        return $this->viewedCancellationPage;
+    }
+
+    public function hasViewedCancellationPage()
+    {
+        return $this->viewedCancellationPage != null;
+    }
+
+    public function setRequestedCancellation($requestedCancellation)
+    {
+        $this->requestedCancellation = $requestedCancellation;
+    }
+
+    public function getRequestedCancellation()
+    {
+        return $this->requestedCancellation;
+    }
+
+    public function hasRequestedCancellation()
+    {
+        return $this->requestedCancellation != null;
     }
 
     abstract public function validatePremium($adjust, \DateTime $date);
@@ -2465,6 +2509,13 @@ abstract class Policy
         if ($this->hasSuspectedFraudulentClaim()) {
             $warnings[] = sprintf(
                 'Policy has a suspected fraudulent claim.'
+            );
+        }
+
+        if ($this->hasRequestedCancellation()) {
+            $warnings[] = sprintf(
+                'User has requested (%s) that this policy be cancelled.',
+                $this->getRequestedCancellation()->format(\DateTime::ATOM)
             );
         }
 

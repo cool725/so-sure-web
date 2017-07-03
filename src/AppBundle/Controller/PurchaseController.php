@@ -717,6 +717,11 @@ class PurchaseController extends BaseController
         if (!$policy) {
             throw $this->createNotFoundException('Unable to see policy');
         }
+
+        if (!$policy->hasViewedCancellationPage()) {
+            $policy->setViewedCancellationPage(new \DateTime());
+            $dm->flush();
+        }
         $cancelForm = $this->get('form.factory')
             ->createNamedBuilder('cancel_form')
             ->add('cancel', SubmitType::class)
@@ -726,6 +731,10 @@ class PurchaseController extends BaseController
             if ($request->request->has('cancel_form')) {
                 $cancelForm->handleRequest($request);
                 if ($cancelForm->isValid()) {
+                    if (!$policy->hasRequestedCancellation()) {
+                        $policy->setRequestedCancellation(new \DateTime());
+                        $dm->flush();
+                    }
                     $body = sprintf(
                         'Requested cancellation for policy %s/%s',
                         $policy->getPolicyNumber(),
