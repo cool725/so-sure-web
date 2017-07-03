@@ -283,6 +283,10 @@
                         <td>{% if policy.screenVerified %}Yes{% elseif policy.screenVerified is null %}Unknown{% else %}No{% endif %}</td>
                     </tr>
                     <tr>
+                        <td>Viewed phone damaged cancellation page</td>
+                        <td>{% if policy.hasViewedCancellationPage %}{{ policy.getViewedCancellationPage|date }}{% else %}No{% endif %}</td>
+                    </tr>
+                    <tr>
                         <td>User Signup - Country of Ip</td>
                         <td>{{ fraud.signup_country }}</td>
                     </tr>
