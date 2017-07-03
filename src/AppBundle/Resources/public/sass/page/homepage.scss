@@ -63,15 +63,15 @@ body {
 
 // Hero Search
 
-.hero h1,
-.hero .lead,
-.search-home {
-    text-align: center;
+// .hero h1,
+// .hero .lead,
+// .search-home {
+//     text-align: center;
 
-    @include breakpoint(laptop) {
-        text-align: left;
-    }
-}
+//     @include breakpoint(laptop) {
+//         text-align: left;
+//     }
+// }
 
 @include breakpoint(laptop) {
 
@@ -81,15 +81,28 @@ body {
 }
 
 .hero-search {
-    width: 388px; height: 331px;
     margin: 0 auto 20px;
     position: relative;
     z-index: 10;
 
     &--left,
     &--right {
-        width: 194px;
+        width: 50%;
         float: left;
+
+        img {
+            width: 100%;
+            height: auto;
+        }
+    }
+
+    @include breakpoint(mobileishup) {
+        width: 388px; height: 331px;
+
+        &--left,
+        &--right {
+            width: 194px;
+        }
     }
 
     @include breakpoint(laptop) {
