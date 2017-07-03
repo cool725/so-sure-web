@@ -124,6 +124,15 @@ class Attribution
         return $this->referer;
     }
 
+    public function equals($attribution)
+    {
+        if (!$attribution) {
+            return false;
+        }
+
+        return $this->__toString() == $attribution->__toString();
+    }
+
     public function __toString()
     {
         return $this->stringImplode(' / ');
