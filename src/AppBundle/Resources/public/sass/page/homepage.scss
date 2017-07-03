@@ -64,23 +64,16 @@ body {
 // Hero Search
 
 .hero h1,
-.hero .lead {
-    text-align: center;
-
-    @include breakpoint(desktop) {
-        text-align: left;
-    }
-}
-
+.hero .lead,
 .search-home {
     text-align: center;
 
-    @include breakpoint(desktop) {
+    @include breakpoint(laptop) {
         text-align: left;
     }
 }
 
-@include breakpoint(desktop) {
+@include breakpoint(laptop) {
 
     .hero {
         padding: 20px 0 0 0;
@@ -99,7 +92,7 @@ body {
         float: left;
     }
 
-    @include breakpoint(desktop) {
+    @include breakpoint(laptop) {
         margin: 0 auto;
         top: 20px;
     }

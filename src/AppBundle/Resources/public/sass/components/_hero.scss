@@ -9,7 +9,7 @@
 		line-height: 1.4;
 		color: $white;
 
-		@include breakpoint(desktop) {
+		@include breakpoint(laptop) {
 			margin-top: 60px;
 			margin-bottom: 0;
 		}
@@ -21,7 +21,7 @@
 		}
 	}
 
-	@include breakpoint(tablet) {
+	@include breakpoint(laptop) {
 		padding: 40px 0 70px 0;
 	}
 
