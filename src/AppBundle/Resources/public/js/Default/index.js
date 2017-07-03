@@ -26,13 +26,17 @@ $(function(){
 
     });
 
-    if(jQuery().lazyload) {
-        // Lazy load images
-        // $('img.lazy').show().lazyload({
-        //     threshold : 200,
-        //     effect: 'fadeIn'
-        // });
+    // IMAGE SRC SWAP
+    var srcSwap = function() {
+        var $this   = $(this);
+        var newSrc = $this.data('alt-src');
+        $this.data('alt-src', $this.attr('src'));
+        $this.attr('src', newSrc);
     }
+
+    $('img[data-alt-src]').each(function() {
+        new Image().src = $(this).data('alt-src');
+    }).hover(srcSwap, srcSwap);
 
     // ???
     $('#phone_phone').change(function() {

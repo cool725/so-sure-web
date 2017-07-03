@@ -37,8 +37,29 @@
     <section class="hero" id="get-quote">
         <div class="container">
             <div class="row">
-                <div class="col-md-12">
-                    <h1>The insurance revolution is here</h1>
+                <div class="col-md-5 hidden-xs">
+                    <div class="hero-search clearfix">
+                        <div class="hero-search--left">
+                            <a href="{{ path('quote_make', {'make':'Apple'}) }}"><img src="{{ cdn_url }}/images/home/search/so-sure_iPhone-search.svg" data-alt-src="{{ cdn_url }}/images/home/search/so-sure_iPhone-search-hover.svg" alt="Apple iPhone Insurance"></a>
+                        </div>
+                        <div class="hero-search--right">
+                            <a href="{{ path('quote_make', {'make':'Samsung'}) }}"><img src="{{ cdn_url }}/images/home/search/so-sure_samsung-search.svg" data-alt-src="{{ cdn_url }}/images/home/search/so-sure_samsung-search-hover.svg" alt="Samsung Insurance"></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <h1>Mobile phone insurance is finally worthwhile</h1>
+                    <p class="lead"><strong>Up to 40% cheaper than traditional insurers</strong> with next working day replacement or repair, get cashback when you &amp; your friends don't claim.
+                    <a id="find-out-more"
+                       href="#"
+                       class="scroll-to text-white text-underline"
+                       data-scroll-to-anchor="#why-so-sure">Learn more</a></p>
+                    {% if phone %}
+                        {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':'homepage', 'id': phone.id })) }}
+                    {% else %}
+                        {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':'homepage'})) }}
+                    {% endif %}
+                 {#    <h1>The insurance revolution is here</h1>
                     <h3 class="text-light-blue">Mobile phone insurance is finally worthwhile</h3>
                     <ul class="list-unstyled fa-list-bullet">
                         <li class="text-white"><i class="fa fa-check-circle fa-lg" aria-hidden="true"></i> Up to 40% cheaper than traditional insurers</li>
@@ -49,7 +70,7 @@
                         {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':'homepage', 'id': phone.id })) }}
                     {% else %}
                         {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':'homepage'})) }}
-                    {% endif %}
+                    {% endif %} #}
                 </div>
             </div>
         </div>

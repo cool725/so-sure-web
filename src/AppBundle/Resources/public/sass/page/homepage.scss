@@ -4,7 +4,7 @@
 @import "../common/palette";
 
 body {
-	@extend .brand-gradient;
+    background-color: $blue;
 }
 
 // Adjust Navbar
@@ -60,3 +60,48 @@ body {
 .tt-hint {
     max-width: 320px;
 }
+
+// Hero Search
+
+.hero h1,
+.hero .lead {
+    text-align: center;
+
+    @include breakpoint(desktop) {
+        text-align: left;
+    }
+}
+
+.search-home {
+    text-align: center;
+
+    @include breakpoint(desktop) {
+        text-align: left;
+    }
+}
+
+@include breakpoint(desktop) {
+
+    .hero {
+        padding: 40px 0 0 0;
+    }
+}
+
+.hero-search {
+    width: 388px; height: 331px;
+    margin: 0 auto 20px;
+    position: relative;
+    z-index: 10;
+
+    &--left,
+    &--right {
+        width: 194px;
+        float: left;
+    }
+
+    @include breakpoint(desktop) {
+        margin: 0 auto -20px;
+    }
+}
+
+
