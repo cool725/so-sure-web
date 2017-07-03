@@ -1764,6 +1764,9 @@ class ApiAuthControllerTest extends BaseControllerTest
         ]]);
         $policyData = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED);
 
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(SalvaPhonePolicy::class);
+        $policy = $repo->find($data['id']);
         // Policy was active - should not be chaging state if so
         $this->assertNotNull($policy->getStatus());
     }
