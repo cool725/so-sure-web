@@ -1710,6 +1710,67 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertNull($policy->getStatus());
     }
 
+    public function testExistingPolicyJudopayDeclined()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testExistingPolicyJudopayDeclined', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $data = $this->verifyResponse(200);
+
+        $judopay = self::$client->getContainer()->get('app.judopay');
+        $receiptId = $judopay->testPay(
+            $user,
+            $data['id'],
+            '7.15', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt), now 7.15 (12%)
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
+        );
+
+        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
+            'consumer_token' => '200000',
+            'card_token' => '55779911',
+            'receipt_id' => $receiptId,
+        ]]);
+        $policyData = $this->verifyResponse(200);
+        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData['status']);
+        $this->assertEquals($data['id'], $policyData['id']);
+
+//        $policyData = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(SalvaPhonePolicy::class);
+        $policy = $repo->find($data['id']);
+
+        $receiptId = $judopay->testPay(
+            $user,
+            sprintf('%sA', $data['id']),
+            '7.15', // gwp 6.38 was 6.99 (9.5% ipt), now 7.02 (10% ipt), now 7.15 (12%)
+            '4221 6900 0000 4963',
+            '12/20',
+            '125'
+        );
+
+        $url = sprintf("/api/v1/auth/policy/%s/pay", $data['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
+            'consumer_token' => '200000',
+            'card_token' => null,
+            'receipt_id' => $receiptId,
+        ]]);
+        $policyData = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(SalvaPhonePolicy::class);
+        $policy = $repo->find($data['id']);
+        // Policy was active - should not be chaging state if so
+        $this->assertNotNull($policy->getStatus());
+    }
+
     public function testNewPolicyJudopayInvalidPremium()
     {
         $user = self::createUser(

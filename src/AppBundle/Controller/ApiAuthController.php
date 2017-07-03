@@ -845,9 +845,11 @@ class ApiAuthController extends BaseController
                 $this->getDataString($judoData, 'receipt_id')
             ), ['exception' => $e]);
 
-            // Status should be set to null to avoid trigger monitoring alerts
-            $policy->setStatus(null);
-            $dm->flush();
+            // Status should be set to null for pending policies to avoid trigger monitoring alerts
+            if ($policy->getStatus() == Policy::STATUS_PENDING) {
+                $policy->setStatus(null);
+                $dm->flush();
+            }
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED, 'Payment Declined', 422);
         } catch (AccessDeniedException $e) {
