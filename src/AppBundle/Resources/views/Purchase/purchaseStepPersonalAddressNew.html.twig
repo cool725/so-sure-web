@@ -117,7 +117,7 @@
                     <div class="form-step">
                         <div class="form-group {% if form_errors(purchase_form.firstName) %}has-error{% endif %}">
                             {{ form_label(purchase_form.name, 'Full Name:', { 'label_attr': {'class': 'sr-only'} }) }}
-                            {{ form_widget(purchase_form.name, {'attr':{'class':'form-control', 'placeholder': 'Full Name', 'autofocus': 'autofocus'}}) }}
+                            {{ form_widget(purchase_form.name, {'attr':{'class':'form-control', 'placeholder': 'Full Name'}}) }}
                             <div class="help-block with-errors">{{ form_errors(purchase_form.name) }}</div>
                         </div>
 
@@ -135,6 +135,7 @@
                             </div>
                             <a href="#"
                                onclick="fb_login();"
+                               formnovalidate="formnovalidate"
                                class="btn btn-facebook btn-block btn-pad"
                                {% if app.user %}disabled{% endif %}>
                                 Login with Facebook
