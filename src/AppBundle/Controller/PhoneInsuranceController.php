@@ -161,8 +161,6 @@ class PhoneInsuranceController extends BaseController
         $phone = null;
         $decodedModel = Phone::decodeModel($model);
         if ($id) {
-            $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_AA);
-
             $phone = $repo->find($id);
             if ($phone->getMemory()) {
                 return $this->redirectToRoute('quote_make_model_memory', [

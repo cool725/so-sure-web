@@ -4,7 +4,7 @@
 @import "../common/palette";
 
 body {
-	@extend .brand-gradient;
+    background-color: $blue;
 }
 
 // Adjust Navbar
@@ -54,9 +54,59 @@ body {
 	}
 }
 
+// Hero Search
 .twitter-typeahead,
 .tt-input,
 .tt-menu,
 .tt-hint {
-    max-width: 320px;
+    width: 215px;
+
+    @include breakpoint(tablet) {
+        // width: 100%;
+        width: 320px;
+    }
 }
+
+.hero.hero-search-container {
+    padding: 10px 0 25px;
+}
+
+@include breakpoint(laptop) {
+
+    .hero.hero-search-container {
+        padding: 20px 0 0 0;
+    }
+}
+
+.hero-search {
+    margin: 0 auto 40px;
+    position: relative;
+    z-index: 10;
+
+    &--left,
+    &--right {
+        width: 50%;
+        float: left;
+
+        img {
+            width: 100%;
+            height: auto;
+        }
+    }
+
+    @include breakpoint(mobileishup) {
+        width: 388px; height: 331px;
+
+        &--left,
+        &--right {
+            width: 194px;
+        }
+    }
+
+    @include breakpoint(laptop) {
+        margin: 0 auto;
+        top: 30px;
+    }
+}
+
+
