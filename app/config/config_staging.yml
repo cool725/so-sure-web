@@ -100,6 +100,12 @@ services:
         tags:
             - {name:kernel.event_subscriber}
 
+    app.assetic.worker.cache_busting:
+        class: AppBundle\Service\FilehashCacheBustingWorker
+        public: false
+        tags:
+            - { name: assetic.factory_worker }
+
 nelmio_security:
     # forced HTTPS handling, don't combine with flexible mode
     forced_ssl:
