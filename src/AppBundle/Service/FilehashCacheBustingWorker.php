@@ -23,7 +23,7 @@ class FilehashCacheBustingWorker extends CacheBustingWorker
      * Get the sha1 hash of an asset or asset collection
      *
      * @param AssetInterface $asset
-     * @param AssetFactory $factory
+     * @param AssetFactory   $factory
      * @return string
      */
     protected function getHash(AssetInterface $asset, AssetFactory $factory)
@@ -33,7 +33,7 @@ class FilehashCacheBustingWorker extends CacheBustingWorker
             foreach ($asset->all() as $i => $leaf) {
                 $this->hashAsset($leaf, $hash);
             }
-        } else{
+        } else {
             $this->hashAsset($asset, $hash);
         }
         return substr(hash_final($hash), 0, 7);
@@ -49,7 +49,11 @@ class FilehashCacheBustingWorker extends CacheBustingWorker
     {
         $sourcePath = $asset->getSourcePath();
         $sourceRoot = $asset->getSourceRoot();
-        $data = $sourcePath && $sourceRoot && file_exists($sourceRoot . "/" . $sourcePath) ? hash_file('sha1', $sourceRoot . "/" . $sourcePath) : $sourcePath;
+        $data = $sourcePath &&
+                $sourceRoot &&
+                file_exists($sourceRoot . "/" . $sourcePath) ?
+                hash_file('sha1', $sourceRoot . "/" . $sourcePath) :
+                $sourcePath;
         hash_update($hash, $data);
     }
 }
