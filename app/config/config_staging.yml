@@ -100,15 +100,14 @@ services:
         tags:
             - {name:kernel.event_subscriber}
 
-nelmio_security:
-    # forced HTTPS handling, don't combine with flexible mode
-    forced_ssl:
-        hsts_max_age: 3600 # 30 days
-        hsts_subdomains: true
-
-services:
     app.assetic.worker.cache_busting:
         class: AppBundle\Service\FilehashCacheBustingWorker
         public: false
         tags:
             - { name: assetic.factory_worker }
+
+nelmio_security:
+    # forced HTTPS handling, don't combine with flexible mode
+    forced_ssl:
+        hsts_max_age: 3600 # 30 days
+        hsts_subdomains: true
