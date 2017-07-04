@@ -82,12 +82,7 @@ label {
 .tt-input,
 .tt-menu,
 .tt-hint {
-    width: 215px;
-
-    @include breakpoint(tablet) {
-        // width: 100%;
-        width: 320px;
-    }
+    width: 100%;
 }
 
 .tt-menu {

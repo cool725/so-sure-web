@@ -55,6 +55,17 @@ body {
 }
 
 // Hero Search
+.twitter-typeahead,
+.tt-input,
+.tt-menu,
+.tt-hint {
+    width: 215px;
+
+    @include breakpoint(tablet) {
+        // width: 100%;
+        width: 320px;
+    }
+}
 
 @include breakpoint(laptop) {
 
