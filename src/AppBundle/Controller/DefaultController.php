@@ -53,9 +53,9 @@ class DefaultController extends BaseController
     public function indexAction(Request $request)
     {
         $sixpack = $this->get('app.sixpack')
-        ->participate(SixpackService::EXPERIMENT_HOMEPAGE_PHONE_IMAGE, ['phone-image', 'plain']);
+            ->participate(SixpackService::EXPERIMENT_HOMEPAGE_PHONE_IMAGE, ['phone-image', 'plain']);
         // $sixpack = $this->get('app.sixpack')
-        ->participate(SixpackService::EXPERIMENT_HOMEPAGE_PHONE_IMAGE, ['plain', 'phone-image']);
+            // ->participate(SixpackService::EXPERIMENT_HOMEPAGE_PHONE_IMAGE, ['plain', 'phone-image']);
         $geoip = $this->get('app.geoip');
         //$ip = "72.229.28.185";
         $ip = $request->getClientIp();
