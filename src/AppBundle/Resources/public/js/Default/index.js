@@ -27,16 +27,13 @@ $(function(){
     });
 
     // IMAGE SRC SWAP
-    var srcSwap = function() {
-        var $this   = $(this);
-        var newSrc = $this.data('alt-src');
-        $this.data('alt-src', $this.attr('src'));
-        $this.attr('src', newSrc);
-    }
-
-    $('img[data-alt-src]').each(function() {
-        new Image().src = $(this).data('alt-src');
-    }).hover(srcSwap, srcSwap);
+    $('.image-swap').each(function() {
+        $(this).on('mouseover', function() {
+            $(this).attr('src', $(this).data('hover-src'));
+        }).on('mouseout', function() {
+            $(this).attr('src', $(this).data('orig-src'));
+        });
+    });
 
     // ???
     $('#phone_phone').change(function() {
