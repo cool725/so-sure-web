@@ -3,7 +3,7 @@
 blockquote {
 	position: relative;
 	margin: 25px 0;
-	padding: 10px 0 10px 20px;
+	padding: 10px 0;
 	border: none;
 
 	text-align: center;
@@ -33,6 +33,6 @@ blockquote {
 		font-family: FontAwesome;
 		font-size: 60px;
 		line-height: 1;
-	    content: '\201C';		
+	    content: '\201C';
 	}
 }
