@@ -67,6 +67,10 @@ body {
     }
 }
 
+.hero {
+    padding: 10px 0 25px;
+}
+
 @include breakpoint(laptop) {
 
     .hero {
