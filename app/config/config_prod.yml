@@ -107,3 +107,10 @@ nelmio_security:
         hsts_preload: true
         whitelist:
             - ^/ops/status
+
+services:
+    app.assetic.worker.cache_busting:
+        class: AppBundle\Service\FilehashCacheBustingWorker
+        public: false
+        tags:
+            - { name: assetic.factory_worker }

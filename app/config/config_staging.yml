@@ -105,3 +105,10 @@ nelmio_security:
     forced_ssl:
         hsts_max_age: 3600 # 30 days
         hsts_subdomains: true
+
+services:
+    app.assetic.worker.cache_busting:
+        class: AppBundle\Service\FilehashCacheBustingWorker
+        public: false
+        tags:
+            - { name: assetic.factory_worker }
