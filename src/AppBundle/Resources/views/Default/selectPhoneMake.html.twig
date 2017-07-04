@@ -10,15 +10,21 @@
         {% set basePath = '/phone-insurance/' %}
     {% endif %}
     {% if type == 'homepage' or type == 'other_pages' %}
-        <form method="get" id="search-phone-form" {% if phone %}action="{{ path('quote_phone', {'id': phone.id }) }}"{% endif %} data-base-path="{{ basePath }}">
-            <input type="text" class="required search-phone-text" id="search-phone" placeholder="Find your phone e.g. iPhone 7" value="{% if phone %}{{ phone }}{% endif %}" />
-            <button type="submit" class="btn btn-success btn-get-quote btn-lg">{{ buttonText }}</button>
+        <form method="get" id="search-phone-form" {% if phone %}action="{{ path('quote_phone', {'id': phone.id }) }}"{% endif %} data-base-path="{{ basePath }}" class="form-inline">
+            <div class="form-group">
+                <input type="text" class="required search-phone-text" id="search-phone" placeholder="Find your phone e.g. iPhone 7" value="{% if phone %}{{ phone }}{% endif %}" />
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-success btn-search">{{ buttonText }}</button>
+            </div>
             {% if type == 'homepage' %}
+            <div class="form-group">
                 <a id="find-out-more"
-                   href="#" class="btn btn-link-white btn-get-quote scroll-to"
+                   href="#" class="btn btn-link-white scroll-to"
                    data-scroll-to-anchor="#why-so-sure">
                     <i class="fa fa-graduation-cap" aria-hidden="true"></i> LEARN MORE
                 </a>
+            </div>
             {% endif %}
         </form>
     {% else %}

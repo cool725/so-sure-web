@@ -54,13 +54,6 @@ body {
 	}
 }
 
-.twitter-typeahead,
-.tt-input,
-.tt-menu,
-.tt-hint {
-    max-width: 320px;
-}
-
 // Hero Search
 
 @include breakpoint(laptop) {
@@ -71,7 +64,7 @@ body {
 }
 
 .hero-search {
-    margin: 0 auto 20px;
+    margin: 0 auto 40px;
     position: relative;
     z-index: 10;
 
@@ -97,7 +90,7 @@ body {
 
     @include breakpoint(laptop) {
         margin: 0 auto;
-        top: 20px;
+        top: 30px;
     }
 }
 

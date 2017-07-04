@@ -41,11 +41,28 @@ label {
     }
 }
 
+// Form Inline
+@include breakpoint(mobileonly) {
+
+    .form-inline {
+
+        .form-control {
+            display: inline-block;
+            width: auto;
+            vertical-align: middle;
+        }
+
+        .form-group {
+            display: inline-block;
+            margin-bottom: 0;
+            vertical-align: middle;
+        }
+    }
+
+}
+
 // Select Phone Make
 // - Hide form on load so no content flash
-#search-phone-form {
-	display: none;
-}
 
 .search-phone-text {
 	min-width: 100%;
@@ -61,15 +78,16 @@ label {
 	}
 }
 
-.btn-get-quote {
-    margin-top: 15px;
-}
-
 .twitter-typeahead,
 .tt-input,
 .tt-menu,
 .tt-hint {
-    width: 100%;
+    width: 215px;
+
+    @include breakpoint(tablet) {
+        // width: 100%;
+        width: 320px;
+    }
 }
 
 .tt-menu {
@@ -98,35 +116,4 @@ label {
 	text-align: center;
 	color: $black;
 	cursor: default;
-}
-
-@include breakpoint(mobileishup) {
-
-    .btn-get-quote {
-        margin-top: 22px;
-    }
-}
-
-@include breakpoint(tablet) {
-
-	.search-phone-text {
-        max-width: 320px;
-        margin: -11px 0 0 0;
-	}
-
-    .btn-get-quote {
-        margin-top: -2px;
-    }
-
-    .twitter-typeahead,
-    .tt-input,
-    .tt-menu,
-    .tt-hint {
-        // max-width: 320px;
-    }
-
-    .twitter-typeahead {
-        margin-right: 5px;
-    }
-
 }
