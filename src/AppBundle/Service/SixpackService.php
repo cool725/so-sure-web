@@ -13,10 +13,11 @@ class SixpackService
 {
     const TIMEOUT = 3;
 
-    const EXPERIMENT_HOMEPAGE_AA = 'homepage-aa';
+    //const EXPERIMENT_HOMEPAGE_AA = 'homepage-aa';
     const EXPERIMENT_LANDING_HOME = 'landing-or-home';
     const EXPERIMENT_CPC_QUOTE_MANUFACTURER = 'cpc-quote-or-manufacturer';
     const EXPERIMENT_SHARE_MESSAGE = 'share-message';
+    const EXPERIMENT_HOMEPAGE_PHONE_IMAGE = 'homepage-phone-image';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_SHARE_MESSAGE_ORIGINAL = 'original';

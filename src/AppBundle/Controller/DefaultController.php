@@ -52,7 +52,8 @@ class DefaultController extends BaseController
      */
     public function indexAction(Request $request)
     {
-        $sixpack = $this->get('app.sixpack')->participate(SixpackService::EXPERIMENT_HOMEPAGE_AA, ['a', 'alt-a']);
+        $sixpack = $this->get('app.sixpack')->participate(SixpackService::EXPERIMENT_HOMEPAGE_PHONE_IMAGE, ['phone-image', 'plain']);
+        // $sixpack = $this->get('app.sixpack')->participate(SixpackService::EXPERIMENT_HOMEPAGE_PHONE_IMAGE, ['plain', 'phone-image']);
         $geoip = $this->get('app.geoip');
         //$ip = "72.229.28.185";
         $ip = $request->getClientIp();
@@ -149,7 +150,8 @@ class DefaultController extends BaseController
             'i6s' => $i6s,
             'i7' => $i7,
             'phone' => $phone,
-            's7' => $s7
+            's7' => $s7,
+            'sixpack' => $sixpack,
         );
 
         if (in_array($request->get('_route'), ['discount-vouchers'])) {
