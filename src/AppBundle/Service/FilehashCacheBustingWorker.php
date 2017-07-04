@@ -28,6 +28,7 @@ class FilehashCacheBustingWorker extends CacheBustingWorker
      */
     protected function getHash(AssetInterface $asset, AssetFactory $factory)
     {
+        \AppBundle\Classes\NoOp::ignore([$factory]);
         $hash = hash_init('sha1');
         if ($asset instanceof AssetCollectionInterface) {
             foreach ($asset->all() as $i => $leaf) {
