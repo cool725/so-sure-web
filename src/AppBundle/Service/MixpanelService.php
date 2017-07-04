@@ -568,6 +568,9 @@ class MixpanelService
         $userData['Number of Payments Received'] = $analytics['paymentsReceived'];
         $userData['Number of Connections'] = $analytics['connections'];
         $userData['Reward Pot Value'] = $analytics['rewardPot'];
+        if (isset($analytics['devices'])) {
+            $userData['Insured Devices'] = join(';', $analytics['devices']);
+        }
         if ($analytics['os']) {
             $userData['OS'] = $analytics['os'];
         }

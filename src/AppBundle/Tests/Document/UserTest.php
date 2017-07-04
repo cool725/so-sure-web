@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Document;
 
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
+use AppBundle\Document\Attribution;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Tests\UserClassTrait;
@@ -244,5 +245,37 @@ class UserTest extends \PHPUnit_Framework_TestCase
             'https://www.gravatar.com/avatar/f3ada405ce890b6f8204094deb12d8a8?d=404&s=1',
             $user->getImageUrl(1)
         );
+    }
+
+    public function testAttribution()
+    {
+        $user = new User();
+        $this->assertNull($user->getAttribution());
+
+        $attribution = new Attribution();
+        $attribution->setCampaignName('foo');
+        $user->setAttribution($attribution);
+        $this->assertEquals('foo', $user->getAttribution()->getCampaignName());
+
+        $attribution = new Attribution();
+        $attribution->setCampaignName('bar');
+        $user->setAttribution($attribution);
+        $this->assertEquals('bar', $user->getAttribution()->getCampaignName());
+    }
+
+    public function testLatestAttribution()
+    {
+        $user = new User();
+        $this->assertNull($user->getLatestAttribution());
+
+        $attribution = new Attribution();
+        $attribution->setCampaignName('foo');
+        $user->setLatestAttribution($attribution);
+        $this->assertEquals('foo', $user->getLatestAttribution()->getCampaignName());
+
+        $attribution = new Attribution();
+        $attribution->setCampaignName('bar');
+        $user->setLatestAttribution($attribution);
+        $this->assertEquals('bar', $user->getLatestAttribution()->getCampaignName());
     }
 }

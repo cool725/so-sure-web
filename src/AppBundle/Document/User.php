@@ -703,6 +703,9 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                 }
             }
             $data['numberPolicies']++;
+            if ($policy instanceof PhonePolicy) {
+                $data['devices'][] = $policy->getPhone()->__toString();
+            }
         }
         $data['firstPolicy'] = [];
         $data['firstPolicy']['promoCode'] = null;
@@ -988,7 +991,9 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     public function setAttribution($attribution)
     {
-        $this->attribution = $attribution;
+        if (!$this->attribution || !$this->attribution->equals($attribution)) {
+            $this->attribution = $attribution;
+        }
     }
 
     public function getLatestAttribution()
@@ -998,7 +1003,9 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     public function setLatestAttribution($latestAttribution)
     {
-        $this->latestAttribution = $latestAttribution;
+        if (!$this->latestAttribution || !$this->latestAttribution->equals($latestAttribution)) {
+            $this->latestAttribution = $latestAttribution;
+        }
     }
 
     public function getBirthday()
