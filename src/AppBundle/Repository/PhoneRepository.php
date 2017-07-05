@@ -17,7 +17,7 @@ class PhoneRepository extends DocumentRepository
             Phone::OS_CYANOGEN,
             Phone::OS_ANDROID,
             Phone::OS_IOS,
-            Phone::OS_WINDOWS
+            Phone::OS_WINDOWS,
         ]));
         $qb->addAnd($qb->expr()->field('make')->notEqual("ALL"));
         $qb->addAnd($qb->expr()->field('active')->equals(true));
