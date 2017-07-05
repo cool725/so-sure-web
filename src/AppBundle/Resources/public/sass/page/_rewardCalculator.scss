@@ -16,7 +16,7 @@
 			text-decoration: line-through;
 			color: lighten($blue, 15%);
 		}
-	}	
+	}
 }
 
 .reward-slider {
@@ -26,7 +26,7 @@
 	.rewardslider__fill {
 		display: block;
 		@include border-radius(10px);
-	}	
+	}
 
 	.rewardslider {
 		background: $grey-light;
@@ -113,22 +113,27 @@
 		width: 100%; height: 20px;
 
 		div {
-			width: 0; height: 100%; 
-			background-color: $grey-light;	
-			@include border-radius(3px);	
-			transition: width 0.5s ease;	
+			width: 0; height: 100%;
+			background-color: $grey-light;
+			@include border-radius(3px);
+			transition: width 0.5s ease;
 		}
-	}	
+	}
 
 	.bar-static {
 		height: 20px;
 		background-color: $blue;
-		@include border-radius(3px);	
-	}	
+		@include border-radius(3px);
+	}
 
 	.bar-us div {
 		background-color: $green;
-	}	
+	}
+}
+
+.slide-me {
+	display: block;
+	margin: -15px 0 0 55px;
 }
 
 .claim-options {
@@ -142,7 +147,7 @@
 
 		&:hover {
 			background-color: $blue-lightest;
-		}		
+		}
 
 		&:focus, &:active, .active {
 			background-color: $blue;
