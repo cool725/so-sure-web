@@ -132,8 +132,14 @@
 }
 
 .slide-me {
-	display: block;
-	margin: -15px auto 0;
+	// display: block;
+	// margin: -15px auto 0;
+	text-align: right;
+
+	img {
+		display: inline-block;
+		margin: -10px 12px 0 0;
+	}
 }
 
 .claim-options {
