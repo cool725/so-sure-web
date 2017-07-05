@@ -142,10 +142,19 @@ class AdminController extends BaseController
                 }
             }
 
-            if ($gwp < $phone->getSalvaMiniumumBinderMonthlyPremium()) {
+            $price = new PhonePrice();
+            $price->setGwp($request->get('gwp'));
+            $price->setValidFrom($from);
+            $notes = $this->conformAlphanumericSpaceDot($this->getRequestString($request, 'notes'), 1500);
+            $price->setNotes($notes);
+            if ($request->get('to')) {
+                $price->setValidTo($to);
+            }
+
+            if ($price->getMonthlyPremiumPrice($from) < $phone->getSalvaMiniumumBinderMonthlyPremium()) {
                 $this->addFlash('error', sprintf(
                     '£%.2f is less than allowed min binder £%.2f',
-                    $gwp,
+                    $price->getMonthlyPremiumPrice($from),
                     $phone->getSalvaMiniumumBinderMonthlyPremium()
                 ));
 
@@ -173,17 +182,10 @@ class AdminController extends BaseController
                 }
                 $phone->getCurrentPhonePrice()->setValidTo($from);
             }
-            $price = new PhonePrice();
-            $price->setGwp($request->get('gwp'));
-            $price->setValidFrom($from);
-            $notes = $this->conformAlphanumericSpaceDot($this->getRequestString($request, 'notes'));
-            $price->setNotes($notes);
-            if ($request->get('to')) {
-                $price->setValidTo($to);
-            }
-            $phone->addPhonePrice($price);
 
+            $phone->addPhonePrice($price);
             $dm->flush();
+
             $this->addFlash(
                 'notice',
                 'Your changes were saved!'
