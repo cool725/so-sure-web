@@ -939,4 +939,28 @@ class Claim
             'shippingAddress' => $this->getShippingAddress(),
         ];
     }
+
+    public function getExpectedExcess()
+    {
+        return self::getExcessValue($this->getType());
+    }
+
+    public static function getExcessValue($type, $validated = true)
+    {
+        if (!$validated) {
+            return 150;
+        }
+
+        if (in_array($type, [Claim::TYPE_LOSS, Claim::TYPE_THEFT])) {
+            return 70;
+        } elseif (in_array($type, [
+            Claim::TYPE_DAMAGE,
+            Claim::TYPE_WARRANTY,
+            Claim::TYPE_EXTENDED_WARRANTY
+        ])) {
+            return 50;
+        }
+
+        throw new \Exception(sprintf('Unknown claim type %s', $type));
+    }
 }
