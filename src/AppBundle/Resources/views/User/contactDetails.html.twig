@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% set white_logo = true %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets output='css/*.css'
+    '@AppBundle/Resources/public/sass/page/user.scss'%}
+    <link rel="stylesheet" href="{{ asset_url }}"> {% endstylesheets %}
+{% endblock %}
+
+{% block body %}
+  {% include 'AppBundle:User:userNav.html.twig' %}
+
+    <section class="user-homepage--content section--pad">
+        <div class="container">
+
+            <div class="row">
+                  <div class="col-md-12">
+                      <h2>Your Contact Details</h2>
+                      <p>Email: {{ user.email }}</p>
+                      <p>Mobile: {{ user.mobileNumber }}</p>
+                      <p>Billing Address: {{ user.billingAddress }}</p>
+                  </div>
+            </div>
+        </div>
+  </section>
+{% endblock %}

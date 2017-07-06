@@ -462,6 +462,20 @@ class UserController extends BaseController
     }
 
     /**
+     * @Route("/contact-details", name="user_contact_details")
+     * @Template
+     */
+    public function contactDetailsAction(Request $request)
+    {
+        $user = $this->getUser();
+        $data = [
+            'user' => $user,
+        ];
+
+        return $data;
+    }
+
+    /**
      * @Route("/fb", name="user_facebook")
      * @Template
      */
