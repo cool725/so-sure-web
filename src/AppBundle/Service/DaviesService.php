@@ -237,11 +237,12 @@ class DaviesService extends S3EmailService
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
-        if ($daviesClaim->isExcessValueCorrect() === false) {
+        $validated = true;
+        if ($daviesClaim->isExcessValueCorrect($validated) === false) {
             $msg = sprintf(
                 'Claim %s does not have the correct excess value. Expected %0.2f Actual %0.2f for %s/%s',
                 $daviesClaim->claimNumber,
-                $daviesClaim->getExpectedExcess(),
+                $daviesClaim->getExpectedExcess($validated),
                 $daviesClaim->excess,
                 $daviesClaim->getClaimType(),
                 $daviesClaim->getClaimStatus()
