@@ -264,6 +264,16 @@ class PhoneInsuranceController extends BaseController
                 }
             }
         }
+        $sliderTest = $this->get('app.sixpack')->participate(
+            SixpackService::EXPERIMENT_QUOTE_SLIDER,
+            ['slide-me', 'original']
+        );
+        /*
+        $sliderTest = $this->get('app.sixpack')->participate(
+            SixpackService::EXPERIMENT_QUOTE_SLIDER,
+            ['original', 'slide-me']
+        );
+        */
 
         $user = new User();
 
@@ -356,6 +366,7 @@ class PhoneInsuranceController extends BaseController
                         $properties['Played with Claims'] = true;
                     }
                     $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
+                    $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_SLIDER);
 
                     // Multipolicy should skip user details
                     if ($this->getUser() && $this->getUser()->hasPolicy()) {
@@ -376,6 +387,7 @@ class PhoneInsuranceController extends BaseController
                         $properties['Played with Claims'] = true;
                     }
                     $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
+                    $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_SLIDER);
 
                     // Multipolicy should skip user details
                     if ($this->getUser() && $this->getUser()->hasPolicy()) {
@@ -437,6 +449,7 @@ class PhoneInsuranceController extends BaseController
             'comparision' => $phone->getComparisions(),
             'comparision_max' => $maxComparision,
             'coming_soon' => $phone->getCurrentPhonePrice() ? false : true,
+            'slider_test' => $sliderTest,
         );
 
         if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
