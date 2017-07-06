@@ -942,6 +942,13 @@ class Claim
 
     public function getExpectedExcess()
     {
+        if (in_array($this->getStatus(), [
+            Claim::STATUS_DECLINED,
+            Claim::STATUS_WITHDRAWN,
+        ])) {
+            return 0;
+        }
+
         return self::getExcessValue($this->getType());
     }
 
