@@ -366,7 +366,6 @@ class PhoneInsuranceController extends BaseController
                         $properties['Played with Claims'] = true;
                     }
                     $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
-                    $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_SLIDER);
 
                     // Multipolicy should skip user details
                     if ($this->getUser() && $this->getUser()->hasPolicy()) {
@@ -387,7 +386,6 @@ class PhoneInsuranceController extends BaseController
                         $properties['Played with Claims'] = true;
                     }
                     $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
-                    $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_SLIDER);
 
                     // Multipolicy should skip user details
                     if ($this->getUser() && $this->getUser()->hasPolicy()) {
