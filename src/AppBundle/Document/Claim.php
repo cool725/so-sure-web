@@ -478,9 +478,9 @@ class Claim
         return $this->number;
     }
 
-    public function setNumber($number)
+    public function setNumber($number, $allowChange = false)
     {
-        if ($this->number && $this->number != $number) {
+        if ($this->number && $this->number != $number && !$allowChange) {
             throw new \Exception('Unable to change claim number');
         }
 

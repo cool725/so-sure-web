@@ -115,7 +115,7 @@ class DaviesService extends S3EmailService
                         'policyNumber' => $daviesClaim->policyNumber,
                     ]
                 );
-                $claim->setNumber($daviesClaim);
+                $claim->setNumber($daviesClaim, true);
             }
         }
 
