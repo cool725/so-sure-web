@@ -135,7 +135,11 @@ class ClaimsController extends BaseController
                     $claim->setHandler($this->getUser());
                     $claimsService = $this->get('app.claims');
                     if ($claimsService->addClaim($policy, $claim)) {
-                        $this->addFlash('success', sprintf('Claim %s is added', $claim->getNumber()));
+                        $this->addFlash('success', sprintf(
+                            'Claim %s is added. Excess is £%d',
+                            $claim->getNumber(),
+                            $claim->getExpectedExcess()
+                        ));
 
                         return $this->redirectToRoute('claims_policy', ['id' => $id]);
                     } else {
