@@ -56,22 +56,22 @@ class ClaimType extends AbstractType
             $choices = [];
             if ($claim->getPolicy()->isAdditionalClaimLostTheftApprovedAllowed()) {
                 $choices = [
-                    sprintf('%s - £%d excess', Claim::TYPE_LOSS, Claim::getExcessValue(Claim::TYPE_LOSS)) =>
-                        Claim::TYPE_LOSS,
-                    sprintf('%s - £%d excess', Claim::TYPE_THEFT, Claim::getExcessValue(Claim::TYPE_THEFT)) =>
-                        Claim::TYPE_THEFT,
+                    $this->getClaimTypeCopy(Claim::TYPE_LOSS) => Claim::TYPE_LOSS,
+                    $this->getClaimTypeCopy(Claim::TYPE_THEFT) => Claim::TYPE_THEFT,
                 ];
             }
             $choices = array_merge($choices, [
-                sprintf('%s - £%d excess', Claim::TYPE_DAMAGE, Claim::getExcessValue(Claim::TYPE_DAMAGE)) =>
-                    Claim::TYPE_DAMAGE,
-                sprintf('%s - £%d excess', Claim::TYPE_WARRANTY, Claim::getExcessValue(Claim::TYPE_WARRANTY)) =>
-                    Claim::TYPE_WARRANTY,
-                sprintf('%s - £%d excess', Claim::TYPE_EXTENDED_WARRANTY, Claim::getExcessValue(Claim::TYPE_EXTENDED_WARRANTY)) =>
-                    Claim::TYPE_EXTENDED_WARRANTY,
+                $this->getClaimTypeCopy(Claim::TYPE_DAMAGE) => Claim::TYPE_DAMAGE,
+                $this->getClaimTypeCopy(Claim::TYPE_WARRANTY) => Claim::TYPE_WARRANTY,
+                $this->getClaimTypeCopy(Claim::TYPE_EXTENDED_WARRANTY) => Claim::TYPE_EXTENDED_WARRANTY,
             ]);
             $form->add('type', ChoiceType::class, ['choices' => $choices]);
         });
+    }
+
+    private function getClaimTypeCopy($claimType)
+    {
+        return sprintf('%s - £%d excess', $claimType, Claim::getExcessValue($claimType));
     }
 
     public function configureOptions(OptionsResolver $resolver)
