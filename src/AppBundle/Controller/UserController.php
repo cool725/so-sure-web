@@ -15,6 +15,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\SCode;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\EmailInvitationType;
+use AppBundle\Form\Type\UserEmailType;
 use AppBundle\Form\Type\SCodeInvitationType;
 use AppBundle\Form\Type\InvitationType;
 use AppBundle\Form\Type\SentInvitationType;
@@ -468,11 +469,30 @@ class UserController extends BaseController
     public function contactDetailsAction(Request $request)
     {
         $user = $this->getUser();
-        $data = [
-            'user' => $user,
-        ];
 
-        return $data;
+        $userEmailForm = $this->get('form.factory')
+            ->createNamedBuilder('user_email_form', UserEmailType::class, $user)
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('user_email_form')) {
+                $userEmailForm->handleRequest($request);
+                if ($userEmailForm->isValid()) {
+                    $this->getManager()->flush();
+                    $this->addFlash(
+                        'success',
+                        'Your email address is updated. You should receive an email confirmation shortly.'
+                    );
+
+                    return $this->redirectToRoute('user_contact_details');
+                }
+            }
+        }
+
+        return [
+            'user' => $user,
+            'email_form' => $userEmailForm->createView(),
+        ];
     }
 
     /**
