@@ -527,7 +527,7 @@ class PurchaseController extends BaseController
             } elseif (!$policy) {
                 $webType = JudopayService::WEB_TYPE_CARD_DETAILS;
             } else {
-                $webType = JudopayService::WEB_TYPE_STANDARD;                
+                $webType = JudopayService::WEB_TYPE_STANDARD;
             }
 
             $this->get('logger')->warning(sprintf(
