@@ -175,7 +175,8 @@ class DaviesService extends S3EmailService
         $claim->setReplacementReceivedDate($daviesClaim->replacementReceivedDate);
         $claim->setReplacementPhoneDetails($daviesClaim->getReplacementPhoneDetails());
 
-        $claim->setDescription($daviesClaim->lossDescription);
+        $validator = new AlphanumericSpaceDotValidator();
+        $claim->setDescription($validator->conform($daviesClaim->lossDescription, 0, 5000));
         $claim->setLocation($daviesClaim->location);
 
         $claim->setClosedDate($daviesClaim->dateClosed);
