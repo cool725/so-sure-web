@@ -109,7 +109,7 @@ class IntercomService
         }
 
         $converted = false;
-        if ($this->leadExists($user)) {
+        if (!$this->userExists($user) && $this->leadExists($user)) {
             $this->convertLead($user);
             $converted = true;
         }
