@@ -25,6 +25,7 @@ use AppBundle\Service\FacebookService;
 use AppBundle\Security\InvitationVoter;
 use AppBundle\Service\MixpanelService;
 use AppBundle\Service\SixpackService;
+use AppBundle\Service\JudopayService;
 
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Facebook\Facebook;
@@ -386,7 +387,8 @@ class UserController extends BaseController
                 $policy,
                 $amount,
                 $request->getClientIp(),
-                $request->headers->get('User-Agent')
+                $request->headers->get('User-Agent'),
+                JudopayService::WEB_TYPE_STANDARD
             );
         }
 

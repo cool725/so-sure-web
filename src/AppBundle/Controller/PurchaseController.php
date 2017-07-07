@@ -42,6 +42,7 @@ use AppBundle\Form\Type\PurchaseStepPhoneNoPhoneType;
 
 use AppBundle\Service\MixpanelService;
 use AppBundle\Service\SixpackService;
+use AppBundle\Service\JudopayService;
 
 use AppBundle\Security\UserVoter;
 
@@ -442,7 +443,8 @@ class PurchaseController extends BaseController
                                     $policy,
                                     $purchase->getAmount(),
                                     $request->getClientIp(),
-                                    $request->headers->get('User-Agent')
+                                    $request->headers->get('User-Agent'),
+                                    JudopayService::WEB_TYPE_STANDARD
                                 );
                                 $purchase->setAgreed(true);
                             } elseif ($purchaseForm->get('existing')->isClicked()) {
@@ -516,64 +518,26 @@ class PurchaseController extends BaseController
         }
         $policy = $payment->getPolicy();
 
-        // If there's not a user, it may be a payment for the remainder of the policy - go ahead and credit
-        if (!$user) {
-            try {
-                $judo->add(
-                    $policy,
-                    $request->get('ReceiptId'),
-                    null,
-                    $request->get('CardToken'),
-                    Payment::SOURCE_WEB,
-                    JudoPaymentMethod::DEVICE_DNA_NOT_PRESENT
-                );
-                $body = sprintf(
-                    'Remainder (likely) payment was received. Policy %s (Total payments received £%0.2f of £%0.2f).',
-                    $policy->getPolicyNumber(),
-                    $policy->getPremiumPaid(),
-                    $policy->getPremium()->getYearlyPremiumPrice()
-                );
-                $message = \Swift_Message::newInstance()
-                    ->setSubject('Remainder Payment received')
-                    ->setFrom('tech@so-sure.com')
-                    ->setTo('dylan@so-sure.com')
-                    ->setCc('patrick@so-sure.com')
-                    ->setBody($body, 'text/html');
-                $this->get('mailer')->send($message);
-            } catch (ProcessedException $e) {
-                if (!$policy->isValidPolicy($policy->getPolicyPrefix($this->getParameter('kernel.environment')))) {
-                    throw $e;
-                }
-                $this->get('logger')->warning(sprintf(
-                    'Duplicate re-use of judo receipt. Possible refresh issue, so ignoring and continuing',
-                    ['exception' => $e]
-                ));
+        $webType = $judo->getTransactionWebType($request->get('ReceiptId'));
+        // Metadata should be present, but if not, use older logic to guess at what type to use
+        if (!$webType) {
+            if (!$user) {
+                // If there's not a user, it may be a payment for the remainder of the policy - go ahead and credit
+                $webType = JudopayService::WEB_TYPE_REMAINDER;
+            } elseif (!$policy) {
+                $webType = JudopayService::WEB_TYPE_CARD_DETAILS;
+            } else {
+                $webType = JudopayService::WEB_TYPE_STANDARD;
             }
 
-            return $this->redirectToRoute('purchase_remainder_policy', ['id' => $policy->getId()]);
-        }
-
-        if ($payment->getUser()->getId() != $this->getUser()->getId()) {
-            throw new AccessDeniedException('Unknown user');
-        }
-
-        // If there's no policy on the payment, then it's a card update
-        if (!$policy) {
-            $judo->updatePaymentMethod(
-                $user,
+            $this->get('logger')->warning(sprintf(
+                'Unable to find web_type metadata for receipt %s. Falling back to %s',
                 $request->get('ReceiptId'),
-                null,
-                $request->get('CardToken'),
-                null
-            );
+                $webType
+            ));
+        }
 
-            $this->addFlash(
-                'success',
-                sprintf('Your card has been updated')
-            );
-
-            return $this->redirectToRoute('user_card_details');
-        } else {
+        if (in_array($webType, [JudopayService::WEB_TYPE_REMAINDER, JudopayService::WEB_TYPE_STANDARD])) {
             try {
                 $judo->add(
                     $policy,
@@ -592,7 +556,12 @@ class PurchaseController extends BaseController
                     ['exception' => $e]
                 ));
             }
-            if ($policy->isInitialPayment()) {
+
+            if ($webType == JudopayService::WEB_TYPE_REMAINDER) {
+                $this->notifyRemainderRecevied($policy);
+
+                return $this->redirectToRoute('purchase_remainder_policy', ['id' => $policy->getId()]);
+            } elseif ($policy->isInitialPayment()) {
                 return $this->redirectToRoute('user_welcome');
             } else {
                 // unpaid policy - outstanding payment
@@ -606,10 +575,42 @@ class PurchaseController extends BaseController
 
                 return $this->redirectToRoute('user_home');
             }
+        } elseif ($webType == JudopayService::WEB_TYPE_CARD_DETAILS) {
+            $judo->updatePaymentMethod(
+                $payment->getUser(),
+                $request->get('ReceiptId'),
+                null,
+                $request->get('CardToken'),
+                null
+            );
+
+            $this->addFlash(
+                'success',
+                sprintf('Your card has been updated')
+            );
+
+            return $this->redirectToRoute('user_card_details');
         }
 
         // shouldn't occur
         return $this->redirectToRoute('user_home');
+    }
+
+    private function notifyRemainderRecevied(Policy $policy)
+    {
+        $body = sprintf(
+            'Remainder (likely) payment was received. Policy %s (Total payments received £%0.2f of £%0.2f).',
+            $policy->getPolicyNumber(),
+            $policy->getPremiumPaid(),
+            $policy->getPremium()->getYearlyPremiumPrice()
+        );
+        $message = \Swift_Message::newInstance()
+            ->setSubject('Remainder Payment received')
+            ->setFrom('tech@so-sure.com')
+            ->setTo('dylan@so-sure.com')
+            ->setCc('patrick@so-sure.com')
+            ->setBody($body, 'text/html');
+        $this->get('mailer')->send($message);
     }
 
     /**
@@ -791,7 +792,8 @@ class PurchaseController extends BaseController
             $policy,
             $amount,
             $request->getClientIp(),
-            $request->headers->get('User-Agent')
+            $request->headers->get('User-Agent'),
+            JudopayService::WEB_TYPE_REMAINDER
         );
 
         $data = [
