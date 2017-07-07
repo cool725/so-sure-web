@@ -89,6 +89,35 @@ class DaviesService extends S3EmailService
             $repo = $this->dm->getRepository(Claim::class);
             $claim = $repo->findOneBy(['number' => $daviesClaim->claimNumber]);
         }
+        // Davies swapped to a new claim numbering format
+        // and appear to be unable to enter the correct data
+        // sometimes they are leaving off the last 2 digits when entering the claim
+        // on our system
+        if (!$claim) {
+            $repo = $this->dm->getRepository(Claim::class);
+            $claim = $repo->findOneBy(['number' => substr($daviesClaim->claimNumber, 0, -2)]);
+            if ($claim) {
+                if ($daviesClaim->policyNumber != $claim->getPolicy()->getPolicyNumber()) {
+                    throw new \Exception(sprintf(
+                        'Unable to locate claim %s in db with number matching. (%s != %s)',
+                        $daviesClaim->claimNumber,
+                        $daviesClaim->policyNumber,
+                        $claim->getPolicy()->getPolicyNumber()
+                    ));
+                }
+                $this->mailer->sendTemplate(
+                    sprintf('Claim Number Update'),
+                    'tech@so-sure.com',
+                    'AppBundle:Email:davies/incorrectClaimNumber.html.twig',
+                    [
+                        'claim' => $claim,
+                        'claimNumber' => $daviesClaim->claimNumber,
+                        'policyNumber' => $daviesClaim->policyNumber,
+                    ]
+                );
+                $claim->setNumber($daviesClaim->claimNumber, true);
+            }
+        }
 
         if (!$claim) {
             throw new \Exception(sprintf('Unable to locate claim %s in db', $daviesClaim->claimNumber));
@@ -146,7 +175,8 @@ class DaviesService extends S3EmailService
         $claim->setReplacementReceivedDate($daviesClaim->replacementReceivedDate);
         $claim->setReplacementPhoneDetails($daviesClaim->getReplacementPhoneDetails());
 
-        $claim->setDescription($daviesClaim->lossDescription);
+        $validator = new AlphanumericSpaceDotValidator();
+        $claim->setDescription($validator->conform($daviesClaim->lossDescription, 0, 5000));
         $claim->setLocation($daviesClaim->location);
 
         $claim->setClosedDate($daviesClaim->dateClosed);
@@ -237,11 +267,12 @@ class DaviesService extends S3EmailService
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
-        if ($daviesClaim->isExcessValueCorrect() === false) {
+        $validated = true;
+        if ($daviesClaim->isExcessValueCorrect($validated) === false) {
             $msg = sprintf(
                 'Claim %s does not have the correct excess value. Expected %0.2f Actual %0.2f for %s/%s',
                 $daviesClaim->claimNumber,
-                $daviesClaim->getExpectedExcess(),
+                $daviesClaim->getExpectedExcess($validated),
                 $daviesClaim->excess,
                 $daviesClaim->getClaimType(),
                 $daviesClaim->getClaimStatus()

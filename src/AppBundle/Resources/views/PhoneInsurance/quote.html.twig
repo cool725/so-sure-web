@@ -73,7 +73,6 @@
                         {% endfor %}
                         <li role="separator" class="divider"></li>
                     {% endif %}
-                    <li role="separator" class="divider"></li>
                     <li><a href="#" data-toggle="modal" data-target="#quoteModal"> I have a different phone</a></li>
                 </ul>
             </div>
@@ -152,7 +151,11 @@
             <div class="row">
                <div class="col-xs-12 col-sm-7 col-md-7">
                     <div class="quote-card">
-                        <h3>so-sure proudly offers</h3>
+                        {% if slider_test == 'slide-me' %}
+                            <h3>What we offer</h3>
+                        {% else %}
+                            <h3>so-sure proudly offers</h3>
+                        {% endif %}
                         <ul class="list-unstyled">
                             <li class="h4 text-underline"><i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i>Next working day replacement or repair</li>
                             <li class="h4"><i class="fa fa-plus-circle fa-lg text-blue" aria-hidden="true"></i>24/7 live support</li>
@@ -177,19 +180,55 @@
                         <ul class="list-unstyled">
                             <li class="h4">
                                 <i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i>
-                                Loss <a href="#" data-toggle="modal" data-target="#theft-and-loss"><i class="fa fa-info-circle"></i></a>
+                                Loss
+                                <i class="fa fa-info-circle"
+                                   data-toggle="popover"
+                                   data-placement="top"
+                                   data-html="true"
+                                   data-trigger="hover"
+                                   data-content="In the event of theft or loss you are also covered for: <br>
+                                   <ul>
+                                     <li>Unauthorised network charges (up to £1,000 including VAT)</li>
+                                     <li>Accessories (e.g. headphones - up to £100 including VAT)</li>
+                                   </ul>"
+                                   title="Theft &amp; Loss"></i>
                             </li>
                             <li class="h4">
-                                <i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Theft <a href="#" data-toggle="modal" data-target="#theft-and-loss"><i class="fa fa-info-circle"></i></a>
+                                <i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Theft
+                                <i class="fa fa-info-circle"
+                                   data-toggle="popover"
+                                   data-placement="top"
+                                   data-html="true"
+                                   data-trigger="hover"
+                                   data-content="In the event of theft or loss you are also covered for: <br>
+                                   <ul>
+                                     <li>Unauthorised network charges (up to £1,000 including VAT)</li>
+                                     <li>Accessories (e.g. headphones - up to £100 including VAT)</li>
+                                   </ul>"
+                                   title="Theft &amp; Loss"></i>
                             </li>
                             <li class="h4">
-                                <i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Accidental damage (e.g. cracked screen) <a href="#" data-toggle="modal" data-target="#accidental-damage"><i class="fa fa-info-circle"></i></a>
+                                <i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Accidental damage (e.g. cracked screen)
+                                <i class="fa fa-info-circle"
+                                   data-toggle="popover"
+                                   data-placement="top"
+                                   data-html="true"
+                                   data-trigger="hover"
+                                   data-content="<p>Including Water Damage</p>"
+                                   title="Accidental damage"></i>
                             </li>
                             <li class="h4">
                                 <i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Out of warranty breakdown
                             </li>
                             <li class="h4">
-                                <i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Worldwide coverage <a href="#" data-toggle="modal" data-target="#worldwide-coverage"><i class="fa fa-info-circle"></i></a>
+                                <i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Worldwide coverage
+                                <i class="fa fa-info-circle"
+                                   data-toggle="popover"
+                                   data-placement="top"
+                                   data-html="true"
+                                   data-trigger="hover"
+                                   data-content="<p>Valid for 90 days while you are traveling for leisure or business.</p>"
+                                   title="Worldwide coverage"></i>
                             </li>
                         </ul>
                     </div>
@@ -207,8 +246,7 @@
                             <h3>Get cashback by connecting to friends</h3>
                         {% endif %}
 
-
-                        <div class="h4 text-grey-blue"><strong>Friends connected</strong></div>
+                        <div class="h4 text-grey-blue"><strong>No. of Friends connected</strong></div>
 
                         {% set start_friends = max_connections %}
 
@@ -234,6 +272,11 @@
                                    data-max-comparison="{{ comparision_max }}">
                         </div>
 
+                        {% if slider_test == 'slide-me' %}
+                        <div class="slide-me">
+                            <img src="{{ cdn_url }}/images/quote-page/arrow-slide-me.svg" alt="">
+                        </div>
+                        {% endif %}
 
                         <div class="reward-total">
                             <div class="cashback-value">
@@ -339,32 +382,34 @@
         </div>
     </section>
 
-    {% include 'AppBundle::Default/press.html.twig' %}
-
-    <section id="quote-banner"
-             class="banner-sticky banner-sticky-hide"
-             data-sticky-trigger="quote"
-             data-sticky-offset="200"
-             data-sticky-static="true"
-             >
-        <div class="container">
-            <div class="row">
-                <div class="col-xs-12 col-sm-6 col-md-8">
-                    <h3><small>Device</small> <span>{{ phone }}</span></h3>
-                </div>
-                <div class="col-xs-12 col-sm-3 col-md-2">
-                    <h3><span>£{{ phone_price.monthlyPremiumPrice }}</span> <small>/month</small></h3>
-                </div>
-                <div class="col-xs-12 col-sm-3 col-md-2">
-
-                    {{ form_start(buy_form_banner) }}
-                        {{ form_widget(buy_form_banner.buy, {'label': 'Get Started', 'attr': {'class': 'btn btn-success '}}) }}
-                    {{ form_end(buy_form_banner)}}
-
+    {% if slider_test != 'slide-me' %}
+        {% include 'AppBundle::Default/press.html.twig' %}
+    
+        <section id="quote-banner"
+                 class="banner-sticky banner-sticky-hide"
+                 data-sticky-trigger="quote"
+                 data-sticky-offset="200"
+                 data-sticky-static="true"
+                 >
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-6 col-md-8">
+                        <h3><small>Device</small> <span>{{ phone }}</span></h3>
+                    </div>
+                    <div class="col-xs-12 col-sm-3 col-md-2">
+                        <h3><span>£{{ phone_price.monthlyPremiumPrice }}</span> <small>/month</small></h3>
+                    </div>
+                    <div class="col-xs-12 col-sm-3 col-md-2">
+    
+                        {{ form_start(buy_form_banner) }}
+                            {{ form_widget(buy_form_banner.buy, {'label': 'Get Started', 'attr': {'class': 'btn btn-success '}}) }}
+                        {{ form_end(buy_form_banner)}}
+    
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    {% endif %}
 
     {% include 'AppBundle::Default/fasterClaims.html.twig' %}
 
@@ -394,6 +439,10 @@
         </div>
     </section>
 
+    {% if slider_test == 'slide-me' %}
+        {% include 'AppBundle::Default/press.html.twig' %}
+    {% endif %}
+
     {% include 'AppBundle::Default/partnership.html.twig' %}
 
     {# Page Modals #}
@@ -414,65 +463,6 @@
                 </div>
                 <div class="modal-body modal-policy">
                     {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  max_pot })) }}
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade"
-         id="theft-and-loss"
-         tabindex="-1"
-         role="dialog"
-         aria-labelledby="Theft & Loss"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h3>Theft &amp; Loss</h3>
-                </div>
-                <div class="modal-body">
-                    <p><strong>In the event of theft or loss you are also covered for:</strong></p>
-                    <p>Unauthorised network charges (up to £1,000 including VAT)</p>
-                    <p>Accessories (e.g. headphones - up to £100 including VAT)</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade"
-         id="accidental-damage"
-         tabindex="-1"
-         role="dialog"
-         aria-labelledby="Accidental Damage"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h3>Accidental Damage</h3>
-                </div>
-                <div class="modal-body">
-                    <p>Including Water Damage.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade"
-         id="worldwide-coverage"
-         tabindex="-1"
-         role="dialog"
-         aria-labelledby="Worldwide Coverage"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h3>Worldwide Coverage</h3>
-                </div>
-                <div class="modal-body">
-                    <p>Valid for 90 days while you are traveling for leisure or business.</p>
                 </div>
             </div>
         </div>

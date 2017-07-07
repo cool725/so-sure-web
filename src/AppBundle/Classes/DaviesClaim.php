@@ -132,25 +132,19 @@ class DaviesClaim extends DaviesExcel
         return $this->reserved;
     }
 
-    public function getExpectedExcess()
+    public function getExpectedExcess($validated = true)
     {
-        if (in_array($this->getClaimType(), [Claim::TYPE_LOSS, Claim::TYPE_THEFT])) {
-            return 70;
-        } elseif (in_array($this->getClaimType(), [
-            Claim::TYPE_DAMAGE,
-            Claim::TYPE_WARRANTY,
-            Claim::TYPE_EXTENDED_WARRANTY
-        ])) {
-            return 50;
+        try {
+            return Claim::getExcessValue($this->getClaimType(), $validated);
+        } catch (\Exception $e) {
+            return null;
         }
-
-        return null;
     }
 
-    public function isExcessValueCorrect()
+    public function isExcessValueCorrect($validated = true)
     {
         if ($this->excess > 0) {
-            return $this->excess == $this->getExpectedExcess();
+            return $this->excess == $this->getExpectedExcess($validated);
         }
 
         // Settled claims should always have excess

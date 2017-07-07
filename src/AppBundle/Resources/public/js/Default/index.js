@@ -51,9 +51,8 @@ $(function(){
         $('.panel-open').not(this).removeClass('panel-open');
     });
 
-    $('#myCollapsible').on('show.bs.collapse', function () {
-        // do something…
-    })
+    // Enable Popovers
+    $('[data-toggle="popover"]').popover();
 
     // Policy Modal
     $('#policy-modal').on('show.bs.modal', function (event) {

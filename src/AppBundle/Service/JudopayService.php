@@ -30,6 +30,15 @@ class JudopayService
 {
     use CurrencyTrait;
 
+    /** Standard payment (monthly/yearly; initial payment or payment after card fails */
+    const WEB_TYPE_STANDARD = 'standard';
+
+    /** No payment, just updating the card details */
+    const WEB_TYPE_CARD_DETAILS = 'card-details';
+
+    /** Remainder of policy payment (typically cancelled policy w/claim) */
+    const WEB_TYPE_REMAINDER = 'remainder';
+
     /** @var LoggerInterface */
     protected $logger;
 
@@ -125,6 +134,35 @@ class JudopayService
         $this->environment = $environment;
     }
 
+    public function getTransaction($receiptId)
+    {
+        $transaction = $this->apiClient->getModel('Transaction');
+        $data = array(
+            'judoId' => $this->judoId,
+        );
+        $transaction->setAttributeValues($data);
+        $details = $transaction->find($receiptId);
+
+        return $details;
+    }
+
+    public function getTransactionWebType($receiptId)
+    {
+        try {
+            $data = $this->getTransaction($receiptId);
+            if (isset($data['yourPaymentMetaData']) && isset($data['yourPaymentMetaData']['web_type'])) {
+                return $data['yourPaymentMetaData']['web_type'];
+            }
+        } catch (\Exception $e) {
+            $this->logger->warning(
+                sprintf('Unable to find transaction receipt %s', $receiptId),
+                ['exception' => $e]
+            );
+        }
+    
+        return null;
+    }
+
     public function getTransactions($pageSize, $logMissing = true)
     {
         $policies = [];
@@ -176,8 +214,8 @@ class JudopayService
                     // Only need to be concerned about successful payments
                     if ($receipt['result'] == JudoPayment::RESULT_SUCCESS) {
                         if ($logMissing) {
-                            $this->logger->warning(sprintf(
-                                'Missing judo payment item for receipt %s on %s [%s]',
+                            $this->logger->error(sprintf(
+                                'INVESTIGATE!! Missing db judo payment for received payment. receipt %s on %s [%s]',
                                 $receiptId,
                                 $receipt['createdAt'],
                                 json_encode($receipt)
@@ -185,7 +223,7 @@ class JudopayService
                         }
                         $result['missing'][$receiptId] = isset($receipt['yourPaymentReference']) ?
                             $receipt['yourPaymentReference'] :
-                            null;
+                            $receiptId;
                     }
                 } else {
                     $result['validated']++;
@@ -928,7 +966,7 @@ class JudopayService
     /**
      *
      */
-    public function webpay(Policy $policy, $amount, $ipAddress, $userAgent)
+    public function webpay(Policy $policy, $amount, $ipAddress, $userAgent, $type = null)
     {
         $payment = new JudoPayment();
         $payment->setAmount($amount);
@@ -948,6 +986,7 @@ class JudopayService
                 'yourPaymentReference' => $payment->getId(),
                 'yourPaymentMetaData' => [
                     'policy_id' => $policy->getId(),
+                    'web_type' => $type ? $type : null,
                 ],
                 'amount' => $this->toTwoDp($amount),
                 'currency' => 'GBP',
@@ -990,6 +1029,9 @@ class JudopayService
                 'clientIpAddress' => $ipAddress,
                 'clientUserAgent' => $userAgent,
                 'webPaymentOperation' => 'register',
+                'yourPaymentMetaData' => [
+                    'web_type' => self::WEB_TYPE_CARD_DETAILS,
+                ],
             )
         );
 

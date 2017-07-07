@@ -478,9 +478,9 @@ class Claim
         return $this->number;
     }
 
-    public function setNumber($number)
+    public function setNumber($number, $allowChange = false)
     {
-        if ($this->number && $this->number != $number) {
+        if ($this->number && $this->number != $number && !$allowChange) {
             throw new \Exception('Unable to change claim number');
         }
 
@@ -938,5 +938,36 @@ class Claim
             'validCrimeRef' => $this->isValidCrimeRef(),
             'shippingAddress' => $this->getShippingAddress(),
         ];
+    }
+
+    public function getExpectedExcess()
+    {
+        if (in_array($this->getStatus(), [
+            Claim::STATUS_DECLINED,
+            Claim::STATUS_WITHDRAWN,
+        ])) {
+            return 0;
+        }
+
+        return self::getExcessValue($this->getType());
+    }
+
+    public static function getExcessValue($type, $validated = true)
+    {
+        if (!$validated) {
+            return 150;
+        }
+
+        if (in_array($type, [Claim::TYPE_LOSS, Claim::TYPE_THEFT])) {
+            return 70;
+        } elseif (in_array($type, [
+            Claim::TYPE_DAMAGE,
+            Claim::TYPE_WARRANTY,
+            Claim::TYPE_EXTENDED_WARRANTY
+        ])) {
+            return 50;
+        }
+
+        throw new \Exception(sprintf('Unknown claim type %s', $type));
     }
 }
