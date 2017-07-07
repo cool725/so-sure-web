@@ -529,6 +529,12 @@ class PurchaseController extends BaseController
             } else {
                 $webType = JudopayService::WEB_TYPE_STANDARD;                
             }
+
+            $this->get('logger')->warning(sprintf(
+                'Unable to find web_type metadata for receipt %s. Falling back to %s',
+                $request->get('ReceiptId'),
+                $webType
+            ));
         }
 
         if (in_array($webType, [JudopayService::WEB_TYPE_REMAINDER, JudopayService::WEB_TYPE_STANDARD])) {

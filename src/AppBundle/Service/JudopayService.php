@@ -141,7 +141,7 @@ class JudopayService
             'judoId' => $this->judoId,
         );
         $transaction->setAttributeValues($data);
-        $details = $transactions->find($receiptId);
+        $details = $transaction->find($receiptId);
 
         return $details;
     }
@@ -150,11 +150,14 @@ class JudopayService
     {
         try {
             $data = $this->getTransaction($receiptId);
-            if (isset($receipt['yourPaymentMetaData']) && isset($receipt['yourPaymentMetaData']['web_type'])) {
-                return $receipt['yourPaymentMetaData']['web_type'];
+            if (isset($data['yourPaymentMetaData']) && isset($data['yourPaymentMetaData']['web_type'])) {
+                return $data['yourPaymentMetaData']['web_type'];
             }
         } catch (\Exception $e) {
-            $this->logger->warning(sprintf('Unable to get transaction receipt %s', $receiptId));
+            $this->logger->warning(
+                sprintf('Unable to find transaction receipt %s', $receiptId),
+                ['exception' => $e]
+            );
         }
     
         return null;
@@ -1026,6 +1029,9 @@ class JudopayService
                 'clientIpAddress' => $ipAddress,
                 'clientUserAgent' => $userAgent,
                 'webPaymentOperation' => 'register',
+                'yourPaymentMetaData' => [
+                    'web_type' => self::WEB_TYPE_CARD_DETAILS,
+                ],
             )
         );
 

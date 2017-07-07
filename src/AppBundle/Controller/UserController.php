@@ -388,7 +388,7 @@ class UserController extends BaseController
                 $amount,
                 $request->getClientIp(),
                 $request->headers->get('User-Agent'),
-                JudopayService::WEB_TYPE_CARD_DETAILS
+                JudopayService::WEB_TYPE_STANDARD
             );
         }
 
