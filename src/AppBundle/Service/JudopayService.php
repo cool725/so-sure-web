@@ -176,8 +176,8 @@ class JudopayService
                     // Only need to be concerned about successful payments
                     if ($receipt['result'] == JudoPayment::RESULT_SUCCESS) {
                         if ($logMissing) {
-                            $this->logger->warning(sprintf(
-                                'Missing judo payment item for receipt %s on %s [%s]',
+                            $this->logger->error(sprintf(
+                                'INVESTIGATE!! Missing db judo payment for received payment. receipt %s on %s [%s]',
                                 $receiptId,
                                 $receipt['createdAt'],
                                 json_encode($receipt)
@@ -185,7 +185,7 @@ class JudopayService
                         }
                         $result['missing'][$receiptId] = isset($receipt['yourPaymentReference']) ?
                             $receipt['yourPaymentReference'] :
-                            null;
+                            $receiptId;
                     }
                 } else {
                     $result['validated']++;

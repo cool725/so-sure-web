@@ -216,14 +216,14 @@ class MonitorService
     public function judopayReceipts()
     {
         $results = $this->judopay->getTransactions(20, false);
-        if (count($results['additional-payments']) > 0) {
+        if (isset($results['additional-payments']) && count($results['additional-payments']) > 0) {
             // @codingStandardsIgnoreStart
             throw new \Exception(sprintf(
                 'Judopay is recording more than 1 payment against a policy that indicates a scheduled payment issue. %s',
                 json_encode($results['additional-payments'])
             ));
             // @codingStandardsIgnoreEnd
-        } elseif (count($result['missing']) > 0) {
+        } elseif (isset($results['missing']) && count($results['missing']) > 0) {
             // @codingStandardsIgnoreStart
             throw new \Exception(sprintf(
                 'Judopay is missing database payment records that indices a mobile payment was received, but not recorded. %s',
