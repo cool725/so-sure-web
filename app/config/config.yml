@@ -340,7 +340,6 @@ nelmio_security:
                 - https://*.google.ie
                 - gsa://onpageload
                 - https://*.doubleclick.net
-                - https://*.hotjar.com
                 - https://*.google.ie
                 - https://cdn.so-sure.com
                 - https://www.youtube.com
@@ -365,7 +364,7 @@ nelmio_security:
                 - https://*.digits.com
                 - https://*.facebook.com
                 - http://*.facebook.com
-                - https://player.vimeo.com
+                - https://*.vimeo.com
                 - https://*.hotjar.com
                 - https://*.doubleclick.net
                 - https://*.googletagmanager.com
