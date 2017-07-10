@@ -735,11 +735,10 @@ class AdminController extends BaseController
         if (!isset($formData['_token'])) {
             throw new \InvalidArgumentException('Missing parameters');
         }
-        /*
-        if (!$this->isCsrfTokenValid('default', $formData['_token'])) {
+        // TODO: Find default intent for forms. hack to add a second token with known intent
+        if (!$this->isCsrfTokenValid('flags', $request->get('_csrf_token'))) {
             throw new \InvalidArgumentException('Invalid csrf token');
         }
-        */
 
         $dm = $this->getManager();
         $repo = $dm->getRepository(Claim::class);

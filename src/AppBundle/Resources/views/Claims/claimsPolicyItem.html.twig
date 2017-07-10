@@ -920,6 +920,7 @@
           <div class="modal-footer">
                 {{ form_widget(formClaimFlags.update, {'label': 'Update Flags', 'attr': {'class': 'btn btn-success'}}) }}
           </div>
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('flags') }}">
             {{ form_end(formClaimFlags )}}
         </div>
       </div>
