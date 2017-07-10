@@ -765,4 +765,41 @@ class AdminController extends BaseController
 
         return new RedirectResponse($this->generateUrl('admin_policy', ['id' => $claim->getPolicy()->getId()]));
     }
+
+    /**
+     * @Route("/claim/withdraw/{id}", name="admin_claim_withdraw")
+     * @Method({"POST"})
+     */
+    public function adminClaimWithdrawAction(Request $request, $id)
+    {
+        if (!$this->isCsrfTokenValid('default', $request->get('_token'))) {
+            throw new \InvalidArgumentException('Invalid csrf token');
+        }
+
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Claim::class);
+        $claim = $repo->find($id);
+        if (!$claim) {
+            throw $this->createNotFoundException('Claim not found');
+        }
+        if (!in_array($claim->getStatus(), [
+            Claim::STATUS_INREVIEW,
+            Claim::STATUS_PENDING_CLOSED,
+            Claim::STATUS_APPROVED,
+        ])) {
+            throw new \Exception(
+                'Claim can only be withdrawn if claim is in-review, approved or pending-closed state'
+            );
+        }
+
+        $claim->setStatus(Claim::STATUS_WITHDRAWN);
+        $dm->flush();
+
+        $this->addFlash(
+            'success',
+            sprintf('Claim %s withdrawn', $claim->getNumber())
+        );
+
+        return new RedirectResponse($this->generateUrl('admin_policy', ['id' => $claim->getPolicy()->getId()]));
+    }
 }
