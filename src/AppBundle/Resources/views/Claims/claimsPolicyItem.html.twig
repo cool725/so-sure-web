@@ -368,6 +368,10 @@
                                     data-flags="{{ claim.ignoreWarningFlags|json_encode }}"
                                     data-update="{{ path('admin_claim_flags', {'id': claim.id}) }}"
                             ><i class="fa fa-flag"></i></button>
+                            <button title="Withdraw claim" type="button" class="btn btn-danger"
+                                    data-toggle="modal" data-target="#withdrawModal"
+                                    data-update="{{ path('admin_claim_withdraw', {'id': claim.id}) }}"
+                            ><i class="fa fa-minus"></i></button>
                             {% endif %}
                         </td>
                     </tr>
@@ -962,6 +966,27 @@
                 {{ form_widget(bacs_form.save, {'label': 'Save Payment', 'attr': {'class': 'btn btn-success'}}) }}
           </div>
             {{ form_end(bacs_form )}}
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="withdrawModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document" style="width: 60%;">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Withdraw Claim</h4>
+          </div>
+          <div class="modal-body">
+            <h4>Claim should only be withdrawn if Davies has been contacted.</h4>
+            <p>This is to allow for cancellation to occur.</p>
+            <p><form id="withdraw-form" method="POST">
+                <button type="submit" class="btn btn-danger">Withdraw claim</button>
+                <input type="hidden" name="_token" value="{{ csrf_token('default') }}">
+            </form></p>
+          </div>
+          <div class="modal-footer">
+          </div>
         </div>
       </div>
     </div>
