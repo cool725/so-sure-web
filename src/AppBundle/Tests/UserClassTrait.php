@@ -35,12 +35,15 @@ trait UserClassTrait
         return sprintf('%s@%s.so-sure.net', $name, str_replace("\\", ".", get_class($caller)));
     }
 
-    public static function createUserPolicy($init = false, $date = null)
+    public static function createUserPolicy($init = false, $date = null, $setId = false)
     {
         $user = new User();
         $user->setFirstName('foo');
         $user->setLastName('bar');
         self::addAddress($user);
+        if ($setId) {
+            $user->setId(rand(1, 999999));
+        }
 
         $policy = new SalvaPhonePolicy();
         $policy->setUser($user);
@@ -236,6 +239,8 @@ trait UserClassTrait
             $payment->setDate($date);
         }
         $policy->addPayment($payment);
+
+        return $payment;
     }
 
     public static function addSoSureStandardPayment($policy, $date = null, $refund = true, $monthly = true)
