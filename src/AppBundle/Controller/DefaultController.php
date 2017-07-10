@@ -30,6 +30,7 @@ use AppBundle\Form\Type\SmsAppLinkType;
 use AppBundle\Document\Form\Register;
 use AppBundle\Document\Form\PhoneMake;
 use AppBundle\Document\User;
+use AppBundle\Document\Claim;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
@@ -316,6 +317,74 @@ class DefaultController extends BaseController
 
         return [
             'lead_form' => $leadForm->createView(),
+        ];
+    }
+
+    /**
+     * @Route("/claim", name="claim")
+     * @Template
+     */
+    public function claimAction(Request $request)
+    {
+        $claimForm = $this->get('form.factory')
+            ->createNamedBuilder('claim_form')
+            ->add('email', EmailType::class)
+            ->add('name', TextType::class)
+            ->add('policyNumber', TextType::class)
+            ->add('phone', TextType::class)
+            ->add('timeToReach', TextType::class)
+            ->add('type', ChoiceType::class, [
+                'required' => true,
+                'placeholder' => 'My phone is...',
+                'choices' => [
+                    'My phone is lost' => Claim::TYPE_LOSS,
+                    'My phone was stolen' => Claim::TYPE_THEFT,
+                    'My phone is damaged or not working' => Claim::TYPE_DAMAGE,
+                ],
+            ])
+            ->add('message', TextareaType::class)
+            ->add('submit', SubmitType::class)
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('claim_form')) {
+                $claimForm->handleRequest($request);
+                if ($claimForm->isValid()) {
+                    // @codingStandardsIgnoreStart
+                    $body = sprintf(
+                        "Name: %s<br>Policy Number: %s<br>Email: %s<br>Contact #: %s<br># Best time to reach: %s<br>Type of claim: %s<br>Message: %s",
+                        $claimForm->getData()['name'],
+                        $claimForm->getData()['policyNumber'],
+                        $claimForm->getData()['email'],
+                        $claimForm->getData()['phone'],
+                        $claimForm->getData()['timeToReach'],
+                        $claimForm->getData()['type'],
+                        $claimForm->getData()['message']
+                    );
+                    // @codingStandardsIgnoreEnd
+
+                    $message = \Swift_Message::newInstance()
+                        ->setSubject(sprintf(
+                            'New Claim from %s/%s',
+                            $claimForm->getData()['name'],
+                            $claimForm->getData()['policyNumber']
+                        ))
+                        ->setFrom('info@so-sure.com')
+                        ->setTo('claims@wearesosure.com.com')
+                        ->setBody($body, 'text/html');
+                    $this->get('mailer')->send($message);
+                    $this->addFlash(
+                        'success',
+                        "Thanks. We'll be in touch shortly"
+                    );
+
+                    return $this->redirectToRoute('claim');
+                }
+            }
+        }
+
+        return [
+            'claim_form' => $claimForm->createView(),
         ];
     }
 

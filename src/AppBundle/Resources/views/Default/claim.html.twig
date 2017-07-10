@@ -1,0 +1,120 @@
+{% extends 'base.html.twig' %}
+
+{# Set vars #}
+{% set new_stylesheet = 1 %}
+
+{% block title %}so-sure - Make a claim
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets output='css/*.css'
+        '@AppBundle/Resources/public/sass/page/corporate.scss'
+    %}
+    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{# {% block nav %}{% endblock %} #}
+
+{% block body %}
+
+    <div class="background-off-white">
+
+    <section class="corporate-hero" id="hero-welcome">
+        <div class="corporate-hero-inner">
+
+            <h1 class="text-blue">Making a claim</h1>
+            <p class="lead">Sorry to hear that something has happened with your phone.
+            If approved, we aim to get your phone replaced or repaired the next working day.
+            </p>
+        </div>
+    </section>
+
+    <section class="section-corporate section-corporate-form section-corporate-pad section-corporate-pad-both" id="corporate-get-quote-form">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-10 col-md-offset-1">
+
+                    <h2 class="text-blue text-center">Let us know a few more details and one of our claim handlers
+                    will call you during business hours</h2>
+
+                    {{ form_start(claim_form) }}
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="">Name <span class="req">*</span></label>
+                                    {{ form_widget(claim_form.name, { 'attr': {'class': 'form-control'}}) }}
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="">Email <span class="req">*</span></label>
+                                    {{ form_widget(claim_form.email, { 'attr': {'class': 'form-control'}}) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="">Policy Number <span class="req">*</span></label>
+                                    {{ form_widget(claim_form.policyNumber, { 'attr': {'class': 'form-control'}}) }}
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="">What happened? <span class="req">*</span></label>
+                                    {{ form_widget(claim_form.type, { 'attr': {'class': 'form-control'}}) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="">Phone Number we can reach you on <span class="req">*</span></label>
+                                    {{ form_widget(claim_form.phone, { 'attr': {'class': 'form-control'}}) }}
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="">Best time to call you <span class="req">*</span></label>
+                                    {{ form_widget(claim_form.timeToReach, { 'attr': {'class': 'form-control'}}) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="">We'll speak to you by phone about your claim, but if there's anything else
+                                    that you'd like to tell us or more details about when you can be reached, please
+                                    include them here:<span class="req">*</span></label>
+                                    {{ form_widget(claim_form.message, { 'attr': {'class': 'form-control', 'rows': '15'}}) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 text-center">
+                                <div class="form-group">
+                                    {{ form_widget(claim_form.submit, { 'label': 'Make a claim', 'attr': {'class': 'btn btn-blue btn-lg'}}) }}
+                                </div>
+                            </div>
+                        </div>
+                    {{ form_end(claim_form) }}
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    </div>
+
+    {# Page Modals #}
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    '@AppBundle/Resources/public/js/Default/index.js' %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}
+
