@@ -11,6 +11,7 @@ use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\DaviesFile;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use VasilDakov\Postcode\Postcode;
+use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 
 class DaviesService extends S3EmailService
 {
