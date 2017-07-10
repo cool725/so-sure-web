@@ -30,7 +30,7 @@ sosure.selectPhoneMake = (function() {
         }, 1000);
         if (!self.sentMixpanel) {
             self.sentMixpanel = true;
-            sosuretrack('Start Search');
+            sosure.track.byName('Start Search');
         }
     }
 
@@ -136,7 +136,7 @@ $(function(){
 
         if(window.location.href.indexOf('?quote=1') != -1) {
             $('#search-phone').focus();
-            sosuretrack('Get A Quote Link');
+            sosure.track.byName('Get A Quote Link');
         }
     });
 

@@ -88,7 +88,7 @@ $(function(){
         on: {
             click: function(e) {
                 console.log(this.share);
-                sosuretrackinvite(this.share);
+                sosure.track.byInvite(this.share);
             }
         }
     });

@@ -70,7 +70,7 @@
                                             <a href="#" data-toggle="modal" data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}">more info</a>.
                                         </small></p>
                                         <p class="help-block"><small>Alternatively send us a screenshot of your IMEI below.</small></p>
-                                        <a href="#" class="btn btn-primary-hollow btn-xs" onclick="sosuretrack('Clicked Upload Imei');Intercom('trackEvent', 'clicked upload imei');Intercom('showNewMessage', 'Hi, I want to take a screenshot of my IMEI number to send to you. Can you let me know what to do? 🙂')">
+                                        <a href="#" class="btn btn-primary-hollow btn-xs" onclick="sosure.track.byName('Clicked Upload Imei');Intercom('trackEvent', 'clicked upload imei');Intercom('showNewMessage', 'Hi, I want to take a screenshot of my IMEI number to send to you. Can you let me know what to do? 🙂')">
                                         <i class="fa fa-file-image-o" aria-hidden="true"></i>
                                         SEND US A SCREENSHOT</a>
                                     <div class="help-block with-errors">{{ form_errors(purchase_form.imei) }}</div>

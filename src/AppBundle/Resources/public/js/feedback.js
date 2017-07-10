@@ -1,6 +1,6 @@
 $(function(){
   $('#pp-cfp').on('click', function() {
-    sosuretrack('Feedback');
+    sosure.track.byName('Feedback');
     $('#pp-cfp-trigger').click();
   });
 });

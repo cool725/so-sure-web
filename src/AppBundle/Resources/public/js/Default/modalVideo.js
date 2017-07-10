@@ -7,5 +7,5 @@ $('.modal-video').on('hidden.bs.modal', function() {
 
 $('.modal-video').on('shown.bs.modal', function() {
     player.play();
-    sosuretrack('Watch Video');
+    sosure.track.byName('Watch Video');
 })
