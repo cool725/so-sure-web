@@ -80,6 +80,8 @@ class ClaimRepository extends DocumentRepository
     public function findMissingReceivedDate()
     {
         return $this->createQueryBuilder()
+            // exclude withdrawn/declined claim in case status changes
+            ->field('status')->in([Claim::STATUS_INREVIEW, Claim::STATUS_APPROVED, Claim::STATUS_SETTLED])
             ->field('replacementReceivedDate')->equals(null)
             ->field('replacementImei')->notEqual(null)
             ->getQuery()->execute();
