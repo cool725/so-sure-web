@@ -48,7 +48,7 @@
             <nav id="user-homepage--nav">
                 <ul class="nav nav-pills scroll">
                     <li role="presentation" class="{% if app.request.get('_route') == 'user_home' or app.request.get('_route')  == 'user_policy' %}active{% endif %}"><a href="{{ path('user_home') }}">Home</a></li>
-                    {# <li role="presentation"><a href="#">Personal Info</a></li> #}
+                    <li role="presentation" class="{% if app.request.get('_route') == 'user_contact_details' %}active{% endif %}"><a href="{{ path('user_contact_details') }}">Contact Details</a></li>
                     <li role="presentation" class="{% if app.request.get('_route') == 'user_card_details' %}active{% endif %}"><a href="{{ path('user_card_details') }}">Payment Details</a></li>
                     {% if policy is defined %}
                         {% if policy.getPolicyTermsFiles|length > 0 %}
