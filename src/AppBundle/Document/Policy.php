@@ -678,6 +678,21 @@ abstract class Policy
         return $connections;
     }
 
+    /**
+     * In the case of multiple policies get the connections where the user is the same
+     */
+    public function getStandardSelfConnections()
+    {
+        $connections = [];
+        foreach ($this->getStandardConnections() as $connection) {
+            if ($connection->getLinkedUser()->getId() == $this->getUser()->getId()) {
+                $connections[] = $connection;
+            }
+        }
+
+        return $connections;
+    }
+
     public function getRewardConnections()
     {
         $connections = [];
@@ -1588,7 +1603,9 @@ abstract class Policy
             // return self::RISK_LEVEL_HIGH;
         }
 
-        if (count($this->getStandardConnections()) > 0) {
+        // If all the connections are only to the same user (mutliple policy), then ignore that aspect
+        if (count($this->getStandardConnections()) > 0 &&
+            count($this->getStandardConnections()) > count($this->getStandardSelfConnections())) {
             // Connected and value of their pot is zero
             if ($this->areEqualToFourDp($this->getPotValue(), 0) ||
                 $this->areEqualToFourDp($this->getPotValue() - $this->getPromoPotValue(), 0)) {

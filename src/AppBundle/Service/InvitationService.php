@@ -988,16 +988,6 @@ class InvitationService
             $date
         );
         $this->dm->flush();
-
-        $now = new \DateTime();
-        /*
-        $this->mixpanel->queueTrackWithUser($policyA->getUser(), MixpanelService::EVENT_CONNECTION_COMPLETE, [
-            'Connection Value' => $inviterConnection->getTotalValue(),
-        ]);
-        $this->mixpanel->queuePersonProperties([
-            'Last connection complete' => $now->format(\DateTime::ATOM),
-        ], false, $policyA->getUser());
-        */
     }
 
     protected function addConnection(

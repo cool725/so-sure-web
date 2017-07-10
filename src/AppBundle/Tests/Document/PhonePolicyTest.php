@@ -33,6 +33,7 @@ class PhonePolicyTest extends WebTestCase
     protected static $phone;
     protected static $invitationService;
     protected static $userManager;
+    protected static $policyService;
 
     public static function setUpBeforeClass()
     {
@@ -49,7 +50,9 @@ class PhonePolicyTest extends WebTestCase
         $phoneRepo = self::$dm->getRepository(Phone::class);
         self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
         self::$invitationService = self::$container->get('app.invitation');
+        self::$invitationService->setDebug(true);
         self::$userManager = self::$container->get('fos_user.user_manager');
+        self::$policyService = self::$container->get('app.policy');
     }
 
     public function setUp()
@@ -451,6 +454,41 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(10, $connectionA->getPromoValue());
 
         $this->assertEquals(SalvaPhonePolicy::RISK_CONNECTED_POT_ZERO, $policyConnected->getRiskReason());
+    }
+
+    public function testGetRiskReasonOnlySelfConnectedNotConnected()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testGetRiskReasonOnlySelfConnectedNotConnected', $this),
+            'bar'
+        );
+        $policy1 = static::initPolicy($user, static::$dm, static::$phone, null, true);
+        $policy2 = static::initPolicy($user, static::$dm, static::$phone, null, true);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy1);
+        static::$policyService->create($policy2);
+        static::$policyService->setEnvironment('test');
+        // Policy needs to be active
+        $policy1->setStatus(Policy::STATUS_ACTIVE);
+        $policy2->setStatus(Policy::STATUS_ACTIVE);
+        static::$dm->flush();
+
+        $this->assertEquals(0, count($policy1->getStandardConnections()));
+        $this->assertEquals(0, count($policy2->getStandardConnections()));
+        $this->assertEquals(0, count($policy1->getStandardSelfConnections()));
+        $this->assertEquals(0, count($policy2->getStandardSelfConnections()));
+
+        static::$invitationService->setEnvironment('prod');
+        self::$invitationService->connect($policy1, $policy2);
+        $this->assertEquals(1, count($policy1->getStandardConnections()));
+        $this->assertEquals(1, count($policy2->getStandardConnections()));
+        $this->assertEquals(1, count($policy1->getStandardSelfConnections()));
+        $this->assertEquals(1, count($policy2->getStandardSelfConnections()));
+        static::$invitationService->setEnvironment('test');
+
+        $this->assertEquals(SalvaPhonePolicy::RISK_NOT_CONNECTED_NEW_POLICY, $policy1->getRiskReason());
+        $this->assertEquals(SalvaPhonePolicy::RISK_NOT_CONNECTED_NEW_POLICY, $policy2->getRiskReason());
     }
 
     /**
@@ -1067,12 +1105,11 @@ class PhonePolicyTest extends WebTestCase
         $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
-        $payment = new JudoPayment();
-        $payment->setAmount(static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
-        $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
-        $payment->setResult(JudoPayment::RESULT_SUCCESS);
-        $payment->setReceipt(rand(1, 999999));
-        $policy->addPayment($payment);
+        self::addPayment(
+            $policy,
+            static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice(),
+            Salva::YEARLY_TOTAL_COMMISSION
+        );
 
         for ($i = 0; $i < 11; $i++) {
             $scheduledPayment = new ScheduledPayment();
@@ -1103,12 +1140,11 @@ class PhonePolicyTest extends WebTestCase
         // not using policy service here, so simulate what's done there
         $policy->setPremiumInstallments(12);
 
-        $payment = new JudoPayment();
-        $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
-        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
-        $payment->setResult(JudoPayment::RESULT_SUCCESS);
-        $payment->setReceipt(rand(1, 999999));
-        $policy->addPayment($payment);
+        self::addPayment(
+            $policy,
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION
+        );
 
         static::$dm->persist($policy);
         static::$dm->persist($user);
@@ -1879,7 +1915,7 @@ class PhonePolicyTest extends WebTestCase
             12
         );
         // add refund of the first month
-        $this->addPayment(
+        self::addPayment(
             $monthlyPolicy,
             0 - static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice($cancelDate),
             0 - Salva::MONTHLY_TOTAL_COMMISSION
@@ -1901,7 +1937,7 @@ class PhonePolicyTest extends WebTestCase
             1
         );
         // add refund of the first month
-        $this->addPayment(
+        self::addPayment(
             $yearlyPolicy,
             0 - static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice($cancelDate),
             0 - Salva::MONTHLY_TOTAL_COMMISSION
@@ -2137,29 +2173,13 @@ class PhonePolicyTest extends WebTestCase
         $policy->create(rand(1, 999999), null, $date, rand(1, 9999));
         $policy->setPremiumInstallments($installments);
 
-        $this->addPayment($policy, $amount, $commission);
+        self::addPayment($policy, $amount, $commission);
 
         self::$dm->persist($user);
         self::$dm->persist($policy);
         self::$dm->flush();
 
         return $policy;
-    }
-
-    private function addPayment($policy, $amount, $commission, \DateTime $date = null)
-    {
-        if (!$date) {
-            $date = new \DateTime('2016-01-01');
-        }
-        $payment = new JudoPayment();
-        $payment->setAmount($amount);
-        $payment->setTotalCommission($commission);
-        $payment->setResult(JudoPayment::RESULT_SUCCESS);
-        $payment->setDate($date);
-        $payment->setReceipt(rand(1, 999999));
-        $policy->addPayment($payment);
-
-        return $payment;
     }
 
     public function testFinalMonthlyPayment()
@@ -2173,7 +2193,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($monthlyPolicy->isFinalMonthlyPayment());
 
         for ($i = 1; $i <= 10; $i++) {
-            $this->addPayment(
+            self::addPayment(
                 $monthlyPolicy,
                 static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice($date),
                 Salva::MONTHLY_TOTAL_COMMISSION
@@ -2196,7 +2216,7 @@ class PhonePolicyTest extends WebTestCase
         );
 
         for ($i = 1; $i <= 10; $i++) {
-            $this->addPayment(
+            self::addPayment(
                 $monthlyPolicy,
                 static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice($date),
                 Salva::MONTHLY_TOTAL_COMMISSION
@@ -2207,7 +2227,7 @@ class PhonePolicyTest extends WebTestCase
             $monthlyPolicy->getOutstandingPremium()
         );
 
-        $this->addPayment(
+        self::addPayment(
             $monthlyPolicy,
             static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice($date),
             Salva::MONTHLY_TOTAL_COMMISSION
@@ -2226,7 +2246,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertTrue($monthlyPolicy->isInitialPayment());
 
         for ($i = 1; $i <= 11; $i++) {
-            $this->addPayment(
+            self::addPayment(
                 $monthlyPolicy,
                 static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice($date),
                 Salva::MONTHLY_TOTAL_COMMISSION
@@ -2438,25 +2458,25 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(30, $policy->getPolicyExpirationDateDays(new \DateTime('2016-02-01')));
 
         // add an ontime payment
-        $payment = new JudoPayment();
-        $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
-        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
-        $payment->setResult(JudoPayment::RESULT_SUCCESS);
-        $payment->setReceipt(rand(1, 999999));
-        $payment->setDate(new \DateTime('2016-02-01'));
-        $policy->addPayment($payment);
+        self::addPayment(
+            $policy,
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            new \DateTime('2016-02-01')
+        );
 
         // expected payment 1/2/16 + 1 month = 1/3/16 + 30 days = 31/3/16
         $this->assertEquals(new \DateTime('2016-03-31'), $policy->getPolicyExpirationDate());
     
         // add a late payment
-        $payment = new JudoPayment();
-        $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
-        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
-        $payment->setResult(JudoPayment::RESULT_SUCCESS);
-        $payment->setReceipt(rand(1, 999999));
-        $payment->setDate(new \DateTime('2016-03-30'));
-        $policy->addPayment($payment);
+        self::addPayment(
+            $policy,
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            new \DateTime('2016-03-30')
+        );
 
         // expected payment 1/3/16 + 1 month = 1/4/16 + 30 days = 1/5/16
         $this->assertEquals(new \DateTime('2016-05-01'), $policy->getPolicyExpirationDate());
@@ -2477,13 +2497,13 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($policy->isPolicyPaidToDate(new \DateTime('2016-02-01 11:01')));
 
         // add an ontime payment
-        $payment = new JudoPayment();
-        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
-        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
-        $payment->setResult(JudoPayment::RESULT_SUCCESS);
-        $payment->setReceipt(rand(1, 999999));
-        $payment->setDate(new \DateTime('2016-02-01 10:00'));
-        $policy->addPayment($payment);
+        self::addPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            new \DateTime('2016-02-01 10:00')
+        );
 
         $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2016-02-01 00:01')));
         $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2016-02-01 10:01')));
@@ -2491,13 +2511,13 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($policy->isPolicyPaidToDate(new \DateTime('2016-03-01 10:01')));
 
         // add a late payment
-        $payment = new JudoPayment();
-        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
-        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
-        $payment->setResult(JudoPayment::RESULT_SUCCESS);
-        $payment->setReceipt(rand(1, 999999));
-        $payment->setDate(new \DateTime('2016-03-30 10:00'));
-        $policy->addPayment($payment);
+        self::addPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            new \DateTime('2016-03-30 10:00')
+        );
 
         $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2016-03-01 09:00')));
         $this->assertFalse($policy->isPolicyPaidToDate(new \DateTime('2016-03-01 11:00')));
@@ -2523,13 +2543,13 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($policy->isPolicyPaidToDate(new \DateTime('2016-03-01')));
 
         // add an ontime payment
-        $payment = new JudoPayment();
-        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
-        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
-        $payment->setResult(JudoPayment::RESULT_SUCCESS);
-        $payment->setReceipt(rand(1, 999999));
-        $payment->setDate(new \DateTime('2016-02-28 10:00'));
-        $policy->addPayment($payment);
+        self::addPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            new \DateTime('2016-02-28 10:00')
+        );
 
         $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2016-03-01')));
         $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2016-03-28 09:00')));
@@ -2537,13 +2557,13 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($policy->isPolicyPaidToDate(new \DateTime('2016-04-01')));
 
         // add a late payment
-        $payment = new JudoPayment();
-        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
-        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
-        $payment->setResult(JudoPayment::RESULT_SUCCESS);
-        $payment->setReceipt(rand(1, 999999));
-        $payment->setDate(new \DateTime('2016-04-15'));
-        $policy->addPayment($payment);
+        self::addPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            new \DateTime('2016-04-15')
+        );
 
         // we don't actually check when payment arrives, just that its there...
         $this->assertFalse($policy->isPolicyPaidToDate(new \DateTime('2016-04-01 11:00')));
@@ -2569,13 +2589,13 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($policy->isPolicyPaidToDate(new \DateTime('2016-03-01')));
 
         // add an ontime payment
-        $payment = new JudoPayment();
-        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
-        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
-        $payment->setResult(JudoPayment::RESULT_SUCCESS);
-        $payment->setReceipt(rand(1, 999999));
-        $payment->setDate(new \DateTime('2016-02-28 15:00'));
-        $policy->addPayment($payment);
+        self::addPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            new \DateTime('2016-02-28 15:00')
+        );
 
         $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2016-03-01')));
         $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2016-03-28 14:00')));
@@ -2583,13 +2603,13 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($policy->isPolicyPaidToDate(new \DateTime('2016-04-01')));
 
         // add a late payment
-        $payment = new JudoPayment();
-        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
-        $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
-        $payment->setResult(JudoPayment::RESULT_SUCCESS);
-        $payment->setReceipt(rand(1, 999999));
-        $payment->setDate(new \DateTime('2016-04-15 15:00'));
-        $policy->addPayment($payment);
+        self::addPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            new \DateTime('2016-04-15 15:00')
+        );
 
         $this->assertFalse($policy->isPolicyPaidToDate(new \DateTime('2016-04-15 00:01')));
         $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2016-04-15 15:01')));

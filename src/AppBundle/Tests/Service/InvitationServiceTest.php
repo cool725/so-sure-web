@@ -1005,6 +1005,33 @@ class InvitationServiceTest extends WebTestCase
         self::$invitationService->accept($invitation, $policy4);
     }
 
+    public function testSelfMultiplePoliciesConnect()
+    {
+        $userA = static::createUser(
+            static::$userManager,
+            static::generateEmail('testSelfMultiplePoliciesConnect', $this),
+            'bar'
+        );
+        $policy1 = static::initPolicy($userA, static::$dm, static::$phone, null, true);
+        $policy2 = static::initPolicy($userA, static::$dm, static::$phone, null, true);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy1);
+        static::$policyService->create($policy2);
+        static::$policyService->setEnvironment('test');
+        // Policy needs to be active
+        $policy1->setStatus(Policy::STATUS_ACTIVE);
+        $policy2->setStatus(Policy::STATUS_ACTIVE);
+        static::$dm->flush();
+
+        $this->assertEquals(0, count($policy1->getStandardSelfConnections()));
+
+        static::$invitationService->setEnvironment('prod');
+        self::$invitationService->connect($policy1, $policy2);
+        $this->assertEquals(1, count($policy1->getStandardSelfConnections()));
+        $this->assertEquals(1, count($policy2->getStandardSelfConnections()));
+        static::$invitationService->setEnvironment('test');
+    }
+
     public function testSCodeMultiplePoliciesFacebook()
     {
         $userA = static::createUser(
