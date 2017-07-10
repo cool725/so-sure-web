@@ -10,7 +10,8 @@
 {% endblock %}
 
 {% block body %}
-  {% include 'AppBundle:User:userNav.html.twig' %}
+
+    {% include 'AppBundle:User:userNav.html.twig' %}
 
     <section class="user-homepage--content section--pad">
         <div class="container">
@@ -21,16 +22,17 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-8">
+                <div class="col-md-6">
                   <h4>Email</h4>
                   <p>{{ user.email }}</p>
                 </div>
                 <div class="col-md-4">
-                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#email-modal">Edit</button>
+                    <br>
+                    <button type="button" class="btn btn-info btn-xs" data-toggle="modal" data-target="#email-modal">Edit</button>
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-8">
+                <div class="col-md-6">
                     <h4>Mobile</h4>
                     <p>{{ user.mobileNumber }}</p>
                 </div>
@@ -38,7 +40,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-8">
+                <div class="col-md-6">
                     <h4>Billing Address</h4>
                     <p>{{ user.billingAddress }}</p>
                 </div>
@@ -46,36 +48,31 @@
                 </div>
             </div>
         </div>
-  </section>
+    </section>
 
-<div class="modal fade" id="email-modal" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-        {{ form_start(email_form) }}
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Edit Email</h4>
-      </div>
-      <div class="modal-body">
-        <div class="row">
-            <div class="form-group col-sm-4">
-                {{ form_label(email_form.email, 'Email') }}
-            </div>
-            <div class="form-group col-sm-4">
-                {{ form_errors(email_form.email) }}
-                {{ form_widget(email_form.email) }}
+    <div class="modal fade" id="email-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            {{ form_start(email_form) }}
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Edit Email</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        {{ form_label(email_form.email, 'Email') }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_errors(email_form.email) }}
+                        {{ form_widget(email_form.email, {'attr': { 'class':'form-control'} }) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_widget(email_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-success btn-block'}}) }}
+                    </div>
+                </div>
+            {{ form_end(email_form) }}
             </div>
         </div>
-        <div class="row">
-            <div class="form-group text-center col-sm-12" style="padding-top: 10px;">
-                {{ form_widget(email_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-success'}}) }}
-            </div>
-        </div>
-      </div>
-        {{ form_end(email_form) }}
     </div>
-  </div>
-</div>
-
 
 {% endblock %}
