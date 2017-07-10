@@ -303,10 +303,10 @@ class PhonePolicyTest extends WebTestCase
 
     public function testGetRiskPolicyConnectionsNoClaims()
     {
-        $policyConnected = static::createUserPolicy(true);
+        $policyConnected = static::createUserPolicy(true, null, true);
         $policyConnected->setStart(new \DateTime("2016-01-01"));
 
-        $policyClaim = static::createUserPolicy(true);
+        $policyClaim = static::createUserPolicy(true, null, true);
         $policyClaim->setStart(new \DateTime("2016-01-01"));
         list($connectionA, $connectionB) = $this->createLinkedConnections($policyConnected, $policyClaim, 10, 10);
         $policyClaim->updatePotValue();
@@ -317,10 +317,10 @@ class PhonePolicyTest extends WebTestCase
 
     public function testGetRiskPolicyConnectionsClaimedPre30()
     {
-        $policyConnected = static::createUserPolicy(true);
+        $policyConnected = static::createUserPolicy(true, null, true);
         $policyConnected->setStart(new \DateTime("2016-01-01"));
 
-        $policyClaim = static::createUserPolicy(true);
+        $policyClaim = static::createUserPolicy(true, null, true);
         $policyClaim->setStart(new \DateTime("2016-01-01"));
         list($connectionA, $connectionB) = $this->createLinkedConnections($policyConnected, $policyClaim, 10, 10);
         $policyClaim->updatePotValue();
@@ -347,10 +347,10 @@ class PhonePolicyTest extends WebTestCase
 
     public function testGetRiskPolicyConnectionsClaimedPost30()
     {
-        $policyConnected = static::createUserPolicy(true);
+        $policyConnected = static::createUserPolicy(true, null, true);
         $policyConnected->setStart(new \DateTime("2016-01-01"));
 
-        $policyClaim = static::createUserPolicy(true);
+        $policyClaim = static::createUserPolicy(true, null, true);
         $policyClaim->setStart(new \DateTime("2016-01-01"));
         list($connectionA, $connectionB) = $this->createLinkedConnections($policyConnected, $policyClaim, 10, 10);
         $policyClaim->updatePotValue();
@@ -438,10 +438,10 @@ class PhonePolicyTest extends WebTestCase
 
     public function testGetRiskReasonPolicyPromoOnlyConnection()
     {
-        $policyConnected = static::createUserPolicy(true);
+        $policyConnected = static::createUserPolicy(true, null, true);
         $policyConnected->setStart(new \DateTime("2016-01-01"));
 
-        $policyClaim = static::createUserPolicy(true);
+        $policyClaim = static::createUserPolicy(true, null, true);
         $policyClaim->setStart(new \DateTime("2016-01-01"));
         list($connectionA, $connectionB) = $this->createLinkedConnections($policyConnected, $policyClaim, 0, 0);
         $connectionA->setPromoValue(10);
@@ -1140,7 +1140,7 @@ class PhonePolicyTest extends WebTestCase
         // not using policy service here, so simulate what's done there
         $policy->setPremiumInstallments(12);
 
-        self::addPayment(
+        $payment = self::addPayment(
             $policy,
             static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
             Salva::MONTHLY_TOTAL_COMMISSION
@@ -2173,7 +2173,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->create(rand(1, 999999), null, $date, rand(1, 9999));
         $policy->setPremiumInstallments($installments);
 
-        self::addPayment($policy, $amount, $commission);
+        self::addPayment($policy, $amount, $commission, null, $date);
 
         self::$dm->persist($user);
         self::$dm->persist($policy);

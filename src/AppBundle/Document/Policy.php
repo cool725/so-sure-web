@@ -685,8 +685,10 @@ abstract class Policy
     {
         $connections = [];
         foreach ($this->getStandardConnections() as $connection) {
-            if ($connection->getLinkedUser()->getId() == $this->getUser()->getId()) {
-                $connections[] = $connection;
+            if ($connection->getLinkedUser()) {
+                if ($connection->getLinkedUser()->getId() == $this->getUser()->getId()) {
+                    $connections[] = $connection;
+                }
             }
         }
 
