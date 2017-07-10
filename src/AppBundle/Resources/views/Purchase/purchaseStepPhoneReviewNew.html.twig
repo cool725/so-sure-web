@@ -162,8 +162,10 @@
 
                 <div class="form-group">
                     <a href="#"
+                       id="imei-screenshot"
                        class="btn btn-blue btn-block btn-pad"
-                       onclick="sosure.track.byName('Clicked Upload Imei');Intercom('trackEvent', 'clicked upload imei');Intercom('showNewMessage', 'Hi, I want to take a screenshot of my IMEI number to send to you. Can you let me know what to do? 🙂')">Send us a screenshot of your IMEI</a><br>
+                       data-intercom-msg="Hi, I want to take a screenshot of my IMEI number to send to you. Can you let me know what to do? 🙂"
+                    >Send us a screenshot of your IMEI</a><br>
                 </div>
                 {% if purchase_form.serialNumber is defined %}
                     <div class="form-group-break form-group {% if form_errors(purchase_form.serialNumber) %}has-error{% endif %}">

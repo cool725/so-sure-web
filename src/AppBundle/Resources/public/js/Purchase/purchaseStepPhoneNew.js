@@ -127,4 +127,11 @@ $(function(){
         $('#loading-overlay--spinner').show();
         $('#webpay-form').submit();
     }
+
+    $('#imei-screenshot').click(function(e) {
+        e.preventDefault();
+        sosure.track.byName('Clicked Upload Imei');
+        Intercom('trackEvent', 'clicked upload imei');
+        Intercom('showNewMessage', $(this).data('intercom-msg'));
+    });
 });
