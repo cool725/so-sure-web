@@ -780,6 +780,10 @@ class SalvaExportService
             'ns2:paymentsPerYearCode',
             $phonePolicy->getPremiumInstallmentCount()
         ));
+        $policy->appendChild($dom->createElement(
+            'ns2:firstDueDate',
+            $this->adjustDate($phonePolicy->getSalvaFirstDueDate())
+        ));
         $policy->appendChild($dom->createElement('ns2:issuerUser', 'so_sure'));
         $policy->appendChild($dom->createElement('ns2:deliveryModeCode', 'undefined'));
         $policy->appendChild($dom->createElement('ns2:policyNo', $phonePolicy->getSalvaPolicyNumber()));
