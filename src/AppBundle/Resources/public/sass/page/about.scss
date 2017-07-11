@@ -1,6 +1,7 @@
 // about.scss
 
 @import "../mixins";
+@import "../common/type";
 @import "../common/paletteNew";
 
 body {
@@ -18,13 +19,24 @@ body {
 }
 
 .section--big-text {
-    // @include breakpoint(tablet) {
-        background-color: $off-white;
-    // }
+    background-color: $off-white;
+	padding: 20px 0 60px;
 
     @include breakpoint(tablet) {
 		padding: 100px 0;
     }
+}
+
+.section--our-team {
+
+	.media {
+		margin-bottom: 40px;
+
+		h4 span {
+			font-family: $avenir-book;
+			font-size: 16px;
+		}
+	}
 }
 
 .curved-background {
