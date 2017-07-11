@@ -1,7 +1,9 @@
 {% extends 'base.html.twig' %}
 
-{% block javascripts %}
-    {{ parent() }}
+{# Set vars #}
+{% set new_stylesheet = 1 %}
+
+{% block title %}so-sure - about us
 {% endblock %}
 
 {% block stylesheets %}
@@ -14,7 +16,97 @@
 {% endblock %}
 
 {% block body %}
-<section class="about-section section--pad">
+
+<nav class="secondary-nav hidden-xs">
+    <ul class="list-inline">
+        <li><a href="#our-story"
+               class="scroll-to"
+               data-scroll-to-anchor="#our-story">
+               Our story</a></li>
+        <li><a href="#our-mission"
+               class="scroll-to"
+               data-scroll-to-anchor="#our-mission">
+               Our mission</a></li>
+        <li><a href="#our-team"
+               class="scroll-to"
+               data-scroll-to-anchor="#our-team">
+               Our team</a></li>
+        <li><a href="#our-partners"
+               class="scroll-to"
+               data-scroll-to-anchor="#our-partners">
+               Our partners</a></li>
+        <li><a href="#our-location"
+               class="scroll-to"
+               data-scroll-to-anchor="#our-location">
+               Our location</a></li>
+    </ul>
+</nav>
+
+<section class="section--pad section-about-us section--big-text">
+    <div class="container">
+        <div class="big-text text-center">
+            Hello, we’re <span class="text-blue">so-sure</span>, the revolutionary mobile phone insurance provider. Started back in 2015, we’re committed to bringing trust and care back into the world of insurance.
+        </div>
+    </div>
+    {# Curve #}
+    <svg class="curved-background hidden-xs" viewBox="0 0 500 150" preserveAspectRatio="xMinYMin meet">
+        <path d="M0,100 C150,200 350,0 500,100 L500,00 L0,0 Z" style="stroke: none; fill:#f6f7fb;"></path>
+    </svg>
+    {# End Curve #}
+</section>
+
+<section id="our-story" class="section-about-us">
+    <div class="container">
+        <div class="about-panel">
+            <div class="about-panel--thumb">
+                <img src="{{ cdn_url }}/images/about/team/dylan_bio.jpg" alt="" class="img-circle" width="136px" height="136px">
+            </div>
+            <h2 class="text-blue text-center">Our story</h2>
+            <p>Sadly, good customer experiences are a dying breed in the insurance world which is why our founder, Dylan Bourguignon, who spent the past 10 years working from inside the insurance world as a private equity investor, decided to start his own version of a good insurance company.</p>
+            <p>Dylan saw how untrustworthy the insurance industry really was and created the first truly customer-centric insurance company - one that is less focused on profits and more on creating an all-round value: rewarding customers when they don’t claim and pay out while providing exceptional service when they do.</p>
+        </div>
+    </div>
+</section>
+
+<section class="section--pad section-about-us">
+    <div class="container">
+        <div class="big-text text-center">
+            We’re here to revolutionise Insurance
+        </div>
+    </div>
+</section>
+
+<section id="our-mission" class="section-about-us">
+    <div class="container">
+        <div class="about-panel">
+            <h2 class="text-blue text-center">Our mission</h2>
+            <p>Having each other's backs should be a no brainer - the power of many will always beat the power of one. That’s why we created something that looks after you when bad stuff happens but still rewards you when you’re being careful. Finally, insurance that’s actually worth it.</p>
+            <p>Insurance used to be great. In fact, it all started in an East London coffee shop (seriously). Ship owners would meet up at Lloyd's coffee house on Tower Street where they would place wagers on which vessels would return from their voyage. These guys knew they had each other's backs which meant they could get on with the things that really matter, like traversing the high seas.</p>
+            <p>What initially started as a bit of fun then spread out to other industries as people began to realise just how vital insurance was.</p>
+            <p>However, somewhere along the way insurance changed - companies started to care less about the customer and more about profits. We’re here to change that and think that we can bring back the trust and value in insurance.</p>
+        </div>
+    </div>
+</section>
+
+<section id="our-team" class="section-about-us section--pad">
+    <div class="container">
+        <h2 class="text-blue text-center">Our team</h2>
+    </div>
+</section>
+
+<section id="our-partners" class="section-about-us">
+    <div class="container">
+        <h2>Our partners</h2>
+    </div>
+</section>
+
+<section id="our-location" class="section-about-us">
+    <div class="container">
+        <h2>Our location</h2>
+    </div>
+</section>
+
+{# <section class="about-section section--pad">
     <div class="container">
         <div class="row">
             <div class="col-md-12">
@@ -42,5 +134,12 @@
             </div>
         </div>
     </div>
-</section>
+</section> #}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    '@AppBundle/Resources/public/js/Default/index.js' %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}

@@ -1,49 +1,109 @@
 // about.scss
 
 @import "../mixins";
-@import "../common/palette";
+@import "../common/paletteNew";
 
-.about-section {
+body {
+    @include breakpoint(tablet) {
+        background-color: $lightest-blue;
+    }
+}
 
-	h1 {
-		margin-bottom: 20px;
-	}
+.navbar {
+    background-color: $white;
+}
 
-	h2 {
-		color: $grey-dark;
-	}
+.section-about-us {
+	position: relative;
+}
 
-	ul {
-		margin-bottom: 20px;
+.section--big-text {
+    // @include breakpoint(tablet) {
+        background-color: $off-white;
+    // }
 
-		li {
-			padding: 8px 0;
-			font-size: 17px;
-		}
-	}
+    @include breakpoint(tablet) {
+		padding: 100px 0;
+    }
+}
 
-	small {
-		font-size: 60%;
-	}
+.curved-background {
+    display: inline-block;
+    position: absolute;
+    left: 0;
+    z-index: 2;
+}
 
-	.go-back {
-		margin-top: 20px;
-	}
+.curved-background-top {
+    top: 0;
+}
 
-	.thumbnail {
-		padding: 15px 15px 4px;
+.about-panel {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 30px;
+    @include border-radius(4px);
+    border: none;
+    box-shadow: none;
+    position: relative;
+    z-index: 3;
 
-		&:hover {
-			background-color: $grey-light;
+    @include breakpoint(tablet) {
+        background-color: $white;
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
+    }
+}
 
-			a {
-				text-decoration: none;
-			}
-		}
+.about-panel--thumb {
+	text-align: center;
+	margin-top: -80px;
+
+	img {
+		border: 3px solid $white;
 	}
 }
 
-/* Modal */
-.team-member-img-modal {
-	margin: 0 auto;
-}
+// .about-section {
+
+// 	h1 {
+// 		margin-bottom: 20px;
+// 	}
+
+// 	h2 {
+// 		color: $grey-dark;
+// 	}
+
+// 	ul {
+// 		margin-bottom: 20px;
+
+// 		li {
+// 			padding: 8px 0;
+// 			font-size: 17px;
+// 		}
+// 	}
+
+// 	small {
+// 		font-size: 60%;
+// 	}
+
+// 	.go-back {
+// 		margin-top: 20px;
+// 	}
+
+// 	.thumbnail {
+// 		padding: 15px 15px 4px;
+
+// 		&:hover {
+// 			background-color: $grey-light;
+
+// 			a {
+// 				text-decoration: none;
+// 			}
+// 		}
+// 	}
+// }
+
+// /* Modal */
+// .team-member-img-modal {
+// 	margin: 0 auto;
+// }

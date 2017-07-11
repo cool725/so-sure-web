@@ -10,6 +10,8 @@ body {
 	font-size: 16px;
 	color: $black;
 
+	padding-top: 50px; // As we're using a fixed nav
+
 	background-color: $white;
 }
 
@@ -57,7 +59,19 @@ h2, h3, h4, .h1, .h2, .h3, .h4  {
 }
 
 p {
-	line-height: 1.5;
+	line-height: 1.9;
+}
+
+.big-text {
+	font-size: 20px;
+	line-height: 36px;
+	margin: 0 auto;
+
+	@include breakpoint(tablet) {
+		max-width: 960px;
+		font-size: 36px;
+		line-height: 60px;
+	}
 }
 
 a {
