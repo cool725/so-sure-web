@@ -5,7 +5,7 @@ $(function(){
     });
 
     $('#policy-modal').on('show.bs.modal', function (event) {
-        sosuretrack('View Full Policy');
+        sosure.track.byName('View Full Policy');
     });
     if ($('#webpay-form').attr('action')) {
         $('#webpay-form').submit();

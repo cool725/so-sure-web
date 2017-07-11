@@ -408,6 +408,8 @@ nelmio_security:
                 - https://*.licdn.com # linkedin
                 - https://*.linkedin.com
                 - https://sdk.accountkit.com
+                # linked in
+                - https://secure.adnxs.com
                 - 'data:'
             style-src:
                 - 'self'
