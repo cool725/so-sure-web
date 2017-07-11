@@ -39,6 +39,11 @@ body {
 	}
 }
 
+.section--our-partners {
+    position: relative;
+    z-index: 3;
+}
+
 .curved-background {
     display: inline-block;
     position: absolute;
@@ -63,6 +68,15 @@ body {
     @include breakpoint(tablet) {
         background-color: $white;
         box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
+    }
+}
+
+.about-panel--transparent {
+	@extend .about-panel;
+
+    @include breakpoint(tablet) {
+        background-color: transparent;
+        box-shadow: none;
     }
 }
 
