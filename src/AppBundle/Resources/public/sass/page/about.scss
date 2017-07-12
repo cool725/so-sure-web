@@ -53,16 +53,22 @@ body {
 	}
 }
 
+// Custom padding
 .section-about-us {
 	position: relative;
+	padding: 20px 0;
+}
+
+.section--our-story {
+	padding-top: 0;
 }
 
 .section--big-text {
     background-color: $off-white;
-	padding: 20px 0 60px;
+	padding: 30px 0 80px;
 
     @include breakpoint(tablet) {
-		padding: 100px 0;
+		padding: 100px 0 80px;
     }
 }
 
@@ -93,6 +99,7 @@ body {
 }
 
 .section--our-partners {
+
 	@include breakpoint(tablet) {
 		margin-top: -50px;
 	}
@@ -100,6 +107,11 @@ body {
 
 .section--our-location {
 	background-color: $off-white;
+
+	@include breakpoint(tablet) {
+		padding-top: 60px;
+		padding-bottom: 60px;
+	}
 
 	.about-panel {
 		background-color: transparent;
