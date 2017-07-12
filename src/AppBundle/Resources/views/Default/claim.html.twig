@@ -29,6 +29,11 @@
             <p class="lead">Sorry to hear that something has happened with your phone.
             If approved, we aim to get your phone replaced or repaired the next working day.
             </p>
+            <p class="lead">Questions? See our claims <a href="/help/support/making-a-claim">FAQ</a>.</p>
+            <a id="corporate-get-quote"
+               href="#"
+               class="btn btn-green btn-lg scroll-to"
+               data-scroll-to-anchor="#corporate-get-quote-form">Make a claim</a>
         </div>
     </section>
 
@@ -78,7 +83,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <label for="">Best time to call you <span class="req">*</span></label>
+                                    <label for="">Best time to call you (UK business hours) <span class="req">*</span></label>
                                     {{ form_widget(claim_form.timeToReach, { 'attr': {'class': 'form-control'}}) }}
                                 </div>
                             </div>
@@ -90,6 +95,14 @@
                                     that you'd like to tell us or more details about when you can be reached, please
                                     include them here:<span class="req">*</span></label>
                                     {{ form_widget(claim_form.message, { 'attr': {'class': 'form-control', 'rows': '15'}}) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12 text-center">
+                                <div class="form-group">
+                                    <label for="">I certificate the above is correct to the best of my knowledge <span class="req">*</span></label>
+                                    {{ form_widget(claim_form.signature, { 'attr': {'placeholder': 'Signature (type in your name)', 'class': 'form-control'}}) }}
                                 </div>
                             </div>
                         </div>

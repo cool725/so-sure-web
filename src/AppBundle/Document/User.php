@@ -27,6 +27,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     use ArrayToApiArrayTrait;
     use PhoneTrait;
     use GravatarTrait;
+    use CurrencyTrait;
 
     const MAX_POLICIES_PER_USER = 2;
 
@@ -674,12 +675,15 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $data['lastConnection'] = null;
         $data['connections'] = 0;
         $data['rewardPot'] = 0;
+        $data['maxPot'] = 0;
         $data['numberPolicies'] = 0;
         $data['approvedClaims'] = 0;
+        $data['approvedNetworkClaims'] = 0;
         foreach ($this->getValidPolicies(true) as $policy) {
             $data['connections'] += count($policy->getConnections());
             $data['rewardPot'] += $policy->getPotValue();
             $data['approvedClaims'] += count($policy->getApprovedClaims());
+            $data['approvedNetworkClaims'] += count($policy->getNetworkClaims(true));
             if ($phone = $policy->getPhone()) {
                 if (!$data['os']) {
                     $data['os'] = $phone->getOs();
@@ -705,6 +709,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             $data['numberPolicies']++;
             if ($policy instanceof PhonePolicy) {
                 $data['devices'][] = $policy->getPhone()->__toString();
+                $data['maxPot'] += $policy->getMaxPot();
             }
         }
         $data['firstPolicy'] = [];
@@ -724,6 +729,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             $diff = $policy->getCreated()->getTimestamp() - $this->getCreated()->getTimestamp();
             $data['firstPolicy']['minutesStartPurchase'] = round($diff / 60);
         }
+        $data['hasFullPot'] = $data['rewardPot'] > 0 && $this->areEqualToTwoDp($data['rewardPot'], $data['maxPot']);
 
         return $data;
     }
