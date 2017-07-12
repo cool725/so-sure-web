@@ -75,8 +75,9 @@ body {
 }
 
 .section--our-team {
+
 	@include breakpoint(laptop) {
-		// margin-bottom: -200px;
+		margin-bottom: -200px;
 	}
 
 	.media {
@@ -102,8 +103,10 @@ body {
 
 .section--our-partners {
 
-	@include breakpoint(tablet) {
-		// margin-top: -50px;
+	@include breakpoint(laptop) {
+		.about-panel--transparent {
+			margin-top: 300px;
+		}
 	}
 }
 
@@ -129,6 +132,17 @@ body {
     position: absolute;
     left: 0;
     z-index: 2;
+}
+
+.curved-background-own {
+	position: relative;
+
+	svg {
+	    display: inline-block;
+	    position: absolute;
+	    left: 0;
+	    z-index: 2;
+	}
 }
 
 .curved-background-top {
