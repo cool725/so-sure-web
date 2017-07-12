@@ -370,6 +370,7 @@ nelmio_security:
                 - https://*.googletagmanager.com
                 - https://*.iubenda.com
                 - https://*.googlesyndication.com
+                - https://*.google.com/
             script-src:
                 - 'self'
                 - 'unsafe-inline'

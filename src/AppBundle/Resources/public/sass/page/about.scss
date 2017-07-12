@@ -36,6 +36,13 @@ body {
 			font-family: $avenir-book;
 			font-size: 16px;
 		}
+
+		.media-left {
+			img {
+				border: 3px solid $white;
+			}
+		}
+
 	}
 }
 
@@ -68,6 +75,10 @@ body {
     @include breakpoint(tablet) {
         background-color: $white;
         box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
+    }
+
+    h2 {
+    	margin-top: 0;
     }
 }
 
