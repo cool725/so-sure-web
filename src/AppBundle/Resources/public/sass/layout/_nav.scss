@@ -9,6 +9,8 @@
     display: block;
 }
 
+
+
 .navbar-default .navbar-collapse {
 	background-color: $white;
 	border-top: 2px solid $grey-light;
@@ -69,3 +71,30 @@
 	}
 
 }
+
+.navbar-sticky {
+    border-bottom: 2px solid $blue;
+}
+
+// Secondary Nav
+.secondary-nav {
+    width: 620px; height: 50px;
+    position: absolute;
+    left: 50%; margin-left: -310px;
+    z-index: 1000;
+    text-align: center;
+    // padding: 15px 0;
+    background-color: $white;
+
+    @include border-bottom-radius(10px);
+
+    li {
+        padding: 15px;
+    }
+}
+
+.secondary-nav-sticky {
+    top: 0;
+    position: fixed;
+}
+

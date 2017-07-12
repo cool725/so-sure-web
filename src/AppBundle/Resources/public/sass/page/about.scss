@@ -1,49 +1,155 @@
 // about.scss
 
 @import "../mixins";
-@import "../common/palette";
+@import "../common/type";
+@import "../common/paletteNew";
 
-.about-section {
+body {
+    background-color: $lightest-blue;
+}
 
-	h1 {
-		margin-bottom: 20px;
+.navbar {
+    background-color: $white;
+}
+
+.about-panel {
+    max-width: 860px;
+    border: none;
+    margin-left: -15px;
+    margin-right: -15px;
+    padding: 30px 15px;
+    box-shadow: none;
+    position: relative;
+    z-index: 4;
+    background-color: $white;
+
+    @include breakpoint(tablet) {
+    	margin: 0 auto;
+		padding: 30px;
+		@include border-radius(4px);
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
+    }
+}
+
+.about-panel--transparent {
+	@extend .about-panel;
+    background-color: transparent;
+    padding-bottom: 0;
+
+    @include breakpoint(tablet) {
+        box-shadow: none;
+        padding-bottom: 30px;
+    }
+}
+
+.about-panel--thumb {
+	text-align: center;
+	margin-top: -80px;
+
+	img {
+		border: 3px solid $white;
+	}
+}
+
+// Custom padding
+.section-about-us {
+	position: relative;
+	padding: 20px 0;
+
+    h2 {
+    	margin-top: 0;
+    }
+}
+
+.section--our-story {
+	padding-top: 0;
+}
+
+.section--big-text {
+    background-color: $off-white;
+	padding: 30px 0 80px;
+
+    @include breakpoint(tablet) {
+		padding: 100px 0 80px;
+    }
+}
+
+.section--our-team {
+
+	@include breakpoint(laptop) {
+		margin-bottom: -200px;
 	}
 
-	h2 {
-		color: $grey-dark;
-	}
+	.media {
+		margin-bottom: 40px;
 
-	ul {
-		margin-bottom: 20px;
-
-		li {
-			padding: 8px 0;
-			font-size: 17px;
+		@include breakpoint(tablet) {
+			padding-right: 20px;
 		}
-	}
 
-	small {
-		font-size: 60%;
-	}
+		h4 span {
+			font-family: $avenir-book;
+			font-size: 16px;
+		}
 
-	.go-back {
-		margin-top: 20px;
-	}
-
-	.thumbnail {
-		padding: 15px 15px 4px;
-
-		&:hover {
-			background-color: $grey-light;
-
-			a {
-				text-decoration: none;
+		.media-left {
+			img {
+				border: 3px solid $white;
 			}
 		}
+
 	}
 }
 
-/* Modal */
-.team-member-img-modal {
-	margin: 0 auto;
+.section--our-partners {
+
+	@include breakpoint(laptop) {
+		.about-panel--transparent {
+			margin-top: 300px;
+		}
+	}
 }
+
+.section--our-location {
+	background-color: $off-white;
+
+	@include breakpoint(tablet) {
+		padding-top: 70px;
+		padding-bottom: 60px;
+	}
+
+	.about-panel {
+		background-color: transparent;
+
+		@include breakpoint(tablet) {
+			background-color: $white;
+		}
+	}
+}
+
+.curved-background {
+    display: inline-block;
+    position: absolute;
+    left: 0;
+    z-index: 2;
+}
+
+.curved-background-own {
+	position: relative;
+
+	svg {
+	    display: inline-block;
+	    position: absolute;
+	    left: 0;
+	    z-index: 2;
+	}
+}
+
+.curved-background-top {
+	top: 0;
+}
+
+.curved-background-bottom {
+	bottom: 0;
+}
+
