@@ -76,10 +76,7 @@ body {
 
 .section--our-team {
 	@include breakpoint(laptop) {
-		margin-bottom: -200px;
-	}
-	@include breakpoint(desktop) {
-		// margin-bottom: -300px;
+		// margin-bottom: -200px;
 	}
 
 	.media {
@@ -106,7 +103,7 @@ body {
 .section--our-partners {
 
 	@include breakpoint(tablet) {
-		margin-top: -50px;
+		// margin-top: -50px;
 	}
 }
 

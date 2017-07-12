@@ -1,5 +1,8 @@
 {% extends 'base.html.twig' %}
 
+{# Set vars #}
+{% set new_stylesheet = 1 %}
+
 {% block javascripts %}
     {{ parent() }}
 {% endblock %}
@@ -14,7 +17,7 @@
 {% endblock %}
 
 {% block body %}
-<section class="about-section section--pad">
+<section class="about-section background-white section--pad">
     <div class="container">
         <div class="row">
             <div class="col-md-12">
