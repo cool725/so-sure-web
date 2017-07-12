@@ -63,7 +63,9 @@ class DaviesService extends S3EmailService
         $success = true;
         $claims = [];
         foreach ($daviesClaims as $daviesClaim) {
-            if (isset($claims[$daviesClaim->policyNumber]) && $claims[$daviesClaim->policyNumber]) {
+            if (isset($claims[$daviesClaim->policyNumber]) &&
+                $claims[$daviesClaim->policyNumber] &&
+                $daviesClaim->isOpen()) {
                 throw new \Exception(sprintf(
                     'There are multiple open claims against policy %s',
                     $daviesClaim->policyNumber

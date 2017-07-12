@@ -638,6 +638,7 @@ services:
             -  { name: kernel.event_listener, event: event.policy.pot, method: onPolicyPotEvent }
             -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
             -  { name: kernel.event_listener, event: event.invitation.accepted, method: onInvitationAcceptedEvent }
+            -  { name: kernel.event_listener, event: event.connection.connected, method: onConnectionConnectedEvent }
             -  { name: kernel.event_listener, event: event.payment.success, method: onPaymentSuccessEvent }
             -  { name: kernel.event_listener, event: event.payment.failed, method: onPaymentFailedEvent }
             -  { name: kernel.event_listener, event: event.user.payment.failed, method: onUserPaymentFailedEvent }

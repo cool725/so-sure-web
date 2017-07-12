@@ -23,6 +23,7 @@ use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\PhoneTrait;
 
 use AppBundle\Event\InvitationEvent;
+use AppBundle\Event\ConnectionEvent;
 
 use AppBundle\Exception\ClaimException;
 use AppBundle\Exception\RateLimitException;
@@ -940,6 +941,10 @@ class InvitationService
             $this->sendPush($invitation, PushService::MESSAGE_CONNECTED);
         }
         $this->sendEvent($invitation, InvitationEvent::EVENT_ACCEPTED);
+        if ($this->dispatcher) {
+            $this->dispatcher->dispatch(ConnectionEvent::EVENT_CONNECTED, new ConnectionEvent($inviteeConnection));
+            $this->dispatcher->dispatch(ConnectionEvent::EVENT_CONNECTED, new ConnectionEvent($inviterConnection));
+        }
 
         $now = new \DateTime();
         $this->mixpanel->queueTrackWithUser($invitation->getInviter(), MixpanelService::EVENT_CONNECTION_COMPLETE, [

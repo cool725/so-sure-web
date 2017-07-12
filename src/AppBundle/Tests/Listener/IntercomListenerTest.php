@@ -16,6 +16,7 @@ use AppBundle\Event\LeadEvent;
 use AppBundle\Event\UserEvent;
 use AppBundle\Event\PolicyEvent;
 use AppBundle\Event\InvitationEvent;
+use AppBundle\Event\ConnectionEvent;
 use AppBundle\Event\PaymentEvent;
 use AppBundle\Event\UserPaymentEvent;
 
@@ -25,6 +26,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Invitation\EmailInvitation;
+use AppBundle\Document\Connection\StandardConnection;
 
 use AppBundle\Service\IntercomService;
 
@@ -247,6 +249,44 @@ class IntercomListenerTest extends WebTestCase
                 }
             }
         }
+    }
+
+    public function testIntercomConnection()
+    {
+        $userA = static::createUser(
+            static::$userManager,
+            static::generateEmail('testIntercomConnection-A', $this),
+            'bar'
+        );
+        $policyA = new PhonePolicy();
+        $policyA->setUser($userA);
+        $policyA->setId(rand(1, 99999));
+
+        $userB = static::createUser(
+            static::$userManager,
+            static::generateEmail('testIntercomConnection-B', $this),
+            'bar'
+        );
+        $policyB = new PhonePolicy();
+        $policyB->setUser($userB);
+        $policyB->setId(rand(1, 99999));
+
+        $connection = new StandardConnection();
+        $connection->setSourcePolicy($policyA);
+        $connection->setSourceUser($userA);
+        $connection->setLinkedPolicy($policyB);
+        $connection->setLinkedUser($userB);
+        $connection->setId(rand(1, 99999));
+
+        static::$redis->del(IntercomService::KEY_INTERCOM_QUEUE);
+        $this->assertEquals(0, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+
+        $listener = new IntercomListener(static::$intercomService);
+        $listener->onConnectionConnectedEvent(new ConnectionEvent($connection));
+
+        $this->assertEquals(1, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+        $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
+        $this->assertEquals($connection->getId(), $data['connectionId']);
     }
 
     public function testIntercomQueuePaymentSuccess()

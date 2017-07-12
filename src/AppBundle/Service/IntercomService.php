@@ -11,6 +11,7 @@ use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
+use AppBundle\Document\Connection\Connection;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Intercom\IntercomClient;
@@ -43,6 +44,8 @@ class IntercomService
     const QUEUE_EVENT_INVITATION_REINVITED = 'invitation-reinvited';
     */
     const QUEUE_EVENT_INVITATION_PENDING = 'invitation-pending';
+    // same as invitation accepted really, only for both policies
+    const QUEUE_EVENT_CONNECTION_CREATED = 'connection-created';
 
     const QUEUE_EVENT_USER_PAYMENT_FAILED = 'userpayment-failed';
 
@@ -251,10 +254,16 @@ class IntercomService
         $analytics = $user->getAnalytics();
         $data['custom_attributes']['Premium'] = $analytics['annualPremium'];
         $data['custom_attributes']['Pot'] = $analytics['rewardPot'];
+        $data['custom_attributes']['Max Pot'] = $analytics['maxPot'];
+        $data['custom_attributes']['Has Full Pot'] = $analytics['hasFullPot'];
         $data['custom_attributes']['Connections'] = $analytics['connections'];
         $data['custom_attributes']['Approved Claims'] = $analytics['approvedClaims'];
+        $data['custom_attributes']['Approved Network Claims'] = $analytics['approvedNetworkClaims'];
         $data['custom_attributes']['Promo Code'] = $analytics['firstPolicy']['promoCode'];
         $data['custom_attributes']['Pending Invites'] = count($user->getUnprocessedReceivedInvitations());
+        if (isset($analytics['devices'])) {
+            $data['custom_attributes']['Insured Devices'] = join(';', $analytics['devices']);
+        }
 
         // Only set the first time, or if the user was converted from a lead
         if (!$user->getIntercomId() || $isConverted) {
@@ -379,6 +388,13 @@ class IntercomService
         $this->sendEvent($user, $event, $data);
     }
 
+    private function sendConnectionCreatedEvent(Connection $connection, $event)
+    {
+        $data = [];
+        $data['metadata']['Connected To'] = $connection->getLinkedUser()->getName();
+        $this->sendEvent($connection->getSourceUser(), $event, $data);
+    }
+
     private function sendUserPaymentEvent(User $user, $event, $additional)
     {
         $data = [];
@@ -501,6 +517,12 @@ class IntercomService
                     }
 
                     $this->sendUserPaymentEvent($this->getUser($data['userId']), $action, $data['additional']);
+                } elseif ($action == self::QUEUE_EVENT_CONNECTION_CREATED) {
+                    if (!isset($data['connectionId'])) {
+                        throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
+                    }
+
+                    $this->sendConnectionCreatedEvent($this->getConnection($data['connectionId']), $action);
                 } else {
                     throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
                 }
@@ -624,6 +646,20 @@ class IntercomService
         return $payment;
     }
 
+    private function getConnection($id)
+    {
+        if (!$id) {
+            throw new \InvalidArgumentException('Missing invitationId');
+        }
+        $repo = $this->dm->getRepository(Connection::class);
+        $connection = $repo->find($id);
+        if (!$connection) {
+            throw new \InvalidArgumentException(sprintf('Unable to find connectionId: %s', $id));
+        }
+
+        return $connection;
+    }
+
     private function getInvitation($id)
     {
         if (!$id) {
@@ -701,6 +737,16 @@ class IntercomService
         $data = [
             'action' => $event,
             'invitationId' => $invitation->getId(),
+            'retryAttempts' => $retryAttempts
+        ];
+        $this->redis->rpush(self::KEY_INTERCOM_QUEUE, serialize($data));
+    }
+
+    public function queueConnection(Connection $connection, $retryAttempts = 0)
+    {
+        $data = [
+            'action' => self::QUEUE_EVENT_CONNECTION_CREATED,
+            'connectionId' => $connection->getId(),
             'retryAttempts' => $retryAttempts
         ];
         $this->redis->rpush(self::KEY_INTERCOM_QUEUE, serialize($data));

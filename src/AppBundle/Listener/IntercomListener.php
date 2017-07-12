@@ -6,6 +6,7 @@ use AppBundle\Document\User;
 use AppBundle\Event\LeadEvent;
 use AppBundle\Event\UserEvent;
 use AppBundle\Event\ClaimEvent;
+use AppBundle\Event\ConnectionEvent;
 use AppBundle\Event\PaymentEvent;
 use AppBundle\Event\PolicyEvent;
 use AppBundle\Event\InvitationEvent;
@@ -62,6 +63,11 @@ class IntercomListener
         // Invitation accepted is a connection, so update both inviter & invitee
         $this->intercom->queue($event->getInvitation()->getInviter());
         $this->intercom->queue($event->getInvitation()->getInvitee());
+    }
+
+    public function onConnectionConnectedEvent(ConnectionEvent $event)
+    {
+        $this->intercom->queueConnection($event->getConnection());
     }
 
     public function onPaymentSuccessEvent(PaymentEvent $event)

@@ -333,6 +333,7 @@ class DefaultController extends BaseController
             ->add('policyNumber', TextType::class)
             ->add('phone', TextType::class)
             ->add('timeToReach', TextType::class)
+            ->add('signature', TextType::class)
             ->add('type', ChoiceType::class, [
                 'required' => true,
                 'placeholder' => 'My phone is...',
@@ -352,14 +353,15 @@ class DefaultController extends BaseController
                 if ($claimForm->isValid()) {
                     // @codingStandardsIgnoreStart
                     $body = sprintf(
-                        "Name: %s<br>Policy Number: %s<br>Email: %s<br>Contact #: %s<br># Best time to reach: %s<br>Type of claim: %s<br>Message: %s",
+                        "Name: %s<br>Policy Number: %s<br>Email: %s<br>Contact #: %s<br># Best time to reach: %s<br>Type of claim: %s<br>Message: %s<br>Signature: %s",
                         $claimForm->getData()['name'],
                         $claimForm->getData()['policyNumber'],
                         $claimForm->getData()['email'],
                         $claimForm->getData()['phone'],
                         $claimForm->getData()['timeToReach'],
                         $claimForm->getData()['type'],
-                        $claimForm->getData()['message']
+                        $claimForm->getData()['message'],
+                        $claimForm->getData()['signature']
                     );
                     // @codingStandardsIgnoreEnd
 
