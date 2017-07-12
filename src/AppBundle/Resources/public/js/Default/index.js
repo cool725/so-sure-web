@@ -34,14 +34,15 @@ $(function(){
 
         if (windowTop > offsetTop) {
             $('.secondary-nav').addClass('secondary-nav-sticky');
+            $('.navbar-default').addClass('navbar-sticky');
         } else {
             $('.secondary-nav').removeClass('secondary-nav-sticky');
+            $('.navbar-default').removeClass('navbar-sticky');
         }
     }
 
     if ($('.secondary-nav').length) {
         $(window).scroll(stickyNav);
-
     }
 
     // IMAGE SRC SWAP

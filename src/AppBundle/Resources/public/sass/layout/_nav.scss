@@ -9,6 +9,8 @@
     display: block;
 }
 
+
+
 .navbar-default .navbar-collapse {
 	background-color: $white;
 	border-top: 2px solid $grey-light;
@@ -68,6 +70,10 @@
 		padding: 0 5px;
 	}
 
+}
+
+.navbar-sticky {
+    border-bottom: 2px solid $blue;
 }
 
 // Secondary Nav

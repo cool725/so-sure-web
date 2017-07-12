@@ -90,8 +90,7 @@
 <section id="our-team" class="section-about-us section--pad section--our-team">
     <div class="container">
         <h2 class="text-blue text-center">Our team</h2>
-        <div class="row">
-            <div class="col-md-10 col-md-offset-1">
+            <div class="about-panel--transparent">
                 <div class="row">
                     <div class="col-sm-6">
                         <div class="media">
@@ -194,51 +193,21 @@
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="media">
-                            <div class="media-left">
-                                <img src="{{ cdn_url }}/images/about/team/_bio.jpg" alt="" class="img-circle" width="100px" height="100px">
-                            </div>
-                            <div class="media-body">
-                                <h4 class="media-heading">Marta <span>/ Head of Product</span></h4>
-                                <p>... <br>
-                                <a href="#"
-                                   data-toggle="modal"
-                                   data-target="#team-member-info-modal"
-                                   data-team-member="Marta Datkiewicz"
-                                   data-team-member-bio="">read more</a></p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="media">
-                            <div class="media-left">
-                                <img src="{{ cdn_url }}/images/about/team/_bio.jpg" alt="" class="img-circle" width="100px" height="100px">
-                            </div>
-                            <div class="media-body">
-                                <h4 class="media-heading">Cameron <span>/ Intern Wizard</span></h4>
-                                <p>... <br>
-                                <a href="#"
-                                   data-toggle="modal"
-                                   data-target="#team-member-info-modal"
-                                   data-team-member="Cameron Sell"
-                                   data-team-member-bio="">read more</a></p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
-    {# Curve #}
-{#     <svg class="curved-background hidden-xs" viewBox="0 0 500 150" preserveAspectRatio="xMinYMin meet">
-        <path d="M0,100 C150,200 350,0 500,100 L500,00 L0,0 Z" style="stroke: none; fill:#D6EBFF;"></path>
-    </svg> #}
-    {# End Curve #}
 </section>
 
-<section id="our-partners" class="section-about-us section--pad section--our-partners background-white">
+{# Curve #}
+<div class="background-white hidden-xs">
+    <svg class="" viewBox="0 0 500 150" preserveAspectRatio="xMinYMin meet">
+        <path d="M0,100 C150,200 350,0 500,100 L500,00 L0,0 Z" style="stroke: none; fill:#D6EBFF;"></path>
+    </svg>
+</div>
+{# End Curve #}
+
+<section id="our-partners" class="section-about-us section--our-partners background-white">
+
     <div class="container">
         <div class="about-panel--transparent">
             <h2 class="text-center text-blue">Our partners</h2>
@@ -255,7 +224,7 @@
     </div>
 </section>
 
-<section id="our-location" class="section-about-us section--pad background-off-white">
+<section id="our-location" class="section-about-us section--pad section--our-location">
     <div class="container">
         <div class="about-panel">
             <h2 class="text-center text-blue">Our location</h2>
