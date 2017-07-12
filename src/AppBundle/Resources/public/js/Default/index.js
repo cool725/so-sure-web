@@ -26,6 +26,24 @@ $(function(){
 
     });
 
+    // STICKY NAV
+    function stickyNav() {
+        var windowTop  = $(window).scrollTop();
+        var offsetFrom = $('.secondary-nav').data('sticky-nav-offset');
+        var offsetTop  = $(offsetFrom).offset().top;
+
+        if (windowTop > offsetTop) {
+            $('.secondary-nav').addClass('secondary-nav-sticky');
+        } else {
+            $('.secondary-nav').removeClass('secondary-nav-sticky');
+        }
+    }
+
+    if ($('.secondary-nav').length) {
+        $(window).scroll(stickyNav);
+
+    }
+
     // IMAGE SRC SWAP
     $('.image-swap').each(function() {
         $(this).on('mouseover', function() {

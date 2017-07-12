@@ -72,20 +72,23 @@
 
 // Secondary Nav
 .secondary-nav {
+    width: 620px; height: 50px;
+    position: absolute;
+    left: 50%; margin-left: -310px;
+    z-index: 1000;
+    text-align: center;
+    // padding: 15px 0;
+    background-color: $white;
 
-    ul {
-        width: 620px; height: 50px;
-        position: absolute;
-        left: 50%; margin-left: -310px;
-        z-index: 1000;
-        text-align: center;
-        // padding: 15px 0;
-        background-color: $white;
+    @include border-bottom-radius(10px);
 
-        @include border-bottom-radius(10px);
-
-        li {
-            padding: 15px;
-        }
+    li {
+        padding: 15px;
     }
 }
+
+.secondary-nav-sticky {
+    top: 0;
+    position: fixed;
+}
+
