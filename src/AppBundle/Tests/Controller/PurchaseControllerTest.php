@@ -360,32 +360,6 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->verifyPurchaseReady($crawler);
     }
 
-    public function testPurchaseReviewWithoutAcceptNew()
-    {
-        $phone = self::getRandomPhone(static::$dm);
-
-        // set phone in session
-        $crawler = self::$client->request(
-            'GET',
-            self::$router->generate('quote_phone', ['id' => $phone->getId()])
-        );
-        $crawler = self::$client->followRedirect();
-
-        $crawler = $this->createPurchaseNew(
-            self::generateEmail('testPurchaseReviewWithoutAcceptNew', $this),
-            'foo bar',
-            new \DateTime('1980-01-01')
-        );
-
-        self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-policy'));
-
-        $crawler = $this->setPhoneNew($phone, null, null);
-
-        self::verifyResponse(200);
-        $this->verifyPurchaseNotReady($crawler);
-    }
-
     public function testPayCC()
     {
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
@@ -616,12 +590,6 @@ class PurchaseControllerTest extends BaseControllerTest
     {
         $form = $crawler->filterXPath('//form[@id="webpay-form"]')->form();
         $this->assertContains('judopay', $form->getUri());
-    }
-    
-    private function verifyPurchaseNotReady($crawler)
-    {
-        $form = $crawler->filterXPath('//form[@id="webpay-form"]')->form();
-        $this->assertNotContains('judopay', $form->getUri());
     }
 
     private function setPhone($phone, $imei = null, $agreed = 1)
