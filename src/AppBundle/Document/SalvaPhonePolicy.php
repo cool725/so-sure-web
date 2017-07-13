@@ -52,6 +52,9 @@ class SalvaPhonePolicy extends PhonePolicy
     /** @MongoDB\Field(type="hash") */
     protected $salvaPolicyResults = array();
 
+    /** @MongoDB\Field(type="hash") */
+    protected $salvaFirstBillingDates = array();
+
     public function getSalvaStatus()
     {
         return $this->salvaStatus;
@@ -70,6 +73,11 @@ class SalvaPhonePolicy extends PhonePolicy
     public function getSalvaPolicyResults()
     {
         return $this->salvaPolicyResults;
+    }
+
+    public function getSalvaFirstBillingDates()
+    {
+        return $this->salvaFirstBillingDates;
     }
 
     public function getSalvaPolicyResultsUnserialized()
@@ -154,6 +162,21 @@ class SalvaPhonePolicy extends PhonePolicy
         $version = $this->getLatestSalvaPolicyNumberVersion();
         $this->salvaPolicyNumbers[$version] = $date->format(\DateTime::ATOM);
 
+        if ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
+            if ($this->isPolicyPaidToDate($date)) {
+                $this->salvaFirstBillingDates[$version] = $this->getNextBillingDate($date)->format(\DateTime::ATOM);
+            } else {
+                // We should not be allowing policies to stay active if older then 1 month unpaid, so should be safe
+                // to assume the previous billing date. As this is only for salva use and they should be verifying
+                // this date, its not a big deal if it is incorrect for the rare case
+                $this->salvaFirstBillingDates[$version] = $this->getPreviousBillingDate($date)->format(\DateTime::ATOM);
+            }
+        } else {
+            // There's not a strict need to record this as will always be the start date,
+            // however, for data consistency, seems like the better option to store it
+            $this->salvaFirstBillingDates[$version] = $this->getStart()->format(\DateTime::ATOM);
+        }
+
         return $version;
     }
 
@@ -173,6 +196,27 @@ class SalvaPhonePolicy extends PhonePolicy
 
         // Current version null
         return null;
+    }
+
+    public function getSalvaFirstDueDate($version = null)
+    {
+        if (!$version) {
+            $version = count($this->getSalvaPolicyNumbers());
+        } else {
+            $version = $version - 1;
+        }
+
+        // Default to start date
+        if (!isset($this->getSalvaFirstBillingDates()[$version])) {
+            return $this->getStart();
+        }
+
+        return new \DateTime($this->getSalvaFirstBillingDates()[$version]);
+    }
+
+    public function getSalvaFirstDueDateByDate(\DateTime $date)
+    {
+        return $this->getSalvaFirstDueDate($this->getSalvaVersion($date));
     }
 
     public function getPaymentsForSalvaVersions($multiArray = true)

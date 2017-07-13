@@ -1168,6 +1168,24 @@ abstract class Policy
         $this->id = $id;
     }
 
+    public function getPreviousBillingDate($date, $filtered = true)
+    {
+        $nextBillingDate = $this->getNextBillingDate($date, $filtered);
+        $previousBillingDate = clone $nextBillingDate;
+        if ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
+            $previousBillingDate->sub(new \DateInterval('P1M'));
+        } else {
+            $previousBillingDate->sub(new \DateInterval('P1Y'));
+        }
+
+        // failsafe - billing date can never be, before the start date
+        if ($previousBillingDate < $this->getStart()) {
+            $previousBillingDate = $this->getStart();
+        }
+
+        return $previousBillingDate;
+    }
+
     public function getNextBillingDate($date, $filtered = true)
     {
         $nextDate = new \DateTime();
