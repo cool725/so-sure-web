@@ -972,6 +972,9 @@ class JudopayService
         $payment->setAmount($amount);
         $payment->setUser($policy->getUser());
         $payment->setSource(Payment::SOURCE_WEB);
+        if ($type == self::WEB_TYPE_REMAINDER) {
+            $payment->setNotes(sprintf('User was requested to pay the remainder of their policy'));
+        }
         $this->dm->persist($payment);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
