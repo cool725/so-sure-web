@@ -46,6 +46,13 @@
     <li>
         <a href="{{ url('user_home') }}?_impersonate={{ unpaid_policy.user.email }}">User Unpaid Page</a> <b>(auto impersonate {{ unpaid_policy.user.email }})</b>
     </li>
+    <li>
+        {% if valid_renewal_policy %}
+            <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy.user.email }}">User Renewal - Home Page</a> <b>(auto impersonate {{ valid_renewal_policy.user.email }})</b>
+        {% else %}
+            No renewal policy available
+        {% endif %}
+    </li>
 </ul>
 
 <h4>Random other pages</h4>

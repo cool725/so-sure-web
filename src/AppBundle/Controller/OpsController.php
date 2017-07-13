@@ -111,6 +111,14 @@ class OpsController extends BaseController
                 break;
             }
         }
+        foreach ($validPolicies as $validRenwalPolicy) {
+            $user = $validRenwalPolicy->getUser();
+            if ($user->canRenewPolicy() && $validRenwalPolicy->isInRenewalTimeframe()) {
+                break;
+            } else {
+                $validRenwalPolicy = null;
+            }
+        }
         $cancelledPolicy = $policyRepo->findOneBy(['status' => Policy::STATUS_CANCELLED]);
 
         return [
@@ -120,6 +128,7 @@ class OpsController extends BaseController
             'valid_policy' => $validPolicy,
             'cancelled_policy' => $cancelledPolicy,
             'valid_multiple_policy' => $validMultiplePolicy,
+            'valid_renewal_policy' => $validRenwalPolicy,
         ];
     }
 

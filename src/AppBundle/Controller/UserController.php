@@ -13,11 +13,14 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\SCode;
+use AppBundle\Document\Feature;
+use AppBundle\Document\Form\Renew;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\EmailInvitationType;
 use AppBundle\Form\Type\UserEmailType;
 use AppBundle\Form\Type\SCodeInvitationType;
 use AppBundle\Form\Type\InvitationType;
+use AppBundle\Form\Type\RenewType;
 use AppBundle\Form\Type\SentInvitationType;
 use AppBundle\Form\Type\UnconnectedUserPolicyType;
 use AppBundle\Document\Invitation\EmailInvitation;
@@ -27,6 +30,8 @@ use AppBundle\Security\InvitationVoter;
 use AppBundle\Service\MixpanelService;
 use AppBundle\Service\SixpackService;
 use AppBundle\Service\JudopayService;
+
+use AppBundle\Security\PolicyVoter;
 
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Facebook\Facebook;
@@ -72,6 +77,29 @@ class UserController extends BaseController
             throw $this->createNotFoundException('Policy not found');
         }
         $this->denyAccessUnlessGranted('view', $policy);
+
+        $feature = $this->get('app.feature');
+        if ($feature->isEnabled(Feature::FEATURE_RENEWAL)) {
+            // Not able to perform any actions with renewed policies yet
+            if ($policy->getStatus() == Policy::STATUS_RENEWAL) {
+                return new RedirectResponse(
+                    $this->generateUrl('user_renew_policy', ['id' => $policy->getPreviousPolicy()->getId()])
+                );
+            }
+
+            foreach ($user->getValidPolicies(true) as $checkPolicy) {
+                if ($checkPolicy->notifyRenewal()) {
+                    $this->addFlash(
+                        'success',
+                        sprintf(
+                            '%s is ready for <a href="%s">renewal</a>',
+                            $checkPolicy->getPolicyNumber(),
+                            $this->generateUrl('user_renew_policy', ['id' => $checkPolicy->getId()])
+                        )
+                    );
+                }
+            }
+        }
 
         $scode = null;
         if ($session = $this->get('session')) {
@@ -341,6 +369,60 @@ class UserController extends BaseController
             'scode' => $scode,
             'unconnected_user_policy_form' => $unconnectedUserPolicyForm->createView(),
             'share_experiment_text' => $shareExperimentText,
+        );
+    }
+
+    /**
+     * @Route("/renew/{id}", name="user_renew_policy")
+     * @Route("/renew/{id}/custom", name="user_renew_custom_policy")
+     * @Template
+     */
+    public function renewPolicyAction(Request $request, $id)
+    {
+        $dm = $this->getManager();
+        $policyRepo = $dm->getRepository(Policy::class);
+        $policy = $policyRepo->find($id);
+        $this->denyAccessUnlessGranted(PolicyVoter::RENEW, $policy);
+
+        // TODO: Determine if policy is the old policy or an unpaid renewal
+        $renew = new Renew();
+        $renew->setPolicy($policy);
+        if ($request->get('_route') == 'user_renew_custom_policy') {
+            $renew->setCustom(true);
+        }
+        $renewForm = $this->get('form.factory')
+            ->createNamedBuilder('renew_form', RenewType::class, $renew)
+            ->getForm();
+        $webpay = null;
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('renew_form')) {
+                $renewForm->handleRequest($request);
+                if ($renewForm->isValid()) {
+                    // TODO: If old policy
+                    $policyService = $this->get('app.policy');
+                    $renewalPolicy = $policyService->renew($policy, $renew->getNumPayments(), $renew->getUsePot());
+                    $message = sprintf(
+                        'Thanks. Your policy is now scheduled to be renewed on %s',
+                        $renewalPolicy->getStart()->format('d M Y')
+                    );
+                    $this->addFlash('success', $message);
+
+                    return new RedirectResponse(
+                        $this->generateUrl('user_policy', ['policyId' => $renewalPolicy->getId()])
+                    );
+                }
+            }
+        }
+
+        return array(
+            'policy' => $policy,
+            'phone' => $policy->getPhone(),
+            'policy_key' => $this->getParameter('policy_key'),
+            'renew_form' => $renewForm->createView(),
+            'is_postback' => 'POST' === $request->getMethod(),
+            'webpay_action' => $webpay ? $webpay['post_url'] : null,
+            'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
+            'custom' => $renew->isCustom(),
         );
     }
 

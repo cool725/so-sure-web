@@ -1142,7 +1142,11 @@ class ApiAuthController extends BaseController
                 );
             }
             if (!$policy->getPolicyTerms()) {
-                throw new \Exception('Policy is missing terms');
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_POLICY_TERMS_NOT_AVAILABLE,
+                    'Terms are not available',
+                    422
+                );
             }
             $this->denyAccessUnlessGranted('view', $policy);
             $policyTermsRoute = $this->get('router')->generate(

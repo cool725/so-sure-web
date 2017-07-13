@@ -60,6 +60,67 @@ class PolicyRepository extends BaseDocumentRepository
             ->execute();
     }
 
+    public function findPoliciesForPendingRenewal($policyPrefix, \DateTime $date = null)
+    {
+        $now = $date;
+        if (!$date) {
+            $date = new \DateTime();
+            $now = new \DateTime();
+            $date = $date->add(new \DateInterval(sprintf('P%dD', Policy::RENEWAL_DAYS)));
+        }
+
+        $qb = $this->createQueryBuilder()
+            ->field('status')->in([
+                Policy::STATUS_ACTIVE,
+                Policy::STATUS_UNPAID,
+            ])
+            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policyPrefix)))
+            ->field('nextPolicy.$id')->equals(null)
+            ->field('end')->lte($date)
+            ->field('end')->gte($now);
+
+        return $qb
+            ->getQuery()
+            ->execute();
+    }
+
+    public function findPoliciesForExpiration($policyPrefix, \DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        $qb = $this->createQueryBuilder()
+            ->field('status')->in([
+                Policy::STATUS_ACTIVE,
+                Policy::STATUS_UNPAID,
+            ])
+            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policyPrefix)))
+            ->field('end')->lte($date);
+
+        return $qb
+            ->getQuery()
+            ->execute();
+    }
+
+    public function findRenewalPoliciesForActivation($policyPrefix, \DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        $qb = $this->createQueryBuilder()
+            ->field('status')->in([
+                Policy::STATUS_RENEWAL,
+            ])
+            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policyPrefix)))
+            ->field('start')->lte($date);
+
+        return $qb
+            ->getQuery()
+            ->execute();
+    }
+
     public function getWeeklyEmail($environment)
     {
         $lastWeek = new \DateTime();

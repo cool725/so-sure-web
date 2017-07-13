@@ -13,11 +13,18 @@ class PolicyVoter extends Voter
     const EDIT = 'edit';
     const SEND_INVITATION = 'send-invitation';
     const CONNECT = 'connect';
+    const RENEW = 'renew';
 
     public function supports($attribute, $subject)
     {
         // if the attribute isn't one we support, return false
-        if (!in_array($attribute, array(self::VIEW, self::EDIT, self::SEND_INVITATION, self::CONNECT))) {
+        if (!in_array($attribute, [
+            self::VIEW,
+            self::EDIT,
+            self::SEND_INVITATION,
+            self::CONNECT,
+            self::RENEW,
+        ])) {
             return false;
         }
 
@@ -41,7 +48,13 @@ class PolicyVoter extends Voter
         // you know $subject is a Policy object, thanks to supports
         /** @var Policy $policy */
         $policy = $subject;
-        
+
+        if ($attribute == self::RENEW) {
+            if (!$policy->canRenew()) {
+                return false;
+            }
+        }
+
         return $policy->getUser()->getId() == $currentUser->getId();
     }
 }

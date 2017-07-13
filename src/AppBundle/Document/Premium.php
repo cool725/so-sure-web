@@ -39,6 +39,13 @@ abstract class Premium
      */
     protected $iptRate;
 
+    /**
+     * @Assert\Range(min=0,max=200)
+     * @MongoDB\Field(type="float")
+     * @Gedmo\Versioned
+     */
+    protected $annualDiscount;
+
     public function __construct()
     {
     }
@@ -71,6 +78,16 @@ abstract class Premium
     public function setIptRate($iptRate)
     {
         $this->iptRate = $iptRate;
+    }
+
+    public function getAnnualDiscount()
+    {
+        return $this->annualDiscount;
+    }
+
+    public function setAnnualDiscount($annualDiscount)
+    {
+        $this->annualDiscount = $annualDiscount;
     }
 
     public function getMonthlyPremiumPrice()

@@ -42,7 +42,8 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     {
         $this->faker = Faker\Factory::create('en_GB');
 
-        $users = $this->newUsers($manager);
+        $users = $this->newUsers($manager, 200);
+        $expUsers = $this->newUsers($manager, 20);
         $manager->flush();
 
         $count = 0;
@@ -60,6 +61,11 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         foreach ($users as $user) {
             $this->addConnections($manager, $user, $users);
+        }
+
+        foreach ($expUsers as $user) {
+            $this->newPolicy($manager, $user, $count, null, null, null, null, null, true, false);
+            $count++;
         }
 
         // Sample user for apple
@@ -120,11 +126,11 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $manager->flush();
     }
 
-    private function newUsers($manager)
+    private function newUsers($manager, $number)
     {
         $userRepo = $manager->getRepository(User::class);
         $users = [];
-        for ($i = 1; $i <= 200; $i++) {
+        for ($i = 1; $i <= $number; $i++) {
             $email = $this->faker->email;
             while ($userRepo->findOneBy(['email' => $email])) {
                 $email = $this->faker->email;
@@ -208,7 +214,8 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $code = null,
         $phone = null,
         $paid = null,
-        $sendInvitation = true
+        $sendInvitation = true,
+        $recent = true
     ) {
         if (!$phone) {
             $phone = $this->getRandomPhone($manager);
@@ -218,7 +225,12 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
 
         $startDate = new \DateTime();
-        $startDate->sub(new \DateInterval(sprintf("P%dD", rand(0, 120))));
+        if ($recent) {
+            $days = sprintf("P%dD", rand(0, 120));
+        } else {
+            $days = sprintf("P336D");
+        }
+        $startDate->sub(new \DateInterval($days));
         $policy = new SalvaPhonePolicy();
         $policy->setPhone($phone);
         $policy->setImei($this->generateRandomImei());

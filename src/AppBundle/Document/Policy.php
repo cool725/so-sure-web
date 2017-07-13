@@ -28,6 +28,8 @@ abstract class Policy
     use CurrencyTrait;
     use DateTrait;
 
+    const RENEWAL_DAYS = 30;
+
     const RISK_LEVEL_HIGH = 'high';
     const RISK_LEVEL_MEDIUM = 'medium';
     const RISK_LEVEL_LOW = 'low';
@@ -48,6 +50,8 @@ abstract class Policy
     const STATUS_UNPAID = 'unpaid';
     const STATUS_MULTIPAY_REQUESTED = 'multipay-requested';
     const STATUS_MULTIPAY_REJECTED = 'multipay-rejected';
+    const STATUS_RENEWAL = 'renewal';
+    const STATUS_PENDING_RENEWAL = 'pending-renewal';
 
     const CANCELLED_UNPAID = 'unpaid';
     const CANCELLED_ACTUAL_FRAUD = 'actual-fraud';
@@ -103,6 +107,18 @@ abstract class Policy
     protected $user;
 
     /**
+     * @MongoDB\ReferenceOne(targetDocument="Policy", inversedBy="previousPolicy")
+     * @Gedmo\Versioned
+     */
+    protected $nextPolicy;
+
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="Policy", inversedBy="nextPolicy")
+     * @Gedmo\Versioned
+     */
+    protected $previousPolicy;
+
+    /**
      * Secondary access to policy - not insured but allowed to access
      *
      * @MongoDB\ReferenceOne(targetDocument="User", inversedBy="namedPolicies")
@@ -124,7 +140,8 @@ abstract class Policy
 
     /**
      * @Assert\Choice({"pending", "active", "cancelled", "expired", "unpaid",
-     *                  "multipay-requested", "multipay-rejected"}, strict=true)
+     *                  "multipay-requested", "multipay-rejected", "renewal",
+     *                  "pending-renewal"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -492,6 +509,32 @@ abstract class Policy
         $this->user = $user;
     }
 
+    public function getPreviousPolicy()
+    {
+        return $this->previousPolicy;
+    }
+
+    public function hasPreviousPolicy()
+    {
+        return $this->getPreviousPolicy() != null;
+    }
+
+    public function getNextPolicy()
+    {
+        return $this->nextPolicy;
+    }
+
+    public function hasNextPolicy()
+    {
+        return $this->getNextPolicy() != null;
+    }
+
+    public function link(Policy $newPolicy)
+    {
+        $newPolicy->previousPolicy = $this;
+        $this->nextPolicy = $newPolicy;
+    }
+
     public function getNamedUser()
     {
         return $this->namedUser;
@@ -814,6 +857,11 @@ abstract class Policy
     public function hasSuspectedFraudulentClaim()
     {
         foreach ($this->getClaims() as $claim) {
+            if ($claim->getSuspectedFraud()) {
+                return true;
+            }
+        }
+        foreach ($this->getLinkedClaims() as $claim) {
             if ($claim->getSuspectedFraud()) {
                 return true;
             }
@@ -1878,7 +1926,7 @@ abstract class Policy
         return $this->getEnd()->diff($date)->days < 30;
     }
 
-    public function shouldExpirePolicy($prefix = null, $date = null)
+    public function shouldCancelPolicy($prefix = null, $date = null)
     {
         if (!$this->isValidPolicy($prefix) || $this->getPremiumPlan() != self::PLAN_MONTHLY) {
             return false;
@@ -2083,7 +2131,12 @@ abstract class Policy
 
     public function age()
     {
+        if (!$this->getStart()) {
+            return null;
+        }
+
         $now = new \DateTime();
+
         return $now->diff($this->getStart())->days;
     }
 
@@ -2612,9 +2665,119 @@ abstract class Policy
         return $unconnectedPolicies;
     }
 
+    public function isInRenewalTimeframe(\DateTime $date = null)
+    {
+        if (!$this->isPolicy()) {
+            return null;
+        }
+
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        if (in_array($this->getStatus(), [Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID])) {
+            $diff = $this->getEnd()->diff($date);
+            $notPastDate = $diff->days > 0 || ($diff->days == 0 && $diff->invert == 1);
+            if ($diff->days <= self::RENEWAL_DAYS && $notPastDate) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Display is about displaying renewal in general, e.g. the renewal tab for the user
+     * so even if they renewed, they should still see the renewal
+     */
+    public function displayRenewal(\DateTime $date = null)
+    {
+        if (!$this->canRenew($date)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Notify user (flash message, emails, etc) about renewals
+     */
+    public function notifyRenewal(\DateTime $date = null)
+    {
+        if (!$this->canRenew($date)) {
+            return false;
+        }
+
+        if (!$this->getUser()->areRenewalsDesired()) {
+            return false;
+        }
+
+        return !$this->isRenewed();
+    }
+
+    /**
+     * Pending renewal policy is required in order to renew
+     */
+    public function canCreatePendingRenewal(\DateTime $date = null)
+    {
+        if (!$this->getUser()->canRenewPolicy()) {
+            return false;
+        }
+
+        // Will also check policy status
+        if (!$this->isInRenewalTimeframe($date)) {
+            return false;
+        }
+
+        // TODO: any other reason why not to allow this policy to be renewed?
+        return true;
+    }
+
+    /**
+     * Can renew is for this specific policy
+     * This is different than if a user is allowed to purchase an additional policy
+     * although lines get blurred if a policy expires and then user wants to re-purchase
+     */
+    public function canRenew(\DateTime $date = null)
+    {
+        // partial renewal policy wasn't created - never allow renewal in this case
+        // not checking if already renewed deliberately as using canRenew to display
+        // renewal page even if already renewed
+        if (!$this->hasNextPolicy()) {
+            return false;
+        }
+
+        // In case user was disallowed after pending renewal was created
+        if (!$this->getUser()->canRenewPolicy()) {
+            return false;
+        }
+
+        // In case the policy is now expired
+        if (!$this->isInRenewalTimeframe($date)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function isRenewed()
+    {
+        // partial renewal policy wasn't created
+        if (!$this->hasNextPolicy()) {
+            return false;
+        }
+
+        return $this->getNextPolicy()->getStatus() == Policy::STATUS_RENEWAL;
+    }
+
     protected function toApiArray()
     {
-        if ($this->isPolicy() && !$this->getPolicyTerms()) {
+        if ($this->isPolicy() && !$this->getPolicyTerms() && in_array($this->getStatus(), [
+            self::STATUS_ACTIVE,
+            self::STATUS_CANCELLED,
+            self::STATUS_UNPAID,
+            self::STATUS_EXPIRED,
+        ])) {
             throw new \Exception(sprintf('Policy %s is missing terms', $this->getId()));
         }
 
@@ -2648,6 +2811,8 @@ abstract class Policy
             'premium_payments' => $this->getPremiumPayments(),
             'premium_gwp' => $this->getPremiumGwpInstallmentPrice(),
             'facebook_filters' => $this->eachApiMethod($this->getSentInvitations(), 'getInviteeFacebookId', false),
+            'previous_policy_id' => $this->hasPreviousPolicy() ? $this->getPreviousPolicy()->getId() : null,
+            'next_policy_id' => $this->hasNextPolicy() ? $this->getNextPolicy()->getId() : null,
         ];
     }
 
