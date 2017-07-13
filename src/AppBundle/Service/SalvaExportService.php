@@ -675,12 +675,16 @@ class SalvaExportService
         throw new \Exception('Unable to get response');
     }
 
-    public function adjustDate(\DateTime $date)
+    public function adjustDate(\DateTime $date, $datetime = true)
     {
         $clonedDate = clone $date;
         $clonedDate->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
 
-        return $clonedDate->format("Y-m-d\TH:i:00");
+        if ($datetime) {
+            return $clonedDate->format("Y-m-d\TH:i:00");
+        } else {
+            return $clonedDate->format("Y-m-d");
+        }
     }
 
     public function cancelXml(SalvaPhonePolicy $phonePolicy, $reason, $date)
@@ -783,6 +787,10 @@ class SalvaExportService
         $policy->appendChild($dom->createElement('ns2:issuerUser', 'so_sure'));
         $policy->appendChild($dom->createElement('ns2:deliveryModeCode', 'undefined'));
         $policy->appendChild($dom->createElement('ns2:policyNo', $phonePolicy->getSalvaPolicyNumber()));
+        $policy->appendChild($dom->createElement(
+            'ns2:firstDueDate',
+            $this->adjustDate($phonePolicy->getSalvaFirstDueDate(), false)
+        ));
 
         $policyCustomers = $dom->createElement('ns2:policyCustomers');
         $policy->appendChild($policyCustomers);
