@@ -261,6 +261,7 @@ class IntercomService
         $data['custom_attributes']['Approved Network Claims'] = $analytics['approvedNetworkClaims'];
         $data['custom_attributes']['Promo Code'] = $analytics['firstPolicy']['promoCode'];
         $data['custom_attributes']['Pending Invites'] = count($user->getUnprocessedReceivedInvitations());
+        $data['custom_attributes']['Number of Policies'] = $analytics['numberPolicies'];
         if (isset($analytics['devices'])) {
             $data['custom_attributes']['Insured Devices'] = join(';', $analytics['devices']);
         }
