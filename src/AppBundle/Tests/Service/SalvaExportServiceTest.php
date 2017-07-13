@@ -684,7 +684,11 @@ class SalvaExportServiceTest extends WebTestCase
 
     public function testVersionedYearlyFirstDueDatePoliciesXml()
     {
-        $policy = $this->createPolicy('testVersionedMonthlyFirstDueDatePoliciesXml', new \DateTime('2016-01-01'), false);
+        $policy = $this->createPolicy(
+            'testVersionedYearlyFirstDueDatePoliciesXml',
+            new \DateTime('2016-01-01'),
+            false
+        );
         $xml = static::$salva->createXml($policy);
         $this->assertContains('<ns2:firstDueDate>2016-01-01</ns2:firstDueDate>', $xml);
 
