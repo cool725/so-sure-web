@@ -16,7 +16,7 @@ window.addEventListener("load", function(){
         },
         content: {
             message: "<small>This website uses cookies to ensure you get the best experience on our website.</small>",
-            dismiss: "Got it!",
+            dismiss: "Close",
             link: "<small>Learn More</small>",
             href: "https://www.iubenda.com/privacy-policy/7805295/cookie-policy"
         }
