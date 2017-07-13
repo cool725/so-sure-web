@@ -22,6 +22,17 @@
 
 .help-block {
     font-size: 14px;
+
+    ul {
+        padding: 0;
+
+        li {
+            list-style: none;
+            font-size: 15px;
+            font-family: $avenir-book;
+            font-weight: normal;
+        }
+    }
 }
 
 .error {
