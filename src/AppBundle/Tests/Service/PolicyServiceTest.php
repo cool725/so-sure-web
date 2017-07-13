@@ -1060,10 +1060,10 @@ class PolicyServiceTest extends WebTestCase
         $policies = static::$policyService->cancelPoliciesPendingCancellation();
         $foundFuture = false;
         $foundExpire = false;
-        foreach ($policies as $policy) {
-            if ($policy->getId() == $policyExpire->getId()) {
+        foreach ($policies as $id => $number) {
+            if ($id == $policyExpire->getId()) {
                 $foundExpire = true;
-            } elseif ($policy->getId() == $policyFuture->getId()) {
+            } elseif ($id == $policyFuture->getId()) {
                 $foundFuture = true;
             }
         }

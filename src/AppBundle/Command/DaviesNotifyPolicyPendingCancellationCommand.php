@@ -10,12 +10,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Classes\DaviesClaim;
 
-class PolicyPendingCancellationCommand extends ContainerAwareCommand
+class DaviesNotifyPolicyPendingCancellationCommand extends ContainerAwareCommand
 {
     protected function configure()
     {
         $this
-            ->setName('sosure:policy:pending-cancellation')
+            ->setName('sosure:davies:notify-pending-cancellation')
             ->setDescription('Notify davies of policies that will be cancelled soon with open claims')
             ->addOption(
                 'prefix',
