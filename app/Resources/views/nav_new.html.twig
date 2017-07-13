@@ -39,7 +39,9 @@
                             <li class=""><a href="{{ path('user_home') }}">Your Account</a></li>
                         {% endif %}
                         {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
-                            <li><a href="{{ path('homepage', {'_impersonate': '_exit'}) }}">Exit <strong>{{ app.user.email }}</strong></a></li>
+                            <li>
+                                <span><a href="{{ path('homepage', {'_impersonate': '_exit'}) }}" class="btn btn-blue-hollow navbar-btn">Exit <strong>{{ app.user.email }}</strong></a></span>
+                            </li>
                         {% else %}
                             <li>
                                 <span><a href="{{ path('fos_user_security_logout') }}" class="btn btn-blue-hollow navbar-btn">Logout</a></span>
