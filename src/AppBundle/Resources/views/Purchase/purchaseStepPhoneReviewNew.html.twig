@@ -214,6 +214,7 @@
                                 {% if app.user.hasValidPaymentMethod %}
                                     <div class="form-group">
                                         {{ form_widget(purchase_form.existing, {'label': 'Pay with card on file', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
+                                        {{ form_widget(purchase_form.next, {'label': 'Pay with a new card', 'attr': {'class': 'btn btn-default btn-block btn-pad'}}) }}
                                     </div>
                                 {% else %}
                                     <div class="form-group">
