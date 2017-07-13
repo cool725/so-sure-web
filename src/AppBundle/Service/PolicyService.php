@@ -1068,13 +1068,24 @@ class PolicyService
         return $repo->findPoliciesForPendingCancellation($prefix, $includeFuture, $date);
     }
 
-    public function cancelPoliciesPendingCancellation($prefix = null, \DateTime $date = null)
+    public function cancelPoliciesPendingCancellation($prefix = null, $dryRun = false, \DateTime $date = null)
     {
         $cancelled = [];
         $policies = $this->getPoliciesPendingCancellation(false, $prefix, $date);
         foreach ($policies as $policy) {
-            $this->cancel($policy, Policy::CANCELLED_USER_REQUESTED, false, true, $date);
-            $cancelled[] = $policy;
+            $cancelled[$policy->getId()] = $policy->getPolicyNumber();
+            if (!$dryRun) {
+                try {
+                    $this->cancel($policy, Policy::CANCELLED_USER_REQUESTED, false, true, $date);
+                } catch (\Exception $e) {
+                    $msg = sprintf(
+                        'Error Cancelling Policy %s / %s',
+                        $policy->getPolicyNumber(),
+                        $policy->getId()
+                    );
+                    $this->logger->error($msg, ['exception' => $e]);
+                }
+            }
         }
 
         return $cancelled;
