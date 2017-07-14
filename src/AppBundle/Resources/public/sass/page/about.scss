@@ -260,7 +260,8 @@ body {
             padding: 0 30px;
 
             a {
-                transition: all 0.8s ease;
+                top: 0;
+                transition: all 0.5s ease 0s;
 
                 &:hover {
                     position: relative;
