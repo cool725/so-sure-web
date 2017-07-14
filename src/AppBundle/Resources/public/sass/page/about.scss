@@ -261,11 +261,12 @@ body {
 
             a {
                 top: 0;
-                transition: all 0.5s ease 0s;
+                transition: transform 1s;
 
                 &:hover {
+                    transform: translate(0, -50px);
                     position: relative;
-                    top: -50px;
+                    // top: -50px;
                 }
             }
         }
