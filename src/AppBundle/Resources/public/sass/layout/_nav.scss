@@ -54,7 +54,7 @@
 	}
 }
 
-@include breakpoint(tablet) {
+@include breakpoint(laptop) {
 
 	.navbar-default .navbar-collapse {
 		background-color: transparent;
