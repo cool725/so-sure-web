@@ -26,7 +26,22 @@ $(function(){
 
     });
 
-    // STICKY NAV
+    // FIXED NAV & STICKY NAV
+    function navbarFixed() {
+        var windowTop  = $(window).scrollTop();
+        var offsetTop  = $('body').offset().top + 50;
+
+        if (windowTop > offsetTop) {
+            $('.navbar-default').addClass('navbar-sticky');
+        } else {
+            $('.navbar-default').removeClass('navbar-sticky');
+        }
+    }
+
+    if ($('.navbar-fixed-top').length) {
+        $(window).scroll(navbarFixed);
+    }
+
     function stickyNav() {
         var windowTop  = $(window).scrollTop();
         var offsetFrom = $('.secondary-nav').data('sticky-nav-offset');
@@ -34,10 +49,8 @@ $(function(){
 
         if (windowTop > offsetTop) {
             $('.secondary-nav').addClass('secondary-nav-sticky');
-            $('.navbar-default').addClass('navbar-sticky');
         } else {
             $('.secondary-nav').removeClass('secondary-nav-sticky');
-            $('.navbar-default').removeClass('navbar-sticky');
         }
     }
 
