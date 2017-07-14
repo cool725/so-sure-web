@@ -51,6 +51,14 @@ body {
 	}
 }
 
+.about-panel--logo {
+
+    img {
+        border: 0;
+        margin-bottom: 10px;
+    }
+}
+
 // Custom padding
 .section-about-us {
 	position: relative;
@@ -153,3 +161,49 @@ body {
 	bottom: 0;
 }
 
+// Contact Us
+#contact-us {
+    margin: 60px 0;
+}
+
+.link-list {
+    text-align: center;
+    // overflow: hidden;
+
+    li {
+        padding: 20px;
+
+        a {
+            display: block;
+
+            span {
+                margin-top: 5px;
+                display: block;
+                color: $primary-blue;
+            }
+        }
+    }
+
+    @include breakpoint(tablet) {
+        border-bottom: 4px solid $lightest-blue;
+        padding: 20px 0 0 0;
+        margin-bottom: 30px;
+
+        li {
+            margin-bottom: -20px;
+            padding: 0 30px;
+
+            a {
+
+                &:hover {
+                    margin-top: -40px;
+                }
+            }
+        }
+    }
+}
+
+.contact-page-from {
+    max-width: 600px;
+    margin: 0 auto;
+}

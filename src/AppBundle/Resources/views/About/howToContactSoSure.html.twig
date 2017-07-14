@@ -13,62 +13,66 @@
 {% endblock %}
 
 {% block body %}
-<section class="about-section background-white section--pad">
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <h1 class="section-title">How to contact so-sure?</h1>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-            	<p>We are always happy to talk and can be found via <a href="#" class="open-intercom"><i class="fa fa-comments"></i> Intercom</a>, <a href="mailto:hello@wearesosure.com"><i class="fa fa-envelope" aria-hidden="true"></i> Email</a>, <a target="_blank" href="https://www.facebook.com/wearesosure/"><i class="fa fa-facebook-official" aria-hidden="true"></i> Facebook</a> and <a target="_blank" href="https://twitter.com/wearesosure"><i class="fa fa-twitter" aria-hidden="true"></i> Twitter</a>.</p>
-				<p>However, if you have a more technical question you can ask a question in the <a href="/help/support">support section</a>.</p>
-				<p><i>p.s. we're always around and love hearing from you. Please get in touch if you want to ask something or even just to say hello :)</i></p>
-            </div>
-        </div>
-                    {{ form_start(contact_form) }}
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <label for="">Name <span class="req">*</span></label>
-                                    {{ form_widget(contact_form.name, { 'attr': {'class': 'form-control'}}) }}
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="form-group">
-                                    <label for="">Email <span class="req">*</span></label>
-                                    {{ form_widget(contact_form.email, { 'attr': {'class': 'form-control'}}) }}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <div class="form-group">
-                                    <label for="">Phone Number we can reach you on <span class="req">*</span></label>
-                                    {{ form_widget(contact_form.phone, { 'attr': {'class': 'form-control'}}) }}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label for="">Your message:<span class="req">*</span></label>
-                                    {{ form_widget(contact_form.message, { 'attr': {'class': 'form-control', 'rows': '15'}}) }}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12 text-center">
-                                <div class="form-group">
-                                    {{ form_widget(contact_form.submit, { 'label': 'Contact us', 'attr': {'class': 'btn btn-blue btn-lg'}}) }}
-                                </div>
-                            </div>
-                        </div>
-                    {{ form_end(contact_form) }}
 
+<section id="contact-us" class="section-about-us section--pad">
+    <div class="container">
+        <div class="about-panel">
+            <div class="about-panel--thumb about-panel--logo">
+                <img src="{{ cdn_url }}/images/logo/so-sure-blue-smile.svg" alt="so-sure" width="100px" height="100px">
+            </div>
+            <h2 class="text-blue text-center">Contact us</h2>
+            <p class="lead text-center">We are always happy to talk and can be found via</p>
+            <ul class="link-list list-inline">
+                <li><a href="#"><img src="" alt="" width="70px" height="70px"><span>Intercom</span></a></li>
+                <li><a href="#"><img src="" alt="" width="70px" height="70px"><span>Email</span></a></li>
+                <li><a href="#"><img src="" alt="" width="70px" height="70px"><span>Facebook</span></a></li>
+                <li><a href="#"><img src="" alt="" width="70px" height="70px"><span>Twitter</span></a></li>
+            </ul>
+            <p class="lead text-center">However, if you have a more technical question see our <a href="/help/support">support section</a>.</p>
+            <p class="lead text-center">Or drop us a note via the form below:</p>
+            {{ form_start(contact_form, {'attr':{'class':'contact-page-from'}}) }}
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="">Name <span class="req">*</span></label>
+                            {{ form_widget(contact_form.name, { 'attr': {'class': 'form-control'}}) }}
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="">Email <span class="req">*</span></label>
+                            {{ form_widget(contact_form.email, { 'attr': {'class': 'form-control'}}) }}
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <label for="">Phone Number we can reach you on <span class="req">*</span></label>
+                            {{ form_widget(contact_form.phone, { 'attr': {'class': 'form-control'}}) }}
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label for="">Your message:<span class="req">*</span></label>
+                            {{ form_widget(contact_form.message, { 'attr': {'class': 'form-control', 'rows': '15'}}) }}
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <div class="form-group">
+                            {{ form_widget(contact_form.submit, { 'label': 'Contact us', 'attr': {'class': 'btn btn-blue btn-lg'}}) }}
+                        </div>
+                    </div>
+                </div>
+            {{ form_end(contact_form) }}
+        </div>
     </div>
 </section>
+
 {% endblock %}
 
 {% block javascripts %}
