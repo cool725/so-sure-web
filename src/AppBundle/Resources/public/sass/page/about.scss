@@ -166,6 +166,61 @@ body {
     // margin: 60px 0;
     padding: 80px 0 60px;
     background-color: $off-white;
+    position: relative;
+
+    .container {
+        position: relative;
+        z-index: 10;
+    }
+
+    &:before, &:after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        background-repeat: no-repeat;
+    }
+
+    &:before {
+        width: 600px; height: 450px;
+        left: 0;
+        z-index: 8;
+        background-position: left bottom;
+        background-image: url('https://cdn.so-sure.com/images/corporate/so-sure_skyline-simple-left-bottom.svg');
+        background-size: 30%;
+        @include breakpoint(midtablet) {
+            background-size: 40%;
+        }
+        @include breakpoint(tablet) {
+            background-size: 50%;
+        }
+        @include breakpoint(laptop) {
+            background-size: 55%;
+        }
+        @include breakpoint(desktop) {
+            background-size: 70%;
+        }
+    }
+
+    &:after {
+        width: 352px; height: 450px;
+        right: 0;
+        z-index: 7;
+        background-position: right bottom;
+        background-image: url('https://cdn.so-sure.com/images/corporate/so-sure_skyline-simple-right-bottom.svg');
+        background-size: 40%;
+        @include breakpoint(midtablet) {
+            background-size: 50%;
+        }
+        @include breakpoint(tablet) {
+            background-size: 65%;
+        }
+        @include breakpoint(laptop) {
+            background-size: 75%;
+        }
+        @include breakpoint(desktop) {
+            background-size: 90%;
+        }
+    }
 
     @include breakpoint(tablet) {
         padding: 100px 0 60px;
@@ -187,22 +242,29 @@ body {
                 display: block;
                 color: $primary-blue;
             }
+
+            &:hover, &:focus, &:active {
+                text-decoration: none;
+            }
         }
     }
 
-    @include breakpoint(tablet) {
+    @include breakpoint(laptop) {
+        height: 100px;
+        overflow: hidden;
         border-bottom: 4px solid $lightest-blue;
-        padding: 20px 0 0 0;
+        padding: 50px 0 0 60px;
         margin-bottom: 30px;
 
         li {
-            margin-bottom: -20px;
             padding: 0 30px;
 
             a {
+                transition: all 0.5s ease;
 
                 &:hover {
-                    margin-top: -40px;
+                    position: relative;
+                    top: -50px;
                 }
             }
         }
