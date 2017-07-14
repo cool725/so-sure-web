@@ -2,6 +2,7 @@
 
 {# Set vars #}
 {% set new_stylesheet = 1 %}
+{% set new_footer = 1 %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -14,7 +15,7 @@
 
 {% block body %}
 
-<section id="contact-us" class="section-about-us section--pad">
+<section id="contact-us" class="section-about-us">
     <div class="container">
         <div class="about-panel">
             <div class="about-panel--thumb about-panel--logo">
@@ -23,7 +24,7 @@
             <h2 class="text-blue text-center">Contact us</h2>
             <p class="lead text-center">We are always happy to talk and can be found via</p>
             <ul class="link-list list-inline">
-                <li><a href="#"><img src="" alt="" width="70px" height="70px"><span>Intercom</span></a></li>
+                <li><a href="#contact-us-intercom"><img src="" alt="" width="70px" height="70px"><span>Intercom</span></a></li>
                 <li><a href="#"><img src="" alt="" width="70px" height="70px"><span>Email</span></a></li>
                 <li><a href="#"><img src="" alt="" width="70px" height="70px"><span>Facebook</span></a></li>
                 <li><a href="#"><img src="" alt="" width="70px" height="70px"><span>Twitter</span></a></li>
@@ -78,6 +79,7 @@
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
-    '@AppBundle/Resources/public/js/Default/index.js' %}
+    '@AppBundle/Resources/public/js/Default/index.js'
+    '@AppBundle/Resources/public/js/About/index.js' %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}

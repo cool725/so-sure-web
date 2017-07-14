@@ -17,4 +17,10 @@ $(function(){
 	});
 
 
+    $('#contact-us-intercom').click(function(e) {
+        e.preventDefault();
+        sosure.track.byName('Clicked Itercom Contact Us');
+        Intercom('trackEvent', 'clicked intercom contact us');
+        Intercom('showNewMessage', $(this).data('intercom-msg'));
+    });
 });
