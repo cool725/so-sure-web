@@ -27,6 +27,46 @@
 				<p><i>p.s. we're always around and love hearing from you. Please get in touch if you want to ask something or even just to say hello :)</i></p>
             </div>
         </div>
+                    {{ form_start(contact_form) }}
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="">Name <span class="req">*</span></label>
+                                    {{ form_widget(contact_form.name, { 'attr': {'class': 'form-control'}}) }}
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label for="">Email <span class="req">*</span></label>
+                                    {{ form_widget(contact_form.email, { 'attr': {'class': 'form-control'}}) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <label for="">Phone Number we can reach you on <span class="req">*</span></label>
+                                    {{ form_widget(contact_form.phone, { 'attr': {'class': 'form-control'}}) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="">Your message:<span class="req">*</span></label>
+                                    {{ form_widget(contact_form.message, { 'attr': {'class': 'form-control', 'rows': '15'}}) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 text-center">
+                                <div class="form-group">
+                                    {{ form_widget(contact_form.submit, { 'label': 'Contact us', 'attr': {'class': 'btn btn-blue btn-lg'}}) }}
+                                </div>
+                            </div>
+                        </div>
+                    {{ form_end(contact_form) }}
+
     </div>
 </section>
 {% endblock %}
