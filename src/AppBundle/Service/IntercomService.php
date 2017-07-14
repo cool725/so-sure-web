@@ -285,7 +285,11 @@ class IntercomService
         }
         // $encoded = json_encode($data, JSON_PRESERVE_ZERO_FRACTION);
         $resp = $this->client->users->create($data);
-        $this->logger->debug(sprintf('Intercom create user (userid %s) %s', $user->getId(), json_encode($resp, JSON_PRESERVE_ZERO_FRACTION)));
+        $this->logger->debug(sprintf(
+            'Intercom create user (userid %s) %s',
+            $user->getId(),
+            json_encode($resp, JSON_PRESERVE_ZERO_FRACTION)
+        ));
 
         $user->setIntercomId($resp->id);
         $this->dm->flush();
