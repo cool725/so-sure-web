@@ -8,6 +8,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 /**
  * @Route("/about/social-insurance")
@@ -46,5 +52,50 @@ class AboutController extends BaseController
      */
     public function howToContactSoSureAction(Request $request)
     {
+        $contactForm = $this->get('form.factory')
+            ->createNamedBuilder('contact_form')
+            ->add('email', EmailType::class)
+            ->add('name', TextType::class)
+            ->add('phone', TextType::class)
+            ->add('message', TextareaType::class)
+            ->add('submit', SubmitType::class)
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('contact_form')) {
+                $contactForm->handleRequest($request);
+                if ($contactForm->isValid()) {
+                    // @codingStandardsIgnoreStart
+                    $body = sprintf(
+                        "Name: %s<br>Email: %s<br>Contact #: %s<br>Message: %s",
+                        $contactForm->getData()['name'],
+                        $contactForm->getData()['email'],
+                        $contactForm->getData()['phone'],
+                        $contactForm->getData()['message']
+                    );
+                    // @codingStandardsIgnoreEnd
+
+                    $message = \Swift_Message::newInstance()
+                        ->setSubject(sprintf(
+                            'Contact Request from %s',
+                            $contactForm->getData()['name']
+                        ))
+                        ->setFrom('info@so-sure.com')
+                        ->setTo('hello@wearesosure.com.com')
+                        ->setBody($body, 'text/html');
+                    $this->get('mailer')->send($message);
+                    $this->addFlash(
+                        'success',
+                        "Thanks. We'll be in touch shortly"
+                    );
+
+                    return $this->redirectToRoute('about_how_to_contact_so_sure');
+                }
+            }
+        }
+
+        return [
+            'contact_form' => $contactForm->createView(),
+        ];
     }
 }
