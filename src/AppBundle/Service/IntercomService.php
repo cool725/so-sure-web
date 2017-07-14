@@ -253,8 +253,11 @@ class IntercomService
 
         $analytics = $user->getAnalytics();
         $data['custom_attributes']['Premium'] = $analytics['annualPremium'];
+        $data['custom_attributes']['Displayable Premium'] = (string) sprintf('%.2f', $analytics['annualPremium']);
         $data['custom_attributes']['Pot'] = $analytics['rewardPot'];
+        $data['custom_attributes']['Displayable Pot'] = (string) sprintf('%.2f', $analytics['rewardPot']);
         $data['custom_attributes']['Max Pot'] = $analytics['maxPot'];
+        $data['custom_attributes']['Displayable Max Pot'] = (string) sprintf('%.2f', $analytics['maxPot']);
         $data['custom_attributes']['Has Full Pot'] = $analytics['hasFullPot'];
         $data['custom_attributes']['Connections'] = $analytics['connections'];
         $data['custom_attributes']['Approved Claims'] = $analytics['approvedClaims'];
@@ -280,9 +283,13 @@ class IntercomService
         if ($optedOut) {
             $data['unsubscribed_from_emails'] = true;
         }
-
+        // $encoded = json_encode($data, JSON_PRESERVE_ZERO_FRACTION);
         $resp = $this->client->users->create($data);
-        $this->logger->debug(sprintf('Intercom create user (userid %s) %s', $user->getId(), json_encode($resp)));
+        $this->logger->debug(sprintf(
+            'Intercom create user (userid %s) %s',
+            $user->getId(),
+            json_encode($resp, JSON_PRESERVE_ZERO_FRACTION)
+        ));
 
         $user->setIntercomId($resp->id);
         $this->dm->flush();
