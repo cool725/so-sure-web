@@ -406,10 +406,11 @@ class Claim
             throw new \Exception('Status must be defined');
         }
 
+        // TODO: Was STATUS_DECLINED as well, but claim 77557421061 is declined - mistake in data?
         if (in_array($this->getType(), [self::TYPE_WARRANTY]) &&
-            in_array($status, [self::STATUS_APPROVED, self::STATUS_DECLINED])) {
+            in_array($status, [self::STATUS_APPROVED])) {
             throw new \InvalidArgumentException(sprintf(
-                'Unable to use approved/declined with Warranty Types. %s/%s',
+                'Unable to use approved with Warranty Types. %s/%s',
                 $this->getNumber(),
                 $this->getId()
             ));
