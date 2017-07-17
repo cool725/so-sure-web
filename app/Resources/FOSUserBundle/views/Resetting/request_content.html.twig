@@ -3,7 +3,7 @@
         <h1 class="h2">Need a new password? No problem.</h1>
         <p>Just enter your email below and we'll send you link to reset it.</p>
         <div class="form-group">
-            <input type="text" id="username" name="username" required="required" class="reset form-control" placeholder="Email Address"/>
+            <input type="email" id="username" name="username" required="required" class="reset form-control" placeholder="Email Address"/>
         </div>
         {% if invalid_username is defined %}
             <p class="error-text">Invalid email address</p>

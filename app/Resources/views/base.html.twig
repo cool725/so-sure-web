@@ -29,7 +29,7 @@
         {% endblock %}
         {% block metaend %}{% endblock %}
     </head>
-    <body>
+    <body {% if distraction_free is defined and distraction_free == 1 %}class="distraction-free"{% endif %}>
         <!-- Google Tag Manager Data Layer -->
         <script>
             {% if intercom_enabled is not defined %}

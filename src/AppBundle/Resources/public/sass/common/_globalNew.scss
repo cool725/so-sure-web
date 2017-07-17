@@ -15,6 +15,10 @@ body {
 	background-color: $white;
 }
 
+body.distraction-free {
+	padding-top: 0;
+}
+
 small {
 	font-size: 14px;
 }
