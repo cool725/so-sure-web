@@ -30,34 +30,34 @@
             </ul>
             <p class="lead text-center">However, if you have a more technical question see our <a href="/help/support">support section</a>.</p>
             <p class="lead text-center">Or drop us a note via the form below:</p>
-            {{ form_start(contact_form, {'attr':{'class':'contact-page-from'}}) }}
+            {{ form_start(contact_form, {'attr':{'id': 'contact-us-form', 'class':'contact-page-from'}}) }}
                 <div class="row">
                     <div class="col-sm-6">
                         <div class="form-group">
-                            <label for="">Name <span class="req">*</span></label>
-                            {{ form_widget(contact_form.name, { 'attr': {'class': 'form-control'}}) }}
+                            <label class="sr-only">Name <span class="req">*</span></label>
+                            {{ form_widget(contact_form.name, { 'attr': {'class': 'form-control', 'placeholder': 'Name *'}}) }}
                         </div>
                     </div>
                     <div class="col-sm-6">
                         <div class="form-group">
-                            <label for="">Email <span class="req">*</span></label>
-                            {{ form_widget(contact_form.email, { 'attr': {'class': 'form-control'}}) }}
+                            <label class="sr-only">Email <span class="req">*</span></label>
+                            {{ form_widget(contact_form.email, { 'attr': {'class': 'form-control', 'placeholder': 'Email *'}}) }}
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-sm-12">
                         <div class="form-group">
-                            <label for="">Phone Number we can reach you on <span class="req">*</span></label>
-                            {{ form_widget(contact_form.phone, { 'attr': {'class': 'form-control'}}) }}
+                            <label class="sr-only">Phone Number we can reach you on <span class="req">*</span></label>
+                            {{ form_widget(contact_form.phone, { 'attr': {'class': 'form-control', 'placeholder': 'Phone Number we can reach you on *'}}) }}
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
-                            <label for="">Your message:<span class="req">*</span></label>
-                            {{ form_widget(contact_form.message, { 'attr': {'class': 'form-control', 'rows': '15'}}) }}
+                            <label class="sr-only">Your message:<span class="req">*</span></label>
+                            {{ form_widget(contact_form.message, { 'attr': {'class': 'form-control', 'rows': '15', 'placeholder': 'Your message *'}}) }}
                         </div>
                     </div>
                 </div>
@@ -78,6 +78,7 @@
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
+    'components/jquery-validation/jquery.validate.js'
     '@AppBundle/Resources/public/js/Default/index.js'
     '@AppBundle/Resources/public/js/About/index.js' %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
