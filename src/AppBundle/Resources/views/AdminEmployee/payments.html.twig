@@ -55,10 +55,10 @@
     {% for i in 1..31 %}
         <tr>
             <td width="15%">{{i }}</td>
-            <td width="15%">{{ data[i]['web']['success'] }} / {{ data[i]['web']['failure'] }}</td>
-            <td width="15%">{{ data[i]['token']['success'] }} / {{ data[i]['token']['failure'] }}</td>
-            <td width="15%">{{ data[i]['mobile']['success'] }} / {{ data[i]['mobile']['failure'] }}</td>
-            <td width="15%">{{ data[i]['apple-pay']['success'] }} / {{ data[i]['apple-pay']['failure'] }}</td>
+            <td width="15%">{{ data[i]['web']['success'] }} / {{ data[i]['web']['failure'] }} ({{ (data[i]['web']['success_percent']*100)|number_format(2, '.', ',') }}%)</td>
+            <td width="15%">{{ data[i]['token']['success'] }} / {{ data[i]['token']['failure'] }} ({{ (data[i]['token']['success_percent']*100)|number_format(2, '.', ',') }}%)</td>
+            <td width="15%">{{ data[i]['mobile']['success'] }} / {{ data[i]['mobile']['failure'] }} ({{ (data[i]['mobile']['success_percent']*100)|number_format(2, '.', ',') }}%)</td>
+            <td width="15%">{{ data[i]['apple-pay']['success'] }} / {{ data[i]['apple-pay']['failure'] }} ({{ (data[i]['apple-pay']['success_percent']*100)|number_format(2, '.', ',') }}%)</td>
         </tr>
     {% endfor %}
 </table>
