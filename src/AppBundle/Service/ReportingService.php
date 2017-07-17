@@ -10,6 +10,7 @@ use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Lead;
+use AppBundle\Document\Payment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
@@ -379,5 +380,39 @@ class ReportingService
         }
 
         return $total;
+    }
+
+    public function payments(\DateTime $date)
+    {
+        $repo = $this->dm->getRepository(Payment::class);
+        $payments = $repo->getAllPaymentsForReport($date);
+        $sources = [
+            Payment::SOURCE_TOKEN,
+            Payment::SOURCE_WEB,
+            Payment::SOURCE_WEB_API,
+            Payment::SOURCE_MOBILE,
+            Payment::SOURCE_APPLE_PAY,
+            Payment::SOURCE_ANDROID_PAY,
+            Payment::SOURCE_SOSURE,
+            Payment::SOURCE_BACS,
+        ];
+        $data = [];
+        foreach ($sources as $source) {
+            for ($i = 1; $i <= 31; $i++) {
+                $data[$i][$source]['success'] = 0;
+                $data[$i][$source]['failure'] = 0;
+            }
+        }
+        foreach ($payments as $payment) {
+            if (isset($data[$payment->getDate()->format('d')][$payment->getSource()]['success'])) {
+                if ($payment->isSuccess()) {
+                    $data[$payment->getDate()->format('d')][$payment->getSource()]['success']++;
+                } else {
+                    $data[$payment->getDate()->format('d')][$payment->getSource()]['failure']++;
+                }
+            }
+        }
+
+        return $data;
     }
 }

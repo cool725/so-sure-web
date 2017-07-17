@@ -1468,4 +1468,29 @@ class AdminEmployeeController extends BaseController
 
         return new RedirectResponse($this->generateUrl('admin_phones'));
     }
+
+    /**
+     * @Route("/payments", name="admin_payments")
+     * @Route("/payments/{year}/{month}", name="admin_payments_date")
+     * @Template
+     */
+    public function paymentsAction(Request $request, $year = null, $month = null)
+    {
+        $now = new \DateTime();
+        if (!$year) {
+            $year = $now->format('Y');
+        }
+        if (!$month) {
+            $month = $now->format('m');
+        }
+        $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
+        $reporting = $this->get('app.reporting');
+        $data = $reporting->payments($date);
+
+        return [
+            'data' => $data,
+            'year' => $year,
+            'month' => $month,
+        ];
+    }
 }

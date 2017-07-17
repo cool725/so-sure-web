@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets
+    'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.css'
+ %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+        'components/moment/moment.min.js'
+        'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.js'
+        '@AppBundle/Resources/public/js/AdminEmployee/payments.js'
+    %}
+    <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock %}
+
+{% block body %}
+<div class="container" style="margin-bottom: 50px">
+
+<div class="row">
+    <div class="col-md-6">
+        <h1>so-sure Payments for {{ month }} / {{ year }}</h1>
+    </div>
+    <form id='payments-form' method="POST">
+    <div class="col-md-2">
+        <div class="form-group" style="padding-top: 15px;">
+            <div class='input-group date' id='payments'>
+                <input name="banking" type='text' class="form-control" value="{{month}}-{{year}}" />
+                <span class="input-group-addon">
+                    <span class="fa fa-calendar"></span>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="form-group" style="padding-top: 15px;">
+            <button class="btn btn-primary">View Month</button>
+        </div>
+    </div>
+    </form>
+</div>
+
+<table>
+    <tr>
+        <th width="15%">Day</th>
+        <th width="15%">Web</th>
+        <th width="15%">Token</th>
+        <th width="15%">Mobile</th>
+        <th width="15%">ApplePay</th>
+    </tr>
+    {% for i in 1..31 %}
+        <tr>
+            <td width="15%">{{i }}</td>
+            <td width="15%">{{ data[i]['web']['success'] }} / {{ data[i]['web']['failure'] }}</td>
+            <td width="15%">{{ data[i]['token']['success'] }} / {{ data[i]['token']['failure'] }}</td>
+            <td width="15%">{{ data[i]['mobile']['success'] }} / {{ data[i]['mobile']['failure'] }}</td>
+            <td width="15%">{{ data[i]['apple-pay']['success'] }} / {{ data[i]['apple-pay']['failure'] }}</td>
+        </tr>
+    {% endfor %}
+</table>
+{% endblock %}
