@@ -1474,7 +1474,7 @@ class AdminEmployeeController extends BaseController
      * @Route("/payments/{year}/{month}", name="admin_payments_date")
      * @Template
      */
-    public function paymentsAction(Request $request, $year = null, $month = null)
+    public function paymentsAction($year = null, $month = null)
     {
         $now = new \DateTime();
         if (!$year) {
