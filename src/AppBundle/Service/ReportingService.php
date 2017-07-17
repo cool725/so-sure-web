@@ -409,7 +409,7 @@ class ReportingService
             }
         }
         foreach ($payments as $payment) {
-            if (!$payment->getSource()) {
+            if (!$payment->getSource() || !$payment->getAmount() || $payment->getAmount() <= 0) {
                 continue;
             }
             $day = $payment->getDate()->format('j');
