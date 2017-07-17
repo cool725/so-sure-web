@@ -395,7 +395,6 @@ class ReportingService
             Payment::SOURCE_ANDROID_PAY,
             Payment::SOURCE_SOSURE,
             Payment::SOURCE_BACS,
-            'web-callback',
         ];
         $data = [];
         for ($i = 1; $i <= 31; $i++) {
@@ -416,13 +415,14 @@ class ReportingService
             $day = $payment->getDate()->format('j');
             if ($payment->isSuccess()) {
                 $data[$day][$payment->getSource()]['success']++;
-                if ($payment->getSource() == Payment::SOURCE_WEB && $payment->getReceipt()) {
-                    $data[$day]['web-callback']['success']++;
-                }
+
+                $data[$day]['policy-success'][$payment->getId()] = true;
+                unset($data[$day]['policy-failure'][$payment->getId()]);
             } else {
                 $data[$day][$payment->getSource()]['failure']++;
-                if ($payment->getSource() == Payment::SOURCE_WEB && $payment->getReceipt()) {
-                    $data[$day]['web-callback']['failure']++;
+
+                if (!isset($data[$day]['policy-success'][$payment->getId()])) {
+                    $data[$day]['policy-failure'][$payment->getId()] = true;
                 }
             }
             $data[$day][$payment->getSource()]['total']++;
@@ -430,13 +430,17 @@ class ReportingService
                 $data[$day][$payment->getSource()]['total'];
             $data[$day][$payment->getSource()]['failure_percent'] = $data[$day][$payment->getSource()]['failure'] /
                 $data[$day][$payment->getSource()]['total'];
-            if ($payment->getSource() == Payment::SOURCE_WEB && $payment->getReceipt()) {
-                $data[$day]['web-callback']['total']++;
-                $data[$day]['web-callback']['success_percent'] = $data[$day]['web-callback']['success'] /
-                    $data[$day]['web-callback']['total'];
-                $data[$day]['web-callback']['failure_percent'] = $data[$day]['web-callback']['failure'] /
-                    $data[$day]['web-callback']['total'];
-            }
+        }
+        for ($day = 1; $day <= 31; $day++) {
+            $data[$day]['policy']['success'] = isset($data[$day]['policy-success']) ?
+                count($data[$day]['policy-success']) : 0;
+            $data[$day]['policy']['failure'] = isset($data[$day]['policy-failure']) ?
+                count($data[$day]['policy-failure']) : 0;
+            $data[$day]['policy']['total'] = $data[$day]['policy']['success'] + $data[$day]['policy']['failure'] ;
+            $data[$day]['policy']['success_percent'] = $data[$day]['policy']['total'] > 0 ?
+                $data[$day]['policy']['success'] / $data[$day]['policy']['total'] : 0;
+            $data[$day]['policy']['failure_percent'] =  $data[$day]['policy']['total'] > 0 ?
+                $data[$day]['policy']['failure'] / $data[$day]['policy']['total'] : 0;
         }
 
         return $data;
