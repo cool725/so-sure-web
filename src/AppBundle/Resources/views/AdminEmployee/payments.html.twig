@@ -12,7 +12,7 @@
     {% javascripts
         'components/moment/moment.min.js'
         'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.js'
-        '@AppBundle/Resources/public/js/Admin/banking.js'
+        '@AppBundle/Resources/public/js/AdminEmployee/payments.js'
     %}
     <script src="{{ asset_url }}"></script>
     {% endjavascripts %}
@@ -25,10 +25,10 @@
     <div class="col-md-6">
         <h1>so-sure Payments for {{ month }} / {{ year }}</h1>
     </div>
-    <form id='banking-form' method="POST">
+    <form id='payments-form' method="POST">
     <div class="col-md-2">
         <div class="form-group" style="padding-top: 15px;">
-            <div class='input-group date' id='banking'>
+            <div class='input-group date' id='payments'>
                 <input name="banking" type='text' class="form-control" value="{{month}}-{{year}}" />
                 <span class="input-group-addon">
                     <span class="fa fa-calendar"></span>
