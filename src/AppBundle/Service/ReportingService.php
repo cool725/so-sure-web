@@ -416,13 +416,17 @@ class ReportingService
             if ($payment->isSuccess()) {
                 $data[$day][$payment->getSource()]['success']++;
 
-                $data[$day]['policy-success'][$payment->getId()] = true;
-                unset($data[$day]['policy-failure'][$payment->getId()]);
+                if ($payment->getSource() == Payment::SOURCE_WEB) {
+                    $data[$day]['policy-success'][$payment->getId()] = true;
+                    unset($data[$day]['policy-failure'][$payment->getId()]);
+                }
             } else {
                 $data[$day][$payment->getSource()]['failure']++;
 
-                if (!isset($data[$day]['policy-success'][$payment->getId()])) {
-                    $data[$day]['policy-failure'][$payment->getId()] = true;
+                if ($payment->getSource() == Payment::SOURCE_WEB) {
+                    if (!isset($data[$day]['policy-success'][$payment->getId()])) {
+                        $data[$day]['policy-failure'][$payment->getId()] = true;
+                    }
                 }
             }
             $data[$day][$payment->getSource()]['total']++;
