@@ -171,7 +171,7 @@ class SalvaPhonePolicy extends PhonePolicy
                 // this date, its not a big deal if it is incorrect for the rare case
                 $this->salvaFirstBillingDates[$version] = $this->getPreviousBillingDate($date)->format(\DateTime::ATOM);
             }
-        } else {
+        } elseif ($this->getPremiumPlan() == self::PLAN_YEARLY) {
             // There's not a strict need to record this as will always be the start date,
             // however, for data consistency, seems like the better option to store it
             $this->salvaFirstBillingDates[$version] = $this->getStart()->format(\DateTime::ATOM);
