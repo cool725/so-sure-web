@@ -372,7 +372,7 @@ class DefaultController extends BaseController
                             $claimForm->getData()['policyNumber']
                         ))
                         ->setFrom('info@so-sure.com')
-                        ->setTo('claims@wearesosure.com.com')
+                        ->setTo('claims@wearesosure.com')
                         ->setBody($body, 'text/html');
                     $this->get('mailer')->send($message);
                     $this->addFlash(
