@@ -1,5 +1,11 @@
 $(function(){
 
+    // UK mobile number
+    jQuery.validator.addMethod('phoneUK', function(phone_number, element) {
+    return this.optional(element) || phone_number.length > 9 &&
+    phone_number.match(/^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$/);
+    }, 'Please enter a valid phone number');
+
 	$('#team-member-info-modal').on('show.bs.modal', function(event) {
 
 		var button = $(event.relatedTarget);
@@ -19,7 +25,6 @@ $(function(){
 
     $('#contact-us-intercom').click(function(e) {
         e.preventDefault();
-        sosure.track.byName('Clicked Itercom Contact Us');
         Intercom('trackEvent', 'clicked intercom contact us');
         Intercom('showNewMessage', $(this).data('intercom-msg'));
     });
@@ -39,7 +44,7 @@ $(function(){
             },
             "contact_form[phone]" : {
                 required: true,
-                digits: true
+                phoneUK: true
             },
             "contact_form[message]" : {
                 required: true
@@ -55,7 +60,6 @@ $(function(){
             },
             "contact_form[phone]" : {
                 required: 'Please enter a valid phone number',
-                digits: 'Phone must contain digits only please'
             },
             "contact_form[message]" : {
                 required: "Please tell us what you'd like to talk about"
