@@ -22,4 +22,16 @@ class PaymentRepository extends DocumentRepository
             ->getQuery()
             ->execute();
     }
+
+    public function getAllPaymentsForReport(\DateTime $date)
+    {
+        $startMonth = $this->startOfMonth($date);
+        $nextMonth = $this->endOfMonth($date);
+
+        return $this->createQueryBuilder()
+            ->field('date')->gte($startMonth)
+            ->field('date')->lt($nextMonth)
+            ->getQuery()
+            ->execute();
+    }
 }
