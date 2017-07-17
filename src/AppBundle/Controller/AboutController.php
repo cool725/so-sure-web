@@ -81,7 +81,7 @@ class AboutController extends BaseController
                             $contactForm->getData()['name']
                         ))
                         ->setFrom('info@so-sure.com')
-                        ->setTo('hello@wearesosure.com.com')
+                        ->setTo('hello@wearesosure.com')
                         ->setBody($body, 'text/html');
                     $this->get('mailer')->send($message);
                     $this->addFlash(
