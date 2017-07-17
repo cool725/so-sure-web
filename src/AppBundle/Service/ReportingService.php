@@ -395,6 +395,7 @@ class ReportingService
             Payment::SOURCE_ANDROID_PAY,
             Payment::SOURCE_SOSURE,
             Payment::SOURCE_BACS,
+            'web-callback',
         ];
         $data = [];
         for ($i = 1; $i <= 31; $i++) {
@@ -413,19 +414,29 @@ class ReportingService
                 continue;
             }
             $day = $payment->getDate()->format('j');
-            if (!isset($data[$day][$payment->getSource()]['success'])) {
-                throw new \Exception(sprintf("%s %s %s", print_r($data, true), $day, $payment->getSource()));
-            }
             if ($payment->isSuccess()) {
                 $data[$day][$payment->getSource()]['success']++;
+                if ($payment->getSource() == Payment::SOURCE_WEB && $payment->getReceipt()) {
+                    $data[$day]['web-callback']['success']++;
+                }
             } else {
                 $data[$day][$payment->getSource()]['failure']++;
+                if ($payment->getSource() == Payment::SOURCE_WEB && $payment->getReceipt()) {
+                    $data[$day]['web-callback']['failure']++;
+                }
             }
             $data[$day][$payment->getSource()]['total']++;
             $data[$day][$payment->getSource()]['success_percent'] = $data[$day][$payment->getSource()]['success'] /
                 $data[$day][$payment->getSource()]['total'];
             $data[$day][$payment->getSource()]['failure_percent'] = $data[$day][$payment->getSource()]['failure'] /
                 $data[$day][$payment->getSource()]['total'];
+            if ($payment->getSource() == Payment::SOURCE_WEB && $payment->getReceipt()) {
+                $data[$day]['web-callback']['total']++;
+                $data[$day]['web-callback']['success_percent'] = $data[$day]['web-callback']['success'] /
+                    $data[$day]['web-callback']['total'];
+                $data[$day]['web-callback']['failure_percent'] = $data[$day]['web-callback']['failure'] /
+                    $data[$day]['web-callback']['total'];
+            }
         }
 
         return $data;
