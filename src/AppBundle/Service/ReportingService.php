@@ -397,20 +397,35 @@ class ReportingService
             Payment::SOURCE_BACS,
         ];
         $data = [];
-        foreach ($sources as $source) {
-            for ($i = 1; $i <= 31; $i++) {
+        for ($i = 1; $i <= 31; $i++) {
+            $data[$i] = [];
+            foreach ($sources as $source) {
+                $data[$i][$source] = [];
                 $data[$i][$source]['success'] = 0;
                 $data[$i][$source]['failure'] = 0;
+                $data[$i][$source]['total'] = 0;
+                $data[$i][$source]['success_percent'] = null;
+                $data[$i][$source]['failure_percent'] = null;
             }
         }
         foreach ($payments as $payment) {
-            if (isset($data[$payment->getDate()->format('d')][$payment->getSource()]['success'])) {
-                if ($payment->isSuccess()) {
-                    $data[$payment->getDate()->format('d')][$payment->getSource()]['success']++;
-                } else {
-                    $data[$payment->getDate()->format('d')][$payment->getSource()]['failure']++;
-                }
+            if (!$payment->getSource()) {
+                continue;
             }
+            $day = $payment->getDate()->format('j');
+            if (!isset($data[$day][$payment->getSource()]['success'])) {
+                throw new \Exception(sprintf("%s %s %s", print_r($data, true), $day, $payment->getSource()));
+            }
+            if ($payment->isSuccess()) {
+                $data[$day][$payment->getSource()]['success']++;
+            } else {
+                $data[$day][$payment->getSource()]['failure']++;
+            }
+            $data[$day][$payment->getSource()]['total']++;
+            $data[$day][$payment->getSource()]['success_percent'] = $data[$day][$payment->getSource()]['success'] /
+                $data[$day][$payment->getSource()]['total'];
+            $data[$day][$payment->getSource()]['failure_percent'] = $data[$day][$payment->getSource()]['failure'] /
+                $data[$day][$payment->getSource()]['total'];
         }
 
         return $data;
