@@ -178,6 +178,12 @@
                             {% endfor %}
                         </tr>
                         <tr>
+                            <td>New Policies via Invitation [KPI: 90]</td>
+                            {% for week in weeks %}
+                                <td>{{ (week.period.data['newInvitationPolicies'] + week.period.data['newSCodePolicies']) }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
                             <td>Total Site Visitors [KPI: 177]</td>
                             {% for week in weeks %}
                                 <td>{{ week['mixpanel-total-site-visitors'] }}</td>
