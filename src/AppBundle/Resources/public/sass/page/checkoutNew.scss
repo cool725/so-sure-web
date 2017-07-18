@@ -5,6 +5,10 @@
 @import "../common/paletteNew";
 @import "checkoutNavNew";
 
+body {
+    overflow-x: hidden;
+}
+
 .checkout {
 
     h1 {
