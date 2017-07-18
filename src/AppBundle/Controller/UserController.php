@@ -24,6 +24,8 @@ use AppBundle\Form\Type\RenewType;
 use AppBundle\Form\Type\SentInvitationType;
 use AppBundle\Form\Type\UnconnectedUserPolicyType;
 use AppBundle\Document\Invitation\EmailInvitation;
+use AppBundle\Document\Form\BillingDay;
+use AppBundle\Form\Type\BillingDayType;
 
 use AppBundle\Service\FacebookService;
 use AppBundle\Security\InvitationVoter;
@@ -462,6 +464,7 @@ class UserController extends BaseController
         $user = $this->getUser();
         $policy = $user->getUnpaidPolicy();
         if ($policy) {
+            $this->denyAccessUnlessGranted('view', $policy);
             if ($policy->getPremiumPlan() != Policy::PLAN_MONTHLY) {
                 throw new \Exception('Unpaid policy should only be triggered for monthly plans');
             }
@@ -531,22 +534,79 @@ class UserController extends BaseController
     }
 
     /**
-     * @Route("/card-details", name="user_card_details")
+     * @Route("/payment-details", name="user_card_details")
+     * @Route("/payment-details/{policyId}", name="user_card_details_policy",
+     *      requirements={"policyId":"[0-9a-f]{24,24}"})
      * @Template
      */
-    public function cardDetailsAction(Request $request)
+    public function cardDetailsAction(Request $request, $policyId = null)
     {
         $user = $this->getUser();
+        $dm = $this->getManager();
+        $policyRepo = $dm->getRepository(Policy::class);
+        if ($policyId) {
+            $policy = $policyRepo->find($policyId);
+        } else {
+            $policy = $user->getLatestPolicy();
+        }
+        $this->denyAccessUnlessGranted('view', $policy);
+
         $webpay = $this->get('app.judopay')->webRegister(
             $user,
             $request->getClientIp(),
             $request->headers->get('User-Agent')
         );
+        $billing = new BillingDay();
+        $billing->setPolicy($policy);
+        $billingForm = $this->get('form.factory')
+            ->createNamedBuilder('billing_form', BillingDayType::class, $billing)
+            ->getForm();
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('billing_form')) {
+                $billingForm->handleRequest($request);
+                if ($billingForm->isValid()) {
+                    $body = sprintf(
+                        "Policy: <a href='%s'>%s</a> has requested a billing date change to the %d.",
+                        $this->generateUrl(
+                            'admin_policy',
+                            ['id' => $policy->getId()],
+                            UrlGeneratorInterface::ABSOLUTE_URL
+                        ),
+                        $policy->getPolicyNumber(),
+                        $billing->getDay()
+                    );
+
+                    $message = \Swift_Message::newInstance()
+                        ->setSubject(sprintf(
+                            'Billing day change request from %s',
+                            $policy->getPolicyNumber()
+                        ))
+                        ->setFrom('info@so-sure.com')
+                        ->setTo('support@wearesosure.com')
+                        ->setBody($body, 'text/html');
+                    $this->get('mailer')->send($message);
+
+                    /*
+                    $policyService = $this->get('app.policy');
+                    $policyService->adjustScheduledPayments($policy);
+                    $dm->flush();
+                    */
+                    $this->addFlash(
+                        'success',
+                        'Thanks for your request. We will be in touch soon.'
+                    );
+
+                    return $this->redirectToRoute('user_card_details_policy', ['policyId' => $policyId]);
+                }
+            }
+        }
 
         $data = [
             'webpay_action' => $webpay ? $webpay['post_url'] : null,
             'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
             'user' => $user,
+            'policy' => $policy,
+            'billing_form' => $billingForm->createView(),
         ];
 
         return $data;
@@ -554,11 +614,21 @@ class UserController extends BaseController
 
     /**
      * @Route("/contact-details", name="user_contact_details")
+     * @Route("/contact-details/{policyId}", name="user_contact_details_policy",
+     *      requirements={"policyId":"[0-9a-f]{24,24}"})
      * @Template
      */
-    public function contactDetailsAction(Request $request)
+    public function contactDetailsAction(Request $request, $policyId = null)
     {
         $user = $this->getUser();
+        $dm = $this->getManager();
+        $policyRepo = $dm->getRepository(Policy::class);
+        if ($policyId) {
+            $policy = $policyRepo->find($policyId);
+        } else {
+            $policy = $user->getLatestPolicy();
+        }
+        $this->denyAccessUnlessGranted('view', $policy);
 
         $userEmailForm = $this->get('form.factory')
             ->createNamedBuilder('user_email_form', UserEmailType::class, $user)
@@ -574,7 +644,7 @@ class UserController extends BaseController
                         'Your email address is updated. You should receive an email confirmation shortly.'
                     );
 
-                    return $this->redirectToRoute('user_contact_details');
+                    return $this->redirectToRoute('user_contact_details_policy', ['policyId' => $policy->getId()]);
                 }
             }
         }
@@ -582,6 +652,7 @@ class UserController extends BaseController
         return [
             'user' => $user,
             'email_form' => $userEmailForm->createView(),
+            'policy' => $policy,
         ];
     }
 

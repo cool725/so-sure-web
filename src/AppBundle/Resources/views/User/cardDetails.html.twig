@@ -16,9 +16,17 @@
         <div class="container">
 
             <div class="row">
-                  <div class="col-md-12">
-                      <h2>Update your card details</h2>
-                      <p>Your current card is: {{ user.paymentMethod }}</p>
+                <div class="col-md-12">
+                    <h2>Your Payment Details</h2>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                  <h4>Your card:</h4>
+                  <p>{{ user.paymentMethod }}</p>
+                </div>
+                <div class="col-md-4">
+                    <br />
                       {% if webpay_action and webpay_reference %}
                       <form action="{{ webpay_action }}" method="post" id="webpay-form">
                           <div class="row">
@@ -28,11 +36,55 @@
                               </div>
                           </div>
                       </form>
-                    {% elseif amount == 0 %}
-                      <p>Your policy is paid to date.</p>
                     {% endif %}
-                  </div>
+                </div>
             </div>
+            {% if policy.premiumPlan == 'monthly' %}
+            <div class="row">
+                <div class="col-md-6">
+                  <h4>Billing date:</h4>
+                  <p>Monthly on the {{ policy.billing|date('jS','Europe/London') }} around {{ policy.billing|date('H','Europe/London') }}:00</p>
+                </div>
+                <div class="col-md-4">
+                    <br />
+                    <button title="Change" type="button" class="btn btn-primary"
+                            data-toggle="modal" data-target="#billingModal"
+                    ><i class="fa fa-edit"></i> Change</button>
+                </div>
+            </div>
+            {% endif %}
         </div>
   </section>
+    
+  {% if policy.premiumPlan == 'monthly' %}
+    <div class="modal fade" id="billingModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            {{ form_start(billing_form) }}
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Request Billing Date Change</h4>
+          </div>
+          <div class="modal-body">
+            <p>
+                Please change my billing date from the {{ policy.billing|date('jS','Europe/London') }} to the {{ form_widget(billing_form.day) }} each month.
+            </p>
+            <p>
+                Note the following:
+                <ul>
+                    <li>You can't be behind in your payments. We will be unable to change your billing date until your account has a £0 balance.</li>
+                    <li>If the request day is earlier than the current day, you will be billed immediately for this month (e.g. today is the 15th, your payment is currently due on the 30th, but you want to change to the 1st. This month, you will be billed on the 15th, but next month will be on the 1st).</li>
+                    <li>If you request to change the date close to when the payment is due, you may need to wait an additional month before we're able to change the payment date.</li>
+                </ul>
+            </p>
+          </div>
+          <div class="modal-footer">
+            {{ form_widget(billing_form.update, {'label': 'Change billing date', 'attr': {'class': 'btn btn-danger confirm-usertoken-clear'}}) }}
+          </div>
+            {{ form_end(billing_form) }}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
 {% endblock %}
