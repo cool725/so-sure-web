@@ -662,7 +662,7 @@ class UserController extends BaseController
      *      requirements={"policyId":"[0-9a-f]{24,24}"})
      * @Template
      */
-    public function policyListAction(Request $request, $policyId = null)
+    public function policyListAction($policyId = null)
     {
         $user = $this->getUser();
         $dm = $this->getManager();
