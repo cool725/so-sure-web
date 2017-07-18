@@ -791,6 +791,7 @@ class PurchaseController extends BaseController
         $totalPaid = $policy->getTotalSuccessfulPayments();
         $yearlyPremium = $policy->getPremium()->getYearlyPremiumPrice();
         $amount = $this->toTwoDp($yearlyPremium - $totalPaid);
+        $webpay = null;
 
         if ($amount > 0) {
             $webpay = $this->get('app.judopay')->webpay(
