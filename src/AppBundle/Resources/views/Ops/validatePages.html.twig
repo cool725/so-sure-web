@@ -16,7 +16,7 @@
     </li>
 </ul>
 
-<h4>Logged out status</h4>
+<h4>Logged out required</h4>
 <ul>
     <li>
         <a href="{{ url('scode', {'code':scode}) }}">SCode Invitiation</a>
@@ -26,7 +26,7 @@
     </li>
 </ul>
 
-<h4>Admin login status</h4>
+<h4>Admin login required</h4>
 <ul>
     <li>
         <a href="{{ url('user_invalid_policy') }}?_impersonate={{ cancelled_policy.user.email }}">User Policy Invalid</a> <b>(auto impersonate {{ cancelled_policy.user.email }}</b>
@@ -52,6 +52,9 @@
         {% else %}
             No renewal policy available
         {% endif %}
+    </li>
+    <li>
+        <a href="{{ url('purchase_remainder_policy', {'id': valid_remainder_policy.id }) }}?_impersonate={{ valid_remainder_policy.user.email }}">User Remainder Payment Page</a> <b>(auto impersonate {{ valid_remainder_policy.user.email }})</b>
     </li>
 </ul>
 
