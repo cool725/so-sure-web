@@ -467,6 +467,29 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $policies;
     }
 
+    public function getDisplayablePoliciesSorted()
+    {
+        $policies = [];
+        foreach ($this->policies as $policy) {
+            if (in_array($policy->getStatus(), [
+                Policy::STATUS_ACTIVE,
+                Policy::STATUS_CANCELLED,
+                Policy::STATUS_EXPIRED,
+                Policy::STATUS_UNPAID,
+                Policy::STATUS_RENEWAL,
+            ])) {
+                $policies[] = $policy;
+            }
+        }
+
+        // sort recent to older
+        usort($policies, function ($a, $b) {
+            return $a->getStart() < $b->getStart();
+        });
+
+        return $policies;
+    }
+
     public function getUnInitPolicy()
     {
         foreach ($this->getAllPolicies() as $policy) {
