@@ -537,7 +537,11 @@ class PurchaseController extends BaseController
             ));
         }
 
-        if (in_array($webType, [JudopayService::WEB_TYPE_REMAINDER, JudopayService::WEB_TYPE_STANDARD])) {
+        if (in_array($webType, [
+            JudopayService::WEB_TYPE_REMAINDER,
+            JudopayService::WEB_TYPE_STANDARD,
+            JudopayService::WEB_TYPE_UNPAID,
+        ])) {
             try {
                 $judo->add(
                     $policy,
@@ -788,13 +792,15 @@ class PurchaseController extends BaseController
         $yearlyPremium = $policy->getPremium()->getYearlyPremiumPrice();
         $amount = $this->toTwoDp($yearlyPremium - $totalPaid);
 
-        $webpay = $this->get('app.judopay')->webpay(
-            $policy,
-            $amount,
-            $request->getClientIp(),
-            $request->headers->get('User-Agent'),
-            JudopayService::WEB_TYPE_REMAINDER
-        );
+        if ($amount > 0) {
+            $webpay = $this->get('app.judopay')->webpay(
+                $policy,
+                $amount,
+                $request->getClientIp(),
+                $request->headers->get('User-Agent'),
+                JudopayService::WEB_TYPE_REMAINDER
+            );
+        }
 
         $data = [
             'phone' => $policy->getPhone(),

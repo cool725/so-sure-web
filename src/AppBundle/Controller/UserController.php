@@ -456,27 +456,32 @@ class UserController extends BaseController
      */
     public function unpaidPolicyAction(Request $request)
     {
-        $user = $this->getUser();
-        $policy = $user->getUnpaidPolicy();
-        if ($policy->getPremiumPlan() != Policy::PLAN_MONTHLY) {
-            throw new \Exception('Unpaid policy should only be triggered for monthly plans');
-        }
         $amount = 0;
         $webpay = null;
-        if (!$policy->isPolicyPaidToDate()) {
-            $amount = $policy->getOutstandingPremiumToDate();
 
-            $webpay = $this->get('app.judopay')->webpay(
-                $policy,
-                $amount,
-                $request->getClientIp(),
-                $request->headers->get('User-Agent'),
-                JudopayService::WEB_TYPE_STANDARD
-            );
+        $user = $this->getUser();
+        $policy = $user->getUnpaidPolicy();
+        if ($policy) {
+            if ($policy->getPremiumPlan() != Policy::PLAN_MONTHLY) {
+                throw new \Exception('Unpaid policy should only be triggered for monthly plans');
+            }
+            if (!$policy->isPolicyPaidToDate()) {
+                $amount = $policy->getOutstandingPremiumToDate();
+
+                if ($amount > 0) {
+                    $webpay = $this->get('app.judopay')->webpay(
+                        $policy,
+                        $amount,
+                        $request->getClientIp(),
+                        $request->headers->get('User-Agent'),
+                        JudopayService::WEB_TYPE_UNPAID
+                    );
+                }
+            }
         }
 
         $data = [
-            'phone' => $policy->getPhone(),
+            'phone' => $policy ? $policy->getPhone() : null,
             'webpay_action' => $webpay ? $webpay['post_url'] : null,
             'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
             'amount' => $amount,

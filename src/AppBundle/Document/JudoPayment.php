@@ -55,6 +55,14 @@ class JudoPayment extends Payment
      */
     protected $riskScore;
 
+    /**
+     * @AppAssert\Alphanumeric()
+     * @Assert\Length(min="0", max="50")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $webType;
+
     public function getResult()
     {
         return $this->result;
@@ -98,6 +106,16 @@ class JudoPayment extends Payment
     public function setBarclaysReference($barclaysReference)
     {
         $this->barclaysReference = $barclaysReference;
+    }
+
+    public function getWebType()
+    {
+        return $this->webType;
+    }
+
+    public function setWebType($webType)
+    {
+        $this->webType = $webType;
     }
 
     public function isSuccess()
