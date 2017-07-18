@@ -30,7 +30,7 @@ class JudopayService
 {
     use CurrencyTrait;
 
-    /** Standard payment (monthly/yearly; initial payment or payment after card fails */
+    /** Standard payment (monthly/yearly; initial payment */
     const WEB_TYPE_STANDARD = 'standard';
 
     /** No payment, just updating the card details */
@@ -38,6 +38,9 @@ class JudopayService
 
     /** Remainder of policy payment (typically cancelled policy w/claim) */
     const WEB_TYPE_REMAINDER = 'remainder';
+
+    /** Payment after card fails */
+    const WEB_TYPE_UNPAID = 'unpaid';
 
     /** @var LoggerInterface */
     protected $logger;
@@ -968,10 +971,16 @@ class JudopayService
      */
     public function webpay(Policy $policy, $amount, $ipAddress, $userAgent, $type = null)
     {
+        if ($this->areEqualToTwoDp(0, $amount)) {
+            throw new \Exception(sprintf('Amount must be > 0 for policy %s', $policy->getId()));
+        }
+
         $payment = new JudoPayment();
         $payment->setAmount($amount);
         $payment->setUser($policy->getUser());
         $payment->setSource(Payment::SOURCE_WEB);
+        $payment->setWebType($type);
+
         if ($type == self::WEB_TYPE_REMAINDER) {
             $payment->setNotes(sprintf('User was requested to pay the remainder of their policy'));
         }

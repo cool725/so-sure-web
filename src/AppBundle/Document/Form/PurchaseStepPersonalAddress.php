@@ -140,8 +140,8 @@ class PurchaseStepPersonalAddress
         $this->name = trim($name);
         $parts = explode(" ", trim($name));
         if (count($parts) == 2) {
-            $this->setFirstName(ucfirst($parts[0]));
-            $this->setLastName(ucfirst($parts[1]));
+            $this->setFirstName(ucfirst(strtolower($parts[0])));
+            $this->setLastName(ucfirst(strtolower($parts[1])));
         }
     }
 

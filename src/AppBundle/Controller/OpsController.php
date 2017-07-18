@@ -119,6 +119,14 @@ class OpsController extends BaseController
                 $validRenwalPolicy = null;
             }
         }
+        foreach ($validPolicies as $validRemainderPolicy) {
+            if ($validRemainderPolicy->getPremiumPlan() == Policy::PLAN_MONTHLY &&
+                $validRemainderPolicy->getOutstandingPremiumToDate() > 0) {
+                break;
+            } else {
+                $validRemainderPolicy = null;
+            }
+        }
         $cancelledPolicy = $policyRepo->findOneBy(['status' => Policy::STATUS_CANCELLED]);
 
         return [
@@ -129,6 +137,7 @@ class OpsController extends BaseController
             'cancelled_policy' => $cancelledPolicy,
             'valid_multiple_policy' => $validMultiplePolicy,
             'valid_renewal_policy' => $validRenwalPolicy,
+            'valid_remainder_policy' => $validRemainderPolicy,
         ];
     }
 
