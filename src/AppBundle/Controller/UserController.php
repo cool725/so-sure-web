@@ -657,6 +657,30 @@ class UserController extends BaseController
     }
 
     /**
+     * @Route("/list", name="user_policy_list")
+     * @Route("/list/{policyId}", name="user_policy_list_policy",
+     *      requirements={"policyId":"[0-9a-f]{24,24}"})
+     * @Template
+     */
+    public function policyListAction(Request $request, $policyId = null)
+    {
+        $user = $this->getUser();
+        $dm = $this->getManager();
+        $policyRepo = $dm->getRepository(Policy::class);
+        if ($policyId) {
+            $policy = $policyRepo->find($policyId);
+        } else {
+            $policy = $user->getLatestPolicy();
+        }
+        $this->denyAccessUnlessGranted('view', $policy);
+
+        return [
+            'user' => $user,
+            'policy' => $policy,
+        ];
+    }
+
+    /**
      * @Route("/fb", name="user_facebook")
      * @Template
      */
