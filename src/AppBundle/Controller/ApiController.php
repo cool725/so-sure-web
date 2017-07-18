@@ -600,12 +600,12 @@ class ApiController extends BaseController
             $user->setEmail($this->getDataString($data, 'email'));
             $user->setFirstName(
                 isset($data['first_name']) ?
-                ucfirst($this->conformAlphanumeric($this->getDataString($data, 'first_name'), 50)) :
+                ucfirst(strtolower($this->conformAlphanumeric($this->getDataString($data, 'first_name'), 50))) :
                 null
             );
             $user->setLastName(
                 isset($data['last_name']) ?
-                ucfirst($this->conformAlphanumeric($this->getDataString($data, 'last_name'), 50)) :
+                ucfirst(strtolower($this->conformAlphanumeric($this->getDataString($data, 'last_name'), 50))) :
                 null
             );
             $user->setFacebookId($this->getDataString($data, 'facebook_id'));
