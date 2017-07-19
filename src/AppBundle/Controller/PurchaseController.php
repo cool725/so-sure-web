@@ -479,6 +479,7 @@ class PurchaseController extends BaseController
         $billingDate = $this->adjustDayForBilling($now);
 
         $data = array(
+            'policy' => $policy,
             'phone' => $phone,
             'purchase_form' => $purchaseForm->createView(),
             'is_postback' => 'POST' === $request->getMethod(),
