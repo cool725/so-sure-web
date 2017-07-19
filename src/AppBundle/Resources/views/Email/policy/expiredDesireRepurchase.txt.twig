@@ -1,0 +1,11 @@
+{% extends 'AppBundle:Email:base.txt.twig' %}
+{% block body %}
+Your policy has now ended.
+
+**
+------------------------------------------------------------
+Thank you for trusting so-sure to provide you with amazing cover for loss, left, accidental damage, and breakdown.
+
+Your policy for {{ policy.phone }} ended on {{ policy.end | date('d M Y H:i', 'Europe/London') }}.
+
+{% endblock body %}

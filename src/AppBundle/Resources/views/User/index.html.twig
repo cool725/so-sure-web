@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+ {% extends 'base.html.twig' %}
 
 {# Set vars #}
 {% set white_logo = true %}
@@ -127,11 +127,13 @@
                             {% endif %}
                         </ul>
                     </div>
+                    {% if policy.canInvite %}
                     <div class="user-homepage--section">
                         <h3 class="text-grey-blue">Add Connections</h3>
                         <p>Want to add a connection? We've made it easy for you to do so with your very own unique sign up link. Click 'Add connection' to get started.</p>
                         <p class="text-center"><a href="#" class="btn btn-primary " data-toggle="modal" data-target="#inviteModal"><i class="fa fa-plus" aria-hidden="true"></i> Add connection</a></p>
                     </div>
+                    {% endif %}
                 </div>
                 <div class="col-sm-5 col-sm-pull-7 col-md-4 col-md-pull-8">
                     {% if policy.canInvite %}
