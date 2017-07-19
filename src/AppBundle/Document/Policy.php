@@ -2282,19 +2282,37 @@ abstract class Policy
         $this->updatePotValue();
     }
 
+    public function isRenewalAllowed(\DateTime $date = null)
+    {
+        if (!in_array($this->getStatus(), [
+            self::STATUS_PENDING_RENEWAL,
+        ])) {
+            return false;
+        }
+
+        if ($this->getPendingCancellation() && $date > $this->getPendingCancellation()) {
+            return false;
+        }
+
+        return true;
+    }
+
     public function renew(\DateTime $date = null)
     {
         if ($date == null) {
             $date = new \DateTime();
         }
 
-        if (!in_array($this->getStatus(), [
-            self::STATUS_PENDING_RENEWAL,
-        ])) {
-            throw new \Exception('Unable to renew a policy if status is not pending renewal');
+        if (!$this->isRenewalAllowed($date)) {
+            throw new \Exception(sprintf(
+                'Unable to renew policy %s as status is incorrect or its too late',
+                $this->getId()
+            ));
         }
 
         $this->setStatus(Policy::STATUS_RENEWAL);
+        // clear the max allowed renewal date
+        $this->setPendingCancellation(null);
     }
 
     public function activate(\DateTime $date = null)
