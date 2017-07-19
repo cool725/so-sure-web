@@ -66,10 +66,12 @@ class DaviesService extends S3EmailService
             if (isset($claims[$daviesClaim->policyNumber]) &&
                 $claims[$daviesClaim->policyNumber] &&
                 $daviesClaim->isOpen()) {
-                throw new \Exception(sprintf(
+                $msg = sprintf(
                     'There are multiple open claims against policy %s',
                     $daviesClaim->policyNumber
-                ));
+                );
+                $this->errors[$daviesClaim->claimNumber][] = $msg;
+                $this->logger->warning($msg);
             }
             $claims[$daviesClaim->policyNumber] = $daviesClaim->isOpen();
         }
