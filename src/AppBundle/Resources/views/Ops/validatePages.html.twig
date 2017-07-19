@@ -60,6 +60,9 @@
             No remainder policy available
         {% endif %}
     </li>
+    <li>
+        <a href="{{ url('user_home') }}?_impersonate={{ claimed_policy.user.email }}">User Home Unable to invite (w/Claimed Policy)</a> <b>(auto impersonate {{ claimed_policy.user.email }})</b>
+    </li>
 </ul>
 
 <h4>Other pages</h4>

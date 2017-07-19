@@ -127,6 +127,13 @@ class OpsController extends BaseController
                 $validRemainderPolicy = null;
             }
         }
+        foreach ($validPolicies as $claimedPolicy) {
+            if ($claimedPolicy->hasMonetaryClaimed()) {
+                break;
+            } else {
+                $claimedPolicy = null;
+            }
+        }
         $cancelledPolicy = $policyRepo->findOneBy(['status' => Policy::STATUS_CANCELLED]);
 
         return [
@@ -138,6 +145,7 @@ class OpsController extends BaseController
             'valid_multiple_policy' => $validMultiplePolicy,
             'valid_renewal_policy' => $validRenwalPolicy,
             'valid_remainder_policy' => $validRemainderPolicy,
+            'claimed_policy' => $claimedPolicy,
         ];
     }
 
