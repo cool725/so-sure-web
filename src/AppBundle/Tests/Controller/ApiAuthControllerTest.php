@@ -3046,6 +3046,31 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals(self::$testUser->getEmailCanonical(), $data['email']);
     }
 
+    public function testGetCurrentUserLocked()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testGetCurrentUserLocked', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id'], null);
+
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $url = sprintf('/api/v1/auth/user?_method=GET');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+
+        $user->setLocked(true);
+        static::$dm->flush();
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(403);
+    }
+
     public function testGetCurrentUserPromoAppMarch2017PreFeb()
     {
         $user = self::createUser(
