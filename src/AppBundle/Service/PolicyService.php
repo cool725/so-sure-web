@@ -1307,6 +1307,8 @@ class PolicyService
         $newPolicy->setImei($policy->getImei());
         $newPolicy->setSerialNumber($policy->getSerialNumber());
         $newPolicy->setStatus(Policy::STATUS_PENDING_RENEWAL);
+        // don't allow renewal after the end the current policy
+        $newPolicy->setPendingCancellation($policy->getEnd());
 
         $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
         $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
@@ -1320,8 +1322,12 @@ class PolicyService
         return $newPolicy;
     }
 
-    public function renew(Policy $policy, $numPayments, $usePot)
+    public function renew(Policy $policy, $numPayments, $usePot, \DateTime $date = null)
     {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
         $newPolicy = $policy->getNextPolicy();
         if (!$newPolicy) {
             throw new \Exception(sprintf(
@@ -1330,12 +1336,20 @@ class PolicyService
             ));
         }
 
+        if (!$newPolicy->isRenewalAllowed($date)) {
+            throw new \Exception(sprintf(
+                'Unable to renew policy %s (pending %s) as status is incorrect or its too late',
+                $policy->getId(),
+                $newPolicy->getId()
+            ));
+        }
+
         // TODO: $usePot
         $this->create($newPolicy, $policy->getEnd(), null, $numPayments);
         if ($usePot) {
             $newPolicy->getPremium()->setAnnualDiscount($policy->getPotValue());
         }
-        $newPolicy->renew();
+        $newPolicy->renew($date);
         $this->dm->flush();
 
         return $newPolicy;
