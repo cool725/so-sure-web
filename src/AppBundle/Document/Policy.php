@@ -1266,7 +1266,12 @@ abstract class Policy
             $this->getStart()->format("Y"),
             $initialPolicyNumber + $seq
         ));
-        $this->setStatus(self::STATUS_PENDING);
+
+        // Renewals may have a status of PENDING_RENEWAL
+        if (!$this->getStatus()) {
+            $this->setStatus(self::STATUS_PENDING);
+        }
+
         if (count($this->getSCodes()) == 0) {
             $this->createAddSCode($scodeCount);
         }
@@ -2298,7 +2303,12 @@ abstract class Policy
             $date = new \DateTime();
         }
 
-        if ($date < $this->getStart() || $date > $this->getEnd()) {
+        // Give a bit of leeway in case we have problems with process, but
+        // if the policy is supposed to be renewed and its more than 7 days
+        // then we really do have an issue and probably need to manually sort out
+        $tooLate = clone $this->getStart();
+        $tooLate = $tooLate->add(new \DateInterval('P7D'));
+        if ($date < $this->getStart() || $date > $tooLate) {
             throw new \Exception('Unable to activate a policy if not between policy dates');
         }
 

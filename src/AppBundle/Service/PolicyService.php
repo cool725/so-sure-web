@@ -1212,9 +1212,9 @@ class PolicyService
     /**
      * @param Policy $policy
      */
-    public function activate(Policy $policy)
+    public function activate(Policy $policy, \DateTime $date = null)
     {
-        $policy->activate();
+        $policy->activate($date);
         $this->dm->flush();
 
         // Not necessary to email as already received docs at time of renewal
@@ -1292,8 +1292,16 @@ class PolicyService
         );
     }
 
-    public function createPendingRenewal(Policy $policy)
+    public function createPendingRenewal(Policy $policy, \DateTime $date = null)
     {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        if (!$policy->canCreatePendingRenewal($date)) {
+            throw new \Exception(sprintf('Unable to create a pending renewal for policy %s', $policy->getId()));
+        }
+
         $newPolicy = new SalvaPhonePolicy();
         $newPolicy->setPhone($policy->getPhone());
         $newPolicy->setImei($policy->getImei());
