@@ -16,6 +16,19 @@ use AppBundle\Service\SixpackService;
  */
 class ApiPartialControllerTest extends BaseControllerTest
 {
+    protected static $endpoint1;
+    protected static $endpoint2;
+
+    public static function setUpBeforeClass()
+    {
+        parent::setUpBeforeClass();
+
+        // @codingStandardsIgnoreStart
+        self::$endpoint1 = 'arn:aws:sns:eu-west-1:812402538357:endpoint/GCM/so-sure_android/5e1cbe93-5f08-3e00-ad40-acb1fd3763af';
+        self::$endpoint2 = 'arn:aws:sns:eu-west-1:812402538357:endpoint/GCM/so-sure_android/5b1217b3-1865-35b2-8e52-27a58cf8441a';
+        // @codingStandardsIgnoreEnd
+    }
+
     // ab
 
     /**
@@ -62,14 +75,9 @@ class ApiPartialControllerTest extends BaseControllerTest
      */
     public function testSns()
     {
-        // @codingStandardsIgnoreStart
-        $endpoint1 = 'arn:aws:sns:eu-west-1:812402538357:endpoint/GCM/so-sure_android/344008b8-a266-3d7b-baa4-f1e8cf9fc16e';
-        $endpoint2 = 'arn:aws:sns:eu-west-1:812402538357:endpoint/GCM/so-sure_android/f09de5ae-9a07-36b3-950d-db1dfee0102f';
-        // @codingStandardsIgnoreEnd
-
         $cognitoIdentityId = $this->getUnauthIdentity();
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/partial/sns', array(
-            'endpoint' => $endpoint1,
+            'endpoint' => self::$endpoint1,
             'platform' => 'Android',
             'version' => '0.0.0',
         ));
@@ -77,21 +85,21 @@ class ApiPartialControllerTest extends BaseControllerTest
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(Sns::class);
-        $sns = $repo->findOneBy(['endpoint' => $endpoint1]);
-        $this->assertNotNull($sns);
+        $sns = $repo->findOneBy(['endpoint' => self::$endpoint1]);
+        $this->assertNotNull($sns, 'If failure, time on system may need to be updated');
         $this->assertTrue(strlen($sns->getAll()) > 0);
         $this->assertTrue(strlen($sns->getUnregistered()) > 0);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/partial/sns', array(
-            'endpoint' => $endpoint2,
-            'old_endpoint' => $endpoint1,
+            'endpoint' => self::$endpoint2,
+            'old_endpoint' => self::$endpoint1,
         ));
         $data = $this->verifyResponse(200);
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(Sns::class);
-        $sns1 = $repo->findOneBy(['endpoint' => $endpoint1]);
-        $sns2 = $repo->findOneBy(['endpoint' => $endpoint2]);
+        $sns1 = $repo->findOneBy(['endpoint' => self::$endpoint1]);
+        $sns2 = $repo->findOneBy(['endpoint' => self::$endpoint2]);
         $this->assertNull($sns1);
         $this->assertNotNull($sns2);
         $this->assertTrue(strlen($sns2->getAll()) > 0);
@@ -107,24 +115,19 @@ class ApiPartialControllerTest extends BaseControllerTest
 
     public function testSnsWithUser()
     {
-        // @codingStandardsIgnoreStart
-        $endpoint1 = 'arn:aws:sns:eu-west-1:812402538357:endpoint/GCM/so-sure_android/344008b8-a266-3d7b-baa4-f1e8cf9fc16e';
-        $endpoint2 = 'arn:aws:sns:eu-west-1:812402538357:endpoint/GCM/so-sure_android/f09de5ae-9a07-36b3-950d-db1dfee0102f';
-        // @codingStandardsIgnoreEnd
-
         $userA = self::createUser(
             self::$userManager,
             self::generateEmail('user-sns-a', $this),
             'foo'
         );
-        $userA->setSnsEndpoint($endpoint1);
+        $userA->setSnsEndpoint(self::$endpoint1);
 
         $userB = self::createUser(
             self::$userManager,
             self::generateEmail('user-sns-b', $this),
             'foo'
         );
-        $userB->setSnsEndpoint($endpoint1);
+        $userB->setSnsEndpoint(self::$endpoint1);
 
         $userC = self::createUser(
             self::$userManager,
@@ -137,20 +140,20 @@ class ApiPartialControllerTest extends BaseControllerTest
         
         $cognitoIdentityId = $this->getAuthUser($userC);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/partial/sns', array(
-            'endpoint' => $endpoint1,
+            'endpoint' => self::$endpoint1,
         ));
         $data = $this->verifyResponse(200);
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(Sns::class);
-        $sns = $repo->findOneBy(['endpoint' => $endpoint1]);
+        $sns = $repo->findOneBy(['endpoint' => self::$endpoint1]);
         $this->assertNotNull($sns);
 
         $userRepo = $dm->getRepository(User::class);
         $changedUserA = $userRepo->findOneBy(['email' => $userA->getEmail()]);
         $changedUserB = $userRepo->findOneBy(['email' => $userB->getEmail()]);
         $changedUserC = $userRepo->findOneBy(['email' => $userC->getEmail()]);
-        $this->assertEquals($endpoint1, $changedUserC->getSnsEndpoint());
+        $this->assertEquals(self::$endpoint1, $changedUserC->getSnsEndpoint());
         $this->assertNull($changedUserA->getSnsEndpoint());
         $this->assertNull($changedUserB->getSnsEndpoint());
     }
