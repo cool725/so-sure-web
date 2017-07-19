@@ -2277,6 +2277,81 @@ abstract class Policy
         $this->updatePotValue();
     }
 
+    public function renew(\DateTime $date = null)
+    {
+        if ($date == null) {
+            $date = new \DateTime();
+        }
+
+        if (!in_array($this->getStatus(), [
+            self::STATUS_PENDING_RENEWAL,
+        ])) {
+            throw new \Exception('Unable to renew a policy if status is not pending renewal');
+        }
+
+        $this->setStatus(Policy::STATUS_RENEWAL);
+    }
+
+    public function activate(\DateTime $date = null)
+    {
+        if ($date == null) {
+            $date = new \DateTime();
+        }
+
+        if ($date < $this->getStart() || $date > $this->getEnd()) {
+            throw new \Exception('Unable to activate a policy if not between policy dates');
+        }
+
+        if (!in_array($this->getStatus(), [
+            self::STATUS_RENEWAL,
+        ])) {
+            throw new \Exception('Unable to activate a policy if status is not renewal');
+        }
+
+        $this->setStatus(Policy::STATUS_ACTIVE);
+    }
+
+    /**
+     * Expire the policy itself, however, this should be done via the policy server in order to
+     * send out all the emails, etc
+     *
+     */
+    public function expire(\DateTime $date = null)
+    {
+        if ($date == null) {
+            $date = new \DateTime();
+        }
+
+        if ($date < $this->getEnd()) {
+            throw new \Exception('Unable to expire a policy prior to its end date');
+        }
+
+        if (!in_array($this->getStatus(), [
+            self::STATUS_ACTIVE,
+            self::STATUS_UNPAID,
+        ])) {
+            throw new \Exception('Unable to expire a policy if status is not active or unpaid');
+        }
+
+        $this->setStatus(Policy::STATUS_EXPIRED);
+
+        /* TODO: Determine rules around user locking
+        $user = $this->getUser();
+        if ($this->isCancelledWithUserDeclined()) {
+            $user->setLocked(true);
+        }
+        */
+
+        // TODO: determine how to handle pot
+
+        // Should never happen, but just in case, cancel any scheduled payments
+        foreach ($this->getScheduledPayments() as $scheduledPayment) {
+            if ($scheduledPayment->getStatus() == ScheduledPayment::STATUS_SCHEDULED) {
+                $scheduledPayment->setStatus(ScheduledPayment::STATUS_CANCELLED);
+            }
+        }
+    }
+
     abstract public function getMaxConnections();
     abstract public function getMaxPot();
     abstract public function getConnectionValue();
@@ -2786,6 +2861,30 @@ abstract class Policy
         }
 
         return $this->getNextPolicy()->getStatus() == Policy::STATUS_RENEWAL;
+    }
+
+    /**
+     * Can the user re-purchase this specific policy
+     * This is different than if a user is allowed to purchase an additional policy
+     * although lines get blurred if a policy expires and then user wants to re-purchase
+     */
+    public function canRepurchase()
+    {
+        // partial renewal policy wasn't created - never allow renewal in this case
+        if (!$this->hasNextPolicy()) {
+            return false;
+        }
+
+        if ($this->isRenewed()) {
+            return false;
+        }
+
+        // In case user was disallowed after pending renewal was created
+        if (!$this->getUser()->canRenewPolicy()) {
+            return false;
+        }
+
+        return true;
     }
 
     protected function toApiArray()

@@ -2867,4 +2867,79 @@ class PhonePolicyTest extends WebTestCase
         $renewalPolicy->setStatus(Policy::STATUS_RENEWAL);
         $this->assertTrue($policy->isRenewed());
     }
+
+    public function testCanRepurchase()
+    {
+        $policy = new SalvaPhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $user = new User();
+        $user->setEmail(static::generateEmail('testCanRepurchase', $this));
+        self::addAddress($user);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
+        $policy->setStart(new \DateTime("2016-01-01"));
+        $policy->setEnd(new \DateTime("2016-12-31 23:59:59"));
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+
+        $this->assertFalse($policy->canRepurchase());
+
+        $renewalPolicy = new SalvaPhonePolicy();
+        $renewalPolicy->setPhone(static::$phone);
+
+        $renewalPolicy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $renewalPolicy->create(rand(1, 999999), null, null, rand(1, 9999));
+        $renewalPolicy->setStart(new \DateTime("2017-01-01"));
+        $renewalPolicy->setEnd(new \DateTime("2017-12-31 23:59:59"));
+        $renewalPolicy->setStatus(Policy::STATUS_PENDING_RENEWAL);
+
+        $policy->link($renewalPolicy);
+
+        $this->assertTrue($policy->hasNextPolicy());
+        $this->assertFalse($policy->isRenewed());
+        $this->assertTrue($policy->canRepurchase());
+
+        $renewalPolicy->setStatus(Policy::STATUS_RENEWAL);
+
+        $this->assertFalse($policy->canRepurchase());
+
+        // TODO add tests on user canRenewPolicy
+    }
+
+    public function testActivate()
+    {
+        $policy = new SalvaPhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $user = new User();
+        $user->setEmail(static::generateEmail('testIsActivate', $this));
+        self::addAddress($user);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
+        $policy->setStart(new \DateTime("2016-01-01"));
+        $policy->setEnd(new \DateTime("2016-12-31 23:59:59"));
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+
+        $this->assertFalse($policy->isRenewed());
+
+        $renewalPolicy = new SalvaPhonePolicy();
+        $renewalPolicy->setPhone(static::$phone);
+
+        $renewalPolicy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $renewalPolicy->create(rand(1, 999999), null, null, rand(1, 9999));
+        $renewalPolicy->setStart(new \DateTime("2017-01-01"));
+        $renewalPolicy->setEnd(new \DateTime("2017-12-31 23:59:59"));
+        $renewalPolicy->setStatus(Policy::STATUS_PENDING_RENEWAL);
+
+        $policy->link($renewalPolicy);
+
+        $this->assertFalse($policy->isRenewed());
+
+        $renewalPolicy->renew();
+
+        $this->assertTrue($policy->isRenewed());
+
+        $renewalPolicy->activate();
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicy->getStatus());
+    }
 }
