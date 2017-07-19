@@ -100,7 +100,7 @@ class OpsController extends BaseController
         $validPolicies = $policyRepo->findBy(['status' => Policy::STATUS_ACTIVE]);
         $position = rand(1, count($validPolicies));
         foreach ($validPolicies as $validPolicy) {
-            if ($position <= 0) {
+            if ($position <= 0 && !$validPolicy->hasMonetaryClaimed()) {
                 break;
             }
             $position--;
