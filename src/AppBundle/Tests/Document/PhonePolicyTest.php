@@ -2854,8 +2854,9 @@ class PhonePolicyTest extends WebTestCase
         $renewalPolicy = $this->getRenewalPolicy($policy);
 
         $this->assertFalse($policy->isRenewed());
+        $this->assertTrue($renewalPolicy->isRenewalAllowed(new \DateTime('2016-12-15')));
 
-        $renewalPolicy->renew();
+        $renewalPolicy->renew(new \DateTime('2016-12-15'));
 
         $this->assertTrue($policy->isRenewed());
 
@@ -2866,6 +2867,22 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_EXPIRED, $policy->getStatus());
     }
 
+    public function testRenewPendingCancellation()
+    {
+        $policy = $this->getPolicy(static::generateEmail('testRenewPendingCancellation', $this));
+
+        $this->assertFalse($policy->isRenewed());
+
+        $renewalPolicy = $this->getRenewalPolicy($policy, false);
+        $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $renewalPolicy->getPendingCancellation());
+
+        $this->assertTrue($renewalPolicy->isRenewalAllowed(new \DateTime('2016-12-31 23:59')));
+        $this->assertFalse($renewalPolicy->isRenewalAllowed(new \DateTime('2017-01-01')));
+
+        $renewalPolicy->renew(new \DateTime('2016-12-15'));
+        $this->assertNull($renewalPolicy->getPendingCancellation());
+    }
+
     /**
      * @expectedException \Exception
      */
@@ -2874,6 +2891,7 @@ class PhonePolicyTest extends WebTestCase
         $policy = $this->getPolicy(static::generateEmail('testRenewInvalidStatus', $this));
         $renewalPolicy = $this->getRenewalPolicy($policy);
         $renewalPolicy->setStatus(Policy::STATUS_ACTIVE);
+        $this->assertFalse($renewalPolicy->isRenewalAllowed(new \DateTime('2016-12-15')));
         $renewalPolicy->renew();
     }
 
@@ -2956,15 +2974,19 @@ class PhonePolicyTest extends WebTestCase
         return $policy;
     }
 
-    private function getRenewalPolicy($policy)
+    private function getRenewalPolicy($policy, $create = true)
     {
         $renewalPolicy = new SalvaPhonePolicy();
         $renewalPolicy->setPhone(static::$phone);
 
         $renewalPolicy->init($policy->getUser(), static::getLatestPolicyTerms(self::$dm));
-        $renewalPolicy->create(rand(1, 999999), null, null, rand(1, 9999));
-        $renewalPolicy->setStart(new \DateTime("2017-01-01"));
-        $renewalPolicy->setEnd(new \DateTime("2017-12-31 23:59:59"));
+        if ($create) {
+            $renewalPolicy->create(rand(1, 999999), null, null, rand(1, 9999));
+            $renewalPolicy->setStart(new \DateTime("2017-01-01"));
+            $renewalPolicy->setEnd(new \DateTime("2017-12-31 23:59:59"));
+        } else {
+            $renewalPolicy->setPendingCancellation(new \DateTime("2016-12-31 23:59:59"));
+        }
         $renewalPolicy->setStatus(Policy::STATUS_PENDING_RENEWAL);
 
         $policy->link($renewalPolicy);

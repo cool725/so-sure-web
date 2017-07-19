@@ -1349,7 +1349,7 @@ class PolicyService
         if ($usePot) {
             $newPolicy->getPremium()->setAnnualDiscount($policy->getPotValue());
         }
-        $newPolicy->renew();
+        $newPolicy->renew($date);
         $this->dm->flush();
 
         return $newPolicy;
