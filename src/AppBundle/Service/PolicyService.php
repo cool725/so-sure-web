@@ -1152,6 +1152,7 @@ class PolicyService
             if (!$dryRun) {
                 try {
                     // TODO: Send email?
+                    // TODO: Set user locked if user should be prevented from policy purchase
                     $policy->setStatus(Policy::STATUS_EXPIRED);
                     $this->dm->flush();
                 } catch (\Exception $e) {

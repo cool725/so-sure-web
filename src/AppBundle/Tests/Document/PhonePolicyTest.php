@@ -1078,6 +1078,22 @@ class PhonePolicyTest extends WebTestCase
         }
     }
 
+    public function testCancelPolicyUserDeclined()
+    {
+        $policyA = static::createUserPolicy(true);
+        static::$dm->persist($policyA);
+        static::$dm->persist($policyA->getUser());
+        static::$dm->flush();
+
+        $policyA->cancel(SalvaPhonePolicy::CANCELLED_ACTUAL_FRAUD);
+
+        $this->assertEquals(SalvaPhonePolicy::STATUS_CANCELLED, $policyA->getStatus());
+        $this->assertEquals(SalvaPhonePolicy::CANCELLED_ACTUAL_FRAUD, $policyA->getCancelledReason());
+        $now = new \DateTime();
+        $this->assertEquals($now->format('y-M-d'), $policyA->getEnd()->format('y-M-d'));
+        $this->assertTrue($policyA->getUser()->isLocked());
+    }
+
     public function testCancelPolicyUpgrade()
     {
         $policyA = static::createUserPolicy(true);
