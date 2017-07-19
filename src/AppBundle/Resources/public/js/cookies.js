@@ -1,8 +1,7 @@
 window.addEventListener("load", function(){
     window.cookieconsent.initialise({
-        theme: "Corporate",
+        theme: "Neon",
         position: "top",
-        static: "true",
         palette: {
             popup: {
                 background: "#202532",
