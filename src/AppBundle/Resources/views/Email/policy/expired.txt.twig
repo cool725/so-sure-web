@@ -1,0 +1,11 @@
+{% extends 'AppBundle:Email:base.txt.twig' %}
+{% block body %}
+Your policy has now ended.
+
+**
+------------------------------------------------------------
+Your policy for {{ policy.phone }} ended on {{ policy.end | date('d M Y H:i', 'Europe/London') }}.
+
+Thank you for using so-sure.
+
+{% endblock body %}
