@@ -1000,6 +1000,36 @@ class PolicyService
         }
     }
 
+    /**
+     * @param Policy $policy
+     */
+    public function expiredPolicyEmail(Policy $policy)
+    {
+        if ($policy->isRenewed()) {
+            // No need to send an email as the renewal email should cover both expiry and renewal
+            \AppBundle\Classes\NoOp::ignore([]);
+        } elseif ($policy->canRepurchase() && $policy->setUser()->areRenewalsDesired()) {
+            $baseTemplate = sprintf('AppBundle:Email:policy/expiredDesireRepurchase');
+            $subject = sprintf('Your so-sure policy %s is now finished', $policy->getPolicyNumber());
+        } else {
+            $baseTemplate = sprintf('AppBundle:Email:policy/expired');
+            $subject = sprintf('Your so-sure policy %s is now finished', $policy->getPolicyNumber());
+        }
+
+        $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
+        $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
+
+        $this->mailer->sendTemplate(
+            $subject,
+            $policy->getUser()->getEmail(),
+            $htmlTemplate,
+            ['policy' => $policy],
+            $textTemplate,
+            ['policy' => $policy],
+            null
+        );
+    }
+
     public function getBreakdownData()
     {
         $repo = $this->dm->getRepository(PhonePolicy::class);
@@ -1126,8 +1156,7 @@ class PolicyService
             $renewals[$policy->getId()] = $policy->getPolicyNumber();
             if (!$dryRun) {
                 try {
-                    $policy->setStatus(Policy::STATUS_ACTIVE);
-                    $this->dm->flush();
+                    $this->activate($policy);
                 } catch (\Exception $e) {
                     $msg = sprintf(
                         'Error activating Policy %s / %s',
@@ -1151,10 +1180,7 @@ class PolicyService
             $expired[$policy->getId()] = $policy->getPolicyNumber();
             if (!$dryRun) {
                 try {
-                    // TODO: Send email?
-                    // TODO: Set user locked if user should be prevented from policy purchase
-                    $policy->setStatus(Policy::STATUS_EXPIRED);
-                    $this->dm->flush();
+                    $this->expire($policy);
                 } catch (\Exception $e) {
                     $msg = sprintf(
                         'Error Expiring Policy %s / %s',
@@ -1167,6 +1193,31 @@ class PolicyService
         }
 
         return $expired;
+    }
+
+    /**
+     * @param Policy    $policy
+     * @param \DateTime $date
+     */
+    public function expire(Policy $policy, \DateTime $date = null)
+    {
+        $policy->expire($date);
+        $this->dm->flush();
+
+        $this->expiredPolicyEmail($policy);
+
+        $this->dispatchEvent(PolicyEvent::EVENT_EXPIRED, new PolicyEvent($policy));
+    }
+
+    /**
+     * @param Policy $policy
+     */
+    public function activate(Policy $policy, \DateTime $date = null)
+    {
+        $policy->activate($date);
+        $this->dm->flush();
+
+        // Not necessary to email as already received docs at time of renewal
     }
 
     public function createPendingRenewalPolicies($prefix, $dryRun = false)
@@ -1241,8 +1292,16 @@ class PolicyService
         );
     }
 
-    public function createPendingRenewal(Policy $policy)
+    public function createPendingRenewal(Policy $policy, \DateTime $date = null)
     {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        if (!$policy->canCreatePendingRenewal($date)) {
+            throw new \Exception(sprintf('Unable to create a pending renewal for policy %s', $policy->getId()));
+        }
+
         $newPolicy = new SalvaPhonePolicy();
         $newPolicy->setPhone($policy->getPhone());
         $newPolicy->setImei($policy->getImei());
@@ -1276,7 +1335,7 @@ class PolicyService
         if ($usePot) {
             $newPolicy->getPremium()->setAnnualDiscount($policy->getPotValue());
         }
-        $newPolicy->setStatus(Policy::STATUS_RENEWAL);
+        $newPolicy->renew();
         $this->dm->flush();
 
         return $newPolicy;
