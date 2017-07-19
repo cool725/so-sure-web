@@ -153,7 +153,7 @@
                            >Dial *#06# to show your IMEI number.</a>
                     </span>
                 </div>
-
+                {% if not policy is defined or not policy or policy.imei|length == 0 %}
                 <div class="form-group">
                     <div class="text-break text-grey">
                         <div class="line"></div>OR<div class="line"></div>
@@ -167,6 +167,7 @@
                        data-intercom-msg="Hi, I want to take a screenshot of my IMEI number to send to you. Can you let me know what to do? 🙂"
                     >Send us a screenshot of your IMEI</a><br>
                 </div>
+                {% endif %}
                 {% if purchase_form.serialNumber is defined %}
                     <div class="form-group-break form-group {% if form_errors(purchase_form.serialNumber) %}has-error{% endif %}">
                         {{ form_label(purchase_form.serialNumber, 'Serial Number:', { 'label_attr': {'class': 'sr-only'} }) }}
