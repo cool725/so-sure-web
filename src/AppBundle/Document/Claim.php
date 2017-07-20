@@ -405,6 +405,17 @@ class Claim
         if (!$status) {
             throw new \Exception('Status must be defined');
         }
+        
+        if (!in_array($status, [
+            self::STATUS_APPROVED,
+            self::STATUS_DECLINED,
+            self::STATUS_INREVIEW,
+            self::STATUS_PENDING_CLOSED,
+            self::STATUS_SETTLED,
+            self::STATUS_WITHDRAWN,
+        ])) {
+            throw new \Exception(sprintf('Status must be a valid status, not %s', $status));
+        }
 
         // TODO: Was STATUS_DECLINED as well, but claim 77557421061 is declined - mistake in data?
         if (in_array($this->getType(), [self::TYPE_WARRANTY]) &&
@@ -485,11 +496,11 @@ class Claim
 
     public function setNumber($number, $allowChange = false)
     {
-        if ($this->number && $this->number != $number && !$allowChange) {
+        if ($this->number && $this->number != (string) $number && !$allowChange) {
             throw new \Exception('Unable to change claim number');
         }
 
-        $this->number = $number;
+        $this->number = (string) $number;
     }
 
     public function getSuspectedFraud()

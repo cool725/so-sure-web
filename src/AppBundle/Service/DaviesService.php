@@ -77,6 +77,12 @@ class DaviesService extends S3EmailService
         }
         foreach ($daviesClaims as $daviesClaim) {
             try {
+                // In case any of the db data failed validation, clear the changeset
+                // This could be done in the exception but very difficult to test, so
+                // might as well, just do it for each loop
+                if ($claim = $this->getClaim($daviesClaim)) {
+                    $this->dm->refresh($claim);
+                }
                 $this->saveClaim($daviesClaim);
             } catch (\Exception $e) {
                 //$success = false;
@@ -88,12 +94,10 @@ class DaviesService extends S3EmailService
         return $success;
     }
 
-    public function saveClaim($daviesClaim, $claim = null)
+    private function getClaim($daviesClaim)
     {
-        if (!$claim) {
-            $repo = $this->dm->getRepository(Claim::class);
-            $claim = $repo->findOneBy(['number' => $daviesClaim->claimNumber]);
-        }
+        $repo = $this->dm->getRepository(Claim::class);
+        $claim = $repo->findOneBy(['number' => $daviesClaim->claimNumber]);
         // Davies swapped to a new claim numbering format
         // and appear to be unable to enter the correct data
         // sometimes they are leaving off the last 2 digits when entering the claim
@@ -124,6 +128,12 @@ class DaviesService extends S3EmailService
             }
         }
 
+        return $claim;
+    }
+
+    public function saveClaim($daviesClaim)
+    {
+        $claim = $this->getClaim($daviesClaim);
         if (!$claim) {
             throw new \Exception(sprintf('Unable to locate claim %s in db', $daviesClaim->claimNumber));
         }
