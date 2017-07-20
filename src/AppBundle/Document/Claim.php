@@ -496,11 +496,11 @@ class Claim
 
     public function setNumber($number, $allowChange = false)
     {
-        if ($this->number && $this->number != $number && !$allowChange) {
+        if ($this->number && $this->number != (string) $number && !$allowChange) {
             throw new \Exception('Unable to change claim number');
         }
 
-        $this->number = $number;
+        $this->number = (string) $number;
     }
 
     public function getSuspectedFraud()

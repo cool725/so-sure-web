@@ -173,13 +173,14 @@ class DaviesServiceTest extends WebTestCase
         $policy1 = static::createUserPolicy(true);
         $policy1->getUser()->setEmail(static::generateEmail('testSaveClaimsSaveException-1', $this));
         $claim1 = new Claim();
-        $policy1->addClaim($claim1);        
+        $policy1->addClaim($claim1);
         $claim1->setNumber('1');
+        $claim1->setType(Claim::TYPE_THEFT);
 
         $policy2 = static::createUserPolicy(true);
         $policy2->getUser()->setEmail(static::generateEmail('testSaveClaimsSaveException-2', $this));
         $claim2 = new Claim();
-        $policy2->addClaim($claim2);        
+        $policy2->addClaim($claim2);
         $claim2->setNumber('2');
 
         static::$dm->persist($policy1->getUser());
@@ -216,20 +217,21 @@ class DaviesServiceTest extends WebTestCase
         self::$daviesService->clearErrors();
 
         $this->assertEquals(0, count(self::$daviesService->getErrors()));
-        $claim1->setStatus('foo');
-        self::$daviesService->saveClaims(1, [$daviesOpen1, $daviesOpen2]);
 
-        print_r(self::$daviesService->getErrors());
+        self::$daviesService->saveClaims(2, [$daviesOpen1, $daviesOpen2]);
+
+        // print_r(self::$daviesService->getErrors());
 
         $this->assertEquals(1, count(self::$daviesService->getErrors()));
 
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(Claim::class);
+
         $updatedClaim1 = $repo->find($claim1Id);
         $updatedClaim2 = $repo->find($claim2Id);
 
-        //$this->assertNull($updatedClaim1->getReserved());
-        //$this->assertEquals(2, $updatedClaim2->getReserved());
+        $this->assertNull($updatedClaim1->getReservedValue());
+        $this->assertEquals(2, $updatedClaim2->getReservedValue());
     }
 
     /**
@@ -627,14 +629,19 @@ class DaviesServiceTest extends WebTestCase
     public function testSaveClaimsReplacementDate()
     {
         $policy = static::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('testSaveClaimsReplacementDate', $this));
         $claim = new Claim();
-        $claim->setNumber(1);
+        $claim->setNumber(rand(1, 999999));
         $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_APPROVED);
         $policy->addClaim($claim);
+        static::$dm->persist($policy->getUser());
+        static::$dm->persist($policy);
+        static::$dm->persist($claim);
+        static::$dm->flush();
 
         $daviesClaim = new DaviesClaim();
-        $daviesClaim->claimNumber = 1;
+        $daviesClaim->claimNumber = (string) $claim->getNumber();
         $daviesClaim->incurred = 0;
         $daviesClaim->reserved = 0;
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
@@ -642,21 +649,26 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->status = DaviesClaim::STATUS_OPEN;
         $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
         $daviesClaim->replacementReceivedDate = new \DateTime('2016-01-02');
-        static::$daviesService->saveClaim($daviesClaim, $claim);
+        static::$daviesService->saveClaim($daviesClaim);
         $this->assertEquals(new \DateTime('2016-01-01'), $claim->getApprovedDate());
     }
 
     public function testSaveClaimsNegativePhoneValue()
     {
         $policy = static::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('testSaveClaimsNegativePhoneValue', $this));
         $claim = new Claim();
-        $claim->setNumber(1);
+        $claim->setNumber(rand(1, 999999));
         $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_INREVIEW);
         $policy->addClaim($claim);
+        static::$dm->persist($policy->getUser());
+        static::$dm->persist($policy);
+        static::$dm->persist($claim);
+        static::$dm->flush();
 
         $daviesClaim = new DaviesClaim();
-        $daviesClaim->claimNumber = 1;
+        $daviesClaim->claimNumber = $claim->getNumber();
         $daviesClaim->phoneReplacementCost = -70;
         $daviesClaim->incurred = -70;
         $daviesClaim->reserved = 0;
@@ -664,7 +676,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->insuredName = 'Mr foo bar';
         $daviesClaim->status = DaviesClaim::STATUS_OPEN;
         $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
-        static::$daviesService->saveClaim($daviesClaim, $claim);
+        static::$daviesService->saveClaim($daviesClaim);
         $this->assertEquals(Claim::STATUS_APPROVED, $claim->getStatus());
         $now = new \DateTime();
         $yesterday = $this->subBusinessDays($now, 1);
@@ -673,22 +685,27 @@ class DaviesServiceTest extends WebTestCase
 
     public function testSaveClaimsYesterday()
     {
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
-        $claim->setNumber(1);
+        $claim->setNumber(rand(1, 999999));
         $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_APPROVED);
         $policy->addClaim($claim);
+        $dm->persist($policy->getUser());
+        $dm->persist($policy);
+        $dm->persist($claim);
+        $dm->flush();
 
         $daviesClaim = new DaviesClaim();
-        $daviesClaim->claimNumber = 1;
+        $daviesClaim->claimNumber = $claim->getNumber();
         $daviesClaim->incurred = 0;
         $daviesClaim->reserved = 0;
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr foo bar';
         $daviesClaim->status = DaviesClaim::STATUS_OPEN;
         $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
-        static::$daviesService->saveClaim($daviesClaim, $claim);
+        static::$daviesService->saveClaim($daviesClaim);
         $now = new \DateTime();
         $yesterday = $this->subBusinessDays($now, 1);
         $this->assertEquals($yesterday, $claim->getApprovedDate());
