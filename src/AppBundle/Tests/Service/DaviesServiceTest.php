@@ -153,16 +153,83 @@ class DaviesServiceTest extends WebTestCase
         self::$daviesService->saveClaims(1, [$davies, $daviesOpen]);
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testSaveClaimsOpen()
     {
         $daviesOpen = new DaviesClaim();
         $daviesOpen->policyNumber = '1';
         $daviesOpen->status = 'Open';
 
+        self::$daviesService->clearErrors();
+
+        $this->assertEquals(0, count(self::$daviesService->getErrors()));
         self::$daviesService->saveClaims(1, [$daviesOpen, $daviesOpen]);
+        $this->assertEquals(1, count(self::$daviesService->getErrors()));
+
+        $this->insureErrorExists('/multiple open claims against policy/');
+    }
+
+    public function testSaveClaimsSaveException()
+    {
+        $policy1 = static::createUserPolicy(true);
+        $policy1->getUser()->setEmail(static::generateEmail('testSaveClaimsSaveException-1', $this));
+        $claim1 = new Claim();
+        $policy1->addClaim($claim1);        
+        $claim1->setNumber('1');
+
+        $policy2 = static::createUserPolicy(true);
+        $policy2->getUser()->setEmail(static::generateEmail('testSaveClaimsSaveException-2', $this));
+        $claim2 = new Claim();
+        $policy2->addClaim($claim2);        
+        $claim2->setNumber('2');
+
+        static::$dm->persist($policy1->getUser());
+        static::$dm->persist($policy2->getUser());
+        static::$dm->persist($policy1);
+        static::$dm->persist($policy2);
+        static::$dm->persist($claim1);
+        static::$dm->persist($claim2);
+        static::$dm->flush();
+        
+        $claim1Id = $claim1->getId();
+        $claim2Id = $claim2->getId();
+
+        $daviesOpen1 = new DaviesClaim();
+        $daviesOpen1->claimNumber = '1';
+        $daviesOpen1->policyNumber = $policy1->getPolicyNumber();
+        $daviesOpen1->status = 'Open';
+        $daviesOpen1->excess = 0;
+        $daviesOpen1->reserved = 1;
+        $daviesOpen1->riskPostCode = 'BX1 1LT';
+        $daviesOpen1->insuredName = 'Foo Bar';
+        $daviesOpen1->type = DaviesClaim::TYPE_LOSS;
+
+        $daviesOpen2 = new DaviesClaim();
+        $daviesOpen2->claimNumber = '2';
+        $daviesOpen2->policyNumber = $policy2->getPolicyNumber();
+        $daviesOpen2->status = 'Open';
+        $daviesOpen2->excess = 0;
+        $daviesOpen2->reserved = 2;
+        $daviesOpen2->riskPostCode = 'BX1 1LT';
+        $daviesOpen2->insuredName = 'Foo Bar';
+        $daviesOpen2->type = DaviesClaim::TYPE_LOSS;
+
+        self::$daviesService->clearErrors();
+
+        $this->assertEquals(0, count(self::$daviesService->getErrors()));
+        $claim1->setStatus('foo');
+        self::$daviesService->saveClaims(1, [$daviesOpen1, $daviesOpen2]);
+
+        print_r(self::$daviesService->getErrors());
+
+        $this->assertEquals(1, count(self::$daviesService->getErrors()));
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Claim::class);
+        $updatedClaim1 = $repo->find($claim1Id);
+        $updatedClaim2 = $repo->find($claim2Id);
+
+        //$this->assertNull($updatedClaim1->getReserved());
+        //$this->assertEquals(2, $updatedClaim2->getReserved());
     }
 
     /**
@@ -305,14 +372,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->status = DaviesClaim::STATUS_OPEN;
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $foundMatch = false;
-        foreach (self::$daviesService->getErrors() as $error) {
-            $matches = preg_grep('/does not match expected postcode/', $error);
-            if (count($matches) > 0) {
-                $foundMatch = true;
-            }
-        }
-        $this->assertTrue($foundMatch);
+        $this->insureErrorExists('/does not match expected postcode/');
     }
 
     public function testValidateClaimDetailsInvalidPostcodeClosedRecent()
@@ -332,14 +392,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->dateClosed = $yesterday;
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $foundMatch = false;
-        foreach (self::$daviesService->getErrors() as $error) {
-            $matches = preg_grep('/does not match expected postcode/', $error);
-            if (count($matches) > 0) {
-                $foundMatch = true;
-            }
-        }
-        $this->assertTrue($foundMatch);
+        $this->insureErrorExists('/does not match expected postcode/');
     }
 
     public function testValidateClaimDetailsInvalidPostcodeClosedOld()
@@ -359,14 +412,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->dateClosed = $fiveDaysAgo;
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $foundMatch = false;
-        foreach (self::$daviesService->getErrors() as $error) {
-            $matches = preg_grep('/does not match expected postcode/', $error);
-            if (count($matches) > 0) {
-                $foundMatch = true;
-            }
-        }
-        $this->assertFalse($foundMatch);
+        $this->insureErrorDoesNotExist('/does not match expected postcode/');
     }
 
     public function testValidateClaimDetailsMissingReserved()
@@ -385,14 +431,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->status = DaviesClaim::STATUS_OPEN;
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $foundMatch = false;
-        foreach (self::$daviesService->getErrors() as $error) {
-            $matches = preg_grep('/does not have a reserved value/', $error);
-            if (count($matches) > 0) {
-                $foundMatch = true;
-            }
-        }
-        $this->assertTrue($foundMatch);
+        $this->insureErrorExists('/does not have a reserved value/');
     }
 
     public function testValidateClaimDetailsIncorrectExcess()
@@ -412,14 +451,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->insuredName = 'Mr foo bar';
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $foundMatch = false;
-        foreach (self::$daviesService->getErrors() as $error) {
-            $matches = preg_grep('/does not have the correct excess value/', $error);
-            if (count($matches) > 0) {
-                $foundMatch = true;
-            }
-        }
-        $this->assertTrue($foundMatch);
+        $this->insureErrorExists('/does not have the correct excess value/');
     }
 
     public function testValidateClaimDetailsClosedWithReserve()
@@ -437,14 +469,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->insuredName = 'Mr foo bar';
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $foundMatch = false;
-        foreach (self::$daviesService->getErrors() as $error) {
-            $matches = preg_grep('/still has a reserve fee/', $error);
-            if (count($matches) > 0) {
-                $foundMatch = true;
-            }
-        }
-        $this->assertTrue($foundMatch);
+        $this->insureErrorExists('/still has a reserve fee/');
     }
 
     public function testValidateClaimDetailsReservedPresent()
@@ -462,14 +487,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->insuredName = 'Mr foo bar';
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $foundMatch = false;
-        foreach (self::$daviesService->getErrors() as $error) {
-            $matches = preg_grep('/does not have a reserved value/', $error);
-            if (count($matches) > 0) {
-                $foundMatch = true;
-            }
-        }
-        $this->assertFalse($foundMatch);
+        $this->insureErrorDoesNotExist('/does not have a reserved value/');
     }
 
     public function testValidateClaimDetailsIncurredPresent()
@@ -487,14 +505,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->insuredName = 'Mr foo bar';
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $foundMatch = false;
-        foreach (self::$daviesService->getErrors() as $error) {
-            $matches = preg_grep('/does not have a reserved value/', $error);
-            if (count($matches) > 0) {
-                $foundMatch = true;
-            }
-        }
-        $this->assertFalse($foundMatch);
+        $this->insureErrorDoesNotExist('/does not have a reserved value/');
     }
 
     public function testValidateClaimDetailsIncurredCorrect()
@@ -519,14 +530,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->insuredName = 'Mr foo bar';
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $foundMatch = false;
-        foreach (self::$daviesService->getErrors() as $error) {
-            $matches = preg_grep('/does not have the correct incurred value/', $error);
-            if (count($matches) > 0) {
-                $foundMatch = true;
-            }
-        }
-        $this->assertFalse($foundMatch);
+        $this->insureErrorDoesNotExist('/does not have the correct incurred value/');
     }
 
     public function testValidateClaimDetailsIncurredIncorrect()
@@ -551,14 +555,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->insuredName = 'Mr foo bar';
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $foundMatch = false;
-        foreach (self::$daviesService->getErrors() as $error) {
-            $matches = preg_grep('/does not have the correct incurred value/', $error);
-            if (count($matches) > 0) {
-                $foundMatch = true;
-            }
-        }
-        $this->assertTrue($foundMatch);
+        $this->insureErrorExists('/does not have the correct incurred value/');
     }
 
     public function testValidateClaimDetailsReciperoFee()
@@ -578,25 +575,11 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->insuredName = 'Mr foo bar';
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $foundMatch = false;
-        foreach (self::$daviesService->getErrors() as $error) {
-            $matches = preg_grep('/does not have the correct recipero fee/', $error);
-            if (count($matches) > 0) {
-                $foundMatch = true;
-            }
-        }
-        $this->assertFalse($foundMatch);
+        $this->insureErrorDoesNotExist('/does not have the correct recipero fee/');
 
         $daviesClaim->reciperoFee = 1.26;
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $foundMatch = false;
-        foreach (self::$daviesService->getErrors() as $error) {
-            $matches = preg_grep('/does not have the correct recipero fee/', $error);
-            if (count($matches) > 0) {
-                $foundMatch = true;
-            }
-        }
-        $this->assertTrue($foundMatch);
+        $this->insureErrorExists('/does not have the correct recipero fee/');
     }
 
     public function testValidateClaimDetailsReceivedDate()
@@ -623,14 +606,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->replacementReceivedDate = new \DateTime('2016-01-01');
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $foundMatch = false;
-        foreach (self::$daviesService->getErrors() as $error) {
-            $matches = preg_grep('/delayed replacement date/', $error);
-            if (count($matches) > 0) {
-                $foundMatch = true;
-            }
-        }
-        $this->assertTrue($foundMatch);
+        $this->insureErrorExists('/delayed replacement date/');
     }
 
     public function testPostValidateClaimDetailsReceivedDate()
@@ -645,14 +621,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->claimNumber = 1;
 
         self::$daviesService->postValidateClaimDetails($claim, $daviesClaim);
-        $foundMatch = false;
-        foreach (self::$daviesService->getErrors() as $error) {
-            $matches = preg_grep('/has an approved date/', $error);
-            if (count($matches) > 0) {
-                $foundMatch = true;
-            }
-        }
-        $this->assertTrue($foundMatch);
+        $this->insureErrorExists('/has an approved date/');
     }
 
     public function testSaveClaimsReplacementDate()
@@ -723,5 +692,50 @@ class DaviesServiceTest extends WebTestCase
         $now = new \DateTime();
         $yesterday = $this->subBusinessDays($now, 1);
         $this->assertEquals($yesterday, $claim->getApprovedDate());
+    }
+
+    private function insureErrorExists($errorRegEx)
+    {
+        $this->insureErrorExistsOrNot($errorRegEx, true);
+    }
+
+    private function insureErrorDoesNotExist($errorRegEx)
+    {
+        $this->insureErrorExistsOrNot($errorRegEx, false);
+    }
+
+    private function insureErrorExistsOrNot($errorRegEx, $exists)
+    {
+        $foundMatch = false;
+        foreach (self::$daviesService->getErrors() as $error) {
+            $matches = preg_grep($errorRegEx, $error);
+            if (count($matches) > 0) {
+                $foundMatch = true;
+            }
+        }
+        if ($exists) {
+            $this->assertTrue($foundMatch);
+        } else {
+            $this->assertFalse($foundMatch);
+        }
+    }
+
+    private function generateUserPolicyClaim($email, $policyNumber)
+    {
+        $address = new Address();
+        $address->setType(Address::TYPE_BILLING);
+        $address->setPostCode('AAA');
+        $user = new User();
+        $user->setBillingAddress($address);
+        $user->setFirstName('foo');
+        $user->setLastName('bar');
+        $user->setEmail($email);
+        $policy = new PhonePolicy();
+        $user->addPolicy($policy);
+        $claim = new Claim();
+        $policy->addClaim($claim);
+        $policy->setPolicyNumber($policyNumber);
+        
+        return $claim;
     }
 }
