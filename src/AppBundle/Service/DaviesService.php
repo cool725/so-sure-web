@@ -77,17 +77,15 @@ class DaviesService extends S3EmailService
         }
         foreach ($daviesClaims as $daviesClaim) {
             try {
-                // In case any of the db data failed validation, clear the changeset
-                // This could be done in the exception but very difficult to test, so
-                // might as well, just do it for each loop
-                if ($claim = $this->getClaim($daviesClaim)) {
-                    $this->dm->refresh($claim);
-                }
                 $this->saveClaim($daviesClaim);
             } catch (\Exception $e) {
                 //$success = false;
                 $this->errors[$daviesClaim->claimNumber][] = $e->getMessage();
                 $this->logger->error(sprintf('Error processing file %s', $key), ['exception' => $e]);
+                // In case any of the db data failed validation, clear the changeset
+                if ($claim = $this->getClaim($daviesClaim)) {
+                    $this->dm->refresh($claim);
+                }
             }
         }
 
