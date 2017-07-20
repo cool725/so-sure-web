@@ -1,0 +1,10 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /tmp/codedeploy
+hooks:
+  AfterInstall:
+    - location: deploy-prod.sh
+      timeout: 600
+      runas: root
