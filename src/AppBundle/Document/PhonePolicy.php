@@ -21,6 +21,11 @@ class PhonePolicy extends Policy
     const NETWORK_CLAIM_VALUE = 2;
     const PROMO_LAUNCH_VALUE = 5;
 
+    const PICSURE_STATUS_APPROVED = 'approved';
+    const PICSURE_STATUS_REJECTED = 'rejected';
+    const PICSURE_STATUS_MANUAL = 'manual';
+    const PICSURE_STATUS_INVALID = 'invalid';
+
     use ArrayToApiArrayTrait;
 
     /**
@@ -85,6 +90,13 @@ class PhonePolicy extends Policy
      * @Gedmo\Versioned
      */
     protected $name;
+
+    /**
+     * @Assert\Choice({"approved", "invalid", "rejected", "manual"}, strict=true)
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $picSureStatus;
 
     public function getPhone()
     {
@@ -442,8 +454,26 @@ class PhonePolicy extends Policy
         return 'Mob';
     }
 
+    public function getPicSureStatus()
+    {
+        return $this->picSureStatus;
+    }
+
+    public function setPicSureStatus($picSureStatus)
+    {
+        $this->picSureStatus = $picSureStatus;
+    }
+
+    public function isPicSureValidated()
+    {
+        return $this->getPicSureStatus() == self::PICSURE_STATUS_APPROVED;
+    }
+
     public function toApiArray()
     {
+        $picSureEnabled = $this->getPolicyTerms() && $this->getPolicyTerms()->isPicSureEnabled();
+        $picSureValidated = $this->isPicSureValidated();
+
         return array_merge(parent::toApiArray(), [
             'phone_policy' => [
                 'imei' => $this->getImei(),
@@ -451,6 +481,33 @@ class PhonePolicy extends Policy
                 'name' => $this->getName() && strlen($this->getName()) > 0 ?
                     $this->getName() :
                     $this->getDefaultName(),
+                'picsure_status' => $this->getPicSureStatus(),
+                'excesses' => [
+                    [
+                        'type' => Claim::TYPE_LOSS,
+                        'amount' => Claim::getExcessValue(Claim::TYPE_LOSS, $picSureValidated, $picSureEnabled)
+                    ],
+                    [
+                        'type' => Claim::TYPE_LOSS,
+                        'amount' => Claim::getExcessValue(Claim::TYPE_LOSS, $picSureValidated, $picSureEnabled)
+                    ],
+                    [
+                        'type' => Claim::TYPE_THEFT,
+                        'amount' => Claim::getExcessValue(Claim::TYPE_THEFT, $picSureValidated, $picSureEnabled)
+                    ],
+                    [
+                        'type' => Claim::TYPE_DAMAGE,
+                        'amount' => Claim::getExcessValue(Claim::TYPE_DAMAGE, $picSureValidated, $picSureEnabled)
+                    ],
+                    [
+                        'type' => Claim::TYPE_WARRANTY,
+                        'amount' => Claim::getExcessValue(Claim::TYPE_WARRANTY, $picSureValidated, $picSureEnabled)
+                    ],
+                    [
+                        'type' => Claim::TYPE_EXTENDED_WARRANTY,
+                        'amount' => Claim::getExcessValue(Claim::TYPE_EXTENDED_WARRANTY, $picSureValidated, $picSureEnabled)
+                    ],
+                ],
             ]
         ]);
     }
