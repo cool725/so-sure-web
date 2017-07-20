@@ -505,7 +505,11 @@ class PhonePolicy extends Policy
                     ],
                     [
                         'type' => Claim::TYPE_EXTENDED_WARRANTY,
-                        'amount' => Claim::getExcessValue(Claim::TYPE_EXTENDED_WARRANTY, $picSureValidated, $picSureEnabled)
+                        'amount' => Claim::getExcessValue(
+                            Claim::TYPE_EXTENDED_WARRANTY,
+                            $picSureValidated,
+                            $picSureEnabled
+                        )
                     ],
                 ],
             ]
