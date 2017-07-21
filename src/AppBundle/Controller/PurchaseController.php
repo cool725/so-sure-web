@@ -438,16 +438,10 @@ class PurchaseController extends BaseController
                                 'Final Monthly Cost' => $price->getMonthlyPremiumPrice(),
                                 'Policy Id' => $policy->getId(),
                             ]);
-                            if ($purchaseForm->get('next')->isClicked()) {
-                                $webpay = $this->get('app.judopay')->webpay(
-                                    $policy,
-                                    $purchase->getAmount(),
-                                    $request->getClientIp(),
-                                    $request->headers->get('User-Agent'),
-                                    JudopayService::WEB_TYPE_STANDARD
-                                );
-                                $purchase->setAgreed(true);
-                            } elseif ($purchaseForm->get('existing')->isClicked()) {
+                            // There was an odd case of next not being detected as clicked
+                            // perhaps a brower issue with multiple buttons
+                            // just in case, assume judo pay if we don't detect existing
+                            if ($purchaseForm->has('existing') && $purchaseForm->get('existing')->isClicked()) {
                                 // TODO: Try/catch
                                 if ($this->get('app.judopay')->existing(
                                     $policy,
@@ -463,6 +457,16 @@ class PurchaseController extends BaseController
                                     );
                                     // @codingStandardsIgnoreEnd
                                 }
+                            } else {
+                                //if ($purchaseForm->has('next') && $purchaseForm->get('next')->isClicked()) {
+                                $webpay = $this->get('app.judopay')->webpay(
+                                    $policy,
+                                    $purchase->getAmount(),
+                                    $request->getClientIp(),
+                                    $request->headers->get('User-Agent'),
+                                    JudopayService::WEB_TYPE_STANDARD
+                                );
+                                $purchase->setAgreed(true);
                             }
                         } else {
                             $this->addFlash(
