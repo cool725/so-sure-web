@@ -74,11 +74,9 @@ $(function() {
       //   loadDigits();
     });
 
-//    loadDigitsInterval = setInterval(function(){ loadDigits(); }, 10000);
+    $('#swap-login').on('click', function(evt) {
 
-    $('#swap-login').on('click', function() {
-
-        event.preventDefault();
+        evt.preventDefault();
 
         $('.login-email').toggle();
         $('.login-account-kit').toggle();
