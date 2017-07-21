@@ -82,22 +82,22 @@ $(function() {
         event.preventDefault();
 
         $('.login-email').toggle();
-        $('.login-digits').toggle();
+        $('.login-account-kit').toggle();
 
         $(this).find('span').toggleText('mobile', 'email');
 
     });
 
-    if ($('.login-digits').data('toggle') == "1") {
+    if ($('.login-account-kit').data('toggle') == "1") {
         $('.login-email').toggle();
-        $('.login-digits').toggle();
+        $('.login-account-kit').toggle();
 
         $('#swap-login').find('span').text('mobile');
     }
     else {
         if (window.location.hash == "#email") {
             $('.login-email').toggle();
-            $('.login-digits').toggle();
+            $('.login-account-kit').toggle();
 
             $('#swap-login').find('span').text('email');
         }
