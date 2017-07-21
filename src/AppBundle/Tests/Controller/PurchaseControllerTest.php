@@ -6,11 +6,13 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Lead;
+use AppBundle\Document\Payment;
 use AppBundle\Document\JudoPayment;
 use AppBundle\Document\CurrencyTrait;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use AppBundle\Classes\Salva;
 use AppBundle\Classes\ApiErrorCode;
+use AppBundle\Document\JudoPaymentMethod;
 
 /**
  * @group functional-net
@@ -462,6 +464,57 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(200);
     }
 
+    public function test2ndPolicyPayCC()
+    {
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $email = self::generateEmail('test2ndPolicyPayCC', $this);
+        $password = 'foo';
+        $phone1 = self::getRandomPhone($dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone1,
+            $dm
+        );
+
+        $policy1 = self::initPolicy($user, $dm, $phone1, null, false, true);
+
+        $judopay = self::$container->get('app.judopay');
+        $policyService = self::$container->get('app.policy');
+        $details = $judopay->testPayDetails(
+            $user,
+            $policy1->getId(),
+            $phone1->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
+        );
+        $policyService->setEnvironment('prod');
+        // @codingStandardsIgnoreStart
+        $judopay->add(
+            $policy1,
+            $details['receiptId'],
+            $details['consumer']['consumerToken'],
+            $details['cardDetails']['cardToken'],
+            Payment::SOURCE_WEB_API,
+            "{\"clientDetails\":{\"OS\":\"Android OS 6.0.1\",\"kDeviceID\":\"da471ee402afeb24\",\"vDeviceID\":\"03bd3e3c-66d0-4e46-9369-cc45bb078f5f\",\"culture_locale\":\"en_GB\",\"deviceModel\":\"Nexus 5\",\"countryCode\":\"826\"}}"
+        );
+        // @codingStandardsIgnoreEnd
+        $policyService->setEnvironment('test');
+        $this->assertTrue($user->hasValidPaymentMethod());
+
+        $phone2 = $this->setRandomPhone();
+        $this->login($email, $password, 'user/');
+
+        $crawler = $this->setPhoneNew($phone2, null, 1, false);
+        self::verifyResponse(302);
+        $redirectUrl = self::$router->generate('user_welcome');
+        $this->assertTrue(self::$client->getResponse()->isRedirect($redirectUrl));
+        $crawler = self::$client->followRedirect();
+        self::verifyResponse(200);
+    }
+
     public function testLeadSource()
     {
         $email = self::generateEmail('testLeadSource', $this);
@@ -617,10 +670,14 @@ class PurchaseControllerTest extends BaseControllerTest
         return $crawler;
     }
 
-    private function setPhoneNew($phone, $imei = null, $agreed = 1)
+    private function setPhoneNew($phone, $imei = null, $agreed = 1, $nextButton = true)
     {
         $crawler = self::$client->request('GET', '/purchase/step-policy?force_result=new');
-        $form = $crawler->selectButton('purchase_form[next]')->form();
+        if ($nextButton) {
+            $form = $crawler->selectButton('purchase_form[next]')->form();
+        } else {
+            $form = $crawler->selectButton('purchase_form[existing]')->form();
+        }
         if (!$imei) {
             $imei = self::generateRandomImei();
         }
