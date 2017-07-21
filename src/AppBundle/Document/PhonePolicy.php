@@ -7,6 +7,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 use AppBundle\Exception\InvalidPremiumException;
+use AppBundle\Document\File\PicSureFile;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PhonePolicyRepository")
@@ -467,6 +468,11 @@ class PhonePolicy extends Policy
     public function isPicSureValidated()
     {
         return $this->getPicSureStatus() == self::PICSURE_STATUS_APPROVED;
+    }
+
+    public function getPolicyPicSureFiles()
+    {
+        return $this->getPolicyFilesByType(PicSureFile::class);
     }
 
     public function toApiArray()
