@@ -587,6 +587,14 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      */
     public function canPurchasePolicy($checkMaxPolicies = true)
     {
+        if ($this->isLocked()) {
+            return false;
+        }
+
+        if (!$this->isEnabled()) {
+            return false;
+        }
+
         if ($this->hasSuspectedFraudulentClaim()) {
             return false;
         }
@@ -604,6 +612,14 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     public function canRenewPolicy()
     {
+        if ($this->isLocked()) {
+            return false;
+        }
+
+        if (!$this->isEnabled()) {
+            return false;
+        }
+
         if ($this->hasSuspectedFraudulentClaim()) {
             return false;
         }

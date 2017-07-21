@@ -687,6 +687,7 @@ class DaviesServiceTest extends WebTestCase
     {
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $policy = static::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('testSaveClaimsYesterday', $this));
         $claim = new Claim();
         $claim->setNumber(rand(1, 999999));
         $claim->setType(Claim::TYPE_LOSS);
