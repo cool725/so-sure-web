@@ -2,7 +2,9 @@
 {% block fos_user_content %}
 
 <h1>Welcome back!</h1>
-<div class="login-account-kit" data-key="{{ fb_appid }}" data-csrf="{{ csrf_token('account-kit') }}" data-toggle="{% if app.request.clientIp == davies_ip %}1{% else %}0{% endif %}">
+
+{# Account Kit Login #}
+<div class="login-account-kit login-box" data-key="{{ fb_appid }}" data-csrf="{{ csrf_token('account-kit') }}" data-toggle="{% if app.request.clientIp == davies_ip %}1{% else %}0{% endif %}">
     <p>Please login below.</p>
     <div class="form-group">
         <input value="+44" id="country_code" class="form-control" />
@@ -14,31 +16,9 @@
         <button onclick="smsLogin();" class="btn btn-success">Login via SMS</button>
     </div>
 </div>
-{#
-<div class="login-digits"
-data-key="{{ digits_consumer_key }}" data-toggle="{% if app.request.clientIp == davies_ip %}1{% else %}0{% endif %}">
 
-    <p class="text-center">Enter your mobile number below, we'll then text you a code. Enter that code and, hey presto, you'll be logged in!</p>
-
-    <div class="digits-loading" style="display:block;">
-        <p><i class="fa fa-refresh fa-spin fa-2x fa-fw text-blue"></i></p>
-        <p>Loading the mobile number login from Twitter's Digits...</p>
-    </div>
-
-    <div class="digits-container-wrapper">
-        <div class="digits-container"></div>
-    </div>
-
-    <form method="POST" action="{{ path('digits_login') }}#mobile" id="digits-form">
-        <input type="hidden" name="credentials" id="credentials">
-        <input type="hidden" name="provider" id="provider">
-        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
-    </form>
-
-    {# <p class="swap-login-wrapper"><a href="#email" class="swap-login btn btn-primary-hollow">Prefer email login?</a></p> #}
-{# </div> #}
-
-<div class="login-email" style="display: none;">
+{# Email Login #}
+<div class="login-email login-box" style="display: none;">
     <p>Please login below.</p>
     <form class="" action="{{ path("fos_user_security_check") }}#email" method="post">
         <input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
@@ -64,7 +44,6 @@ data-key="{{ digits_consumer_key }}" data-toggle="{% if app.request.clientIp == 
             <small><a href="{{ path('fos_user_resetting_request') }}">Forgot password?</a></small>
         </div>
     </form>
-    {# <p class="swap-login-wrapper"><a href="#mobile" class="swap-login btn btn-primary-hollow btn-xs">Prefer mobile login?</a></p> #}
 </div>
 
 <div class="swap-login-wrapper form-group">
