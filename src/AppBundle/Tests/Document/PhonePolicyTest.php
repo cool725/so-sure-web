@@ -2963,6 +2963,7 @@ class PhonePolicyTest extends WebTestCase
 
         $user = new User();
         $user->setEmail($email);
+        $user->setEnabled(true);
         self::addAddress($user);
 
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));

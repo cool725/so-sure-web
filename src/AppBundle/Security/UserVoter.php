@@ -39,9 +39,8 @@ class UserVoter extends Voter
         // you know $subject is a User object, thanks to supports
         /** @var User $user */
         $requestedUser = $subject;
-        
-        if ($attribute == self::ADD_POLICY &&
-            (!$requestedUser->isEnabled() || $requestedUser->isLocked())) {
+
+        if ($attribute == self::ADD_POLICY && !$requestedUser->canPurchasePolicy()) {
             return false;
         }
 
