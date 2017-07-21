@@ -284,14 +284,15 @@ class PurchaseController extends BaseController
         $user = $this->getUser();
         if (!$user) {
             return $this->redirectToRoute('purchase');
-        }
-        /* TODO: Consider if we want warning that you're purchasing additional policy
-        } elseif ($user->hasPolicy()) {
-            $this->addFlash('error', 'Sorry, but we currently only support 1 policy per email address.');
+        } elseif (!$user->canPurchasePolicy()) {
+            $this->addFlash(
+                'error',
+                "Sorry, but you've reached the maximum number of allowed policies. Contact us for more details."
+            );
 
             return $this->redirectToRoute('user_home');
         }
-        */
+
         $this->denyAccessUnlessGranted(UserVoter::ADD_POLICY, $user);
         if (!$user->hasValidBillingDetails()) {
             return $this->redirectToRoute('purchase_step_personal');

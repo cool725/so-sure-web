@@ -1081,6 +1081,7 @@ class PhonePolicyTest extends WebTestCase
     public function testCancelPolicyUserDeclined()
     {
         $policyA = static::createUserPolicy(true);
+        $policyA->getUser()->setEmail(static::generateEmail('testCancelPolicyUserDeclined', $this));
         static::$dm->persist($policyA);
         static::$dm->persist($policyA->getUser());
         static::$dm->flush();
@@ -2963,6 +2964,7 @@ class PhonePolicyTest extends WebTestCase
 
         $user = new User();
         $user->setEmail($email);
+        $user->setEnabled(true);
         self::addAddress($user);
 
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));

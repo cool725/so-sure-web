@@ -339,7 +339,6 @@ class ApiAuthController extends BaseController
             $imeiValidator = $this->get('app.imei');
             $jwtValidator = $this->get('app.jwt');
             $user = $this->getUser();
-            $this->denyAccessUnlessGranted(UserVoter::ADD_POLICY, $user);
 
             if (!$user->canPurchasePolicy()) {
                 return $this->getErrorJsonResponse(
@@ -348,6 +347,7 @@ class ApiAuthController extends BaseController
                     422
                 );
             }
+            $this->denyAccessUnlessGranted(UserVoter::ADD_POLICY, $user);
 
             $phone = $this->getPhone(
                 $this->getDataString($phonePolicyData, 'make'),
