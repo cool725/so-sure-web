@@ -1,8 +1,8 @@
  AccountKit_OnInteractive = function(){
     AccountKit.init(
       {
-        appId: $('.login-account-kit').data('key'), 
-        state:$('.login-account-kit').data('csrf'), 
+        appId: $('.login-account-kit').data('key'),
+        state:$('.login-account-kit').data('csrf'),
         version:"v1.0",
         fbAppEventsEnabled:true
       }
@@ -30,11 +30,11 @@
     var countryCode = document.getElementById("country_code").value;
     var phoneNumber = document.getElementById("phone_number").value;
     AccountKit.login(
-      'PHONE', 
+      'PHONE',
       {countryCode: countryCode, phoneNumber: phoneNumber}, // will use default values if not specified
       loginCallback
     );
-  }  
+  }
 function onLogin(loginResponse) {
   // Send headers to your server and validate user by calling Digits API
   var oAuthHeaders = loginResponse.oauth_echo_headers;
@@ -59,31 +59,47 @@ function loadDigits() {
       })
       .done(onLogin)
       .fail(function() { alert('Sorry, there seems to be a temporary issue with logging in.  Please try the email login or contact support@wearesosure.com'); });
-  }) 
+  })
 }
 
+$.fn.extend({
+    toggleText: function(a, b){
+        return this.text(this.text() == b ? a : b);
+    }
+});
+
 $(function() {
-  
-    $(window).bind("load", function() { 
+
+    $(window).bind("load", function() {
      // loadAccountKit();
       //   loadDigits();
     });
 
 //    loadDigitsInterval = setInterval(function(){ loadDigits(); }, 10000);
 
-    $('.swap-login').on('click', function() {
-      $('.login-email').toggle();
-      $('.login-digits').toggle();
+    $('#swap-login').on('click', function() {
+
+        event.preventDefault();
+
+        $('.login-email').toggle();
+        $('.login-digits').toggle();
+
+        $(this).find('span').toggleText('mobile', 'email');
+
     });
 
     if ($('.login-digits').data('toggle') == "1") {
-      $('.login-email').toggle();
-      $('.login-digits').toggle();
-    }
-    else {
-      if (window.location.hash == "#email") {
         $('.login-email').toggle();
         $('.login-digits').toggle();
-      }
+
+        $('#swap-login').find('span').text('mobile');
+    }
+    else {
+        if (window.location.hash == "#email") {
+            $('.login-email').toggle();
+            $('.login-digits').toggle();
+
+            $('#swap-login').find('span').text('email');
+        }
     }
 });

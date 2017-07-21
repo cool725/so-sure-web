@@ -3,11 +3,11 @@
 
 <h1>Welcome back!</h1>
 <div class="login-account-kit" data-key="{{ fb_appid }}" data-csrf="{{ csrf_token('account-kit') }}">
-<input value="+44" id="country_code" />
-<input placeholder="phone number" id="phone_number"/>
-<button onclick="smsLogin();">Login via SMS</button>
-    
+    <input value="+44" id="country_code" />
+    <input placeholder="phone number" id="phone_number"/>
+    <button onclick="smsLogin();">Login via SMS</button>
 </div>
+
 <div class="login-digits"
 data-key="{{ digits_consumer_key }}" data-toggle="{% if app.request.clientIp == davies_ip %}1{% else %}0{% endif %}">
 
@@ -28,7 +28,7 @@ data-key="{{ digits_consumer_key }}" data-toggle="{% if app.request.clientIp == 
         <input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
     </form>
 
-    <p class="swap-login-wrapper"><a href="#email" class="swap-login btn btn-primary-hollow">Prefer email login?</a></p>
+    {# <p class="swap-login-wrapper"><a href="#email" class="swap-login btn btn-primary-hollow">Prefer email login?</a></p> #}
 </div>
 
 <div class="login-email" style="display: none;">
@@ -57,10 +57,16 @@ data-key="{{ digits_consumer_key }}" data-toggle="{% if app.request.clientIp == 
             <small><a href="{{ path('fos_user_resetting_request') }}">Forgot password?</a></small>
         </div>
     </form>
-    <p class="swap-login-wrapper"><a href="#mobile" class="swap-login btn btn-primary-hollow btn-xs">Prefer mobile login?</a></p>
+    {# <p class="swap-login-wrapper"><a href="#mobile" class="swap-login btn btn-primary-hollow btn-xs">Prefer mobile login?</a></p> #}
 </div>
 
-<div><a href="#" onclick="fb_login();" class="btn btn-facebook"><i class="fa fa-facebook-official"></i> &nbsp;Login with Facebook</a></div>
+<div class="swap-login-wrapper form-group">
+    <a href="#" id="swap-login" class="btn btn-primary-hollow">Prefer <span>email</span> login?</a>
+</div>
+
+<div class="form-group">
+    <a href="#" onclick="fb_login();" class="btn btn-facebook"><i class="fa fa-facebook-official"></i> &nbsp;Login with Facebook</a>
+</div>
 
 <script src="https://sdk.accountkit.com/en_US/sdk.js"></script>
 
