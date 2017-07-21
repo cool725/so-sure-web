@@ -817,4 +817,34 @@ class DefaultController extends BaseController
             'is_opted_out' => $invitationService->isOptedOut($email, $cat),
         );
     }
+
+    /**
+     * @Route("/accountkit-login", name="accountkit_login")
+     */
+    public function accountKitLoginAction(Request $request)
+    {
+        $facebook = $this->get('app.facebook');
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(User::class);
+
+        $csrf = $request->get('csrf');
+        $authorizationCode = $request->get('code');
+
+        if (!$this->isCsrfTokenValid('account-kit', $request->get('csrf'))) {
+            throw new \InvalidArgumentException('Invalid csrf token');
+        }
+
+        $mobileNumber = $facebook->getAccountKitMobileNumber($authorizationCode);
+        $user = $repo->findOneBy(['mobileNumber' => $mobileNumber]);
+        if (!$user) {
+            throw new \Exception('Unknown user');
+        }
+
+        $this->get('fos_user.security.login_manager')->loginUser(
+            $this->getParameter('fos_user.firewall_name'),
+            $user
+        );
+
+        return new RedirectResponse($this->generateUrl('user_home'));
+    }
 }

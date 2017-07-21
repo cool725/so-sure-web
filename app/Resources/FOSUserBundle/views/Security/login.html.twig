@@ -7,7 +7,7 @@
 <div class="login-account-kit login-box" data-key="{{ fb_appid }}" data-csrf="{{ csrf_token('account-kit') }}" data-toggle="{% if app.request.clientIp == davies_ip %}1{% else %}0{% endif %}">
     <p>Please login below.</p>
     <div class="form-group">
-        <input value="+44" id="country_code" class="form-control" />
+        <input type="hidden" value="+44" id="country_code" class="form-control" />
     </div>
     <div class="form-group">
         <input placeholder="phone number" id="phone_number" class="form-control" />
@@ -55,6 +55,11 @@
 </div>
 
 <script src="https://sdk.accountkit.com/en_US/sdk.js"></script>
+
+<form id="accountkit-form" method="post" action="{{ path('accountkit_login') }}">
+    <input type="hidden" id="accountkit-code" name="code">
+    <input type="hidden" id="accountkit-csrf" name="csrf">
+</form>
 
 {% endblock fos_user_content %}
 

@@ -12,10 +12,9 @@
   // login callback
   function loginCallback(response) {
     if (response.status === "PARTIALLY_AUTHENTICATED") {
-      var code = response.code;
-      var csrf = response.state;
-      alert(response.code);
-      // Send code to server to exchange for access token
+      $('#accountkit-code').val(response.code);
+      $('#accountkit-csrf').val(response.state);
+      $('#accountkit-form').submit();
     }
     else if (response.status === "NOT_AUTHENTICATED") {
       // handle authentication failure
