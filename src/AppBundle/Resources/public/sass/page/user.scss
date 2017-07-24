@@ -151,6 +151,12 @@ body {
         }
     }
 
+    @include breakpoint(mobileonly) {
+        > li + li {
+            margin-bottom: 15px;
+        }
+    }
+
 	> li > a {
         border: 2px solid $blue;
         color: $blue;
@@ -168,6 +174,7 @@ body {
         color: $white;
 	}
 }
+
 
 /* Welcome Page */
 
