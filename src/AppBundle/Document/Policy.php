@@ -2527,6 +2527,18 @@ abstract class Policy
         return $diff;
     }
 
+    public function getRemainderOfPolicyPrice()
+    {
+        $totalPaid = $this->getTotalSuccessfulPayments();
+        $yearlyPremium = $this->getPremium()->getYearlyPremiumPrice();
+        $diff = $yearlyPremium - $totalPaid;
+        if ($diff < 0) {
+            return 0;
+        }
+
+        return $this->toTwoDp($diff);
+    }
+
     public function canInvite()
     {
         if ($this->isPotCompletelyFilled()) {

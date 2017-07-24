@@ -940,6 +940,9 @@ class PolicyService
     public function cancelledPolicyEmail(Policy $policy)
     {
         $baseTemplate = sprintf('AppBundle:Email:policy-cancellation/%s', $policy->getCancelledReason());
+        if ($policy->getCancelledReason() == Policy::CANCELLED_UNPAID && $policy->hasMonetaryClaimed()) {
+            $baseTemplate = sprintf('%sWithClaim', $baseTemplate);
+        }
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
 

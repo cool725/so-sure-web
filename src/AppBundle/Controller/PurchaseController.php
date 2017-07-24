@@ -794,9 +794,7 @@ class PurchaseController extends BaseController
             throw $this->createNotFoundException('Unknown policy');
         }
 
-        $totalPaid = $policy->getTotalSuccessfulPayments();
-        $yearlyPremium = $policy->getPremium()->getYearlyPremiumPrice();
-        $amount = $this->toTwoDp($yearlyPremium - $totalPaid);
+        $amount = $policy->getRemainderOfPolicyPrice();
         $webpay = null;
 
         if ($amount > 0) {
