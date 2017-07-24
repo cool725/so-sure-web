@@ -47,6 +47,14 @@
 
                     {{ form_start(claim_form) }}
                         <div class="row">
+                            <div class="col-sm-12 text-center">
+                                <div class="form-group">
+                                    <label for="">I certificate the below is correct to the best of my knowledge <span class="req">*</span></label>
+                                    {{ form_widget(claim_form.signature, { 'attr': {'placeholder': 'Signature (type in your name)', 'class': 'form-control'}}) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label for="">Name <span class="req">*</span></label>
@@ -95,14 +103,6 @@
                                     that you'd like to tell us or more details about when you can be reached, please
                                     include them here:<span class="req">*</span></label>
                                     {{ form_widget(claim_form.message, { 'attr': {'class': 'form-control', 'rows': '15'}}) }}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-sm-12 text-center">
-                                <div class="form-group">
-                                    <label for="">I certificate the above is correct to the best of my knowledge <span class="req">*</span></label>
-                                    {{ form_widget(claim_form.signature, { 'attr': {'placeholder': 'Signature (type in your name)', 'class': 'form-control'}}) }}
                                 </div>
                             </div>
                         </div>
