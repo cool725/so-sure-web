@@ -494,10 +494,6 @@ class PhonePolicy extends Policy
                         'amount' => Claim::getExcessValue(Claim::TYPE_LOSS, $picSureValidated, $picSureEnabled)
                     ],
                     [
-                        'type' => Claim::TYPE_LOSS,
-                        'amount' => Claim::getExcessValue(Claim::TYPE_LOSS, $picSureValidated, $picSureEnabled)
-                    ],
-                    [
                         'type' => Claim::TYPE_THEFT,
                         'amount' => Claim::getExcessValue(Claim::TYPE_THEFT, $picSureValidated, $picSureEnabled)
                     ],
