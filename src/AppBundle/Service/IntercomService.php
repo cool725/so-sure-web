@@ -28,6 +28,7 @@ class IntercomService
 
     const QUEUE_LEAD = 'lead';
     const QUEUE_USER = 'user';
+    const QUEUE_MESSAGE = 'message';
 
     const QUEUE_EVENT_POLICY_CREATED = 'policy-created';
     const QUEUE_EVENT_POLICY_CANCELLED = 'policy-cancelled';
@@ -427,6 +428,26 @@ class IntercomService
         $this->logger->debug(sprintf('Intercom create event (%s) %s', $event, json_encode($resp)));
     }
 
+    private function sendMessage(User $user = null, Lead $lead = null, $data = null, \DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        if ($user) {
+            $data['from']['type'] = 'user';
+            $data['from']['id'] = $user->getIntercomId();
+            $data['from']['user_id'] = $user->getId();
+        } elseif ($lead) {
+            $data['from']['type'] = 'contact';
+            $data['from']['id'] = $lead->getIntercomId();
+            $data['from']['user_id'] = $lead->getId();
+        }
+
+        $resp = $this->client->messages->create($data);
+        $this->logger->debug(sprintf('Intercom create event (sendMessage) %s', json_encode($resp)));
+    }
+
     private function sendLeadEvent(Lead $lead, $event, $data, \DateTime $date = null)
     {
         if (!$date) {
@@ -446,14 +467,15 @@ class IntercomService
 
     public function process($max)
     {
-        $count = 0;
-        while ($count < $max) {
+        $requeued = 0;
+        $processed = 0;
+        while ($processed + $requeued < $max) {
             $user = null;
             $data = null;
             try {
                 $queueItem = $this->redis->lpop(self::KEY_INTERCOM_QUEUE);
                 if (!$queueItem) {
-                    return $count;
+                    return $processed;
                 }
                 $data = unserialize($queueItem);
 
@@ -462,6 +484,15 @@ class IntercomService
                 } else {
                     // legacy before action was used.  can be removed soon after
                     $action = self::QUEUE_USER;
+                }
+
+                // Requeue anything not yet ready to process
+                $now = new \DateTime();
+                if (isset($data['processTime'])
+                    && $data['processTime'] > $now->format('U')) {
+                    $this->redis->rpush(self::KEY_INTERCOM_QUEUE, serialize($data));
+                    $requeued++;
+                    continue;
                 }
 
                 if ($action == self::QUEUE_USER) {
@@ -476,6 +507,20 @@ class IntercomService
                     }
 
                     $this->updateLead($this->getLead($data['leadId']));
+                } elseif ($action == self::QUEUE_MESSAGE) {
+                    if (!isset($data['leadId']) && !isset($data['userId'])) {
+                        throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
+                    }
+                    $user = null;
+                    $lead = null;
+                    if (isset($data['userId'])) {
+                        $user = $this->getUser($data['userId']);
+                    }
+                    if (isset($data['leadId'])) {
+                        $lead = $this->getLead($data['leadId']);
+                    }
+
+                    $this->sendMessage($user, $lead, $data);
                 } elseif ($action == self::QUEUE_EVENT_SAVE_QUOTE) {
                     if (!isset($data['leadId'])) {
                         throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
@@ -534,7 +579,7 @@ class IntercomService
                 } else {
                     throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
                 }
-                $count = $count + 1;
+                $processed++;
             } catch (\InvalidArgumentException $e) {
                 $this->logger->error(sprintf(
                     'Error processing Intercom queue message %s. Ex: %s',
@@ -555,7 +600,7 @@ class IntercomService
             }
         }
 
-        return $count;
+        return $processed;
     }
 
     private function getLead($id)
@@ -597,6 +642,22 @@ class IntercomService
         }
 
         return $user;
+    }
+
+    private function findUser($email)
+    {
+        $repo = $this->dm->getRepository(User::class);
+        $user = $repo->findOneBy(['emailCanonical' => strtolower($email)]);
+
+        return $user;
+    }
+
+    private function findLead($email)
+    {
+        $repo = $this->dm->getRepository(Lead::class);
+        $lead = $repo->findOneBy(['email' => strtolower($email)]);
+
+        return $lead;
     }
 
     private function deleteUser($id)
@@ -776,6 +837,41 @@ class IntercomService
         $this->emailReport($lines);
 
         return $lines;
+    }
+
+    public function queueMessage($email, $message, $retryAttempts = 0)
+    {
+        $data = [
+            'action' => self::QUEUE_MESSAGE,
+            'retryAttempts' => $retryAttempts,
+            'body' => $message,
+        ];
+        $foundUserOrLead = false;
+        if ($user = $this->findUser($email)) {
+            $data['userId'] = $user->getId();
+            $foundUserOrLead = true;
+        }
+        if ($lead = $this->findLead($email)) {
+            $data['leadId'] = $lead->getId();
+            $foundUserOrLead = true;
+        }
+
+        if (!$foundUserOrLead) {
+            $lead = new Lead();
+            $lead->setEmail(strtolower($email));
+            $lead->setSource(Lead::SOURCE_CONTACT_US);
+            $this->dm->persist($lead);
+            $this->dm->flush();
+
+            $this->queueLead($lead, self::QUEUE_LEAD);
+
+            $now = new \DateTime();
+            $now = $now->add(new \DateInterval('PT5M'));
+            $data['processTime'] = $now->format('U');
+            $data['leadId'] = $lead->getId();
+        }
+        
+        $this->redis->rpush(self::KEY_INTERCOM_QUEUE, serialize($data));
     }
 
     private function emailReport($lines)

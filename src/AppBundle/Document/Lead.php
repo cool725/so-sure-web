@@ -19,6 +19,7 @@ class Lead
     const SOURCE_BUY = 'buy';
     const SOURCE_SAVE_QUOTE = 'save-quote';
     const SOURCE_PURCHASE_FLOW = 'purchase-flow';
+    const SOURCE_CONTACT_US = 'contact-us';
 
     // Lead Source is used in User & Policy
     const LEAD_SOURCE_INVITATION = 'invitation';
@@ -56,7 +57,7 @@ class Lead
     protected $name;
 
     /**
-     * @Assert\Choice({"text-me", "launch-usa", "buy", "save-quote", "purchase-flow"}, strict=true)
+     * @Assert\Choice({"text-me", "launch-usa", "buy", "save-quote", "purchase-flow", "contact-us"}, strict=true)
      * @MongoDB\Field(type="string")
      */
     protected $source;

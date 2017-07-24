@@ -74,6 +74,8 @@ class AboutController extends BaseController
                         $contactForm->getData()['message']
                     );
                     // @codingStandardsIgnoreEnd
+                    $intercom = $this->get('app.intercom');
+                    $intercom->queueMessage($contactForm->getData()['email'], $body);
 
                     $message = \Swift_Message::newInstance()
                         ->setSubject(sprintf(
