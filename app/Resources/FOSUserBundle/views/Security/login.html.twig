@@ -2,30 +2,24 @@
 {% block fos_user_content %}
 
 <h1>Welcome back!</h1>
-<div class="login-digits"
-data-key="{{ digits_consumer_key }}" data-toggle="{% if app.request.clientIp == davies_ip %}1{% else %}0{% endif %}">
 
-    <p class="text-center">Enter your mobile number below, we'll then text you a code. Enter that code and, hey presto, you'll be logged in!</p>
-
-    <div class="digits-loading" style="display:block;">
-        <p><i class="fa fa-refresh fa-spin fa-2x fa-fw text-blue"></i></p>
-        <p>Loading the mobile number login from Twitter's Digits...</p>
+{# Account Kit Login #}
+<div class="login-account-kit login-box" data-key="{{ fb_appid }}" data-csrf="{{ csrf_token('account-kit') }}" data-toggle="{% if app.request.clientIp == davies_ip %}1{% else %}0{% endif %}">
+    <p>If you click on Log In via SMS, a popup will appear.</p>
+    <div class="form-group">
+        <input type="hidden" value="+44" id="country_code" class="form-control" />
     </div>
-
-    <div class="digits-container-wrapper">
-        <div class="digits-container"></div>
+    <div class="form-group">
+        <input placeholder="Mobile number" id="phone_number" class="form-control" />
+        <span class="help-block text-center"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> UK numbers only</span>
     </div>
-
-    <form method="POST" action="{{ path('digits_login') }}#mobile" id="digits-form">
-        <input type="hidden" name="credentials" id="credentials">
-        <input type="hidden" name="provider" id="provider">
-        <input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
-    </form>
-
-    <p class="swap-login-wrapper"><a href="#email" class="swap-login btn btn-primary-hollow">Prefer email login?</a></p>
+    <div class="form-group">
+        <button onclick="smsLogin();" class="btn btn-success">Login via SMS</button>
+    </div>
 </div>
 
-<div class="login-email" style="display: none;">
+{# Email Login #}
+<div class="login-email login-box" style="display: none;">
     <p>Please login below.</p>
     <form class="" action="{{ path("fos_user_security_check") }}#email" method="post">
         <input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
@@ -45,24 +39,35 @@ data-key="{{ digits_consumer_key }}" data-toggle="{% if app.request.clientIp == 
             </label>
         </div>
         <div class="form-group">
-            <input type="submit" id="_submit" name="_submit" value="Login" class="btn btn-success btn-lg"/>
+            <input type="submit" id="_submit" name="_submit" value="Login" class="btn btn-success"/>
         </div>
         <div class="form-group">
             <small><a href="{{ path('fos_user_resetting_request') }}">Forgot password?</a></small>
         </div>
     </form>
-    <p class="swap-login-wrapper"><a href="#mobile" class="swap-login btn btn-primary-hollow btn-xs">Prefer mobile login?</a></p>
 </div>
 
-<div><a href="#" onclick="fb_login();" class="btn btn-facebook"><i class="fa fa-facebook-official"></i> &nbsp;Login with Facebook</a></div>
+<div class="swap-login-wrapper form-group">
+    <a href="#" id="swap-login" class="btn btn-primary-hollow">Prefer <span>email</span> login?</a>
+</div>
 
-<script id="digits-sdk" src="https://cdn.digits.com/1/sdk.js" async></script>
+<div class="form-group">
+    <a href="#" onclick="fb_login();" class="btn btn-facebook"><i class="fa fa-facebook-official"></i> &nbsp;Login with Facebook</a>
+</div>
+
+<script src="https://sdk.accountkit.com/en_US/sdk.js"></script>
+
+<form id="accountkit-form" method="post" action="{{ path('accountkit_login') }}">
+    <input type="hidden" id="accountkit-code" name="code">
+    <input type="hidden" id="accountkit-csrf" name="csrf">
+</form>
 
 {% endblock fos_user_content %}
 
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
+        'components/jquery-validation/jquery.validate.js'
         '../app/Resources/public/js/login.js'
     %}
     <script src="{{ asset_url }}"></script>
