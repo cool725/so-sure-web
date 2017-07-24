@@ -89,4 +89,12 @@ class Feature
     {
         $this->enabled = $enabled;
     }
+
+    public function toApiArray()
+    {
+        return [
+            'name' => $this->getName(),
+            'enabled' => $this->isEnabled() ? true : false,
+        ];
+    }
 }

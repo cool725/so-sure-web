@@ -12,6 +12,7 @@ use AppBundle\Document\File\DaviesFile;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use VasilDakov\Postcode\Postcode;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
+use AppBundle\Exception\ValidationException;
 
 class DaviesService extends S3EmailService
 {
@@ -22,6 +23,7 @@ class DaviesService extends S3EmailService
     protected $claimsService;
 
     protected $mailer;
+    protected $validator;
 
     public function setClaims($claimsService)
     {
@@ -31,6 +33,11 @@ class DaviesService extends S3EmailService
     public function setMailer($mailer)
     {
         $this->mailer = $mailer;
+    }
+
+    public function setValidator($validator)
+    {
+        $this->validator = $validator;
     }
 
     public function processExcelData($key, $data)
@@ -200,6 +207,18 @@ class DaviesService extends S3EmailService
         $claim->setShippingAddress($daviesClaim->shippingAddress);
 
         $this->updatePolicy($claim, $daviesClaim);
+
+        $errors = $this->validator->validate($claim);
+        if (count($errors) > 0) {
+            $this->logger->error(sprintf(
+                'Claim %s/%s (status: %s) failed validation. Discarding updates.',
+                $claim->getId(),
+                $daviesClaim->claimNumber,
+                $claim->getStatus()
+            ));
+            $this->dm->clear();
+        }
+
         $this->dm->flush();
 
         $this->postValidateClaimDetails($claim, $daviesClaim);

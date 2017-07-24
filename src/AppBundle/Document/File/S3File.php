@@ -22,7 +22,8 @@ use AppBundle\Validator\Constraints as AppAssert;
  *      "invoice"="InvoiceFile",
  *      "davies"="DaviesFile",
  *      "imeiUpload"="ImeiUploadFile",
- *      "brightstar"="BrightstarFile"
+ *      "brightstar"="BrightstarFile",
+ *      "picsure"="PicSureFile"
  * })
  * @Gedmo\Loggable
  */

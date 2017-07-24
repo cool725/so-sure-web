@@ -1493,4 +1493,42 @@ class AdminEmployeeController extends BaseController
             'month' => $month,
         ];
     }
+
+    /**
+     * @Route("/picsure", name="admin_picsure")
+     * @Route("/picsure/{id}/approve", name="admin_picsure_approve")
+     * @Route("/picsure/{id}/reject", name="admin_picsure_reject")
+     * @Route("/picsure/{id}/invalid", name="admin_picsure_invalid")
+     * @Template
+     */
+    public function picsureAction(Request $request, $id = null)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(PhonePolicy::class);
+        $policy = null;
+        if ($id) {
+            $policy = $repo->find($id);
+        }
+        if ($request->get('_route') == "admin_picsure_approve") {
+            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+            $dm->flush();
+
+            return new RedirectResponse($this->generateUrl('admin_picsure'));
+        } elseif ($request->get('_route') == "admin_picsure_reject") {
+            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_REJECTED);
+            $dm->flush();
+
+            return new RedirectResponse($this->generateUrl('admin_picsure'));
+        } elseif ($request->get('_route') == "admin_picsure_invalid") {
+            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_INVALID);
+            $dm->flush();
+
+            return new RedirectResponse($this->generateUrl('admin_picsure'));
+        }
+
+        $policies = $repo->findBy(['picSureStatus' => PhonePolicy::PICSURE_STATUS_MANUAL]);
+        return [
+            'policies' => $policies,
+        ];
+    }
 }

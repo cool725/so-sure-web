@@ -69,6 +69,7 @@ if [ "$SKIP_DB" == "0" ]; then
     app/console --env=test doctrine:mongodb:fixtures:load --no-interaction --fixtures src/AppBundle/DataFixtures/MongoDB/b/Phone --append
     app/console --env=test doctrine:mongodb:fixtures:load --no-interaction --fixtures src/AppBundle/DataFixtures/MongoDB/b/PlayDevice --append
     app/console --env=test doctrine:mongodb:fixtures:load --no-interaction --fixtures src/AppBundle/DataFixtures/MongoDB/b/User --append
+    app/console --env=test doctrine:mongodb:fixtures:load --no-interaction --fixtures src/AppBundle/DataFixtures/MongoDB/d/Feature --append
     app/console --env=test sosure:doctrine:index
   fi
 fi

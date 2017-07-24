@@ -968,9 +968,9 @@ class Claim
         return self::getExcessValue($this->getType());
     }
 
-    public static function getExcessValue($type, $validated = true)
+    public static function getExcessValue($type, $validated = true, $picSureEnabled = false)
     {
-        if (!$validated) {
+        if ($picSureEnabled && !$validated) {
             return 150;
         }
 
