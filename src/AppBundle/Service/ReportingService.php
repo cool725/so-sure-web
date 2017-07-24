@@ -395,6 +395,9 @@ class ReportingService
             Payment::SOURCE_ANDROID_PAY,
             Payment::SOURCE_SOSURE,
             Payment::SOURCE_BACS,
+            sprintf('web-%s', JudopayService::WEB_TYPE_STANDARD),
+            sprintf('web-%s', JudopayService::WEB_TYPE_UNPAID),
+            sprintf('web-%s', JudopayService::WEB_TYPE_REMAINDER),
         ];
         $data = [];
         for ($i = 1; $i <= 31; $i++) {
@@ -417,6 +420,10 @@ class ReportingService
                 $data[$day][$payment->getSource()]['success']++;
 
                 if ($payment->getSource() == Payment::SOURCE_WEB) {
+                    if ($payment->getWebType()) {
+                        $data[$day][sprintf('web-%s', $payment->getWebType())]['success']++;
+                    }
+
                     $data[$day]['policy-success'][$payment->getId()] = true;
                     unset($data[$day]['policy-failure'][$payment->getId()]);
                 }
@@ -424,6 +431,10 @@ class ReportingService
                 $data[$day][$payment->getSource()]['failure']++;
 
                 if ($payment->getSource() == Payment::SOURCE_WEB) {
+                    if ($payment->getWebType()) {
+                        $data[$day][sprintf('web-%s', $payment->getWebType())]['failure']++;
+                    }
+
                     if (!isset($data[$day]['policy-success'][$payment->getId()])) {
                         $data[$day]['policy-failure'][$payment->getId()] = true;
                     }
@@ -434,6 +445,14 @@ class ReportingService
                 $data[$day][$payment->getSource()]['total'];
             $data[$day][$payment->getSource()]['failure_percent'] = $data[$day][$payment->getSource()]['failure'] /
                 $data[$day][$payment->getSource()]['total'];
+            if ($payment->getSource() == Payment::SOURCE_WEB && $payment->getWebType()) {
+                $webSource = sprintf('web-%s', $payment->getWebType());
+                $data[$day][$webSource]['total']++;
+                $data[$day][$webSource]['success_percent'] = $data[$day][$webSource]['success'] /
+                    $data[$day][$webSource]['total'];
+                $data[$day][$webSource]['failure_percent'] = $data[$day][$webSource]['failure'] /
+                    $data[$day][$webSource]['total'];
+            }
         }
         for ($day = 1; $day <= 31; $day++) {
             $data[$day]['policy']['success'] = isset($data[$day]['policy-success']) ?
