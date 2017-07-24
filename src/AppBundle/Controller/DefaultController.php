@@ -531,6 +531,15 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/protect-your-bubble-vs-so-sure", name="protect_your_bubble_vs_so_sure")
+     * @Template
+     */
+    public function protectYourBubbleVsSoSure()
+    {
+        return array();
+    }
+
+    /**
      * @Route("/samsung-s7-insured-with-vodafone", name="samsung_s7_insured_with_vodafone")
      * @Route("/google-pixel-insured-with-vodafone", name="google_pixel_insured_with_vodafone")
      * @Route("/iphone-SE-insured-with-vodafone", name="iphone_SE_insured_with_vodafone")

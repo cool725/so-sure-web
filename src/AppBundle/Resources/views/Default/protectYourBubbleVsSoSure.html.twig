@@ -1,0 +1,142 @@
+{% extends 'base.html.twig' %}
+
+{# Set vars #}
+{% set new_stylesheet = 1 %}
+{# {% set new_footer = 1 %} #}
+
+
+{% block title %}so-sure - Protect Your Bubble
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets output='css/*.css'
+        '@AppBundle/Resources/public/sass/page/competitors.scss'
+    %}
+    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{% block body %}
+
+    <section class="section--pad">
+        <div class="container">
+            <h1 class="text-blue text-center">Protect Your Bubble vs So-Sure Phone Insurance</h1>
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2">
+                    <p class="big-text text-center">At So-Sure we believe in keeping things real. We don’t want to hide behind any marketing gimmicks or fancy numbers.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section--pad background-off-white">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2">
+                    <p class="lead">Which is why we thought we’d just lay out the facts bare and simple. The rest is up to you.</p>
+                    <div class="panel table-responsive">
+                        <table class="table" width="100%">
+                            <thead>
+                                <tr>
+                                    <td><span class="visible-xs"><small>Scroll right to see more <i class="fa fa-arrow-right" aria-hidden="true"></i></small></span></td>
+                                    <td>so-sure</td>
+                                    <td>Protect Your Bubble</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Cover for theft, damage and breakdown</td>
+                                    <td>Yes</td>
+                                    <td>Yes</td>
+                                </tr>
+                                <tr>
+                                    <td>Cover for loss</td>
+                                    <td>As standard</td>
+                                    <td>Extra £1.50 per month</td>
+                                </tr>
+                                <tr>
+                                    <td>Replacement time (loss/theft)</td>
+                                    <td>Next working day</td>
+                                    <td>2 working days</td>
+                                </tr>
+                                <tr>
+                                    <td>Replacement time (damage/breakdown)</td>
+                                    <td>Next working day</td>
+                                    <td>3-5 working days</td>
+                                </tr>
+                                <tr>
+                                    <td>Insure old/used phones</td>
+                                    <td>Yes</td>
+                                    <td>Only up to 12 months old</td>
+                                </tr>
+                                <tr>
+                                    <td>Up to 80% cashback every year</td>
+                                    <td>Yes</td>
+                                    <td>No</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="text-center">
+        <div class="container">
+            <div class="landing-panel">
+                <div class="row">
+                    <div class="col-sm-6 col-md-3">
+                        <img src="{{ cdn_url }}/images/library_benefits/so-sure_next-working-day.svg" width="150" height="150" alt="so-sure - Next working day repair/replacement">
+                        <h4 class="h-light">Next working day replacement or repair</h4>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <img src="{{ cdn_url }}/images/library_benefits/so-sure_connections.svg" width="150" height="150" alt="so-sure - Cash back when you and your friends don’t claim">
+                        <h4 class="h-light">Cash back when you and your friends don’t claim</h4>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <img src="{{ cdn_url }}/images/library_benefits/so-sure_call-center-staff.svg" width="150" height="150" alt="so-sure - 24/7 Live Support">
+                        <h4 class="h-light">24/7 Live Support</h4>
+                    </div>
+                    <div class="col-sm-6 col-md-3">
+                        <img src="{{ cdn_url }}/images/library_benefits/so-sure_instant-cover.svg" width="150" height="150" alt="so-sure - Instant cover when you buy your policy">
+                        <h4 class="h-light">Instant cover when you buy your policy</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section--pad">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2">
+                    <p class="lead">Get a better level of cover right now. Up to £95 cash back when you don’t claim and 24/7 cover when you do.</p>
+                    <p class="text-center">
+                        <a href="#"
+                           class="btn btn-green btn-lg"
+                           data-toggle="modal"
+                           data-target="#quoteModal">Get a Quote</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    {# Page Modals #}
+
+    {% include 'AppBundle::Default/modalQuote.html.twig' with {'selectPhoneMakeType': 'purchase-select'} %}
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    'components/typeahead.js/typeahead.bundle.min.js'
+    'components/fuse.js/fuse.min.js'
+    '@AppBundle/Resources/public/js/Default/index.js'
+    '@AppBundle/Resources/public/js/Default/selectPhoneMake.js' %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}
+

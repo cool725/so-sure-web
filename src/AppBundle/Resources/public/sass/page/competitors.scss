@@ -1,0 +1,71 @@
+//Competitors
+
+@import "../mixins";
+@import "../common/paletteNew";
+
+body {
+    background-color: $white;
+}
+
+.navbar {
+    background-color: $white;
+}
+
+// Tables
+.panel {
+    .table {
+
+        > thead {
+
+            > tr {
+                > td {
+                    font-weight: bold;
+                    background-color: $primary-blue;
+                    color: $white;
+
+                    padding-top: 15px;
+                    padding-bottom: 15px;
+                    border-right: 2px solid $pale-grey;
+
+                    &:last-of-type {
+                        border-right: none;
+                    }
+                }
+            }
+        }
+
+        > tbody {
+
+            > tr {
+                > td {
+                    font-weight: bold;
+                    padding-top: 15px;
+                    padding-bottom: 15px;
+                    border-color: $pale-grey;
+                    border-width: 2px;
+                    border-right: 2px solid $pale-grey;
+
+                    &:last-of-type {
+                        border-right: none;
+                    }
+                }
+
+                &:first-of-type {
+                    > td {
+                        border-top: none;
+                    }
+                }
+            }
+        }
+
+    }
+
+    .table:first-child > thead:first-child > tr:first-child td:first-child {
+        border-top-left-radius: 10px;
+    }
+
+    .table:first-child > thead:first-child > tr:first-child td:last-child {
+        border-top-right-radius: 10px;
+    }
+}
+
