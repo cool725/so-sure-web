@@ -524,7 +524,7 @@ abstract class BaseController extends Controller
 
         return $phone;
     }
-    
+
     protected function validateObject($object)
     {
         $validator = $this->get('validator');
