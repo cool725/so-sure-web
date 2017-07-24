@@ -3,7 +3,7 @@ $(function(){
     // UK mobile number
     jQuery.validator.addMethod('phoneUK', function(phone_number, element) {
     return this.optional(element) || phone_number.length > 9 &&
-    phone_number.match(/^((\(?0\d{4}\)?\s?\d{3}\s?\d{3})|(\(?0\d{3}\)?\s?\d{3}\s?\d{4})|(\(?0\d{2}\)?\s?\d{4}\s?\d{4}))(\s?\#(\d{4}|\d{3}))?$/);
+    phone_number.match(/([+]?\d{1,2}[.-\s]?)?(\d{3}[.-]?){2}\d{4}/);
     }, 'Please enter a valid phone number');
 
 	$('#team-member-info-modal').on('show.bs.modal', function(event) {
@@ -64,6 +64,9 @@ $(function(){
             "contact_form[message]" : {
                 required: "Please tell us what you'd like to talk about"
             }
+        },
+        submitHandler: function(form) {
+            form.submit();
         }
     });
 });
