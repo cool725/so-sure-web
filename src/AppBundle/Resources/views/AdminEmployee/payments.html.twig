@@ -47,7 +47,10 @@
 <table>
     <tr>
         <th width="15%">Day</th>
-        <th width="15%">Web</th>
+        <th width="15%">Web Overall</th>
+        <th width="15%">Web Standard</th>
+        <th width="15%">Web Unpaid</th>
+        <th width="15%">Web Remainder</th>
         <th width="15%">Web (unique/eventual paid Policy)</th>
         <th width="15%">Token</th>
         <th width="15%">Mobile</th>
@@ -57,6 +60,9 @@
         <tr>
             <td width="15%">{{i }}</td>
             <td width="15%">{{ data[i]['web']['success'] }} / {{ data[i]['web']['total'] }} ({{ (data[i]['web']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+            <td width="15%">{{ data[i]['web-standard']['success'] }} / {{ data[i]['web-standard']['total'] }} ({{ (data[i]['web-standard']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+            <td width="15%">{{ data[i]['web-unpaid']['success'] }} / {{ data[i]['web-unpaid']['total'] }} ({{ (data[i]['web-unpaid']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
+            <td width="15%">{{ data[i]['web-remainder']['success'] }} / {{ data[i]['web-remainder']['total'] }} ({{ (data[i]['web-remainder']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
             <td width="15%">{{ data[i]['policy']['success'] }} / {{ data[i]['policy']['total'] }} ({{ (data[i]['policy']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
             <td width="15%">{{ data[i]['token']['success'] }} / {{ data[i]['token']['total'] }} ({{ (data[i]['token']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
             <td width="15%">{{ data[i]['mobile']['success'] }} / {{ data[i]['mobile']['total'] }} ({{ (data[i]['mobile']['success_percent']*100)|number_format(0, '.', ',') }}%)</td>
