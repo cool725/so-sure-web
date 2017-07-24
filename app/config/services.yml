@@ -315,6 +315,7 @@ services:
             - [setMailer, ['@app.mailer']]
             - [setBucket, ['ops.so-sure.com']]
             - [setPath, ['claims-report']]
+            - [setValidator, ['@validator']]
         tags:
             - { name: monolog.logger, channel: davies }
 
