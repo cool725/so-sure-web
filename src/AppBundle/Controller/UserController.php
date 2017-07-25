@@ -554,7 +554,8 @@ class UserController extends BaseController
         $webpay = $this->get('app.judopay')->webRegister(
             $user,
             $request->getClientIp(),
-            $request->headers->get('User-Agent')
+            $request->headers->get('User-Agent'),
+            $policy
         );
         $billing = new BillingDay();
         $billing->setPolicy($policy);
