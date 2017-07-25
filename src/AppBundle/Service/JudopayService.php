@@ -1237,7 +1237,10 @@ class JudopayService
         $multiPay->getPayer()->addPayerPolicy($policy);
         $this->dm->flush();
 
-        $this->tokenPay($policy, $amount);
+        $payment = $this->tokenPay($policy, $amount);
+        if (!$payment->isSuccess()) {
+            return false;
+        }
 
         $this->policyService->create($policy, $date, true);
         $this->dm->flush();
@@ -1274,7 +1277,10 @@ class JudopayService
             $policy->setPayer($policy->getUser());
         }
 
-        $this->tokenPay($policy, $amount);
+        $payment = $this->tokenPay($policy, $amount);
+        if (!$payment->isSuccess()) {
+            return false;
+        }
 
         $this->policyService->create($policy, $date, true);
         $this->dm->flush();

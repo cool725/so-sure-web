@@ -263,11 +263,20 @@ class ApiAuthController extends BaseController
             $this->denyAccessUnlessGranted('pay', $multiPay);
 
             if ($action == 'accept') {
-                $multiPay->setStatus(MultiPay::STATUS_ACCEPTED);
-
                 /** @var $judopay JudopayService */
                 $judopay = $this->get('app.judopay');
-                $judopay->multiPay($multiPay, $amount);
+                if (!$judopay->multiPay($multiPay, $amount)) {
+                    // TODO: Change to payment declined
+                    throw new \Exception('Failed payment');
+                    /*
+                    return $this->getErrorJsonResponse(
+                        ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED,
+                        'Access denied',
+                        422
+                    );
+                    */
+                }
+                $multiPay->setStatus(MultiPay::STATUS_ACCEPTED);
             } else {
                 $multiPay->setStatus(MultiPay::STATUS_REJECTED);
                 $multiPay->getPolicy()->setStatus(Policy::STATUS_MULTIPAY_REJECTED);
