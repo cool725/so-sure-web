@@ -1205,5 +1205,30 @@ class PolicyServiceTest extends WebTestCase
 
         static::$policyService->activate($renewalPolicy, new \DateTime('2017-01-01'));
         $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicy->getStatus());
+
+        $this->assertEquals(
+            new \DateTime('2017-01-31'),
+            $renewalPolicy->getPolicyExpirationDate(new \DateTime('2017-01-01'))
+        );
+
+        for ($i = 1; $i <= 11; $i++) {
+            static::addPayment(
+                $renewalPolicy,
+                $renewalPolicy->getPremium()->getMonthlyPremiumPrice(),
+                Salva::MONTHLY_TOTAL_COMMISSION
+            );
+        }
+        static::addPayment(
+            $renewalPolicy,
+            $renewalPolicy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::FINAL_MONTHLY_TOTAL_COMMISSION
+        );
+
+        $premium = $renewalPolicy->getPremium();
+        $this->assertEquals($premium->getYearlyPremiumPrice(), $renewalPolicy->getTotalPremiumPrice());
+        $this->assertEquals($premium->getYearlyGwp(), $renewalPolicy->getTotalGwp());
+        $this->assertEquals($premium->getYearlyGwp(), $renewalPolicy->getUsedGwp());
+        $this->assertEquals($premium->getYearlyIpt(), $renewalPolicy->getTotalIpt());
+        $this->assertEquals(Salva::YEARLY_TOTAL_COMMISSION, $renewalPolicy->getTotalBrokerFee());
     }
 }
