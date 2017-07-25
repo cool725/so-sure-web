@@ -13,6 +13,9 @@ body {
 
 // Tables
 .panel {
+    @include border-radius(10px);
+    border: none;
+
     .table {
 
         > thead {
