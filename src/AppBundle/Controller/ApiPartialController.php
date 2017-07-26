@@ -147,7 +147,7 @@ class ApiPartialController extends BaseController
             $features = $repo->findAll();
 
             return new JsonResponse([
-                'excesses' => $this->eachApiArray($features),
+                'flags' => $this->eachApiArray($features),
             ]);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api featureFlagsAction.', ['exception' => $e]);
