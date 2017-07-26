@@ -5,7 +5,7 @@
 {# {% set new_footer = 1 %} #}
 
 
-{% block title %}so-sure - Protect Your Bubble vs So-Sure Phone Insurance
+{% block title %}so-sure - SO-SURE vs Protect Your Bubble Phone Insurance
 {% endblock %}
 
 {% block stylesheets %}
@@ -18,18 +18,29 @@
 
 {% block body %}
 
-    <section class="section--pad background-off-white">
+    <section class="section--pad">
         <div class="container">
-            <h1 class="text-blue text-center">Protect Your Bubble vs So-Sure Phone Insurance</h1>
+            <h1 class="text-blue text-center">SO-SURE vs Protect Your Bubble Phone Insurance</h1>
             <div class="row">
                 <div class="col-md-8 col-md-offset-2">
-                    <p class="big-text text-center">At So-Sure we believe in keeping things real. We don’t want to hide behind any marketing gimmicks or fancy numbers.</p>
+                    <p class="text-center"><span class="big-text">At so-sure we believe in keeping things real. We don’t want to hide behind any marketing gimmicks or fancy numbers.</span></p>
+                    <p class="text-center">
+                        <a href="#"
+                           class="btn btn-green btn-lg btn-pad"
+                           data-toggle="modal"
+                           data-target="#quoteModal">Get a Quote</a>
+                    </p>
                 </div>
             </div>
         </div>
+        {# Curve #}
+        <svg class="curved-background hidden-xs" viewBox="0 0 500 150" preserveAspectRatio="xMinYMin meet">
+            <path d="M0,100 C150,200 350,0 500,100 L500,00 L0,0 Z" style="stroke: none; fill:#ffffff;"></path>
+        </svg>
+        {# End Curve #}
     </section>
 
-    <section class="section--pad background-lightest-blue">
+    <section class="background-lightest-blue">
         <div class="container">
             <div class="row">
                 <div class="col-md-8 col-md-offset-2">
@@ -39,52 +50,57 @@
                             <thead>
                                 <tr>
                                     <td></td>
-                                    <td class="h3">so-sure</td>
-                                    <td class="h3">Protect Your Bubble</td>
+                                    <td align="center" class="h4" width="28%">SO-SURE</td>
+                                    <td align="center" class="h4" width="28%">Protect Your Bubble</td>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
                                     <td class="background-off-white">Cover for theft, damage and breakdown</td>
-                                    <td>Yes</td>
-                                    <td>Yes</td>
+                                    <td align="center" class="tick-background">Yes</td>
+                                    <td align="center" class="tick-background">Yes</td>
                                 </tr>
                                 <tr>
                                     <td class="background-off-white">Cover for loss</td>
-                                    <td>As standard</td>
-                                    <td>Extra £1.50 per month</td>
+                                    <td align="center" class="tick-background">As standard</td>
+                                    <td align="center" class="cross-background">Extra £1.50 per month</td>
                                 </tr>
                                 <tr>
                                     <td class="background-off-white">Replacement time (loss/theft)</td>
-                                    <td>Next working day</td>
-                                    <td>2 working days</td>
+                                    <td align="center">1 working day</td>
+                                    <td align="center">2 working days</td>
                                 </tr>
                                 <tr>
                                     <td class="background-off-white">Replacement time (damage/breakdown)</td>
-                                    <td>Next working day</td>
-                                    <td>3-5 working days</td>
+                                    <td align="center">1 working day</td>
+                                    <td align="center">3-5 working days</td>
                                 </tr>
                                 <tr>
                                     <td class="background-off-white">Insure old/used phones</td>
-                                    <td>Yes</td>
-                                    <td>Only up to 12 months old</td>
+                                    <td align="center" class="tick-background">Yes</td>
+                                    <td align="center" class="cross-background">Only up to 12 months old</td>
                                 </tr>
                                 <tr>
                                     <td class="background-off-white">Up to 80% cashback every year</td>
-                                    <td>Yes</td>
-                                    <td>No</td>
+                                    <td align="center" class="tick-background">Yes</td>
+                                    <td align="center" class="cross-background">No</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
-                    <p class="text-center">
-                        <a href="#"
-                           class="btn btn-green btn-lg"
-                           data-toggle="modal"
-                           data-target="#quoteModal">Get a Quote</a>
-                    </p>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <section class="section--pad background-lightest-blue">
+        <div class="container">
+            <p class="text-center">
+                <a href="#"
+                   class="btn btn-green btn-pad btn-lg"
+                   data-toggle="modal"
+                   data-target="#quoteModal">Get a Quote</a>
+            </p>
         </div>
     </section>
 
@@ -92,6 +108,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-8 col-md-offset-2">
+                    <h2 class="text-blue">SO-SURE benefits</h2>
                     <div class="row">
                         <div class="col-sm-6 col-md-3">
                             <img src="{{ cdn_url }}/images/library_benefits/so-sure_next-working-day.svg" width="150" height="150" alt="so-sure - Next working day repair/replacement">
@@ -122,7 +139,7 @@
                     <p class="lead">Get a better level of cover right now. Up to £95 cash back when you don’t claim and 24/7 cover when you do.</p>
                     <p class="text-center">
                         <a href="#"
-                           class="btn btn-green btn-lg"
+                           class="btn btn-green btn-pad btn-lg"
                            data-toggle="modal"
                            data-target="#quoteModal">Get a Quote</a>
                     </p>

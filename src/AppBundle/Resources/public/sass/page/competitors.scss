@@ -11,6 +11,22 @@ body {
     background-color: $white;
 }
 
+section {
+    position: relative;
+
+    .container {
+        position: relative;
+        z-index: 3;
+    }
+}
+
+.curved-background {
+    display: inline-block;
+    position: absolute;
+    top: 100%; left: 0;
+    z-index: 2;
+}
+
 // Tables
 .panel {
     @include border-radius(10px);
@@ -72,3 +88,10 @@ body {
     }
 }
 
+.tick-background {
+    background: $white url('https://cdn.so-sure.com/images/library_benefits/so-sure_cover-tick-smaller.svg') center no-repeat;
+}
+
+.cross-background {
+    background: $white url('https://cdn.so-sure.com/images/library_benefits/so-sure_cover-cross-smaller.svg') center no-repeat;
+}

@@ -531,10 +531,10 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/protect-your-bubble-vs-so-sure", name="protect_your_bubble_vs_so_sure")
+     * @Route("/so-sure-vs-protect-your-bubble", name="so_sure_vs_protect_your_bubble")
      * @Template
      */
-    public function protectYourBubbleVsSoSure()
+    public function soSureVsProtectYourBubble()
     {
         return array();
     }
