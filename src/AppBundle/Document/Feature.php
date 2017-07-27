@@ -13,10 +13,12 @@ class Feature
 {
     const FEATURE_QUOTE_LEAD = 'quote-lead';
     const FEATURE_RENEWAL = 'renewal';
+    const FEATURE_PICSURE = 'picsure';
 
     public static $features = [
         self::FEATURE_QUOTE_LEAD,
         self::FEATURE_RENEWAL,
+        self::FEATURE_PICSURE,
     ];
 
     /**

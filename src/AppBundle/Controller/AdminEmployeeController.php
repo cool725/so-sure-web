@@ -75,6 +75,7 @@ use AppBundle\Form\Type\UserEmailType;
 use AppBundle\Form\Type\UserPermissionType;
 use AppBundle\Form\Type\ClaimFlagsType;
 use AppBundle\Exception\RedirectException;
+use AppBundle\Service\PushService;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
