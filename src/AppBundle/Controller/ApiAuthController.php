@@ -12,7 +12,7 @@ use AppBundle\Form\Type\LaunchType;
 use AppBundle\Form\Type\PhoneType;
 
 use AppBundle\Document\Address;
-use AppBundle\Document\Payment;
+use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;

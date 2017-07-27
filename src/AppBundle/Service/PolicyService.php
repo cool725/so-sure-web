@@ -1208,6 +1208,30 @@ class PolicyService
         return $expired;
     }
 
+    public function fullyExpireExpiredClaimablePolicies($prefix, $dryRun = false)
+    {
+        $fullyExpired = [];
+        $policyRepo = $this->dm->getRepository(Policy::class);
+        $policies = $policyRepo->findPoliciesForFullExpiration($prefix);
+        foreach ($policies as $policy) {
+            $fullyExpired[$policy->getId()] = $policy->getPolicyNumber();
+            if (!$dryRun) {
+                try {
+                    $this->fullyExpire($policy);
+                } catch (\Exception $e) {
+                    $msg = sprintf(
+                        'Error Fully Expiring Policy %s / %s',
+                        $policy->getPolicyNumber(),
+                        $policy->getId()
+                    );
+                    $this->logger->error($msg, ['exception' => $e]);
+                }
+            }
+        }
+
+        return $fullyExpired;
+    }
+
     /**
      * @param Policy    $policy
      * @param \DateTime $date
@@ -1220,6 +1244,16 @@ class PolicyService
         $this->expiredPolicyEmail($policy);
 
         $this->dispatchEvent(PolicyEvent::EVENT_EXPIRED, new PolicyEvent($policy));
+    }
+
+    /**
+     * @param Policy    $policy
+     * @param \DateTime $date
+     */
+    public function fullyExpire(Policy $policy, \DateTime $date = null)
+    {
+        $policy->fullyExpire($date);
+        $this->dm->flush();
     }
 
     /**
@@ -1362,11 +1396,16 @@ class PolicyService
         // TODO: $usePot
         $startDate = $this->endOfDay($policy->getEnd());
         $this->create($newPolicy, $startDate, null, $numPayments);
+        $discount = 0;
         if ($usePot) {
-            $newPolicy->getPremium()->setAnnualDiscount($policy->getPotValue());
+            $discount = $policy->getPotValue();
         }
-        $newPolicy->renew($date);
+        $newPolicy->renew($discount, $date);
         $this->dm->flush();
+
+        if ($usePot) {
+            $this->adjustScheduledPayments($newPolicy, false, $date);
+        }
 
         return $newPolicy;
     }

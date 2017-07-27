@@ -11,7 +11,9 @@ use AppBundle\Document\Lead;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Reward;
 use AppBundle\Document\SCode;
-use AppBundle\Document\JudoPayment;
+use AppBundle\Document\Payment\JudoPayment;
+use AppBundle\Document\Payment\PolicyDiscountPayment;
+use AppBundle\Document\Payment\PotRewardPayment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\CurrencyTrait;
@@ -1788,6 +1790,22 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($policy->canCancel(Policy::CANCELLED_USER_REQUESTED, new \DateTime("2016-01-01")));
     }
 
+    public function testCanCancelPolicyExpiredClaimable()
+    {
+        $policy = new SalvaPhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $user = new User();
+        $user->setEmail(static::generateEmail('can-cancel-policy-expired', $this));
+        self::addAddress($user);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
+        $policy->setStart(new \DateTime("2016-01-01"));
+        $policy->setEnd(new \DateTime("2016-12-31 23:59"));
+        $policy->setStatus(Policy::STATUS_EXPIRED_CLAIMABLE);
+        $this->assertFalse($policy->canCancel(Policy::CANCELLED_USER_REQUESTED, new \DateTime("2016-01-01")));
+    }
+
     public function testIsWithinCooloffPeriod()
     {
         $policy = new SalvaPhonePolicy();
@@ -2659,6 +2677,7 @@ class PhonePolicyTest extends WebTestCase
         $ignoredStatuses = [
             SalvaPhonePolicy::STATUS_CANCELLED,
             SalvaPhonePolicy::STATUS_EXPIRED,
+            SalvaPhonePolicy::STATUS_EXPIRED_CLAIMABLE,
             SalvaPhonePolicy::STATUS_MULTIPAY_REJECTED,
             SalvaPhonePolicy::STATUS_MULTIPAY_REQUESTED
         ];
@@ -2848,7 +2867,7 @@ class PhonePolicyTest extends WebTestCase
 
     public function testRenewActivateExpire()
     {
-        $policy = $this->getPolicy(static::generateEmail('testRenew', $this));
+        $policy = $this->getPolicy(static::generateEmail('testRenewActivateExpire', $this));
 
         $this->assertFalse($policy->isRenewed());
 
@@ -2857,7 +2876,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($policy->isRenewed());
         $this->assertTrue($renewalPolicy->isRenewalAllowed(new \DateTime('2016-12-15')));
 
-        $renewalPolicy->renew(new \DateTime('2016-12-15'));
+        $renewalPolicy->renew(0, new \DateTime('2016-12-15'));
 
         $this->assertTrue($policy->isRenewed());
 
@@ -2865,7 +2884,116 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicy->getStatus());
 
         $policy->expire(new \DateTime("2017-01-01"));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policy->getStatus());
+
+        $policy->fullyExpire(new \DateTime("2017-01-29"));
         $this->assertEquals(Policy::STATUS_EXPIRED, $policy->getStatus());
+        foreach ($policy->getPayments() as $payment) {
+            $this->assertFalse($payment instanceof PotRewardPayment);
+            $this->assertFalse($payment instanceof PolicyDiscountPayment);
+        }
+    }
+
+    public function testRenewActivateExpireWithPot()
+    {
+        $policyA = $this->getPolicy(static::generateEmail('testRenewActivateExpireWithPot-A', $this));
+        $policyB = $this->getPolicy(static::generateEmail('testRenewActivateExpireWithPot-B', $this));
+        list($connectionA, $connectionB) = $this->createLinkedConnections($policyA, $policyB, 10, 10);
+
+        $this->assertFalse($policyA->isRenewed());
+
+        $renewalPolicyA = $this->getRenewalPolicy($policyA);
+
+        $this->assertFalse($policyA->isRenewed());
+        $this->assertTrue($renewalPolicyA->isRenewalAllowed(new \DateTime('2016-12-15')));
+
+        $renewalPolicyA->renew(10, new \DateTime('2016-12-15'));
+
+        $this->assertTrue($policyA->isRenewed());
+
+        $renewalPolicyA->activate(new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+
+        $policyA->expire(new \DateTime("2017-01-01"));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        $policyA->fullyExpire(new \DateTime("2017-01-29"));
+        $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
+        $foundReward = false;
+        $foundDiscount = false;
+        foreach ($policyA->getPayments() as $payment) {
+            if ($payment instanceof PotRewardPayment) {
+                $this->assertEquals(-10, $payment->getAmount());
+                $foundReward = true;
+            }
+            if ($payment instanceof PolicyDiscountPayment) {
+                $this->assertEquals(10, $payment->getAmount());
+                $foundDiscount = true;
+            }
+        }
+
+        $this->assertTrue($foundReward);
+        $this->assertTrue($foundDiscount);
+
+        $foundRenewalDiscount = false;
+        foreach ($renewalPolicyA->getPayments() as $payment) {
+            if ($payment instanceof PolicyDiscountPayment) {
+                $this->assertEquals(10, $payment->getAmount());
+                $foundRenewalDiscount = true;
+            }
+        }
+
+        $this->assertTrue($foundRenewalDiscount);
+    }
+
+    public function testRenewActivateExpireWithoutPot()
+    {
+        $policyA = $this->getPolicy(static::generateEmail('testRenewActivateExpireWithoutPot-A', $this));
+        $policyB = $this->getPolicy(static::generateEmail('testRenewActivateExpireWithoutPot-B', $this));
+        list($connectionA, $connectionB) = $this->createLinkedConnections($policyA, $policyB, 10, 10);
+
+        $this->assertFalse($policyA->isRenewed());
+
+        $renewalPolicyA = $this->getRenewalPolicy($policyA);
+
+        $this->assertFalse($policyA->isRenewed());
+        $this->assertTrue($renewalPolicyA->isRenewalAllowed(new \DateTime('2016-12-15')));
+
+        $renewalPolicyA->renew(0, new \DateTime('2016-12-15'));
+
+        $this->assertTrue($policyA->isRenewed());
+
+        $renewalPolicyA->activate(new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+
+        $policyA->expire(new \DateTime("2017-01-01"));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        $policyA->fullyExpire(new \DateTime("2017-01-29"));
+        $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
+        $foundReward = false;
+        $foundDiscount = false;
+        foreach ($policyA->getPayments() as $payment) {
+            if ($payment instanceof PotRewardPayment) {
+                $this->assertEquals(-10, $payment->getAmount());
+                $foundReward = true;
+            }
+            if ($payment instanceof PolicyDiscountPayment) {
+                $foundDiscount = true;
+            }
+        }
+
+        $this->assertTrue($foundReward);
+        $this->assertFalse($foundDiscount);
+
+        $foundRenewalDiscount = false;
+        foreach ($renewalPolicyA->getPayments() as $payment) {
+            if ($payment instanceof PolicyDiscountPayment) {
+                $foundDiscount = true;
+            }
+        }
+
+        $this->assertFalse($foundRenewalDiscount);
     }
 
     public function testRenewPendingCancellation()
@@ -2880,7 +3008,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertTrue($renewalPolicy->isRenewalAllowed(new \DateTime('2016-12-31 23:59')));
         $this->assertFalse($renewalPolicy->isRenewalAllowed(new \DateTime('2017-01-01')));
 
-        $renewalPolicy->renew(new \DateTime('2016-12-15'));
+        $renewalPolicy->renew(0, new \DateTime('2016-12-15'));
         $this->assertNull($renewalPolicy->getPendingCancellation());
     }
 
@@ -2893,7 +3021,7 @@ class PhonePolicyTest extends WebTestCase
         $renewalPolicy = $this->getRenewalPolicy($policy);
         $renewalPolicy->setStatus(Policy::STATUS_ACTIVE);
         $this->assertFalse($renewalPolicy->isRenewalAllowed(new \DateTime('2016-12-15')));
-        $renewalPolicy->renew();
+        $renewalPolicy->renew(0);
     }
 
     /**
@@ -2903,7 +3031,7 @@ class PhonePolicyTest extends WebTestCase
     {
         $policy = $this->getPolicy(static::generateEmail('testActivateInvalidStatus', $this));
         $renewalPolicy = $this->getRenewalPolicy($policy);
-        $renewalPolicy->renew();
+        $renewalPolicy->renew(0);
         $renewalPolicy->setStatus(Policy::STATUS_ACTIVE);
         $renewalPolicy->activate(new \DateTime('2017-01-01'));
     }
@@ -2915,7 +3043,7 @@ class PhonePolicyTest extends WebTestCase
     {
         $policy = $this->getPolicy(static::generateEmail('testActivateInvalidStatus', $this));
         $renewalPolicy = $this->getRenewalPolicy($policy);
-        $renewalPolicy->renew();
+        $renewalPolicy->renew(0);
         $renewalPolicy->activate(new \DateTime('2016-12-31 23:59'));
     }
 
@@ -2926,7 +3054,7 @@ class PhonePolicyTest extends WebTestCase
     {
         $policy = $this->getPolicy(static::generateEmail('testActivateInvalidStatus', $this));
         $renewalPolicy = $this->getRenewalPolicy($policy);
-        $renewalPolicy->renew();
+        $renewalPolicy->renew(0);
         $renewalPolicy->activate(new \DateTime('2017-01-09'));
     }
 
@@ -2942,6 +3070,15 @@ class PhonePolicyTest extends WebTestCase
     /**
      * @expectedException \Exception
      */
+    public function testFullyExpireTooEarly()
+    {
+        $policy = $this->getPolicy(static::generateEmail('testExpireTooEarly', $this));
+        $policy->fullyExpire(new \DateTime("2016-12-31 23:58"));
+    }
+
+    /**
+     * @expectedException \Exception
+     */
     public function testExpireInvalidStatus()
     {
         $policy = $this->getPolicy(static::generateEmail('testExpireInvalidStatus', $this));
@@ -2949,12 +3086,22 @@ class PhonePolicyTest extends WebTestCase
         $policy->expire(new \DateTime("2017-01-01"));
     }
 
+    /**
+     * @expectedException \Exception
+     */
+    public function testFullyExpireInvalidStatus()
+    {
+        $policy = $this->getPolicy(static::generateEmail('testExpireInvalidStatus', $this));
+        $policy->setStatus(Policy::STATUS_CANCELLED);
+        $policy->fullyExpire(new \DateTime("2017-01-01"));
+    }
+
     public function testExpireUnpaid()
     {
         $policy = $this->getPolicy(static::generateEmail('testExpireInvalidStatus', $this));
         $policy->setStatus(Policy::STATUS_UNPAID);
         $policy->expire(new \DateTime("2017-01-01"));
-        $this->assertEquals(Policy::STATUS_EXPIRED, $policy->getStatus());
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policy->getStatus());
     }
 
     private function getPolicy($email)

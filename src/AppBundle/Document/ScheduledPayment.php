@@ -6,6 +6,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
+use AppBundle\Document\Payment\Payment;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\ScheduledPaymentRepository")
@@ -70,7 +71,8 @@ class ScheduledPayment
     protected $policy;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="Payment", inversedBy="scheduledPayment", cascade={"persist"})
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Payment\Payment",
+     *     inversedBy="scheduledPayment", cascade={"persist"})
      * @Gedmo\Versioned
      */
     protected $payment;

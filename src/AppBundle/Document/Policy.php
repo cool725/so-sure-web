@@ -14,6 +14,8 @@ use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\File\PolicyTermsFile;
 use AppBundle\Document\File\PolicyScheduleFile;
+use AppBundle\Document\Payment\PolicyDiscountPayment;
+use AppBundle\Document\Payment\PotRewardPayment;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PolicyRepository")
@@ -46,6 +48,7 @@ abstract class Policy
     const STATUS_PENDING = 'pending';
     const STATUS_ACTIVE = 'active';
     const STATUS_CANCELLED = 'cancelled';
+    const STATUS_EXPIRED_CLAIMABLE = 'expired-claimable';
     const STATUS_EXPIRED = 'expired';
     const STATUS_UNPAID = 'unpaid';
     const STATUS_MULTIPAY_REQUESTED = 'multipay-requested';
@@ -96,7 +99,8 @@ abstract class Policy
     protected $id;
 
     /**
-     * @MongoDB\ReferenceMany(targetDocument="Payment", mappedBy="policy", cascade={"persist"})
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Payment\Payment",
+     *     mappedBy="policy", cascade={"persist"})
      */
     protected $payments;
 
@@ -139,7 +143,7 @@ abstract class Policy
     protected $payer;
 
     /**
-     * @Assert\Choice({"pending", "active", "cancelled", "expired", "unpaid",
+     * @Assert\Choice({"pending", "active", "cancelled", "expired", "expired-claimable", "unpaid",
      *                  "multipay-requested", "multipay-rejected", "renewal",
      *                  "pending-renewal"}, strict=true)
      * @MongoDB\Field(type="string")
@@ -1831,7 +1835,7 @@ abstract class Policy
 
     public function isExpired()
     {
-        return $this->getStatus() == self::STATUS_EXPIRED;
+        return in_array($this->getStatus(), [self::STATUS_EXPIRED, self::STATUS_EXPIRED_CLAIMABLE]);
     }
 
     public function isCancelled()
@@ -1889,7 +1893,11 @@ abstract class Policy
     public function canCancel($reason, $date = null)
     {
         // Doesn't make sense to cancel
-        if (in_array($this->getStatus(), [self::STATUS_CANCELLED, self::STATUS_EXPIRED])) {
+        if (in_array($this->getStatus(), [
+            self::STATUS_CANCELLED,
+            self::STATUS_EXPIRED,
+            self::STATUS_EXPIRED_CLAIMABLE
+        ])) {
             return false;
         }
 
@@ -2297,7 +2305,7 @@ abstract class Policy
         return true;
     }
 
-    public function renew(\DateTime $date = null)
+    public function renew($discount, \DateTime $date = null)
     {
         if ($date == null) {
             $date = new \DateTime();
@@ -2313,6 +2321,10 @@ abstract class Policy
         $this->setStatus(Policy::STATUS_RENEWAL);
         // clear the max allowed renewal date
         $this->setPendingCancellation(null);
+
+        if ($discount && $discount > 0) {
+            $this->getPremium()->setAnnualDiscount($discount);
+        }
     }
 
     public function activate(\DateTime $date = null)
@@ -2361,7 +2373,7 @@ abstract class Policy
             throw new \Exception('Unable to expire a policy if status is not active or unpaid');
         }
 
-        $this->setStatus(Policy::STATUS_EXPIRED);
+        $this->setStatus(Policy::STATUS_EXPIRED_CLAIMABLE);
 
         /* TODO: Determine rules around user locking
         $user = $this->getUser();
@@ -2376,6 +2388,46 @@ abstract class Policy
         foreach ($this->getScheduledPayments() as $scheduledPayment) {
             if ($scheduledPayment->getStatus() == ScheduledPayment::STATUS_SCHEDULED) {
                 $scheduledPayment->setStatus(ScheduledPayment::STATUS_CANCELLED);
+            }
+        }
+    }
+
+    /**
+     * Fully Expire the policy itself. Claims are no longer allowed against the policy.
+     */
+    public function fullyExpire(\DateTime $date = null)
+    {
+        if ($date == null) {
+            $date = new \DateTime();
+        }
+
+        if ($date < $this->getEnd()) {
+            throw new \Exception('Unable to expire a policy prior to its end date');
+        }
+
+        if (!in_array($this->getStatus(), [
+            self::STATUS_EXPIRED_CLAIMABLE,
+        ])) {
+            throw new \Exception('Unable to fully expire a policy if status is not expired-claimable');
+        }
+
+        $this->setStatus(Policy::STATUS_EXPIRED);
+
+        $this->updatePotValue();
+
+        if ($this->getPotValue() > 0 && !$this->areEqualToTwoDp(0, $this->getPotValue())) {
+            $reward = new PotRewardPayment();
+            $reward->setAmount(0 - $this->getPotValue());
+            $this->addPayment($reward);
+
+            if ($this->getNextPolicy() && $this->getNextPolicy()->getPremium()->hasAnnualDiscount()) {
+                $discount = new PolicyDiscountPayment();
+                $discount->setAmount($this->getPotValue());
+                $this->addPayment($discount);
+
+                $discount = new PolicyDiscountPayment();
+                $discount->setAmount($this->getPotValue());
+                $this->getNextPolicy()->addPayment($discount);
             }
         }
     }
@@ -2559,6 +2611,7 @@ abstract class Policy
         $ignoredStatuses = [
             self::STATUS_CANCELLED,
             self::STATUS_EXPIRED,
+            self::STATUS_EXPIRED_CLAIMABLE,
             self::STATUS_MULTIPAY_REJECTED,
             self::STATUS_MULTIPAY_REQUESTED
         ];
@@ -2688,6 +2741,13 @@ abstract class Policy
 
         if (in_array($this->getStatus(), [self::STATUS_CANCELLED, self::STATUS_EXPIRED])) {
             $warnings[] = sprintf('Policy is %s - DO NOT ALLOW CLAIM', $this->getStatus());
+        }
+
+        if (in_array($this->getStatus(), [self::STATUS_EXPIRED_CLAIMABLE])) {
+            $warnings[] = sprintf(
+                'Policy is expired - ONLY ALLOW IF LOSS WAS BEFORE %s',
+                $this->getEnd()->format(\DateTime::ATOM)
+            );
         }
 
         if ($this->hasOpenClaim(true)) {
@@ -2934,6 +2994,7 @@ abstract class Policy
             self::STATUS_CANCELLED,
             self::STATUS_UNPAID,
             self::STATUS_EXPIRED,
+            self::STATUS_EXPIRED_CLAIMABLE,
         ])) {
             throw new \Exception(sprintf('Policy %s is missing terms', $this->getId()));
         }

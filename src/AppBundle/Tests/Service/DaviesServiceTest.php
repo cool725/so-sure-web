@@ -45,7 +45,7 @@ class DaviesServiceTest extends WebTestCase
 
         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $phoneRepo = self::$dm->getRepository(Phone::class);
-        self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
+        self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 6', 'memory' => 64]);
         self::$phoneA = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
         self::$phoneB = $phoneRepo->findOneBy(['devices' => 'A0001', 'memory' => 64]);
     }
@@ -53,6 +53,11 @@ class DaviesServiceTest extends WebTestCase
     public function setUp()
     {
         self::$daviesService->clearErrors();
+        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $phoneRepo = self::$dm->getRepository(Phone::class);
+        self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 6', 'memory' => 64]);
+        self::$phoneA = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
+        self::$phoneB = $phoneRepo->findOneBy(['devices' => 'A0001', 'memory' => 64]);
     }
 
     public function tearDown()
@@ -730,7 +735,6 @@ class DaviesServiceTest extends WebTestCase
 
     public function testSaveClaimsYesterday()
     {
-        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $policy = static::createUserPolicy(true);
         $policy->getUser()->setEmail(static::generateEmail('testSaveClaimsYesterday', $this));
         $claim = new Claim();
@@ -738,10 +742,10 @@ class DaviesServiceTest extends WebTestCase
         $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_APPROVED);
         $policy->addClaim($claim);
-        $dm->persist($policy->getUser());
-        $dm->persist($policy);
-        $dm->persist($claim);
-        $dm->flush();
+        static::$dm->persist($policy->getUser());
+        static::$dm->persist($policy);
+        static::$dm->persist($claim);
+        static::$dm->flush();
 
         $daviesClaim = new DaviesClaim();
         $daviesClaim->claimNumber = $claim->getNumber();

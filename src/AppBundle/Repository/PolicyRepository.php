@@ -28,6 +28,7 @@ class PolicyRepository extends BaseDocumentRepository
                 Policy::STATUS_ACTIVE,
                 Policy::STATUS_CANCELLED,
                 Policy::STATUS_EXPIRED,
+                Policy::STATUS_EXPIRED_CLAIMABLE,
                 Policy::STATUS_UNPAID
             ])
             ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policyPrefix)))
@@ -94,6 +95,25 @@ class PolicyRepository extends BaseDocumentRepository
             ->field('status')->in([
                 Policy::STATUS_ACTIVE,
                 Policy::STATUS_UNPAID,
+            ])
+            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policyPrefix)))
+            ->field('end')->lte($date);
+
+        return $qb
+            ->getQuery()
+            ->execute();
+    }
+
+    public function findPoliciesForFullExpiration($policyPrefix, \DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+            $date = $date->sub(new \DateInterval('P28D'));
+        }
+
+        $qb = $this->createQueryBuilder()
+            ->field('status')->in([
+                Policy::STATUS_EXPIRED_CLAIMABLE,
             ])
             ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policyPrefix)))
             ->field('end')->lte($date);

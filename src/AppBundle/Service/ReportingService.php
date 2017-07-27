@@ -10,7 +10,7 @@ use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Lead;
-use AppBundle\Document\Payment;
+use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
@@ -402,6 +402,8 @@ class ReportingService
             Payment::SOURCE_ANDROID_PAY,
             Payment::SOURCE_SOSURE,
             Payment::SOURCE_BACS,
+            Payment::SOURCE_SYSTEM,
+            Payment::SOURCE_ADMIN,
             sprintf('web-%s', JudopayService::WEB_TYPE_STANDARD),
             sprintf('web-%s', JudopayService::WEB_TYPE_UNPAID),
             sprintf('web-%s', JudopayService::WEB_TYPE_REMAINDER),

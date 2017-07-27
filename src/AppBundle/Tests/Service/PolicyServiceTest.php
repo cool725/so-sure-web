@@ -5,15 +5,15 @@ namespace AppBundle\Tests\Service;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
-use AppBundle\Document\BacsPayment;
+use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PolicyTerms;
-use AppBundle\Document\GocardlessPayment;
+use AppBundle\Document\Payment\GocardlessPayment;
 use AppBundle\Document\SCode;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\Phone;
-use AppBundle\Document\JudoPayment;
+use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\OptOut\EmailOptOut;
@@ -1132,7 +1132,7 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
 
         static::$policyService->expire($policy, new \DateTime('2017-01-01'));
-        $this->assertEquals(Policy::STATUS_EXPIRED, $policy->getStatus());
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policy->getStatus());
     }
 
     public function testPolicyRenew()

@@ -5,7 +5,7 @@ namespace AppBundle\Tests\Document;
 use AppBundle\Classes\Salva;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\SalvaPhonePolicy;
-use AppBundle\Document\JudoPayment;
+use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\CurrencyTrait;
 
 /**

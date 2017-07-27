@@ -12,7 +12,7 @@ use AppBundle\Classes\Salva;
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
-use AppBundle\Document\Payment;
+use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Listener\RefundListener;

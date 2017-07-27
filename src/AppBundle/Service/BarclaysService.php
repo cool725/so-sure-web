@@ -4,7 +4,7 @@ namespace AppBundle\Service;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Document\CurrencyTrait;
-use AppBundle\Document\JudoPayment;
+use AppBundle\Document\Payment\JudoPayment;
 
 class BarclaysService
 {

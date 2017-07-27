@@ -6,7 +6,7 @@ use AppBundle\Classes\Salva;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Document\PhonePrice;
-use AppBundle\Document\JudoPayment;
+use AppBundle\Document\Payment\JudoPayment;
 
 /**
  * @group unit
