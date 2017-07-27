@@ -24,6 +24,8 @@ class PushService
     const MESSAGE_PROMO = 'promo';
     const MESSAGE_MULTIPAY = 'multipay';
 
+    const PSEUDO_MESSAGE_PICSURE = 'picsure';
+
     /** @var LoggerInterface */
     protected $logger;
 
@@ -83,6 +85,8 @@ class PushService
             return ClientUrl::POT;
         } elseif ($messageType == self::MESSAGE_INVITATION) {
             return ClientUrl::POT;
+        } elseif ($messageType == self::PSEUDO_MESSAGE_PICSURE) {
+            return ClientUrl::PICSURE;
         } else {
             return null;
         }
@@ -113,9 +117,20 @@ class PushService
             return true;
         } elseif ($messageType == self::MESSAGE_MULTIPAY) {
             return true;
+        } elseif ($messageType == self::PSEUDO_MESSAGE_PICSURE) {
+            return true;
         } else {
             return null;
         }
+    }
+
+    public function getActualMessageType($messageType)
+    {
+        if ($messageType == self::PSEUDO_MESSAGE_PICSURE) {
+            return self::MESSAGE_GENERAL;
+        }
+
+        return $messageType;
     }
 
     /**
@@ -142,7 +157,7 @@ class PushService
         }
 
         $apns['aps']['alert'] = $message;
-        $apns['aps']['category'] = $messageType;
+        $apns['aps']['category'] = $this->getActualMessageType($messageType);
         if ($badge) {
             $apns['aps']['badge'] = $badge;
         }
@@ -159,7 +174,7 @@ class PushService
     public function getCustomData($messageType, $messageData = null)
     {
         $data = [];
-        $data['ss']['message_type'] = $messageType;
+        $data['ss']['message_type'] = $this->getActualMessageType($messageType);
         if ($messageData) {
             $data['ss']['data'][$messageType] = $messageData;
         }

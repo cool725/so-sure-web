@@ -1517,9 +1517,9 @@ class AdminEmployeeController extends BaseController
             try {
                 $push = $this->get('app.push');
                 // @codingStandardsIgnoreStart
-                $push->sendToUser(PushService::MESSAGE_GENERAL, $policy->getUser(), sprintf(
+                $push->sendToUser(PushService::PSEUDO_MESSAGE_PICSURE, $policy->getUser(), sprintf(
                     'Your pic-sure image has been approved and your phone is now valided.'
-                ), null, ['ss' => ['uri' => ClientUrl::PICSURE, 'refresh' => true]]);
+                ));
                 // @codingStandardsIgnoreEnd
             } catch (\Exception $e) {
                 $this->get('logger')->error(sprintf("Error in pic-sure push."), ['exception' => $e]);
@@ -1532,9 +1532,9 @@ class AdminEmployeeController extends BaseController
             try {
                 $push = $this->get('app.push');
                 // @codingStandardsIgnoreStart
-                $push->sendToUser(PushService::MESSAGE_GENERAL, $policy->getUser(), sprintf(
+                $push->sendToUser(PushService::PSEUDO_MESSAGE_PICSURE, $policy->getUser(), sprintf(
                     'Your pic-sure image has been rejected. If you phone was damaged prior to your policy purchase, then it is crimial fraud to claim on our policy. Please contact us if you have purchased this policy by mistake.'
-                ), null, ['ss' => ['uri' => ClientUrl::PICSURE, 'refresh' => true]]);
+                ));
                 // @codingStandardsIgnoreEnd
             } catch (\Exception $e) {
                 $this->get('logger')->error(sprintf("Error in pic-sure push."), ['exception' => $e]);
@@ -1547,9 +1547,9 @@ class AdminEmployeeController extends BaseController
             try {
                 $push = $this->get('app.push');
                 // @codingStandardsIgnoreStart
-                $push->sendToUser(PushService::MESSAGE_GENERAL, $policy->getUser(), sprintf(
+                $push->sendToUser(PushService::PSEUDO_MESSAGE_PICSURE, $policy->getUser(), sprintf(
                     'Sorry, but we were not able to see your phone clearly enough to determine if the phone is undamaged. Please try uploading your pic-sure photo again making sure that the phone is clearly visible in the photo.'
-                ), null, ['ss' => ['uri' => ClientUrl::PICSURE, 'refresh' => true]]);
+                ));
                 // @codingStandardsIgnoreEnd
             } catch (\Exception $e) {
                 $this->get('logger')->error(sprintf("Error in pic-sure push."), ['exception' => $e]);
