@@ -1512,16 +1512,46 @@ class AdminEmployeeController extends BaseController
         if ($request->get('_route') == "admin_picsure_approve") {
             $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
             $dm->flush();
+            try {
+                $push = $this->get('app.push');
+                // @codingStandardsIgnoreStart
+                $push->sendToUser(PushService::MESSAGE_GENERAL, $policy->getUser(), sprintf(
+                    'Your pic-sure image has been approved and your phone is now valided.'
+                ), null, ['ss' => ['uri' => ClientUrl::PICSURE, 'refresh' => true]]);
+                // @codingStandardsIgnoreEnd
+            } catch (\Exception $e) {
+                $this->get('logger')->error(sprintf("Error in pic-sure push."), ['exception' => $e]);
+            }
 
             return new RedirectResponse($this->generateUrl('admin_picsure'));
         } elseif ($request->get('_route') == "admin_picsure_reject") {
             $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_REJECTED);
             $dm->flush();
+            try {
+                $push = $this->get('app.push');
+                // @codingStandardsIgnoreStart
+                $push->sendToUser(PushService::MESSAGE_GENERAL, $policy->getUser(), sprintf(
+                    'Your pic-sure image has been rejected. If you phone was damaged prior to your policy purchase, then it is crimial fraud to claim on our policy. Please contact us if you have purchased this policy by mistake.'
+                ), null, ['ss' => ['uri' => ClientUrl::PICSURE, 'refresh' => true]]);
+                // @codingStandardsIgnoreEnd
+            } catch (\Exception $e) {
+                $this->get('logger')->error(sprintf("Error in pic-sure push."), ['exception' => $e]);
+            }
 
             return new RedirectResponse($this->generateUrl('admin_picsure'));
         } elseif ($request->get('_route') == "admin_picsure_invalid") {
             $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_INVALID);
             $dm->flush();
+            try {
+                $push = $this->get('app.push');
+                // @codingStandardsIgnoreStart
+                $push->sendToUser(PushService::MESSAGE_GENERAL, $policy->getUser(), sprintf(
+                    'Sorry, but we were not able to see your phone clearly enough to determine if the phone is undamaged. Please try uploading your pic-sure photo again making sure that the phone is clearly visible in the photo.'
+                ), null, ['ss' => ['uri' => ClientUrl::PICSURE, 'refresh' => true]]);
+                // @codingStandardsIgnoreEnd
+            } catch (\Exception $e) {
+                $this->get('logger')->error(sprintf("Error in pic-sure push."), ['exception' => $e]);
+            }
 
             return new RedirectResponse($this->generateUrl('admin_picsure'));
         }
