@@ -278,4 +278,24 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $user->setLatestAttribution($attribution);
         $this->assertEquals('bar', $user->getLatestAttribution()->getCampaignName());
     }
+
+    public function testCanRenewPolicy()
+    {
+        $user = new User();
+        $user->setLocked(true);
+        $this->assertFalse($user->canRenewPolicy());
+
+        $user->setLocked(false);
+        $user->setEnabled(false);
+        $this->assertFalse($user->canRenewPolicy());
+
+        $user->setEnabled(true);
+        $this->assertTrue($user->canRenewPolicy());
+
+        $user->setDisallowRenewal(true);
+        $this->assertFalse($user->canRenewPolicy());
+
+        $user->setDisallowRenewal(false);
+        $this->assertTrue($user->canRenewPolicy());
+    }
 }

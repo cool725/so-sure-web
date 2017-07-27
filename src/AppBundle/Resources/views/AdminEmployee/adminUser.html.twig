@@ -254,6 +254,12 @@
                         {{ form_widget(user_permission_form.locked) }}
                         <strong>Too many login attempts - Will disable user from logging in until password reset</strong>
                     </div>
+                    <div class="form-group">
+                        {{ form_label(user_permission_form.disallowRenewal) }}
+                        {{ form_errors(user_permission_form.disallowRenewal) }}
+                        {{ form_widget(user_permission_form.disallowRenewal) }}
+                        <strong>If yes, will prevent user from being able to renew their policy. Only disallow in rare cases.</strong>
+                    </div>
                 </div>
             </div>
           </div>

@@ -289,6 +289,13 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      */
     protected $trusted;
 
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
+    protected $disallowRenewal;
+
     public function __construct()
     {
         parent::__construct();
@@ -617,6 +624,10 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         }
 
         if (!$this->isEnabled()) {
+            return false;
+        }
+
+        if ($this->getDisallowRenewal()) {
             return false;
         }
 
@@ -1202,6 +1213,16 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             $size,
             sprintf('https://cdn.so-sure.com/images/alpha/%s.png', $initial)
         );
+    }
+
+    public function setDisallowRenewal($disallowRenewal)
+    {
+        $this->disallowRenewal = $disallowRenewal;
+    }
+
+    public function getDisallowRenewal()
+    {
+        return $this->disallowRenewal;
     }
 
     public function hasValidDetails()
