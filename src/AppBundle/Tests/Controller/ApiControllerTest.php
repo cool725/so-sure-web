@@ -1352,7 +1352,7 @@ class ApiControllerTest extends BaseControllerTest
     {
         $crawler = self::$client->request('GET', '/api/v1/version/v2?platform=ios&version=0.0.1&include=feature-flags');
         $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
-        $this->assertTrue(count($data['feature_flags']) > 0);
+        $this->assertTrue(count($data['feature_flags']['flags']) > 0);
     }
 
     public function testReplay()

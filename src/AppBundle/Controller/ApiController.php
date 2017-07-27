@@ -736,7 +736,9 @@ class ApiController extends BaseController
                     $features = $repo->findAll();
 
                     return new JsonResponse([
-                        'feature_flags' => $this->eachApiArray($features),
+                        'feature_flags' => [
+                            'flags' => $this->eachApiArray($features),
+                        ]
                     ]);
                 } else {
                     return new JsonResponse();
