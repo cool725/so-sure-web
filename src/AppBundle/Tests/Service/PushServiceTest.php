@@ -52,6 +52,18 @@ class PushServiceTest extends WebTestCase
         ], $data);
     }
 
+    public function testPseudoMessagePicsure()
+    {
+        $data = self::$push->getCustomData(PushService::PSEUDO_MESSAGE_PICSURE);
+        $this->assertEquals(['ss' => [
+                'uri' => 'sosure://open/picsure',
+                'refresh' => true,
+                'message_type' => 'general'
+            ],
+            'type' => 'alert'
+        ], $data);
+    }
+
     public function testCustomDataMessageInvitation()
     {
         $data = self::$push->getCustomData(PushService::MESSAGE_INVITATION);
