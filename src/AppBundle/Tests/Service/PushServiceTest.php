@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Service;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Service\PushService;
+use AppBundle\Document\PhonePolicy;
 
 /**
  * @group functional-nonet
@@ -59,6 +60,21 @@ class PushServiceTest extends WebTestCase
                 'uri' => 'sosure://open/picsure',
                 'refresh' => true,
                 'message_type' => 'general'
+            ],
+            'type' => 'alert'
+        ], $data);
+    }
+
+    public function testPseudoMessagePicsurePolicy()
+    {
+        $policy = new PhonePolicy();
+        $policy->setId(rand(1, 999999));
+        $data = self::$push->getCustomData(PushService::PSEUDO_MESSAGE_PICSURE, null, $policy);
+        $this->assertEquals(['ss' => [
+                'uri' => 'sosure://open/picsure',
+                'refresh' => true,
+                'message_type' => 'general'
+                'policy_id' => $policy->getId(),
             ],
             'type' => 'alert'
         ], $data);
