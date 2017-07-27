@@ -17,8 +17,10 @@ use AppBundle\Document\Sns;
 use AppBundle\Document\SCode;
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\Feature;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\PolicyTerms;
+use AppBundle\Document\ArrayToApiArrayTrait;
 
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Service\RateLimitService;
@@ -36,6 +38,8 @@ use GuzzleHttp\Client;
  */
 class ApiController extends BaseController
 {
+    use ArrayToApiArrayTrait;
+
     /**
      * @Route("/login", name="api_login")
      * @Method({"POST"})
@@ -666,6 +670,7 @@ class ApiController extends BaseController
 
     /**
      * @Route("/version", name="api_version")
+     * @Route("/version/v2", name="api_version2")
      * @Method({"GET"})
      */
     public function versionAction(Request $request)
@@ -720,7 +725,25 @@ class ApiController extends BaseController
                 );
             }
 
-            return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'OK', 200);
+            if ($request->get('_route') == 'api_version') {
+                return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'OK', 200);
+            } else {
+                $includes = $this->getRequestString($request, 'include');
+                $includeItems = explode(',', $includes);
+                if (in_array('feature-flags', $includeItems)) {
+                    $dm = $this->getManager();
+                    $repo = $dm->getRepository(Feature::class);
+                    $features = $repo->findAll();
+
+                    return new JsonResponse([
+                        'feature_flags' => [
+                            'flags' => $this->eachApiArray($features),
+                        ]
+                    ]);
+                } else {
+                    return new JsonResponse();
+                }
+            }
         } catch (ValidationException $ex) {
             $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
 

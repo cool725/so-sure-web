@@ -79,8 +79,8 @@ class ApiPartialControllerTest extends BaseControllerTest
         $url = sprintf('/api/v1/partial/feature-flags?_method=GET');
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, array());
         $data = $this->verifyResponse(200);
-        $this->assertTrue(isset($data['excesses']));
-        $this->assertTrue(count($data['excesses']) > 0);
+        $this->assertTrue(isset($data['flags']));
+        $this->assertTrue(count($data['flags']) > 0);
     }
 
     // sns
