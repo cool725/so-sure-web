@@ -22,7 +22,10 @@ class UserPermissionType extends AbstractType
         $builder
             ->add('enabled', ChoiceType::class, ['expanded' => true, 'choices' => ['Yes' => true, 'No' => false]])
             ->add('locked', ChoiceType::class, ['expanded' => true, 'choices' => ['Yes' => true, 'No' => false]])
-            ->add('disallowRenewal', ChoiceType::class, ['expanded' => true, 'choices' => ['Yes' => true, 'No' => false]])
+            ->add('disallowRenewal', ChoiceType::class, [
+                'expanded' => true,
+                'choices' => ['Yes' => true, 'No' => false]
+            ])
             ->add('update', SubmitType::class)
         ;
     }
