@@ -1519,7 +1519,7 @@ class AdminEmployeeController extends BaseController
                 // @codingStandardsIgnoreStart
                 $push->sendToUser(PushService::PSEUDO_MESSAGE_PICSURE, $policy->getUser(), sprintf(
                     'Your pic-sure image has been approved and your phone is now valided.'
-                ));
+                ), null, null, $policy);
                 // @codingStandardsIgnoreEnd
             } catch (\Exception $e) {
                 $this->get('logger')->error(sprintf("Error in pic-sure push."), ['exception' => $e]);
@@ -1534,7 +1534,7 @@ class AdminEmployeeController extends BaseController
                 // @codingStandardsIgnoreStart
                 $push->sendToUser(PushService::PSEUDO_MESSAGE_PICSURE, $policy->getUser(), sprintf(
                     'Your pic-sure image has been rejected. If you phone was damaged prior to your policy purchase, then it is crimial fraud to claim on our policy. Please contact us if you have purchased this policy by mistake.'
-                ));
+                ), null, null, $policy);
                 // @codingStandardsIgnoreEnd
             } catch (\Exception $e) {
                 $this->get('logger')->error(sprintf("Error in pic-sure push."), ['exception' => $e]);
@@ -1549,7 +1549,7 @@ class AdminEmployeeController extends BaseController
                 // @codingStandardsIgnoreStart
                 $push->sendToUser(PushService::PSEUDO_MESSAGE_PICSURE, $policy->getUser(), sprintf(
                     'Sorry, but we were not able to see your phone clearly enough to determine if the phone is undamaged. Please try uploading your pic-sure photo again making sure that the phone is clearly visible in the photo.'
-                ));
+                ), null, null, $policy);
                 // @codingStandardsIgnoreEnd
             } catch (\Exception $e) {
                 $this->get('logger')->error(sprintf("Error in pic-sure push."), ['exception' => $e]);
