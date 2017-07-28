@@ -90,16 +90,16 @@ class PushService
         }
     }
 
-    public function getUri($messageType)
+    public function getUri($messageType, Policy $policy = null)
     {
         if ($messageType == self::MESSAGE_GENERAL) {
             return null;
         } elseif ($messageType == self::MESSAGE_CONNECTED) {
-            return ClientUrl::POT;
+            return ClientUrl::getUrlWithQuerystring(ClientUrl::POT, $policy);
         } elseif ($messageType == self::MESSAGE_INVITATION) {
-            return ClientUrl::POT;
+            return ClientUrl::getUrlWithQuerystring(ClientUrl::POT, $policy);
         } elseif ($messageType == self::PSEUDO_MESSAGE_PICSURE) {
-            return ClientUrl::PICSURE;
+            return ClientUrl::getUrlWithQuerystring(ClientUrl::PICSURE, $policy);
         } else {
             return null;
         }
@@ -197,7 +197,7 @@ class PushService
         if ($messageData) {
             $data['ss']['data'][$messageType] = $messageData;
         }
-        $uri = $this->getUri($messageType);
+        $uri = $this->getUri($messageType, $policy);
         if ($uri) {
             $data['ss']['uri'] = $uri;
         }
@@ -208,9 +208,6 @@ class PushService
         $refresh = $this->getRefresh($messageType);
         if ($refresh) {
             $data['ss']['refresh'] = $refresh;
-        }
-        if ($policy) {
-            $data['ss']['policy_id'] = $policy->getId();
         }
 
         // Depreciated field, but keep as alert to always display message
