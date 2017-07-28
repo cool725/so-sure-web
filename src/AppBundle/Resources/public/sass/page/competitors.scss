@@ -4,7 +4,7 @@
 @import "../common/paletteNew";
 
 body {
-    background-color: $white;
+    background-color: $lightest-blue;
 }
 
 .navbar {
@@ -20,6 +20,17 @@ section {
     }
 }
 
+.section-intro {
+    @include breakpoint(laptop) {
+        padding-bottom: 100px;
+    }
+}
+
+.section-table {
+    @include breakpoint(laptop) {
+        padding-top: 80px;
+    }
+}
 .section--bottom {
     padding: 0 0 40px;
 }
@@ -27,7 +38,7 @@ section {
 .curved-background {
     display: inline-block;
     position: absolute;
-    top: 0; left: 0;
+    left: 0; bottom: -100px;
     z-index: 2;
 }
 

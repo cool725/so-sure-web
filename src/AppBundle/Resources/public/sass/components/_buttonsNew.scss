@@ -73,6 +73,12 @@
 	padding-bottom: 15px;
 }
 
+.btn-big-text {
+	@include breakpoint(tablet) {
+		font-size: 24px;
+	}
+}
+
 // Others
 
 .btn-arrow-right {
