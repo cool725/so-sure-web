@@ -73,8 +73,8 @@ class PushServiceTest extends WebTestCase
         $this->assertEquals(['ss' => [
                 'uri' => 'sosure://open/picsure',
                 'refresh' => true,
-                'message_type' => 'general'
-                'policy_id' => $policy->getId(),
+                'message_type' => 'general',
+                'policy_id' => $policy->getId()
             ],
             'type' => 'alert'
         ], $data);
