@@ -3,7 +3,7 @@ $(function(){
     // UK mobile number
     jQuery.validator.addMethod('phoneUK', function(phone_number, element) {
     return this.optional(element) || phone_number.length > 9 &&
-    phone_number.match(/([+]?\d{1,2}[.-\s]?)?(\d{3}[.-]?){2}\d{4}/);
+    phone_number.match(/\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/);
     }, 'Please enter a valid phone number');
 
 	$('#team-member-info-modal').on('show.bs.modal', function(event) {
