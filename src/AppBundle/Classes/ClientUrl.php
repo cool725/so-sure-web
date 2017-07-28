@@ -1,6 +1,8 @@
 <?php
 namespace AppBundle\Classes;
 
+use AppBundle\Document\Policy;
+
 class ClientUrl
 {
     const POT = 'sosure://open/pot';
