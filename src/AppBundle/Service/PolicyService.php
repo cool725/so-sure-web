@@ -1322,6 +1322,8 @@ class PolicyService
         $this->dm->persist($newPolicy);
         $this->dm->flush();
 
+        $this->dispatchEvent(PolicyEvent::EVENT_PENDING_RENEWAL, new PolicyEvent($policy));
+
         return $newPolicy;
     }
 
