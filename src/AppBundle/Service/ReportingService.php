@@ -171,6 +171,13 @@ class ReportingService
                 $start,
                 $end
             ));
+            $data[sprintf('desiredEnding%sPolicies', $key)] = count($policyRepo->findAllEndingPolicies(
+                $cancellationReason,
+                true,
+                $start,
+                $end,
+                true
+            ));
         }
         $data['totalEndingPoliciesAdjUpgrade'] = $data['totalEndingPolicies'] - $data['totalUpgradePolicies'];
         $data['endingEndingPoliciesAdjUpgrade'] = $data['endingEndingPolicies'] - $data['endingUpgradePolicies'];
