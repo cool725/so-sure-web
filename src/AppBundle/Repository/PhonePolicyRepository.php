@@ -205,7 +205,8 @@ class PhonePolicyRepository extends PolicyRepository
         $cancellationReason,
         $onlyWithFNOL = false,
         \DateTime $startDate = null,
-        \DateTime $endDate = null
+        \DateTime $endDate = null,
+        $requestedCancellation = null
     ) {
         if (!$endDate) {
             $endDate = new \DateTime();
@@ -236,8 +237,13 @@ class PhonePolicyRepository extends PolicyRepository
             ->execute()
             ->toArray();
 
-        return array_filter($data, function ($policy) {
-            return count($policy->getClaims()) > 0;
+        return array_filter($data, function ($policy, $requestedCancellation) {
+            if ($requestedCancellation !== null) {
+                return count($policy->getClaims()) > 0 ||
+                    $policy->getRequestedCancellation() == $requestedCancellation;
+            } else {
+                return count($policy->getClaims()) > 0;
+            }
         });
     }
 
