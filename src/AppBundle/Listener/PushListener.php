@@ -26,8 +26,10 @@ class PushListener
     public function onPolicyPendingRenewalEvent(PolicyEvent $event)
     {
         $policy = $event->getPolicy();
+        // @codingStandardsIgnoreStart
         $this->push->sendToUser(PushService::MESSAGE_GENERAL, $policy->getUser(), sprintf(
             'Your policy is ending soon. Renew today to keep your phone protected against Theft, Loss, Accidental Damage, and more.'
         ), null, null, $policy);
+        // @codingStandardsIgnoreEnd
     }
 }
