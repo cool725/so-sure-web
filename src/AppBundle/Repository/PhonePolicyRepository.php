@@ -237,10 +237,10 @@ class PhonePolicyRepository extends PolicyRepository
             ->execute()
             ->toArray();
 
-        return array_filter($data, function ($policy, $requestedCancellation) {
+        return array_filter($data, function ($policy) use ($requestedCancellation) {
             if ($requestedCancellation) {
                 return count($policy->getClaims()) > 0 ||
-                    $policy->getRequestedCancellation() !== null;
+                    $policy->hasRequestedCancellation();
             } else {
                 return count($policy->getClaims()) > 0;
             }
