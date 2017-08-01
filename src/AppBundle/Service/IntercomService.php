@@ -839,7 +839,7 @@ class IntercomService
         return $lines;
     }
 
-    public function queueMessage($email, $message, $retryAttempts = 0)
+    public function queueMessage($email, $message, $source = null, $retryAttempts = 0)
     {
         $data = [
             'action' => self::QUEUE_MESSAGE,
@@ -859,7 +859,9 @@ class IntercomService
         if (!$foundUserOrLead) {
             $lead = new Lead();
             $lead->setEmail(strtolower($email));
-            $lead->setSource(Lead::SOURCE_CONTACT_US);
+            if ($source) {
+                $lead->setSource($source);
+            }
             $this->dm->persist($lead);
             $this->dm->flush();
 
@@ -870,7 +872,7 @@ class IntercomService
             $data['processTime'] = $now->format('U');
             $data['leadId'] = $lead->getId();
         }
-        
+
         $this->redis->rpush(self::KEY_INTERCOM_QUEUE, serialize($data));
     }
 

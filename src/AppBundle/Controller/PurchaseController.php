@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 use AppBundle\Classes\ApiErrorCode;
 
@@ -781,16 +782,27 @@ class PurchaseController extends BaseController
                         $policy->setRequestedCancellation(new \DateTime());
                         $dm->flush();
                     }
+                    // @codingStandardsIgnoreStart
                     $body = sprintf(
-                        'Requested cancellation for policy %s/%s',
+                        "Policy: <a href='%s'>%s/%s</a>. Requested a cancellation via the site as phone was damaged prior to purchase. Verify policy id match in system.",
+                        $this->generateUrl(
+                            'admin_policy',
+                            ['id' => $policy->getId()],
+                            UrlGeneratorInterface::ABSOLUTE_URL
+                        ),
                         $policy->getPolicyNumber(),
                         $policy->getId()
                     );
+                    // @codingStandardsIgnoreEnd
                     $message = \Swift_Message::newInstance()
                         ->setSubject(sprintf('Requested Policy Cancellation'))
                         ->setFrom('info@so-sure.com')
-                        ->setTo('support@wearesosure.com')
+                        ->setTo('bcc@wearesosure.com')
                         ->setBody($body, 'text/html');
+
+                    $intercom = $this->get('app.intercom');
+                    $intercom->queueMessage($policy->getUser()->getEmail(), $body);
+
                     $this->get('mailer')->send($message);
                     $this->get('app.mixpanel')->queueTrack(
                         MixpanelService::EVENT_REQUEST_CANCEL_POLICY,

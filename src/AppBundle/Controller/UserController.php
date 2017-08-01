@@ -566,16 +566,19 @@ class UserController extends BaseController
             if ($request->request->has('billing_form')) {
                 $billingForm->handleRequest($request);
                 if ($billingForm->isValid()) {
+                    // @codingStandardsIgnoreStart
                     $body = sprintf(
-                        "Policy: <a href='%s'>%s</a> has requested a billing date change to the %d.",
+                        "Policy: <a href='%s'>%s/%s</a> has requested a billing date change to the %d. Verify policy id match in system.",
                         $this->generateUrl(
                             'admin_policy',
                             ['id' => $policy->getId()],
                             UrlGeneratorInterface::ABSOLUTE_URL
                         ),
                         $policy->getPolicyNumber(),
+                        $policy->getId(),
                         $billing->getDay()
                     );
+                    // @codingStandardsIgnoreEnd
 
                     $message = \Swift_Message::newInstance()
                         ->setSubject(sprintf(
@@ -583,9 +586,12 @@ class UserController extends BaseController
                             $policy->getPolicyNumber()
                         ))
                         ->setFrom('info@so-sure.com')
-                        ->setTo('support@wearesosure.com')
+                        ->setTo('contact-us@wearesosure.com')
                         ->setBody($body, 'text/html');
                     $this->get('mailer')->send($message);
+
+                    $intercom = $this->get('app.intercom');
+                    $intercom->queueMessage($policy->getUser()->getEmail(), $body);
 
                     /*
                     $policyService = $this->get('app.policy');
