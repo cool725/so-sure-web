@@ -650,11 +650,18 @@ services:
     app.listener.mixpanel:
         class:   AppBundle\Listener\MixpanelListener
         arguments:
-            intercom: "@app.mixpanel"
+            mixpanel: "@app.mixpanel"
         tags:
             -  { name: kernel.event_listener, event: event.payment.success, method: onPaymentSuccessEvent }
             -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
             -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
+
+    app.listener.push:
+        class:   AppBundle\Listener\PushListener
+        arguments:
+            push: "@app.push"
+        tags:
+            -  { name: kernel.event_listener, event: event.policy.pending-renewal, method: onPolicyPendingRenewalEvent }
 
     app.listener.salva:
         class:   AppBundle\Listener\SalvaListener
