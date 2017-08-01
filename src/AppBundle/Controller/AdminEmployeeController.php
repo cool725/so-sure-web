@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use AppBundle\Classes\ClientUrl;
 use AppBundle\Classes\SoSure;
 use AppBundle\Classes\Salva;
 use AppBundle\Document\DateTrait;
@@ -75,6 +76,7 @@ use AppBundle\Form\Type\UserEmailType;
 use AppBundle\Form\Type\UserPermissionType;
 use AppBundle\Form\Type\ClaimFlagsType;
 use AppBundle\Exception\RedirectException;
+use AppBundle\Service\PushService;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -1512,16 +1514,46 @@ class AdminEmployeeController extends BaseController
         if ($request->get('_route') == "admin_picsure_approve") {
             $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
             $dm->flush();
+            try {
+                $push = $this->get('app.push');
+                // @codingStandardsIgnoreStart
+                $push->sendToUser(PushService::PSEUDO_MESSAGE_PICSURE, $policy->getUser(), sprintf(
+                    'Your pic-sure image has been approved and your phone is now valided.'
+                ), null, null, $policy);
+                // @codingStandardsIgnoreEnd
+            } catch (\Exception $e) {
+                $this->get('logger')->error(sprintf("Error in pic-sure push."), ['exception' => $e]);
+            }
 
             return new RedirectResponse($this->generateUrl('admin_picsure'));
         } elseif ($request->get('_route') == "admin_picsure_reject") {
             $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_REJECTED);
             $dm->flush();
+            try {
+                $push = $this->get('app.push');
+                // @codingStandardsIgnoreStart
+                $push->sendToUser(PushService::PSEUDO_MESSAGE_PICSURE, $policy->getUser(), sprintf(
+                    'Your pic-sure image has been rejected. If you phone was damaged prior to your policy purchase, then it is crimial fraud to claim on our policy. Please contact us if you have purchased this policy by mistake.'
+                ), null, null, $policy);
+                // @codingStandardsIgnoreEnd
+            } catch (\Exception $e) {
+                $this->get('logger')->error(sprintf("Error in pic-sure push."), ['exception' => $e]);
+            }
 
             return new RedirectResponse($this->generateUrl('admin_picsure'));
         } elseif ($request->get('_route') == "admin_picsure_invalid") {
             $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_INVALID);
             $dm->flush();
+            try {
+                $push = $this->get('app.push');
+                // @codingStandardsIgnoreStart
+                $push->sendToUser(PushService::PSEUDO_MESSAGE_PICSURE, $policy->getUser(), sprintf(
+                    'Sorry, but we were not able to see your phone clearly enough to determine if the phone is undamaged. Please try uploading your pic-sure photo again making sure that the phone is clearly visible in the photo.'
+                ), null, null, $policy);
+                // @codingStandardsIgnoreEnd
+            } catch (\Exception $e) {
+                $this->get('logger')->error(sprintf("Error in pic-sure push."), ['exception' => $e]);
+            }
 
             return new RedirectResponse($this->generateUrl('admin_picsure'));
         }

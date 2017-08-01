@@ -4,6 +4,7 @@ namespace AppBundle\Service;
 use AppBundle\Document\User;
 use Psr\Log\LoggerInterface;
 use AppBundle\Classes\ClientUrl;
+use AppBundle\Document\Policy;
 
 class PushService
 {
@@ -24,6 +25,8 @@ class PushService
     const MESSAGE_PROMO = 'promo';
     const MESSAGE_MULTIPAY = 'multipay';
 
+    const PSEUDO_MESSAGE_PICSURE = 'picsure';
+
     /** @var LoggerInterface */
     protected $logger;
 
@@ -41,8 +44,14 @@ class PushService
         $this->sns = $sns;
     }
 
-    public function sendToUser($messageType, User $user, $message, $badge = null, $messageData = null)
-    {
+    public function sendToUser(
+        $messageType,
+        User $user,
+        $message,
+        $badge = null,
+        $messageData = null,
+        Policy $policy = null
+    ) {
         $this->logger->debug(sprintf('Push triggered to user id: %s %s', $user->getId(), $message));
         if (!$user->getSnsEndpoint() || strlen(trim($user->getSnsEndpoint())) == 0) {
             $this->logger->debug(sprintf('Push skipped (no endpoint)'));
@@ -50,15 +59,21 @@ class PushService
             return;
         }
 
-        return $this->send($messageType, $user->getSnsEndpoint(), $message, $badge, $messageData);
+        return $this->send($messageType, $user->getSnsEndpoint(), $message, $badge, $messageData, $policy);
     }
 
-    public function send($messageType, $arn, $message, $badge = null, $messageData = null)
-    {
+    public function send(
+        $messageType,
+        $arn,
+        $message,
+        $badge = null,
+        $messageData = null,
+        Policy $policy = null
+    ) {
         $this->logger->debug(sprintf('Push triggered to %s %s', $arn, $message));
         try {
-            $apns = $this->generateAPNSMessage($messageType, $message, $badge, $messageData);
-            $gcm = $this->generateGCMMessage($messageType, $message, $messageData);
+            $apns = $this->generateAPNSMessage($messageType, $message, $badge, $messageData, null, $policy);
+            $gcm = $this->generateGCMMessage($messageType, $message, $messageData, $policy);
             $this->sns->publish([
                'TargetArn' => $arn,
                'MessageStructure' => 'json',
@@ -75,14 +90,16 @@ class PushService
         }
     }
 
-    public function getUri($messageType)
+    public function getUri($messageType, Policy $policy = null)
     {
         if ($messageType == self::MESSAGE_GENERAL) {
             return null;
         } elseif ($messageType == self::MESSAGE_CONNECTED) {
-            return ClientUrl::POT;
+            return ClientUrl::getUrlWithQuerystring(ClientUrl::POT, $policy);
         } elseif ($messageType == self::MESSAGE_INVITATION) {
-            return ClientUrl::POT;
+            return ClientUrl::getUrlWithQuerystring(ClientUrl::POT, $policy);
+        } elseif ($messageType == self::PSEUDO_MESSAGE_PICSURE) {
+            return ClientUrl::getUrlWithQuerystring(ClientUrl::PICSURE, $policy);
         } else {
             return null;
         }
@@ -113,19 +130,30 @@ class PushService
             return true;
         } elseif ($messageType == self::MESSAGE_MULTIPAY) {
             return true;
+        } elseif ($messageType == self::PSEUDO_MESSAGE_PICSURE) {
+            return true;
         } else {
             return null;
         }
     }
 
+    public function getActualMessageType($messageType)
+    {
+        if ($messageType == self::PSEUDO_MESSAGE_PICSURE) {
+            return self::MESSAGE_GENERAL;
+        }
+
+        return $messageType;
+    }
+
     /**
      * @see https://developers.google.com/cloud-messaging/http-server-ref#notification-payload-support
      */
-    public function generateGCMMessage($messageType, $message, $messageData = null)
+    public function generateGCMMessage($messageType, $message, $messageData = null, Policy $policy = null)
     {
         $gcm['data']['message'] = $message;
 
-        $gcm['data'] = array_merge($gcm['data'], $this->getCustomData($messageType, $messageData));
+        $gcm['data'] = array_merge($gcm['data'], $this->getCustomData($messageType, $messageData, $policy));
 
         return $gcm;
     }
@@ -135,14 +163,20 @@ class PushService
      * @see https://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/TheNotificationPayload.html
      * @codingStandardsIgnoreEnd
      */
-    public function generateAPNSMessage($messageType, $message, $badge = null, $messageData = null, $newContent = null)
-    {
+    public function generateAPNSMessage(
+        $messageType,
+        $message,
+        $badge = null,
+        $messageData = null,
+        $newContent = null,
+        Policy $policy = null
+    ) {
         if ($badge && $newContent) {
             throw new \Exception('Silent notifications can not contain badge updates');
         }
 
         $apns['aps']['alert'] = $message;
-        $apns['aps']['category'] = $messageType;
+        $apns['aps']['category'] = $this->getActualMessageType($messageType);
         if ($badge) {
             $apns['aps']['badge'] = $badge;
         }
@@ -151,19 +185,19 @@ class PushService
         }
 
         // custom data
-        $apns = array_merge($apns, $this->getCustomData($messageType, $messageData));
+        $apns = array_merge($apns, $this->getCustomData($messageType, $messageData, $policy));
 
         return $apns;
     }
 
-    public function getCustomData($messageType, $messageData = null)
+    public function getCustomData($messageType, $messageData = null, Policy $policy = null)
     {
         $data = [];
-        $data['ss']['message_type'] = $messageType;
+        $data['ss']['message_type'] = $this->getActualMessageType($messageType);
         if ($messageData) {
             $data['ss']['data'][$messageType] = $messageData;
         }
-        $uri = $this->getUri($messageType);
+        $uri = $this->getUri($messageType, $policy);
         if ($uri) {
             $data['ss']['uri'] = $uri;
         }
