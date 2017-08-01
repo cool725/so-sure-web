@@ -27,7 +27,7 @@ class PushListener
     {
         $policy = $event->getPolicy();
         $this->push->sendToUser(PushService::MESSAGE_GENERAL, $policy->getUser(), sprintf(
-            'Your policy is ending soon. Renew today to to protected against Theft, Loss and Accidental Damage.'
+            'Your policy is ending soon. Renew today to keep your phone protected against Theft, Loss, Accidental Damage, and more.'
         ), null, null, $policy);
     }
 }
