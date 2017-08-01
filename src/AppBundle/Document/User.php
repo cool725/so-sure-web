@@ -767,6 +767,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $data['numberPolicies'] = 0;
         $data['approvedClaims'] = 0;
         $data['approvedNetworkClaims'] = 0;
+        $data['accountPaidToDate'] = true;
         foreach ($this->getValidPolicies(true) as $policy) {
             $data['connections'] += count($policy->getConnections());
             $data['rewardPot'] += $policy->getPotValue();
@@ -798,6 +799,9 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             if ($policy instanceof PhonePolicy) {
                 $data['devices'][] = $policy->getPhone()->__toString();
                 $data['maxPot'] += $policy->getMaxPot();
+            }
+            if ($policy->getStatus() == Policy::STATUS_UNPAID) {
+                $data['accountPaidToDate'] = false;
             }
         }
         $data['firstPolicy'] = [];
