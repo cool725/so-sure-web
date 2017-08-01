@@ -272,8 +272,7 @@ class ClaimsController extends BaseController
         $dm = $this->getManager();
         $repo = $dm->getRepository(Claim::class);
         $claim = $repo->find($id);
-        $notes = $this->conformAlphanumericSpaceDot($this->getRequestString($request, 'notes'), 500);
-        $claim->setNotes($notes);
+        $claim->setNotes($this->getRequestString($request, 'notes'));
 
         $dm->flush();
         $this->addFlash(

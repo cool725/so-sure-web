@@ -6,6 +6,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
+use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\ClaimRepository")
@@ -530,7 +531,9 @@ class Claim
 
     public function setNotes($notes)
     {
-        $this->notes = $notes;
+        $validator = new AlphanumericSpaceDotValidator();
+
+        $this->notes = $validator->conform(substr($notes, 0, 500));
     }
 
     public function getDescription()
