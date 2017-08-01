@@ -80,6 +80,11 @@ class IntercomListener
         $this->intercom->queuePayment($event->getPayment(), IntercomService::QUEUE_EVENT_PAYMENT_FAILED);
     }
 
+    public function onPaymentFirstProblemEvent(PaymentEvent $event)
+    {
+        $this->intercom->queuePayment($event->getPayment(), IntercomService::QUEUE_EVENT_PAYMENT_FIRST_PROBLEM);
+    }
+
     public function onUserPaymentFailedEvent(UserPaymentEvent $event)
     {
         $this->intercom->queueUser(

@@ -5,6 +5,7 @@ namespace AppBundle\Document;
 use FOS\UserBundle\Document\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @MongoDB\EmbeddedDocument
@@ -16,4 +17,21 @@ use Gedmo\Mapping\Annotation as Gedmo;
 abstract class PaymentMethod
 {
     abstract public function isValid();
+
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
+    protected $firstProblem;
+
+    public function getFirstProblem()
+    {
+        return $this->firstProblem;
+    }
+
+    public function setFirstProblem($firstProblem)
+    {
+        $this->firstProblem = $firstProblem;
+    }
 }

@@ -20,6 +20,11 @@ class MailerService
     /** @var string */
     protected $defaultSenderName;
 
+    public function setMailer($mailer)
+    {
+        $this->mailer = $mailer;
+    }
+
     /**
      * @param \Swift_Mailer $mailer
      * @param               $smtp

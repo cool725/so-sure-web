@@ -759,6 +759,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $data = [];
         $data['os'] = null;
         $data['annualPremium'] = 0;
+        $data['monthlyPremium'] = 0;
         $data['paymentsReceived'] = 0;
         $data['lastPaymentReceived'] = null;
         $data['lastConnection'] = null;
@@ -783,6 +784,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             }
             if ($plan = $policy->getPremiumPlan()) {
                 $data['annualPremium'] += $policy->getPremium()->getYearlyPremiumPrice();
+                $data['monthlyPremium'] += $policy->getPremium()->getMonthlyPremiumPrice();
                 $data['paymentsReceived'] += count($policy->getSuccessfulPaymentCredits());
 
                 if ($payment = $policy->getLastSuccessfulPaymentCredit()) {

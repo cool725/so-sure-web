@@ -706,8 +706,17 @@ class JudopayService
         }
     }
 
+    public function getMailer()
+    {
+        return $this->mailer;
+    }
+
     public function processScheduledPaymentResult($scheduledPayment, $payment, \DateTime $date = null)
     {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
         $policy = $scheduledPayment->getPolicy();
         if ($payment) {
             $scheduledPayment->setPayment($payment);
@@ -741,7 +750,29 @@ class JudopayService
                 $next = $rescheduled->getScheduled();
             }
 
-            $this->failedPaymentEmail($policy, $next);
+            // Due to a limitation in intercom, messages are only sent to a user once
+            // So, we want to use Intercom but only if its the first time that's been used
+            $paymentMethod = $policy->getUser()->getPaymentMethod();
+            $days = null;
+            if ($firstProblem = $paymentMethod->getFirstProblem()) {
+                $diff = $date->diff($firstProblem);
+                $days = $diff->days;
+            }
+            if ($failedPayments >= 2 && !$firstProblem) {
+                $paymentMethod->setFirstProblem($date);
+                if ($this->dispatcher) {
+                    $this->logger->debug('Event Payment First Problem');
+                    $this->dispatcher->dispatch(PaymentEvent::EVENT_FIRST_PROBLEM, new PaymentEvent($payment));
+                } else {
+                    $this->logger->warning('Dispatcher is disabled for Judo Service');
+                }
+            } elseif ($failedPayments >= 2 && $days && $days <= 30) {
+                // intercom campaign should be handling addition if its the same payment problem
+                \AppBundle\Classes\NoOp::ignore([]);
+            } else {
+                $this->failedPaymentEmail($policy, $next);
+            }
+
             // Sms is quite invasive and occasionlly a failed payment will just work the next time
             // so allow 1 failed payment before sending sms
             if ($failedPayments > 1) {

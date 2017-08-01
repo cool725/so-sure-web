@@ -642,6 +642,7 @@ services:
             -  { name: kernel.event_listener, event: event.connection.connected, method: onConnectionConnectedEvent }
             -  { name: kernel.event_listener, event: event.payment.success, method: onPaymentSuccessEvent }
             -  { name: kernel.event_listener, event: event.payment.failed, method: onPaymentFailedEvent }
+            -  { name: kernel.event_listener, event: event.payment.first-problem, method: onPaymentFirstProblemEvent }
             -  { name: kernel.event_listener, event: event.user.payment.failed, method: onUserPaymentFailedEvent }
             -  { name: kernel.event_listener, event: event.claim.created, method: onClaimCreatedEvent }
             -  { name: kernel.event_listener, event: event.claim.approved, method: onClaimApprovedEvent }
