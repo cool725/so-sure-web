@@ -1,0 +1,137 @@
+//Competitors
+
+@import "../mixins";
+@import "../common/paletteNew";
+
+body {
+    background-color: $lightest-blue;
+}
+
+.navbar {
+    background-color: $white;
+}
+
+section {
+    position: relative;
+
+    .container {
+        position: relative;
+        z-index: 3;
+    }
+}
+
+.section-intro {
+    @include breakpoint(laptop) {
+        padding-bottom: 100px;
+    }
+}
+
+.section-table {
+    @include breakpoint(laptop) {
+        padding-top: 80px;
+    }
+}
+.section--bottom {
+    padding: 0 0 40px;
+}
+
+.curved-background {
+    display: inline-block;
+    position: absolute;
+    left: 0; bottom: -100px;
+    z-index: 2;
+}
+
+// Tables
+.panel {
+    @include border-radius(10px);
+    border: none;
+
+    .table {
+
+        > thead {
+
+            > tr {
+                > td {
+                    font-weight: bold;
+                    background-color: $primary-blue;
+                    color: $white;
+
+                    padding-top: 15px;
+                    padding-bottom: 15px;
+                    border-right: 2px solid $pale-grey;
+
+                    &:last-of-type {
+                        border-right: none;
+                    }
+                }
+            }
+        }
+
+        > tbody {
+
+            > tr {
+                > td {
+                    font-weight: bold;
+                    padding-top: 15px;
+                    padding-bottom: 15px;
+                    border-color: $pale-grey;
+                    border-width: 2px;
+                    border-right: 2px solid $pale-grey;
+
+                    &:last-of-type {
+                        border-right: none;
+                    }
+                }
+
+                &:first-of-type {
+                    > td {
+                        border-top: none;
+                    }
+                }
+            }
+        }
+
+    }
+
+    .table:first-child > thead:first-child > tr:first-child td:first-child {
+        border-top-left-radius: 10px;
+    }
+
+    .table:first-child > thead:first-child > tr:first-child td:last-child {
+        border-top-right-radius: 10px;
+    }
+}
+
+.panel {
+    @include border-radius(10px);
+    border: none;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.15);
+    margin-bottom: 0;
+
+    h2 {
+        margin-top: 0;
+    }
+}
+
+.panel-pad {
+    padding: 30px 15px;
+    position: relative;
+    z-index: 3;
+
+    // @include breakpoint(tablet) {
+    //     padding: 30px;
+    // }
+
+    // @include breakpoint(laptop) {
+    //     padding: 50px;
+    // }
+}
+
+.tick-background {
+    background: $white url('https://cdn.so-sure.com/images/library_benefits/so-sure_cover-tick-smaller.svg') center no-repeat;
+}
+
+.cross-background {
+    background: $white url('https://cdn.so-sure.com/images/library_benefits/so-sure_cover-cross-smaller.svg') center no-repeat;
+}
