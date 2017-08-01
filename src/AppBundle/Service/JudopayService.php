@@ -448,6 +448,12 @@ class JudopayService
         if ($transactionDetails["result"] != JudoPayment::RESULT_SUCCESS) {
             throw new PaymentDeclinedException();
         }
+        $repo = $this->dm->getRepository(JudoPayment::class);
+        $payment = $repo->findOneBy(['receipt' => $receiptId]);
+        if ($payment) {
+            $payment->setResult($transactionDetails["result"]);
+            $payment->setMessage($transactionDetails["message"]);
+        }
 
         $judo = $user->getPaymentMethod();
         if (!$judo) {
@@ -1017,12 +1023,16 @@ class JudopayService
         return array('post_url' => $webpaymentDetails["postUrl"], 'payment' => $payment);
     }
 
-    public function webRegister(User $user, $ipAddress, $userAgent)
+    public function webRegister(User $user, $ipAddress, $userAgent, $policy = null)
     {
         $payment = new JudoPayment();
         $payment->setAmount(0);
         $payment->setUser($user);
         $payment->setSource(Payment::SOURCE_WEB);
+        $payment->setWebType(self::WEB_TYPE_CARD_DETAILS);
+        if ($policy) {
+            $payment->setPolicy($policy);
+        }
         $this->dm->persist($payment);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
@@ -1227,7 +1237,10 @@ class JudopayService
         $multiPay->getPayer()->addPayerPolicy($policy);
         $this->dm->flush();
 
-        $this->tokenPay($policy, $amount);
+        $payment = $this->tokenPay($policy, $amount);
+        if (!$payment->isSuccess()) {
+            return false;
+        }
 
         $this->policyService->create($policy, $date, true);
         $this->dm->flush();
@@ -1264,7 +1277,10 @@ class JudopayService
             $policy->setPayer($policy->getUser());
         }
 
-        $this->tokenPay($policy, $amount);
+        $payment = $this->tokenPay($policy, $amount);
+        if (!$payment->isSuccess()) {
+            return false;
+        }
 
         $this->policyService->create($policy, $date, true);
         $this->dm->flush();

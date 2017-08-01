@@ -12,8 +12,10 @@ use AppBundle\Form\Type\LaunchType;
 use AppBundle\Form\Type\PhoneType;
 
 use AppBundle\Document\Address;
+use AppBundle\Document\ArrayToApiArrayTrait;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Sns;
+use AppBundle\Document\Feature;
 use AppBundle\Document\SCode;
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
@@ -35,6 +37,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class ApiPartialController extends BaseController
 {
+    use ArrayToApiArrayTrait;
+
     /**
      * @Route("/ab/{name}", name="api_ab_partipate")
      * @Method({"GET"})
@@ -126,6 +130,27 @@ class ApiPartialController extends BaseController
             );
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api abConvertAction.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
+     * @Route("/feature-flags", name="api_feature_flags")
+     * @Method({"GET"})
+     */
+    public function featureFlagsAction()
+    {
+        try {
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(Feature::class);
+            $features = $repo->findAll();
+
+            return new JsonResponse([
+                'flags' => $this->eachApiArray($features),
+            ]);
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api featureFlagsAction.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }

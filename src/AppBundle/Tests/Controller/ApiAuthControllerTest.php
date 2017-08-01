@@ -693,6 +693,11 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertGreaterThan(0, $data['monthly_premium']);
         $this->assertGreaterThan(0, $data['yearly_premium']);
         $this->assertEquals("Kelvin’s iPhone5", $data['phone_policy']['name']);
+        $this->assertNull($data['phone_policy']['picsure_status']);
+        $this->assertTrue(count($data['phone_policy']['excesses']) > 0);
+        foreach ($data['phone_policy']['excesses'] as $excess) {
+            $this->assertEquals(150, $excess['amount']);
+        }
 
         // Now make sure that the policy shows up against the user
         $url = sprintf('/api/v1/auth/user/%s?_method=GET', $user->getId());
@@ -2632,6 +2637,62 @@ class ApiAuthControllerTest extends BaseControllerTest
             'name' => 'Invitation Name',
         ]);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_CONNECTED);
+    }
+
+    // policy/{id}/picsure
+
+    /**
+     *
+     */
+    public function testPicsure()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testPicsure', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+        $url = sprintf("/api/v1/auth/policy/%s/picsure", $policyData['id']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+        ]);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'bucket' => 'foo',
+        ]);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'key' => 'foo',
+        ]);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'bucket' => 'help.so-sure.com',
+            'key' => 'vagrant/KEY_NOT_FOUND',
+        ]);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PICSURE_FILE_NOT_FOUND);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $repo->find($policyData['id']);
+        $this->assertEquals(PhonePolicy::PICSURE_STATUS_INVALID, $updatedPolicy->getPicSureStatus());
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'bucket' => 'help.so-sure.com',
+            'key' => 'vagrant/sitemap.xml',
+        ]);
+        $data = $this->verifyResponse(200);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $repo->find($policyData['id']);
+        $this->assertEquals(PhonePolicy::PICSURE_STATUS_MANUAL, $updatedPolicy->getPicSureStatus());
     }
 
     // scode

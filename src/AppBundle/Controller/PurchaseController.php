@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 use AppBundle\Classes\ApiErrorCode;
 
@@ -524,7 +525,12 @@ class PurchaseController extends BaseController
         }
         $policy = $payment->getPolicy();
 
-        $webType = $judo->getTransactionWebType($request->get('ReceiptId'));
+        // Payment should have the webtype so no need to query judopay
+        $webType = $payment->getWebType();
+        if (!$webType) {
+            // Just in case payment record doesn't have, see if judo has in metadata
+            $webType = $judo->getTransactionWebType($request->get('ReceiptId'));
+        }
         // Metadata should be present, but if not, use older logic to guess at what type to use
         if (!$webType) {
             if (!$user) {
@@ -570,9 +576,9 @@ class PurchaseController extends BaseController
             if ($webType == JudopayService::WEB_TYPE_REMAINDER) {
                 $this->notifyRemainderRecevied($policy);
 
-                return $this->redirectToRoute('purchase_remainder_policy', ['id' => $policy->getId()]);
+                return $this->getRouteForPostCC($policy, $webType);
             } elseif ($policy->isInitialPayment()) {
-                return $this->redirectToRoute('user_welcome');
+                return $this->getRouteForPostCC($policy, $webType);
             } else {
                 // unpaid policy - outstanding payment
                 $this->addFlash(
@@ -582,10 +588,12 @@ class PurchaseController extends BaseController
                         $policy->getLastSuccessfulPaymentCredit()->getAmount()
                     )
                 );
-
-                return $this->redirectToRoute('user_home');
+                return $this->getRouteForPostCC($policy, $webType);
             }
         } elseif ($webType == JudopayService::WEB_TYPE_CARD_DETAILS) {
+            $payment->setReceipt($request->get('ReceiptId'));
+            $dm->flush();
+
             $judo->updatePaymentMethod(
                 $payment->getUser(),
                 $request->get('ReceiptId'),
@@ -599,10 +607,33 @@ class PurchaseController extends BaseController
                 sprintf('Your card has been updated')
             );
 
-            return $this->redirectToRoute('user_card_details');
+            return $this->getRouteForPostCC($policy, $webType);
         }
 
-        // shouldn't occur
+        return $this->getRouteForPostCC($policy, $webType);
+    }
+
+    private function getRouteForPostCC($policy, $webType)
+    {
+        if ($webType == JudopayService::WEB_TYPE_CARD_DETAILS) {
+            if ($policy) {
+                return $this->redirectToRoute('user_card_details_policy', ['policyId' => $policy->getId()]);
+            } else {
+                return $this->redirectToRoute('user_card_details');
+            }
+        } elseif ($webType == JudopayService::WEB_TYPE_REMAINDER) {
+            return $this->redirectToRoute('purchase_remainder_policy', ['id' => $policy->getId()]);
+        } elseif (in_array($webType, [
+            JudopayService::WEB_TYPE_STANDARD,
+            JudopayService::WEB_TYPE_UNPAID,
+        ])) {
+            if ($policy->isInitialPayment()) {
+                return $this->redirectToRoute('user_welcome');
+            } else {
+                return $this->redirectToRoute('user_home');
+            }
+        }
+
         return $this->redirectToRoute('user_home');
     }
 
@@ -629,44 +660,49 @@ class PurchaseController extends BaseController
      */
     public function purchaseJudoPayFailAction(Request $request)
     {
+        $this->get('logger')->info(sprintf(
+            'Judo Web Failure ReceiptId: %s Ref: %s',
+            $request->get('ReceiptId'),
+            $request->get('Reference')
+        ));
+        $user = $this->getUser();
         $dm = $this->getManager();
+        $judo = $this->get('app.judopay');
         $repo = $dm->getRepository(Payment::class);
-        $reference = $request->get('Reference');
-        if (!$reference) {
-            $unInitPolicies = $this->getUser()->getUnInitPolicies();
-            if (count($unInitPolicies) > 0) {
-                $this->addFlash('warning', 'You seem to have a policy that you started creating, but is unpaid.');
-                return $this->redirectToRoute('purchase_step_policy');
-            }
-
-            throw new \Exception('Unable to locate reference');
-        }
-
-        $payment = $repo->findOneBy(['reference' => $reference]);
+        $payment = $repo->findOneBy(['reference' => $request->get('Reference')]);
         if (!$payment) {
             throw new \Exception('Unable to locate payment');
         }
         $policy = $payment->getPolicy();
 
-        // If there's not a user, it may be a payment for the remainder of the policy
-        if (!$this->getUser()) {
-            return $this->redirectToRoute('purchase_remainder_policy', ['id' => $policy->getId()]);
+        $webType = $payment->getWebType();
+        // Metadata should be present, but if not, use older logic to guess at what type to use
+        if (!$webType) {
+            if (!$user) {
+                // If there's not a user, it may be a payment for the remainder of the policy - go ahead and credit
+                $webType = JudopayService::WEB_TYPE_REMAINDER;
+            } elseif (!$policy) {
+                $webType = JudopayService::WEB_TYPE_CARD_DETAILS;
+            } else {
+                $webType = JudopayService::WEB_TYPE_STANDARD;
+            }
+
+            $this->get('logger')->warning(sprintf(
+                'Unable to find web_type metadata for receipt %s. Falling back to %s',
+                $request->get('ReceiptId'),
+                $webType
+            ));
         }
 
-        if ($payment->getUser()->getId() != $this->getUser()->getId()) {
-            throw new AccessDeniedException('Unknown user');
-        }
+        $payment->setSuccess(false);
+        $dm->flush();
 
-        $this->addFlash('error', 'There was a problem processing your payment. You can try again.');
-        $user = $this->getUser();
-        if (!$user->hasActivePolicy()) {
-            return $this->redirectToRoute('purchase_step_policy');
-        } elseif ($user->hasUnpaidPolicy()) {
-            return $this->redirectToRoute('user_unpaid_policy');
-        } else {
-            // would expect 1 of the 2 above - default back to user home just in case
-            return $this->redirectToRoute('user_home');
-        }
+        $this->addFlash(
+            'error',
+            sprintf('Your payment was cancelled or declined. Please try again.')
+        );
+
+        return $this->getRouteForPostCC($policy, $webType);
     }
 
     /**
@@ -746,16 +782,27 @@ class PurchaseController extends BaseController
                         $policy->setRequestedCancellation(new \DateTime());
                         $dm->flush();
                     }
+                    // @codingStandardsIgnoreStart
                     $body = sprintf(
-                        'Requested cancellation for policy %s/%s',
+                        "Policy: <a href='%s'>%s/%s</a>. Requested a cancellation via the site as phone was damaged prior to purchase. Verify policy id match in system.",
+                        $this->generateUrl(
+                            'admin_policy',
+                            ['id' => $policy->getId()],
+                            UrlGeneratorInterface::ABSOLUTE_URL
+                        ),
                         $policy->getPolicyNumber(),
                         $policy->getId()
                     );
+                    // @codingStandardsIgnoreEnd
                     $message = \Swift_Message::newInstance()
                         ->setSubject(sprintf('Requested Policy Cancellation'))
                         ->setFrom('info@so-sure.com')
-                        ->setTo('support@wearesosure.com')
+                        ->setTo('bcc@wearesosure.com')
                         ->setBody($body, 'text/html');
+
+                    $intercom = $this->get('app.intercom');
+                    $intercom->queueMessage($policy->getUser()->getEmail(), $body);
+
                     $this->get('mailer')->send($message);
                     $this->get('app.mixpanel')->queueTrack(
                         MixpanelService::EVENT_REQUEST_CANCEL_POLICY,

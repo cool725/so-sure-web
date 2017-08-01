@@ -24,6 +24,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\MultiPay;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\File\PicSureFile;
 
 use AppBundle\Document\PhoneTrait;
 
@@ -262,11 +263,20 @@ class ApiAuthController extends BaseController
             $this->denyAccessUnlessGranted('pay', $multiPay);
 
             if ($action == 'accept') {
-                $multiPay->setStatus(MultiPay::STATUS_ACCEPTED);
-
                 /** @var $judopay JudopayService */
                 $judopay = $this->get('app.judopay');
-                $judopay->multiPay($multiPay, $amount);
+                if (!$judopay->multiPay($multiPay, $amount)) {
+                    // TODO: Change to payment declined
+                    throw new \Exception('Failed payment');
+                    /*
+                    return $this->getErrorJsonResponse(
+                        ApiErrorCode::ERROR_POLICY_PAYMENT_DECLINED,
+                        'Access denied',
+                        422
+                    );
+                    */
+                }
+                $multiPay->setStatus(MultiPay::STATUS_ACCEPTED);
             } else {
                 $multiPay->setStatus(MultiPay::STATUS_REJECTED);
                 $multiPay->getPolicy()->setStatus(Policy::STATUS_MULTIPAY_REJECTED);
@@ -808,7 +818,9 @@ class ApiAuthController extends BaseController
                 $paymentMethod = $policy->getUser()->getPaymentMethod();
                 if ($paymentMethod instanceof JudoPaymentMethod) {
                     $judo = $this->get('app.judopay');
-                    $judo->existing($policy, $existingData['amount']);
+                    if (!$judo->existing($policy, $existingData['amount'])) {
+                        throw new PaymentDeclinedException('Token payment failed');
+                    }
                 } else {
                     throw new ValidationException('Unsupport payment method');
                 }
@@ -874,6 +886,63 @@ class ApiAuthController extends BaseController
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api payPolicy.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
+     * @Route("/policy/{id}/picsure", name="api_auth_picsure")
+     * @Method({"POST"})
+     */
+    public function picsureAction(Request $request, $id)
+    {
+        try {
+            $data = json_decode($request->getContent(), true)['body'];
+            if (!$this->validateFields($data, ['bucket', 'key'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(Policy::class);
+            $policy = $repo->find($id);
+            if (!$policy) {
+                throw new NotFoundHttpException();
+            }
+            $this->denyAccessUnlessGranted('view', $policy);
+            $s3 = $this->get('aws.s3');
+            $result = $s3->getObject(array(
+                'Bucket' => $this->getDataString($data, 'bucket'),
+                'Key'    => $this->getDataString($data, 'key'),
+            ));
+            $picsure = new PicSureFile();
+            $picsure->setBucket($this->getDataString($data, 'bucket'));
+            $picsure->setKey($this->getDataString($data, 'key'));
+            $policy->addPolicyFile($picsure);
+            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_MANUAL);
+            $dm->flush();
+
+            return new JsonResponse($policy->toApiArray());
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (\Aws\S3\Exception\S3Exception $e) {
+            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_INVALID);
+            $dm->flush();
+
+            $msg = sprintf(
+                'Missing file s3://%s/%s',
+                $this->getDataString($data, 'bucket'),
+                $this->getDataString($data, 'key')
+            );
+            $this->get('logger')->error($msg, ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_POLICY_PICSURE_FILE_NOT_FOUND,
+                $msg,
+                422
+            );
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api picsureAction.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }

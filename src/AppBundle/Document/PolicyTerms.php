@@ -9,4 +9,11 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
  */
 class PolicyTerms extends PolicyDocument
 {
+    public function isPicSureEnabled()
+    {
+        // assuming that picsure will always be enabled going forward
+        return !in_array($this->getVersion(), [
+            'Version 1 May 2016'
+        ]);
+    }
 }

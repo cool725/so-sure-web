@@ -15,6 +15,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
+use AppBundle\Document\Lead;
+
 /**
  * @Route("/about/social-insurance")
  */
@@ -75,7 +77,7 @@ class AboutController extends BaseController
                     );
                     // @codingStandardsIgnoreEnd
                     $intercom = $this->get('app.intercom');
-                    $intercom->queueMessage($contactForm->getData()['email'], $body);
+                    $intercom->queueMessage($contactForm->getData()['email'], $body, Lead::SOURCE_CONTACT_US);
 
                     $message = \Swift_Message::newInstance()
                         ->setSubject(sprintf(
@@ -83,7 +85,7 @@ class AboutController extends BaseController
                             $contactForm->getData()['name']
                         ))
                         ->setFrom('info@so-sure.com')
-                        ->setTo('hello@wearesosure.com')
+                        ->setTo('contact-us@so-sure.com')
                         ->setBody($body, 'text/html');
                     $this->get('mailer')->send($message);
                     $this->addFlash(

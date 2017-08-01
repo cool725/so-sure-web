@@ -25,7 +25,6 @@ class UpdateFeatureData implements FixtureInterface, ContainerAwareInterface
     {
         $repo = $manager->getRepository(Feature::class);
         foreach (Feature::$features as $feature) {
-            print $feature;
             $this->upsertFeature($manager, $feature);
         }
         

@@ -92,7 +92,7 @@ class KernelListener
     {
         $tracking = null;
         $session = $request->getSession();
-        if ($session->isStarted()) {
+        if ($session && $session->isStarted()) {
             $tracking = $session->get(SoSure::SOSURE_TRACKING_SESSION_NAME);
         }
 

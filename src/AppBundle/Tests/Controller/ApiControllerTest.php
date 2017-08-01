@@ -1341,6 +1341,20 @@ class ApiControllerTest extends BaseControllerTest
         $this->assertTrue($isVerified);
     }
 
+    public function testVersion2NoInclude()
+    {
+        $crawler = self::$client->request('GET', '/api/v1/version/v2?platform=ios&version=0.0.1');
+        $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
+        $this->assertFalse(isset($data['feature_flags']));
+    }
+
+    public function testVersion2Include()
+    {
+        $crawler = self::$client->request('GET', '/api/v1/version/v2?platform=ios&version=0.0.1&include=feature-flags');
+        $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
+        $this->assertTrue(count($data['feature_flags']['flags']) > 0);
+    }
+
     public function testReplay()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();

@@ -102,12 +102,12 @@ class BICommand extends ContainerAwareCommand
 
         return $lines;
     }
-    
+
     private function getManager()
     {
         return $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
     }
-    
+
     public function getS3()
     {
         return $this->getContainer()->get("aws.s3");

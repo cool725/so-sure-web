@@ -1348,7 +1348,8 @@ class PolicyService
         }
 
         // TODO: $usePot
-        $this->create($newPolicy, $policy->getEnd(), null, $numPayments);
+        $startDate = $this->endOfDay($policy->getEnd());
+        $this->create($newPolicy, $startDate, null, $numPayments);
         if ($usePot) {
             $newPolicy->getPremium()->setAnnualDiscount($policy->getPotValue());
         }

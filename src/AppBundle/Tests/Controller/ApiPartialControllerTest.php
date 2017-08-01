@@ -68,6 +68,21 @@ class ApiPartialControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(200);
     }
 
+    // feature flags
+
+    /**
+     *
+     */
+    public function testFeatureFlags()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $url = sprintf('/api/v1/partial/feature-flags?_method=GET');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, array());
+        $data = $this->verifyResponse(200);
+        $this->assertTrue(isset($data['flags']));
+        $this->assertTrue(count($data['flags']) > 0);
+    }
+
     // sns
 
     /**

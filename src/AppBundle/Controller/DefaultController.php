@@ -855,7 +855,12 @@ class DefaultController extends BaseController
         $mobileNumber = $facebook->getAccountKitMobileNumber($authorizationCode);
         $user = $repo->findOneBy(['mobileNumber' => $mobileNumber]);
         if (!$user) {
-            throw new \Exception('Unknown user');
+            $this->addFlash(
+                'error',
+                "Sorry, we can't seem to find your user account. Please contact us if you need help."
+            );
+
+            return new RedirectResponse($this->generateUrl('fos_user_security_login'));
         }
 
         $this->get('fos_user.security.login_manager')->loginUser(
