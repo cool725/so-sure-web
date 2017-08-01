@@ -59,8 +59,8 @@ class MixpanelService
     const CUSTOM_CPC_QUOTE_PAGE_UK = '$custom_event:534870';
 
     const CUSTOM_CPC_MANUFACTURER_PAGE_UK = '$custom_event:534868';
-    const CUSTOM_INVITATION_PAGE_SCODE = '$custom_event:534894';
-    const CUSTOM_INVITATION_PAGE_EMAIL = '$custom_event:534898';
+    const CUSTOM_INVITATION_PAGE_SCODE = '$custom_event:591840';
+    const CUSTOM_INVITATION_PAGE_EMAIL = '$custom_event:591838';
 
     /** @var DocumentManager */
     protected $dm;
