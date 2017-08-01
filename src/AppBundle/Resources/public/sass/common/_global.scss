@@ -30,6 +30,18 @@ h5, h6, .h5, .h6 {
 	color: $black;
 }
 
+a {
+	color: $blue;
+
+	&:hover, &:focus {
+		color: darken($blue, 15%);
+	}
+
+	&:active {
+		color: darken($blue, 25%);
+	}
+}
+
 // Helpers - for rapid prototyping
 
 	// Alignment

@@ -68,6 +68,10 @@ label {
 
 .form-inline {
 
+    .form-control {
+        vertical-align: initial;
+    }
+
     @include breakpoint(tablet) {
         .twitter-typeahead {
             width: 320px;
@@ -78,9 +82,6 @@ label {
             }
         }
 
-        .btn {
-            margin-top: -11px;
-        }
     }
 }
 

@@ -1,0 +1,181 @@
+// quote.scss
+
+@import "../mixins";
+@import "../common/type";
+@import "../common/palette";
+@import "../common/paletteNew";
+@import "homepage";
+@import "rewardCalculatorNew";
+
+.quote-card {
+    max-width: 400px;
+    margin: 0 auto 25px;
+    position: relative;
+    background-color: $white;
+
+	h1 {
+		font-size: 24px;
+		line-height: 1.5;
+
+		.memory-dropdown-list {
+			display: inline;
+
+		    a {
+		    	&:hover, &:focus {
+		    		text-decoration: none;
+		    	}
+		    }
+		}
+
+		.memory-dropdown {
+			font-family: $avenir-book;
+		    min-width: 200px !important;
+		    left: auto; right: auto;
+
+
+		    @include breakpoint(mobileishup) {
+				right: 0 !important;
+		    }
+		}
+
+		@include breakpoint(laptop) {
+				font-size: 30px;
+		}
+	}
+
+	.quote__cta {
+		@include breakpoint(midtablet) {
+			width: 40%;
+			margin: 0 auto;
+		}
+	}
+
+	.quote-ul {
+	    padding-left: 30px;
+	    margin: 15px 0 0 0;
+	    position: relative;
+
+	    li {
+		    padding: 4px 0;
+		    color: $grey-dark;
+		    position: relative;
+	    }
+
+	    li.h4 {
+
+	    	&:first-of-type {
+				margin-top: 0;
+	    	}
+
+	    	&:last-of-type {
+				margin-bottom: 0;
+	    	}
+	    }
+	}
+
+	.fa-lg {
+	    position: absolute;
+	    left: -30px; top: 4px;
+	}
+
+	p.h4 {
+		margin: 0 0 10px;
+	}
+
+	.quote-tip {
+	    background-color: $grey-light;
+	    position: relative;
+	    text-align: center;
+	    padding: 10px 15px;
+	    margin: 25px 0 10px;
+
+	    &:before {
+		    width: 0; height: 0;
+		    content: '';
+		    position: absolute;
+		    bottom: 100%; left: 0; right: 0;
+		    margin: 0 auto;
+		    border-style: solid;
+		    border-width: 0 10px 10px 10px;
+		    border-color: transparent transparent $grey-light transparent;
+	    }
+	}
+
+	padding: 25px;
+	border: 2px solid $grey-light;
+	@include border-radius(4px);
+
+	@include breakpoint(tablet) {
+		max-width: none;
+
+		.rrp {
+			text-align: right;
+		}
+	}
+}
+
+.stat-banner, .phone-details  {
+	padding: 20px 15px;
+	color: $white;
+
+	h3 {
+		color: $white;
+	}
+
+	ul {
+		li {
+
+			&:before {
+			  content: '\2022';
+			  margin-right: 0.5em;
+			}
+		}
+	}
+
+	@include breakpoint(tablet) {
+		text-align: center;
+	}
+}
+
+// .memory-dropdown {
+// 	font-family: $avenir-book;
+//     min-width: 200px !important;
+//     left: auto; right: auto;
+
+
+//     @include breakpoint(mobileishup) {
+// 		right: 0 !important;
+//     }
+// }
+
+.memory-dropdown-list {
+    display: inline;
+
+    a {
+    	&:hover, &:focus {
+    		text-decoration: none;
+    	}
+    }
+}
+
+@include breakpoint(tablet) {
+
+	.quote {
+		max-width: 840px;
+		margin: 25px auto;
+		position: relative;
+
+		// h1, .h3, .h4 {
+		// 	line-height: 1;
+		// }
+	}
+
+}
+
+// Email
+.input-group .form-control {
+    border: 2px solid $grey-light;
+    box-shadow: none;
+}
+
+

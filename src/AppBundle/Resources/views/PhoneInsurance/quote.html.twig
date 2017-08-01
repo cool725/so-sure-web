@@ -384,7 +384,7 @@
 
     {% if slider_test != 'slide-me' %}
         {% include 'AppBundle::Default/press.html.twig' %}
-    
+
         <section id="quote-banner"
                  class="banner-sticky banner-sticky-hide"
                  data-sticky-trigger="quote"
@@ -400,11 +400,11 @@
                         <h3><span>£{{ phone_price.monthlyPremiumPrice }}</span> <small>/month</small></h3>
                     </div>
                     <div class="col-xs-12 col-sm-3 col-md-2">
-    
+
                         {{ form_start(buy_form_banner) }}
                             {{ form_widget(buy_form_banner.buy, {'label': 'Get Started', 'attr': {'class': 'btn btn-success '}}) }}
                         {{ form_end(buy_form_banner)}}
-    
+
                     </div>
                 </div>
             </div>

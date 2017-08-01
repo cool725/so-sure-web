@@ -1,0 +1,266 @@
+{% extends 'base.html.twig' %}
+
+{# Set vars #}
+{% set new_stylesheet = 1 %}
+
+{% block title %}so-sure -
+    {{ phone }}{% endblock %}
+{% block meta %}
+    <meta name="description" content="For a small monthly fee your phone is covered for theft, loss, accidental damage and unauthorised usage."/>
+    <meta name="keywords" content="mobile insurance, phone insurance, mobile phone insurance, cheap mobile phone insurance, cheap phone insurance, cheap mobile insurance, better phone insurance, better mobile phone insurance"/>
+    <link rel="canonical" href="{{ url('quote_make_model', {'make': phone.make, 'model': phone.encodedModel}) }}" />
+
+    <meta property="og:video" content="https://cdn.so-sure.com/video/explainer-subtitle-640.mp4" />
+    <meta property="og:video:secure_url" content="https://cdn.so-sure.com/video/explainer-subtitle-640.mp4" />
+    <meta property="og:video:type" content="video/mp4" />
+    <meta property="og:video:width" content="640" />
+    <meta property="og:video:height" content="360" />
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets output='css/*.css'
+    '@AppBundle//Resources/public/sass/page/quoteNew.scss'
+    %}
+    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{% block body %}
+
+    <section class="section--pad quote">
+        <div class="container">
+            <div class="row">
+                {# Quote Left #}
+                <div class="col-md-8">
+                    <div class="quote__left">
+                        <h1 class="h2">
+                            <span class="text-blue">Insurance for your</span>
+                            <div class="dropdown memory-dropdown-list">
+                                <a href="#"
+                                   class="dropdown-toggle text-nowrap"
+                                   type="button"
+                                   id="memoryDropdownList"
+                                   data-toggle="dropdown"
+                                   aria-haspopup="true"
+                                   aria-expanded="true">
+                                    {{ phone }}
+                                    <i class="fa fa-caret-down" aria-hidden="true"></i>
+                                </a>
+                                <ul class="dropdown-menu memory-dropdown" aria-labelledby="memoryDropdownList">
+                                    {% if phones | length > 1 %}
+                                        <li class="dropdown-header">Select alternate model</li>
+                                        {% for phone_mem in phones if phone_mem.id != phone.id %}
+                                            <li>
+                                                <a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class=""> {{ phone.model }} - {{ phone_mem.memory }}GB</a>
+                                            </li>
+                                        {% endfor %}
+                                        <li role="separator" class="divider"></li>
+                                    {% endif %}
+                                    <li><a href="#" data-toggle="modal" data-target="#quoteModal"> I have a different phone</a></li>
+                                </ul>
+                            </div>
+                            <br>
+                            <span class="text-nowrap">only <span class="text-blue">£{{ phone_price.monthlyPremiumPrice }}</span> per month</span>
+                        </h1>
+                        <h4 class="text-blue">Effective monthly premium after cashback:<br><small>(Cashback paid out end of policy year)</small></h4>
+
+                        {# Slider #}
+                        <div id="loading-overlay-init" class="loading-overlay" style="display:block;"></div>
+
+                        {# Set the start friends amount #}
+                        {% set start_friends = max_connections / 2 %}
+
+                        {# Set the amount of cashback #}
+                        {% set start_value = start_friends * connection_value %}
+
+                        {# If greater than max pot, pot max is start value #}
+                        {% if start_value > max_pot %}
+                            {% set start_value = max_pot %}
+                        {% endif %}
+
+                        {# Start amount and work out monthly #}
+                        {% set start_premium = annual_premium - start_value %}
+                        {% set monthly_premium = start_premium / 12 %}
+
+                        <div class="reward-slider">
+                            <output for="range" class="rewardslider__output">
+                                <span id="premium" class="h3 text-white">£{{ monthly_premium|number_format(2, '.', ',') }}</span><br>
+                                <small class="text-nowrap">per month</small>
+                            </output>
+                            <input type="range"
+                                   id="reward-slider"
+                                   min="0"
+                                   max="{{ max_connections }}"
+                                   value="{{ start_friends }}"
+                                   data-maxpot="{{ max_pot }}"
+                                   data-connection-value="{{ connection_value }}"
+                                   data-premium="{{ annual_premium }}"
+                                   data-monthly-premium="{{ monthly_premium }}">
+                        </div>
+                        <h4 class="text-blue">Number of connections</h4>
+                        <p class="lead">Get cashback by connection to friends. <br> Save money on your premium when you and your friends don't claim.</p>
+                        {# CTA #}
+                        <div class="quote__cta">
+                            <div class="form-group">
+                                {{ form_widget(buy_form.buy_tablet, {'label': 'Get Started', 'attr': {'class': 'btn btn btn-green btn-block btn-pad btn-big-text'}}) }}
+                            </div>
+                            <a href="#"
+                               data-toggle="modal"
+                               data-target="#policy-modal"
+                               id="policy-modal-trigger"
+                               class="text-underline">
+                               <small>Full Terms &amp; Conditions</small></a>
+                        </div>
+                        {# Save Quote #}
+                        {% if feature_enabled('quote-lead') %}
+                            <h3>Guarantee this price for the next 7 days</h3>
+                            {{ form_start(lead_form, {'attr': {'class': 'form-inline quote__save'}}) }}
+                                {{ form_label(lead_form.email, 'Your email:', { 'label_attr': {'class': 'sr-only'} }) }}
+                                {{ form_widget(lead_form.email, {'attr':{'class':'form-control', 'placeholder': 'Enter your email'}}) }}
+                                {{ form_widget(lead_form.save, {'label': 'Save this quote', 'attr': {'class': 'btn btn-blue btn-pad'}}) }}
+                            {{ form_end(lead_form) }}
+                        {% endif %}
+                    </div>
+                </div>
+                {# Quote Right #}
+                <div class="col-md-4 quote__right">
+                    <div class="quote__right">
+                        <div class="row">
+                            <div class="col-sm-6 col-md-12">
+                                <h3>Our cover always includes</h3>
+                                <ul class="list-unstyled fa-list-bullet">
+                                    <li><i class="fa fa-check text-green" aria-hidden="true"></i> Theft</li>
+                                    <li><i class="fa fa-check text-green" aria-hidden="true"></i> Loss</li>
+                                    <li><i class="fa fa-check text-green" aria-hidden="true"></i> Out of warranty breakdown</li>
+                                    <li><i class="fa fa-check text-green" aria-hidden="true"></i> Water damage</li>
+                                    <li><i class="fa fa-check text-green" aria-hidden="true"></i> Cracked screen</li>
+                                    <li><i class="fa fa-check text-green" aria-hidden="true"></i> Worldwide cover</li>
+                                </ul>
+                            </div>
+                            <div class="col-sm-6 col-md-12">
+                                <h3>What we offer</h3>
+                                <ul class="list-unstyled fa-list-bullet">
+                                    <li><i class="fa fa-check text-blue" aria-hidden="true"></i> Next working day replacement or repair</li>
+                                    <li><i class="fa fa-check text-blue" aria-hidden="true"></i> 24/7 live support</li>
+                                    <li><i class="fa fa-check text-blue" aria-hidden="true"></i> Insure used phones</li>
+                                    <li><i class="fa fa-check text-blue" aria-hidden="true"></i> Instant cover when you purchase your policy</li>
+                                    <li><i class="fa fa-check text-blue" aria-hidden="true"></i> Up to 80% cashback every year</li>
+                                </ul>
+                            </div>
+                        </div>
+                        {# CTA #}
+                        <div class="quote__cta visible-xs">
+                            <div class="form-group">
+                                {{ form_widget(buy_form.buy_tablet, {'label': 'Get Started', 'attr': {'class': 'btn btn btn-green btn-block btn-pad btn-big-text'}}) }}
+                            </div>
+                            <a href="#"
+                               data-toggle="modal"
+                               data-target="#policy-modal"
+                               id="policy-modal-trigger"
+                               class="text-underline">
+                               <small>Full Terms &amp; Conditions</small></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% include 'AppBundle::Default/fasterClaims.html.twig' %}
+
+    {% include 'AppBundle::Default/saveMoney.html.twig' %}
+
+    {% include 'AppBundle::Default/faqs.html.twig' %}
+
+    {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}
+
+    {% include 'AppBundle::Default/whySoSure.html.twig' %}
+
+    <section class="phone-details background-blue">
+        <div class="container">
+            <h3>About the {{ phone.make }} {{ phone.model }}</h3>
+            <ul class="list-inline">
+                <li>Camera: {{ phone.camera }} MP</li>
+                <li>Size: {{ phone.getScreenPhysicalInch }}"</li>
+                <li>Screen Resolution: {{ phone.getScreenResolution }}</li>
+                <li>RAM: {{ phone.getRamDisplay }}</li>
+            </ul>
+            {% if phone.funFacts|length > 0 %}
+                <p>{{ phone.funFacts|raw }}</p>
+            {% endif %}
+            {% if phone.description|length > 0 %}
+                <p>{{ phone.description|raw }}</p>
+            {% endif %}
+        </div>
+    </section>
+
+    {% if slider_test == 'slide-me' %}
+        {% include 'AppBundle::Default/press.html.twig' %}
+    {% endif %}
+
+    {% include 'AppBundle::Default/partnership.html.twig' %}
+
+    {# Page Modals #}
+
+    {% include 'AppBundle::Default/modalVideo.html.twig' %}
+
+    <div class="modal modal-fullscreen fade"
+         id="policy-modal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="So-Sure Policy Terms"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h3>So-Sure Policy Terms</h3>
+                </div>
+                <div class="modal-body modal-policy">
+                    {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  max_pot })) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade"
+         id="calculation-details"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="Calculation Details"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h3>Calculation Details</h3>
+                </div>
+                <div class="modal-body">
+                    <p><strong>How we calculate this:</strong></p>
+                    <p>Prices based on data available from competitor websites, last updated on 1 February 2017.  </p>
+                    <p>Networks taken as an average of O2, Vodafone, and Three.</p>
+                    <p>High Street is Car Phone Warehouse.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include 'AppBundle::Default/modalQuote.html.twig' with {'selectPhoneMakeType': ''} %}
+    {# End Page Modals #}
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    'components/vimeo-player-js/player.min.js'
+    'components/typeahead.js/typeahead.bundle.min.js'
+    'components/fuse.js/fuse.min.js'
+    'components/rangeslider.js/rangeslider.min.js'
+    '@AppBundle/Resources/public/js/Default/modalVideo.js'
+    '@AppBundle/Resources/public/js/Default/index.js'
+    '@AppBundle/Resources/public/js/Default/sliderNew.js'
+    '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
+    '@AppBundle/Resources/public/js/Default/bannerSticky.js' %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}

@@ -455,9 +455,9 @@ class PhoneInsuranceController extends BaseController
 
         if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
             // return $this->render('AppBundle:PhoneInsurance:insuranceLanding.html.twig', $data);
-            return $this->render('AppBundle:PhoneInsurance:quote.html.twig', $data);
+            return $this->render('AppBundle:PhoneInsurance:quoteNewSlider.html.twig', $data);
         } else {
-            return $this->render('AppBundle:PhoneInsurance:quote.html.twig', $data);
+            return $this->render('AppBundle:PhoneInsurance:quoteNewSlider.html.twig', $data);
         }
 
         // //if ($phone->getCurrentPhonePrice()) {
