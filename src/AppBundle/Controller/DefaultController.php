@@ -536,6 +536,15 @@ class DefaultController extends BaseController
      */
     public function soSureVsProtectYourBubble()
     {
+        $exp = $this->get('app.sixpack')->participate(
+            SixpackService::EXPERIMENT_PYG_HOME,
+            ['pyg', 'home'],
+            true
+        );
+        if ($exp == 'home') {
+            return new RedirectResponse($this->generateUrl('homepage'));
+        }
+
         return array();
     }
 
