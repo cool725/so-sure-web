@@ -89,7 +89,7 @@ class ApiViewControllerTest extends BaseControllerTest
         return $data;
     }
 
-    public function testPolicyTermsDiff()
+    public function testPolicyTermsDiffV1()
     {
         $user = self::createUser(
             self::$userManager,
@@ -100,7 +100,50 @@ class ApiViewControllerTest extends BaseControllerTest
         $data = $this->checkPolicy($policy, true);
 
         $templating = self::$container->get('templating');
-        $pdf = $templating->render('AppBundle:Pdf:policyTerms.html.twig', ['policy' => $policy]);
+        $pdf = $templating->render('AppBundle:Pdf:policyTermsV1.html.twig', ['policy' => $policy]);
+
+        // remove tags
+        $data = strip_tags($data);
+        $pdf = strip_tags($pdf);
+
+        // adjust for differences in files
+        $pdf = str_replace('p {display: block;}', '', $pdf);
+        $pdf = str_replace('•', '', $pdf);
+        $pdf = str_replace('&nbsp;', '', $pdf);
+
+        // top and bottom of api is slightly different - best to add to pdf version to avoid replacing unindented areas
+        $pdf = sprintf('so-sure Policy Document%s', $pdf);
+        // @codingStandardsIgnoreStart
+        $pdf = sprintf('%s Contact details Address: so-sure Limited, 10 Finsbury Square, London EC2A 1AF Email: support@wearesosure.com', $pdf);
+        // @codingStandardsIgnoreEnd
+
+        // delete extra spaces, and chunk into 200 chars to make comparision easier
+        $data = trim(preg_replace('/\s+/', ' ', $data));
+        $pdf = trim(preg_replace('/\s+/', ' ', $pdf));
+        $data = chunk_split($data, 200);
+        $pdf = chunk_split($pdf, 200);
+
+        /* If changes do occur, useful for running a diff
+        file_put_contents('/vagrant/terms-api.txt', $data);
+        file_put_contents('/vagrant/terms-pdf.txt', $pdf);
+        print 'meld /var/sosure/terms-api.txt /var/sosure/terms-pdf.txt';
+        */
+
+        $this->assertEquals($data, $pdf);
+    }
+
+    public function testPolicyTermsDiffV2()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('policy-terms-diff-v2', $this),
+            'foo'
+        );
+        $policy = $this->createPolicy($user, true);
+        $data = $this->checkPolicy($policy, true);
+
+        $templating = self::$container->get('templating');
+        $pdf = $templating->render('AppBundle:Pdf:policyTermsV2.html.twig', ['policy' => $policy]);
 
         // remove tags
         $data = strip_tags($data);

@@ -568,13 +568,18 @@ class PolicyService
             unlink($tmpFile);
         }
 
+        $template = 'AppBundle:Pdf:policyTermsV1.html.twig';
+        if ($policy->getPolicyTerms()->isPicSureEnabled()) {
+            $template = 'AppBundle:Pdf:policyTermsV2.html.twig';
+        }
+
         $this->snappyPdf->setOption('orientation', 'Landscape');
         $this->snappyPdf->setOption('lowquality', false);
         $this->snappyPdf->setOption('page-size', 'A4');
         $this->snappyPdf->setOption('margin-top', '0');
         $this->snappyPdf->setOption('margin-bottom', '0');
         $this->snappyPdf->generateFromHtml(
-            $this->templating->render('AppBundle:Pdf:policyTerms.html.twig', ['policy' => $policy]),
+            $this->templating->render($template, ['policy' => $policy]),
             $tmpFile
         );
 
@@ -604,11 +609,16 @@ class PolicyService
             unlink($tmpFile);
         }
 
+        $template = 'AppBundle:Pdf:policyScheduleV1.html.twig';
+        if ($policy->getPolicyTerms()->isPicSureEnabled()) {
+            $template = 'AppBundle:Pdf:policyScheduleV2.html.twig';
+        }
+
         $this->snappyPdf->setOption('orientation', 'Portrait');
         $this->snappyPdf->setOption('page-size', 'A4');
         $this->snappyPdf->setOption('margin-top', '20mm');
         $this->snappyPdf->generateFromHtml(
-            $this->templating->render('AppBundle:Pdf:policySchedule.html.twig', ['policy' => $policy]),
+            $this->templating->render($template, ['policy' => $policy]),
             $tmpFile
         );
 
