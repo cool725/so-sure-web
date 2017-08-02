@@ -62,9 +62,11 @@
                     {% endif %}
                     <tr class="{% if scheduledPayment.status == 'failed' %}danger{% elseif isExpired %}warning{% endif %}">
                         <td>
+                            {% if not scheduledPayment.policy.isBillablePolicy %}<del>{% endif %}
                             <a href="{{ path('admin_policy', {'id': scheduledPayment.policy.id }) }}">
                                 {{ scheduledPayment.policy.policyNumber }}
                             </a>
+                            {% if not scheduledPayment.policy.isBillablePolicy %}</del>{% endif %}
                             {% if scheduledPayment.policy.status == 'unpaid' %}
                                 <i class="fa fa-warning"
                                    title="Policy is unpaid. Unless payment is made, policy will be automatically cancelled on {{ scheduledPayment.policy.getPolicyExpirationDate|date('d M Y H:i', 'Europe/London') }}"></i>
