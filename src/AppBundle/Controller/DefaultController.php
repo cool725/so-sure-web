@@ -534,7 +534,7 @@ class DefaultController extends BaseController
      * @Route("/so-sure-vs-protect-your-bubble", name="so_sure_vs_protect_your_bubble")
      * @Route("/so-sure-vs-protect-your-bubble-phone-insurance", name="so_sure_vs_protect_your_bubble_phone_insurance")
      * @Route("/so-sure-vs-carphone-warehouse-phone-insurance", name="so_sure_vs_carphone_warehouse_phone_insurance")
-     * @Route("/so-sure-vs-ee-damage-cover", name="so_sure_vs_ee_damage_cover")
+     * @Route("/so-sure-vs-ee-damage-cover-insurance", name="so_sure_vs_ee_damage_cover_insurance")
      * @Route("/so-sure-vs-tesco-phone-insurance", name="so_sure_vs_tesco_phone_insurance")
      * @Template
      */
@@ -598,7 +598,7 @@ class DefaultController extends BaseController
                 'c_cashback' => 'No',
                 'c_cashback_bg' => 'cross-background',
             ];
-        } elseif ($request->get('_route') == "so_sure_vs_ee_damage_cover") {
+        } elseif ($request->get('_route') == "so_sure_vs_ee_damage_cover_insurance") {
             $data = [
                 'c_name' => 'EE Damage Cover',
                 's_theft' => 'Yes',
@@ -624,7 +624,7 @@ class DefaultController extends BaseController
             ];
         } elseif ($request->get('_route') == "so_sure_vs_tesco_phone_insurance") {
             $data = [
-                'c_name' => 'Tesco Phone Insurance',
+                'c_name' => 'Tesco',
                 's_theft' => 'Yes',
                 's_theft_bg' => 'tick-background',
                 's_loss' => 'Yes',
