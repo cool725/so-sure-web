@@ -549,6 +549,24 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/so-sure-vs-carphone-warehouse", name="so_sure_vs_carphone_warehouse")
+     * @Template
+     */
+    public function soSureVsCarphoneWarehouse()
+    {
+        $exp = $this->get('app.sixpack')->participate(
+            SixpackService::EXPERIMENT_PYG_HOME,
+            ['pyg', 'home'],
+            true
+        );
+        if ($exp == 'home') {
+            return new RedirectResponse($this->generateUrl('homepage'));
+        }
+
+        return array();
+    }
+
+    /**
      * @Route("/samsung-s7-insured-with-vodafone", name="samsung_s7_insured_with_vodafone")
      * @Route("/google-pixel-insured-with-vodafone", name="google_pixel_insured_with_vodafone")
      * @Route("/iphone-SE-insured-with-vodafone", name="iphone_SE_insured_with_vodafone")
