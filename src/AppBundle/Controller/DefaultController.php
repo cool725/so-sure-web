@@ -594,7 +594,7 @@ class DefaultController extends BaseController
                 'c_cashback' => 'No',
                 'c_cashback_bg' => 'cross-background',
             ];
-        } 
+        }
 
         return array('data' => $data);
     }
