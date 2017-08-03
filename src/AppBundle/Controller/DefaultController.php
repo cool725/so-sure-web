@@ -615,7 +615,7 @@ class DefaultController extends BaseController
                 'c_theft_bg' => 'tick-background',
                 'c_loss' => 'No',
                 'c_loss_bg' => 'cross-background',
-                'c_theft_replacement' => 'Next working day for theft only',
+                'c_theft_replacement' => 'Theft: Next working day Loss: N/A',
                 'c_damage_replacement' => 'Next working day',
                 'c_used_phones' => 'Only new phones bought from EE',
                 'c_used_phones_bg' => 'cross-background',
