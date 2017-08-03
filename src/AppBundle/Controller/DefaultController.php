@@ -624,7 +624,7 @@ class DefaultController extends BaseController
             ];
         } elseif ($request->get('_route') == "so_sure_vs_tesco_phone_insurance") {
             $data = [
-                'c_name' => 'Tesco',
+                'c_name' => 'Tesco Phone',
                 's_theft' => 'Yes',
                 's_theft_bg' => 'tick-background',
                 's_loss' => 'Yes',
