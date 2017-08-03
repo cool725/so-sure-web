@@ -600,7 +600,7 @@ class DefaultController extends BaseController
             ];
         } elseif ($request->get('_route') == "so_sure_vs_ee_phone_insurance") {
             $data = [
-                'c_name' => 'EE Damage Cover',
+                'c_name' => 'EE',
                 's_theft' => 'Yes',
                 's_theft_bg' => 'tick-background',
                 's_loss' => 'Yes',
@@ -615,7 +615,7 @@ class DefaultController extends BaseController
                 'c_theft_bg' => 'tick-background',
                 'c_loss' => 'No',
                 'c_loss_bg' => 'cross-background',
-                'c_theft_replacement' => 'N/A',
+                'c_theft_replacement' => 'Next working day for theft only',
                 'c_damage_replacement' => 'Next working day',
                 'c_used_phones' => 'Only new phones bought from EE',
                 'c_used_phones_bg' => 'cross-background',
