@@ -5,7 +5,7 @@
 {# {% set new_footer = 1 %} #}
 
 
-{% block title %}so-sure - SO-SURE vs Protect Your Bubble Phone Insurance
+{% block title %}so-sure - SO-SURE vs {{ data.c_name }} Insurance
 {% endblock %}
 
 {% block stylesheets %}
@@ -20,7 +20,7 @@
 
     <section class="section--pad background-white section-intro">
         <div class="container">
-            <h1 class="text-blue text-center">SO-SURE vs Protect Your Bubble Phone Insurance</h1>
+            <h1 class="text-blue text-center">SO-SURE vs {{ data.c_name }} Insurance</h1>
             <div class="row">
                 <div class="col-md-8 col-md-offset-2">
                     <p class="text-center"><span class="big-text">At so-sure we believe in keeping things real. We don’t want to hide behind any marketing gimmicks or fancy numbers.</span></p>
@@ -51,39 +51,39 @@
                                 <tr>
                                     <td></td>
                                     <td align="center" class="h4" width="28%">SO-SURE</td>
-                                    <td align="center" class="h4" width="28%">Protect Your Bubble</td>
+                                    <td align="center" class="h4" width="28%">{{ data.c_name }}</td>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
                                     <td class="background-off-white">Cover for theft, damage and breakdown</td>
-                                    <td align="center" class="tick-background">Yes</td>
-                                    <td align="center" class="tick-background">Yes</td>
+                                    <td align="center" class="{{ data.s_theft_bg }}">{{ data.s_theft }}</td>
+                                    <td align="center" class="{{ data.c_theft_bg }}">{{ data.c_theft }}</td>
                                 </tr>
                                 <tr>
                                     <td class="background-off-white">Cover for loss</td>
-                                    <td align="center" class="tick-background">As standard</td>
-                                    <td align="center" class="cross-background">Extra £1.50 per month</td>
+                                    <td align="center" class="{{ data.s_loss_bg }}">{{ data.s_loss }}</td>
+                                    <td align="center" class="{{ data.c_loss_bg }}">{{ data.c_loss }}</td>
                                 </tr>
                                 <tr>
                                     <td class="background-off-white">Replacement time (loss/theft)</td>
-                                    <td align="center">1 working day</td>
-                                    <td align="center">2 working days</td>
+                                    <td align="center">{{ data.s_theft_replacement }}</td>
+                                    <td align="center">{{ data.c_theft_replacement }}</td>
                                 </tr>
                                 <tr>
                                     <td class="background-off-white">Replacement time (damage/breakdown)</td>
-                                    <td align="center">1 working day</td>
-                                    <td align="center">3-5 working days</td>
+                                    <td align="center">{{ data.s_damage_replacement }}</td>
+                                    <td align="center">{{ data.c_damage_replacement }}</td>
                                 </tr>
                                 <tr>
                                     <td class="background-off-white">Insure old/used phones</td>
-                                    <td align="center" class="tick-background">Yes</td>
-                                    <td align="center" class="cross-background">Only up to 12 months old</td>
+                                    <td align="center" class="{{ data.s_used_phones_bg }}">{{ data.s_used_phones }}</td>
+                                    <td align="center" class="{{ data.c_used_phones_bg }}">{{ data.c_used_phones }}</td>
                                 </tr>
                                 <tr>
                                     <td class="background-off-white">Up to 80% cashback every year</td>
-                                    <td align="center" class="tick-background">Yes</td>
-                                    <td align="center" class="cross-background">No</td>
+                                    <td align="center" class="{{ data.s_cashback_bg }}">{{ data.s_cashback }}</td>
+                                    <td align="center" class="{{ data.c_cashback_bg }}">{{ data.c_cashback }}</td>
                                 </tr>
                             </tbody>
                         </table>
