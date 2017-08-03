@@ -21,6 +21,7 @@ use AppBundle\Validator\Constraints as AppAssert;
  *      "policyTerms"="PolicyTermsFile",
  *      "invoice"="InvoiceFile",
  *      "davies"="DaviesFile",
+ *      "screenUpload"="ScreenUploadFile",
  *      "imeiUpload"="ImeiUploadFile",
  *      "brightstar"="BrightstarFile",
  *      "picsure"="PicSureFile"
