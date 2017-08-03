@@ -91,12 +91,16 @@ class ApiViewControllerTest extends BaseControllerTest
 
     public function testPolicyTermsDiffV1()
     {
+        $policyTermsRepo = static::$dm->getRepository(PolicyTerms::class);
+        $oldTerms = $policyTermsRepo->findOneBy(['latest' => false]);
+
         $user = self::createUser(
             self::$userManager,
             self::generateEmail('policy-terms-diff', $this),
             'foo'
         );
         $policy = $this->createPolicy($user, true);
+        $policy->setPolicyTerms($oldTerms);
         $data = $this->checkPolicy($policy, true);
 
         $templating = self::$container->get('templating');
