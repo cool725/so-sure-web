@@ -532,7 +532,10 @@ class DefaultController extends BaseController
 
     /**
      * @Route("/so-sure-vs-protect-your-bubble", name="so_sure_vs_protect_your_bubble")
-     * @Route("/so-sure-vs-carphone-warehouse", name="so_sure_vs_carphone_warehouse")
+     * @Route("/so-sure-vs-protect-your-bubble-phone-insurance", name="so_sure_vs_protect_your_bubble_phone_insurance")
+     * @Route("/so-sure-vs-carphone-warehouse-phone-insurance", name="so_sure_vs_carphone_warehouse_phone_insurance")
+     * @Route("/so-sure-vs-ee-damage-cover-insurance", name="so_sure_vs_ee_damage_cover_insurance")
+     * @Route("/so-sure-vs-tesco-phone-insurance", name="so_sure_vs_tesco_phone_insurance")
      * @Template
      */
     public function soSureVsCompetitor(Request $request)
@@ -546,7 +549,8 @@ class DefaultController extends BaseController
             return new RedirectResponse($this->generateUrl('homepage'));
         }
 
-        if ($request->get('_route') == "so_sure_vs_protect_your_bubble") {
+        if ($request->get('_route') == "so_sure_vs_protect_your_bubble_phone_insurance" ||
+            $request->get('_route') == "so_sure_vs_protect_your_bubble") {
             $data = [
                 'c_name' => 'Protect Your Bubble',
                 's_theft' => 'Yes',
@@ -570,7 +574,7 @@ class DefaultController extends BaseController
                 'c_cashback' => 'No',
                 'c_cashback_bg' => 'cross-background',
             ];
-        } elseif ($request->get('_route') == "so_sure_vs_carphone_warehouse") {
+        } elseif ($request->get('_route') == "so_sure_vs_carphone_warehouse_phone_insurance") {
             $data = [
                 'c_name' => 'Carphone Warehouse',
                 's_theft' => 'Yes',
@@ -590,6 +594,54 @@ class DefaultController extends BaseController
                 'c_theft_replacement' => 'Next working day',
                 'c_damage_replacement' => 'Next working day',
                 'c_used_phones' => 'No',
+                'c_used_phones_bg' => 'cross-background',
+                'c_cashback' => 'No',
+                'c_cashback_bg' => 'cross-background',
+            ];
+        } elseif ($request->get('_route') == "so_sure_vs_ee_damage_cover_insurance") {
+            $data = [
+                'c_name' => 'EE Damage Cover',
+                's_theft' => 'Yes',
+                's_theft_bg' => 'tick-background',
+                's_loss' => 'Yes',
+                's_loss_bg' => 'tick-background',
+                's_theft_replacement' => 'Next working day',
+                's_damage_replacement' => 'Next working day',
+                's_used_phones' => 'Yes',
+                's_used_phones_bg' => 'tick-background',
+                's_cashback' => 'Yes',
+                's_cashback_bg' => 'tick-background',
+                'c_theft' => 'Yes',
+                'c_theft_bg' => 'tick-background',
+                'c_loss' => 'No',
+                'c_loss_bg' => 'cross-background',
+                'c_theft_replacement' => 'Theft: Next working day Loss: N/A',
+                'c_damage_replacement' => 'Next working day',
+                'c_used_phones' => 'Only new phones bought from EE',
+                'c_used_phones_bg' => 'cross-background',
+                'c_cashback' => 'No',
+                'c_cashback_bg' => 'cross-background',
+            ];
+        } elseif ($request->get('_route') == "so_sure_vs_tesco_phone_insurance") {
+            $data = [
+                'c_name' => 'Tesco Phone',
+                's_theft' => 'Yes',
+                's_theft_bg' => 'tick-background',
+                's_loss' => 'Yes',
+                's_loss_bg' => 'tick-background',
+                's_theft_replacement' => 'Next working day',
+                's_damage_replacement' => 'Next working day',
+                's_used_phones' => 'Yes',
+                's_used_phones_bg' => 'tick-background',
+                's_cashback' => 'Yes',
+                's_cashback_bg' => 'tick-background',
+                'c_theft' => 'Yes',
+                'c_theft_bg' => 'tick-background',
+                'c_loss' => 'Yes',
+                'c_loss_bg' => 'tick-background',
+                'c_theft_replacement' => '7-10 working days',
+                'c_damage_replacement' => '7-10 working days',
+                'c_used_phones' => 'Only new phones bought from Tesco',
                 'c_used_phones_bg' => 'cross-background',
                 'c_cashback' => 'No',
                 'c_cashback_bg' => 'cross-background',
