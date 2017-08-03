@@ -532,9 +532,10 @@ class DefaultController extends BaseController
 
     /**
      * @Route("/so-sure-vs-protect-your-bubble", name="so_sure_vs_protect_your_bubble")
+     * @Route("/so-sure-vs-carphone-warehouse", name="so_sure_vs_carphone_warehouse")
      * @Template
      */
-    public function soSureVsProtectYourBubble()
+    public function soSureVsCompetitor(Request $request)
     {
         $exp = $this->get('app.sixpack')->participate(
             SixpackService::EXPERIMENT_PYG_HOME,
@@ -545,7 +546,57 @@ class DefaultController extends BaseController
             return new RedirectResponse($this->generateUrl('homepage'));
         }
 
-        return array();
+        if ($request->get('_route') == "so_sure_vs_protect_your_bubble") {
+            $data = [
+                'c_name' => 'Protect Your Bubble',
+                's_theft' => 'Yes',
+                's_theft_bg' => 'tick-background',
+                's_loss' => 'As standard',
+                's_loss_bg' => 'tick-background',
+                's_theft_replacement' => '1 working day',
+                's_damage_replacement' => '1 working day',
+                's_used_phones' => 'Yes',
+                's_used_phones_bg' => 'tick-background',
+                's_cashback' => 'Yes',
+                's_cashback_bg' => 'tick-background',
+                'c_theft' => 'Yes',
+                'c_theft_bg' => 'tick-background',
+                'c_loss' => 'Extra £1.50 per month',
+                'c_loss_bg' => 'cross-background',
+                'c_theft_replacement' => '2 working days',
+                'c_damage_replacement' => '3-5 working days',
+                'c_used_phones' => 'Only up to 12 months old',
+                'c_used_phones_bg' => 'cross-background',
+                'c_cashback' => 'No',
+                'c_cashback_bg' => 'cross-background',
+            ];
+        } elseif ($request->get('_route') == "so_sure_vs_carphone_warehouse") {
+            $data = [
+                'c_name' => 'Carphone Warehouse',
+                's_theft' => 'Yes',
+                's_theft_bg' => 'tick-background',
+                's_loss' => 'Yes',
+                's_loss_bg' => 'tick-background',
+                's_theft_replacement' => 'Next working day',
+                's_damage_replacement' => 'Next working day',
+                's_used_phones' => 'Yes',
+                's_used_phones_bg' => 'tick-background',
+                's_cashback' => 'Yes',
+                's_cashback_bg' => 'tick-background',
+                'c_theft' => 'Yes',
+                'c_theft_bg' => 'tick-background',
+                'c_loss' => 'Yes',
+                'c_loss_bg' => 'tick-background',
+                'c_theft_replacement' => 'Next working day',
+                'c_damage_replacement' => 'Next working day',
+                'c_used_phones' => 'No',
+                'c_used_phones_bg' => 'cross-background',
+                'c_cashback' => 'No',
+                'c_cashback_bg' => 'cross-background',
+            ];
+        }
+
+        return array('data' => $data);
     }
 
     /**
