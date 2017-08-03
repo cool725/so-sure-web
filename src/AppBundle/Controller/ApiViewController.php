@@ -12,6 +12,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
+use AppBundle\Document\Feature;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Document\PolicyTerms;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -25,7 +26,6 @@ class ApiViewController extends BaseController
 {
     /**
      * @Route("/policy/terms", name="latest_policy_terms")
-     * @Template
      */
     public function policyLatestTermsAction(Request $request)
     {
@@ -46,7 +46,7 @@ class ApiViewController extends BaseController
         $maxPotVaue = $request->get('maxPotValue');
         $maxConnections = ceil($maxPotVaue / 10);
         $yearlyPremium = $request->get('yearlyPremium') ? $request->get('yearlyPremium') : ( $maxPotVaue / 0.8);
-        return array(
+        $data = array(
             'maxPotValue' => $maxPotVaue,
             'maxConnections' => $maxConnections,
             'yearlyPremium' => $yearlyPremium,
@@ -54,11 +54,17 @@ class ApiViewController extends BaseController
             // don't display promo values
             // 'promo_code' => $repo->isPromoLaunch($prefix) ? 'launch' : null,
         );
+
+        $feature = $this->get('app.feature');
+        if ($feature->isEnabled(Feature::FEATURE_PICSURE)) {
+            return $this->render('AppBundle:ApiView:policyTermsV2.html.twig', $data);
+        } else {
+            return $this->render('AppBundle:ApiView:policyTermsV1.html.twig', $data);
+        }
     }
 
     /**
      * @Route("/policy/{id}/terms", name="policy_terms")
-     * @Template("AppBundle::ApiView/policyLatestTerms.html.twig")
      */
     public function policyTermsAction(Request $request, $id)
     {
@@ -78,11 +84,17 @@ class ApiViewController extends BaseController
         $maxConnections = ceil($maxPotVaue / 10);
         $yearlyPremium = $request->get('yearlyPremium') ? $request->get('yearlyPremium') : ( $maxPotVaue / 0.8);
         $promoCode = $policy->getPromoCode();
-        return array(
+        $data = array(
             'maxPotValue' => $maxPotVaue,
             'maxConnections' => $maxConnections,
             'yearlyPremium' => $yearlyPremium,
             'promo_code' => $promoCode,
         );
+
+        if ($policy->getPolicyTerms()->isPicSureEnabled()) {
+            return $this->render('AppBundle:ApiView:policyTermsV2.html.twig', $data);
+        } else {
+            return $this->render('AppBundle:ApiView:policyTermsV1.html.twig', $data);
+        }
     }
 }

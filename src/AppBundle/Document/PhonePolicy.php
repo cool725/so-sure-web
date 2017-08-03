@@ -491,22 +491,22 @@ class PhonePolicy extends Policy
                 'excesses' => [
                     [
                         'type' => Claim::TYPE_LOSS,
+                        'display' => 'Loss',
                         'amount' => Claim::getExcessValue(Claim::TYPE_LOSS, $picSureValidated, $picSureEnabled)
                     ],
                     [
                         'type' => Claim::TYPE_THEFT,
+                        'display' => 'Theft',
                         'amount' => Claim::getExcessValue(Claim::TYPE_THEFT, $picSureValidated, $picSureEnabled)
                     ],
                     [
                         'type' => Claim::TYPE_DAMAGE,
+                        'display' => 'Accidental Damage',
                         'amount' => Claim::getExcessValue(Claim::TYPE_DAMAGE, $picSureValidated, $picSureEnabled)
                     ],
                     [
-                        'type' => Claim::TYPE_WARRANTY,
-                        'amount' => Claim::getExcessValue(Claim::TYPE_WARRANTY, $picSureValidated, $picSureEnabled)
-                    ],
-                    [
                         'type' => Claim::TYPE_EXTENDED_WARRANTY,
+                        'display' => 'Breakdown',
                         'amount' => Claim::getExcessValue(
                             Claim::TYPE_EXTENDED_WARRANTY,
                             $picSureValidated,

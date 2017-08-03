@@ -71,10 +71,9 @@ class PushServiceTest extends WebTestCase
         $policy->setId(rand(1, 999999));
         $data = self::$push->getCustomData(PushService::PSEUDO_MESSAGE_PICSURE, null, $policy);
         $this->assertEquals(['ss' => [
-                'uri' => 'sosure://open/picsure',
+                'uri' => sprintf('sosure://open/picsure/?policy_id=%s', $policy->getId()),
                 'refresh' => true,
-                'message_type' => 'general',
-                'policy_id' => $policy->getId()
+                'message_type' => 'general'
             ],
             'type' => 'alert'
         ], $data);
