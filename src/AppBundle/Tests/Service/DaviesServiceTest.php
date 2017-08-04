@@ -331,10 +331,10 @@ class DaviesServiceTest extends WebTestCase
         $policy->setUser($user);
         $claim = new Claim();
         $policy->addClaim($claim);
-        $policy->setPolicyNumber(1);
+        $policy->setPolicyNumber('TEST/2017/123456');
 
         $daviesClaim = new DaviesClaim();
-        $daviesClaim->policyNumber = 1;
+        $daviesClaim->policyNumber = 'TEST/2017/123456';
         $daviesClaim->reserved = 1;
         $daviesClaim->insuredName = 'Mr foo bar';
         $daviesClaim->riskPostCode = 'se152sz';
