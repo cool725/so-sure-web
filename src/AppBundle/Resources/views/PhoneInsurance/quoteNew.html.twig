@@ -102,7 +102,9 @@
                         {# CTA #}
                         <div class="quote__cta">
                             <div class="form-group">
-                                {{ form_widget(buy_form.buy_tablet, {'label': 'Get Started', 'attr': {'class': 'btn btn btn-green btn-block btn-pad btn-big-text'}}) }}
+                                {{ form_start(buy_form) }}
+                                    {{ form_widget(buy_form.buy_tablet, {'label': 'Get Started', 'attr': {'class': 'btn btn-green btn-block btn-pad btn-big-text'}}) }}
+                                {{ form_end(buy_form) }}
                             </div>
                             <a href="#"
                                data-toggle="modal"

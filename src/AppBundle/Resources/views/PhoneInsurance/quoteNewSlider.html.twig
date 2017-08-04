@@ -106,7 +106,9 @@
                         {# CTA #}
                         <div class="quote__cta">
                             <div class="form-group">
-                                {{ form_widget(buy_form.buy_tablet, {'label': 'Get Started', 'attr': {'class': 'btn btn btn-success btn-lg btn-block'}}) }}
+                                {{ form_start(buy_form) }}
+                                    {{ form_widget(buy_form.buy_tablet, {'label': 'Get Started', 'attr': {'class': 'btn btn-success btn-block btn-pad btn-big-text'}}) }}
+                                {{ form_end(buy_form) }}
                             </div>
                             <a href="#"
                                data-toggle="modal"
@@ -209,13 +211,13 @@
                                            title="Theft &amp; Loss"></i>
                                     </li>
                                     <li class="h4">
-                                        <i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Accidental damage (e.g. cracked screen)
+                                        <i class="fa fa-check-circle fa-lg text-green" aria-hidden="true"></i> Accidental damage (i.e. water/screen)
                                         <i class="fa fa-info-circle"
                                            data-toggle="popover"
                                            data-placement="top"
                                            data-html="true"
                                            data-trigger="hover"
-                                           data-content="<p>Including Water Damage</p>"
+                                           data-content="<p>Including water damage &amp; cracked screens</p>"
                                            title="Accidental damage"></i>
                                     </li>
                                     <li class="h4">
