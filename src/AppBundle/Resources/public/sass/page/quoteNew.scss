@@ -1,0 +1,110 @@
+// quote.scss
+
+@import "../mixins";
+@import "../common/palette";
+@import "../common/paletteNew";
+@import "../common/type";
+@import "rewardCalculatorNew";
+
+.navbar {
+	background-color: $white;
+}
+
+.quote {
+
+	&__left {
+		text-align: center;
+
+		h1 {
+			font-size: 24px;
+		}
+
+		.memory-dropdown-list {
+			display: inline;
+
+		    a {
+		    	&:hover, &:focus {
+		    		text-decoration: none;
+		    	}
+		    }
+		}
+
+		.memory-dropdown {
+			font-family: $avenir-book;
+		    min-width: 200px !important;
+		    left: auto; right: auto;
+
+
+		    @include breakpoint(mobileishup) {
+				right: 0 !important;
+		    }
+		}
+
+		@include breakpoint(laptop) {
+			margin-right: 10px;
+			padding-right: 30px;
+			border-right: 2px dashed $lightest-blue;
+
+			h1 {
+				font-size: 30px;
+			}
+		}
+	}
+
+	&__right {}
+
+	&__cta {
+
+		@include breakpoint(midtablet) {
+			width: 40%;
+			margin: 0 auto;
+		}
+	}
+
+	&__save {
+		.form-control {
+			width: 100%;
+		}
+
+		.btn {
+			display: block;
+			min-width: 100%;
+		}
+
+		@include breakpoint(midtablet) {
+			.form-control {
+				width: 300px;
+			}
+
+			.btn {
+				display: inline;
+				min-width: 0;
+			}
+		}
+	}
+}
+
+.stat-banner, .phone-details  {
+	padding: 20px 15px;
+	color: $white;
+
+	h3 {
+		color: $white;
+		margin-top: 0;
+	}
+
+	ul {
+		li {
+
+			&:before {
+			  content: '\2022';
+			  margin-right: 0.5em;
+			}
+		}
+	}
+
+	@include breakpoint(tablet) {
+		text-align: center;
+	}
+}
+

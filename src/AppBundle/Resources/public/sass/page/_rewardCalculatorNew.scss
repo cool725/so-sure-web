@@ -1,0 +1,129 @@
+// _rewardCalculator.scss
+
+.reward-slider {
+	margin: 25px 0;
+	padding-top: 100px;
+	position: relative;
+
+	.rewardslider,
+	.rewardslider__fill {
+		display: block;
+		@include border-radius(10px);
+	}
+
+	.rewardslider {
+		background: $grey-light;
+		position: relative;
+
+		&__output {
+			display: none;
+			width: 110px;
+			position: absolute;
+			top: -98px;
+			padding: 10px 15px;
+
+			text-align: center;
+			color: $white;
+			background-color: $blue;
+
+			@include border-radius(4px);
+
+			&:before,
+			&:after {
+				border-width: 11px;
+				border-style: solid;
+				border-color: transparent;
+				content: '';
+				display: block;
+				margin: auto;
+				width: 10px;
+				position: absolute;
+				left: 0; right: 0;
+			}
+			&:before {
+				border-top-color: $blue;
+				border-bottom-width: 0;
+				bottom: -11px;
+			}
+			&:after {
+				border-bottom-width: 0;
+				bottom: -10px;
+			}
+		}
+	}
+
+	.rewardslider--horizontal {
+	  	width: 85%; height: 20px;
+	  	margin: 0 auto;
+	}
+
+	.rewardslider--vertical {
+		width: 20px;
+		min-height: 150px;
+		max-height: 100%;
+	}
+
+	.rewardslider--disabled {
+	  	filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40);
+	  	opacity: 0.4;
+	}
+
+	.rewardslider__fill {
+		background: $blue-lighter;
+		position: absolute;
+	}
+
+	.rewardslider--horizontal .rewardslider__fill {
+		top: 0;
+		height: 100%;
+	}
+
+	.rewardslider--vertical .rewardslider__fill {
+		bottom: 0;
+		width: 100%;
+	}
+
+	.rewardslider__handle {
+		width: 40px; height: 40px;
+		background-color: $blue;
+		cursor: pointer;
+		display: inline-block;
+		position: absolute;
+		@include border-radius(50%);
+
+		color: $white;
+		font-weight: bold;
+		font-size: 22px;
+		text-align: center;
+		line-height: 42px;
+
+		&:hover, &:focus {
+			background-color: darken($blue, 15%);
+		}
+
+		&:active {
+			background-color: darken($blue, 25%);
+		}
+	}
+
+	.rewardslider--horizontal .rewardslider__handle {
+	  	top: -10px;
+	 	touch-action: pan-y;
+	  	-ms-touch-action: pan-y;
+	}
+
+	.rewardslider--vertical .rewardslider__handle {
+		left: -10px;
+		touch-action: pan-x;
+		-ms-touch-action: pan-x;
+	}
+
+	.slide-me {
+		position: absolute;
+		top: 0; left: 20px;
+
+		@include breakpoint(tablet) {
+			left: 60px;
+		}
+	}
+}

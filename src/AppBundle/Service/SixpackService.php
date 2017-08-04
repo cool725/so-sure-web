@@ -20,6 +20,7 @@ class SixpackService
     const EXPERIMENT_HOMEPAGE_PHONE_IMAGE = 'homepage-phone-image';
     // const EXPERIMENT_QUOTE_SLIDER = 'quote-slider';
     const EXPERIMENT_PYG_HOME= 'pyg-or-home';
+    const EXPERIMENT_QUOTE_SIMPLE_COMPLEX_SPLIT = 'quote-simple-complex-split';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_SHARE_MESSAGE_ORIGINAL = 'original';
