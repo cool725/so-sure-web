@@ -453,17 +453,26 @@ class PhoneInsuranceController extends BaseController
             'slider_test' => 'slide-me',
         );
 
-        if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
-            // return $this->render('AppBundle:PhoneInsurance:insuranceLanding.html.twig', $data);
-            return $this->render('AppBundle:PhoneInsurance:quoteNewSlider.html.twig', $data);
-        } else {
-            return $this->render('AppBundle:PhoneInsurance:quoteNewSlider.html.twig', $data);
+        $exp = $this->get('app.sixpack')->participate(
+            SixpackService::EXPERIMENT_QUOTE_SIMPLE_COMPLEX_SPLIT,
+            ['simple', 'complex', 'split'],
+            false
+        );
+        if ($request->get('force')) {
+            $exp = $request->get('force');
+        }
+        $template = 'AppBundle:PhoneInsurance:quote.html.twig';
+        if ($exp == 'complex') {
+            $template = 'AppBundle:PhoneInsurance:quoteNewSlider.html.twig';
+        } elseif ($exp == 'split') {
+            $template = 'AppBundle:PhoneInsurance:quoteNew.html.twig';
         }
 
-        // //if ($phone->getCurrentPhonePrice()) {
-        //     return $this->render('AppBundle:PhoneInsurance:quote.html.twig', $data);
-        // //} else {
-        // //    return $this->render('AppBundle:Default:quotePhoneUpcoming.html.twig', $data);
-        // //}
-    }
+        if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
+            // return $this->render('AppBundle:PhoneInsurance:insuranceLanding.html.twig', $data);
+            return $this->render($template, $data);
+        } else {
+            return $this->render($template, $data);
+        }
+   }
 }
