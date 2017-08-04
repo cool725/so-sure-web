@@ -3,6 +3,7 @@
 .reward-slider {
 	margin: 25px 0;
 	padding-top: 100px;
+	position: relative;
 
 	.rewardslider,
 	.rewardslider__fill {
@@ -115,5 +116,10 @@
 		left: -10px;
 		touch-action: pan-x;
 		-ms-touch-action: pan-x;
+	}
+
+	.slide-me {
+		position: absolute;
+		top: 0; left: 0;
 	}
 }

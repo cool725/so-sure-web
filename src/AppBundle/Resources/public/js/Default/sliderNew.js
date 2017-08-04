@@ -90,6 +90,8 @@ $(function(){
             // Update the friend total
             updateHandle($handle[0], this.value);
 
+            $('.slide-me').fadeOut();
+
             var updated_value = $('#reward-slider').val();
             var save_value = updated_value * connection_value;
 

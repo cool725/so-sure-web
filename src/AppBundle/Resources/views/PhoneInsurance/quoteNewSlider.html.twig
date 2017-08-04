@@ -87,6 +87,11 @@
                         {% set monthly_premium = start_premium / 12 %}
 
                         <div class="reward-slider">
+
+                            <div class="slide-me">
+                                <img src="{{ cdn_url }}/images/quote-page/so-sure_arrow-slide-me.svg" alt="">
+                            </div>
+
                             <output for="range" class="rewardslider__output">
                                 <span id="premium" class="h3 text-white">£{{ monthly_premium|number_format(2, '.', ',') }}</span><br>
                                 <small class="text-nowrap">per month</small>
