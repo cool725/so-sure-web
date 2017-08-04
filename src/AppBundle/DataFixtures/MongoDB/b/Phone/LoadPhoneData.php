@@ -136,6 +136,9 @@ abstract class LoadPhoneData implements ContainerAwareInterface
             $releaseDateText = str_replace(' ', '', $data[21]);
             if (strlen($releaseDateText) > 0) {
                 $releaseDate = \DateTime::createFromFormat('m/y', $releaseDateText);
+                if (!$releaseDate) {
+                    throw new \Exception('Unknown date format');
+                }
                 $releaseDate->setTime(0, 0);
                 // otherwise is current day
                 $releaseDate->modify('first day of this month');
