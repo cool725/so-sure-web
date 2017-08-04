@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
-use AppBundle\Document\JudoPayment;
+use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\User;
 
 class UpdatePolicyStatusCommand extends ContainerAwareCommand
@@ -38,6 +38,7 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $lines = [];
+        $lines[] = '';
         $dryRun = true === $input->getOption('dry-run');
         $prefix = $input->getOption('prefix');
 
@@ -53,6 +54,7 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
             $lines[] = sprintf('%s %s / %s', $copy, $number, $id);
         }
         $lines[] = sprintf('%s cancelled policies processed', count($cancelled));
+        $lines[] = '';
 
         // Pending Cancellation Policies - Cancel
         $pendingCancellation = $policyService->cancelPoliciesPendingCancellation($prefix, $dryRun);
@@ -64,6 +66,7 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
             $lines[] = sprintf('%s %s / %s', $copy, $number, $id);
         }
         $lines[] = sprintf('%s pending cancellation policies processed', count($pendingCancellation));
+        $lines[] = '';
 
         // Create Polices - Pending Renewal
         $pendingRenewal = $policyService->createPendingRenewalPolicies($prefix, $dryRun);
@@ -75,6 +78,7 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
             $lines[] = sprintf('%s %s / %s', $copy, $number, $id);
         }
         $lines[] = sprintf('%s partial renewal policies processed', count($pendingRenewal));
+        $lines[] = '';
 
         // Activate Policies - Renewed
         $renewal = $policyService->activateRenewalPolicies($prefix, $dryRun);
@@ -86,6 +90,7 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
             $lines[] = sprintf('%s %s / %s', $copy, $number, $id);
         }
         $lines[] = sprintf('%s activated renewal policies processed', count($renewal));
+        $lines[] = '';
 
         // Expire Policies - (Active/Unpaid)
         $expired = $policyService->expireEndingPolicies($prefix, $dryRun);
@@ -96,7 +101,20 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
         foreach ($expired as $id => $number) {
             $lines[] = sprintf('%s %s / %s', $copy, $number, $id);
         }
-        $lines[] = sprintf('%s expired policies processed', count($expired));
+        $lines[] = sprintf('%s expire (claimable) policies processed', count($expired));
+        $lines[] = '';
+
+        // Fully Expire Policies - (from Expired-Claimable)
+        $fullyExpired = $policyService->fullyExpireExpiredClaimablePolicies($prefix, $dryRun);
+        $copy = 'Fully Expire Policy';
+        if ($dryRun) {
+            $copy = 'Dry Run - Should fully expire Policy';
+        }
+        foreach ($fullyExpired as $id => $number) {
+            $lines[] = sprintf('%s %s / %s', $copy, $number, $id);
+        }
+        $lines[] = sprintf('%s fully expire policies processed', count($fullyExpired));
+        $lines[] = '';
 
         $output->writeln(join(PHP_EOL, $lines));
 

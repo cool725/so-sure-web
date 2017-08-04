@@ -8,7 +8,7 @@ use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Company;
-use AppBundle\Document\JudoPayment;
+use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Classes\Salva;

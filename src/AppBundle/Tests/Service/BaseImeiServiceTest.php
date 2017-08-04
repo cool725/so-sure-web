@@ -95,6 +95,10 @@ class BaseImeiServiceTest extends WebTestCase
         $policy->setStatus(PhonePolicy::STATUS_EXPIRED);
         static::$dm->flush();
         $this->assertFalse(self::$imei->isDuplicatePolicyImei($imeiNumber));
+
+        $policy->setStatus(PhonePolicy::STATUS_EXPIRED_CLAIMABLE);
+        static::$dm->flush();
+        $this->assertFalse(self::$imei->isDuplicatePolicyImei($imeiNumber));
     }
 
     public function testIsDuplicatePolicyImeiCancelledUserOk()

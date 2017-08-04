@@ -10,8 +10,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\Phone;
 use AppBundle\Document\SalvaPhonePolicy;
-use AppBundle\Document\JudoPayment;
-use AppBundle\Document\Payment;
+use AppBundle\Document\Payment\JudoPayment;
+use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\User;
 
 class PolicyPayCommand extends ContainerAwareCommand

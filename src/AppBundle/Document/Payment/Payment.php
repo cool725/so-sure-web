@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Document;
+namespace AppBundle\Document\Payment;
 
 use AppBundle\Classes\Salva;
 use FOS\UserBundle\Document\User as BaseUser;
@@ -8,6 +8,9 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
+use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\User;
+use AppBundle\Document\ScheduledPayment;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PaymentRepository")
@@ -18,7 +21,9 @@ use AppBundle\Validator\Constraints as AppAssert;
  *      "judo"="JudoPayment",
  *      "gocardless"="GocardlessPayment",
  *      "sosure"="SoSurePayment",
- *      "bacs"="BacsPayment"
+ *      "bacs"="BacsPayment",
+ *      "potReward"="PotRewardPayment",
+ *      "policyDiscount"="PolicyDiscountPayment"
  * })
  * @Gedmo\Loggable
  */
@@ -33,8 +38,15 @@ abstract class Payment
     const SOURCE_MOBILE = 'mobile';
     const SOURCE_APPLE_PAY = 'apple-pay';
     const SOURCE_ANDROID_PAY = 'android-pay';
+
+    // DEPRECIATED
     const SOURCE_SOSURE = 'sosure';
+
+    // DEPRECIATED
     const SOURCE_BACS = 'bacs';
+
+    const SOURCE_SYSTEM = 'system';
+    const SOURCE_ADMIN = 'admin';
 
     /**
      * @MongoDB\Id
@@ -120,7 +132,7 @@ abstract class Payment
     protected $reference;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="Policy", inversedBy="payments")
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy", inversedBy="payments")
      * @Gedmo\Versioned
      */
     protected $policy;
@@ -135,7 +147,7 @@ abstract class Payment
     protected $receipt;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="User", inversedBy="payments")
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User", inversedBy="payments")
      * @Gedmo\Versioned
      */
     protected $user;
@@ -155,6 +167,7 @@ abstract class Payment
     protected $notes;
 
     /**
+     * sosure & bacs deprecated sources
      * @Assert\Choice({
      *      "mobile",
      *      "web",
@@ -163,7 +176,9 @@ abstract class Payment
      *      "apple-pay",
      *      "android-pay",
      *      "sosure",
-     *      "bacs"
+     *      "bacs",
+     *      "system",
+     *      "admin"
      * }, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
@@ -233,7 +248,7 @@ abstract class Payment
                 self::SOURCE_APPLE_PAY
             ])) {
             return "Mobile";
-        } elseif ($this->getSource() == self::SOURCE_BACS) {
+        } elseif ($this instanceof BacsPayment) {
             return "Bacs";
         } else {
             if ($this->getSource()) {

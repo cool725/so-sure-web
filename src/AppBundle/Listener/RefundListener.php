@@ -9,9 +9,9 @@ use AppBundle\Classes\Salva;
 use AppBundle\Event\PolicyEvent;
 use AppBundle\Document\Policy;
 use AppBundle\Document\SalvaPhonePolicy;
-use AppBundle\Document\SoSurePayment;
-use AppBundle\Document\Payment;
-use AppBundle\Document\JudoPayment;
+use AppBundle\Document\Payment\SoSurePayment;
+use AppBundle\Document\Payment\Payment;
+use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\CurrencyTrait;
 
 class RefundListener
@@ -61,7 +61,7 @@ class RefundListener
             $total = Payment::sumPayments($payments, false, SoSurePayment::class);
 
             if (!$this->areEqualToTwoDp(0, $total['total'])) {
-                $sosurePayment = SoSurePayment::init();
+                $sosurePayment = SoSurePayment::init(Payment::SOURCE_SYSTEM);
                 $sosurePayment->setAmount(0 - $total['total']);
                 $sosurePayment->setTotalCommission(0 - $total['totalCommission']);
                 $sosurePayment->setNotes(sprintf(
@@ -144,9 +144,9 @@ class RefundListener
             $refundAmount,
             $refundCommissionAmount,
             sprintf('promo %s refund', $policy->getPromoCode()),
-            Payment::SOURCE_SOSURE
+            Payment::SOURCE_SYSTEM
         );
-        $sosurePayment = SoSurePayment::init();
+        $sosurePayment = SoSurePayment::init(Payment::SOURCE_SYSTEM);
         $sosurePayment->setAmount($refundAmount);
         $sosurePayment->setTotalCommission($refundCommissionAmount);
         $sosurePayment->setNotes(sprintf('promo %s paid by so-sure', $policy->getPromoCode()));

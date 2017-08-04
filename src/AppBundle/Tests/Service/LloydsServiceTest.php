@@ -4,7 +4,7 @@ namespace AppBundle\Tests\Service;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\File\BarclaysFile;
-use AppBundle\Document\JudoPayment;
+use AppBundle\Document\Payment\JudoPayment;
 use Symfony\Component\HttpFoundation\File\File;
 
 /**

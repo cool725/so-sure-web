@@ -9,8 +9,8 @@ use JudoPay;
 use AppBundle\Classes\Salva;
 
 use AppBundle\Document\JudoPaymentMethod;
-use AppBundle\Document\Payment;
-use AppBundle\Document\JudoPayment;
+use AppBundle\Document\Payment\Payment;
+use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Phone;
 use AppBundle\Document\User;
 use AppBundle\Document\ScheduledPayment;
@@ -259,7 +259,7 @@ class JudopayService
     ) {
         $this->statsd->startTiming("judopay.add");
         // doesn't make sense to add payments for expired policies
-        if ($policy->getStatus() == PhonePolicy::STATUS_EXPIRED) {
+        if (in_array($policy->getStatus(), [PhonePolicy::STATUS_EXPIRED, PhonePolicy::STATUS_EXPIRED_CLAIMABLE])) {
             throw new \Exception('Unable to apply payment to cancelled/expired policy');
         } elseif ($policy->getStatus() == PhonePolicy::STATUS_CANCELLED) {
             // a bit unusual, but for remainder payments w/claim it could occur

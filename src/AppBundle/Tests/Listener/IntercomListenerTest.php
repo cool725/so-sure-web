@@ -23,7 +23,7 @@ use AppBundle\Event\UserPaymentEvent;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Lead;
 use AppBundle\Document\User;
-use AppBundle\Document\JudoPayment;
+use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Connection\StandardConnection;

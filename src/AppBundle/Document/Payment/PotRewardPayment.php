@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Document;
+namespace AppBundle\Document\Payment;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -11,12 +11,12 @@ use AppBundle\Validator\Constraints as AppAssert;
  * @MongoDB\Document
  * @Gedmo\Loggable
  */
-class BacsPayment extends Payment
+class PotRewardPayment extends Payment
 {
     public function __construct()
     {
         $this->setSuccess(true);
-        $this->setSource(self::SOURCE_BACS);
+        $this->setSource(self::SOURCE_SYSTEM);
     }
 
     public function isSuccess()

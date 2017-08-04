@@ -10,7 +10,7 @@ use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
 use AppBundle\Document\Connection\StandardConnection;
-use AppBundle\Document\JudoPayment;
+use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Claim;
 use AppBundle\Classes\Salva;

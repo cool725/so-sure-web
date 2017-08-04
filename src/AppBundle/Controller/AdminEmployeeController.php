@@ -16,7 +16,7 @@ use AppBundle\Classes\Salva;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\Claim;
-use AppBundle\Document\BacsPayment;
+use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Address;
 use AppBundle\Document\Company;
 use AppBundle\Document\Charge;
@@ -25,10 +25,10 @@ use AppBundle\Document\PhonePrice;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;
-use AppBundle\Document\Payment;
+use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\ScheduledPayment;
-use AppBundle\Document\JudoPayment;
-use AppBundle\Document\SoSurePayment;
+use AppBundle\Document\Payment\JudoPayment;
+use AppBundle\Document\Payment\SoSurePayment;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
 use AppBundle\Document\Lead;
@@ -380,6 +380,7 @@ class AdminEmployeeController extends BaseController
             ->createNamedBuilder('phone_form', PhoneType::class, $policy)
             ->getForm();
         $bacsPayment = new BacsPayment();
+        $bacsPayment->setSource(Payment::SOURCE_ADMIN);
         $bacsPayment->setDate(new \DateTime());
         $bacsPayment->setAmount($policy->getPremium()->getYearlyPremiumPrice());
 

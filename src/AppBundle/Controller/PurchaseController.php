@@ -22,7 +22,7 @@ use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
-use AppBundle\Document\Payment;
+use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\User;
 use AppBundle\Document\Lead;
 use AppBundle\Document\JudoPaymentMethod;

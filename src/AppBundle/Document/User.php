@@ -482,6 +482,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                 Policy::STATUS_ACTIVE,
                 Policy::STATUS_CANCELLED,
                 Policy::STATUS_EXPIRED,
+                Policy::STATUS_EXPIRED_CLAIMABLE,
                 Policy::STATUS_UNPAID,
                 Policy::STATUS_RENEWAL,
             ])) {
@@ -1013,7 +1014,11 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
         foreach ($this->getAllPolicies() as $policy) {
             // No need to updated cancelled or expired policies
-            if (in_array($policy->getStatus(), [Policy::STATUS_CANCELLED, Policy::STATUS_EXPIRED])) {
+            if (in_array($policy->getStatus(), [
+                Policy::STATUS_CANCELLED,
+                Policy::STATUS_EXPIRED,
+                Policy::STATUS_EXPIRED_CLAIMABLE,
+            ])) {
                 continue;
             }
             if ($policy instanceof PhonePolicy) {

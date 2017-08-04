@@ -30,7 +30,7 @@ class BacsType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'AppBundle\Document\BacsPayment',
+            'data_class' => 'AppBundle\Document\Payment\BacsPayment',
         ));
     }
 }

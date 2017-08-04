@@ -148,6 +148,7 @@ class PhonePolicyRepository extends PolicyRepository
                 Policy::STATUS_UNPAID,
                 Policy::STATUS_CANCELLED,
                 Policy::STATUS_EXPIRED,
+                Policy::STATUS_EXPIRED_CLAIMABLE,
             ])
             ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
 
@@ -258,6 +259,7 @@ class PhonePolicyRepository extends PolicyRepository
                 Policy::STATUS_ACTIVE,
                 Policy::STATUS_CANCELLED,
                 Policy::STATUS_EXPIRED,
+                Policy::STATUS_EXPIRED_CLAIMABLE,
                 Policy::STATUS_UNPAID
             ])
             ->field('premiumInstallments')->gt(0);

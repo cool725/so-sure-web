@@ -3,7 +3,7 @@
 namespace AppBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
-use AppBundle\Document\Payment;
+use AppBundle\Document\Payment\Payment;
 
 class PaymentEvent extends Event
 {

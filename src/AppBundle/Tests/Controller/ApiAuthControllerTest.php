@@ -10,7 +10,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\LostPhone;
-use AppBundle\Document\JudoPayment;
+use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\SCode;
 use AppBundle\Document\Reward;

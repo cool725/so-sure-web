@@ -10,7 +10,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Service\SequenceService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use AppBundle\Document\GocardlessPayment;
+use AppBundle\Document\Payment\GocardlessPayment;
 use AppBundle\Classes\Salva;
 
 class GocardlessService

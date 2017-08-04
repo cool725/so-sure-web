@@ -90,6 +90,11 @@ abstract class Premium
         $this->annualDiscount = $annualDiscount;
     }
 
+    public function hasAnnualDiscount()
+    {
+        return $this->getAnnualDiscount() > 0 && !$this->areEqualToTwoDp(0, $this->getAnnualDiscount());
+    }
+
     public function getMonthlyPremiumPrice()
     {
         return $this->getGwp() + $this->getIpt();

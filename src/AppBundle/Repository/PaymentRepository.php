@@ -3,7 +3,7 @@
 namespace AppBundle\Repository;
 
 use Doctrine\ODM\MongoDB\DocumentRepository;
-use AppBundle\Document\JudoPayment;
+use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\DateTrait;
 
 class PaymentRepository extends DocumentRepository
