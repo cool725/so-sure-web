@@ -25,5 +25,5 @@ if [ ! -d $FOLDER ]; then
     exit 1
 fi
 
-echo "Reloading db for $ENV environment"
+echo "Appending data to db for $ENV environment in $FOLDER"
 sudo -u www-data app/console --env=$ENV doctrine:mongodb:fixtures:load  --append --fixtures=$FOLDER
