@@ -123,20 +123,6 @@
         </div>
     </section>
 
-    <div class="modal modal-policy fade" id="policy-modal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Policy</h4>
-                </div>
-                <div class="modal-body">
-                    {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  policy.maxPot })) }}
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="modal modal-fullscreen fade"
          id="policy-modal"
          tabindex="-1"
@@ -153,7 +139,7 @@
                     <h3>So-Sure Policy Terms</h3>
                 </div>
                 <div class="modal-body modal-policy">
-                    {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  policy.maxPot })) }}
+                    {{ render(controller('AppBundle:ApiView:policyTerms', {'id': policy.id, 'policy_key': policy_key, 'maxPotValue':  policy.maxPot, 'include': true })) }}
                 </div>
             </div>
         </div>

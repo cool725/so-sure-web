@@ -51,6 +51,7 @@ class ApiViewController extends BaseController
             'maxConnections' => $maxConnections,
             'yearlyPremium' => $yearlyPremium,
             'promo_code' => null,
+            'include' => $request->get('include'),
             // don't display promo values
             // 'promo_code' => $repo->isPromoLaunch($prefix) ? 'launch' : null,
         );
@@ -89,6 +90,7 @@ class ApiViewController extends BaseController
             'maxConnections' => $maxConnections,
             'yearlyPremium' => $yearlyPremium,
             'promo_code' => $promoCode,
+            'include' => $request->get('include'),
         );
 
         if ($policy->getPolicyTerms()->isPicSureEnabled()) {
