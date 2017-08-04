@@ -29,6 +29,7 @@ class ApiViewControllerTest extends BaseControllerTest
         $url = sprintf('/view/policy/terms?maxPotValue=62.8&policy_key=%s', $policyKey);
         $crawler = self::$client->request('GET', $url);
         $data = self::verifyResponseHtml(200);
+        $this->assertContains('<body>', $data);
         $this->assertNotContains('promotion code "LAUNCH"', $data);
     }
 
@@ -106,6 +107,7 @@ class ApiViewControllerTest extends BaseControllerTest
         $templating = self::$container->get('templating');
         $pdf = $templating->render('AppBundle:Pdf:policyTermsV1.html.twig', ['policy' => $policy]);
 
+        $this->assertContains('<body>', $data);
         // remove tags
         $data = strip_tags($data);
         $pdf = strip_tags($pdf);
@@ -149,6 +151,7 @@ class ApiViewControllerTest extends BaseControllerTest
         $templating = self::$container->get('templating');
         $pdf = $templating->render('AppBundle:Pdf:policyTermsV2.html.twig', ['policy' => $policy]);
 
+        $this->assertContains('<body>', $data);
         // remove tags
         $data = strip_tags($data);
         $pdf = strip_tags($pdf);
