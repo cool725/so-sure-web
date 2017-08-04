@@ -60,3 +60,103 @@
 		}
 	}
 }
+
+// Variations
+
+.modal-fullscreen {
+
+	.modal-dialog {
+		width: 100%;
+		margin: 0 auto;
+
+		@include breakpoint(tablet) {
+			width: 750px;
+		}
+
+		@include breakpoint(laptop) {
+			width: 970px;
+		}
+
+		@include breakpoint(desktop) {
+			width: 1170px;
+		}
+
+	}
+
+	.responsive-container {
+		height: 0;
+		overflow: hidden;
+		position: relative;
+		padding-bottom: 53.4%;
+		padding-top: 30px;
+	}
+
+	.responsive-container, .responsive-container iframe {
+		width: 100%; height: 100%;
+		position: absolute;
+		top: 0; left: 0;
+	}
+
+}
+
+.modal-middle {
+	padding-top: 10%;
+}
+
+.modal-policy {
+
+	h1 {
+		font-size: 24px;
+	}
+
+	h2 {
+		margin: 0 0 15px;
+		padding: 10px 30px 10px 15px;
+		background-color: $grey-light;
+		border: 1px solid $grey;
+		@include border-radius(4px);
+		font-family: $avenir-book;
+		font-size: 16px;
+		cursor: pointer;
+		position: relative;
+
+		&:after {
+			content: '\f054';
+			font-family: FontAwesome;
+			position: absolute;
+			right: 15px; top: 10px;
+		}
+	}
+
+	h2.section-open:after {
+		content: '\f078';
+	}
+
+	h3 {
+		font-size: 16px;
+	}
+
+	p {
+		font-size: 14px;
+		padding: 0 15px;
+	}
+
+	ul {
+		font-size: 14px;
+		padding: 5px 15px 5px 25px;
+	}
+
+	table {
+		margin: 10px auto;
+		font-size: 14px;
+
+		td, th {
+			padding: 15px;
+		}
+
+		th {
+			font-weight: bold;
+		}
+	}
+
+}
