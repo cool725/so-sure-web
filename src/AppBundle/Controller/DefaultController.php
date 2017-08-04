@@ -536,6 +536,11 @@ class DefaultController extends BaseController
      */
     public function soSureVsGadgetCover()
     {
+
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_CPC_COMPETITOR_PAGE, [
+            'Competitor' => 'Gadget Cover',
+        ]);
+
         return array();
     }
 
@@ -545,6 +550,11 @@ class DefaultController extends BaseController
      */
     public function soSureVsHalifaxCover()
     {
+
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_CPC_COMPETITOR_PAGE, [
+            'Competitor' => 'Halifax',
+        ]);
+
         return array();
     }
 
@@ -554,6 +564,11 @@ class DefaultController extends BaseController
      */
     public function soSureVsThree()
     {
+
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_CPC_COMPETITOR_PAGE, [
+            'Competitor' => 'Three',
+        ]);
+
         return array();
     }
 
