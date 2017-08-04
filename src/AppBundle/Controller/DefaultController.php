@@ -540,6 +540,15 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/so-sure-vs-halifax-phone-insurance", name="so-sure-vs-halifax_phone_insurance")
+     * @Template
+     */
+    public function soSureVsHalifaxCover()
+    {
+        return array();
+    }
+
+    /**
      * @Route("/so-sure-vs-protect-your-bubble", name="so_sure_vs_protect_your_bubble")
      * @Route("/so-sure-vs-protect-your-bubble-phone-insurance", name="so_sure_vs_protect_your_bubble_phone_insurance")
      * @Route("/so-sure-vs-carphone-warehouse-phone-insurance", name="so_sure_vs_carphone_warehouse_phone_insurance")
