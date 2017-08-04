@@ -474,5 +474,5 @@ class PhoneInsuranceController extends BaseController
         } else {
             return $this->render($template, $data);
         }
-   }
+    }
 }
