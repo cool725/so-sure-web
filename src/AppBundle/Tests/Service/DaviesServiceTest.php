@@ -144,6 +144,19 @@ class DaviesServiceTest extends WebTestCase
         $this->assertEquals(self::$phoneB->getId(), $policy->getPhone()->getId());
     }
 
+    public function testGetPolicyNumber()
+    {
+        $davies = new DaviesClaim();
+        $davies->policyNumber = 'TEST/2017/12345';
+        $this->assertEquals('TEST/2017/12345', $davies->getPolicyNumber());
+
+        $davies->policyNumber = 'number TEST/2017/12345';
+        $this->assertEquals('TEST/2017/12345', $davies->getPolicyNumber());
+
+        $davies->policyNumber = 'TEST/2017/1A2345';
+        $this->assertNull($davies->getPolicyNumber());
+    }
+
     public function testSaveClaimsClosed()
     {
         $davies = new DaviesClaim();

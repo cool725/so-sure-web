@@ -225,6 +225,16 @@ class DaviesClaim extends DaviesExcel
         }
     }
 
+    public function getPolicyNumber()
+    {
+        if (preg_match('/[^a-zA-Z]*([a-zA-Z]+\/[0-9]{4,4}\/[0-9]{5,20}).*/', $this->policyNumber, $matches) &&
+            isset($matches[1])) {
+            return $matches[1];
+        }
+
+        return null;
+    }
+
     public function isOpen($includeReOpened = false)
     {
         if ($includeReOpened) {
