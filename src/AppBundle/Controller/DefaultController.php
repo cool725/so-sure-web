@@ -648,6 +648,10 @@ class DefaultController extends BaseController
             ];
         }
 
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_CPC_COMPETITOR_PAGE, [
+            'Competitor' => $data['c_name'],
+        ]);
+
         return array('data' => $data);
     }
 
