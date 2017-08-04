@@ -245,6 +245,8 @@ class PhoneInsuranceController extends BaseController
 
         if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
             if ($make == "Samsung") {
+                return new RedirectResponse($this->generateUrl('insure_make', ['make' => 'Samsung']));
+                /*
                 $exp = $this->get('app.sixpack')->participate(
                     SixpackService::EXPERIMENT_CPC_QUOTE_MANUFACTURER,
                     ['cpc-quote', 'cpc-manufacturer'],
@@ -253,7 +255,10 @@ class PhoneInsuranceController extends BaseController
                 if ($exp == 'cpc-manufacturer') {
                     return new RedirectResponse($this->generateUrl('insure_make', ['make' => 'Samsung']));
                 }
+                */
             } else {
+                return new RedirectResponse($this->generateUrl('homepage'));
+                /*
                 $exp = $this->get('app.sixpack')->participate(
                     SixpackService::EXPERIMENT_LANDING_HOME,
                     ['landing', 'home'],
@@ -262,16 +267,13 @@ class PhoneInsuranceController extends BaseController
                 if ($exp == 'home') {
                     return new RedirectResponse($this->generateUrl('homepage'));
                 }
+                */
             }
         }
-        $sliderTest = $this->get('app.sixpack')->participate(
-            SixpackService::EXPERIMENT_QUOTE_SLIDER,
-            ['slide-me', 'original']
-        );
         /*
         $sliderTest = $this->get('app.sixpack')->participate(
             SixpackService::EXPERIMENT_QUOTE_SLIDER,
-            ['original', 'slide-me']
+            ['slide-me', 'original']
         );
         */
 
@@ -447,7 +449,8 @@ class PhoneInsuranceController extends BaseController
             'comparision' => $phone->getComparisions(),
             'comparision_max' => $maxComparision,
             'coming_soon' => $phone->getCurrentPhonePrice() ? false : true,
-            'slider_test' => $sliderTest,
+            //'slider_test' => $sliderTest,
+            'slider_test' => 'slide-me',
         );
 
         if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
