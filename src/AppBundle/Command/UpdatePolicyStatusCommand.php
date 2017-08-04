@@ -119,7 +119,7 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
         $output->writeln(join(PHP_EOL, $lines));
 
         # 5 lines for each section output
-        if (count($lines) > 5) {
+        if (count($lines) > 6) {
             $mailer = $this->getContainer()->get('app.mailer');
             $mailer->send(
                 'Updated Policy Status',

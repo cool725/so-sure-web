@@ -70,17 +70,17 @@ class DaviesService extends S3EmailService
         $success = true;
         $claims = [];
         foreach ($daviesClaims as $daviesClaim) {
-            if (isset($claims[$daviesClaim->policyNumber]) &&
-                $claims[$daviesClaim->policyNumber] &&
+            if (isset($claims[$daviesClaim->getPolicyNumber()]) &&
+                $claims[$daviesClaim->getPolicyNumber()] &&
                 $daviesClaim->isOpen()) {
                 $msg = sprintf(
                     'There are multiple open claims against policy %s',
-                    $daviesClaim->policyNumber
+                    $daviesClaim->getPolicyNumber()
                 );
                 $this->errors[$daviesClaim->claimNumber][] = $msg;
                 $this->logger->warning($msg);
             }
-            $claims[$daviesClaim->policyNumber] = $daviesClaim->isOpen();
+            $claims[$daviesClaim->getPolicyNumber()] = $daviesClaim->isOpen();
         }
         foreach ($daviesClaims as $daviesClaim) {
             try {
@@ -111,11 +111,11 @@ class DaviesService extends S3EmailService
             $repo = $this->dm->getRepository(Claim::class);
             $claim = $repo->findOneBy(['number' => substr($daviesClaim->claimNumber, 0, -2)]);
             if ($claim) {
-                if ($daviesClaim->policyNumber != $claim->getPolicy()->getPolicyNumber()) {
+                if ($daviesClaim->getPolicyNumber() != $claim->getPolicy()->getPolicyNumber()) {
                     throw new \Exception(sprintf(
                         'Unable to locate claim %s in db with number matching. (%s != %s)',
                         $daviesClaim->claimNumber,
-                        $daviesClaim->policyNumber,
+                        $daviesClaim->getPolicyNumber(),
                         $claim->getPolicy()->getPolicyNumber()
                     ));
                 }
@@ -126,7 +126,7 @@ class DaviesService extends S3EmailService
                     [
                         'claim' => $claim,
                         'claimNumber' => $daviesClaim->claimNumber,
-                        'policyNumber' => $daviesClaim->policyNumber,
+                        'policyNumber' => $daviesClaim->getPolicyNumber(),
                     ]
                 );
                 $claim->setNumber($daviesClaim->claimNumber, true);
@@ -228,11 +228,11 @@ class DaviesService extends S3EmailService
 
     public function validateClaimDetails(Claim $claim, DaviesClaim $daviesClaim)
     {
-        if (strtolower($claim->getPolicy()->getPolicyNumber()) != strtolower($daviesClaim->policyNumber)) {
+        if (strtolower($claim->getPolicy()->getPolicyNumber()) != strtolower($daviesClaim->getPolicyNumber())) {
             throw new \Exception(sprintf(
                 'Claim %s does not match policy number %s',
                 $daviesClaim->claimNumber,
-                $daviesClaim->policyNumber
+                $daviesClaim->getPolicyNumber()
             ));
         }
 
