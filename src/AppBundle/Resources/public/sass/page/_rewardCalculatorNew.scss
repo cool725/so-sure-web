@@ -120,6 +120,10 @@
 
 	.slide-me {
 		position: absolute;
-		top: 0; left: 0;
+		top: 0; left: 20px;
+
+		@include breakpoint(tablet) {
+			left: 60px;
+		}
 	}
 }
