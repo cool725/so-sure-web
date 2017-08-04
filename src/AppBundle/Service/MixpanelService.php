@@ -35,6 +35,7 @@ class MixpanelService
 
     const EVENT_CPC_QUOTE_PAGE = 'CPC Quote Page';
     const EVENT_CPC_MANUFACTURER_PAGE = 'CPC Manufacturer Page';
+    const EVENT_CPC_COMPETITOR_PAGE = 'CPC Competitor Page';
     const EVENT_RECEIVE_DETAILS = 'Receive Personal Details';
     const EVENT_PURCHASE_POLICY = 'Purchase Policy';
     const EVENT_PAYMENT = 'Payment';
