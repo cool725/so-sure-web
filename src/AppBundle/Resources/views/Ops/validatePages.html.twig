@@ -44,6 +44,13 @@
         <a href="{{ url('user_home') }}?_impersonate={{ claimed_policy.user.email }}">User Home - Unable to invite (w/Claimed Policy)</a> <b>(auto impersonate {{ claimed_policy.user.email }})</b>
     </li>
     <li>
+        {% if expired_policy %}
+        <a href="{{ url('user_policy', {'policyId': expired_policy.id }) }}?_impersonate={{ expired_policy.user.email }}">User Home - Expired Policy</a> <b>(auto impersonate {{ expired_policy.user.email }})</b>
+        {% else %}
+            No expired policy available
+        {% endif %}
+    </li>
+    <li>
         <a href="{{ url('user_welcome') }}?_impersonate={{ valid_policy.user.email }}">User Welcome</a> <b>(auto impersonate {{ valid_policy.user.email }})</b>
     </li>
     <li>

@@ -2599,6 +2599,12 @@ abstract class Policy
         if ($this->hasMonetaryClaimed()) {
             return false;
         }
+        if (!in_array($this->getStatus(), [
+            self::STATUS_ACTIVE,
+            self::STATUS_UNPAID,
+        ])) {
+            return false;
+        }
 
         return true;
     }

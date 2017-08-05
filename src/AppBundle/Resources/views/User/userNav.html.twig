@@ -36,7 +36,11 @@
                             </ul>
                         </div>
                         {% endif %}
-                        <h5 class="text-light-blue">Policy: <strong>{{ policy.policyNumber }}</strong> ({{ policy.start|date('dS M Y') }} - {{ policy.end|date('dS M Y') }})</h5>
+                        <h5 class="text-light-blue">
+                            Policy:
+                            {% if policy.status == 'expired' or policy.status == 'expired-claimable' %}<del>{% endif %}
+                             <strong>{{ policy.policyNumber }}</strong> ({{ policy.start|date('dS M Y') }} - {{ policy.end|date('dS M Y') }})</h5>
+                            {% if policy.status == 'expired' or policy.status == 'expired-claimable' %}</del>{% endif %}
                     {% endif %}
                 </div>
             </div>

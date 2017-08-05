@@ -96,6 +96,7 @@ class OpsController extends BaseController
         $invitation = $invitationRepo->findOneBy(['accepted' => null, 'rejected' => null, 'cancelled' => null]);
 
         $policyRepo = $dm->getRepository(Policy::class);
+        $expiredPolicy = $policyRepo->findOneBy(['status' => Policy::STATUS_EXPIRED]);
         $unpaidPolicy = $policyRepo->findOneBy(['status' => Policy::STATUS_UNPAID]);
         $validPolicies = $policyRepo->findBy(['status' => Policy::STATUS_ACTIVE]);
         $position = rand(1, count($validPolicies));
@@ -146,6 +147,7 @@ class OpsController extends BaseController
             'valid_renewal_policy' => $validRenwalPolicy,
             'valid_remainder_policy' => $validRemainderPolicy,
             'claimed_policy' => $claimedPolicy,
+            'expired_policy' => $expiredPolicy,
         ];
     }
 

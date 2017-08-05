@@ -52,7 +52,11 @@ use AppBundle\Service\RateLimitService;
 use AppBundle\Service\PushService;
 use AppBundle\Service\JudopayService;
 
+use AppBundle\Security\PolicyVoter;
 use AppBundle\Security\UserVoter;
+use AppBundle\Security\InvitationVoter;
+use AppBundle\Security\MultiPayVoter;
+
 use AppBundle\Classes\ApiErrorCode;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Response;
@@ -152,18 +156,18 @@ class ApiAuthController extends BaseController
             $invitationService = $this->get('app.invitation');
 
             if ($action == 'accept') {
-                $this->denyAccessUnlessGranted('accept', $invitation);
+                $this->denyAccessUnlessGranted(InvitationVoter::ACCEPT, $invitation);
                 $policy = $policyRepo->find($this->getDataString($data, 'policy_id'));
                 // TODO: Validation user hasn't exceeded pot amout
                 $invitationService->accept($invitation, $policy);
             } elseif ($action == 'reject') {
-                $this->denyAccessUnlessGranted('reject', $invitation);
+                $this->denyAccessUnlessGranted(InvitationVoter::REJECT, $invitation);
                 $invitationService->reject($invitation);
             } elseif ($action == 'cancel') {
-                $this->denyAccessUnlessGranted('cancel', $invitation);
+                $this->denyAccessUnlessGranted(InvitationVoter::CANCEL, $invitation);
                 $invitationService->cancel($invitation);
             } elseif ($action == 'reinvite') {
-                $this->denyAccessUnlessGranted('reinvite', $invitation);
+                $this->denyAccessUnlessGranted(InvitationVoter::REINVITE, $invitation);
                 //\Doctrine\Common\Util\Debug::dump($invitation);
                 $invitationService->reinvite($invitation);
             } else {
@@ -260,7 +264,7 @@ class ApiAuthController extends BaseController
             }
             // TODO: Validate payment amount for accept
 
-            $this->denyAccessUnlessGranted('pay', $multiPay);
+            $this->denyAccessUnlessGranted(MultiPayVoter::PAY, $multiPay);
 
             if ($action == 'accept') {
                 /** @var $judopay JudopayService */
@@ -499,7 +503,7 @@ class ApiAuthController extends BaseController
                     404
                 );
             }
-            $this->denyAccessUnlessGranted('view', $policy);
+            $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
 
             return new JsonResponse($policy->toApiArray());
         } catch (AccessDeniedException $ade) {
@@ -529,13 +533,13 @@ class ApiAuthController extends BaseController
             if (!$policy) {
                 throw new NotFoundHttpException();
             }
-            $this->denyAccessUnlessGranted('connect', $policy);
+            $this->denyAccessUnlessGranted(PolicyVoter::CONNECT, $policy);
 
             $connectPolicy = $repo->find($data['policy_id']);
             if (!$connectPolicy) {
                 throw new NotFoundHttpException();
             }
-            $this->denyAccessUnlessGranted('connect', $connectPolicy);
+            $this->denyAccessUnlessGranted(PolicyVoter::CONNECT, $connectPolicy);
 
             $invitationService = $this->get('app.invitation');
             try {
@@ -624,7 +628,7 @@ class ApiAuthController extends BaseController
             if (!$policy) {
                 throw new NotFoundHttpException();
             }
-            $this->denyAccessUnlessGranted('send-invitation', $policy);
+            $this->denyAccessUnlessGranted(PolicyVoter::SEND_INVITATION, $policy);
 
             $invitationService = $this->get('app.invitation');
             // avoid sending email/sms invitations if testing
@@ -784,7 +788,7 @@ class ApiAuthController extends BaseController
                     404
                 );
             }
-            $this->denyAccessUnlessGranted('edit', $policy);
+            $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
 
             if (isset($data['bank_account'])) {
                 $gocardless = $this->get('app.gocardless');
@@ -909,7 +913,7 @@ class ApiAuthController extends BaseController
             if (!$policy) {
                 throw new NotFoundHttpException();
             }
-            $this->denyAccessUnlessGranted('view', $policy);
+            $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
             $s3 = $this->get('aws.s3');
             $result = $s3->getObject(array(
                 'Bucket' => $this->getDataString($data, 'bucket'),
@@ -966,7 +970,7 @@ class ApiAuthController extends BaseController
             if (!$policy) {
                 throw new NotFoundHttpException();
             }
-            $this->denyAccessUnlessGranted('edit', $policy);
+            $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
             if ($this->getDataString($data, 'type') == SCode::TYPE_STANDARD && $policy->getStandardSCode()) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_INVALD_DATA_FORMAT,
@@ -1055,7 +1059,7 @@ class ApiAuthController extends BaseController
             if (!$policy) {
                 throw new NotFoundHttpException();
             }
-            $this->denyAccessUnlessGranted('edit', $policy);
+            $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
 
             $scode->setActive(false);
             $dm->flush();
@@ -1125,7 +1129,7 @@ class ApiAuthController extends BaseController
                 );
             }
 
-            $this->denyAccessUnlessGranted('edit', $multiPayPolicy);
+            $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $multiPayPolicy);
 
             if ($action == 'request') {
                 $multiPay = new MultiPay();
@@ -1217,7 +1221,7 @@ class ApiAuthController extends BaseController
                     422
                 );
             }
-            $this->denyAccessUnlessGranted('view', $policy);
+            $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
             $policyTermsRoute = $this->get('router')->generate(
                 'policy_terms',
                 [
@@ -1275,7 +1279,7 @@ class ApiAuthController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'User not found', 404);
             }
 
-            $this->denyAccessUnlessGranted('view', $user);
+            $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $user);
 
             $this->get('statsd')->endTiming("api.getCurrentUser");
             $intercomHash = $this->get('app.intercom')->getApiUserHash($user);
@@ -1323,7 +1327,7 @@ class ApiAuthController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'User not found', 404);
             }
 
-            $this->denyAccessUnlessGranted('view', $user);
+            $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $user);
             $debug = false;
             if ($this->getRequestBool($request, 'debug')) {
                 $debug = true;
@@ -1357,7 +1361,7 @@ class ApiAuthController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'User not found', 404);
             }
 
-            $this->denyAccessUnlessGranted('edit', $user);
+            $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);
             $data = json_decode($request->getContent(), true)['body'];
             // $this->get('logger')->info(sprintf('Update user %s', json_encode($data)));
 
@@ -1496,7 +1500,7 @@ class ApiAuthController extends BaseController
             $repo = $dm->getRepository(User::class);
             $user = $repo->find($id);
 
-            $this->denyAccessUnlessGranted('edit', $user);
+            $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);
 
             $addressValidator = $this->get('app.address');
             if (!$addressValidator->validatePostcode($this->getDataString($data, 'postcode'))) {
@@ -1566,7 +1570,7 @@ class ApiAuthController extends BaseController
                     404
                 );
             }
-            $this->denyAccessUnlessGranted('edit', $user);
+            $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);
 
             if ($judoData) {
                 $judo = $this->get('app.judopay');
@@ -1635,7 +1639,7 @@ class ApiAuthController extends BaseController
                 );
             }
             */
-            $this->denyAccessUnlessGranted('edit', $user);
+            $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);
 
             $make = $this->getRequestString($request, 'make');
             $device = $this->getRequestString($request, 'device');

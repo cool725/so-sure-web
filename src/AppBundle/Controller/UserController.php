@@ -78,7 +78,7 @@ class UserController extends BaseController
         if (!$policy) {
             throw $this->createNotFoundException('Policy not found');
         }
-        $this->denyAccessUnlessGranted('view', $policy);
+        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
 
         $feature = $this->get('app.feature');
         if ($feature->isEnabled(Feature::FEATURE_RENEWAL)) {
@@ -464,7 +464,7 @@ class UserController extends BaseController
         $user = $this->getUser();
         $policy = $user->getUnpaidPolicy();
         if ($policy) {
-            $this->denyAccessUnlessGranted('view', $policy);
+            $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
             if ($policy->getPremiumPlan() != Policy::PLAN_MONTHLY) {
                 throw new \Exception('Unpaid policy should only be triggered for monthly plans');
             }
@@ -551,7 +551,7 @@ class UserController extends BaseController
         } else {
             $policy = $user->getLatestPolicy();
         }
-        $this->denyAccessUnlessGranted('view', $policy);
+        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
 
         $webpay = $this->get('app.judopay')->webRegister(
             $user,
@@ -637,7 +637,7 @@ class UserController extends BaseController
         } else {
             $policy = $user->getLatestPolicy();
         }
-        $this->denyAccessUnlessGranted('view', $policy);
+        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
 
         $userEmailForm = $this->get('form.factory')
             ->createNamedBuilder('user_email_form', UserEmailType::class, $user)
@@ -681,7 +681,7 @@ class UserController extends BaseController
         } else {
             $policy = $user->getLatestPolicy();
         }
-        $this->denyAccessUnlessGranted('view', $policy);
+        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
 
         return [
             'user' => $user,
