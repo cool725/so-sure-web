@@ -276,7 +276,9 @@ class IntercomService
         $data['custom_attributes']['Pending Invites'] = count($user->getUnprocessedReceivedInvitations());
         $data['custom_attributes']['Number of Policies'] = $analytics['numberPolicies'];
         $data['custom_attributes']['Account Paid To Date'] = $analytics['accountPaidToDate'];
-        $data['custom_attributes']['Card Details'] = $user->getPaymentMethod() ? $user->getPaymentMethod() : null;
+        $data['custom_attributes']['Card Details'] = $user->getPaymentMethod() ?
+            $user->getPaymentMethod()->__toString() :
+            null;
         if (isset($analytics['devices'])) {
             $data['custom_attributes']['Insured Devices'] = join(';', $analytics['devices']);
         }
