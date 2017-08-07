@@ -599,7 +599,7 @@ abstract class Policy
 
     public function getBillingDay()
     {
-        return $this->getBilling()->format('j');
+        return $this->getBilling() ? $this->getBilling()->format('j') : null;
     }
 
     public function setBilling(\DateTime $billing, \DateTime $changeDate = null)
@@ -3037,6 +3037,7 @@ abstract class Policy
             'facebook_filters' => $this->eachApiMethod($this->getSentInvitations(), 'getInviteeFacebookId', false),
             'previous_policy_id' => $this->hasPreviousPolicy() ? $this->getPreviousPolicy()->getId() : null,
             'next_policy_id' => $this->hasNextPolicy() ? $this->getNextPolicy()->getId() : null,
+            'billing_day' => $this->getBillingDay(),
         ];
     }
 
