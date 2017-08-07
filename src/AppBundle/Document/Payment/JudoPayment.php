@@ -73,8 +73,10 @@ class JudoPayment extends Payment
         $this->result = $result;
         if ($result == self::RESULT_SUCCESS) {
             $this->setSuccess(true);
-        } else {
+        } elseif (in_array($result, [self::RESULT_DECLINED, self::RESULT_SKIPPED])) {
             $this->setSuccess(false);
+        } else {
+            throw new \Exception(sprintf('Unknown result %s', $result));
         }
     }
 

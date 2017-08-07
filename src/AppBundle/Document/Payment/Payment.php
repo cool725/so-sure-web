@@ -296,7 +296,20 @@ abstract class Payment
 
     public function setSuccess($success)
     {
+        if ($this->hasSuccess() && $this->success != $success) {
+            throw new \Exception(sprintf(
+                'Attempting to overwrite success for payment %s to %s',
+                $this->getId(),
+                $success
+            ));
+        }
+
         $this->success = $success;
+    }
+
+    public function hasSuccess()
+    {
+        return $this->success !== null;
     }
 
     abstract public function isSuccess();
