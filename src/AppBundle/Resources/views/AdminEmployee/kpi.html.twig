@@ -232,7 +232,13 @@
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Click Buy Now [KPI: 201]</td>
+                            <td>CPC Competitors Page [KPI: 201]</td>
+                            {% for week in weeks %}
+                                <td>{% if week['mixpanel-cpc-competitors-uk'] is defined %}{{ week['mixpanel-cpc-competitors-uk'] }}{% else %}unknown - see mixpanel{% endif %}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td>Click Buy Now [KPI: 202]</td>
                             {% for week in weeks %}
                                 <td>{% if week['mixpanel-click-buy-now'] is defined %}{{ week['mixpanel-click-buy-now'] }}{% else %}unknown - see mixpanel{% endif %}</td>
                             {% endfor %}

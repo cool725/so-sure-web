@@ -60,6 +60,7 @@ class MixpanelService
     const CUSTOM_CPC_QUOTE_PAGE_UK = '$custom_event:534870';
 
     const CUSTOM_CPC_MANUFACTURER_PAGE_UK = '$custom_event:534868';
+    const CUSTOM_CPC_COMPETITOR_PAGE_UK = '$custom_event:599266';
     const CUSTOM_INVITATION_PAGE_SCODE = '$custom_event:591840';
     const CUSTOM_INVITATION_PAGE_EMAIL = '$custom_event:591838';
 
@@ -271,6 +272,7 @@ class MixpanelService
             self::EVENT_INVITE,
             self::CUSTOM_CPC_QUOTE_PAGE_UK,
             self::CUSTOM_CPC_MANUFACTURER_PAGE_UK,
+            self::CUSTOM_CPC_COMPETITOR_PAGE_UK,
             self::CUSTOM_INVITATION_PAGE_SCODE,
             self::CUSTOM_INVITATION_PAGE_EMAIL,
         ];
@@ -298,6 +300,9 @@ class MixpanelService
             } elseif ($event == self::CUSTOM_CPC_MANUFACTURER_PAGE_UK) {
                 $stats['CPC Manufacturer Page UK'] = $results[$key];
                 $this->stats->set(Stats::MIXPANEL_CPC_MANUFACTURER_UK, $start, $results[$key]);
+            } elseif ($event == self::CUSTOM_CPC_COMPETITOR_PAGE_UK) {
+                $stats['CPC Competitor Page UK'] = $results[$key];
+                $this->stats->set(Stats::MIXPANEL_CPC_COMPETITORS_UK, $start, $results[$key]);
             } elseif ($event == self::EVENT_BUY_BUTTON_CLICKED) {
                 $stats['Click Buy Now Button'] = $results[$key];
                 $this->stats->set(Stats::MIXPANEL_CLICK_BUY_NOW, $start, $results[$key]);

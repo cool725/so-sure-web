@@ -21,6 +21,7 @@ class Stats
 
     const MIXPANEL_QUOTES_UK = 'mixpanel-quotes-uk';
     const MIXPANEL_CPC_MANUFACTURER_UK = 'mixpanel-cpc-manufacturer-uk';
+    const MIXPANEL_CPC_COMPETITORS_UK = 'mixpanel-cpc-competitors-uk';
     const MIXPANEL_CLICK_BUY_NOW = 'mixpanel-click-buy-now';
     const MIXPANEL_RECEIVE_PERSONAL_DETAILS = 'mixpanel-receive-personal-details';
     const MIXPANEL_INVITE_SOMEONE = 'mixpanel-invite-someone';
