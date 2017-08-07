@@ -80,6 +80,15 @@ class IntercomListener
         $this->intercom->queuePayment($event->getPayment(), IntercomService::QUEUE_EVENT_PAYMENT_FAILED);
     }
 
+    public function onPaymentFirstProblemEvent(PaymentEvent $event)
+    {
+        // We have a few new properties on the user that are required for the payment first problem
+        // Resynce user for now to ensure everything is present.
+        // Eventually can be removed if all users are re-synced or if enough time has elapsed (1 year?)
+        $this->intercom->queue($event->getPayment()->getPolicy()->getUser());
+        $this->intercom->queuePayment($event->getPayment(), IntercomService::QUEUE_EVENT_PAYMENT_FIRST_PROBLEM);
+    }
+
     public function onUserPaymentFailedEvent(UserPaymentEvent $event)
     {
         $this->intercom->queueUser(

@@ -10,6 +10,9 @@ class PaymentEvent extends Event
     const EVENT_SUCCESS = 'event.payment.success';
     const EVENT_FAILED = 'event.payment.failed';
 
+    // Problem is where the payment has failed twice
+    const EVENT_FIRST_PROBLEM = 'event.payment.first-problem';
+
     /** @var Payment */
     protected $payment;
 

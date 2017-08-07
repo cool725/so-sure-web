@@ -343,6 +343,33 @@ class IntercomListenerTest extends WebTestCase
         $this->assertEquals(2, $data['paymentId']);
     }
 
+    public function testIntercomQueuePaymentFirstProblem()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testIntercomQueuePaymentFirstProblem', $this),
+            'bar'
+        );
+        $policy = new PhonePolicy();
+        $policy->setUser($user);
+        $policy->setId(rand(1, 99999));
+
+        $payment = new JudoPayment();
+        $payment->setId(3);
+        $payment->setAmount(3);
+        $payment->setPolicy($policy);
+
+        static::$redis->del(IntercomService::KEY_INTERCOM_QUEUE);
+        $this->assertEquals(0, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+
+        $listener = new IntercomListener(static::$intercomService);
+        $listener->onPaymentFirstProblemEvent(new PaymentEvent($payment));
+
+        $this->assertEquals(1, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+        $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
+        $this->assertEquals(3, $data['paymentId']);
+    }
+
     public function testIntercomQueueUserPaymentFailed()
     {
         $user = static::createUser(

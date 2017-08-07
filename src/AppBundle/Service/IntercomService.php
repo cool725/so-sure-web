@@ -13,11 +13,15 @@ use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\Connection\Connection;
 
+use AppBundle\Document\CurrencyTrait;
+
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Intercom\IntercomClient;
 
 class IntercomService
 {
+    use CurrencyTrait;
+
     const KEY_INTERCOM_QUEUE = 'queue:intercom';
 
     const TAG_DONT_CONTACT = "Don't Contact (Duplicate)";
@@ -35,6 +39,8 @@ class IntercomService
 
     const QUEUE_EVENT_PAYMENT_SUCCESS = 'payment-succeed';
     const QUEUE_EVENT_PAYMENT_FAILED = 'payment-failed';
+    const QUEUE_EVENT_PAYMENT_FIRST_PROBLEM = 'payment-first-problem';
+
     /*
     const QUEUE_EVENT_INVITATION_ACCEPTED = 'invitation-accepted';
     const QUEUE_EVENT_INVITATION_CANCELLED = 'invitation-cancelled';
@@ -253,8 +259,11 @@ class IntercomService
         }
 
         $analytics = $user->getAnalytics();
-        $data['custom_attributes']['Premium'] = $analytics['annualPremium'];
+        $data['custom_attributes']['Premium'] = $this->toTwoDp($analytics['annualPremium']);
         $data['custom_attributes']['Displayable Premium'] = (string) sprintf('%.2f', $analytics['annualPremium']);
+        $data['custom_attributes']['Monthly Premium'] = $this->toTwoDp($analytics['monthlyPremium']);
+        $data['custom_attributes']['Displayable Monthly Premium'] =
+            (string) sprintf('%.2f', $analytics['monthlyPremium']);
         $data['custom_attributes']['Pot'] = $analytics['rewardPot'];
         $data['custom_attributes']['Displayable Pot'] = (string) sprintf('%.2f', $analytics['rewardPot']);
         $data['custom_attributes']['Max Pot'] = $analytics['maxPot'];
@@ -267,10 +276,10 @@ class IntercomService
         $data['custom_attributes']['Pending Invites'] = count($user->getUnprocessedReceivedInvitations());
         $data['custom_attributes']['Number of Policies'] = $analytics['numberPolicies'];
         $data['custom_attributes']['Account Paid To Date'] = $analytics['accountPaidToDate'];
+        $data['custom_attributes']['Card Details'] = $user->getPaymentMethod() ? $user->getPaymentMethod() : null;
         if (isset($analytics['devices'])) {
             $data['custom_attributes']['Insured Devices'] = join(';', $analytics['devices']);
         }
-
         // Only set the first time, or if the user was converted from a lead
         if (!$user->getIntercomId() || $isConverted) {
             if ($user->getIdentityLog() && $user->getIdentityLog()->getIp()) {
@@ -543,8 +552,11 @@ class IntercomService
                     }
 
                     $this->sendPolicyEvent($this->getPolicy($data['policyId']), $action);
-                } elseif ($action == self::QUEUE_EVENT_PAYMENT_SUCCESS ||
-                          $action == self::QUEUE_EVENT_PAYMENT_FAILED) {
+                } elseif (in_array($action, [
+                    self::QUEUE_EVENT_PAYMENT_SUCCESS,
+                    self::QUEUE_EVENT_PAYMENT_FAILED,
+                    self::QUEUE_EVENT_PAYMENT_FIRST_PROBLEM,
+                ])) {
                     if (!isset($data['paymentId'])) {
                         throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
                     }

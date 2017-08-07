@@ -39,4 +39,12 @@ class FeatureService
             $this->logger->error(sprintf('Error w/feature %s', $featureName), ['exception' => $e]);
         }
     }
+
+    public function setEnabled($featureName, $enabled)
+    {
+        $repo = $this->dm->getRepository(Feature::class);
+        $feature = $repo->findOneBy(['name' => $featureName]);
+        $feature->setEnabled($enabled);
+        $this->dm->flush();
+    }
 }
