@@ -255,7 +255,7 @@ class UserControllerTest extends BaseControllerTest
         if ($allowed) {
             $count = 1;
         }
-        $this->assertEquals($count, $crawler->evaluate('count(//a[@id="connect-with"])')[0]);
+        $this->assertEquals($count, $crawler->evaluate('count(//a[@id="add-connect"])')[0]);
     }
 
     private function validateRewardPot($crawler, $amount)

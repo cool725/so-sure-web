@@ -94,6 +94,7 @@
                         {{ form_end(sent_invitation_form) }}
                     </div>
                     {% endif %}
+                    {% if policy.connections|length > 0 %}
                     <div class="user-homepage--section">
                         <h3 class="text-grey-blue">Connections</h3>
                         <ul class="list-inline">
@@ -121,17 +122,18 @@
                             {% endfor %}
                             {% if policy.canInvite %}
                             <li>
-                                {# id="connect-with" used in tests #}
                                 <a id="connect-with" href="#" data-toggle="modal" data-target="#inviteModal"><img src="{{ cdn_url }}/images/alpha/add.png" alt="Add connection" class="img-circle coffee-stamp-add"></a>
                             </li>
                             {% endif %}
                         </ul>
                     </div>
+                    {% endif %}
                     {% if policy.canInvite %}
                     <div class="user-homepage--section">
                         <h3 class="text-grey-blue">Add Connections</h3>
                         <p>Want to add a connection? We've made it easy for you to do so with your very own unique sign up link. Click 'Add connection' to get started.</p>
-                        <p class="text-center"><a href="#" class="btn btn-primary " data-toggle="modal" data-target="#inviteModal"><i class="fa fa-plus" aria-hidden="true"></i> Add connection</a></p>
+                        {# id="add-connect" used in tests #}
+                        <p class="text-center"><a id="add-connect" href="#" class="btn btn-primary " data-toggle="modal" data-target="#inviteModal"><i class="fa fa-plus" aria-hidden="true"></i> Add connection</a></p>
                     </div>
                     {% endif %}
                 </div>

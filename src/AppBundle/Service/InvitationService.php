@@ -675,7 +675,7 @@ class InvitationService
             $host = strtolower(parse_url($url, PHP_URL_HOST));
             if (in_array($host, ['sosure.app.link', 'sosure.test-app.link'])) {
                 $body = (string) $res->getBody();
-                $pattern = '/.*window\.location\s*=\s*["]([^"]*)["].*/m';
+                $pattern = '/.*window\.location\s*=.*["](http[^"]*)["].*/m';
                 $matches = array();
                 preg_match($pattern, $body, $matches);
                 if (count($matches) >= 2 && filter_var($matches[1], FILTER_VALIDATE_URL)) {
@@ -873,6 +873,15 @@ class InvitationService
         if (!$policy->isValidPolicy($prefix)) {
             throw new InvalidPolicyException(sprintf(
                 'Policy must be pending/active before inviting/connecting (%s)',
+                $policy->getPolicyNumber()
+            ));
+        }
+        if (!in_array($policy->getStatus(), [
+            Policy::STATUS_ACTIVE,
+            Policy::STATUS_UNPAID,
+        ])) {
+            throw new InvalidPolicyException(sprintf(
+                'Policy must be active before inviting/connecting (%s)',
                 $policy->getPolicyNumber()
             ));
         }

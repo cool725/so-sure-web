@@ -4,8 +4,10 @@ namespace AppBundle\Tests\Security;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
+use AppBundle\Document\Policy;
 use AppBundle\Document\SalvaPhonePolicy;
 use Symfony\Component\Security\Core\Authentication\Token\PreAuthenticatedToken;
+use AppBundle\Security\PolicyVoter;
 
 /**
  * @group functional-nonet
@@ -60,7 +62,7 @@ class PolicyVoterTest extends WebTestCase
         $policy->setUser($user);
         $token = new PreAuthenticatedToken($user, '1', 'test');
 
-        $this->assertTrue(self::$policyVoter->voteOnAttribute('view', $policy, $token));
+        $this->assertTrue(self::$policyVoter->voteOnAttribute(PolicyVoter::VIEW, $policy, $token));
     }
 
     public function testVoteDiffUser()
@@ -75,6 +77,26 @@ class PolicyVoterTest extends WebTestCase
         $userDiff->setId(2);
         $token = new PreAuthenticatedToken($userDiff, '1', 'test');
 
-        $this->assertFalse(self::$policyVoter->voteOnAttribute('view', $policy, $token));
+        $this->assertFalse(self::$policyVoter->voteOnAttribute(PolicyVoter::VIEW, $policy, $token));
+    }
+
+    public function testVoteEditExpired()
+    {
+        $user = new User();
+        $user->setId(1);
+        self::addAddress($user);
+        $policy = new SalvaPhonePolicy();
+        $policy->setUser($user);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+
+        $token = new PreAuthenticatedToken($user, '1', 'test');
+
+        $this->assertTrue(self::$policyVoter->voteOnAttribute(PolicyVoter::EDIT, $policy, $token));
+
+        $policy->setStatus(Policy::STATUS_EXPIRED_CLAIMABLE);
+        $this->assertFalse(self::$policyVoter->voteOnAttribute(PolicyVoter::EDIT, $policy, $token));
+
+        $policy->setStatus(Policy::STATUS_EXPIRED);
+        $this->assertFalse(self::$policyVoter->voteOnAttribute(PolicyVoter::EDIT, $policy, $token));
     }
 }
