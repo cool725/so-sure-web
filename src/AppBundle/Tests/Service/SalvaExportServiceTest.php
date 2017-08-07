@@ -690,16 +690,16 @@ class SalvaExportServiceTest extends WebTestCase
             false
         );
         $xml = static::$salva->createXml($policy);
-        $this->assertContains('<ns2:firstDueDate>2016-01-01</ns2:firstDueDate>', $xml);
+        $this->assertNotContains('<ns2:firstDueDate>', $xml);
 
         static::$salva->incrementPolicyNumber($policy, new \DateTime('2016-01-10 01:00'));
 
         $xml = static::$salva->createXml($policy);
-        $this->assertContains('<ns2:firstDueDate>2016-01-01</ns2:firstDueDate>', $xml);
+        $this->assertNotContains('<ns2:firstDueDate>', $xml);
 
         static::$salva->incrementPolicyNumber($policy, new \DateTime('2016-02-15 01:00'));
 
         $xml = static::$salva->createXml($policy);
-        $this->assertContains('<ns2:firstDueDate>2016-01-01</ns2:firstDueDate>', $xml);
+        $this->assertNotContains('<ns2:firstDueDate>', $xml);
     }
 }
