@@ -200,6 +200,11 @@ class SalvaPhonePolicy extends PhonePolicy
 
     public function getSalvaFirstDueDate($version = null)
     {
+        // If premium is completely paid
+        if ($this->areEqualToTwoDp(0, $this->getOutstandingPremium())) {
+            return null;
+        }
+
         if (!$version) {
             $version = count($this->getSalvaPolicyNumbers());
         } else {
