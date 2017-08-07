@@ -720,7 +720,10 @@ class JudopayServiceTest extends WebTestCase
         );
         $this->assertEquals(ScheduledPayment::STATUS_FAILED, $scheduledPayment->getStatus());
         $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
-        $this->assertEquals($scheduledPayment->getScheduled(), $policy->getUser()->getPaymentMethod()->getFirstProblem());
+        $this->assertEquals(
+            $scheduledPayment->getScheduled(),
+            $policy->getUser()->getPaymentMethod()->getFirstProblem()
+        );
     }
 
     public function testRemainderPaymentCancelledPolicy()
