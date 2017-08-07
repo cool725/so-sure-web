@@ -8,6 +8,7 @@ use AppBundle\Document\Address;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
+use AppBundle\Document\Feature;
 use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Payment\Payment;
@@ -45,6 +46,8 @@ class JudopayServiceTest extends WebTestCase
         self::$userManager = self::$container->get('fos_user.user_manager');
         self::$policyService = self::$container->get('app.policy');
         self::$judopay = self::$container->get('app.judopay');
+        $feature = self::$container->get('app.feature');
+        $feature->setEnabled(Feature::FEATURE_PAYMENT_PROBLEM_INTERCOM, true);
     }
 
     public function tearDown()
@@ -691,13 +694,16 @@ class JudopayServiceTest extends WebTestCase
         $mailer = $this->getMockBuilder('Swift_Mailer')
             ->disableOriginalConstructor()
             ->getMock();
-        $mailer->expects($this->once())->method('send');
+        $mailer->expects($this->exactly(3))->method('send');
         self::$judopay->getMailer()->setMailer($mailer);
 
-        // 1st failure
+        // 1st failure (expected email; total = 1)
+        // print '1/1st failure' . PHP_EOL;
         $scheduledPayment = $policy->getNextScheduledPayment();
+        // print_r($scheduledPayment->getScheduled());
         $payment = new JudoPayment();
         $payment->setResult(JudoPayment::RESULT_DECLINED);
+        $payment->setPolicy($policy);
 
         self::$judopay->processScheduledPaymentResult(
             $scheduledPayment,
@@ -708,10 +714,13 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
         $this->assertNull($policy->getUser()->getPaymentMethod()->getFirstProblem());
 
-        // 2nd failure - should trigger problem
+        // 2nd failure - should trigger problem  (expected no email; total = 1)
+        // print '1/2nd failure' . PHP_EOL;
         $scheduledPayment = $policy->getNextScheduledPayment();
+        // print_r($scheduledPayment->getScheduled());
         $payment = new JudoPayment();
         $payment->setResult(JudoPayment::RESULT_DECLINED);
+        $payment->setPolicy($policy);
 
         self::$judopay->processScheduledPaymentResult(
             $scheduledPayment,
@@ -720,10 +729,76 @@ class JudopayServiceTest extends WebTestCase
         );
         $this->assertEquals(ScheduledPayment::STATUS_FAILED, $scheduledPayment->getStatus());
         $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
+        /*
         $this->assertEquals(
             $scheduledPayment->getScheduled(),
             $policy->getUser()->getPaymentMethod()->getFirstProblem()
+        );*/
+
+        // 3rd failure - nothing (expected no email; total = 1)
+        // print '1/3rd failure' . PHP_EOL;
+        $scheduledPayment = $policy->getNextScheduledPayment();
+        // print_r($scheduledPayment->getScheduled());
+        $payment = new JudoPayment();
+        $payment->setResult(JudoPayment::RESULT_DECLINED);
+        $payment->setPolicy($policy);
+
+        self::$judopay->processScheduledPaymentResult(
+            $scheduledPayment,
+            $payment,
+            clone $scheduledPayment->getScheduled()
         );
+        $this->assertEquals(ScheduledPayment::STATUS_FAILED, $scheduledPayment->getStatus());
+        $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
+        $this->assertNotEquals(
+            $scheduledPayment->getScheduled(),
+            $policy->getUser()->getPaymentMethod()->getFirstProblem()
+        );
+
+        // 4th - success (expected no email; total = 1)
+        // print '1/4th success' . PHP_EOL;
+        $scheduledPayment = $policy->getNextScheduledPayment();
+        // print_r($scheduledPayment->getScheduled());
+        $payment = new JudoPayment();
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+
+        self::$judopay->processScheduledPaymentResult($scheduledPayment, $payment);
+        $this->assertEquals(ScheduledPayment::STATUS_SUCCESS, $scheduledPayment->getStatus());
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+
+        // 1st failure (expected email; total = 2)
+        // print '2/1st failure' . PHP_EOL;
+        $scheduledPayment = $policy->getNextScheduledPayment();
+        // print_r($scheduledPayment->getScheduled());
+        $payment = new JudoPayment();
+        $payment->setResult(JudoPayment::RESULT_DECLINED);
+        $payment->setPolicy($policy);
+
+        self::$judopay->processScheduledPaymentResult(
+            $scheduledPayment,
+            $payment,
+            clone $scheduledPayment->getScheduled()
+        );
+        $this->assertEquals(ScheduledPayment::STATUS_FAILED, $scheduledPayment->getStatus());
+        $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
+        $this->assertNotNull($policy->getUser()->getPaymentMethod()->getFirstProblem());
+
+        // 2nd failure -  (expected email; total = 3)
+        // print '2/2nd failure' . PHP_EOL;
+        $scheduledPayment = $policy->getNextScheduledPayment();
+        // print_r($scheduledPayment->getScheduled());
+        $payment = new JudoPayment();
+        $payment->setResult(JudoPayment::RESULT_DECLINED);
+        $payment->setPolicy($policy);
+
+        self::$judopay->processScheduledPaymentResult(
+            $scheduledPayment,
+            $payment,
+            clone $scheduledPayment->getScheduled()
+        );
+        $this->assertEquals(ScheduledPayment::STATUS_FAILED, $scheduledPayment->getStatus());
+        $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
+        $this->assertNotNull($policy->getUser()->getPaymentMethod()->getFirstProblem());
     }
 
     public function testRemainderPaymentCancelledPolicy()

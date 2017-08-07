@@ -76,6 +76,7 @@ services:
             webSecret:            "%judopay_websecret%"
             dispatcher:           "@event_dispatcher"
             sms:                  "@app.sms"
+            feature:              "@app.feature"
 
     app.barclays:
         class: AppBundle\Service\BarclaysService

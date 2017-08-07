@@ -13,6 +13,7 @@ use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Phone;
 use AppBundle\Document\User;
+use AppBundle\Document\Feature;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;
@@ -73,6 +74,9 @@ class JudopayService
     /** @var SmsService */
     protected $sms;
 
+    /** @var FeatureService */
+    protected $featureService;
+
     public function setDispatcher($dispatcher)
     {
         $this->dispatcher = $dispatcher;
@@ -92,6 +96,7 @@ class JudopayService
      * @param string          $webSecret
      * @param                 $dispatcher
      * @param SmsService      $sms
+     * @param FeatureService  $featureService
      */
     public function __construct(
         DocumentManager $dm,
@@ -106,7 +111,8 @@ class JudopayService
         $webToken,
         $webSecret,
         $dispatcher,
-        SmsService $sms
+        SmsService $sms,
+        FeatureService $featureService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -135,6 +141,7 @@ class JudopayService
         $this->webClient = new Judopay($webData);
         $this->statsd = $statsd;
         $this->environment = $environment;
+        $this->featureService = $featureService;
     }
 
     public function getTransaction($receiptId)
@@ -753,22 +760,30 @@ class JudopayService
             // Due to a limitation in intercom, messages are only sent to a user once
             // So, we want to use Intercom but only if its the first time that's been used
             $paymentMethod = $policy->getUser()->getPaymentMethod();
-            $days = null;
+            $withinFirstProblemTimeframe = false;
             if ($firstProblem = $paymentMethod->getFirstProblem()) {
                 $diff = $date->diff($firstProblem);
                 $days = $diff->days;
+                // 30 - 7 = 23 days - firstProblem is recorded 7 days into problem (failedPayments >= 2)
+                // must be less than or will catch first next month
+                $withinFirstProblemTimeframe = $days < 23;
             }
-            if ($failedPayments >= 2 && !$firstProblem) {
-                $paymentMethod->setFirstProblem($date);
-                if ($this->dispatcher) {
-                    $this->logger->debug('Event Payment First Problem');
-                    $this->dispatcher->dispatch(PaymentEvent::EVENT_FIRST_PROBLEM, new PaymentEvent($payment));
+            if ($this->featureService->isEnabled(Feature::FEATURE_PAYMENT_PROBLEM_INTERCOM)) {
+                if ($failedPayments >= 2 && !$firstProblem) {
+                    $paymentMethod->setFirstProblem($date);
+                    $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+                    if ($this->dispatcher) {
+                        $this->logger->debug('Event Payment First Problem');
+                        $this->dispatcher->dispatch(PaymentEvent::EVENT_FIRST_PROBLEM, new PaymentEvent($payment));
+                    } else {
+                        $this->logger->warning('Dispatcher is disabled for Judo Service');
+                    }
+                } elseif ($failedPayments >= 2 && $withinFirstProblemTimeframe) {
+                    // intercom campaign should be handling addition if its the same payment problem
+                    \AppBundle\Classes\NoOp::ignore([]);
                 } else {
-                    $this->logger->warning('Dispatcher is disabled for Judo Service');
+                    $this->failedPaymentEmail($policy, $next);
                 }
-            } elseif ($failedPayments >= 2 && $days && $days <= 30) {
-                // intercom campaign should be handling addition if its the same payment problem
-                \AppBundle\Classes\NoOp::ignore([]);
             } else {
                 $this->failedPaymentEmail($policy, $next);
             }
