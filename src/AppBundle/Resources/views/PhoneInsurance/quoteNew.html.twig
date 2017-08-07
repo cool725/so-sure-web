@@ -70,8 +70,10 @@
                         {# Set the start friends amount #}
                         {% set start_friends = max_connections / 2 %}
 
+                        {% set start_friends_rounded = start_friends|round() %}
+
                         {# Set the amount of cashback #}
-                        {% set start_value = start_friends * connection_value %}
+                        {% set start_value = start_friends_rounded  * connection_value %}
 
                         {# If greater than max pot, pot max is start value #}
                         {% if start_value > max_pot %}
@@ -96,7 +98,7 @@
                                    id="reward-slider"
                                    min="0"
                                    max="{{ max_connections }}"
-                                   value="{{ start_friends }}"
+                                   value="{{ start_friends_rounded }}"
                                    data-maxpot="{{ max_pot }}"
                                    data-connection-value="{{ connection_value }}"
                                    data-premium="{{ annual_premium }}"
