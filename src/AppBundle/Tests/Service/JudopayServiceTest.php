@@ -603,6 +603,7 @@ class JudopayServiceTest extends WebTestCase
         $scheduledPayment = $policy->getNextScheduledPayment();
         $payment = new JudoPayment();
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setPolicy($policy);
 
         self::$judopay->processScheduledPaymentResult($scheduledPayment, $payment);
         $this->assertEquals(ScheduledPayment::STATUS_SUCCESS, $scheduledPayment->getStatus());
@@ -622,6 +623,7 @@ class JudopayServiceTest extends WebTestCase
             }
             $payment = new JudoPayment();
             $payment->setResult(JudoPayment::RESULT_DECLINED);
+            $payment->setPolicy($policy);
 
             self::$judopay->processScheduledPaymentResult(
                 $scheduledPayment,
@@ -637,6 +639,7 @@ class JudopayServiceTest extends WebTestCase
         $scheduledPayment = $policy->getNextScheduledPayment();
         $payment = new JudoPayment();
         $payment->setResult(JudoPayment::RESULT_DECLINED);
+        $payment->setPolicy($policy);
 
         self::$judopay->processScheduledPaymentResult(
             $scheduledPayment,

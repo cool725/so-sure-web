@@ -365,9 +365,17 @@ class IntercomListenerTest extends WebTestCase
         $listener = new IntercomListener(static::$intercomService);
         $listener->onPaymentFirstProblemEvent(new PaymentEvent($payment));
 
-        $this->assertEquals(1, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
-        $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
-        $this->assertEquals(3, $data['paymentId']);
+        // User is also updated now
+        $this->assertEquals(2, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+        $foundPayment = false;
+
+        while ($data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE))) {
+            if (isset($data['paymentId'])) {
+                $this->assertEquals(3, $data['paymentId']);
+                $foundPayment = true;
+            }
+        }
+        $this->assertTrue($foundPayment);
     }
 
     public function testIntercomQueueUserPaymentFailed()
