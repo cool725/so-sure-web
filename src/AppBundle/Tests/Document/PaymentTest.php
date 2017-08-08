@@ -65,4 +65,16 @@ class PaymentTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0.88, $payment->getCoverholderCommission());
         $this->assertEquals(0.06, $payment->getBrokerCommission());
     }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testOverwriteSuccess()
+    {
+        $payment = new JudoPayment();
+        $this->assertFalse($payment->hasSuccess());
+        $payment->setSuccess(true);
+        $this->assertTrue($payment->hasSuccess());
+        $payment->setSuccess(false);
+    }
 }

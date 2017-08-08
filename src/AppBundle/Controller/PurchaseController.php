@@ -694,7 +694,9 @@ class PurchaseController extends BaseController
             ));
         }
 
-        $payment->setSuccess(false);
+        if (!$payment->hasSuccess()) {
+            $payment->setSuccess(false);
+        }
         $dm->flush();
 
         $this->addFlash(
