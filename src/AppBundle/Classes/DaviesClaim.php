@@ -409,7 +409,7 @@ class DaviesClaim extends DaviesExcel
                 throw new \Exception('Unknown or missing claim type');
             }
         } catch (\Exception $e) {
-            throw new \Exception(sprintf('%s claim: %s', $e->getMessage(), json_encode($this)));
+            throw new \Exception(sprintf('%s claim: %s %s', $e->getMessage(), json_encode($this), json_encode($data)));
         }
 
         return true;
