@@ -72,11 +72,15 @@ class IntercomListener
 
     public function onPaymentSuccessEvent(PaymentEvent $event)
     {
+        // user record needs to be updated to ensure that the paid state is set correctly
+        $this->intercom->queue($event->getPayment()->getPolicy()->getUser());
         $this->intercom->queuePayment($event->getPayment(), IntercomService::QUEUE_EVENT_PAYMENT_SUCCESS);
     }
 
     public function onPaymentFailedEvent(PaymentEvent $event)
     {
+        // user record needs to be updated to ensure that the paid state is set correctly
+        $this->intercom->queue($event->getPayment()->getPolicy()->getUser());
         $this->intercom->queuePayment($event->getPayment(), IntercomService::QUEUE_EVENT_PAYMENT_FAILED);
     }
 
