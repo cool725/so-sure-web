@@ -19,6 +19,7 @@ class PaymentRepository extends DocumentRepository
             ->field('success')->equals(true)
             ->field('date')->gte($startMonth)
             ->field('date')->lt($nextMonth)
+            ->field('type')->in(['judo', 'bacs', 'gocardless', 'sosure'])
             ->getQuery()
             ->execute();
     }
@@ -31,6 +32,26 @@ class PaymentRepository extends DocumentRepository
         return $this->createQueryBuilder()
             ->field('date')->gte($startMonth)
             ->field('date')->lt($nextMonth)
+            ->field('type')->in(['judo', 'bacs', 'gocardless', 'sosure'])
+            ->getQuery()
+            ->execute();
+    }
+
+    public function getAllPayments(\DateTime $date, $type = null)
+    {
+        $startMonth = $this->startOfMonth($date);
+        $nextMonth = $this->endOfMonth($date);
+        if (!$type) {
+            $type = ['judo', 'bacs', 'gocardless', 'sosure'];
+        } elseif (is_string($type)) {
+            $type = [$type];
+        }
+
+        return $this->createQueryBuilder()
+            ->field('success')->equals(true)
+            ->field('date')->gte($startMonth)
+            ->field('date')->lt($nextMonth)
+            ->field('type')->in($type)
             ->getQuery()
             ->execute();
     }

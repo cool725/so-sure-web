@@ -477,4 +477,33 @@ class ReportingService
 
         return $data;
     }
+
+    public function getActivePoliciesCount($date)
+    {
+        $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
+
+        return $phonePolicyRepo->countAllActivePoliciesToEndOfMonth($date);
+    }
+
+    public function getAllPaymentTotals($isProd, \DateTime $date)
+    {
+        $payments = $this->getPayments($date);
+        $potRewardPayments = $this->getPayments($date, 'potReward');
+
+        return [
+            'all' => Payment::sumPayments($payments, $isProd),
+            'judo' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
+            'sosure' => Payment::sumPayments($payments, $isProd, SoSurePayment::class),
+            'bacs' => Payment::sumPayments($payments, $isProd, BacsPayment::class),
+            'potReward' => Payment::sumPayments($potRewardPayments, $isProd, PotRewardPayment::class),
+        ];
+    }
+
+    private function getPayments(\DateTime $date, $type = null)
+    {
+        $paymentRepo = $this->dm->getRepository(Payment::class);
+        $payments = $paymentRepo->getAllPayments($date, $type);
+
+        return $payments;
+    }
 }
