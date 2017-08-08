@@ -1,6 +1,8 @@
+{% set text_width = "75%" %}
+<h4>Payments</h4>
 <table class="table table-striped">
     <tr class="info">
-        <td>Total for month</td>
+        <td width="{{ text_width }}">Total for month</td>
         <td>£{{ paymentTotals.all.total|number_format(2, '.', ',') }}</td>
     </tr>
     <tr>
@@ -43,8 +45,18 @@
         <td>Afl Commission</td>
         <td>£{{ paymentTotals.all.brokerCommission|number_format(2, '.', ',') }} ( {{ paymentTotals.all.brokerCommissionPercent |number_format(1, '.', ',')}}% )</td>
     </tr>
+</table>
+<h4>Reward Pot</h4>
+<table class="table table-striped">
+    <tr class="info">
+        <td width="{{ text_width }}">Reward Pot Due To Customers</td>
+        <td>£{{ paymentTotals.potReward.total|number_format(2, '.', ',') }} </td>
+    </tr>
+</table>
+<h4>Rollup</h4>
+<table class="table table-striped">
     <tr>
-        <td>Number of Payments Received</td>
+        <td width="{{ text_width }}">Number of Payments Received</td>
         <td>{{ paymentTotals.judo.numReceived }} Judo + {{ paymentTotals.bacs.numReceived }} Bacs</td>
     </tr>
     <tr>

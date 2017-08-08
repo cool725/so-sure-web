@@ -393,13 +393,13 @@ class AdminController extends BaseController
 
         $templating = $this->get('templating');
         $snappyPdf = $this->get('knp_snappy.pdf');
-        $snappyPdf->setOption('orientation', 'Landscape');
+        $snappyPdf->setOption('orientation', 'Portrait');
         $snappyPdf->setOption('page-size', 'A4');
         $html = $templating->render('AppBundle:Pdf:adminAccounts.html.twig', [
             'year' => $year,
             'month' => $month,
-            'paymentTotals' => $this->getAllPaymentTotals($date),
-            'activePolicies' => $this->getActivePolicies($date),
+            'paymentTotals' => $this->get('app.reporting')->getAllPaymentTotals($this->isProduction(), $date),
+            'activePolicies' => $this->get('app.reporting')->getActivePoliciesCount($date),
         ]);
 
         return new Response(
@@ -410,36 +410,6 @@ class AdminController extends BaseController
                 'Content-Disposition'   => sprintf('attachment; filename="so-sure-%d-%d.pdf"', $year, $month)
             )
         );
-    }
-
-    private function getAllPaymentTotals(\DateTime $date)
-    {
-        $isProd = $this->isProduction();
-        $payments = $this->getPayments($date);
-
-        return [
-            'all' => Payment::sumPayments($payments, $isProd),
-            'judo' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
-            'sosure' => Payment::sumPayments($payments, $isProd, SoSurePayment::class),
-            'bacs' => Payment::sumPayments($payments, $isProd, BacsPayment::class),
-        ];
-    }
-
-    private function getPayments(\DateTime $date)
-    {
-        $dm = $this->getManager();
-        $paymentRepo = $dm->getRepository(Payment::class);
-        $payments = $paymentRepo->getAllPaymentsForExport($date);
-
-        return $payments;
-    }
-
-    private function getActivePolicies($date)
-    {
-        $dm = $this->getManager();
-        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
-
-        return $phonePolicyRepo->countAllActivePoliciesToEndOfMonth($date);
     }
 
     /**
@@ -491,9 +461,9 @@ class AdminController extends BaseController
             'judoForm' => $judoForm->createView(),
             'year' => $year,
             'month' => $month,
-            'paymentTotals' => $this->getAllPaymentTotals($date),
+            'paymentTotals' => $this->get('app.reporting')->getAllPaymentTotals($this->isProduction(), $date),
             // TODO: query will eve
-            'activePolicies' => $this->getActivePolicies($date),
+            'activePolicies' => $this->get('app.reporting')->getActivePoliciesCount($date),
             'files' => $s3FileRepo->getAllFiles($date),
         ];
     }
