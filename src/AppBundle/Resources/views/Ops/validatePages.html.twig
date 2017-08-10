@@ -57,10 +57,17 @@
         <a href="{{ url('user_home') }}?_impersonate={{ unpaid_policy.user.email }}">User Unpaid Page</a> <b>(auto impersonate {{ unpaid_policy.user.email }})</b>
     </li>
     <li>
-        {% if valid_renewal_policy %}
-            <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy.user.email }}">User Renewal - Home Page</a> <b>(auto impersonate {{ valid_renewal_policy.user.email }})</b>
+        {% if valid_renewal_policy_no_pot %}
+            <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_no_pot.user.email }}">User Renewal No Pot - Home Page</a> <b>(auto impersonate {{ valid_renewal_policy_no_pot.user.email }})</b>
         {% else %}
-            No renewal policy available
+            No renewal policy (without pot) available
+        {% endif %}
+    </li>
+    <li>
+        {% if valid_renewal_policy_with_pot %}
+            <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_with_pot.user.email }}">User Renewal With Pot - Home Page</a> <b>(auto impersonate {{ valid_renewal_policy_with_pot.user.email }})</b>
+        {% else %}
+            No renewal policy (with pot) available
         {% endif %}
     </li>
     <li>

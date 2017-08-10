@@ -1,0 +1,84 @@
+<?php
+
+namespace AppBundle\Document\Form;
+
+use AppBundle\Document\PhonePolicy;
+use Symfony\Component\Validator\Constraints as Assert;
+use AppBundle\Validator\Constraints as AppAssert;
+use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\PhoneTrait;
+use AppBundle\Document\Policy;
+use AppBundle\Document\Cashback;
+
+class RenewCashback extends Renew
+{
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\NotNull(message="Account Name is required.")
+     * @Assert\Length(min="2", max="100")
+     */
+    protected $accountName;
+
+    /**
+     * @AppAssert\SortCode()
+     * @Assert\NotNull(message="Sort code is required.")
+     * @Assert\Length(min="6", max="6")
+     */
+    protected $sortCode;
+
+    /**
+     * @AppAssert\BankAccountNumber()
+     * @Assert\NotNull(message="Account Number is required.")
+     * @Assert\Length(min="8", max="8")
+     */
+    protected $accountNumber;
+
+    public function getAccountName()
+    {
+        return $this->accountName;
+    }
+
+    public function setAccountName($accountName)
+    {
+        $this->accountName = $accountName;
+    }
+
+    public function getSortCode()
+    {
+        return $this->sortCode;
+    }
+
+    public function setSortCode($sortCode)
+    {
+        $this->sortCode = $sortCode;
+    }
+
+    public function getAccountNumber()
+    {
+        return $this->accountNumber;
+    }
+
+    public function setAccountNumber($accountNumber)
+    {
+        $this->accountNumber = $accountNumber;
+    }
+
+    public function createCashback()
+    {
+        if ($this->getUsePot()) {
+            throw new \Exception(sprintf('Cashbash should not use pot'));
+        }
+        if ($this->getPolicy()->getPotValue() <= 0) {
+            throw new \Exception('Cashbash required pot with value in it');
+        }
+
+        $cashback = new Cashback();
+        $cashback->setAccountName($this->getAccountName());
+        $cashback->setAccountNumber($this->getAccountNumber());
+        $cashback->setSortCode($this->getSortCode());
+        $this->getPolicy()->setCashback($cashback);
+        $cashback->setStatus(Cashback::STATUS_PENDING_CLAIMABLE);
+
+        return $cashback;
+    }
+}

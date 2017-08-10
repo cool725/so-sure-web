@@ -1,0 +1,112 @@
+{% extends 'base.html.twig' %}
+
+{% set white_logo = true %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets output='css/*.css'
+        'components/owl.carousel/owl.carousel.min.css'
+        'components/owl.carousel/owl.theme.default.min.css'
+        '@AppBundle/Resources/public/sass/page/checkoutNew.scss'
+    '@AppBundle/Resources/public/sass/page/user.scss'%}
+    <link rel="stylesheet" href="{{ asset_url }}"> {% endstylesheets %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    'components/owl.carousel/owl.carousel.min.js'
+    '@AppBundle/Resources/public/js/User/renew.js'
+     %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}
+
+{% block body %}
+  {% include 'AppBundle:User:userNav.html.twig' %}
+    {% if policy.hasNextPolicy and policy.nextPolicy.status == "renewal" %}
+        <section class="user-homepage--content section--pad">
+            <div class="container">
+            <h2>Your policy is scheduled to be renewed</h2>
+            {% if policy.hasCashback %}
+                <h2>Your cashback request was received and will be processed 28-45 days after your policy has ended.</h2>
+            {% endif %}
+            </div>
+        </section>
+    {% elseif policy.hasCashback %}
+        <section class="user-homepage--content section--pad">
+            <div class="container">
+            <h2>Your cashback request was received and will be processed 28-45 days after your policy has ended.</h2>
+            </div>
+        </section>
+    {% else %}
+
+    <section class="user-homepage--content section--pad">
+        <div class="container text-center">
+        <h2>
+            Renew your {{ policy.phone.make }} {{ policy.phone.model }} {% if policy.phone.memory %}{{ policy.phone.memory }}GB{% endif %} insurance
+            <br />
+            {% if policy.getPremiumPlan == 'monthly' %}
+                for just £{{ renew.getAdjustedStandardMonthlyPremiumPrice }} a month
+            {% else %}
+                for just £{{ renew.getAdjustedYearlyPremiumPrice }} a year
+            {% endif %}
+        </h2>
+        {% if policy.potValue > 0 %}
+            {% if policy.getPremiumPlan == 'monthly' %}
+                <p>(£{{ renew.getMonthlyPremiumPrice }}/month without your £{{ policy.potValue }} reward pot)</p>
+            {% else %}
+                <p>(£{{ renew.getYearlyPremiumPrice }}/year without your £{{ policy.potValue }} reward pot)</p>
+            {% endif %}
+        {% endif %}
+        <h3>and keep covered against:</h3>
+
+        <div class="row">
+            <div class="col-md-3">
+                <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-water-damage.svg" alt="Accidental Damage" title="Accidental damage">
+                <h5>Water damage</h5>
+            </div>
+            <div class="col-md-3">
+                <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-cracked-screen.svg" alt="Cracked screen" title="Cracked screen">
+                <h5>Cracked screen</h5>
+            </div>
+            <div class="col-md-3">
+                <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-loss.svg" alt="Loss" title="Loss">
+                <h5>Loss</h5>
+            </div>
+            <div class="col-md-3">
+                <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-theft.svg" alt="Theft" title="Theft">
+                <h5>Theft</h5>
+            </div>
+        </div>
+        
+        {% block actions %}
+        {% endblock %}
+
+        </div>
+    </section>
+    {% endif %}
+
+    {% block modals %}
+    {% endblock %}
+<div class="modal modal-fullscreen fade"
+     id="policy-modal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="So-Sure Policy Terms"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <i class="fa fa-times fa-lg" aria-hidden="true"></i>
+                    <span class="sr-only">Close</span>
+                </button>
+                <h3>So-Sure Policy Terms</h3>
+            </div>
+            <div class="modal-body modal-policy">
+                {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot })) }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -112,12 +112,24 @@ class OpsController extends BaseController
                 break;
             }
         }
-        foreach ($validPolicies as $validRenwalPolicy) {
-            $user = $validRenwalPolicy->getUser();
-            if ($user->canRenewPolicy() && $validRenwalPolicy->isInRenewalTimeframe()) {
+        foreach ($validPolicies as $validRenwalPolicyNoPot) {
+            $user = $validRenwalPolicyNoPot->getUser();
+            if ($user->canRenewPolicy() && $validRenwalPolicyNoPot->isInRenewalTimeframe() &&
+                $validRenwalPolicyNoPot->getPotValue() == 0 && !$validRenwalPolicyNoPot->isRenewed() &&
+                !$validRenwalPolicyNoPot->hasCashback()) {
                 break;
             } else {
-                $validRenwalPolicy = null;
+                $validRenwalPolicyNoPot = null;
+            }
+        }
+        foreach ($validPolicies as $validRenwalPolicyWithPot) {
+            $user = $validRenwalPolicyWithPot->getUser();
+            if ($user->canRenewPolicy() && $validRenwalPolicyWithPot->isInRenewalTimeframe() &&
+                $validRenwalPolicyWithPot->getPotValue() > 0 && !$validRenwalPolicyWithPot->isRenewed() &&
+                !$validRenwalPolicyWithPot->hasCashback()) {
+                break;
+            } else {
+                $validRenwalPolicyWithPot = null;
             }
         }
         foreach ($validPolicies as $validRemainderPolicy) {
@@ -144,7 +156,8 @@ class OpsController extends BaseController
             'valid_policy' => $validPolicy,
             'cancelled_policy' => $cancelledPolicy,
             'valid_multiple_policy' => $validMultiplePolicy,
-            'valid_renewal_policy' => $validRenwalPolicy,
+            'valid_renewal_policy_no_pot' => $validRenwalPolicyNoPot,
+            'valid_renewal_policy_with_pot' => $validRenwalPolicyWithPot,
             'valid_remainder_policy' => $validRemainderPolicy,
             'claimed_policy' => $claimedPolicy,
             'expired_policy' => $expiredPolicy,

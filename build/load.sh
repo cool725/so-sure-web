@@ -1,15 +1,20 @@
 #!/bin/bash
+set -e
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR/..
 
 ENV="vagrant"
-while getopts "e:h" opt; do
+PREFIX=""
+while getopts "p:e:h" opt; do
   case $opt in
     e)
       ENV=$OPTARG
       ;;
+    p)
+      PREFIX=$OPTARG
+      ;;
     h)
-      echo "Usage: $0 [-e environment=$ENV]"
+      echo "Usage: $0 [-e environment=$ENV] [-p prefix - update policy status]"
       ;;
   esac
 done
@@ -28,3 +33,11 @@ sudo app/console --env=$ENV doctrine:mongodb:fixtures:load --no-interaction --fi
 sudo app/console --env=$ENV doctrine:mongodb:fixtures:load --no-interaction --fixtures=src/AppBundle/DataFixtures/MongoDB/b --append
 sudo app/console --env=$ENV doctrine:mongodb:fixtures:load --no-interaction --fixtures=src/AppBundle/DataFixtures/MongoDB/c --append
 sudo app/console --env=$ENV doctrine:mongodb:fixtures:load --no-interaction --fixtures=src/AppBundle/DataFixtures/MongoDB/d --append
+if [ "$PREFIX" != "" ]; then
+  sudo app/console --env=$ENV sosure:policy:update-status --prefix $PREFIX
+fi
+
+for feature in "renewal"
+do
+  sudo app/console --env=$ENV sosure:feature $feature true
+done

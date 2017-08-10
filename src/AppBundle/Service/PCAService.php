@@ -120,6 +120,16 @@ class PCAService
         $this->redis->hset(self::REDIS_POSTCODE_KEY, $postcode, 1);
     }
 
+    public function validateSortCode($sortCode)
+    {
+        return true;
+    }
+
+    public function validateAccountNumber($accountNumber)
+    {
+        return true;
+    }
+
     /**
      * Use the free find service to ensure that the postcode is valid
      *

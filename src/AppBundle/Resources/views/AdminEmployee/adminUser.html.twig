@@ -85,6 +85,8 @@
                                 <a href="{{ path('admin_policy', {'id': policy.id }) }}">
                                     {{ policy.policyNumber }}
                                 </a> ({{ policy.status }})
+                            {% elseif policy.status == 'pending-renewal' %}
+                                <a href="{{ path('admin_policy', {'id': policy.id }) }}">{{ policy.id }}</a> (Pending Renwal)
                             {% else %}
                                 <a href="{{ path('admin_policy', {'id': policy.id }) }}">{{ policy.id }} (In progress)</a>
                             {% endif %}
