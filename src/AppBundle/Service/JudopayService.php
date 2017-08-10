@@ -769,7 +769,9 @@ class JudopayService
                 $withinFirstProblemTimeframe = $days < 23;
             }
             if ($this->featureService->isEnabled(Feature::FEATURE_PAYMENT_PROBLEM_INTERCOM)) {
-                if ($failedPayments >= 2 && !$firstProblem) {
+                // We need the user to only enter the campaign on the 2nd failure as otherwise
+                // the timing will be completely off
+                if ($failedPayments == 2 && !$firstProblem) {
                     $paymentMethod->setFirstProblem($date);
                     $this->dm->flush(null, array('w' => 'majority', 'j' => true));
                     if ($this->dispatcher) {
