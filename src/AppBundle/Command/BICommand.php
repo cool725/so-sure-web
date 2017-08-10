@@ -10,6 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
+use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Classes\SoSure;
 
@@ -53,16 +54,39 @@ class BICommand extends ContainerAwareCommand
             '"Policy Start Date"',
             '"FNOL"',
             '"Postcode"',
+            '"Claim Type"',
+            '"Claim Location"',
+            '"Policy Cancellation Date"',
+            '"Policy Cancellation Type"',
+            '"Policy Connections"',
+            '"Claim Suspected Fraud"',
+            '"Policy upgraded"',
+            '"Age of Policy Holder"',
         ]);
         foreach ($claims as $claim) {
+            $policy = $claim->getPolicy();
+            $user = $policy->getUser();
             $lines[] = implode(',', [
-                sprintf('"%s"', $claim->getPolicy()->getPolicyNumber()),
-                sprintf('"%s"', $claim->getPolicy()->getStart()->format('Y-m-d H:i:s')),
+                sprintf('"%s"', $policy->getPolicyNumber()),
+                sprintf('"%s"', $policy->getStart()->format('Y-m-d H:i:s')),
                 sprintf(
                     '"%s"',
                     $claim->getNotificationDate() ? $claim->getNotificationDate()->format('Y-m-d H:i:s') : ""
                 ),
-                sprintf('"%s"', $claim->getPolicy()->getUser()->getBillingAddress()->getPostcode()),
+                sprintf('"%s"', $user->getBillingAddress()->getPostcode()),
+                sprintf('"%s"', $claim->getType()),
+                sprintf('"%s"', $claim->getLocation()),
+                sprintf('"%s"', $policy->getCancelledReason() ? $policy->getEnd()->format('Y-m-d H:i:s') : ""),
+                sprintf('"%s"', $policy->getCancelledReason() ? $policy->getCancelledReason() : ""),
+                sprintf('"%s"', count($policy->getStandardConnections())),
+                sprintf('"%s"', $claim->getSuspectedFraud() ? 'yes' : 'no'),
+                sprintf(
+                    '"%s"',
+                    $policy->getCancelledReason() && $policy->getCancelledReason() == Policy::CANCELLED_UPGRADE ?
+                        'yes' :
+                        'no'
+                ),
+                sprintf('"%d"', $user->getAge()),
             ]);
         }
         $this->uploadS3(implode(PHP_EOL, $lines), 'claims.csv');
@@ -88,14 +112,14 @@ class BICommand extends ContainerAwareCommand
         foreach ($policies as $policy) {
             $user = $policy->getUser();
             $lines[] = implode(',', [
-               sprintf('"%s"', $policy->getPolicyNumber()),
-               sprintf('"%d"', $user->getAge()),
-               sprintf('"%s"', $user->getBillingAddress()->getPostcode()),
-               sprintf('"%s"', $policy->getStart()->format('Y-m-d')),
-               sprintf('"%s"', $policy->getEnd()->format('Y-m-d')),
-               sprintf('"%s"', $policy->getStatus()),
-               sprintf('"%s"', $user->getId()),
-               sprintf('"%s"', $policy->getCancelledReason() ? $policy->getCancelledReason() : null),
+                sprintf('"%s"', $policy->getPolicyNumber()),
+                sprintf('"%d"', $user->getAge()),
+                sprintf('"%s"', $user->getBillingAddress()->getPostcode()),
+                sprintf('"%s"', $policy->getStart()->format('Y-m-d')),
+                sprintf('"%s"', $policy->getEnd()->format('Y-m-d')),
+                sprintf('"%s"', $policy->getStatus()),
+                sprintf('"%s"', $user->getId()),
+                sprintf('"%s"', $policy->getCancelledReason() ? $policy->getCancelledReason() : null),
             ]);
         }
         $this->uploadS3(implode(PHP_EOL, $lines), 'policies.csv');
@@ -122,7 +146,7 @@ class BICommand extends ContainerAwareCommand
     {
         $tmpFile = sprintf('%s/%s', sys_get_temp_dir(), $filename);
         file_put_contents($tmpFile, $data);
-        $s3Key = sprintf('%s/quicksight/%s', $this->getEnvironment(), $filename);
+        $s3Key = sprintf('%s/bi/%s', $this->getEnvironment(), $filename);
 
         $result = $this->getS3()->putObject(array(
             'Bucket' => 'admin.so-sure.com',
