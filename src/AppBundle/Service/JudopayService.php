@@ -761,7 +761,7 @@ class JudopayService
             // So, we want to use Intercom but only if its the first time that's been used
             $paymentMethod = $policy->getUser()->getPaymentMethod();
             $withinFirstProblemTimeframe = false;
-            if ($firstProblem = $paymentMethod->getFirstProblem()) {
+            if ($paymentMethod && $firstProblem = $paymentMethod->getFirstProblem()) {
                 $diff = $date->diff($firstProblem);
                 $days = $diff->days;
                 // 30 - 7 = 23 days - firstProblem is recorded 7 days into problem (failedPayments >= 2)
