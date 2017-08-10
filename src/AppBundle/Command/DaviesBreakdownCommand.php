@@ -8,6 +8,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
+use AppBundle\Classes\DaviesClaim;
 use AppBundle\Document\Charge;
 use AppBundle\Document\Invoice;
 use AppBundle\Document\InvoiceItem;
@@ -29,7 +30,6 @@ class DaviesBreakdownCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $emailAddresses = ['patrick@so-sure.com','laura.harvey@davies-group.com','dylan@so-sure.com'];
         $now = new \DateTime();
         $filename = sprintf("so-sure-policy-breakdown-%s.pdf", $now->format('Y-m-d'));
         $tmpFile = sprintf(
@@ -47,7 +47,7 @@ class DaviesBreakdownCommand extends ContainerAwareCommand
         $mailer = $this->getContainer()->get('app.mailer');
         $mailer->sendTemplate(
             sprintf('so-sure Policy Breakdown Report'),
-            $emailAddresses,
+            DaviesClaim::$breakdownEmailAddresses,
             'AppBundle:Email:davies/breakdown.html.twig',
             [],
             null,

@@ -8,6 +8,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
+use AppBundle\Classes\DaviesClaim;
 use AppBundle\Document\Charge;
 use AppBundle\Document\Invoice;
 use AppBundle\Document\InvoiceItem;
@@ -50,12 +51,7 @@ class DaviesInvoiceCommand extends ContainerAwareCommand
         }
 
         $skipEmail = true === $input->getOption('skip-email');
-        $emailAddress = [
-            'accounts.payable@davies-group.com',
-            'laura.harvey@davies-group.com',
-            'patrick@so-sure.com',
-            'dylan@so-sure.com'
-        ];
+        $emailAddress = DaviesClaim::$invoiceEmailAddresses;
         if ($skipEmail) {
             $emailAddress = null;
         }

@@ -47,6 +47,21 @@ class DaviesClaim extends DaviesExcel
     const TYPE_WARRANTY = 'Warranty';
     const TYPE_EXTENDED_WARRANTY = 'Extended Warranty';
 
+    public static $breakdownEmailAddresses = [
+        'laura.harvey@davies-group.com',
+        'Louisa.Luxton@davies-group.com',
+        'patrick@so-sure.com',
+        'dylan@so-sure.com',
+    ];
+
+    public static $invoiceEmailAddresses = [
+        'accounts.payable@davies-group.com',
+        'laura.harvey@davies-group.com',
+        'Louisa.Luxton@davies-group.com',
+        'patrick@so-sure.com',
+        'dylan@so-sure.com',
+    ];
+
     public static $sheetNames = [
         self::SHEET_NAME_V7,
         self::SHEET_NAME_V1
