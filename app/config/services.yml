@@ -363,6 +363,7 @@ services:
             address:              "@app.address"
             imeiValidator:        "@app.imei"
             rateLimit:            "@app.ratelimit"
+            intercom:             "@app.intercom"
 
     app.invoice:
         class: AppBundle\Service\InvoiceService

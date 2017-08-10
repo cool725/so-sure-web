@@ -91,6 +91,8 @@ class PolicyService
 
     protected $rateLimit;
 
+    protected $intercom;
+
     protected $warnMakeModelMismatch = true;
 
     public function setMailer($mailer)
@@ -139,6 +141,7 @@ class PolicyService
      * @param                  $address
      * @param                  $imeiValidator
      * @param                  $rateLimit
+     * @param                  $intercom
      */
     public function __construct(
         DocumentManager $dm,
@@ -158,7 +161,8 @@ class PolicyService
         $branch,
         $address,
         $imeiValidator,
-        $rateLimit
+        $rateLimit,
+        $intercom
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -178,6 +182,7 @@ class PolicyService
         $this->address = $address;
         $this->imeiValidator = $imeiValidator;
         $this->rateLimit = $rateLimit;
+        $this->intercom = $intercom;
     }
 
     private function validateUser($user)
@@ -1408,5 +1413,30 @@ class PolicyService
         }
 
         return $newPolicy;
+    }
+
+    public function billingDay(Policy $policy, $day)
+    {
+        // @codingStandardsIgnoreStart
+        $body = sprintf(
+            "Policy: <a href='%s'>%s/%s</a> has requested a billing date change to the %d. Verify policy id match in system.",
+            $this->router->generate(
+                'admin_policy',
+                ['id' => $policy->getId()],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            ),
+            $policy->getPolicyNumber(),
+            $policy->getId(),
+            $day
+        );
+        // @codingStandardsIgnoreEnd
+
+        $subject = sprintf(
+            'Billing day change request from %s',
+            $policy->getPolicyNumber()
+        );
+        $this->mailer->send($subject, 'contact-us@wearesosure.com', $body);
+
+        $this->intercom->queueMessage($policy->getUser()->getEmail(), $body);
     }
 }

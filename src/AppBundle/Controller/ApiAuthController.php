@@ -516,6 +516,48 @@ class ApiAuthController extends BaseController
     }
 
     /**
+     * @Route("/policy/{id}/billing-day", name="api_auth_billing_day")
+     * @Method({"POST"})
+     */
+    public function billingDayAction(Request $request, $id)
+    {
+        try {
+            $data = json_decode($request->getContent(), true)['body'];
+            if (!$this->validateFields($data, ['billing_day'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(Policy::class);
+            $policy = $repo->find($id);
+            if (!$policy) {
+                throw new NotFoundHttpException();
+            }
+            $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+
+            $day = $data['billing_day'];
+            if ($day < 1 || $day > 28) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_INVALD_DATA_FORMAT,
+                    'Billing day must be 1-28',
+                    422
+                );
+            }
+
+            $policyService = $this->get('app.policy');
+            $policyService->billingDay($policy, $day);
+
+            return new JsonResponse($policy->toApiArray());
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api billingDayAction.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
      * @Route("/policy/{id}/connect", name="api_auth_new_connection")
      * @Method({"POST"})
      */

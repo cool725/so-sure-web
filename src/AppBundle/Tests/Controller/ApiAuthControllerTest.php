@@ -1361,6 +1361,45 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(403);
     }
 
+    // policy/{id}/billing-day
+
+    /**
+     *
+     */
+    public function testBillingDay()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testBillingDay', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+        $url = sprintf("/api/v1/auth/policy/%s/billing-day", $policyData['id']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+        ]);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'billing_day' => '0',
+        ]);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'billing_day' => '29',
+        ]);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'billing_day' => '9',
+        ]);
+        $data = $this->verifyResponse(200);
+    }
+
     // policy/{id}/connect
 
     /**
