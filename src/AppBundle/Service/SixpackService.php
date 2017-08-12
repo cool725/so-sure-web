@@ -21,6 +21,7 @@ class SixpackService
     // const EXPERIMENT_QUOTE_SLIDER = 'quote-slider';
     const EXPERIMENT_PYG_HOME= 'pyg-or-home';
     const EXPERIMENT_QUOTE_SIMPLE_COMPLEX_SPLIT = 'quote-simple-complex-split';
+    const EXPERIMENT_CPC_MANUFACTURER_HOME = 'cpc-manufacturer-or-home';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_SHARE_MESSAGE_ORIGINAL = 'original';
