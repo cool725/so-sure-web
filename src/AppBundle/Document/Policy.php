@@ -203,6 +203,12 @@ abstract class Policy
     protected $policyTerms;
 
     /**
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Cashback")
+     * @Gedmo\Versioned
+     */
+    protected $cashback;
+
+    /**
      * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Connection\Connection", cascade={"persist"})
      */
     protected $connections = array();
@@ -501,6 +507,22 @@ abstract class Policy
         return array_filter($this->getSuccessfulPayments(), function ($payment) {
             return $payment->getAmount() <= 0 && !$payment instanceof SoSurePayment;
         });
+    }
+
+    public function getCashback()
+    {
+        return $this->cashback;
+    }
+
+    public function hasCashback()
+    {
+        return $this->getCashback() !== null;
+    }
+
+    public function setCashback($cashback)
+    {
+        $this->cashback = $cashback;
+        $cashback->setPolicy($this);
     }
 
     public function getUser()
@@ -2420,7 +2442,20 @@ abstract class Policy
             $reward->setAmount(0 - $this->getPotValue());
             $this->addPayment($reward);
 
-            if ($this->getNextPolicy() && $this->getNextPolicy()->getPremium()->hasAnnualDiscount()) {
+            // We can't give cashback + give a discount on the next year's policy as that would be
+            // discounting twice - should never occur
+            if ($this->hasCashback() && $this->getNextPolicy() &&
+                $this->getNextPolicy()->getPremium()->hasAnnualDiscount()) {
+                throw new \Exception(sprintf(
+                    'Cashback was requested, yet there is a discount on the next policy. %s',
+                    $this->getId()
+                ));
+            }
+
+            if ($this->hasCashback()) {
+                $this->getCashback()->setStatus(Cashback::STATUS_PENDING_PAYMENT);
+                $this->getCashback()->setAmount($this->getPotValue());
+            } elseif ($this->getNextPolicy() && $this->getNextPolicy()->getPremium()->hasAnnualDiscount()) {
                 $discount = new PolicyDiscountPayment();
                 $discount->setAmount($this->getPotValue());
                 $this->addPayment($discount);
@@ -2428,6 +2463,19 @@ abstract class Policy
                 $discount = new PolicyDiscountPayment();
                 $discount->setAmount($this->getPotValue());
                 $this->getNextPolicy()->addPayment($discount);
+            } else {
+                // No cashback requested but also no renewal
+                // so money was in the pot but user has completely ignored
+                // create a cashback entry and try to find the user
+                $cashback = new Cashback();
+                $cashback->setStatus(Cashback::STATUS_FAILED);
+                $cashback->setAmount($this->getPotValue());
+                $this->setCashback($cashback);
+            }
+        } else {
+            if ($this->hasCashback()) {
+                // If there's no money in the pot, then someone has claimed - so cashback is rejected
+                $this->getCashback()->setStatus(Cashback::STATUS_CLAIMED);
             }
         }
     }

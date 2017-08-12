@@ -1259,6 +1259,7 @@ class PolicyService
     {
         $policy->fullyExpire($date);
         $this->dm->flush();
+        // TODO: if cashback is present, then notify user about status
     }
 
     /**

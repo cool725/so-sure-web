@@ -7,6 +7,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\PhoneTrait;
+use AppBundle\Document\Policy;
+use AppBundle\Document\Cashback;
 
 class Renew
 {
@@ -43,7 +45,7 @@ class Renew
     protected $numPayments;
 
     protected $usePot;
-    
+
     public function getPolicy()
     {
         return $this->policy;
@@ -64,31 +66,84 @@ class Renew
         return $this->encodedAmount;
     }
 
+    public function getMonthlyPremiumPrice()
+    {
+        // TODO: Current Price or new policy price? Depends on IPT
+        $price = $this->getPolicy()->getPhone()->getCurrentPhonePrice();
+        return $price->getMonthlyPremiumPrice();
+    }
+
+    public function getYearlyPremiumPrice()
+    {
+        // TODO: Current Price or new policy price? Depends on IPT
+        $price = $this->getPolicy()->getPhone()->getCurrentPhonePrice();
+        return $price->getYearlyPremiumPrice();
+    }
+
+    public function getAdjustedStandardMonthlyPremiumPrice()
+    {
+        $potValue = $this->getPolicy()->getPotValue();
+        // TODO: Current Price or new policy price? Depends on IPT
+        $price = $this->getPolicy()->getPhone()->getCurrentPhonePrice();
+
+        return $price->getAdjustedStandardMonthlyPremiumPrice($potValue);
+    }
+
+    public function getAdjustedYearlyPremiumPrice()
+    {
+        $potValue = $this->getPolicy()->getPotValue();
+        // TODO: Current Price or new policy price? Depends on IPT
+        $price = $this->getPolicy()->getPhone()->getCurrentPhonePrice();
+
+        return $price->getAdjustedYearlyPremiumPrice($potValue);
+    }
+
+    public function useSimpleAmount()
+    {
+        if ($this->getPolicy()->getPremiumPlan() == Policy::PLAN_MONTHLY) {
+            $this->setEncodedAmount(implode("|", [$this->getAdjustedStandardMonthlyPremiumPrice(), 12, 1]));
+        } elseif ($this->getPolicy()->getPremiumPlan() == Policy::PLAN_YEARLY) {
+            $this->setEncodedAmount(implode("|", [$this->getAdjustedYearlyPremiumPrice(), 1, 1]));
+        }
+    }
+
     public function setEncodedAmount($encodedAmount)
     {
         $data = explode("|", $encodedAmount);
         $amount = $data[0];
         $numPayments = $data[1];
-        $usePot = $data[2];
+        $usePot = filter_var($data[2], FILTER_VALIDATE_BOOLEAN);
 
+        $potValue = $this->getPolicy()->getPotValue();
         // TODO: allow discounted price as well
+        // TODO: Current Price or new policy price? Depends on IPT
         $price = $this->getPolicy()->getPhone()->getCurrentPhonePrice();
         $monthlyPrice = $price->getMonthlyPremiumPrice();
-        $potValue = $this->getPolicy()->getPotValue();
         $monthlyInitialAdjustedPrice = $price->getAdjustedInitialMonthlyPremiumPrice($potValue);
         $monthlyStandardAdjustedPrice = $price->getAdjustedStandardMonthlyPremiumPrice($potValue);
         $yearlyPrice = $price->getYearlyPremiumPrice();
         $yearlyAdjustedPrice = $price->getAdjustedYearlyPremiumPrice($potValue);
 
-        if (!$this->isCustom() &&
+        if ($usePot &&
             !$this->areEqualToTwoDp($amount, $monthlyInitialAdjustedPrice) &&
             !$this->areEqualToTwoDp($amount, $monthlyStandardAdjustedPrice) &&
             !$this->areEqualToTwoDp($amount, $yearlyAdjustedPrice)) {
-            throw new \InvalidArgumentException(sprintf('Amount must be a monthly or annual figure'));
-        } elseif ($this->isCustom() &&
+            throw new \InvalidArgumentException(sprintf(
+                'Amount must be a monthly or annual figure. Not %f. Expected: [%f, %f, %f]',
+                $amount,
+                $monthlyInitialAdjustedPrice,
+                $monthlyStandardAdjustedPrice,
+                $yearlyAdjustedPrice
+            ));
+        } elseif (!$usePot &&
             !$this->areEqualToTwoDp($amount, $monthlyPrice) &&
             !$this->areEqualToTwoDp($amount, $yearlyPrice)) {
-            throw new \InvalidArgumentException(sprintf('Amount must be a monthly or annual figure'));
+            throw new \InvalidArgumentException(sprintf(
+                'Amount must be a monthly or annual figure. Not %f. Expected: [%f, %f]',
+                $amount,
+                $monthlyPrice,
+                $yearlyPrice
+            ));
         }
 
         $this->encodedAmount = $encodedAmount;

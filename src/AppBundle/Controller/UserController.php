@@ -13,14 +13,18 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\SCode;
+use AppBundle\Document\Cashback;
 use AppBundle\Document\Feature;
 use AppBundle\Document\Form\Renew;
+use AppBundle\Document\Form\RenewCashback;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\EmailInvitationType;
 use AppBundle\Form\Type\UserEmailType;
 use AppBundle\Form\Type\SCodeInvitationType;
 use AppBundle\Form\Type\InvitationType;
 use AppBundle\Form\Type\RenewType;
+use AppBundle\Form\Type\RenewCashbackType;
+use AppBundle\Form\Type\CashbackType;
 use AppBundle\Form\Type\SentInvitationType;
 use AppBundle\Form\Type\UnconnectedUserPolicyType;
 use AppBundle\Document\Invitation\EmailInvitation;
@@ -37,9 +41,11 @@ use AppBundle\Security\PolicyVoter;
 
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Facebook\Facebook;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use AppBundle\Exception\DuplicateInvitationException;
+use AppBundle\Exception\ValidationException;
 
 /**
  * @Route("/user")
@@ -376,7 +382,6 @@ class UserController extends BaseController
 
     /**
      * @Route("/renew/{id}", name="user_renew_policy")
-     * @Route("/renew/{id}/custom", name="user_renew_custom_policy")
      * @Template
      */
     public function renewPolicyAction(Request $request, $id)
@@ -389,13 +394,11 @@ class UserController extends BaseController
         // TODO: Determine if policy is the old policy or an unpaid renewal
         $renew = new Renew();
         $renew->setPolicy($policy);
-        if ($request->get('_route') == 'user_renew_custom_policy') {
-            $renew->setCustom(true);
-        }
+        $renew->useSimpleAmount();
         $renewForm = $this->get('form.factory')
-            ->createNamedBuilder('renew_form', RenewType::class, $renew)
+            ->createNamedBuilder('renew_form')
+            ->add('renew', SubmitType::class)
             ->getForm();
-        $webpay = null;
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('renew_form')) {
                 $renewForm->handleRequest($request);
@@ -412,20 +415,172 @@ class UserController extends BaseController
                     return new RedirectResponse(
                         $this->generateUrl('user_policy', ['policyId' => $renewalPolicy->getId()])
                     );
+                } else {
+                    $this->addFlash(
+                        'error',
+                        sprintf(
+                            "Sorry, there's a problem renewing your policy. Please try again or contact us. %s",
+                            $renewForm->getErrors()
+                        )
+                    );
+                    return new RedirectResponse(
+                        $this->generateUrl('user_renew_policy', ['id' => $id])
+                    );
                 }
             }
         }
 
-        return array(
+        return [
             'policy' => $policy,
             'phone' => $policy->getPhone(),
             'policy_key' => $this->getParameter('policy_key'),
             'renew_form' => $renewForm->createView(),
             'is_postback' => 'POST' === $request->getMethod(),
-            'webpay_action' => $webpay ? $webpay['post_url'] : null,
-            'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
-            'custom' => $renew->isCustom(),
-        );
+            'renew' => $renew,
+        ];
+    }
+
+    /**
+     * @Route("/renew/{id}/custom", name="user_renew_custom_policy")
+     * @Template
+     */
+    public function renewPolicyCustomAction(Request $request, $id)
+    {
+        $dm = $this->getManager();
+        $policyRepo = $dm->getRepository(Policy::class);
+        $policy = $policyRepo->find($id);
+        $this->denyAccessUnlessGranted(PolicyVoter::RENEW, $policy);
+
+        // TODO: Determine if policy is the old policy or an unpaid renewal
+        $renew = new Renew();
+        $renew->setPolicy($policy);
+        $renew->setCustom(true);
+        $renewForm = $this->get('form.factory')
+            ->createNamedBuilder('renew_form', RenewType::class, $renew)
+            ->getForm();
+        $renewCashback = new RenewCashback();
+        $renewCashback->setPolicy($policy);
+        $renewCashback->setCustom(true);
+        $renewCashbackForm = $this->get('form.factory')
+            ->createNamedBuilder('renew_cashback_form', RenewCashbackType::class, $renewCashback)
+            ->getForm();
+        $cashback = new Cashback();
+        $cashback->setPolicy($policy);
+        $cashback->setStatus(Cashback::STATUS_PENDING_CLAIMABLE);
+        $cashbackForm = $this->get('form.factory')
+            ->createNamedBuilder('cashback_form', CashbackType::class, $cashback)
+            ->getForm();
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('renew_form')) {
+                $renewForm->handleRequest($request);
+                if ($renewForm->isValid()) {
+                    // TODO: If old policy
+                    $policyService = $this->get('app.policy');
+                    $renewalPolicy = $policyService->renew($policy, $renew->getNumPayments(), $renew->getUsePot());
+                    $message = sprintf(
+                        'Thanks. Your policy is now scheduled to be renewed on %s',
+                        $renewalPolicy->getStart()->format('d M Y')
+                    );
+                    $this->addFlash('success', $message);
+
+                    return new RedirectResponse(
+                        $this->generateUrl('user_policy', ['policyId' => $renewalPolicy->getId()])
+                    );
+                } else {
+                    $this->addFlash(
+                        'error',
+                        sprintf(
+                            "Sorry, there's a problem renewing your policy. Please try again or contact us. %s",
+                            $renewForm->getErrors()
+                        )
+                    );
+                }
+            } elseif ($request->request->has('renew_cashback_form')) {
+                $renewCashbackForm->handleRequest($request);
+                try {
+                    if ($renewCashbackForm->isValid()) {
+                        $cashbackFromRenewal = $renewCashback->createCashback();
+                        $this->validateObject($cashbackFromRenewal);
+                        $dm->persist($cashbackFromRenewal);
+
+                        // TODO: If old policy
+                        $policyService = $this->get('app.policy');
+                        $renewalPolicy = $policyService->renew(
+                            $policy,
+                            $renewCashback->getNumPayments(),
+                            $renewCashback->getUsePot()
+                        );
+                        $message = sprintf(
+                            'Thanks. Your policy is now scheduled to be renewed on %s',
+                            $renewalPolicy->getStart()->format('d M Y')
+                        );
+                        $this->addFlash('success', $message);
+
+                        return new RedirectResponse(
+                            $this->generateUrl('user_policy', ['policyId' => $renewalPolicy->getId()])
+                        );
+                    } else {
+                        $this->addFlash(
+                            'error',
+                            sprintf(
+                                "Sorry, there's a problem renewing your policy. Please try again or contact us. %s",
+                                $renewCashbackForm->getErrors()
+                            )
+                        );
+                    }
+                } catch (ValidationException $e) {
+                    /*
+                    $this->addFlash(
+                        'error',
+                        sprintf(
+                            "Sorry, there's a problem renewing your policy. Please try again or contact us. %s",
+                            $e->getMessage()
+                        )
+                    );
+                    */
+                    $this->addFlash(
+                        'error',
+                        sprintf(
+                            "Sorry, there's a problem renewing your policy. Please try again or contact us."
+                        )
+                    );
+                }
+            } elseif ($request->request->has('cashback_form')) {
+                $cashbackForm->handleRequest($request);
+                if ($cashbackForm->isValid()) {
+                    $policy->setCashback($cashback);
+                    $dm->persist($cashback);
+                    $dm->flush();
+                    $message = sprintf(
+                        'Your request for cashback has been accepted.'
+                    );
+                    $this->addFlash('success', $message);
+
+                    return new RedirectResponse(
+                        $this->generateUrl('user_renew_custom_policy', ['id' => $id])
+                    );
+                } else {
+                    $this->addFlash(
+                        'error',
+                        sprintf(
+                            "Sorry, there's a problem requesting cashback. Please try again or contact us. %s",
+                            $cashbackForm->getErrors()
+                        )
+                    );
+                }
+            }
+        }
+
+        return [
+            'policy' => $policy,
+            'phone' => $policy->getPhone(),
+            'policy_key' => $this->getParameter('policy_key'),
+            'renew_form' => $renewForm->createView(),
+            'renew_cashback_form' => $renewCashbackForm->createView(),
+            'cashback_form' => $cashbackForm->createView(),
+            'is_postback' => 'POST' === $request->getMethod(),
+            'renew' => $renew,
+        ];
     }
 
     /**

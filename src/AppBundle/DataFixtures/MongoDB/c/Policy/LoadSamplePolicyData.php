@@ -65,7 +65,16 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         foreach ($expUsers as $user) {
             $this->newPolicy($manager, $user, $count, null, null, null, null, null, true, false);
+            $user->setEnabled(true);
             $count++;
+        }
+        $manager->flush();
+
+        foreach ($expUsers as $user) {
+            $rand = rand(0, 1);
+            if ($rand == 0) {
+                $this->addConnections($manager, $user, $expUsers);
+            }
         }
 
         // Sample user for apple

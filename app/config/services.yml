@@ -754,8 +754,14 @@ services:
         tags:
             - { name: form.type }
 
-    app.form.type.renew:
-        class: AppBundle\Form\Type\RenewType
+    app.form.type.renewcashback:
+        class: AppBundle\Form\Type\RenewCashbackType
+        arguments: ["@request_stack", "%form_required%"]
+        tags:
+            - { name: form.type }
+
+    app.form.type.cashback:
+        class: AppBundle\Form\Type\CashbackType
         arguments: ["@request_stack", "%form_required%"]
         tags:
             - { name: form.type }
@@ -835,6 +841,18 @@ services:
 
     app.validator.postcode:
         class: AppBundle\Validator\Constraints\PostcodeValidator
+        arguments: ["@app.address"]
+        tags:
+            - { name: validator.constraint_validator }
+
+    app.validator.sortcode:
+        class: AppBundle\Validator\Constraints\SortCodeValidator
+        arguments: ["@app.address"]
+        tags:
+            - { name: validator.constraint_validator }
+
+    app.validator.bankaccountnumber:
+        class: AppBundle\Validator\Constraints\BankAccountNumberValidator
         arguments: ["@app.address"]
         tags:
             - { name: validator.constraint_validator }

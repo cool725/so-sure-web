@@ -1,107 +1,46 @@
-{% extends 'base.html.twig' %}
+{% extends 'AppBundle:User:baseRenewPolicy.html.twig' %}
 
-{% set white_logo = true %}
-
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-    '@AppBundle/Resources/public/sass/page/checkout.scss'
-    '@AppBundle/Resources/public/sass/page/user.scss'%}
-    <link rel="stylesheet" href="{{ asset_url }}"> {% endstylesheets %}
+{% block actions %}
+    <div class="checkout--phone-indent">
+        <div class="form-group form-footer">
+            <div class="row">
+                <div class="col-xs-6 col-sm-6 col-md-6">
+                    <a href="#" class="btn btn-success" data-toggle="modal" data-target="#renewModal">Renew my policy</a>
+                </div>
+                <div class="col-xs-6 col-sm-6 col-md-6">
+                    {% if policy.potValue > 0 %}
+                        <a href="{{ path('user_renew_custom_policy', {'id': policy.id}) }}" class="btn btn-info ">Make changes or get your pot back in cash?</a>
+                    {% else %}
+                        <a href="{{ path('user_renew_custom_policy', {'id': policy.id}) }}" class="btn btn-info ">Make changes?</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
-{% block body %}
-  {% include 'AppBundle:User:userNav.html.twig' %}
-    {% if policy.hasNextPolicy and policy.nextPolicy.status == "renewal" %}
-        <section class="user-homepage--content section--pad">
-            <div class="container">
-            <h2>Your policy is scheduled to be renewed</h2>
-            </div>
-        </section>
-    {% else %}
-
-    <section class="user-homepage--content section--pad">
-        <div class="container">
-        <h2>Renew your policy</h2>
-
-        {{ form_start(renew_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
-        <div class="checkout--phone-indent">
-            <div class="form-group">
-                <label class="">Your Phone:</label>
-                <div class="h3">
-                    <strong>
-                            {{ policy.phone.make }} {{ policy.phone.model }} {% if policy.phone.memory %}
-                                    {{ policy.phone.memory }}GB
-                                {% endif %}
-                    </strong>
-                </div>
-            </div>
-            {% if policy.potValue > 0 %}
-            <div class="form-group">
-                <label class="">Your expected reward pot:</label>
-                <div class="h3">
-                    <strong>
-                        £{{ policy.potValue }}
-                    </strong>
-                </div>
-            </div>
-            {% endif %}
-            <div class="form-group {% if form_errors(renew_form.encodedAmount) %}has-error{% endif %}">
-                {{ form_label(renew_form.encodedAmount, 'Payment Options:', { 'label_attr': {'class': ''} }) }}
-                {{ form_widget(renew_form.encodedAmount) }}
-                <div class="help-block with-errors">{{ form_errors(renew_form.encodedAmount) }}</div>
-            </div>
-            <div class="review-terms">
-                <p><strong>Before you pay, please confirm that the following is correct:</strong></p>
-                <ol>
-                    <li>I am a resident of the United Kingdom</li>
-                    <li>
-                        I have read &amp; understood the so-sure
-                        <a data-toggle="modal" data-target="#policy-modal" style="cursor: pointer;">policy document</a>
-                    </li>
-                </ol>
-                <div class="form-group checkbox terms-checkbox text-center {% if is_postback %}has-error{% endif %}">
-                    {{ form_widget(renew_form.agreed, {'label': 'I confirm the above is correct'}) }}
-                    <div class="help-block with-errors">{{ form_errors(renew_form.agreed) }}</div>
-                </div>
-            </div>
-                <div class="form-group form-footer">
-                    <div class="row">
-                        <div class="col-xs-6 col-sm-6 col-md-6">
-                        {% if custom and policy.potValue > 0 %}
-                            <a href="{{ path('user_renew_custom_policy', {'id': policy.id}) }}" class="btn btn-info ">Please don't renew me, I just want my money back</a>
-                        {% else %}
-                            <a href="{{ path('user_renew_custom_policy', {'id': policy.id}) }}" class="btn btn-info ">Make changes or get your pot back in cash?</a>
-                        {% endif %}
-                        </div>
-                        <div class="col-xs-6 col-sm-6 col-md-6">
-                            {{ form_widget(renew_form.renew, {'label': 'Renew my policy', 'attr': {'class': 'btn btn-success btn-block btn-arrow-right'}}) }}
-                        </div>
-                    </div>
-                </div>
-        </div>
-        {{ form_end(renew_form) }}
-        </div>
-  </section>
-  {% endif %}
-
-<div class="modal modal-fullscreen fade"
-     id="policy-modal"
+{% block modals %}
+<div class="modal modal-purchase fade"
+     id="renewModal"
      tabindex="-1"
-     role="dialog"
-     aria-labelledby="So-Sure Policy Terms"
-     aria-hidden="true">
-    <div class="modal-dialog">
+     role="dialog">
+    <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">
-                    <i class="fa fa-times fa-lg" aria-hidden="true"></i>
-                    <span class="sr-only">Close</span>
-                </button>
-                <h3>So-Sure Policy Terms</h3>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h3 class="modal-title text-blue">Before you proceed! <br>Please confirm the following are correct:</h3>
             </div>
-            <div class="modal-body modal-policy">
-                {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot })) }}
+            <div class="modal-body">
+                {{ form_start(renew_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
+                <ol>
+                    <li>I am a resident of the United Kingdom.</li>
+                    <li>I have read &amp; understood the so-sure policy document.</li>
+                </ol>
+                <p>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</p>
+                <div class="form-group">
+                    {{ form_widget(renew_form.renew, {'label': 'Renew my policy', 'attr': {'class': 'btn btn-success btn-block btn-arrow-right'}}) }}
+                </div>
+                {{ form_end(renew_form) }}
             </div>
         </div>
     </div>

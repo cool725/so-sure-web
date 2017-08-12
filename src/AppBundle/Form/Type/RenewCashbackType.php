@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 
-class RenewType extends AbstractType
+class RenewCashbackType extends AbstractType
 {
     use CurrencyTrait;
 
@@ -48,6 +48,9 @@ class RenewType extends AbstractType
     {
         $builder
             ->add('encodedAmount', HiddenType::class, ['required' => $this->required])
+            ->add('accountName', TextType::class, ['required' => $this->required])
+            ->add('sortCode', TextType::class, ['required' => $this->required])
+            ->add('accountNumber', TextType::class, ['required' => $this->required])
             ->add('renew', SubmitType::class)
         ;
     }
@@ -55,7 +58,7 @@ class RenewType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'AppBundle\Document\Form\Renew',
+            'data_class' => 'AppBundle\Document\Form\RenewCashback',
         ));
     }
 }
