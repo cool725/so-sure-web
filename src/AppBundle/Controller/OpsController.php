@@ -112,24 +112,46 @@ class OpsController extends BaseController
                 break;
             }
         }
-        foreach ($validPolicies as $validRenwalPolicyNoPot) {
-            $user = $validRenwalPolicyNoPot->getUser();
-            if ($user->canRenewPolicy() && $validRenwalPolicyNoPot->isInRenewalTimeframe() &&
-                $validRenwalPolicyNoPot->getPotValue() == 0 && !$validRenwalPolicyNoPot->isRenewed() &&
-                !$validRenwalPolicyNoPot->hasCashback()) {
+        foreach ($validPolicies as $validRenwalPolicyMonthlyNoPot) {
+            if ($this->policyRenewalStatus($validRenwalPolicyMonthlyNoPot, false, Policy::PLAN_MONTHLY)) {
                 break;
             } else {
-                $validRenwalPolicyNoPot = null;
+                $validRenwalPolicyMonthlyNoPot = null;
             }
         }
-        foreach ($validPolicies as $validRenwalPolicyWithPot) {
-            $user = $validRenwalPolicyWithPot->getUser();
-            if ($user->canRenewPolicy() && $validRenwalPolicyWithPot->isInRenewalTimeframe() &&
-                $validRenwalPolicyWithPot->getPotValue() > 0 && !$validRenwalPolicyWithPot->isRenewed() &&
-                !$validRenwalPolicyWithPot->hasCashback()) {
+        foreach ($validPolicies as $validRenwalPolicyYearlyNoPot) {
+            if ($this->policyRenewalStatus($validRenwalPolicyYearlyNoPot, false, Policy::PLAN_YEARLY)) {
                 break;
             } else {
-                $validRenwalPolicyWithPot = null;
+                $validRenwalPolicyYearlyNoPot = null;
+            }
+        }
+        foreach ($validPolicies as $validRenwalPolicyYearlyOnlyNoPot) {
+            if ($this->policyRenewalStatus($validRenwalPolicyYearlyOnlyNoPot, false, Policy::PLAN_YEARLY, true)) {
+                break;
+            } else {
+                $validRenwalPolicyYearlyOnlyNoPot = null;
+            }
+        }
+        foreach ($validPolicies as $validRenwalPolicyMonthlyWithPot) {
+            if ($this->policyRenewalStatus($validRenwalPolicyMonthlyWithPot, true, Policy::PLAN_MONTHLY)) {
+                break;
+            } else {
+                $validRenwalPolicyMonthlyWithPot = null;
+            }
+        }
+        foreach ($validPolicies as $validRenwalPolicyYearlyWithPot) {
+            if ($this->policyRenewalStatus($validRenwalPolicyYearlyWithPot, true, Policy::PLAN_YEARLY)) {
+                break;
+            } else {
+                $validRenwalPolicyYearlyWithPot = null;
+            }
+        }
+        foreach ($validPolicies as $validRenwalPolicyYearlyOnlyWithPot) {
+            if ($this->policyRenewalStatus($validRenwalPolicyYearlyOnlyWithPot, true, Policy::PLAN_YEARLY, true)) {
+                break;
+            } else {
+                $validRenwalPolicyYearlyOnlyWithPot = null;
             }
         }
         foreach ($validPolicies as $validRemainderPolicy) {
@@ -156,12 +178,32 @@ class OpsController extends BaseController
             'valid_policy' => $validPolicy,
             'cancelled_policy' => $cancelledPolicy,
             'valid_multiple_policy' => $validMultiplePolicy,
-            'valid_renewal_policy_no_pot' => $validRenwalPolicyNoPot,
-            'valid_renewal_policy_with_pot' => $validRenwalPolicyWithPot,
+            'valid_renewal_policy_monthly_no_pot' => $validRenwalPolicyMonthlyNoPot,
+            'valid_renewal_policy_yearly_no_pot' => $validRenwalPolicyYearlyNoPot,
+            'valid_renewal_policy_yearly_only_no_pot' => $validRenwalPolicyYearlyOnlyNoPot,
+            'valid_renewal_policy_monthly_with_pot' => $validRenwalPolicyMonthlyWithPot,
+            'valid_renewal_policy_yearly_with_pot' => $validRenwalPolicyYearlyWithPot,
+            'valid_renewal_policy_yearly_only_with_pot' => $validRenwalPolicyYearlyOnlyWithPot,
             'valid_remainder_policy' => $validRemainderPolicy,
             'claimed_policy' => $claimedPolicy,
             'expired_policy' => $expiredPolicy,
         ];
+    }
+
+    private function policyRenewalStatus(Policy $policy, $hasPot, $plan, $yearlyOnly = false)
+    {
+        $user = $policy->getUser();
+        if ($user->canRenewPolicy() && $policy->isInRenewalTimeframe() &&
+            !$policy->isRenewed() && !$policy->hasCashback()) {
+            if ((!$hasPot && $policy->getPotValue() == 0) || ($hasPot && $policy->getPotValue() > 0)) {
+                if ((!$yearlyOnly && $user->allowedMonthlyPayments()) ||
+                    ($yearlyOnly && !$user->allowedMonthlyPayments())) {
+                    return $policy->getPremiumPlan() == $plan;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**

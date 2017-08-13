@@ -57,24 +57,56 @@
         <a href="{{ url('user_home') }}?_impersonate={{ unpaid_policy.user.email }}">User Unpaid Page</a> <b>(auto impersonate {{ unpaid_policy.user.email }})</b>
     </li>
     <li>
-        {% if valid_renewal_policy_no_pot %}
-            <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_no_pot.user.email }}">User Renewal No Pot - Home Page</a> <b>(auto impersonate {{ valid_renewal_policy_no_pot.user.email }})</b>
-        {% else %}
-            No renewal policy (without pot) available
-        {% endif %}
-    </li>
-    <li>
-        {% if valid_renewal_policy_with_pot %}
-            <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_with_pot.user.email }}">User Renewal With Pot - Home Page</a> <b>(auto impersonate {{ valid_renewal_policy_with_pot.user.email }})</b>
-        {% else %}
-            No renewal policy (with pot) available
-        {% endif %}
-    </li>
-    <li>
         {% if valid_remainder_policy %}
         <a href="{{ url('purchase_remainder_policy', {'id': valid_remainder_policy.id }) }}?_impersonate={{ valid_remainder_policy.user.email }}">User Remainder Payment Page</a> <b>(auto impersonate {{ valid_remainder_policy.user.email }})</b>
         {% else %}
             No remainder policy available
+        {% endif %}
+    </li>
+</ul>
+
+<h4>Renewals</h4>
+<ul>
+    <li>
+        {% if valid_renewal_policy_monthly_no_pot %}
+            <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_monthly_no_pot.user.email }}">User Renewal Monthly No Pot - Home Page</a> <b>(auto impersonate {{ valid_renewal_policy_monthly_no_pot.user.email }})</b>
+        {% else %}
+            No renewal policy (monthly without pot) available
+        {% endif %}
+    </li>
+    <li>
+        {% if valid_renewal_policy_yearly_no_pot %}
+            <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_yearly_no_pot.user.email }}">User Renewal Yearly No Pot - Home Page</a> <b>(auto impersonate {{ valid_renewal_policy_yearly_no_pot.user.email }})</b>
+        {% else %}
+            No renewal policy (yearly without pot) available
+        {% endif %}
+    </li>
+    <li>
+        {% if valid_renewal_policy_yearly_only_no_pot %}
+            <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_yearly_only_no_pot.user.email }}">User Renewal Yearly (Restricted) No Pot - Home Page</a> <b>(auto impersonate {{ valid_renewal_policy_yearly_only_no_pot.user.email }})</b>
+        {% else %}
+            No renewal policy (yearly restricted without pot) available
+        {% endif %}
+    </li>
+    <li>
+        {% if valid_renewal_policy_monthly_with_pot %}
+            <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_monthly_with_pot.user.email }}">User Renewal Monthly With Pot - Home Page</a> <b>(auto impersonate {{ valid_renewal_policy_monthly_with_pot.user.email }})</b>
+        {% else %}
+            No renewal policy (monthly with pot) available
+        {% endif %}
+    </li>
+    <li>
+        {% if valid_renewal_policy_yearly_with_pot %}
+            <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_yearly_with_pot.user.email }}">User Renewal Yearly With Pot - Home Page</a> <b>(auto impersonate {{ valid_renewal_policy_yearly_with_pot.user.email }})</b>
+        {% else %}
+            No renewal policy (yearly with pot) available
+        {% endif %}
+    </li>
+    <li>
+        {% if valid_renewal_policy_yearly_only_with_pot %}
+            <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_yearly_only_with_pot.user.email }}">User Renewal Yearly (Restricted) With Pot - Home Page</a> <b>(auto impersonate {{ valid_renewal_policy_yearly_only_with_pot.user.email }})</b>
+        {% else %}
+            No renewal policy (yearly restricted with pot) available
         {% endif %}
     </li>
 </ul>
