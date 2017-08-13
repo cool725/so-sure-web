@@ -323,6 +323,46 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
         $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V1);
     }
 
+    public function testFromArrayReceivedDateEarly()
+    {
+        $data = [
+            'So-Sure -Mobile',
+            '320160401000001',
+            'Mr John Smith',
+            'AB12 3CD',
+            '42794',
+            '42794',
+            '42794',
+            'Damage',
+            'Cracked Screen',
+            'Work',
+            'Closed',
+            'Settled',
+            '42794',
+            'Samsung',
+            'S6',
+            '351236666677777',
+            '40000',
+            '£250.49',
+            '£5.29',
+            '£1.30',
+            '£250',
+            '£0.75',
+            '£275',
+            '£50',
+            '£220',
+            '£1.08',
+            '07123 456789',
+            '42794',
+            '42794',
+            '42794',
+            '123 The Street, Town, City, Postcode'
+        ];
+        $davies = new DaviesClaim();
+        $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V1);
+        $this->assertNull($davies->replacementReceivedDate);
+    }
+
     /**
      * @expectedException \Exception
      */
