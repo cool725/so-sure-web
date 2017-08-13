@@ -154,6 +154,33 @@ class Cashback
         $this->amount = $amount;
     }
 
+    public function getDisplayableAmount()
+    {
+        // amount is not set whilst pending claimable so use pot
+        if ($this->getStatus() == self::STATUS_PENDING_CLAIMABLE) {
+            return $this->getPolicy()->getPotValue();
+        } elseif (in_array($this->getStatus(), [self::STATUS_PENDING_PAYMENT, self::STATUS_PAID])) {
+            return $this->getAmount();
+        } elseif (in_array($this->getStatus(), [self::STATUS_FAILED, self::STATUS_CLAIMED])) {
+            return 0;
+        }
+    }
+
+    public function getDisplayableStatus()
+    {
+        if ($this->getStatus() == self::STATUS_PENDING_CLAIMABLE) {
+            return 'Processing';
+        } elseif ($this->getStatus() == self::STATUS_PENDING_PAYMENT) {
+            return 'Approved';
+        } elseif ($this->getStatus() == self::STATUS_PAID) {
+            return 'Paid';
+        } elseif ($this->getStatus() == self::STATUS_FAILED) {
+            return 'Invalid or missing payment details';
+        } elseif ($this->getStatus() == self::STATUS_CLAIMED) {
+            return 'Declined due to claim';
+        }
+    }
+
     public function getReference()
     {
         return $this->reference;
