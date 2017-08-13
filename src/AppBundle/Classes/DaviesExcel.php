@@ -23,7 +23,12 @@ class DaviesExcel
         return in_array(trim($value), ['', 'Unknown', 'TBC', 'Tbc', 'tbc', '-', '0', 'N/A', 'n/a', 'NA', 'na', '#N/A']);
     }
 
-    protected function excelDate($days, $skipEndCheck = false)
+    /**
+     * @param mixed   $days           int (excel number of days from 1/1/1900) or string date 31/1/2016
+     * @param boolean $skipEndCheck   future dates are normally disallowed except for policy end date
+     * @param boolean $nullIfTooEarly davies using 1/1/2001 (or probably other) dates to indicate null
+     */
+    protected function excelDate($days, $skipEndCheck = false, $nullIfTooEarly = false)
     {
         try {
             if (!$days || $this->isNullableValue($days)) {
@@ -46,6 +51,10 @@ class DaviesExcel
 
             $minDate = new \DateTime(SoSure::POLICY_START);
             $now = new \DateTime();
+
+            if ($nullIfTooEarly && $origin < $minDate) {
+                return null;
+            }
 
             if ($origin < $minDate || ($origin > $now && !$skipEndCheck)) {
                 throw new \Exception(sprintf('Out of range for date %s', $origin->format(\DateTime::ATOM)));

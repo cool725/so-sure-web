@@ -349,7 +349,7 @@ class DaviesClaim extends DaviesExcel
             $this->replacementMake = $this->nullIfBlank($data[++$i]);
             $this->replacementModel = $this->nullIfBlank($data[++$i]);
             $this->replacementImei = $this->nullIfBlank($data[++$i]);
-            $this->replacementReceivedDate = $this->excelDate($data[++$i]);
+            $this->replacementReceivedDate = $this->excelDate($data[++$i], false, true);
 
             if (in_array($columns, [self::COLUMN_COUNT_V6, self::COLUMN_COUNT_V7])) {
                 $this->phoneReplacementCost = $this->nullIfBlank($data[++$i]);
