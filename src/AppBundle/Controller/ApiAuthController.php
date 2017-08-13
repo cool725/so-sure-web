@@ -599,7 +599,7 @@ class ApiAuthController extends BaseController
                 422
             );
         } catch (\Exception $e) {
-            $this->get('logger')->error('Error in api picsureAction.', ['exception' => $e]);
+            $this->get('logger')->error('Error in api cashbackAction.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
@@ -1037,6 +1037,50 @@ class ApiAuthController extends BaseController
             );
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api picsureAction.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
+     * @Route("/policy/{id}/renew", name="api_auth_renew")
+     * @Method({"POST"})
+     */
+    public function renewAction(Request $request, $id)
+    {
+        try {
+            $data = json_decode($request->getContent(), true)['body'];
+            if (!$this->validateFields($data, ['number_payments', 'use_pot'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(Policy::class);
+            $policy = $repo->find($id);
+            if (!$policy) {
+                throw new NotFoundHttpException();
+            }
+            $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+
+            $policyService = $this->get('app.policy');
+            $policyService->renew(
+                $policy,
+                $this->getDataString($data, 'number_payments'),
+                $this->getDataBool($data, 'use_pot')
+            );
+
+            return new JsonResponse($policy->toApiArray());
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (ValidationException $e) {
+            $this->get('logger')->info(sprintf('Failed cashback'), ['exception' => $e]);
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_INVALD_DATA_FORMAT,
+                'Invalid bank details',
+                422
+            );
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api renewAction.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
