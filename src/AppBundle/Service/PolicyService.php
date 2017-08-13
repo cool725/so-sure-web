@@ -5,6 +5,7 @@ use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+use AppBundle\Document\Cashback;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
@@ -1260,6 +1261,13 @@ class PolicyService
         $policy->fullyExpire($date);
         $this->dm->flush();
         // TODO: if cashback is present, then notify user about status
+    }
+
+    public function cashback(Policy $policy, Cashback $cashback)
+    {
+        $policy->setCashback($cashback);
+        $this->dm->flush();
+        // TODO: email user
     }
 
     /**

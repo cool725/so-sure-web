@@ -548,9 +548,7 @@ class UserController extends BaseController
             } elseif ($request->request->has('cashback_form')) {
                 $cashbackForm->handleRequest($request);
                 if ($cashbackForm->isValid()) {
-                    $policy->setCashback($cashback);
-                    $dm->persist($cashback);
-                    $dm->flush();
+                    $policyService->cashback($policy, $cashback);
                     $message = sprintf(
                         'Your request for cashback has been accepted.'
                     );

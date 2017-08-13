@@ -2097,6 +2097,63 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(200);
     }
 
+    // policy/{id}/cashback
+
+    /**
+     *
+     */
+    public function testCashback()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testCashback', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+        $url = sprintf("/api/v1/auth/policy/%s/cashback", $policyData['id']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+        ]);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'account_name' => 'foo',
+            'account_number' => '123',
+        ]);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'sort_code' => 'foo',
+            'account_number' => '123',
+        ]);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'account_name' => 'foo',
+            'sort_code' => '123',
+        ]);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'account_name' => 'foo',
+            'sort_code' => '123',
+            'account_number' => '123',
+        ]);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'account_name' => 'foo',
+            'sort_code' => '123456',
+            'account_number' => '12345678',
+        ]);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals('pending-claimable', $data['cashback_status']);
+    }
+
     // policy/{id}/invitation
 
     /**
