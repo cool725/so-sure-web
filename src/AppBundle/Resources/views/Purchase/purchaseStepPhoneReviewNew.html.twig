@@ -208,7 +208,11 @@
                                 <ol>
                                     <li>My phone is in full working condition and my screen is not cracked.</li>
                                     <li>I am a resident of the United Kingdom.</li>
-                                    <li>I have read &amp; understood the so-sure policy document.</li>
+                                    <li>I have read &amp; understood the
+                                        <a href="#" data-toggle="modal" data-target="#policy-modal">
+                                            so-sure policy document
+                                        </a>.
+                                    </li>
                                 </ol>
                                 <p>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</p>
                                 <p class="text-center" style="display: none">{{ form_widget(purchase_form.agreed, {'label': ' I confirm the above is correct', 'value': 'checked'}) }}</p>
