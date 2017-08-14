@@ -754,17 +754,6 @@ class PurchaseController extends BaseController
         return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'OK', 200);
     }
 
-
-    /**
-     * @Route("/policy-documentation", name="policy_documentation")
-     * @Template
-     */
-    public function policyDocumentation()
-    {
-        return [];
-    }
-
-
     /**
      * @Route("/cancel/{id}", name="purchase_cancel")
      * @Template

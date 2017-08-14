@@ -134,4 +134,14 @@ $(function(){
         Intercom('trackEvent', 'clicked upload imei');
         Intercom('showNewMessage', $(this).data('intercom-msg'));
     });
+
+    // Hide/Show policy doc
+    $('.policy-doc-toggle').click(function(e) {
+
+        e.preventDefault();
+
+        $(this).toggleText('hide so-sure policy document', 'so-sure policy document');
+
+        $('.modal-body__policy-doc').toggle();
+    });
 });

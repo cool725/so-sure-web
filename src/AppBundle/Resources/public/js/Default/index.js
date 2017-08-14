@@ -87,7 +87,7 @@ $(function(){
     $('[data-toggle="popover"]').popover();
 
     // Policy Modal
-    $('#policy-modal').on('show.bs.modal', function (event) {
+    $('#policy-modal, .modal-policy').on('show.bs.modal', function (event) {
 
         var modal = $(this);
         var h1    = $(this).find('h1');
