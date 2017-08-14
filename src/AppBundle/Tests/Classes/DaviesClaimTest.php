@@ -228,6 +228,55 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($davies::MISTATUS_CLAIMANT_CORRESPONDENCE, $davies->miStatus);
     }
 
+    public function testMIStatusError()
+    {
+        // @codingStandardsIgnoreStart
+        $data = [
+            'So-Sure -Mobile',
+            '320170109000912',
+            'Mr Steve Morrison',
+            'TR11 2HR',
+            '21/12/2016',
+            '03/11/2016',
+            '02/11/2017',
+            'Accidental Damage - Dropped In Water',
+            'The insured went out for lunch and fell off his motorbike. The insureds phone was in his pocket and this got damage. The screen has got lines across and the back of the phone has completely shattered.',
+            'In Street',
+            'Open',
+            'Error',
+            'TBC',
+            'Samsung',
+            'Galaxy S7 edge (32 GB)',
+            '351236666677777',
+            'TBC',
+            '£0.01',
+            '£700.00',
+            '£0.02',
+            '£0.03',
+            '£0.04',
+            '£0.05',
+            '£1.08',
+            '£0.06',
+            '£0.26',
+            '£700.26',
+            '-£35.00',
+            '£15.00',
+            '£50.00',
+            'Mob/2016/5500048',
+            '09/01/2017',
+            '09/01/2017',
+            'TBC',
+            'Discount Tyres Redruth Ltd, School Lane, TR15 2DU',
+            '£700.26'
+        ];
+        // @codingStandardsIgnoreEnd
+
+        $davies = new DaviesClaim();
+        $this->assertTrue($davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V6));
+        $this->assertEquals($davies::MISTATUS_ERROR, $davies->miStatus);
+        $this->assertTrue($davies->hasError());
+    }
+
     /**
      * @expectedException \Exception
      */
@@ -321,6 +370,46 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
         ];
         $davies = new DaviesClaim();
         $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V1);
+    }
+
+    public function testFromArrayReceivedDateEarly()
+    {
+        $data = [
+            'So-Sure -Mobile',
+            '320160401000001',
+            'Mr John Smith',
+            'AB12 3CD',
+            '42794',
+            '42794',
+            '42794',
+            'Damage',
+            'Cracked Screen',
+            'Work',
+            'Closed',
+            'Settled',
+            '42794',
+            'Samsung',
+            'S6',
+            '351236666677777',
+            '40000',
+            '£250.49',
+            '£5.29',
+            '£1.30',
+            '£250',
+            '£0.75',
+            '£275',
+            '£50',
+            '£220',
+            '£1.08',
+            '07123 456789',
+            '42794',
+            '42794',
+            '42794',
+            '123 The Street, Town, City, Postcode'
+        ];
+        $davies = new DaviesClaim();
+        $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V1);
+        $this->assertNull($davies->replacementReceivedDate);
     }
 
     /**

@@ -37,7 +37,7 @@ class DaviesClaim extends DaviesExcel
     const MISTATUS_RETURNED_CHEQUE = "Returned Cheque";
     const MISTATUS_SUPPLIER_CORRESPONDENCE = "Supplier Correspondence";
     const MISTATUS_SUPPLIER_FEE = "Supplier Fee";
-    const MISTATUS_ERROR = "DMS Error";
+    const MISTATUS_ERROR = "Error";
     const MISTATUS_COMPLAINT = "Complaint";
     const MISTATUS_INSURER = "Contact from insurer";
 
@@ -145,6 +145,11 @@ class DaviesClaim extends DaviesExcel
         }
 
         return $this->reserved;
+    }
+
+    public function hasError()
+    {
+        return strtolower($this->miStatus) == strtolower(self::MISTATUS_ERROR);
     }
 
     public function getExpectedExcess($validated = true)
@@ -349,7 +354,7 @@ class DaviesClaim extends DaviesExcel
             $this->replacementMake = $this->nullIfBlank($data[++$i]);
             $this->replacementModel = $this->nullIfBlank($data[++$i]);
             $this->replacementImei = $this->nullIfBlank($data[++$i]);
-            $this->replacementReceivedDate = $this->excelDate($data[++$i]);
+            $this->replacementReceivedDate = $this->excelDate($data[++$i], false, true);
 
             if (in_array($columns, [self::COLUMN_COUNT_V6, self::COLUMN_COUNT_V7])) {
                 $this->phoneReplacementCost = $this->nullIfBlank($data[++$i]);

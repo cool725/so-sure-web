@@ -138,6 +138,9 @@ class DaviesService extends S3EmailService
 
     public function saveClaim($daviesClaim)
     {
+        if ($daviesClaim->hasError()) {
+            throw new \Exception(sprintf('Claim %s has error status. Skipping', $daviesClaim->claimNumber));
+        }
         $claim = $this->getClaim($daviesClaim);
         if (!$claim) {
             throw new \Exception(sprintf('Unable to locate claim %s in db', $daviesClaim->claimNumber));

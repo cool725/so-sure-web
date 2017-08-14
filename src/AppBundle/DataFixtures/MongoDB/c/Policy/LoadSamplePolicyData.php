@@ -16,6 +16,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\SCode;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Classes\Salva;
+use AppBundle\Classes\SoSure;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Faker;
@@ -43,7 +44,8 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $this->faker = Faker\Factory::create('en_GB');
 
         $users = $this->newUsers($manager, 200);
-        $expUsers = $this->newUsers($manager, 20);
+        $expUsersA = $this->newUsers($manager, 40);
+        $expUsersB = $this->newUsers($manager, 40, true);
         $manager->flush();
 
         $count = 0;
@@ -63,17 +65,28 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $this->addConnections($manager, $user, $users);
         }
 
-        foreach ($expUsers as $user) {
+        foreach ($expUsersA as $user) {
+            $this->newPolicy($manager, $user, $count, null, null, null, null, null, true, false);
+            $user->setEnabled(true);
+            $count++;
+        }
+        foreach ($expUsersB as $user) {
             $this->newPolicy($manager, $user, $count, null, null, null, null, null, true, false);
             $user->setEnabled(true);
             $count++;
         }
         $manager->flush();
 
-        foreach ($expUsers as $user) {
+        foreach ($expUsersA as $user) {
             $rand = rand(0, 1);
             if ($rand == 0) {
-                $this->addConnections($manager, $user, $expUsers);
+                $this->addConnections($manager, $user, $expUsersA);
+            }
+        }
+        foreach ($expUsersB as $user) {
+            $rand = rand(0, 1);
+            if ($rand == 0) {
+                $this->addConnections($manager, $user, $expUsersB);
             }
         }
 
@@ -135,7 +148,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $manager->flush();
     }
 
-    private function newUsers($manager, $number)
+    private function newUsers($manager, $number, $yearlyOnlyPostcode = false)
     {
         $userRepo = $manager->getRepository(User::class);
         $users = [];
@@ -144,7 +157,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             while ($userRepo->findOneBy(['email' => $email])) {
                 $email = $this->faker->email;
             }
-            $user = $this->newUser($email);
+            $user = $this->newUser($email, false, $yearlyOnlyPostcode);
             $manager->persist($user);
             $users[] = $user;
         }
@@ -152,7 +165,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         return $users;
     }
 
-    private function newUser($email, $forceEmailAddress = false)
+    private function newUser($email, $forceEmailAddress = false, $yearlyOnlyPostcode = false)
     {
         $user = new User();
         $user->setFirstName($this->faker->firstName);
@@ -184,7 +197,11 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $address->setType(Address::TYPE_BILLING);
         $address->setLine1(trim(preg_replace('/[\\n\\r]+/', ' ', $this->faker->streetAddress)));
         $address->setCity($this->faker->city);
-        $address->setPostcode($this->faker->postcode);
+        if ($yearlyOnlyPostcode) {
+            $address->setPostcode(SoSure::$yearlyOnlyPostcodes[0]);
+        } else {
+            $address->setPostcode($this->faker->postcode);
+        }
 
         $user->setBillingAddress($address);
 

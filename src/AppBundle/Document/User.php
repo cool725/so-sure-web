@@ -498,6 +498,23 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $policies;
     }
 
+    public function getDisplayableCashbackSorted()
+    {
+        $cashback = [];
+        foreach ($this->policies as $policy) {
+            if ($policy->hasCashback()) {
+                $cashback[] = $policy->getCashback();
+            }
+        }
+
+        // sort recent to older
+        usort($cashback, function ($a, $b) {
+            return $a->getCreatedDate() < $b->getCreatedDate();
+        });
+
+        return $cashback;
+    }
+
     public function getUnInitPolicy()
     {
         foreach ($this->getAllPolicies() as $policy) {
