@@ -30,7 +30,7 @@ abstract class Policy
     use CurrencyTrait;
     use DateTrait;
 
-    const RENEWAL_DAYS = 30;
+    const RENEWAL_DAYS = 21;
 
     const RISK_LEVEL_HIGH = 'high';
     const RISK_LEVEL_MEDIUM = 'medium';
