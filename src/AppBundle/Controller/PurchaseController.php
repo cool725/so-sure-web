@@ -431,7 +431,7 @@ class PurchaseController extends BaseController
                             $purchase->getAmount(),
                             $purchase->getPhone()->getCurrentPhonePrice()->getYearlyPremiumPrice()
                         );
-    
+
                         if ($monthly || $yearly) {
                             $price = $purchase->getPhone()->getCurrentPhonePrice();
                             $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_POLICY_READY, [
@@ -753,6 +753,17 @@ class PurchaseController extends BaseController
 
         return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'OK', 200);
     }
+
+
+    /**
+     * @Route("/policy-documentation", name="policy_documentation")
+     * @Template
+     */
+    public function policyDocumentation()
+    {
+        return [];
+    }
+
 
     /**
      * @Route("/cancel/{id}", name="purchase_cancel")
