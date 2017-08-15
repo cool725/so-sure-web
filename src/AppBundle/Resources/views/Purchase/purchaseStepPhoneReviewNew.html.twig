@@ -210,7 +210,7 @@
                                         <li>My phone is in full working condition and my screen is not cracked.</li>
                                         <li>I am a resident of the United Kingdom.</li>
                                         <li>I have read &amp; understood the
-                                            <a class="policy-doc-toggle" href="#">so-sure policy document</a>.
+                                            <a class="policy-doc-toggle" href="#policy-doc">so-sure policy document</a>.
                                         </li>
                                     </ol>
                                     <p>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</p>
@@ -226,7 +226,8 @@
                                         </div>
                                     {% endif %}
                                 </div>
-                                <div class="modal-body__policy-doc" style="display:none;">
+                                <div id="#policy-doc" class="modal-body__policy-doc" style="display:none;">
+                                    <button type="button" class="close policy-doc-toggle" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                                     {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot })) }}
                                 </div>
                             </div>

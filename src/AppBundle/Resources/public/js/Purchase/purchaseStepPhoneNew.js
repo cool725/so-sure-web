@@ -137,11 +137,7 @@ $(function(){
 
     // Hide/Show policy doc
     $('.policy-doc-toggle').click(function(e) {
-
-        e.preventDefault();
-
-        $(this).toggleText('hide so-sure policy document', 'so-sure policy document');
-
+        // e.preventDefault();
         $('.modal-body__policy-doc').toggle();
     });
 });
