@@ -1050,8 +1050,14 @@ class ApiAuthController extends BaseController
     {
         try {
             $data = json_decode($request->getContent(), true)['body'];
-            if (!$this->validateFields($data, ['number_payments', 'use_pot'])) {
+            if (!$this->validateFields($data, ['number_payments'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            if (isset($data['cashback'])) {
+                if (!$this->validateFields($data['cashback'], ['account_number', 'sort_code', 'account_name'])) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+                }
             }
 
             $dm = $this->getManager();
@@ -1062,11 +1068,21 @@ class ApiAuthController extends BaseController
             }
             $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
 
+            $cashback = null;
+            if (isset($data['cashback'])) {
+                $cashback = new Cashback();
+                $cashback->setAccountName($this->getDataString($data['cashback'], 'account_name'));
+                $cashback->setSortCode($this->getDataString($data['cashback'], 'sort_code'));
+                $cashback->setAccountNumber($this->getDataString($data['cashback'], 'account_number'));
+                $cashback->setStatus(Cashback::STATUS_PENDING_CLAIMABLE);
+                $cashback->setPolicy($policy);
+            }
+
             $policyService = $this->get('app.policy');
             $policyService->renew(
                 $policy,
                 $this->getDataString($data, 'number_payments'),
-                $this->getDataBool($data, 'use_pot')
+                $cashback
             );
 
             return new JsonResponse($policy->toApiArray());

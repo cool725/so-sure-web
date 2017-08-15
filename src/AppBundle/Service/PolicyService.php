@@ -1266,6 +1266,7 @@ class PolicyService
     public function cashback(Policy $policy, Cashback $cashback)
     {
         $policy->setCashback($cashback);
+        //$this->dm->persist($cashback);
         $this->dm->flush();
         // TODO: email user
     }
@@ -1385,7 +1386,7 @@ class PolicyService
         return $newPolicy;
     }
 
-    public function renew(Policy $policy, $numPayments, $usePot, \DateTime $date = null)
+    public function renew(Policy $policy, $numPayments, Cashback $cashback = null, \DateTime $date = null)
     {
         if (!$date) {
             $date = new \DateTime();
@@ -1407,17 +1408,20 @@ class PolicyService
             ));
         }
 
-        // TODO: $usePot
+        if ($cashback) {
+            $this->cashback($policy, $cashback);
+        }
+
         $startDate = $this->endOfDay($policy->getEnd());
         $this->create($newPolicy, $startDate, null, $numPayments);
         $discount = 0;
-        if ($usePot) {
+        if (!$cashback && $policy->getPotValue() > 0) {
             $discount = $policy->getPotValue();
         }
         $newPolicy->renew($discount, $date);
         $this->dm->flush();
 
-        if ($usePot) {
+        if (!$cashback && $policy->getPotValue() > 0) {
             $this->adjustScheduledPayments($newPolicy, false, $date);
         }
 

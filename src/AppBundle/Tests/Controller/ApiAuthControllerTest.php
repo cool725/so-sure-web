@@ -2837,23 +2837,78 @@ class ApiAuthControllerTest extends BaseControllerTest
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
             'number_payments' => '1',
-        ]);
-        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
-
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
-            'use_pot' => 'false',
+            'cashback' => ['account_name' => 'foo'],
         ]);
         $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
             'number_payments' => '15',
-            'use_pot' => 'false',
+            'cashback' => ['account_name' => 'foo', 'sort_code' => '123456', 'account_number' => '12345678'],
         ]);
         $data = $this->verifyResponse(500);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
             'number_payments' => '12',
-            'use_pot' => 'false',
+        ]);
+        $data = $this->verifyResponse(200);
+    }
+
+    public function testApiRenewCashback()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testApiRenewCashback', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+
+        $lastYear = new \DateTime();
+        $lastYear = $lastYear->sub(new \DateInterval('P350D'));
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            $lastYear,
+            true
+        );
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, $lastYear, true);
+        static::$policyService->setEnvironment('test');
+        static::$dm->flush();
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+
+        $renewalPolicy = static::$policyService->createPendingRenewal(
+            $policy,
+            new \DateTime()
+        );
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
+
+        $url = sprintf("/api/v1/auth/policy/%s/renew", $policy->getId());
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'number_payments' => '12',
+            'cashback' => ['account_name' => 'a', 'sort_code' => '123456', 'account_number' => '12345678'],
+        ]);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'number_payments' => '12',
+            'cashback' => ['account_name' => 'foo', 'sort_code' => '1', 'account_number' => '12345678'],
+        ]);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'number_payments' => '12',
+            'cashback' => ['account_name' => 'foo', 'sort_code' => '123456', 'account_number' => '1'],
+        ]);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'number_payments' => '12',
+            'cashback' => ['account_name' => 'foo', 'sort_code' => '123456', 'account_number' => '12345678'],
         ]);
         $data = $this->verifyResponse(200);
     }
