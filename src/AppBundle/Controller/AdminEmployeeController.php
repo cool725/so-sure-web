@@ -697,11 +697,12 @@ class AdminEmployeeController extends BaseController
             } elseif ($request->request->has('regenerate_policy_schedule_form')) {
                 $regeneratePolicyScheduleForm->handleRequest($request);
                 if ($regeneratePolicyScheduleForm->isValid()) {
+                    $policyService->generatePolicyTerms($policy);
                     $policyService->generatePolicySchedule($policy);
                     $dm->flush();
                     $this->addFlash(
                         'success',
-                        'Re-generated Policy Schedule'
+                        'Re-generated Policy Terms & Schedule'
                     );
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);

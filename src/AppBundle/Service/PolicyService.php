@@ -514,7 +514,7 @@ class PolicyService
         return $count;
     }
 
-    public function generatePolicyFiles($policy, $email = true)
+    public function generatePolicyFiles($policy, $email = true, $bcc = null)
     {
         $this->statsd->startTiming("policy.schedule+terms");
         $policyTerms = $this->generatePolicyTerms($policy);
@@ -523,7 +523,7 @@ class PolicyService
         $this->statsd->endTiming("policy.schedule+terms");
 
         if ($email) {
-            $this->newPolicyEmail($policy, [$policySchedule, $policyTerms]);
+            $this->newPolicyEmail($policy, [$policySchedule, $policyTerms], $bcc);
         }
     }
 
