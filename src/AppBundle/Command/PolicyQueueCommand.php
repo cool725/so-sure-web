@@ -40,7 +40,13 @@ class PolicyQueueCommand extends ContainerAwareCommand
                 'id',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Policy id to manually resend the policy docs (will not affect the queue)'
+                'Policy id to manually regenerate & resend the policy docs (will not affect the queue)'
+            )
+            ->addOption(
+                'policyNumber',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Policy number to manually regeneate & resend the policy docs (will not affect the queue)'
             )
         ;
     }
@@ -52,6 +58,7 @@ class PolicyQueueCommand extends ContainerAwareCommand
         $show = true === $input->getOption('show');
         $process = $input->getOption('process');
         $policyId = $input->getOption('id');
+        $policyNumber = $input->getOption('policyNumber');
 
         if ($clear) {
             if ($process > 0) {
@@ -72,8 +79,15 @@ class PolicyQueueCommand extends ContainerAwareCommand
             if (!$policy) {
                 throw new \Exception(sprintf('Unable to find policy %s', $policyId));
             }
-            $policyService->generatePolicyFiles($policy);
+            $policyService->generatePolicyFiles($policy, true, 'bcc@so-sure.com');
             $output->writeln(sprintf("Re-generated policy (%s) docs and emailed", $policy->getId()));
+        } elseif ($policyNumber) {
+            $policy = $this->getPolicyByNumber($policyNumber);
+            if (!$policy) {
+                throw new \Exception(sprintf('Unable to find policy %s', $policyNumber));
+            }
+            $policyService->generatePolicyFiles($policy, true, 'bcc@so-sure.com');
+            $output->writeln(sprintf("Re-generated policy (%s) docs and emailed", $policy->getPolicyNumber()));
         } else {
             $count = $policyService->process($process);
             $output->writeln(sprintf("Generated docs for %d policies", $count));
@@ -86,5 +100,13 @@ class PolicyQueueCommand extends ContainerAwareCommand
         $repo = $dm->getRepository(Policy::class);
 
         return $repo->find($policyId);
+    }
+
+    private function getPolicyByNumber($policyNumber)
+    {
+        $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+
+        return $repo->findOneBy(['policyNumber' => $policyNumber]);
     }
 }
