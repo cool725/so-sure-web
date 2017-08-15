@@ -140,4 +140,8 @@ $(function(){
         // e.preventDefault();
         $('.modal-body__policy-doc').toggle();
     });
+
+    $('#policy-modal, .modal-policy').on('hide.bs.modal', function (event) {
+        $('.modal-body__policy-doc').hide();
+    });
 });
