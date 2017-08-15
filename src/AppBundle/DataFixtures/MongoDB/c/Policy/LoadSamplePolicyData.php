@@ -254,7 +254,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         if ($recent) {
             $days = sprintf("P%dD", rand(0, 120));
         } else {
-            $days = sprintf("P336D");
+            $days = sprintf("P345D");
         }
         $startDate->sub(new \DateInterval($days));
         $policy = new SalvaPhonePolicy();
