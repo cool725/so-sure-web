@@ -21,6 +21,7 @@ class SixpackService
     // const EXPERIMENT_QUOTE_SLIDER = 'quote-slider';
     const EXPERIMENT_PYG_HOME= 'pyg-or-home';
     const EXPERIMENT_QUOTE_SIMPLE_COMPLEX_SPLIT = 'quote-simple-complex-split';
+    const EXPERIMENT_QUOTE_SIMPLE_SPLIT = 'quote-simple-split';
     const EXPERIMENT_CPC_MANUFACTURER_HOME = 'cpc-manufacturer-or-home';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
@@ -161,7 +162,11 @@ class SixpackService
             $body = (string) $res->getBody();
             $data = json_decode($body, true);
             // {"status": "failed", "message": "this client was not participating"}
-            if (stripos($data['message'], 'not participating') !== false) {
+            // There appears to be an error with sixpack in use that is returning experiment does not exist
+            // rather than this client was not participating
+            // {"status": "failed", "message": "experiment does not exist"}
+            if (stripos($data['message'], 'not participating') !== false ||
+                stripos($data['message'], 'experiment does not exist') !== false) {
                 return null;
             } else {
                 $this->logger->error(sprintf('Failed converting exp %s', $experiment), ['exception' => $e]);

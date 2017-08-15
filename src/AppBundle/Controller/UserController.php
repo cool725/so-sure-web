@@ -669,6 +669,7 @@ class UserController extends BaseController
         //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_SLIDER);
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_PYG_HOME);
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_SIMPLE_COMPLEX_SPLIT);
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_SIMPLE_SPLIT);
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_CPC_MANUFACTURER_HOME);
 
         $countUnprocessedInvitations = count($user->getUnprocessedReceivedInvitations());

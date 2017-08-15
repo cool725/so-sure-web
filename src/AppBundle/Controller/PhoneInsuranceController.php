@@ -463,9 +463,16 @@ class PhoneInsuranceController extends BaseController
             'slider_test' => 'slide-me',
         );
 
+        /*
         $exp = $this->get('app.sixpack')->participate(
             SixpackService::EXPERIMENT_QUOTE_SIMPLE_COMPLEX_SPLIT,
             ['simple', 'complex', 'split'],
+            false
+        );
+        */
+        $exp = $this->get('app.sixpack')->participate(
+            SixpackService::EXPERIMENT_QUOTE_SIMPLE_SPLIT,
+            ['simple', 'split'],
             false
         );
         if ($request->get('force')) {
