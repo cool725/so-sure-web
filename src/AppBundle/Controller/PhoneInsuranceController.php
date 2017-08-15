@@ -244,8 +244,18 @@ class PhoneInsuranceController extends BaseController
         }
 
         if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
-            if ($make == "Samsung") {
-                return new RedirectResponse($this->generateUrl('insure_make', ['make' => 'Samsung']));
+            if (in_array($make, ["Samsung", "Apple"])) {
+                $exp = $this->get('app.sixpack')->participate(
+                    SixpackService::EXPERIMENT_CPC_MANUFACTURER_HOME,
+                    ['cpc-manufacturer', 'home'],
+                    false
+                );
+                if ($exp == 'cpc-manufacturer') {
+                    return new RedirectResponse($this->generateUrl('insure_make', ['make' => $phone->getMake()]));
+                } else {
+                    return new RedirectResponse($this->generateUrl('homepage'));
+                }
+                // return new RedirectResponse($this->generateUrl('insure_make', ['make' => 'Samsung']));
                 /*
                 $exp = $this->get('app.sixpack')->participate(
                     SixpackService::EXPERIMENT_CPC_QUOTE_MANUFACTURER,
