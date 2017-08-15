@@ -431,7 +431,7 @@ class PurchaseController extends BaseController
                             $purchase->getAmount(),
                             $purchase->getPhone()->getCurrentPhonePrice()->getYearlyPremiumPrice()
                         );
-    
+
                         if ($monthly || $yearly) {
                             $price = $purchase->getPhone()->getCurrentPhonePrice();
                             $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_POLICY_READY, [

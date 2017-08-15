@@ -87,7 +87,7 @@ $(function(){
     $('[data-toggle="popover"]').popover();
 
     // Policy Modal
-    $('#policy-modal').on('show.bs.modal', function (event) {
+    $('#policy-modal, .modal-policy').on('show.bs.modal', function (event) {
 
         var modal = $(this);
         var h1    = $(this).find('h1');
@@ -99,8 +99,8 @@ $(function(){
 
         modal.find('table').addClass('table, table-bordered');
 
-        h2.click(function() {
-
+        h2.click(function(e) {
+            e.preventDefault();
             $(this).nextUntil(h2).slideToggle();
             $(this).toggleClass('section-open');
         });

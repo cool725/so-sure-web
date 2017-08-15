@@ -194,7 +194,7 @@
                         Back
                     </a>
                 </div>
-                <div class="modal modal-purchase fade"
+                <div class="modal modal-purchase modal-policy fade"
                      id="reviewModal"
                      tabindex="-1"
                      role="dialog">
@@ -205,23 +205,31 @@
                                 <h3 class="modal-title text-blue">Before you proceed! <br>Please confirm the following are correct:</h3>
                             </div>
                             <div class="modal-body">
-                                <ol>
-                                    <li>My phone is in full working condition and my screen is not cracked.</li>
-                                    <li>I am a resident of the United Kingdom.</li>
-                                    <li>I have read &amp; understood the so-sure policy document.</li>
-                                </ol>
-                                <p>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</p>
-                                <p class="text-center" style="display: none">{{ form_widget(purchase_form.agreed, {'label': ' I confirm the above is correct', 'value': 'checked'}) }}</p>
-                                {% if app.user.hasValidPaymentMethod %}
-                                    <div class="form-group">
-                                        {{ form_widget(purchase_form.existing, {'label': 'Pay with card on file', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
-                                        {{ form_widget(purchase_form.next, {'label': 'Pay with a new card', 'attr': {'class': 'btn btn-default btn-block btn-pad'}}) }}
-                                    </div>
-                                {% else %}
-                                    <div class="form-group">
-                                        {{ form_widget(purchase_form.next, {'label': 'Continue to payment', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
-                                    </div>
-                                {% endif %}
+                                <div class="modal-body__review">
+                                    <ol>
+                                        <li>My phone is in full working condition and my screen is not cracked.</li>
+                                        <li>I am a resident of the United Kingdom.</li>
+                                        <li>I have read &amp; understood the
+                                            <a class="policy-doc-toggle" href="#policy-doc">so-sure policy document</a>.
+                                        </li>
+                                    </ol>
+                                    <p>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</p>
+                                    <p class="text-center" style="display: none">{{ form_widget(purchase_form.agreed, {'label': ' I confirm the above is correct', 'value': 'checked'}) }}</p>
+                                    {% if app.user.hasValidPaymentMethod %}
+                                        <div class="form-group">
+                                            {{ form_widget(purchase_form.existing, {'label': 'Pay with card on file', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
+                                            {{ form_widget(purchase_form.next, {'label': 'Pay with a new card', 'attr': {'class': 'btn btn-default btn-block btn-pad'}}) }}
+                                        </div>
+                                    {% else %}
+                                        <div class="form-group">
+                                            {{ form_widget(purchase_form.next, {'label': 'Continue to payment', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div id="#policy-doc" class="modal-body__policy-doc" style="display:none;">
+                                    <button type="button" class="close policy-doc-toggle" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                    {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot })) }}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -288,7 +296,7 @@
     </div>
 </div>
 
-<div class="modal modal-fullscreen fade"
+{# <div class="modal modal-fullscreen fade"
      id="policy-modal"
      tabindex="-1"
      role="dialog"
@@ -305,7 +313,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> #}
 
 {# End Page Modals #}
 

@@ -320,3 +320,12 @@
     }
 }
 
+.modal-body__policy-doc {
+    height: 300px;
+    margin: 30px -25px 0;
+    padding: 10px;
+    overflow-y: scroll;
+
+    border: 1px solid $grey;
+    @include border-radius(4px);
+}
