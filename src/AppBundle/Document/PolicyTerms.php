@@ -13,7 +13,7 @@ class PolicyTerms extends PolicyDocument
     {
         // assuming that picsure will always be enabled going forward
         return !in_array($this->getVersion(), [
-            'Version 1 May 2016'
+            'Version 1 June 2016'
         ]);
     }
 }
