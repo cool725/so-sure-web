@@ -48,9 +48,9 @@
                 {% if policy.potValue > 0 %}
                     <h4 class="text-center">
                         {% if policy.getPremiumPlan == 'monthly' %}
-                            (<span class="text-blue">£{{ renew.getMonthlyPremiumPrice }}</span> / month without your <span class="text-blue">£{{ policy.potValue }}</span> reward pot)
+                            (<span class="text-blue">£{{ renew.getMonthlyPremiumPrice }}</span> per month without your <span class="text-blue">£{{ policy.potValue }}</span> reward pot)
                         {% else %}
-                            (<span class="text-blue">£{{ renew.getYearlyPremiumPrice }}</span> / year without your <span class="text-blue">£{{ policy.potValue }}</span> reward pot)
+                            (<span class="text-blue">£{{ renew.getYearlyPremiumPrice }}</span> per year without your <span class="text-blue">£{{ policy.potValue }}</span> reward pot)
                         {% endif %}
                     </h4>
                 {% endif %}

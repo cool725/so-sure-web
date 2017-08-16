@@ -183,11 +183,11 @@
             background-color: $white;
             border: 1px solid $primary-blue;
             position: absolute;
-            left: 50%; bottom: 30px;
+            left: 50%; top: 50%;
             margin-left: -20px;
 
             @include breakpoint(tablet) {
-                bottom: 35px;
+                // bottom: 35px;
             }
         }
     }
@@ -232,6 +232,11 @@
             color: $white;
         }
     }
+}
+
+.payment--step + .payment--step {
+    border-bottom: none;
+    border-top: none;
 }
 
 // Cover / Benefits

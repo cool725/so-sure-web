@@ -9,7 +9,7 @@
                 <small>(Select an option below)</small></h4>
                 <div class="payment--btn payment--btn-two payment--btn-left" id="payment--reward">
                     <div class="payment--btn-inner" id="payment--monthly">
-                        <span class="amount">Use reward pot</span>
+                        <span class="amount"><span class="h4">Use reward pot</span></span>
                     </div>
                 </div>
                 <div class="payment--btn-or">
@@ -17,10 +17,14 @@
                 </div>
                 <div class="payment--btn payment--btn-two payment--btn-right" id="payment--cashback">
                     <div class="payment--btn-inner">
-                        <span class="amount">No, I want cashback</span>
+                        <span class="amount"><span class="h4">No, I want cashback</span></span>
                     </div>
                 </div>
             {% endif %}
+        </div>
+    </div>
+    <div class="payment--step">
+        <div class="payment--step-inner clearfix">
             <h4>How would you like to pay?<br>
             <small>(Select an option below)</small></h4>
             {% if app.user.allowedMonthlyPayments %}
@@ -35,9 +39,9 @@
                 </div>
             {% endif %}
             {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %}
-            <div class="payment--btn-or">
-                OR
-            </div>
+                <div class="payment--btn-or">
+                    OR
+                </div>
             {% endif %}
             {% if app.user.allowedYearlyPayments %}
                 <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two payment--btn-right {% endif %}" id="payment--adjusted-yearly" data-value="{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }}|1|1">
