@@ -20,8 +20,11 @@ class SoSure
     }
 
     // make sure uppper case/normalised
-    // Dylan requested DE14 & TN15 7LY in Jan 2017 due to suspecion of fraud in those
-    // postcodes based on claims we receieved
+    // DE14 added Jan 2017 due to suspecion of fraud in those postcodes based on claims we receieved
     public static $yearlyOnlyPostcodeOutcodes = ['DE14'];
-    public static $yearlyOnlyPostcodes = ['TN15 7LY'];
+
+    // make sure uppper case/normalised
+    // TN15 7LY add Jan 2017 due to suspecion of fraud in those postcodes based on claims we receieved
+    // P£21 7TB added 16/8/17 due to explainable but odd situation from customer triggering manual fraud suspicion
+    public static $yearlyOnlyPostcodes = ['TN15 7LY', 'PE21 7TB'];
 }
