@@ -27,8 +27,13 @@
     {% endif %}
     <div class="payment--step">
         <div class="payment--step-inner clearfix">
-            <h4>How would you like to pay?<br>
-            <small>(Select an option below)</small></h4>
+            {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %}
+                <h4>How would you like to pay?<br>
+                <small>(Select an option below)</small></h4>
+            {% else %}
+                <h4>Payment will be taken (Thoughts?)<br>
+                    <small>(More text)</small></h4>
+            {% endif %}
             {% if app.user.allowedMonthlyPayments %}
                 <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two payment--btn-left {% endif %}" id="payment--adjusted-monthly" data-value="{{ renew.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }}|12|1">
                     <div class="payment--btn-inner {% if not app.user.allowedYearlyPayments %} payment--btn-inner-single {% endif %}">
