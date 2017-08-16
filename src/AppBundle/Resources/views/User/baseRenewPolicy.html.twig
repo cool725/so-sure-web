@@ -44,23 +44,18 @@
                     {% else %}
                         <span class="title-price">for just <span class="text-blue">£{{ renew.getAdjustedYearlyPremiumPrice }}</span> per year</span>
                     {% endif %} <br>
-                    <small class="h4 text-light-blue">Last years premium
+                </h1>
+
+                {% if policy.potValue > 0 %}
+                    <div class="text-center">
+                        <span class="h4 text-light-blue">
                             {% if policy.getPremiumPlan == 'monthly' %}
-                                <span class="text-blue">£{{ renew.getMonthlyPremiumPrice }}</span> per month
+                                (<span class="text-blue">£{{ renew.getMonthlyPremiumPrice }}</span> per month without your <span class="text-blue">£{{ policy.potValue }}</span> reward pot)
                             {% else %}
-                                <span class="text-blue">£{{ renew.getYearlyPremiumPrice }}</span> per year
+                                (<span class="text-blue">£{{ renew.getYearlyPremiumPrice }}</span> per year without your <span class="text-blue">£{{ policy.potValue }}</span> reward pot)
                             {% endif %}
                         </span>
-                    </small><br>
-                </h1>
-                {% if policy.potValue > 0 %}
-                    <h4 class="text-center">
-                        {% if policy.getPremiumPlan == 'monthly' %}
-                            (<span class="text-blue">£{{ renew.getMonthlyPremiumPrice }}</span> per month without your <span class="text-blue">£{{ policy.potValue }}</span> reward pot)
-                        {% else %}
-                            (<span class="text-blue">£{{ renew.getYearlyPremiumPrice }}</span> per year without your <span class="text-blue">£{{ policy.potValue }}</span> reward pot)
-                        {% endif %}
-                    </h4>
+                    </div>
                 {% endif %}
                 <h4 class="text-center">and keep covered against:</h4>
 
