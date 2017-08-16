@@ -38,12 +38,20 @@
                     <br class="visible-xs">
                     <span class="title-phone text-blue text-nowrap">{{ policy.phone.make }} {{ policy.phone.model }} {% if policy.phone.memory %}{{ policy.phone.memory }}GB{% endif %} </span>
                     <br class="visible-xs">
-                    <span class="title-top">insurance</span> <br>
+                    <span class="title-top">insurance</span><br>
                     {% if policy.getPremiumPlan == 'monthly' %}
-                        <span class="title-price">for just <span class="text-blue">£{{ renew.getAdjustedStandardMonthlyPremiumPrice }}</span> a month</span>
+                        <span class="title-price">for just <span class="text-blue">£{{ renew.getAdjustedStandardMonthlyPremiumPrice }}</span> per month</span>
                     {% else %}
-                        <span class="title-price">for just <span class="text-blue">£{{ renew.getAdjustedYearlyPremiumPrice }}</span> a year</span>
-                    {% endif %}
+                        <span class="title-price">for just <span class="text-blue">£{{ renew.getAdjustedYearlyPremiumPrice }}</span> per year</span>
+                    {% endif %} <br>
+                    <small class="h4 text-light-blue">Last years premium
+                            {% if policy.getPremiumPlan == 'monthly' %}
+                                <span class="text-blue">£{{ renew.getMonthlyPremiumPrice }}</span> per month
+                            {% else %}
+                                <span class="text-blue">£{{ renew.getYearlyPremiumPrice }}</span> per year
+                            {% endif %}
+                        </span>
+                    </small><br>
                 </h1>
                 {% if policy.potValue > 0 %}
                     <h4 class="text-center">
