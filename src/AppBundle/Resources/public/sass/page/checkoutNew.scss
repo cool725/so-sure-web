@@ -183,11 +183,11 @@
             background-color: $white;
             border: 1px solid $primary-blue;
             position: absolute;
-            left: 50%; top: 50%;
+            left: 50%; bottom: 30px;
             margin-left: -20px;
 
             @include breakpoint(tablet) {
-                // bottom: 35px;
+                bottom: 35px;
             }
         }
     }

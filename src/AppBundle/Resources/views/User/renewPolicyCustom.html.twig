@@ -1,15 +1,16 @@
 {% extends 'AppBundle:User:baseRenewPolicy.html.twig' %}
 
 {% block actions %}
-    <div class="payment--step">
-        <div class="payment--step-inner clearfix">
 
-            {% if policy.potValue > 0 %}
-                <h4>How would you like to use your pot?<br>
+    {% if policy.potValue > 0 %}
+        <div class="payment--step">
+            <div class="payment--step-inner clearfix">
+                <h4>Would you like to use your pot to renew?<br>
                 <small>(Select an option below)</small></h4>
                 <div class="payment--btn payment--btn-two payment--btn-left" id="payment--reward">
                     <div class="payment--btn-inner" id="payment--monthly">
-                        <span class="amount"><span class="h4">Use reward pot</span></span>
+                        <span class="amount">Yes</span><br>
+                        <span class="billed">Use reward pot</span>
                     </div>
                 </div>
                 <div class="payment--btn-or">
@@ -17,12 +18,13 @@
                 </div>
                 <div class="payment--btn payment--btn-two payment--btn-right" id="payment--cashback">
                     <div class="payment--btn-inner">
-                        <span class="amount"><span class="h4">No, I want cashback</span></span>
+                        <span class="amount">No</span><br>
+                        <span class="billed">I want cashback</span>
                     </div>
                 </div>
-            {% endif %}
+            </div>
         </div>
-    </div>
+    {% endif %}
     <div class="payment--step">
         <div class="payment--step-inner clearfix">
             <h4>How would you like to pay?<br>
