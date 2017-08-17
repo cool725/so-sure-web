@@ -69,7 +69,7 @@ class RenewCashback extends Renew
             throw new \Exception(sprintf('Cashbash should not use pot'));
         }
         if ($this->getPolicy()->getPotValue() <= 0) {
-            throw new \Exception('Cashbash required pot with value in it');
+            throw new \Exception('Cashback required pot with value in it');
         }
 
         $cashback = new Cashback();

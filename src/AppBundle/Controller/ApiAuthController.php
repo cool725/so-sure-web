@@ -13,6 +13,7 @@ use AppBundle\Form\Type\PhoneType;
 
 use AppBundle\Document\Address;
 use AppBundle\Document\Payment\Payment;
+use AppBundle\Document\Cashback;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;
@@ -558,6 +559,53 @@ class ApiAuthController extends BaseController
     }
 
     /**
+     * @Route("/policy/{id}/cashback", name="api_auth_cashback")
+     * @Method({"POST"})
+     */
+    public function cashbackAction(Request $request, $id)
+    {
+        try {
+            $data = json_decode($request->getContent(), true)['body'];
+            if (!$this->validateFields($data, ['account_name', 'sort_code', 'account_number'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(Policy::class);
+            $policy = $repo->find($id);
+            if (!$policy) {
+                throw new NotFoundHttpException();
+            }
+            $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+
+            $policyService = $this->get('app.policy');
+            $cashback = new Cashback();
+            $cashback->setPolicy($policy);
+            $cashback->setStatus(Cashback::STATUS_PENDING_CLAIMABLE);
+            $cashback->setAccountName($this->getDataString($data, 'account_name'));
+            $cashback->setSortcode($this->getDataString($data, 'sort_code'));
+            $cashback->setAccountNumber($this->getDataString($data, 'account_number'));
+            $this->validateObject($cashback);
+            $policyService->cashback($policy, $cashback);
+
+            return new JsonResponse($policy->toApiArray());
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (ValidationException $e) {
+            $this->get('logger')->info(sprintf('Failed cashback'), ['exception' => $e]);
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_INVALD_DATA_FORMAT,
+                'Invalid bank details',
+                422
+            );
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api cashbackAction.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
      * @Route("/policy/{id}/connect", name="api_auth_new_connection")
      * @Method({"POST"})
      */
@@ -989,6 +1037,66 @@ class ApiAuthController extends BaseController
             );
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api picsureAction.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
+     * @Route("/policy/{id}/renew", name="api_auth_renew")
+     * @Method({"POST"})
+     */
+    public function renewAction(Request $request, $id)
+    {
+        try {
+            $data = json_decode($request->getContent(), true)['body'];
+            if (!$this->validateFields($data, ['number_payments'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            if (isset($data['cashback'])) {
+                if (!$this->validateFields($data['cashback'], ['account_number', 'sort_code', 'account_name'])) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+                }
+            }
+
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(Policy::class);
+            $policy = $repo->find($id);
+            if (!$policy) {
+                throw new NotFoundHttpException();
+            }
+            $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+
+            $cashback = null;
+            if (isset($data['cashback'])) {
+                $cashback = new Cashback();
+                $cashback->setAccountName($this->getDataString($data['cashback'], 'account_name'));
+                $cashback->setSortCode($this->getDataString($data['cashback'], 'sort_code'));
+                $cashback->setAccountNumber($this->getDataString($data['cashback'], 'account_number'));
+                $cashback->setStatus(Cashback::STATUS_PENDING_CLAIMABLE);
+                $cashback->setPolicy($policy);
+            }
+
+            $policyService = $this->get('app.policy');
+            $policyService->renew(
+                $policy,
+                $this->getDataString($data, 'number_payments'),
+                $cashback
+            );
+
+            return new JsonResponse($policy->toApiArray());
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (ValidationException $e) {
+            $this->get('logger')->info(sprintf('Failed cashback'), ['exception' => $e]);
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_INVALD_DATA_FORMAT,
+                'Invalid bank details',
+                422
+            );
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api renewAction.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }

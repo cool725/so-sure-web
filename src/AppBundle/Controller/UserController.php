@@ -405,7 +405,10 @@ class UserController extends BaseController
                 if ($renewForm->isValid()) {
                     // TODO: If old policy
                     $policyService = $this->get('app.policy');
-                    $renewalPolicy = $policyService->renew($policy, $renew->getNumPayments(), $renew->getUsePot());
+                    if (!$renew->getUsePot()) {
+                        throw new \Exception(sprintf('Renew should be using pot'));
+                    }
+                    $renewalPolicy = $policyService->renew($policy, $renew->getNumPayments());
                     $message = sprintf(
                         'Thanks. Your policy is now scheduled to be renewed on %s',
                         $renewalPolicy->getStart()->format('d M Y')
@@ -476,7 +479,10 @@ class UserController extends BaseController
                 if ($renewForm->isValid()) {
                     // TODO: If old policy
                     $policyService = $this->get('app.policy');
-                    $renewalPolicy = $policyService->renew($policy, $renew->getNumPayments(), $renew->getUsePot());
+                    if (!$renew->getUsePot()) {
+                        throw new \Exception(sprintf('Renew should be using pot'));
+                    }
+                    $renewalPolicy = $policyService->renew($policy, $renew->getNumPayments());
                     $message = sprintf(
                         'Thanks. Your policy is now scheduled to be renewed on %s',
                         $renewalPolicy->getStart()->format('d M Y')
@@ -501,14 +507,13 @@ class UserController extends BaseController
                     if ($renewCashbackForm->isValid()) {
                         $cashbackFromRenewal = $renewCashback->createCashback();
                         $this->validateObject($cashbackFromRenewal);
-                        $dm->persist($cashbackFromRenewal);
 
                         // TODO: If old policy
                         $policyService = $this->get('app.policy');
                         $renewalPolicy = $policyService->renew(
                             $policy,
                             $renewCashback->getNumPayments(),
-                            $renewCashback->getUsePot()
+                            $cashbackFromRenewal
                         );
                         $message = sprintf(
                             'Thanks. Your policy is now scheduled to be renewed on %s',
@@ -548,9 +553,7 @@ class UserController extends BaseController
             } elseif ($request->request->has('cashback_form')) {
                 $cashbackForm->handleRequest($request);
                 if ($cashbackForm->isValid()) {
-                    $policy->setCashback($cashback);
-                    $dm->persist($cashback);
-                    $dm->flush();
+                    $policyService->cashback($policy, $cashback);
                     $message = sprintf(
                         'Your request for cashback has been accepted.'
                     );

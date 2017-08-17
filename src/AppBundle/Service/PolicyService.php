@@ -5,6 +5,7 @@ use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+use AppBundle\Document\Cashback;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
@@ -1026,7 +1027,7 @@ class PolicyService
         if ($policy->isRenewed()) {
             // No need to send an email as the renewal email should cover both expiry and renewal
             \AppBundle\Classes\NoOp::ignore([]);
-        } elseif ($policy->canRepurchase() && $policy->setUser()->areRenewalsDesired()) {
+        } elseif ($policy->canRepurchase() && $policy->getUser()->areRenewalsDesired()) {
             $baseTemplate = sprintf('AppBundle:Email:policy/expiredDesireRepurchase');
             $subject = sprintf('Your so-sure policy %s is now finished', $policy->getPolicyNumber());
         } else {
@@ -1262,6 +1263,14 @@ class PolicyService
         // TODO: if cashback is present, then notify user about status
     }
 
+    public function cashback(Policy $policy, Cashback $cashback)
+    {
+        $policy->setCashback($cashback);
+        //$this->dm->persist($cashback);
+        $this->dm->flush();
+        // TODO: email user
+    }
+
     /**
      * @param Policy $policy
      */
@@ -1377,7 +1386,7 @@ class PolicyService
         return $newPolicy;
     }
 
-    public function renew(Policy $policy, $numPayments, $usePot, \DateTime $date = null)
+    public function renew(Policy $policy, $numPayments, Cashback $cashback = null, \DateTime $date = null)
     {
         if (!$date) {
             $date = new \DateTime();
@@ -1399,17 +1408,22 @@ class PolicyService
             ));
         }
 
-        // TODO: $usePot
+        if ($cashback) {
+            $this->cashback($policy, $cashback);
+        } else {
+            $policy->clearCashback();
+        }
+
         $startDate = $this->endOfDay($policy->getEnd());
         $this->create($newPolicy, $startDate, null, $numPayments);
         $discount = 0;
-        if ($usePot) {
+        if (!$cashback && $policy->getPotValue() > 0) {
             $discount = $policy->getPotValue();
         }
         $newPolicy->renew($discount, $date);
         $this->dm->flush();
 
-        if ($usePot) {
+        if (!$cashback && $policy->getPotValue() > 0) {
             $this->adjustScheduledPayments($newPolicy, false, $date);
         }
 

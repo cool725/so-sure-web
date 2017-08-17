@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Service;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
+use AppBundle\Document\Cashback;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
@@ -21,6 +22,7 @@ use AppBundle\Document\OptOut\SmsOptOut;
 use AppBundle\Service\InvitationService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Exception\InvalidPremiumException;
+use AppBundle\Exception\ValidationException;
 use AppBundle\Classes\Salva;
 use AppBundle\Service\SalvaExportService;
 
@@ -1165,8 +1167,177 @@ class PolicyServiceTest extends WebTestCase
         );
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
 
-        static::$policyService->renew($policy, 12, false, new \DateTime('2016-12-30'));
+        static::$policyService->renew($policy, 12, null, new \DateTime('2016-12-30'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicy->getStatus());
+    }
+
+    public function testPolicyRenewCashback()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPolicyRenewCashback', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-01-01'), true);
+        static::$policyService->setEnvironment('test');
+        static::$dm->flush();
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+
+        $renewalPolicy = static::$policyService->createPendingRenewal(
+            $policy,
+            new \DateTime('2016-12-15')
+        );
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
+
+        $cashback = $this->getCashback($policy);
+        $cashback->setAccountName('a');
+        $exceptionThrown = false;
+        try {
+            static::$policyService->renew($policy, 12, $cashback, new \DateTime('2016-12-30'));
+        } catch (ValidationException $e) {
+            $exceptionThrown = true;
+        }
+        $this->assertTrue($exceptionThrown);
+
+        $cashback = $this->getCashback($policy);
+        $cashback->setSortCode('1');
+        $exceptionThrown = false;
+        try {
+            static::$policyService->renew($policy, 12, $cashback, new \DateTime('2016-12-30'));
+        } catch (ValidationException $e) {
+            $exceptionThrown = true;
+        }
+        $this->assertTrue($exceptionThrown);
+
+        $cashback = $this->getCashback($policy);
+        $cashback->setAccountNumber('1');
+        $exceptionThrown = false;
+        try {
+            static::$policyService->renew($policy, 12, $cashback, new \DateTime('2016-12-30'));
+        } catch (ValidationException $e) {
+            $exceptionThrown = true;
+        }
+        $this->assertTrue($exceptionThrown);
+
+        $cashback = $this->getCashback($policy);
+        static::$policyService->renew($policy, 12, $cashback, new \DateTime('2016-12-30'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicy->getStatus());
+    }
+
+    public function testPolicyCashbackThenRenew()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPolicyCashbackThenRenew', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-01-01'), true);
+        static::$policyService->setEnvironment('test');
+        static::$dm->flush();
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+
+        $renewalPolicy = static::$policyService->createPendingRenewal(
+            $policy,
+            new \DateTime('2016-12-15')
+        );
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
+
+        $cashback = $this->getCashback($policy);
+        static::$policyService->cashback($policy, $cashback);
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $policyRepo->find($policy->getId());
+
+        $this->assertEquals($cashback->getAccountNumber(), $updatedPolicy->getCashback()->getAccountNumber());
+
+        static::$policyService->renew($updatedPolicy, 12, null, new \DateTime('2016-12-30'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicy->getStatus());
+
+        $this->assertNull($policy->getCashback());
+    }
+
+    public function testPolicyCashbackThenRenewWithCashback()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPolicyCashbackThenRenewWithCashback', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-01-01'), true);
+        static::$policyService->setEnvironment('test');
+        static::$dm->flush();
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+
+        $renewalPolicy = static::$policyService->createPendingRenewal(
+            $policy,
+            new \DateTime('2016-12-15')
+        );
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
+
+        $cashback = $this->getCashback($policy);
+        static::$policyService->cashback($policy, $cashback);
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $policyRepo->find($policy->getId());
+
+        $this->assertEquals($cashback->getAccountNumber(), $updatedPolicy->getCashback()->getAccountNumber());
+
+        $cashback = $this->getCashback($policy);
+        $cashback->setAccountNumber('87654321');
+        static::$policyService->renew($updatedPolicy, 12, $cashback, new \DateTime('2016-12-30'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicy->getStatus());
+
+        $this->assertEquals($cashback->getAccountNumber(), $updatedPolicy->getCashback()->getAccountNumber());
+    }
+
+    private function getCashback($policy)
+    {
+        $cashback = new Cashback();
+        $cashback->setStatus(Cashback::STATUS_PENDING_CLAIMABLE);
+        $cashback->setAccountName('foo');
+        $cashback->setSortCode('123456');
+        $cashback->setAccountNumber('12345678');
+        $cashback->setPolicy($policy);
+
+        return $cashback;
     }
 
     public function testPolicyActive()
@@ -1199,7 +1370,7 @@ class PolicyServiceTest extends WebTestCase
         );
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
 
-        static::$policyService->renew($policy, 12, false, new \DateTime('2016-12-30'));
+        static::$policyService->renew($policy, 12, null, new \DateTime('2016-12-30'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicy->getStatus());
         $this->assertNull($renewalPolicy->getPendingCancellation());
 
