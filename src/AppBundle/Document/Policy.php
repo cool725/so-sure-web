@@ -203,7 +203,7 @@ abstract class Policy
     protected $policyTerms;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Cashback", cascade={"persist"})
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Cashback", cascade={"persist"}, orphanRemoval="true")
      * @Gedmo\Versioned
      */
     protected $cashback;
@@ -522,7 +522,17 @@ abstract class Policy
     public function setCashback($cashback)
     {
         $this->cashback = $cashback;
-        $cashback->setPolicy($this);
+        if ($cashback) {
+            $cashback->setPolicy($this);
+        }
+    }
+
+    public function clearCashback()
+    {
+        if ($this->cashback) {
+            $this->cashback->setPolicy(null);
+        }
+        $this->cashback = null;
     }
 
     public function getUser()

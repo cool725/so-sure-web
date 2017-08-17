@@ -1410,6 +1410,8 @@ class PolicyService
 
         if ($cashback) {
             $this->cashback($policy, $cashback);
+        } else {
+            $policy->clearCashback();
         }
 
         $startDate = $this->endOfDay($policy->getEnd());
