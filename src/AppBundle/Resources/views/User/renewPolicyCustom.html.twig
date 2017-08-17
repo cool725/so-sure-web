@@ -25,6 +25,7 @@
             </div>
         </div>
     {% endif %}
+
     <div class="payment--step">
         <div class="payment--step-inner clearfix">
             {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %}
@@ -34,39 +35,13 @@
                 <h4>Payment will be taken (Thoughts?)<br>
                     <small>(More text)</small></h4>
             {% endif %}
-            {% if app.user.allowedMonthlyPayments %}
-                <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two payment--btn-left {% endif %}" id="payment--adjusted-monthly" data-value="{{ renew.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }}|12|1">
-                    <div class="payment--btn-inner {% if not app.user.allowedYearlyPayments %} payment--btn-inner-single {% endif %}">
-                        <span class="billed visible-xs">Monthly <br></span>
-                        <span class="amount">£{{ renew.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }}
-                        <span class="hidden-xs">a month</span><br></span>
-                        <small class="visible-xs">Billed on {{ policy.getPendingCancellation|date('jS') }} of each month</small>
-                        <small class="hidden-xs">You will be billed on the {{ policy.getPendingCancellation|date('jS') }}  of each month</small>
-                    </div>
-                </div>
-            {% endif %}
-            {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %}
-                <div class="payment--btn-or">
-                    OR
-                </div>
-            {% endif %}
-            {% if app.user.allowedYearlyPayments %}
-                <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two payment--btn-right {% endif %}" id="payment--adjusted-yearly" data-value="{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }}|1|1">
-                    <div class="payment--btn-inner {% if not app.user.allowedMonthlyPayments %} payment--btn-inner-single {% endif %}">
-                        <span class="billed visible-xs">Yearly <br></span>
-                        <span class="amount">£{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }}
-                        <span class="hidden-xs">a year</span><br></span>
-                        <small class="visible-xs">Billed on date of purchase</small>
-                        <small class="hidden-xs">You will be billed for the year on {{ policy.getPendingCancellation|date('jS M') }}</small>
-                    </div>
-                </div>
-            {% endif %}
-            {% if policy.potValue > 0 %}
+
+            <div id="payment--reward-btns">
                 {% if app.user.allowedMonthlyPayments %}
-                    <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two payment--btn-left {% endif %}" id="payment--monthly" data-value="{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}|12|0">
+                    <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two payment--btn-left {% endif %}" id="payment--adjusted-monthly" data-value="{{ renew.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }}|12|1">
                         <div class="payment--btn-inner {% if not app.user.allowedYearlyPayments %} payment--btn-inner-single {% endif %}">
                             <span class="billed visible-xs">Monthly <br></span>
-                            <span class="amount">£{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}
+                            <span class="amount">£{{ renew.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }}
                             <span class="hidden-xs">a month</span><br></span>
                             <small class="visible-xs">Billed on {{ policy.getPendingCancellation|date('jS') }} of each month</small>
                             <small class="hidden-xs">You will be billed on the {{ policy.getPendingCancellation|date('jS') }}  of each month</small>
@@ -79,37 +54,71 @@
                     </div>
                 {% endif %}
                 {% if app.user.allowedYearlyPayments %}
-                    <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two payment--btn-right {% endif %}" id="payment--yearly" data-value="{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}|1|0">
+                    <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two payment--btn-right {% endif %}" id="payment--adjusted-yearly" data-value="{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }}|1|1">
                         <div class="payment--btn-inner {% if not app.user.allowedMonthlyPayments %} payment--btn-inner-single {% endif %}">
                             <span class="billed visible-xs">Yearly <br></span>
-                            <span class="amount">£{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}
+                            <span class="amount">£{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }}
                             <span class="hidden-xs">a year</span><br></span>
                             <small class="visible-xs">Billed on date of purchase</small>
                             <small class="hidden-xs">You will be billed for the year on {{ policy.getPendingCancellation|date('jS M') }}</small>
                         </div>
                     </div>
                 {% endif %}
+            </div>
+
+            {% if policy.potValue > 0 %}
+                <div id="payment--cashback-btns" style="display:none;">
+                    {% if app.user.allowedMonthlyPayments %}
+                        <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two payment--btn-left {% endif %}" id="payment--monthly" data-value="{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}|12|0">
+                            <div class="payment--btn-inner {% if not app.user.allowedYearlyPayments %} payment--btn-inner-single {% endif %}">
+                                <span class="billed visible-xs">Monthly <br></span>
+                                <span class="amount">£{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}
+                                <span class="hidden-xs">a month</span><br></span>
+                                <small class="visible-xs">Billed on {{ policy.getPendingCancellation|date('jS') }} of each month</small>
+                                <small class="hidden-xs">You will be billed on the {{ policy.getPendingCancellation|date('jS') }}  of each month</small>
+                            </div>
+                        </div>
+                    {% endif %}
+                    {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %}
+                        <div class="payment--btn-or">
+                            OR
+                        </div>
+                    {% endif %}
+                    {% if app.user.allowedYearlyPayments %}
+                        <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two payment--btn-right {% endif %}" id="payment--yearly" data-value="{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}|1|0">
+                            <div class="payment--btn-inner {% if not app.user.allowedMonthlyPayments %} payment--btn-inner-single {% endif %}">
+                                <span class="billed visible-xs">Yearly <br></span>
+                                <span class="amount">£{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}
+                                <span class="hidden-xs">a year</span><br></span>
+                                <small class="visible-xs">Billed on date of purchase</small>
+                                <small class="hidden-xs">You will be billed for the year on {{ policy.getPendingCancellation|date('jS M') }}</small>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
             {% endif %}
+
         </div>
     </div>
+
     <div class="checkout--step">
         <div class="container">
             <form>
-                <div class="form-group">
-                    <a id="renew--continue-btn"
-                       href="#"
+                <div class="form-group" id="renew--continue-btn">
+                    <a href="#"
                        data-toggle="modal"
                        data-target="#renewModal"
                        class="btn btn-green btn-block btn-pad">Continue</a>
-                    {% if policy.potValue > 0 %}
-                        <a id="renew--continue-cashback-btn"
-                           href="#"
+                </div>
+                {% if policy.potValue > 0 %}
+                    <div class="form-group"
+                         id="renew--continue-cashback-btn"
+                         style="display:none;">
+                        <a href="#"
                            data-toggle="modal"
                            data-target="#renewCashbackModal"
                            class="btn btn-green btn-block btn-pad">Continue</a>
-                    {% endif %}
-                </div>
-                {% if policy.potValue > 0 %}
+                    </div>
                     <div class="form-group">
                         <a href="#" data-toggle="modal" data-target="#cashbackModal" class="btn btn-blue btn-block btn-pad">Don't renew, just get cashback</a>
                     </div>
@@ -117,9 +126,17 @@
                 <div class="form-group">
                     <a href="{{ path('user_renew_policy', {'id': policy.id}) }}" class="btn btn-blue-hollow btn-block btn-pad">Back</a>
                 </div>
+                <p><small>Our pricing may have increased slightly. This is largely due to the government mandated increase in IPT to 12% in June 2017.  Your premium last year was
+                {% if policy.getPremiumPlan == 'monthly' %}
+                    <span class="text-blue">£{{ renew.getMonthlyPremiumPrice }}</span> per month.
+                {% else %}
+                    <span class="text-blue">£{{ renew.getYearlyPremiumPrice }}</span> per year.
+                {% endif %}
+                </small></p>
             </form>
         </div>
     </div>
+
 {% endblock %}
 
 {% block modals %}
