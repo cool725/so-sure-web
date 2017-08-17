@@ -1027,7 +1027,7 @@ class PolicyService
         if ($policy->isRenewed()) {
             // No need to send an email as the renewal email should cover both expiry and renewal
             \AppBundle\Classes\NoOp::ignore([]);
-        } elseif ($policy->canRepurchase() && $policy->setUser()->areRenewalsDesired()) {
+        } elseif ($policy->canRepurchase() && $policy->getUser()->areRenewalsDesired()) {
             $baseTemplate = sprintf('AppBundle:Email:policy/expiredDesireRepurchase');
             $subject = sprintf('Your so-sure policy %s is now finished', $policy->getPolicyNumber());
         } else {
