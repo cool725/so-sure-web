@@ -140,7 +140,7 @@
 {% endblock %}
 
 {% block modals %}
-<div class="modal modal-purchase fade"
+<div class="modal modal-purchase modal-policy fade"
      id="renewModal"
      tabindex="-1"
      role="dialog">
@@ -151,21 +151,27 @@
                 <h3 class="modal-title text-blue">Before you proceed! <br>Please confirm the following are correct:</h3>
             </div>
             <div class="modal-body">
-                {{ form_start(renew_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
-                <ol>
-                    <li>I am a resident of the United Kingdom.</li>
-                    <li>I have read &amp; understood the so-sure policy document.</li>
-                </ol>
-                <p>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</p>
-                <div class="form-group">
-                    {{ form_widget(renew_form.renew, {'label': 'Renew my policy', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
+                <div class="modal-body__review">
+                    {{ form_start(renew_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
+                    <ol>
+                        <li>I am a resident of the United Kingdom.</li>
+                        <li>I have read &amp; understood the <a class="policy-doc-toggle" href="#policy-doc">so-sure policy document</a>.</li>
+                    </ol>
+                    <p>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</p>
+                    <div class="form-group">
+                        {{ form_widget(renew_form.renew, {'label': 'Renew my policy', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
+                    </div>
+                    {{ form_end(renew_form) }}
                 </div>
-                {{ form_end(renew_form) }}
+                <div id="#policy-doc" class="modal-body__policy-doc" style="display:none;">
+                    <button type="button" class="close policy-doc-toggle" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot })) }}
+                </div>
             </div>
         </div>
     </div>
 </div>
-<div class="modal modal-purchase fade"
+<div class="modal modal-purchase modal-policy fade"
      id="renewCashbackModal"
      tabindex="-1"
      role="dialog">
@@ -176,28 +182,34 @@
                 <h3 class="modal-title text-blue">Before you proceed! <br>Please confirm the following are correct:</h3>
             </div>
             <div class="modal-body">
-                {{ form_start(renew_cashback_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
-                <ol>
-                    <li>I am a resident of the United Kingdom.</li>
-                    <li>I have read &amp; understood the so-sure policy document.</li>
-                </ol>
-                <p>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</p>
-                <div class="form-group">
-                    {{ form_widget(renew_cashback_form.accountName, {'attr': {'placeholder': 'Account Name', 'class': 'form-control'}}) }}
-                    <div class="help-block with-errors">{{ form_errors(renew_cashback_form.accountName) }}</div>
+                <div class="modal-body__review">
+                    {{ form_start(renew_cashback_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
+                    <ol>
+                        <li>I am a resident of the United Kingdom.</li>
+                        <li>I have read &amp; understood the <a class="policy-doc-toggle" href="#policy-doc">so-sure policy document</a>.</li>
+                    </ol>
+                    <p>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</p>
+                    <div class="form-group">
+                        {{ form_widget(renew_cashback_form.accountName, {'attr': {'placeholder': 'Account Name', 'class': 'form-control'}}) }}
+                        <div class="help-block with-errors">{{ form_errors(renew_cashback_form.accountName) }}</div>
+                    </div>
+                    <div class="form-group cashback--item">
+                        {{ form_widget(renew_cashback_form.sortCode, {'attr': {'placeholder': 'Sort Code', 'class': 'form-control'}}) }}
+                        <div class="help-block with-errors">{{ form_errors(renew_cashback_form.sortCode) }}</div>
+                    </div>
+                    <div class="form-group cashback--item">
+                        {{ form_widget(renew_cashback_form.accountNumber, {'attr': {'placeholder': 'Account Number', 'class': 'form-control'}}) }}
+                        <div class="help-block with-errors">{{ form_errors(renew_cashback_form.accountNumber) }}</div>
+                    </div>
+                    <div class="form-group">
+                        {{ form_widget(renew_cashback_form.renew, {'label': 'Renew my policy', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
+                    </div>
+                    {{ form_end(renew_cashback_form) }}
                 </div>
-                <div class="form-group cashback--item">
-                    {{ form_widget(renew_cashback_form.sortCode, {'attr': {'placeholder': 'Sort Code', 'class': 'form-control'}}) }}
-                    <div class="help-block with-errors">{{ form_errors(renew_cashback_form.sortCode) }}</div>
+                <div id="#policy-doc" class="modal-body__policy-doc" style="display:none;">
+                    <button type="button" class="close policy-doc-toggle" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot })) }}
                 </div>
-                <div class="form-group cashback--item">
-                    {{ form_widget(renew_cashback_form.accountNumber, {'attr': {'placeholder': 'Account Number', 'class': 'form-control'}}) }}
-                    <div class="help-block with-errors">{{ form_errors(renew_cashback_form.accountNumber) }}</div>
-                </div>
-                <div class="form-group">
-                    {{ form_widget(renew_cashback_form.renew, {'label': 'Renew my policy', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
-                </div>
-                {{ form_end(renew_cashback_form) }}
             </div>
         </div>
     </div>
@@ -220,19 +232,19 @@
                 </p>
                 {{ form_start(cashback_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
                 <div class="form-group cashback--item">
-                    {{ form_widget(cashback_form.accountName, {'attr': {'placeholder': 'Account Name'}}) }}
+                    {{ form_widget(cashback_form.accountName, {'attr': {'placeholder': 'Account Name', 'class': 'form-control'}}) }}
                     <div class="help-block with-errors">{{ form_errors(cashback_form.accountName) }}</div>
                 </div>
                 <div class="form-group cashback--item">
-                    {{ form_widget(cashback_form.sortCode, {'attr': {'placeholder': 'Sort Code'}}) }}
+                    {{ form_widget(cashback_form.sortCode, {'attr': {'placeholder': 'Sort Code', 'class': 'form-control'}}) }}
                     <div class="help-block with-errors">{{ form_errors(cashback_form.sortCode) }}</div>
                 </div>
                 <div class="form-group cashback--item">
-                    {{ form_widget(cashback_form.accountNumber, {'attr': {'placeholder': 'Account Number'}}) }}
+                    {{ form_widget(cashback_form.accountNumber, {'attr': {'placeholder': 'Account Number', 'class': 'form-control'}}) }}
                     <div class="help-block with-errors">{{ form_errors(cashback_form.accountNumber) }}</div>
                 </div>
                 <div class="form-group">
-                    {{ form_widget(cashback_form.cashback, {'label': 'Request cashback', 'attr': {'class': 'btn btn-success btn-block btn-arrow-right'}}) }}
+                    {{ form_widget(cashback_form.cashback, {'label': 'Request cashback', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
 
                 </div>
                 {{ form_end(cashback_form) }}

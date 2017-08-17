@@ -66,4 +66,14 @@ $(function(){
         $('#renew_cashback_form_encodedAmount').val(value);
     });
 
+    // Hide/Show policy doc
+    $('.policy-doc-toggle').click(function(e) {
+        // e.preventDefault();
+        $('.modal-body__policy-doc').toggle();
+    });
+
+    $('#policy-modal, .modal-policy').on('hide.bs.modal', function (event) {
+        $('.modal-body__policy-doc').hide();
+    });
+
 });
