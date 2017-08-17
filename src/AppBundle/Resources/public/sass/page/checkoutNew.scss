@@ -234,7 +234,8 @@
     }
 }
 
-.payment--step + .payment--step {
+.payment--step + .payment--step,
+.payment--step + .checkout--step {
     border-bottom: none;
     border-top: none;
 }
