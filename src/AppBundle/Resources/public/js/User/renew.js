@@ -33,8 +33,10 @@ sosure.renew = (function() {
 })();
 
 $(function(){
-
     sosure.renew.init();
+});
+
+$(function(){
 
     // Init carousel
     $('.owl-carousel').owlCarousel({
