@@ -145,7 +145,7 @@ class ApiViewControllerTest extends BaseControllerTest
             /* If changes do occur, useful for running a diff */
             file_put_contents('/vagrant/terms-api.txt', $data);
             file_put_contents('/vagrant/terms-pdf.txt', $pdf);
-            print 'meld /var/sosure/terms-api.txt /var/sosure/terms-pdf.txt';
+            //print 'meld /var/sosure/terms-api.txt /var/sosure/terms-pdf.txt';
         }
 
         $this->assertEquals($data, $pdf);
