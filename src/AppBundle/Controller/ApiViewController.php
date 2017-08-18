@@ -39,6 +39,8 @@ class ApiViewController extends BaseController
 
         $dm = $this->getManager();
         $repo = $dm->getRepository(PhonePolicy::class);
+        $termsRepo = $dm->getRepository(PolicyTerms::class);
+        $terms = $termsRepo->findOneBy(['latest' => true]);
 
         $tmpPolicy = new PhonePolicy();
         $prefix = $tmpPolicy->getPolicyNumberPrefix();
@@ -56,12 +58,10 @@ class ApiViewController extends BaseController
             // 'promo_code' => $repo->isPromoLaunch($prefix) ? 'launch' : null,
         );
 
-        $feature = $this->get('app.feature');
-        if ($feature->isEnabled(Feature::FEATURE_PICSURE)) {
-            return $this->render('AppBundle:ApiView:policyTermsV2.html.twig', $data);
-        } else {
-            return $this->render('AppBundle:ApiView:policyTermsV1.html.twig', $data);
-        }
+        $template = sprintf(
+            'AppBundle:ApiView:policyTermsV%d.html.twig',
+            $terms->getVersionNumber()
+        );
     }
 
     /**
@@ -93,10 +93,11 @@ class ApiViewController extends BaseController
             'include' => $request->get('include'),
         );
 
-        if ($policy->getPolicyTerms()->isPicSureEnabled()) {
-            return $this->render('AppBundle:ApiView:policyTermsV2.html.twig', $data);
-        } else {
-            return $this->render('AppBundle:ApiView:policyTermsV1.html.twig', $data);
-        }
+        $template = sprintf(
+            'AppBundle:ApiView:policyTermsV%d.html.twig',
+            $policy->getPolicyTerms()->getVersionNumber()
+        );
+
+        return $this->render($template, $data);
     }
 }

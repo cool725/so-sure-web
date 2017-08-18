@@ -90,67 +90,35 @@ class ApiViewControllerTest extends BaseControllerTest
         return $data;
     }
 
-    public function testPolicyTermsDiffV1()
+    public function testPolicyTermsDiffs()
     {
         $policyTermsRepo = static::$dm->getRepository(PolicyTerms::class);
-        $oldTerms = $policyTermsRepo->findOneBy(['latest' => false]);
+        $count = 0;
+        foreach (PolicyTerms::$allVersions as $version) {
+            $count++;
+            $terms = $policyTermsRepo->findOneBy(['version' => $version]);
+            $user = self::createUser(
+                self::$userManager,
+                self::generateEmail(sprintf('policy-terms-diff-v%d', $count), $this),
+                'foo'
+            );
+            $policy = $this->createPolicy($user, true);
+            $policy->setPolicyTerms($terms);
+            self::$dm->flush();
+            $data = $this->checkPolicy($policy, true);
 
-        $user = self::createUser(
-            self::$userManager,
-            self::generateEmail('policy-terms-diff', $this),
-            'foo'
-        );
-        $policy = $this->createPolicy($user, true);
-        $policy->setPolicyTerms($oldTerms);
-        $data = $this->checkPolicy($policy, true);
+            $templating = self::$container->get('templating');
+            $pdf = $templating->render(
+                sprintf('AppBundle:Pdf:policyTermsV%d.html.twig', PolicyTerms::getVersionNumberByVersion($version)),
+                ['policy' => $policy]
+            );
 
-        $templating = self::$container->get('templating');
-        $pdf = $templating->render('AppBundle:Pdf:policyTermsV1.html.twig', ['policy' => $policy]);
-
-        $this->assertContains('<body>', $data);
-        // remove tags
-        $data = strip_tags($data);
-        $pdf = strip_tags($pdf);
-
-        // adjust for differences in files
-        $pdf = str_replace('p {display: block;}', '', $pdf);
-        $pdf = str_replace('•', '', $pdf);
-        $pdf = str_replace('&nbsp;', '', $pdf);
-
-        // top and bottom of api is slightly different - best to add to pdf version to avoid replacing unindented areas
-        $pdf = sprintf('so-sure Policy Document%s', $pdf);
-        // @codingStandardsIgnoreStart
-        $pdf = sprintf('%s Contact details Address: so-sure Limited, 10 Finsbury Square, London EC2A 1AF Email: support@wearesosure.com', $pdf);
-        // @codingStandardsIgnoreEnd
-
-        // delete extra spaces, and chunk into 200 chars to make comparision easier
-        $data = trim(preg_replace('/\s+/', ' ', $data));
-        $pdf = trim(preg_replace('/\s+/', ' ', $pdf));
-        $data = chunk_split($data, 200);
-        $pdf = chunk_split($pdf, 200);
-
-        /* If changes do occur, useful for running a diff
-        file_put_contents('/vagrant/terms-api.txt', $data);
-        file_put_contents('/vagrant/terms-pdf.txt', $pdf);
-        print 'meld /var/sosure/terms-api.txt /var/sosure/terms-pdf.txt';
-        */
-
-        $this->assertEquals($data, $pdf);
+            $this->verifyTerms($data, $pdf);
+        }
     }
 
-    public function testPolicyTermsDiffV2()
+    private function verifyTerms($data, $pdf, $debug = false)
     {
-        $user = self::createUser(
-            self::$userManager,
-            self::generateEmail('policy-terms-diff-v2', $this),
-            'foo'
-        );
-        $policy = $this->createPolicy($user, true);
-        $data = $this->checkPolicy($policy, true);
-
-        $templating = self::$container->get('templating');
-        $pdf = $templating->render('AppBundle:Pdf:policyTermsV2.html.twig', ['policy' => $policy]);
-
         $this->assertContains('<body>', $data);
         // remove tags
         $data = strip_tags($data);
@@ -173,11 +141,12 @@ class ApiViewControllerTest extends BaseControllerTest
         $data = chunk_split($data, 200);
         $pdf = chunk_split($pdf, 200);
 
-        /* If changes do occur, useful for running a diff
-        file_put_contents('/vagrant/terms-api.txt', $data);
-        file_put_contents('/vagrant/terms-pdf.txt', $pdf);
-        print 'meld /var/sosure/terms-api.txt /var/sosure/terms-pdf.txt';
-        */
+        if ($debug) {
+            /* If changes do occur, useful for running a diff */
+            file_put_contents('/vagrant/terms-api.txt', $data);
+            file_put_contents('/vagrant/terms-pdf.txt', $pdf);
+            print 'meld /var/sosure/terms-api.txt /var/sosure/terms-pdf.txt';
+        }
 
         $this->assertEquals($data, $pdf);
     }
