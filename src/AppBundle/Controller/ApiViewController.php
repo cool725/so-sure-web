@@ -62,6 +62,8 @@ class ApiViewController extends BaseController
             'AppBundle:ApiView:policyTermsV%d.html.twig',
             $terms->getVersionNumber()
         );
+
+        return $this->render($template, $data);
     }
 
     /**

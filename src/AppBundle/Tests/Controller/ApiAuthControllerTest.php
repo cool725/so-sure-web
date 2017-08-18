@@ -668,7 +668,7 @@ class ApiAuthControllerTest extends BaseControllerTest
     /**
      *
      */
-    public function testNewPolicy()
+    public function testApiNewPolicy()
     {
         $this->clearRateLimit();
         $user = self::createUser(self::$userManager, self::generateEmail('policy', $this), 'foo', true);
@@ -687,6 +687,12 @@ class ApiAuthControllerTest extends BaseControllerTest
         ]]);
 
         $data = $this->verifyResponse(200);
+        $repo = self::$dm->getRepository(Policy::class);
+        $policy = $repo->find($data['id']);
+        $this->assertTrue($policy !== null);
+        $this->assertEquals('62.253.24.189', $policy->getIdentityLog()->getIp());
+        $this->assertEquals('GB', $policy->getIdentityLog()->getCountry());
+        $this->assertEquals([-0.13,51.5], $policy->getIdentityLog()->getLoc()->coordinates);
 
         $this->assertTrue(strlen($data['id']) > 5);
         $this->assertTrue(in_array('A0001', $data['phone_policy']['phone']['devices']));
@@ -696,7 +702,10 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertNull($data['phone_policy']['picsure_status']);
         $this->assertTrue(count($data['phone_policy']['excesses']) > 0);
         foreach ($data['phone_policy']['excesses'] as $excess) {
-            $this->assertEquals(150, $excess['amount']);
+            $excessMax = $policy->getPolicyTerms()->isPicSureEnabled() ? 150 : 70;
+            $excessMin = $policy->getPolicyTerms()->isPicSureEnabled() ? 150 : 50;
+            $this->assertGreaterThanOrEqual($excessMin, $excess['amount']);
+            $this->assertLessThanOrEqual($excessMax, $excess['amount']);
         }
 
         // Now make sure that the policy shows up against the user
@@ -711,13 +720,6 @@ class ApiAuthControllerTest extends BaseControllerTest
             }
         }
         $this->assertTrue($foundPolicy);
-
-        $repo = self::$dm->getRepository(Policy::class);
-        $policy = $repo->find($data['id']);
-        $this->assertTrue($policy !== null);
-        $this->assertEquals('62.253.24.189', $policy->getIdentityLog()->getIp());
-        $this->assertEquals('GB', $policy->getIdentityLog()->getCountry());
-        $this->assertEquals([-0.13,51.5], $policy->getIdentityLog()->getLoc()->coordinates);
     }
 
     public function testNewPolicy17DigitImei()
