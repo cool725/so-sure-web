@@ -20,26 +20,32 @@
     <section class="checkout">
         <div class="checkout--top">
             <div class="container">
-
                 {% if policy.hasNextPolicy and policy.nextPolicy.status == "renewal" %}
                     <h1 class="h2">
                         <span class="title-top">
-                            Your policy is scheduled to be renewed
-                            {% if policy.hasCashback %}
-                                <br>
-                                Your cashback request was received and will be processed <span class="text-blue">28-45</span> days after your policy has ended.
-                            {% endif %}
+                            Thank you for renewing your policy with so-sure.
                         </span>
                     </h1>
+                    <h4 class="text-center">You will continue to be protected against theft, loss, and accidental damage.</h4>
+                    <p class="lead text-center">Make sure that you continue to get your pot reward next year by re-inviting all your existing connections.<br> Add more connections to get even more money in your pot.</p>
+                    {% if policy.hasCashback %}
+                        <p class="lead text-center">
+                            Your cashback request was received and will be processed <span class="text-blue">28-45</span> days after your policy has ended.
+                        </p>
+                    {% endif %}
                 {% elseif policy.hasCashback %}
-                    <h1 class="h2"><span class="title-top">Your cashback request was received and will be processed <span class="text-blue">28-45</span> days after your policy has ended.</span></h1>
+                    <p class="lead text-center">Your cashback request was received and will be processed <span class="text-blue">28-45</span> days after your policy has ended.</span></p>
                 {% else %}
                     {% block titleArea %}{% endblock %}
+                    {% block content %}{% endblock %}
                 {% endif %}
-                {% block content %}{% endblock %}
             </div>
         </div>
-        {% block actions %}{% endblock %}
+        {% if policy.hasNextPolicy and policy.nextPolicy.status == "renewal" %}
+            <h1 class="text-center">connections here</h1>
+        {% else %}
+            {% block actions %}{% endblock %}
+        {% endif %}
     </section>
 
     {% block modals %}{% endblock %}
