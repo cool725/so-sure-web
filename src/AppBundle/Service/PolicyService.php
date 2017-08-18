@@ -574,10 +574,10 @@ class PolicyService
             unlink($tmpFile);
         }
 
-        $template = 'AppBundle:Pdf:policyTermsV1.html.twig';
-        if ($policy->getPolicyTerms()->isPicSureEnabled()) {
-            $template = 'AppBundle:Pdf:policyTermsV2.html.twig';
-        }
+        $template = sprintf(
+            'AppBundle:Pdf:policyTermsV%d.html.twig',
+            $policy->getPolicyTerms()->getVersionNumber()
+        );
 
         $this->snappyPdf->setOption('orientation', 'Landscape');
         $this->snappyPdf->setOption('lowquality', false);
@@ -615,10 +615,10 @@ class PolicyService
             unlink($tmpFile);
         }
 
-        $template = 'AppBundle:Pdf:policyScheduleV1.html.twig';
-        if ($policy->getPolicyTerms()->isPicSureEnabled()) {
-            $template = 'AppBundle:Pdf:policyScheduleV2.html.twig';
-        }
+        $template = sprintf(
+            'AppBundle:Pdf:policyScheduleV%d.html.twig',
+            $policy->getPolicyTerms()->getVersionNumber()
+        );
 
         $this->snappyPdf->setOption('orientation', 'Portrait');
         $this->snappyPdf->setOption('page-size', 'A4');
