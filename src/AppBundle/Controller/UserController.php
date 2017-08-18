@@ -381,13 +381,24 @@ class UserController extends BaseController
     }
 
     /**
+     * @Route("/renew", name="user_renew_policy_any")
      * @Route("/renew/{id}", name="user_renew_policy")
      * @Template
      */
-    public function renewPolicyAction(Request $request, $id)
+    public function renewPolicyAction(Request $request, $id = null)
     {
         $dm = $this->getManager();
         $policyRepo = $dm->getRepository(Policy::class);
+
+        if (!$id) {
+            foreach ($this->getUser()->getPolicies() as $policy) {
+                if ($policy->canRenew()) {
+                    $id = $policy->getId();
+                    break;
+                }
+            }
+        }
+
         $policy = $policyRepo->find($id);
         $this->denyAccessUnlessGranted(PolicyVoter::RENEW, $policy);
 
