@@ -620,6 +620,9 @@ abstract class BaseController extends Controller
         $dm = $this->getManager();
         $snsRepo = $dm->getRepository(Sns::class);
         $sns = $snsRepo->findOneBy(['endpoint' => $endpoint]);
+        if (!$sns) {
+            return;
+        }
         $subscriptionArn = null;
         switch ($topic) {
             case 'all':
