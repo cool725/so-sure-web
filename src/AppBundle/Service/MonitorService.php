@@ -89,7 +89,7 @@ class MonitorService
         $now = new \DateTime();
         foreach ($claims as $claim) {
             $replacementDate = $claim->getPolicy()->getImeiReplacementDate();
-            if (!$replacementDate ||
+            if ($replacementDate &&
                 $now->getTimestamp() - $replacementDate->getTimestamp() > 3600) {
                 throw new \Exception(sprintf(
                     'Claim %s Policy %s is missing replacement phone',
