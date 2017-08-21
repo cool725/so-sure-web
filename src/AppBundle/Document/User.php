@@ -433,6 +433,8 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     public function getPolicies()
     {
+        return $this->policies;
+        /*
         $policies = [];
         foreach ($this->policies as $policy) {
             // If the user is declined we want to have the policy in the list
@@ -443,6 +445,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         }
 
         return $policies;
+        */
     }
 
     public function getNamedPolicies()
