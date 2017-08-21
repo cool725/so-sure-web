@@ -100,12 +100,12 @@
     }
 
     .radio {
-        position:absolute;
-        left:-10000px;
-        top:auto;
-        width:1px;
-        height:1px;
-        overflow:hidden;
+        position: absolute;
+        left: -10000px;
+        top: auto;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
     }
 }
 
@@ -130,14 +130,15 @@
     text-align: center;
 
     &-inner {
+        max-width: 700px;
         position: relative;
         margin: 0 auto;
-        padding: 10px 0 0;
+        padding: 0;
         border-left: 1px solid $pale-grey;
         border-right: 1px solid $pale-grey;
 
         h4 {
-            margin: 0 0 10px;
+            margin: 10px 0;
         }
     }
 
@@ -183,41 +184,15 @@
             background-color: $white;
             border: 1px solid $primary-blue;
             position: absolute;
-            left: 50%; bottom: 30px;
+            left: 50%; bottom: 50%;
             margin-left: -20px;
-
-            @include breakpoint(tablet) {
-                bottom: 35px;
-            }
+            margin-bottom: -55px;
         }
     }
 
     .payment--btn-two {
         width: 50%;
         float: left;
-    }
-
-    @include breakpoint(tablet) {
-
-        .payment--btn-inner {
-            max-width: 350px;
-            padding: 10px 0;
-        }
-
-        .payment--btn-left {
-            .payment--btn-inner {
-                float: right;
-                margin-right: 50px;
-            }
-        }
-
-        .payment--btn-right {
-            .payment--btn-inner {
-                float: left;
-                margin-left: 50px;
-            }
-        }
-
     }
 
     .payment--btn-inner-single {
@@ -232,6 +207,37 @@
             color: $white;
         }
     }
+
+    .payment--no-btn {
+        padding: 15px 0;
+        background-color: $white;
+        border-top: 1px solid $pale-grey;
+
+        font-family: $avenir-heavy;
+        color: $dark-grey;
+
+        .billed {
+            font-size: 16px;
+        }
+
+        .amount {
+            font-size: 24px;
+        }
+
+        .no-btn {
+            color: $primary-blue;
+        }
+
+        small {
+            font-size: 12px;
+            font-family: $avenir-book;
+        }
+    }
+}
+
+.payment--step + .payment--step {
+    border-bottom: none;
+    border-top: none;
 }
 
 // Cover / Benefits

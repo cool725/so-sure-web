@@ -1,48 +1,140 @@
 {% extends 'AppBundle:User:baseRenewPolicy.html.twig' %}
 
+{% block titleArea %}
+    <h1>
+        <span class="title-top">Renew your</span>
+        <br class="visible-xs">
+        <span class="title-phone text-blue text-nowrap">{{ policy.phone.make }} {{ policy.phone.model }} {% if policy.phone.memory %}{{ policy.phone.memory }}GB{% endif %} </span>
+        <br class="visible-xs">
+        <span class="title-top">insurance</span><br>
+        {% if policy.getPremiumPlan == 'monthly' %}
+            <span class="title-price">for just <span class="text-blue">£{{ renew.getAdjustedStandardMonthlyPremiumPrice }}</span> per month</span>
+        {% else %}
+            <span class="title-price">for just <span class="text-blue">£{{ renew.getAdjustedYearlyPremiumPrice }}</span> per year</span>
+        {% endif %} <br>
+    </h1>
+
+    {% if policy.potValue > 0 %}
+        <div class="text-center">
+            <span class="h4 text-light-blue">
+                {% if policy.getPremiumPlan == 'monthly' %}
+                    (<span class="text-blue">£{{ renew.getMonthlyPremiumPrice }}</span> per month without your <span class="text-blue">£{{ policy.potValue }}</span> reward pot)
+                {% else %}
+                    (<span class="text-blue">£{{ renew.getYearlyPremiumPrice }}</span> per year without your <span class="text-blue">£{{ policy.potValue }}</span> reward pot)
+                {% endif %}
+            </span>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <h4 class="text-center">and keep covered against:</h4>
+
+    <div class="owl-carousel owl-theme visible-xs benefits">
+        <div class="item">
+            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-water-damage.svg" alt="Accidental Damage" title="Accidental damage">
+            <h5>Water damage</h5>
+        </div>
+        <div class="item">
+            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-cracked-screen.svg" alt="Cracked screen" title="Cracked screen">
+            <h5>Cracked screen</h5>
+        </div>
+        <div class="item">
+            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-loss.svg" alt="Loss" title="Loss">
+            <h5>Loss</h5>
+        </div>
+        <div class="item">
+            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-theft.svg" alt="Theft" title="Theft">
+            <h5>Theft</h5>
+        </div>
+    </div>
+
+    <ul class="list-inline cover-list hidden-xs benefits">
+        <li>
+            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-water-damage.svg" alt="Accidental Damage" title="Accidental damage">
+            <h5 class="h-light">Water damage</h5>
+        </li>
+        <li>
+            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-cracked-screen.svg" alt="Cracked screen" title="Cracked screen">
+            <h5 class="h-light">Cracked screen</h5>
+        </li>
+        <li>
+            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-loss.svg" alt="Loss" title="Loss">
+            <h5 class="h-light">Loss</h5>
+        </li>
+        <li>
+            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-theft.svg" alt="Theft" title="Theft">
+            <h5 class="h-light">Theft</h5>
+        </li>
+    </ul>
+{% endblock %}
+
 {% block actions %}
-    <div class="checkout--phone-indent">
-        <div class="form-group form-footer">
-            <div class="row">
-                <div class="col-xs-6 col-sm-6 col-md-6">
-                    <a href="#" class="btn btn-success" data-toggle="modal" data-target="#renewModal">Renew my policy</a>
+    <div class="checkout--step">
+        <div class="container">
+            <form>
+                <div class="form-step">
+                    <div class="form-group">
+                        <a href="#"
+                           class="btn btn-green btn-block btn-pad"
+                           data-toggle="modal"
+                           data-target="#renewModal">Renew my policy</a>
+                    </div>
+                    <div class="form-group">
+                        {% if policy.potValue > 0 %}
+                            <a href="{{ path('user_renew_custom_policy', {'id': policy.id}) }}" class="btn btn-blue btn-block btn-pad">Make changes or get your pot back in cash?</a>
+                        {% elseif policy.getPremiumPlan == 'monthly' %}
+                            <a href="{{ path('user_renew_custom_policy', {'id': policy.id}) }}" class="btn btn-blue btn-block btn-pad">Make changes?</a>
+                        {% endif %}
+                    </div>
                 </div>
-                <div class="col-xs-6 col-sm-6 col-md-6">
-                    {% if policy.potValue > 0 %}
-                        <a href="{{ path('user_renew_custom_policy', {'id': policy.id}) }}" class="btn btn-info ">Make changes or get your pot back in cash?</a>
-                    {% else %}
-                        <a href="{{ path('user_renew_custom_policy', {'id': policy.id}) }}" class="btn btn-info ">Make changes?</a>
-                    {% endif %}
-                </div>
-            </div>
+                <p><small>Our pricing may have increased slightly. This is largely due to the government mandated increase in IPT to 12% in June 2017.  Your premium last year was
+                {% if policy.getPremiumPlan == 'monthly' %}
+                    <span class="text-blue">£{{ renew.getMonthlyPremiumPrice }}</span> per month.
+                {% else %}
+                    <span class="text-blue">£{{ renew.getYearlyPremiumPrice }}</span> per year.
+                {% endif %}
+                </small></p>
+            </form>
         </div>
     </div>
 {% endblock %}
 
 {% block modals %}
-<div class="modal modal-purchase fade"
-     id="renewModal"
-     tabindex="-1"
-     role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h3 class="modal-title text-blue">Before you proceed! <br>Please confirm the following are correct:</h3>
-            </div>
-            <div class="modal-body">
-                {{ form_start(renew_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
-                <ol>
-                    <li>I am a resident of the United Kingdom.</li>
-                    <li>I have read &amp; understood the so-sure policy document.</li>
-                </ol>
-                <p>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</p>
-                <div class="form-group">
-                    {{ form_widget(renew_form.renew, {'label': 'Renew my policy', 'attr': {'class': 'btn btn-success btn-block btn-arrow-right'}}) }}
+    <div class="modal modal-purchase modal-policy fade"
+         id="renewModal"
+         tabindex="-1"
+         role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button"
+                            class="close"
+                            data-dismiss="modal"
+                            aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h3 class="modal-title text-blue">Before you proceed! <br>Please confirm the following are correct:</h3>
                 </div>
-                {{ form_end(renew_form) }}
+                <div class="modal-body">
+                    <div class="modal-body__review">
+                        {{ form_start(renew_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
+                        <ol>
+                            <li>I am a resident of the United Kingdom.</li>
+                            <li>I have read &amp; understood the <a class="policy-doc-toggle" href="#policy-doc">so-sure policy document</a>.</li>
+                        </ol>
+                        <p>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</p>
+                        <div class="form-group">
+                            {{ form_widget(renew_form.renew, {'label': 'Renew my policy', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
+                        </div>
+                        {{ form_end(renew_form) }}
+                    </div>
+                    <div id="#policy-doc" class="modal-body__policy-doc" style="display:none;">
+                        <button type="button" class="close policy-doc-toggle" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot })) }}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 {% endblock %}

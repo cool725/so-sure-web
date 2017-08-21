@@ -12,7 +12,7 @@ sosure.renew = (function() {
         .parent()
         .parent()
         .find('.payment--btn')
-        .removeClass('payment--btn-selected');        
+        .removeClass('payment--btn-selected');
         $('#renew_form_encodedAmount').val('');
         $('#renew_cashback_form_encodedAmount').val('');
     }
@@ -39,6 +39,17 @@ $(function(){
 });
 
 $(function(){
+
+    // Init carousel
+    $('.owl-carousel').owlCarousel({
+        margin: 30,
+        stagePadding: 70,
+        items: 2,
+        loop: true
+    });
+
+    $('.item').trigger('initialized.owl.carousel').show();
+
     $('#payment--cashback').click(function(event) {
         sosure.renew.clear_payment_buttons($(this));
         sosure.renew.use_cashback(true);
@@ -58,5 +69,15 @@ $(function(){
         $('#renew_form_encodedAmount').val(value);
         $('#renew_cashback_form_encodedAmount').val(value);
     });
-    
+
+    // Hide/Show policy doc
+    $('.policy-doc-toggle').click(function(e) {
+        // e.preventDefault();
+        $('.modal-body__policy-doc').toggle();
+    });
+
+    $('#policy-modal, .modal-policy').on('hide.bs.modal', function (event) {
+        $('.modal-body__policy-doc').hide();
+    });
+
 });

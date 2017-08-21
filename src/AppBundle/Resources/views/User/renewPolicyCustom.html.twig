@@ -1,114 +1,222 @@
 {% extends 'AppBundle:User:baseRenewPolicy.html.twig' %}
 
-{% block actions %}
+{% block titleArea %}
+    <h1>
+        <span class="title-top">Renew your</span>
+        <br class="visible-xs">
+        <span class="title-phone text-blue text-nowrap">{{ policy.phone.make }} {{ policy.phone.model }} {% if policy.phone.memory %}{{ policy.phone.memory }}GB{% endif %} </span>
+        <br class="visible-xs">
+        <span class="title-top">insurance</span><br>
+        {% if policy.getPremiumPlan == 'monthly' %}
+            <span class="title-price">for just <span class="text-blue">£{{ renew.getAdjustedStandardMonthlyPremiumPrice }}</span> per month</span>
+        {% else %}
+            <span class="title-price">for just <span class="text-blue">£{{ renew.getAdjustedYearlyPremiumPrice }}</span> per year</span>
+        {% endif %} <br>
+    </h1>
+
     {% if policy.potValue > 0 %}
-    <h4>How would you like to use your pot?<br>
-    <small>(Select an option below)</small></h4>
-    <div class="payment--step">
-        <div class="payment--step-inner clearfix">
-            <div class="payment--btn payment--btn-two payment--btn-left" id="payment--reward">
-                <div class="payment--btn-inner" id="payment--monthly">
-                    <span class="amount">Use reward pot</span>
-                </div>
-            </div>
-            <div class="payment--btn-or">
-                OR
-            </div>
-            <div class="payment--btn payment--btn-two payment--btn-right" id="payment--cashback">
-                <div class="payment--btn-inner">
-                    <span class="amount">No, I want cashback</span>
-                </div>
-            </div>
+        <div class="text-center">
+            <span class="h4 text-light-blue">
+                {% if policy.getPremiumPlan == 'monthly' %}
+                    (<span class="text-blue">£{{ renew.getMonthlyPremiumPrice }}</span> per month without your <span class="text-blue">£{{ policy.potValue }}</span> reward pot)
+                {% else %}
+                    (<span class="text-blue">£{{ renew.getYearlyPremiumPrice }}</span> per year without your <span class="text-blue">£{{ policy.potValue }}</span> reward pot)
+                {% endif %}
+            </span>
         </div>
-    </div>
     {% endif %}
-    <h4>How would you like to pay?<br>
-    <small>(Select an option below)</small></h4>
-    <div class="payment--step">
-        <div class="payment--step-inner clearfix" id="payment--reward-btns">
-            {% if app.user.allowedMonthlyPayments %}
-            <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two payment--btn-left {% endif %}" id="payment--adjusted-monthly" data-value="{{ renew.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }}|12|1">
-                <div class="payment--btn-inner {% if not app.user.allowedYearlyPayments %} payment--btn-inner-single {% endif %}">
-                    <span class="billed visible-xs">Monthly <br></span>
-                    <span class="amount">£{{ renew.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }}
-                    <span class="hidden-xs">a month</span><br></span>
-                    <small class="visible-xs">Billed on {{ policy.getPendingCancellation|date('jS') }} of each month</small>
-                    <small class="hidden-xs">You will be billed on the {{ policy.getPendingCancellation|date('jS') }}  of each month</small>
-                </div>
-            </div>
-            {% endif %}
-            {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %}
-            <div class="payment--btn-or">
-                OR
-            </div>
-            {% endif %}
-            {% if app.user.allowedYearlyPayments %}
-            <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two payment--btn-right {% endif %}" id="payment--adjusted-yearly" data-value="{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }}|1|1">
-                <div class="payment--btn-inner {% if not app.user.allowedMonthlyPayments %} payment--btn-inner-single {% endif %}">
-                    <span class="billed visible-xs">Yearly <br></span>
-                    <span class="amount">£{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }}
-                    <span class="hidden-xs">a year</span><br></span>
-                    <small class="visible-xs">Billed on date of purchase</small>
-                    <small class="hidden-xs">You will be billed for the year on {{ policy.getPendingCancellation|date('jS M') }}</small>
-                </div>
-            </div>
-            {% endif %}
+{% endblock %}
+
+{% block content %}
+    <h4 class="text-center">and keep covered against:</h4>
+
+    <div class="owl-carousel owl-theme visible-xs benefits">
+        <div class="item">
+            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-water-damage.svg" alt="Accidental Damage" title="Accidental damage">
+            <h5>Water damage</h5>
         </div>
-        {% if policy.potValue > 0 %}
-        <div class="payment--step-inner clearfix" id="payment--cashback-btns">
-            {% if app.user.allowedMonthlyPayments %}
-            <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two payment--btn-left {% endif %}" id="payment--monthly" data-value="{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}|12|0">
-                <div class="payment--btn-inner {% if not app.user.allowedYearlyPayments %} payment--btn-inner-single {% endif %}">
-                    <span class="billed visible-xs">Monthly <br></span>
-                    <span class="amount">£{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}
-                    <span class="hidden-xs">a month</span><br></span>
-                    <small class="visible-xs">Billed on {{ policy.getPendingCancellation|date('jS') }} of each month</small>
-                    <small class="hidden-xs">You will be billed on the {{ policy.getPendingCancellation|date('jS') }}  of each month</small>
-                </div>
-            </div>
-            {% endif %}
-            {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %}
-            <div class="payment--btn-or">
-                OR
-            </div>
-            {% endif %}
-            {% if app.user.allowedYearlyPayments %}
-            <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two payment--btn-right {% endif %}" id="payment--yearly" data-value="{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}|1|0">
-                <div class="payment--btn-inner {% if not app.user.allowedMonthlyPayments %} payment--btn-inner-single {% endif %}">
-                    <span class="billed visible-xs">Yearly <br></span>
-                    <span class="amount">£{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}
-                    <span class="hidden-xs">a year</span><br></span>
-                    <small class="visible-xs">Billed on date of purchase</small>
-                    <small class="hidden-xs">You will be billed for the year on {{ policy.getPendingCancellation|date('jS M') }}</small>
-                </div>
-            </div>
-            {% endif %}
+        <div class="item">
+            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-cracked-screen.svg" alt="Cracked screen" title="Cracked screen">
+            <h5>Cracked screen</h5>
         </div>
-        {% endif %}
+        <div class="item">
+            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-loss.svg" alt="Loss" title="Loss">
+            <h5>Loss</h5>
+        </div>
+        <div class="item">
+            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-theft.svg" alt="Theft" title="Theft">
+            <h5>Theft</h5>
+        </div>
     </div>
-        <div class="checkout--phone-indent">
-                <div class="form-group form-footer">
-                    <div class="row">
-                        <div class="col-xs-6 col-sm-6 col-md-6">
-                            <a id="renew--continue-btn" href="#" data-toggle="modal" data-target="#renewModal" class="btn btn-success">Continue</a>
-                            {% if policy.potValue > 0 %}
-                                <a id="renew--continue-cashback-btn" href="#" data-toggle="modal" data-target="#renewCashbackModal" class="btn btn-success">Continue</a>
-                            {% endif %}
-                        </div>
-                        {% if policy.potValue > 0 %}
-                        <div class="col-xs-6 col-sm-6 col-md-6">
-                            <a href="#" data-toggle="modal" data-target="#cashbackModal" class="btn btn-info">Don't renew, just get cashback</a>
-                        </div>
-                        {% endif %}
-                        <div class="col-xs-6 col-sm-6 col-md-6">
-                            <a href="{{ path('user_renew_policy', {'id': policy.id}) }}" class="btn btn-info btn-hallow ">Back</a>
-                        </div>
+
+    <ul class="list-inline cover-list hidden-xs benefits">
+        <li>
+            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-water-damage.svg" alt="Accidental Damage" title="Accidental damage">
+            <h5 class="h-light">Water damage</h5>
+        </li>
+        <li>
+            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-cracked-screen.svg" alt="Cracked screen" title="Cracked screen">
+            <h5 class="h-light">Cracked screen</h5>
+        </li>
+        <li>
+            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-loss.svg" alt="Loss" title="Loss">
+            <h5 class="h-light">Loss</h5>
+        </li>
+        <li>
+            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-theft.svg" alt="Theft" title="Theft">
+            <h5 class="h-light">Theft</h5>
+        </li>
+    </ul>
+{% endblock %}
+
+{% block actions %}
+
+    {% if policy.potValue > 0 %}
+        <div class="payment--step">
+            <div class="payment--step-inner clearfix">
+                <h4>Would you like to use your pot to renew?<br>
+                <small>(Select an option below)</small></h4>
+                <div class="payment--btn payment--btn-two payment--btn-left payment--btn-selected" id="payment--reward">
+                    <div class="payment--btn-inner" id="payment--monthly">
+                        <span class="amount">Yes</span><br>
+                        <span class="billed">Use reward pot</span>
                     </div>
                 </div>
+                <div class="payment--btn-or">
+                    OR
+                </div>
+                <div class="payment--btn payment--btn-two payment--btn-right" id="payment--cashback">
+                    <div class="payment--btn-inner">
+                        <span class="amount">No</span><br>
+                        <span class="billed">I want cashback</span>
+                    </div>
+                </div>
+            </div>
         </div>
+    {% endif %}
+
+    <div class="payment--step">
+        <div class="payment--step-inner clearfix">
+            {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %}
+                <h4>How would you like to pay?<br>
+                <small>(Select an option below)</small></h4>
+            {% else %}
+                <h4>Your yearly premium</h4>
+            {% endif %}
+
+            <div id="payment--reward-btns">
+                {% if app.user.allowedMonthlyPayments %}
+                    <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two payment--btn-left {% endif %} {% if policy.getPremiumPlan == 'monthly' %}payment--btn-selected{% endif %}"
+                         id="payment--adjusted-monthly"
+                         data-value="{{ renew.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }}|12|1">
+                        <div class="payment--btn-inner {% if not app.user.allowedYearlyPayments %} payment--btn-inner-single {% endif %}">
+                            <span class="billed visible-xs">Monthly <br></span>
+                            <span class="amount">£{{ renew.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }}
+                            <span class="hidden-xs">per month</span><br></span>
+                            <small class="visible-xs">Billed on {{ policy.getPendingCancellation|date('jS') }} of each month</small>
+                            <small class="hidden-xs">You will be billed on the {{ policy.getPendingCancellation|date('jS') }}  of each month</small>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %}
+                    <div class="payment--btn-or">
+                        OR
+                    </div>
+                {% endif %}
+                {% if app.user.allowedYearlyPayments %}
+                    <div class="{% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %}payment--btn payment--btn-two payment--btn-right {% if policy.getPremiumPlan == 'yearly' %}payment--btn-selected{% endif %}{% else %}payment--no-btn{% endif %}"
+                         id="payment--adjusted-yearly"
+                         data-value="{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }}|1|1">
+                        <div class="payment--btn-inner {% if not app.user.allowedMonthlyPayments %} payment--btn-inner-single {% endif %}">
+                            <span class="billed visible-xs">Yearly <br></span>
+                            <span class="amount"><span class="no-btn">£{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }}</span>
+                            <span class="hidden-xs">per year</span><br></span>
+                            <small class="visible-xs">Billed on date of purchase</small>
+                            <small class="hidden-xs">You will be billed for the year on {{ policy.getPendingCancellation|date('jS M') }}</small>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            {% if policy.potValue > 0 %}
+                <div id="payment--cashback-btns" style="display:none;">
+                    {% if app.user.allowedMonthlyPayments %}
+                        <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two payment--btn-left {% endif %} {% if policy.getPremiumPlan == 'monthly' %}payment--btn-selected{% endif %}"
+                             id="payment--monthly"
+                             data-value="{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}|12|0">
+                            <div class="payment--btn-inner {% if not app.user.allowedYearlyPayments %} payment--btn-inner-single {% endif %}">
+                                <span class="billed visible-xs">Monthly <br></span>
+                                <span class="amount">£{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}
+                                <span class="hidden-xs">per month</span><br></span>
+                                <small class="visible-xs">Billed on {{ policy.getPendingCancellation|date('jS') }} of each month</small>
+                                <small class="hidden-xs">You will be billed on the {{ policy.getPendingCancellation|date('jS') }}  of each month</small>
+                            </div>
+                        </div>
+                    {% endif %}
+                    {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %}
+                        <div class="payment--btn-or">
+                            OR
+                        </div>
+                    {% endif %}
+                    {% if app.user.allowedYearlyPayments %}
+                        <div class="{% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %}payment--btn payment--btn-two payment--btn-right {% if policy.getPremiumPlan == 'yearly' %}payment--btn-selected{% endif %}{% else %}payment--no-btn{% endif %}"
+                             id="payment--yearly"
+                             data-value="{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}|1|0">
+                            <div class="payment--btn-inner {% if not app.user.allowedMonthlyPayments %} payment--btn-inner-single {% endif %}">
+                                <span class="billed visible-xs">Yearly <br></span>
+                                <span class="amount"><span class="no-btn">£{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}</span>
+                                <span class="hidden-xs">per year</span><br></span>
+                                <small class="visible-xs">Billed on date of purchase</small>
+                                <small class="hidden-xs">You will be billed for the year on {{ policy.getPendingCancellation|date('jS M') }}</small>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+    <div class="checkout--step">
+        <div class="container">
+            <form>
+                <div class="form-group" id="renew--continue-btn">
+                    <a href="#"
+                       data-toggle="modal"
+                       data-target="#renewModal"
+                       class="btn btn-green btn-block btn-pad">Continue</a>
+                </div>
+                {% if policy.potValue > 0 %}
+                    <div class="form-group"
+                         id="renew--continue-cashback-btn"
+                         style="display:none;">
+                        <a href="#"
+                           data-toggle="modal"
+                           data-target="#renewCashbackModal"
+                           class="btn btn-green btn-block btn-pad">Continue</a>
+                    </div>
+                    <div class="form-group">
+                        <a href="#" data-toggle="modal" data-target="#cashbackModal" class="btn btn-blue btn-block btn-pad">Don't renew, just get cashback</a>
+                    </div>
+                {% endif %}
+                <div class="form-group">
+                    <a href="{{ path('user_renew_policy', {'id': policy.id}) }}" class="btn btn-blue-hollow btn-block btn-pad">Back</a>
+                </div>
+                <p><small>Our pricing may have increased slightly. This is largely due to the government mandated increase in IPT to 12% in June 2017.  Your premium last year was
+                {% if policy.getPremiumPlan == 'monthly' %}
+                    <span class="text-blue">£{{ renew.getMonthlyPremiumPrice }}</span> per month.
+                {% else %}
+                    <span class="text-blue">£{{ renew.getYearlyPremiumPrice }}</span> per year.
+                {% endif %}
+                </small></p>
+            </form>
+        </div>
+    </div>
+
 {% endblock %}
+
 {% block modals %}
-<div class="modal modal-purchase fade"
+<div class="modal modal-purchase modal-policy fade"
      id="renewModal"
      tabindex="-1"
      role="dialog">
@@ -119,21 +227,27 @@
                 <h3 class="modal-title text-blue">Before you proceed! <br>Please confirm the following are correct:</h3>
             </div>
             <div class="modal-body">
-                {{ form_start(renew_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
-                <ol>
-                    <li>I am a resident of the United Kingdom.</li>
-                    <li>I have read &amp; understood the so-sure policy document.</li>
-                </ol>
-                <p>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</p>
-                <div class="form-group">
-                    {{ form_widget(renew_form.renew, {'label': 'Renew my policy', 'attr': {'class': 'btn btn-success btn-block btn-arrow-right'}}) }}
+                <div class="modal-body__review">
+                    {{ form_start(renew_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
+                    <ol>
+                        <li>I am a resident of the United Kingdom.</li>
+                        <li>I have read &amp; understood the <a class="policy-doc-toggle" href="#policy-doc">so-sure policy document</a>.</li>
+                    </ol>
+                    <p>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</p>
+                    <div class="form-group">
+                        {{ form_widget(renew_form.renew, {'label': 'Renew my policy', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
+                    </div>
+                    {{ form_end(renew_form) }}
                 </div>
-                {{ form_end(renew_form) }}
+                <div id="#policy-doc" class="modal-body__policy-doc" style="display:none;">
+                    <button type="button" class="close policy-doc-toggle" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot })) }}
+                </div>
             </div>
         </div>
     </div>
 </div>
-<div class="modal modal-purchase fade"
+<div class="modal modal-purchase modal-policy fade"
      id="renewCashbackModal"
      tabindex="-1"
      role="dialog">
@@ -144,28 +258,34 @@
                 <h3 class="modal-title text-blue">Before you proceed! <br>Please confirm the following are correct:</h3>
             </div>
             <div class="modal-body">
-                {{ form_start(renew_cashback_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
-                <ol>
-                    <li>I am a resident of the United Kingdom.</li>
-                    <li>I have read &amp; understood the so-sure policy document.</li>
-                </ol>
-                <p>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</p>
-                <div class="form-group">
-                    {{ form_widget(renew_cashback_form.accountName, {'attr': {'placeholder': 'Account Name'}}) }}
-                    <div class="help-block with-errors">{{ form_errors(renew_cashback_form.accountName) }}</div>
+                <div class="modal-body__review">
+                    {{ form_start(renew_cashback_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
+                    <ol>
+                        <li>I am a resident of the United Kingdom.</li>
+                        <li>I have read &amp; understood the <a class="policy-doc-toggle" href="#policy-doc">so-sure policy document</a>.</li>
+                    </ol>
+                    <p>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</p>
+                    <div class="form-group">
+                        {{ form_widget(renew_cashback_form.accountName, {'attr': {'placeholder': 'Account Name', 'class': 'form-control'}}) }}
+                        <div class="help-block with-errors">{{ form_errors(renew_cashback_form.accountName) }}</div>
+                    </div>
+                    <div class="form-group cashback--item">
+                        {{ form_widget(renew_cashback_form.sortCode, {'attr': {'placeholder': 'Sort Code', 'class': 'form-control'}}) }}
+                        <div class="help-block with-errors">{{ form_errors(renew_cashback_form.sortCode) }}</div>
+                    </div>
+                    <div class="form-group cashback--item">
+                        {{ form_widget(renew_cashback_form.accountNumber, {'attr': {'placeholder': 'Account Number', 'class': 'form-control'}}) }}
+                        <div class="help-block with-errors">{{ form_errors(renew_cashback_form.accountNumber) }}</div>
+                    </div>
+                    <div class="form-group">
+                        {{ form_widget(renew_cashback_form.renew, {'label': 'Renew my policy', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
+                    </div>
+                    {{ form_end(renew_cashback_form) }}
                 </div>
-                <div class="form-group cashback--item">
-                    {{ form_widget(renew_cashback_form.sortCode, {'attr': {'placeholder': 'Sort Code'}}) }}
-                    <div class="help-block with-errors">{{ form_errors(renew_cashback_form.sortCode) }}</div>
+                <div id="#policy-doc" class="modal-body__policy-doc" style="display:none;">
+                    <button type="button" class="close policy-doc-toggle" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot })) }}
                 </div>
-                <div class="form-group cashback--item">
-                    {{ form_widget(renew_cashback_form.accountNumber, {'attr': {'placeholder': 'Account Number'}}) }}
-                    <div class="help-block with-errors">{{ form_errors(renew_cashback_form.accountNumber) }}</div>
-                </div>
-                <div class="form-group">
-                    {{ form_widget(renew_cashback_form.renew, {'label': 'Renew my policy', 'attr': {'class': 'btn btn-success btn-block btn-arrow-right'}}) }}
-                </div>
-                {{ form_end(renew_cashback_form) }}
             </div>
         </div>
     </div>
@@ -188,19 +308,19 @@
                 </p>
                 {{ form_start(cashback_form, {'attr': {'data-toggle': 'validator', 'class': ''}}) }}
                 <div class="form-group cashback--item">
-                    {{ form_widget(cashback_form.accountName, {'attr': {'placeholder': 'Account Name'}}) }}
+                    {{ form_widget(cashback_form.accountName, {'attr': {'placeholder': 'Account Name', 'class': 'form-control'}}) }}
                     <div class="help-block with-errors">{{ form_errors(cashback_form.accountName) }}</div>
                 </div>
                 <div class="form-group cashback--item">
-                    {{ form_widget(cashback_form.sortCode, {'attr': {'placeholder': 'Sort Code'}}) }}
+                    {{ form_widget(cashback_form.sortCode, {'attr': {'placeholder': 'Sort Code', 'class': 'form-control'}}) }}
                     <div class="help-block with-errors">{{ form_errors(cashback_form.sortCode) }}</div>
                 </div>
                 <div class="form-group cashback--item">
-                    {{ form_widget(cashback_form.accountNumber, {'attr': {'placeholder': 'Account Number'}}) }}
+                    {{ form_widget(cashback_form.accountNumber, {'attr': {'placeholder': 'Account Number', 'class': 'form-control'}}) }}
                     <div class="help-block with-errors">{{ form_errors(cashback_form.accountNumber) }}</div>
                 </div>
                 <div class="form-group">
-                    {{ form_widget(cashback_form.cashback, {'label': 'Request cashback', 'attr': {'class': 'btn btn-success btn-block btn-arrow-right'}}) }}
+                    {{ form_widget(cashback_form.cashback, {'label': 'Request cashback', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
 
                 </div>
                 {{ form_end(cashback_form) }}
