@@ -83,7 +83,7 @@
                     <div class="form-group">
                         {% if policy.potValue > 0 %}
                             <a href="{{ path('user_renew_custom_policy', {'id': policy.id}) }}" class="btn btn-blue btn-block btn-pad">Make changes or get your pot back in cash?</a>
-                        {% elseif policy.getPremiumPlan == 'monthly' %}
+                        {% else %}
                             <a href="{{ path('user_renew_custom_policy', {'id': policy.id}) }}" class="btn btn-blue btn-block btn-pad">Make changes?</a>
                         {% endif %}
                     </div>
