@@ -239,7 +239,7 @@ class MonitorService
         $repo = $this->dm->getRepository(PolicyTerms::class);
         $terms = $repo->findAll();
         $termVersions = [];
-        foreach($terms as $term) {
+        foreach ($terms as $term) {
             if (!in_array($term->getVersion(), PolicyTerms::$allVersions)) {
                 throw new \Exception(sprintf(
                     'Policy Terms %s is in db but not present in code',
@@ -248,7 +248,7 @@ class MonitorService
             }
             $termVersions[] = $term->getVersion();
         }
-        foreach(PolicyTerms::$allVersions as $version) {
+        foreach (PolicyTerms::$allVersions as $version) {
             if (!in_array($version, $termVersions)) {
                 throw new \Exception(sprintf(
                     'Policy Terms %s is in code but not present in db',
