@@ -400,6 +400,16 @@ class UserController extends BaseController
         }
 
         $policy = $policyRepo->find($id);
+        if (!$policy) {
+            throw $this->createNotFoundException('Policy not found');
+        }
+
+        if ($policy->isRenewed()) {
+            return $this->redirectToRoute('user_renew_completed', ['id' => $id]);
+        } elseif ($policy->hasCashback()) {
+            return $this->redirectToRoute('user_renew_only_cashback', ['id' => $id]);
+        }
+
         $this->denyAccessUnlessGranted(PolicyVoter::RENEW, $policy);
 
         // TODO: Determine if policy is the old policy or an unpaid renewal
@@ -463,6 +473,16 @@ class UserController extends BaseController
         $dm = $this->getManager();
         $policyRepo = $dm->getRepository(Policy::class);
         $policy = $policyRepo->find($id);
+        if (!$policy) {
+            throw $this->createNotFoundException('Policy not found');
+        }
+
+        if ($policy->isRenewed()) {
+            return $this->redirectToRoute('user_renew_completed', ['id' => $id]);
+        } elseif ($policy->hasCashback()) {
+            return $this->redirectToRoute('user_renew_only_cashback', ['id' => $id]);
+        }
+
         $this->denyAccessUnlessGranted(PolicyVoter::RENEW, $policy);
 
         // TODO: Determine if policy is the old policy or an unpaid renewal
@@ -566,6 +586,7 @@ class UserController extends BaseController
             } elseif ($request->request->has('cashback_form')) {
                 $cashbackForm->handleRequest($request);
                 if ($cashbackForm->isValid()) {
+                    $policyService = $this->get('app.policy');
                     $policyService->cashback($policy, $cashback);
                     $message = sprintf(
                         'Your request for cashback has been accepted.'
@@ -596,6 +617,50 @@ class UserController extends BaseController
             'cashback_form' => $cashbackForm->createView(),
             'is_postback' => 'POST' === $request->getMethod(),
             'renew' => $renew,
+        ];
+    }
+
+    /**
+     * @Route("/renew/{id}/complete", name="user_renew_completed")
+     * @Template
+     */
+    public function renewPolicyCompleteAction(Request $request, $id)
+    {
+        $dm = $this->getManager();
+        $policyRepo = $dm->getRepository(Policy::class);
+        $policy = $policyRepo->find($id);
+        if (!$policy) {
+            throw $this->createNotFoundException('Policy not found');
+        }
+
+        if (!$policy->isRenewed()) {
+            return $this->redirectToRoute('user_renew_policy', ['id' => $id]);
+        }
+
+        return [
+            'policy' => $policy,
+        ];
+    }
+
+    /**
+     * @Route("/renew/{id}/only-cashback", name="user_renew_only_cashback")
+     * @Template
+     */
+    public function renewPolicyOnlyCashbackAction(Request $request, $id)
+    {
+        $dm = $this->getManager();
+        $policyRepo = $dm->getRepository(Policy::class);
+        $policy = $policyRepo->find($id);
+        if (!$policy) {
+            throw $this->createNotFoundException('Policy not found');
+        }
+
+        if (!$policy->hasCashback()) {
+            return $this->redirectToRoute('user_renew_policy', ['id' => $id]);
+        }
+
+        return [
+            'policy' => $policy,
         ];
     }
 

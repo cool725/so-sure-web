@@ -1,0 +1,25 @@
+{% extends 'AppBundle:User:baseRenewPolicy.html.twig' %}
+
+{% block titleArea %}
+    <h1 class="h2">
+        <span class="title-top">
+            Thank you for renewing your policy with so-sure.
+        </span>
+    </h1>
+    <h4 class="text-center">You will continue to be protected against theft, loss, and accidental damage.</h4>
+    <p class="lead text-center">Make sure that you continue to get your pot reward next year by re-inviting all your existing connections.<br> Add more connections to get even more money in your pot.</p>
+    {% if policy.hasCashback %}
+        <p class="lead text-center">
+            Your cashback request was received and will be processed <span class="text-blue">28-45</span> days after your policy has ended.
+        </p>
+    {% endif %}
+{% endblock %}
+
+{% block actions %}
+            <h1 class="text-center">connections here</h1>
+{% endblock %}
+
+{% block content %}
+
+{% endblock %}
+
