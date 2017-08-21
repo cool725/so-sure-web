@@ -878,7 +878,6 @@ class InvitationServiceTest extends WebTestCase
             'bar'
         );
         $policy = static::initPolicy($user, static::$dm, static::$phone, null, true);
-        $policy->setStatus(Policy::STATUS_ACTIVE);
 
         $userInvitee = static::createUser(
             static::$userManager,
@@ -922,9 +921,7 @@ class InvitationServiceTest extends WebTestCase
             'bar'
         );
         $policy1 = static::initPolicy($userA, static::$dm, static::$phone, null, true);
-        $policy1->setStatus(Policy::STATUS_ACTIVE);
         $policy2 = static::initPolicy($userA, static::$dm, static::$phone, null, true);
-        $policy2->setStatus(Policy::STATUS_ACTIVE);
 
         $userB = static::createUser(
             static::$userManager,
@@ -1000,8 +997,6 @@ class InvitationServiceTest extends WebTestCase
         );
         $policy1 = static::initPolicy($userA, static::$dm, static::$phone, null, true);
         $policy2 = static::initPolicy($userA, static::$dm, static::$phone, null, true);
-        $policy1->setStatus(Policy::STATUS_ACTIVE);
-        $policy2->setStatus(Policy::STATUS_ACTIVE);
 
         $userB = static::createUser(
             static::$userManager,
@@ -1010,8 +1005,6 @@ class InvitationServiceTest extends WebTestCase
         );
         $policy3 = static::initPolicy($userB, static::$dm, static::$phone, null, true);
         $policy4 = static::initPolicy($userB, static::$dm, static::$phone, null, true);
-        $policy3->setStatus(Policy::STATUS_ACTIVE);
-        $policy4->setStatus(Policy::STATUS_ACTIVE);
 
         static::$policyService->setEnvironment('prod');
         static::$policyService->create($policy1);

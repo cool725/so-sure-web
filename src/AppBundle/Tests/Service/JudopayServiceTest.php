@@ -219,7 +219,7 @@ class JudopayServiceTest extends WebTestCase
     {
         $user = $this->createValidUser(static::generateEmail('judo-add', $this));
         $phone = static::getRandomPhone(static::$dm);
-        $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, false);
 
         $receiptId = self::$judopay->testPay(
             $user,
@@ -245,7 +245,7 @@ class JudopayServiceTest extends WebTestCase
     {
         $user = $this->createValidUser(static::generateEmail('testJudoAdditionalUnexpectedPayment', $this));
         $phone = static::getRandomPhone(static::$dm);
-        $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, false);
 
         $receiptId = self::$judopay->testPay(
             $user,
@@ -286,7 +286,7 @@ class JudopayServiceTest extends WebTestCase
     {
         $user = $this->createValidUser(static::generateEmail('judo-commission', $this));
         $phone = static::getRandomPhone(static::$dm);
-        $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, false);
 
         $receiptId = self::$judopay->testPay(
             $user,
@@ -308,7 +308,7 @@ class JudopayServiceTest extends WebTestCase
     {
         $user = $this->createValidUser(static::generateEmail('judo-refund', $this));
         $phone = static::getRandomPhone(static::$dm);
-        $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, false);
 
         $receiptId = self::$judopay->testPay(
             $user,
@@ -347,7 +347,7 @@ class JudopayServiceTest extends WebTestCase
     {
         $user = $this->createValidUser(static::generateEmail('judo-refund-exceeded', $this));
         $phone = static::getRandomPhone(static::$dm);
-        $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, false);
 
         $receiptId = self::$judopay->testPay(
             $user,
@@ -1031,7 +1031,7 @@ class JudopayServiceTest extends WebTestCase
     {
         $user = $this->createValidUser(static::generateEmail('testJudoMultiPolicy', $this));
         $phone = static::getRandomPhone(static::$dm);
-        $policy1 = static::initPolicy($user, static::$dm, $phone, null, false, true);
+        $policy1 = static::initPolicy($user, static::$dm, $phone, null, false, false);
         $policy2 = static::initPolicy($user, static::$dm, $phone);
         $policy3 = static::initPolicy($user, static::$dm, $phone);
 
@@ -1135,7 +1135,7 @@ class JudopayServiceTest extends WebTestCase
     {
         $user = $this->createValidUser(static::generateEmail('testJudoCommissionActual', $this));
         $phone = static::getRandomPhone(static::$dm);
-        $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, false);
 
         $details = self::$judopay->testPayDetails(
             $user,
