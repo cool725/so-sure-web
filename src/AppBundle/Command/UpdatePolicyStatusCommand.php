@@ -8,6 +8,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
+use AppBundle\Document\Feature;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Payment\JudoPayment;
@@ -45,6 +46,7 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
         $prefix = $input->getOption('prefix');
 
         $policyService = $this->getContainer()->get('app.policy');
+        $featureService = $this->getContainer()->get('app.feature');
 
         // Unpaid Policies - Cancel
         $cancelled = $policyService->cancelUnpaidPolicies($prefix, $dryRun);
@@ -74,33 +76,40 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
         $lines[] = '';
         $ignoreLineCount++;
 
-        // Create Polices - Pending Renewal
-        $pendingRenewal = $policyService->createPendingRenewalPolicies($prefix, $dryRun);
-        $copy = 'Partial Renewal Policy';
-        if ($dryRun) {
-            $copy = 'Dry Run - Should create Partial Renewal Policy';
-        }
-        foreach ($pendingRenewal as $id => $number) {
-            $lines[] = sprintf('%s %s / %s', $copy, $number, $id);
-        }
-        $lines[] = sprintf('%s partial renewal policies processed', count($pendingRenewal));
-        $ignoreLineCount++;
-        $lines[] = '';
-        $ignoreLineCount++;
+        if ($featureService->isEnabled(Feature::FEATURE_RENEWAL)) {
+            // Create Polices - Pending Renewal
+            $pendingRenewal = $policyService->createPendingRenewalPolicies($prefix, $dryRun);
+            $copy = 'Partial Renewal Policy';
+            if ($dryRun) {
+                $copy = 'Dry Run - Should create Partial Renewal Policy';
+            }
+            foreach ($pendingRenewal as $id => $number) {
+                $lines[] = sprintf('%s %s / %s', $copy, $number, $id);
+            }
+            $lines[] = sprintf('%s partial renewal policies processed', count($pendingRenewal));
+            $ignoreLineCount++;
+            $lines[] = '';
+            $ignoreLineCount++;
 
-        // Activate Policies - Renewed
-        $renewal = $policyService->activateRenewalPolicies($prefix, $dryRun);
-        $copy = 'Activated Renewal Policy';
-        if ($dryRun) {
-            $copy = 'Dry Run - Should activate Renewal Policy';
+            // Activate Policies - Renewed
+            $renewal = $policyService->activateRenewalPolicies($prefix, $dryRun);
+            $copy = 'Activated Renewal Policy';
+            if ($dryRun) {
+                $copy = 'Dry Run - Should activate Renewal Policy';
+            }
+            foreach ($renewal as $id => $number) {
+                $lines[] = sprintf('%s %s / %s', $copy, $number, $id);
+            }
+            $lines[] = sprintf('%s activated renewal policies processed', count($renewal));
+            $ignoreLineCount++;
+            $lines[] = '';
+            $ignoreLineCount++;
+        } else {
+            $lines[] = 'Renewal feature flag not enabled. Skipping partial policy creation & renewal activation.';
+            $ignoreLineCount++;
+            $lines[] = '';
+            $ignoreLineCount++;
         }
-        foreach ($renewal as $id => $number) {
-            $lines[] = sprintf('%s %s / %s', $copy, $number, $id);
-        }
-        $lines[] = sprintf('%s activated renewal policies processed', count($renewal));
-        $ignoreLineCount++;
-        $lines[] = '';
-        $ignoreLineCount++;
 
         // Expire Policies - (Active/Unpaid)
         $expired = $policyService->expireEndingPolicies($prefix, $dryRun);
