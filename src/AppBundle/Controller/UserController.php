@@ -636,6 +636,7 @@ class UserController extends BaseController
         if (!$policy->isRenewed()) {
             return $this->redirectToRoute('user_renew_policy', ['id' => $id]);
         }
+        $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
 
         return [
             'policy' => $policy,
@@ -658,6 +659,7 @@ class UserController extends BaseController
         if (!$policy->hasCashback()) {
             return $this->redirectToRoute('user_renew_policy', ['id' => $id]);
         }
+        $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
 
         return [
             'policy' => $policy,
