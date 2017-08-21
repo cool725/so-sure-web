@@ -469,12 +469,14 @@ class UserController extends BaseController
         $renew = new Renew();
         $renew->setPolicy($policy);
         $renew->setCustom(true);
+        $renew->useSimpleAmount();
         $renewForm = $this->get('form.factory')
             ->createNamedBuilder('renew_form', RenewType::class, $renew)
             ->getForm();
         $renewCashback = new RenewCashback();
         $renewCashback->setPolicy($policy);
         $renewCashback->setCustom(true);
+        $renewCashback->useDefaultAmount();
         $renewCashbackForm = $this->get('form.factory')
             ->createNamedBuilder('renew_cashback_form', RenewCashbackType::class, $renewCashback)
             ->getForm();

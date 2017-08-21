@@ -63,6 +63,16 @@ class RenewCashback extends Renew
         $this->accountNumber = $accountNumber;
     }
 
+    public function useDefaultAmount()
+    {
+        $usePot = $this->getPolicy()->getPotValue() > 0 ? 1 : 0;
+        if ($this->getPolicy()->getPremiumPlan() == Policy::PLAN_MONTHLY) {
+            $this->setEncodedAmount(implode("|", [$this->getAdjustedStandardMonthlyPremiumPrice(), 12, $usePot]));
+        } elseif ($this->getPolicy()->getPremiumPlan() == Policy::PLAN_YEARLY) {
+            $this->setEncodedAmount(implode("|", [$this->getAdjustedYearlyPremiumPrice(), 1, $usePot]));
+        }
+    }
+
     public function createCashback()
     {
         if ($this->getUsePot()) {
