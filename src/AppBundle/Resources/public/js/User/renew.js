@@ -1,3 +1,5 @@
+var sosure = sosure || {};
+
 sosure.renew = (function() {
     var self = {};
     self.form = null;
