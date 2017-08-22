@@ -21,14 +21,14 @@
     {# Maybe these lines could be combined someway ???? #}
     <p class="lead text-center">
         {% if policy.getPremiumPlan == 'monthly' %}
-            Your monthly premium is <span class="text-blue h4">£{{ policy.getMonthlyPremiumPrice }}</span>
+            Your monthly premium is <span class="text-blue h4">£XXX</span>
             {# if discounted #}
-                (discounted by <span class="text-blue h4">£{{ policy.potValue }}</span> each month)
+                (discounted by <span class="text-blue h4">£XXX</span> each month)
             {# endif #}
         {% else %}
-            Your annual premium is <span class="text-blue h4">£{{ policy.getYearlyPremiumPrice }}</span>
+            Your annual premium is <span class="text-blue h4">£XXX</span>
             {# if discounted #}
-                (discounted by <span class="text-blue h4">£{{ policy.potValue }}</span> for the year)
+                (discounted by <span class="text-blue h4">£XXX</span> for the year)
             {# endif #}
         {% endif %}
     </p>
@@ -44,27 +44,26 @@
     <div class="connections">
         <ul class="list-unstyled renew-list">
             {% for connection in policy.connections %}
-            <li class="renew-list__connection">
-                <label for="user-connect">
-                    <span class="sr-only">Select user</span>
-                    <input class="checkbox-connect" type="checkbox" />
-                </label>
-                <img src="{{ connection.linkedUser.getImageUrlFallback }}" style="width: 50px"
-                title="{% if connection.linkedUser.id == app.user.id %}{{ connection.linkedPolicy.defaultName }}{% else %}{{ connection.linkedUser.name }}{% endif %}"
-                alt="{{ connection.linkedUser.name }}"
-                class="
-                {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}
-                    img-circle coffee-stamp
-                {% else %}
-                    img-circle coffee-stamp user-has-claimed
-                {% endif %}"
-                >
-                <span class="h4">{% if connection.linkedUser.id == app.user.id %}{{ connection.linkedPolicy.defaultName }}{% else %}{{ connection.linkedUser.name }}{% endif %}</span>
-            </li>
+                <li class="renew-list__connection">
+                    <label for="user-connect">
+                        <span class="sr-only">Select user</span>
+                        <input class="checkbox-connect" type="checkbox" />
+                    </label>
+                    <img src="{{ connection.linkedUser.getImageUrlFallback }}" style="width: 50px"
+                    title="{% if connection.linkedUser.id == app.user.id %}{{ connection.linkedPolicy.defaultName }}{% else %}{{ connection.linkedUser.name }}{% endif %}"
+                    alt="{{ connection.linkedUser.name }}"
+                    class="
+                    {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}
+                        img-circle coffee-stamp
+                    {% else %}
+                        img-circle coffee-stamp user-has-claimed
+                    {% endif %}"
+                    >
+                    <span class="h4">{% if connection.linkedUser.id == app.user.id %}{{ connection.linkedPolicy.defaultName }}{% else %}{{ connection.linkedUser.name }}{% endif %}</span>
+                </li>
             {% endfor %}
         </ul>
         <div class="form-group text-center">
-            {# <a id="select-all-connections" href="#" class="btn btn-blue">Select all</a> #}
             <div class="checkbox">
                 <label>
                     <input id="select-all-connections" type="checkbox" /> <strong>select / deselect all connections</strong>
