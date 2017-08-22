@@ -631,11 +631,15 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         if ($checkMaxPolicies && count($this->getValidPolicies(true)) >= self::MAX_POLICIES_PER_USER) {
             return false;
         }
+        // TODO avg claims on any policy in the past > 2
+        // TODO only difference in purchase vs re-purchase if if the policy previously exists and there
+        // is a dispossession/wreckage. As the imei check will perform that validation, its ok for now
+        // although a better solution would be nice
 
         return true;
     }
 
-    public function canRenewPolicy()
+    public function canRenewPolicy(Policy $policy)
     {
         if ($this->isLocked()) {
             return false;
@@ -656,6 +660,12 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         if ($this->hasCancelledPolicyWithUserDeclined()) {
             return false;
         }
+
+        if ($policy->isCancelledWithPolicyDeclined()) {
+            return false;
+        }
+
+        // TODO avg claims on any policy in the past > 2
 
         return true;
     }

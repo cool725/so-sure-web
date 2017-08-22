@@ -88,7 +88,7 @@ class PushListenerTest extends WebTestCase
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
 
         $this->assertTrue($policy->isValidPolicy());
-        $this->assertTrue($policy->getUser()->canRenewPolicy());
+        $this->assertTrue($policy->getUser()->canRenewPolicy($policy));
 
         $now = new \DateTime();
         self::$policyService->createPendingRenewal($policy, $now);
