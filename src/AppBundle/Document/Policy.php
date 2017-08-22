@@ -55,6 +55,7 @@ abstract class Policy
     const STATUS_MULTIPAY_REJECTED = 'multipay-rejected';
     const STATUS_RENEWAL = 'renewal';
     const STATUS_PENDING_RENEWAL = 'pending-renewal';
+    const STATUS_UNRENEWED = 'unrenewed';
 
     const CANCELLED_UNPAID = 'unpaid';
     const CANCELLED_ACTUAL_FRAUD = 'actual-fraud';
@@ -145,7 +146,7 @@ abstract class Policy
     /**
      * @Assert\Choice({"pending", "active", "cancelled", "expired", "expired-claimable", "unpaid",
      *                  "multipay-requested", "multipay-rejected", "renewal",
-     *                  "pending-renewal"}, strict=true)
+     *                  "pending-renewal", "unrenewed"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -268,6 +269,13 @@ abstract class Policy
      * @Gedmo\Versioned
      */
     protected $pendingCancellation;
+
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
+    protected $pendingRenewalExpiration;
 
     /**
      * @Assert\Range(min=0,max=200)
@@ -671,6 +679,16 @@ abstract class Policy
     public function setPendingCancellation(\DateTime $pendingCancellation = null)
     {
         $this->pendingCancellation = $pendingCancellation;
+    }
+
+    public function getPendingRenewalExpiration()
+    {
+        return $this->pendingRenewalExpiration;
+    }
+
+    public function setPendingRenewalExpiration(\DateTime $pendingRenewalExpiration = null)
+    {
+        $this->pendingRenewalExpiration = $pendingRenewalExpiration;
     }
 
     public function getStatus()
@@ -1255,13 +1273,15 @@ abstract class Policy
         $this->setPolicyTerms($terms);
     }
 
-    public function create($seq, $prefix = null, \DateTime $startDate = null, $scodeCount = 1)
+    public function isCreateAllowed(\DateTime $date = null)
     {
+        \AppBundle\Classes\NoOp::ignore([$date]);
+
         if (!$this->getUser()) {
-            throw new \Exception('Missing user for policy');
+            return false;
         }
         if (!$this->getUser()->getBillingAddress()) {
-            throw new \Exception('User must have a billing address');
+            return false;
         }
 
         // Only create 1 time
@@ -1269,13 +1289,39 @@ abstract class Policy
             return;
         }
 
-        if (!$prefix) {
-            $prefix = $this->getPolicyNumberPrefix();
+        // Standard create would be null or pending
+        // Multipay rejected - original user can still purchase policy
+        if (!in_array($this->getStatus(), [
+            null,
+            self::STATUS_PENDING,
+            self::STATUS_PENDING_RENEWAL,
+            self::STATUS_MULTIPAY_REQUESTED,
+            self::STATUS_MULTIPAY_REJECTED,
+        ])) {
+            return false;
         }
+
+        return true;
+    }
+
+    public function create($seq, $prefix = null, \DateTime $startDate = null, $scodeCount = 1)
+    {
         if (!$startDate) {
             $startDate = new \DateTime();
             // No longer necessary to start 10 minutes in the future
             // $startDate->add(new \DateInterval('PT10M'));
+        }
+
+        if (!$this->isCreateAllowed($startDate)) {
+            throw new \Exception(sprintf(
+                'Unable to create policy %s. Missing user/address or invalid status (%s)',
+                $this->getId(),
+                $this->getStatus()
+            ));
+        }
+
+        if (!$prefix) {
+            $prefix = $this->getPolicyNumberPrefix();
         }
 
         // TODO: move to SalvaPhonePolicy
@@ -2330,7 +2376,22 @@ abstract class Policy
             return false;
         }
 
-        if ($this->getPendingCancellation() && $date > $this->getPendingCancellation()) {
+        if ($this->getPendingRenewalExpiration() && $date > $this->getPendingRenewalExpiration()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function isUnRenewalAllowed(\DateTime $date = null)
+    {
+        if (!in_array($this->getStatus(), [
+            self::STATUS_PENDING_RENEWAL,
+        ])) {
+            return false;
+        }
+
+        if (!$this->getPendingRenewalExpiration() || $date < $this->getPendingRenewalExpiration()) {
             return false;
         }
 
@@ -2352,17 +2413,35 @@ abstract class Policy
 
         $this->setStatus(Policy::STATUS_RENEWAL);
         // clear the max allowed renewal date
-        $this->setPendingCancellation(null);
+        $this->setPendingRenewalExpiration(null);
 
         if ($discount && $discount > 0) {
             $this->getPremium()->setAnnualDiscount($discount);
         }
     }
 
+    public function unrenew(\DateTime $date = null)
+    {
+        if (!$this->isUnRenewalAllowed($date)) {
+            throw new \Exception(sprintf(
+                'Unable to unrenew policy %s as status is incorrect or its too late',
+                $this->getId()
+            ));
+        }
+
+        $this->setStatus(Policy::STATUS_UNRENEWED);
+    }
+
     public function activate(\DateTime $date = null)
     {
         if ($date == null) {
             $date = new \DateTime();
+        }
+
+        if (!in_array($this->getStatus(), [
+            self::STATUS_RENEWAL,
+        ])) {
+            throw new \Exception('Unable to activate a policy if status is not renewal');
         }
 
         // Give a bit of leeway in case we have problems with process, but
@@ -2372,12 +2451,6 @@ abstract class Policy
         $tooLate = $tooLate->add(new \DateInterval('P7D'));
         if ($date < $this->getStart() || $date > $tooLate) {
             throw new \Exception('Unable to activate a policy if not between policy dates');
-        }
-
-        if (!in_array($this->getStatus(), [
-            self::STATUS_RENEWAL,
-        ])) {
-            throw new \Exception('Unable to activate a policy if status is not renewal');
         }
 
         $this->setStatus(Policy::STATUS_ACTIVE);

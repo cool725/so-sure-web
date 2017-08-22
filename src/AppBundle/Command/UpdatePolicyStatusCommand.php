@@ -104,6 +104,20 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
             $ignoreLineCount++;
             $lines[] = '';
             $ignoreLineCount++;
+
+            // Unrenew Policies (Pending Renewal -> UnRenewed)
+            $unrenewed = $policyService->unrenewPolicies($prefix, $dryRun);
+            $copy = 'Unrenewed Policy';
+            if ($dryRun) {
+                $copy = 'Dry Run - Should unrenew Policy';
+            }
+            foreach ($unrenewed as $id => $number) {
+                $lines[] = sprintf('%s %s / %s', $copy, $number, $id);
+            }
+            $lines[] = sprintf('%s unrenewed policies processed', count($unrenewed));
+            $ignoreLineCount++;
+            $lines[] = '';
+            $ignoreLineCount++;
         } else {
             $lines[] = 'Renewal feature flag not enabled. Skipping partial policy creation & renewal activation.';
             $ignoreLineCount++;

@@ -1117,6 +1117,13 @@ class PolicyService
         return $repo->findPoliciesForPendingCancellation($prefix, $includeFuture, $date);
     }
 
+    public function getPoliciesForUnRenew(\DateTime $date = null)
+    {
+        $repo = $this->dm->getRepository(Policy::class);
+
+        return $repo->findPendingRenewalPoliciesForUnRenewed($date);
+    }
+
     public function cancelPoliciesPendingCancellation($prefix = null, $dryRun = false, \DateTime $date = null)
     {
         $cancelled = [];
@@ -1138,6 +1145,31 @@ class PolicyService
         }
 
         return $cancelled;
+    }
+
+    public function unrenewPolicies($prefix = null, $dryRun = false, \DateTime $date = null)
+    {
+        // Have a feeling I will need prefix in the future here
+        \AppBundle\Classes\NoOp::ignore([$prefix]);
+
+        $expired = [];
+        $policies = $this->getPoliciesForUnRenew($date);
+        foreach ($policies as $policy) {
+            $expired[$policy->getId()] = $policy->getPolicyNumber();
+            if (!$dryRun) {
+                try {
+                    $this->unrenew($policy, $date);
+                } catch (\Exception $e) {
+                    $msg = sprintf(
+                        'Error Un-Renewing Policy %s',
+                        $policy->getId()
+                    );
+                    $this->logger->error($msg, ['exception' => $e]);
+                }
+            }
+        }
+
+        return $expired;
     }
 
     public function cancelUnpaidPolicies($prefix, $dryRun = false)
@@ -1282,6 +1314,18 @@ class PolicyService
         // Not necessary to email as already received docs at time of renewal
     }
 
+    /**
+     * @param Policy $policy
+     */
+    public function unrenew(Policy $policy, \DateTime $date = null)
+    {
+        $policy->unrenew($date);
+        $this->dm->flush();
+
+        // Might be an idea to email at this point,
+        // although the policy end status is probably set at the same time
+    }
+
     public function createPendingRenewalPolicies($prefix, $dryRun = false)
     {
         $pendingRenewal = [];
@@ -1370,7 +1414,7 @@ class PolicyService
         $newPolicy->setSerialNumber($policy->getSerialNumber());
         $newPolicy->setStatus(Policy::STATUS_PENDING_RENEWAL);
         // don't allow renewal after the end the current policy
-        $newPolicy->setPendingCancellation($policy->getEnd());
+        $newPolicy->setPendingRenewalExpiration($policy->getEnd());
 
         $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
         $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
