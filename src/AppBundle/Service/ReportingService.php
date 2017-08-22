@@ -9,6 +9,7 @@ use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Claim;
+use AppBundle\Document\Cashback;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\ScheduledPayment;
@@ -264,9 +265,11 @@ class ReportingService
 
         $data['totalAvgHoursToConnect'] = $connectionRepo->avgHoursToConnect();
 
-        $data['totalRunRate'] = Policy::sumYearlyPremiumPrice($newToDateDirectPolicies, null, true) +
-            Policy::sumYearlyPremiumPrice($newToDateInvitationPolicies, null, true) +
-            Policy::sumYearlyPremiumPrice($newToDateSCodePolicies, null, true);
+        $data['totalRunRate'] = $this->getTotalRunRate(
+            $newToDateDirectPolicies,
+            $newToDateInvitationPolicies,
+            $newToDateSCodePolicies
+        );
 
         return [
             'start' => $start,
@@ -277,6 +280,27 @@ class ReportingService
             'approvedClaims' => $approvedClaimsTotals,
             'closedClaims' => $closedClaimsTotals,
         ];
+    }
+
+    private function getTotalRunRateByDate($date)
+    {
+        $policyRepo = $this->dm->getRepository(PhonePolicy::class);
+        $newToDateDirectPolicies = $policyRepo->findAllNewPolicies(null, null, $date);
+        $newToDateInvitationPolicies = $policyRepo->findAllNewPolicies(Lead::LEAD_SOURCE_INVITATION, null, $date);
+        $newToDateSCodePolicies = $policyRepo->findAllNewPolicies(Lead::LEAD_SOURCE_SCODE, null, $date);
+
+        return $this->getTotalRunRate(
+            $newToDateDirectPolicies,
+            $newToDateInvitationPolicies,
+            $newToDateSCodePolicies
+        );
+    }
+
+    private function getTotalRunRate($newToDateDirectPolicies, $newToDateInvitationPolicies, $newToDateSCodePolicies)
+    {
+        return Policy::sumYearlyPremiumPrice($newToDateDirectPolicies, null, true) +
+            Policy::sumYearlyPremiumPrice($newToDateInvitationPolicies, null, true) +
+            Policy::sumYearlyPremiumPrice($newToDateSCodePolicies, null, true);
     }
 
     private function getExcludedPolicies($isKpi)
@@ -489,10 +513,31 @@ class ReportingService
         return $phonePolicyRepo->countAllActivePoliciesToEndOfMonth($date);
     }
 
+    public function getActivePoliciesWithPolicyDiscountCount($date)
+    {
+        $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
+
+        return $phonePolicyRepo->countAllActivePoliciesWithPolicyDiscountToEndOfMonth($date);
+    }
+
+    public function getRewardPotLiability($date)
+    {
+        $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
+        $policies = $phonePolicyRepo->findPoliciesForRewardPotLiability($this->endOfMonth($date));
+        $rewardPotLiability = 0;
+        foreach ($policies as $policy) {
+            $rewardPotLiability += $policy->getPotValue();
+        }
+
+        return $rewardPotLiability;
+    }
+
     public function getAllPaymentTotals($isProd, \DateTime $date)
     {
         $payments = $this->getPayments($date);
         $potRewardPayments = $this->getPayments($date, 'potReward');
+        $policyDiscountPayments = $this->getPayments($date, 'policyDiscount');
+        $totalRunRate = $this->getTotalRunRateByDate($this->endOfMonth($date));
 
         return [
             'all' => Payment::sumPayments($payments, $isProd),
@@ -500,7 +545,18 @@ class ReportingService
             'sosure' => Payment::sumPayments($payments, $isProd, SoSurePayment::class),
             'bacs' => Payment::sumPayments($payments, $isProd, BacsPayment::class),
             'potReward' => Payment::sumPayments($potRewardPayments, $isProd, PotRewardPayment::class),
+            'policyDiscounts' => Payment::sumPayments($policyDiscountPayments, $isProd, PolicyDiscountPayment::class),
+            'totalRunRate' => $totalRunRate,
+            'totalCashback' => Cashback::sumCashback($this->getCashback($date)),
         ];
+    }
+
+    private function getCashback(\DateTime $date)
+    {
+        $cashbackRepo = $this->dm->getRepository(Cashback::class);
+        $cashback = $cashbackRepo->getPaidCashback($date);
+
+        return $cashback;
     }
 
     private function getPayments(\DateTime $date, $type = null)

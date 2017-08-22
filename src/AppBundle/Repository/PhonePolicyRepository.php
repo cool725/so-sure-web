@@ -33,6 +33,16 @@ class PhonePolicyRepository extends PolicyRepository
     /**
      * All policies that are active (excluding so-sure test ones)
      */
+    public function countAllActivePoliciesWithPolicyDiscountToEndOfMonth(\DateTime $date = null)
+    {
+        $nextMonth = $this->endOfMonth($date);
+
+        return $this->countAllActivePoliciesByInstallments(null, null, $nextMonth, true);
+    }
+
+    /**
+     * All policies that are active (excluding so-sure test ones)
+     */
     public function countAllActivePolicies(\DateTime $endDate = null, \DateTime $startDate = null)
     {
         return $this->countAllActivePoliciesByInstallments(null, $startDate, $endDate);
@@ -44,7 +54,8 @@ class PhonePolicyRepository extends PolicyRepository
     public function countAllActivePoliciesByInstallments(
         $installments,
         \DateTime $startDate = null,
-        \DateTime $endDate = null
+        \DateTime $endDate = null,
+        $policyDiscountPresent = null
     ) {
         if (!$endDate) {
             $endDate = new \DateTime();
@@ -68,10 +79,33 @@ class PhonePolicyRepository extends PolicyRepository
         if ($this->excludedPolicyIds) {
             $this->addExcludedPolicyQuery($qb, 'id');
         }
+        if ($policyDiscountPresent !== null) {
+            $qb->field('policyDiscountPresent')->equals($policyDiscountPresent);
+        }
 
         return $qb->getQuery()
             ->execute()
             ->count();
+    }
+
+    public function findPoliciesForRewardPotLiability(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+        $policy = new PhonePolicy();
+
+        $qb = $this->createQueryBuilder()
+            ->field('status')->in([
+                Policy::STATUS_ACTIVE,
+                Policy::STATUS_UNPAID,
+            ])
+            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())))
+            ->field('end')->gt($date);
+
+        return $qb
+            ->getQuery()
+            ->execute();
     }
 
     /**
