@@ -86,19 +86,22 @@ $(function(){
             $('.select-all-connections').not(this).prop('checked',true);
             $('.checkbox-connect').each(function() {
                 this.checked = true;
+                $(this).parent().parent('li').addClass('background-off-white');
             });
         } else {
             $('.select-all-connections').not(this).prop('checked',false);
             $('.checkbox-connect').each(function() {
                 this.checked = false;
+                $(this).parent().parent('li').removeClass('background-off-white');
             });
         }
     });
 
     $('.checkbox-connect').on('click',function(){
-        if($('.checkbox-connect:checked').length == $('.checkbox-connect').length) {
+        $(this).parent().parent('li').toggleClass('background-off-white');
+        if ($('.checkbox-connect:checked').length == $('.checkbox-connect').length) {
             $('.select-all-connections').prop('checked',true);
-        }else{
+        } else {
             $('.select-all-connections').prop('checked',false);
         }
     });
