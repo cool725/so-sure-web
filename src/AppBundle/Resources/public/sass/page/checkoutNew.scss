@@ -322,3 +322,20 @@
     border: 1px solid $grey;
     @include border-radius(4px);
 }
+
+// Connections List (Renewals)
+.connections-list {
+    max-width: 345px;
+    margin: 30px auto;
+
+    border: 1px solid $grey;
+    @include border-radius(2px);
+
+    li {
+        padding: 15px 10px;
+
+        img {
+            margin-left: 10px;
+        }
+    }
+}

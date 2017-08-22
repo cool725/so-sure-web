@@ -1,42 +1,69 @@
 {% extends 'AppBundle:User:baseRenewPolicy.html.twig' %}
 
 {% block titleArea %}
-    <h1 class="h2">
-        <span class="title-top">
-            Thank you for renewing your policy with so-sure.
-        </span>
-    </h1>
-    <h4 class="text-center">You will continue to be protected against theft, loss, and accidental damage.</h4>
-    <p class="lead text-center">Make sure that you continue to get your pot reward next year by re-inviting all your existing connections.<br> Add more connections to get even more money in your pot.</p>
+    <h1 class="h2"><span class="title-top">Thank you for renewing your policy with so-sure.</span></h1>
     {% if policy.hasCashback %}
-        <p class="lead text-center">
+        <h4 class="text-center">
             Your cashback request was received and will be processed <span class="text-blue">28-45</span> days after your policy has ended.
+        </h4>
+    {% endif %}
+    <h4 class="text-center">You will continue to be protected against theft, loss, and accidental damage.</h4>
+    <p class="lead text-center">Your policy <span class="h4 text-blue">{{ policy.policyNumber }}</span> is scheduled to be renewed on <span class="h4">11/11/2017</span></p>
+
+    {# Maybe these lines could be combined someway ???? #}
+    <p class="lead text-center">Your
+        {% if policy.getPremiumPlan == 'monthly' %}
+            monthly
+        {% else %}
+            annual
+        {% endif %}
+        premium is <span class="text-blue h4">£XX.XX</span>{# £premium #}
+        {# if discounted #}
+            (discounted by <span class="text-blue h4">£XX.XX</span>).
+        {# endif #}
+    </p>
+    {% if policy.potValue > 0 %}
+        <p class="lead text-center">
+            Your pot reward of <span class="text-blue h4">£XX.XX</span> will be used to discount your premium by <span class="text-blue h4">£XX.XX</span> each month.
         </p>
     {% endif %}
-{% endblock %}
 
-{% block actions %}
-            {# TODO - adjust copy if there was a claim #}
-            <h3 class="text-center">Make sure that you continue to get your pot reward next year by re-inviting all your existing connections.</h1>
-            <ul class="list-inline">
-                {% for connection in policy.connections %}
-                <li>
-                    <img src="{{ connection.linkedUser.getImageUrlFallback }}" style="width: 50px"
-                    title="{% if connection.linkedUser.id == app.user.id %}{{ connection.linkedPolicy.defaultName }}{% else %}{{ connection.linkedUser.name }}{% endif %}"
-                    alt="{{ connection.linkedUser.name }}"
-                    class="
-                    {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}           img-circle coffee-stamp
-                    {% else %}
-                                img-circle coffee-stamp user-has-claimed
-                    {% endif %}"
-                    >
-                    {% if connection.linkedUser.id == app.user.id %}{{ connection.linkedPolicy.defaultName }}{% else %}{{ connection.linkedUser.name }}{% endif %}
-                </li>
-                {% endfor %}
-            </ul>
+
 {% endblock %}
 
 {% block content %}
-
+    <p class="lead text-center">Make sure that you continue to get your pot reward next year by re-inviting all your existing connections.</p>
+    <p class="lead text-center">Add more connections to get even more money in your pot.</p>
 {% endblock %}
 
+{% block actions %}
+    <ul class="list-unstyled connections-list">
+        {% for connection in policy.connections %}
+        <li>
+            <label for="">
+                <span class="sr-only">Select user</span>
+                <input type="checkbox" />
+            </label>
+            <img src="{{ connection.linkedUser.getImageUrlFallback }}" style="width: 50px"
+            title="{% if connection.linkedUser.id == app.user.id %}{{ connection.linkedPolicy.defaultName }}{% else %}{{ connection.linkedUser.name }}{% endif %}"
+            alt="{{ connection.linkedUser.name }}"
+            class="
+            {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}
+                img-circle coffee-stamp
+            {% else %}
+                img-circle coffee-stamp user-has-claimed
+            {% endif %}"
+            >
+            {% if connection.linkedUser.id == app.user.id %}{{ connection.linkedPolicy.defaultName }}{% else %}{{ connection.linkedUser.name }}{% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+
+    <div class="checkout--step">
+        <div class="container">
+            <form>
+                Controls
+            </form>
+        </div>
+    </div>
+{% endblock %}
