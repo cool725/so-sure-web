@@ -141,6 +141,23 @@ class PolicyRepository extends BaseDocumentRepository
             ->execute();
     }
 
+    public function findPendingRenewalPoliciesForUnRenewed(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        $qb = $this->createQueryBuilder()
+            ->field('status')->in([
+                Policy::STATUS_PENDING_RENEWAL,
+            ])
+            ->field('pendingRenewalExpiration')->lte($date);
+
+        return $qb
+            ->getQuery()
+            ->execute();
+    }
+
     public function getWeeklyEmail($environment)
     {
         $lastWeek = new \DateTime();

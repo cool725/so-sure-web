@@ -2996,20 +2996,134 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($foundRenewalDiscount);
     }
 
-    public function testRenewPendingCancellation()
+    public function testPendingRenewalExpiration()
     {
-        $policy = $this->getPolicy(static::generateEmail('testRenewPendingCancellation', $this));
+        $policy = $this->getPolicy(static::generateEmail('testPendingRenewalExpiration', $this));
 
         $this->assertFalse($policy->isRenewed());
 
         $renewalPolicy = $this->getRenewalPolicy($policy, false);
-        $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $renewalPolicy->getPendingCancellation());
+        $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $renewalPolicy->getPendingRenewalExpiration());
 
         $this->assertTrue($renewalPolicy->isRenewalAllowed(new \DateTime('2016-12-31 23:59')));
         $this->assertFalse($renewalPolicy->isRenewalAllowed(new \DateTime('2017-01-01')));
 
         $renewalPolicy->renew(0, new \DateTime('2016-12-15'));
-        $this->assertNull($renewalPolicy->getPendingCancellation());
+        $this->assertNull($renewalPolicy->getPendingRenewalExpiration());
+    }
+
+    public function testUnRenew()
+    {
+        $policy = $this->getPolicy(static::generateEmail('testUnRenew', $this));
+
+        $this->assertFalse($policy->isRenewed());
+
+        $renewalPolicy = $this->getRenewalPolicy($policy, false);
+        $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $renewalPolicy->getPendingRenewalExpiration());
+
+        $this->assertTrue($renewalPolicy->isRenewalAllowed(new \DateTime('2016-12-31 23:59')));
+        $this->assertFalse($renewalPolicy->isRenewalAllowed(new \DateTime('2017-01-01')));
+
+        $renewalPolicy->unrenew(new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_UNRENEWED, $renewalPolicy->getStatus());
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testUnRenewThenCreate()
+    {
+        $policy = $this->getPolicy(static::generateEmail('testUnRenewThenCreate', $this));
+
+        $this->assertFalse($policy->isRenewed());
+
+        $renewalPolicy = $this->getRenewalPolicy($policy, false);
+        $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $renewalPolicy->getPendingRenewalExpiration());
+
+        $this->assertTrue($renewalPolicy->isRenewalAllowed(new \DateTime('2016-12-31 23:59')));
+        $this->assertFalse($renewalPolicy->isRenewalAllowed(new \DateTime('2017-01-01')));
+
+        $renewalPolicy->unrenew(new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_UNRENEWED, $renewalPolicy->getStatus());
+
+        $renewalPolicy->create(rand(1, 999999), null, null, rand(1, 9999));
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testUnRenewalTooEarly()
+    {
+        $policy = $this->getPolicy(static::generateEmail('testUnRenewalTooEarly', $this));
+
+        $this->assertFalse($policy->isRenewed());
+
+        $renewalPolicy = $this->getRenewalPolicy($policy, false);
+        $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $renewalPolicy->getPendingRenewalExpiration());
+
+        $this->assertTrue($renewalPolicy->isRenewalAllowed(new \DateTime('2016-12-31 23:59')));
+        $this->assertFalse($renewalPolicy->isRenewalAllowed(new \DateTime('2017-01-01')));
+
+        $renewalPolicy->unrenew(new \DateTime('2016-12-15'));
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testUnRenewalInvalidStatus()
+    {
+        $policy = $this->getPolicy(static::generateEmail('testUnRenewalInvalidStatus', $this));
+
+        $this->assertFalse($policy->isRenewed());
+
+        $renewalPolicy = $this->getRenewalPolicy($policy, false);
+        $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $renewalPolicy->getPendingRenewalExpiration());
+
+        $renewalPolicy->setStatus(Policy::STATUS_RENEWAL);
+
+        $renewalPolicy->unrenew(new \DateTime('2017-01-01'));
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testUnRenewedFailsRenew()
+    {
+        $policy = $this->getPolicy(static::generateEmail('testUnRenewedFailsRenew', $this));
+
+        $this->assertFalse($policy->isRenewed());
+
+        $renewalPolicy = $this->getRenewalPolicy($policy, false);
+        $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $renewalPolicy->getPendingRenewalExpiration());
+
+        $this->assertTrue($renewalPolicy->isRenewalAllowed(new \DateTime('2016-12-31 23:59')));
+        $this->assertFalse($renewalPolicy->isRenewalAllowed(new \DateTime('2017-01-01')));
+
+        $renewalPolicy->unrenew(new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_UNRENEWED, $renewalPolicy->getStatus());
+
+        $renewalPolicy->renew(0, new \DateTime('2017-12-15'));
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testUnRenewedFailsActive()
+    {
+        $policy = $this->getPolicy(static::generateEmail('testUnRenewedFailsRenew', $this));
+
+        $this->assertFalse($policy->isRenewed());
+
+        $renewalPolicy = $this->getRenewalPolicy($policy, false);
+        $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $renewalPolicy->getPendingRenewalExpiration());
+
+        $this->assertTrue($renewalPolicy->isRenewalAllowed(new \DateTime('2016-12-31 23:59')));
+        $this->assertFalse($renewalPolicy->isRenewalAllowed(new \DateTime('2017-01-01')));
+
+        $renewalPolicy->unrenew(new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_UNRENEWED, $renewalPolicy->getStatus());
+
+        $renewalPolicy->activate(new \DateTime('2017-01-01'));
     }
 
     /**
@@ -3134,7 +3248,7 @@ class PhonePolicyTest extends WebTestCase
             $renewalPolicy->setStart(new \DateTime("2017-01-01"));
             $renewalPolicy->setEnd(new \DateTime("2017-12-31 23:59:59"));
         } else {
-            $renewalPolicy->setPendingCancellation(new \DateTime("2016-12-31 23:59:59"));
+            $renewalPolicy->setPendingRenewalExpiration(new \DateTime("2016-12-31 23:59:59"));
         }
         $renewalPolicy->setStatus(Policy::STATUS_PENDING_RENEWAL);
 

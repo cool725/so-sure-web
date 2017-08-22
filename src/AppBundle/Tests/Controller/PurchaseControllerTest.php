@@ -478,7 +478,7 @@ class PurchaseControllerTest extends BaseControllerTest
             $dm
         );
 
-        $policy1 = self::initPolicy($user, $dm, $phone1, null, false, true);
+        $policy1 = self::initPolicy($user, $dm, $phone1, null, false, false);
 
         $judopay = self::$container->get('app.judopay');
         $policyService = self::$container->get('app.policy');
