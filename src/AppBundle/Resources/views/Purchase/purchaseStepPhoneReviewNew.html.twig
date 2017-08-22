@@ -136,52 +136,57 @@
         <div class="container">
 
             {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'data-client-validation': form_client_validation, 'autocomplete': 'off' }}) }}
+
                 <div class="form-group payment-options {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
                     {{ form_label(purchase_form.amount, 'Payment Options:', { 'label_attr': {'class': 'sr-only'} }) }}
                     {{ form_widget(purchase_form.amount) }}
                     <div class="help-block with-errors">{{ form_errors(purchase_form.amount) }}</div>
                 </div>
+
                 <div class="form-group {% if form_errors(purchase_form.imei) %}has-error{% endif %}">
                     {{ form_label(purchase_form.imei, 'IMEI Number:', { 'label_attr': {'class': 'sr-only'} }) }}
                     {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control', 'placeholder':'IMEI Number', 'autofocus': 'autofocus'}}) }}
                     <div class="help-block with-errors">{{ form_errors(purchase_form.imei) }}</div>
-                    <span class="help-block text-center">
+                    <div class="help-block text-center">
                         <a href="#"
                            class="text-underline"
                            data-toggle="modal"
                            data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}"
                            >Dial *#06# to show your IMEI number.</a>
-                    </span>
-                </div>
-                {% if not policy is defined or not policy or policy.imei|length == 0 %}
-                <div class="form-group">
-                    <div class="text-break text-grey">
-                        <div class="line"></div>OR<div class="line"></div>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <a href="#"
-                       id="imei-screenshot"
-                       class="btn btn-blue btn-block btn-pad"
-                       data-intercom-msg="Hi, I want to take a screenshot of my IMEI number to send to you. Can you let me know what to do? 🙂"
-                    >Send us a screenshot of your IMEI</a><br>
-                </div>
+                {% if not policy is defined or not policy or policy.imei|length == 0 %}
+                    <div class="form-group">
+                        <div class="text-break text-grey">
+                            <div class="line"></div>OR<div class="line"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <a href="#"
+                           id="imei-screenshot"
+                           class="btn btn-blue btn-block btn-pad"
+                           data-intercom-msg="Hi, I want to take a screenshot of my IMEI number to send to you. Can you let me know what to do? 🙂"
+                        >Send us a screenshot of your IMEI</a><br>
+                    </div>
                 {% endif %}
+
                 {% if purchase_form.serialNumber is defined %}
-                    <div class="form-group-break form-group {% if form_errors(purchase_form.serialNumber) %}has-error{% endif %}">
+                    <div class="form-group {% if form_errors(purchase_form.serialNumber) %}has-error{% endif %}">
                         {{ form_label(purchase_form.serialNumber, 'Serial Number:', { 'label_attr': {'class': 'sr-only'} }) }}
                         {{ form_widget(purchase_form.serialNumber, {'attr':{'class':'form-control',  'pattern': '[a-zA-Z0-9]{5,32}', 'title': 'Enter a valid serial number', 'placeholder':'Serial Number'}}) }}
                         <div class="help-block with-errors">{{ form_errors(purchase_form.serialNumber) }}</div>
-                        <span class="help-block text-center">
+                        <div class="help-block text-center">
                             <a href="#"
                                class="text-underline"
                                data-toggle="modal"
                                data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}">Go to Settings > General > About.</a>
-                        </span>
+                        </div>
                     </div>
                 {% endif %}
-                <div class="form-group">
+
+                <div class="form-group form-group-break">
                     <a href="#"
                        id="step--validate"
                        class="btn btn-green btn-block btn-pad">
@@ -190,7 +195,7 @@
                 </div>
                 <div class="form-group">
                     <a href="{{ path('purchase_step_personal') }}"
-                       class="btn btn-grey btn-block btn-pad">
+                       class="btn btn-blue-hollow btn-block btn-pad">
                         Back
                     </a>
                 </div>
@@ -236,6 +241,7 @@
                 </div>
 
             {{ form_end(purchase_form) }}
+
             <form action="{{ webpay_action }}" method="post" id="webpay-form">
                 <input id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
             </form>

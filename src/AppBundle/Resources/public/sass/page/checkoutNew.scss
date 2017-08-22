@@ -82,20 +82,7 @@
         margin: 0 auto;
 
         .form-group-break {
-            position: relative;
             margin-top: 30px;
-
-            &:after {
-                content: '';
-                position: absolute;
-                top: -25px;
-                margin-left: -1000px;
-                width: 3000px; height: 275px;
-                background-color: $off-white;
-                border-top: 1px solid $pale-grey;
-                border-bottom: 1px solid $pale-grey;
-                z-index: -1;
-            }
         }
     }
 
@@ -110,8 +97,8 @@
 }
 
 .checkout--step-payment {
-    padding: 20px 0;
-    background-color: $white;
+    // padding: 20px 0;
+    // background-color: $white;
     border-color: transparent;
 }
 
