@@ -334,10 +334,20 @@
 
         li {
             padding: 15px 10px;
+            border-bottom: 1px solid $grey;
+            cursor: pointer;
 
             img {
-                margin-left: 10px;
+                margin: 0 10px;
             }
+
+            &:last-of-type {
+                border: none;
+            }
+        }
+
+        .connection-selected {
+            background-color: $off-white;
         }
     }
 }
