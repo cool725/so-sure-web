@@ -7,6 +7,7 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Exception\MonitorException;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\MultiPay;
 use AppBundle\Document\Claim;
 use AppBundle\Document\File\DaviesFile;
@@ -89,7 +90,7 @@ class MonitorService
         $now = new \DateTime();
         foreach ($claims as $claim) {
             $replacementDate = $claim->getPolicy()->getImeiReplacementDate();
-            if (!$replacementDate ||
+            if ($replacementDate &&
                 $now->getTimestamp() - $replacementDate->getTimestamp() > 3600) {
                 throw new \Exception(sprintf(
                     'Claim %s Policy %s is missing replacement phone',
@@ -230,6 +231,30 @@ class MonitorService
                 json_encode($results['missing'])
             ));
             // @codingStandardsIgnoreEnd
+        }
+    }
+
+    public function policyTerms()
+    {
+        $repo = $this->dm->getRepository(PolicyTerms::class);
+        $terms = $repo->findAll();
+        $termVersions = [];
+        foreach ($terms as $term) {
+            if (!in_array($term->getVersion(), PolicyTerms::$allVersions)) {
+                throw new \Exception(sprintf(
+                    'Policy Terms %s is in db but not present in code',
+                    $term->getVersion()
+                ));
+            }
+            $termVersions[] = $term->getVersion();
+        }
+        foreach (PolicyTerms::$allVersions as $version) {
+            if (!in_array($version, $termVersions)) {
+                throw new \Exception(sprintf(
+                    'Policy Terms %s is in code but not present in db',
+                    $version
+                ));
+            }
         }
     }
 }
