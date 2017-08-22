@@ -80,4 +80,27 @@ $(function(){
         $('.modal-body__policy-doc').hide();
     });
 
+    // Connections
+    $('#select-all-connections').on('click',function(){
+        if (this.checked) {
+            $('.checkbox-connect').each(function() {
+                this.checked = true;
+            });
+        } else {
+            $('.checkbox-connect').each(function() {
+                this.checked = false;
+            });
+        }
+    });
+
+    $('.checkbox-connect').on('click',function(){
+        if($('.checkbox-connect:checked').length == $('.checkbox-connect').length) {
+            $('#select-all-connections').prop('checked',true);
+        }else{
+            $('#select-all-connections').prop('checked',false);
+        }
+    });
+
+
+
 });

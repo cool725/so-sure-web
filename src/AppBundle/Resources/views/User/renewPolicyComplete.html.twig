@@ -1,14 +1,22 @@
 {% extends 'AppBundle:User:baseRenewPolicy.html.twig' %}
 
 {% block titleArea %}
+
     <h1 class="h2"><span class="title-top">Thank you for renewing your policy with so-sure.</span></h1>
+
     {% if policy.hasCashback %}
         <h4 class="text-center">
             Your cashback request was received and will be processed <span class="text-blue">28-45</span> days after your policy has ended.
         </h4>
     {% endif %}
+
     <h4 class="text-center">You will continue to be protected against theft, loss, and accidental damage.</h4>
-    <p class="lead text-center">Your policy <span class="h4 text-blue">{{ policy.policyNumber }}</span> is scheduled to be renewed on <span class="h4">11/11/2017</span></p>
+
+    <p class="lead text-center">Your policy
+        <span class="h4 text-blue">{{ policy.policyNumber }}</span>
+        is scheduled to be renewed on
+        <span class="h4">{{ policy.nextPolicy.start|date("d/m/Y") }}</span>
+    </p>
 
     {# Maybe these lines could be combined someway ???? #}
     <p class="lead text-center">Your
@@ -19,15 +27,16 @@
         {% endif %}
         premium is <span class="text-blue h4">£XX.XX</span>{# £premium #}
         {# if discounted #}
-            (discounted by <span class="text-blue h4">£XX.XX</span>).
+            (discounted by <span class="text-blue h4">£XX.XX</span>
+            from your reward pot
+            {% if policy.getPremiumPlan == 'monthly' %}
+                each month
+            {% else %}
+                for the year
+            {% endif %}
+            ).
         {# endif #}
     </p>
-    {% if policy.potValue > 0 %}
-        <p class="lead text-center">
-            Your pot reward of <span class="text-blue h4">£XX.XX</span> will be used to discount your premium by <span class="text-blue h4">£XX.XX</span> each month.
-        </p>
-    {% endif %}
-
 
 {% endblock %}
 
@@ -37,27 +46,37 @@
 {% endblock %}
 
 {% block actions %}
-    <ul class="list-unstyled connections-list">
-        {% for connection in policy.connections %}
-        <li>
-            <label for="">
-                <span class="sr-only">Select user</span>
-                <input type="checkbox" />
-            </label>
-            <img src="{{ connection.linkedUser.getImageUrlFallback }}" style="width: 50px"
-            title="{% if connection.linkedUser.id == app.user.id %}{{ connection.linkedPolicy.defaultName }}{% else %}{{ connection.linkedUser.name }}{% endif %}"
-            alt="{{ connection.linkedUser.name }}"
-            class="
-            {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}
-                img-circle coffee-stamp
-            {% else %}
-                img-circle coffee-stamp user-has-claimed
-            {% endif %}"
-            >
-            {% if connection.linkedUser.id == app.user.id %}{{ connection.linkedPolicy.defaultName }}{% else %}{{ connection.linkedUser.name }}{% endif %}
-        </li>
-        {% endfor %}
-    </ul>
+    <div class="connections">
+        <ul class="list-unstyled renew-list">
+            {% for connection in policy.connections %}
+            <li class="renew-list__connection">
+                <label for="user-connect">
+                    <span class="sr-only">Select user</span>
+                    <input class="checkbox-connect" type="checkbox" />
+                </label>
+                <img src="{{ connection.linkedUser.getImageUrlFallback }}" style="width: 50px"
+                title="{% if connection.linkedUser.id == app.user.id %}{{ connection.linkedPolicy.defaultName }}{% else %}{{ connection.linkedUser.name }}{% endif %}"
+                alt="{{ connection.linkedUser.name }}"
+                class="
+                {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}
+                    img-circle coffee-stamp
+                {% else %}
+                    img-circle coffee-stamp user-has-claimed
+                {% endif %}"
+                >
+                {% if connection.linkedUser.id == app.user.id %}{{ connection.linkedPolicy.defaultName }}{% else %}{{ connection.linkedUser.name }}{% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+        <div class="form-group text-center">
+            {# <a id="select-all-connections" href="#" class="btn btn-blue">Select all</a> #}
+            <div class="checkbox">
+                <label>
+                    <input id="select-all-connections" type="checkbox" /> <span class="">select / deselect all</span>
+                </label>
+            </div>
+        </div>
+    </div>
 
     <div class="checkout--step">
         <div class="container">
