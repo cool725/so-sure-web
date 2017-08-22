@@ -72,6 +72,7 @@ class BaseImeiService
             if ($policy->isExpired()) {
                 continue;
             }
+
             // Cancelled policies that are not policy declined can be paid for again
             if ($policy->isCancelled() && !$policy->isCancelledWithPolicyDeclined()) {
                 continue;

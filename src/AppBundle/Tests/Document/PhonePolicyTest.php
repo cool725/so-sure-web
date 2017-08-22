@@ -11,6 +11,7 @@ use AppBundle\Document\Lead;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Reward;
 use AppBundle\Document\SCode;
+use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
 use AppBundle\Document\Payment\PotRewardPayment;
@@ -1083,18 +1084,102 @@ class PhonePolicyTest extends WebTestCase
     public function testCancelPolicyUserDeclined()
     {
         $policyA = static::createUserPolicy(true);
-        $policyA->getUser()->setEmail(static::generateEmail('testCancelPolicyUserDeclined', $this));
+        $policyA->getUser()->setEmail(static::generateEmail('testCancelPolicyUserDeclinedA', $this));
+        $policyB = static::createUserPolicy(true);
+        $policyB->getUser()->setEmail(static::generateEmail('testCancelPolicyUserDeclinedB', $this));
+        $policyC = static::createUserPolicy(true);
+        $policyC->getUser()->setEmail(static::generateEmail('testCancelPolicyUserDeclinedC', $this));
+        $policyD = static::createUserPolicy(true);
+        $policyD->getUser()->setEmail(static::generateEmail('testCancelPolicyUserDeclinedD', $this));
+        $policyE = static::createUserPolicy(true);
+        $policyE->getUser()->setEmail(static::generateEmail('testCancelPolicyUserDeclinedE', $this));
+        $policyF = static::createUserPolicy(true);
+        $policyF->getUser()->setEmail(static::generateEmail('testCancelPolicyUserDeclinedF', $this));
+        static::$dm->persist($policyA);
+        static::$dm->persist($policyA->getUser());
+        static::$dm->persist($policyB);
+        static::$dm->persist($policyB->getUser());
+        static::$dm->persist($policyC);
+        static::$dm->persist($policyC->getUser());
+        static::$dm->persist($policyD);
+        static::$dm->persist($policyD->getUser());
+        static::$dm->persist($policyE);
+        static::$dm->persist($policyE->getUser());
+        static::$dm->persist($policyF);
+        static::$dm->persist($policyF->getUser());
+        static::$dm->flush();
+
+        $this->assertFalse($policyA->isCancelledWithUserDeclined());
+        $policyA->cancel(SalvaPhonePolicy::CANCELLED_ACTUAL_FRAUD);
+        $policyB->cancel(SalvaPhonePolicy::CANCELLED_SUSPECTED_FRAUD);
+        $policyC->setStatus(SalvaPhonePolicy::STATUS_CANCELLED);
+        $policyC->setCancelledReason(SalvaPhonePolicy::CANCELLED_BADRISK);
+        $policyD->cancel(SalvaPhonePolicy::CANCELLED_UPGRADE);
+
+        $this->assertTrue($policyA->isCancelledWithUserDeclined());
+        $this->assertTrue($policyB->isCancelledWithUserDeclined());
+        $this->assertTrue($policyC->isCancelledWithUserDeclined());
+        $this->assertFalse($policyD->isCancelledWithUserDeclined());
+
+        $this->assertFalse($policyE->isCancelledWithUserDeclined());
+        $policyE->cancel(SalvaPhonePolicy::CANCELLED_USER_REQUESTED);
+        $claimE = new Claim();
+        $claimE->setStatus(Claim::STATUS_APPROVED);
+        $policyE->addClaim($claimE);
+        $this->assertTrue($policyE->isCancelledWithUserDeclined());
+
+        $this->assertFalse($policyF->isCancelledWithUserDeclined());
+        $claimF = new Claim();
+        $claimF->setStatus(Claim::STATUS_WITHDRAWN);
+        $policyF->addClaim($claimF);
+        $policyF->setStatus(SalvaPhonePolicy::STATUS_UNPAID);
+        $policyF->cancel(SalvaPhonePolicy::CANCELLED_UNPAID);
+        $this->assertTrue($policyF->isCancelledWithUserDeclined());
+    }
+
+    public function testCancelPolicyPolicyDeclined()
+    {
+        $policyA = static::createUserPolicy(true);
+        $policyA->getUser()->setEmail(static::generateEmail('testCancelPolicyPolicyDeclinedA', $this));
+        $policyB = static::createUserPolicy(true);
+        $policyB->getUser()->setEmail(static::generateEmail('testCancelPolicyPolicyDeclinedB', $this));
+        static::$dm->persist($policyA);
+        static::$dm->persist($policyA->getUser());
+        static::$dm->persist($policyB);
+        static::$dm->persist($policyB->getUser());
+        static::$dm->flush();
+
+        $this->assertFalse($policyA->isCancelledWithPolicyDeclined());
+        $policyA->cancel(SalvaPhonePolicy::CANCELLED_DISPOSSESSION);
+        $policyB->cancel(SalvaPhonePolicy::CANCELLED_WRECKAGE);
+
+        $this->assertTrue($policyA->isCancelledWithPolicyDeclined());
+        $this->assertTrue($policyB->isCancelledWithPolicyDeclined());
+    }
+
+    public function testIsFullyPaid()
+    {
+        $policyA = static::createUserPolicy(true);
+        $policyA->getUser()->setEmail(static::generateEmail('testIsFullyPaid', $this));
         static::$dm->persist($policyA);
         static::$dm->persist($policyA->getUser());
         static::$dm->flush();
 
-        $policyA->cancel(SalvaPhonePolicy::CANCELLED_ACTUAL_FRAUD);
+        $this->assertFalse($policyA->isFullyPaid());
+        $bacs = new BacsPayment();
+        $bacs->setAmount($policyA->getPremium()->getMonthlyPremiumPrice());
+        $policyA->addPayment($bacs);
+        $this->assertFalse($policyA->isFullyPaid());
 
-        $this->assertEquals(SalvaPhonePolicy::STATUS_CANCELLED, $policyA->getStatus());
-        $this->assertEquals(SalvaPhonePolicy::CANCELLED_ACTUAL_FRAUD, $policyA->getCancelledReason());
-        $now = new \DateTime();
-        $this->assertEquals($now->format('y-M-d'), $policyA->getEnd()->format('y-M-d'));
-        $this->assertTrue($policyA->getUser()->isLocked());
+        $bacs = new BacsPayment();
+        $bacs->setAmount($policyA->getPremium()->getMonthlyPremiumPrice() * 11);
+        $policyA->addPayment($bacs);
+        $this->assertTrue($policyA->isFullyPaid());
+
+        $bacs = new BacsPayment();
+        $bacs->setAmount($policyA->getPremium()->getMonthlyPremiumPrice());
+        $policyA->addPayment($bacs);
+        $this->assertTrue($policyA->isFullyPaid());
     }
 
     public function testCancelPolicyUpgrade()
@@ -2816,7 +2901,16 @@ class PhonePolicyTest extends WebTestCase
         $this->assertTrue($policy->canCreatePendingRenewal(new \DateTime("2016-12-10")));
         $this->assertFalse($policy->canCreatePendingRenewal(new \DateTime("2017-01-01 00:01")));
 
-        // TODO add tests on user canRenewPolicy
+        $policy->getUser()->setLocked(true);
+        $this->assertFalse($policy->canCreatePendingRenewal(new \DateTime("2016-12-10")));
+        $policy->getUser()->setLocked(false);
+
+        $policy->setStatus(SalvaPhonePolicy::STATUS_CANCELLED);
+        $policy->setCancelledReason(SalvaPhonePolicy::CANCELLED_DISPOSSESSION);
+        $this->assertFalse($policy->canCreatePendingRenewal(new \DateTime("2016-12-10")));
+
+        $policy->setStatus(SalvaPhonePolicy::STATUS_UNPAID);
+        $this->assertTrue($policy->canCreatePendingRenewal(new \DateTime("2016-12-10")));
     }
 
     public function testCanRenew()
@@ -2829,7 +2923,16 @@ class PhonePolicyTest extends WebTestCase
 
         $this->assertTrue($policy->canRenew(new \DateTime("2016-12-10")));
 
-        // TODO add tests on user canRenewPolicy
+        $policy->getUser()->setLocked(true);
+        $this->assertFalse($policy->canRenew(new \DateTime("2016-12-10")));
+        $policy->getUser()->setLocked(false);
+
+        $policy->setStatus(SalvaPhonePolicy::STATUS_CANCELLED);
+        $policy->setCancelledReason(SalvaPhonePolicy::CANCELLED_DISPOSSESSION);
+        $this->assertFalse($policy->canRenew(new \DateTime("2016-12-10")));
+
+        $policy->setStatus(SalvaPhonePolicy::STATUS_UNPAID);
+        $this->assertTrue($policy->canRenew(new \DateTime("2016-12-10")));
     }
 
     public function testIsRenewed()
@@ -2862,7 +2965,18 @@ class PhonePolicyTest extends WebTestCase
 
         $this->assertFalse($policy->canRepurchase());
 
-        // TODO add tests on user canRenewPolicy
+        $renewalPolicy->setStatus(Policy::STATUS_UNRENEWED);
+
+        $policy->getUser()->setLocked(true);
+        $this->assertFalse($policy->canRepurchase());
+        $policy->getUser()->setLocked(false);
+
+        $policy->setStatus(SalvaPhonePolicy::STATUS_CANCELLED);
+        $policy->setCancelledReason(SalvaPhonePolicy::CANCELLED_DISPOSSESSION);
+        $this->assertFalse($policy->canRepurchase());
+
+        $policy->setCancelledReason(SalvaPhonePolicy::CANCELLED_COOLOFF);
+        $this->assertTrue($policy->canRepurchase());
     }
 
     public function testRenewActivateExpire()

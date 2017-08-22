@@ -608,7 +608,6 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     /**
      * Can purchase implies that user is allowed to purchase an additional policy
      * This is different than being allowed to renew an existing policy
-     * although lines get blurred if a policy expires and then user wants to re-purchase
      */
     public function canPurchasePolicy($checkMaxPolicies = true)
     {
@@ -620,10 +619,6 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             return false;
         }
 
-        if ($this->hasSuspectedFraudulentClaim()) {
-            return false;
-        }
-
         if ($this->hasCancelledPolicyWithUserDeclined()) {
             return false;
         }
@@ -631,7 +626,50 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         if ($checkMaxPolicies && count($this->getValidPolicies(true)) >= self::MAX_POLICIES_PER_USER) {
             return false;
         }
-        // TODO avg claims on any policy in the past > 2
+
+        if ($this->getAvgPolicyClaims() > 2 && !$this->areEqualToTwoDp(2, $this->getAvgPolicyClaims())) {
+            return false;
+        }
+
+        // TODO only difference in purchase vs re-purchase if if the policy previously exists and there
+        // is a dispossession/wreckage. As the imei check will perform that validation, its ok for now
+        // although a better solution would be nice
+
+        return true;
+    }
+
+    /**
+     * Can the user re-purchase this specific policy
+     * This is different than being allowed to renew an existing policy (renewal has expired)
+     */
+    public function canRepurchasePolicy(Policy $policy, $checkMaxPolicies = true)
+    {
+        if ($this->isLocked()) {
+            return false;
+        }
+
+        if (!$this->isEnabled()) {
+            return false;
+        }
+
+        if ($this->hasCancelledPolicyWithUserDeclined()) {
+            return false;
+        }
+
+        if ($policy->isCancelledWithPolicyDeclined()) {
+            return false;
+        }
+
+        if ($checkMaxPolicies && count($this->getValidPolicies(true)) >= self::MAX_POLICIES_PER_USER) {
+            return false;
+        }
+
+        if ($this->getAvgPolicyClaims() > 2 && !$this->areEqualToTwoDp(2, $this->getAvgPolicyClaims())) {
+            return false;
+        }
+
+        // TODO: Consider if we want to block a different user doing a re-purchase
+
         // TODO only difference in purchase vs re-purchase if if the policy previously exists and there
         // is a dispossession/wreckage. As the imei check will perform that validation, its ok for now
         // although a better solution would be nice
@@ -653,10 +691,6 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             return false;
         }
 
-        if ($this->hasSuspectedFraudulentClaim()) {
-            return false;
-        }
-
         if ($this->hasCancelledPolicyWithUserDeclined()) {
             return false;
         }
@@ -665,9 +699,33 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             return false;
         }
 
-        // TODO avg claims on any policy in the past > 2
+        if ($this->getAvgPolicyClaims() > 2 && !$this->areEqualToTwoDp(2, $this->getAvgPolicyClaims())) {
+            return false;
+        }
 
         return true;
+    }
+
+    public function getAvgPolicyClaims()
+    {
+        $claims = 0;
+        $policies = 0;
+        foreach ($this->getAllPolicies() as $policy) {
+            // TODO: Blend upgrades
+            if ($policy->getStatus() == Policy::STATUS_CANCELLED &&
+                $policy->getCancelledReason() == Policy::CANCELLED_COOLOFF) {
+                continue;
+            }
+
+            $policies++;
+            $claims += count($policy->getApprovedClaims());
+        }
+
+        if ($policies > 0) {
+            return $claims / $policies;
+        } else {
+            return 0;
+        }
     }
 
     public function areRenewalsDesired()

@@ -1966,7 +1966,7 @@ abstract class Policy
             return true;
         }
 
-        // User has a withdrawn or declined claim and policy was cancelled/unpaid 
+        // User has a withdrawn or declined claim and policy was cancelled/unpaid
         if ($this->getCancelledReason() == self::CANCELLED_UNPAID && count($this->getWithdrawnDeclinedClaims()) > 0) {
             return true;
         }
@@ -2681,7 +2681,7 @@ abstract class Policy
 
     public function isFullyPaid(\DateTime $date = null)
     {
-        return $this->areEqualToTwoDp(0, $this->getRemainderOfPolicyPrice($date);
+        return $this->areEqualToTwoDp(0, $this->getRemainderOfPolicyPrice($date));
     }
 
     public function getTotalSuccessfulPayments(\DateTime $date = null)
@@ -3141,17 +3141,18 @@ abstract class Policy
      */
     public function canRepurchase()
     {
-        // partial renewal policy wasn't created - never allow renewal in this case
-        if (!$this->hasNextPolicy()) {
-            return false;
-        }
-
-        if ($this->isRenewed()) {
+        // active/unpaid or polices in the renewal flow should not be able to be repurchased
+        if (in_array($this->getStatus(), [
+            self::STATUS_ACTIVE,
+            self::STATUS_PENDING_RENEWAL,
+            self::STATUS_RENEWAL,
+            self::STATUS_UNPAID,
+        ])) {
             return false;
         }
 
         // In case user was disallowed after pending renewal was created
-        if (!$this->getUser()->canRenewPolicy($this)) {
+        if (!$this->getUser()->canRepurchasePolicy($this)) {
             return false;
         }
 
