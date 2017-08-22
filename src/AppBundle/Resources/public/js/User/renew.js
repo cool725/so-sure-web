@@ -81,12 +81,14 @@ $(function(){
     });
 
     // Connections
-    $('#select-all-connections').on('click',function(){
+    $('.select-all-connections').on('click',function(){
         if (this.checked) {
+            $('.select-all-connections').not(this).prop('checked',true);
             $('.checkbox-connect').each(function() {
                 this.checked = true;
             });
         } else {
+            $('.select-all-connections').not(this).prop('checked',false);
             $('.checkbox-connect').each(function() {
                 this.checked = false;
             });
@@ -95,9 +97,9 @@ $(function(){
 
     $('.checkbox-connect').on('click',function(){
         if($('.checkbox-connect:checked').length == $('.checkbox-connect').length) {
-            $('#select-all-connections').prop('checked',true);
+            $('.select-all-connections').prop('checked',true);
         }else{
-            $('#select-all-connections').prop('checked',false);
+            $('.select-all-connections').prop('checked',false);
         }
     });
 

@@ -42,6 +42,13 @@
 
 {% block actions %}
     <div class="connections">
+        <div class="form-group text-center">
+            <div class="checkbox">
+                <label>
+                    <input class="select-all-connections" type="checkbox" /> <strong>select / deselect all connections</strong>
+                </label>
+            </div>
+        </div>
         <ul class="list-unstyled renew-list">
             {% for connection in policy.connections %}
                 <li class="renew-list__connection">
@@ -66,7 +73,7 @@
         <div class="form-group text-center">
             <div class="checkbox">
                 <label>
-                    <input id="select-all-connections" type="checkbox" /> <strong>select / deselect all connections</strong>
+                    <input class="select-all-connections" type="checkbox" /> <strong>select / deselect all connections</strong>
                 </label>
             </div>
         </div>
@@ -75,7 +82,12 @@
     <div class="checkout--step">
         <div class="container">
             <form>
-                Controls
+                <div class="form-group">
+                    <a href="#" class="btn btn-green btn-block btn-pad">Save</a>
+                </div>
+                <div class="form-group">
+                    <a href="#" class="btn btn-blue-hollow btn-block btn-pad">Back</a>
+                </div>
             </form>
         </div>
     </div>
