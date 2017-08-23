@@ -624,7 +624,7 @@ class UserController extends BaseController
      * @Route("/renew/{id}/complete", name="user_renew_completed")
      * @Template
      */
-    public function renewPolicyCompleteAction(Request $request, $id)
+    public function renewPolicyCompleteAction($id)
     {
         $dm = $this->getManager();
         $policyRepo = $dm->getRepository(Policy::class);
@@ -647,7 +647,7 @@ class UserController extends BaseController
      * @Route("/renew/{id}/only-cashback", name="user_renew_only_cashback")
      * @Template
      */
-    public function renewPolicyOnlyCashbackAction(Request $request, $id)
+    public function renewPolicyOnlyCashbackAction($id)
     {
         $dm = $this->getManager();
         $policyRepo = $dm->getRepository(Policy::class);
