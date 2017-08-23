@@ -456,14 +456,16 @@ class AdminController extends BaseController
                 }
             }
         }
+        $reportingService = $this->get('app.reporting');
 
         return [
             'judoForm' => $judoForm->createView(),
             'year' => $year,
             'month' => $month,
-            'paymentTotals' => $this->get('app.reporting')->getAllPaymentTotals($this->isProduction(), $date),
-            // TODO: query will eve
-            'activePolicies' => $this->get('app.reporting')->getActivePoliciesCount($date),
+            'paymentTotals' => $reportingService->getAllPaymentTotals($this->isProduction(), $date),
+            'activePolicies' => $reportingService->getActivePoliciesCount($date),
+            'activePoliciesWithDiscount' => $reportingService->getActivePoliciesWithPolicyDiscountCount($date),
+            'rewardPotLiability' => $reportingService->getRewardPotLiability($date),
             'files' => $s3FileRepo->getAllFiles($date),
         ];
     }

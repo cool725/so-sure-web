@@ -8,7 +8,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 
 /**
- * @MongoDB\Document
+ * @MongoDB\Document(repositoryClass="AppBundle\Repository\CashbackRepository")
  * @Gedmo\Loggable
  */
 class Cashback
@@ -219,5 +219,15 @@ class Cashback
     public function setAccountName($accountName)
     {
         $this->accountName = $accountName;
+    }
+
+    public static function sumCashback($cashbacks)
+    {
+        $total = 0;
+        foreach ($cashbacks as $cashback) {
+            $total += $cashback->getAmount();
+        }
+
+        return $total;
     }
 }

@@ -372,6 +372,12 @@ abstract class Policy
     protected $viewedCancellationPage;
 
     /**
+     * @MongoDB\Boolean()
+     * @Gedmo\Versioned
+     */
+    protected $policyDiscountPresent;
+
+    /**
      * @Assert\DateTime()
      * @MongoDB\Date()
      * @Gedmo\Versioned
@@ -417,6 +423,20 @@ abstract class Policy
         }
 
         $this->payments->add($payment);
+        // Reporting is much much easier if we have a flag on the record rather than having to traverse payments
+        if ($payment instanceof PolicyDiscountPayment) {
+            $this->setPolicyDiscountPresent(true);
+        }
+    }
+
+    public function hasPolicyDiscountPresent()
+    {
+        return $this->policyDiscountPresent;
+    }
+
+    public function setPolicyDiscountPresent($policyDiscountPresent)
+    {
+        $this->policyDiscountPresent = $policyDiscountPresent;
     }
 
     /**
