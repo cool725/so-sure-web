@@ -1026,7 +1026,7 @@ class PolicyService
     {
         if ($policy->isRenewed()) {
             // No need to send an email as the renewal email should cover both expiry and renewal
-            \AppBundle\Classes\NoOp::ignore([]);
+            return;
         } elseif ($policy->canRepurchase() && $policy->getUser()->areRenewalsDesired()) {
             $baseTemplate = sprintf('AppBundle:Email:policy/expiredDesireRepurchase');
             $subject = sprintf('Your so-sure policy %s is now finished', $policy->getPolicyNumber());
@@ -1425,9 +1425,38 @@ class PolicyService
         $this->dm->persist($newPolicy);
         $this->dm->flush();
 
+        $this->pendingRenewalEmail($policy);
         $this->dispatchEvent(PolicyEvent::EVENT_PENDING_RENEWAL, new PolicyEvent($policy));
 
         return $newPolicy;
+    }
+
+    public function pendingRenewalEmail(Policy $policy)
+    {
+        $baseTemplate = sprintf('AppBundle:Email:policy/pendingRenewal');
+        $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
+        $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
+
+        $subject = sprintf(
+            'Your so-sure Policy %s is ready for renewal',
+            $policy->getPolicyNumber()
+        );
+        $data = [
+            'policy' => $policy,
+            'renew_url' => $this->router->generate(
+                'user_renew_policy',
+                ['id' => $policy->getId()],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            ),
+        ];
+        $this->mailer->sendTemplate(
+            $subject,
+            $policy->getUser()->getEmail(),
+            $htmlTemplate,
+            $data,
+            $textTemplate,
+            $data
+        );
     }
 
     public function renew(Policy $policy, $numPayments, Cashback $cashback = null, \DateTime $date = null)

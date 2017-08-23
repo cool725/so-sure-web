@@ -1,0 +1,31 @@
+{% extends 'AppBundle:Email:base.txt.twig' %}
+{% block body %}
+Your SO-SURE policy is due to expire in 3 weeks.
+
+**
+------------------------------------------------------------
+Your SO-SURE policy is due to expire in 3 weeks.
+{% if policy.nextPolicy.premium.monthlyPremiumPrice < policy.premium.monthlyPremiumPrice %}
+We have great news...
+
+Your monthly premium has decreased from £{{ policy.nextPolicy.premium.monthlyPremiumPrice }} to £{{ policy.premium.monthlyPremiumPrice }} per month!
+
+So for only £{{ policy.nextPolicy.premium.monthlyPremiumPrice }} per month, your phone can remain protected from loss, theft, accidental damage & out of warranty breakdown.
+{% else %}
+For only £{{ policy.nextPolicy.premium.monthlyPremiumPrice }} per month, your phone can remain protected from loss, theft, accidental damage & out of warranty breakdown.
+
+Unfortunately, our pricing has slightly increased due to the government mandated increase in IPT to 12% (June 2017). By way of comparison, your premium last year was £{{ policy.premium.monthlyPremiumPrice }} per month.
+{% endif %}
+
+For your information, your current policy details are:
+
+{{ policy.policyNumber }}
+
+{{ policy.end|date }}
+
+Provided that you and your connections haven't claimed, you may also be eligible to receive cashback from your Reward Pot!
+
+So make sure to renew your policy by clicking the link below! You can also use that link to check your cashback.
+
+{{ renew_url }}
+{% endblock body %}

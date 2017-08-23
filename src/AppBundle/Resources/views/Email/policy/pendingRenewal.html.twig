@@ -1,0 +1,34 @@
+{% extends 'AppBundle:Email:base.html.twig' %}
+{% import "AppBundle:Email:macros.html.twig" as macros %}
+{% block title %}Your policy is due to expire in 3 weeks{% endblock %}
+{% block body %}
+	{{ macros.start_table() }}
+		<h1>
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		</h1>
+		<div style="font-size: 14px; text-align: left;">
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+				Your SO-SURE policy is due to expire in 3 weeks.<br><br>
+				{% if policy.nextPolicy.premium.monthlyPremiumPrice < policy.premium.monthlyPremiumPrice %}
+					We have great news...<br><br>
+					Your monthly premium has decreased from £{{ policy.nextPolicy.premium.monthlyPremiumPrice }} to £{{ policy.premium.monthlyPremiumPrice }} per month!<br><br>
+					So for only £{{ policy.nextPolicy.premium.monthlyPremiumPrice }} per month, your phone can remain protected from loss, theft, accidental damage & out of warranty breakdown. <br><br>
+			   {% else %}
+					For only £{{ policy.nextPolicy.premium.monthlyPremiumPrice }} per month, your phone can remain protected from loss, theft, accidental damage & out of warranty breakdown.<br><br>
+					Unfortunately, our pricing has slightly increased due to the government mandated increase in IPT to 12% (June 2017). By way of comparison, your premium last year was £{{ policy.premium.monthlyPremiumPrice }} per month.<br><br>
+			   {% endif %}
+			   For your information, your current policy details are:<br><br>
+			   {{ policy.policyNumber }}<br><br>
+			   {{ policy.end|date }}<br><br>
+			   Provided that you and your connections haven't claimed, you may also be eligible to receive cashback from your Reward Pot!<br><br>
+			   So make sure to renew your policy by clicking the link below! <br><br>
+               If you have any questions, please don't hesitate to
+				<a href="mailto:support@wearesosure.com?subject=I%20have%20a%20question" target="_blank"><span style="color:#3399ff">contact us</span></a>.
+				<br><br><br>
+		   </div>
+		</div>
+	{{ macros.end_table() }}
+	{{ macros.email_button_table(renew_url, "Renew your policy", "Renew your policy")}}
+	{{ macros.email_button_table(renew_url, "Check your cashback", "Check your cashback")}}
+{% endblock %}
