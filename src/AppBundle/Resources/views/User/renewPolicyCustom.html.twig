@@ -202,12 +202,17 @@
                 <div class="form-group">
                     <a href="{{ path('user_renew_policy', {'id': policy.id}) }}" class="btn btn-blue-hollow btn-block btn-pad">Back</a>
                 </div>
-                <p><small>Our pricing may have increased slightly. This is largely due to the government mandated increase in IPT to 12% in June 2017.  Your premium last year was
-                {% if policy.getPremiumPlan == 'monthly' %}
-                    <span class="text-blue">£{{ renew.getMonthlyPremiumPrice }}</span> per month.
-                {% else %}
-                    <span class="text-blue">£{{ renew.getYearlyPremiumPrice }}</span> per year.
-                {% endif %}
+                <p><small>
+                    {% if policy.premium.getMonthlyPremiumPrice < renew.getMonthlyPremiumPrice %}
+                        Our pricing may have increased slightly. This is largely due to the government mandated increase in IPT to 12% in June 2017.  Your premium last year was
+                    {% else %}
+                        We have great news. Your renewal premium is less than last year's premium of
+                    {% endif %}
+                    {% if policy.getPremiumPlan == 'monthly' %}
+                        <span class="text-blue">£{{ policy.premium.getMonthlyPremiumPrice }}</span> per month.
+                    {% else %}
+                        <span class="text-blue">£{{ policy.getYearlyPremiumPrice }}</span> per year.
+                    {% endif %}
                 </small></p>
             </form>
         </div>
