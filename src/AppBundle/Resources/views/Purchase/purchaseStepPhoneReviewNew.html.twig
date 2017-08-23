@@ -145,7 +145,7 @@
 
                 <div class="form-group {% if form_errors(purchase_form.imei) %}has-error{% endif %}">
                     {{ form_label(purchase_form.imei, 'IMEI Number:', { 'label_attr': {'class': 'sr-only'} }) }}
-                    {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control', 'placeholder':'IMEI Number', 'autofocus': 'autofocus'}}) }}
+                    {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control', 'placeholder':'IMEI Number'}}) }}
                     <div class="help-block with-errors">{{ form_errors(purchase_form.imei) }}</div>
                     <div class="help-block text-center">
                         <a href="#"
