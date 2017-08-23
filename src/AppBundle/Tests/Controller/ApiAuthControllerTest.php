@@ -999,6 +999,32 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_DUPLICATE_IMEI);
     }
 
+    public function testNewPolicyExpiredDuplicateImei()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $crawler = $this->generatePolicy($cognitoIdentityId, self::$testUser);
+        $data = $this->verifyResponse(200);
+
+        $policyId = $data['id'];
+        $imei = $data['phone_policy']['imei'];
+        
+        $repo = static::$dm->getRepository(Policy::class);
+        $policy = $repo->find($policyId);
+        $policy->setStatus(Policy::STATUS_EXPIRED);
+        static::$dm->flush();
+
+        $this->clearRateLimit();
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
+            'imei' => $imei,
+            'make' => 'Apple',
+            'device' => 'iPhone 6',
+            'memory' => 64,
+            'rooted' => false,
+            'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
+        ]]);
+        $data = $this->verifyResponse(200);
+    }
+
     public function testNewPolicyRateLimited()
     {
         $this->clearRateLimit();
