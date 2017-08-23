@@ -9,9 +9,29 @@
     background-color: $white-opaque;
 
     // Important!
-    display: none;
+    // display: none;
 
     &--inner {
+        width: 100%; height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+// Loading overlay
+.loading-overlay-widget {
+    width: 100%; height: 100%;
+    position: fixed;
+    z-index: 1200;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: $white-opaque;
+    outline: 0;
+
+    // Important!
+    display: none;
+
+    &__inner {
         width: 100%; height: 100%;
         display: flex;
         align-items: center;

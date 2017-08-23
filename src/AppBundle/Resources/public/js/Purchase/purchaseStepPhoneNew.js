@@ -86,6 +86,8 @@ sosure.purchaseStepPhone = (function() {
             },
 
             submitHandler: function(form) {
+                // Show loading overlay
+                $('#so-sure-loading').show();
                 form.submit();
             }
         });
@@ -124,7 +126,8 @@ $(function(){
     });
 
     if ($.trim($('#Reference').val()).length > 0) {
-        $('#loading-overlay--spinner').show();
+        // Show loading overlay
+        $('#so-sure-loading').show();
         $('#webpay-form').submit();
     }
 
