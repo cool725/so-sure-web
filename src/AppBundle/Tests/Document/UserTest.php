@@ -2,7 +2,10 @@
 
 namespace AppBundle\Tests\Document;
 
+use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\Policy;
 use AppBundle\Document\User;
+use AppBundle\Document\Claim;
 use AppBundle\Document\Address;
 use AppBundle\Document\Attribution;
 use AppBundle\Document\SalvaPhonePolicy;
@@ -281,21 +284,103 @@ class UserTest extends \PHPUnit_Framework_TestCase
 
     public function testCanRenewPolicy()
     {
+        $policy = new PhonePolicy();
         $user = new User();
         $user->setLocked(true);
-        $this->assertFalse($user->canRenewPolicy());
+        $this->assertFalse($user->canRenewPolicy($policy));
 
         $user->setLocked(false);
         $user->setEnabled(false);
-        $this->assertFalse($user->canRenewPolicy());
+        $this->assertFalse($user->canRenewPolicy($policy));
 
         $user->setEnabled(true);
-        $this->assertTrue($user->canRenewPolicy());
+        $this->assertTrue($user->canRenewPolicy($policy));
 
         $user->setDisallowRenewal(true);
-        $this->assertFalse($user->canRenewPolicy());
+        $this->assertFalse($user->canRenewPolicy($policy));
 
         $user->setDisallowRenewal(false);
-        $this->assertTrue($user->canRenewPolicy());
+        $this->assertTrue($user->canRenewPolicy($policy));
+
+        $policyB = new PhonePolicy();
+        $user = new User();
+        $user->setLocked(false);
+        $user->setEnabled(true);
+        $user->addPolicy($policyB);
+        $this->assertTrue($user->canRenewPolicy($policyB));
+        $policyB->setStatus(SalvaPhonePolicy::STATUS_CANCELLED);
+        $policyB->setCancelledReason(SalvaPhonePolicy::CANCELLED_ACTUAL_FRAUD);
+        $this->assertFalse($user->canRenewPolicy($policyB));
+
+        $policyC = new PhonePolicy();
+        $user = new User();
+        $user->setLocked(false);
+        $user->setEnabled(true);
+        $user->addPolicy($policyC);
+        $this->assertTrue($user->canRenewPolicy($policyC));
+        $policyC->setStatus(SalvaPhonePolicy::STATUS_CANCELLED);
+        $policyC->setCancelledReason(SalvaPhonePolicy::CANCELLED_DISPOSSESSION);
+        $this->assertFalse($user->canRenewPolicy($policyC));
+
+        $policyD = new PhonePolicy();
+        $user = new User();
+        $user->setLocked(false);
+        $user->setEnabled(true);
+        $user->addPolicy($policyD);
+        $this->assertTrue($user->canRenewPolicy($policyD));
+        $policyD->setStatus(SalvaPhonePolicy::STATUS_CANCELLED);
+        $policyD->setCancelledReason(SalvaPhonePolicy::CANCELLED_USER_REQUESTED);
+        $this->assertTrue($user->canRenewPolicy($policyD));
+
+        $policyE = new PhonePolicy();
+        $user = new User();
+        $user->setLocked(false);
+        $user->setEnabled(true);
+        $user->addPolicy($policyE);
+        $this->assertTrue($user->canRenewPolicy($policyE));
+        $claim = new Claim();
+        $claim->setStatus(Claim::STATUS_APPROVED);
+        $policyE->addClaim($claim);
+        $this->assertTrue($user->canRenewPolicy($policyE));
+        $claim = new Claim();
+        $claim->setStatus(Claim::STATUS_APPROVED);
+        $policyE->addClaim($claim);
+        $this->assertTrue($user->canRenewPolicy($policyE));
+        $claim = new Claim();
+        $claim->setStatus(Claim::STATUS_APPROVED);
+        $policyE->addClaim($claim);
+        $this->assertFalse($user->canRenewPolicy($policyE));
+    }
+
+    public function testGetAvgPolicyClaims()
+    {
+        $user = new User();
+        $this->assertEquals(0, $user->getAvgPolicyClaims());
+
+        $policy = new PhonePolicy();
+        $policy->setStatus(SalvaPhonePolicy::STATUS_CANCELLED);
+        $policy->setCancelledReason(SalvaPhonePolicy::CANCELLED_COOLOFF);
+        $claim = new Claim();
+        $claim->setStatus(Claim::STATUS_APPROVED);
+        $policy->addClaim($claim);
+        $user->addPolicy($policy);
+        $this->assertEquals(0, $user->getAvgPolicyClaims());
+
+        $policy = new PhonePolicy();
+        $claim = new Claim();
+        $claim->setStatus(Claim::STATUS_APPROVED);
+        $policy->addClaim($claim);
+        $user->addPolicy($policy);
+        $this->assertEquals(1, $user->getAvgPolicyClaims());
+
+        $policy = new PhonePolicy();
+        $claim = new Claim();
+        $claim->setStatus(Claim::STATUS_APPROVED);
+        $policy->addClaim($claim);
+        $claim = new Claim();
+        $claim->setStatus(Claim::STATUS_APPROVED);
+        $policy->addClaim($claim);
+        $user->addPolicy($policy);
+        $this->assertEquals(1.5, $user->getAvgPolicyClaims());
     }
 }

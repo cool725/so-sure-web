@@ -10,11 +10,17 @@ else
     echo "Non-production server - safe to run"
 fi
 
+RUN_FILTER=$1
+
 set -e
 
 if [ -d /dev/shm/cache/test ]; then
   rm -rf /dev/shm/cache/test/
 fi
 
-./vendor/phing/phing/bin/phing -f build/test.xml test:unit
+if [ "$RUN_FILTER" == "" ]; then
+  ./vendor/phing/phing/bin/phing -f build/test.xml test:unit
+else
+  ./build/phpunit.sh --filter "$RUN_FILTER" --bootstrap vendor/autoload.php src/AppBundle/
+fi
 ./vendor/phing/phing/bin/phing force:cs

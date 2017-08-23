@@ -3442,6 +3442,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals(1, count($data['policies']));
         $this->assertFalse($data['has_cancelled_policy']);
         $this->assertTrue($data['has_valid_policy']);
+        $this->assertTrue($data['can_purchase_policy']);
 
         $policyService = static::$container->get('app.policy');
         $repo = static::$dm->getRepository(SalvaPhonePolicy::class);
@@ -3450,16 +3451,11 @@ class ApiAuthControllerTest extends BaseControllerTest
 
         $url = sprintf('/api/v1/auth/user?_method=GET');
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
-        $data = $this->verifyResponse(403);
-
-        $user->setLocked(false);
-        static::$dm->flush();
-
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(200);
         $this->assertEquals(1, count($data['policies']));
         $this->assertTrue($data['has_cancelled_policy']);
         $this->assertFalse($data['has_valid_policy']);
+        $this->assertFalse($data['can_purchase_policy']);
     }
 
     public function testGetCurrentUserWithCancelledUserOkPolicy()

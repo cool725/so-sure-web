@@ -937,6 +937,18 @@ abstract class Policy
         return $claims;
     }
 
+    public function getWithdrawnDeclinedClaims()
+    {
+        $claims = [];
+        foreach ($this->getClaims() as $claim) {
+            if (in_array($claim->getStatus(), [Claim::STATUS_DECLINED, Claim::STATUS_WITHDRAWN])) {
+                $claims[] = $claim;
+            }
+        }
+
+        return $claims;
+    }
+
     public function getPotValue()
     {
         return $this->toTwoDp($this->potValue);
@@ -1926,6 +1938,9 @@ abstract class Policy
         return $this->isExpired() || $this->isCancelled();
     }
 
+    /**
+     * User declined indicates that this user should not be allowed to purchase/repurchase/renew any policies
+     */
     public function isCancelledWithUserDeclined()
     {
         // Not cancelled, obviously false
@@ -1946,9 +1961,34 @@ abstract class Policy
             return false;
         }
 
-        // other cases (unpaid, user cancelled, cooloff) should rely on basic rule - based entirely on any user claims
-        // TODO: Dispossession/wreckage are currently included in this calculation, but perhaps should be under bad risk
-        if (count($this->getClaims()) > 0) {
+        // User has a cancelled policy for any reason w/approved claimed and policy was not paid in full
+        if (count($this->getApprovedClaims()) > 0 && !$this->isFullyPaid()) {
+            return true;
+        }
+
+        // User has a withdrawn or declined claim and policy was cancelled/unpaid
+        if ($this->getCancelledReason() == self::CANCELLED_UNPAID && count($this->getWithdrawnDeclinedClaims()) > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Policy declined indicates that this specific policy (e.g. phone)
+     * should not be renewed/repurchase
+     */
+    public function isCancelledWithPolicyDeclined()
+    {
+        // Not cancelled, obviously false
+        if ($this->getStatus() != self::STATUS_CANCELLED) {
+            return false;
+        }
+        // Fraud/bad risk will always be user declined to purchase additional
+        if (in_array($this->getCancelledReason(), [
+            self::CANCELLED_DISPOSSESSION,
+            self::CANCELLED_WRECKAGE,
+        ])) {
             return true;
         }
 
@@ -2338,11 +2378,7 @@ abstract class Policy
         $this->setCancelledReason($reason);
         $this->setEnd($date);
 
-        // User declined cancellations should lock the user record
         $user = $this->getUser();
-        if ($this->isCancelledWithUserDeclined()) {
-            $user->setLocked(true);
-        }
 
         // zero out the connection value for connections bound to this policy
         foreach ($this->getConnections() as $networkConnection) {
@@ -2479,13 +2515,6 @@ abstract class Policy
         }
 
         $this->setStatus(Policy::STATUS_EXPIRED_CLAIMABLE);
-
-        /* TODO: Determine rules around user locking
-        $user = $this->getUser();
-        if ($this->isCancelledWithUserDeclined()) {
-            $user->setLocked(true);
-        }
-        */
 
         // TODO: determine how to handle pot
 
@@ -2650,6 +2679,11 @@ abstract class Policy
         return $connectionValues;
     }
 
+    public function isFullyPaid(\DateTime $date = null)
+    {
+        return $this->areEqualToTwoDp(0, $this->getRemainderOfPolicyPrice($date));
+    }
+
     public function getTotalSuccessfulPayments(\DateTime $date = null)
     {
         if (!$date) {
@@ -2710,9 +2744,9 @@ abstract class Policy
         return $diff;
     }
 
-    public function getRemainderOfPolicyPrice()
+    public function getRemainderOfPolicyPrice(\DateTime $date = null)
     {
-        $totalPaid = $this->getTotalSuccessfulPayments();
+        $totalPaid = $this->getTotalSuccessfulPayments($date);
         $yearlyPremium = $this->getPremium()->getYearlyPremiumPrice();
         $diff = $yearlyPremium - $totalPaid;
         if ($diff < 0) {
@@ -3050,7 +3084,7 @@ abstract class Policy
      */
     public function canCreatePendingRenewal(\DateTime $date = null)
     {
-        if (!$this->getUser()->canRenewPolicy()) {
+        if (!$this->getUser()->canRenewPolicy($this)) {
             return false;
         }
 
@@ -3078,7 +3112,7 @@ abstract class Policy
         }
 
         // In case user was disallowed after pending renewal was created
-        if (!$this->getUser()->canRenewPolicy()) {
+        if (!$this->getUser()->canRenewPolicy($this)) {
             return false;
         }
 
@@ -3107,17 +3141,18 @@ abstract class Policy
      */
     public function canRepurchase()
     {
-        // partial renewal policy wasn't created - never allow renewal in this case
-        if (!$this->hasNextPolicy()) {
-            return false;
-        }
-
-        if ($this->isRenewed()) {
+        // active/unpaid or polices in the renewal flow should not be able to be repurchased
+        if (in_array($this->getStatus(), [
+            self::STATUS_ACTIVE,
+            self::STATUS_PENDING_RENEWAL,
+            self::STATUS_RENEWAL,
+            self::STATUS_UNPAID,
+        ])) {
             return false;
         }
 
         // In case user was disallowed after pending renewal was created
-        if (!$this->getUser()->canRenewPolicy()) {
+        if (!$this->getUser()->canRepurchasePolicy($this)) {
             return false;
         }
 

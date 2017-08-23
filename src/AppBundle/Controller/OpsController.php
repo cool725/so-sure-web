@@ -193,7 +193,7 @@ class OpsController extends BaseController
     private function policyRenewalStatus(Policy $policy, $hasPot, $plan, $yearlyOnly = false)
     {
         $user = $policy->getUser();
-        if ($user->canRenewPolicy() && $policy->isInRenewalTimeframe() &&
+        if ($user->canRenewPolicy($policy) && $policy->isInRenewalTimeframe() &&
             !$policy->isRenewed() && !$policy->hasCashback()) {
             if ((!$hasPot && $policy->getPotValue() == 0) || ($hasPot && $policy->getPotValue() > 0)) {
                 if ((!$yearlyOnly && $user->allowedMonthlyPayments()) ||
