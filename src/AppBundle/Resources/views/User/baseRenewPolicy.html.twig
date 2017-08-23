@@ -34,6 +34,8 @@
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
+    'components/jquery-validation/jquery.validate.js'
+    'components/jquery-mask-plugin/jquery.mask.min.js'
     'components/owl.carousel/owl.carousel.min.js'
     '@AppBundle/Resources/public/js/Default/index.js'
     '@AppBundle/Resources/public/js/User/renew.js'
