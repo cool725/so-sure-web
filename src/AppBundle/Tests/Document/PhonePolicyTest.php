@@ -2959,7 +2959,7 @@ class PhonePolicyTest extends WebTestCase
 
         $this->assertTrue($policy->hasNextPolicy());
         $this->assertFalse($policy->isRenewed());
-        $this->assertTrue($policy->canRepurchase());
+        $this->assertFalse($policy->canRepurchase());
 
         $renewalPolicy->setStatus(Policy::STATUS_RENEWAL);
 
