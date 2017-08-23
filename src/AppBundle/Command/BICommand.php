@@ -27,13 +27,20 @@ class BICommand extends ContainerAwareCommand
                 InputOption::VALUE_NONE,
                 'show debug output'
             )
+            ->addOption(
+                'prefix',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Policy prefix'
+            )
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $debug = $input->getOption('debug');
-        $lines = $this->exportPolicies();
+        $prefix = $input->getOption('prefix');
+        $lines = $this->exportPolicies($prefix);
         if ($debug) {
             $output->write(json_encode($lines, JSON_PRETTY_PRINT));
         }
@@ -94,10 +101,10 @@ class BICommand extends ContainerAwareCommand
         return $lines;
     }
 
-    private function exportPolicies()
+    private function exportPolicies($prefix)
     {
         $repo = $this->getManager()->getRepository(PhonePolicy::class);
-        $policies = $repo->findAllStartedPolicies();
+        $policies = $repo->findAllStartedPolicies($prefix);
         $lines = [];
         $lines[] = implode(',', [
             '"Policy Number"',
@@ -108,6 +115,10 @@ class BICommand extends ContainerAwareCommand
             '"Policy Status"',
             '"Policy Holder Id"',
             '"Policy Cancellation Reason"',
+            '"Requested Cancellation (Phone Damaged Prior To Policy)"',
+            '"Total Number of Claims"',
+            '"Number of Approved/Settled Claims"',
+            '"Number of Withdrawn/Declined Claims"',
         ]);
         foreach ($policies as $policy) {
             $user = $policy->getUser();
@@ -120,6 +131,10 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $policy->getStatus()),
                 sprintf('"%s"', $user->getId()),
                 sprintf('"%s"', $policy->getCancelledReason() ? $policy->getCancelledReason() : null),
+                sprintf('"%s"', $policy->hasRequestedCancellation() ? 'yes' : 'no'),
+                sprintf('"%s"', count($policy->getClaims())),
+                sprintf('"%s"', count($policy->getApprovedClaims())),
+                sprintf('"%s"', count($policy->getWithdrawnDeclinedClaims())),
             ]);
         }
         $this->uploadS3(implode(PHP_EOL, $lines), 'policies.csv');
