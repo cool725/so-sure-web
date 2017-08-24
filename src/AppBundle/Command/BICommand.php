@@ -132,9 +132,9 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $user->getId()),
                 sprintf('"%s"', $policy->getCancelledReason() ? $policy->getCancelledReason() : null),
                 sprintf('"%s"', $policy->hasRequestedCancellation() ? 'yes' : 'no'),
-                sprintf('"%s"', count($policy->getClaims())),
-                sprintf('"%s"', count($policy->getApprovedClaims())),
-                sprintf('"%s"', count($policy->getWithdrawnDeclinedClaims())),
+                sprintf('"%s"', count($policy->getClaims()) + count($policy->getLinkedClaims())),
+                sprintf('"%s"', count($policy->getApprovedClaims(true, true))),
+                sprintf('"%s"', count($policy->getWithdrawnDeclinedClaims(true))),
             ]);
         }
         $this->uploadS3(implode(PHP_EOL, $lines), 'policies.csv');
