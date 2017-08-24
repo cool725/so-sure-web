@@ -1965,6 +1965,11 @@ abstract class Policy
         return in_array($this->getStatus(), [self::STATUS_EXPIRED, self::STATUS_EXPIRED_CLAIMABLE]);
     }
 
+    public function isUnrenewed()
+    {
+        return in_array($this->getStatus(), [self::STATUS_UNRENEWED]);
+    }
+
     public function isCancelled()
     {
         return $this->getStatus() == self::STATUS_CANCELLED;
