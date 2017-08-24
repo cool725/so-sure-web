@@ -219,14 +219,14 @@ abstract class Policy
      *  mappedBy="policy",
      *  cascade={"persist"})
      */
-    protected $claims = array();
+    protected $claims;
 
     /**
      * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Claim",
      *  mappedBy="linkedPolicy",
      *  cascade={"persist"})
      */
-    protected $linkedClaims = array();
+    protected $linkedClaims;
 
     /**
      * @Assert\DateTime()
@@ -389,6 +389,8 @@ abstract class Policy
         $this->created = new \DateTime();
         $this->payments = new \Doctrine\Common\Collections\ArrayCollection();
         $this->invitations = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->claims = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->linkedClaims = new \Doctrine\Common\Collections\ArrayCollection();
         $this->potValue = 0;
     }
 
@@ -944,7 +946,7 @@ abstract class Policy
         return false;
     }
 
-    public function getApprovedClaims($includeSettled = true)
+    public function getApprovedClaims($includeSettled = true, $includeLinkedClaims = false)
     {
         $claims = [];
         foreach ($this->getClaims() as $claim) {
@@ -953,16 +955,31 @@ abstract class Policy
                 $claims[] = $claim;
             }
         }
+        if ($includeLinkedClaims) {
+            foreach ($this->getLinkedClaims() as $claim) {
+                if ($claim->getStatus() == Claim::STATUS_APPROVED ||
+                    ($includeSettled && $claim->getStatus() == Claim::STATUS_SETTLED)) {
+                    $claims[] = $claim;
+                }
+            }
+        }
 
         return $claims;
     }
 
-    public function getWithdrawnDeclinedClaims()
+    public function getWithdrawnDeclinedClaims($includeLinkedClaims = false)
     {
         $claims = [];
         foreach ($this->getClaims() as $claim) {
             if (in_array($claim->getStatus(), [Claim::STATUS_DECLINED, Claim::STATUS_WITHDRAWN])) {
                 $claims[] = $claim;
+            }
+        }
+        if ($includeLinkedClaims) {
+            foreach ($this->getLinkedClaims() as $claim) {
+                if (in_array($claim->getStatus(), [Claim::STATUS_DECLINED, Claim::STATUS_WITHDRAWN])) {
+                    $claims[] = $claim;
+                }
             }
         }
 
