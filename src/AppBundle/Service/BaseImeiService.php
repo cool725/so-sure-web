@@ -73,6 +73,11 @@ class BaseImeiService
                 continue;
             }
 
+            // Unrenewed policies can be paid for again
+            if ($policy->isUnrenewed()) {
+                continue;
+            }
+
             // Cancelled policies that are not policy declined can be paid for again
             if ($policy->isCancelled() && !$policy->isCancelledWithPolicyDeclined()) {
                 continue;
