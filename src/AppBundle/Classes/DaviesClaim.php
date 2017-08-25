@@ -10,6 +10,7 @@ class DaviesClaim extends DaviesExcel
     use CurrencyTrait;
     use DateTrait;
 
+    const SHEET_NAME_V8 = 'Created - Cumulative';
     const SHEET_NAME_V7 = 'Created - Cumulative';
     const SHEET_NAME_V6 = 'Created - Cumulative';
     const SHEET_NAME_V1 = 'Original';
@@ -17,6 +18,7 @@ class DaviesClaim extends DaviesExcel
     const COLUMN_COUNT_V1 = 31;
     const COLUMN_COUNT_V6 = 36;
     const COLUMN_COUNT_V7 = 37;
+    const COLUMN_COUNT_V8 = 40;
 
     const STATUS_OPEN = 'Open';
     const STATUS_CLOSED = 'Closed';
@@ -63,14 +65,14 @@ class DaviesClaim extends DaviesExcel
     ];
 
     public static $sheetNames = [
-        self::SHEET_NAME_V7,
+        self::SHEET_NAME_V8,
         self::SHEET_NAME_V1
     ];
 
     public static function getColumnsFromSheetName($sheetName)
     {
-        if ($sheetName == self::SHEET_NAME_V7) {
-            return self::COLUMN_COUNT_V7;
+        if ($sheetName == self::SHEET_NAME_V8) {
+            return self::COLUMN_COUNT_V8;
         } elseif ($sheetName == self::SHEET_NAME_V1) {
             return self::COLUMN_COUNT_V1;
         } else {
@@ -127,7 +129,12 @@ class DaviesClaim extends DaviesExcel
 
     // davies use only
     public $daviesIncurred;
+
     public $risk;
+
+    public $daysSinceInception;
+    public $initialSuspicion;
+    public $finalSuspicion;
 
     public function getIncurred()
     {
@@ -356,7 +363,7 @@ class DaviesClaim extends DaviesExcel
             $this->replacementImei = $this->nullIfBlank($data[++$i]);
             $this->replacementReceivedDate = $this->excelDate($data[++$i], false, true);
 
-            if (in_array($columns, [self::COLUMN_COUNT_V6, self::COLUMN_COUNT_V7])) {
+            if (in_array($columns, [self::COLUMN_COUNT_V6, self::COLUMN_COUNT_V7, self::COLUMN_COUNT_V8])) {
                 $this->phoneReplacementCost = $this->nullIfBlank($data[++$i]);
                 $this->phoneReplacementCostReserved = $this->nullIfBlank($data[++$i]);
                 $this->accessories = $this->nullIfBlank($data[++$i]);
@@ -388,11 +395,16 @@ class DaviesClaim extends DaviesExcel
             $this->dateClosed = $this->excelDate($data[++$i]);
             $this->shippingAddress = $this->nullIfBlank($data[++$i]);
 
-            if (in_array($columns, [self::COLUMN_COUNT_V6, self::COLUMN_COUNT_V7])) {
+            if (in_array($columns, [self::COLUMN_COUNT_V6, self::COLUMN_COUNT_V7, self::COLUMN_COUNT_V8])) {
                 $this->daviesIncurred = $this->nullIfBlank($data[++$i]);
             }
-            if (in_array($columns, [self::COLUMN_COUNT_V7])) {
+            if (in_array($columns, [self::COLUMN_COUNT_V7, self::COLUMN_COUNT_V8])) {
                 $this->risk = $this->nullIfBlank($data[++$i]);
+            }
+            if (in_array($columns, [self::COLUMN_COUNT_V8])) {
+                $this->daysSinceInception = $this->nullIfBlank($data[++$i]);
+                $this->initialSuspicion = $this->isSuspicious($data[++$i]);
+                $this->finalSuspicion = $this->isSuspicious($data[++$i]);
             }
 
             if (!in_array(strtolower($this->status), [
