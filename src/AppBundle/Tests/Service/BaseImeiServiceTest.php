@@ -101,6 +101,25 @@ class BaseImeiServiceTest extends WebTestCase
         $this->assertFalse(self::$imei->isDuplicatePolicyImei($imeiNumber));
     }
 
+    public function testIsDuplicatePolicyImeiUnrenewed()
+    {
+        $imeiNumber = rand(1, 999999);
+
+        $this->assertFalse(self::$imei->isDuplicatePolicyImei($imeiNumber));
+
+        $policy = new PhonePolicy();
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+        $policy->setImei($imeiNumber);
+        static::$dm->persist($policy);
+        static::$dm->flush();
+
+        $this->assertTrue(self::$imei->isDuplicatePolicyImei($imeiNumber));
+
+        $policy->setStatus(PhonePolicy::STATUS_UNRENEWED);
+        static::$dm->flush();
+        $this->assertFalse(self::$imei->isDuplicatePolicyImei($imeiNumber));
+    }
+
     public function testIsDuplicatePolicyImeiCancelledUserOk()
     {
         $imeiNumber = rand(1, 999999);

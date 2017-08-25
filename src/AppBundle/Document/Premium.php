@@ -95,6 +95,28 @@ abstract class Premium
         return $this->getAnnualDiscount() > 0 && !$this->areEqualToTwoDp(0, $this->getAnnualDiscount());
     }
 
+    public function getMonthlyDiscount()
+    {
+        return floor(100 * $this->annualDiscount / 12) / 100;
+    }
+
+    public function getAdjustedInitialMonthlyPremiumPrice()
+    {
+        $monthlyAdjustment = $this->annualDiscount - ($this->getMonthlyDiscount() * 11);
+
+        return $this->toTwoDp($this->getMonthlyPremiumPrice() - $monthlyAdjustment);
+    }
+
+    public function getAdjustedStandardMonthlyPremiumPrice()
+    {
+        return $this->toTwoDp($this->getMonthlyPremiumPrice() - $this->getMonthlyDiscount());
+    }
+
+    public function getAdjustedYearlyPremiumPrice()
+    {
+        return $this->toTwoDp($this->getYearlyPremiumPrice() - $this->annualDiscount);
+    }
+
     public function getMonthlyPremiumPrice()
     {
         return $this->getGwp() + $this->getIpt();

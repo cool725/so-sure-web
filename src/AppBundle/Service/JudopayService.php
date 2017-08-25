@@ -374,7 +374,6 @@ class JudopayService
 
         // simple way of cloning an array
         $dataCopy = json_decode(json_encode($data), true);
-
         if (!$data) {
             throw new \Exception('Missing data array');
         }

@@ -1,0 +1,98 @@
+{% extends 'AppBundle:User:baseRenewPolicy.html.twig' %}
+
+{% block titleArea %}
+
+    <h1 class="h2"><span class="title-top">Thank you for renewing your policy <br class="visible-xs">with so-sure.</span></h1>
+
+    {% if policy.hasCashback %}
+        <h4 class="text-center">
+            Your cashback request was received and will be processed <span class="text-blue">28-45</span> days after your policy has ended.
+        </h4>
+    {% endif %}
+
+    <h4 class="text-center">You will continue to be protected against theft, loss, and accidental damage.</h4>
+
+    <p class="lead text-center">Your policy
+        <span class="h4 text-blue">{{ policy.policyNumber }}</span>
+        is scheduled to be renewed on
+        <span class="h4 text-blue">{{ policy.nextPolicy.start|date("d/m/Y") }}</span>.
+    </p>
+
+    {# Maybe these lines could be combined someway ???? #}
+    <p class="lead text-center">
+        {% if policy.nextPolicy.getPremiumPlan == 'monthly' %}
+            Your monthly payment is <span class="text-blue h4">£{{ policy.nextPolicy.premium.adjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }}</span>
+            {% if policy.nextPolicy.premium.hasAnnualDiscount %}
+                (includes your pot reward discount of <span class="text-blue h4">£{{ policy.nextPolicy.premium.getMonthlyDiscount|number_format(2, '.', ',') }}</span> each month)
+            {% endif %}
+        {% else %}
+            Your annual payment is <span class="text-blue h4">£{{ policy.nextPolicy.premium.adjustedYearlyPremiumPrice|number_format(2, '.', ',') }}</span>
+            {% if policy.nextPolicy.premium.hasAnnualDiscount %}
+                (includes your pot reward discount of <span class="text-blue h4">£{{ policy.nextPolicy.premium.annualDiscount|number_format(2, '.', ',') }}</span> for the year)
+            {% endif %}
+        {% endif %}
+    </p>
+
+{% endblock %}
+
+{% block content %}
+    {#
+    <h4 class="text-center">Make sure that you continue to get your pot reward next year by re-inviting all your existing connections.</h4>
+    #}
+{% endblock %}
+
+{% block actions %}
+    {#
+    <div class="connections">
+        <div class="form-group text-center">
+            <div class="checkbox">
+                <label>
+                    <input class="select-all-connections" type="checkbox" /> <strong>select / deselect all connections</strong>
+                </label>
+            </div>
+        </div>
+        <ul class="list-unstyled renew-list">
+            {% for connection in policy.connections %}
+                <li class="renew-list__connection">
+                    <label for="user-connect">
+                        <span class="sr-only">Select user</span>
+                        <input class="checkbox-connect" type="checkbox" />
+                    </label>
+                    <img src="{{ connection.linkedUser.getImageUrlFallback }}" style="width: 50px"
+                    title="{% if connection.linkedUser.id == app.user.id %}{{ connection.linkedPolicy.defaultName }}{% else %}{{ connection.linkedUser.name }}{% endif %}"
+                    alt="{{ connection.linkedUser.name }}"
+                    class="
+                    {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}
+                        img-circle coffee-stamp
+                    {% else %}
+                        img-circle coffee-stamp user-has-claimed
+                    {% endif %}"
+                    >
+                    <span class="h4">{% if connection.linkedUser.id == app.user.id %}{{ connection.linkedPolicy.defaultName }}{% else %}{{ connection.linkedUser.name }}{% endif %}</span>
+                </li>
+            {% endfor %}
+        </ul>
+        <div class="form-group text-center">
+            <div class="checkbox">
+                <label>
+                    <input class="select-all-connections" type="checkbox" /> <strong>select / deselect all connections</strong>
+                </label>
+            </div>
+        </div>
+    </div>
+    #}
+    <div class="checkout--step">
+        <div class="container">
+            <form>
+                {#
+                <div class="form-group">
+                    <a href="#" class="btn btn-green btn-block btn-pad">Save</a>
+                </div>
+    #}
+                <div class="form-group">
+                    <a href="{{ path('user_home') }}" class="btn btn-blue-hollow btn-block btn-pad">Back</a>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

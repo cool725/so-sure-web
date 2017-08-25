@@ -198,7 +198,7 @@ class Cashback
 
     public function setSortCode($sortCode)
     {
-        $this->sortCode = $sortCode;
+        $this->sortCode = str_replace('-', '', $sortCode);
     }
 
     public function getAccountNumber()
