@@ -12,6 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\RadioType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\TelType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use AppBundle\Document\Phone;
 use AppBundle\Validator\Constraints\AgeValidator;
@@ -62,7 +63,7 @@ class PurchaseStepPersonalType extends AbstractType
                   ),
                   'years' => $years,
             ])
-            ->add('mobileNumber', TextType::class, ['required' => $this->required])
+            ->add('mobileNumber', TelType::class, ['required' => $this->required])
             ->add('next', SubmitType::class)
         ;
     }
