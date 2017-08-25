@@ -96,7 +96,7 @@ class UserController extends BaseController
             }
 
             foreach ($user->getValidPolicies(true) as $checkPolicy) {
-                if ($checkPolicy->notifyRenewal()) {
+                if ($checkPolicy->notifyRenewal() && !$checkPolicy->isRenewed() && !$checkPolicy->hasCashback()) {
                     $this->addFlash(
                         'success',
                         sprintf(
@@ -466,6 +466,7 @@ class UserController extends BaseController
 
     /**
      * @Route("/renew/{id}/custom", name="user_renew_custom_policy")
+     * @Route("/renew/{id}/retry", name="user_renew_retry_policy")
      * @Template
      */
     public function renewPolicyCustomAction(Request $request, $id)
@@ -477,10 +478,12 @@ class UserController extends BaseController
             throw $this->createNotFoundException('Policy not found');
         }
 
-        if ($policy->isRenewed()) {
-            return $this->redirectToRoute('user_renew_completed', ['id' => $id]);
-        } elseif ($policy->hasCashback()) {
-            return $this->redirectToRoute('user_renew_only_cashback', ['id' => $id]);
+        if ($request->get('_route') != 'user_renew_retry_policy') {
+            if ($policy->isRenewed()) {
+                return $this->redirectToRoute('user_renew_completed', ['id' => $id]);
+            } elseif ($policy->hasCashback()) {
+                return $this->redirectToRoute('user_renew_only_cashback', ['id' => $id]);
+            }
         }
 
         $this->denyAccessUnlessGranted(PolicyVoter::RENEW, $policy);

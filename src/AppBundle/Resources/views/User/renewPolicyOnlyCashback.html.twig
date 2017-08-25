@@ -2,17 +2,74 @@
 
 {% block titleArea %}
     <h1 class="h2">
-        <span class="title-top">
-            Your cashback request was received.
-        </span>
+        <span class="title-top">Your cashback request was received</span>
     </h1>
-    <p class="lead text-center">Your cashback request will be processed <span class="text-blue">28-45</span> days after your policy has ended.</span></p>
+    <h4 class="text-center">Your cashback request will be processed <span class="text-blue">28-45</span> days after your policy has ended.</h4>
+    <h3 class="text-center">We’re sorry you’re leaving</h3>
 {% endblock %}
 
 {% block content %}
-    
+
+    <p class="text-center">
+        <img src="{{ cdn_url }}/images/renewals/so-sure-breakup.svg" alt="Broken phone and heart">
+    </p>
+
+    <p class="lead text-center">Are you sure you want to leave us? Your phone will no longer be covered against:</p>
+
+
+    <div class="owl-carousel owl-theme visible-xs benefits">
+        <div class="item">
+            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-water-damage.svg" alt="Accidental Damage" title="Accidental damage">
+            <h5>Water damage</h5>
+        </div>
+        <div class="item">
+            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-cracked-screen.svg" alt="Cracked screen" title="Cracked screen">
+            <h5>Cracked screen</h5>
+        </div>
+        <div class="item">
+            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-loss.svg" alt="Loss" title="Loss">
+            <h5>Loss</h5>
+        </div>
+        <div class="item">
+            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-theft.svg" alt="Theft" title="Theft">
+            <h5>Theft</h5>
+        </div>
+    </div>
+
+    <ul class="list-inline cover-list hidden-xs benefits">
+        <li>
+            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-water-damage.svg" alt="Accidental Damage" title="Accidental damage">
+            <h5 class="h-light">Water damage</h5>
+        </li>
+        <li>
+            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-cracked-screen.svg" alt="Cracked screen" title="Cracked screen">
+            <h5 class="h-light">Cracked screen</h5>
+        </li>
+        <li>
+            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-loss.svg" alt="Loss" title="Loss">
+            <h5 class="h-light">Loss</h5>
+        </li>
+        <li>
+            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-theft.svg" alt="Theft" title="Theft">
+            <h5 class="h-light">Theft</h5>
+        </li>
+    </ul>
+
 {% endblock %}
 
 {% block actions %}
-{#    <h1 class="text-center">renew policy here</h1> #}
+    <div class="checkout--step">
+        <div class="container">
+            <form>
+                <div class="form-group">
+                    <a href="{{ path('user_renew_retry_policy', {'id': policy.id }) }}"
+                       class="btn btn-green btn-block btn-pad">I'd like to renew my policy</a>
+                </div>
+                <div class="form-group">
+                    <a href="{{ path('user_policy', {'policyId': policy.id }) }}"
+                       class="btn btn-blue btn-block btn-pad">Take me home</a>
+                </div>
+            </form>
+        </div>
+    </div>
 {% endblock %}
