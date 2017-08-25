@@ -658,6 +658,7 @@ services:
             -  { name: kernel.event_listener, event: event.payment.success, method: onPaymentSuccessEvent }
             -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
             -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
+            -  { name: kernel.event_listener, event: event.policy.renewed, method: onPolicyRenewedEvent }
 
     app.listener.push:
         class:   AppBundle\Listener\PushListener

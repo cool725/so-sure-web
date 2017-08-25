@@ -49,4 +49,22 @@ class MixpanelListener
             'Policy Id' => $policy->getId(),
         ]);
     }
+
+    public function onPolicyRenewedEvent(PolicyEvent $event)
+    {
+        $policy = $event->getPolicy();
+        $cashback = 'N/A';
+        if ($policy->getPotValue() > 0) {
+            if ($policy->getCashback()) {
+                $cashback = 'Yes';
+            } else {
+                $cashback = 'No';
+            }
+        }
+
+        $this->mixpanel->queueTrackWithUser($policy->getUser(), MixpanelService::EVENT_RENEW, [
+            'Cashback' => $cashback,
+            'Policy Id' => $policy->getId(),
+        ]);
+    }
 }
