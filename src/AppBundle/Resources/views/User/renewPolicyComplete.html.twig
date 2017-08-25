@@ -20,16 +20,16 @@
 
     {# Maybe these lines could be combined someway ???? #}
     <p class="lead text-center">
-        {% if policy.getPremiumPlan == 'monthly' %}
-            Your monthly premium is <span class="text-blue h4">£XXX</span>
-            {# if discounted #}
+        {% if policy.nextPolicy.getPremiumPlan == 'monthly' %}
+            Your monthly premium is <span class="text-blue h4">{{ policy.nextPolicy.getMonthlyPremiumPrice|number_format(2, '.', ',') }}</span>
+            {% if policy.nextPolicy.premium.hasAnnualDiscount %}
                 (discounted by <span class="text-blue h4">£XXX</span> each month)
-            {# endif #}
+            {% endif %}
         {% else %}
-            Your annual premium is <span class="text-blue h4">£XXX</span>
-            {# if discounted #}
-                (discounted by <span class="text-blue h4">£XXX</span> for the year)
-            {# endif #}
+            Your annual premium is <span class="text-blue h4">{{ policy.nextPolicy.getYearlyPremiumPrice|number_format(2, '.', ',') }}</span>
+            {% if policy.nextPolicy.premium.hasAnnualDiscount %}
+                (discounted by <span class="text-blue h4">£{{ policy.nextPolicy.premium.annualDiscount|number_format(2, '.', ',') }}</span> for the year)
+            {% endif %}
         {% endif %}
     </p>
 
@@ -37,7 +37,6 @@
 
 {% block content %}
     <h4 class="text-center">Make sure that you continue to get your pot reward next year by re-inviting all your existing connections.</h4>
-    <p class="lead text-center">Add more connections to get even more money in your pot.</p>
 {% endblock %}
 
 {% block actions %}
@@ -86,7 +85,7 @@
                     <a href="#" class="btn btn-green btn-block btn-pad">Save</a>
                 </div>
                 <div class="form-group">
-                    <a href="#" class="btn btn-blue-hollow btn-block btn-pad">Back</a>
+                    <a href="{{ path('user_home') }}" class="btn btn-blue-hollow btn-block btn-pad">Back</a>
                 </div>
             </form>
         </div>

@@ -8,9 +8,9 @@
         <br class="visible-xs">
         <span class="title-top">insurance</span><br>
         {% if policy.getPremiumPlan == 'monthly' %}
-            <span class="title-price">for just <span class="text-blue">£{{ renew.getAdjustedStandardMonthlyPremiumPrice }}</span> per month</span>
+            <span class="title-price">for just <span class="text-blue">£{{ renew.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }}</span> per month</span>
         {% else %}
-            <span class="title-price">for just <span class="text-blue">£{{ renew.getAdjustedYearlyPremiumPrice }}</span> per year</span>
+            <span class="title-price">for just <span class="text-blue">£{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }}</span> per year</span>
         {% endif %} <br>
     </h1>
 
@@ -18,9 +18,9 @@
         <div class="text-center">
             <span class="h4 text-light-blue">
                 {% if policy.getPremiumPlan == 'monthly' %}
-                    (<span class="text-blue">£{{ renew.getMonthlyPremiumPrice }}</span> per month without your <span class="text-blue">£{{ policy.potValue }}</span> reward pot)
+                    (<span class="text-blue">£{{ renew.getMonthlyPremiumPrice|number_format(2, '.', ',') }}</span> per month without your <span class="text-blue">£{{ policy.potValue|number_format(2, '.', ',') }}</span> reward pot)
                 {% else %}
-                    (<span class="text-blue">£{{ renew.getYearlyPremiumPrice }}</span> per year without your <span class="text-blue">£{{ policy.potValue }}</span> reward pot)
+                    (<span class="text-blue">£{{ renew.getYearlyPremiumPrice|number_format(2, '.', ',') }}</span> per year without your <span class="text-blue">£{{ policy.potValue|number_format(2, '.', ',') }}</span> reward pot)
                 {% endif %}
             </span>
         </div>
@@ -203,15 +203,15 @@
                     <a href="{{ path('user_renew_policy', {'id': policy.id}) }}" class="btn btn-blue-hollow btn-block btn-pad">Back</a>
                 </div>
                 <p><small>
-                    {% if policy.premium.getMonthlyPremiumPrice < renew.getMonthlyPremiumPrice %}
-                        Our pricing may have increased slightly. This is largely due to the government mandated increase in IPT to 12% in June 2017.  Your premium last year was
-                    {% else %}
+                    {% if renew.getMonthlyPremiumPrice < policy.premium.getMonthlyPremiumPrice %}
                         We have great news. Your renewal premium is less than last year's premium of
+                    {% else %}
+                        Our pricing may have increased slightly. This is largely due to the government mandated increase in IPT to 12% in June 2017.  Your premium last year was
                     {% endif %}
                     {% if policy.getPremiumPlan == 'monthly' %}
-                        <span class="text-blue">£{{ policy.premium.getMonthlyPremiumPrice }}</span> per month.
+                        <span class="text-blue">£{{ policy.premium.getMonthlyPremiumPrice|number_format(2, '.', ',') }}</span> per month.
                     {% else %}
-                        <span class="text-blue">£{{ policy.getYearlyPremiumPrice }}</span> per year.
+                        <span class="text-blue">£{{ policy.getYearlyPremiumPrice|number_format(2, '.', ',') }}</span> per year.
                     {% endif %}
                 </small></p>
             </form>
@@ -308,7 +308,7 @@
             </div>
             <div class="modal-body">
                 <p>
-                    Please use this form to request cashback. Note that it will take 30-45 days
+                    Please use this form to request cashback. Note that it will take 28-45 days
                     from the end of your policy before the bacs transfer will be sent.
                 </p>
                 {{ form_start(cashback_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form-cashback'}}) }}
