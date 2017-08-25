@@ -112,6 +112,10 @@ sosure.renew = (function() {
         .parent()
         .find('.payment--btn')
         .removeClass('payment--btn-selected');
+        $('.payment--btns')
+        .find('.payment--btn')
+        .removeClass('payment--btn-selected');
+
         $('#renew_form_encodedAmount').val('');
         $('#renew_cashback_form_encodedAmount').val('');
     }
