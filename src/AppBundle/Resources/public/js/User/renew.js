@@ -184,29 +184,45 @@ $(function(){
     });
 
     // Connections
-    $('.select-all-connections').on('click',function(){
-        if (this.checked) {
-            $('.select-all-connections').not(this).prop('checked',true);
-            $('.checkbox-connect').each(function() {
-                this.checked = true;
-                $(this).parent().parent('li').addClass('background-off-white');
-            });
-        } else {
-            $('.select-all-connections').not(this).prop('checked',false);
-            $('.checkbox-connect').each(function() {
-                this.checked = false;
-                $(this).parent().parent('li').removeClass('background-off-white');
-            });
-        }
-    });
+    // $('.select-all-connections').on('click',function(){
+    //     if (this.checked) {
+    //         $('.select-all-connections').not(this).prop('checked',true);
+    //         $('.checkbox-connect').each(function() {
+    //             this.checked = true;
+    //             $(this).parent().parent('li').addClass('background-off-white');
+    //         });
+    //     } else {
+    //         $('.select-all-connections').not(this).prop('checked',false);
+    //         $('.checkbox-connect').each(function() {
+    //             this.checked = false;
+    //             $(this).parent().parent('li').removeClass('background-off-white');
+    //         });
+    //     }
+    // });
 
-    $('.checkbox-connect').on('click',function(){
-        $(this).parent().parent('li').toggleClass('background-off-white');
-        if ($('.checkbox-connect:checked').length == $('.checkbox-connect').length) {
-            $('.select-all-connections').prop('checked',true);
+    // $('.checkbox-connect').on('click',function(){
+    //     $(this).parent().parent('li').toggleClass('background-off-white');
+    //     if ($('.checkbox-connect:checked').length == $('.checkbox-connect').length) {
+    //         $('.select-all-connections').prop('checked',true);
+    //     } else {
+    //         $('.select-all-connections').prop('checked',false);
+    //     }
+    // });
+
+    $('.connections__user').on('click', function(e) {
+
+        // Find the > checkbox
+        var checkbox = $(this).find('input[type="checkbox"]');
+
+        // If checkbox is checked or not
+        if ($(checkbox).prop('checked')) {
+            $(checkbox).prop('checked', false);
         } else {
-            $('.select-all-connections').prop('checked',false);
+            $(checkbox).prop('checked', true);
         }
+
+        // Toggle selected class
+        $(this).toggleClass('connections__user--selected');
     });
 
 

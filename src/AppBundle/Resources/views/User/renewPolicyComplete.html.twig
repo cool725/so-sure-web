@@ -44,50 +44,32 @@
 {% block actions %}
     {{ form_start(renew_connections_form) }}
     <div class="connections">
-        <div class="form-group text-center">
-            <div class="checkbox">
-                <label>
-                    <input class="select-all-connections" type="checkbox" /> <strong>select / deselect all connections</strong>
-                </label>
-            </div>
-        </div>
-        <ul class="list-unstyled renew-list">        
-        {% for renewalConnection in renew_connections_form.renewalConnections %}
-                <li class="renew-list__connection">
-                    <label for="user-connect">
-                        <span class="sr-only">Select user</span>
-                        {{ form_row(renewalConnection.renew) }}
-                    </label>
-                    <img src="{{ renewalConnection.vars.data.linkedUser.getImageUrlFallback }}" style="width: 50px"
-                    title="{{ renewalConnection.vars.data.linkedUser.name }}"
-                    alt="{{ renewalConnection.vars.data.linkedUser.name }}"
-                    class="
-                    {% if not renewalConnection.vars.data.linkedPolicy.hasMonetaryClaimed %}
-                        img-circle coffee-stamp
-                    {% else %}
-                        img-circle coffee-stamp user-has-claimed
-                    {% endif %}"
-                    >
-                    <span class="h4">{{ renewalConnection.vars.data.linkedUser.name }}</span>
-                </li>
-        {% endfor %}
-        </ul>
-        <div class="form-group text-center">
-            <div class="checkbox">
-                <label>
-                    <input class="select-all-connections" type="checkbox" /> <strong>select / deselect all connections</strong>
-                </label>
-            </div>
+        <div class="connections__list">
+            {% for renewalConnection in renew_connections_form.renewalConnections %}
+                <div class="connections__user connections__user--selected">
+                    {{ form_row(renewalConnection.renew) }}
+                    <img src="{{ renewalConnection.vars.data.linkedUser.getImageUrlFallback }}"     style="width: 50px"
+                         title="{{ renewalConnection.vars.data.linkedUser.name }}"
+                         alt="{{ renewalConnection.vars.data.linkedUser.name }}"
+                         class="
+                        {% if not renewalConnection.vars.data.linkedPolicy.hasMonetaryClaimed %}
+                            img-circle coffee-stamp
+                        {% else %}{% endif %}" />
+                    <span class="">{{ renewalConnection.vars.data.linkedUser.name }}</span>
+                </div>
+            {% endfor %}
         </div>
     </div>
     <div class="checkout--step">
         <div class="container">
+            <div class="form">
                 <div class="form-group">
                     {{ form_widget(renew_connections_form.save, {'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
                 </div>
                 <div class="form-group">
                     <a href="{{ path('user_home') }}" class="btn btn-blue-hollow btn-block btn-pad">Back</a>
                 </div>
+            </div>
         </div>
     </div>
     {{ form_end(renew_connections_form) }}
