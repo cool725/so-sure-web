@@ -12,6 +12,7 @@ use AppBundle\Classes\Salva;
 use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\Connection\StandardConnection;
+use AppBundle\Document\Connection\RenewalConnection;
 use AppBundle\Document\File\PolicyTermsFile;
 use AppBundle\Document\File\PolicyScheduleFile;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
@@ -213,6 +214,11 @@ abstract class Policy
      * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Connection\Connection", cascade={"persist"})
      */
     protected $connections = array();
+
+    /**
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Connection\RenewalConnection", cascade={"persist"})
+     */
+    protected $renewalConnections = array();
 
     /**
      * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Claim",
@@ -824,6 +830,18 @@ abstract class Policy
         }
 
         return $connections;
+    }
+
+    public function addRenewalConnection(RenewalConnection $connection)
+    {
+        $connection->setSourcePolicy($this);
+        $connection->setSourceUser($this->getUser());
+        $this->renewalConnections->add($connection);
+    }
+
+    public function getRenewalConnections()
+    {
+        return $this->renewalConnections;
     }
 
     public function getLastConnection()
@@ -2495,6 +2513,10 @@ abstract class Policy
 
         if ($discount && $discount > 0) {
             $this->getPremium()->setAnnualDiscount($discount);
+        }
+
+        foreach ($this->getPreviousPolicy()->getStandardConnections() as $connection) {
+            $this->addRenewalConnection($connection->createRenewal());
         }
     }
 

@@ -16,7 +16,11 @@ use AppBundle\Document\CurrencyTrait;
  * @Gedmo\Loggable
  * @MongoDB\InheritanceType("SINGLE_COLLECTION")
  * @MongoDB\DiscriminatorField("type")
- * @MongoDB\DiscriminatorMap({"standard"="StandardConnection", "reward"="RewardConnection"})
+ * @MongoDB\DiscriminatorMap({
+ *      "standard"="StandardConnection",
+ *      "reward"="RewardConnection",
+ *      "renewal"="RenewalConnection"
+ * })
  * @MongoDB\Index(keys={"sourcePolicy.id"="asc"}, sparse="true")
  * @MongoDB\Index(keys={"linkedPolicy.id"="asc"}, sparse="true")
  */
@@ -297,5 +301,17 @@ class Connection
             'facebook_id' => $this->getLinkedUser() ? $this->getLinkedUser()->getFacebookId() : null,
             'policy_id' => $this->getLinkedPolicy() ? $this->getLinkedPolicy()->getId() : null,
         ];
+    }
+
+    public function createRenewal()
+    {
+        $renewalConnection = new RenewalConnection();
+        $renewalConnection->setLinkedPolicy($this->getLinkedPolicy());
+        $renewalConnection->setLinkedUser($this->getLinkedUser());
+
+        // default to renew the connection
+        $renewalConnection->setRenew(true);
+
+        return $renewalConnection;
     }
 }

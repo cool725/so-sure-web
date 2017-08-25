@@ -366,14 +366,14 @@ abstract class BaseController extends Controller
         return null;
     }
 
-    protected function formToMongoSearch($form, $qb, $formField, $mongoField, $run = false)
+    protected function formToMongoSearch($form, $qb, $formField, $mongoField, $run = false, $exact = false)
     {
         $data = (string) $form->get($formField)->getData();
 
-        return $this->dataToMongoSearch($qb, $data, $mongoField, $run);
+        return $this->dataToMongoSearch($qb, $data, $mongoField, $run, $exact);
     }
 
-    protected function dataToMongoSearch($qb, $data, $mongoField, $run = false)
+    protected function dataToMongoSearch($qb, $data, $mongoField, $run = false, $exact = false)
     {
         if (strlen($data) == 0) {
             return null;
@@ -381,7 +381,11 @@ abstract class BaseController extends Controller
 
         // Escape special chars
         $data = preg_quote($data, '/');
-        $qb = $qb->addAnd($qb->expr()->field($mongoField)->equals(new MongoRegex(sprintf("/.*%s.*/i", $data))));
+        if ($exact) {
+            $qb = $qb->addAnd($qb->expr()->field($mongoField)->equals($data));
+        } else {
+            $qb = $qb->addAnd($qb->expr()->field($mongoField)->equals(new MongoRegex(sprintf("/.*%s.*/i", $data))));
+        }
         if ($run) {
             return $qb->getQuery()->execute();
         }
@@ -727,7 +731,7 @@ abstract class BaseController extends Controller
                 $policiesQb->expr()->field('status')->in([Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID])
             );
         } else {
-            $this->formToMongoSearch($form, $policiesQb, 'status', 'status');
+            $this->formToMongoSearch($form, $policiesQb, 'status', 'status', false, true);
         }
 
         $this->formToMongoSearch($form, $policiesQb, 'policy', 'policyNumber');

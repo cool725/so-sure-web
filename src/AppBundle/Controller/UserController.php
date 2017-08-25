@@ -27,6 +27,7 @@ use AppBundle\Form\Type\RenewCashbackType;
 use AppBundle\Form\Type\CashbackType;
 use AppBundle\Form\Type\SentInvitationType;
 use AppBundle\Form\Type\UnconnectedUserPolicyType;
+use AppBundle\Form\Type\RenewConnectionsType;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Form\BillingDay;
 use AppBundle\Form\Type\BillingDayType;
@@ -627,7 +628,7 @@ class UserController extends BaseController
      * @Route("/renew/{id}/complete", name="user_renew_completed")
      * @Template
      */
-    public function renewPolicyCompleteAction($id)
+    public function renewPolicyCompleteAction(Request $request, $id)
     {
         $dm = $this->getManager();
         $policyRepo = $dm->getRepository(Policy::class);
@@ -641,8 +642,32 @@ class UserController extends BaseController
         }
         $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
 
+        $renewConnectionsForm = $this->get('form.factory')
+            ->createNamedBuilder('renew_connections_form', RenewConnectionsType::class, $policy->getNextPolicy())
+            ->getForm();
+        if ($request->request->has('renew_connections_form')) {
+            $renewConnectionsForm->handleRequest($request);
+            if ($renewConnectionsForm->isValid()) {
+                $dm->flush();
+                $this->addFlash('success', 'Your connections have been updated');
+    
+                return new RedirectResponse(
+                    $this->generateUrl('user_renew_completed', ['id' => $id])
+                );
+            } else {
+                $this->addFlash(
+                    'error',
+                    sprintf(
+                        "Sorry, there's a problem updating your connections. Please try again or contact us. %s",
+                        $renewConnectionsForm->getErrors()
+                    )
+                );
+            }
+        }
+
         return [
             'policy' => $policy,
+            'renew_connections_form' => $renewConnectionsForm->createView(),
         ];
     }
 
