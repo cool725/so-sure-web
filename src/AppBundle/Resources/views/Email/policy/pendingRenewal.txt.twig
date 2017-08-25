@@ -21,11 +21,13 @@ For your information, your current policy details are:
 
 {{ policy.policyNumber }}
 
-{{ policy.end|date }}
+Expiring on: {{ policy.end|date('d M Y H:i', 'Europe/London') }}
+{% if policy.potValue > 0 %}
 
 Provided that you and your connections haven't claimed, you may also be eligible to receive cashback from your Reward Pot!
+{% endif %}
 
-So make sure to renew your policy by clicking the link below! You can also use that link to check your cashback.
+So make sure to renew your policy by clicking the link below! {% if policy.potValue > 0 %}You can also use that link to check your cashback.{% endif %}
 
 {{ renew_url }}
 {% endblock body %}
