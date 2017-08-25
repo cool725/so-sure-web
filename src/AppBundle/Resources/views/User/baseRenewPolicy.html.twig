@@ -20,32 +20,11 @@
     <section class="checkout">
         <div class="checkout--top">
             <div class="container">
-                {% if policy.hasNextPolicy and policy.nextPolicy.status == "renewal" %}
-                    <h1 class="h2">
-                        <span class="title-top">
-                            Thank you for renewing your policy with so-sure.
-                        </span>
-                    </h1>
-                    <h4 class="text-center">You will continue to be protected against theft, loss, and accidental damage.</h4>
-                    <p class="lead text-center">Make sure that you continue to get your pot reward next year by re-inviting all your existing connections.<br> Add more connections to get even more money in your pot.</p>
-                    {% if policy.hasCashback %}
-                        <p class="lead text-center">
-                            Your cashback request was received and will be processed <span class="text-blue">28-45</span> days after your policy has ended.
-                        </p>
-                    {% endif %}
-                {% elseif policy.hasCashback %}
-                    <p class="lead text-center">Your cashback request was received and will be processed <span class="text-blue">28-45</span> days after your policy has ended.</span></p>
-                {% else %}
-                    {% block titleArea %}{% endblock %}
-                    {% block content %}{% endblock %}
-                {% endif %}
+                {% block titleArea %}{% endblock %}
+                {% block content %}{% endblock %}
             </div>
         </div>
-        {% if policy.hasNextPolicy and policy.nextPolicy.status == "renewal" %}
-            <h1 class="text-center">connections here</h1>
-        {% else %}
-            {% block actions %}{% endblock %}
-        {% endif %}
+        {% block actions %}{% endblock %}
     </section>
 
     {% block modals %}{% endblock %}
@@ -55,6 +34,8 @@
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
+    'components/jquery-validation/jquery.validate.js'
+    'components/jquery-mask-plugin/jquery.mask.min.js'
     'components/owl.carousel/owl.carousel.min.js'
     '@AppBundle/Resources/public/js/Default/index.js'
     '@AppBundle/Resources/public/js/User/renew.js'
