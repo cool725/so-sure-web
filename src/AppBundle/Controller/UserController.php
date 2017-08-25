@@ -454,6 +454,9 @@ class UserController extends BaseController
                 }
             }
         }
+        $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_RENEWAL, [
+            'Renew Type' => 'Quick',
+        ]);
 
         return [
             'policy' => $policy,
@@ -592,6 +595,9 @@ class UserController extends BaseController
                 if ($cashbackForm->isValid()) {
                     $policyService = $this->get('app.policy');
                     $policyService->cashback($policy, $cashback);
+
+                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_CASHBACK);
+
                     $message = sprintf(
                         'Your request for cashback has been accepted.'
                     );
@@ -610,6 +616,16 @@ class UserController extends BaseController
                     );
                 }
             }
+        }
+
+        if ($request->get('_route') != 'user_renew_retry_policy') {
+            $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_RENEWAL, [
+                'Renew Type' => 'Custom',
+            ]);
+        } else {
+            $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_RENEWAL, [
+                'Renew Type' => 'Second Chance',
+            ]);
         }
 
         return [

@@ -51,6 +51,9 @@ class MixpanelService
     const EVENT_LEAD_CAPTURE = 'Lead Capture';
     const EVENT_CANCEL_POLICY_PAGE = 'Cancel Policy Page';
     const EVENT_REQUEST_CANCEL_POLICY = 'Request Cancel Policy';
+    const EVENT_RENEWAL = 'Renewal Page';
+    const EVENT_RENEW = 'Renew Policy';
+    const EVENT_CASHBACK = 'Cashback Only';
 
     const CUSTOM_TOTAL_SITE_VISITORS = '$custom_event:379938';
     const CUSTOM_QUOTE_PAGE_UK = '$custom_event:458980';

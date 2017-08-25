@@ -1500,6 +1500,8 @@ class PolicyService
             $this->adjustScheduledPayments($newPolicy, false, $date);
         }
 
+        $this->dispatchEvent(PolicyEvent::EVENT_RENEWED, new PolicyEvent($policy));
+
         return $newPolicy;
     }
 
