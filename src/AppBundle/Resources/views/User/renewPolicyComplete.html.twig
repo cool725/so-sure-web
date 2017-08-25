@@ -36,9 +36,9 @@
 {% endblock %}
 
 {% block content %}
-    {#
-    <h4 class="text-center">Make sure that you continue to get your pot reward next year by re-inviting all your existing connections.</h4>
-    #}
+    {% if renew_connections_form.renewalConnections|length > 0%}
+        <h4 class="text-center">Make sure that you continue to get your pot reward next year by re-inviting all your existing connections.</h4>
+    {% endif %}
 {% endblock %}
 
 {% block actions %}
