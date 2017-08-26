@@ -836,7 +836,7 @@ abstract class Policy
     {
         $connection->setSourcePolicy($this);
         $connection->setSourceUser($this->getUser());
-        $this->renewalConnections->add($connection);
+        $this->renewalConnections[] = $connection;
     }
 
     public function getRenewalConnections()
