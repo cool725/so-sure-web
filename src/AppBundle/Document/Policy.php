@@ -2644,6 +2644,7 @@ abstract class Policy
                 // so money was in the pot but user has completely ignored
                 // create a cashback entry and try to find the user
                 $cashback = new Cashback();
+                $cashback->setDate(new \DateTime());
                 $cashback->setStatus(Cashback::STATUS_FAILED);
                 $cashback->setAmount($this->getPotValue());
                 $this->setCashback($cashback);

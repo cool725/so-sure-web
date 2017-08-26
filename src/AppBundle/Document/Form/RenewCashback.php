@@ -83,6 +83,7 @@ class RenewCashback extends Renew
         }
 
         $cashback = new Cashback();
+        $cashback->setDate(new \DateTime());
         $cashback->setAccountName($this->getAccountName());
         $cashback->setAccountNumber($this->getAccountNumber());
         $cashback->setSortCode($this->getSortCode());
