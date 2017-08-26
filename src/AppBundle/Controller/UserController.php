@@ -787,7 +787,7 @@ class UserController extends BaseController
     public function welcomeAction()
     {
         $user = $this->getUser();
-        if (!$user->hasActivePolicy()) {
+        if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
             return new RedirectResponse($this->generateUrl('user_invalid_policy'));
         }
 
