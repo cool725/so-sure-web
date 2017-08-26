@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets
+    'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.css'
+ %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+        'components/moment/moment.min.js'
+        'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.js'
+        '@AppBundle/Resources/public/js/Admin/cashback.js'
+    %}
+    <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock %}
+
+{% block body %}
+<div class="container" style="margin-bottom: 50px">
+
+<div class="row">
+    <div class="col-md-6">
+        <h1>so-sure Cashback for {{ month }} / {{ year }}</h1>
+    </div>
+    <form id='cashback-form' method="POST">
+    <div class="col-md-2">
+        <div class="form-group" style="padding-top: 15px;">
+            <div class='input-group date' id='cashback'>
+                <input name="charge" type='text' class="form-control" value="{{month}}-{{year}}" />
+                <span class="input-group-addon">
+                    <span class="fa fa-calendar"></span>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class='col-md-4'>
+        <div class="form-group" style="padding-top: 15px;">
+            <button class="btn btn-primary">View Cashback</button>
+        </div>
+    </div>
+    </form>
+</div>
+    <div class="bg-info text-center" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
+        {{ form_start(cashback_search_form) }}
+        <div class="row">
+            <div class="col-md-8">
+                {{ form_widget(cashback_search_form.status) }}                
+            </div>
+            <div class="col-md-4">
+                {{ form_widget(cashback_search_form.search, {'attr':{'class':'btn btn-info'}}) }}
+            </div>
+        </div>
+        {{ form_end(cashback_search_form) }}
+    </div>
+    {% if cashback|length == 0 %}
+    <div class="row-fluid">
+        <h2>No cashback items found</h2>
+    </div>
+    {% else %}
+    <h3>Cashback</h3>
+    {% for cashback_item in cashback %}
+        <div class="row">
+            <div class="col-md-8">
+                <a href="{{ path('admin_policy', {'id': cashback_item.policy.id}) }}">{{ cashback_item.policy.policyNumber }}</a>
+                 -
+                £{{ cashback_item.getDisplayableAmount|number_format(2, '.',',') }} ({{ cashback_item.status }})
+            </div>
+            {% if cashback_item.status == 'pending-payment' %}
+            <div class="col-md-2">
+                {{ cashback_item.accountName }} {{ cashback_item.sortCode }} {{ cashback_item.accountNumber }}
+            </div>
+            <div class="col-md-2">
+                <form method="POST" action="{{ url('admin_cashback_action', {'id': cashback_item.id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('default') }}" />
+                    <input type="hidden" name="status" value="paid">
+                    <input type="hidden" name="return_url" value="{{ app.request.uri }}">
+                    <input type="submit" class="btn btn-danger" value="Set as paid">
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    {% endfor %}
+    {% endif %}
+</div>
+{% endblock %}

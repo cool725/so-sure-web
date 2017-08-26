@@ -737,6 +737,12 @@ services:
         tags:
             - { name: form.type }
 
+    app.form.type.cashbacksearch:
+        class: AppBundle\Form\Type\CashbackSearchType
+        arguments: ["@request_stack", "%kernel.environment%"]
+        tags:
+            - { name: form.type }
+
     app.form.type.phonemake:
         class: AppBundle\Form\Type\PhoneMakeType
         arguments: ["@doctrine_mongodb.odm.default_document_manager", "%form_required%"]
