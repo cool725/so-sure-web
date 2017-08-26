@@ -87,8 +87,8 @@ class RenewCashback extends Renew
         $cashback->setAccountName($this->getAccountName());
         $cashback->setAccountNumber($this->getAccountNumber());
         $cashback->setSortCode($this->getSortCode());
-        $this->getPolicy()->setCashback($cashback);
         $cashback->setStatus(Cashback::STATUS_PENDING_CLAIMABLE);
+        $this->getPolicy()->setCashback($cashback);
 
         return $cashback;
     }

@@ -2629,6 +2629,7 @@ abstract class Policy
             }
 
             if ($this->hasCashback()) {
+                $this->getCashback()->setDate(new \DateTime());
                 $this->getCashback()->setStatus(Cashback::STATUS_PENDING_PAYMENT);
                 $this->getCashback()->setAmount($this->getPotValue());
             } elseif ($this->getNextPolicy() && $this->getNextPolicy()->getPremium()->hasAnnualDiscount()) {
@@ -2653,6 +2654,7 @@ abstract class Policy
             if ($this->hasCashback()) {
                 // If there's no money in the pot, then someone has claimed - so cashback is rejected
                 $this->getCashback()->setStatus(Cashback::STATUS_CLAIMED);
+                $this->getCashback()->setDate(new \DateTime());
             }
         }
     }
