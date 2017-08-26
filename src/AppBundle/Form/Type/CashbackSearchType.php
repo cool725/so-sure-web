@@ -56,7 +56,7 @@ class CashbackSearchType extends AbstractType
         $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) use ($currentRequest) {
             $form = $event->getForm();
             if ($currentRequest->query->get('status')) {
-                $form->get('status')->setData($currentRequest->query->get('status'));                
+                $form->get('status')->setData($currentRequest->query->get('status'));
             } else {
                 $form->get('status')->setData([Cashback::STATUS_PENDING_PAYMENT]);
             }
