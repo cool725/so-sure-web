@@ -23,7 +23,8 @@ use AppBundle\Document\ScheduledPayment;
  *      "sosure"="SoSurePayment",
  *      "bacs"="BacsPayment",
  *      "potReward"="PotRewardPayment",
- *      "policyDiscount"="PolicyDiscountPayment"
+ *      "policyDiscount"="PolicyDiscountPayment",
+ *      "sosurePotReward"="SoSurePotRewardPayment"
  * })
  * @Gedmo\Loggable
  */

@@ -19,6 +19,7 @@ use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Payment\SoSurePayment;
 use AppBundle\Document\Payment\PotRewardPayment;
+use AppBundle\Document\Payment\SoSurePotRewardPayment;
 
 class ReportingService
 {
@@ -536,6 +537,7 @@ class ReportingService
     {
         $payments = $this->getPayments($date);
         $potRewardPayments = $this->getPayments($date, 'potReward');
+        $soSurePotRewardPayments = $this->getPayments($date, 'sosurePotReward');
         $policyDiscountPayments = $this->getPayments($date, 'policyDiscount');
         $totalRunRate = $this->getTotalRunRateByDate($this->endOfMonth($date));
 
@@ -545,6 +547,7 @@ class ReportingService
             'sosure' => Payment::sumPayments($payments, $isProd, SoSurePayment::class),
             'bacs' => Payment::sumPayments($payments, $isProd, BacsPayment::class),
             'potReward' => Payment::sumPayments($potRewardPayments, $isProd, PotRewardPayment::class),
+            'sosurePotReward' => Payment::sumPayments($soSurePotRewardPayments, $isProd, SoSurePotRewardPayment::class),
             'policyDiscounts' => Payment::sumPayments($policyDiscountPayments, $isProd, PolicyDiscountPayment::class),
             'totalRunRate' => $totalRunRate,
             'totalCashback' => Cashback::sumCashback($this->getCashback($date)),

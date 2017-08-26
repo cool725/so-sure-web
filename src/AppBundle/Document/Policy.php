@@ -17,6 +17,7 @@ use AppBundle\Document\File\PolicyTermsFile;
 use AppBundle\Document\File\PolicyScheduleFile;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
 use AppBundle\Document\Payment\PotRewardPayment;
+use AppBundle\Document\Payment\SoSurePotRewardPayment;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PolicyRepository")
@@ -2614,8 +2615,14 @@ abstract class Policy
         $this->updatePotValue();
 
         if ($this->getPotValue() > 0 && !$this->areEqualToTwoDp(0, $this->getPotValue())) {
+            if ($this->getPromoPotValue() > 0 && !$this->areEqualToTwoDp(0, $this->getPromoPotValue())) {
+                $reward = new SoSurePotRewardPayment();
+                $reward->setAmount($this->toTwoDp(0 - $this->getPromoPotValue()));
+                $this->addPayment($reward);
+            }
+
             $reward = new PotRewardPayment();
-            $reward->setAmount(0 - $this->getPotValue());
+            $reward->setAmount($this->toTwoDp(0 - ($this->getPotValue() - $this->getPromoPotValue())));
             $this->addPayment($reward);
 
             // We can't give cashback + give a discount on the next year's policy as that would be
