@@ -508,6 +508,7 @@ class UserController extends BaseController
             ->createNamedBuilder('renew_cashback_form', RenewCashbackType::class, $renewCashback)
             ->getForm();
         $cashback = new Cashback();
+        $cashback->setDate(new \DateTime());
         $cashback->setPolicy($policy);
         $cashback->setStatus(Cashback::STATUS_PENDING_CLAIMABLE);
         $cashbackForm = $this->get('form.factory')

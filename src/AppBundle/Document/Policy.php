@@ -836,7 +836,7 @@ abstract class Policy
     {
         $connection->setSourcePolicy($this);
         $connection->setSourceUser($this->getUser());
-        $this->renewalConnections->add($connection);
+        $this->renewalConnections[] = $connection;
     }
 
     public function getRenewalConnections()
@@ -2629,6 +2629,7 @@ abstract class Policy
             }
 
             if ($this->hasCashback()) {
+                $this->getCashback()->setDate(new \DateTime());
                 $this->getCashback()->setStatus(Cashback::STATUS_PENDING_PAYMENT);
                 $this->getCashback()->setAmount($this->getPotValue());
             } elseif ($this->getNextPolicy() && $this->getNextPolicy()->getPremium()->hasAnnualDiscount()) {
@@ -2644,6 +2645,7 @@ abstract class Policy
                 // so money was in the pot but user has completely ignored
                 // create a cashback entry and try to find the user
                 $cashback = new Cashback();
+                $cashback->setDate(new \DateTime());
                 $cashback->setStatus(Cashback::STATUS_FAILED);
                 $cashback->setAmount($this->getPotValue());
                 $this->setCashback($cashback);
@@ -2652,6 +2654,7 @@ abstract class Policy
             if ($this->hasCashback()) {
                 // If there's no money in the pot, then someone has claimed - so cashback is rejected
                 $this->getCashback()->setStatus(Cashback::STATUS_CLAIMED);
+                $this->getCashback()->setDate(new \DateTime());
             }
         }
     }

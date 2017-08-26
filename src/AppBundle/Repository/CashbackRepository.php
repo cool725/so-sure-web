@@ -17,8 +17,8 @@ class CashbackRepository extends DocumentRepository
 
         return $this->createQueryBuilder()
             ->field('status')->equals(Cashback::STATUS_PAID)
-            ->field('paidDate')->gte($startMonth)
-            ->field('paidDate')->lt($nextMonth)
+            ->field('date')->gte($startMonth)
+            ->field('date')->lt($nextMonth)
             ->getQuery()
             ->execute();
     }
