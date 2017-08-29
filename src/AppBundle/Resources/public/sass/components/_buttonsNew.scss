@@ -104,6 +104,11 @@
 	// }
 }
 
+.btn.disabled,
+.btn[disabled] {
+	cursor: not-allowed !important;
+}
+
 // .btn-30 + .btn-30 {
 // 	margin-bottom: 15px;
 // }
