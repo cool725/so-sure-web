@@ -16,6 +16,21 @@ class DaviesExcel
         return str_replace('£', '', trim($field));
     }
 
+    protected function isSuspicious($field)
+    {
+        if (!$field || $this->isNullableValue($field)) {
+            return null;
+        }
+
+        if (in_array(strtolower($field), ['ok'])) {
+            return false;
+        } elseif (in_array(strtolower($field), ['suspicious'])) {
+            return true;
+        }
+
+        return null;
+    }
+
     protected function isNullableValue($value)
     {
         // possible values that Davies might use as placeholders

@@ -27,6 +27,7 @@ use AppBundle\Form\Type\RenewCashbackType;
 use AppBundle\Form\Type\CashbackType;
 use AppBundle\Form\Type\SentInvitationType;
 use AppBundle\Form\Type\UnconnectedUserPolicyType;
+use AppBundle\Form\Type\RenewConnectionsType;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Form\BillingDay;
 use AppBundle\Form\Type\BillingDayType;
@@ -96,7 +97,7 @@ class UserController extends BaseController
             }
 
             foreach ($user->getValidPolicies(true) as $checkPolicy) {
-                if ($checkPolicy->notifyRenewal()) {
+                if ($checkPolicy->notifyRenewal() && !$checkPolicy->isRenewed() && !$checkPolicy->hasCashback()) {
                     $this->addFlash(
                         'success',
                         sprintf(
@@ -453,6 +454,9 @@ class UserController extends BaseController
                 }
             }
         }
+        $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_RENEWAL, [
+            'Renew Type' => 'Quick',
+        ]);
 
         return [
             'policy' => $policy,
@@ -466,6 +470,7 @@ class UserController extends BaseController
 
     /**
      * @Route("/renew/{id}/custom", name="user_renew_custom_policy")
+     * @Route("/renew/{id}/retry", name="user_renew_retry_policy")
      * @Template
      */
     public function renewPolicyCustomAction(Request $request, $id)
@@ -477,10 +482,12 @@ class UserController extends BaseController
             throw $this->createNotFoundException('Policy not found');
         }
 
-        if ($policy->isRenewed()) {
-            return $this->redirectToRoute('user_renew_completed', ['id' => $id]);
-        } elseif ($policy->hasCashback()) {
-            return $this->redirectToRoute('user_renew_only_cashback', ['id' => $id]);
+        if ($request->get('_route') != 'user_renew_retry_policy') {
+            if ($policy->isRenewed()) {
+                return $this->redirectToRoute('user_renew_completed', ['id' => $id]);
+            } elseif ($policy->hasCashback()) {
+                return $this->redirectToRoute('user_renew_only_cashback', ['id' => $id]);
+            }
         }
 
         $this->denyAccessUnlessGranted(PolicyVoter::RENEW, $policy);
@@ -501,6 +508,7 @@ class UserController extends BaseController
             ->createNamedBuilder('renew_cashback_form', RenewCashbackType::class, $renewCashback)
             ->getForm();
         $cashback = new Cashback();
+        $cashback->setDate(new \DateTime());
         $cashback->setPolicy($policy);
         $cashback->setStatus(Cashback::STATUS_PENDING_CLAIMABLE);
         $cashbackForm = $this->get('form.factory')
@@ -588,6 +596,9 @@ class UserController extends BaseController
                 if ($cashbackForm->isValid()) {
                     $policyService = $this->get('app.policy');
                     $policyService->cashback($policy, $cashback);
+
+                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_CASHBACK);
+
                     $message = sprintf(
                         'Your request for cashback has been accepted.'
                     );
@@ -608,6 +619,16 @@ class UserController extends BaseController
             }
         }
 
+        if ($request->get('_route') != 'user_renew_retry_policy') {
+            $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_RENEWAL, [
+                'Renew Type' => 'Custom',
+            ]);
+        } else {
+            $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_RENEWAL, [
+                'Renew Type' => 'Second Chance',
+            ]);
+        }
+
         return [
             'policy' => $policy,
             'phone' => $policy->getPhone(),
@@ -624,7 +645,7 @@ class UserController extends BaseController
      * @Route("/renew/{id}/complete", name="user_renew_completed")
      * @Template
      */
-    public function renewPolicyCompleteAction($id)
+    public function renewPolicyCompleteAction(Request $request, $id)
     {
         $dm = $this->getManager();
         $policyRepo = $dm->getRepository(Policy::class);
@@ -638,8 +659,32 @@ class UserController extends BaseController
         }
         $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
 
+        $renewConnectionsForm = $this->get('form.factory')
+            ->createNamedBuilder('renew_connections_form', RenewConnectionsType::class, $policy->getNextPolicy())
+            ->getForm();
+        if ($request->request->has('renew_connections_form')) {
+            $renewConnectionsForm->handleRequest($request);
+            if ($renewConnectionsForm->isValid()) {
+                $dm->flush();
+                $this->addFlash('success', 'Your connections have been updated');
+    
+                return new RedirectResponse(
+                    $this->generateUrl('user_renew_completed', ['id' => $id])
+                );
+            } else {
+                $this->addFlash(
+                    'error',
+                    sprintf(
+                        "Sorry, there's a problem updating your connections. Please try again or contact us. %s",
+                        $renewConnectionsForm->getErrors()
+                    )
+                );
+            }
+        }
+
         return [
             'policy' => $policy,
+            'renew_connections_form' => $renewConnectionsForm->createView(),
         ];
     }
 
@@ -742,7 +787,7 @@ class UserController extends BaseController
     public function welcomeAction()
     {
         $user = $this->getUser();
-        if (!$user->hasActivePolicy()) {
+        if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
             return new RedirectResponse($this->generateUrl('user_invalid_policy'));
         }
 

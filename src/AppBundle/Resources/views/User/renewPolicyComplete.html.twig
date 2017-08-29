@@ -36,63 +36,41 @@
 {% endblock %}
 
 {% block content %}
-    {#
-    <h4 class="text-center">Make sure that you continue to get your pot reward next year by re-inviting all your existing connections.</h4>
-    #}
+    {% if renew_connections_form.renewalConnections|length > 0%}
+        <h4 class="text-center">Make sure that you continue to get your pot reward next year by re-inviting all your existing connections.</h4>
+    {% endif %}
 {% endblock %}
 
 {% block actions %}
-    {#
+    {{ form_start(renew_connections_form) }}
     <div class="connections">
-        <div class="form-group text-center">
-            <div class="checkbox">
-                <label>
-                    <input class="select-all-connections" type="checkbox" /> <strong>select / deselect all connections</strong>
-                </label>
-            </div>
-        </div>
-        <ul class="list-unstyled renew-list">
-            {% for connection in policy.connections %}
-                <li class="renew-list__connection">
-                    <label for="user-connect">
-                        <span class="sr-only">Select user</span>
-                        <input class="checkbox-connect" type="checkbox" />
-                    </label>
-                    <img src="{{ connection.linkedUser.getImageUrlFallback }}" style="width: 50px"
-                    title="{% if connection.linkedUser.id == app.user.id %}{{ connection.linkedPolicy.defaultName }}{% else %}{{ connection.linkedUser.name }}{% endif %}"
-                    alt="{{ connection.linkedUser.name }}"
-                    class="
-                    {% if not policy.hasMonetaryClaimed and not policy.hasMonetaryNetworkClaim %}
-                        img-circle coffee-stamp
-                    {% else %}
-                        img-circle coffee-stamp user-has-claimed
-                    {% endif %}"
-                    >
-                    <span class="h4">{% if connection.linkedUser.id == app.user.id %}{{ connection.linkedPolicy.defaultName }}{% else %}{{ connection.linkedUser.name }}{% endif %}</span>
-                </li>
+        <div class="connections__list">
+            {% for renewalConnection in renew_connections_form.renewalConnections %}
+                <div class="connections__user connections__user--selected">
+                    {{ form_row(renewalConnection.renew) }}
+                    <img src="{{ renewalConnection.vars.data.linkedUser.getImageUrlFallback }}"     style="width: 50px"
+                         title="{{ renewalConnection.vars.data.linkedUser.name }}"
+                         alt="{{ renewalConnection.vars.data.linkedUser.name }}"
+                         class="
+                        {% if not renewalConnection.vars.data.linkedPolicy.hasMonetaryClaimed %}
+                            img-circle coffee-stamp
+                        {% else %}{% endif %}" />
+                    <span class="">{{ renewalConnection.vars.data.linkedUser.name }}</span>
+                </div>
             {% endfor %}
-        </ul>
-        <div class="form-group text-center">
-            <div class="checkbox">
-                <label>
-                    <input class="select-all-connections" type="checkbox" /> <strong>select / deselect all connections</strong>
-                </label>
-            </div>
         </div>
     </div>
-    #}
     <div class="checkout--step">
         <div class="container">
-            <form>
-                {#
+            <div class="form">
                 <div class="form-group">
-                    <a href="#" class="btn btn-green btn-block btn-pad">Save</a>
+                    {{ form_widget(renew_connections_form.save, {'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
                 </div>
-    #}
                 <div class="form-group">
                     <a href="{{ path('user_home') }}" class="btn btn-blue-hollow btn-block btn-pad">Back</a>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
+    {{ form_end(renew_connections_form) }}
 {% endblock %}

@@ -69,12 +69,30 @@
     <tr>
         <td width="{{ indent_width }}"></td>
         <td width="{{ text_width }}">Reward Pot Refund Due To Settled Claim Since Policy Year End</td>
-        <td>(£{{ paymentTotals.potReward.received|number_format(2, '.', ',') }})</td>
+        <td>(£{{ paymentTotals.potReward.refunded|number_format(2, '.', ',') }})</td>
     </tr>
     <tr>
         <td width="{{ indent_width }}"></td>
         <td width="{{ text_width }}"><strong>Net Reward Pot Incurred</strong></td>
         <td>£{{ paymentTotals.potReward.total|number_format(2, '.', ',') }}</td>
+    </tr>
+    <tr class="info">
+        <td colspan="3">End of Year Reward Pot Incurred by so-sure (marketing)</td>
+    </tr>
+    <tr>
+        <td width="{{ indent_width }}"></td>
+        <td width="{{ text_width }}">End of Policy Year Reward Pot Incurred</td>
+        <td>£{{ paymentTotals.sosurePotReward.received|number_format(2, '.', ',') }}</td>
+    </tr>
+    <tr>
+        <td width="{{ indent_width }}"></td>
+        <td width="{{ text_width }}">Reward Pot Refund Due To Settled Claim Since Policy Year End</td>
+        <td>(£{{ paymentTotals.sosurePotReward.refunded|number_format(2, '.', ',') }})</td>
+    </tr>
+    <tr>
+        <td width="{{ indent_width }}"></td>
+        <td width="{{ text_width }}"><strong>Net Reward Pot Incurred by so-sure (marketing)</strong></td>
+        <td>£{{ paymentTotals.sosurePotReward.total|number_format(2, '.', ',') }}</td>
     </tr>
     <tr class="info">
         <td colspan="3">Reward Pot Paid To Customers</td>
@@ -176,13 +194,18 @@
     </tr>
     <tr>
         <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">so-sure (marketing)</td>
-        <td>(£{{ paymentTotals.sosure.received|number_format(2, '.', ',') }})</td>
+        <td width="{{ text_width }}">so-sure (marketing) Premium Payments</td>
+        <td>(£{{ paymentTotals.sosure.total|number_format(2, '.', ',') }})</td>
+    </tr>
+    <tr>
+        <td width="{{ indent_width }}"></td>
+        <td width="{{ text_width }}">so-sure (marketing) Net Reward Pot Incurred</td>
+        <td>(£{{ paymentTotals.sosurePotReward.total|number_format(2, '.', ',') }})</td>
     </tr>
     <tr>
         <td width="{{ indent_width }}"></td>
         <td width="{{ text_width }}"><strong>Net transfer to so-sure</strong></td>
-        <td><strong>£{{ (paymentTotals.all.coverholderCommission - paymentTotals.sosure.received)|number_format(2, '.', ',') }}</strong></td>
+        <td><strong>£{{ (paymentTotals.all.coverholderCommission - paymentTotals.sosure.total - paymentTotals.sosurePotReward.total)|number_format(2, '.', ',') }}</strong></td>
     </tr>
     <tr class="info">
         <td colspan="3">AFL Transfer</td>

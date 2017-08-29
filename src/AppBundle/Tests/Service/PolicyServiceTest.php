@@ -1331,6 +1331,7 @@ class PolicyServiceTest extends WebTestCase
     private function getCashback($policy)
     {
         $cashback = new Cashback();
+        $cashback->setDate(new \DateTime());
         $cashback->setStatus(Cashback::STATUS_PENDING_CLAIMABLE);
         $cashback->setAccountName('foo');
         $cashback->setSortCode('123456');

@@ -12,10 +12,12 @@ use AppBundle\Classes\Salva;
 use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\Connection\StandardConnection;
+use AppBundle\Document\Connection\RenewalConnection;
 use AppBundle\Document\File\PolicyTermsFile;
 use AppBundle\Document\File\PolicyScheduleFile;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
 use AppBundle\Document\Payment\PotRewardPayment;
+use AppBundle\Document\Payment\SoSurePotRewardPayment;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PolicyRepository")
@@ -213,6 +215,11 @@ abstract class Policy
      * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Connection\Connection", cascade={"persist"})
      */
     protected $connections = array();
+
+    /**
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Connection\RenewalConnection", cascade={"persist"})
+     */
+    protected $renewalConnections = array();
 
     /**
      * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Claim",
@@ -824,6 +831,18 @@ abstract class Policy
         }
 
         return $connections;
+    }
+
+    public function addRenewalConnection(RenewalConnection $connection)
+    {
+        $connection->setSourcePolicy($this);
+        $connection->setSourceUser($this->getUser());
+        $this->renewalConnections[] = $connection;
+    }
+
+    public function getRenewalConnections()
+    {
+        return $this->renewalConnections;
     }
 
     public function getLastConnection()
@@ -2496,6 +2515,10 @@ abstract class Policy
         if ($discount && $discount > 0) {
             $this->getPremium()->setAnnualDiscount($discount);
         }
+
+        foreach ($this->getPreviousPolicy()->getStandardConnections() as $connection) {
+            $this->addRenewalConnection($connection->createRenewal());
+        }
     }
 
     public function unrenew(\DateTime $date = null)
@@ -2592,8 +2615,14 @@ abstract class Policy
         $this->updatePotValue();
 
         if ($this->getPotValue() > 0 && !$this->areEqualToTwoDp(0, $this->getPotValue())) {
+            if ($this->getPromoPotValue() > 0 && !$this->areEqualToTwoDp(0, $this->getPromoPotValue())) {
+                $reward = new SoSurePotRewardPayment();
+                $reward->setAmount($this->toTwoDp(0 - $this->getPromoPotValue()));
+                $this->addPayment($reward);
+            }
+
             $reward = new PotRewardPayment();
-            $reward->setAmount(0 - $this->getPotValue());
+            $reward->setAmount($this->toTwoDp(0 - ($this->getPotValue() - $this->getPromoPotValue())));
             $this->addPayment($reward);
 
             // We can't give cashback + give a discount on the next year's policy as that would be
@@ -2607,6 +2636,7 @@ abstract class Policy
             }
 
             if ($this->hasCashback()) {
+                $this->getCashback()->setDate(new \DateTime());
                 $this->getCashback()->setStatus(Cashback::STATUS_PENDING_PAYMENT);
                 $this->getCashback()->setAmount($this->getPotValue());
             } elseif ($this->getNextPolicy() && $this->getNextPolicy()->getPremium()->hasAnnualDiscount()) {
@@ -2622,6 +2652,7 @@ abstract class Policy
                 // so money was in the pot but user has completely ignored
                 // create a cashback entry and try to find the user
                 $cashback = new Cashback();
+                $cashback->setDate(new \DateTime());
                 $cashback->setStatus(Cashback::STATUS_FAILED);
                 $cashback->setAmount($this->getPotValue());
                 $this->setCashback($cashback);
@@ -2630,6 +2661,7 @@ abstract class Policy
             if ($this->hasCashback()) {
                 // If there's no money in the pot, then someone has claimed - so cashback is rejected
                 $this->getCashback()->setStatus(Cashback::STATUS_CLAIMED);
+                $this->getCashback()->setDate(new \DateTime());
             }
         }
     }

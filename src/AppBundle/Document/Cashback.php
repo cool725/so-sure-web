@@ -46,7 +46,7 @@ class Cashback
      * @MongoDB\Date()
      * @Gedmo\Versioned
      */
-    protected $paidDate;
+    protected $date;
 
     /**
      * @Assert\NotNull(message="Policy is required")
@@ -61,6 +61,13 @@ class Cashback
      * @Gedmo\Versioned
      */
     protected $amount;
+
+    /**
+     * @Assert\Range(min=0,max=200)
+     * @MongoDB\Field(type="float")
+     * @Gedmo\Versioned
+     */
+    protected $initialAmount;
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
@@ -114,14 +121,14 @@ class Cashback
         $this->createdDate = $createdDate;
     }
 
-    public function getPaidDate()
+    public function getDate()
     {
-        return $this->paidDate;
+        return $this->date;
     }
 
-    public function setPaidDate($paidDate)
+    public function setDate($date)
     {
-        $this->paidDate = $paidDate;
+        $this->date = $date;
     }
 
     public function getPolicy()
@@ -152,6 +159,14 @@ class Cashback
     public function setAmount($amount)
     {
         $this->amount = $amount;
+        if (!$this->initialAmount) {
+            $this->initialAmount = $amount;
+        }
+    }
+
+    public function getInitialAmount()
+    {
+        return $this->initialAmount;
     }
 
     public function getDisplayableAmount()
@@ -220,7 +235,7 @@ class Cashback
     {
         $this->accountName = $accountName;
     }
-
+    
     public static function sumCashback($cashbacks)
     {
         $total = 0;

@@ -658,6 +658,7 @@ services:
             -  { name: kernel.event_listener, event: event.payment.success, method: onPaymentSuccessEvent }
             -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
             -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
+            -  { name: kernel.event_listener, event: event.policy.renewed, method: onPolicyRenewedEvent }
 
     app.listener.push:
         class:   AppBundle\Listener\PushListener
@@ -733,6 +734,12 @@ services:
     app.form.type.claimsearch:
         class: AppBundle\Form\Type\ClaimSearchType
         arguments: ["@request_stack"]
+        tags:
+            - { name: form.type }
+
+    app.form.type.cashbacksearch:
+        class: AppBundle\Form\Type\CashbackSearchType
+        arguments: ["@request_stack", "%kernel.environment%"]
         tags:
             - { name: form.type }
 

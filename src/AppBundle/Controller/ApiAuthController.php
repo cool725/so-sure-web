@@ -580,6 +580,7 @@ class ApiAuthController extends BaseController
 
             $policyService = $this->get('app.policy');
             $cashback = new Cashback();
+            $cashback->setDate(new \DateTime());
             $cashback->setPolicy($policy);
             $cashback->setStatus(Cashback::STATUS_PENDING_CLAIMABLE);
             $cashback->setAccountName($this->getDataString($data, 'account_name'));
@@ -1071,6 +1072,7 @@ class ApiAuthController extends BaseController
             $cashback = null;
             if (isset($data['cashback'])) {
                 $cashback = new Cashback();
+                $cashback->setDate(new \DateTime());
                 $cashback->setAccountName($this->getDataString($data['cashback'], 'account_name'));
                 $cashback->setSortCode($this->getDataString($data['cashback'], 'sort_code'));
                 $cashback->setAccountNumber($this->getDataString($data['cashback'], 'account_number'));

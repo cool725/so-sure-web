@@ -34,6 +34,22 @@
                                 {% endif %}
                             </td>
                         </tr>
+                        {% if policy.previousPolicy and policy.previousPolicy.policyNumber|length > 0 %}
+                        <tr>
+                            <td>Previous Policy Number</td>
+                            <td>
+                                <a href="{{ path('claims_policy', {'id': policy.previousPolicy.id}) }}">{{ policy.previousPolicy.policyNumber }}</a>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% if policy.nextPolicy and policy.nextPolicy.policyNumber|length > 0 %}
+                        <tr>
+                            <td>Next Policy Number</td>
+                            <td>
+                                    <a href="{{ path('claims_policy', {'id': policy.nextPolicy.id}) }}">{{ policy.nextPolicy.policyNumber }}</a>
+                            </td>
+                        </tr>
+                        {% endif %}
                         {% if policy.phone %}
                         <tr>
                             <td>Phone</td>
@@ -116,6 +132,14 @@
                         <tr>
                             <td>Policy Installments</td>
                             <td>{{ policy.premiumInstallmentCount }} installment(s) of £{{ policy.premiumInstallmentPrice| number_format(2, '.', ',') }}</td>
+                        </tr>
+                        {% endif %}
+                        {% if policy.hasCashback %}
+                        <tr>
+                            <td>Cashback</td>
+                            <td>
+                                £{{ policy.cashback.getDisplayableAmount| number_format(2, '.', ',') }} ({{policy.cashback.status}})
+                            </td>
                         </tr>
                         {% endif %}
                         {% if policy.isPolicy %}
@@ -267,7 +291,11 @@
                         </td>
                     </tr>
                     <tr>
-                        <td>Pot Value</td>
+                        <td>Current Pot Value</td>
+                        <td>£{{ policy.potValue|number_format(2, '.', ',') }}</td>
+                    </tr>
+                    <tr>
+                        <td>Current Pot Value</td>
                         <td>£{{ policy.potValue|number_format(2, '.', ',') }}</td>
                     </tr>
                 </table>

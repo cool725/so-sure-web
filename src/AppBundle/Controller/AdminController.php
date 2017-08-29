@@ -15,6 +15,7 @@ use AppBundle\Document\DateTrait;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Charge;
+use AppBundle\Document\Cashback;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\Policy;
@@ -43,6 +44,7 @@ use AppBundle\Document\File\LloydsFile;
 use AppBundle\Document\Form\Cancel;
 use AppBundle\Form\Type\CancelPolicyType;
 use AppBundle\Form\Type\ClaimType;
+use AppBundle\Form\Type\CashbackSearchType;
 use AppBundle\Form\Type\ClaimFlagsType;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\ImeiType;
@@ -772,5 +774,82 @@ class AdminController extends BaseController
         );
 
         return new RedirectResponse($this->generateUrl('admin_policy', ['id' => $claim->getPolicy()->getId()]));
+    }
+
+    /**
+     * @Route("/cashback/{id}", name="admin_cashback_action", requirements={"id":"[0-9a-f]{24,24}"})
+     * @Method({"POST"})
+     */
+    public function adminCashbackActionAction(Request $request, $id)
+    {
+        if (!$this->isCsrfTokenValid('default', $request->get('_token'))) {
+            throw new \InvalidArgumentException('Invalid csrf token');
+        }
+
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Cashback::class);
+        $cashback = $repo->find($id);
+        if (!$cashback) {
+            throw $this->createNotFoundException('Cashback not found');
+        }
+        if (in_array($cashback->getStatus(), [
+            Cashback::STATUS_PENDING_CLAIMABLE,
+            Cashback::STATUS_CLAIMED,
+        ])) {
+            throw new \Exception(
+                'Not allowed to change claimed/claimable cashback status'
+            );
+        }
+
+        $cashback->setDate(new \DateTime());
+        $cashback->setStatus($request->get('status'));
+        $dm->flush();
+
+        $this->addFlash(
+            'success',
+            sprintf('Set %s cashback to %s', $cashback->getPolicy()->getPolicyNumber(), $cashback->getStatus())
+        );
+
+        return new RedirectResponse($request->get('return_url'));
+    }
+
+    /**
+     * @Route("/cashback", name="admin_cashback")
+     * @Route("/cashback/{year}/{month}", name="admin_cashback_date")
+     * @Template
+     */
+    public function cashbackAction(Request $request, $year = null, $month = null)
+    {
+        $now = new \DateTime();
+        if (!$year) {
+            $year = $now->format('Y');
+        }
+        if (!$month) {
+            $month = $now->format('m');
+        }
+        $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
+        $nextMonth = clone $date;
+        $nextMonth = $nextMonth->add(new \DateInterval('P1M'));
+
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Cashback::class);
+        $qb = $repo->createQueryBuilder();
+        $qb = $qb->field('date')->gte($date);
+        $qb = $qb->field('date')->lt($nextMonth);
+
+        $cashbackSearchForm = $this->get('form.factory')
+            ->createNamedBuilder('search_form', CashbackSearchType::class, null, ['method' => 'GET'])
+            ->getForm();
+        $cashbackSearchForm->handleRequest($request);
+        $data = $cashbackSearchForm->get('status')->getData();
+
+        $qb = $qb->field('status')->in($data);
+
+        return [
+            'year' => $year,
+            'month' => $month,
+            'cashback' => $qb->getQuery()->execute(),
+            'cashback_search_form' => $cashbackSearchForm->createView(),
+        ];
     }
 }

@@ -11,6 +11,7 @@ class PolicyEvent extends Event
     const EVENT_CANCELLED = 'event.policy.cancelled';
     const EVENT_EXPIRED = 'event.policy.expired';
     const EVENT_PENDING_RENEWAL = 'event.policy.pending-renewal';
+    const EVENT_RENEWED = 'event.policy.renewed';
 
     // Certain changes to a policy (user) should trigger a new salva version
     const EVENT_SALVA_INCREMENT = 'event.policy.salva_increment';
