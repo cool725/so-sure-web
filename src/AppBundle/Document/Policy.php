@@ -18,6 +18,7 @@ use AppBundle\Document\File\PolicyScheduleFile;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
 use AppBundle\Document\Payment\PotRewardPayment;
 use AppBundle\Document\Payment\SoSurePotRewardPayment;
+use AppBundle\Exception\ClaimException;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\PolicyRepository")
@@ -446,6 +447,39 @@ abstract class Policy
     public function setPolicyDiscountPresent($policyDiscountPresent)
     {
         $this->policyDiscountPresent = $policyDiscountPresent;
+    }
+
+    public function getPaymentsByType($type)
+    {
+        $payments = $this->getPayments();
+        if (is_object($payments)) {
+            $payments = $payments->toArray();
+        }
+        if (!$this->getPayments()) {
+            return [];
+        }
+
+        return array_filter($payments, function ($payment) use ($type) {
+            return $payment instanceof $type;
+        });
+    }
+
+    public function getPaymentByType($type)
+    {
+        $payments = $this->getPaymentsByType($type);
+        if (!$payments || count($payments) == 0) {
+            return null;
+        }
+
+        return array_values($payments)[0];
+    }
+
+    public function hasAdjustedRewardPotPayment()
+    {
+        $promoPotRewards = $this->getPaymentsByType(SoSurePotRewardPayment::class);
+        $potRewards = $this->getPaymentsByType(PotRewardPayment::class);
+
+        return count($promoPotRewards) > 1 || count($potRewards) > 1;
     }
 
     /**
@@ -2260,6 +2294,21 @@ abstract class Policy
         return $this->hasNetworkClaim(true);
     }
 
+    public function hasOpenNetworkClaim()
+    {
+        foreach ($this->getStandardConnections() as $connection) {
+            $policy = $connection->getLinkedPolicy();
+            if (!$policy) {
+                throw new \Exception(sprintf('Invalid connection in policy %s', $this->getId()));
+            }
+            if ($policy->hasOpenClaim()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function getNetworkClaims($monitaryOnly = false, $includeOpen = false)
     {
         $claims = [];
@@ -2467,6 +2516,10 @@ abstract class Policy
 
     public function isRenewalAllowed(\DateTime $date = null)
     {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
         if (!in_array($this->getStatus(), [
             self::STATUS_PENDING_RENEWAL,
         ])) {
@@ -2557,6 +2610,31 @@ abstract class Policy
         $this->setStatus(Policy::STATUS_ACTIVE);
     }
 
+    abstract public function setPolicyDetailsForPendingRenewal(Policy $policy);
+
+    public function createPendingRenewal(PolicyTerms $terms, \DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        if (!$this->canCreatePendingRenewal($date)) {
+            throw new \Exception(sprintf('Unable to create a pending renewal for policy %s', $policy->getId()));
+        }
+
+        $newPolicy = new static();
+        $this->setPolicyDetailsForPendingRenewal($newPolicy);
+        $newPolicy->setStatus(Policy::STATUS_PENDING_RENEWAL);
+        // don't allow renewal after the end the current policy
+        $newPolicy->setPendingRenewalExpiration($this->getEnd());
+
+        $newPolicy->init($this->getUser(), $terms);
+
+        $this->link($newPolicy);
+
+        return $newPolicy;
+    }
+
     /**
      * Expire the policy itself, however, this should be done via the policy server in order to
      * send out all the emails, etc
@@ -2589,6 +2667,59 @@ abstract class Policy
                 $scheduledPayment->setStatus(ScheduledPayment::STATUS_CANCELLED);
             }
         }
+
+        $this->updatePotValue();
+
+        if ($this->getPotValue() > 0 && !$this->areEqualToTwoDp(0, $this->getPotValue())) {
+            // Promo pot reward
+            if ($this->getPromoPotValue() > 0 && !$this->areEqualToTwoDp(0, $this->getPromoPotValue())) {
+                $reward = new SoSurePotRewardPayment();
+                $reward->setAmount($this->toTwoDp(0 - $this->getPromoPotValue()));
+                $this->addPayment($reward);
+            }
+
+            // Normal pot reward
+            $reward = new PotRewardPayment();
+            $reward->setAmount($this->toTwoDp(0 - ($this->getPotValue() - $this->getPromoPotValue())));
+            $this->addPayment($reward);
+
+            // We can't give cashback + give a discount on the next year's policy as that would be
+            // discounting twice - should never occur
+            if ($this->hasCashback() && $this->getNextPolicy() &&
+                $this->getNextPolicy()->getPremium()->hasAnnualDiscount()) {
+                throw new \Exception(sprintf(
+                    'Cashback was requested, yet there is a discount on the next policy. %s',
+                    $this->getId()
+                ));
+            }
+
+            if ($this->hasCashback()) {
+                // TODO: Should we be checking cashback status?
+                $this->getCashback()->setDate(new \DateTime());
+                $this->getCashback()->setStatus(Cashback::STATUS_PENDING_CLAIMABLE);
+                $this->getCashback()->setAmount($this->getPotValue());
+            } elseif ($this->getNextPolicy() && $this->getNextPolicy()->getPremium()->hasAnnualDiscount()) {
+                $discount = new PolicyDiscountPayment();
+                $discount->setAmount($this->getPotValue());
+                $this->getNextPolicy()->addPayment($discount);
+            } else {
+                // No cashback requested but also no renewal
+                // so money was in the pot but user has completely ignored
+                // create a cashback entry and try to find the user
+                $cashback = new Cashback();
+                $cashback->setDate(new \DateTime());
+                $cashback->setStatus(Cashback::STATUS_FAILED);
+                $cashback->setAmount($this->getPotValue());
+                $this->setCashback($cashback);
+            }
+        } else {
+            // 0 pot value
+            if ($this->hasCashback()) {
+                // If there's no money in the pot, then someone has claimed - so cashback is rejected
+                $this->getCashback()->setStatus(Cashback::STATUS_CLAIMED);
+                $this->getCashback()->setDate(new \DateTime());
+            }
+        }
     }
 
     /**
@@ -2610,58 +2741,60 @@ abstract class Policy
             throw new \Exception('Unable to fully expire a policy if status is not expired-claimable');
         }
 
+        if ($this->hasOpenClaim() || $this->hasOpenNetworkClaim()) {
+            throw new ClaimException(sprintf(
+                'Unable to fully expire policy %s as it has an open claim/network claim',
+                $this->getId()
+            ));
+        }
+
         $this->setStatus(Policy::STATUS_EXPIRED);
 
         $this->updatePotValue();
 
-        if ($this->getPotValue() > 0 && !$this->areEqualToTwoDp(0, $this->getPotValue())) {
-            if ($this->getPromoPotValue() > 0 && !$this->areEqualToTwoDp(0, $this->getPromoPotValue())) {
-                $reward = new SoSurePotRewardPayment();
-                $reward->setAmount($this->toTwoDp(0 - $this->getPromoPotValue()));
-                $this->addPayment($reward);
-            }
+        $promoPotReward = $this->getPaymentByType(SoSurePotRewardPayment::class);
+        $potReward = $this->getPaymentByType(PotRewardPayment::class);
 
-            $reward = new PotRewardPayment();
-            $reward->setAmount($this->toTwoDp(0 - ($this->getPotValue() - $this->getPromoPotValue())));
+        // Promo pot reward
+        $promoPotValue = 0 - $this->getPromoPotValue();
+        if ($promoPotReward && !$this->areEqualToTwoDp($promoPotReward->getAmount(), $promoPotValue)) {
+            // pot changed (due to claim) - issue refund if applicable
+            $reward = new SoSurePotRewardPayment();
+            $reward->setAmount($this->toTwoDp($promoPotValue - $promoPotReward->getAmount()));
             $this->addPayment($reward);
+        }
 
-            // We can't give cashback + give a discount on the next year's policy as that would be
-            // discounting twice - should never occur
-            if ($this->hasCashback() && $this->getNextPolicy() &&
-                $this->getNextPolicy()->getPremium()->hasAnnualDiscount()) {
-                throw new \Exception(sprintf(
-                    'Cashback was requested, yet there is a discount on the next policy. %s',
-                    $this->getId()
-                ));
-            }
+        // Standard pot reward
+        $standardPotValue = 0 - $this->getPotValue() - $this->getPromoPotValue();
+        if ($potReward && !$this->areEqualToTwoDp($potReward->getAmount(), $standardPotValue)) {
+            // pot changed (due to claim) - issue refund if applicable
+            $reward = new PotRewardPayment();
+            $reward->setAmount($this->toTwoDp($standardPotValue - $potReward->getAmount()));
+            $this->addPayment($reward);
+        }
 
-            if ($this->hasCashback()) {
-                $this->getCashback()->setDate(new \DateTime());
+        // Update cashback state
+        if ($this->hasCashback()) {
+            if ($this->areEqualToTwoDp($this->getCashback()->getAmount(), $this->getPotValue())) {
                 $this->getCashback()->setStatus(Cashback::STATUS_PENDING_PAYMENT);
-                $this->getCashback()->setAmount($this->getPotValue());
-            } elseif ($this->getNextPolicy() && $this->getNextPolicy()->getPremium()->hasAnnualDiscount()) {
-                $discount = new PolicyDiscountPayment();
-                $discount->setAmount($this->getPotValue());
-                $this->addPayment($discount);
-
-                $discount = new PolicyDiscountPayment();
-                $discount->setAmount($this->getPotValue());
-                $this->getNextPolicy()->addPayment($discount);
             } else {
-                // No cashback requested but also no renewal
-                // so money was in the pot but user has completely ignored
-                // create a cashback entry and try to find the user
-                $cashback = new Cashback();
-                $cashback->setDate(new \DateTime());
-                $cashback->setStatus(Cashback::STATUS_FAILED);
-                $cashback->setAmount($this->getPotValue());
-                $this->setCashback($cashback);
+                $this->getCashback()->setAmount($this->getPotValue());
+                if ($this->areEqualToTwoDp(0, $this->getCashback()->getAmount())) {
+                    $this->getCashback()->setStatus(Cashback::STATUS_CLAIMED);
+                } else {
+                    $this->getCashback()->setStatus(Cashback::STATUS_PENDING_PAYMENT);
+                }
             }
-        } else {
-            if ($this->hasCashback()) {
-                // If there's no money in the pot, then someone has claimed - so cashback is rejected
-                $this->getCashback()->setStatus(Cashback::STATUS_CLAIMED);
-                $this->getCashback()->setDate(new \DateTime());
+            $this->getCashback()->setDate(new \DateTime());
+        }
+
+        if ($this->getNextPolicy()) {
+            $discount = $this->getNextPolicy()->getPaymentByType(PolicyDiscountPayment::class);
+            if ($discount && !$this->areEqualToTwoDp($discount->getAmount(), $this->getPotValue())) {
+                // pot changed (due to claim) - issue refund if applicable
+                $adjustedDiscount = new PolicyDiscountPayment();
+                $adjustedDiscount->setAmount($this->toTwoDp($this->getPotValue() - $discount->getAmount()));
+                $this->getNextPolicy()->addPayment($adjustedDiscount);
             }
         }
     }

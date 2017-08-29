@@ -6,6 +6,7 @@ use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Phone;
+use AppBundle\Document\Cashback;
 use AppBundle\Document\User;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Policy;
@@ -15,6 +16,7 @@ use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
 use AppBundle\Document\Payment\PotRewardPayment;
+use AppBundle\Document\Payment\SoSurePotRewardPayment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\CurrencyTrait;
@@ -3034,20 +3036,14 @@ class PhonePolicyTest extends WebTestCase
         $policyA->fullyExpire(new \DateTime("2017-01-29"));
         $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
         $foundReward = false;
-        $foundDiscount = false;
         foreach ($policyA->getPayments() as $payment) {
             if ($payment instanceof PotRewardPayment) {
                 $this->assertEquals(-10, $payment->getAmount());
                 $foundReward = true;
             }
-            if ($payment instanceof PolicyDiscountPayment) {
-                $this->assertEquals(10, $payment->getAmount());
-                $foundDiscount = true;
-            }
         }
 
         $this->assertTrue($foundReward);
-        $this->assertTrue($foundDiscount);
 
         $foundRenewalDiscount = false;
         foreach ($renewalPolicyA->getPayments() as $payment) {
@@ -3058,6 +3054,165 @@ class PhonePolicyTest extends WebTestCase
         }
 
         $this->assertTrue($foundRenewalDiscount);
+    }
+
+    public function testDiscountExpiredWithClaim()
+    {
+        $policyA = $this->getPolicy(static::generateEmail('testDiscountExpiredWithClaim-A', $this));
+        $policyB = $this->getPolicy(static::generateEmail('testDiscountExpiredWithClaim-B', $this));
+        list($connectionA, $connectionB) = $this->createLinkedConnections($policyA, $policyB, 10, 10);
+
+        $this->assertFalse($policyA->isRenewed());
+
+        $renewalPolicyA = $this->getRenewalPolicy($policyA);
+
+        $this->assertFalse($policyA->isRenewed());
+        $this->assertTrue($renewalPolicyA->isRenewalAllowed(new \DateTime('2016-12-15')));
+
+        $renewalPolicyA->renew(10, new \DateTime('2016-12-15'));
+
+        $this->assertTrue($policyA->isRenewed());
+
+        $renewalPolicyA->activate(new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+
+        $policyA->expire(new \DateTime("2017-01-01"));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        $claimA = new Claim();
+        $claimA->setType(Claim::TYPE_LOSS);
+        $claimA->setStatus(Claim::STATUS_SETTLED);
+        $policyA->addClaim($claimA);
+
+        $policyA->fullyExpire(new \DateTime("2017-01-29"));
+        $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
+        $foundReward = false;
+        $foundRefund = false;
+        foreach ($policyA->getPayments() as $payment) {
+            if ($payment instanceof PotRewardPayment && $payment->getAmount() == -10) {
+                $foundReward = true;
+            }
+            if ($payment instanceof PotRewardPayment && $payment->getAmount() == 10) {
+                $foundRefund = true;
+            }
+        }
+
+        $this->assertTrue($foundReward);
+        $this->assertTrue($foundRefund);
+
+        $foundRenewalDiscount = false;
+        $foundRenewalRefund = false;
+        foreach ($renewalPolicyA->getPayments() as $payment) {
+            if ($payment instanceof PolicyDiscountPayment && $payment->getAmount() == 10) {
+                $foundRenewalDiscount = true;
+            }
+            if ($payment instanceof PolicyDiscountPayment && $payment->getAmount() == -10) {
+                $foundRenewalRefund = true;
+            }
+        }
+
+        $this->assertTrue($foundRenewalDiscount);
+        $this->assertTrue($foundRenewalRefund);
+    }
+
+    public function testClaimExpiredWithClaim()
+    {
+        $policyA = $this->getPolicy(static::generateEmail('testCashbackExpiredWithClaim-A', $this));
+        $policyB = $this->getPolicy(static::generateEmail('testCashbackExpiredWithClaim-B', $this));
+        list($connectionA, $connectionB) = $this->createLinkedConnections($policyA, $policyB, 10, 10);
+
+        $this->assertFalse($policyA->isRenewed());
+
+        $renewalPolicyA = $this->getRenewalPolicy($policyA);
+
+        $this->assertFalse($policyA->isRenewed());
+        $this->assertTrue($renewalPolicyA->isRenewalAllowed(new \DateTime('2016-12-15')));
+
+        $renewalPolicyA->renew(0, new \DateTime('2016-12-15'));
+
+        $this->assertTrue($policyA->isRenewed());
+
+        $renewalPolicyA->activate(new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+
+        $policyA->expire(new \DateTime("2017-01-01"));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        $this->assertEquals(10, $policyA->getCashback()->getAmount());
+
+        $claimA = new Claim();
+        $claimA->setType(Claim::TYPE_LOSS);
+        $claimA->setStatus(Claim::STATUS_SETTLED);
+        $policyA->addClaim($claimA);
+
+        $policyA->fullyExpire(new \DateTime("2017-01-29"));
+        $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
+
+        $this->assertEquals(0, $policyA->getCashback()->getAmount());
+
+        $foundReward = false;
+        $foundRefund = false;
+        foreach ($policyA->getPayments() as $payment) {
+            if ($payment instanceof PotRewardPayment && $payment->getAmount() == -10) {
+                $foundReward = true;
+            }
+            if ($payment instanceof PotRewardPayment && $payment->getAmount() == 10) {
+                $foundRefund = true;
+            }
+        }
+
+        $this->assertTrue($foundReward);
+        $this->assertTrue($foundRefund);
+
+        $foundRenewalDiscount = false;
+        $foundRenewalRefund = false;
+        foreach ($renewalPolicyA->getPayments() as $payment) {
+            if ($payment instanceof PolicyDiscountPayment && $payment->getAmount() == 10) {
+                $foundRenewalDiscount = true;
+            }
+            if ($payment instanceof PolicyDiscountPayment && $payment->getAmount() == -10) {
+                $foundRenewalRefund = true;
+            }
+        }
+
+        $this->assertFalse($foundRenewalDiscount);
+        $this->assertFalse($foundRenewalRefund);
+    }
+
+    /**
+     * @expectedException \AppBundle\Exception\ClaimException
+     */
+    public function testOpenClaimExpired()
+    {
+        $policyA = $this->getPolicy(static::generateEmail('testOpenClaimExpired-A', $this));
+        $policyB = $this->getPolicy(static::generateEmail('testOpenClaimExpired-B', $this));
+        list($connectionA, $connectionB) = $this->createLinkedConnections($policyA, $policyB, 10, 10);
+
+        $this->assertFalse($policyA->isRenewed());
+
+        $renewalPolicyA = $this->getRenewalPolicy($policyA);
+
+        $this->assertFalse($policyA->isRenewed());
+        $this->assertTrue($renewalPolicyA->isRenewalAllowed(new \DateTime('2016-12-15')));
+
+        $renewalPolicyA->renew(0, new \DateTime('2016-12-15'));
+
+        $this->assertTrue($policyA->isRenewed());
+
+        $renewalPolicyA->activate(new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+
+        $policyA->expire(new \DateTime("2017-01-01"));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        $this->assertEquals(10, $policyA->getCashback()->getAmount());
+
+        $claimA = new Claim();
+        $claimA->setType(Claim::TYPE_LOSS);
+        $claimA->setStatus(Claim::STATUS_INREVIEW);
+        $policyA->addClaim($claimA);
+
+        $policyA->fullyExpire(new \DateTime("2017-01-29"));
     }
 
     public function testRenewActivateExpireWithoutPot()
@@ -3330,6 +3485,192 @@ class PhonePolicyTest extends WebTestCase
         $policy->setStatus(Policy::STATUS_UNPAID);
         $policy->expire(new \DateTime("2017-01-01"));
         $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policy->getStatus());
+    }
+
+    public function testExpireWithPromoNoCashback()
+    {
+        $policyA = $this->getPolicy(static::generateEmail('testExpireA', $this));
+        $policyB = $this->getPolicy(static::generateEmail('testExpireB', $this));
+        $policyA->setStatus(Policy::STATUS_ACTIVE);
+        $policyB->setStatus(Policy::STATUS_ACTIVE);
+        $this->createLinkedConnections($policyA, $policyB, 15, 15);
+        $policyA->expire(new \DateTime("2017-01-01"));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+        static::$dm->persist($policyA->getUser());
+        static::$dm->persist($policyB->getUser());
+        static::$dm->persist($policyA);
+        static::$dm->persist($policyB);
+        static::$dm->flush();
+        $this->assertNotNull($policyA->getId());
+        $this->assertNotNull($policyB->getId());
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = self::$dm->getRepository(Policy::class);
+        $updatedPolicyA = $repo->find($policyA->getId());
+
+        $foundSoSure = false;
+        $foundPot = false;
+        foreach ($updatedPolicyA->getPayments() as $payment) {
+            if ($payment instanceof SoSurePotRewardPayment) {
+                $this->assertTrue($this->areEqualToTwoDp(-5, $payment->getAmount()));
+                $foundSoSure = true;
+            }
+            if ($payment instanceof PotRewardPayment) {
+                $this->assertTrue($this->areEqualToTwoDp(-10, $payment->getAmount()));
+                $foundPot = true;
+            }
+        }
+        $this->assertTrue($foundSoSure);
+        $this->assertTrue($foundPot);
+        $this->assertNotNull($updatedPolicyA->getCashback());
+        $this->assertEquals(15, $updatedPolicyA->getCashback()->getAmount());
+        $this->assertEquals(Cashback::STATUS_FAILED, $updatedPolicyA->getCashback()->getStatus());
+    }
+
+    public function testExpireWithPromoNoCashbackClaimed()
+    {
+        $policyA = $this->getPolicy(static::generateEmail('testExpireWithPromoNoCashbackClaimedA', $this));
+        $policyB = $this->getPolicy(static::generateEmail('testExpireWithPromoNoCashbackClaimedB', $this));
+        $policyA->setStatus(Policy::STATUS_ACTIVE);
+        $policyB->setStatus(Policy::STATUS_ACTIVE);
+        $this->createLinkedConnections($policyA, $policyB, 15, 15);
+        $policyA->expire(new \DateTime("2017-01-01"));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+        static::$dm->persist($policyA->getUser());
+        static::$dm->persist($policyB->getUser());
+        static::$dm->persist($policyA);
+        static::$dm->persist($policyB);
+        static::$dm->flush();
+        $this->assertNotNull($policyA->getId());
+        $this->assertNotNull($policyB->getId());
+
+        $claimA = new Claim();
+        $claimA->setType(Claim::TYPE_LOSS);
+        $claimA->setStatus(Claim::STATUS_SETTLED);
+        $policyA->addClaim($claimA);
+
+        $policyA->fullyExpire(new \DateTime("2017-01-29"));
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = self::$dm->getRepository(Policy::class);
+        $updatedPolicyA = $repo->find($policyA->getId());
+
+        $foundSoSure = false;
+        $foundSoSureRefund = false;
+        $foundPot = false;
+        $foundPotRefund = false;
+        foreach ($updatedPolicyA->getPayments() as $payment) {
+            if ($payment instanceof SoSurePotRewardPayment && $payment->getAmount() == -5) {
+                $foundSoSure = true;
+            }
+            if ($payment instanceof SoSurePotRewardPayment && $payment->getAmount() == 5) {
+                $foundSoSureRefund = true;
+            }
+            if ($payment instanceof PotRewardPayment && $payment->getAmount() == -10) {
+                $foundPot = true;
+            }
+            if ($payment instanceof PotRewardPayment && $payment->getAmount() == 10) {
+                $foundPotRefund = true;
+            }
+        }
+        $this->assertTrue($foundSoSure);
+        $this->assertTrue($foundSoSureRefund);
+        $this->assertTrue($foundPot);
+        $this->assertTrue($foundPotRefund);
+        $this->assertNotNull($updatedPolicyA->getCashback());
+        $this->assertEquals(0, $updatedPolicyA->getCashback()->getAmount());
+        $this->assertEquals(Cashback::STATUS_CLAIMED, $updatedPolicyA->getCashback()->getStatus());
+    }
+
+    public function testExpireNoPromoWithCashback()
+    {
+        $policyA = $this->getPolicy(static::generateEmail('testExpireWithCashbackA', $this));
+        $policyB = $this->getPolicy(static::generateEmail('testExpireWithCashbackB', $this));
+        $policyA->setStatus(Policy::STATUS_ACTIVE);
+        $policyB->setStatus(Policy::STATUS_ACTIVE);
+        $this->createLinkedConnections($policyA, $policyB, 10, 10);
+
+        $cashback = new Cashback();
+        $cashback->setAccountName('a b');
+        $cashback->setSortCode('123456');
+        $cashback->setAccountNumber('12345678');
+        $policyA->setCashback($cashback);
+
+        $policyA->expire(new \DateTime("2017-01-01"));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+        static::$dm->persist($policyA->getUser());
+        static::$dm->persist($policyB->getUser());
+        static::$dm->persist($policyA);
+        static::$dm->persist($policyB);
+        static::$dm->flush();
+        $this->assertNotNull($policyA->getId());
+        $this->assertNotNull($policyB->getId());
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = self::$dm->getRepository(Policy::class);
+        $updatedPolicyA = $repo->find($policyA->getId());
+
+        $foundSoSure = false;
+        $foundPot = false;
+        foreach ($updatedPolicyA->getPayments() as $payment) {
+            if ($payment instanceof SoSurePotRewardPayment) {
+                $foundSoSure = true;
+            }
+            if ($payment instanceof PotRewardPayment) {
+                $this->assertTrue($this->areEqualToTwoDp(-10, $payment->getAmount()));
+                $foundPot = true;
+            }
+        }
+        $this->assertFalse($foundSoSure);
+        $this->assertTrue($foundPot);
+        $this->assertNotNull($updatedPolicyA->getCashback());
+        $this->assertEquals(10, $updatedPolicyA->getCashback()->getAmount());
+        $this->assertEquals(Cashback::STATUS_PENDING_CLAIMABLE, $updatedPolicyA->getCashback()->getStatus());
+    }
+
+    public function testExpireRenewed()
+    {
+        $policyA = $this->getPolicy(static::generateEmail('testExpireRenewedA', $this));
+        $policyB = $this->getPolicy(static::generateEmail('testExpireRenewedB', $this));
+        $policyA->setStatus(Policy::STATUS_ACTIVE);
+        $policyB->setStatus(Policy::STATUS_ACTIVE);
+        $this->createLinkedConnections($policyA, $policyB, 10, 10);
+
+        $renewalPolicy = $policyA->createPendingRenewal($policyA->getPolicyTerms(), new \DateTime('2016-12-15'));
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
+        //\Doctrine\Common\Util\Debug::dump($policyA);
+        $renewalPolicy->renew(10, new \DateTime('2016-12-16'));
+
+        $policyA->expire(new \DateTime("2017-01-01"));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+        static::$dm->persist($policyA->getUser());
+        static::$dm->persist($policyB->getUser());
+        static::$dm->persist($policyA);
+        static::$dm->persist($policyB);
+        static::$dm->persist($renewalPolicy);
+        static::$dm->flush();
+        $this->assertNotNull($policyA->getId());
+        $this->assertNotNull($policyB->getId());
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = self::$dm->getRepository(Policy::class);
+        $updatedPolicyA = $repo->find($policyA->getId());
+
+        $foundSoSure = false;
+        $foundPot = false;
+        $foundDiscount = false;
+        foreach ($updatedPolicyA->getPayments() as $payment) {
+            if ($payment instanceof SoSurePotRewardPayment) {
+                $foundSoSure = true;
+            }
+            if ($payment instanceof PotRewardPayment) {
+                $this->assertTrue($this->areEqualToTwoDp(-10, $payment->getAmount()));
+                $foundPot = true;
+            }
+        }
+        $this->assertFalse($foundSoSure);
+        $this->assertTrue($foundPot);
+        $this->assertNull($updatedPolicyA->getCashback());
     }
 
     private function getPolicy($email)
