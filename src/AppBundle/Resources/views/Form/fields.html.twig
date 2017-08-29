@@ -36,3 +36,15 @@
     </label>
 {% endspaceless %}
 {% endblock radio_widget %}
+
+{% block tel_widget %}
+{% spaceless %}
+    <input type="tel" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %} />
+{% endspaceless %}
+{% endblock tel_widget %}
+
+{% block app_number_widget %}
+{% spaceless %}
+    <input type="number" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %} />
+{% endspaceless %}
+{% endblock app_number_widget %}
