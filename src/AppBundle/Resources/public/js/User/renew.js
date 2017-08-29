@@ -166,6 +166,7 @@ $(function(){
     // Check if limited to yearly
     var limited = false;
 
+    // If only one payment option exists set limited to true
     if ($('.payment--no-btn').length) {
         limited = true;
     }
@@ -179,6 +180,7 @@ $(function(){
         $('#renew_form_encodedAmount').val(value);
         $('#renew_cashback_form_encodedAmount').val(value);
 
+        // Handle disabling the button if a certain amount is not selected
         if (limited == false) {
             // If option not set do not allow the user to continue
             if ($('#renew_form_encodedAmount').val() != '') {
@@ -222,6 +224,5 @@ $(function(){
         // Toggle selected class
         $(this).toggleClass('connections__user--selected');
     });
-
 
 });
