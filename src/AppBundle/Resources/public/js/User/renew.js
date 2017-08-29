@@ -163,6 +163,13 @@ $(function(){
         sosure.renew.use_cashback(false);
     });
 
+    // Check if limited to yearly
+    var limited = false;
+
+    if ($('.payment--no-btn').length) {
+        limited = true;
+    }
+
     $('.payment--btn').click(function(event) {
         sosure.renew.clear_payment_buttons($(this));
 
@@ -171,6 +178,22 @@ $(function(){
         var value = $(this).data('value');
         $('#renew_form_encodedAmount').val(value);
         $('#renew_cashback_form_encodedAmount').val(value);
+
+        if (limited == false) {
+            // If option not set do not allow the user to continue
+            if ($('#renew_form_encodedAmount').val() != '') {
+                $('#renew--continue-btn a').removeClass('disabled').text('Continue');
+            } else {
+                $('#renew--continue-btn a').addClass('disabled').text('Choose a payment option above');
+            }
+
+            if ($('#renew_cashback_form_encodedAmount').val() != '') {
+                $('#renew--continue-cashback-btn a').removeClass('disabled').text('Continue');
+            } else {
+                $('#renew--continue-cashback-btn a').addClass('disabled').text('Choose a payment option above');;
+            }
+        }
+
     });
 
     // Hide/Show policy doc
@@ -184,31 +207,6 @@ $(function(){
     });
 
     // Connections
-    // $('.select-all-connections').on('click',function(){
-    //     if (this.checked) {
-    //         $('.select-all-connections').not(this).prop('checked',true);
-    //         $('.checkbox-connect').each(function() {
-    //             this.checked = true;
-    //             $(this).parent().parent('li').addClass('background-off-white');
-    //         });
-    //     } else {
-    //         $('.select-all-connections').not(this).prop('checked',false);
-    //         $('.checkbox-connect').each(function() {
-    //             this.checked = false;
-    //             $(this).parent().parent('li').removeClass('background-off-white');
-    //         });
-    //     }
-    // });
-
-    // $('.checkbox-connect').on('click',function(){
-    //     $(this).parent().parent('li').toggleClass('background-off-white');
-    //     if ($('.checkbox-connect:checked').length == $('.checkbox-connect').length) {
-    //         $('.select-all-connections').prop('checked',true);
-    //     } else {
-    //         $('.select-all-connections').prop('checked',false);
-    //     }
-    // });
-
     $('.connections__user').on('click', function(e) {
 
         // Find the > checkbox
