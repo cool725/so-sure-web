@@ -60,7 +60,7 @@ class PurchaseStepPersonalAddressType extends AbstractType
                   ),
                   'years' => $years,
             ])
-            ->add('mobileNumber', TextType::class, ['required' => $this->required])
+            ->add('mobileNumber', TelType::class, ['required' => $this->required])
             ->add('addressLine1', TextType::class, ['required' => $this->required])
             ->add('addressLine2', TextType::class, ['required' => false])
             ->add('addressLine3', TextType::class, ['required' => false])

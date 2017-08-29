@@ -43,7 +43,7 @@ class PurchaseStepPhoneType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('imei', TextType::class, ['required' => $this->required])
+            ->add('imei', TelType::class, ['required' => $this->required])
             ->add('agreed', CheckboxType::class, ['required' => $this->required])
             ->add('next', SubmitType::class)
         ;

@@ -62,7 +62,7 @@ class PurchaseStepPersonalType extends AbstractType
                   ),
                   'years' => $years,
             ])
-            ->add('mobileNumber', TextType::class, ['required' => $this->required])
+            ->add('mobileNumber', TelType::class, ['required' => $this->required])
             ->add('next', SubmitType::class)
         ;
     }
