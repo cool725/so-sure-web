@@ -265,7 +265,7 @@
             </div>
             <div class="modal-body">
                 <div class="modal-body__review">
-                    {{ form_start(renew_cashback_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form-renew-cashback'}}) }}
+                    {{ form_start(renew_cashback_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form-renew-cashback', 'autocomplete': 'off'}}) }}
                     <ol>
                         <li>My phone is in full working condition and my screen is not cracked.</li>
                         <li>I am a resident of the United Kingdom.</li>
@@ -313,7 +313,7 @@
                     Please use this form to request cashback. Note that it will take 28-45 days
                     from the end of your policy before the bacs transfer will be sent.
                 </p>
-                {{ form_start(cashback_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form-cashback'}}) }}
+                {{ form_start(cashback_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form-cashback', 'autocomplete': 'off'}}) }}
                 <div class="form-group cashback--item">
                     {{ form_widget(cashback_form.accountName, {'attr': {'placeholder': 'Account Name', 'class': 'form-control'}}) }}
                     <div class="help-block with-errors">{{ form_errors(cashback_form.accountName) }}</div>
