@@ -1401,7 +1401,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             ),
             'can_purchase_policy' => $this->canPurchasePolicy(),
             'has_payment_method' => $this->hasValidPaymentMethod(),
-            'card_details' => $this->getPaymentMethod() ? $this->getPaymentMethod()->__toString() : null,
+            'card_details' => $this->getPaymentMethod() ? $this->getPaymentMethod()->__toString() : 'Unknown card details',
         ];
     }
 }
