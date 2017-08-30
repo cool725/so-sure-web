@@ -2,7 +2,6 @@
 
 {# Set vars #}
 {% set new_stylesheet = 1 %}
-{% set new_footer = 1 %}
 {% set make_extra = '' %}
 {% if make == "Samsung" %}
     {% set make_extra = 'Galaxy' %}
@@ -30,6 +29,20 @@
 {# {% block nav %}{% endblock %} #}
 
 {% block body %}
+
+    {% include 'AppBundle::Default/hero.html.twig' %}
+
+    {% include 'AppBundle::Default/press.html.twig' %}
+
+    {% include 'AppBundle::Default/whySoSure.html.twig' %}
+
+    {% include 'AppBundle::Default/saveMoney.html.twig' %}
+
+    {% include 'AppBundle::Default/fasterClaims.html.twig' %}
+
+    {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}
+
+    {% include 'AppBundle::Default/partnership.html.twig' %}
 
     <section class="section-landing section-landing--title">
         <div class="container text-center">
@@ -156,7 +169,7 @@
         </div>
     </section>
 
-    <section class="section--pad">
+  <section class="section--pad">
         <div class="container">
 
            {% if make == "Samsung" %}
@@ -197,9 +210,9 @@
         </div>
     </section>
 
-
     {# Page Modals #}
 
+    {% include 'AppBundle::Default/modalVideo.html.twig' %}
     {% include 'AppBundle::Default/modalQuote.html.twig' with {'selectPhoneMakeType': ''} %}
 
     {# End Page Modals #}
@@ -209,6 +222,8 @@
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
+    'components/vimeo-player-js/player.min.js'
+    '@AppBundle/Resources/public/js/Default/modalVideo.js'
     'components/jquery_lazyload/jquery.lazyload.js'
     'components/typeahead.js/typeahead.bundle.min.js'
     'components/fuse.js/fuse.min.js'
