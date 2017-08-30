@@ -425,6 +425,13 @@ class PhonePolicy extends Policy
         }
     }
 
+    public function setPolicyDetailsForPendingRenewal(Policy $policy)
+    {
+        $policy->setPhone($this->getPhone());
+        $policy->setImei($this->getImei());
+        $policy->setSerialNumber($this->getSerialNumber());
+    }
+
     /**
      * If the premium is initialized prior to an ipt rate change
      * and then created after, the IPT would be incorrect

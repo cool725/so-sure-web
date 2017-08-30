@@ -1290,9 +1290,21 @@ class PolicyService
      */
     public function fullyExpire(Policy $policy, \DateTime $date = null)
     {
-        $policy->fullyExpire($date);
-        $this->dm->flush();
-        // TODO: if cashback is present, then notify user about status
+        try {
+            $policy->fullyExpire($date);
+            $this->dm->flush();
+
+            if ($policy->hasAdjustedRewardPotPayment()) {
+                // TODO: notify user about reduced/0 pot
+                \AppBundle\Classes\NoOp::ignore([]);
+            } elseif ($policy->hasCashback()) {
+                // TODO: if cashback is present, then notify user about status
+                \AppBundle\Classes\NoOp::ignore([]);
+            }
+        } catch (ClaimException $e) {
+            // TODO: If cashback is available, notify user about delay
+            \AppBundle\Classes\NoOp::ignore([]);
+        }
     }
 
     public function cashback(Policy $policy, Cashback $cashback)
@@ -1400,27 +1412,9 @@ class PolicyService
 
     public function createPendingRenewal(Policy $policy, \DateTime $date = null)
     {
-        if (!$date) {
-            $date = new \DateTime();
-        }
-
-        if (!$policy->canCreatePendingRenewal($date)) {
-            throw new \Exception(sprintf('Unable to create a pending renewal for policy %s', $policy->getId()));
-        }
-
-        $newPolicy = new SalvaPhonePolicy();
-        $newPolicy->setPhone($policy->getPhone());
-        $newPolicy->setImei($policy->getImei());
-        $newPolicy->setSerialNumber($policy->getSerialNumber());
-        $newPolicy->setStatus(Policy::STATUS_PENDING_RENEWAL);
-        // don't allow renewal after the end the current policy
-        $newPolicy->setPendingRenewalExpiration($policy->getEnd());
-
         $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
         $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
-        $newPolicy->init($policy->getUser(), $latestTerms);
-
-        $policy->link($newPolicy);
+        $newPolicy = $policy->createPendingRenewal($latestTerms, $date);
 
         $this->dm->persist($newPolicy);
         $this->dm->flush();
