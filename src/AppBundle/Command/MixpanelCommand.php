@@ -44,6 +44,13 @@ class MixpanelCommand extends ContainerAwareCommand
                 'Max Number to process',
                 50
             )
+            ->addOption(
+                'days',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Number of days to keep users',
+                90
+            )
         ;
     }
 
@@ -53,6 +60,7 @@ class MixpanelCommand extends ContainerAwareCommand
         $email = $input->getOption('email');
         $id = $input->getOption('id');
         $process = $input->getOption('process');
+        $days = $input->getOption('days');
         $user = null;
         if ($email) {
             if ($user = $this->getUser($email)) {
@@ -101,7 +109,7 @@ class MixpanelCommand extends ContainerAwareCommand
             $results = $this->getMixpanel()->queueDelete($id);
             $output->writeln(json_encode($results, JSON_PRETTY_PRINT));
         } elseif ($action == 'delete-old-users') {
-            $data = $this->getMixpanel()->deleteOldUsers();
+            $data = $this->getMixpanel()->deleteOldUsers($days);
             $output->writeln(sprintf("Queued %d users for deletion (of %d)", $data['count'], $data['total']));
         } elseif ($action == 'count-users') {
             $total = $this->getMixpanel()->getUserCount();
