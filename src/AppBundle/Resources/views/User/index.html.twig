@@ -131,7 +131,7 @@
                     {% if policy.canInvite %}
                     <div class="user-homepage--section">
                         <h3 class="text-grey-blue">Add Connections</h3>
-                        <p>Want to add a connection? We've made it easy for you to do so with your very own unique sign up link. Click 'Add connection' to get started.</p>
+                        <p>Want to add a connection? We've made it easy for you to do so with your very own unique sign up link. <br> Share the link or click 'Add connection' to get started.</p>
                         {# id="add-connect" used in tests #}
                         <p class="text-center"><a id="add-connect" href="#" class="btn btn-primary " data-toggle="modal" data-target="#inviteModal"><i class="fa fa-plus" aria-hidden="true"></i> Add connection</a></p>
                     </div>
@@ -160,6 +160,23 @@
                                 <div class="help-block with-errors" id="scode-form-code-err"></div>
                             </div>
                         {{ form_end(scode_form) }}
+                    </div>
+                    <div id="scode-box" class="box-border-grey text-center">
+                        <h4>Your invite code</h4>
+                        <form>
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ policy.standardSCode.shareLink }}">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-primary btn-copy"
+                                                data-clipboard-target="#scode"
+                                                data-toggle="tooltip"
+                                                data-placement="bottom"
+                                                >Copy</button>
+                                    </span>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                     {% endif %}
                     <div class="box-border-grey text-center">
