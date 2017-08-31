@@ -86,17 +86,15 @@ $(function() {
     });
 
     if ($('.login-account-kit').data('toggle') == "1") {
+        $('#swap-login').css('visibility', 'visible').find('span').text('mobile');
         $('.login-email').toggle();
         $('.login-account-kit').toggle();
-
-        $('#swap-login').find('span').text('mobile');
     }
     else {
         if (window.location.hash == "#email") {
+            $('#swap-login').css('visibility', 'visible').find('span').text('email');
             $('.login-email').toggle();
             $('.login-account-kit').toggle();
-
-            $('#swap-login').find('span').text('email');
         }
     }
 });
