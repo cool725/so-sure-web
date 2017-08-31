@@ -69,32 +69,30 @@ $.fn.extend({
 
 $(function() {
 
-    $(window).bind("load", function() {
-     // loadAccountKit();
-      //   loadDigits();
-    });
-
     $('#swap-login').on('click', function(evt) {
-
         evt.preventDefault();
-
         $('.login-email').toggle();
         $('.login-account-kit').toggle();
-
         $(this).find('span').toggleText('mobile', 'email');
-
     });
 
-    if ($('.login-account-kit').data('toggle') == "1") {
+    var showMobileLogin = true;
+
+    if ($('.login-account-kit').data('toggle') == "0"
+      || window.location.hash == "#email") {
+        showMobileLogin = false;
+    }
+
+    if (showMobileLogin) {
+        // console.log('Mobile');
         $('#swap-login').css('visibility', 'visible').find('span').text('mobile');
         $('.login-email').toggle();
         $('.login-account-kit').toggle();
-    }
-    else {
-        if (window.location.hash == "#email") {
-            $('#swap-login').css('visibility', 'visible').find('span').text('email');
+    } else {
+        // console.log('Email');
+        $('#swap-login').css('visibility', 'visible').find('span').text('email');
             $('.login-email').toggle();
             $('.login-account-kit').toggle();
-        }
     }
+
 });
