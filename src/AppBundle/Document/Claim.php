@@ -432,11 +432,13 @@ class Claim
         // can have financial and pot reward implications and needs to be checked
         if (in_array($this->status, [self::STATUS_APPROVED, self::STATUS_SETTLED]) &&
             in_array($status, [self::STATUS_DECLINED, self::STATUS_WITHDRAWN])) {
+            // @codingStandardsIgnoreStart
             throw new \InvalidArgumentException(sprintf(
                 'Unable to change from approved/settled status to declined/withdrawn automatically. Review implication and manually update %s/%s',
                 $this->getNumber(),
                 $this->getId()
             ));
+            // @codingStandardsIgnoreEnd
         }
 
         $this->status = $status;

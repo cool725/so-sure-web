@@ -214,10 +214,11 @@ class DaviesService extends S3EmailService
         $errors = $this->validator->validate($claim);
         if (count($errors) > 0) {
             $this->logger->error(sprintf(
-                'Claim %s/%s (status: %s) failed validation. Discarding updates.',
+                'Claim %s/%s (status: %s) failed validation. Discarding updates. Error: %s',
                 $claim->getId(),
                 $daviesClaim->claimNumber,
-                $claim->getStatus()
+                $claim->getStatus(),
+                json_encode($errors)
             ));
             $this->dm->clear();
         }
