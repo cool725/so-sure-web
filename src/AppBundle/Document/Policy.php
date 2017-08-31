@@ -1969,20 +1969,20 @@ abstract class Policy
         return $cliffDate;
     }
 
-    public function hasMonetaryClaimed($includeOpen = false, $includeLinked = false)
+    public function hasMonetaryClaimed($includeApproved = false, $includeLinked = false)
     {
-        $count = count($this->getMonetaryClaimed($includeOpen));
+        $count = count($this->getMonetaryClaimed($includeApproved));
         if ($includeLinked) {
-            $count += count($this->getMonetaryLinkedClaimed($includeOpen));
+            $count += count($this->getMonetaryLinkedClaimed($includeApproved));
         }
         return $count > 0;
     }
 
-    public function getMonetaryClaimed($includeOpen = false)
+    public function getMonetaryClaimed($includeApproved = false)
     {
         $claims = [];
         foreach ($this->claims as $claim) {
-            if ($claim->isMonetaryClaim($includeOpen)) {
+            if ($claim->isMonetaryClaim($includeApproved)) {
                 $claims[] = $claim;
             }
         }
@@ -1990,27 +1990,16 @@ abstract class Policy
         return $claims;
     }
 
-    public function getMonetaryLinkedClaimed($includeOpen = false)
+    public function getMonetaryLinkedClaimed($includeApproved = false)
     {
         $claims = [];
         foreach ($this->linkedClaims as $claim) {
-            if ($claim->isMonetaryClaim($includeOpen)) {
+            if ($claim->isMonetaryClaim($includeApproved)) {
                 $claims[] = $claim;
             }
         }
 
         return $claims;
-    }
-
-    public function isClaimInProgress()
-    {
-        foreach ($this->claims as $claim) {
-            if ($claim->isOpen()) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     public function isExpired()
@@ -2115,7 +2104,7 @@ abstract class Policy
         }
 
         // Any claims must be completed before cancellation is allowed
-        if ($this->isClaimInProgress()) {
+        if ($this->hasOpenClaim()) {
             return false;
         }
 
@@ -2309,7 +2298,7 @@ abstract class Policy
         return false;
     }
 
-    public function getNetworkClaims($monitaryOnly = false, $includeOpen = false)
+    public function getNetworkClaims($monitaryOnly = false, $includeApproved = false)
     {
         $claims = [];
         foreach ($this->getStandardConnections() as $connection) {
@@ -2318,7 +2307,7 @@ abstract class Policy
                 throw new \Exception(sprintf('Invalid connection in policy %s', $this->getId()));
             }
             foreach ($policy->getClaims() as $claim) {
-                if (!$monitaryOnly || $claim->isMonetaryClaim($includeOpen)) {
+                if (!$monitaryOnly || $claim->isMonetaryClaim($includeApproved)) {
                     $claims[] = $claim;
                 }
             }

@@ -820,10 +820,12 @@ class PolicyService
         $closeOpenClaims = false,
         \DateTime $date = null
     ) {
-        if ($closeOpenClaims && $policy->isClaimInProgress()) {
+        if ($closeOpenClaims && $policy->hasOpenClaim()) {
             foreach ($policy->getClaims() as $claim) {
-                $claim->setStatus(Claim::STATUS_PENDING_CLOSED);
-                $this->claimPendingClosedEmail($claim);
+                if ($claim->isOpen()) {
+                    $claim->setStatus(Claim::STATUS_PENDING_CLOSED);
+                    $this->claimPendingClosedEmail($claim);
+                }
             }
             $this->dm->flush();
         }
@@ -1367,20 +1369,24 @@ class PolicyService
 
         $pendingCancellationPolicies = $policyRepo->findPoliciesForPendingCancellation($prefix, false, $date);
         foreach ($pendingCancellationPolicies as $policy) {
-            if ($policy->isClaimInProgress()) {
+            if ($policy->hasOpenClaim()) {
                 foreach ($policy->getClaims() as $claim) {
-                    $this->pendingCancellationEmail($claim, $policy->getPendingCancellation());
-                    $count++;
+                    if ($claim->isOpen()) {
+                        $this->pendingCancellationEmail($claim, $policy->getPendingCancellation());
+                        $count++;
+                    }
                 }
             }
         }
 
         $policies = $policyRepo->findBy(['status' => Policy::STATUS_UNPAID]);
         foreach ($policies as $policy) {
-            if ($policy->shouldCancelPolicy($prefix, $date) && $policy->isClaimInProgress()) {
+            if ($policy->shouldCancelPolicy($prefix, $date) && $policy->hasOpenClaim()) {
                 foreach ($policy->getClaims() as $claim) {
-                    $this->pendingCancellationEmail($claim, $policy->getPolicyExpirationDate());
-                    $count++;
+                    if ($claim->isOpen()) {
+                        $this->pendingCancellationEmail($claim, $policy->getPolicyExpirationDate());
+                        $count++;
+                    }
                 }
             }
         }

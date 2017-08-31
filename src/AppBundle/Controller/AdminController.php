@@ -758,10 +758,9 @@ class AdminController extends BaseController
         if (!in_array($claim->getStatus(), [
             Claim::STATUS_INREVIEW,
             Claim::STATUS_PENDING_CLOSED,
-            Claim::STATUS_APPROVED,
         ])) {
             throw new \Exception(
-                'Claim can only be withdrawn if claim is in-review, approved or pending-closed state'
+                'Claim can only be withdrawn if claim is in-review or pending-closed state'
             );
         }
 
