@@ -163,20 +163,7 @@
                     </div>
                     <div id="scode-box" class="box-border-grey text-center">
                         <h4>Your invite code</h4>
-                        <form>
-                            <div class="form-group">
-                                <div class="input-group">
-                                    <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ policy.standardSCode.shareLink }}">
-                                    <span class="input-group-btn">
-                                        <button class="btn btn-primary btn-copy"
-                                                data-clipboard-target="#scode"
-                                                data-toggle="tooltip"
-                                                data-placement="bottom"
-                                                >Copy</button>
-                                    </span>
-                                </div>
-                            </div>
-                        </form>
+                        <span class="h2 text-blue">{{ policy.standardSCode.code }}</span>
                     </div>
                     {% endif %}
                     <div class="box-border-grey text-center">
