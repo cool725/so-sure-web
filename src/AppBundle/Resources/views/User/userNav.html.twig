@@ -8,7 +8,7 @@
                     {% if policy is defined %}
                         {% if policy.user.getValidPolicies(true) | length == 1 %}
                         <div class="h3 text-white">
-                            <span class="text-nowrap">{{ policy.phone }}</span>
+                            <span class="">{{ policy.phone }}</span>
                         </div>
                         {% else %}
                         <div class="dropdown policy-dropdown-list">
@@ -63,21 +63,21 @@
                             <a href="{{ path('user_contact_details_policy', {'policyId': policy.id}) }}">Contact Details</a>
                         {% else %}
                             <a href="{{ path('user_contact_details') }}">Contact Details</a>
-                        {% endif %}                    
+                        {% endif %}
                     </li>
                     <li role="presentation" class="{% if app.request.get('_route') == 'user_card_details' or app.request.get('_route') == 'user_card_details_policy' %}active{% endif %}">
                         {% if policy is defined %}
                             <a href="{{ path('user_card_details_policy', {'policyId': policy.id}) }}">Payment Details</a>
                         {% else %}
                             <a href="{{ path('user_card_details') }}">Payment Details</a>
-                        {% endif %}                    
+                        {% endif %}
                     </a></li>
                     <li role="presentation" class="{% if app.request.get('_route') == 'user_policy_list' or app.request.get('_route') == 'user_policy_list_policy' %}active{% endif %}">
                         {% if policy is defined %}
                             <a href="{{ path('user_policy_list_policy', {'policyId': policy.id}) }}">My Policies</a>
                         {% else %}
                             <a href="{{ path('user_policy_list') }}">My Policies</a>
-                        {% endif %}                    
+                        {% endif %}
                     </a></li>
                     {% if policy is defined %}
                         {% if feature_enabled('renewal') and policy.displayRenewal %}

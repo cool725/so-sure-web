@@ -118,22 +118,17 @@ a {
 		position: relative;
 	}
 
-	@include breakpoint(mobileishup) {
-
-		.box-border-grey {
-			padding: 15px;
-			margin-bottom: 25px;
-			background-color: $white;
-			border: 2px solid $grey-light;
-			@include border-radius(4px);
-		}
-
-	    .box-border--highlight {
-	        border-color: $blue;
-	    }
-
+	.box-border-grey {
+		padding: 15px;
+		margin-bottom: 25px;
+		background-color: $white;
+		border: 2px solid $grey-light;
+		@include border-radius(4px);
 	}
 
+    .box-border--highlight {
+        border-color: $blue;
+    }
 
 
 // Fixes (Overide external plugins etc)
