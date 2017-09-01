@@ -94,14 +94,13 @@ $(function() {
     // When clicking the sms login check window opens if not provide temp message
     $('#sms-login__btn').on('click', function(e) {
         e.preventDefault();
-
-        smsLogin();
-
         $('#sms-login__warning').show();
+        smsLogin();
+    });
 
-        $(window).blur(function() {
-            $('#sms-login__warning').hide();
-        });
+    // Hide warning if we leave the window
+    $(window).blur(function() {
+        $('#sms-login__warning').hide();
     });
 
 });
