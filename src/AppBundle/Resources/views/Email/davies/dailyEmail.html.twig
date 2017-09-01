@@ -12,6 +12,35 @@
            <h2>Daily Claims Report</h2>
            <h3>Last received daily export: {% if latestFile %}{{ latestFile.created|date('d M Y H:i', 'Europe/London') }}{% else %}Unknown{%endif%}</h3>
            <h3>Last successful daily export: {% if successFile %}{{ successFile.created|date('d M Y H:i', 'Europe/London') }}{% else %}Unknown{%endif%}</h3>
+
+		   {% if errors|length > 0 %}
+		   <div style="font-size: 14px; text-align: left;"><font face="arial, helvetica neue, helvetica, sans-serif">
+			   <h3>Errors in last import</h3>
+			{% for claimNumber,msgs in errors %}
+				 <p>Claim: {{ claimNumber }}</p>
+					 <ul>
+						 {% for msg in msgs %}
+							 <li>{{ msg }}</li>
+						 {% endfor %}
+					 </ul>
+			 {% endfor %}
+		   </div>
+		   {% endif %}
+
+		   {% if warnings|length > 0 %}
+		   <div style="font-size: 14px; text-align: left;"><font face="arial, helvetica neue, helvetica, sans-serif">
+			   <h3>Warnings in last import</h3>
+			{% for claimNumber,msgs in warnings %}
+				 <p>Claim: {{ claimNumber }}</p>
+					 <ul>
+						 {% for msg in msgs %}
+							 <li>{{ msg }}</li>
+						 {% endfor %}
+					 </ul>
+			 {% endfor %}
+		   </div>
+		   {% endif %}
+
            {% if claims|length == 0 %}
                <p>No outstanding claims</p>
            {% endif %}
@@ -31,19 +60,6 @@
            {% endfor %}
 		   </div>
 
-		   <div style="font-size: 14px; text-align: left;"><font face="arial, helvetica neue, helvetica, sans-serif">
-		   {% if errors|length > 0 %}
-			   <h3>Warnings/Errors in last import</h3>
-			{% for claimNumber,msgs in errors %}
-				 <p>Claim: {{ claimNumber }}</p>
-					 <ul>
-						 {% for msg in msgs %}
-							 <li>{{ msg }}</li>
-						 {% endfor %}
-					 </ul>
-			 {% endfor %}
-		   {% endif %}
-		   </div>
 		</div>
 	{{ macros.end_table() }}
 	{{ macros.email_button_table(url('admin_claims'), "View Claims", "View Claims")}}
