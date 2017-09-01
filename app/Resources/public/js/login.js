@@ -70,12 +70,14 @@ $.fn.extend({
 
 $(function() {
 
+    // Action of button to toggle between login screens
     $('#swap-login').on('click', function(e) {
         e.preventDefault();
         $('.login-email, .login-account-kit').toggle();
         $(this).find('span').toggleText('mobile', 'email');
     });
 
+    // Check the data attr for account kit || check the url
     var showMobileLogin = true;
 
     if ($('.login-account-kit').data('toggle') == "0"
@@ -83,11 +85,13 @@ $(function() {
         showMobileLogin = false;
     }
 
+    // Swap to email
     if (showMobileLogin == false) {
         $('.login-email, .login-account-kit').toggle();
         $('#swap-login span').toggleText('mobile', 'email');
     }
 
+    // When clicking the sms login check window opens if not provide temp message
     $('#sms-login__btn').on('click', function(e) {
         e.preventDefault();
 
