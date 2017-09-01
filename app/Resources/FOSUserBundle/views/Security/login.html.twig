@@ -14,7 +14,12 @@
         <span class="help-block text-center"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> UK numbers only</span>
     </div>
     <div class="form-group">
-        <button onclick="smsLogin();" class="btn btn-success btn-block">Login via SMS</button>
+        <button id="sms-login__btn" onclick="smsLogin();" class="btn btn-success btn-block">Login via SMS</button>
+    </div>
+    <div id="sms-login__warning" class="form-group" style="display: none;">
+        <div class="help-block">
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Opening a new window there may be a small delay
+        </div>
     </div>
 </div>
 

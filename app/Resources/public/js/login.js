@@ -88,4 +88,14 @@ $(function() {
         $('#swap-login span').toggleText('mobile', 'email');
     }
 
+    $('#sms-login__btn').on('click', function(e) {
+        e.preventDefault();
+
+        $('#sms-login__warning').show();
+
+        $(window).blur(function() {
+            $('#sms-login__warning').hide();
+        });
+    });
+
 });
