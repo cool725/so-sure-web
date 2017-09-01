@@ -838,6 +838,17 @@ abstract class Policy
         return $connections;
     }
 
+    public function isConnected(Policy $policy)
+    {
+        foreach ($this->getStandardConnections() as $connection) {
+            if ($connection->getLinkedPolicy()->getId() == $policy->getId()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * In the case of multiple policies get the connections where the user is the same
      */
@@ -2559,7 +2570,10 @@ abstract class Policy
         }
 
         foreach ($this->getPreviousPolicy()->getStandardConnections() as $connection) {
-            $this->addRenewalConnection($connection->createRenewal());
+            if (in_array($connection->getLinkedPolicy()->getStatus(), [self::STATUS_ACTIVE, self::STATUS_UNPAID]) &&
+                $connection->getLinkedPolicy()->isConnected($this->getPreviousPolicy())) {
+                $this->addRenewalConnection($connection->createRenewal());
+            }
         }
     }
 
@@ -2597,6 +2611,20 @@ abstract class Policy
         }
 
         $this->setStatus(Policy::STATUS_ACTIVE);
+
+        foreach ($this->getRenewalConnections() as $connection) {
+            if ($connection->getRenew()) {
+                $newConnection = new StandardConnection();
+                $newConnection->setLinkedUser($connection->getLinkedUser());
+                $newConnection->setLinkedPolicy($connection->getLinkedPolicy());
+                $newConnection->setValue($this->getAllowedConnectionValue($date));
+                $newConnection->setPromoValue($this->getAllowedPromoConnectionValue($date));
+                $newConnection->setExcludeReporting(!$this->isValidPolicy());
+                $this->addConnection($newConnection);
+            }
+        }
+
+        $this->updatePotValue();
     }
 
     abstract public function setPolicyDetailsForPendingRenewal(Policy $policy);
@@ -2608,7 +2636,7 @@ abstract class Policy
         }
 
         if (!$this->canCreatePendingRenewal($date)) {
-            throw new \Exception(sprintf('Unable to create a pending renewal for policy %s', $policy->getId()));
+            throw new \Exception(sprintf('Unable to create a pending renewal for policy %s', $this->getId()));
         }
 
         $newPolicy = new static();
@@ -2764,6 +2792,7 @@ abstract class Policy
 
         // Update cashback state
         if ($this->hasCashback()) {
+            // TODO: What about already invalid cashback details (STATUS_FAILED)
             if ($this->areEqualToTwoDp($this->getCashback()->getAmount(), $this->getPotValue())) {
                 $this->getCashback()->setStatus(Cashback::STATUS_PENDING_PAYMENT);
             } else {

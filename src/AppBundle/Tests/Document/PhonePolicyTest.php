@@ -533,31 +533,6 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(0, $policy->calculatePotValue());
     }
 
-    protected function createLinkedConnections($policyA, $policyB, $valueA, $valueB)
-    {
-        $connectionA = new StandardConnection();
-        $connectionA->setValue($valueA);
-        if ($valueA > 10) {
-            $connectionA->setValue(10);
-            $connectionA->setPromoValue($valueA - 10);
-        }
-        $connectionA->setLinkedUser($policyB->getUser());
-        $connectionA->setLinkedPolicy($policyB);
-        $policyA->addConnection($connectionA);
-
-        $connectionB = new StandardConnection();
-        $connectionB->setValue($valueB);
-        if ($valueB > 10) {
-            $connectionB->setValue(10);
-            $connectionB->setPromoValue($valueB - 10);
-        }
-        $connectionB->setLinkedUser($policyA->getUser());
-        $connectionB->setLinkedPolicy($policyA);
-        $policyB->addConnection($connectionB);
-
-        return [$connectionA, $connectionB];
-    }
-
     public function testCalculatePotValueOneConnection()
     {
         $policyA = static::createUserPolicy();
