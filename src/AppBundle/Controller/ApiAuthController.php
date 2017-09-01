@@ -26,6 +26,7 @@ use AppBundle\Document\MultiPay;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Document\File\PicSureFile;
+use AppBundle\Document\Connection\Connection;
 
 use AppBundle\Document\PhoneTrait;
 
@@ -1038,6 +1039,54 @@ class ApiAuthController extends BaseController
             );
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api picsureAction.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
+     * @Route("/policy/{id}/reconnect/{connectionId}", name="api_auth_reconnect")
+     * @Method({"POST"})
+     */
+    public function reconnectAction(Request $request, $id, $connectionId)
+    {
+        try {
+            $data = json_decode($request->getContent(), true)['body'];
+            if (!$this->validateFields($data, ['renew'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+            $renew = $this->getDataBool($data, 'renew');
+            if ($renew === null) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, 'Unknown renew value', 422);                
+            }
+
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(Policy::class);
+            $policy = $repo->find($id);
+            if (!$policy) {
+                throw new NotFoundHttpException();
+            }
+            $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
+
+            $connectionRepo = $dm->getRepository(Connection::class);
+            $connection = $repo->find($connectionId);
+            if (!$connection) {
+                throw new NotFoundHttpException();
+            }
+            $connection->setRenew($renew);
+            $dm->flush();
+
+            return new JsonResponse($policy->toApiArray());
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (NotFoundHttpException $e) {
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_NOT_FOUND,
+                'Unable to find policy/connection',
+                404
+            );
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api reconnectAction.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
