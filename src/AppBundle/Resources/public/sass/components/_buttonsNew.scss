@@ -79,6 +79,10 @@
 	}
 }
 
+.btn-link-white {
+	@include btn(transparent, $white, $white);
+}
+
 // Others
 
 .btn-arrow-right {
