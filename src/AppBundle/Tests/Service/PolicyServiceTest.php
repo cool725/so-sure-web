@@ -1582,4 +1582,97 @@ class PolicyServiceTest extends WebTestCase
             $renewalPolicyB->getPolicyExpirationDate(new \DateTime('2017-01-01'))
         );
     }
+
+    public function testNotReconnectedDoesNotAppear()
+    {
+        $userA = static::createUser(
+            static::$userManager,
+            static::generateEmail('testNotReconnectedDoesNotAppearA', $this),
+            'bar',
+            static::$dm
+        );
+        $userB = static::createUser(
+            static::$userManager,
+            static::generateEmail('testNotReconnectedDoesNotAppearB', $this),
+            'bar',
+            static::$dm
+        );
+        $policyA = static::initPolicy(
+            $userA,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+        $policyB = static::initPolicy(
+            $userB,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-02-15'),
+            true
+        );
+
+        $policyA->setStatus(PhonePolicy::STATUS_PENDING);
+        $policyB->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policyA, new \DateTime('2016-01-01'), true);
+        static::$policyService->create($policyB, new \DateTime('2016-02-15'), true);
+        static::$policyService->setEnvironment('test');
+        static::$dm->flush();
+
+        list($connectionA, $connectionB) = $this->createLinkedConnections($policyA, $policyB, 10, 10);
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policyA->getStatus());
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policyB->getStatus());
+
+        $renewalPolicyA = static::$policyService->createPendingRenewal(
+            $policyA,
+            new \DateTime('2016-12-15')
+        );
+        $renewalPolicyB = static::$policyService->createPendingRenewal(
+            $policyB,
+            new \DateTime('2017-02-01')
+        );
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyA->getStatus());
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyB->getStatus());
+
+        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-30'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+        $this->assertNull($renewalPolicyA->getPendingCancellation());
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(Policy::class);
+        $updatedRenewalPolicyA = $policyRepo->find($renewalPolicyA->getId());
+        $updatedRenewalPolicyB = $policyRepo->find($renewalPolicyB->getId());
+
+        $foundRenewalConnection = false;
+        foreach ($updatedRenewalPolicyA->getRenewalConnections() as $connection) {
+            $this->assertTrue($connection->getRenew());
+            $foundRenewalConnection = true;
+            $connection->setRenew(false);
+        }
+        $this->assertTrue($foundRenewalConnection);
+        static::$dm->flush();
+
+        static::$policyService->renew($policyB, 12, null, new \DateTime('2017-01-30'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
+        $this->assertNull($renewalPolicyB->getPendingCancellation());
+
+        $foundRenewalConnection = false;
+        foreach ($updatedRenewalPolicyB->getRenewalConnections() as $connection) {
+            $foundRenewalConnection = true;
+        }
+        $this->assertFalse($foundRenewalConnection);
+
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-02-15'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
+
+        $this->assertEquals(0, $renewalPolicyA->getPotValue());
+        $this->assertEquals(0, $renewalPolicyB->getPotValue());
+    }
 }
