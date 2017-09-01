@@ -144,8 +144,8 @@ a {
 		min-height: 250px;
 		max-width: 345px;
 		margin: 0 auto;
-	}
 
-	#swap-login {
-		visibility: hidden;
+		&--controls {
+			min-height: 0;
+		}
 	}

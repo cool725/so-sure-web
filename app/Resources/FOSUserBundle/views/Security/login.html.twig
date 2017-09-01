@@ -10,11 +10,11 @@
         <input type="hidden" value="+44" id="country_code" class="form-control" />
     </div>
     <div class="form-group">
-        <input placeholder="Mobile number" id="phone_number" class="form-control" />
+        <input placeholder="Mobile number" id="phone_number" class="form-control input-lg" />
         <span class="help-block text-center"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> UK numbers only</span>
     </div>
     <div class="form-group">
-        <button onclick="smsLogin();" class="btn btn-success">Login via SMS</button>
+        <button onclick="smsLogin();" class="btn btn-success btn-block">Login via SMS</button>
     </div>
 </div>
 
@@ -24,35 +24,37 @@
     <form class="" action="{{ path("fos_user_security_check") }}#email" method="post">
         <input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
         <div class="form-group">
-            <input type="email" id="username" name="_username" value="{{ last_username }}" required="required" placeholder="Email Address" class="form-control" />
+            <input type="email" id="username" name="_username" value="{{ last_username }}" required="required" placeholder="Email Address" class="form-control input-lg" />
         </div>
         <div class="form-group">
-            <input type="password" id="password" name="_password" required="required" placeholder="Password" class="form-control" />
+            <input type="password" id="password" name="_password" required="required" placeholder="Password" class="form-control input-lg" />
         </div>
         {% if error %}
             <div class="error-text" style="padding-bottom: 10px;">Looks like the email address or password you’ve entered is incorrect. Please try again.</div>
         {% endif %}
+        <div class="form-group">
+            <input type="submit" id="_submit" name="_submit" value="Login" class="btn btn-success btn-block"/>
+        </div>
+        <div class="form-group">
+            <small><a class="btn btn-link btn-xs" href="{{ path('fos_user_resetting_request') }}">Forgot password?</a></small>
+        </div>
         <div class="form-group">
             <label for="remember_me">
                 <input type="checkbox" id="remember_me" name="_remember_me" value="on" {% if app.request.clientIp == davies_ip %}checked{% endif %} />
                 Remember me
             </label>
         </div>
-        <div class="form-group">
-            <input type="submit" id="_submit" name="_submit" value="Login" class="btn btn-success"/>
-        </div>
-        <div class="form-group">
-            <small><a href="{{ path('fos_user_resetting_request') }}">Forgot password?</a></small>
-        </div>
     </form>
 </div>
 
-<div class="swap-login-wrapper form-group">
-    <a href="#" id="swap-login" class="btn btn-primary-hollow">Prefer <span>email</span> login?</a>
-</div>
+<div class="login-box login-box--controls">
+    <div class="swap-login-wrapper form-group">
+        <a href="#" id="swap-login" class="btn btn-primary-hollow btn-block">Prefer <span>email</span> login?</a>
+    </div>
 
-<div class="form-group">
-    <a href="#" onclick="fb_login();" class="btn btn-facebook"><i class="fa fa-facebook-official"></i> &nbsp;Login with Facebook</a>
+    <div class="form-group">
+        <a href="#" onclick="fb_login();" class="btn btn-facebook btn-block"><i class="fa fa-facebook-official"></i> &nbsp;Login with Facebook</a>
+    </div>
 </div>
 
 <script src="https://sdk.accountkit.com/en_US/sdk.js"></script>
