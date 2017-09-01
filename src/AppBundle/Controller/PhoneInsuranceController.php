@@ -128,6 +128,25 @@ class PhoneInsuranceController extends BaseController
             ksort($phonesMem[$phone->getName()]['mem']);
         }
 
+        $template = 'AppBundle:PhoneInsurance:makeInsurance.html.twig';
+        if (in_array($request->get('_route'), ['insure_make'])) {
+            $exp = $this->get('app.sixpack')->participate(
+                SixpackService::EXPERIMENT_CPC_MANUFACTURER_WITH_HOME,
+                ['home', 'top', 'bottom'],
+                false
+            );
+            if ($request->get('force')) {
+                $exp = $request->get('force');
+            }
+            if ($exp == 'home') {
+                return new RedirectResponse($this->generateUrl('homepage'));
+            } elseif ($exp == 'top') {
+                $template = 'AppBundle:PhoneInsurance:makeInsuranceTop.html.twig';
+            } elseif ($exp == 'bottom') {
+                $template = 'AppBundle:PhoneInsurance:makeInsuranceBottom.html.twig';
+            }
+        }
+
         $event = MixpanelService::EVENT_MANUFACTURER_PAGE;
         if (in_array($request->get('_route'), ['insure_make'])) {
             $event = MixpanelService::EVENT_CPC_MANUFACTURER_PAGE;
@@ -135,8 +154,9 @@ class PhoneInsuranceController extends BaseController
         $this->get('app.mixpanel')->queueTrackWithUtm($event, [
             'Manufacturer' => $make,
         ]);
+        $data = ['phones' => $phonesMem, 'make' => $make];
 
-        return array('phones' => $phonesMem, 'make' => $make);
+        return $this->render($template, $data);
     }
 
     /**
@@ -243,41 +263,13 @@ class PhoneInsuranceController extends BaseController
             ], UrlGeneratorInterface::ABSOLUTE_URL));
         }
 
+        // We have run various tests for cpc traffic in the page where both manufacturer and homepage
+        // outperformed quote page. Also homepage was better than manufacturer page
         if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
-            if (in_array($make, ["Samsung", "Apple"])) {
-                $exp = $this->get('app.sixpack')->participate(
-                    SixpackService::EXPERIMENT_CPC_MANUFACTURER_HOME,
-                    ['cpc-manufacturer', 'home'],
-                    false
-                );
-                if ($exp == 'cpc-manufacturer') {
-                    return new RedirectResponse($this->generateUrl('insure_make', ['make' => $phone->getMake()]));
-                } else {
-                    return new RedirectResponse($this->generateUrl('homepage'));
-                }
-                // return new RedirectResponse($this->generateUrl('insure_make', ['make' => 'Samsung']));
-                /*
-                $exp = $this->get('app.sixpack')->participate(
-                    SixpackService::EXPERIMENT_CPC_QUOTE_MANUFACTURER,
-                    ['cpc-quote', 'cpc-manufacturer'],
-                    true
-                );
-                if ($exp == 'cpc-manufacturer') {
-                    return new RedirectResponse($this->generateUrl('insure_make', ['make' => 'Samsung']));
-                }
-                */
+            if (in_array($make, ["Samsung", "Apple", "OnePlus", "Sony"])) {
+                return new RedirectResponse($this->generateUrl('insure_make', ['make' => $phone->getMake()]));
             } else {
                 return new RedirectResponse($this->generateUrl('homepage'));
-                /*
-                $exp = $this->get('app.sixpack')->participate(
-                    SixpackService::EXPERIMENT_LANDING_HOME,
-                    ['landing', 'home'],
-                    true
-                );
-                if ($exp == 'home') {
-                    return new RedirectResponse($this->generateUrl('homepage'));
-                }
-                */
             }
         }
         /*
