@@ -42,6 +42,7 @@ abstract class S3EmailService
     /** @var string */
     protected $environment;
 
+    protected $warnings = [];
     protected $errors = [];
 
     public function setDm($dm)
@@ -79,6 +80,16 @@ abstract class S3EmailService
         $this->path = sprintf('%s/%s', $pathPrefix, $this->environment);
     }
 
+    public function getWarnings()
+    {
+        return $this->warnings;
+    }
+
+    public function clearWarnings()
+    {
+        $this->warnings = [];
+    }
+
     public function getErrors()
     {
         return $this->errors;
@@ -100,6 +111,7 @@ abstract class S3EmailService
         $lines = [];
         $keys = $this->listS3();
         foreach ($keys as $key) {
+            $this->clearWarnings();
             $this->clearErrors();
             $lines[] = sprintf('Processing %s/%s', $this->path, $key);
             $processed = false;

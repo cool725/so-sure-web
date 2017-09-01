@@ -71,14 +71,14 @@ class DaviesService extends S3EmailService
         $claims = [];
         foreach ($daviesClaims as $daviesClaim) {
             if (isset($claims[$daviesClaim->getPolicyNumber()]) &&
-                $claims[$daviesClaim->getPolicyNumber()] &&
-                $daviesClaim->isOpen()) {
-                $msg = sprintf(
-                    'There are multiple open claims against policy %s',
-                    $daviesClaim->getPolicyNumber()
-                );
-                $this->errors[$daviesClaim->claimNumber][] = $msg;
-                $this->logger->warning($msg);
+                $claims[$daviesClaim->getPolicyNumber()]) {
+                if ($daviesClaim->isOpen()) {
+                    $msg = sprintf(
+                        'There are multiple open claims against policy %s. Validate status of all.',
+                        $daviesClaim->getPolicyNumber()
+                    );
+                    $this->warnings[$daviesClaim->claimNumber][] = $msg;
+                }
             }
             $claims[$daviesClaim->getPolicyNumber()] = $daviesClaim->isOpen();
         }
@@ -249,6 +249,12 @@ class DaviesService extends S3EmailService
                 $daviesClaim->claimNumber
             ));
         }
+        if ($daviesClaim->replacementReceivedDate && $daviesClaim->replacementReceivedDate < $daviesClaim->lossDate) {
+            throw new \Exception(sprintf(
+                'Claim %s has a replacement received date prior to loss date',
+                $daviesClaim->claimNumber
+            ));
+        }
 
         $now = new \DateTime();
         if ($daviesClaim->isOpen() || ($daviesClaim->dateClosed && $daviesClaim->dateClosed->diff($now)->days < 5)) {
@@ -275,8 +281,7 @@ class DaviesService extends S3EmailService
                     $claim->getPolicy()->getUser()->getName(),
                     $percent
                 );
-                $this->logger->warning($msg);
-                $this->errors[$daviesClaim->claimNumber][] = $msg;
+                $this->warnings[$daviesClaim->claimNumber][] = $msg;
             }
 
             if ($daviesClaim->riskPostCode && !$this->postcodeCompare(
@@ -289,8 +294,7 @@ class DaviesService extends S3EmailService
                     $daviesClaim->riskPostCode,
                     $claim->getPolicy()->getUser()->getBillingAddress()->getPostCode()
                 );
-                $this->logger->warning($msg);
-                $this->errors[$daviesClaim->claimNumber][] = $msg;
+                $this->warnings[$daviesClaim->claimNumber][] = $msg;
             }
         }
 
@@ -363,8 +367,7 @@ class DaviesService extends S3EmailService
                     $daviesClaim->replacementReceivedDate->format(\DateTime::ATOM),
                     $ago->format(\DateTime::ATOM)
                 );
-                $this->logger->warning($msg);
-                $this->errors[$daviesClaim->claimNumber][] = $msg;
+                $this->warnings[$daviesClaim->claimNumber][] = $msg;
             }
         }
     }
@@ -426,7 +429,7 @@ class DaviesService extends S3EmailService
             if (!$policy->getImeiReplacementDate()) {
                 throw new \Exception(sprintf(
                     'Expected imei replacement date for policy %s',
-                    $policy->getId()
+                    $policy->getPolicyNumber()
                 ));
             }
 
@@ -465,7 +468,8 @@ class DaviesService extends S3EmailService
                 'claims' => $claims,
                 'latestFile' => $latestFile,
                 'successFile' => $successFile,
-                'errors' => $this->errors
+                'warnings' => $this->warnings,
+                'errors' => $this->errors,
             ]
         );
 
