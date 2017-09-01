@@ -177,13 +177,13 @@ class DaviesServiceTest extends WebTestCase
         $daviesOpen->policyNumber = '1';
         $daviesOpen->status = 'Open';
 
-        self::$daviesService->clearErrors();
+        self::$daviesService->clearWarnings();
 
-        $this->assertEquals(0, count(self::$daviesService->getErrors()));
+        $this->assertEquals(0, count(self::$daviesService->getWarnings()));
         self::$daviesService->saveClaims(1, [$daviesOpen, $daviesOpen]);
-        $this->assertEquals(1, count(self::$daviesService->getErrors()));
+        $this->assertEquals(1, count(self::$daviesService->getWarnings()));
 
-        $this->insureErrorExists('/multiple open claims against policy/');
+        $this->insureWarningExists('/multiple open claims against policy/');
     }
 
     public function testSaveClaimsSaveException()
@@ -378,6 +378,29 @@ class DaviesServiceTest extends WebTestCase
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
     }
 
+    /**
+     * @expectedException \Exception
+     */
+    public function testValidateClaimDetailsInvalidReceivedDate()
+    {
+        $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        $policy->addClaim($claim);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = 1;
+        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->incurred = 0;
+        $daviesClaim->reserved = 0;
+        $daviesClaim->lossDate = new \DateTime('2017-07-01');
+        $daviesClaim->replacementReceivedDate = new \DateTime('2017-06-01');
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+    }
+
     public function testValidateClaimDetailsInvalidPostcode()
     {
         $policy = static::createUserPolicy(true);
@@ -392,7 +415,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->status = DaviesClaim::STATUS_OPEN;
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $this->insureErrorExists('/does not match expected postcode/');
+        $this->insureWarningExists('/does not match expected postcode/');
     }
 
     public function testValidateClaimDetailsInvalidPostcodeClosedRecent()
@@ -412,7 +435,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->dateClosed = $yesterday;
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $this->insureErrorExists('/does not match expected postcode/');
+        $this->insureWarningExists('/does not match expected postcode/');
     }
 
     public function testValidateClaimDetailsInvalidPostcodeClosedOld()
@@ -626,7 +649,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->replacementReceivedDate = new \DateTime('2016-01-01');
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $this->insureErrorExists('/delayed replacement date/');
+        $this->insureWarningExists('/delayed replacement date/');
     }
 
     public function testPostValidateClaimDetailsReceivedDate()
@@ -772,6 +795,32 @@ class DaviesServiceTest extends WebTestCase
         $now = new \DateTime();
         $yesterday = $this->subBusinessDays($now, 1);
         $this->assertEquals($yesterday, $claim->getApprovedDate());
+    }
+
+    private function insureWarningExists($warningRegEx)
+    {
+        $this->insureWarningExistsOrNot($warningRegEx, true);
+    }
+
+    private function insureWarningDoesNotExist($warningRegEx)
+    {
+        $this->insureWarningExistsOrNot($warningRegEx, false);
+    }
+
+    private function insureWarningExistsOrNot($warningRegEx, $exists)
+    {
+        $foundMatch = false;
+        foreach (self::$daviesService->getWarnings() as $warning) {
+            $matches = preg_grep($warningRegEx, $warning);
+            if (count($matches) > 0) {
+                $foundMatch = true;
+            }
+        }
+        if ($exists) {
+            $this->assertTrue($foundMatch);
+        } else {
+            $this->assertFalse($foundMatch);
+        }
     }
 
     private function insureErrorExists($errorRegEx)
