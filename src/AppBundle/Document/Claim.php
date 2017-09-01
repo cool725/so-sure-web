@@ -428,6 +428,19 @@ class Claim
             ));
         }
 
+        // Don't trust davies enough with data - changing from approved / settled to declined / withdrawn
+        // can have financial and pot reward implications and needs to be checked
+        if (in_array($this->status, [self::STATUS_APPROVED, self::STATUS_SETTLED]) &&
+            in_array($status, [self::STATUS_DECLINED, self::STATUS_WITHDRAWN])) {
+            // @codingStandardsIgnoreStart
+            throw new \InvalidArgumentException(sprintf(
+                'Unable to change from approved/settled status to declined/withdrawn automatically. Review implication and manually update %s/%s',
+                $this->getNumber(),
+                $this->getId()
+            ));
+            // @codingStandardsIgnoreEnd
+        }
+
         $this->status = $status;
     }
 
@@ -837,10 +850,10 @@ class Claim
         $this->charges[] = $charge;
     }
 
-    public function isMonetaryClaim($includeOpen = false)
+    public function isMonetaryClaim($includeApproved = false)
     {
         $statuses = [self::STATUS_SETTLED];
-        if ($includeOpen) {
+        if ($includeApproved) {
             $statuses[] = self::STATUS_APPROVED;
         }
 
