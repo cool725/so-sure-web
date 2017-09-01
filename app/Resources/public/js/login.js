@@ -91,6 +91,8 @@ $(function() {
     $('#sms-login__btn').on('click', function(e) {
         e.preventDefault();
 
+        smsLogin();
+
         $('#sms-login__warning').show();
 
         $(window).blur(function() {
