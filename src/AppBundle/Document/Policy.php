@@ -2599,14 +2599,14 @@ abstract class Policy
         $this->setStatus(Policy::STATUS_ACTIVE);
 
         foreach ($this->getRenewalConnections() as $connection) {
-            if ($connection->getRenewed()) {
+            if ($connection->getRenew()) {
                 $newConnection = new StandardConnection();
                 $newConnection->setLinkedUser($connection->getLinkedUser());
                 $newConnection->setLinkedPolicy($connection->getLinkedPolicy());
                 $newConnection->setValue($this->getAllowedConnectionValue($date));
                 $newConnection->setPromoValue($this->getAllowedPromoConnectionValue($date));
                 $newConnection->setExcludeReporting(!$this->isValidPolicy());
-                $this->addConnection($newConnection);                
+                $this->addConnection($newConnection);
             }
         }
 

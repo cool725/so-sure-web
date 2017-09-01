@@ -13,6 +13,7 @@ use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Payment\SoSurePayment;
 use AppBundle\Document\ImeiTrait;
 use AppBundle\Document\Reward;
+use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Classes\Salva;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
@@ -345,5 +346,30 @@ trait UserClassTrait
         static::$dm->flush();
 
         return $reward;
+    }
+
+    protected function createLinkedConnections($policyA, $policyB, $valueA, $valueB)
+    {
+        $connectionA = new StandardConnection();
+        $connectionA->setValue($valueA);
+        if ($valueA > 10) {
+            $connectionA->setValue(10);
+            $connectionA->setPromoValue($valueA - 10);
+        }
+        $connectionA->setLinkedUser($policyB->getUser());
+        $connectionA->setLinkedPolicy($policyB);
+        $policyA->addConnection($connectionA);
+
+        $connectionB = new StandardConnection();
+        $connectionB->setValue($valueB);
+        if ($valueB > 10) {
+            $connectionB->setValue(10);
+            $connectionB->setPromoValue($valueB - 10);
+        }
+        $connectionB->setLinkedUser($policyA->getUser());
+        $connectionB->setLinkedPolicy($policyA);
+        $policyB->addConnection($connectionB);
+
+        return [$connectionA, $connectionB];
     }
 }
