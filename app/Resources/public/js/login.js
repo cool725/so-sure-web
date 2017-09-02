@@ -1,49 +1,50 @@
- AccountKit_OnInteractive = function(){
+AccountKit_OnInteractive = function(){
     AccountKit.init(
-      {
-        appId: $('.login-account-kit').data('key'),
-        state:$('.login-account-kit').data('csrf'),
-        version:"v1.0",
-        fbAppEventsEnabled:true
-      }
+        {
+            appId: $('.login-account-kit').data('key'),
+            state:$('.login-account-kit').data('csrf'),
+            version:"v1.0",
+            fbAppEventsEnabled:true
+        }
     );
-  };
+};
 
-  // login callback
-  function loginCallback(response) {
+// login callback
+function loginCallback(response) {
     if (response.status === "PARTIALLY_AUTHENTICATED") {
-      $('#accountkit-code').val(response.code);
-      $('#accountkit-csrf').val(response.state);
-      $('#accountkit-form').submit();
+        $('#accountkit-code').val(response.code);
+        $('#accountkit-csrf').val(response.state);
+        $('#accountkit-form').submit();
     }
     else if (response.status === "NOT_AUTHENTICATED") {
-      // handle authentication failure
+        // handle authentication failure
     }
     else if (response.status === "BAD_PARAMS") {
-      // handle bad parameters
+        // handle bad parameters
     }
-  }
+}
 
-  // phone form submission handler
-  function smsLogin() {
+// phone form submission handler
+function smsLogin() {
     var countryCode = document.getElementById("country_code").value;
     var phoneNumber = document.getElementById("phone_number").value;
     AccountKit.login(
-      'PHONE',
-      {countryCode: countryCode, phoneNumber: phoneNumber}, // will use default values if not specified
-      loginCallback
+        'PHONE',
+        {countryCode: countryCode, phoneNumber: phoneNumber}, // will use default values if not specified
+        loginCallback
     );
-  }
+}
+
 function onLogin(loginResponse) {
-  // Send headers to your server and validate user by calling Digits API
-  var oAuthHeaders = loginResponse.oauth_echo_headers;
-  var verifyData = {
-    credentials: oAuthHeaders['X-Verify-Credentials-Authorization'],
-    provider: oAuthHeaders['X-Auth-Service-Provider']
-  };
-  $('#credentials').val(verifyData.credentials);
-  $('#provider').val(verifyData.provider);
-  $('#digits-form').submit();
+    // Send headers to your server and validate user by calling Digits API
+    var oAuthHeaders = loginResponse.oauth_echo_headers;
+    var verifyData = {
+        credentials: oAuthHeaders['X-Verify-Credentials-Authorization'],
+        provider: oAuthHeaders['X-Auth-Service-Provider']
+    };
+    $('#credentials').val(verifyData.credentials);
+    $('#provider').val(verifyData.provider);
+    $('#digits-form').submit();
 }
 
 var loadDigitsInterval;
@@ -69,34 +70,37 @@ $.fn.extend({
 
 $(function() {
 
-    $(window).bind("load", function() {
-     // loadAccountKit();
-      //   loadDigits();
-    });
-
-    $('#swap-login').on('click', function(evt) {
-
-        evt.preventDefault();
-
-        $('.login-email').toggle();
-        $('.login-account-kit').toggle();
-
+    // Action of button to toggle between login screens
+    $('#swap-login').on('click', function(e) {
+        e.preventDefault();
+        $('.login-email, .login-account-kit').toggle();
         $(this).find('span').toggleText('mobile', 'email');
-
     });
 
-    if ($('.login-account-kit').data('toggle') == "1") {
-        $('.login-email').toggle();
-        $('.login-account-kit').toggle();
+    // Check the data attr for account kit || check the url
+    var showMobileLogin = true;
 
-        $('#swap-login').find('span').text('mobile');
+    if ($('.login-account-kit').data('toggle') == "1"
+      || window.location.hash == "#email") {
+        showMobileLogin = false;
     }
-    else {
-        if (window.location.hash == "#email") {
-            $('.login-email').toggle();
-            $('.login-account-kit').toggle();
 
-            $('#swap-login').find('span').text('email');
-        }
+    // Swap to email
+    if (showMobileLogin == false) {
+        $('.login-email, .login-account-kit').toggle();
+        $('#swap-login span').toggleText('mobile', 'email');
     }
+
+    // When clicking the sms login check window opens if not provide temp message
+    $('#sms-login__btn').on('click', function(e) {
+        e.preventDefault();
+        $('#sms-login__warning').show();
+        smsLogin();
+    });
+
+    // Hide warning if we leave the window
+    $(window).blur(function() {
+        $('#sms-login__warning').hide();
+    });
+
 });
