@@ -300,6 +300,7 @@ class Connection
             'value' => $this->toTwoDp($this->getTotalValue()),
             'facebook_id' => $this->getLinkedUser() ? $this->getLinkedUser()->getFacebookId() : null,
             'policy_id' => $this->getLinkedPolicy() ? $this->getLinkedPolicy()->getId() : null,
+            'reconnect_on_renewal' => $this instanceof RenewalConnection ? $this->getRenew() : null,
         ];
     }
 

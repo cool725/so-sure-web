@@ -3392,11 +3392,12 @@ abstract class Policy
             self::STATUS_UNPAID,
             self::STATUS_EXPIRED,
             self::STATUS_EXPIRED_CLAIMABLE,
+            self::STATUS_RENEWAL,
         ])) {
             throw new \Exception(sprintf('Policy %s is missing terms', $this->getId()));
         }
 
-        return [
+        $data = [
             'id' => $this->getId(),
             'status' => $this->getStatus(),
             'type' => 'phone',
@@ -3413,7 +3414,6 @@ abstract class Policy
                 'historical_max_value' => $this->getHistoricalMaxPotValue(),
                 'connection_values' => $this->getConnectionValues(),
             ],
-            'connections' => $this->eachApiArray($this->getConnections(), $this->getNetworkClaims()),
             'sent_invitations' => $this->eachApiArray($this->getSentInvitations()),
             'promo_code' => $this->getPromoCode(),
             'has_claim' => $this->hasMonetaryClaimed(),
@@ -3431,6 +3431,14 @@ abstract class Policy
             'billing_day' => $this->getBillingDay(),
             'cashback_status' => $this->getCashback() ? $this->getCashback()->getStatus() : null,
         ];
+
+        if ($this->getStatus() == self::STATUS_RENEWAL) {
+            $data['connections'] = $this->eachApiArray($this->getRenewalConnections(), $this->getNetworkClaims());
+        } else {
+            $data['connections'] = $this->eachApiArray($this->getConnections(), $this->getNetworkClaims());
+        }
+
+        return $data;
     }
 
     public static function sumYearlyPremiumPrice($policies, $prefix = null, $activeUnpaidOnly = false)
