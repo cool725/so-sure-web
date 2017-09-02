@@ -1648,19 +1648,23 @@ abstract class Policy
 
     public function getCooloffRefundAmount()
     {
-        // Cooloff should refund full amount (which should be equal to the last payment)
-        $paymentToRefund = $this->getLastSuccessfulPaymentCredit();
-        $this->validateRefundAmountIsInstallmentPrice($paymentToRefund);
-        $amount = $paymentToRefund->getAmount();
+        $amountToRefund = 0;
+        // Cooloff should refund full amount (which should be equal to the last payment except for renewals)
+        if ($paymentToRefund = $this->getLastSuccessfulPaymentCredit()) {
+            $amountToRefund = $paymentToRefund->getAmount();
+        }
+        if ($amountToRefund > 0) {
+            $this->validateRefundAmountIsInstallmentPrice($paymentToRefund);
+        }
         $paid = $this->getPremiumPaid();
 
         // we should never refund more than the user paid
         // especially relevent for cases with an automatic free month
-        if ($amount > $paid) {
+        if ($amountToRefund > $paid) {
             return $paid;
         }
 
-        return $paymentToRefund->getAmount();
+        return $amountToRefund;
     }
 
     public function getProratedRefundAmount($date = null)
@@ -1673,19 +1677,26 @@ abstract class Policy
 
     public function getCooloffRefundCommissionAmount()
     {
-        // Cooloff should refund full amount (which should be equal to the last payment)
-        $paymentToRefund = $this->getLastSuccessfulPaymentCredit();
-        $this->validateRefundAmountIsInstallmentPrice($paymentToRefund);
-        $amount = $paymentToRefund->getAmount();
+        $amountToRefund = 0;
+        $commissionToRefund = 0;
+        // Cooloff should refund full amount (which should be equal to the last payment except for renewals)
+        if ($paymentToRefund = $this->getLastSuccessfulPaymentCredit()) {
+            $amountToRefund = $paymentToRefund->getAmount();
+            $commissionToRefund = $paymentToRefund->getTotalCommission();
+        }
+        if ($amountToRefund > 0) {
+            $this->validateRefundAmountIsInstallmentPrice($paymentToRefund);
+        }
+
         $paid = $this->getPremiumPaid();
 
         // we should never refund more than the user paid
         // especially relevent for cases with an automatic free month
-        if ($amount > $paid) {
+        if ($amountToRefund > $paid) {
             return $this->getTotalCommissionPaid();
         }
 
-        return $paymentToRefund->getTotalCommission();
+        return $commissionToRefund;
     }
 
     public function getProratedRefundCommissionAmount($date = null)
@@ -2136,7 +2147,11 @@ abstract class Policy
 
     public function validateRefundAmountIsInstallmentPrice($payment)
     {
-        if (!$this->areEqualToTwoDp($payment->getAmount(), $this->getPremiumInstallmentPrice())) {
+        $amount = 0;
+        if ($payment) {
+            $amount = $payment->getAmount();
+        }
+        if (!$this->areEqualToTwoDp($amount, $this->getPremiumInstallmentPrice())) {
             throw new \InvalidArgumentException(sprintf(
                 'Failed to validate [policy %s] refund amount (%f) does not match premium price (%f)',
                 $this->getPolicyNumber(),
@@ -2396,7 +2411,12 @@ abstract class Policy
 
         $now = new \DateTime();
 
-        return $now->diff($this->getStart())->days;
+        $days = $now->diff($this->getStart())->days;
+        if ($now < $this->getStart()) {
+            return 0 - $days;
+        } else {
+            return $days;
+        }
     }
 
     public function getPolicyPrefix($environment)
