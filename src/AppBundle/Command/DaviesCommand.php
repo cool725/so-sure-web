@@ -41,6 +41,12 @@ class DaviesCommand extends ContainerAwareCommand
                 InputOption::VALUE_REQUIRED,
                 json_encode(DaviesClaim::$sheetNames)
             )
+            ->addOption(
+                'max-parse-errors',
+                null,
+                InputOption::VALUE_REQUIRED,
+                0
+            )
         ;
     }
 
@@ -49,6 +55,7 @@ class DaviesCommand extends ContainerAwareCommand
         $isDaily = true === $input->getOption('daily');
         $useMime = true !== $input->getOption('use-extension');
         $file = $input->getOption('file');
+        $maxParseErrors = $input->getOption('max-parse-errors');
         $sheetName = $input->getOption('sheetName');
         if (!$sheetName) {
             $sheetName = DaviesClaim::SHEET_NAME_V6;
@@ -65,10 +72,10 @@ class DaviesCommand extends ContainerAwareCommand
             $count = $davies->claimsDailyEmail();
             $output->writeln(sprintf('%d outstanding claims. Email report sent.', $count));
         } elseif ($file) {
-            $lines = $davies->importFile($file, $sheetName, $useMime);
+            $lines = $davies->importFile($file, $sheetName, $useMime, $maxParseErrors);
             $output->writeln(implode(PHP_EOL, $lines));
         } else {
-            $lines = $davies->import($sheetName, $useMime);
+            $lines = $davies->import($sheetName, $useMime, $maxParseErrors);
             $output->writeln(implode(PHP_EOL, $lines));
         }
         $output->writeln('Finished');

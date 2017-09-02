@@ -106,7 +106,7 @@ abstract class S3EmailService
     abstract public function getColumnsFromSheetName($sheetName);
     abstract public function createLineObject($line, $columns);
 
-    public function import($sheetName, $useMime = true)
+    public function import($sheetName, $useMime = true, $maxParseErrors = 0)
     {
         $lines = [];
         $keys = $this->listS3();
@@ -118,7 +118,7 @@ abstract class S3EmailService
             try {
                 $emailFile = $this->downloadEmail($key);
                 if ($excelFile = $this->extractExcelFromEmail($emailFile)) {
-                    $data = $this->parseExcel($excelFile, $sheetName, $useMime);
+                    $data = $this->parseExcel($excelFile, $sheetName, $useMime, $maxParseErrors);
                     $processed = $this->processExcelData($key, $data);
                 } else {
                     throw new \Exception('Unable to locate excel file in email message');
@@ -149,13 +149,13 @@ abstract class S3EmailService
         return $lines;
     }
 
-    public function importFile($file, $sheetName, $useMime = true)
+    public function importFile($file, $sheetName, $useMime = true, $maxParseErrors = 0)
     {
         $lines = [];
         $lines[] = sprintf('Processing %s', $file);
         $processed = false;
         try {
-            $data = $this->parseExcel($file, $sheetName, $useMime);
+            $data = $this->parseExcel($file, $sheetName, $useMime, $maxParseErrors);
             $processed = $this->processExcelData($file, $data);
         } catch (\Exception $e) {
             $processed = false;
@@ -280,7 +280,7 @@ abstract class S3EmailService
         return $excelFile;
     }
 
-    public function parseExcel($filename, $sheetName, $useMime = true)
+    public function parseExcel($filename, $sheetName, $useMime = true, $maxParseErrors = 0)
     {
         $tempFile = $this->generateTempFile();
         $this->excel->convertToCsv($filename, $tempFile, $sheetName, $useMime);
@@ -290,6 +290,7 @@ abstract class S3EmailService
         $data = [];
         $row = -1;
         $columns = -1;
+        $parseErrors = 0;
         foreach ($lines as $line) {
             $row++;
             try {
@@ -303,8 +304,11 @@ abstract class S3EmailService
                 }
             } catch (\Exception $e) {
                 $this->logger->error(sprintf("Error parsing line %s. Ex: %s", json_encode($line), $e->getMessage()));
+                $parseErrors++;
 
-                throw $e;
+                if ($parseErrors > $maxParseErrors) {
+                    throw $e;
+                }
             }
         }
 
