@@ -1695,7 +1695,7 @@ class PolicyServiceTest extends WebTestCase
 
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');
-        static::$policyService->create($policy, new \DateTime('2016-01-01'));
+        static::$policyService->create($policy, new \DateTime('2016-01-01'), true);
         static::$policyService->setEnvironment('test');
         static::$dm->flush();
 
