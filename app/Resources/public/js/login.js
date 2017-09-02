@@ -80,7 +80,7 @@ $(function() {
     // Check the data attr for account kit || check the url
     var showMobileLogin = true;
 
-    if ($('.login-account-kit').data('toggle') == "0"
+    if ($('.login-account-kit').data('toggle') == "1"
       || window.location.hash == "#email") {
         showMobileLogin = false;
     }
