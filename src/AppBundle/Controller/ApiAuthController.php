@@ -1057,7 +1057,7 @@ class ApiAuthController extends BaseController
             }
             $renew = $this->getDataBool($data, 'renew');
             if ($renew === null) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, 'Unknown renew value', 422);                
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, 'Unknown renew value', 422);
             }
 
             $dm = $this->getManager();
@@ -1069,7 +1069,7 @@ class ApiAuthController extends BaseController
             $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
 
             $connectionRepo = $dm->getRepository(Connection::class);
-            $connection = $repo->find($connectionId);
+            $connection = $connectionRepo->find($connectionId);
             if (!$connection) {
                 throw new NotFoundHttpException();
             }

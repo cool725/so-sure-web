@@ -2893,8 +2893,13 @@ class ApiAuthControllerTest extends BaseControllerTest
             'number_payments' => '12',
         ]);
         $data = $this->verifyResponse(200);
+
+        $url = sprintf("/api/v1/auth/policy/%s?_method=GET", $renewalPolicyA->getId());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityIdA, $url, [
+        ]);
+        $data = $this->verifyResponse(200);
+
         $reconnectionId = $data['connections'][0]['id'];
-        print_r($data);
 
         $url = sprintf("/api/v1/auth/policy/%s/reconnect/%s", $renewalPolicyA->getId(), 'a');
 
@@ -2918,6 +2923,12 @@ class ApiAuthControllerTest extends BaseControllerTest
         ]);
         $data = $this->verifyResponse(200);
         $this->assertFalse($data['connections'][0]['reconnect_on_renewal']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityIdA, $url, [
+            'renew' => true,
+        ]);
+        $data = $this->verifyResponse(200);
+        $this->assertTrue($data['connections'][0]['reconnect_on_renewal']);
     }
 
     // policy/{id}/renew

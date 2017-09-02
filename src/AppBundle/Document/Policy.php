@@ -3435,7 +3435,7 @@ abstract class Policy
         if ($this->getStatus() == self::STATUS_RENEWAL) {
             $data['connections'] = $this->eachApiArray($this->getRenewalConnections(), $this->getNetworkClaims());
         } else {
-            $data['connections'] = $this->eachApiArray($this->getConnections(), $this->getNetworkClaims());            
+            $data['connections'] = $this->eachApiArray($this->getConnections(), $this->getNetworkClaims());
         }
 
         return $data;
