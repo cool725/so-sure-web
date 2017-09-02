@@ -1648,10 +1648,14 @@ abstract class Policy
 
     public function getCooloffRefundAmount()
     {
-        // Cooloff should refund full amount (which should be equal to the last payment)
+        // Cooloff should refund full amount (which should be equal to the last payment except for renewals)
         $paymentToRefund = $this->getLastSuccessfulPaymentCredit();
-        $this->validateRefundAmountIsInstallmentPrice($paymentToRefund);
-        $amount = $paymentToRefund->getAmount();
+        if (!$paymentToRefund && $this->getStatus() == self::STATUS_RENEWAL) {
+            $amount = 0;
+        } else {
+            $this->validateRefundAmountIsInstallmentPrice($paymentToRefund);
+            $amount = $paymentToRefund->getAmount();
+        }
         $paid = $this->getPremiumPaid();
 
         // we should never refund more than the user paid
@@ -1660,7 +1664,7 @@ abstract class Policy
             return $paid;
         }
 
-        return $paymentToRefund->getAmount();
+        return $amount;
     }
 
     public function getProratedRefundAmount($date = null)
@@ -2136,7 +2140,11 @@ abstract class Policy
 
     public function validateRefundAmountIsInstallmentPrice($payment)
     {
-        if (!$this->areEqualToTwoDp($payment->getAmount(), $this->getPremiumInstallmentPrice())) {
+        $amount = 0;
+        if ($payment) {
+            $amount = $payment->getAmount();
+        }
+        if (!$this->areEqualToTwoDp($amount, $this->getPremiumInstallmentPrice())) {
             throw new \InvalidArgumentException(sprintf(
                 'Failed to validate [policy %s] refund amount (%f) does not match premium price (%f)',
                 $this->getPolicyNumber(),
@@ -2396,7 +2404,12 @@ abstract class Policy
 
         $now = new \DateTime();
 
-        return $now->diff($this->getStart())->days;
+        $days = $now->diff($this->getStart())->days;
+        if ($now < $this->getStart()) {
+            return 0 - $days;
+        } else {
+            return $days;
+        }
     }
 
     public function getPolicyPrefix($environment)
