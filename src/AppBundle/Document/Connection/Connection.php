@@ -274,6 +274,7 @@ class Connection
             return $this->clearValue();
         } elseif ($diff->m >= 11) {
             // TODO: consider this case - if less than 30 days to replace your connection, shouldn't you get it?
+            \AppBundle\Classes\NoOp::ignore([]);
         }
 
         $this->value = $this->toTwoDp($this->value * $diff->m / 12);
