@@ -40,6 +40,48 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(15, $connection->getTotalValue());
     }
 
+    public function testConnectionProrate()
+    {
+        $connection = new StandardConnection();
+        $connection->setDate(new \DateTime('2016-01-01'));
+
+        // reset
+        $connection->setValue(10);
+        $connection->setPromoValue(5);
+
+        // 5 months
+        $connection->prorateValue(new \DateTime('2016-06-01 00:00:01'));
+        $this->assertEquals(0, $connection->getValue());
+        $this->assertEquals(0, $connection->getTotalValue());
+
+        // reset
+        $connection->setValue(10);
+        $connection->setPromoValue(5);
+
+        // 6 months
+        $connection->prorateValue(new \DateTime('2016-07-01 00:00:01'));
+        $this->assertEquals(5, $connection->getValue());
+        $this->assertEquals(7.5, $connection->getTotalValue());
+
+        // reset
+        $connection->setValue(10);
+        $connection->setPromoValue(5);
+
+        // 7 months
+        $connection->prorateValue(new \DateTime('2016-08-01 00:00:01'));
+        $this->assertEquals(5.83, $connection->getValue());
+        $this->assertEquals(8.75, $connection->getTotalValue());
+
+        // reset
+        $connection->setValue(10);
+        $connection->setPromoValue(5);
+
+        // 11 months
+        $connection->prorateValue(new \DateTime('2016-12-01 00:00:01'));
+        $this->assertEquals(9.17, $connection->getValue());
+        $this->assertEquals(13.75, $connection->getTotalValue());
+    }
+
     public function testConnectionApi()
     {
         $connection = new StandardConnection();

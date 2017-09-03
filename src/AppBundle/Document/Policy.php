@@ -2518,7 +2518,7 @@ abstract class Policy
             }
             foreach ($networkConnection->getLinkedPolicy()->getConnections() as $otherConnection) {
                 if ($otherConnection->getLinkedPolicy()->getId() == $this->getId()) {
-                    $otherConnection->clearValue();
+                    $otherConnection->prorateValue();
                 }
             }
             $networkConnection->getLinkedPolicy()->updatePotValue();
