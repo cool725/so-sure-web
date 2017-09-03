@@ -353,7 +353,8 @@ class Connection
                 $connection->getLinkedPolicy()->getId()
             );
             */
-            if ($this->getLinkedPolicy()->getId() == $connection->getSourcePolicy()->getId()) {
+            if ($this->getLinkedPolicy() &&
+                $this->getLinkedPolicy()->getId() == $connection->getSourcePolicy()->getId()) {
                 return $connection;
             }
         }
