@@ -1281,14 +1281,6 @@ class PolicyService
         $policy->expire($date);
         // TODO: consider if we need to handle the pending renewal cancellation here at the same time
         // to avoid any timing issues
-        if (!$policy->isRenewed()) {
-            foreach ($policy->getStandardConnections() as $connection) {
-                if ($inversedConnection = $connection->findInversedConnection()) {
-                    $inversedConnection->prorateValue($date);
-                    // listener on connection will notify user
-                }
-            }
-        }
         $this->dm->flush();
 
         $this->expiredPolicyEmail($policy);

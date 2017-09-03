@@ -2781,6 +2781,15 @@ abstract class Policy
                 $this->getCashback()->setDate(new \DateTime());
             }
         }
+
+        if (!$this->isRenewed()) {
+            foreach ($this->getStandardConnections() as $connection) {
+                if ($inversedConnection = $connection->findInversedConnection()) {
+                    $inversedConnection->prorateValue($date);
+                    // listener on connection will notify user
+                }
+            }
+        }
     }
 
     /**
