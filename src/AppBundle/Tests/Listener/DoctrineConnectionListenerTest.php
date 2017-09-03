@@ -4,11 +4,12 @@ namespace AppBundle\Tests\Listener;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
-use AppBundle\Listener\DoctrineClaimListener;
+use AppBundle\Listener\DoctrineConnectionListener;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
-use AppBundle\Event\ClaimEvent;
-use AppBundle\Document\Claim;
+use AppBundle\Event\ConnectionEvent;
+use AppBundle\Document\Connection\Connection;
+use AppBundle\Document\Connection\StandardConnection;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -46,7 +47,7 @@ class DoctrineConnectionListenerTest extends WebTestCase
     {
         $connection = new StandardConnection();
         static::$dm->persist($connection);
-        $listener = $this->createClaimEventListener($connection, $this->once(), [ConnectionEvent::EVENT_REDUCED]);
+        $listener = $this->createConnectionEventListener($connection, $this->once(), [ConnectionEvent::EVENT_REDUCED]);
 
         $changeSet = ['value' => [10, 5.8]];
         $events = new PreUpdateEventArgs($connection, self::$dm, $changeSet);
@@ -57,7 +58,7 @@ class DoctrineConnectionListenerTest extends WebTestCase
     {
         $connection = new StandardConnection();
         static::$dm->persist($connection);
-        $listener = $this->createClaimEventListener($connection, $this->never(), []);
+        $listener = $this->createConnectionEventListener($connection, $this->never(), []);
 
         $changeSet = ['value' => [10, 10]];
         $events = new PreUpdateEventArgs($connection, self::$dm, $changeSet);
@@ -68,7 +69,7 @@ class DoctrineConnectionListenerTest extends WebTestCase
     {
         $connection = new StandardConnection();
         static::$dm->persist($connection);
-        $listener = $this->createClaimEventListener($connection, $this->once(), [ConnectionEvent::EVENT_REDUCED]);
+        $listener = $this->createConnectionEventListener($connection, $this->once(), [ConnectionEvent::EVENT_REDUCED]);
 
         $changeSet = ['promoValue' => [10, 5.8]];
         $events = new PreUpdateEventArgs($connection, self::$dm, $changeSet);
@@ -79,7 +80,7 @@ class DoctrineConnectionListenerTest extends WebTestCase
     {
         $connection = new StandardConnection();
         static::$dm->persist($connection);
-        $listener = $this->createClaimEventListener($connection, $this->never(), []);
+        $listener = $this->createConnectionEventListener($connection, $this->never(), []);
 
         $changeSet = ['promoValue' => [10, 10]];
         $events = new PreUpdateEventArgs($connection, self::$dm, $changeSet);
