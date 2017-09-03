@@ -8,6 +8,7 @@ use AppBundle\Document\Connection\Connection;
 class ConnectionEvent extends Event
 {
     const EVENT_CONNECTED = 'event.connection.connected';
+    const EVENT_REDUCED = 'event.connection.reduced';
 
     /** @var Connection */
     protected $connection;

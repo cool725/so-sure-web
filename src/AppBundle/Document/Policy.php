@@ -223,6 +223,15 @@ abstract class Policy
     protected $renewalConnections = array();
 
     /**
+     * @MongoDB\ReferenceMany(
+     *  targetDocument="AppBundle\Document\Connection\Connection",
+     *  mappedBy="linkedPolicy",
+     *  cascade={"persist"}
+     * )
+     */
+    protected $acceptedConnections;
+
+    /**
      * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Claim",
      *  mappedBy="policy",
      *  cascade={"persist"})
@@ -399,6 +408,7 @@ abstract class Policy
         $this->invitations = new \Doctrine\Common\Collections\ArrayCollection();
         $this->claims = new \Doctrine\Common\Collections\ArrayCollection();
         $this->linkedClaims = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->acceptedConnections = new \Doctrine\Common\Collections\ArrayCollection();
         $this->potValue = 0;
     }
 
@@ -824,6 +834,16 @@ abstract class Policy
     public function getConnections()
     {
         return $this->connections;
+    }
+
+    public function addAcceptedConnection(Connection $connection)
+    {
+        $this->acceptedConnections[] = $connection;
+    }
+
+    public function getAcceptedConnections()
+    {
+        return $this->acceptedConnections;
     }
 
     public function getStandardConnections()
@@ -2516,10 +2536,9 @@ abstract class Policy
             if ($networkConnection instanceof RewardConnection) {
                 continue;
             }
-            foreach ($networkConnection->getLinkedPolicy()->getConnections() as $otherConnection) {
-                if ($otherConnection->getLinkedPolicy()->getId() == $this->getId()) {
-                    $otherConnection->prorateValue();
-                }
+            if ($inversedConnection = $networkConnection->findInversedConnection()) {
+                $inversedConnection->prorateValue();
+                // listener on connection will notify user
             }
             $networkConnection->getLinkedPolicy()->updatePotValue();
         }
@@ -2641,6 +2660,11 @@ abstract class Policy
                 $newConnection->setPromoValue($this->getAllowedPromoConnectionValue($date));
                 $newConnection->setExcludeReporting(!$this->isValidPolicy());
                 $this->addConnection($newConnection);
+            } else {
+                if ($inversedConnection = $connection->findInversedConnection()) {
+                    $inversedConnection->prorateValue($date);
+                    // listener on connection will notify user
+                }
             }
         }
 

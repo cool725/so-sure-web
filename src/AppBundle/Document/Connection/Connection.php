@@ -65,7 +65,7 @@ class Connection
     protected $initialInvitationDate;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy")
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy", inversedBy="acceptedConnections")
      * @Gedmo\Versioned
      */
     protected $linkedPolicy;
@@ -199,6 +199,7 @@ class Connection
         }
 
         $this->linkedPolicy = $policy;
+        $policy->addAcceptedConnection($this);
     }
 
     public function getDate()
@@ -335,5 +336,27 @@ class Connection
         $renewalConnection->setRenew(true);
 
         return $renewalConnection;
+    }
+
+    public function findInversedConnection()
+    {
+        if (!$this->getSourcePolicy()) {
+            return;
+        }
+        foreach ($this->getSourcePolicy()->getAcceptedConnections() as $connection) {
+            /*
+            print sprintf("%s/%s : %s -> %s\n",
+                $this->getSourcePolicy()->getId(),
+                $this->getLinkedPolicy()->getId(),
+                $connection->getSourcePolicy()->getId(),
+                $connection->getLinkedPolicy()->getId()
+            );
+            */
+            if ($this->getLinkedPolicy()->getId() == $connection->getSourcePolicy()->getId()) {
+                return $connection;
+            }
+        }
+
+        return null;
     }
 }
