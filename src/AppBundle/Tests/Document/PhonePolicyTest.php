@@ -3499,7 +3499,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertTrue($foundPot);
         $this->assertNotNull($updatedPolicyA->getCashback());
         $this->assertEquals(15, $updatedPolicyA->getCashback()->getAmount());
-        $this->assertEquals(Cashback::STATUS_FAILED, $updatedPolicyA->getCashback()->getStatus());
+        $this->assertEquals(Cashback::STATUS_MISSING, $updatedPolicyA->getCashback()->getStatus());
     }
 
     public function testExpireWithPromoNoCashbackClaimed()

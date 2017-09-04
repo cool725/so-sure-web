@@ -1531,4 +1531,66 @@ class PolicyService
 
         $this->intercom->queueMessage($policy->getUser()->getEmail(), $body);
     }
+
+    public function updateCashback(Cashback $cashback, $status)
+    {
+        if (in_array($cashback->getStatus(), [
+            Cashback::STATUS_PENDING_CLAIMABLE,
+            Cashback::STATUS_CLAIMED,
+        ])) {
+            throw new \Exception(sprintf(
+                'Not allowed to change claimed/claimable cashback status id %s',
+                $cashback->getId()
+            ));
+        }
+        if (!$cashback->getAmount() || $this->areEqualToTwoDp(0, $cashback->getAmount())) {
+            throw new \Exception(sprintf(
+                'Missing cashback amount (or 0) id %s',
+                $cashback->getId()
+            ));
+        }
+
+        $cashback->setDate(new \DateTime());
+        $cashback->setStatus($status);
+        $this->dm->flush();
+
+        if (in_array($status, [Cashback::STATUS_PAID, Cashback::STATUS_FAILED, Cashback::STATUS_MISSING])) {
+            $this->cashbackEmail($cashback);
+        }
+    }
+
+    public function cashbackEmail(Cashback $cashback)
+    {
+        if ($cashback->getStatus() == Cashback::STATUS_PAID) {
+            $baseTemplate = sprintf('AppBundle:Email:cashback/paid');
+            $subject = sprintf('Your Reward Pot has been paid out');
+        } elseif ($cashback->getStatus() == Cashback::STATUS_FAILED) {
+            $baseTemplate = sprintf('AppBundle:Email:cashback/failed');
+            $subject = sprintf('Your SO-SURE cashback');
+        } elseif ($cashback->getStatus() == Cashback::STATUS_MISSING) {
+            $baseTemplate = sprintf('AppBundle:Email:cashback/missing');
+            $subject = sprintf('Your SO-SURE cashback');
+        } else {
+            throw new \Exception('Unknown cashback status for email');
+        }
+        $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
+        $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
+
+        $data = [
+            'cashback' => $cashback,
+            'withdraw_url' => $this->router->generate(
+                'user_cashback',
+                ['id' => $cashback->getId()],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            ),
+        ];
+        $this->mailer->sendTemplate(
+            $subject,
+            $cashback->getPolicy()->getUser()->getEmail(),
+            $htmlTemplate,
+            $data,
+            $textTemplate,
+            $data
+        );
+    }
 }

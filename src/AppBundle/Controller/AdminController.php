@@ -791,19 +791,9 @@ class AdminController extends BaseController
         if (!$cashback) {
             throw $this->createNotFoundException('Cashback not found');
         }
-        if (in_array($cashback->getStatus(), [
-            Cashback::STATUS_PENDING_CLAIMABLE,
-            Cashback::STATUS_CLAIMED,
-        ])) {
-            throw new \Exception(
-                'Not allowed to change claimed/claimable cashback status'
-            );
-        }
 
-        $cashback->setDate(new \DateTime());
-        $cashback->setStatus($request->get('status'));
-        $dm->flush();
-
+        $policyService = $this->get('app.policy');
+        $policyService->updateCashback($cashback, $request->get('status'));
         $this->addFlash(
             'success',
             sprintf('Set %s cashback to %s', $cashback->getPolicy()->getPolicyNumber(), $cashback->getStatus())

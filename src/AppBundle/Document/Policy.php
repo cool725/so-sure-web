@@ -2788,7 +2788,7 @@ abstract class Policy
                 // create a cashback entry and try to find the user
                 $cashback = new Cashback();
                 $cashback->setDate(new \DateTime());
-                $cashback->setStatus(Cashback::STATUS_FAILED);
+                $cashback->setStatus(Cashback::STATUS_MISSING);
                 $cashback->setAmount($this->getPotValue());
                 $this->setCashback($cashback);
             }
@@ -2864,15 +2864,22 @@ abstract class Policy
 
         // Update cashback state
         if ($this->hasCashback()) {
-            // TODO: What about already invalid cashback details (STATUS_FAILED)
+            // Status should be pending-claimable unless no banking details were provided (missing)
+            // any other status puts us in an unknown situation, so allow amount to be updated if claim, but
+            // don't change status (just in case)
+            $allowStatusUpdate = $this->getCashback()->getStatus() == Cashback::STATUS_PENDING_CLAIMABLE;
             if ($this->areEqualToTwoDp($this->getCashback()->getAmount(), $this->getPotValue())) {
-                $this->getCashback()->setStatus(Cashback::STATUS_PENDING_PAYMENT);
+                if ($allowStatusUpdate) {
+                    $this->getCashback()->setStatus(Cashback::STATUS_PENDING_PAYMENT);
+                }
             } else {
                 $this->getCashback()->setAmount($this->getPotValue());
                 if ($this->areEqualToTwoDp(0, $this->getCashback()->getAmount())) {
                     $this->getCashback()->setStatus(Cashback::STATUS_CLAIMED);
                 } else {
-                    $this->getCashback()->setStatus(Cashback::STATUS_PENDING_PAYMENT);
+                    if ($allowStatusUpdate) {
+                        $this->getCashback()->setStatus(Cashback::STATUS_PENDING_PAYMENT);
+                    }
                 }
             }
             $this->getCashback()->setDate(new \DateTime());

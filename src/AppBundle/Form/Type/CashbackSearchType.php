@@ -47,6 +47,7 @@ class CashbackSearchType extends AbstractType
                     Cashback::STATUS_PAID => Cashback::STATUS_PAID,
                     Cashback::STATUS_CLAIMED => Cashback::STATUS_CLAIMED,
                     Cashback::STATUS_FAILED => Cashback::STATUS_FAILED,
+                    Cashback::STATUS_MISSING => Cashback::STATUS_MISSING,
                 ]
             ])
             ->add('search', SubmitType::class)

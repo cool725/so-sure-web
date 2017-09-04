@@ -19,6 +19,7 @@ class Cashback
     const STATUS_PENDING_PAYMENT = 'pending-payment';
     const STATUS_PAID = 'paid';
     const STATUS_CLAIMED = 'claimed';
+    const STATUS_MISSING = 'missing';
     const STATUS_FAILED = 'failed';
 
     /**
@@ -35,7 +36,7 @@ class Cashback
 
     /**
      * @Assert\NotNull(message="Cashback status is required")
-     * @Assert\Choice({"pending-claimable", "pending-payment", "paid", "claimed", "failed"}, strict=true)
+     * @Assert\Choice({"pending-claimable", "pending-payment", "paid", "claimed", "missing", "failed"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -176,7 +177,9 @@ class Cashback
             return $this->getPolicy()->getPotValue();
         } elseif (in_array($this->getStatus(), [self::STATUS_PENDING_PAYMENT, self::STATUS_PAID])) {
             return $this->getAmount();
-        } elseif (in_array($this->getStatus(), [self::STATUS_FAILED, self::STATUS_CLAIMED])) {
+        } elseif (in_array($this->getStatus(), [self::STATUS_FAILED, self::STATUS_MISSING])) {
+            return $this->getAmount();
+        } elseif (in_array($this->getStatus(), [self::STATUS_CLAIMED])) {
             return 0;
         }
     }
@@ -189,8 +192,10 @@ class Cashback
             return 'Approved';
         } elseif ($this->getStatus() == self::STATUS_PAID) {
             return 'Paid';
+        } elseif ($this->getStatus() == self::STATUS_MISSING) {
+            return 'Missing payment details';
         } elseif ($this->getStatus() == self::STATUS_FAILED) {
-            return 'Invalid or missing payment details';
+            return 'Invalid payment details';
         } elseif ($this->getStatus() == self::STATUS_CLAIMED) {
             return 'Declined due to claim';
         }

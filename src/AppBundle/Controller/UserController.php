@@ -712,6 +712,63 @@ class UserController extends BaseController
     }
 
     /**
+     * @Route("/cashback/{id}", name="user_cashback")
+     * @Template
+     */
+    public function cashbackAction(Request $request, $id)
+    {
+        $dm = $this->getManager();
+        $cashbackRepo = $dm->getRepository(Cashback::class);
+        $cashback = $cashbackRepo->find($id);
+        if (!$cashback) {
+            throw $this->createNotFoundException('Cashback not found');
+        }
+        if (!in_array($cashback->getStatus(), [Cashback::STATUS_FAILED, Cashback::STATUS_MISSING])) {
+            throw new \Exception(sprintf(
+                'Update cashback can only be done for missing/failed status. Id: %s',
+                $cashback->getId()
+            ));
+        }
+        //$this->denyAccessUnlessGranted(PolicyVoter::EDIT, $cashback->getPolicy());
+        $cashbackForm = $this->get('form.factory')
+            ->createNamedBuilder('cashback_form', CashbackType::class, $cashback)
+            ->getForm();
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('cashback_form')) {
+                $cashbackForm->handleRequest($request);
+                if ($cashbackForm->isValid()) {
+                    $policyService = $this->get('app.policy');
+                    $policyService->updateCashback($cashback, Cashback::STATUS_PENDING_PAYMENT);
+
+                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_CASHBACK);
+
+                    $message = sprintf(
+                        'Your request for cashback has been accepted.'
+                    );
+                    $this->addFlash('success', $message);
+
+                    return new RedirectResponse(
+                        $this->generateUrl('user_home')
+                    );
+                } else {
+                    $this->addFlash(
+                        'error',
+                        sprintf(
+                            "Sorry, there's a problem requesting cashback. Please try again or contact us. %s",
+                            $cashbackForm->getErrors()
+                        )
+                    );
+                }
+            }
+        }
+
+        return [
+            'cashback' => $cashback,
+            'cashback_form' => $cashbackForm->createView(),
+        ];
+    }
+
+    /**
      * @Route("/invalid", name="user_invalid_policy")
      * @Template
      */
