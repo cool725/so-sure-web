@@ -223,6 +223,15 @@ abstract class Policy
     protected $renewalConnections = array();
 
     /**
+     * @MongoDB\ReferenceMany(
+     *  targetDocument="AppBundle\Document\Connection\Connection",
+     *  mappedBy="linkedPolicy",
+     *  cascade={"persist"}
+     * )
+     */
+    protected $acceptedConnections;
+
+    /**
      * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Claim",
      *  mappedBy="policy",
      *  cascade={"persist"})
@@ -399,6 +408,7 @@ abstract class Policy
         $this->invitations = new \Doctrine\Common\Collections\ArrayCollection();
         $this->claims = new \Doctrine\Common\Collections\ArrayCollection();
         $this->linkedClaims = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->acceptedConnections = new \Doctrine\Common\Collections\ArrayCollection();
         $this->potValue = 0;
     }
 
@@ -824,6 +834,16 @@ abstract class Policy
     public function getConnections()
     {
         return $this->connections;
+    }
+
+    public function addAcceptedConnection(Connection $connection)
+    {
+        $this->acceptedConnections[] = $connection;
+    }
+
+    public function getAcceptedConnections()
+    {
+        return $this->acceptedConnections;
     }
 
     public function getStandardConnections()
@@ -2268,6 +2288,7 @@ abstract class Policy
 
     public function getUnreplacedConnectionCancelledPolicyInLast30Days($date = null)
     {
+        $unreplacedConnections = [];
         foreach ($this->getConnections() as $connection) {
             if ($connection->getReplacementUser() || $connection instanceof RewardConnection) {
                 continue;
@@ -2277,11 +2298,20 @@ abstract class Policy
                 throw new \Exception(sprintf('Invalid connection in policy %s', $this->getId()));
             }
             if ($policy->isCancelled() && $policy->hasEndedInLast30Days($date)) {
-                return $connection;
+                $unreplacedConnections[] = $connection;
             }
         }
 
-        return null;
+        if (count($unreplacedConnections) == 0) {
+            return null;
+        }
+
+        // sort older to more recent
+        usort($unreplacedConnections, function ($a, $b) {
+            return $a->getLinkedPolicy()->getEnd() > $b->getLinkedPolicy()->getEnd();
+        });
+
+        return $unreplacedConnections[0];
     }
 
     public function hasNetworkClaimedInLast30Days($date = null, $includeOpen = false)
@@ -2516,10 +2546,9 @@ abstract class Policy
             if ($networkConnection instanceof RewardConnection) {
                 continue;
             }
-            foreach ($networkConnection->getLinkedPolicy()->getConnections() as $otherConnection) {
-                if ($otherConnection->getLinkedPolicy()->getId() == $this->getId()) {
-                    $otherConnection->clearValue();
-                }
+            if ($inversedConnection = $networkConnection->findInversedConnection()) {
+                $inversedConnection->prorateValue();
+                // listener on connection will notify user
             }
             $networkConnection->getLinkedPolicy()->updatePotValue();
         }
@@ -2641,6 +2670,11 @@ abstract class Policy
                 $newConnection->setPromoValue($this->getAllowedPromoConnectionValue($date));
                 $newConnection->setExcludeReporting(!$this->isValidPolicy());
                 $this->addConnection($newConnection);
+            } else {
+                if ($inversedConnection = $connection->findInversedConnection()) {
+                    $inversedConnection->prorateValue($date);
+                    // listener on connection will notify user
+                }
             }
         }
 
@@ -2755,6 +2789,15 @@ abstract class Policy
                 // If there's no money in the pot, then someone has claimed - so cashback is rejected
                 $this->getCashback()->setStatus(Cashback::STATUS_CLAIMED);
                 $this->getCashback()->setDate(new \DateTime());
+            }
+        }
+
+        if (!$this->isRenewed()) {
+            foreach ($this->getStandardConnections() as $connection) {
+                if ($inversedConnection = $connection->findInversedConnection()) {
+                    $inversedConnection->prorateValue($date);
+                    // listener on connection will notify user
+                }
             }
         }
     }

@@ -1662,36 +1662,63 @@ class InvitationServiceTest extends WebTestCase
         $this->assertTrue($policy->isPolicy());
         $policy->setStatus(Policy::STATUS_ACTIVE);
 
-        $userInvitee = static::createUser(
+        $userInviteeA = static::createUser(
             static::$userManager,
-            static::generateEmail('invite-accept-cancel-before', $this),
+            static::generateEmail('invite-accept-cancel-beforeA', $this),
             'bar'
         );
-        $policyInvitee = static::initPolicy(
-            $userInvitee,
+        $userInviteeB = static::createUser(
+            static::$userManager,
+            static::generateEmail('invite-accept-cancel-beforeB', $this),
+            'bar'
+        );
+        $policyInviteeA = static::initPolicy(
+            $userInviteeA,
             static::$dm,
             static::$phone,
             new \DateTime('2016-02-01'),
             false,
             true
         );
-        $policyInvitee->setStatus(Policy::STATUS_ACTIVE);
-
-        $invitation = self::$invitationService->inviteByEmail(
-            $policy,
-            static::generateEmail('invite-accept-cancel-before', $this)
+        $policyInviteeB = static::initPolicy(
+            $userInviteeB,
+            static::$dm,
+            static::$phone,
+            new \DateTime('2016-02-01'),
+            false,
+            true
         );
-        $this->assertTrue($invitation instanceof EmailInvitation);
+        $policyInviteeA->setStatus(Policy::STATUS_ACTIVE);
+        $policyInviteeB->setStatus(Policy::STATUS_ACTIVE);
 
-        self::$invitationService->accept($invitation, $policyInvitee, new \DateTime('2016-02-01'));
+        $invitationA = self::$invitationService->inviteByEmail(
+            $policy,
+            static::generateEmail('invite-accept-cancel-beforeA', $this)
+        );
+        $this->assertTrue($invitationA instanceof EmailInvitation);
+        $invitationB = self::$invitationService->inviteByEmail(
+            $policy,
+            static::generateEmail('invite-accept-cancel-beforeB', $this)
+        );
+        $this->assertTrue($invitationB instanceof EmailInvitation);
+
+        self::$invitationService->accept($invitationA, $policyInviteeA, new \DateTime('2016-02-01'));
+        self::$invitationService->accept($invitationB, $policyInviteeB, new \DateTime('2016-02-01'));
 
         // Now Cancel policy
         self::$policyService->cancel(
-            $policyInvitee,
+            $policyInviteeA,
             Policy::CANCELLED_ACTUAL_FRAUD,
             false,
             false,
             new \DateTime('2016-04-03')
+        );
+        self::$policyService->cancel(
+            $policyInviteeB,
+            Policy::CANCELLED_ACTUAL_FRAUD,
+            false,
+            false,
+            new \DateTime('2016-04-02')
         );
 
         $userInvitee = static::createUser(
@@ -1714,21 +1741,34 @@ class InvitationServiceTest extends WebTestCase
             static::generateEmail('invite-accept-cancel-after', $this)
         );
         $this->assertTrue($invitationAfter instanceof EmailInvitation);
+        $replacementConnection = $policy->getUnreplacedConnectionCancelledPolicyInLast30Days(
+            new \DateTime('2016-04-10')
+        );
+        $this->assertNotNull($replacementConnection);
+        $this->assertEquals($policyInviteeB->getId(), $replacementConnection->getLinkedPolicy()->getId());
 
         self::$invitationService->accept($invitationAfter, $policyInviteeAfter, new \DateTime('2016-04-10'));
 
         $repo = static::$dm->getRepository(Policy::class);
         $inviterPolicy = $repo->find($policy->getId());
-        $connectionFound = false;
+        $connectionFoundBefore = false;
+        $connectionFoundAfter = false;
         foreach ($inviterPolicy->getConnections() as $connection) {
+            if ($connection->getLinkedPolicy()->getId() == $policyInviteeB->getId()) {
+                $connectionFoundBefore = true;
+                $this->assertEquals(0, $connection->getTotalValue());
+                $this->assertNotNull($connection->getReplacementUser());
+                $this->assertEquals($userInvitee->getEmail(), $connection->getReplacementUser()->getEmail());
+            }
             if ($connection->getLinkedPolicy()->getId() == $policyInviteeAfter->getId()) {
-                $connectionFound = true;
+                $connectionFoundAfter = true;
                 $this->assertEquals(10, $connection->getTotalValue());
                 // non prod acceptence without prefix
                 $this->assertTrue($connection->getExcludeReporting());
             }
         }
-        $this->assertTrue($connectionFound);
+        $this->assertTrue($connectionFoundBefore);
+        $this->assertTrue($connectionFoundAfter);
     }
 
     /**

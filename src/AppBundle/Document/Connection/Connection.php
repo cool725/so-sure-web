@@ -65,7 +65,7 @@ class Connection
     protected $initialInvitationDate;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy")
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy", inversedBy="acceptedConnections")
      * @Gedmo\Versioned
      */
     protected $linkedPolicy;
@@ -199,6 +199,7 @@ class Connection
         }
 
         $this->linkedPolicy = $policy;
+        $policy->addAcceptedConnection($this);
     }
 
     public function getDate()
@@ -206,7 +207,7 @@ class Connection
         return $this->date;
     }
 
-    public function setDate($date)
+    public function setDate(\DateTime $date = null)
     {
         $this->date = $date;
     }
@@ -256,6 +257,28 @@ class Connection
     {
         $this->value = 0;
         $this->promoValue = 0;
+    }
+
+    /**
+     * If connected for > 6 months, then take monthly prorated value for connection
+     */
+    public function prorateValue(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+        $diff = $date->diff($this->getDate());
+        //print $date->format(\DateTime::ATOM) . PHP_EOL;
+        //print_r($diff);
+        if ($diff->m < 6) {
+            return $this->clearValue();
+        } elseif ($diff->m >= 11) {
+            // TODO: consider this case - if less than 30 days to replace your connection, shouldn't you get it?
+            \AppBundle\Classes\NoOp::ignore([]);
+        }
+
+        $this->value = $this->toTwoDp($this->value * $diff->m / 12);
+        $this->promoValue = $this->toTwoDp($this->promoValue * $diff->m / 12);
     }
 
     public function getInitialValue()
@@ -314,5 +337,28 @@ class Connection
         $renewalConnection->setRenew(true);
 
         return $renewalConnection;
+    }
+
+    public function findInversedConnection()
+    {
+        if (!$this->getSourcePolicy()) {
+            return;
+        }
+        foreach ($this->getSourcePolicy()->getAcceptedConnections() as $connection) {
+            /*
+            print sprintf("%s/%s : %s -> %s\n",
+                $this->getSourcePolicy()->getId(),
+                $this->getLinkedPolicy()->getId(),
+                $connection->getSourcePolicy()->getId(),
+                $connection->getLinkedPolicy()->getId()
+            );
+            */
+            if ($this->getLinkedPolicy() &&
+                $this->getLinkedPolicy()->getId() == $connection->getSourcePolicy()->getId()) {
+                return $connection;
+            }
+        }
+
+        return null;
     }
 }
