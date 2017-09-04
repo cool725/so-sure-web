@@ -160,7 +160,7 @@ class Cashback
     public function setAmount($amount)
     {
         $this->amount = $amount;
-        if (!$this->initialAmount) {
+        if (!$this->initialAmount && $this->greaterThanZero($amount)) {
             $this->initialAmount = $amount;
         }
     }
@@ -240,7 +240,12 @@ class Cashback
     {
         $this->accountName = $accountName;
     }
-    
+
+    public function isAmountReduced()
+    {
+        return $this->greaterThanZero($this->initialAmount - $this->amount);
+    }
+
     public static function sumCashback($cashbacks)
     {
         $total = 0;

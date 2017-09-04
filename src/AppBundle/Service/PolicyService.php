@@ -1298,11 +1298,18 @@ class PolicyService
             $policy->fullyExpire($date);
             $this->dm->flush();
 
+            if ($policy->hasCashback()) {
+                // TODO: Do we need to check the status of the cashback prior to setting the status
+                // - any situations that shouldn't be allowed?
+                if ($this->areEqualToTwoDp(0, $this->getCashback()->getAmount())) {
+                    $this->updateCashback($policy->getCashback(), Cashback::STATUS_CLAIMED);
+                } else {
+                    $this->updateCashback($policy->getCashback(), Cashback::STATUS_PENDING_PAYMENT);
+                }
+            }
+
             if ($policy->hasAdjustedRewardPotPayment()) {
                 // TODO: notify user about reduced/0 pot
-                \AppBundle\Classes\NoOp::ignore([]);
-            } elseif ($policy->hasCashback()) {
-                // TODO: if cashback is present, then notify user about status
                 \AppBundle\Classes\NoOp::ignore([]);
             }
         } catch (ClaimException $e) {
@@ -1534,18 +1541,9 @@ class PolicyService
 
     public function updateCashback(Cashback $cashback, $status)
     {
-        if (in_array($cashback->getStatus(), [
-            Cashback::STATUS_PENDING_CLAIMABLE,
-            Cashback::STATUS_CLAIMED,
-        ])) {
+        if (!$cashback->getAmount()) {
             throw new \Exception(sprintf(
-                'Not allowed to change claimed/claimable cashback status id %s',
-                $cashback->getId()
-            ));
-        }
-        if (!$cashback->getAmount() || $this->areEqualToTwoDp(0, $cashback->getAmount())) {
-            throw new \Exception(sprintf(
-                'Missing cashback amount (or 0) id %s',
+                'Missing cashback amount id %s',
                 $cashback->getId()
             ));
         }
@@ -1554,7 +1552,13 @@ class PolicyService
         $cashback->setStatus($status);
         $this->dm->flush();
 
-        if (in_array($status, [Cashback::STATUS_PAID, Cashback::STATUS_FAILED, Cashback::STATUS_MISSING])) {
+        if (in_array($status, [
+            Cashback::STATUS_PAID,
+            Cashback::STATUS_FAILED,
+            Cashback::STATUS_MISSING,
+            Cashback::STATUS_CLAIMED,
+            Cashback::STATUS_PENDING_PAYMENT,
+        ])) {
             $this->cashbackEmail($cashback);
         }
     }
@@ -1570,6 +1574,15 @@ class PolicyService
         } elseif ($cashback->getStatus() == Cashback::STATUS_MISSING) {
             $baseTemplate = sprintf('AppBundle:Email:cashback/missing');
             $subject = sprintf('Your SO-SURE cashback');
+        } elseif ($cashback->getStatus() == Cashback::STATUS_PENDING_PAYMENT && !$cashback->isAmountReduced()) {
+            $baseTemplate = sprintf('AppBundle:Email:cashback/approved');
+            $subject = sprintf('Keeping your phone safe does pay off');
+        } elseif ($cashback->getStatus() == Cashback::STATUS_PENDING_PAYMENT && $cashback->isAmountReduced()) {
+            $baseTemplate = sprintf('AppBundle:Email:cashback/approved-reduced');
+            $subject = sprintf('Important information about your Reward Pot cashback');
+        } elseif ($cashback->getStatus() == Cashback::STATUS_CLAIMED) {
+            $baseTemplate = sprintf('AppBundle:Email:cashback/claimed');
+            $subject = sprintf('Important information about your Reward Pot cashback');
         } else {
             throw new \Exception('Unknown cashback status for email');
         }

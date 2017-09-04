@@ -738,7 +738,14 @@ class UserController extends BaseController
                 $cashbackForm->handleRequest($request);
                 if ($cashbackForm->isValid()) {
                     $policyService = $this->get('app.policy');
-                    $policyService->updateCashback($cashback, Cashback::STATUS_PENDING_PAYMENT);
+                    if ($cashback->getPolicy()->getStatus() == Policy::STATUS_EXPIRED) {
+                        $policyService->updateCashback($cashback, Cashback::STATUS_PENDING_PAYMENT);
+                    } elseif ($cashback->getPolicy()->getStatus() == Policy::STATUS_EXPIRED_CLAIMABLE) {
+                        // Don't think this case should occur, but the 2 combinations should work if it does
+                        $policyService->updateCashback($cashback, Cashback::STATUS_PENDING_CLAIMABLE);
+                    } else {
+                        throw new \Exception(sprintf('Unexpected policy status for cashback %s', $cashback->getId()));
+                    }
 
                     $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_CASHBACK);
 

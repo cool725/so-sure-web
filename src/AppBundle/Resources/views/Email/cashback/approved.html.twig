@@ -1,0 +1,24 @@
+{% extends 'AppBundle:Email:base.html.twig' %}
+{% import "AppBundle:Email:macros.html.twig" as macros %}
+{% block title %}Keeping your phone safe does pay off.{% endblock %}
+{% block body %}
+	{{ macros.start_table() }}
+	<h1>
+	   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+	</h1>
+	<div style="font-size: 14px; text-align: left;">
+	   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+	   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+        Hi {{ cashback.policy.user.name }},<br><br>
+        This is just to let you know that your Reward Pot value of £{{ cashback.amount|number_format(2,'.',',') }} has been approved and will be transfered to your bank account within the next 14 days. Turns out being careful with your devices does pay out :)
+		<br><br>
+        We hope you use it to treat yourself to something nice.
+		<br><br>
+		Thank you for using so-sure.
+		<br><br>
+        Best,<br>
+        SO-SURE Team
+	   </div>
+	</div>
+	{{ macros.end_table() }}
+{% endblock %}

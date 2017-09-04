@@ -2862,26 +2862,9 @@ abstract class Policy
             $this->addPayment($reward);
         }
 
-        // Update cashback state
+        // Ensure cashback has the correct amount
         if ($this->hasCashback()) {
-            // Status should be pending-claimable unless no banking details were provided (missing)
-            // any other status puts us in an unknown situation, so allow amount to be updated if claim, but
-            // don't change status (just in case)
-            $allowStatusUpdate = $this->getCashback()->getStatus() == Cashback::STATUS_PENDING_CLAIMABLE;
-            if ($this->areEqualToTwoDp($this->getCashback()->getAmount(), $this->getPotValue())) {
-                if ($allowStatusUpdate) {
-                    $this->getCashback()->setStatus(Cashback::STATUS_PENDING_PAYMENT);
-                }
-            } else {
-                $this->getCashback()->setAmount($this->getPotValue());
-                if ($this->areEqualToTwoDp(0, $this->getCashback()->getAmount())) {
-                    $this->getCashback()->setStatus(Cashback::STATUS_CLAIMED);
-                } else {
-                    if ($allowStatusUpdate) {
-                        $this->getCashback()->setStatus(Cashback::STATUS_PENDING_PAYMENT);
-                    }
-                }
-            }
+            $this->getCashback()->setAmount($this->getPotValue());
             $this->getCashback()->setDate(new \DateTime());
         }
 
