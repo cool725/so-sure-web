@@ -103,8 +103,11 @@ $(function() {
     // Hide warning if we leave the window
     $(window).blur(function() {
         $('#sms-login__warning').hide();
-        $('#sms-login__btn').prop('disabled', false);
         $('#btn-spinner').hide();
+        // After blur - if refocus enable button again (Mobile issue)
+        $(window).focus(function() {
+            $('#sms-login__btn').prop('disabled', false);
+        });
     });
 
 });
