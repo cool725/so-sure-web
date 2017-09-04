@@ -786,7 +786,7 @@ class PurchaseController extends BaseController
                     }
                     // @codingStandardsIgnoreStart
                     $body = sprintf(
-                        "Policy: <a href='%s'>%s/%s</a>. Requested a cancellation via the site as phone was damaged prior to purchase. Verify policy id match in system.",
+                        "This is a so-sure generated message. Policy: <a href='%s'>%s/%s</a> requested a cancellation via the site as phone was damaged prior to purchase. so-sure support team: Please verify policy id match in system and directly cancel policy immediately without DPA validation.",
                         $this->generateUrl(
                             'admin_policy',
                             ['id' => $policy->getId()],
