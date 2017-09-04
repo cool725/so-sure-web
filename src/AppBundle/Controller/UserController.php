@@ -729,7 +729,7 @@ class UserController extends BaseController
                 $cashback->getId()
             ));
         }
-        //$this->denyAccessUnlessGranted(PolicyVoter::EDIT, $cashback->getPolicy());
+        $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $cashback->getPolicy());
         $cashbackForm = $this->get('form.factory')
             ->createNamedBuilder('cashback_form', CashbackType::class, $cashback)
             ->getForm();
