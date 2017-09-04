@@ -1376,7 +1376,7 @@ class AdminEmployeeController extends BaseController
         } else {
             $now = new \DateTime($now);
         }
-        $date = new \DateTime('2016-09-12');
+        $date = new \DateTime('2016-09-12 00:00');
         // TODO: Be smarter with start date, but this at least drops number of queries down significantly
         while ($date < $now) {
             $end = clone $date;
@@ -1394,6 +1394,7 @@ class AdminEmployeeController extends BaseController
             $week = [
                 'start_date' => clone $date,
                 'end_date' => $end,
+                'end_date_disp' => (clone $end)->sub(new \DateInterval('PT1S')),
                 'count' => $count,
             ];
             $start = $this->startOfDay(clone $date);
@@ -1437,8 +1438,16 @@ class AdminEmployeeController extends BaseController
             $weeks[] = $week;
         }
 
+        $adjustedWeeks = array_slice($weeks, 0 - $numWeeks);
+        $reversedAdjustedWeeks = array_reverse($adjustedWeeks);
         return [
-            'weeks' =>  array_reverse(array_slice($weeks, 0 - $numWeeks)),
+            'weeks' => $reversedAdjustedWeeks,
+            'next_page' => $this->generateUrl('admin_kpi_date', [
+                'now' => $adjustedWeeks[0]['start_date']->format('y-m-d')
+            ]),
+            'previous_page' => $this->generateUrl('admin_kpi_date', [
+                'now' => $reversedAdjustedWeeks[0]['end_date']->format('y-m-d')
+            ]),
             'now' => $now,
         ];
     }

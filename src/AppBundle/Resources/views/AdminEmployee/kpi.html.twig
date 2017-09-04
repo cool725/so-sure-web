@@ -40,6 +40,8 @@
             <div class="col-md-2">
                 <div class="form-group" style="padding-top: 15px;">
                     <button class="btn btn-primary">Adjust date</button>
+                <a href="{{ previous_page }}"><i class="fa fa-arrow-left"></i></a>
+                <a href="{{ next_page }}"><i class="fa fa-arrow-right"></i></a>
                 </div>
             </div>
         </form>
@@ -52,7 +54,9 @@
                     <tr>
                     <th></th>
                     {% for week in weeks %}
-                        <td>{{ week.start_date|date('d M Y') }} - {{ week.end_date|date('d M Y') }}</td>
+                        <td>Ending <b>{{ week.end_date_disp|date('d M Y') }}</b><br>
+                            <small>{{ week.start_date|date('d M Y') }} - {{ week.end_date_disp|date('d M Y') }}</small>
+                        </td>
                     {% endfor %}
                     </tr>
                     </thead>
@@ -199,6 +203,12 @@
                             <td>Total Connections [KPI: 61 - just validate]</td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['totalActiveConnections'] }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td># Unique Policies w/Connections</td>
+                            {% for week in weeks %}
+                                <td>{{ week.period.data['newTotalPoliciesWithConnections'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>

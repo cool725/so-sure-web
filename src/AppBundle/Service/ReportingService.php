@@ -224,6 +224,17 @@ class ReportingService
         $data['totalActiveConnections'] = $connectionRepo->count(null, $totalEnd, false) / 2;
         $data['totalEndedConnections'] = $connectionRepo->count(null, $totalEnd, true) / 2;
 
+        $policies = [];
+        foreach ($connectionRepo->connectedByDate(null, $end, null) as $connection) {
+            if (!in_array($connection->getSourcePolicy()->getId(), $policies)) {
+                $policies[] = $connection->getSourcePolicy()->getId();
+            }
+            if (!in_array($connection->getLinkedPolicy()->getId(), $policies)) {
+                $policies[] = $connection->getLinkedPolicy()->getId();
+            }
+        }
+        $data['newTotalPoliciesWithConnections'] = count($policies);
+
         $data['newInvitations'] = $invitationRepo->count(null, $start, $end);
         $data['totalInvitations'] = $invitationRepo->count(null, null, $totalEnd);
 

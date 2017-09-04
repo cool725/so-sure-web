@@ -96,9 +96,15 @@ class ConnectionRepository extends BaseDocumentRepository
 
     public function count(\DateTime $start = null, \DateTime $end = null, $cancelled = false)
     {
+        return $this->connectedByDate($start, $end, $cancelled)->count();
+    }
+
+    public function connectedByDate(\DateTime $start = null, \DateTime $end = null, $cancelled = false)
+    {
         $qb = $this->createQueryBuilder();
         $qb->field('excludeReporting')->notEqual(true);
 
+        // TODO: Adjust this - should compare initial with final values
         if ($cancelled === false) {
             // connection = 0 are connections attached to a cancelled policy
             $qb->field('value')->gt(0);
@@ -119,8 +125,7 @@ class ConnectionRepository extends BaseDocumentRepository
         }
 
         return $qb->getQuery()
-            ->execute()
-            ->count();
+            ->execute();
     }
 
     public function countByConnection($connections)
