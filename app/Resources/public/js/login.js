@@ -95,12 +95,16 @@ $(function() {
     $('#sms-login__btn').on('click', function(e) {
         e.preventDefault();
         $('#sms-login__warning').show();
+        $('#sms-login__btn').prop('disabled', true);
+        $('#btn-spinner').show();
         smsLogin();
     });
 
     // Hide warning if we leave the window
     $(window).blur(function() {
         $('#sms-login__warning').hide();
+        $('#sms-login__btn').prop('disabled', false);
+        $('#btn-spinner').hide();
     });
 
 });
