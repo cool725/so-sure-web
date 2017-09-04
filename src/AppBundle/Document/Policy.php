@@ -2288,6 +2288,7 @@ abstract class Policy
 
     public function getUnreplacedConnectionCancelledPolicyInLast30Days($date = null)
     {
+        $unreplacedConnections = [];
         foreach ($this->getConnections() as $connection) {
             if ($connection->getReplacementUser() || $connection instanceof RewardConnection) {
                 continue;
@@ -2297,11 +2298,20 @@ abstract class Policy
                 throw new \Exception(sprintf('Invalid connection in policy %s', $this->getId()));
             }
             if ($policy->isCancelled() && $policy->hasEndedInLast30Days($date)) {
-                return $connection;
+                $unreplacedConnections[] = $connection;
             }
         }
 
-        return null;
+        if (count($unreplacedConnections) == 0) {
+            return null;
+        }
+
+        // sort older to more recent
+        usort($unreplacedConnections, function ($a, $b) {
+            return $a->getLinkedPolicy()->getEnd() > $b->getLinkedPolicy()->getEnd();
+        });
+
+        return $unreplacedConnections[0];
     }
 
     public function hasNetworkClaimedInLast30Days($date = null, $includeOpen = false)

@@ -1022,6 +1022,8 @@ class InvitationService
             $connectionValue = $replacementConnection->getInitialValue();
             $promoConnectionValue = $replacementConnection->getInitialPromoValue();
             $replacementConnection->setReplacementUser($linkedUser);
+            $replacementConnection->setValue(0);
+            $replacementConnection->setPromoValue(0);
         }
         $connection = new StandardConnection();
         $connection->setLinkedUser($linkedUser);
