@@ -2064,6 +2064,15 @@ abstract class Policy
         return $this->isExpired() || $this->isCancelled();
     }
 
+    public function isClaimable()
+    {
+        return in_array($this->getStatus(), [
+           self::STATUS_ACTIVE,
+           self::STATUS_UNPAID,
+           self::STATUS_EXPIRED_CLAIMABLE,
+        ]);
+    }
+
     /**
      * User declined indicates that this user should not be allowed to purchase/repurchase/renew any policies
      */
