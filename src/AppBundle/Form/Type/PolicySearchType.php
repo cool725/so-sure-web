@@ -36,6 +36,19 @@ class PolicySearchType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        // TODO: Determine if claims or admin search and hide a few statuses
+        $statuses = [
+            'Any' => null,
+            'Current' => 'current',
+            Policy::STATUS_PENDING => Policy::STATUS_PENDING,
+            Policy::STATUS_ACTIVE => Policy::STATUS_ACTIVE,
+            Policy::STATUS_CANCELLED => Policy::STATUS_CANCELLED,
+            Policy::STATUS_EXPIRED => Policy::STATUS_EXPIRED,
+            Policy::STATUS_EXPIRED_CLAIMABLE => Policy::STATUS_EXPIRED_CLAIMABLE,
+            Policy::STATUS_UNPAID => Policy::STATUS_UNPAID,
+            Policy::STATUS_PENDING_RENEWAL => Policy::STATUS_PENDING_RENEWAL,
+            Policy::STATUS_RENEWAL => Policy::STATUS_RENEWAL,
+        ];
         $builder
             ->add('email', TextType::class, ['required' => false])
             ->add('mobile', TextType::class, ['required' => false])
@@ -47,18 +60,7 @@ class PolicySearchType extends AbstractType
             ->add('status', ChoiceType::class, [
                 'required' => false,
                 'data' => 'current',
-                'choices' => [
-                    'Any' => null,
-                    'Current' => 'current',
-                    Policy::STATUS_PENDING => Policy::STATUS_PENDING,
-                    Policy::STATUS_ACTIVE => Policy::STATUS_ACTIVE,
-                    Policy::STATUS_CANCELLED => Policy::STATUS_CANCELLED,
-                    Policy::STATUS_EXPIRED => Policy::STATUS_EXPIRED,
-                    Policy::STATUS_EXPIRED_CLAIMABLE => Policy::STATUS_EXPIRED_CLAIMABLE,
-                    Policy::STATUS_UNPAID => Policy::STATUS_UNPAID,
-                    Policy::STATUS_PENDING_RENEWAL => Policy::STATUS_PENDING_RENEWAL,
-                    Policy::STATUS_RENEWAL => Policy::STATUS_RENEWAL,
-                ]
+                'choices' => $statuses,
             ])
             ->add('sosure', ChoiceType::class, [
                 'required' => false,
