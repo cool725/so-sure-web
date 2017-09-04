@@ -1090,11 +1090,17 @@ class AdminEmployeeController extends BaseController
                         '',
                     'number' => $connection->getSourcePolicy()->getPolicyNumber(),
                     'connections' => [],
+                    'connections_details' => [],
+                    'isCancelled' => $connection->getSourcePolicy()->isCancelled(),
                 ];
             }
             $data[$connection->getSourcePolicy()->getId()]['connections'][] = $connection->getDate() ?
                 $connection->getDate()->format('d M Y') :
                 '';
+            $data[$connection->getSourcePolicy()->getId()]['connections_details'][] = [
+                'date' => $connection->getDate() ? $connection->getDate()->format('d M Y') : '',
+                'value' => $connection->getValue(),
+            ];
         }
 
         usort($data, function ($a, $b) {
