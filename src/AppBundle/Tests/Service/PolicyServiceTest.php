@@ -1403,6 +1403,12 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals($premium->getYearlyGwp(), $renewalPolicy->getUsedGwp());
         $this->assertEquals($premium->getYearlyIpt(), $renewalPolicy->getTotalIpt());
         $this->assertEquals(Salva::YEARLY_TOTAL_COMMISSION, $renewalPolicy->getTotalBrokerFee());
+
+        static::$policyService->expire($policy, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policy->getStatus());
+
+        static::$policyService->fullyExpire($policy, new \DateTime('2017-01-29'));
+        $this->assertEquals(Policy::STATUS_EXPIRED, $policy->getStatus());
     }
 
     public function testPolicyActiveWithConnections()
@@ -1491,6 +1497,12 @@ class PolicyServiceTest extends WebTestCase
             new \DateTime('2017-01-31'),
             $renewalPolicyB->getPolicyExpirationDate(new \DateTime('2017-01-01'))
         );
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        static::$policyService->fullyExpire($policyA, new \DateTime('2017-01-29'));
+        $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
     }
 
     public function testPolicyActiveWithConnectionsNoRenewal()
@@ -1581,6 +1593,15 @@ class PolicyServiceTest extends WebTestCase
             new \DateTime('2017-01-31'),
             $renewalPolicyB->getPolicyExpirationDate(new \DateTime('2017-01-01'))
         );
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+        $this->assertNotNull($policyA->getCashback());
+        $this->assertEquals(10, $policyA->getCashback()->getAmount());
+        $this->assertEquals(Cashback::STATUS_MISSING, $policyA->getCashback()->getStatus());
+
+        static::$policyService->fullyExpire($policyA, new \DateTime('2017-01-29'));
+        $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
     }
 
     public function testNotReconnectedDoesNotAppear()

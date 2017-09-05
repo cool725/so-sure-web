@@ -1298,10 +1298,12 @@ class PolicyService
             $policy->fullyExpire($date);
             $this->dm->flush();
 
-            if ($policy->hasCashback()) {
-                // TODO: Do we need to check the status of the cashback prior to setting the status
-                // - any situations that shouldn't be allowed?
-                if ($this->areEqualToTwoDp(0, $this->getCashback()->getAmount())) {
+            if ($policy->hasCashback() && !in_array($policy->getCashback()->getStatus(), [
+                Cashback::STATUS_MISSING,
+                Cashback::STATUS_FAILED,
+                Cashback::STATUS_PAID,
+            ])) {
+                if ($this->areEqualToTwoDp(0, $policy->getCashback()->getAmount())) {
                     $this->updateCashback($policy->getCashback(), Cashback::STATUS_CLAIMED);
                 } else {
                     $this->updateCashback($policy->getCashback(), Cashback::STATUS_PENDING_PAYMENT);
