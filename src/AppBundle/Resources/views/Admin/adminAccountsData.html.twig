@@ -272,6 +272,7 @@
         <td>Number of Active Policies (as of end {{ month }} / {{ year }})</td>
         <td>{{ activePolicies }}</td>
     </tr>
+    {#
     <tr>
         <td width="{{ indent_width }}"></td>
         <td>Number of Active Policies w/Reward Pot Discount (as of end {{ month }} / {{ year }})</td>
@@ -282,9 +283,10 @@
         <td>Reward Pot Liability <br /><i>Active Policies not ending in month w/Reward Pot</i></td>
         <td>£{{ rewardPotLiability|number_format(2, '.', ',') }}</td>
     </tr>
+    #}
     <tr>
         <td width="{{ indent_width }}"></td>
-        <td>Run Rate Premium</td>
+        <td>Annual Run Rate Premium</td>
         <td>£{{ paymentTotals.totalRunRate|number_format(0, '.', ',') }}</td>
     </tr>
 </table>
