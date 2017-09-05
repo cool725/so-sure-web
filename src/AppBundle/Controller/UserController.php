@@ -667,7 +667,7 @@ class UserController extends BaseController
             if ($renewConnectionsForm->isValid()) {
                 $dm->flush();
                 $this->addFlash('success', 'Your connections have been updated');
-    
+
                 return new RedirectResponse(
                     $this->generateUrl('user_renew_completed', ['id' => $id])
                 );
