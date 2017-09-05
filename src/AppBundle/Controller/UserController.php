@@ -667,7 +667,7 @@ class UserController extends BaseController
             if ($renewConnectionsForm->isValid()) {
                 $dm->flush();
                 $this->addFlash('success', 'Your connections have been updated');
-    
+
                 return new RedirectResponse(
                     $this->generateUrl('user_renew_completed', ['id' => $id])
                 );
@@ -729,7 +729,7 @@ class UserController extends BaseController
                 $cashback->getId()
             ));
         }
-        $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $cashback->getPolicy());
+        // $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $cashback->getPolicy());
         $cashbackForm = $this->get('form.factory')
             ->createNamedBuilder('cashback_form', CashbackType::class, $cashback)
             ->getForm();
