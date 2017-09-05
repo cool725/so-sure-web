@@ -3554,7 +3554,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertTrue($foundPotRefund);
         $this->assertNotNull($updatedPolicyA->getCashback());
         $this->assertEquals(0, $updatedPolicyA->getCashback()->getAmount());
-        $this->assertEquals(Cashback::STATUS_CLAIMED, $updatedPolicyA->getCashback()->getStatus());
+        $this->assertEquals(Cashback::STATUS_MISSING, $updatedPolicyA->getCashback()->getStatus());
     }
 
     public function testExpireNoPromoWithCashback()
