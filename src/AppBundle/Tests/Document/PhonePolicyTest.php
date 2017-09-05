@@ -535,8 +535,8 @@ class PhonePolicyTest extends WebTestCase
 
     public function testCalculatePotValueOneConnection()
     {
-        $policyA = static::createUserPolicy();
-        $policyB = static::createUserPolicy();
+        $policyA = static::createUserPolicy(true);
+        $policyB = static::createUserPolicy(true);
         list($connectionA, $connectionB) = $this->createLinkedConnections($policyA, $policyB, 10, 10);
 
         $this->assertEquals(10, $policyA->calculatePotValue());
@@ -544,10 +544,10 @@ class PhonePolicyTest extends WebTestCase
 
     public function testCalculatePromoPotValueOneConnection()
     {
-        $policyA = static::createUserPolicy();
+        $policyA = static::createUserPolicy(true);
         $policyA->setPromoCode(SalvaPhonePolicy::PROMO_LAUNCH);
         $policyA->setPhone(static::$phone);
-        $policyB = static::createUserPolicy();
+        $policyB = static::createUserPolicy(true);
         list($connectionA, $connectionB) = $this->createLinkedConnections($policyA, $policyB, 15, 10);
         $policyA->setStatus(SalvaPhonePolicy::STATUS_PENDING);
         $policyA->setStart(new \DateTime('2016-01-01'));
@@ -562,8 +562,8 @@ class PhonePolicyTest extends WebTestCase
 
     public function testCalculatePotValueOneInitialOnePostCliffConnection()
     {
-        $policyA = static::createUserPolicy();
-        $policyB = static::createUserPolicy();
+        $policyA = static::createUserPolicy(true);
+        $policyB = static::createUserPolicy(true);
         list($connectionInitialA, $connectionInitialB) = $this->createLinkedConnections($policyA, $policyB, 10, 10);
         list($connectionPostCliffA, $connectionPostCliffB) = $this->createLinkedConnections($policyA, $policyB, 2, 2);
 
@@ -572,11 +572,11 @@ class PhonePolicyTest extends WebTestCase
 
     public function testCalculatePotValueOneValidNetworkClaimThirtyPot()
     {
-        $policy = static::createUserPolicy();
+        $policy = static::createUserPolicy(true);
 
         $linkedPolicies = [];
         for ($i = 1; $i <= 3; $i++) {
-            $linkedPolicy = static::createUserPolicy();
+            $linkedPolicy = static::createUserPolicy(true);
             list($connectionA, $connectionB) = $this->createLinkedConnections($policy, $linkedPolicy, 10, 10);
             $linkedPolicies[] = $linkedPolicy;
         }
@@ -610,11 +610,11 @@ class PhonePolicyTest extends WebTestCase
 
     public function testCalculatePotValueOneValidClaimFourtyPot()
     {
-        $policy = static::createUserPolicy();
+        $policy = static::createUserPolicy(true);
 
         $linkedPolicies = [];
         for ($i = 1; $i <= 4; $i++) {
-            $linkedPolicy = static::createUserPolicy();
+            $linkedPolicy = static::createUserPolicy(true);
             list($connectionA, $connectionB) = $this->createLinkedConnections($policy, $linkedPolicy, 10, 10);
             $linkedPolicies[] = $linkedPolicy;
         }
@@ -629,11 +629,11 @@ class PhonePolicyTest extends WebTestCase
 
     public function testCalculatePotValueTwoValidNetworkClaimFourtyPot()
     {
-        $policy = static::createUserPolicy();
+        $policy = static::createUserPolicy(true);
 
         $linkedPolicies = [];
         for ($i = 1; $i <= 4; $i++) {
-            $linkedPolicy = static::createUserPolicy();
+            $linkedPolicy = static::createUserPolicy(true);
             list($connectionA, $connectionB) = $this->createLinkedConnections($policy, $linkedPolicy, 10, 10);
             $linkedPolicies[] = $linkedPolicy;
         }
@@ -654,11 +654,11 @@ class PhonePolicyTest extends WebTestCase
 
     public function testCalculatePotValueOneInvalidNetworkClaimFourtyPot()
     {
-        $policy = static::createUserPolicy();
+        $policy = static::createUserPolicy(true);
 
         $linkedPolicies = [];
         for ($i = 1; $i <= 4; $i++) {
-            $linkedPolicy = static::createUserPolicy();
+            $linkedPolicy = static::createUserPolicy(true);
             list($connectionA, $connectionB) = $this->createLinkedConnections($policy, $linkedPolicy, 10, 10);
             $linkedPolicies[] = $linkedPolicy;
         }
