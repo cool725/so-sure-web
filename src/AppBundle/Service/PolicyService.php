@@ -1322,6 +1322,7 @@ class PolicyService
 
     public function cashback(Policy $policy, Cashback $cashback)
     {
+        // TODO: Validate cashback amount
         $policy->setCashback($cashback);
         //$this->dm->persist($cashback);
         $this->dm->flush();

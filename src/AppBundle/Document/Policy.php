@@ -2750,9 +2750,9 @@ abstract class Policy
 
         $this->updatePotValue();
 
-        if ($this->getPotValue() > 0 && !$this->areEqualToTwoDp(0, $this->getPotValue())) {
+        if ($this->greaterThanZero($this->getPotValue())) {
             // Promo pot reward
-            if ($this->getPromoPotValue() > 0 && !$this->areEqualToTwoDp(0, $this->getPromoPotValue())) {
+            if ($this->greaterThanZero($this->getPromoPotValue())) {
                 $reward = new SoSurePotRewardPayment();
                 $reward->setAmount($this->toTwoDp(0 - $this->getPromoPotValue()));
                 $this->addPayment($reward);
@@ -2802,9 +2802,11 @@ abstract class Policy
         }
 
         if (!$this->isRenewed()) {
+//            throw new \Exception('not renewed');
             foreach ($this->getStandardConnections() as $connection) {
                 if ($inversedConnection = $connection->findInversedConnection()) {
                     $inversedConnection->prorateValue($date);
+                    $inversedConnection->getSourcePolicy()->updatePotValue();
                     // listener on connection will notify user
                 }
             }
@@ -3418,7 +3420,15 @@ abstract class Policy
             return false;
         }
 
-        return $this->getNextPolicy()->getStatus() == Policy::STATUS_RENEWAL;
+        // Typically would expect renewal status
+        // however, if checked post active, then the status would be active/unpaid
+        // or various other statuses
+        // however, if pending renewal or unrenewed, then policy has definitely not been renewed
+        // so a safer assumption
+        return !in_array($this->getNextPolicy()->getStatus(), [
+            Policy::STATUS_PENDING_RENEWAL,
+            Policy::STATUS_UNRENEWED,
+        ]);
     }
 
     /**
