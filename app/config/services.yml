@@ -586,6 +586,13 @@ services:
             -  { name: doctrine_mongodb.odm.event_listener, event: postPersist }
             -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
 
+    doctrine.listener.connection:
+        class:   AppBundle\Listener\DoctrineConnectionListener
+        arguments:
+            dispatcher: "@event_dispatcher"
+        tags:
+            -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
+
     doctrine.listener.salva:
         class:   AppBundle\Listener\DoctrineSalvaListener
         arguments:

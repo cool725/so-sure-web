@@ -48,11 +48,13 @@
             {% for policy in data %}
                 {% set total = total + policy.connection_count %}
                 <tr>
-                    <td style="width: 10%"><a href="{{ path('admin_policy', {'id': policy.id }) }}">{{ policy.number }}</a></td>
+                    <td style="width: 10%" class="{% if policy.isCancelled %}bg-danger{% endif %}">
+                        <a href="{{ path('admin_policy', {'id': policy.id }) }}">{{ policy.number }}</a>
+                    </td>
                     <td>{{ policy.date }}</td>
                     <td>{{ policy.connection_count }}</td>
-                    {% for connection in policy.connections %}
-                        <td>{{ connection }}</td>
+                    {% for connection in policy.connections_details %}
+                        <td class="{% if connection.value == 0 %}bg-danger{% endif %}">{{ connection.date }}</td>
                     {% endfor %}
                 </tr>
             {% endfor %}

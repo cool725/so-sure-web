@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Document;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Phone;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\User;
 use AppBundle\Document\PolicyTerms;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -38,6 +39,111 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $connection->setPromoValue(5);
         $this->assertEquals(5, $connection->getPromoValue());
         $this->assertEquals(15, $connection->getTotalValue());
+    }
+
+    public function testInversedConnection()
+    {
+        $userA = new User();
+        $policyA = new PhonePolicy();
+        $policyA->setId(1);
+        $policyA->setUser($userA);
+
+        $userB = new User();
+        $policyB = new PhonePolicy();
+        $policyB->setId(2);
+        $policyB->setUser($userB);
+
+        $userC = new User();
+        $policyC = new PhonePolicy();
+        $policyC->setId(3);
+        $policyC->setUser($userC);
+
+        $connectionAB = new StandardConnection();
+        $connectionAB->setId(12);
+        $connectionAB->setLinkedPolicy($policyB);
+        $this->assertNull($connectionAB->findInversedConnection());
+
+        $policyA->addConnection($connectionAB);
+        $this->assertNull($connectionAB->findInversedConnection());
+
+        $connectionAC = new StandardConnection();
+        $connectionAC->setId(13);
+        $connectionAC->setLinkedPolicy($policyC);
+        $this->assertNull($connectionAC->findInversedConnection());
+
+        $policyA->addConnection($connectionAC);
+        $this->assertNull($connectionAB->findInversedConnection());
+
+        $connectionBA = new StandardConnection();
+        $connectionBA->setId(21);
+        $connectionBA->setLinkedPolicy($policyA);
+        $policyB->addConnection($connectionBA);
+
+        $connectionBC = new StandardConnection();
+        $connectionBC->setId(23);
+        $connectionBC->setLinkedPolicy($policyC);
+        $policyB->addConnection($connectionBC);
+
+        $connectionCA = new StandardConnection();
+        $connectionCA->setId(31);
+        $connectionCA->setLinkedPolicy($policyA);
+        $policyC->addConnection($connectionCA);
+
+        $connectionCB = new StandardConnection();
+        $connectionCB->setId(32);
+        $connectionCB->setLinkedPolicy($policyB);
+        $policyC->addConnection($connectionCB);
+
+        $this->assertEquals(21, $connectionAB->findInversedConnection()->getId());
+        $this->assertEquals(12, $connectionBA->findInversedConnection()->getId());
+
+        $this->assertEquals(31, $connectionAC->findInversedConnection()->getId());
+        $this->assertEquals(13, $connectionCA->findInversedConnection()->getId());
+
+        $this->assertEquals(32, $connectionBC->findInversedConnection()->getId());
+        $this->assertEquals(23, $connectionCB->findInversedConnection()->getId());
+    }
+
+    public function testConnectionProrate()
+    {
+        $connection = new StandardConnection();
+        $connection->setDate(new \DateTime('2016-01-01'));
+
+        // reset
+        $connection->setValue(10);
+        $connection->setPromoValue(5);
+
+        // 5 months
+        $connection->prorateValue(new \DateTime('2016-06-01 00:00:01'));
+        $this->assertEquals(0, $connection->getValue());
+        $this->assertEquals(0, $connection->getTotalValue());
+
+        // reset
+        $connection->setValue(10);
+        $connection->setPromoValue(5);
+
+        // 6 months
+        $connection->prorateValue(new \DateTime('2016-07-01 00:00:01'));
+        $this->assertEquals(5, $connection->getValue());
+        $this->assertEquals(7.5, $connection->getTotalValue());
+
+        // reset
+        $connection->setValue(10);
+        $connection->setPromoValue(5);
+
+        // 7 months
+        $connection->prorateValue(new \DateTime('2016-08-01 00:00:01'));
+        $this->assertEquals(5.83, $connection->getValue());
+        $this->assertEquals(8.75, $connection->getTotalValue());
+
+        // reset
+        $connection->setValue(10);
+        $connection->setPromoValue(5);
+
+        // 11 months
+        $connection->prorateValue(new \DateTime('2016-12-01 00:00:01'));
+        $this->assertEquals(9.17, $connection->getValue());
+        $this->assertEquals(13.75, $connection->getTotalValue());
     }
 
     public function testConnectionApi()

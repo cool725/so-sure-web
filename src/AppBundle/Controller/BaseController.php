@@ -726,9 +726,18 @@ abstract class BaseController extends Controller
         }
 
         $status = (string) $form->get('status')->getData();
+        // having a - in the name of the status requires a special case
         if ($status == 'current') {
             $policiesQb = $policiesQb->addAnd(
                 $policiesQb->expr()->field('status')->in([Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID])
+            );
+        } elseif ($status == Policy::STATUS_EXPIRED_CLAIMABLE) {
+            $policiesQb = $policiesQb->addAnd(
+                $policiesQb->expr()->field('status')->in([Policy::STATUS_EXPIRED_CLAIMABLE])
+            );
+        } elseif ($status == Policy::STATUS_PENDING_RENEWAL) {
+            $policiesQb = $policiesQb->addAnd(
+                $policiesQb->expr()->field('status')->in([Policy::STATUS_PENDING_RENEWAL])
             );
         } else {
             $this->formToMongoSearch($form, $policiesQb, 'status', 'status', false, true);
