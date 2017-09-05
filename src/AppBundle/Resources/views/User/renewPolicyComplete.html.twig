@@ -42,37 +42,37 @@
 {% endblock %}
 
 {% block actions %}
-    {{ form_start(renew_connections_form) }}
     {% if renew_connections_form.renewalConnections|length > 0%}
-        <div class="connections">
-            <div class="connections__list">
-                {% for renewalConnection in renew_connections_form.renewalConnections %}
-                    <div class="connections__user connections__user--selected">
-                        {{ form_row(renewalConnection.renew) }}
-                        <img src="{{ renewalConnection.vars.data.linkedUser.getImageUrlFallback }}"     style="width: 50px"
-                             title="{{ renewalConnection.vars.data.linkedUser.name }}"
-                             alt="{{ renewalConnection.vars.data.linkedUser.name }}"
-                             class="
-                            {% if not renewalConnection.vars.data.linkedPolicy.hasMonetaryClaimed %}
-                                img-circle coffee-stamp
-                            {% else %}{% endif %}" />
-                        <span class="">{{ renewalConnection.vars.data.linkedUser.name }}</span>
+        {{ form_start(renew_connections_form) }}
+            <div class="connections">
+                <div class="connections__list">
+                    {% for renewalConnection in renew_connections_form.renewalConnections %}
+                        <div class="connections__user connections__user--selected">
+                            {{ form_row(renewalConnection.renew) }}
+                            <img src="{{ renewalConnection.vars.data.linkedUser.getImageUrlFallback }}"     style="width: 50px"
+                                 title="{{ renewalConnection.vars.data.linkedUser.name }}"
+                                 alt="{{ renewalConnection.vars.data.linkedUser.name }}"
+                                 class="
+                                {% if not renewalConnection.vars.data.linkedPolicy.hasMonetaryClaimed %}
+                                    img-circle coffee-stamp
+                                {% else %}{% endif %}" />
+                            <span class="">{{ renewalConnection.vars.data.linkedUser.name }}</span>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="checkout--step">
+                <div class="container">
+                    <div class="form">
+                        <div class="form-group">
+                            {{ form_widget(renew_connections_form.save, {'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
+                        </div>
+                        <div class="form-group">
+                            <a href="{{ path('user_home') }}" class="btn btn-blue-hollow btn-block btn-pad">Back</a>
+                        </div>
                     </div>
-                {% endfor %}
+                </div>
             </div>
-        </div>
+        {{ form_end(renew_connections_form) }}
     {% endif %}
-    <div class="checkout--step">
-        <div class="container">
-            <div class="form">
-                <div class="form-group">
-                    {{ form_widget(renew_connections_form.save, {'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
-                </div>
-                <div class="form-group">
-                    <a href="{{ path('user_home') }}" class="btn btn-blue-hollow btn-block btn-pad">Back</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    {{ form_end(renew_connections_form) }}
 {% endblock %}
