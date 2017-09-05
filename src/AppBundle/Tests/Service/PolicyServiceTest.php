@@ -1739,8 +1739,10 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
         $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
 
-        $this->assertEquals(0, $renewalPolicyA->getPotValue());
-        $this->assertEquals(0, $renewalPolicyB->getPotValue());
+        $updatedRenewalPolicyA = $policyRepo->find($renewalPolicyA->getId());
+        $updatedRenewalPolicyB = $policyRepo->find($renewalPolicyB->getId());
+        $this->assertEquals(0, $updatedRenewalPolicyA->getPotValue());
+        $this->assertEquals(0, $updatedRenewalPolicyB->getPotValue());
     }
 
     public function testSalvaRenewalCooloff()
