@@ -171,8 +171,8 @@ class MonitorService
 
     public function mixpanelUserCount()
     {
-        // acutal 26000 for plan
-        $maxUsers = 25000;
+        // acutal 50,000 for plan
+        $maxUsers = 48000;
         $total = $this->mixpanel->getUserCount();
         if ($total > $maxUsers) {
             throw new \Exception(sprintf('User count %d too high (warning %d)', $total, $maxUsers));

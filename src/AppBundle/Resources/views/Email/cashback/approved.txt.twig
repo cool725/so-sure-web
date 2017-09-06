@@ -1,0 +1,17 @@
+{% extends 'AppBundle:Email:base.txt.twig' %}
+{% block body %}
+Keeping your phone safe does pay off.
+
+**
+------------------------------------------------------------
+Hi {{ cashback.policy.user.name }},
+
+This is just to let you know that your Reward Pot value of £{{ cashback.amount|number_format(2,'.',',') }} has been approved and will be transfered to your bank account within the next 14 days. Turns out being careful with your devices does pay out :)
+
+We hope you use it to treat yourself to something nice.
+
+Thank you for using so-sure.
+
+Best,
+SO-SURE Team
+{% endblock body %}

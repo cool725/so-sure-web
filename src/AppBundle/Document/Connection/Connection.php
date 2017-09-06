@@ -268,8 +268,8 @@ class Connection
             $date = new \DateTime();
         }
         $diff = $date->diff($this->getDate());
-        //print $date->format(\DateTime::ATOM) . PHP_EOL;
-        //print_r($diff);
+        // print $date->format(\DateTime::ATOM) . PHP_EOL;
+        // print_r($diff);
         if ($diff->m < 6) {
             return $this->clearValue();
         } elseif ($diff->m >= 11) {

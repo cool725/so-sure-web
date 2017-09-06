@@ -10,16 +10,18 @@
         <input type="hidden" value="+44" id="country_code" class="form-control" />
     </div>
     <div class="form-group">
-        <input placeholder="Mobile number" id="phone_number" class="form-control input-lg" />
+        <input placeholder="Mobile number" id="phone_number" class="form-control input-lg" type="tel" />
         <span class="help-block text-center"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> UK numbers only</span>
     </div>
     <div class="form-group">
-        <button id="sms-login__btn" class="btn btn-success btn-block">Login via SMS</button>
+        <button id="sms-login__btn" class="btn btn-success btn-block">
+            <span id="btn-spinner" style="display:none;"><i class="fa fa-refresh fa-spin"></i></span>
+            Login via SMS
+        </button>
     </div>
     <div id="sms-login__warning" class="form-group" style="display:none;">
         <div class="help-block">
-            Opening a new window there may be a small delay <br><br>
-            <i class="fa fa-refresh fa-spin fa-2x"></i>
+            <small>There may be a small delay whilst we open a new window.<br><br></small>
         </div>
     </div>
 </div>

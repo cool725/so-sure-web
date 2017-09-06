@@ -348,6 +348,10 @@
             margin-left: 15px;
         }
 
+        input[type='checkbox'] {
+            cursor: pointer;
+        }
+
         &:last-of-type {
             border: none;
         }

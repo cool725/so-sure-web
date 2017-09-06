@@ -210,19 +210,23 @@ $(function(){
 
     // Connections
     $('.connections__user').on('click', function(e) {
+        e.stopPropagation();
 
-        // Find the > checkbox
-        var checkbox = $(this).find('input[type="checkbox"]');
+        var checkbox = $(this).find(':checkbox'),
+            checked  = checkbox.is(':checked');
 
-        // If checkbox is checked or not
-        if ($(checkbox).prop('checked')) {
+        if (checked) {
             $(checkbox).prop('checked', false);
         } else {
             $(checkbox).prop('checked', true);
         }
 
-        // Toggle selected class
-        $(this).toggleClass('connections__user--selected');
     });
+
+    // Bind event to trigger the click on the parent
+    $('.connections__user div input:checkbox').click(function(e) {
+        $(this).parent().parent().click();
+    });
+
 
 });
