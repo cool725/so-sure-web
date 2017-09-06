@@ -52,6 +52,7 @@ abstract class Policy
     const STATUS_ACTIVE = 'active';
     const STATUS_CANCELLED = 'cancelled';
     const STATUS_EXPIRED_CLAIMABLE = 'expired-claimable';
+    const STATUS_EXPIRED_WAIT_CLAIM = 'expired-wait-claim';
     const STATUS_EXPIRED = 'expired';
     const STATUS_UNPAID = 'unpaid';
     const STATUS_MULTIPAY_REQUESTED = 'multipay-requested';
@@ -147,8 +148,8 @@ abstract class Policy
     protected $payer;
 
     /**
-     * @Assert\Choice({"pending", "active", "cancelled", "expired", "expired-claimable", "unpaid",
-     *                  "multipay-requested", "multipay-rejected", "renewal",
+     * @Assert\Choice({"pending", "active", "cancelled", "expired", "expired-claimable", "expired-wait-claim",
+     *                  "unpaid", "multipay-requested", "multipay-rejected", "renewal",
      *                  "pending-renewal", "unrenewed"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
@@ -766,6 +767,15 @@ abstract class Policy
 
     public function getStatus()
     {
+        return $this->status;
+    }
+
+    public function getApiStatus()
+    {
+        if ($this->getStatus() == self::STATUS_EXPIRED_WAIT_CLAIM) {
+            return self::STATUS_EXPIRED;
+        }
+
         return $this->status;
     }
 
@@ -2046,7 +2056,11 @@ abstract class Policy
 
     public function isExpired()
     {
-        return in_array($this->getStatus(), [self::STATUS_EXPIRED, self::STATUS_EXPIRED_CLAIMABLE]);
+        return in_array($this->getStatus(), [
+            self::STATUS_EXPIRED,
+            self::STATUS_EXPIRED_CLAIMABLE,
+            self::STATUS_EXPIRED_WAIT_CLAIM,
+        ]);
     }
 
     public function isUnrenewed()
@@ -2149,7 +2163,8 @@ abstract class Policy
         if (in_array($this->getStatus(), [
             self::STATUS_CANCELLED,
             self::STATUS_EXPIRED,
-            self::STATUS_EXPIRED_CLAIMABLE
+            self::STATUS_EXPIRED_CLAIMABLE,
+            self::STATUS_EXPIRED_WAIT_CLAIM,
         ])) {
             return false;
         }
@@ -2826,17 +2841,25 @@ abstract class Policy
             throw new \Exception('Unable to expire a policy prior to its end date');
         }
 
-        if (!in_array($this->getStatus(), [
-            self::STATUS_EXPIRED_CLAIMABLE,
-        ])) {
-            throw new \Exception('Unable to fully expire a policy if status is not expired-claimable');
+        if (!in_array($this->getStatus(), [self::STATUS_EXPIRED_CLAIMABLE, self::STATUS_EXPIRED_WAIT_CLAIM])) {
+            throw new \Exception('Unable to fully expire a policy if status is not expired-claimable or wait-claim');
         }
 
         if ($this->hasOpenClaim() || $this->hasOpenNetworkClaim()) {
-            throw new ClaimException(sprintf(
-                'Unable to fully expire policy %s as it has an open claim/network claim',
-                $this->getId()
-            ));
+            // if already set, avoid setting again as might trigger db logging
+            if ($this->getStatus() == self::STATUS_EXPIRED_WAIT_CLAIM) {
+                return;
+            }
+            $this->setStatus(self::STATUS_EXPIRED_WAIT_CLAIM);
+
+            // we want the pot value up to date for email about delay
+            $this->updatePotValue();
+            if ($this->hasCashback()) {
+                $this->getCashback()->setAmount($this->getPotValue());
+                $this->getCashback()->setDate(new \DateTime());
+            }
+
+            return;
         }
 
         $this->setStatus(Policy::STATUS_EXPIRED);
@@ -3072,6 +3095,7 @@ abstract class Policy
             self::STATUS_CANCELLED,
             self::STATUS_EXPIRED,
             self::STATUS_EXPIRED_CLAIMABLE,
+            self::STATUS_EXPIRED_WAIT_CLAIM,
             self::STATUS_MULTIPAY_REJECTED,
             self::STATUS_MULTIPAY_REQUESTED
         ];
@@ -3199,7 +3223,11 @@ abstract class Policy
             $warnings[] = sprintf('Policy is NOT paid to date - Policy must be paid to date prior to approval');
         }
 
-        if (in_array($this->getStatus(), [self::STATUS_CANCELLED, self::STATUS_EXPIRED])) {
+        if (in_array($this->getStatus(), [
+            self::STATUS_CANCELLED,
+            self::STATUS_EXPIRED,
+            self::STATUS_EXPIRED_WAIT_CLAIM
+        ])) {
             $warnings[] = sprintf('Policy is %s - DO NOT ALLOW CLAIM', $this->getStatus());
         }
 
@@ -3464,6 +3492,7 @@ abstract class Policy
             self::STATUS_UNPAID,
             self::STATUS_EXPIRED,
             self::STATUS_EXPIRED_CLAIMABLE,
+            self::STATUS_EXPIRED_WAIT_CLAIM,
             self::STATUS_RENEWAL,
         ])) {
             throw new \Exception(sprintf('Policy %s is missing terms', $this->getId()));
@@ -3471,7 +3500,7 @@ abstract class Policy
 
         $data = [
             'id' => $this->getId(),
-            'status' => $this->getStatus(),
+            'status' => $this->getApiStatus(),
             'type' => 'phone',
             'start_date' => $this->getStart() ? $this->getStart()->format(\DateTime::ATOM) : null,
             'end_date' => $this->getEnd() ? $this->getEnd()->format(\DateTime::ATOM) : null,

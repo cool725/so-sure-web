@@ -17,6 +17,7 @@ class Cashback
 
     const STATUS_PENDING_CLAIMABLE = 'pending-claimable';
     const STATUS_PENDING_PAYMENT = 'pending-payment';
+    const STATUS_PENDING_WAIT_CLAIM = 'pending-wait-claim';
     const STATUS_PAID = 'paid';
     const STATUS_CLAIMED = 'claimed';
     const STATUS_MISSING = 'missing';
@@ -36,7 +37,8 @@ class Cashback
 
     /**
      * @Assert\NotNull(message="Cashback status is required")
-     * @Assert\Choice({"pending-claimable", "pending-payment", "paid", "claimed", "missing", "failed"}, strict=true)
+     * @Assert\Choice({"pending-claimable", "pending-wait-claim", "pending-payment", "paid",
+     *                 "claimed", "missing", "failed"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -173,7 +175,7 @@ class Cashback
     public function getDisplayableAmount()
     {
         // amount is not set whilst pending claimable so use pot
-        if ($this->getStatus() == self::STATUS_PENDING_CLAIMABLE) {
+        if (in_array($this->getStatus(), [self::STATUS_PENDING_CLAIMABLE, self::STATUS_PENDING_WAIT_CLAIM])) {
             return $this->getPolicy()->getPotValue();
         } elseif (in_array($this->getStatus(), [self::STATUS_PENDING_PAYMENT, self::STATUS_PAID])) {
             return $this->getAmount();
@@ -190,6 +192,8 @@ class Cashback
             return 'Processing';
         } elseif ($this->getStatus() == self::STATUS_PENDING_PAYMENT) {
             return 'Approved';
+        } elseif ($this->getStatus() == self::STATUS_PENDING_WAIT_CLAIM) {
+            return 'Waiting on claim';
         } elseif ($this->getStatus() == self::STATUS_PAID) {
             return 'Paid';
         } elseif ($this->getStatus() == self::STATUS_MISSING) {

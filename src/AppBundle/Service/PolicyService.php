@@ -1295,15 +1295,24 @@ class PolicyService
     public function fullyExpire(Policy $policy, \DateTime $date = null)
     {
         try {
+            $initialStatus = $policy->getStatus();
             $policy->fullyExpire($date);
             $this->dm->flush();
+
+            // If no change in wait claim, then don't proceed as may resend emails for cashback
+            if ($policy->getStatus() == Policy::STATUS_EXPIRED_WAIT_CLAIM &&
+                $initialStatus == Policy::STATUS_EXPIRED_WAIT_CLAIM) {
+                return;
+            }
 
             if ($policy->hasCashback() && !in_array($policy->getCashback()->getStatus(), [
                 Cashback::STATUS_MISSING,
                 Cashback::STATUS_FAILED,
                 Cashback::STATUS_PAID,
             ])) {
-                if ($this->areEqualToTwoDp(0, $policy->getCashback()->getAmount())) {
+                if ($policy->getStatus() == Policy::STATUS_EXPIRED_WAIT_CLAIM) {
+                    $this->updateCashback($policy->getCashback(), Cashback::STATUS_PENDING_WAIT_CLAIM);
+                } elseif ($this->areEqualToTwoDp(0, $policy->getCashback()->getAmount())) {
                     $this->updateCashback($policy->getCashback(), Cashback::STATUS_CLAIMED);
                 } else {
                     $this->updateCashback($policy->getCashback(), Cashback::STATUS_PENDING_PAYMENT);
@@ -1551,6 +1560,11 @@ class PolicyService
             ));
         }
 
+        // If no change in status, don't change anything to avoid db logging updates & duplicate emails
+        if ($cashback->getStatus() == $status) {
+            return;
+        }
+
         $cashback->setDate(new \DateTime());
         $cashback->setStatus($status);
         $this->dm->flush();
@@ -1561,6 +1575,7 @@ class PolicyService
             Cashback::STATUS_MISSING,
             Cashback::STATUS_CLAIMED,
             Cashback::STATUS_PENDING_PAYMENT,
+            Cashback::STATUS_PENDING_WAIT_CLAIM,
         ])) {
             $this->cashbackEmail($cashback);
         }
@@ -1585,6 +1600,9 @@ class PolicyService
             $subject = sprintf('Important information about your Reward Pot cashback');
         } elseif ($cashback->getStatus() == Cashback::STATUS_CLAIMED) {
             $baseTemplate = sprintf('AppBundle:Email:cashback/claimed');
+            $subject = sprintf('Important information about your Reward Pot cashback');
+        } elseif ($cashback->getStatus() == Cashback::STATUS_PENDING_WAIT_CLAIM) {
+            $baseTemplate = sprintf('AppBundle:Email:cashback/delay');
             $subject = sprintf('Important information about your Reward Pot cashback');
         } else {
             throw new \Exception('Unknown cashback status for email');
