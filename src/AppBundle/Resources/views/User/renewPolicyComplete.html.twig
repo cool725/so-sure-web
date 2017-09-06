@@ -46,7 +46,7 @@
     <div class="connections">
         <div class="connections__list">
             {% for renewalConnection in renew_connections_form.renewalConnections %}
-                <div class="connections__user connections__user--selected">
+                <div class="connections__user">
                     {{ form_row(renewalConnection.renew) }}
                     <img src="{{ renewalConnection.vars.data.linkedUser.getImageUrlFallback }}"     style="width: 50px"
                          title="{{ renewalConnection.vars.data.linkedUser.name }}"
