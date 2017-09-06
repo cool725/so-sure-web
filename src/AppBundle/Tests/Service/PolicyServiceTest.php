@@ -364,6 +364,7 @@ class PolicyServiceTest extends WebTestCase
             for ($i = 0; $i < 11; $i++) {
                 $scheduledDate = $updatedPolicy->getScheduledPayments()[$i]->getScheduled();
                 $this->assertEquals($expectedDay, $scheduledDate->format('d'));
+                $this->assertTrue($scheduledDate->diff($policy->getStart())->days >= 28);
             }
         }
     }
@@ -1598,17 +1599,17 @@ class PolicyServiceTest extends WebTestCase
         }
     }
 
-    public function testPolicyActiveWithConnectionsNoRenewal()
+    public function testPolicyActiveWithConnectionsNoReconnect()
     {
         $userA = static::createUser(
             static::$userManager,
-            static::generateEmail('testPolicyActiveWithConnectionsNoRenewalA', $this),
+            static::generateEmail('testPolicyActiveWithConnectionsNoReconnectA', $this),
             'bar',
             static::$dm
         );
         $userB = static::createUser(
             static::$userManager,
-            static::generateEmail('testPolicyActiveWithConnectionsNoRenewalB', $this),
+            static::generateEmail('testPolicyActiveWithConnectionsNoReconnectB', $this),
             'bar',
             static::$dm
         );
@@ -1741,6 +1742,26 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_EXPIRED, $policyB->getStatus());
         $this->assertEquals(10, $policyB->getCashback()->getAmount());
         $this->assertEquals(Cashback::STATUS_PENDING_PAYMENT, $policyB->getCashback()->getStatus());
+
+        $this->assertTrue($renewalPolicyA->getPremium()->hasAnnualDiscount());
+        $this->assertEquals(10, $renewalPolicyA->getPremium()->getAnnualDiscount());
+
+        $total = 0;
+        $premium = $renewalPolicyA->getPremium();
+        $foundStartDate = false;
+        foreach ($renewalPolicyA->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED) as $scheduledPayment) {
+            //print_r($scheduledPayment->getScheduled()->diff($renewalPolicyA->getStart()));
+            if (abs($scheduledPayment->getScheduled()->diff($renewalPolicyA->getStart())->days) == 0) {
+                $foundStartDate = true;
+            }
+            $this->assertTrue(
+                $scheduledPayment->getAmount() == $premium->getAdjustedStandardMonthlyPremiumPrice() ||
+                $scheduledPayment->getAmount() == $premium->getAdjustedFinalMonthlyPremiumPrice()
+            );
+            $total += $scheduledPayment->getAmount();
+        }
+        $this->assertEquals($total, $renewalPolicyA->getPremium()->getAdjustedYearlyPremiumPrice());
+        $this->assertTrue($foundStartDate);
     }
 
     public function testNotReconnectedDoesNotAppear()

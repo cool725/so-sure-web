@@ -90,7 +90,7 @@ abstract class Price
         return $this->toTwoDp($this->getMonthlyPremiumPrice($date) * 12);
     }
 
-    public function getAdjustedInitialMonthlyPremiumPrice($potValue, \DateTime $date = null)
+    public function getAdjustedFinalMonthlyPremiumPrice($potValue, \DateTime $date = null)
     {
         $monthlyAdjustment = floor(100 * $potValue / 12) / 100;
         $monthlyAdjustment = $potValue - ($monthlyAdjustment * 11);
