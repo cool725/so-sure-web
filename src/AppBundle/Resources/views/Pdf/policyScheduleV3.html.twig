@@ -30,10 +30,34 @@
                 <li>Date of subscription: {{ policy.start | date('d M Y H:i', 'Europe/London') }}</li>
                 <li>Mobile phone covered by insurance: {{ policy.phone.make }} {{ policy.phone.model }} [IMEI: {{ policy.imei }}{% if policy.serialNumber %} / Serial Number: {{ policy.serialNumber }}{% endif %}]</li>
                 <li>Period of cover: from {{ policy.start | date('d M Y H:i', 'Europe/London') }} to {{ policy.end|date('d M Y H:i', 'Europe/London') }}</li>
-                {% if policy.premiumPlan == 'monthly' %}
-                <li>Cost of policy: £{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }}, inclusive of £{{ policy.premium.yearlyIpt|number_format(2, '.', ',') }} Insurance Premium Tax (IPT) payable in 12 monthly installments of £{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }}.</li>
+                {% if policy.premium.hasAnnualDiscount %}
+                    {% if policy.premiumPlan == 'monthly' %}
+                        <li>
+                            Cost of policy: £{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }},
+                            inclusive of £{{ policy.premium.yearlyIpt|number_format(2, '.', ',') }} Insurance Premium Tax (IPT)
+                            payable in 12 monthly installments of £{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }}.
+                        </li>
+                    {% else %}
+                        <li>
+                            Cost of policy: £{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }},
+                            inclusive of £{{ policy.premium.yearlyIpt|number_format(2, '.', ',') }} Insurance Premium Tax (IPT)
+                            payable in 1 installment of £{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }}.
+                        </li>
+                    {% endif %}
                 {% else %}
-                <li>Cost of policy: £{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }}, inclusive of £{{ policy.premium.yearlyIpt|number_format(2, '.', ',') }} Insurance Premium Tax (IPT) payable in 1 installment of £{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }}.</li>
+                    {% if policy.premiumPlan == 'monthly' %}
+                        <li>
+                            Cost of policy: £{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }},
+                            inclusive of £{{ policy.premium.yearlyIpt|number_format(2, '.', ',') }} Insurance Premium Tax (IPT)
+                            payable in 12 monthly installments of £{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }}.
+                        </li>
+                    {% else %}
+                        <li>
+                            Cost of policy: £{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }},
+                            inclusive of £{{ policy.premium.yearlyIpt|number_format(2, '.', ',') }} Insurance Premium Tax (IPT)
+                            payable in 1 installment of £{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }}.
+                        </li>
+                    {% endif %}
                 {% endif %}
             </ul>
         </div>
