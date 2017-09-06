@@ -12,7 +12,7 @@
         Hi {{ cashback.policy.user.name }},<br><br>
 		Since you and your connections have taken a good care of your phones, you have become eligible for a £{{ cashback.amount|number_format(2,'.',',') }} so-sure cashback.
 		<br><br>
-		You’ve earned it so treat yourself to something nice.
+		In order to transfer your cashback to you, we need your bank details. Please login to your account to securely provide us with this information.
 		<br><br>
 		Thank you for using so-sure.
 		<br><br>
@@ -21,5 +21,5 @@
 	   </div>
 	</div>
 	{{ macros.end_table() }}
-	{{ macros.email_button_table(withdraw_url, "Withdraw", "Withdraw")}}
+	{{ macros.email_button_table(withdraw_url, "Add my bank details", "Add my bank details")}}
 {% endblock %}
