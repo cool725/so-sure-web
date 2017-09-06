@@ -1505,6 +1505,99 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
     }
 
+    public function testUpdateCashback()
+    {
+        $userA = static::createUser(
+            static::$userManager,
+            static::generateEmail('testUpdateCashbackA', $this),
+            'bar',
+            static::$dm
+        );
+        $userB = static::createUser(
+            static::$userManager,
+            static::generateEmail('testUpdateCashbackB', $this),
+            'bar',
+            static::$dm
+        );
+        $policyA = static::initPolicy(
+            $userA,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+        $policyB = static::initPolicy(
+            $userB,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+
+        $policyA->setStatus(PhonePolicy::STATUS_PENDING);
+        $policyB->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policyA, new \DateTime('2016-01-01'), true);
+        static::$policyService->create($policyB, new \DateTime('2016-01-01'), true);
+        static::$policyService->setEnvironment('test');
+        static::$dm->flush();
+
+        list($connectionA, $connectionB) = $this->createLinkedConnections(
+            $policyA,
+            $policyB,
+            10,
+            10,
+            new \DateTime('2016-01-01'),
+            new \DateTime('2016-01-01')
+        );
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(Policy::class);
+        $policyA = $policyRepo->find($policyA->getId());
+        $policyB = $policyRepo->find($policyB->getId());
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policyA->getStatus());
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policyB->getStatus());
+
+        $this->assertEquals(10, $policyA->getPotValue());
+        $this->assertEquals(10, $policyB->getPotValue());
+
+
+        $renewalPolicyA = static::$policyService->createPendingRenewal(
+            $policyA,
+            new \DateTime('2016-12-15')
+        );
+        $renewalPolicyB = static::$policyService->createPendingRenewal(
+            $policyB,
+            new \DateTime('2016-12-15')
+        );
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyA->getStatus());
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyB->getStatus());
+
+        $cashbackB = new Cashback();
+        $cashbackB->setDate(new \DateTime());
+        $cashbackB->setStatus(Cashback::STATUS_PENDING_CLAIMABLE);
+        $cashbackB->setAccountName('foo bar');
+        $cashbackB->setSortCode('123456');
+        $cashbackB->setAccountNumber('12345678');
+        $cashbackB->setAmount(10);
+        $cashbackB->setPolicy($policyB);
+        static::$dm->persist($cashbackB);
+        static::$dm->flush();
+
+        foreach ([
+            Cashback::STATUS_PAID,
+            Cashback::STATUS_FAILED,
+            Cashback::STATUS_MISSING,
+            Cashback::STATUS_CLAIMED,
+            Cashback::STATUS_PENDING_PAYMENT,
+            Cashback::STATUS_PENDING_WAIT_CLAIM,
+        ] as $status) {
+            static::$policyService->updateCashback($cashbackB, $status);
+            $this->assertEquals($status, $cashbackB->getStatus());
+        }
+    }
+
     public function testPolicyActiveWithConnectionsNoRenewal()
     {
         $userA = static::createUser(
