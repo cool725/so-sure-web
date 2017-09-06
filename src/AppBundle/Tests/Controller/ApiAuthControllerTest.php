@@ -2901,7 +2901,7 @@ class ApiAuthControllerTest extends BaseControllerTest
 
         $reconnectionId = $data['connections'][0]['id'];
 
-        $url = sprintf("/api/v1/auth/policy/%s/reconnect/%s", $renewalPolicyA->getId(), 'a');
+        $url = sprintf("/api/v1/auth/policy/%s/reconnect", $renewalPolicyA->getId());
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityIdA, $url, [
         ]);
@@ -2910,22 +2910,36 @@ class ApiAuthControllerTest extends BaseControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityIdA, $url, [
             'renew' => 'foo',
         ]);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityIdA, $url, [
+            'connection_id' => 'foo',
+        ]);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityIdA, $url, [
+            'renew' => 'foo',
+            'connection_id' => '1',
+        ]);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityIdA, $url, [
             'renew' => false,
+            'connection_id' => 'foo',
         ]);
         $data = $this->verifyResponse(404);
 
-        $url = sprintf("/api/v1/auth/policy/%s/reconnect/%s", $renewalPolicyA->getId(), $reconnectionId);
+        $url = sprintf("/api/v1/auth/policy/%s/reconnect", $renewalPolicyA->getId());
         $crawler = static::postRequest(self::$client, $cognitoIdentityIdA, $url, [
             'renew' => false,
+            'connection_id' => $reconnectionId,
         ]);
         $data = $this->verifyResponse(200);
         $this->assertFalse($data['connections'][0]['reconnect_on_renewal']);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityIdA, $url, [
             'renew' => true,
+            'connection_id' => $reconnectionId,
         ]);
         $data = $this->verifyResponse(200);
         $this->assertTrue($data['connections'][0]['reconnect_on_renewal']);
