@@ -96,6 +96,9 @@ class PolicyVoterTest extends WebTestCase
         $policy->setStatus(Policy::STATUS_EXPIRED_CLAIMABLE);
         $this->assertFalse(self::$policyVoter->voteOnAttribute(PolicyVoter::EDIT, $policy, $token));
 
+        $policy->setStatus(Policy::STATUS_EXPIRED_WAIT_CLAIM);
+        $this->assertFalse(self::$policyVoter->voteOnAttribute(PolicyVoter::EDIT, $policy, $token));
+
         $policy->setStatus(Policy::STATUS_EXPIRED);
         $this->assertFalse(self::$policyVoter->voteOnAttribute(PolicyVoter::EDIT, $policy, $token));
     }

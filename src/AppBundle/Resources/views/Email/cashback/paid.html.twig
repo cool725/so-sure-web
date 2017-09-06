@@ -1,0 +1,22 @@
+{% extends 'AppBundle:Email:base.html.twig' %}
+{% import "AppBundle:Email:macros.html.twig" as macros %}
+{% block title %}Your Reward Pot has been paid out.{% endblock %}
+{% block body %}
+	{{ macros.start_table() }}
+	<h1>
+	   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+	</h1>
+	<div style="font-size: 14px; text-align: left;">
+	   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+	   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+        Hi {{ cashback.policy.user.name }},<br><br>
+        Your SO-SURE Reward Pot cashback of £{{ cashback.amount|number_format(2,'.',',') }} has now been transferred to the bank account you have provided us with. Is should be with you within 3 to 5 working days.
+		<br><br>
+        We hope you use it to treat yourself to something nice. You’ve earned it!
+		<br><br>
+        Best,<br>
+        SO-SURE Team
+	   </div>
+	</div>
+	{{ macros.end_table() }}
+{% endblock %}

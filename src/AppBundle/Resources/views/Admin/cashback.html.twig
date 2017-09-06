@@ -63,13 +63,13 @@
     <h3>Cashback</h3>
     {% for cashback_item in cashback %}
         <div class="row">
-            <div class="col-md-8">
+            <div class="col-md-6">
                 <a href="{{ path('admin_policy', {'id': cashback_item.policy.id}) }}">{{ cashback_item.policy.policyNumber }}</a>
                  -
                 £{{ cashback_item.getDisplayableAmount|number_format(2, '.',',') }} ({{ cashback_item.status }})
             </div>
             {% if cashback_item.status == 'pending-payment' %}
-            <div class="col-md-2">
+            <div class="col-md-4">
                 {{ cashback_item.accountName }} {{ cashback_item.sortCode }} {{ cashback_item.accountNumber }}
             </div>
             <div class="col-md-2">
@@ -78,6 +78,18 @@
                     <input type="hidden" name="status" value="paid">
                     <input type="hidden" name="return_url" value="{{ app.request.uri }}">
                     <input type="submit" class="btn btn-danger" value="Set as paid">
+                </form>
+            </div>
+            {% elseif cashback_item.status == 'paid' %}
+            <div class="col-md-4">
+                {{ cashback_item.accountName }} {{ cashback_item.sortCode }} {{ cashback_item.accountNumber }}
+            </div>
+            <div class="col-md-2">
+                <form method="POST" action="{{ url('admin_cashback_action', {'id': cashback_item.id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('default') }}" />
+                    <input type="hidden" name="status" value="failed">
+                    <input type="hidden" name="return_url" value="{{ app.request.uri }}">
+                    <input type="submit" class="btn btn-danger" value="Set as failed">
                 </form>
             </div>
             {% endif %}

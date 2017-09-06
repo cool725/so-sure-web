@@ -60,6 +60,7 @@ class PolicyVoter extends Voter
         ])) {
             if (in_array($policy->getStatus(), [
                 Policy::STATUS_EXPIRED_CLAIMABLE,
+                Policy::STATUS_EXPIRED_WAIT_CLAIM,
                 Policy::STATUS_EXPIRED,
             ])) {
                 return false;

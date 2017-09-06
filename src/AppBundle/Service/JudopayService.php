@@ -266,7 +266,11 @@ class JudopayService
     ) {
         $this->statsd->startTiming("judopay.add");
         // doesn't make sense to add payments for expired policies
-        if (in_array($policy->getStatus(), [PhonePolicy::STATUS_EXPIRED, PhonePolicy::STATUS_EXPIRED_CLAIMABLE])) {
+        if (in_array($policy->getStatus(), [
+            PhonePolicy::STATUS_EXPIRED,
+            PhonePolicy::STATUS_EXPIRED_CLAIMABLE,
+            PhonePolicy::STATUS_EXPIRED_WAIT_CLAIM,
+        ])) {
             throw new \Exception('Unable to apply payment to cancelled/expired policy');
         } elseif ($policy->getStatus() == PhonePolicy::STATUS_CANCELLED) {
             // a bit unusual, but for remainder payments w/claim it could occur
