@@ -740,12 +740,12 @@ class UserController extends BaseController
                     $policyService = $this->get('app.policy');
                     if ($cashback->getPolicy()->getStatus() == Policy::STATUS_EXPIRED) {
                         $policyService->updateCashback($cashback, Cashback::STATUS_PENDING_PAYMENT);
-                    } elseif (in_array($cashback->getPolicy()->getStatus(), [
-                        Policy::STATUS_EXPIRED_CLAIMABLE,
-                        Policy::STATUS_EXPIRED_WAIT_CLAIM,
-                    ])) {
+                    } elseif (in_array($cashback->getPolicy()->getStatus(), [Policy::STATUS_EXPIRED_CLAIMABLE])) {
                         // Don't think this case should occur, but the 2 combinations should work if it does
                         $policyService->updateCashback($cashback, Cashback::STATUS_PENDING_CLAIMABLE);
+                    } elseif (in_array($cashback->getPolicy()->getStatus(), [Policy::STATUS_EXPIRED_WAIT_CLAIM])) {
+                        // Don't think this case should occur, but the 2 combinations should work if it does
+                        $policyService->updateCashback($cashback, Cashback::STATUS_PENDING_WAIT_CLAIM);
                     } else {
                         throw new \Exception(sprintf('Unexpected policy status for cashback %s', $cashback->getId()));
                     }
