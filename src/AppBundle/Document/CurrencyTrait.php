@@ -74,4 +74,9 @@ trait CurrencyTrait
 
         return abs($float1 - $float2) < 0.00001;
     }
+
+    public function greaterThanZero($float)
+    {
+        return $float > 0 && !$this->areEqualToTwoDp(0, $float);
+    }
 }

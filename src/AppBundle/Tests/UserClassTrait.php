@@ -348,7 +348,7 @@ trait UserClassTrait
         return $reward;
     }
 
-    protected function createLinkedConnections($policyA, $policyB, $valueA, $valueB)
+    protected function createLinkedConnections($policyA, $policyB, $valueA, $valueB, $dateA = null, $dateB = null)
     {
         $connectionA = new StandardConnection();
         $connectionA->setValue($valueA);
@@ -358,7 +358,11 @@ trait UserClassTrait
         }
         $connectionA->setLinkedUser($policyB->getUser());
         $connectionA->setLinkedPolicy($policyB);
+        if ($dateA) {
+            $connectionA->setDate($dateA);
+        }
         $policyA->addConnection($connectionA);
+        $policyA->updatePotValue();
 
         $connectionB = new StandardConnection();
         $connectionB->setValue($valueB);
@@ -368,7 +372,11 @@ trait UserClassTrait
         }
         $connectionB->setLinkedUser($policyA->getUser());
         $connectionB->setLinkedPolicy($policyA);
+        if ($dateB) {
+            $connectionB->setDate($dateB);
+        }
         $policyB->addConnection($connectionB);
+        $policyB->updatePotValue();
 
         return [$connectionA, $connectionB];
     }

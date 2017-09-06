@@ -1,0 +1,24 @@
+{% extends 'AppBundle:Email:base.html.twig' %}
+{% import "AppBundle:Email:macros.html.twig" as macros %}
+{% block title %}Important information about your Reward Pot cashback.{% endblock %}
+{% block body %}
+	{{ macros.start_table() }}
+	<h1>
+	   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+	</h1>
+	<div style="font-size: 14px; text-align: left;">
+	   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+	   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+        Hi {{ cashback.policy.user.name }},<br><br>
+		Your so-sure Reward Pot cashback of £ £{{ cashback.amount|number_format(2,'.',',') }} is currently under review as you or one of your connections have made a claim with us.
+		<br><br>
+		This may cause some changes to the final value of your Reward Pot and we will update you once the claim is settled.
+		<br><br>
+		If you have any further questions on this, please do not hesitate to contact us.
+		<br><br>
+        Best,<br>
+        SO-SURE Team
+	   </div>
+	</div>
+	{{ macros.end_table() }}
+{% endblock %}

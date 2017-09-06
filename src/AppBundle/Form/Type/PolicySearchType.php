@@ -45,6 +45,7 @@ class PolicySearchType extends AbstractType
             Policy::STATUS_CANCELLED => Policy::STATUS_CANCELLED,
             Policy::STATUS_EXPIRED => Policy::STATUS_EXPIRED,
             Policy::STATUS_EXPIRED_CLAIMABLE => Policy::STATUS_EXPIRED_CLAIMABLE,
+            Policy::STATUS_EXPIRED_WAIT_CLAIM => Policy::STATUS_EXPIRED_WAIT_CLAIM,
             Policy::STATUS_UNPAID => Policy::STATUS_UNPAID,
             Policy::STATUS_PENDING_RENEWAL => Policy::STATUS_PENDING_RENEWAL,
             Policy::STATUS_RENEWAL => Policy::STATUS_RENEWAL,

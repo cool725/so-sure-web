@@ -735,6 +735,10 @@ abstract class BaseController extends Controller
             $policiesQb = $policiesQb->addAnd(
                 $policiesQb->expr()->field('status')->in([Policy::STATUS_EXPIRED_CLAIMABLE])
             );
+        } elseif ($status == Policy::STATUS_EXPIRED_WAIT_CLAIM) {
+            $policiesQb = $policiesQb->addAnd(
+                $policiesQb->expr()->field('status')->in([Policy::STATUS_EXPIRED_WAIT_CLAIM])
+            );
         } elseif ($status == Policy::STATUS_PENDING_RENEWAL) {
             $policiesQb = $policiesQb->addAnd(
                 $policiesQb->expr()->field('status')->in([Policy::STATUS_PENDING_RENEWAL])

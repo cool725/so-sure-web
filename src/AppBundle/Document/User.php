@@ -483,6 +483,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                 Policy::STATUS_CANCELLED,
                 Policy::STATUS_EXPIRED,
                 Policy::STATUS_EXPIRED_CLAIMABLE,
+                Policy::STATUS_EXPIRED_WAIT_CLAIM,
                 Policy::STATUS_UNPAID,
                 Policy::STATUS_RENEWAL,
             ])) {
@@ -1105,6 +1106,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                 Policy::STATUS_CANCELLED,
                 Policy::STATUS_EXPIRED,
                 Policy::STATUS_EXPIRED_CLAIMABLE,
+                Policy::STATUS_EXPIRED_WAIT_CLAIM,
             ])) {
                 continue;
             }
