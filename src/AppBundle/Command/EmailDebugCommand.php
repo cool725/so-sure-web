@@ -74,7 +74,7 @@ class EmailDebugCommand extends BaseCommand
             sprintf('AppBundle:Email:%s.html.twig', $template),
             $data,
             sprintf('AppBundle:Email:%s.txt.twig', $template),
-            $data            
+            $data
         );
     }
 }
