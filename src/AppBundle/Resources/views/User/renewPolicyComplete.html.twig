@@ -42,8 +42,8 @@
 {% endblock %}
 
 {% block actions %}
-    {{ form_start(renew_connections_form) }}
     {% if renew_connections_form.renewalConnections|length > 0%}
+    {{ form_start(renew_connections_form) }}
         <div class="connections">
             <div class="connections__list">
                 {% for renewalConnection in renew_connections_form.renewalConnections %}
@@ -83,6 +83,6 @@
                 </div>
             </div>
         </div>
-    {% endif %}
     {{ form_end(renew_connections_form) }}
+    {% endif %}
 {% endblock %}
