@@ -29,6 +29,7 @@ class PolicyRepository extends BaseDocumentRepository
                 Policy::STATUS_CANCELLED,
                 Policy::STATUS_EXPIRED,
                 Policy::STATUS_EXPIRED_CLAIMABLE,
+                Policy::STATUS_EXPIRED_WAIT_CLAIM,
                 Policy::STATUS_UNPAID
             ])
             ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policyPrefix)))
@@ -114,6 +115,7 @@ class PolicyRepository extends BaseDocumentRepository
         $qb = $this->createQueryBuilder()
             ->field('status')->in([
                 Policy::STATUS_EXPIRED_CLAIMABLE,
+                Policy::STATUS_EXPIRED_WAIT_CLAIM,
             ])
             ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policyPrefix)))
             ->field('end')->lte($date);

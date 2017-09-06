@@ -1,0 +1,17 @@
+{% extends 'AppBundle:Email:base.txt.twig' %}
+{% block body %}
+Your SO-SURE cashback.
+
+**
+------------------------------------------------------------
+Hi {{ cashback.policy.user.name }},
+
+We tried to send your so-sure cashback of £{{ cashback.amount|number_format(2,'.',',') }} to the account you gave us. Unfornately, there appears to be a problem transfering the funds.
+
+Please login to your account using the link below and update your details so we can re-send the cashback to you.
+
+Update my cashback details: {{ withdraw_url }}
+
+Best,
+SO-SURE Team
+{% endblock body %}

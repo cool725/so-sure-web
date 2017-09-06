@@ -667,7 +667,7 @@ class UserController extends BaseController
             if ($renewConnectionsForm->isValid()) {
                 $dm->flush();
                 $this->addFlash('success', 'Your connections have been updated');
-    
+
                 return new RedirectResponse(
                     $this->generateUrl('user_renew_completed', ['id' => $id])
                 );
@@ -708,6 +708,73 @@ class UserController extends BaseController
 
         return [
             'policy' => $policy,
+        ];
+    }
+
+    /**
+     * @Route("/cashback/{id}", name="user_cashback")
+     * @Template
+     */
+    public function cashbackAction(Request $request, $id)
+    {
+        $dm = $this->getManager();
+        $cashbackRepo = $dm->getRepository(Cashback::class);
+        $cashback = $cashbackRepo->find($id);
+        if (!$cashback) {
+            throw $this->createNotFoundException('Cashback not found');
+        }
+        if (!in_array($cashback->getStatus(), [Cashback::STATUS_FAILED, Cashback::STATUS_MISSING])) {
+            throw new \Exception(sprintf(
+                'Update cashback can only be done for missing/failed status. Id: %s',
+                $cashback->getId()
+            ));
+        }
+        $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $cashback->getPolicy());
+        $cashbackForm = $this->get('form.factory')
+            ->createNamedBuilder('cashback_form', CashbackType::class, $cashback)
+            ->getForm();
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('cashback_form')) {
+                $cashbackForm->handleRequest($request);
+                if ($cashbackForm->isValid()) {
+                    $policyService = $this->get('app.policy');
+                    if ($cashback->getPolicy()->getStatus() == Policy::STATUS_EXPIRED) {
+                        $policyService->updateCashback($cashback, Cashback::STATUS_PENDING_PAYMENT);
+                    } elseif (in_array($cashback->getPolicy()->getStatus(), [Policy::STATUS_EXPIRED_CLAIMABLE])) {
+                        // Don't think this case should occur, but the 2 combinations should work if it does
+                        $policyService->updateCashback($cashback, Cashback::STATUS_PENDING_CLAIMABLE);
+                    } elseif (in_array($cashback->getPolicy()->getStatus(), [Policy::STATUS_EXPIRED_WAIT_CLAIM])) {
+                        // Don't think this case should occur, but the 2 combinations should work if it does
+                        $policyService->updateCashback($cashback, Cashback::STATUS_PENDING_WAIT_CLAIM);
+                    } else {
+                        throw new \Exception(sprintf('Unexpected policy status for cashback %s', $cashback->getId()));
+                    }
+
+                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_CASHBACK);
+
+                    $message = sprintf(
+                        'Your request for cashback has been accepted.'
+                    );
+                    $this->addFlash('success', $message);
+
+                    return new RedirectResponse(
+                        $this->generateUrl('user_home')
+                    );
+                } else {
+                    $this->addFlash(
+                        'error',
+                        sprintf(
+                            "Sorry, there's a problem requesting cashback. Please try again or contact us. %s",
+                            $cashbackForm->getErrors()
+                        )
+                    );
+                }
+            }
+        }
+
+        return [
+            'cashback' => $cashback,
+            'cashback_form' => $cashbackForm->createView(),
         ];
     }
 

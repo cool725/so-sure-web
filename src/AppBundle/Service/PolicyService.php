@@ -1295,14 +1295,32 @@ class PolicyService
     public function fullyExpire(Policy $policy, \DateTime $date = null)
     {
         try {
+            $initialStatus = $policy->getStatus();
             $policy->fullyExpire($date);
             $this->dm->flush();
 
+            // If no change in wait claim, then don't proceed as may resend emails for cashback
+            if ($policy->getStatus() == Policy::STATUS_EXPIRED_WAIT_CLAIM &&
+                $initialStatus == Policy::STATUS_EXPIRED_WAIT_CLAIM) {
+                return;
+            }
+
+            if ($policy->hasCashback() && !in_array($policy->getCashback()->getStatus(), [
+                Cashback::STATUS_MISSING,
+                Cashback::STATUS_FAILED,
+                Cashback::STATUS_PAID,
+            ])) {
+                if ($policy->getStatus() == Policy::STATUS_EXPIRED_WAIT_CLAIM) {
+                    $this->updateCashback($policy->getCashback(), Cashback::STATUS_PENDING_WAIT_CLAIM);
+                } elseif ($this->areEqualToTwoDp(0, $policy->getCashback()->getAmount())) {
+                    $this->updateCashback($policy->getCashback(), Cashback::STATUS_CLAIMED);
+                } else {
+                    $this->updateCashback($policy->getCashback(), Cashback::STATUS_PENDING_PAYMENT);
+                }
+            }
+
             if ($policy->hasAdjustedRewardPotPayment()) {
                 // TODO: notify user about reduced/0 pot
-                \AppBundle\Classes\NoOp::ignore([]);
-            } elseif ($policy->hasCashback()) {
-                // TODO: if cashback is present, then notify user about status
                 \AppBundle\Classes\NoOp::ignore([]);
             }
         } catch (ClaimException $e) {
@@ -1313,6 +1331,7 @@ class PolicyService
 
     public function cashback(Policy $policy, Cashback $cashback)
     {
+        // TODO: Validate cashback amount
         $policy->setCashback($cashback);
         //$this->dm->persist($cashback);
         $this->dm->flush();
@@ -1530,5 +1549,82 @@ class PolicyService
         $this->mailer->send($subject, 'contact-us@wearesosure.com', $body);
 
         $this->intercom->queueMessage($policy->getUser()->getEmail(), $body);
+    }
+
+    public function updateCashback(Cashback $cashback, $status)
+    {
+        if (!$cashback->getAmount()) {
+            throw new \Exception(sprintf(
+                'Missing cashback amount id %s',
+                $cashback->getId()
+            ));
+        }
+
+        // If no change in status, don't change anything to avoid db logging updates & duplicate emails
+        if ($cashback->getStatus() == $status) {
+            return;
+        }
+
+        $cashback->setDate(new \DateTime());
+        $cashback->setStatus($status);
+        $this->dm->flush();
+
+        if (in_array($status, [
+            Cashback::STATUS_PAID,
+            Cashback::STATUS_FAILED,
+            Cashback::STATUS_MISSING,
+            Cashback::STATUS_CLAIMED,
+            Cashback::STATUS_PENDING_PAYMENT,
+            Cashback::STATUS_PENDING_WAIT_CLAIM,
+        ])) {
+            $this->cashbackEmail($cashback);
+        }
+    }
+
+    public function cashbackEmail(Cashback $cashback)
+    {
+        if ($cashback->getStatus() == Cashback::STATUS_PAID) {
+            $baseTemplate = sprintf('AppBundle:Email:cashback/paid');
+            $subject = sprintf('Your Reward Pot has been paid out');
+        } elseif ($cashback->getStatus() == Cashback::STATUS_FAILED) {
+            $baseTemplate = sprintf('AppBundle:Email:cashback/failed');
+            $subject = sprintf('Your SO-SURE cashback');
+        } elseif ($cashback->getStatus() == Cashback::STATUS_MISSING) {
+            $baseTemplate = sprintf('AppBundle:Email:cashback/missing');
+            $subject = sprintf('Your SO-SURE cashback');
+        } elseif ($cashback->getStatus() == Cashback::STATUS_PENDING_PAYMENT && !$cashback->isAmountReduced()) {
+            $baseTemplate = sprintf('AppBundle:Email:cashback/approved');
+            $subject = sprintf('Keeping your phone safe does pay off');
+        } elseif ($cashback->getStatus() == Cashback::STATUS_PENDING_PAYMENT && $cashback->isAmountReduced()) {
+            $baseTemplate = sprintf('AppBundle:Email:cashback/approved-reduced');
+            $subject = sprintf('Important information about your Reward Pot cashback');
+        } elseif ($cashback->getStatus() == Cashback::STATUS_CLAIMED) {
+            $baseTemplate = sprintf('AppBundle:Email:cashback/claimed');
+            $subject = sprintf('Important information about your Reward Pot cashback');
+        } elseif ($cashback->getStatus() == Cashback::STATUS_PENDING_WAIT_CLAIM) {
+            $baseTemplate = sprintf('AppBundle:Email:cashback/delay');
+            $subject = sprintf('Important information about your Reward Pot cashback');
+        } else {
+            throw new \Exception('Unknown cashback status for email');
+        }
+        $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
+        $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
+
+        $data = [
+            'cashback' => $cashback,
+            'withdraw_url' => $this->router->generate(
+                'user_cashback',
+                ['id' => $cashback->getId()],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            ),
+        ];
+        $this->mailer->sendTemplate(
+            $subject,
+            $cashback->getPolicy()->getUser()->getEmail(),
+            $htmlTemplate,
+            $data,
+            $textTemplate,
+            $data
+        );
     }
 }

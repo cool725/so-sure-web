@@ -1,0 +1,19 @@
+{% extends 'AppBundle:Email:base.txt.twig' %}
+{% block body %}
+Your SO-SURE cashback.
+
+**
+------------------------------------------------------------
+Hi {{ cashback.policy.user.name }},
+
+Since you and your connections have taken a good care of your phones, you have become eligible for a £{{ cashback.amount|number_format(2,'.',',') }} so-sure cashback.
+
+You’ve earned it so treat yourself to something nice.
+
+Withdraw: {{ withdraw_url }}
+
+Thank you for using so-sure.
+
+Best,
+SO-SURE Team
+{% endblock body %}
