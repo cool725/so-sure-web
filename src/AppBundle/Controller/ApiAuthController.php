@@ -1045,17 +1045,18 @@ class ApiAuthController extends BaseController
     }
 
     /**
-     * @Route("/policy/{id}/reconnect/{connectionId}", name="api_auth_reconnect")
+     * @Route("/policy/{id}/reconnect", name="api_auth_reconnect")
      * @Method({"POST"})
      */
-    public function reconnectAction(Request $request, $id, $connectionId)
+    public function reconnectAction(Request $request, $id)
     {
         try {
             $data = json_decode($request->getContent(), true)['body'];
-            if (!$this->validateFields($data, ['renew'])) {
+            if (!$this->validateFields($data, ['renew', 'connection_id'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
             $renew = $this->getDataBool($data, 'renew');
+            $connectionId = $this->getDataString($data, 'connection_id');
             if ($renew === null) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, 'Unknown renew value', 422);
             }
