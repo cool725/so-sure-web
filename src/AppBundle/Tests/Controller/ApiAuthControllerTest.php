@@ -2180,6 +2180,18 @@ class ApiAuthControllerTest extends BaseControllerTest
         ]);
         $data = $this->verifyResponse(200);
         $this->assertEquals('pending-claimable', $data['cashback_status']);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(SalvaPhonePolicy::class);
+        $policy = $repo->find($policyData['id']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'account_name' => 'bar',
+            'sort_code' => '654321',
+            'account_number' => '87654321',
+        ]);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals('pending-claimable', $data['cashback_status']);
     }
 
     // policy/{id}/invitation

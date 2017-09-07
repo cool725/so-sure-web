@@ -259,4 +259,34 @@ class Cashback
 
         return $total;
     }
+
+    public function getExpectedStatus()
+    {
+        if (in_array($this->getStatus(), [self::STATUS_CLAIMED, self::STATUS_PAID])) {
+            throw new \Exception('Unable to suggest status for paid/claimed cashback');
+        }
+
+        // we assume a basic validation on the object beforehand, however do very basic checks
+        // for missing data
+        if (!$this->getAccountName() || !$this->getAccountNumber() || !$this->getSortCode()
+            || strlen($this->getAccountName()) == 0 || strlen($this->getAccountNumber()) == 0 ||
+            strlen($this->getSortCode()) == 0) {
+            // keep the failed status
+            if ($this->getStatus() == self::STATUS_FAILED) {
+                return self::STATUS_FAILED;
+            }
+
+            return self::STATUS_MISSING;
+        }
+
+        if ($this->getPolicy()->getStatus() == Policy::STATUS_EXPIRED) {
+            return self::STATUS_PENDING_PAYMENT;
+        } elseif ($this->getPolicy()->getStatus() == Policy::STATUS_EXPIRED_CLAIMABLE) {
+            return self::STATUS_PENDING_CLAIMABLE;
+        } elseif ($this->getPolicy()->getStatus() == Policy::STATUS_EXPIRED_WAIT_CLAIM) {
+            return self::STATUS_PENDING_WAIT_CLAIM;
+        }
+
+        return self::STATUS_PENDING_CLAIMABLE;
+    }
 }
