@@ -27,10 +27,6 @@ $(function(){
         phone_number.match(/^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$/);
     }, 'Valid UK Mobile Number (Sorry for those outside the UK, but for now, we can only insure UK residents)');
 
-    jQuery.validator.addMethod('phoneUnicode', function(phone_number, element){
-
-    }, 'Message');
-
     // UK Postcode
     jQuery.validator.addMethod("postcodeUK", function(value, element) {
     return this.optional(element) || /^([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9]?[A-Za-z]))))[ ]?[0-9][A-Za-z]{2})$/.test(value);
