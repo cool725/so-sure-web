@@ -106,10 +106,10 @@ class Connection
     protected $initialPromoValue;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User")
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Connection\Connection")
      * @Gedmo\Versioned
      */
-    protected $replacementUser;
+    protected $replacementConnection;
 
     /**
      * @Assert\Type("bool")
@@ -291,14 +291,14 @@ class Connection
         return $this->initialPromoValue;
     }
 
-    public function getReplacementUser()
+    public function getReplacementConnection()
     {
-        return $this->replacementUser;
+        return $this->replacementConnection;
     }
 
-    public function setReplacementUser($replacementUser)
+    public function setReplacementConnection($replacementConnection)
     {
-        $this->replacementUser = $replacementUser;
+        $this->replacementConnection = $replacementConnection;
     }
 
     public function toApiArray($claims)

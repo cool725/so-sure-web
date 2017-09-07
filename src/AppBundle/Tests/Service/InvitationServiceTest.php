@@ -1757,8 +1757,11 @@ class InvitationServiceTest extends WebTestCase
             if ($connection->getLinkedPolicy()->getId() == $policyInviteeB->getId()) {
                 $connectionFoundBefore = true;
                 $this->assertEquals(0, $connection->getTotalValue());
-                $this->assertNotNull($connection->getReplacementUser());
-                $this->assertEquals($userInvitee->getEmail(), $connection->getReplacementUser()->getEmail());
+                $this->assertNotNull($connection->getReplacementConnection());
+                $this->assertEquals(
+                    $userInvitee->getEmail(),
+                    $connection->getReplacementConnection()->getLinkedPolicy()->getUser()->getEmail()
+                );
             }
             if ($connection->getLinkedPolicy()->getId() == $policyInviteeAfter->getId()) {
                 $connectionFoundAfter = true;

@@ -2314,7 +2314,7 @@ abstract class Policy
     {
         $unreplacedConnections = [];
         foreach ($this->getConnections() as $connection) {
-            if ($connection->getReplacementUser() || $connection instanceof RewardConnection) {
+            if ($connection->getReplacementConnection() || $connection instanceof RewardConnection) {
                 continue;
             }
             $policy = $connection->getLinkedPolicy();
