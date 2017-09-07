@@ -1333,9 +1333,13 @@ class PolicyService
     {
         // TODO: Validate cashback amount
         $policy->setCashback($cashback);
-        //$this->dm->persist($cashback);
         $this->dm->flush();
-        // TODO: email user
+
+        if ($cashback->getAmount()) {
+            // cashback needs id, so flush is required above
+            $this->updateCashback($cashback, $cashback->getExpectedStatus());
+            $this->dm->flush();
+        }
     }
 
     /**

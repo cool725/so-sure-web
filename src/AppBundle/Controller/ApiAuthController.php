@@ -580,13 +580,18 @@ class ApiAuthController extends BaseController
             $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
 
             $policyService = $this->get('app.policy');
-            $cashback = new Cashback();
-            $cashback->setDate(new \DateTime());
-            $cashback->setPolicy($policy);
-            $cashback->setStatus(Cashback::STATUS_PENDING_CLAIMABLE);
+            $cashback = $policy->getCashback();
+            if (!$cashback) {
+                $cashback = new Cashback();
+                // due to validate object call later
+                $cashback->setPolicy($policy);
+                $cashback->setStatus(Cashback::STATUS_PENDING_CLAIMABLE);
+            }
             $cashback->setAccountName($this->getDataString($data, 'account_name'));
             $cashback->setSortcode($this->getDataString($data, 'sort_code'));
             $cashback->setAccountNumber($this->getDataString($data, 'account_number'));
+
+            //\Doctrine\Common\Util\Debug::dump($phone->getCurrentPhonePrice());
             $this->validateObject($cashback);
             $policyService->cashback($policy, $cashback);
 
