@@ -500,7 +500,23 @@ class JudopayService
         }
 
         // webpayment will already have a payment record
-        $payment = $repo->find($transactionDetails["yourPaymentReference"]);
+
+        // Try to find payment via policy object, so that there isn't any inconsistencies
+        // Uncertain if this is doing anything productive or not, but there was an error
+        // that seems like it could only be causes by loading an unflush db record - ch4972
+        $payment = null;
+        foreach ($policy->getPayments() as $payment) {
+            if ($payment->getId() == $transactionDetails["yourPaymentReference"]) {
+                break;
+            }
+
+            $payment = null;
+        }
+        // Fallback to db query if unable to find
+        if (!$payment) {
+            $payment = $repo->find($transactionDetails["yourPaymentReference"]);
+        }
+
         if (!$payment) {
             $payment = new JudoPayment();
             $payment->setReference($transactionDetails["yourPaymentReference"]);

@@ -74,6 +74,50 @@ class JudopayServiceTest extends WebTestCase
         return $user;
     }
     
+    public function testJudoPaymentPolicyNoReload()
+    {
+        $user = $this->createValidUser(static::generateEmail('testJudoPaymentPolicyNoReload', $this));
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
+
+        $judo = new JudoPaymentMethod();
+        $judo->setCustomerToken('ctoken');
+        $judo->addCardToken('token', null);
+        $user->setPaymentMethod($judo);
+        static::$dm->flush();
+
+        $paymentA = new JudoPayment();
+        $paymentA->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+        $paymentA->setSuccess(false);
+        $policy->addPayment($paymentA);
+        static::$dm->persist($paymentA);
+        static::$dm->flush();
+
+        $payment = new JudoPayment();
+        $payment->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+        $policy->addPayment($payment);
+        static::$dm->persist($payment);
+        static::$dm->flush();
+
+        $transactionDetails = self::$judopay->testPayDetails(
+            $user,
+            $payment->getId(),
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
+        );
+        $receiptId = $transactionDetails['receiptId'];
+
+        $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token', Payment::SOURCE_WEB_API);
+        $this->assertEquals('Success', $payment->getResult());
+
+        // We must be able to access the new policy on the policy without reloading the db record
+        $this->assertEquals(2, count($policy->getPayments()));
+        $this->assertFalse($policy->getPayments()[0]->isSuccess());
+        $this->assertTrue($policy->getPayments()[1]->isSuccess());
+    }
+
     public function testJudoReceiptMonthly()
     {
         $user = $this->createValidUser(static::generateEmail('judo-receipt', $this));
