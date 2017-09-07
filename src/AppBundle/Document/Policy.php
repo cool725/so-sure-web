@@ -2639,7 +2639,7 @@ abstract class Policy
         $this->setPendingRenewalExpiration(null);
 
         if ($discount && $discount > 0) {
-            if (!$this->areEqualsToTwoDp($discount, $this->getPreviousPolicy()->getPotValue())) {
+            if (!$this->areEqualToTwoDp($discount, $this->getPreviousPolicy()->getPotValue())) {
                 throw new \Exception(sprintf(
                     'Invalid discount amount used for renewal. Policy %s. %f != %f',
                     $policy->getId(),
