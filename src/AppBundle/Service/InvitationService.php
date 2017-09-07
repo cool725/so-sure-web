@@ -1017,15 +1017,18 @@ class InvitationService
 
         $connectionValue = $policy->getAllowedConnectionValue($date);
         $promoConnectionValue = $policy->getAllowedPromoConnectionValue($date);
+
+        $connection = new StandardConnection();
+
         // If there was a concellation in the network, new connection should replace the cancelled connection
         if ($replacementConnection = $policy->getUnreplacedConnectionCancelledPolicyInLast30Days($date)) {
             $connectionValue = $replacementConnection->getInitialValue();
             $promoConnectionValue = $replacementConnection->getInitialPromoValue();
-            $replacementConnection->setReplacementUser($linkedUser);
+            $replacementConnection->setReplacementConnection($connection);
             $replacementConnection->setValue(0);
             $replacementConnection->setPromoValue(0);
         }
-        $connection = new StandardConnection();
+
         $connection->setLinkedUser($linkedUser);
         $connection->setLinkedPolicy($linkedPolicy);
         $connection->setValue($connectionValue);
