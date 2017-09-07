@@ -49,7 +49,12 @@ sosure.purchaseStepAddress = (function() {
                 },
                 "purchase_form[mobileNumber]" : {
                     required: true,
-                    phoneUK: true
+                    phoneUK: true,
+                    normalizer: function(value) {
+                        var value  = $(this).val();
+                        value = value.replace(/[^ -~]/g, '');
+                        return value;
+                    }
                 },
                 "purchase_form[addressLine1]" : {
                     required: true

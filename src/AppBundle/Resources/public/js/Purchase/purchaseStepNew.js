@@ -23,9 +23,13 @@ $(function(){
 
     // UK mobile number
     jQuery.validator.addMethod('phoneUK', function(phone_number, element) {
-    return this.optional(element) || phone_number.length > 9 &&
-    phone_number.match(/^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$/);
+        return this.optional(element) || phone_number.length > 9 &&
+        phone_number.match(/^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$/);
     }, 'Valid UK Mobile Number (Sorry for those outside the UK, but for now, we can only insure UK residents)');
+
+    jQuery.validator.addMethod('phoneUnicode', function(phone_number, element){
+
+    }, 'Message');
 
     // UK Postcode
     jQuery.validator.addMethod("postcodeUK", function(value, element) {
