@@ -480,7 +480,9 @@ class Claim
 
     public function setReplacementPhoneDetails($replacementPhoneDetails)
     {
-        $this->replacementPhoneDetails = $replacementPhoneDetails;
+        $validator = new AlphanumericSpaceDotValidator();
+
+        $this->replacementPhoneDetails = $validator->conform(substr($replacementPhoneDetails, 0, 100));
     }
 
     public function getReplacementImei()
