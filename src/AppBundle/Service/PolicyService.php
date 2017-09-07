@@ -344,6 +344,9 @@ class PolicyService
     {
         $this->statsd->startTiming("policy.create");
         try {
+            if (!$date) {
+                $date = new \DateTime();
+            }
             $user = $policy->getUser();
 
             $prefix = $policy->getPolicyPrefix($this->environment);
@@ -362,7 +365,9 @@ class PolicyService
                 $user->addPayerPolicy($policy);
             }
 
-            $this->generateScheduledPayments($policy, $date, $numPayments);
+            if ($numPayments === null) {
+                $this->generateScheduledPayments($policy, $date, $numPayments);
+            }
 
             // Generate/set scode prior to creating policy as policy create has a fallback scode creation
             $scode = null;
@@ -733,11 +738,25 @@ class PolicyService
         }
     }
 
+    public function regenerateScheduledPayments(Policy $policy, \DateTime $date = null, $numPayments = null)
+    {
+        foreach ($policy->getScheduledPayments() as $scheduledPayment) {
+            $scheduledPayment->cancel();
+        }
+
+        $this->generateScheduledPayments($policy, $date, $numPayments);
+    }
+
     public function generateScheduledPayments(Policy $policy, \DateTime $date = null, $numPayments = null)
     {
+        // initial purchase is payment received then create policy
+        // vs renewal which will have the number of payments requested
+        $isInitialPurchase = $numPayments === null;
         if (!$date) {
-            // TODO: Should this be policy start date?
-            $date = new \DateTime();
+            if (!$policy->getStart()) {
+                throw new \Exception('Unable to generate payments if policy does not have a start date');
+            }
+            $date = clone $policy->getStart();
         } else {
             $date = clone $date;
         }
@@ -747,54 +766,14 @@ class PolicyService
             $date->sub(new \DateInterval(sprintf('P%dD', $date->format('d') - 28)));
         }
 
-        $payment = null;
-        $paymentItem = null;
-        foreach ($policy->getPayments() as $paymentItem) {
-            if (!$paymentItem->isSuccess()) {
-                $paymentItem = null;
-                continue;
+        if (!$numPayments) {
+            if ($paymentItem = $policy->getLastSuccessfulPaymentCredit()) {
+                $premium = $policy->getPremium();
+                $numPayments = $premium->getNumberOfScheduledMonthlyPayments($paymentItem->getAmount());
             }
         }
 
-        if (!$numPayments && $paymentItem) {
-            if ($this->areEqualToFourDp(
-                $paymentItem->getAmount(),
-                $policy->getPremium()->getYearlyPremiumPrice()
-            )) {
-                $numPayments = 1;
-            } elseif ($this->areEqualToFourDp(
-                $paymentItem->getAmount(),
-                $policy->getPremium()->getMonthlyPremiumPrice()
-            )) {
-                $numPayments = 12;
-            }
-        }
-
-        if ($numPayments) {
-            if ($numPayments == 1) {
-                $policy->setPremiumInstallments(1);
-            } elseif ($numPayments == 12) {
-                $policy->setPremiumInstallments(12);
-                for ($i = 1; $i <= 11; $i++) {
-                    $scheduledDate = clone $date;
-                    $scheduledDate->add(new \DateInterval(sprintf('P%dM', $i)));
-
-                    $scheduledPayment = new ScheduledPayment();
-                    $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
-                    $scheduledPayment->setScheduled($scheduledDate);
-                    $scheduledPayment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
-                    $policy->addScheduledPayment($scheduledPayment);
-                }
-            } else {
-                throw new InvalidPremiumException(sprintf(
-                    'Invalid payment %f for policy %s [Expected %f or %f]',
-                    $paymentItem ? $paymentItem->getAmount() : $numPayments,
-                    $policy->getId(),
-                    $policy->getPremium()->getYearlyPremiumPrice(),
-                    $policy->getPremium()->getMonthlyPremiumPrice()
-                ));
-            }
-        } else {
+        if (!$numPayments || $numPayments < 1 || $numPayments > 12) {
             throw new InvalidPremiumException(sprintf(
                 'Invalid payment %f for policy %s [Expected %f or %f]',
                 $paymentItem ? $paymentItem->getAmount() : $numPayments,
@@ -802,6 +781,27 @@ class PolicyService
                 $policy->getPremium()->getYearlyPremiumPrice(),
                 $policy->getPremium()->getMonthlyPremiumPrice()
             ));
+        }
+
+        // premium installments must either be 1 or 12
+        $policy->setPremiumInstallments($numPayments == 1 ? 1 : 12);
+        $numScheduledPayments = $numPayments - count($policy->getSuccessfulPaymentCredits());
+        for ($i = 1; $i <= $numScheduledPayments; $i++) {
+            $scheduledDate = clone $date;
+            // initial purchase should start at 1 month from initial purchase
+            $scheduledDate->add(new \DateInterval(sprintf('P%dM', $isInitialPurchase ? $i : $i - 1)));
+
+            $scheduledPayment = new ScheduledPayment();
+            $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+            $scheduledPayment->setScheduled($scheduledDate);
+            if ($i == 1 && $numPayments == 1) {
+                $scheduledPayment->setAmount($policy->getPremium()->getAdjustedYearlyPremiumPrice());
+            } elseif ($i <= 11) {
+                $scheduledPayment->setAmount($policy->getPremium()->getAdjustedStandardMonthlyPremiumPrice());
+            } else {
+                $scheduledPayment->setAmount($policy->getPremium()->getAdjustedFinalMonthlyPremiumPrice());
+            }
+            $policy->addScheduledPayment($scheduledPayment);
         }
     }
 
@@ -1294,37 +1294,37 @@ class PolicyService
      */
     public function fullyExpire(Policy $policy, \DateTime $date = null)
     {
-        try {
-            $initialStatus = $policy->getStatus();
-            $policy->fullyExpire($date);
-            $this->dm->flush();
+        $initialStatus = $policy->getStatus();
+        $policy->fullyExpire($date);
+        $this->dm->flush();
 
-            // If no change in wait claim, then don't proceed as may resend emails for cashback
-            if ($policy->getStatus() == Policy::STATUS_EXPIRED_WAIT_CLAIM &&
-                $initialStatus == Policy::STATUS_EXPIRED_WAIT_CLAIM) {
-                return;
-            }
+        // If no change in wait claim, then don't proceed as may resend emails for cashback
+        if ($policy->getStatus() == Policy::STATUS_EXPIRED_WAIT_CLAIM &&
+            $initialStatus == Policy::STATUS_EXPIRED_WAIT_CLAIM) {
+            return;
+        }
 
-            if ($policy->hasCashback() && !in_array($policy->getCashback()->getStatus(), [
-                Cashback::STATUS_MISSING,
-                Cashback::STATUS_FAILED,
-                Cashback::STATUS_PAID,
-            ])) {
-                if ($policy->getStatus() == Policy::STATUS_EXPIRED_WAIT_CLAIM) {
-                    $this->updateCashback($policy->getCashback(), Cashback::STATUS_PENDING_WAIT_CLAIM);
-                } elseif ($this->areEqualToTwoDp(0, $policy->getCashback()->getAmount())) {
-                    $this->updateCashback($policy->getCashback(), Cashback::STATUS_CLAIMED);
-                } else {
-                    $this->updateCashback($policy->getCashback(), Cashback::STATUS_PENDING_PAYMENT);
-                }
+        if ($policy->hasCashback() && !in_array($policy->getCashback()->getStatus(), [
+            Cashback::STATUS_MISSING,
+            Cashback::STATUS_FAILED,
+            Cashback::STATUS_PAID,
+        ])) {
+            if ($policy->getStatus() == Policy::STATUS_EXPIRED_WAIT_CLAIM) {
+                $this->updateCashback($policy->getCashback(), Cashback::STATUS_PENDING_WAIT_CLAIM);
+            } elseif ($this->areEqualToTwoDp(0, $policy->getCashback()->getAmount())) {
+                $this->updateCashback($policy->getCashback(), Cashback::STATUS_CLAIMED);
+            } else {
+                $this->updateCashback($policy->getCashback(), Cashback::STATUS_PENDING_PAYMENT);
             }
+        }
 
-            if ($policy->hasAdjustedRewardPotPayment()) {
-                // TODO: notify user about reduced/0 pot
-                \AppBundle\Classes\NoOp::ignore([]);
-            }
-        } catch (ClaimException $e) {
-            // TODO: If cashback is available, notify user about delay
+        if ($policy->isRenewed() && $policy->hasAdjustedRewardPotPayment()) {
+            $this->regenerateScheduledPayments($policy->getNextPolicy());
+
+            // bill for outstanding payments due
+            $outstanding = $policy->getNextPolicy()->getOutstandingPremiumToDate();
+
+            // TODO: notify user about reduced/0 pot
             \AppBundle\Classes\NoOp::ignore([]);
         }
     }
@@ -1509,17 +1509,16 @@ class PolicyService
         }
 
         $startDate = $this->endOfDay($policy->getEnd());
-        $this->create($newPolicy, $startDate, null, $numPayments);
         $discount = 0;
         if (!$cashback && $policy->getPotValue() > 0) {
             $discount = $policy->getPotValue();
         }
-        $newPolicy->renew($discount, $date);
-        $this->dm->flush();
 
-        if (!$cashback && $policy->getPotValue() > 0) {
-            $this->adjustScheduledPayments($newPolicy, false, $date);
-        }
+        $this->create($newPolicy, $startDate, null, $numPayments);
+        $newPolicy->renew($discount, $date);
+        $this->generateScheduledPayments($newPolicy, $startDate, $numPayments);
+
+        $this->dm->flush();
 
         $this->dispatchEvent(PolicyEvent::EVENT_RENEWED, new PolicyEvent($policy));
 

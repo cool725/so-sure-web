@@ -23,6 +23,10 @@ class PhonePremiumTest extends \PHPUnit_Framework_TestCase
         $phonePremium->setGwp(5);
         $phonePremium->setIpt(0.5);
         $this->assertEquals(5.5, $phonePremium->getMonthlyPremiumPrice());
+
+        $this->assertTrue($phonePremium->isEvenlyDivisible(5.5));
+
+        $this->assertEquals(12, $phonePremium->getNumberOfScheduledMonthlyPayments(5.5));
     }
 
     public function testYearlyPremium()
@@ -31,5 +35,42 @@ class PhonePremiumTest extends \PHPUnit_Framework_TestCase
         $phonePremium->setGwp(5);
         $phonePremium->setIpt(0.5);
         $this->assertEquals(5.5 * 12, $phonePremium->getYearlyPremiumPrice());
+
+        $this->assertEquals(66, $phonePremium->getAdjustedYearlyPremiumPrice());
+
+        $this->assertTrue($phonePremium->isEvenlyDivisible(66));
+
+        $this->assertEquals(12, $phonePremium->getNumberOfMonthlyPayments(66));
+
+        $this->assertEquals(1, $phonePremium->getNumberOfScheduledMonthlyPayments(66));
+    }
+
+    public function testMonthlyPremiumWithDiscount()
+    {
+        $phonePremium = new PhonePremium();
+        $phonePremium->setGwp(5);
+        $phonePremium->setIpt(0.5);
+        $phonePremium->setAnnualDiscount(10);
+        $this->assertEquals(4.67, $phonePremium->getAdjustedStandardMonthlyPremiumPrice());
+        $this->assertEquals(4.63, $phonePremium->getAdjustedFinalMonthlyPremiumPrice());
+
+        $this->assertTrue($phonePremium->isEvenlyDivisible(4.67, true));
+
+        $this->assertEquals(12, $phonePremium->getNumberOfScheduledMonthlyPayments(4.67));
+    }
+
+    public function testYearlyPremiumWithDiscount()
+    {
+        $phonePremium = new PhonePremium();
+        $phonePremium->setGwp(5);
+        $phonePremium->setIpt(0.5);
+        $phonePremium->setAnnualDiscount(10);
+        $this->assertEquals(56, $phonePremium->getAdjustedYearlyPremiumPrice());
+
+        $this->assertTrue($phonePremium->isEvenlyDivisible(56, true));
+
+        $this->assertEquals(12, $phonePremium->getNumberOfMonthlyPayments(56));
+
+        $this->assertEquals(1, $phonePremium->getNumberOfScheduledMonthlyPayments(56));
     }
 }

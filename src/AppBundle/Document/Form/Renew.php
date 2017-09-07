@@ -119,19 +119,19 @@ class Renew
         // TODO: Current Price or new policy price? Depends on IPT
         $price = $this->getPolicy()->getPhone()->getCurrentPhonePrice();
         $monthlyPrice = $price->getMonthlyPremiumPrice();
-        $monthlyInitialAdjustedPrice = $price->getAdjustedInitialMonthlyPremiumPrice($potValue);
+        $monthlyFinalAdjustedPrice = $price->getAdjustedFinalMonthlyPremiumPrice($potValue);
         $monthlyStandardAdjustedPrice = $price->getAdjustedStandardMonthlyPremiumPrice($potValue);
         $yearlyPrice = $price->getYearlyPremiumPrice();
         $yearlyAdjustedPrice = $price->getAdjustedYearlyPremiumPrice($potValue);
 
         if ($usePot &&
-            !$this->areEqualToTwoDp($amount, $monthlyInitialAdjustedPrice) &&
+            !$this->areEqualToTwoDp($amount, $monthlyFinalAdjustedPrice) &&
             !$this->areEqualToTwoDp($amount, $monthlyStandardAdjustedPrice) &&
             !$this->areEqualToTwoDp($amount, $yearlyAdjustedPrice)) {
             throw new \InvalidArgumentException(sprintf(
                 'Amount must be a monthly or annual figure. Not %f. Expected: [%f, %f, %f]',
                 $amount,
-                $monthlyInitialAdjustedPrice,
+                $monthlyFinalAdjustedPrice,
                 $monthlyStandardAdjustedPrice,
                 $yearlyAdjustedPrice
             ));
