@@ -369,7 +369,7 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
         $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
 
-        $payment = $policy->getLastSuccessfulPaymentCredit();
+        $payment = $policy->getLastSuccessfulUserPaymentCredit();
 
         $refund = self::$judopay->refund($payment);
         $this->assertEquals('Success', $refund->getResult());
@@ -987,7 +987,7 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
         $this->assertEquals(
             Salva::MONTHLY_TOTAL_COMMISSION,
-            $policy->getLastSuccessfulPaymentCredit()->getTotalCommission()
+            $policy->getLastSuccessfulUserPaymentCredit()->getTotalCommission()
         );
 
         for ($i = 1; $i <= 10; $i++) {
@@ -1007,7 +1007,7 @@ class JudopayServiceTest extends WebTestCase
             $this->assertEquals(ScheduledPayment::STATUS_SUCCESS, $scheduledPayment->getStatus());
             $this->assertEquals(
                 Salva::MONTHLY_TOTAL_COMMISSION,
-                $policy->getLastSuccessfulPaymentCredit()->getTotalCommission()
+                $policy->getLastSuccessfulUserPaymentCredit()->getTotalCommission()
             );
         }
 
@@ -1224,7 +1224,7 @@ class JudopayServiceTest extends WebTestCase
         );
         static::$policyService->setEnvironment('test');
 
-        $payment = $updatedPolicy->getLastSuccessfulPaymentCredit();
+        $payment = $updatedPolicy->getLastSuccessfulUserPaymentCredit();
         $this->assertEquals(
             Salva::MONTHLY_TOTAL_COMMISSION * 10 + Salva::FINAL_MONTHLY_TOTAL_COMMISSION,
             $payment->getTotalCommission()

@@ -23,4 +23,9 @@ class PolicyDiscountPayment extends Payment
     {
         return $this->success;
     }
+
+    public function isUserPayment()
+    {
+        return false;
+    }
 }

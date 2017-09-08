@@ -1990,8 +1990,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice(), $policyData['premium']);
         $this->assertEquals('monthly', $policyData['premium_plan']);
         $environment = self::$client->getContainer()->getParameter('kernel.environment');
-        $prefix = $policy->getPolicyPrefix($environment);
-        $this->assertTrue($policy->arePolicyScheduledPaymentsCorrect($prefix));
+        $this->assertTrue($policy->arePolicyScheduledPaymentsCorrect());
         $this->assertEquals(1, count($policy->getAllScheduledPayments(ScheduledPayment::STATUS_CANCELLED)));
     }
 

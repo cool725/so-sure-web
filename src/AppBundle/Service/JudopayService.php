@@ -654,6 +654,13 @@ class JudopayService
 
     public function scheduledPayment(ScheduledPayment $scheduledPayment, $prefix = null, $date = null)
     {
+        if (!$scheduledPayment->getPolicy()->isValidPolicy($prefix)) {
+            throw new \Exception(sprintf(
+                'Scheduled payment %s policy is not valid. Invalid Prefix?',
+                $scheduledPayment->getId()
+            ));
+        }
+
         if (!$scheduledPayment->isBillable($prefix)) {
             throw new \Exception(sprintf(
                 'Scheduled payment %s is not billable (status: %s)',

@@ -15,4 +15,9 @@ class GocardlessPayment extends Payment
     {
         return true;
     }
+
+    public function isUserPayment()
+    {
+        return true;
+    }
 }

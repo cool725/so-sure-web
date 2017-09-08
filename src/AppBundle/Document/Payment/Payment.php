@@ -314,6 +314,7 @@ abstract class Payment
     }
 
     abstract public function isSuccess();
+    abstract public function isUserPayment();
 
     public function calculateSplit()
     {

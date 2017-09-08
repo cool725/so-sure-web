@@ -63,6 +63,15 @@ class EmailDebugCommand extends BaseCommand
                     UrlGeneratorInterface::ABSOLUTE_URL
                 ),
             ];
+        } elseif (in_array($template, [
+            'potReward/adjusted',
+        ])) {
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(Policy::class);
+            $data = [
+                'policy' => $repo->findOneBy([]),
+                'additional_amount' => 10,
+            ];
         } else {
             throw new \Exception(sprintf('Unsupported template %s for email debug. Add data', $template));
         }

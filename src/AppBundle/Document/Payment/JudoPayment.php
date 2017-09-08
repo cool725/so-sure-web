@@ -138,4 +138,9 @@ class JudoPayment extends Payment
     {
         $this->riskScore = $riskScore;
     }
+
+    public function isUserPayment()
+    {
+        return true;
+    }
 }

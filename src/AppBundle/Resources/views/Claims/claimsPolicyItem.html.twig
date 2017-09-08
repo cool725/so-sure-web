@@ -88,11 +88,11 @@
                             <td>{{ policy.start | date('d M Y H:i', 'Europe/London') }} - {{ policy.end | date('d M Y H:i', 'Europe/London') }}</td>
                         </tr>
                         {% endif %}
-                        {% if policy.isPolicy and policy.getFirstSuccessfulPaymentCredit %}
+                        {% if policy.isPolicy and policy.getFirstSuccessfulUserPaymentCredit %}
                         <tr>
                             <td>Policy Purchased via</td>
                             <td>
-                                {{ policy.getFirstSuccessfulPaymentCredit.getSourceForClaims }}
+                                {{ policy.getFirstSuccessfulUserPaymentCredit.getSourceForClaims }}
                             </td>
                         </tr>
                         {% endif %}

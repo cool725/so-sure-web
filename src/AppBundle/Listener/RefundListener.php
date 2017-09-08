@@ -73,7 +73,7 @@ class RefundListener
             }
         }
 
-        $payment = $policy->getLastSuccessfulPaymentCredit();
+        $payment = $policy->getLastSuccessfulUserPaymentCredit();
         $refundAmount = $policy->getRefundAmount($event->getDate());
         $refundCommissionAmount = $policy->getRefundCommissionAmount($event->getDate());
         $this->logger->info(sprintf('Processing refund %f (policy %s)', $refundAmount, $policy->getId()));
@@ -115,7 +115,7 @@ class RefundListener
             return;
         }
 
-        $payment = $policy->getLastSuccessfulPaymentCredit();
+        $payment = $policy->getLastSuccessfulUserPaymentCredit();
         // Only run against JudoPayments
         if (!$payment instanceof JudoPayment) {
             return;

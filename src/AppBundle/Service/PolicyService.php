@@ -674,8 +674,7 @@ class PolicyService
     public function adjustScheduledPayments(Policy $policy, $expectSingleAdjustment = false, \DateTime $date = null)
     {
         $log = [];
-        $prefix = $policy->getPolicyPrefix($this->environment);
-        if ($policy->arePolicyScheduledPaymentsCorrect($prefix, $date)) {
+        if ($policy->arePolicyScheduledPaymentsCorrect($date)) {
             return null;
         }
 
@@ -692,14 +691,15 @@ class PolicyService
                 $scheduledPayment->setScheduled($adjustedScheduledDay);
             }
         }
-        if ($policy->arePolicyScheduledPaymentsCorrect($prefix, $date)) {
+
+        if ($policy->arePolicyScheduledPaymentsCorrect($date)) {
             $this->dm->flush();
             return null;
         }
 
         $scheduledPayments = [];
         // Try cancellating scheduled payments until amount matches
-        while (!$policy->arePolicyScheduledPaymentsCorrect($prefix, $date) &&
+        while (!$policy->arePolicyScheduledPaymentsCorrect($date) &&
                 ($scheduledPayment = $policy->getNextScheduledPayment()) !== null) {
             $scheduledPayments[] = $scheduledPayment;
             $scheduledPayment->cancel();
@@ -712,7 +712,7 @@ class PolicyService
             );
         }
 
-        if ($policy->arePolicyScheduledPaymentsCorrect($prefix, $date)) {
+        if ($policy->arePolicyScheduledPaymentsCorrect($date)) {
             $this->dm->flush();
             // If user has manually paid, there should be a single adjustment made, so reduce log level
             if ($expectSingleAdjustment && count($scheduledPayments) == 1) {
@@ -741,17 +741,22 @@ class PolicyService
         }
     }
 
-    public function regenerateScheduledPayments(Policy $policy, \DateTime $date = null, $numPayments = null)
-    {
-        foreach ($policy->getScheduledPayments() as $scheduledPayment) {
-            $scheduledPayment->cancel();
-        }
-
-        $this->generateScheduledPayments($policy, $date, $numPayments);
+    public function regenerateScheduledPayments(
+        Policy $policy,
+        \DateTime $date = null,
+        $numPayments = null,
+        $billingOffset = null
+    ) {
+        $policy->cancelScheduledPayments();
+        $this->generateScheduledPayments($policy, $date, $numPayments, $billingOffset);
     }
 
-    public function generateScheduledPayments(Policy $policy, \DateTime $date = null, $numPayments = null)
-    {
+    public function generateScheduledPayments(
+        Policy $policy,
+        \DateTime $date = null,
+        $numPayments = null,
+        $billingOffset = null
+    ) {
         // initial purchase is payment received then create policy
         // vs renewal which will have the number of payments requested
         $isInitialPurchase = $numPayments === null;
@@ -764,13 +769,18 @@ class PolicyService
             $date = clone $date;
         }
 
+        // To determine any payments made
+        $initialDate = clone $date;
+
         // To allow billing on same date every month, 28th is max allowable day on month
         if ($date->format('d') > 28) {
             $date->sub(new \DateInterval(sprintf('P%dD', $date->format('d') - 28)));
         }
 
         if (!$numPayments) {
-            if ($paymentItem = $policy->getLastSuccessfulPaymentCredit()) {
+            if ($policy->getPremiumInstallments()) {
+                $numPayments = $policy->getPremiumInstallments();
+            } elseif ($paymentItem = $policy->getLastSuccessfulUserPaymentCredit()) {
                 $premium = $policy->getPremium();
                 $numPayments = $premium->getNumberOfScheduledMonthlyPayments($paymentItem->getAmount());
             }
@@ -778,8 +788,9 @@ class PolicyService
 
         if (!$numPayments || $numPayments < 1 || $numPayments > 12) {
             throw new InvalidPremiumException(sprintf(
-                'Invalid payment %f for policy %s [Expected %f or %f]',
-                $paymentItem ? $paymentItem->getAmount() : $numPayments,
+                'Invalid payment %f (%d) for policy %s [Expected %f or %f]',
+                $paymentItem ? $paymentItem->getAmount() : null,
+                $numPayments,
                 $policy->getId(),
                 $policy->getPremium()->getYearlyPremiumPrice(),
                 $policy->getPremium()->getMonthlyPremiumPrice()
@@ -788,7 +799,22 @@ class PolicyService
 
         // premium installments must either be 1 or 12
         $policy->setPremiumInstallments($numPayments == 1 ? 1 : 12);
-        $numScheduledPayments = $numPayments - count($policy->getSuccessfulPaymentCredits());
+        $paid = $policy->getTotalSuccessfulPayments($initialDate);
+        if ($billingOffset) {
+            $paid += $billingOffset;
+        }
+        $numPaidPayments = $policy->getPremium()->getNumberOfMonthlyPayments($paid);
+        if (!$numPaidPayments) {
+            if ($paid > 0) {
+                // There were some payments applied to the policy, but amounts don't split
+                throw new \Exception(sprintf(
+                    'Unable to determine correct payment schedule for policy %s',
+                    $policy->getId()
+                ));
+            }
+            $numPaidPayments = 0;
+        }
+        $numScheduledPayments = $numPayments - $numPaidPayments;
         for ($i = 1; $i <= $numScheduledPayments; $i++) {
             $scheduledDate = clone $date;
             // initial purchase should start at 1 month from initial purchase
@@ -1322,14 +1348,41 @@ class PolicyService
         }
 
         if ($policy->isRenewed() && $policy->hasAdjustedRewardPotPayment()) {
-            $this->regenerateScheduledPayments($policy->getNextPolicy());
+            $outstanding = $policy->getNextPolicy()->getOutstandingPremiumToDate($date ? $date : new \DateTime());
+
+            $this->regenerateScheduledPayments($policy->getNextPolicy(), $date, null, $outstanding);
 
             // bill for outstanding payments due
-            $outstanding = $policy->getNextPolicy()->getOutstandingPremiumToDate();
+            $outstanding = $policy->getNextPolicy()->getOutstandingPremiumToDate($date ? $date : new \DateTime());
+            $scheduledPayment = new ScheduledPayment();
+            $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+            $scheduledPayment->setScheduled($date ? $date : new \DateTime());
+            $scheduledPayment->setAmount($outstanding);
+            $policy->getNextPolicy()->addScheduledPayment($scheduledPayment);
+            $this->dm->flush();
+            //\Doctrine\Common\Util\Debug::dump($scheduledPayment);
 
-            // TODO: notify user about reduced/0 pot
-            \AppBundle\Classes\NoOp::ignore([]);
+            $this->adjustPotRewardEmail($policy->getNextPolicy(), $outstanding);
         }
+    }
+
+    public function adjustPotRewardEmail(Policy $policy, $additionalAmount)
+    {
+        $baseTemplate = sprintf('AppBundle:Email:potReward/adjusted');
+        $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
+        $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
+
+        $subject = sprintf('Important information about your Reward Pot');
+        $this->mailer->sendTemplate(
+            $subject,
+            $policy->getUser()->getEmail(),
+            $htmlTemplate,
+            ['policy' => $policy, 'additional_amount' => $additionalAmount],
+            $textTemplate,
+            ['policy' => $policy, 'additional_amount' => $additionalAmount],
+            null,
+            'bcc@so-sure.com'
+        );
     }
 
     public function cashback(Policy $policy, Cashback $cashback)
