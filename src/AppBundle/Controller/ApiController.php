@@ -715,6 +715,16 @@ class ApiController extends BaseController
                 );
             }
 
+            // Breaking change to return all the policies objects to support renewals
+            if (($platform == 'ios' && version_compare($version, '1.5.4', '<=')) ||
+                ($platform == 'android' && version_compare($version, '1.5.7.0', '<=')) ) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_UPGRADE_APP,
+                    sprintf('%s %s must be upgraded due to renewals', $platform, $version),
+                    422
+                );
+            }
+
             // Test version
             $key = sprintf('UPGRADE_APP_VERSIONS_%s', $platform);
             if ($version == "0.0.0" || $redis->sismember($key, $version)) {

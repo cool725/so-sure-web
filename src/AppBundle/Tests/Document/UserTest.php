@@ -161,7 +161,7 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $policy->setCancelledReason(SalvaPhonePolicy::CANCELLED_COOLOFF);
         $this->assertEquals(0, count($user->getPolicies()));
         $user->addPolicy($policy);
-        $this->assertEquals(0, count($user->getPolicies()));
+        $this->assertEquals(1, count($user->getPolicies()));
         $this->assertEquals(1, count($user->getAllPolicies()));
     }
 
