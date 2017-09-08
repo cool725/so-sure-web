@@ -627,7 +627,7 @@ class PolicyService
 
         $this->snappyPdf->setOption('orientation', 'Portrait');
         $this->snappyPdf->setOption('page-size', 'A4');
-        $this->snappyPdf->setOption('margin-top', '20mm');
+        $this->snappyPdf->setOption('margin-top', '0mm');
         $this->snappyPdf->generateFromHtml(
             $this->templating->render($template, ['policy' => $policy]),
             $tmpFile

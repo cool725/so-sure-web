@@ -1,14 +1,28 @@
+{% set td_width_a = "35%" %}
+{% set td_width_b = "65%" %}
+{% set claims_td_width_a = "60%" %}
+{% set claims_td_width_b = "40%" %}
 <html>
     <head>
         <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+        <style>
+            body: { width: 100%; }
+            table { width: 100%; border-collapse: separate; border-spacing:1em; }
+            td:first { width: 60%; }
+            .table-striped > tbody > tr:nth-child(2n+1) {
+                background-color: #f9f9f9;
+            }
+        </style>
     </head>
     <body>
         <div style="text-align: center">
-            <img src="{{ cdn_url }}/images/icons/logo-social-insurance-2x.png" width="60%" />
+            <img src="{{ cdn_url }}/images/logo/so-sure_logo-full-blue.png" width="50%" />
             <h2>Mobile Phone Insurance Policy Schedule</h2>
         </div>
         <div>
-            <p>
+            <table>
+                <tr>
+                    <td width="60%">
                 {{ policy.user.name }}<br />
                 {{ policy.user.billingAddress.line1 }}<br />
                 {% if policy.user.billingAddress.line2 %}
@@ -19,54 +33,118 @@
                 {% endif %}
                 {{ policy.user.billingAddress.city }} {{ policy.user.billingAddress.postcode }}<br />
                 United Kingdom
-        </div>
-        <div>
-            <p>Date of Birth: {{ policy.user.birthday|date('d M Y') }}</p>
+                    </td>
+                    <td width="40%" valign="top">
+                        Date of Birth: {{ policy.user.birthday|date('d M Y') }}
+                    </td>
+                </tr>
+            </table>
         </div>
         <h4>Policy Reference</h4>
         <div>
-            <ul>
-                <li>Policy Number: {{ policy.policyNumber }}</li>
-                <li>Date of subscription: {{ policy.start | date('d M Y H:i', 'Europe/London') }}</li>
-                <li>Mobile phone covered by insurance: {{ policy.phone.make }} {{ policy.phone.model }} [IMEI: {{ policy.imei }}{% if policy.serialNumber %} / Serial Number: {{ policy.serialNumber }}{% endif %}]</li>
-                <li>Period of cover: from {{ policy.start | date('d M Y H:i', 'Europe/London') }} to {{ policy.end|date('d M Y H:i', 'Europe/London') }}</li>
+            <table class="table-striped">
+                <tr>
+                    <td width="{{ td_width_a }}">
+                        Policy Number
+                    </td>
+                    <td width="{{ td_width_b }}">
+                        {{ policy.policyNumber }}
+                    </td>
+                </tr>
+                <tr>
+                    <td width="{{ td_width_a }}">
+                        Date of subscription
+                    </td>
+                    <td width="{{ td_width_b }}">
+                        {{ policy.start | date('d M Y H:i', 'Europe/London') }}
+                    </td>
+                </tr>
+                <tr>
+                    <td width="{{ td_width_a }}">
+                        Mobile phone covered by insurance
+                    </td>
+                    <td width="{{ td_width_b }}">
+                        {{ policy.phone.make }} {{ policy.phone.model }}
+                        [IMEI: {{ policy.imei }}{% if policy.serialNumber %} / Serial Number: {{ policy.serialNumber }}{% endif %}]
+                    </td>
+                </tr>
+                <tr>
+                    <td width="{{ td_width_a }}">
+                        Period of cover
+                    </td>
+                    <td width="{{ td_width_b }}">
+                        from {{ policy.start | date('d M Y H:i', 'Europe/London') }} to {{ policy.end|date('d M Y H:i', 'Europe/London') }}
+                    </td>
+                </tr>
+                <tr>
+                    <td width="{{ td_width_a }}">
+                        Annual Policy cost
+                    </td>
+                    <td width="{{ td_width_b }}">
+                        £{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }}, 
+                        inclusive of £{{ policy.premium.yearlyIpt|number_format(2, '.', ',') }} Insurance Premium Tax (IPT)
+                    </td>
+                </tr>
                 {% if policy.premium.hasAnnualDiscount %}
-                    {% if policy.premiumPlan == 'monthly' %}
-                        <li>
-                            Cost of policy: £{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }},
-                            inclusive of £{{ policy.premium.yearlyIpt|number_format(2, '.', ',') }} Insurance Premium Tax (IPT)
-                            payable in 12 monthly installments of £{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }}.
-                        </li>
-                    {% else %}
-                        <li>
-                            Cost of policy: £{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }},
-                            inclusive of £{{ policy.premium.yearlyIpt|number_format(2, '.', ',') }} Insurance Premium Tax (IPT)
-                            payable in 1 installment of £{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }}.
-                        </li>
-                    {% endif %}
-                {% else %}
-                    {% if policy.premiumPlan == 'monthly' %}
-                        <li>
-                            Cost of policy: £{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }},
-                            inclusive of £{{ policy.premium.yearlyIpt|number_format(2, '.', ',') }} Insurance Premium Tax (IPT)
-                            payable in 12 monthly installments of £{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }}.
-                        </li>
-                    {% else %}
-                        <li>
-                            Cost of policy: £{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }},
-                            inclusive of £{{ policy.premium.yearlyIpt|number_format(2, '.', ',') }} Insurance Premium Tax (IPT)
-                            payable in 1 installment of £{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }}.
-                        </li>
-                    {% endif %}
+                <tr>
+                    <td width="{{ td_width_a }}">
+                        Reward Pot Discount <b>*</b>
+                    </td>
+                    <td width="{{ td_width_b }}">
+                        £{{ policy.premium.getAnnualDiscount|number_format(2, '.', ',') }}
+                    </td>
+                </tr>
+                <tr>
+                    <td width="{{ td_width_a }}">
+                        Annual Policy Cost after Discount
+                    </td>
+                    <td width="{{ td_width_b }}">
+                        £{{ policy.premium.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }}
+                    </td>
+                </tr>
                 {% endif %}
-            </ul>
+                <tr>
+                    <td width="{{ td_width_a }}">
+                        Payments
+                    </td>
+                    <td width="{{ td_width_b }}">
+                        {% if policy.premiumPlan == 'monthly' %}
+                            {% if policy.premium.getAdjustedStandardMonthlyPremiumPrice != policy.premium.getAdjustedInitialMonthlyPremiumPrice %}
+                                11 monthly payments of £{{ policy.premium.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }}
+                                and 1 final payment of £{{ policy.premium.getAdjustedInitialMonthlyPremiumPrice|number_format(2, '.', ',') }}
+                            {% else %}
+                                12 monthly payments of £{{ policy.premium.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }}
+                            {% endif %}
+                        {% else %}
+                            1 annual payment of £{{ policy.premium.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }}
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
+            {% if policy.premium.hasAnnualDiscount %}
+            <p style="font-size: 12px;"><b>*</b> so-sure wants to share the benefits of your Reward Pot as soon as possible. In order to do so, we assume that once your policy has ended, that both you & your connections will not claim for events that occurred in the past. However, on rare occasions, this could occur and you and your connections have up to 28 days to claim after an event occurs. In such a situation, where your Reward Pot was affected, we would need to adjust your Reward Pot Discount and increase your billable amount. This will never exceed the the Policy cost.</p>
+            {% endif %}
         </div>
         <div>
             <p>Excess to be paid at point of claim:</p>
-            <ul>
-                <li>£50 for Accidental Damage or Breakdown claim</li>
-                <li>£70 for Theft or Loss claim</li>
-            </ul>
+            <table class="table-striped">
+                <tr>
+                    <td width="{{ claims_td_width_a }}">
+                        Accidental Damage or Breakdown claim
+                    </td>
+                    <td width="{{ claims_td_width_b }}">
+                        £50
+                    </td>
+                </tr>
+                <tr>
+                    <td width="{{ claims_td_width_a }}">
+                        Theft or Loss claim
+                    </td>
+                    <td width="{{ claims_td_width_b }}">
+                        £70
+                    </td>
+                </tr>
+            </table>
         </div>
         <div style="position: absolute; float: left; bottom: 50px; font-size: 12px; margin-right: 25mm;">
             <i>
