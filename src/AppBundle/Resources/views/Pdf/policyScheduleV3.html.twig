@@ -91,7 +91,7 @@
                         Reward Pot Discount <b>*</b>
                     </td>
                     <td width="{{ td_width_b }}">
-                        £{{ policy.premium.getAnnualDiscount|number_format(2, '.', ',') }}
+                        -£{{ policy.premium.getAnnualDiscount|number_format(2, '.', ',') }}
                     </td>
                 </tr>
                 <tr>
@@ -122,7 +122,7 @@
                 </tr>
             </table>
             {% if policy.premium.hasAnnualDiscount %}
-            <p style="font-size: 12px;"><b>*</b> so-sure wants to share the benefits of your Reward Pot as soon as possible. In order to do so, we assume that once your policy has ended, that both you & your connections will not claim for events that occurred in the past. However, on rare occasions, this could occur and you and your connections have up to 28 days to claim after an event occurs. In such a situation, where your Reward Pot was affected, we would need to adjust your Reward Pot Discount and increase your billable amount. This will never exceed the the Policy cost.</p>
+            <p style="font-size: 12px;"><b>*</b> so-sure wants to share the benefits of your Reward Pot as soon as possible. In order to do so, we assume that once your policy has ended, that both you & your connections will not claim for events that occurred in the past. However, on rare occasions, this could occur and you and your connections have up to 28 days to claim after an event occurs. In such a situation, where your Reward Pot was affected, we would need to adjust your Reward Pot Discount and increase your billable amount, which will never exceed the the Policy cost.</p>
             {% endif %}
         </div>
         <div>
