@@ -109,9 +109,9 @@
                     </td>
                     <td width="{{ td_width_b }}">
                         {% if policy.premiumPlan == 'monthly' %}
-                            {% if policy.premium.getAdjustedStandardMonthlyPremiumPrice != policy.premium.getAdjustedInitialMonthlyPremiumPrice %}
+                            {% if policy.premium.getAdjustedStandardMonthlyPremiumPrice != policy.premium.getAdjustedFinalMonthlyPremiumPrice %}
                                 11 monthly payments of £{{ policy.premium.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }}
-                                and 1 final payment of £{{ policy.premium.getAdjustedInitialMonthlyPremiumPrice|number_format(2, '.', ',') }}
+                                and 1 final payment of £{{ policy.premium.getAdjustedFinalMonthlyPremiumPrice|number_format(2, '.', ',') }}
                             {% else %}
                                 12 monthly payments of £{{ policy.premium.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }}
                             {% endif %}
