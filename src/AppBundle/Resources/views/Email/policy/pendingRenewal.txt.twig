@@ -1,10 +1,10 @@
 {% extends 'AppBundle:Email:base.txt.twig' %}
 {% block body %}
-Your SO-SURE policy is due to expire in 3 weeks.
+Your SO-SURE policy is due to expire on {{ policy.end | date('d M Y H:i', 'Europe/London') }}.
 
 **
 ------------------------------------------------------------
-Your SO-SURE policy is due to expire in 3 weeks.
+Your SO-SURE policy is due to expire on {{ policy.end | date('d M Y H:i', 'Europe/London') }}.
 {% if policy.nextPolicy.premium.monthlyPremiumPrice < policy.premium.monthlyPremiumPrice %}
 We have great news...
 
