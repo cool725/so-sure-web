@@ -22,4 +22,9 @@ class BacsPayment extends Payment
     {
         return $this->success;
     }
+
+    public function isUserPayment()
+    {
+        return true;
+    }
 }

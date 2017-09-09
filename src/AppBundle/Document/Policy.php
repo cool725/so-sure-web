@@ -18,6 +18,7 @@ use AppBundle\Document\File\PolicyScheduleFile;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
 use AppBundle\Document\Payment\PotRewardPayment;
 use AppBundle\Document\Payment\SoSurePotRewardPayment;
+use AppBundle\Document\Payment\Payment;
 use AppBundle\Exception\ClaimException;
 
 /**
@@ -493,6 +494,15 @@ abstract class Policy
         return count($promoPotRewards) > 1 || count($potRewards) > 1;
     }
 
+    public function getAdjustedRewardPotPaymentAmount()
+    {
+        $promoPotRewards = $this->getPaymentsByType(SoSurePotRewardPayment::class);
+        $potRewards = $this->getPaymentsByType(PotRewardPayment::class);
+
+        return Payment::sumPayments($potRewards, false)['total'] +
+            Payment::sumPayments($promoPotRewards, false)['total'];
+    }
+
     /**
      * Successful Payments
      */
@@ -508,6 +518,24 @@ abstract class Policy
 
         return array_filter($payments, function ($payment) {
             return $payment->isSuccess();
+        });
+    }
+
+    /**
+     * Successful Payments
+     */
+    public function getSuccessfulUserPayments()
+    {
+        $payments = $this->getPayments();
+        if (is_object($payments)) {
+            $payments = $payments->toArray();
+        }
+        if (!$this->getPayments()) {
+            return [];
+        }
+
+        return array_filter($payments, function ($payment) {
+            return $payment->isSuccess() && $payment->isUserPayment();
         });
     }
 
@@ -535,7 +563,18 @@ abstract class Policy
     public function getSuccessfulPaymentCredits()
     {
         return array_filter($this->getSuccessfulPayments(), function ($payment) {
-            return $payment->getAmount() > 0 && !$payment instanceof SoSurePayment;
+            return $payment->getAmount() > 0 && !$payment instanceof SoSurePayment &&
+            !$payment instanceof PolicyDiscountPayment;
+        });
+    }
+
+    /**
+     * Payments filtered by credits (pos amount)
+     */
+    public function getSuccessfulUserPaymentCredits()
+    {
+        return array_filter($this->getSuccessfulUserPayments(), function ($payment) {
+            return $payment->getAmount() > 0;
         });
     }
 
@@ -549,9 +588,9 @@ abstract class Policy
         });
     }
 
-    public function getFirstSuccessfulPaymentCredit()
+    public function getFirstSuccessfulUserPaymentCredit()
     {
-        $payments = $this->getSuccessfulPaymentCredits();
+        $payments = $this->getSuccessfulUserPaymentCredits();
         if (count($payments) == 0) {
             return null;
         }
@@ -565,9 +604,9 @@ abstract class Policy
         return $payments[0];
     }
 
-    public function getLastSuccessfulPaymentCredit()
+    public function getLastSuccessfulUserPaymentCredit()
     {
-        $payments = $this->getSuccessfulPaymentCredits();
+        $payments = $this->getSuccessfulUserPaymentCredits();
         if (count($payments) == 0) {
             return null;
         }
@@ -1680,7 +1719,7 @@ abstract class Policy
     {
         $amountToRefund = 0;
         // Cooloff should refund full amount (which should be equal to the last payment except for renewals)
-        if ($paymentToRefund = $this->getLastSuccessfulPaymentCredit()) {
+        if ($paymentToRefund = $this->getLastSuccessfulUserPaymentCredit()) {
             $amountToRefund = $paymentToRefund->getAmount();
         }
         if ($amountToRefund > 0) {
@@ -1710,7 +1749,7 @@ abstract class Policy
         $amountToRefund = 0;
         $commissionToRefund = 0;
         // Cooloff should refund full amount (which should be equal to the last payment except for renewals)
-        if ($paymentToRefund = $this->getLastSuccessfulPaymentCredit()) {
+        if ($paymentToRefund = $this->getLastSuccessfulUserPaymentCredit()) {
             $amountToRefund = $paymentToRefund->getAmount();
             $commissionToRefund = $paymentToRefund->getTotalCommission();
         }
@@ -2236,7 +2275,7 @@ abstract class Policy
         }
 
         // if its a valid policy without a payment, probably it should be expired
-        if (!$this->getLastSuccessfulPaymentCredit()) {
+        if (!$this->getLastSuccessfulUserPaymentCredit()) {
             throw new \Exception(sprintf(
                 'Policy %s does not have a success payment - should be expired?',
                 $this->getId()
@@ -2285,7 +2324,7 @@ abstract class Policy
                     $this->getId()
                 ));
                 // Older method of using the last payment recevied date to determine expiration
-                // $billingDate = clone $this->getLastSuccessfulPaymentCredit()->getDate();
+                // $billingDate = clone $this->getLastSuccessfulUserPaymentCredit()->getDate();
                 // $billingDate->add(new \DateInterval('P1M'));
                 // break;
             }
@@ -2578,15 +2617,20 @@ abstract class Policy
         }
 
         // Cancel any scheduled payments
-        foreach ($this->getScheduledPayments() as $scheduledPayment) {
-            if ($scheduledPayment->getStatus() == ScheduledPayment::STATUS_SCHEDULED) {
-                $scheduledPayment->setStatus(ScheduledPayment::STATUS_CANCELLED);
-            }
-        }
+        $this->cancelScheduledPayments();
 
         $this->updatePotValue();
     }
 
+    public function cancelScheduledPayments()
+    {
+        foreach ($this->getScheduledPayments() as $scheduledPayment) {
+            if ($scheduledPayment->getStatus() == ScheduledPayment::STATUS_SCHEDULED) {
+                $scheduledPayment->cancel();
+            }
+        }
+    }
+    
     public function isRenewalAllowed(\DateTime $date = null)
     {
         if (!$date) {
@@ -2804,6 +2848,11 @@ abstract class Policy
             } elseif ($this->getNextPolicy() && $this->getNextPolicy()->getPremium()->hasAnnualDiscount()) {
                 $discount = new PolicyDiscountPayment();
                 $discount->setAmount($this->getPotValue());
+                if ($this->getNextPolicy()->getStart()) {
+                    $discount->setDate($this->getNextPolicy()->getStart());
+                } else {
+                    $discount->setDate($date);
+                }
                 $this->getNextPolicy()->addPayment($discount);
             } else {
                 // No cashback requested but also no renewal
@@ -2906,8 +2955,10 @@ abstract class Policy
             if ($discount && !$this->areEqualToTwoDp($discount->getAmount(), $this->getPotValue())) {
                 // pot changed (due to claim) - issue refund if applicable
                 $adjustedDiscount = new PolicyDiscountPayment();
+                $adjustedDiscount->setDate($date);
                 $adjustedDiscount->setAmount($this->toTwoDp($this->getPotValue() - $discount->getAmount()));
                 $this->getNextPolicy()->addPayment($adjustedDiscount);
+                $this->getNextPolicy()->getPremium()->setAnnualDiscount($this->getPotValue());
             }
         }
     }
@@ -3057,6 +3108,7 @@ abstract class Policy
         $expectedPaid = $this->getTotalExpectedPaidToDate($date);
 
         $diff = $expectedPaid - $totalPaid;
+        //print sprintf("paid %f expected %f diff %f\n", $totalPaid, $expectedPaid, $diff);
         if ($diff < 0) {
             return 0;
         }
@@ -3138,7 +3190,14 @@ abstract class Policy
         return $this->areEqualToTwoDp($expectedPaid, $totalPaid) || $totalPaid > $expectedPaid;
     }
 
-    public function arePolicyScheduledPaymentsCorrect($prefix = null, \DateTime $date = null)
+    public function getOutstandingScheduledPaymentsAmount()
+    {
+        $scheduledPayments = $this->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);
+
+        return ScheduledPayment::sumScheduledPaymentAmounts($scheduledPayments);
+    }
+
+    public function arePolicyScheduledPaymentsCorrect(\DateTime $date = null)
     {
         $scheduledPayments = $this->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);
 
@@ -3149,7 +3208,7 @@ abstract class Policy
             }
         }
 
-        $totalScheduledPayments = ScheduledPayment::sumScheduledPaymentAmounts($scheduledPayments, $prefix);
+        $totalScheduledPayments = ScheduledPayment::sumScheduledPaymentAmounts($scheduledPayments);
         $outstanding = $this->getYearlyPremiumPrice() - $this->getTotalSuccessfulPayments($date);
         //print sprintf("%f ?= %f\n", $outstanding, $totalScheduledPayments);
 

@@ -585,7 +585,7 @@ class PurchaseController extends BaseController
                     'success',
                     sprintf(
                         'Thanks for your payment of £%0.2f',
-                        $policy->getLastSuccessfulPaymentCredit()->getAmount()
+                        $policy->getLastSuccessfulUserPaymentCredit()->getAmount()
                     )
                 );
                 return $this->getRouteForPostCC($policy, $webType);

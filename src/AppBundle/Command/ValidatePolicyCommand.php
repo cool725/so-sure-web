@@ -86,7 +86,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             $blank = [];
             $this->header($policy, $blank, $lines);
             if ($adjustScheduledPayments) {
-                if (!$policy->arePolicyScheduledPaymentsCorrect($prefix, $validateDate)) {
+                if (!$policy->arePolicyScheduledPaymentsCorrect($validateDate)) {
                     if ($policyService->adjustScheduledPayments($policy)) {
                         $lines[] = "Successfully adjusted the scheduled payments";
                     } else {
@@ -134,13 +134,13 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 }
             }
 
-            $valid = $policy->arePolicyScheduledPaymentsCorrect($prefix, $validateDate);
+            $valid = $policy->arePolicyScheduledPaymentsCorrect($validateDate);
             $lines[] = sprintf(
                 '%s scheduled payments (likely incorrect if within 2 weeks of cancellation date)',
                 $valid ? 'correct ' : 'INCORRECT'
             );
             if (!$valid) {
-                $lines[] = $this->failureScheduledPaymentsMessage($policy, $prefix, $validateDate);
+                $lines[] = $this->failureScheduledPaymentsMessage($policy, $validateDate);
             }
             if ($policy->hasMonetaryClaimed()) {
                 // @codingStandardsIgnoreStart
@@ -196,14 +196,14 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                     $this->header($policy, $policies, $lines);
                     $lines[] = $this->failureIptRateMessage($policy);
                 }
-                if ($policy->arePolicyScheduledPaymentsCorrect($prefix, $validateDate) === false) {
+                if ($policy->arePolicyScheduledPaymentsCorrect($validateDate) === false) {
                     $this->header($policy, $policies, $lines);
                     $warnClaim = true;
                     $lines[] = sprintf(
                         'Incorrect scheduled payments (likely if within 2 weeks of cancellation date)',
                         $policy->getPolicyNumber()
                     );
-                    $lines[] = $this->failureScheduledPaymentsMessage($policy, $prefix, $validateDate);
+                    $lines[] = $this->failureScheduledPaymentsMessage($policy, $validateDate);
                 }
                 if ($policy->hasCorrectPolicyStatus($validateDate) === false) {
                     $this->header($policy, $policies, $lines);
@@ -326,10 +326,10 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         );
     }
 
-    private function failureScheduledPaymentsMessage($policy, $prefix, $date)
+    private function failureScheduledPaymentsMessage($policy, $date)
     {
         $scheduledPayments = $policy->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);
-        $totalScheduledPayments = ScheduledPayment::sumScheduledPaymentAmounts($scheduledPayments, $prefix);
+        $totalScheduledPayments = ScheduledPayment::sumScheduledPaymentAmounts($scheduledPayments);
 
         return sprintf(
             'Total Premium £%0.2f Payments Made £%0.2f Scheduled Payments £%0.2f',

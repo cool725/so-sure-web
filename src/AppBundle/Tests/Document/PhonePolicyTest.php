@@ -1183,8 +1183,8 @@ class PhonePolicyTest extends WebTestCase
         $user->setEmail(self::generateEmail('testCancelPolicyCancelsScheduledPayments', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
-        $policy->setStart(new \DateTime("2016-01-01"));
+        $policy->create(rand(1, 999999), null, new \DateTime("2016-01-01"), rand(1, 9999));
+        $policy->setStatus(Policy::STATUS_ACTIVE);
 
         self::addPayment(
             $policy,
@@ -1192,19 +1192,27 @@ class PhonePolicyTest extends WebTestCase
             Salva::YEARLY_TOTAL_COMMISSION
         );
 
+        $date = new \DateTime("2016-01-01");
         for ($i = 0; $i < 11; $i++) {
+            $date = $date->add(new \DateInterval('P1M'));
             $scheduledPayment = new ScheduledPayment();
             $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+            $scheduledPayment->setAmount(1);
+            $scheduledPayment->setScheduled(clone $date);
             $policy->addScheduledPayment($scheduledPayment);
         }
         static::$dm->persist($policy);
         static::$dm->persist($user);
         static::$dm->flush();
 
+        $this->assertEquals(11, $policy->getOutstandingScheduledPaymentsAmount());
+
         $policy->cancel(SalvaPhonePolicy::CANCELLED_USER_REQUESTED);
         foreach ($policy->getScheduledPayments() as $scheduledPayment) {
             $this->assertEquals(ScheduledPayment::STATUS_CANCELLED, $scheduledPayment->getStatus());
         }
+
+        $this->assertEquals(0, $policy->getOutstandingScheduledPaymentsAmount());
     }
 
     public function testValidateRefundAmountIsInstallmentPrice()
@@ -1620,7 +1628,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
-        $this->assertNull($policy->getLastSuccessfulPaymentCredit());
+        $this->assertNull($policy->getLastSuccessfulUserPaymentCredit());
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
@@ -1631,7 +1639,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->addPayment($payment);
 
         $date = new \DateTime('2016-01-01');
-        $this->assertEquals($date, $policy->getLastSuccessfulPaymentCredit()->getDate());
+        $this->assertEquals($date, $policy->getLastSuccessfulUserPaymentCredit()->getDate());
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
@@ -1642,7 +1650,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->addPayment($payment);
 
         $date = new \DateTime('2016-01-01');
-        $this->assertEquals($date, $policy->getLastSuccessfulPaymentCredit()->getDate());
+        $this->assertEquals($date, $policy->getLastSuccessfulUserPaymentCredit()->getDate());
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
@@ -1653,7 +1661,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->addPayment($payment);
 
         $date = new \DateTime('2016-02-15');
-        $this->assertEquals($date, $policy->getLastSuccessfulPaymentCredit()->getDate());
+        $this->assertEquals($date, $policy->getLastSuccessfulUserPaymentCredit()->getDate());
 
         // Neg payment (debit/refund) should be ignored
         $payment = new JudoPayment();
@@ -1664,7 +1672,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->addPayment($payment);
 
         $date = new \DateTime('2016-02-15');
-        $this->assertEquals($date, $policy->getLastSuccessfulPaymentCredit()->getDate());
+        $this->assertEquals($date, $policy->getLastSuccessfulUserPaymentCredit()->getDate());
     }
 
     /**
@@ -3641,6 +3649,26 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(0.12, $renewalPolicy->getPremium()->getIptRate());
     }
 
+    public function testAdjustedRewardPotPaymentAmount()
+    {
+        $policy = $this->getPolicy(static::generateEmail('testAdjustedRewardPotPaymentAmount ', $this));
+        $this->assertEquals(0, $policy->getAdjustedRewardPotPaymentAmount());
+
+        $potReward = new PotRewardPayment();
+        $potReward->setAmount(2);
+        $policy->addPayment($potReward);
+        $this->assertEquals(2, $policy->getAdjustedRewardPotPaymentAmount());
+
+        $potReward = new SoSurePotRewardPayment();
+        $potReward->setAmount(1);
+        $policy->addPayment($potReward);
+        $this->assertEquals(3, $policy->getAdjustedRewardPotPaymentAmount());
+
+        $potReward = new PotRewardPayment();
+        $potReward->setAmount(-2);
+        $policy->addPayment($potReward);
+        $this->assertEquals(1, $policy->getAdjustedRewardPotPaymentAmount());
+    }
 
     public function testExpireRenewed()
     {

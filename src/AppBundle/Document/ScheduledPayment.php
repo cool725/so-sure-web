@@ -177,10 +177,10 @@ class ScheduledPayment
         return $rescheduled;
     }
 
-    public function isBillable($prefix = null)
+    public function isBillable()
     {
         return $this->getStatus() == self::STATUS_SCHEDULED &&
-                $this->getPolicy()->isValidPolicy($prefix) &&
+                $this->getPolicy()->isPolicy() &&
                 $this->getPolicy()->isBillablePolicy();
     }
 
@@ -210,11 +210,11 @@ class ScheduledPayment
         ];
     }
 
-    public static function sumScheduledPaymentAmounts($scheduledPayments, $prefix = null)
+    public static function sumScheduledPaymentAmounts($scheduledPayments)
     {
         $total = 0;
         foreach ($scheduledPayments as $scheduledPayment) {
-            if ($scheduledPayment->isBillable($prefix)) {
+            if ($scheduledPayment->isBillable()) {
                 $total += $scheduledPayment->getAmount();
             }
         }

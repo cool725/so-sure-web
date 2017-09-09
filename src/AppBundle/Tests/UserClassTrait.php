@@ -156,7 +156,6 @@ trait UserClassTrait
             $newDate = null;
             if ($date) {
                 $newDate = clone $date;
-                $newDate->add(new \DateInterval('PT1S'));
             }
             if ($monthly) {
                 $policy->setPremiumInstallments(12);

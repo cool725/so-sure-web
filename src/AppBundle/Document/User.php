@@ -890,7 +890,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                 $data['monthlyPremium'] += $policy->getPremium()->getMonthlyPremiumPrice();
                 $data['paymentsReceived'] += count($policy->getSuccessfulPaymentCredits());
 
-                if ($payment = $policy->getLastSuccessfulPaymentCredit()) {
+                if ($payment = $policy->getLastSuccessfulUserPaymentCredit()) {
                     if (!$data['lastPaymentReceived'] || $data['lastPaymentReceived'] < $payment->getDate()) {
                         $data['lastPaymentReceived'] = $payment->getDate();
                     }
