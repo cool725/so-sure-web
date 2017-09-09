@@ -425,11 +425,14 @@ class PhonePolicy extends Policy
         }
     }
 
-    public function setPolicyDetailsForPendingRenewal(Policy $policy)
+    public function setPolicyDetailsForPendingRenewal(Policy $policy, \DateTime $startDate)
     {
         $policy->setPhone($this->getPhone());
         $policy->setImei($this->getImei());
         $policy->setSerialNumber($this->getSerialNumber());
+
+        // make sure ipt rate is set to ipt rate at the start of the policy
+        $this->validatePremium(true, $startDate);
     }
 
     /**

@@ -95,14 +95,26 @@ abstract class Premium
         return $this->getAnnualDiscount() > 0 && !$this->areEqualToTwoDp(0, $this->getAnnualDiscount());
     }
 
-    public function getMonthlyDiscount()
+    /**
+     * @param float $discount Only use pre-renewal to indicate possible monthly premium values
+     */
+    public function getMonthlyDiscount($discount = null)
     {
-        return floor(100 * $this->annualDiscount / 12) / 100;
+        if (!$discount) {
+            $discount = $this->annualDiscount;
+        }
+        return floor(100 * $discount / 12) / 100;
     }
 
-    public function getAdjustedFinalMonthlyPremiumPrice()
+    /**
+     * @param float $discount Only use pre-renewal to indicate possible monthly premium values
+     */
+    public function getAdjustedFinalMonthlyPremiumPrice($discount = null)
     {
-        $monthlyAdjustment = $this->annualDiscount - ($this->getMonthlyDiscount() * 11);
+        if (!$discount) {
+            $discount = $this->annualDiscount;
+        }
+        $monthlyAdjustment = $discount - ($this->getMonthlyDiscount($discount) * 11);
 
         return $this->toTwoDp($this->getMonthlyPremiumPrice() - $monthlyAdjustment);
     }
@@ -112,16 +124,19 @@ abstract class Premium
      */
     public function getAdjustedStandardMonthlyPremiumPrice($discount = null)
     {
-        if (!$discount) {
-            $discount = $this->getMonthlyDiscount();
-        }
-
-        return $this->toTwoDp($this->getMonthlyPremiumPrice() - $discount);
+        return $this->toTwoDp($this->getMonthlyPremiumPrice() - $this->getMonthlyDiscount($discount));
     }
 
-    public function getAdjustedYearlyPremiumPrice()
+    /**
+     * @param float $discount Only use pre-renewal to indicate possible monthly premium values
+     */
+    public function getAdjustedYearlyPremiumPrice($discount = null)
     {
-        return $this->toTwoDp($this->getYearlyPremiumPrice() - $this->annualDiscount);
+        if (!$discount) {
+            $discount = $this->annualDiscount;
+        }
+
+        return $this->toTwoDp($this->getYearlyPremiumPrice() - $discount);
     }
 
     public function getMonthlyPremiumPrice()

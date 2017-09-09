@@ -3623,6 +3623,25 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(Cashback::STATUS_PENDING_CLAIMABLE, $updatedPolicyA->getCashback()->getStatus());
     }
 
+    public function testRenewalIpt()
+    {
+        $policy = $this->getPolicy(static::generateEmail('testRenewalIpt', $this), new \DateTime('2016-06-01'));
+        $this->assertEquals(0.095, $policy->getPremium()->getIptRate());
+
+        $renewalPolicy = $policy->createPendingRenewal($policy->getPolicyTerms(), new \DateTime('2017-05-15'));
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
+        $this->assertEquals(0.12, $renewalPolicy->getPremium()->getIptRate());
+
+        // in policy service, renew calls create
+        $renewalPolicy->create(rand(1, 999999), null, new \DateTime('2017-06-01'));
+        $renewalPolicy->renew(0, new \DateTime('2017-05-30'));
+        $this->assertEquals(0.12, $renewalPolicy->getPremium()->getIptRate());
+
+        $renewalPolicy->activate(new \DateTime('2017-06-01'));
+        $this->assertEquals(0.12, $renewalPolicy->getPremium()->getIptRate());
+    }
+
+
     public function testExpireRenewed()
     {
         $policyA = $this->getPolicy(static::generateEmail('testExpireRenewedA', $this));
@@ -3668,8 +3687,11 @@ class PhonePolicyTest extends WebTestCase
         $this->assertNull($updatedPolicyA->getCashback());
     }
 
-    private function getPolicy($email)
+    private function getPolicy($email, \DateTime $date = null)
     {
+        if (!$date) {
+            $date = new \DateTime("2016-01-01");
+        }
         $policy = new SalvaPhonePolicy();
         $policy->setPhone(static::$phone);
 
@@ -3679,9 +3701,7 @@ class PhonePolicyTest extends WebTestCase
         self::addAddress($user);
 
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
-        $policy->setStart(new \DateTime("2016-01-01"));
-        $policy->setEnd(new \DateTime("2016-12-31 23:59:59"));
+        $policy->create(rand(1, 999999), null, $date, rand(1, 9999));
         $policy->setStatus(Policy::STATUS_ACTIVE);
 
         return $policy;
