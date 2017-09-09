@@ -1318,7 +1318,7 @@ class ApiControllerTest extends BaseControllerTest
         $identityLog = $updatedUser->getLatestMobileIdentityLog();
 
         $this->assertEquals('ios', $identityLog->getPlatform());
-        $this->assertEquals('0.0.1', $identityLog->getVersion());
+        $this->assertEquals('2.0.1', $identityLog->getVersion());
         $this->assertEquals(1, $identityLog->getUuid());
         $this->assertNotNull($identityLog->getPhone());
     }
