@@ -356,6 +356,7 @@ class PolicyServiceTest extends WebTestCase
             $payment = new GocardlessPayment();
             $payment->setAmount($policy->getPhone()->getCurrentPhonePrice($date)->getMonthlyPremiumPrice($date));
             $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+            $payment->setDate($date);
             $policy->addPayment($payment);
 
             static::$policyService->create($policy, $date);

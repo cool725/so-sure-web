@@ -2848,7 +2848,11 @@ abstract class Policy
             } elseif ($this->getNextPolicy() && $this->getNextPolicy()->getPremium()->hasAnnualDiscount()) {
                 $discount = new PolicyDiscountPayment();
                 $discount->setAmount($this->getPotValue());
-                $discount->setDate($this->getNextPolicy()->getStart());
+                if ($this->getNextPolicy()->getStart()) {
+                    $discount->setDate($this->getNextPolicy()->getStart());
+                } else {
+                    $discount->setDate($date);
+                }
                 $this->getNextPolicy()->addPayment($discount);
             } else {
                 // No cashback requested but also no renewal
