@@ -419,6 +419,9 @@ class PolicyService
             // Dispatch should be last as there may be events that assume the policy is active
             // (e.g. intercom)
             $this->dispatchEvent(PolicyEvent::EVENT_CREATED, new PolicyEvent($policy));
+            if ($setActive) {
+                $this->dispatchEvent(PolicyEvent::EVENT_START, new PolicyEvent($policy));
+            }
         } catch (\Exception $e) {
             $this->logger->error(sprintf('Error creating policy %s', $policy->getId()), ['exception' => $e]);
             throw $e;
@@ -1350,6 +1353,8 @@ class PolicyService
         $policy->activate($date);
         $this->dm->flush();
 
+        $this->dispatchEvent(PolicyEvent::EVENT_START, new PolicyEvent($policy));
+
         // Not necessary to email as already received docs at time of renewal
     }
 
@@ -1518,7 +1523,7 @@ class PolicyService
             $discount = $policy->getPotValue();
         }
 
-        $this->create($newPolicy, $startDate, null, $numPayments);
+        $this->create($newPolicy, $startDate, false, $numPayments);
         $newPolicy->renew($discount, $date);
         $this->generateScheduledPayments($newPolicy, $startDate, $numPayments);
 

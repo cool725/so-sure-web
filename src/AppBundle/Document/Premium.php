@@ -107,9 +107,16 @@ abstract class Premium
         return $this->toTwoDp($this->getMonthlyPremiumPrice() - $monthlyAdjustment);
     }
 
-    public function getAdjustedStandardMonthlyPremiumPrice()
+    /**
+     * @param float $discount Only use pre-renewal to indicate possible monthly premium values
+     */
+    public function getAdjustedStandardMonthlyPremiumPrice($discount = null)
     {
-        return $this->toTwoDp($this->getMonthlyPremiumPrice() - $this->getMonthlyDiscount());
+        if (!$discount) {
+            $discount = $this->getMonthlyDiscount();
+        }
+
+        return $this->toTwoDp($this->getMonthlyPremiumPrice() - $discount);
     }
 
     public function getAdjustedYearlyPremiumPrice()
