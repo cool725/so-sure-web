@@ -64,8 +64,8 @@
                         Mobile phone covered by insurance
                     </td>
                     <td width="{{ td_width_b }}">
-                        {{ policy.phone.make }} {{ policy.phone.model }}
-                        [IMEI: {{ policy.imei }}{% if policy.serialNumber %} / Serial Number: {{ policy.serialNumber }}{% endif %}]
+                        {{ policy.phone.__toString }}
+                        [IMEI: {{ policy.imei }}{% if policy.serialNumber and policy.imei != policy.serialNumber %} / Serial Number: {{ policy.serialNumber }}{% endif %}]
                     </td>
                 </tr>
                 <tr>
