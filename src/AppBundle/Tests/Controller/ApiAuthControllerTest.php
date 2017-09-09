@@ -3651,7 +3651,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $url = sprintf('/api/v1/auth/user?_method=GET');
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(200);
-        $this->assertEquals(0, count($data['policies']));
+        $this->assertEquals(1, count($data['policies']));
         $this->assertFalse($data['has_cancelled_policy']);
         $this->assertFalse($data['has_valid_policy']);
     }
