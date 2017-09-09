@@ -76,7 +76,13 @@
             <div class="payment--step-inner clearfix">
                 <h4>Would you like to use your pot to renew?<br>
                 <small>(Select an option below)</small></h4>
-                <div class="payment--btn payment--btn-two payment--btn-left payment--btn-selected" id="payment--reward">
+                <div class="payment--btn payment--btn-two payment--btn-left payment--btn-selected" id="payment--reward"
+                    {% if app.user.allowedMonthlyPayments and not app.user.allowedYearlyPayments %}
+                         data-value="{{ renew.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',') }}|12|1"
+                    {% elseif not app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %}
+                         data-value="{{ renew.getAdjustedYearlyPremiumPrice|number_format(2, '.', ',') }}|1|1"
+                    {% endif %}
+                >
                     <div class="payment--btn-inner" id="payment--monthly">
                         <span class="amount">Yes</span><br>
                         <span class="billed">Use reward pot</span>
@@ -85,7 +91,13 @@
                 <div class="payment--btn-or">
                     OR
                 </div>
-                <div class="payment--btn payment--btn-two payment--btn-right" id="payment--cashback">
+                <div class="payment--btn payment--btn-two payment--btn-right" id="payment--cashback"
+                    {% if app.user.allowedMonthlyPayments and not app.user.allowedYearlyPayments %}
+                         data-value="{{ renew.getMonthlyPremiumPrice|number_format(2, '.', ',') }}|12|0"
+                    {% elseif not app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %}
+                         data-value="{{ renew.getYearlyPremiumPrice|number_format(2, '.', ',') }}|1|0"
+                    {% endif %}
+                >
                     <div class="payment--btn-inner">
                         <span class="amount">No</span><br>
                         <span class="billed">I want cashback</span>
@@ -143,10 +155,10 @@
                     {% if app.user.allowedMonthlyPayments %}
                         <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two payment--btn-left {% endif %} {% if policy.getPremiumPlan == 'monthly' %}payment--btn-selected{% endif %}"
                              id="payment--monthly"
-                             data-value="{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}|12|0">
+                             data-value="{{ renew.monthlyPremiumPrice|number_format(2, '.', ',') }}|12|0">
                             <div class="payment--btn-inner {% if not app.user.allowedYearlyPayments %} payment--btn-inner-single {% endif %}">
                                 <span class="billed visible-xs">Monthly <br></span>
-                                <span class="amount">£{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}
+                                <span class="amount">£{{ renew.monthlyPremiumPrice|number_format(2, '.', ',') }}
                                 <span class="hidden-xs">per month</span><br></span>
                                 <small class="visible-xs">Billed on {{ policy.getPendingCancellation|date('jS') }} of each month</small>
                                 <small class="hidden-xs">You will be billed on the {{ policy.getPendingCancellation|date('jS') }}  of each month</small>
@@ -161,10 +173,10 @@
                     {% if app.user.allowedYearlyPayments %}
                         <div class="{% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %}payment--btn payment--btn-two payment--btn-right {% if policy.getPremiumPlan == 'yearly' %}payment--btn-selected{% endif %}{% else %}payment--no-btn{% endif %}"
                              id="payment--yearly"
-                             data-value="{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}|1|0">
+                             data-value="{{ renew.getYearlyPremiumPrice|number_format(2, '.', ',') }}|1|0">
                             <div class="payment--btn-inner {% if not app.user.allowedMonthlyPayments %} payment--btn-inner-single {% endif %}">
                                 <span class="billed visible-xs">Yearly <br></span>
-                                <span class="amount"><span class="no-btn">£{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}</span>
+                                <span class="amount"><span class="no-btn">£{{ renew.yearlyPremiumPrice|number_format(2, '.', ',') }}</span>
                                 <span class="hidden-xs">per year</span><br></span>
                                 <small class="visible-xs">Billed on date of purchase</small>
                                 <small class="hidden-xs">You will be billed for the year on {{ policy.getPendingCancellation|date('jS M') }}</small>

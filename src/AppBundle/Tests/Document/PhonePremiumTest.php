@@ -59,6 +59,17 @@ class PhonePremiumTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(12, $phonePremium->getNumberOfScheduledMonthlyPayments(4.67));
     }
 
+    public function testMonthlyPremiumWithDiscountPreRenewal()
+    {
+        $phonePremium = new PhonePremium();
+        $phonePremium->setGwp(5);
+        $phonePremium->setIpt(0.5);
+        $this->assertEquals(4.67, $phonePremium->getAdjustedStandardMonthlyPremiumPrice(10));
+        $this->assertEquals(4.63, $phonePremium->getAdjustedFinalMonthlyPremiumPrice(10));
+        $this->assertEquals(5.5, $phonePremium->getAdjustedStandardMonthlyPremiumPrice());
+        $this->assertEquals(5.5, $phonePremium->getAdjustedFinalMonthlyPremiumPrice());
+    }
+
     public function testYearlyPremiumWithDiscount()
     {
         $phonePremium = new PhonePremium();
@@ -72,5 +83,14 @@ class PhonePremiumTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(12, $phonePremium->getNumberOfMonthlyPayments(56));
 
         $this->assertEquals(1, $phonePremium->getNumberOfScheduledMonthlyPayments(56));
+    }
+
+    public function testYearlyPremiumWithDiscountPreRenewal()
+    {
+        $phonePremium = new PhonePremium();
+        $phonePremium->setGwp(5);
+        $phonePremium->setIpt(0.5);
+        $this->assertEquals(56, $phonePremium->getAdjustedYearlyPremiumPrice(10));
+        $this->assertEquals(66, $phonePremium->getAdjustedYearlyPremiumPrice());
     }
 }

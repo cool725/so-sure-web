@@ -2642,7 +2642,7 @@ abstract class Policy
             if (!$this->areEqualToTwoDp($discount, $this->getPreviousPolicy()->getPotValue())) {
                 throw new \Exception(sprintf(
                     'Invalid discount amount used for renewal. Policy %s. %f != %f',
-                    $policy->getId(),
+                    $this->getId(),
                     $discount,
                     $this->getPreviousPolicy()->getPotValue()
                 ));
@@ -2713,7 +2713,7 @@ abstract class Policy
         $this->updatePotValue();
     }
 
-    abstract public function setPolicyDetailsForPendingRenewal(Policy $policy);
+    abstract public function setPolicyDetailsForPendingRenewal(Policy $policy, \DateTime $startDate);
 
     public function createPendingRenewal(PolicyTerms $terms, \DateTime $date = null)
     {
@@ -2726,7 +2726,7 @@ abstract class Policy
         }
 
         $newPolicy = new static();
-        $this->setPolicyDetailsForPendingRenewal($newPolicy);
+        $this->setPolicyDetailsForPendingRenewal($newPolicy, $this->getEnd());
         $newPolicy->setStatus(Policy::STATUS_PENDING_RENEWAL);
         // don't allow renewal after the end the current policy
         $newPolicy->setPendingRenewalExpiration($this->getEnd());
