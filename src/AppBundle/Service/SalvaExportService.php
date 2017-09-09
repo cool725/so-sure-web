@@ -432,14 +432,18 @@ class SalvaExportService
         return $responseId;
     }
 
-    public function cancelPolicy(SalvaPhonePolicy $phonePolicy, $reason = null)
+    public function cancelPolicy(SalvaPhonePolicy $phonePolicy, $reason = null, $version = null)
     {
         $date = $phonePolicy->getEnd();
 
         // We should only bump the salva version if we're replacing a policy
         if ($reason && $reason == self::CANCELLED_REPLACE) {
             // latest start date same as previous termination date
-            $date = $phonePolicy->getLatestSalvaStartDate();
+            if ($version) {
+                $date = $phonePolicy->getSalvaStartDate($version + 1);
+            } else {
+                $date = $phonePolicy->getLatestSalvaStartDate();
+            }
         }
 
         if (!$reason) {
@@ -467,7 +471,7 @@ class SalvaExportService
             }
         }
 
-        $cancelXml = $this->cancelXml($phonePolicy, $reason, $date);
+        $cancelXml = $this->cancelXml($phonePolicy, $reason, $date, $version);
         $xml = $cancelXml['xml'];
         $this->logger->info($xml);
         if (!$this->validate($xml, self::SCHEMA_POLICY_TERMINATE)) {
@@ -687,19 +691,21 @@ class SalvaExportService
         }
     }
 
-    public function cancelXml(SalvaPhonePolicy $phonePolicy, $reason, $date)
+    public function cancelXml(SalvaPhonePolicy $phonePolicy, $reason, $date, $version = null)
     {
-        if ($reason == self::CANCELLED_REPLACE) {
-            // Make sure policy was incremented prior to calling
-            $version = $phonePolicy->getLatestSalvaPolicyNumberVersion() - 1;
-            if (!isset($phonePolicy->getPaymentsForSalvaVersions()[$version])) {
-                throw new \Exception(sprintf(
-                    'Missing version %s for salva. Was version incremented prior to cancellation?',
-                    $version
-                ));
+        if (!$version) {
+            if ($reason == self::CANCELLED_REPLACE) {
+                // Make sure policy was incremented prior to calling
+                $version = $phonePolicy->getLatestSalvaPolicyNumberVersion() - 1;
+                if (!isset($phonePolicy->getPaymentsForSalvaVersions()[$version])) {
+                    throw new \Exception(sprintf(
+                        'Missing version %s for salva. Was version incremented prior to cancellation?',
+                        $version
+                    ));
+                }
+            } else {
+                    $version = $phonePolicy->getLatestSalvaPolicyNumberVersion();
             }
-        } else {
-            $version = $phonePolicy->getLatestSalvaPolicyNumberVersion();
         }
 
         $policyNumber = $phonePolicy->getSalvaPolicyNumber($version);

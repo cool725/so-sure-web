@@ -66,6 +66,12 @@ class SalvaQueuePolicyCommand extends ContainerAwareCommand
                 InputOption::VALUE_REQUIRED,
                 'Testing only! If requeuing for updated, set the policy change date'
             )
+            ->addOption(
+                'salva-version',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'If cancelling, use this specific version instead of latest - only if we get out of sync w/salva'
+            )
         ;
     }
 
@@ -80,6 +86,7 @@ class SalvaQueuePolicyCommand extends ContainerAwareCommand
         $show = true === $input->getOption('show');
         $process = $input->getOption('process');
         $requeueDateOption = $input->getOption('requeue-date');
+        $version = $input->getOption('salva-version');
         $requeueDate = null;
         if ($requeueDateOption) {
             $requeueDate = new \DateTime($requeueDateOption);
@@ -91,7 +98,7 @@ class SalvaQueuePolicyCommand extends ContainerAwareCommand
             $phonePolicy = $repo->findOneBy(['policyNumber' => $policyNumber]);
 
             if ($cancel) {
-                $responseId = $salva->cancelPolicy($phonePolicy, $cancel);
+                $responseId = $salva->cancelPolicy($phonePolicy, $cancel, $version);
                 $output->writeln(sprintf(
                     "Policy %s was successfully cancelled. Response %s",
                     $policyNumber,
