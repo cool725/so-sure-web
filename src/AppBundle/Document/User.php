@@ -1410,7 +1410,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             'mobile_number' => $this->getMobileNumber(),
             'policies' => $this->eachApiArray($this->getPolicies()),
             'received_invitations' => $this->eachApiArray($this->getUnprocessedReceivedInvitations(), true, $debug),
-            'has_cancelled_policy' => $this->hasCancelledPolicy(),
+            'has_cancelled_policy' => $this->hasCancelledPolicyWithUserDeclined(),
             'has_unpaid_policy' => $this->hasUnpaidPolicy(),
             'has_valid_policy' => $this->hasActivePolicy(), // poor initial naming :(
             'birthday' => $this->getBirthday() ? $this->getBirthday()->format(\DateTime::ATOM) : null,
