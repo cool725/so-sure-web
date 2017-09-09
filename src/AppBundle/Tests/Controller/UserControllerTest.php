@@ -108,7 +108,7 @@ class UserControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', '/user/');
 
         // todo - will fail during leap year
-        $this->validateBonus($crawler, 304, 304);
+        $this->validateBonus($crawler, [304, 305], [304, 305]);
         $this->validateRewardPot($crawler, 0);
         $this->validateInviteAllowed($crawler, true);
     }
@@ -268,14 +268,19 @@ class UserControllerTest extends BaseControllerTest
 
     private function validateBonus($crawler, $daysRemaining, $daysTotal)
     {
-        $this->assertEquals(
-            $daysRemaining,
-            $crawler->filterXPath('//div[@id="connection-bonus-chart"]')->attr('data-bonus-days-remaining')
-        );
-        $this->assertEquals(
-            $daysTotal,
-            $crawler->filterXPath('//div[@id="connection-bonus-chart"]')->attr('data-bonus-days-total')
-        );
+        $chart = $crawler->filterXPath('//div[@id="connection-bonus-chart"]');
+        $actualRemaining = $chart->attr('data-bonus-days-remaining');
+        $actualTotal = $chart->attr('data-bonus-days-total');
+        if (is_array($daysRemaining)) {
+            $this->assertTrue(in_array($actualRemaining, $daysRemaining));
+        } else {
+            $this->assertEquals($daysRemaining, $actualRemaining);
+        }
+        if (is_array($daysTotal)) {
+            $this->assertTrue(in_array($actualTotal, $daysTotal));
+        } else {
+            $this->assertEquals($daysTotal, $actualTotal);
+        }
     }
 
     public function testUserUnpaidPolicy()
