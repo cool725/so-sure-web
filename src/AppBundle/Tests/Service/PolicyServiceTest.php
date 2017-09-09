@@ -1173,6 +1173,44 @@ class PolicyServiceTest extends WebTestCase
 
         static::$policyService->renew($policy, 12, null, new \DateTime('2016-12-30'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicy->getStatus());
+        $this->assertNull($policy->getCashback());
+    }
+
+    public function testCreatePendingRenewalPolicies()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testCreatePendingRenewalPolicies', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->create($policy, new \DateTime('2016-01-01'), true);
+        static::$dm->flush();
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+
+        $policies = static::$policyService->createPendingRenewalPolicies(
+            'TEST',
+            false,
+            new \DateTime('2016-12-01')
+        );
+        $this->assertEquals(0, count($policies));
+
+        $policies = static::$policyService->createPendingRenewalPolicies(
+            'TEST',
+            false,
+            new \DateTime('2016-12-15')
+        );
+        $this->assertEquals(1, count($policies));
     }
 
     public function testPolicyRenewCashback()
@@ -1238,6 +1276,12 @@ class PolicyServiceTest extends WebTestCase
         $cashback = $this->getCashback($policy);
         static::$policyService->renew($policy, 12, $cashback, new \DateTime('2016-12-30'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicy->getStatus());
+        $this->assertNotNull($policy->getCashback());
+        $this->assertEquals(Cashback::STATUS_PENDING_CLAIMABLE, $policy->getCashback()->getStatus());
+        $this->assertEquals(
+            $renewalPolicy->getPremium()->getMonthlyPremiumPrice(),
+            $renewalPolicy->getNextScheduledPayment()->getAmount()
+        );
     }
 
     public function testPolicyCashbackThenRenew()
@@ -1277,7 +1321,10 @@ class PolicyServiceTest extends WebTestCase
         $policyRepo = $dm->getRepository(Policy::class);
         $updatedPolicy = $policyRepo->find($policy->getId());
 
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $updatedPolicy->getNextPolicy()->getStatus());
+
         $this->assertEquals($cashback->getAccountNumber(), $updatedPolicy->getCashback()->getAccountNumber());
+        $this->assertEquals(Cashback::STATUS_PENDING_CLAIMABLE, $updatedPolicy->getCashback()->getStatus());
 
         static::$policyService->renew($updatedPolicy, 12, null, new \DateTime('2016-12-30'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicy->getStatus());
@@ -1473,6 +1520,17 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
         $this->assertNull($renewalPolicyA->getPendingCancellation());
         $this->assertNull($renewalPolicyB->getPendingCancellation());
+
+        $this->assertNull($policyA->getCashback());
+        $this->assertNull($policyB->getCashback());
+        $this->assertNotEquals(
+            $renewalPolicyA->getPremium()->getMonthlyPremiumPrice(),
+            $renewalPolicyA->getPremium()->getAdjustedStandardMonthlyPremiumPrice()
+        );
+        $this->assertEquals(
+            $renewalPolicyA->getPremium()->getAdjustedStandardMonthlyPremiumPrice(),
+            $renewalPolicyA->getNextScheduledPayment()->getAmount()
+        );
 
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $policyRepo = $dm->getRepository(Policy::class);
