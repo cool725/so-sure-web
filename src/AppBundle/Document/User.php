@@ -807,6 +807,18 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $policies;
     }
 
+    public function getPendingRenewalPolicies()
+    {
+        $policies = [];
+        foreach ($this->getPolicies() as $policy) {
+            if (in_array($policy->getStatus(), [Policy::STATUS_PENDING_RENEWAL])) {
+                $policies[] = $policy;
+            }
+        }
+
+        return $policies;
+    }
+
     public function getFirstPolicy()
     {
         $policies = $this->getValidPolicies(true);
@@ -859,6 +871,8 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $data['approvedClaims'] = 0;
         $data['approvedNetworkClaims'] = 0;
         $data['accountPaidToDate'] = true;
+        $data['renewalMonthlyPremiumNoPot'] = 0;
+        $data['renewalMonthlyPremiumWithPot'] = 0;
         foreach ($this->getValidPolicies(true) as $policy) {
             $data['connections'] += count($policy->getConnections());
             $data['rewardPot'] += $policy->getPotValue();
@@ -895,6 +909,11 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             if ($policy->getStatus() == Policy::STATUS_UNPAID) {
                 $data['accountPaidToDate'] = false;
             }
+        }
+        foreach ($this->getPendingRenewalPolicies() as $policy) {
+            $data['renewalMonthlyPremiumNoPot'] += $policy->getPremium()->getMonthlyPremiumPrice();
+            $data['renewalMonthlyPremiumWithPot'] +=
+                $policy->getPremium()->getAdjustedStandardMonthlyPremiumPrice($policy->getPotValue());
         }
         $data['firstPolicy'] = [];
         $data['firstPolicy']['promoCode'] = null;

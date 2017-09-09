@@ -58,6 +58,24 @@ class IntercomListener
         $this->intercom->queuePolicy($event->getPolicy(), IntercomService::QUEUE_EVENT_POLICY_CANCELLED);
     }
 
+    public function onPolicyPendingRenewedEvent(PolicyEvent $event)
+    {
+        $this->intercom->queue($event->getPolicy()->getUser());
+        $this->intercom->queuePolicy($event->getPolicy(), IntercomService::QUEUE_EVENT_POLICY_PENDING_RENEWAL);
+    }
+
+    public function onPolicyRenewedEvent(PolicyEvent $event)
+    {
+        $this->intercom->queue($event->getPolicy()->getUser());
+        $this->intercom->queuePolicy($event->getPolicy(), IntercomService::QUEUE_EVENT_POLICY_RENEWED);
+    }
+
+    public function onPolicyStartEvent(PolicyEvent $event)
+    {
+        $this->intercom->queue($event->getPolicy()->getUser());
+        $this->intercom->queuePolicy($event->getPolicy(), IntercomService::QUEUE_EVENT_POLICY_START);
+    }
+
     public function onInvitationAcceptedEvent(InvitationEvent $event)
     {
         // Invitation accepted is a connection, so update both inviter & invitee
