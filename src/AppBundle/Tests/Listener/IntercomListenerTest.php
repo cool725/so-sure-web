@@ -128,6 +128,8 @@ class IntercomListenerTest extends WebTestCase
         $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
         $this->assertEquals($user->getId(), $data['userId']);
 
+        static::$policyService->expire($policy, new \DateTime('2017-01-01'));
+
         static::$redis->del(IntercomService::KEY_INTERCOM_QUEUE);
         $this->assertEquals(0, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
 
