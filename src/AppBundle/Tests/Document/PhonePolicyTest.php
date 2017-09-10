@@ -2996,11 +2996,11 @@ class PhonePolicyTest extends WebTestCase
 
         $this->assertTrue($policy->isRenewed());
 
+        $policy->expire(new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policy->getStatus());
+
         $renewalPolicy->activate(new \DateTime('2017-01-01'));
         $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicy->getStatus());
-
-        $policy->expire(new \DateTime("2017-01-01"));
-        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policy->getStatus());
 
         $policy->fullyExpire(new \DateTime("2017-01-29"));
         $this->assertEquals(Policy::STATUS_EXPIRED, $policy->getStatus());
@@ -3030,11 +3030,11 @@ class PhonePolicyTest extends WebTestCase
 
         $this->assertTrue($policy->isRenewed());
 
-        $renewalPolicy->activate(new \DateTime('2017-01-01'));
-        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicy->getStatus());
-
         $policy->expire(new \DateTime("2017-01-01"));
         $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policy->getStatus());
+
+        $renewalPolicy->activate(new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicy->getStatus());
 
         $policy->fullyExpire(new \DateTime("2017-01-29"));
         $this->assertEquals(Policy::STATUS_EXPIRED_WAIT_CLAIM, $policy->getStatus());
@@ -3066,11 +3066,11 @@ class PhonePolicyTest extends WebTestCase
 
         $this->assertTrue($policyA->isRenewed());
 
-        $renewalPolicyA->activate(new \DateTime('2017-01-01'));
-        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
-
         $policyA->expire(new \DateTime("2017-01-01"));
         $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        $renewalPolicyA->activate(new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
 
         $policyA->fullyExpire(new \DateTime("2017-01-29"));
         $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
@@ -3112,11 +3112,11 @@ class PhonePolicyTest extends WebTestCase
 
         $this->assertTrue($policyA->isRenewed());
 
-        $renewalPolicyA->activate(new \DateTime('2017-01-01'));
-        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
-
         $policyA->expire(new \DateTime("2017-01-01"));
         $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        $renewalPolicyA->activate(new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
 
         $claimA = new Claim();
         $claimA->setType(Claim::TYPE_LOSS);
@@ -3171,11 +3171,11 @@ class PhonePolicyTest extends WebTestCase
 
         $this->assertTrue($policyA->isRenewed());
 
-        $renewalPolicyA->activate(new \DateTime('2017-01-01'));
-        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
-
         $policyA->expire(new \DateTime("2017-01-01"));
         $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        $renewalPolicyA->activate(new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
 
         $this->assertEquals(10, $policyA->getCashback()->getAmount());
 
@@ -3235,11 +3235,11 @@ class PhonePolicyTest extends WebTestCase
 
         $this->assertTrue($policyA->isRenewed());
 
-        $renewalPolicyA->activate(new \DateTime('2017-01-01'));
-        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
-
         $policyA->expire(new \DateTime("2017-01-01"));
         $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        $renewalPolicyA->activate(new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
 
         $policyA->fullyExpire(new \DateTime("2017-01-29"));
         $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
