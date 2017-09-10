@@ -808,8 +808,10 @@ class PolicyService
             if ($paid > 0) {
                 // There were some payments applied to the policy, but amounts don't split
                 throw new \Exception(sprintf(
-                    'Unable to determine correct payment schedule for policy %s',
-                    $policy->getId()
+                    'Unable to determine correct payment schedule for policy %s (%f / %d)',
+                    $policy->getId(),
+                    $paid,
+                    $numPaidPayments
                 ));
             }
             $numPaidPayments = 0;
@@ -1348,12 +1350,11 @@ class PolicyService
         }
 
         if ($policy->isRenewed() && $policy->hasAdjustedRewardPotPayment()) {
-            $outstanding = $policy->getNextPolicy()->getOutstandingPremiumToDate($date ? $date : new \DateTime());
-
+            $outstanding = $policy->getNextPolicy()->getOutstandingPremiumToDate($date ? $date : new \DateTime(), true);
             $this->regenerateScheduledPayments($policy->getNextPolicy(), $date, null, $outstanding);
 
             // bill for outstanding payments due
-            $outstanding = $policy->getNextPolicy()->getOutstandingPremiumToDate($date ? $date : new \DateTime());
+            $outstanding = $policy->getNextPolicy()->getOutstandingUserPremiumToDate($date ? $date : new \DateTime());
             $scheduledPayment = new ScheduledPayment();
             $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
             $scheduledPayment->setScheduled($date ? $date : new \DateTime());
@@ -1365,7 +1366,7 @@ class PolicyService
             $this->adjustPotRewardEmail($policy->getNextPolicy(), $outstanding);
         }
     }
-
+    
     public function adjustPotRewardEmail(Policy $policy, $additionalAmount)
     {
         $baseTemplate = sprintf('AppBundle:Email:potReward/adjusted');

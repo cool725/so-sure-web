@@ -114,9 +114,9 @@ class PhonePolicyTest extends WebTestCase
 
     public function testHasNetworkClaimedInLast30Days()
     {
-        $policyA = static::createUserPolicy(true);
+        $policyA = static::createUserPolicy(true, new \DateTime('2016-01-01'));
         $policyA->getUser()->setEmail(static::generateEmail('policya', $this));
-        $policyB = static::createUserPolicy(true);
+        $policyB = static::createUserPolicy(true, new \DateTime('2016-01-01'));
         $policyB->getUser()->setEmail(static::generateEmail('policyb', $this));
         list($connectionA, $connectionB) = $this->createLinkedConnections($policyA, $policyB, 10, 10);
         static::$dm->persist($policyA->getUser());
@@ -133,6 +133,7 @@ class PhonePolicyTest extends WebTestCase
 
         $claimA = new Claim();
         $claimA->setRecordedDate(new \DateTime("2016-01-01"));
+        $claimA->setLossDate(new \DateTime("2016-01-01"));
         $claimA->setStatus(Claim::STATUS_SETTLED);
         $claimA->setClosedDate(new \DateTime("2016-01-01"));
         $policyA->addClaim($claimA);
@@ -141,6 +142,7 @@ class PhonePolicyTest extends WebTestCase
 
         $claimB = new Claim();
         $claimB->setRecordedDate(new \DateTime("2016-02-01"));
+        $claimB->setLossDate(new \DateTime("2016-02-01"));
         $claimB->setStatus(Claim::STATUS_SETTLED);
         $claimB->setClosedDate(new \DateTime("2016-02-01"));
         $policyA->addClaim($claimB);
@@ -212,14 +214,15 @@ class PhonePolicyTest extends WebTestCase
 
     public function testHasNetworkClaimedInLast30DaysWithOpenStatus()
     {
-        $policyA = static::createUserPolicy(true);
-        $policyB = static::createUserPolicy(true);
+        $policyA = static::createUserPolicy(true, new \DateTime('2016-01-01'));
+        $policyB = static::createUserPolicy(true, new \DateTime('2016-01-01'));
         list($connectionA, $connectionB) = $this->createLinkedConnections($policyA, $policyB, 10, 10);
 
         $this->assertFalse($policyA->hasNetworkClaimedInLast30Days(null, true));
 
         $claimA = new Claim();
         $claimA->setRecordedDate(new \DateTime("2016-01-01"));
+        $claimA->setLossDate(new \DateTime("2016-01-01"));
         $claimA->setStatus(Claim::STATUS_APPROVED);
         $policyA->addClaim($claimA);
         $this->assertFalse($policyB->hasNetworkClaimedInLast30Days(new \DateTime("2016-02-01")));
@@ -230,6 +233,7 @@ class PhonePolicyTest extends WebTestCase
 
         $claimB = new Claim();
         $claimB->setRecordedDate(new \DateTime("2016-02-01"));
+        $claimB->setLossDate(new \DateTime("2016-02-01"));
         $claimB->setStatus(Claim::STATUS_APPROVED);
         $policyA->addClaim($claimB);
         $this->assertFalse($policyB->hasNetworkClaimedInLast30Days(new \DateTime("2016-02-21")));
@@ -341,6 +345,7 @@ class PhonePolicyTest extends WebTestCase
 
         $claim = new Claim();
         $claim->setRecordedDate(new \DateTime("2016-01-10"));
+        $claim->setLossDate(new \DateTime("2016-01-10"));
         $claim->setStatus(Claim::STATUS_SETTLED);
         $policyClaim->addClaim($claim);
 
@@ -401,9 +406,10 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(10, $policyB->getPotValue());
 
         $claimA = new Claim();
-        $claimA->setRecordedDate(new \DateTime("2016-01-01"));
+        $claimA->setLossDate(new \DateTime());
+        //$claimA->setRecordedDate(new \DateTime("2016-01-01"));
         $claimA->setStatus(Claim::STATUS_SETTLED);
-        $claimA->setClosedDate(new \DateTime("2016-01-01"));
+        //$claimA->setClosedDate(new \DateTime("2016-01-01"));
         $policyA->addClaim($claimA);
 
         $policyA->updatePotValue();
@@ -583,6 +589,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(30, $policy->calculatePotValue());
 
         $claim = new Claim();
+        $claim->setLossDate(new \DateTime());
         $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_SETTLED);
         $linkedPolicies[0]->addClaim($claim);
@@ -602,6 +609,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(40, $policy->calculatePotValue());
 
         $claim = new Claim();
+        $claim->setLossDate(new \DateTime());
         $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_SETTLED);
         $linkedPolicies[0]->addClaim($claim);
@@ -640,11 +648,13 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(40, $policy->calculatePotValue());
 
         $claimA = new Claim();
+        $claimA->setLossDate(new \DateTime());
         $claimA->setType(Claim::TYPE_LOSS);
         $claimA->setStatus(Claim::STATUS_SETTLED);
         $linkedPolicies[0]->addClaim($claimA);
 
         $claimB = new Claim();
+        $claimB->setLossDate(new \DateTime());
         $claimB->setType(Claim::TYPE_LOSS);
         $claimB->setStatus(Claim::STATUS_SETTLED);
         $linkedPolicies[1]->addClaim($claimB);
@@ -745,6 +755,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(10, $policy->getConnectionValue(new \DateTime('2016-02-29 23:59:59')));
 
         $claimA = new Claim();
+        $claimA->setLossDate(new \DateTime('2016-02-29'));
         $claimA->setType(Claim::TYPE_LOSS);
         $claimA->setStatus(Claim::STATUS_SETTLED);
         $linkedPolicy->addClaim($claimA);
