@@ -2450,11 +2450,7 @@ abstract class Policy
     {
         $claims = [];
         foreach ($this->getStandardConnections() as $connection) {
-            $policy = $connection->getLinkedPolicy();
-            if (!$policy) {
-                throw new \Exception(sprintf('Invalid connection in policy %s', $this->getId()));
-            }
-            foreach ($policy->getClaims() as $claim) {
+            foreach ($connection->getLinkedClaimsDuringPeriod() as $claim) {
                 if (!$monitaryOnly || $claim->isMonetaryClaim($includeApproved)) {
                     $claims[] = $claim;
                 }
@@ -3145,6 +3141,21 @@ abstract class Policy
         return $totalPaid;
     }
 
+    public function getTotalSuccessfulUserPayments(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+        $totalPaid = 0;
+        foreach ($this->getSuccessfulUserPayments() as $payment) {
+            if ($payment->getDate() <= $date) {
+                $totalPaid += $payment->getAmount();
+            }
+        }
+
+        return $totalPaid;
+    }
+
     public function getTotalExpectedPaidToDate(\DateTime $date = null)
     {
         if (!$this->isPolicy() || !$this->getStart()) {
@@ -3173,13 +3184,31 @@ abstract class Policy
         return $expectedPaid;
     }
 
-    public function getOutstandingPremiumToDate(\DateTime $date = null)
+    public function getOutstandingPremiumToDate(\DateTime $date = null, $allowNegative = false)
     {
         if (!$this->isPolicy()) {
             return null;
         }
 
         $totalPaid = $this->getTotalSuccessfulPayments($date);
+        $expectedPaid = $this->getTotalExpectedPaidToDate($date);
+
+        $diff = $expectedPaid - $totalPaid;
+        //print sprintf("paid %f expected %f diff %f\n", $totalPaid, $expectedPaid, $diff);
+        if (!$allowNegative && $diff < 0) {
+            return 0;
+        }
+
+        return $diff;
+    }
+
+    public function getOutstandingUserPremiumToDate(\DateTime $date = null)
+    {
+        if (!$this->isPolicy()) {
+            return null;
+        }
+
+        $totalPaid = $this->getTotalSuccessfulUserPayments($date);
         $expectedPaid = $this->getTotalExpectedPaidToDate($date);
 
         $diff = $expectedPaid - $totalPaid;
