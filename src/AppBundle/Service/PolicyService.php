@@ -1423,16 +1423,16 @@ class PolicyService
         // although the policy end status is probably set at the same time
     }
 
-    public function createPendingRenewalPolicies($prefix, $dryRun = false)
+    public function createPendingRenewalPolicies($prefix, $dryRun = false, \DateTime $date = null)
     {
         $pendingRenewal = [];
         $policyRepo = $this->dm->getRepository(Policy::class);
-        $policies = $policyRepo->findPoliciesForPendingRenewal($prefix);
+        $policies = $policyRepo->findPoliciesForPendingRenewal($prefix, $date);
         foreach ($policies as $policy) {
-            if ($policy->canCreatePendingRenewal()) {
+            if ($policy->canCreatePendingRenewal($date)) {
                 $pendingRenewal[$policy->getId()] = $policy->getPolicyNumber();
                 if (!$dryRun) {
-                    $this->createPendingRenewal($policy);
+                    $this->createPendingRenewal($policy, $date);
                 }
             }
         }

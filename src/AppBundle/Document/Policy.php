@@ -3119,7 +3119,7 @@ abstract class Policy
     public function getRemainderOfPolicyPrice(\DateTime $date = null)
     {
         $totalPaid = $this->getTotalSuccessfulPayments($date);
-        $yearlyPremium = $this->getPremium()->getYearlyPremiumPrice();
+        $yearlyPremium = $this->getPremium()->getAdjustedYearlyPremiumPrice();
         $diff = $yearlyPremium - $totalPaid;
         if ($diff < 0) {
             return 0;
