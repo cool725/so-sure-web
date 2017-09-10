@@ -3645,6 +3645,8 @@ class PhonePolicyTest extends WebTestCase
         $renewalPolicy->renew(0, new \DateTime('2017-05-30'));
         $this->assertEquals(0.12, $renewalPolicy->getPremium()->getIptRate());
 
+        $policy->expire(new \DateTime('2017-06-01'));
+
         $renewalPolicy->activate(new \DateTime('2017-06-01'));
         $this->assertEquals(0.12, $renewalPolicy->getPremium()->getIptRate());
     }
