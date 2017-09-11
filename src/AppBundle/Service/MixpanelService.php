@@ -53,7 +53,7 @@ class MixpanelService
     const EVENT_REQUEST_CANCEL_POLICY = 'Request Cancel Policy';
     const EVENT_RENEWAL = 'Renewal Page';
     const EVENT_RENEW = 'Renew Policy';
-    const EVENT_CASHBACK = 'Cashback Only';
+    const EVENT_CASHBACK = 'Cashback';
 
     const CUSTOM_TOTAL_SITE_VISITORS = '$custom_event:379938';
     const CUSTOM_QUOTE_PAGE_UK = '$custom_event:458980';

@@ -67,4 +67,15 @@ class MixpanelListener
             'Policy Id' => $policy->getId(),
         ]);
     }
+
+    public function onPolicyCashbackEvent(PolicyEvent $event)
+    {
+        $policy = $event->getPolicy();
+
+        $this->mixpanel->queueTrackWithUser($policy->getUser(), MixpanelService::EVENT_CASHBACK, [
+            'Policy Id' => $policy->getId(),
+            'Renewed' => $policy->isRenewed() ? 'Yes' : 'No',
+            'Amount' => $policy->getCashback() ? $policy->getCashback()->getAmount() : 0,
+        ]);
+    }
 }

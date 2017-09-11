@@ -1397,6 +1397,8 @@ class PolicyService
             $this->updateCashback($cashback, $cashback->getExpectedStatus());
             $this->dm->flush();
         }
+
+        $this->dispatchEvent(PolicyEvent::EVENT_CASHBACK, new PolicyEvent($policy));
     }
 
     /**
