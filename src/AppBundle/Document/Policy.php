@@ -268,6 +268,13 @@ abstract class Policy
      * @MongoDB\Date()
      * @Gedmo\Versioned
      */
+    protected $issueDate;
+
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
     protected $start;
 
     /**
@@ -730,6 +737,20 @@ abstract class Policy
     public function setPayer(User $user)
     {
         $this->payer = $user;
+    }
+
+    public function getIssueDate()
+    {
+        if (!$this->issueDate) {
+            return $this->getStart();
+        }
+
+        return $this->issueDate;
+    }
+
+    public function setIssueDate(\DateTime $issueDate = null)
+    {
+        $this->issueDate = $issueDate;
     }
 
     public function getStart()
@@ -1517,6 +1538,7 @@ abstract class Policy
 
     public function create($seq, $prefix = null, \DateTime $startDate = null, $scodeCount = 1)
     {
+        $issueDate = new \DateTime();
         if (!$startDate) {
             $startDate = new \DateTime();
             // No longer necessary to start 10 minutes in the future
@@ -1538,8 +1560,10 @@ abstract class Policy
         // TODO: move to SalvaPhonePolicy
         // salva needs a end time of 23:59 in local time
         $startDate->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
+        $issueDate->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
 
         $this->setStart($startDate);
+        $this->setIssueDate($issueDate);
         $this->setBilling($this->getStartForBilling());
         $nextYear = clone $this->getStart();
         // This is same date/time but add 1 to the year

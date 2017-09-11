@@ -3350,6 +3350,17 @@ class PhonePolicyTest extends WebTestCase
         $renewalPolicy->unrenew(new \DateTime('2016-12-15'));
     }
 
+    public function testIssueDate()
+    {
+        $policy = new SalvaPhonePolicy();
+        $this->assertNull($policy->getIssueDate());
+        $policy->setStart(new \DateTime('2016-01-01'));
+        $this->assertEquals(new \DateTime('2016-01-01'), $policy->getIssueDate());
+
+        $policy->setIssueDate(new \DateTime('2017-01-01'));
+        $this->assertEquals(new \DateTime('2017-01-01'), $policy->getIssueDate());
+    }
+
     /**
      * @expectedException \Exception
      */
@@ -3742,8 +3753,16 @@ class PhonePolicyTest extends WebTestCase
         self::addAddress($user);
 
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+
+        $issueDate = new \DateTime();
         $policy->create(rand(1, 999999), null, $date, rand(1, 9999));
         $policy->setStatus(Policy::STATUS_ACTIVE);
+
+        $issueDate2 = clone $issueDate;
+        $issueDate2->add(new \DateInterval('PT1S'));
+
+        $this->assertEquals($date, $policy->getStart());
+        $this->assertTrue($policy->getIssueDate() == $issueDate || $policy->getIssueDate == $issueDate2);
 
         return $policy;
     }
