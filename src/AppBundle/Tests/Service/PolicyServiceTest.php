@@ -1160,21 +1160,27 @@ class PolicyServiceTest extends WebTestCase
 
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');
-        static::$policyService->create($policy, new \DateTime('2016-01-01'), true);
+        static::$policyService->create($policy, new \DateTime('2016-06-01'), true);
         static::$policyService->setEnvironment('test');
         static::$dm->flush();
+        $this->assertEquals(new \DateTimeZone(Salva::SALVA_TIMEZONE), $policy->getStart()->getTimeZone());
 
         $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
 
         $renewalPolicy = static::$policyService->createPendingRenewal(
             $policy,
-            new \DateTime('2016-12-15')
+            new \DateTime('2017-05-15')
         );
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
 
-        static::$policyService->renew($policy, 12, null, new \DateTime('2016-12-30'));
+        static::$policyService->renew($policy, 12, null, new \DateTime('2017-05-30'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicy->getStatus());
         $this->assertNull($policy->getCashback());
+        $this->assertEquals(
+            new \DateTime('2017-06-01 00:00:00', new \DateTimeZone(Salva::SALVA_TIMEZONE)),
+            $renewalPolicy->getStart()
+        );
+        $this->assertEquals(new \DateTimeZone(Salva::SALVA_TIMEZONE), $renewalPolicy->getStart()->getTimeZone());
     }
 
     public function testCreatePendingRenewalPolicies()

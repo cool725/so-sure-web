@@ -49,6 +49,10 @@ class DateTraitTest extends \PHPUnit_Framework_TestCase
             new \DateTime('2016-02-12 00:00'),
             $this->startOfDay(new \DateTime('2016-02-12 15:00'))
         );
+        $this->assertEquals(
+            new \DateTime('2016-06-12 00:00', new \DateTimeZone('Europe/London')),
+            $this->startOfDay(new \DateTime('2016-06-12 15:00', new \DateTimeZone('Europe/London')))
+        );
     }
 
     public function testEndOfDay()
@@ -56,6 +60,10 @@ class DateTraitTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             new \DateTime('2016-02-13 00:00'),
             $this->endOfDay(new \DateTime('2016-02-12 15:00'))
+        );
+        $this->assertEquals(
+            new \DateTime('2016-06-13 00:00', new \DateTimeZone('Europe/London')),
+            $this->endOfDay(new \DateTime('2016-06-12 15:00', new \DateTimeZone('Europe/London')))
         );
     }
 
