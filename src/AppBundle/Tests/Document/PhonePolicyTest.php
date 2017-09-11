@@ -3350,6 +3350,17 @@ class PhonePolicyTest extends WebTestCase
         $renewalPolicy->unrenew(new \DateTime('2016-12-15'));
     }
 
+    public function testIssueDate()
+    {
+        $policy = new SalvaPhonePolicy();
+        $this->assertNull($policy->getIssueDate());
+        $policy->setStart(new \DateTime('2016-01-01'));
+        $this->assertEquals(new \DateTime('2016-01-01'), $policy->getIssueDate());
+
+        $policy->setIssueDate(new \DateTime('2017-01-01'));
+        $this->assertEquals(new \DateTime('2017-01-01'), $policy->getIssueDate());
+    }
+
     /**
      * @expectedException \Exception
      */

@@ -89,8 +89,14 @@ class SalvaExportServiceTest extends WebTestCase
         $tariff2 = sprintf('<ns2:tariffDate>%s</ns2:tariffDate>', static::$salva->adjustDate($issueDate2));
         $this->assertTrue(stripos($xml, $tariff) !== false || stripos($xml, $tariff2) !== false);
 
-        $startDate = sprintf('<ns2:insurancePeriodStart>%s</ns2:insurancePeriodStart>', static::$salva->adjustDate($issueDate));
-        $startDate2 = sprintf('<ns2:insurancePeriodStart>%s</ns2:insurancePeriodStart>', static::$salva->adjustDate($issueDate2));
+        $startDate = sprintf(
+            '<ns2:insurancePeriodStart>%s</ns2:insurancePeriodStart>',
+            static::$salva->adjustDate($issueDate)
+        );
+        $startDate2 = sprintf(
+            '<ns2:insurancePeriodStart>%s</ns2:insurancePeriodStart>',
+            static::$salva->adjustDate($issueDate2)
+        );
         $this->assertTrue(stripos($xml, $startDate) !== false || stripos($xml, $startDate2) !== false);
     }
 
@@ -119,7 +125,10 @@ class SalvaExportServiceTest extends WebTestCase
         $tariff2 = sprintf('<ns2:tariffDate>%s</ns2:tariffDate>', static::$salva->adjustDate($issueDate2));
         $this->assertTrue(stripos($xml, $tariff) !== false || stripos($xml, $tariff2) !== false);
 
-        $startDate = sprintf('<ns2:insurancePeriodStart>%s</ns2:insurancePeriodStart>', static::$salva->adjustDate($futureDate));
+        $startDate = sprintf(
+            '<ns2:insurancePeriodStart>%s</ns2:insurancePeriodStart>',
+            static::$salva->adjustDate($futureDate)
+        );
         $this->assertContains($startDate, $xml);
     }
 
