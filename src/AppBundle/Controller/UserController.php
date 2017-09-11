@@ -667,7 +667,7 @@ class UserController extends BaseController
                 $this->addFlash('success', 'Your connections have been updated');
 
                 return new RedirectResponse(
-                    $this->generateUrl('user_renew_completed', ['id' => $id])
+                    $this->generateUrl('user_home')
                 );
             } else {
                 $this->addFlash(
