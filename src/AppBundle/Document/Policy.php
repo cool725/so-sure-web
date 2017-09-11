@@ -3522,10 +3522,13 @@ abstract class Policy
     public function getUnconnectedUserPolicies()
     {
         $unconnectedPolicies = [];
+        if (!$this->isActive()) {
+            return $unconnectedPolicies;
+        }
         foreach ($this->getUser()->getValidPolicies() as $policy) {
             if ($policy->getId() != $this->getId()) {
                 $connectionFound = false;
-                foreach ($this->getConnections() as $connection) {
+                foreach ($this->getStandardConnections() as $connection) {
                     $connectionFound = $connectionFound ||
                         $connection->getLinkedPolicy()->getId() == $policy->getId();
                 }

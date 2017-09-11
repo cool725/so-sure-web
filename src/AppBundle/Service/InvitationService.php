@@ -277,6 +277,17 @@ class InvitationService
         }
     }
 
+    public function validateNotRenewalPolicy(Policy $sourcePolicy, Policy $linkedPolicy)
+    {
+        if ($sourcePolicy->getNextPolicy() &&
+            $sourcePolicy->getNextPolicy()->getId() == $linkedPolicy->getId()) {
+            throw new SelfInviteException('Policy can not be linked to its renewal policy');
+        } elseif ($sourcePolicy->getPreviousPolicy() &&
+            $sourcePolicy->getPreviousPolicy()->getId() == $linkedPolicy->getId()) {
+            throw new SelfInviteException('Policy can not be linked to its previous policy');
+        }
+    }
+
     public function inviteByEmail(Policy $policy, $email, $name = null, $skipSend = null)
     {
         $this->validatePolicy($policy);
@@ -986,6 +997,9 @@ class InvitationService
 
         $this->validateNotConnectedByPolicy($policyA, $policyB);
         $this->validateNotConnectedByPolicy($policyB, $policyA);
+
+        $this->validateNotRenewalPolicy($policyA, $policyB);
+        $this->validateNotRenewalPolicy($policyB, $policyA);
 
         $connectionA = $this->addConnection(
             $policyA,

@@ -1072,6 +1072,46 @@ class InvitationServiceTest extends WebTestCase
         static::$invitationService->setEnvironment('test');
     }
 
+    /**
+     * @expectedException AppBundle\Exception\SelfInviteException
+     */
+    public function testSelfRenewalPoliciesConnect()
+    {
+        $userA = static::createUser(
+            static::$userManager,
+            static::generateEmail('testSelfRenewalPoliciesConnect', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($userA, static::$dm, static::$phone, null, true);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-06-01'), true);
+        static::$policyService->setEnvironment('test');
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        static::$dm->flush();
+
+        $this->assertEquals(0, count($policy->getStandardSelfConnections()));
+
+        $renewalPolicy = static::$policyService->createPendingRenewal(
+            $policy,
+            new \DateTime('2017-05-15')
+        );
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
+
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->renew($policy, 12, null, new \DateTime('2017-05-30'));
+        static::$policyService->setEnvironment('test');
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicy->getStatus());
+        $this->assertNull($policy->getCashback());
+
+        // Unlikely to occur, but just in case it does - active needed to invite/connect
+        $renewalPolicy->setStatus(Policy::STATUS_ACTIVE);
+        static::$dm->flush();
+
+        static::$invitationService->setEnvironment('prod');
+        self::$invitationService->connect($policy, $renewalPolicy);
+        static::$invitationService->setEnvironment('test');
+    }
+
     public function testSCodeMultiplePoliciesFacebook()
     {
         $userA = static::createUser(
