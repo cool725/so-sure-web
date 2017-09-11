@@ -2991,14 +2991,14 @@ class PhonePolicyTest extends WebTestCase
         $policyB->setPhone(static::$phone);
         $policyB->init($policyA->getUser(), static::getLatestPolicyTerms(self::$dm));
 
-        $policy->create(rand(1, 999999), null, $date, rand(1, 9999));
-        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policyB->create(rand(1, 999999), null, new \DateTime('2016-01-01'), rand(1, 9999));
+        $policyB->setStatus(Policy::STATUS_ACTIVE);
 
         static::$dm->persist($policyA);
         static::$dm->persist($policyA->getUser());
         static::$dm->persist($policyB);
         static::$dm->flush();
-        $this->assertEquals(2, count($renewalPolicy->getUser()->getValidPolicies()));
+        $this->assertEquals(2, count($policyA->getUser()->getValidPolicies()));
 
         $this->assertEquals(1, count($policyA->getUnconnectedUserPolicies()));
         $this->assertEquals(1, count($policyB->getUnconnectedUserPolicies()));
