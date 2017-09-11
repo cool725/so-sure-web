@@ -2962,6 +2962,48 @@ class PhonePolicyTest extends WebTestCase
         $this->assertTrue($policy->isRenewed());
     }
 
+    public function testGetUnconnectedUserPolicies()
+    {
+        $policy = $this->getPolicy(static::generateEmail('testGetUnconnectedUserPolicies', $this));
+
+        $this->assertFalse($policy->isRenewed());
+
+        $renewalPolicy = $this->getRenewalPolicy($policy);
+
+        $this->assertFalse($policy->isRenewed());
+
+        $renewalPolicy->renew(0, new \DateTime('2016-12-15'));
+        $this->assertTrue($policy->isRenewed());
+        static::$dm->persist($policy);
+        static::$dm->persist($policy->getUser());
+        static::$dm->persist($renewalPolicy);
+        static::$dm->flush();
+        $this->assertEquals(1, count($renewalPolicy->getUser()->getValidPolicies()));
+
+        $this->assertEquals(0, count($policy->getUnconnectedUserPolicies()));
+        $this->assertEquals(0, count($renewalPolicy->getUnconnectedUserPolicies()));
+    }
+
+    public function testGetUnconnectedUserPoliciesCanConnect()
+    {
+        $policyA = $this->getPolicy(static::generateEmail('testGetUnconnectedUserPoliciesCanConnect', $this));
+        $policyB = new SalvaPhonePolicy();
+        $policyB->setPhone(static::$phone);
+        $policyB->init($policyA->getUser(), static::getLatestPolicyTerms(self::$dm));
+
+        $policyB->create(rand(1, 999999), null, new \DateTime('2016-01-01'), rand(1, 9999));
+        $policyB->setStatus(Policy::STATUS_ACTIVE);
+
+        static::$dm->persist($policyA);
+        static::$dm->persist($policyA->getUser());
+        static::$dm->persist($policyB);
+        static::$dm->flush();
+        $this->assertEquals(2, count($policyA->getUser()->getValidPolicies()));
+
+        $this->assertEquals(1, count($policyA->getUnconnectedUserPolicies()));
+        $this->assertEquals(1, count($policyB->getUnconnectedUserPolicies()));
+    }
+
     public function testCanRepurchase()
     {
         $policy = $this->getPolicy(static::generateEmail('testCanRepurchase', $this));

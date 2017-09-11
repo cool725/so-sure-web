@@ -186,9 +186,7 @@ class Connection
 
     public function setSourcePolicy(Policy $policy)
     {
-        if ($this->getId() && $this->getLinkedPolicy() && $this->getLinkedPolicy()->getId() == $policy->getId()) {
-            throw new \Exception('Policy can not be linked to itself');
-        }
+        $this->validateSelfConnection($policy, $this->getLinkedPolicy());
 
         $this->sourcePolicy = $policy;
     }
@@ -200,12 +198,27 @@ class Connection
 
     public function setLinkedPolicy(Policy $policy)
     {
-        if ($this->getId() && $this->getSourcePolicy() && $this->getSourcePolicy()->getId() == $policy->getId()) {
-            throw new \Exception('Policy can not be linked to itself');
-        }
+        $this->validateSelfConnection($policy, $this->getSourcePolicy());
 
         $this->linkedPolicy = $policy;
         $policy->addAcceptedConnection($this);
+    }
+
+    private function validateSelfConnection($policyA, $policyB)
+    {
+        if (!$policyA || !$policyB || !$policyA->getId() || !$policyB->getId()) {
+            return;
+        }
+
+        if ($policyB->getId() == $policyA->getId()) {
+            throw new \Exception('Policy can not be linked to itself');
+        } elseif ($policyB->getNextPolicy() &&
+            $policyB->getNextPolicy()->getId() == $policyA->getId()) {
+            throw new \Exception('Policy can not be linked to its renewal policy');
+        } elseif ($policyB->getPreviousPolicy() &&
+            $policyB->getPreviousPolicy()->getId() == $policyA->getId()) {
+            throw new \Exception('Policy can not be linked to its previous policy');
+        }
     }
 
     public function getLinkedPolicyRenewal()
