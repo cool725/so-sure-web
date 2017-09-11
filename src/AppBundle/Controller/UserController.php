@@ -597,8 +597,6 @@ class UserController extends BaseController
                     $policyService = $this->get('app.policy');
                     $policyService->cashback($policy, $cashback);
 
-                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_CASHBACK);
-
                     $message = sprintf(
                         'Your request for cashback has been accepted.'
                     );
@@ -747,8 +745,6 @@ class UserController extends BaseController
                     } else {
                         throw new \Exception(sprintf('Unexpected policy status for cashback %s', $cashback->getId()));
                     }
-
-                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_CASHBACK);
 
                     $message = sprintf(
                         'Your request for cashback has been accepted.'
