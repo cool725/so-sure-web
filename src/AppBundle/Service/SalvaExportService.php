@@ -811,7 +811,7 @@ class SalvaExportService
         $insuredObjects->appendChild($insuredObject);
         $insuredObject->appendChild($dom->createElement('ns2:productObjectCode', 'ss_phone'));
         $insuredObject->appendChild(
-            $dom->createElement('ns2:tariffDate', $this->adjustDate($phonePolicy->getStart()))
+            $dom->createElement('ns2:tariffDate', $this->adjustDate($phonePolicy->getIssueDate()))
         );
 
         $objectCustomers = $dom->createElement('ns2:objectCustomers');

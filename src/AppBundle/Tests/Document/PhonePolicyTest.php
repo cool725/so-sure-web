@@ -3742,8 +3742,16 @@ class PhonePolicyTest extends WebTestCase
         self::addAddress($user);
 
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+
+        $issueDate = new \DateTime();
         $policy->create(rand(1, 999999), null, $date, rand(1, 9999));
         $policy->setStatus(Policy::STATUS_ACTIVE);
+
+        $issueDate2 = clone $issueDate;
+        $issueDate2->add(new \DateInterval('PT1S'));
+
+        $this->assertEquals($date, $policy->getStart());
+        $this->assertTrue($policy->getIssueDate() == $issueDate || $policy->getIssueDate == $issueDate2);
 
         return $policy;
     }
