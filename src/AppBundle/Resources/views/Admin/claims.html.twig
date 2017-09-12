@@ -80,7 +80,7 @@
                                 {% else %}
                                     -
                                 {% endif %}
-                                {% if claim.replacementImei %}
+                                {% if claim.replacementImei or claim.replacementReceivedDate %}
                                     {% if claim.replacementPhoneDetails %}
                                         {% if claim.replacementPhone%}<i class="fa fa-check" title="Davies: '{{ claim.replacementPhoneDetails }}' <==> so-sure: '{{ claim.replacementPhone }}'"></i>
                                         {% else %}<i class="fa fa-warning" title="{{ claim.replacementPhoneDetails }} recorded, but replacement phone not confirmed"></i>
