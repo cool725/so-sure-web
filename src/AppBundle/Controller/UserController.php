@@ -87,26 +87,22 @@ class UserController extends BaseController
         }
         $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
 
-        $feature = $this->get('app.feature');
-        if ($feature->isEnabled(Feature::FEATURE_RENEWAL)) {
-            // Not able to perform any actions with renewed policies yet
-            if ($policy->getStatus() == Policy::STATUS_RENEWAL) {
-                return new RedirectResponse(
-                    $this->generateUrl('user_renew_policy', ['id' => $policy->getPreviousPolicy()->getId()])
-                );
-            }
+        if ($policy->getStatus() == Policy::STATUS_RENEWAL) {
+            return new RedirectResponse(
+                $this->generateUrl('user_renew_policy', ['id' => $policy->getPreviousPolicy()->getId()])
+            );
+        }
 
-            foreach ($user->getValidPolicies(true) as $checkPolicy) {
-                if ($checkPolicy->notifyRenewal() && !$checkPolicy->isRenewed() && !$checkPolicy->hasCashback()) {
-                    $this->addFlash(
-                        'success',
-                        sprintf(
-                            '%s is ready for <a href="%s">renewal</a>',
-                            $checkPolicy->getPolicyNumber(),
-                            $this->generateUrl('user_renew_policy', ['id' => $checkPolicy->getId()])
-                        )
-                    );
-                }
+        foreach ($user->getValidPolicies(true) as $checkPolicy) {
+            if ($checkPolicy->notifyRenewal() && !$checkPolicy->isRenewed() && !$checkPolicy->hasCashback()) {
+                $this->addFlash(
+                    'success',
+                    sprintf(
+                        '%s is ready for <a href="%s">renewal</a>',
+                        $checkPolicy->getPolicyNumber(),
+                        $this->generateUrl('user_renew_policy', ['id' => $checkPolicy->getId()])
+                    )
+                );
             }
         }
 
