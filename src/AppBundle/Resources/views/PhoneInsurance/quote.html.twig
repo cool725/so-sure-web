@@ -85,7 +85,11 @@
                 <div class="col-md-12">
                     <div id="cover-price" class="quote-cost text-center">
                         {{ form_start(buy_form) }}
-                        <div class="text-center h4">If your phone is stolen/lost, replacing it costs <strong>£{{ phone.initialPrice }}</strong> 😧 Get peace of mind for:</div>
+                        <div class="text-center h4">
+                            {% if phone.initialPrice > 0 %}
+                                If your phone is stolen/lost, replacing it costs <strong>£{{ phone.initialPrice }}</strong> 😧
+                            {% endif %}
+                            Get peace of mind for:</div>
                         <div class="row">
                             {% if coming_soon %}
                                 <div class="col-sm-6">
@@ -122,7 +126,7 @@
                 </div>
             </div>
 
-            {% if feature_enabled('quote-lead') %}
+            {% if feature_enabled('quote-lead') and phone.initialPrice > 0 %}
             <div class="row">
                 <div class="col-md-12">
                     <div class="quote-card">

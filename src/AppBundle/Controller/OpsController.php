@@ -12,6 +12,7 @@ use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Document\User;
 use AppBundle\Document\SCode;
 use AppBundle\Document\Policy;
+use AppBundle\Document\Phone;
 use AppBundle\Service\MixpanelService;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use AppBundle\Document\Invitation\EmailInvitation;
@@ -94,6 +95,9 @@ class OpsController extends BaseController
 
         $invitationRepo = $dm->getRepository(EmailInvitation::class);
         $invitation = $invitationRepo->findOneBy(['accepted' => null, 'rejected' => null, 'cancelled' => null]);
+
+        $phoneRepo = $dm->getRepository(Phone::class);
+        $upcomingPhone = $phoneRepo->findOneBy(['active' => true, 'phonePrices' => null]);
 
         $policyRepo = $dm->getRepository(Policy::class);
         $expiredPolicy = $policyRepo->findOneBy(['status' => Policy::STATUS_EXPIRED]);
@@ -187,6 +191,7 @@ class OpsController extends BaseController
             'valid_remainder_policy' => $validRemainderPolicy,
             'claimed_policy' => $claimedPolicy,
             'expired_policy' => $expiredPolicy,
+            'upcoming_phone' => $upcomingPhone,
         ];
     }
 
