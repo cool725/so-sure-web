@@ -718,7 +718,7 @@ class DaviesServiceTest extends WebTestCase
         $claim = new Claim();
         $claim->setNumber(rand(1, 999999));
         $claim->setType(Claim::TYPE_LOSS);
-        $claim->setStatus(Claim::STATUS_APPROVED);
+        $claim->setStatus(Claim::STATUS_INREVIEW);
         $policy->addClaim($claim);
         static::$dm->persist($policy->getUser());
         static::$dm->persist($policy);
@@ -735,6 +735,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
         $daviesClaim->replacementReceivedDate = new \DateTime('2016-01-02');
         static::$daviesService->saveClaim($daviesClaim, false);
+        $this->assertNotNull($claim->getApprovedDate());
         $this->assertEquals(new \DateTime('2016-01-01'), $claim->getApprovedDate());
     }
 
