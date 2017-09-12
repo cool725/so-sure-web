@@ -159,6 +159,9 @@ class DaviesService extends S3EmailService
         } elseif ($daviesClaim->replacementImei && $claim->getStatus() == Claim::STATUS_INREVIEW) {
             // If there's a replacement IMEI, the claim has definitely been approved
             $claim->setStatus(Claim::STATUS_APPROVED);
+        } elseif ($daviesClaim->replacementReceivedDate && $claim->getStatus() == Claim::STATUS_INREVIEW) {
+            // If there's a replacement received date, the claim has definitely been approved
+            $claim->setStatus(Claim::STATUS_APPROVED);
         } elseif ($daviesClaim->phoneReplacementCost < 0 && $claim->getStatus() == Claim::STATUS_INREVIEW) {
             // If phone replacement value is negative, an excess payment has been applied to the account
             // e.g. the user paid the excess, which indicates that the claim was approved
