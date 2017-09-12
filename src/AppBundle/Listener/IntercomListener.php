@@ -77,7 +77,7 @@ class IntercomListener
     public function onPolicyStartEvent(PolicyEvent $event)
     {
         $this->intercom->queue($event->getPolicy()->getUser());
-        $this->intercom->queuePolicy($event->getPolicy(), IntercomService::QUEUE_EVENT_POLICY_STARTED);
+        $this->intercom->queuePolicy($event->getPolicy(), IntercomService::QUEUE_EVENT_POLICY_START);
 
         // Eventually we want to migrate users to the policy started event
         // However, this will impact on users in the connection campaign, and so
