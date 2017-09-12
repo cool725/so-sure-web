@@ -874,6 +874,9 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $data['renewalMonthlyPremiumNoPot'] = 0;
         $data['renewalMonthlyPremiumWithPot'] = 0;
         foreach ($this->getValidPolicies(true) as $policy) {
+            if (!$policy->isActive()) {
+                continue;
+            }
             $data['connections'] += count($policy->getConnections());
             $data['rewardPot'] += $policy->getPotValue();
             $data['approvedClaims'] += count($policy->getApprovedClaims());
