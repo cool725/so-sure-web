@@ -80,7 +80,7 @@
                         {% endif %}
                     </a></li>
                     {% if policy is defined %}
-                        {% if feature_enabled('renewal') and policy.displayRenewal %}
+                        {% if policy.displayRenewal %}
                             <li role="presentation" class="{% if app.request.get('_route') == 'user_renew_policy' or app.request.get('_route') == 'user_renew_policy_any' or app.request.get('_route') == 'user_renew_custom_policy' %}active{% endif %}"><a href="{{ path('user_renew_policy', {'id': policy.id }) }}">Renew your policy</a></li>
                         {% endif %}
                     {% endif %}
