@@ -42,8 +42,12 @@ class IntercomListener
 
     public function onPolicyCreatedEvent(PolicyEvent $event)
     {
+        // move event to onPolicyStartEvent
+        return;
+        /*
         $this->intercom->queue($event->getPolicy()->getUser());
         $this->intercom->queuePolicy($event->getPolicy(), IntercomService::QUEUE_EVENT_POLICY_CREATED);
+        */
     }
 
     public function onPolicyPotEvent(PolicyEvent $event)
@@ -74,6 +78,11 @@ class IntercomListener
     {
         $this->intercom->queue($event->getPolicy()->getUser());
         $this->intercom->queuePolicy($event->getPolicy(), IntercomService::QUEUE_EVENT_POLICY_START);
+
+        // Eventually we want to migrate users to the policy started event
+        // However, this will impact on users in the connection campaign, and so
+        // send both created & started events for now until we can migrate over
+        $this->intercom->queuePolicy($event->getPolicy(), IntercomService::QUEUE_EVENT_POLICY_CREATED);
     }
 
     public function onInvitationAcceptedEvent(InvitationEvent $event)
