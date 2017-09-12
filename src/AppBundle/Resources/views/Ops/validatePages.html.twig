@@ -12,6 +12,13 @@
         <a href="{{ url('quote_make_model', {'make':'Apple','model':'iPhone+6S'}) }}">Quote</a>
     </li>
     <li>
+        {% if upcoming_phone %}
+        <a href="{{ url('quote_make_model', {'make': upcoming_phone.make,'model': upcoming_phone.model}) }}">Quote - Upcoming Phone</a>
+        {% else %}
+            No Upcoming Phone in DB
+        {% endif %}
+    </li>
+    <li>
         <a href="{{ url('phone_insurance_water_damage') }}">SEO Phone Pages (several other similiar)</a>
     </li>
 </ul>
