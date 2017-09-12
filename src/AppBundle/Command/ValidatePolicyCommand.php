@@ -311,7 +311,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         return sprintf(
             'Unexpected ipt rate %0.2f (Expected %0.2f',
             $policy->getPremium()->getIptRate(),
-            $this->getCurrentIptRate($policy->getStart())
+            $policy->getCurrentIptRate($policy->getStart())
         );
     }
 
