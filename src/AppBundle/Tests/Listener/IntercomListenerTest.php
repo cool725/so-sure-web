@@ -100,8 +100,8 @@ class IntercomListenerTest extends WebTestCase
 
         $this->assertTrue($policy->isValidPolicy());
 
-        // Expect a policy create event + a policy start event + user update x 2
-        $this->assertEquals(4, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+        // Expect a policy create event + a policy start event + user update
+        $this->assertEquals(3, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
         $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
         $this->assertEquals($user->getId(), $data['userId']);
 
@@ -123,8 +123,8 @@ class IntercomListenerTest extends WebTestCase
 
         static::$policyService->renew($policy, 12, null, new \DateTime('2016-12-30'));
 
-        // Expect a policy created event + policy renewal event + user update x 2
-        $this->assertEquals(4, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+        // Expect a policy created event + policy renewal event + user update
+        $this->assertEquals(3, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
         $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
         $this->assertEquals($user->getId(), $data['userId']);
 
@@ -180,10 +180,8 @@ class IntercomListenerTest extends WebTestCase
         $listener = new IntercomListener(static::$intercomService);
         $listener->onPolicyCreatedEvent(new PolicyEvent($policy));
 
-        // Expect a user update + a policy create event
-        $this->assertEquals(2, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
-        $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
-        $this->assertEquals($user->getId(), $data['userId']);
+        // No events anymore - moved to started
+        $this->assertEquals(0, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
     }
 
     public function testIntercomQueueCancelled()
