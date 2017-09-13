@@ -435,7 +435,7 @@ class PhonePolicy extends Policy
         $policy->setSerialNumber($this->getSerialNumber());
 
         // make sure ipt rate is set to ipt rate at the start of the policy
-        $this->validatePremium(true, $startDate);
+        $policy->validatePremium(true, $startDate);
     }
 
     /**
