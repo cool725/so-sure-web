@@ -786,7 +786,12 @@ abstract class BaseController extends Controller
             });
             $pager = $this->arrayPager($request, $policies);
         } else {
-            $pager = $this->pager($request, $policiesQb);
+            $policies = $policiesQb->getQuery()->execute()->toArray();
+            // sort older to more recent
+            usort($policies, function ($a, $b) {
+                return $a->getStart() > $b->getStart();
+            });
+            $pager = $this->arrayPager($request, $policies);
         }
 
         return [

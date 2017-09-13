@@ -128,7 +128,9 @@
                                 {% if policy.status == "cancelled" %} / {{ policy.cancelledReason }}{% endif %}
                                 {% if policy.status == "unpaid" %} / {{ policy.policyExpirationDate | date('d M Y H:i', 'Europe/London') }}{% endif %}
                             </td>
-                            <td>{{ policy.age }} {% if policy.getPremiumPlan == 'yearly' %}<i class="fa fa-calendar" title="Yearly plan"></i>{% endif %} </td>
+                            <td>{{ policy.age }} {% if policy.getPremiumPlan == 'yearly' %}<i class="fa fa-calendar" title="Yearly plan"></i>{% endif %}
+                                {% if policy.nextPolicy %}<a href="{{ path(policy_route, {'id': policy.nextPolicy.id}) }}" title="Next policy {{ policy.nextPolicy.status }}"><i class="fa fa-arrow-right"></i> </a>{% endif %}
+                            </td>
                             <td>{{ policy.user.firstname }} {{ policy.user.lastname }}</td>
                             <td>
                                 {% if is_granted('ROLE_EMPLOYEE') %}
