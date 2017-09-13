@@ -26,6 +26,8 @@ use AppBundle\Classes\Salva;
 
 /**
  * @group functional-nonet
+ *
+ * AppBundle\\Tests\\Document\\PhonePolicyTest
  */
 class PhonePolicyTest extends WebTestCase
 {
@@ -1701,6 +1703,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
         $policy->setPremiumInstallments(12);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
 
         // Policy doesn't have a payment, so should be expired
         $this->assertTrue($policy->shouldCancelPolicy(null, new \DateTime("2016-01-01")));
@@ -1717,6 +1720,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999), null, new \DateTime("2016-01-01"), rand(1, 9999));
         $policy->setPremiumInstallments(12);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
@@ -2304,6 +2308,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999), null, $date, rand(1, 9999));
         $policy->setPremiumInstallments($installments);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
 
         self::addPayment($policy, $amount, $commission, null, $date);
 
@@ -2760,6 +2765,7 @@ class PhonePolicyTest extends WebTestCase
             Salva::MONTHLY_TOTAL_COMMISSION,
             12
         );
+        $policy->setStatus(SalvaPhonePolicy::STATUS_PENDING);
         $this->assertEquals(SalvaPhonePolicy::STATUS_PENDING, $policy->getStatus());
         $this->assertFalse($policy->hasCorrectPolicyStatus($date));
 
