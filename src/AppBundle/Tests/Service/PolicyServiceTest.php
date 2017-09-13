@@ -39,6 +39,7 @@ class PolicyServiceTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     use \AppBundle\Document\DateTrait;
+    use \AppBundle\Document\CurrencyTrait;
 
     protected static $container;
     protected static $policyService;
@@ -2953,6 +2954,8 @@ class PolicyServiceTest extends WebTestCase
         static::$policyService->create($policyB, clone $dateB, true);
         static::$policyService->setEnvironment('test');
         static::$dm->flush();
+        $this->assertEquals($this->getCurrentIptRate($dateA), $policyA->getPremium()->getIptRate());
+        $this->assertEquals($this->getCurrentIptRate($dateB), $policyB->getPremium()->getIptRate());
 
         if ($connect) {
             list($connectionA, $connectionB) = $this->createLinkedConnections(
@@ -2978,6 +2981,10 @@ class PolicyServiceTest extends WebTestCase
         );
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyA->getStatus());
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyB->getStatus());
+        $this->assertEquals($this->getCurrentIptRate($dateA), $policyA->getPremium()->getIptRate());
+        $this->assertEquals($this->getCurrentIptRate($dateB), $policyB->getPremium()->getIptRate());
+        $this->assertEquals($this->getCurrentIptRate($policyA->getEnd()), $renewalPolicyA->getPremium()->getIptRate());
+        $this->assertEquals($this->getCurrentIptRate($policyB->getEnd()), $renewalPolicyB->getPremium()->getIptRate());
 
         if ($additional) {
             for ($i = 0; $i < $additional; $i++) {
