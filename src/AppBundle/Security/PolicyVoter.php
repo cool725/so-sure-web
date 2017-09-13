@@ -14,6 +14,7 @@ class PolicyVoter extends Voter
     const SEND_INVITATION = 'send-invitation';
     const CONNECT = 'connect';
     const RENEW = 'renew';
+    const CASHBACK = 'cashback';
 
     public function supports($attribute, $subject)
     {
