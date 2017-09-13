@@ -3757,7 +3757,7 @@ class PhonePolicyTest extends WebTestCase
 
     public function testRenewalIpt()
     {
-        $policy = $this->getPolicy(static::generateEmail('testRenewalIpt', $this), new \DateTime('2016-06-01'));
+        $policy = $this->getPolicy(static::generateEmail('testRenewalIpt', $this), new \DateTime('2016-06-02'));
         $this->assertEquals(0.095, $policy->getPremium()->getIptRate());
 
         $renewalPolicy = $policy->createPendingRenewal($policy->getPolicyTerms(), new \DateTime('2017-05-15'));
