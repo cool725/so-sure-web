@@ -71,7 +71,8 @@ class InvitationServiceTest extends WebTestCase
             self::$container->get('templating'),
             self::$container->get('api.router'),
             'foo@foo.com',
-            'bar'
+            'bar',
+            'http://localhost'
         );
         self::$invitationService = self::$container->get('app.invitation');
         self::$invitationService->setMailer($mailer);

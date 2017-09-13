@@ -2549,6 +2549,10 @@ abstract class Policy
             $potValue = 0;
         }
 
+        if ($this->getMaxPot() < $potValue && ($potValue - $this->getMaxPot()) < 10) {
+            $potValue = $this->getMaxPot();
+        }
+
         return $potValue;
     }
 
