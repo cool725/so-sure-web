@@ -20,6 +20,7 @@ class PhoneRepository extends DocumentRepository
             Phone::OS_WINDOWS,
         ]));
         $qb->addAnd($qb->expr()->field('make')->notEqual("ALL"));
+        $qb->addAnd($qb->expr()->field('phonePrices')->notEqual(null));
         $qb->addAnd($qb->expr()->field('active')->equals(true));
         $qb->sort('make', 'asc')
             ->sort('model', 'asc')

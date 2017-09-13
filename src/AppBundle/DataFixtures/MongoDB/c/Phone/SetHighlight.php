@@ -45,6 +45,7 @@ class SetHighlight implements FixtureInterface, ContainerAwareInterface
         $phone->setMake('Apple');
         $phone->setModel('Upcoming');
         $phone->setActive(true);
+        $phone->setOs(Phone::OS_IOS);
         $manager->persist($phone);
 
         $manager->flush();
