@@ -51,10 +51,17 @@
         <a href="{{ url('user_home') }}?_impersonate={{ claimed_policy.user.email }}">User Home - Unable to invite (w/Claimed Policy)</a> <b>(auto impersonate {{ claimed_policy.user.email }})</b>
     </li>
     <li>
-        {% if expired_policy %}
-        <a href="{{ url('user_policy', {'policyId': expired_policy.id }) }}?_impersonate={{ expired_policy.user.email }}">User Home - Expired Policy</a> <b>(auto impersonate {{ expired_policy.user.email }})</b>
+        {% if expired_policy_nocashback %}
+        <a href="{{ url('user_policy', {'policyId': expired_policy_nocashback.id }) }}?_impersonate={{ expired_policy_nocashback.user.email }}">User Home - Expired Policy No Cashback</a> <b>(auto impersonate {{ expired_policy_nocashback.user.email }})</b>
         {% else %}
-            No expired policy available
+            No expired policy (no cashback) available
+        {% endif %}
+    </li>
+    <li>
+        {% if expired_policy_cashback %}
+        <a href="{{ url('user_policy', {'policyId': expired_policy_cashback.id }) }}?_impersonate={{ expired_policy_cashback.user.email }}">User Home - Expired Policy Cashback</a> <b>(auto impersonate {{ expired_policy_cashback.user.email }})</b>
+        {% else %}
+            No expired policy (cashback) available
         {% endif %}
     </li>
     <li>

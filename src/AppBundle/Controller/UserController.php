@@ -788,6 +788,17 @@ class UserController extends BaseController
             return $this->redirectToRoute('purchase_step_policy');
         }
 
+        foreach ($user->getDisplayableCashbackSorted() as $cashback) {
+            if (in_array($cashback->getStatus(), [Cashback::STATUS_MISSING, Cashback::STATUS_FAILED])) {
+                $message = sprintf(
+                    'You have £%0.2f cashback just waiting for you. <a href="%s">Add/Update your banking details</a>.',
+                    $cashback->getAmount(),
+                    $this->generateUrl('user_cashback', ['id' => $cashback->getId()])
+                );
+                $this->addFlash('success', $message);
+            }
+        }
+
         return array(
         );
     }
