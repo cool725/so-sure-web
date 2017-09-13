@@ -1178,7 +1178,12 @@ abstract class Policy
     public function setPotValue($potValue)
     {
         if ($this->toTwoDp($potValue) > $this->getMaxPot()) {
-            throw new \Exception(sprintf('Max pot value exceeded (%s of %s)', $potValue, $this->getMaxPot()));
+            throw new \Exception(sprintf(
+                'Max pot value exceeded (%s of %s for %s)',
+                $potValue,
+                $this->getMaxPot(),
+                $this->getId()
+            ));
         }
 
         $this->potValue = $potValue;
@@ -2542,6 +2547,10 @@ abstract class Policy
             $potValue = 10;
         } elseif ($networkClaimCount > 0) {
             $potValue = 0;
+        }
+
+        if ($this->getMaxPot() < $potValue && ($potValue - $this->getMaxPot()) < 10) {
+            $potValue = $this->getMaxPot();
         }
 
         return $potValue;

@@ -242,6 +242,60 @@ class PhonePolicyTest extends WebTestCase
         $this->assertTrue($policyB->hasNetworkClaimedInLast30Days(new \DateTime("2016-02-21"), true));
     }
 
+    public function testCalculatePotValue()
+    {
+        $policyConnected = static::createUserPolicy(true, null, true);
+        $policyConnected->setStart(new \DateTime("2017-01-01"));
+
+        for ($i = 1; $i <= $policyConnected->getMaxConnections(new \DateTime("2017-01-01")); $i++) {
+            $policy = static::createUserPolicy(true);
+            $policy->setStart(new \DateTime("2017-01-01"));
+            list($connectionA, $connectionB) = $this->createLinkedConnections($policyConnected, $policy, 10, 10);
+        }
+        $this->assertEquals($policyConnected->getMaxPot(), $policyConnected->calculatePotValue(false));
+
+        $policy = static::createUserPolicy(true);
+        $policy->setStart(new \DateTime("2017-01-01"));
+        list($connectionA, $connectionB) = $this->createLinkedConnections(
+            $policyConnected,
+            $policy,
+            10,
+            10,
+            null,
+            null,
+            false
+        );
+        $this->assertEquals($policyConnected->getMaxPot(), $policyConnected->calculatePotValue(false));
+    }
+
+    public function testCalculatePotValueReverse()
+    {
+        $policyConnected = static::createUserPolicy(true, null, true);
+        $policyConnected->setStart(new \DateTime("2017-01-01"));
+
+        for ($i = 1; $i <= $policyConnected->getMaxConnections(new \DateTime("2017-01-01")); $i++) {
+            $policy = static::createUserPolicy(true);
+            $policy->setStart(new \DateTime("2017-01-01"));
+            list($connectionA, $connectionB) = $this->createLinkedConnections(
+                $policyConnected,
+                $policy,
+                10,
+                10,
+                null,
+                null,
+                false
+            );
+        }
+        //\Doctrine\Common\Util\Debug::dump($policyConnected);
+        $this->assertEquals(0, $policyConnected->calculatePotValue(false));
+
+        $policy = static::createUserPolicy(true);
+        $policy->setStart(new \DateTime("2017-01-01"));
+        list($connectionA, $connectionB) = $this->createLinkedConnections($policyConnected, $policy, 10, 10);
+
+        $this->assertEquals(10, $policyConnected->calculatePotValue(false));
+    }
+
     public function testGetRiskNoPolicy()
     {
         $policyA = new SalvaPhonePolicy();
