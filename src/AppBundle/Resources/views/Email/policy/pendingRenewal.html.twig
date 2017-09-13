@@ -12,21 +12,21 @@
 				Your SO-SURE policy is due to expire on {{ policy.end | date('d M Y H:i', 'Europe/London') }}<br><br>
 				{% if policy.nextPolicy.premium.monthlyPremiumPrice < policy.premium.monthlyPremiumPrice %}
 					We have great news...<br><br>
-					Your monthly premium has decreased from £{{ policy.nextPolicy.premium.monthlyPremiumPrice }} to £{{ policy.premium.monthlyPremiumPrice }} per month!<br><br>
+					Your monthly premium has decreased from £{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} to £{{ policy.nextPolicy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month!<br><br>
 					So for only
 					{% spaceless %}
 					<strong style="color: #3399ff;font-weight: bold;font-family:arial,helvetica neue,helvetica,sans-serif">
-					£{{ policy.nextPolicy.premium.monthlyPremiumPrice }} per month</strong>,
+					£{{ policy.nextPolicy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month</strong>,
 	 			    {% endspaceless %}
 					your phone can remain protected from loss, theft, accidental damage & out of warranty breakdown. <br><br>
 			   {% else %}
 					For only
 					{% spaceless %}
 					<strong style="color: #3399ff;font-weight: bold;font-family:arial,helvetica neue,helvetica,sans-serif">
-					£{{ policy.nextPolicy.premium.monthlyPremiumPrice }} per month</strong>,
+					£{{ policy.nextPolicy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month</strong>,
 	 			    {% endspaceless %}
 					your phone can remain protected from loss, theft, accidental damage & out of warranty breakdown.<br><br>
-					Unfortunately, our pricing may have slightly increased due to the government mandated increase in IPT to 12% (June 2017). By way of comparison, your premium last year was £{{ policy.premium.monthlyPremiumPrice }} per month.<br><br>
+					Unfortunately, our pricing may have slightly increased due to the government mandated increase in IPT to 12% (June 2017). By way of comparison, your premium last year was £{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month.<br><br>
 			   {% endif %}
 			   For your information, your current policy details are:<br><br>
 			   {{ policy.policyNumber }}<br><br>
