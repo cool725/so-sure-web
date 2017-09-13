@@ -3763,16 +3763,19 @@ class PhonePolicyTest extends WebTestCase
         $renewalPolicy = $policy->createPendingRenewal($policy->getPolicyTerms(), new \DateTime('2017-05-15'));
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
         $this->assertEquals(0.12, $renewalPolicy->getPremium()->getIptRate());
+        $this->assertEquals(0.095, $policy->getPremium()->getIptRate());
 
         // in policy service, renew calls create
-        $renewalPolicy->create(rand(1, 999999), null, new \DateTime('2017-06-01'));
+        $renewalPolicy->create(rand(1, 999999), null, new \DateTime('2017-06-02'));
         $renewalPolicy->renew(0, new \DateTime('2017-05-30'));
         $this->assertEquals(0.12, $renewalPolicy->getPremium()->getIptRate());
+        $this->assertEquals(0.095, $policy->getPremium()->getIptRate());
 
-        $policy->expire(new \DateTime('2017-06-01'));
+        $policy->expire(new \DateTime('2017-06-02'));
 
-        $renewalPolicy->activate(new \DateTime('2017-06-01'));
+        $renewalPolicy->activate(new \DateTime('2017-06-02'));
         $this->assertEquals(0.12, $renewalPolicy->getPremium()->getIptRate());
+        $this->assertEquals(0.095, $policy->getPremium()->getIptRate());
     }
 
     public function testAdjustedRewardPotPaymentAmount()
