@@ -1231,7 +1231,7 @@ class PolicyService
         return $cancelled;
     }
 
-    public function activateRenewalPolicies($prefix, $dryRun = false)
+    public function activateRenewalPolicies($prefix, $dryRun = false, \DateTime $date = null)
     {
         $renewals = [];
         $policyRepo = $this->dm->getRepository(Policy::class);
@@ -1240,7 +1240,7 @@ class PolicyService
             $renewals[$policy->getId()] = $policy->getPolicyNumber();
             if (!$dryRun) {
                 try {
-                    $this->activate($policy);
+                    $this->activate($policy, $date);
                 } catch (\Exception $e) {
                     $msg = sprintf(
                         'Error activating Policy %s / %s',

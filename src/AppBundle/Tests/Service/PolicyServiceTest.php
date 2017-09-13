@@ -1226,6 +1226,53 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(1, count($policies));
     }
 
+    public function testActivateRenewalPolicies()
+    {
+        $policies = static::$policyService->activateRenewalPolicies(
+            'TEST',
+            false,
+            new \DateTime('2016-12-15')
+        );
+
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testActivateRenewalPolicies', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-01-01'), true);
+        static::$policyService->setEnvironment('test');
+        static::$dm->flush();
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+
+        $renewalPolicy = static::$policyService->createPendingRenewal(
+            $policy,
+            new \DateTime('2016-12-15')
+        );
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
+
+        static::$policyService->renew($policy, 12, null, new \DateTime('2016-12-30'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicy->getStatus());
+
+        $policies = static::$policyService->activateRenewalPolicies(
+            'TEST',
+            false,
+            new \DateTime('2017-01-02')
+        );
+        $this->assertEquals(1, count($policies));
+    }
+
     public function testPolicyRenewCashback()
     {
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(

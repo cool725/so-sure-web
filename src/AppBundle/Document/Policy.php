@@ -236,7 +236,7 @@ abstract class Policy
     /**
      * @MongoDB\ReferenceMany(
      *  targetDocument="AppBundle\Document\Connection\Connection",
-     *  mappedBy="linkedPolicyRenwal",
+     *  mappedBy="linkedPolicyRenewal",
      *  cascade={"persist"}
      * )
      */
