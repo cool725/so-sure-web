@@ -1178,7 +1178,12 @@ abstract class Policy
     public function setPotValue($potValue)
     {
         if ($this->toTwoDp($potValue) > $this->getMaxPot()) {
-            throw new \Exception(sprintf('Max pot value exceeded (%s of %s)', $potValue, $this->getMaxPot()));
+            throw new \Exception(sprintf(
+                'Max pot value exceeded (%s of %s for %s)',
+                $potValue,
+                $this->getMaxPot(),
+                $this->getId()
+            ));
         }
 
         $this->potValue = $potValue;
