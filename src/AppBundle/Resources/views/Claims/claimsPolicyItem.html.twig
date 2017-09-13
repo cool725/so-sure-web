@@ -38,7 +38,7 @@
                         <tr>
                             <td>Previous Policy Number</td>
                             <td>
-                                <a href="{{ path('claims_policy', {'id': policy.previousPolicy.id}) }}">{{ policy.previousPolicy.policyNumber }}</a>
+                                <a href="{{ path(policy_route, {'id': policy.previousPolicy.id}) }}">{{ policy.previousPolicy.policyNumber }}</a>
                             </td>
                         </tr>
                         {% endif %}
@@ -46,7 +46,7 @@
                         <tr>
                             <td>Next Policy Number</td>
                             <td>
-                                    <a href="{{ path('claims_policy', {'id': policy.nextPolicy.id}) }}">{{ policy.nextPolicy.policyNumber }}</a>
+                                    <a href="{{ path(policy_route, {'id': policy.nextPolicy.id}) }}">{{ policy.nextPolicy.policyNumber }}</a>
                             </td>
                         </tr>
                         {% endif %}
