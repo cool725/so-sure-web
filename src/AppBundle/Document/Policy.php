@@ -936,6 +936,16 @@ abstract class Policy
         return $this->acceptedConnectionsRenewal;
     }
 
+    public function getAcceptedConnectionsRenewalIds()
+    {
+        $ids = [];
+        foreach ($this->getAcceptedConnectionsRenewal() as $connection) {
+            $ids[] = $connection->getId();
+        }
+
+        return $ids;
+    }
+
     public function getStandardConnections()
     {
         $connections = [];
@@ -2830,8 +2840,9 @@ abstract class Policy
                 } else {
                     // TODO: Not sure about this one...
                     throw new \Exception(sprintf(
-                        'Unable to find inverse connection %s',
-                        $connection->getId()
+                        'Unable to find inverse connection %s (accepted renewals: %s)',
+                        $connection->getId(),
+                        json_encode($this->getAcceptedConnectionsRenewalIds())
                     ));
                 }
             }
