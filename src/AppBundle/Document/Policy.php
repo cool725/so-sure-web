@@ -2323,7 +2323,7 @@ abstract class Policy
 
     public function shouldCancelPolicy($prefix = null, $date = null)
     {
-        if (!$this->isValidPolicy($prefix) || $this->getPremiumPlan() != self::PLAN_MONTHLY) {
+        if (!$this->isValidPolicy($prefix) || $this->getPremiumPlan() != self::PLAN_MONTHLY || !$this->isActive()) {
             return false;
         }
 
@@ -2351,6 +2351,10 @@ abstract class Policy
         if ($this->getPremiumPlan() == self::PLAN_YEARLY) {
             return null;
         }
+        if (!$this->isActive()) {
+            return null;
+        }
+
         if (!$date) {
             $date = new \DateTime();
         }
