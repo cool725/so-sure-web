@@ -8,9 +8,12 @@ use AppBundle\Document\User;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Event\PolicyEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use AppBundle\Document\CurrencyTrait;
 
 class DoctrineSalvaListener
 {
+    use CurrencyTrait;
+
     /** @var EventDispatcher */
     protected $dispatcher;
 
@@ -48,7 +51,23 @@ class DoctrineSalvaListener
                     'premium',
                 ];
                 foreach ($fields as $field) {
+                    $changed = false;
+
                     if ($eventArgs->hasChangedField($field)) {
+                        if ($field == 'premium') {
+                            $oldPremium = $eventArgs->getOldValue('premium');
+                            $newPremium = $eventArgs->getNewValue('premium');
+                            if (!$this->areEqualToTwoDp($oldPremium->getGwp(), $newPremium->getGwp())
+                                || !$this->areEqualToTwoDp($oldPremium->getIpt(), $newPremium->getIpt())
+                                || !$this->areEqualToTwoDp($oldPremium->getIptRate(), $newPremium->getIptRate())) {
+                                $changed = true;
+                            }
+                        } else {
+                            $changed = true;
+                        }
+                    }
+
+                    if ($changed) {
                         $this->logger->debug(sprintf('preUpdateDebug changedfield : %s', $field));
                         if (!in_array($policy->getId(), $dispatched)) {
                             $this->triggerEvent($policy, PolicyEvent::EVENT_SALVA_INCREMENT);
