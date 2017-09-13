@@ -233,7 +233,7 @@ class Connection
         }
 
         $this->linkedPolicyRenewal = $policy;
-        //$policy->addAcceptedConnectionRenewal($this);
+        $policy->addAcceptedConnectionRenewal($this);
     }
 
     public function getDate()

@@ -31,6 +31,8 @@ use AppBundle\Service\SalvaExportService;
 
 /**
  * @group functional-nonet
+ *
+ * AppBundle\\Tests\\Service\\PolicyServiceTest
  */
 class PolicyServiceTest extends WebTestCase
 {
