@@ -10,11 +10,14 @@ use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
 use AppBundle\Event\PolicyEvent;
 use AppBundle\Listener\DoctrineSalvaListener;
 use AppBundle\Document\User;
+use AppBundle\Document\PhonePremium;
 use AppBundle\Document\PhonePolicy;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @group functional-nonet
+ *
+ * AppBundle\\Tests\\Listener\\DoctrineSalvaListenerTest
  */
 class DoctrineSalvaListenerTest extends WebTestCase
 {
@@ -64,8 +67,37 @@ class DoctrineSalvaListenerTest extends WebTestCase
         // policy updated
         $this->runPreUpdate($policy, $this->once(), ['phone' => ['Apple', 'Samsung']]);
         $this->runPreUpdate($policy, $this->once(), ['imei' => ['11', '12']]);
-        $this->runPreUpdate($policy, $this->once(), ['premium' => [1, 2]]);
         $this->runPreUpdate($policy, $this->never(), ['potValue' => [1, 2]]);
+
+        $premiumA = new PhonePremium();
+        $premiumA->setGwp(5.89);
+        $premiumA->setIpt(0.89);
+        $premiumA->setIptRate(0.12);
+        $premiumA->setAnnualDiscount(10);
+
+        $premiumB = clone $premiumA;
+
+        $this->runPreUpdate($policy, $this->never(), ['premium' => [$premiumA, $premiumB]]);
+
+        $premiumB = clone $premiumA;
+        $premiumB->setGwp(1);
+        $this->runPreUpdate($policy, $this->once(), ['premium' => [$premiumA, $premiumB]]);
+
+        $premiumB = clone $premiumA;
+        $premiumB->setIpt(1);
+        $this->runPreUpdate($policy, $this->once(), ['premium' => [$premiumA, $premiumB]]);
+
+        $premiumB = clone $premiumA;
+        $premiumB->setIptRate(0.15);
+        $this->runPreUpdate($policy, $this->once(), ['premium' => [$premiumA, $premiumB]]);
+
+        $premiumB = clone $premiumA;
+        $premiumB->setAnnualDiscount(0);
+        $this->runPreUpdate($policy, $this->never(), ['premium' => [$premiumA, $premiumB]]);
+
+        $premiumB = clone $premiumA;
+        $premiumB->setGwp(5.891);
+        $this->runPreUpdate($policy, $this->never(), ['premium' => [$premiumA, $premiumB]]);
 
         // user updated
         $this->runPreUpdateUser($user, $policy, $this->once(), ['firstName' => ['foo', 'bar']]);
@@ -91,7 +123,7 @@ class DoctrineSalvaListenerTest extends WebTestCase
         // policy updated
         $this->runPreUpdate($policy, $this->once(), ['phone' => ['Apple', 'Samsung']]);
         $this->runPreUpdate($policy, $this->once(), ['imei' => ['11', '12']]);
-        $this->runPreUpdate($policy, $this->once(), ['premium' => [1, 2]]);
+        //$this->runPreUpdate($policy, $this->once(), ['premium' => [1, 2]]);
         $this->runPreUpdate($policy, $this->never(), ['potValue' => [1, 2]]);
 
         // user updated
