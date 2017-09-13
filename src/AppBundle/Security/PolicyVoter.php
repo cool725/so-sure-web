@@ -23,6 +23,7 @@ class PolicyVoter extends Voter
             self::VIEW,
             self::EDIT,
             self::SEND_INVITATION,
+            self::CASHBACK,
             self::CONNECT,
             self::RENEW,
         ])) {

@@ -12,6 +12,7 @@ use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Document\User;
 use AppBundle\Document\SCode;
 use AppBundle\Document\Policy;
+use AppBundle\Document\Cashback;
 use AppBundle\Document\Phone;
 use AppBundle\Service\MixpanelService;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -100,7 +101,19 @@ class OpsController extends BaseController
         $upcomingPhone = $phoneRepo->findOneBy(['active' => true, 'phonePrices' => null]);
 
         $policyRepo = $dm->getRepository(Policy::class);
-        $expiredPolicy = $policyRepo->findOneBy(['status' => Policy::STATUS_EXPIRED]);
+        $expiredPolicies = $policyRepo->findBy(['status' => Policy::STATUS_EXPIRED_CLAIMABLE]);
+        $expiredPolicyNoCashback = null;
+        $expiredPolicyCashback = null;
+        foreach ($expiredPolicies as $expiredPolicy) {
+            if ($expiredPolicy->getCashback()) {
+                if ($expiredPolicy->getCashback()->getStatus() == Cashback::STATUS_CLAIMED) {
+                    $expiredPolicyNoCashback = $expiredPolicy;
+                }
+                if ($expiredPolicy->getCashback()->getStatus() == Cashback::STATUS_MISSING) {
+                    $expiredPolicyCashback = $expiredPolicy;
+                }
+            }
+        }
         $unpaidPolicy = $policyRepo->findOneBy(['status' => Policy::STATUS_UNPAID]);
         $validPolicies = $policyRepo->findBy(['status' => Policy::STATUS_ACTIVE]);
         $position = rand(1, count($validPolicies));
@@ -190,7 +203,8 @@ class OpsController extends BaseController
             'valid_renewal_policy_yearly_only_with_pot' => $validRenwalPolicyYearlyOnlyWithPot,
             'valid_remainder_policy' => $validRemainderPolicy,
             'claimed_policy' => $claimedPolicy,
-            'expired_policy' => $expiredPolicy,
+            'expired_policy_nocashback' => $expiredPolicyNoCashback,
+            'expired_policy_cashback' => $expiredPolicyCashback,
             'upcoming_phone' => $upcomingPhone,
         ];
     }
