@@ -1595,10 +1595,9 @@ class PolicyService
         // @codingStandardsIgnoreStart
         $body = sprintf(
             "Policy: <a href='%s'>%s/%s</a> has requested a billing date change to the %d. Verify policy id match in system.",
-            $this->router->generate(
+            $this->mailer->generateUrl(
                 'admin_policy',
-                ['id' => $policy->getId()],
-                UrlGeneratorInterface::ABSOLUTE_URL
+                ['id' => $policy->getId()]
             ),
             $policy->getPolicyNumber(),
             $policy->getId(),
