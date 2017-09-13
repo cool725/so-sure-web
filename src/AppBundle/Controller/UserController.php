@@ -93,6 +93,7 @@ class UserController extends BaseController
             );
         }
 
+        $renewMessage = false;
         foreach ($user->getValidPolicies(true) as $checkPolicy) {
             if ($checkPolicy->notifyRenewal() && !$checkPolicy->isRenewed() && !$checkPolicy->hasCashback()) {
                 $this->addFlash(
@@ -103,7 +104,11 @@ class UserController extends BaseController
                         $this->generateUrl('user_renew_policy', ['id' => $checkPolicy->getId()])
                     )
                 );
+                $renewMessage = true;
             }
+        }
+        if (!$renewMessage) {
+            $this->addCashbackFlash();
         }
 
         $scode = null;
@@ -788,6 +793,15 @@ class UserController extends BaseController
             return $this->redirectToRoute('purchase_step_policy');
         }
 
+        $this->addCashbackFlash();
+
+        return array(
+        );
+    }
+
+    private function addCashbackFlash()
+    {
+        $user = $this->getUser();
         foreach ($user->getDisplayableCashbackSorted() as $cashback) {
             if (in_array($cashback->getStatus(), [Cashback::STATUS_MISSING, Cashback::STATUS_FAILED])) {
                 $message = sprintf(
@@ -798,9 +812,6 @@ class UserController extends BaseController
                 $this->addFlash('success', $message);
             }
         }
-
-        return array(
-        );
     }
 
     /**
@@ -1010,7 +1021,9 @@ class UserController extends BaseController
         } else {
             $policy = $user->getLatestPolicy();
         }
-        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+        if ($policy) {
+            $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+        }
 
         return [
             'user' => $user,
