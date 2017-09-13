@@ -1233,7 +1233,7 @@ class PolicyServiceTest extends WebTestCase
         $policies = static::$policyService->activateRenewalPolicies(
             'TEST',
             false,
-            new \DateTime('2016-12-15')
+            new \DateTime('2017-01-02')
         );
 
         $user = static::createUser(
