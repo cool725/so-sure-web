@@ -2496,6 +2496,20 @@ class PhonePolicyTest extends WebTestCase
         }
     }
 
+    public function testIsUnRenewalAllowed()
+    {
+        $policy = new SalvaPhonePolicy();
+        $this->assertFalse($policy->isUnRenewalAllowed());
+
+        $policy->setStatus(Policy::STATUS_PENDING_RENEWAL);
+        $this->assertFalse($policy->isUnRenewalAllowed());
+
+        $policy->setPendingRenewalExpiration(new \DateTime('2017-09-13 23:59:00'));
+        $this->assertTrue($policy->isUnRenewalAllowed());
+        $this->assertTrue($policy->isUnRenewalAllowed(new \DateTime('2017-09-14 00:00')));
+        $this->assertFalse($policy->isUnRenewalAllowed(new \DateTime('2017-09-13 23:00')));
+    }
+
     /**
      * @expectedException AppBundle\Exception\InvalidPremiumException
      */

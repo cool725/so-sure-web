@@ -2723,6 +2723,10 @@ abstract class Policy
 
     public function isUnRenewalAllowed(\DateTime $date = null)
     {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
         if (!in_array($this->getStatus(), [
             self::STATUS_PENDING_RENEWAL,
         ])) {
