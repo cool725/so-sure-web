@@ -84,6 +84,21 @@ class EmailDebugCommand extends BaseCommand
                 'policy' => $connection->getSourcePolicy(),
                 'causalUser' => $connection->getLinkedUser(),
             ];
+        } elseif (in_array($template, [
+            'policy/pendingRenewal',
+        ])) {
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(Policy::class);
+            $policies = $repo->findBy(['status' => Policy::STATUS_PENDING_RENEWAL]);
+            foreach ($policies as $policy) {
+                if (!$policy->getPremium() || !$policy->getNextPolicy() || !$policy->getNextPolicy()->getPremium()) {
+                    continue;
+                }
+                break;
+            }
+            $data = [
+                'policy' => $policy,
+            ];
         } else {
             throw new \Exception(sprintf('Unsupported template %s for email debug. Add data', $template));
         }

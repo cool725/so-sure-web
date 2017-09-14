@@ -2358,12 +2358,12 @@ abstract class Policy
 
     public function shouldCancelPolicy($prefix = null, $date = null)
     {
-        if (!$this->isValidPolicy($prefix) || $this->getPremiumPlan() != self::PLAN_MONTHLY || !$this->isActive()) {
+        if (!$this->isValidPolicy($prefix) || !$this->isActive()) {
             return false;
         }
 
-        // if its a valid policy without a payment, probably it should be expired
-        if (!$this->getLastSuccessfulUserPaymentCredit()) {
+        // if its an initial (not renewal) valid policy without a payment, probably it should be expired
+        if (!$this->hasPreviousPolicy() && !$this->getLastSuccessfulUserPaymentCredit()) {
             throw new \Exception(sprintf(
                 'Policy %s does not have a success payment - should be expired?',
                 $this->getId()
@@ -2379,13 +2379,9 @@ abstract class Policy
 
     /**
      * Note that expiration date is for cancellations only and may be after policy end date
-     * Only makes sense if policy is a monthly plan
      */
     public function getPolicyExpirationDate(\DateTime $date = null)
     {
-        if ($this->getPremiumPlan() == self::PLAN_YEARLY) {
-            return null;
-        }
         if (!$this->isActive()) {
             return null;
         }
@@ -2394,14 +2390,25 @@ abstract class Policy
             $date = new \DateTime();
         }
 
+        // Yearly payments are a bit different
+        if ($this->getPremiumPlan() == self::PLAN_YEARLY) {
+            if ($this->areEqualToTwoDp(0, $this->getOutstandingPremiumToDate($date))) {
+                return $this->endOfDay($this->getEnd());
+            } else {
+                throw new \Exception(sprintf(
+                    'Failed to find a yearly date with a 0 outstanding premium (%f). Policy %s/%s',
+                    $this->getOutstandingPremiumToDate($date),
+                    $this->getPolicyNumber(),
+                    $this->getId()
+                ));
+            }
+        }
+
         $billingDate = $this->getNextBillingDate($date);
         $maxCount = $this->dateDiffMonths($billingDate, $this->getBilling());
 
         // print $billingDate->format(\DateTime::ATOM) . PHP_EOL;
-        while ($this->getOutstandingPremiumToDate($billingDate) > 0 && !$this->areEqualToTwoDp(
-            $this->getOutstandingPremiumToDate($billingDate),
-            0
-        )) {
+        while ($this->greaterThanZero($this->getOutstandingPremiumToDate($billingDate))) {
             $billingDate = $billingDate->sub(new \DateInterval('P1M'));
             // print $billingDate->format(\DateTime::ATOM) . PHP_EOL;
             // print $this->getOutstandingPremiumToDate($billingDate) . PHP_EOL;
@@ -3265,6 +3272,9 @@ abstract class Policy
             $expectedPaid = $this->getPremiumInstallmentPrice();
         } elseif ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
             $months = $this->dateDiffMonths($date, $this->getBilling());
+            if ($months > 12) {
+                $months = 12;
+            }
             // print PHP_EOL;
             // print $date->format(\DateTime::ATOM) . PHP_EOL;
             // print $this->getBilling()->format(\DateTime::ATOM) . PHP_EOL;
