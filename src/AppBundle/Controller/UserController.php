@@ -386,7 +386,7 @@ class UserController extends BaseController
     /**
      * @Route("/repurchase/{id}", name="user_repurchase_policy")
      */
-    public function repurchasePolicyAction(Request $request, $id)
+    public function repurchasePolicyAction($id)
     {
         $dm = $this->getManager();
         $policyRepo = $dm->getRepository(Policy::class);
@@ -401,14 +401,6 @@ class UserController extends BaseController
         $newPolicy = $policyService->repurchase($policy);
 
         return $this->redirectToRoute('purchase_step_policy_id', ['id' => $newPolicy->getId()]);
-        // TODO: Find duplicate pending policy
-        /*
-        if ($policy->hasCashback()) {
-            return $this->redirectToRoute('user_renew_only_cashback', ['id' => $id]);
-        }
-        */
-
-
     }
 
     /**
