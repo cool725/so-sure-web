@@ -3,8 +3,8 @@ $(function(){
     // UK mobile number
     jQuery.validator.addMethod('phoneUK', function(phone_number, element) {
     return this.optional(element) || phone_number.length > 9 &&
-    phone_number.match(/^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$/);
-    }, 'Valid UK Mobile Number (Sorry for those outside the UK, but for now, we can only insure UK residents)');
+    phone_number.match(/[-.+() 0-9]{7,20}/);
+-    }, 'Please enter a valid phone number');
 
 	$('#team-member-info-modal').on('show.bs.modal', function(event) {
 
