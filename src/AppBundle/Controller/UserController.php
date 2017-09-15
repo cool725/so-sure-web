@@ -66,7 +66,8 @@ class UserController extends BaseController
         $user = $this->getUser();
         if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
             // mainly for facebook registration, although makes sense for all users
-            if ($this->getSessionQuotePhone($request)) {
+            // check for canPurchasePolicy is necessary to prevent redirect loop
+            if ($this->getSessionQuotePhone($request) && $user->canPurchasePolicy()) {
                 // TODO: If possible to detect if the user came via the purchase page or via the login page
                 // login page would be nice to add a flash message saying their policy has not yet been purchased
                 return new RedirectResponse($this->generateUrl('purchase_step_policy'));
