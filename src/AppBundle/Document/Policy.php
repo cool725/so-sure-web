@@ -2865,6 +2865,7 @@ abstract class Policy
     }
 
     abstract public function setPolicyDetailsForPendingRenewal(Policy $policy, \DateTime $startDate);
+    abstract public function setPolicyDetailsForRepurchase(Policy $policy, \DateTime $startDate);
 
     public function createPendingRenewal(PolicyTerms $terms, \DateTime $date = null)
     {
@@ -2885,6 +2886,25 @@ abstract class Policy
         $newPolicy->init($this->getUser(), $terms);
 
         $this->link($newPolicy);
+
+        return $newPolicy;
+    }
+
+    public function createRepurchase(PolicyTerms $terms, \DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        if (!$this->canRepurchase()) {
+            throw new \Exception(sprintf('Unable to repurchase for policy %s', $this->getId()));
+        }
+
+        $newPolicy = new static();
+        $this->setPolicyDetailsForRepurchase($newPolicy, $date);
+        $newPolicy->setStatus(null);
+
+        $newPolicy->init($this->getUser(), $terms);
 
         return $newPolicy;
     }
@@ -3697,6 +3717,34 @@ abstract class Policy
             Policy::STATUS_PENDING_RENEWAL,
             Policy::STATUS_UNRENEWED,
         ]);
+    }
+
+    /**
+     * Display is about displaying repurchase button in general
+     */
+    public function displayRepurchase()
+    {
+        if (!$this->canRepurchase()) {
+            return false;
+        }
+
+        // Expired policies that are unrenewed
+        if (in_array($this->getStatus(), [
+            self::STATUS_EXPIRED,
+            self::STATUS_EXPIRED_CLAIMABLE,
+            self::STATUS_EXPIRED_WAIT_CLAIM,
+        ]) && $this->hasNextPolicy() && $this->getNextPolicy()->getStatus() == self::STATUS_UNRENEWED) {
+            return true;
+        }
+
+        if ($this->getStatus() == self::STATUS_CANCELLED && in_array($this->getCancelledReason(), [
+            self::CANCELLED_COOLOFF,
+            self::CANCELLED_USER_REQUESTED,
+        ])) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

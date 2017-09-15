@@ -1590,6 +1590,38 @@ class PolicyService
         return $newPolicy;
     }
 
+    public function repurchase(Policy $policy, \DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        if (!$policy->canRepurchase()) {
+            throw new \Exception(sprintf(
+                'Unable to repurchase policy %s',
+                $policy->getId()
+            ));
+        }
+
+        $repo = $this->dm->getRepository(PhonePolicy::class);
+        $policies = $repo->findDuplicateImei($policy->getImei());
+        foreach ($policies as $checkPolicy) {
+            if (!$checkPolicy->getStatus() &&
+                $checkPolicy->getUser()->getId() == $policy->getUser()->getId()) {
+                return $checkPolicy;
+            }
+        }
+
+        $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
+        $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
+        $newPolicy = $policy->createRepurchase($latestTerms, $date);
+
+        $this->dm->persist($newPolicy);
+        $this->dm->flush();
+
+        return $newPolicy;
+    }
+
     public function billingDay(Policy $policy, $day)
     {
         // @codingStandardsIgnoreStart

@@ -278,9 +278,10 @@ class PurchaseController extends BaseController
      *   as these will impact Adwords
      *
      * @Route("/step-policy", name="purchase_step_policy")
+     * @Route("/step-policy/{id}", name="purchase_step_policy_id")
      * @Template
     */
-    public function purchaseStepPhoneReviewAction(Request $request)
+    public function purchaseStepPhoneReviewAction(Request $request, $id = null)
     {
         $user = $this->getUser();
         if (!$user) {
@@ -306,8 +307,16 @@ class PurchaseController extends BaseController
 
         $purchase = new PurchaseStepPhone();
         $purchase->setUser($user);
+        $policy = null;
+        if ($id) {
+            $policyRepo = $dm->getRepository(Policy::class);
+            $policy = $policyRepo->find($id);
+        }
 
-        $policy = $user->getUnInitPolicy();
+        if (!$policy) {
+            $policy = $user->getUnInitPolicy();
+        }
+
         if ($policy) {
             if (!$phone && $policy->getPhone()) {
                 $phone = $policy->getPhone();

@@ -384,6 +384,34 @@ class UserController extends BaseController
     }
 
     /**
+     * @Route("/repurchase/{id}", name="user_repurchase_policy")
+     */
+    public function repurchasePolicyAction(Request $request, $id)
+    {
+        $dm = $this->getManager();
+        $policyRepo = $dm->getRepository(Policy::class);
+        $policy = $policyRepo->find($id);
+        if (!$policy) {
+            throw $this->createNotFoundException('Policy not found');
+        }
+
+        $this->denyAccessUnlessGranted(PolicyVoter::REPURCHASE, $policy);
+
+        $policyService = $this->get('app.policy');
+        $newPolicy = $policyService->repurchase($policy);
+
+        return $this->redirectToRoute('purchase_step_policy_id', ['id' => $newPolicy->getId()]);
+        // TODO: Find duplicate pending policy
+        /*
+        if ($policy->hasCashback()) {
+            return $this->redirectToRoute('user_renew_only_cashback', ['id' => $id]);
+        }
+        */
+
+
+    }
+
+    /**
      * @Route("/renew", name="user_renew_policy_any")
      * @Route("/renew/{id}", name="user_renew_policy")
      * @Template
@@ -788,10 +816,13 @@ class UserController extends BaseController
             throw new \Exception('Attempting to access invalid policy page with active/unpaid policy');
         }
 
-        // If there are any policies in progress, redirect to the purchase
-        $unInitPolicies = $user->getUnInitPolicies();
-        if (count($unInitPolicies) > 0) {
-            return $this->redirectToRoute('purchase_step_policy');
+        foreach ($user->getUnInitPolicies() as $unInitPolicy) {
+            $message = sprintf(
+                'Insure your <a href="%s">%s phone</a>',
+                $this->generateUrl('purchase_step_policy_id', ['id' => $unInitPolicy->getId()]),
+                $unInitPolicy->getPhone()->__toString()
+            );
+            $this->addFlash('success', $message);
         }
 
         $this->addCashbackFlash();

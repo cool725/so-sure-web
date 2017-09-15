@@ -438,6 +438,16 @@ class PhonePolicy extends Policy
         $policy->validatePremium(true, $startDate);
     }
 
+    public function setPolicyDetailsForRepurchase(Policy $policy, \DateTime $startDate)
+    {
+        $policy->setPhone($this->getPhone());
+        $policy->setImei($this->getImei());
+        $policy->setSerialNumber($this->getSerialNumber());
+
+        // make sure ipt rate is set to ipt rate at the start of the policy
+        $policy->validatePremium(true, $startDate);
+    }
+
     /**
      * If the premium is initialized prior to an ipt rate change
      * and then created after, the IPT would be incorrect
