@@ -111,6 +111,8 @@ class UserController extends BaseController
         if (!$renewMessage) {
             $this->addCashbackFlash();
         }
+        $this->addRepurchaseExpiredPolicyFlash();
+        $this->addUnInitPolicyInsureFlash();
 
         $scode = null;
         if ($session = $this->get('session')) {
@@ -808,6 +810,38 @@ class UserController extends BaseController
             throw new \Exception('Attempting to access invalid policy page with active/unpaid policy');
         }
 
+        $this->addRepurchaseExpiredPolicyFlash();
+
+        $this->addUnInitPolicyInsureFlash();
+
+        $this->addCashbackFlash();
+
+        return array(
+        );
+    }
+
+    private function addRepurchaseExpiredPolicyFlash()
+    {
+        $user = $this->getUser();
+        $excludePolicyImei = [];
+        foreach ($user->getUnInitPolicies() as $unInitPolicy) {
+            $excludePolicyImei[] = $unInitPolicy->getImei();
+        }
+        foreach ($user->getPolicies() as $policy) {
+            if ($policy->isPolicyExpiredWithin30Days() && !in_array($policy->getImei(), $excludePolicyImei)) {
+                $message = sprintf(
+                    'Re-purchase insurance for your <a href="%s">%s phone</a>',
+                    $this->generateUrl('user_repurchase_policy', ['id' => $policy->getId()]),
+                    $policy->getPhone()->__toString()
+                );
+                $this->addFlash('success', $message);
+            }
+        }
+    }
+
+    private function addUnInitPolicyInsureFlash()
+    {
+        $user = $this->getUser();
         foreach ($user->getUnInitPolicies() as $unInitPolicy) {
             $message = sprintf(
                 'Insure your <a href="%s">%s phone</a>',
@@ -816,11 +850,6 @@ class UserController extends BaseController
             );
             $this->addFlash('success', $message);
         }
-
-        $this->addCashbackFlash();
-
-        return array(
-        );
     }
 
     private function addCashbackFlash()

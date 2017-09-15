@@ -2082,6 +2082,25 @@ abstract class Policy
         return $this->getStart()->diff($date)->days <= 30;
     }
 
+    public function isPolicyExpiredWithin30Days($unrenewed = true, $date = null)
+    {
+        if (!$this->getEnd()) {
+            return null;
+        }
+
+        if ($unrenewed) {
+            if (!$this->hasNextPolicy() || !$this->getNextPolicy()->isUnrenewed()) {
+                return false;
+            }
+        }
+
+        if ($date == null) {
+            $date = new \DateTime();
+        }
+
+        return $date->diff($this->getEnd())->days <= 30;
+    }
+
     public function isPolicyWithin60Days($date = null)
     {
         if (!$this->getStart()) {
