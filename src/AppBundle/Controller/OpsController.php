@@ -186,13 +186,21 @@ class OpsController extends BaseController
                 $claimedPolicy = null;
             }
         }
-        $cancelledPolicy = $policyRepo->findOneBy(['status' => Policy::STATUS_CANCELLED]);
+        $cancelledFraudPolicy = $policyRepo->findOneBy([
+            'status' => Policy::STATUS_CANCELLED,
+            'cancelledReason' => Policy::CANCELLED_ACTUAL_FRAUD,
+        ]);
+        $cancelledPolicy = $policyRepo->findOneBy([
+            'status' => Policy::STATUS_CANCELLED,
+            'cancelledReason' => Policy::CANCELLED_USER_REQUESTED,
+        ]);
 
         return [
             'scode' => $scode->getCode(),
             'invitation' => $invitation,
             'unpaid_policy' => $unpaidPolicy,
             'valid_policy' => $validPolicy,
+            'cancelled_fraud_policy' => $cancelledFraudPolicy,
             'cancelled_policy' => $cancelledPolicy,
             'valid_multiple_policy' => $validMultiplePolicy,
             'valid_renewal_policy_monthly_no_pot' => $validRenwalPolicyMonthlyNoPot,
