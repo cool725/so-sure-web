@@ -194,6 +194,7 @@ class ReportingService
 
         $renewalPolicies = $policyRepo->findAllEndingPolicies(
             null,
+            false,
             $start,
             $end
         );
