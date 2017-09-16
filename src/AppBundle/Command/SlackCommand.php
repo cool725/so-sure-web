@@ -9,6 +9,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\Policy;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class SlackCommand extends ContainerAwareCommand
@@ -27,6 +28,13 @@ class SlackCommand extends ContainerAwareCommand
             )
             ->addOption(
                 'unpaid-channel',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Channel to post to',
+                '#customer-contact'
+            )
+            ->addOption(
+                'renewal-channel',
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Channel to post to',
@@ -52,6 +60,7 @@ class SlackCommand extends ContainerAwareCommand
     {
         $policyChannel = $input->getOption('policy-channel');
         $unpaidChannel = $input->getOption('unpaid-channel');
+        $renewalChannel = $input->getOption('renewal-channel');
         $weeks = $input->getOption('weeks');
         $skipSlack = $input->getOption('skip-slack');
 
@@ -59,6 +68,11 @@ class SlackCommand extends ContainerAwareCommand
         $output->writeln($text);
 
         $lines = $this->unpaid($unpaidChannel, $skipSlack);
+        foreach ($lines as $line) {
+            $output->writeln($line);
+        }
+
+        $lines = $this->renewals($renewalChannel, $skipSlack);
         foreach ($lines as $line) {
             $output->writeln($line);
         }
@@ -97,6 +111,42 @@ class SlackCommand extends ContainerAwareCommand
                     $text
                 );
             }
+            $lines[] = $text;
+
+            // @codingStandardsIgnoreEnd
+            if (!$skipSlack) {
+                $this->send($text, $channel);
+            }
+        }
+
+        return $lines;
+    }
+
+    private function renewals($channel, $skipSlack)
+    {
+        $router = $this->getContainer()->get('router');
+        $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
+        $repo = $dm->getRepository(PhonePolicy::class);
+        $policies = $repo->findBy(['status' => Policy::STATUS_PENDING_RENEWAL]);
+
+        $lines = [];
+        $now = new \DateTime();
+        foreach ($policies as $policy) {
+            $diff = $now->diff($policy->getPendingRenewalExpiration());
+            if (!in_array($diff->days, [5])) {
+                continue;
+            }
+            if (!$policy->getPreviousPolicy()->displayRenewal($now)) {
+                continue;
+            }
+
+            // @codingStandardsIgnoreStart
+            $text = sprintf(
+                "Policy <%s|%s> will be expired in %d days and is NOT renewed. Please call customer.",
+                $router->generate('admin_policy', ['id' => $policy->getPreviousPolicy()->getId()], UrlGeneratorInterface::ABSOLUTE_URL),
+                $policy->getPreviousPolicy()->getPolicyNumber(),
+                $diff->days
+            );
             $lines[] = $text;
 
             // @codingStandardsIgnoreEnd
