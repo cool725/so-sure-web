@@ -921,6 +921,10 @@ class PolicyService
      */
     public function newPolicyEmail(Policy $policy, $attachmentFiles = null, $bcc = null)
     {
+        if (!$this->mailer) {
+            return;
+        }
+
         $baseTemplate = 'AppBundle:Email:policy/new';
         if ($policy->getPreviousPolicy()) {
             $baseTemplate = 'AppBundle:Email:policy/renew';
@@ -947,6 +951,10 @@ class PolicyService
      */
     public function weeklyEmail(Policy $policy)
     {
+        if (!$this->mailer) {
+            return;
+        }
+
         // No need to send weekly email if pot is full
         if ($policy->isPotCompletelyFilled()) {
             return;
@@ -988,6 +996,10 @@ class PolicyService
      */
     public function cancelledPolicyEmail(Policy $policy)
     {
+        if (!$this->mailer) {
+            return;
+        }
+
         $baseTemplate = sprintf('AppBundle:Email:policy-cancellation/%s', $policy->getCancelledReason());
         if ($policy->getCancelledReason() == Policy::CANCELLED_UNPAID && $policy->hasMonetaryClaimed()) {
             $baseTemplate = sprintf('%sWithClaim', $baseTemplate);
@@ -1009,6 +1021,10 @@ class PolicyService
 
     public function claimPendingClosedEmail(Claim $claim)
     {
+        if (!$this->mailer) {
+            return;
+        }
+
         $baseTemplate = sprintf('AppBundle:Email:davies/claimCancellation');
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
@@ -1030,6 +1046,10 @@ class PolicyService
      */
     public function networkCancelledPolicyEmails(Policy $policy)
     {
+        if (!$this->mailer) {
+            return;
+        }
+
         $cancelledUser = $policy->getUser();
         foreach ($policy->getConnections() as $networkConnection) {
             if ($networkConnection instanceof RewardConnection) {
@@ -1057,6 +1077,10 @@ class PolicyService
      */
     public function expiredPolicyEmail(Policy $policy)
     {
+        if (!$this->mailer) {
+            return;
+        }
+
         if ($policy->isRenewed()) {
             // No need to send an email as the renewal email should cover both expiry and renewal
             return;
@@ -1369,6 +1393,10 @@ class PolicyService
     
     public function adjustPotRewardEmail(Policy $policy, $additionalAmount)
     {
+        if (!$this->mailer) {
+            return;
+        }
+
         $baseTemplate = sprintf('AppBundle:Email:potReward/adjusted');
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
@@ -1482,6 +1510,10 @@ class PolicyService
 
     public function pendingCancellationEmail(Claim $claim, $cancellationDate)
     {
+        if (!$this->mailer) {
+            return;
+        }
+
         $baseTemplate = sprintf('AppBundle:Email:davies/pendingCancellation');
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
@@ -1519,6 +1551,10 @@ class PolicyService
 
     public function pendingRenewalEmail(Policy $policy)
     {
+        if (!$this->mailer) {
+            return;
+        }
+
         $baseTemplate = sprintf('AppBundle:Email:policy/pendingRenewal');
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
@@ -1678,6 +1714,10 @@ class PolicyService
 
     public function cashbackEmail(Cashback $cashback)
     {
+        if (!$this->mailer) {
+            return;
+        }
+
         if ($cashback->getStatus() == Cashback::STATUS_PAID) {
             $baseTemplate = sprintf('AppBundle:Email:cashback/paid');
             $subject = sprintf('Your Reward Pot has been paid out');

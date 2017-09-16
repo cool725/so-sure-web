@@ -34,7 +34,7 @@ sudo app/console --env=$ENV doctrine:mongodb:fixtures:load --no-interaction --fi
 sudo app/console --env=$ENV doctrine:mongodb:fixtures:load --no-interaction --fixtures=src/AppBundle/DataFixtures/MongoDB/c --append
 sudo app/console --env=$ENV doctrine:mongodb:fixtures:load --no-interaction --fixtures=src/AppBundle/DataFixtures/MongoDB/d --append
 if [ "$PREFIX" != "" ]; then
-  sudo app/console --env=$ENV sosure:policy:update-status --prefix $PREFIX
+  sudo app/console --env=$ENV sosure:policy:update-status --skip-email --prefix $PREFIX
 fi
 
 for feature in "renewal"
