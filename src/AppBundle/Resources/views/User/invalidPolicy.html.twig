@@ -12,7 +12,6 @@
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
 
-
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets output='css/*.css'
@@ -20,18 +19,32 @@
     <link rel="stylesheet" href="{{ asset_url }}"> {% endstylesheets %}
 {% endblock %}
 
-
 {% block body %}
-    <section class="user-invalid">
+  {% if app.user.policies|length > 0 %}
+    {% include 'AppBundle:User:userNav.html.twig' %}
+  {% endif %}
+    <section class="user-homepage--content section--pad">
         <div class="container">
             <div class="row">
+              {% if app.user.canPurchasePolicy %}
                 <div class="col-md-12">
-                    <h1 class="text-white h2">Oops! Looks like you haven't purchased a policy with us yet...</h1>
-                    <p class="lead text-light-blue">Select your phone below and follow the steps to get your phone covered with us.</p>
+                  {% if app.user.policies|length > 0 %}
+                    <h2>You don't have any active polices.</h2>
+                    <p class="lead">Select your phone below and follow the steps to get your phone covered with us.</p>
+                  {% else %}
+                    <h2>Oops! Looks like you haven't purchased a policy with us yet...</h2>
+                    <p class="lead">Select your phone below and follow the steps to get your phone covered with us.</p>
+                  {% endif %}
                 </div>
                 <div class="col-md-12">
                     {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':'other_pages'})) }}
                 </div>
+              {% else %}
+                <div class="col-md-12">
+                    <h2>You've reached the maximum number of allowed policies.</h2>
+                    <p class="lead">Contact us for more details.</p>
+                </div>
+              {% endif %} 
             </div>
         </div>
     </section>

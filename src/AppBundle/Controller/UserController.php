@@ -66,7 +66,8 @@ class UserController extends BaseController
         $user = $this->getUser();
         if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
             // mainly for facebook registration, although makes sense for all users
-            if ($this->getSessionQuotePhone($request)) {
+            // check for canPurchasePolicy is necessary to prevent redirect loop
+            if ($this->getSessionQuotePhone($request) && $user->canPurchasePolicy()) {
                 // TODO: If possible to detect if the user came via the purchase page or via the login page
                 // login page would be nice to add a flash message saying their policy has not yet been purchased
                 return new RedirectResponse($this->generateUrl('purchase_step_policy'));
@@ -110,6 +111,8 @@ class UserController extends BaseController
         if (!$renewMessage) {
             $this->addCashbackFlash();
         }
+        $this->addRepurchaseExpiredPolicyFlash();
+        $this->addUnInitPolicyInsureFlash();
 
         $scode = null;
         if ($session = $this->get('session')) {
@@ -380,6 +383,26 @@ class UserController extends BaseController
             'unconnected_user_policy_form' => $unconnectedUserPolicyForm->createView(),
             'share_experiment_text' => $shareExperimentText,
         );
+    }
+
+    /**
+     * @Route("/repurchase/{id}", name="user_repurchase_policy")
+     */
+    public function repurchasePolicyAction($id)
+    {
+        $dm = $this->getManager();
+        $policyRepo = $dm->getRepository(Policy::class);
+        $policy = $policyRepo->find($id);
+        if (!$policy) {
+            throw $this->createNotFoundException('Policy not found');
+        }
+
+        $this->denyAccessUnlessGranted(PolicyVoter::REPURCHASE, $policy);
+
+        $policyService = $this->get('app.policy');
+        $newPolicy = $policyService->repurchase($policy);
+
+        return $this->redirectToRoute('purchase_step_policy_id', ['id' => $newPolicy->getId()]);
     }
 
     /**
@@ -787,16 +810,46 @@ class UserController extends BaseController
             throw new \Exception('Attempting to access invalid policy page with active/unpaid policy');
         }
 
-        // If there are any policies in progress, redirect to the purchase
-        $unInitPolicies = $user->getUnInitPolicies();
-        if (count($unInitPolicies) > 0) {
-            return $this->redirectToRoute('purchase_step_policy');
-        }
+        $this->addRepurchaseExpiredPolicyFlash();
+
+        $this->addUnInitPolicyInsureFlash();
 
         $this->addCashbackFlash();
 
         return array(
         );
+    }
+
+    private function addRepurchaseExpiredPolicyFlash()
+    {
+        $user = $this->getUser();
+        $excludePolicyImei = [];
+        foreach ($user->getUnInitPolicies() as $unInitPolicy) {
+            $excludePolicyImei[] = $unInitPolicy->getImei();
+        }
+        foreach ($user->getPolicies() as $policy) {
+            if ($policy->isPolicyExpiredWithin30Days() && !in_array($policy->getImei(), $excludePolicyImei)) {
+                $message = sprintf(
+                    'Re-purchase insurance for your <a href="%s">%s phone</a>',
+                    $this->generateUrl('user_repurchase_policy', ['id' => $policy->getId()]),
+                    $policy->getPhone()->__toString()
+                );
+                $this->addFlash('success', $message);
+            }
+        }
+    }
+
+    private function addUnInitPolicyInsureFlash()
+    {
+        $user = $this->getUser();
+        foreach ($user->getUnInitPolicies() as $unInitPolicy) {
+            $message = sprintf(
+                'Insure your <a href="%s">%s phone</a>',
+                $this->generateUrl('purchase_step_policy_id', ['id' => $unInitPolicy->getId()]),
+                $unInitPolicy->getPhone()->__toString()
+            );
+            $this->addFlash('success', $message);
+        }
     }
 
     private function addCashbackFlash()

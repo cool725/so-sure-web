@@ -37,6 +37,10 @@
                         <a href="{{ s3DownloadLink(policyItem.getPolicyScheduleFiles[0].bucket, policyItem.getPolicyScheduleFiles[0].key) }}"
                         class="btn btn-primary"><i class="fa fa-download"></i> Policy Schedule</a>
                     {% endif %}
+                    {% if policyItem.displayRepurchase %}
+                        <a href="{{ path('user_repurchase_policy', {'id': policyItem.id }) }}"
+                        class="btn btn-primary"> Repurchase Policy</a>
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}

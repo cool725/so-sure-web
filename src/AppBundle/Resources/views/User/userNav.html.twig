@@ -61,14 +61,14 @@
                     <li role="presentation" class="{% if app.request.get('_route') == 'user_contact_details' or app.request.get('_route') == 'user_contact_details_policy'  %}active{% endif %}">
                         {% if policy is defined and policy %}
                             <a href="{{ path('user_contact_details_policy', {'policyId': policy.id}) }}">Contact Details</a>
-                        {% else %}
+                        {% elseif app.user.getLatestPolicy %}
                             <a href="{{ path('user_contact_details') }}">Contact Details</a>
                         {% endif %}
                     </li>
                     <li role="presentation" class="{% if app.request.get('_route') == 'user_card_details' or app.request.get('_route') == 'user_card_details_policy' %}active{% endif %}">
                         {% if policy is defined and policy %}
                             <a href="{{ path('user_card_details_policy', {'policyId': policy.id}) }}">Payment Details</a>
-                        {% else %}
+                        {% elseif app.user.getLatestPolicy %}
                             <a href="{{ path('user_card_details') }}">Payment Details</a>
                         {% endif %}
                     </a></li>

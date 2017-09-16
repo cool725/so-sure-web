@@ -43,9 +43,10 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     {
         $this->faker = Faker\Factory::create('en_GB');
 
-        $users = $this->newUsers($manager, 200);
+        $users = $this->newUsers($manager, 150);
         $expUsersA = $this->newUsers($manager, 40);
         $expUsersB = $this->newUsers($manager, 40, true);
+        $expUsersC = $this->newUsers($manager, 40);
         $manager->flush();
 
         $count = 0;
@@ -72,6 +73,11 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
         foreach ($expUsersB as $user) {
             $this->newPolicy($manager, $user, $count, null, null, null, null, null, true, false);
+            $user->setEnabled(true);
+            $count++;
+        }
+        foreach ($expUsersC as $user) {
+            $this->newPolicy($manager, $user, $count, null, null, null, null, null, true, null);
             $user->setEnabled(true);
             $count++;
         }
@@ -142,9 +148,33 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
 
         $policyRepo = $manager->getRepository(Policy::class);
-        $policy = $policyRepo->findOneBy(['status' => Policy::STATUS_ACTIVE, 'claims' => null]);
         $policyService = $this->container->get('app.policy');
-        $policyService->cancel($policy, Policy::CANCELLED_ACTUAL_FRAUD, true);
+        $fraud = null;
+        $unpaid = null;
+        $maxAttempts = 0;
+
+        $policies = $policyRepo->findBy(['status' => Policy::STATUS_ACTIVE]);
+        foreach ($policies as $policy) {
+            if (count($policy->getClaims()) == 0 && count($policy->getUser()->getPolicies()) == 1) {
+                if (!$fraud && $policy->canCancel(Policy::CANCELLED_ACTUAL_FRAUD)) {
+                    $fraud = true;
+                    $policyService->cancel($policy, Policy::CANCELLED_ACTUAL_FRAUD, true, true);
+                    $policy->getUser()->setEnabled(true);
+                } elseif (!$unpaid) {
+                    if ($policy->canCancel(Policy::CANCELLED_USER_REQUESTED)) {
+                        $unpaid = true;
+                        $policyService->cancel($policy, Policy::CANCELLED_USER_REQUESTED, true, true);
+                        $policy->getUser()->setEnabled(true);
+                    }
+                } else {
+                    break;
+                }
+            }
+            $maxAttempts++;
+            if ($maxAttempts > 50) {
+                throw new \Exception('Unable to cancel policies');
+            }
+        }
         $manager->flush();
     }
 
@@ -253,8 +283,10 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $startDate = new \DateTime();
         if ($recent) {
             $days = sprintf("P%dD", rand(0, 120));
-        } else {
+        } elseif ($recent === false) {
             $days = sprintf("P345D");
+        } else {
+            $days = sprintf("P366D");
         }
         $startDate->sub(new \DateInterval($days));
         $policy = new SalvaPhonePolicy();
@@ -285,7 +317,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $claimStatus = Claim::STATUS_SETTLED;
             $claimType = Claim::TYPE_LOSS;
         }
-        if ($claim) {
+        if ($claim && $recent !== null) {
             $this->addClaim($dm, $policy, $claimType, $claimStatus);
         }
         if ($promo === null) {
@@ -302,7 +334,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $payment->setAmount($phone->getCurrentPhonePrice()->getYearlyPremiumPrice(clone $startDate));
             $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
             $payment->setResult(JudoPayment::RESULT_SUCCESS);
-            $payment->setReceipt(rand(1, 999999) + rand(1, 999999));
+            $payment->setReceipt(rand(1, 9999999) + rand(1, 9999999));
             $payment->setNotes('LoadSamplePolicyData');
             $policy->addPayment($payment);
         } else {
@@ -316,7 +348,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                     $payment->setTotalCommission(Salva::FINAL_MONTHLY_TOTAL_COMMISSION);
                 }
                 $payment->setResult(JudoPayment::RESULT_SUCCESS);
-                $payment->setReceipt(rand(1, 999999) + rand(1, 999999));
+                $payment->setReceipt(rand(1, 9999999) + rand(1, 9999999));
                 $payment->setNotes('LoadSamplePolicyData');
                 $policy->addPayment($payment);
                 $paymentDate->add(new \DateInterval('P1M'));
@@ -350,7 +382,9 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $manager->persist($invitation);
         }
 
-        if ($policy->isPolicyPaidToDate($now)) {
+        if ($recent === null) {
+            $policy->setStatus(SalvaPhonePolicy::STATUS_EXPIRED_CLAIMABLE);
+        } elseif ($policy->isPolicyPaidToDate($now)) {
             $policy->setStatus(SalvaPhonePolicy::STATUS_ACTIVE);
         } else {
             $policy->setStatus(SalvaPhonePolicy::STATUS_UNPAID);

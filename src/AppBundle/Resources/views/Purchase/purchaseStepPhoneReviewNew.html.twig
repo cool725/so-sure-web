@@ -196,10 +196,17 @@
                     </a>
                 </div>
                 <div class="form-group">
+                    {% if app.request.get('_route') == "purchase_step_policy_id" %}
+                    <a href="{{ path('user_home') }}"
+                       class="btn btn-blue-hollow btn-block btn-pad">
+                        Back
+                    </a>
+                    {% else %}
                     <a href="{{ path('purchase_step_personal') }}"
                        class="btn btn-blue-hollow btn-block btn-pad">
                         Back
                     </a>
+                    {% endif %}
                 </div>
                 <div class="modal modal-purchase modal-policy fade"
                      id="reviewModal"
