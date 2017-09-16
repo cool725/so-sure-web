@@ -135,8 +135,8 @@ class BaseControllerTest extends WebTestCase
         self::$client->followRedirects(false);
         if ($location) {
             $this->assertEquals(
-                self::$client->getHistory()->current()->getUri(),
-                sprintf('http://localhost/%s', $location)
+                sprintf('http://localhost/%s', $location),
+                self::$client->getHistory()->current()->getUri()
             );
         }
     }

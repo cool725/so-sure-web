@@ -39,6 +39,12 @@ class UpdatePolicyStatusCommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 'Policy Id - will ignore feature flags'
             )
+            ->addOption(
+                'skip-email',
+                null,
+                InputOption::VALUE_NONE,
+                'Skip sending email. Development use only!'
+            )
         ;
     }
 
@@ -49,11 +55,15 @@ class UpdatePolicyStatusCommand extends BaseCommand
         $lines[] = '';
         $ignoreLineCount++;
         $dryRun = true === $input->getOption('dry-run');
+        $skipEmail = true === $input->getOption('skip-email');
         $prefix = $input->getOption('prefix');
         $policyId = $input->getOption('id');
 
         $policyService = $this->getContainer()->get('app.policy');
         $featureService = $this->getContainer()->get('app.feature');
+        if ($skipEmail) {
+            $policyService->setMailer(null);
+        }
 
         // Unpaid Policies - Cancel
         $cancelled = $policyService->cancelUnpaidPolicies($prefix, $dryRun);

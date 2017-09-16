@@ -30,6 +30,8 @@ use AppBundle\Service\MixpanelService;
 
 /**
  * @group functional-net
+ *
+ * AppBundle\\Tests\\Listener\\MixpanelListenerTest
  */
 class MixpanelListenerTest extends WebTestCase
 {

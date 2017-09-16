@@ -3108,6 +3108,55 @@ class PhonePolicyTest extends WebTestCase
         $this->assertTrue($policy->canRepurchase());
     }
 
+    public function testDisplayRepurchase()
+    {
+        $policy = $this->getPolicy(static::generateEmail('testDisplayRepurchase', $this));
+
+        $this->assertFalse($policy->displayRepurchase());
+
+        $renewalPolicy = $this->getRenewalPolicy($policy);
+
+        $this->assertTrue($policy->hasNextPolicy());
+        $this->assertFalse($policy->isRenewed());
+        $this->assertFalse($policy->displayRepurchase());
+
+        $renewalPolicy->setStatus(Policy::STATUS_RENEWAL);
+
+        $this->assertFalse($policy->displayRepurchase());
+
+        $policy->setStatus(SalvaPhonePolicy::STATUS_EXPIRED_CLAIMABLE);
+        $renewalPolicy->setStatus(Policy::STATUS_UNRENEWED);
+        $this->assertTrue($policy->displayRepurchase());
+
+        $policy->getUser()->setLocked(true);
+        $this->assertFalse($policy->displayRepurchase());
+        $policy->getUser()->setLocked(false);
+
+        $policy->setStatus(SalvaPhonePolicy::STATUS_CANCELLED);
+        $policy->setCancelledReason(SalvaPhonePolicy::CANCELLED_DISPOSSESSION);
+        $this->assertFalse($policy->displayRepurchase());
+
+        $policy->setCancelledReason(SalvaPhonePolicy::CANCELLED_COOLOFF);
+        $this->assertTrue($policy->displayRepurchase());
+
+        $policy->setCancelledReason(SalvaPhonePolicy::CANCELLED_USER_REQUESTED);
+        $this->assertTrue($policy->displayRepurchase());
+    }
+
+    public function testCreateRepurchase()
+    {
+        $policy = $this->getPolicy(static::generateEmail('testCreateRepurchase', $this));
+        $policy->setStatus(SalvaPhonePolicy::STATUS_CANCELLED);
+        $policy->setCancelledReason(SalvaPhonePolicy::CANCELLED_USER_REQUESTED);
+        $repurchase = $policy->createRepurchase($policy->getPolicyTerms());
+
+        $this->assertEquals($policy->getImei(), $repurchase->getImei());
+        $this->assertEquals($policy->getSerialNumber(), $repurchase->getSerialNumber());
+        $this->assertEquals($policy->getUser()->getId(), $repurchase->getUser()->getId());
+        $this->assertEquals($policy->getPhone()->getId(), $repurchase->getPhone()->getId());
+        $this->assertNull($repurchase->getStatus());
+    }
+
     public function testRenewActivateExpire()
     {
         $policy = $this->getPolicy(static::generateEmail('testRenewActivateExpire', $this));

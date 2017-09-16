@@ -51,6 +51,10 @@ class PolicyVoterTest extends WebTestCase
         $this->assertTrue(self::$policyVoter->supports('view', $policy));
         $this->assertTrue(self::$policyVoter->supports('edit', $policy));
         $this->assertTrue(self::$policyVoter->supports('send-invitation', $policy));
+        $this->assertTrue(self::$policyVoter->supports('connect', $policy));
+        $this->assertTrue(self::$policyVoter->supports('cashback', $policy));
+        $this->assertTrue(self::$policyVoter->supports('renew', $policy));
+        $this->assertTrue(self::$policyVoter->supports('repurchase', $policy));
     }
 
     public function testVoteOk()
@@ -63,6 +67,22 @@ class PolicyVoterTest extends WebTestCase
         $token = new PreAuthenticatedToken($user, '1', 'test');
 
         $this->assertTrue(self::$policyVoter->voteOnAttribute(PolicyVoter::VIEW, $policy, $token));
+    }
+
+    public function testVoteRepurchase()
+    {
+        $user = new User();
+        $user->setId(1);
+        $user->setEnabled(true);
+        self::addAddress($user);
+        $policy = new SalvaPhonePolicy();
+        $policy->setUser($user);
+        $token = new PreAuthenticatedToken($user, '1', 'test');
+
+        $this->assertTrue(self::$policyVoter->voteOnAttribute(PolicyVoter::REPURCHASE, $policy, $token));
+
+        $user->setEnabled(false);
+        $this->assertFalse(self::$policyVoter->voteOnAttribute(PolicyVoter::REPURCHASE, $policy, $token));
     }
 
     public function testVoteDiffUser()

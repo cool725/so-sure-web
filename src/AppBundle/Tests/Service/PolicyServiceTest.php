@@ -1186,6 +1186,42 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(new \DateTimeZone(Salva::SALVA_TIMEZONE), $renewalPolicy->getStart()->getTimeZone());
     }
 
+    public function testPolicyRepurchase()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPolicyRepurchase', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-01-01'), true);
+        static::$policyService->setEnvironment('test');
+        static::$dm->flush();
+        $this->assertEquals(new \DateTimeZone(Salva::SALVA_TIMEZONE), $policy->getStart()->getTimeZone());
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+
+        $policy->expire(new \DateTime('2017-01-01'));
+
+        $repurchase = static::$policyService->repurchase($policy);
+        $this->assertNotEquals($policy->getId(), $repurchase->getId());
+        $this->assertEquals($policy->getImei(), $repurchase->getImei());
+        $this->assertNull($repurchase->getStatus());
+
+        $repurchase2 = static::$policyService->repurchase($policy);
+        $this->assertEquals($repurchase->getId(), $repurchase2->getId());
+    }
+
     public function testCreatePendingRenewalPolicies()
     {
         $policies = static::$policyService->createPendingRenewalPolicies(
@@ -1535,11 +1571,11 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
     }
 
-    public function testPolicyRepurchase()
+    public function testPolicyPurchaseAgain()
     {
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
-            static::generateEmail('testPolicyRepurchaseA', $this),
-            static::generateEmail('testPolicyRepurchaseB', $this)
+            static::generateEmail('testPolicyPurchaseAgainA', $this),
+            static::generateEmail('testPolicyPurchaseAgainB', $this)
         );
         $renewalPolicyA = $policyA->getNextPolicy();
         $renewalPolicyB = $policyB->getNextPolicy();

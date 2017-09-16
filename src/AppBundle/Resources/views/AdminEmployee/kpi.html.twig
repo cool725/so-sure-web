@@ -151,6 +151,13 @@
                             {% endfor %}
                         </tr>
                         <tr>
+                            <td>Policy Renewed [KPI: 60]
+                            </td>
+                            {% for week in weeks %}
+                                <td>{{ week.period.data['endingPoliciesRenewed'] }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
                             <td>FNOL Claims [KPI: 62]
                                     <span class="badge" title="Days delayed - requires input by davies so may be missed">-3 (approx)</span>
                             </td>

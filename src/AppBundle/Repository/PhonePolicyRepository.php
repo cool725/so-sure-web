@@ -256,9 +256,13 @@ class PhonePolicyRepository extends PolicyRepository
         $qb = $this->createQueryBuilder()
             ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
 
-        if ($cancellationReason) {
-            $qb->field('cancelledReason')->equals($cancellationReason);
-        }
+        $qb->field('status')->in([
+            Policy::STATUS_CANCELLED,
+            Policy::STATUS_EXPIRED_CLAIMABLE,
+            Policy::STATUS_EXPIRED,
+            Policy::STATUS_EXPIRED_WAIT_CLAIM,
+        ]);
+        $qb->field('cancelledReason')->equals($cancellationReason);
         $qb->field('end')->lte($endDate);
         if ($startDate) {
             $qb->field('end')->gte($startDate);
