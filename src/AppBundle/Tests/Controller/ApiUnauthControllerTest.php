@@ -61,7 +61,7 @@ class ApiUnauthControllerTest extends BaseControllerTest
     {
         $this->clearRateLimit();
         $cognitoIdentityId = $this->getUnauthIdentity();
-        $url = '/api/v1/version?platform=ios&version=0.0.1&device=iPhone%205c&memory=32&uuid=1&_method=GET';
+        $url = '/api/v1/version?platform=ios&version=2.0.1&device=iPhone%205c&memory=32&uuid=1&_method=GET';
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
 
@@ -83,7 +83,7 @@ class ApiUnauthControllerTest extends BaseControllerTest
         $identityLog = $updatedUser->getLatestMobileIdentityLog();
 
         $this->assertEquals('ios', $identityLog->getPlatform());
-        $this->assertEquals('0.0.1', $identityLog->getVersion());
+        $this->assertEquals('2.0.1', $identityLog->getVersion());
         $this->assertEquals(1, $identityLog->getUuid());
         $this->assertNotNull($identityLog->getPhone());
     }

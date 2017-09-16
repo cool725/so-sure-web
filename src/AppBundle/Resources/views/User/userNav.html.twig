@@ -5,7 +5,7 @@
                     <img src="{{ app.user.getImageUrlFallback }}" alt="{{ app.user.firstname }}" class="img-circle user-img">
                     <h2 class="text-light-blue">Welcome back, {{ app.user.firstname }}!</h2>
                     {# TODO: put policy in session #}
-                    {% if policy is defined %}
+                    {% if policy is defined and policy %}
                         {% if policy.user.getValidPolicies(true) | length == 1 %}
                         <div class="h3 text-white">
                             <span class="">{{ policy.phone }}</span>
@@ -52,35 +52,35 @@
             <nav id="user-homepage--nav">
                 <ul class="nav nav-pills scroll">
                     <li role="presentation" class="{% if app.request.get('_route') == 'user_home' or app.request.get('_route')  == 'user_policy' %}active{% endif %}">
-                        {% if policy is defined %}
+                        {% if policy is defined and policy %}
                             <a href="{{ path('user_policy', {'policyId': policy.id}) }}">Home</a>
                         {% else %}
                             <a href="{{ path('user_home') }}">Home</a>
                         {% endif %}
                     </li>
                     <li role="presentation" class="{% if app.request.get('_route') == 'user_contact_details' or app.request.get('_route') == 'user_contact_details_policy'  %}active{% endif %}">
-                        {% if policy is defined %}
+                        {% if policy is defined and policy %}
                             <a href="{{ path('user_contact_details_policy', {'policyId': policy.id}) }}">Contact Details</a>
-                        {% else %}
+                        {% elseif app.user.getLatestPolicy %}
                             <a href="{{ path('user_contact_details') }}">Contact Details</a>
                         {% endif %}
                     </li>
                     <li role="presentation" class="{% if app.request.get('_route') == 'user_card_details' or app.request.get('_route') == 'user_card_details_policy' %}active{% endif %}">
-                        {% if policy is defined %}
+                        {% if policy is defined and policy %}
                             <a href="{{ path('user_card_details_policy', {'policyId': policy.id}) }}">Payment Details</a>
-                        {% else %}
+                        {% elseif app.user.getLatestPolicy %}
                             <a href="{{ path('user_card_details') }}">Payment Details</a>
                         {% endif %}
                     </a></li>
                     <li role="presentation" class="{% if app.request.get('_route') == 'user_policy_list' or app.request.get('_route') == 'user_policy_list_policy' %}active{% endif %}">
-                        {% if policy is defined %}
+                        {% if policy is defined and policy %}
                             <a href="{{ path('user_policy_list_policy', {'policyId': policy.id}) }}">My Policies</a>
                         {% else %}
                             <a href="{{ path('user_policy_list') }}">My Policies</a>
                         {% endif %}
                     </a></li>
-                    {% if policy is defined %}
-                        {% if feature_enabled('renewal') and policy.displayRenewal %}
+                    {% if policy is defined and policy %}
+                        {% if policy.displayRenewal %}
                             <li role="presentation" class="{% if app.request.get('_route') == 'user_renew_policy' or app.request.get('_route') == 'user_renew_policy_any' or app.request.get('_route') == 'user_renew_custom_policy' %}active{% endif %}"><a href="{{ path('user_renew_policy', {'id': policy.id }) }}">Renew your policy</a></li>
                         {% endif %}
                     {% endif %}

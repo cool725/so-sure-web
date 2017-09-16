@@ -35,9 +35,14 @@ class MixpanelListener
     public function onPolicyCreatedEvent(PolicyEvent $event)
     {
         $policy = $event->getPolicy();
+        $source = 'Unknown';
+        if ($payment = $policy->getLastSuccessfulUserPaymentCredit()) {
+            $source = $payment->getSourceForClaims();
+        }
         $this->mixpanel->queueTrackWithUser($policy->getUser(), MixpanelService::EVENT_PURCHASE_POLICY, [
             'Payment Option' => $policy->getPremiumPlan(),
             'Policy Id' => $policy->getId(),
+            'Payment Source' => $source,
         ]);
     }
 
@@ -65,6 +70,17 @@ class MixpanelListener
         $this->mixpanel->queueTrackWithUser($policy->getUser(), MixpanelService::EVENT_RENEW, [
             'Cashback' => $cashback,
             'Policy Id' => $policy->getId(),
+        ]);
+    }
+
+    public function onPolicyCashbackEvent(PolicyEvent $event)
+    {
+        $policy = $event->getPolicy();
+
+        $this->mixpanel->queueTrackWithUser($policy->getUser(), MixpanelService::EVENT_CASHBACK, [
+            'Policy Id' => $policy->getId(),
+            'Renewed' => $policy->isRenewed() ? 'Yes' : 'No',
+            'Amount' => $policy->getCashback() ? $policy->getCashback()->getAmount() : 0,
         ]);
     }
 }

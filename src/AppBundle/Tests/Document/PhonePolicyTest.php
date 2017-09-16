@@ -26,6 +26,8 @@ use AppBundle\Classes\Salva;
 
 /**
  * @group functional-nonet
+ *
+ * AppBundle\\Tests\\Document\\PhonePolicyTest
  */
 class PhonePolicyTest extends WebTestCase
 {
@@ -114,9 +116,9 @@ class PhonePolicyTest extends WebTestCase
 
     public function testHasNetworkClaimedInLast30Days()
     {
-        $policyA = static::createUserPolicy(true);
+        $policyA = static::createUserPolicy(true, new \DateTime('2016-01-01'));
         $policyA->getUser()->setEmail(static::generateEmail('policya', $this));
-        $policyB = static::createUserPolicy(true);
+        $policyB = static::createUserPolicy(true, new \DateTime('2016-01-01'));
         $policyB->getUser()->setEmail(static::generateEmail('policyb', $this));
         list($connectionA, $connectionB) = $this->createLinkedConnections($policyA, $policyB, 10, 10);
         static::$dm->persist($policyA->getUser());
@@ -133,6 +135,7 @@ class PhonePolicyTest extends WebTestCase
 
         $claimA = new Claim();
         $claimA->setRecordedDate(new \DateTime("2016-01-01"));
+        $claimA->setLossDate(new \DateTime("2016-01-01"));
         $claimA->setStatus(Claim::STATUS_SETTLED);
         $claimA->setClosedDate(new \DateTime("2016-01-01"));
         $policyA->addClaim($claimA);
@@ -141,6 +144,7 @@ class PhonePolicyTest extends WebTestCase
 
         $claimB = new Claim();
         $claimB->setRecordedDate(new \DateTime("2016-02-01"));
+        $claimB->setLossDate(new \DateTime("2016-02-01"));
         $claimB->setStatus(Claim::STATUS_SETTLED);
         $claimB->setClosedDate(new \DateTime("2016-02-01"));
         $policyA->addClaim($claimB);
@@ -212,14 +216,15 @@ class PhonePolicyTest extends WebTestCase
 
     public function testHasNetworkClaimedInLast30DaysWithOpenStatus()
     {
-        $policyA = static::createUserPolicy(true);
-        $policyB = static::createUserPolicy(true);
+        $policyA = static::createUserPolicy(true, new \DateTime('2016-01-01'));
+        $policyB = static::createUserPolicy(true, new \DateTime('2016-01-01'));
         list($connectionA, $connectionB) = $this->createLinkedConnections($policyA, $policyB, 10, 10);
 
         $this->assertFalse($policyA->hasNetworkClaimedInLast30Days(null, true));
 
         $claimA = new Claim();
         $claimA->setRecordedDate(new \DateTime("2016-01-01"));
+        $claimA->setLossDate(new \DateTime("2016-01-01"));
         $claimA->setStatus(Claim::STATUS_APPROVED);
         $policyA->addClaim($claimA);
         $this->assertFalse($policyB->hasNetworkClaimedInLast30Days(new \DateTime("2016-02-01")));
@@ -230,10 +235,65 @@ class PhonePolicyTest extends WebTestCase
 
         $claimB = new Claim();
         $claimB->setRecordedDate(new \DateTime("2016-02-01"));
+        $claimB->setLossDate(new \DateTime("2016-02-01"));
         $claimB->setStatus(Claim::STATUS_APPROVED);
         $policyA->addClaim($claimB);
         $this->assertFalse($policyB->hasNetworkClaimedInLast30Days(new \DateTime("2016-02-21")));
         $this->assertTrue($policyB->hasNetworkClaimedInLast30Days(new \DateTime("2016-02-21"), true));
+    }
+
+    public function testCalculatePotValue()
+    {
+        $policyConnected = static::createUserPolicy(true, null, true);
+        $policyConnected->setStart(new \DateTime("2017-01-01"));
+
+        for ($i = 1; $i <= $policyConnected->getMaxConnections(new \DateTime("2017-01-01")); $i++) {
+            $policy = static::createUserPolicy(true);
+            $policy->setStart(new \DateTime("2017-01-01"));
+            list($connectionA, $connectionB) = $this->createLinkedConnections($policyConnected, $policy, 10, 10);
+        }
+        $this->assertEquals($policyConnected->getMaxPot(), $policyConnected->calculatePotValue(false));
+
+        $policy = static::createUserPolicy(true);
+        $policy->setStart(new \DateTime("2017-01-01"));
+        list($connectionA, $connectionB) = $this->createLinkedConnections(
+            $policyConnected,
+            $policy,
+            10,
+            10,
+            null,
+            null,
+            false
+        );
+        $this->assertEquals($policyConnected->getMaxPot(), $policyConnected->calculatePotValue(false));
+    }
+
+    public function testCalculatePotValueReverse()
+    {
+        $policyConnected = static::createUserPolicy(true, null, true);
+        $policyConnected->setStart(new \DateTime("2017-01-01"));
+
+        for ($i = 1; $i <= $policyConnected->getMaxConnections(new \DateTime("2017-01-01")); $i++) {
+            $policy = static::createUserPolicy(true);
+            $policy->setStart(new \DateTime("2017-01-01"));
+            list($connectionA, $connectionB) = $this->createLinkedConnections(
+                $policyConnected,
+                $policy,
+                10,
+                10,
+                null,
+                null,
+                false
+            );
+        }
+        //\Doctrine\Common\Util\Debug::dump($policyConnected);
+        $this->assertEquals(0, $policyConnected->calculatePotValue(false));
+
+        $policy = static::createUserPolicy(true);
+        $policy->setStart(new \DateTime("2017-01-01"));
+        list($connectionA, $connectionB) = $this->createLinkedConnections($policyConnected, $policy, 10, 10);
+
+        $this->assertEquals(10, $policyConnected->calculatePotValue(false));
     }
 
     public function testGetRiskNoPolicy()
@@ -341,6 +401,7 @@ class PhonePolicyTest extends WebTestCase
 
         $claim = new Claim();
         $claim->setRecordedDate(new \DateTime("2016-01-10"));
+        $claim->setLossDate(new \DateTime("2016-01-10"));
         $claim->setStatus(Claim::STATUS_SETTLED);
         $policyClaim->addClaim($claim);
 
@@ -401,9 +462,10 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(10, $policyB->getPotValue());
 
         $claimA = new Claim();
-        $claimA->setRecordedDate(new \DateTime("2016-01-01"));
+        $claimA->setLossDate(new \DateTime());
+        //$claimA->setRecordedDate(new \DateTime("2016-01-01"));
         $claimA->setStatus(Claim::STATUS_SETTLED);
-        $claimA->setClosedDate(new \DateTime("2016-01-01"));
+        //$claimA->setClosedDate(new \DateTime("2016-01-01"));
         $policyA->addClaim($claimA);
 
         $policyA->updatePotValue();
@@ -583,6 +645,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(30, $policy->calculatePotValue());
 
         $claim = new Claim();
+        $claim->setLossDate(new \DateTime());
         $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_SETTLED);
         $linkedPolicies[0]->addClaim($claim);
@@ -602,6 +665,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(40, $policy->calculatePotValue());
 
         $claim = new Claim();
+        $claim->setLossDate(new \DateTime());
         $claim->setType(Claim::TYPE_LOSS);
         $claim->setStatus(Claim::STATUS_SETTLED);
         $linkedPolicies[0]->addClaim($claim);
@@ -640,11 +704,13 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(40, $policy->calculatePotValue());
 
         $claimA = new Claim();
+        $claimA->setLossDate(new \DateTime());
         $claimA->setType(Claim::TYPE_LOSS);
         $claimA->setStatus(Claim::STATUS_SETTLED);
         $linkedPolicies[0]->addClaim($claimA);
 
         $claimB = new Claim();
+        $claimB->setLossDate(new \DateTime());
         $claimB->setType(Claim::TYPE_LOSS);
         $claimB->setStatus(Claim::STATUS_SETTLED);
         $linkedPolicies[1]->addClaim($claimB);
@@ -745,6 +811,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(10, $policy->getConnectionValue(new \DateTime('2016-02-29 23:59:59')));
 
         $claimA = new Claim();
+        $claimA->setLossDate(new \DateTime('2016-02-29'));
         $claimA->setType(Claim::TYPE_LOSS);
         $claimA->setStatus(Claim::STATUS_SETTLED);
         $linkedPolicy->addClaim($claimA);
@@ -1183,8 +1250,8 @@ class PhonePolicyTest extends WebTestCase
         $user->setEmail(self::generateEmail('testCancelPolicyCancelsScheduledPayments', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
-        $policy->setStart(new \DateTime("2016-01-01"));
+        $policy->create(rand(1, 999999), null, new \DateTime("2016-01-01"), rand(1, 9999));
+        $policy->setStatus(Policy::STATUS_ACTIVE);
 
         self::addPayment(
             $policy,
@@ -1192,19 +1259,27 @@ class PhonePolicyTest extends WebTestCase
             Salva::YEARLY_TOTAL_COMMISSION
         );
 
+        $date = new \DateTime("2016-01-01");
         for ($i = 0; $i < 11; $i++) {
+            $date = $date->add(new \DateInterval('P1M'));
             $scheduledPayment = new ScheduledPayment();
             $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+            $scheduledPayment->setAmount(1);
+            $scheduledPayment->setScheduled(clone $date);
             $policy->addScheduledPayment($scheduledPayment);
         }
         static::$dm->persist($policy);
         static::$dm->persist($user);
         static::$dm->flush();
 
+        $this->assertEquals(11, $policy->getOutstandingScheduledPaymentsAmount());
+
         $policy->cancel(SalvaPhonePolicy::CANCELLED_USER_REQUESTED);
         foreach ($policy->getScheduledPayments() as $scheduledPayment) {
             $this->assertEquals(ScheduledPayment::STATUS_CANCELLED, $scheduledPayment->getStatus());
         }
+
+        $this->assertEquals(0, $policy->getOutstandingScheduledPaymentsAmount());
     }
 
     public function testValidateRefundAmountIsInstallmentPrice()
@@ -1620,7 +1695,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
 
-        $this->assertNull($policy->getLastSuccessfulPaymentCredit());
+        $this->assertNull($policy->getLastSuccessfulUserPaymentCredit());
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
@@ -1631,7 +1706,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->addPayment($payment);
 
         $date = new \DateTime('2016-01-01');
-        $this->assertEquals($date, $policy->getLastSuccessfulPaymentCredit()->getDate());
+        $this->assertEquals($date, $policy->getLastSuccessfulUserPaymentCredit()->getDate());
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
@@ -1642,7 +1717,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->addPayment($payment);
 
         $date = new \DateTime('2016-01-01');
-        $this->assertEquals($date, $policy->getLastSuccessfulPaymentCredit()->getDate());
+        $this->assertEquals($date, $policy->getLastSuccessfulUserPaymentCredit()->getDate());
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
@@ -1653,7 +1728,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->addPayment($payment);
 
         $date = new \DateTime('2016-02-15');
-        $this->assertEquals($date, $policy->getLastSuccessfulPaymentCredit()->getDate());
+        $this->assertEquals($date, $policy->getLastSuccessfulUserPaymentCredit()->getDate());
 
         // Neg payment (debit/refund) should be ignored
         $payment = new JudoPayment();
@@ -1664,7 +1739,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->addPayment($payment);
 
         $date = new \DateTime('2016-02-15');
-        $this->assertEquals($date, $policy->getLastSuccessfulPaymentCredit()->getDate());
+        $this->assertEquals($date, $policy->getLastSuccessfulUserPaymentCredit()->getDate());
     }
 
     /**
@@ -1682,6 +1757,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
         $policy->setPremiumInstallments(12);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
 
         // Policy doesn't have a payment, so should be expired
         $this->assertTrue($policy->shouldCancelPolicy(null, new \DateTime("2016-01-01")));
@@ -1698,6 +1774,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999), null, new \DateTime("2016-01-01"), rand(1, 9999));
         $policy->setPremiumInstallments(12);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
@@ -2285,6 +2362,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999), null, $date, rand(1, 9999));
         $policy->setPremiumInstallments($installments);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
 
         self::addPayment($policy, $amount, $commission, null, $date);
 
@@ -2416,6 +2494,20 @@ class PhonePolicyTest extends WebTestCase
                 $monthlyPolicy->getTotalExpectedPaidToDate($date)
             );
         }
+    }
+
+    public function testIsUnRenewalAllowed()
+    {
+        $policy = new SalvaPhonePolicy();
+        $this->assertFalse($policy->isUnRenewalAllowed());
+
+        $policy->setStatus(Policy::STATUS_PENDING_RENEWAL);
+        $this->assertFalse($policy->isUnRenewalAllowed());
+
+        $policy->setPendingRenewalExpiration(new \DateTime('2017-09-13 23:59:00'));
+        $this->assertTrue($policy->isUnRenewalAllowed());
+        $this->assertTrue($policy->isUnRenewalAllowed(new \DateTime('2017-09-14 00:00')));
+        $this->assertFalse($policy->isUnRenewalAllowed(new \DateTime('2017-09-13 23:00')));
     }
 
     /**
@@ -2741,6 +2833,7 @@ class PhonePolicyTest extends WebTestCase
             Salva::MONTHLY_TOTAL_COMMISSION,
             12
         );
+        $policy->setStatus(SalvaPhonePolicy::STATUS_PENDING);
         $this->assertEquals(SalvaPhonePolicy::STATUS_PENDING, $policy->getStatus());
         $this->assertFalse($policy->hasCorrectPolicyStatus($date));
 
@@ -2943,6 +3036,48 @@ class PhonePolicyTest extends WebTestCase
         $this->assertTrue($policy->isRenewed());
     }
 
+    public function testGetUnconnectedUserPolicies()
+    {
+        $policy = $this->getPolicy(static::generateEmail('testGetUnconnectedUserPolicies', $this));
+
+        $this->assertFalse($policy->isRenewed());
+
+        $renewalPolicy = $this->getRenewalPolicy($policy);
+
+        $this->assertFalse($policy->isRenewed());
+
+        $renewalPolicy->renew(0, new \DateTime('2016-12-15'));
+        $this->assertTrue($policy->isRenewed());
+        static::$dm->persist($policy);
+        static::$dm->persist($policy->getUser());
+        static::$dm->persist($renewalPolicy);
+        static::$dm->flush();
+        $this->assertEquals(1, count($renewalPolicy->getUser()->getValidPolicies()));
+
+        $this->assertEquals(0, count($policy->getUnconnectedUserPolicies()));
+        $this->assertEquals(0, count($renewalPolicy->getUnconnectedUserPolicies()));
+    }
+
+    public function testGetUnconnectedUserPoliciesCanConnect()
+    {
+        $policyA = $this->getPolicy(static::generateEmail('testGetUnconnectedUserPoliciesCanConnect', $this));
+        $policyB = new SalvaPhonePolicy();
+        $policyB->setPhone(static::$phone);
+        $policyB->init($policyA->getUser(), static::getLatestPolicyTerms(self::$dm));
+
+        $policyB->create(rand(1, 999999), null, new \DateTime('2016-01-01'), rand(1, 9999));
+        $policyB->setStatus(Policy::STATUS_ACTIVE);
+
+        static::$dm->persist($policyA);
+        static::$dm->persist($policyA->getUser());
+        static::$dm->persist($policyB);
+        static::$dm->flush();
+        $this->assertEquals(2, count($policyA->getUser()->getValidPolicies()));
+
+        $this->assertEquals(1, count($policyA->getUnconnectedUserPolicies()));
+        $this->assertEquals(1, count($policyB->getUnconnectedUserPolicies()));
+    }
+
     public function testCanRepurchase()
     {
         $policy = $this->getPolicy(static::generateEmail('testCanRepurchase', $this));
@@ -2973,6 +3108,55 @@ class PhonePolicyTest extends WebTestCase
         $this->assertTrue($policy->canRepurchase());
     }
 
+    public function testDisplayRepurchase()
+    {
+        $policy = $this->getPolicy(static::generateEmail('testDisplayRepurchase', $this));
+
+        $this->assertFalse($policy->displayRepurchase());
+
+        $renewalPolicy = $this->getRenewalPolicy($policy);
+
+        $this->assertTrue($policy->hasNextPolicy());
+        $this->assertFalse($policy->isRenewed());
+        $this->assertFalse($policy->displayRepurchase());
+
+        $renewalPolicy->setStatus(Policy::STATUS_RENEWAL);
+
+        $this->assertFalse($policy->displayRepurchase());
+
+        $policy->setStatus(SalvaPhonePolicy::STATUS_EXPIRED_CLAIMABLE);
+        $renewalPolicy->setStatus(Policy::STATUS_UNRENEWED);
+        $this->assertTrue($policy->displayRepurchase());
+
+        $policy->getUser()->setLocked(true);
+        $this->assertFalse($policy->displayRepurchase());
+        $policy->getUser()->setLocked(false);
+
+        $policy->setStatus(SalvaPhonePolicy::STATUS_CANCELLED);
+        $policy->setCancelledReason(SalvaPhonePolicy::CANCELLED_DISPOSSESSION);
+        $this->assertFalse($policy->displayRepurchase());
+
+        $policy->setCancelledReason(SalvaPhonePolicy::CANCELLED_COOLOFF);
+        $this->assertTrue($policy->displayRepurchase());
+
+        $policy->setCancelledReason(SalvaPhonePolicy::CANCELLED_USER_REQUESTED);
+        $this->assertTrue($policy->displayRepurchase());
+    }
+
+    public function testCreateRepurchase()
+    {
+        $policy = $this->getPolicy(static::generateEmail('testCreateRepurchase', $this));
+        $policy->setStatus(SalvaPhonePolicy::STATUS_CANCELLED);
+        $policy->setCancelledReason(SalvaPhonePolicy::CANCELLED_USER_REQUESTED);
+        $repurchase = $policy->createRepurchase($policy->getPolicyTerms());
+
+        $this->assertEquals($policy->getImei(), $repurchase->getImei());
+        $this->assertEquals($policy->getSerialNumber(), $repurchase->getSerialNumber());
+        $this->assertEquals($policy->getUser()->getId(), $repurchase->getUser()->getId());
+        $this->assertEquals($policy->getPhone()->getId(), $repurchase->getPhone()->getId());
+        $this->assertNull($repurchase->getStatus());
+    }
+
     public function testRenewActivateExpire()
     {
         $policy = $this->getPolicy(static::generateEmail('testRenewActivateExpire', $this));
@@ -2988,11 +3172,11 @@ class PhonePolicyTest extends WebTestCase
 
         $this->assertTrue($policy->isRenewed());
 
+        $policy->expire(new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policy->getStatus());
+
         $renewalPolicy->activate(new \DateTime('2017-01-01'));
         $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicy->getStatus());
-
-        $policy->expire(new \DateTime("2017-01-01"));
-        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policy->getStatus());
 
         $policy->fullyExpire(new \DateTime("2017-01-29"));
         $this->assertEquals(Policy::STATUS_EXPIRED, $policy->getStatus());
@@ -3022,11 +3206,11 @@ class PhonePolicyTest extends WebTestCase
 
         $this->assertTrue($policy->isRenewed());
 
-        $renewalPolicy->activate(new \DateTime('2017-01-01'));
-        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicy->getStatus());
-
         $policy->expire(new \DateTime("2017-01-01"));
         $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policy->getStatus());
+
+        $renewalPolicy->activate(new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicy->getStatus());
 
         $policy->fullyExpire(new \DateTime("2017-01-29"));
         $this->assertEquals(Policy::STATUS_EXPIRED_WAIT_CLAIM, $policy->getStatus());
@@ -3058,11 +3242,11 @@ class PhonePolicyTest extends WebTestCase
 
         $this->assertTrue($policyA->isRenewed());
 
-        $renewalPolicyA->activate(new \DateTime('2017-01-01'));
-        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
-
         $policyA->expire(new \DateTime("2017-01-01"));
         $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        $renewalPolicyA->activate(new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
 
         $policyA->fullyExpire(new \DateTime("2017-01-29"));
         $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
@@ -3104,11 +3288,11 @@ class PhonePolicyTest extends WebTestCase
 
         $this->assertTrue($policyA->isRenewed());
 
-        $renewalPolicyA->activate(new \DateTime('2017-01-01'));
-        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
-
         $policyA->expire(new \DateTime("2017-01-01"));
         $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        $renewalPolicyA->activate(new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
 
         $claimA = new Claim();
         $claimA->setType(Claim::TYPE_LOSS);
@@ -3163,11 +3347,11 @@ class PhonePolicyTest extends WebTestCase
 
         $this->assertTrue($policyA->isRenewed());
 
-        $renewalPolicyA->activate(new \DateTime('2017-01-01'));
-        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
-
         $policyA->expire(new \DateTime("2017-01-01"));
         $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        $renewalPolicyA->activate(new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
 
         $this->assertEquals(10, $policyA->getCashback()->getAmount());
 
@@ -3227,11 +3411,11 @@ class PhonePolicyTest extends WebTestCase
 
         $this->assertTrue($policyA->isRenewed());
 
-        $renewalPolicyA->activate(new \DateTime('2017-01-01'));
-        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
-
         $policyA->expire(new \DateTime("2017-01-01"));
         $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        $renewalPolicyA->activate(new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
 
         $policyA->fullyExpire(new \DateTime("2017-01-29"));
         $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
@@ -3329,6 +3513,17 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($renewalPolicy->isRenewalAllowed(new \DateTime('2017-01-01')));
 
         $renewalPolicy->unrenew(new \DateTime('2016-12-15'));
+    }
+
+    public function testIssueDate()
+    {
+        $policy = new SalvaPhonePolicy();
+        $this->assertNull($policy->getIssueDate());
+        $policy->setStart(new \DateTime('2016-01-01'));
+        $this->assertEquals(new \DateTime('2016-01-01'), $policy->getIssueDate());
+
+        $policy->setIssueDate(new \DateTime('2017-01-01'));
+        $this->assertEquals(new \DateTime('2017-01-01'), $policy->getIssueDate());
     }
 
     /**
@@ -3623,6 +3818,50 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(Cashback::STATUS_PENDING_CLAIMABLE, $updatedPolicyA->getCashback()->getStatus());
     }
 
+    public function testRenewalIpt()
+    {
+        $policy = $this->getPolicy(static::generateEmail('testRenewalIpt', $this), new \DateTime('2016-06-02'));
+        $this->assertEquals(0.095, $policy->getPremium()->getIptRate());
+
+        $renewalPolicy = $policy->createPendingRenewal($policy->getPolicyTerms(), new \DateTime('2017-05-15'));
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
+        $this->assertEquals(0.12, $renewalPolicy->getPremium()->getIptRate());
+        $this->assertEquals(0.095, $policy->getPremium()->getIptRate());
+
+        // in policy service, renew calls create
+        $renewalPolicy->create(rand(1, 999999), null, new \DateTime('2017-06-02'));
+        $renewalPolicy->renew(0, new \DateTime('2017-05-30'));
+        $this->assertEquals(0.12, $renewalPolicy->getPremium()->getIptRate());
+        $this->assertEquals(0.095, $policy->getPremium()->getIptRate());
+
+        $policy->expire(new \DateTime('2017-06-02'));
+
+        $renewalPolicy->activate(new \DateTime('2017-06-02'));
+        $this->assertEquals(0.12, $renewalPolicy->getPremium()->getIptRate());
+        $this->assertEquals(0.095, $policy->getPremium()->getIptRate());
+    }
+
+    public function testAdjustedRewardPotPaymentAmount()
+    {
+        $policy = $this->getPolicy(static::generateEmail('testAdjustedRewardPotPaymentAmount ', $this));
+        $this->assertEquals(0, $policy->getAdjustedRewardPotPaymentAmount());
+
+        $potReward = new PotRewardPayment();
+        $potReward->setAmount(2);
+        $policy->addPayment($potReward);
+        $this->assertEquals(2, $policy->getAdjustedRewardPotPaymentAmount());
+
+        $potReward = new SoSurePotRewardPayment();
+        $potReward->setAmount(1);
+        $policy->addPayment($potReward);
+        $this->assertEquals(3, $policy->getAdjustedRewardPotPaymentAmount());
+
+        $potReward = new PotRewardPayment();
+        $potReward->setAmount(-2);
+        $policy->addPayment($potReward);
+        $this->assertEquals(1, $policy->getAdjustedRewardPotPaymentAmount());
+    }
+
     public function testExpireRenewed()
     {
         $policyA = $this->getPolicy(static::generateEmail('testExpireRenewedA', $this));
@@ -3668,8 +3907,11 @@ class PhonePolicyTest extends WebTestCase
         $this->assertNull($updatedPolicyA->getCashback());
     }
 
-    private function getPolicy($email)
+    private function getPolicy($email, \DateTime $date = null)
     {
+        if (!$date) {
+            $date = new \DateTime("2016-01-01");
+        }
         $policy = new SalvaPhonePolicy();
         $policy->setPhone(static::$phone);
 
@@ -3679,10 +3921,16 @@ class PhonePolicyTest extends WebTestCase
         self::addAddress($user);
 
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
-        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
-        $policy->setStart(new \DateTime("2016-01-01"));
-        $policy->setEnd(new \DateTime("2016-12-31 23:59:59"));
+
+        $issueDate = new \DateTime();
+        $policy->create(rand(1, 999999), null, $date, rand(1, 9999));
         $policy->setStatus(Policy::STATUS_ACTIVE);
+
+        $issueDate2 = clone $issueDate;
+        $issueDate2->add(new \DateInterval('PT1S'));
+
+        $this->assertEquals($date, $policy->getStart());
+        $this->assertTrue($policy->getIssueDate() == $issueDate || $policy->getIssueDate == $issueDate2);
 
         return $policy;
     }

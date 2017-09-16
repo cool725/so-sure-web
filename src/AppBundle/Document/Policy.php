@@ -18,6 +18,7 @@ use AppBundle\Document\File\PolicyScheduleFile;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
 use AppBundle\Document\Payment\PotRewardPayment;
 use AppBundle\Document\Payment\SoSurePotRewardPayment;
+use AppBundle\Document\Payment\Payment;
 use AppBundle\Exception\ClaimException;
 
 /**
@@ -233,6 +234,15 @@ abstract class Policy
     protected $acceptedConnections;
 
     /**
+     * @MongoDB\ReferenceMany(
+     *  targetDocument="AppBundle\Document\Connection\Connection",
+     *  mappedBy="linkedPolicyRenewal",
+     *  cascade={"persist"}
+     * )
+     */
+    protected $acceptedConnectionsRenewal;
+
+    /**
      * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Claim",
      *  mappedBy="policy",
      *  cascade={"persist"})
@@ -252,6 +262,13 @@ abstract class Policy
      * @Gedmo\Versioned
      */
     protected $created;
+
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
+    protected $issueDate;
 
     /**
      * @Assert\DateTime()
@@ -410,6 +427,7 @@ abstract class Policy
         $this->claims = new \Doctrine\Common\Collections\ArrayCollection();
         $this->linkedClaims = new \Doctrine\Common\Collections\ArrayCollection();
         $this->acceptedConnections = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->acceptedConnectionsRenewal = new \Doctrine\Common\Collections\ArrayCollection();
         $this->potValue = 0;
     }
 
@@ -493,6 +511,15 @@ abstract class Policy
         return count($promoPotRewards) > 1 || count($potRewards) > 1;
     }
 
+    public function getAdjustedRewardPotPaymentAmount()
+    {
+        $promoPotRewards = $this->getPaymentsByType(SoSurePotRewardPayment::class);
+        $potRewards = $this->getPaymentsByType(PotRewardPayment::class);
+
+        return Payment::sumPayments($potRewards, false)['total'] +
+            Payment::sumPayments($promoPotRewards, false)['total'];
+    }
+
     /**
      * Successful Payments
      */
@@ -508,6 +535,24 @@ abstract class Policy
 
         return array_filter($payments, function ($payment) {
             return $payment->isSuccess();
+        });
+    }
+
+    /**
+     * Successful Payments
+     */
+    public function getSuccessfulUserPayments()
+    {
+        $payments = $this->getPayments();
+        if (is_object($payments)) {
+            $payments = $payments->toArray();
+        }
+        if (!$this->getPayments()) {
+            return [];
+        }
+
+        return array_filter($payments, function ($payment) {
+            return $payment->isSuccess() && $payment->isUserPayment();
         });
     }
 
@@ -535,7 +580,18 @@ abstract class Policy
     public function getSuccessfulPaymentCredits()
     {
         return array_filter($this->getSuccessfulPayments(), function ($payment) {
-            return $payment->getAmount() > 0 && !$payment instanceof SoSurePayment;
+            return $payment->getAmount() > 0 && !$payment instanceof SoSurePayment &&
+            !$payment instanceof PolicyDiscountPayment;
+        });
+    }
+
+    /**
+     * Payments filtered by credits (pos amount)
+     */
+    public function getSuccessfulUserPaymentCredits()
+    {
+        return array_filter($this->getSuccessfulUserPayments(), function ($payment) {
+            return $payment->getAmount() > 0;
         });
     }
 
@@ -549,9 +605,9 @@ abstract class Policy
         });
     }
 
-    public function getFirstSuccessfulPaymentCredit()
+    public function getFirstSuccessfulUserPaymentCredit()
     {
-        $payments = $this->getSuccessfulPaymentCredits();
+        $payments = $this->getSuccessfulUserPaymentCredits();
         if (count($payments) == 0) {
             return null;
         }
@@ -565,9 +621,9 @@ abstract class Policy
         return $payments[0];
     }
 
-    public function getLastSuccessfulPaymentCredit()
+    public function getLastSuccessfulUserPaymentCredit()
     {
-        $payments = $this->getSuccessfulPaymentCredits();
+        $payments = $this->getSuccessfulUserPaymentCredits();
         if (count($payments) == 0) {
             return null;
         }
@@ -681,6 +737,20 @@ abstract class Policy
     public function setPayer(User $user)
     {
         $this->payer = $user;
+    }
+
+    public function getIssueDate()
+    {
+        if (!$this->issueDate) {
+            return $this->getStart();
+        }
+
+        return $this->issueDate;
+    }
+
+    public function setIssueDate(\DateTime $issueDate = null)
+    {
+        $this->issueDate = $issueDate;
     }
 
     public function getStart()
@@ -854,6 +924,26 @@ abstract class Policy
     public function getAcceptedConnections()
     {
         return $this->acceptedConnections;
+    }
+
+    public function addAcceptedConnectionRenewal(Connection $connection)
+    {
+        $this->acceptedConnectionsRenewal[] = $connection;
+    }
+
+    public function getAcceptedConnectionsRenewal()
+    {
+        return $this->acceptedConnectionsRenewal;
+    }
+
+    public function getAcceptedConnectionsRenewalIds()
+    {
+        $ids = [];
+        foreach ($this->getAcceptedConnectionsRenewal() as $connection) {
+            $ids[] = $connection->getId();
+        }
+
+        return $ids;
     }
 
     public function getStandardConnections()
@@ -1088,7 +1178,12 @@ abstract class Policy
     public function setPotValue($potValue)
     {
         if ($this->toTwoDp($potValue) > $this->getMaxPot()) {
-            throw new \Exception(sprintf('Max pot value exceeded (%s of %s)', $potValue, $this->getMaxPot()));
+            throw new \Exception(sprintf(
+                'Max pot value exceeded (%s of %s for %s)',
+                $potValue,
+                $this->getMaxPot(),
+                $this->getId()
+            ));
         }
 
         $this->potValue = $potValue;
@@ -1265,6 +1360,15 @@ abstract class Policy
         }
 
         return null;
+    }
+
+    public function isActive($includeUnpaid = true)
+    {
+        if ($includeUnpaid) {
+            return in_array($this->getStatus(), [self::STATUS_ACTIVE, self::STATUS_UNPAID]);
+        } else {
+            return in_array($this->getStatus(), [self::STATUS_ACTIVE]);
+        }
     }
 
     public function getPolicyFiles()
@@ -1449,6 +1553,7 @@ abstract class Policy
 
     public function create($seq, $prefix = null, \DateTime $startDate = null, $scodeCount = 1)
     {
+        $issueDate = new \DateTime();
         if (!$startDate) {
             $startDate = new \DateTime();
             // No longer necessary to start 10 minutes in the future
@@ -1470,8 +1575,10 @@ abstract class Policy
         // TODO: move to SalvaPhonePolicy
         // salva needs a end time of 23:59 in local time
         $startDate->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
+        $issueDate->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
 
         $this->setStart($startDate);
+        $this->setIssueDate($issueDate);
         $this->setBilling($this->getStartForBilling());
         $nextYear = clone $this->getStart();
         // This is same date/time but add 1 to the year
@@ -1680,7 +1787,7 @@ abstract class Policy
     {
         $amountToRefund = 0;
         // Cooloff should refund full amount (which should be equal to the last payment except for renewals)
-        if ($paymentToRefund = $this->getLastSuccessfulPaymentCredit()) {
+        if ($paymentToRefund = $this->getLastSuccessfulUserPaymentCredit()) {
             $amountToRefund = $paymentToRefund->getAmount();
         }
         if ($amountToRefund > 0) {
@@ -1710,7 +1817,7 @@ abstract class Policy
         $amountToRefund = 0;
         $commissionToRefund = 0;
         // Cooloff should refund full amount (which should be equal to the last payment except for renewals)
-        if ($paymentToRefund = $this->getLastSuccessfulPaymentCredit()) {
+        if ($paymentToRefund = $this->getLastSuccessfulUserPaymentCredit()) {
             $amountToRefund = $paymentToRefund->getAmount();
             $commissionToRefund = $paymentToRefund->getTotalCommission();
         }
@@ -1975,6 +2082,25 @@ abstract class Policy
         return $this->getStart()->diff($date)->days <= 30;
     }
 
+    public function isPolicyExpiredWithin30Days($unrenewed = true, $date = null)
+    {
+        if (!$this->getEnd()) {
+            return null;
+        }
+
+        if ($unrenewed) {
+            if (!$this->hasNextPolicy() || !$this->getNextPolicy()->isUnrenewed()) {
+                return false;
+            }
+        }
+
+        if ($date == null) {
+            $date = new \DateTime();
+        }
+
+        return $date->diff($this->getEnd())->days <= 30;
+    }
+
     public function isPolicyWithin60Days($date = null)
     {
         if (!$this->getStart()) {
@@ -2231,12 +2357,12 @@ abstract class Policy
 
     public function shouldCancelPolicy($prefix = null, $date = null)
     {
-        if (!$this->isValidPolicy($prefix) || $this->getPremiumPlan() != self::PLAN_MONTHLY) {
+        if (!$this->isValidPolicy($prefix) || $this->getPremiumPlan() != self::PLAN_MONTHLY || !$this->isActive()) {
             return false;
         }
 
         // if its a valid policy without a payment, probably it should be expired
-        if (!$this->getLastSuccessfulPaymentCredit()) {
+        if (!$this->getLastSuccessfulUserPaymentCredit()) {
             throw new \Exception(sprintf(
                 'Policy %s does not have a success payment - should be expired?',
                 $this->getId()
@@ -2259,6 +2385,10 @@ abstract class Policy
         if ($this->getPremiumPlan() == self::PLAN_YEARLY) {
             return null;
         }
+        if (!$this->isActive()) {
+            return null;
+        }
+
         if (!$date) {
             $date = new \DateTime();
         }
@@ -2285,7 +2415,7 @@ abstract class Policy
                     $this->getId()
                 ));
                 // Older method of using the last payment recevied date to determine expiration
-                // $billingDate = clone $this->getLastSuccessfulPaymentCredit()->getDate();
+                // $billingDate = clone $this->getLastSuccessfulUserPaymentCredit()->getDate();
                 // $billingDate->add(new \DateInterval('P1M'));
                 // break;
             }
@@ -2314,7 +2444,7 @@ abstract class Policy
     {
         $unreplacedConnections = [];
         foreach ($this->getConnections() as $connection) {
-            if ($connection->getReplacementUser() || $connection instanceof RewardConnection) {
+            if ($connection->getReplacementConnection() || $connection instanceof RewardConnection) {
                 continue;
             }
             $policy = $connection->getLinkedPolicy();
@@ -2382,11 +2512,7 @@ abstract class Policy
     {
         $claims = [];
         foreach ($this->getStandardConnections() as $connection) {
-            $policy = $connection->getLinkedPolicy();
-            if (!$policy) {
-                throw new \Exception(sprintf('Invalid connection in policy %s', $this->getId()));
-            }
-            foreach ($policy->getClaims() as $claim) {
+            foreach ($connection->getLinkedClaimsDuringPeriod() as $claim) {
                 if (!$monitaryOnly || $claim->isMonetaryClaim($includeApproved)) {
                     $claims[] = $claim;
                 }
@@ -2418,7 +2544,6 @@ abstract class Policy
     public function calculatePotValue($promoValueOnly = false)
     {
         $potValue = 0;
-        // TODO: How does a cancelled policy affect networked connections?  Would the connection be withdrawn?
         foreach ($this->connections as $connection) {
             if ($promoValueOnly) {
                 $potValue += $connection->getPromoValue();
@@ -2441,6 +2566,10 @@ abstract class Policy
             $potValue = 10;
         } elseif ($networkClaimCount > 0) {
             $potValue = 0;
+        }
+
+        if ($this->getMaxPot() < $potValue && ($potValue - $this->getMaxPot()) < 10) {
+            $potValue = $this->getMaxPot();
         }
 
         return $potValue;
@@ -2514,7 +2643,7 @@ abstract class Policy
     {
         // We should only bill policies that are active or unpaid
         // Doesn't make sense to bill expired or cancelled policies
-        return in_array($this->getStatus(), [self::STATUS_ACTIVE, self::STATUS_UNPAID]);
+        return $this->isActive(true);
     }
 
     public function getSentInvitations($onlyProcessed = true)
@@ -2578,15 +2707,20 @@ abstract class Policy
         }
 
         // Cancel any scheduled payments
-        foreach ($this->getScheduledPayments() as $scheduledPayment) {
-            if ($scheduledPayment->getStatus() == ScheduledPayment::STATUS_SCHEDULED) {
-                $scheduledPayment->setStatus(ScheduledPayment::STATUS_CANCELLED);
-            }
-        }
+        $this->cancelScheduledPayments();
 
         $this->updatePotValue();
     }
 
+    public function cancelScheduledPayments()
+    {
+        foreach ($this->getScheduledPayments() as $scheduledPayment) {
+            if ($scheduledPayment->getStatus() == ScheduledPayment::STATUS_SCHEDULED) {
+                $scheduledPayment->cancel();
+            }
+        }
+    }
+    
     public function isRenewalAllowed(\DateTime $date = null)
     {
         if (!$date) {
@@ -2608,6 +2742,10 @@ abstract class Policy
 
     public function isUnRenewalAllowed(\DateTime $date = null)
     {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
         if (!in_array($this->getStatus(), [
             self::STATUS_PENDING_RENEWAL,
         ])) {
@@ -2639,12 +2777,25 @@ abstract class Policy
         $this->setPendingRenewalExpiration(null);
 
         if ($discount && $discount > 0) {
+            if (!$this->areEqualToTwoDp($discount, $this->getPreviousPolicy()->getPotValue())) {
+                throw new \Exception(sprintf(
+                    'Invalid discount amount used for renewal. Policy %s. %f != %f',
+                    $this->getId(),
+                    $discount,
+                    $this->getPreviousPolicy()->getPotValue()
+                ));
+            }
             $this->getPremium()->setAnnualDiscount($discount);
         }
 
         foreach ($this->getPreviousPolicy()->getStandardConnections() as $connection) {
-            if (in_array($connection->getLinkedPolicy()->getStatus(), [self::STATUS_ACTIVE, self::STATUS_UNPAID]) &&
+            if ($connection->getLinkedPolicy()->isActive(true) &&
                 $connection->getLinkedPolicy()->isConnected($this->getPreviousPolicy())) {
+                $this->addRenewalConnection($connection->createRenewal());
+            } elseif ($connection->getLinkedPolicyRenewal() &&
+                $connection->getLinkedPolicyRenewal()->isActive(true) &&
+                $connection->getLinkedPolicyRenewal()->isConnected($this->getPreviousPolicy())
+            ) {
                 $this->addRenewalConnection($connection->createRenewal());
             }
         }
@@ -2674,6 +2825,17 @@ abstract class Policy
             throw new \Exception('Unable to activate a policy if status is not renewal');
         }
 
+        if ($this->getPreviousPolicy() && !in_array($this->getPreviousPolicy()->getStatus(), [
+            self::STATUS_EXPIRED,
+            self::STATUS_EXPIRED_CLAIMABLE,
+            self::STATUS_EXPIRED_WAIT_CLAIM,
+        ])) {
+            throw new \Exception(sprintf(
+                'Previous policy for %s must be expired before we can activate renewal',
+                $this->getId()
+            ));
+        }
+
         // Give a bit of leeway in case we have problems with process, but
         // if the policy is supposed to be renewed and its more than 7 days
         // then we really do have an issue and probably need to manually sort out
@@ -2687,17 +2849,33 @@ abstract class Policy
 
         foreach ($this->getRenewalConnections() as $connection) {
             if ($connection->getRenew()) {
+                // There needs to be an inversed connection
+                if (!$connection->findInversedConnection()) {
+                    if ($connection->getLinkedPolicy()->isRenewal() &&
+                        $connection->getLinkedPolicy()->isActive()) {
+                        continue;
+                    }
+                }
                 $newConnection = new StandardConnection();
                 $newConnection->setLinkedUser($connection->getLinkedUser());
                 $newConnection->setLinkedPolicy($connection->getLinkedPolicy());
                 $newConnection->setValue($this->getAllowedConnectionValue($date));
                 $newConnection->setPromoValue($this->getAllowedPromoConnectionValue($date));
                 $newConnection->setExcludeReporting(!$this->isValidPolicy());
+                $newConnection->setDate($date);
                 $this->addConnection($newConnection);
             } else {
                 if ($inversedConnection = $connection->findInversedConnection()) {
                     $inversedConnection->prorateValue($date);
+                    $inversedConnection->getSourcePolicy()->updatePotValue();
                     // listener on connection will notify user
+                } else {
+                    // TODO: Not sure about this one...
+                    throw new \Exception(sprintf(
+                        'Unable to find inverse connection %s (accepted renewals: %s)',
+                        $connection->getId(),
+                        json_encode($this->getAcceptedConnectionsRenewalIds())
+                    ));
                 }
             }
         }
@@ -2705,7 +2883,8 @@ abstract class Policy
         $this->updatePotValue();
     }
 
-    abstract public function setPolicyDetailsForPendingRenewal(Policy $policy);
+    abstract public function setPolicyDetailsForPendingRenewal(Policy $policy, \DateTime $startDate);
+    abstract public function setPolicyDetailsForRepurchase(Policy $policy, \DateTime $startDate);
 
     public function createPendingRenewal(PolicyTerms $terms, \DateTime $date = null)
     {
@@ -2718,7 +2897,7 @@ abstract class Policy
         }
 
         $newPolicy = new static();
-        $this->setPolicyDetailsForPendingRenewal($newPolicy);
+        $this->setPolicyDetailsForPendingRenewal($newPolicy, $this->getEnd());
         $newPolicy->setStatus(Policy::STATUS_PENDING_RENEWAL);
         // don't allow renewal after the end the current policy
         $newPolicy->setPendingRenewalExpiration($this->getEnd());
@@ -2726,6 +2905,25 @@ abstract class Policy
         $newPolicy->init($this->getUser(), $terms);
 
         $this->link($newPolicy);
+
+        return $newPolicy;
+    }
+
+    public function createRepurchase(PolicyTerms $terms, \DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        if (!$this->canRepurchase()) {
+            throw new \Exception(sprintf('Unable to repurchase for policy %s', $this->getId()));
+        }
+
+        $newPolicy = new static();
+        $this->setPolicyDetailsForRepurchase($newPolicy, $date);
+        $newPolicy->setStatus(null);
+
+        $newPolicy->init($this->getUser(), $terms);
 
         return $newPolicy;
     }
@@ -2745,10 +2943,7 @@ abstract class Policy
             throw new \Exception('Unable to expire a policy prior to its end date');
         }
 
-        if (!in_array($this->getStatus(), [
-            self::STATUS_ACTIVE,
-            self::STATUS_UNPAID,
-        ])) {
+        if (!$this->isActive(true)) {
             throw new \Exception('Unable to expire a policy if status is not active or unpaid');
         }
 
@@ -2796,6 +2991,11 @@ abstract class Policy
             } elseif ($this->getNextPolicy() && $this->getNextPolicy()->getPremium()->hasAnnualDiscount()) {
                 $discount = new PolicyDiscountPayment();
                 $discount->setAmount($this->getPotValue());
+                if ($this->getNextPolicy()->getStart()) {
+                    $discount->setDate($this->getNextPolicy()->getStart());
+                } else {
+                    $discount->setDate($date);
+                }
                 $this->getNextPolicy()->addPayment($discount);
             } else {
                 // No cashback requested but also no renewal
@@ -2817,7 +3017,6 @@ abstract class Policy
         }
 
         if (!$this->isRenewed()) {
-//            throw new \Exception('not renewed');
             foreach ($this->getStandardConnections() as $connection) {
                 if ($inversedConnection = $connection->findInversedConnection()) {
                     $inversedConnection->prorateValue($date);
@@ -2825,6 +3024,26 @@ abstract class Policy
                     // listener on connection will notify user
                 }
             }
+        } else {
+            foreach ($this->getAcceptedConnections() as $connection) {
+                if ($connection instanceof StandardConnection &&
+                    ($connection->getSourcePolicy()->isActive(true) ||
+                        $connection->getSourcePolicy()->getStatus() == Policy::STATUS_RENEWAL)
+                ) {
+                    $connection->setLinkedPolicyRenewal($this->getNextPolicy());
+                } elseif ($connection instanceof RenewalConnection &&
+                    !$connection->getSourcePolicy()->isActive()
+                ) {
+                    $connection->setLinkedPolicy($this->getNextPolicy());
+                }
+            }
+            /*
+            foreach ($this->getStandardConnections() as $connection) {
+                if ($inversedConnection = $connection->findInversedConnection()) {
+                    $inversedConnection->setLinkedPolicyRenewal($this->getNextPolicy());
+                }
+            }
+            */
         }
     }
 
@@ -2898,8 +3117,10 @@ abstract class Policy
             if ($discount && !$this->areEqualToTwoDp($discount->getAmount(), $this->getPotValue())) {
                 // pot changed (due to claim) - issue refund if applicable
                 $adjustedDiscount = new PolicyDiscountPayment();
+                $adjustedDiscount->setDate($date);
                 $adjustedDiscount->setAmount($this->toTwoDp($this->getPotValue() - $discount->getAmount()));
                 $this->getNextPolicy()->addPayment($adjustedDiscount);
+                $this->getNextPolicy()->getPremium()->setAnnualDiscount($this->getPotValue());
             }
         }
     }
@@ -3011,6 +3232,21 @@ abstract class Policy
         return $totalPaid;
     }
 
+    public function getTotalSuccessfulUserPayments(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+        $totalPaid = 0;
+        foreach ($this->getSuccessfulUserPayments() as $payment) {
+            if ($payment->getDate() <= $date) {
+                $totalPaid += $payment->getAmount();
+            }
+        }
+
+        return $totalPaid;
+    }
+
     public function getTotalExpectedPaidToDate(\DateTime $date = null)
     {
         if (!$this->isPolicy() || !$this->getStart()) {
@@ -3039,7 +3275,7 @@ abstract class Policy
         return $expectedPaid;
     }
 
-    public function getOutstandingPremiumToDate(\DateTime $date = null)
+    public function getOutstandingPremiumToDate(\DateTime $date = null, $allowNegative = false)
     {
         if (!$this->isPolicy()) {
             return null;
@@ -3049,6 +3285,25 @@ abstract class Policy
         $expectedPaid = $this->getTotalExpectedPaidToDate($date);
 
         $diff = $expectedPaid - $totalPaid;
+        //print sprintf("paid %f expected %f diff %f\n", $totalPaid, $expectedPaid, $diff);
+        if (!$allowNegative && $diff < 0) {
+            return 0;
+        }
+
+        return $diff;
+    }
+
+    public function getOutstandingUserPremiumToDate(\DateTime $date = null)
+    {
+        if (!$this->isPolicy()) {
+            return null;
+        }
+
+        $totalPaid = $this->getTotalSuccessfulUserPayments($date);
+        $expectedPaid = $this->getTotalExpectedPaidToDate($date);
+
+        $diff = $expectedPaid - $totalPaid;
+        //print sprintf("paid %f expected %f diff %f\n", $totalPaid, $expectedPaid, $diff);
         if ($diff < 0) {
             return 0;
         }
@@ -3059,7 +3314,7 @@ abstract class Policy
     public function getRemainderOfPolicyPrice(\DateTime $date = null)
     {
         $totalPaid = $this->getTotalSuccessfulPayments($date);
-        $yearlyPremium = $this->getPremium()->getYearlyPremiumPrice();
+        $yearlyPremium = $this->getPremium()->getAdjustedYearlyPremiumPrice();
         $diff = $yearlyPremium - $totalPaid;
         if ($diff < 0) {
             return 0;
@@ -3076,10 +3331,7 @@ abstract class Policy
         if ($this->hasMonetaryClaimed()) {
             return false;
         }
-        if (!in_array($this->getStatus(), [
-            self::STATUS_ACTIVE,
-            self::STATUS_UNPAID,
-        ])) {
+        if (!$this->isActive(true)) {
             return false;
         }
 
@@ -3130,7 +3382,14 @@ abstract class Policy
         return $this->areEqualToTwoDp($expectedPaid, $totalPaid) || $totalPaid > $expectedPaid;
     }
 
-    public function arePolicyScheduledPaymentsCorrect($prefix = null, \DateTime $date = null)
+    public function getOutstandingScheduledPaymentsAmount()
+    {
+        $scheduledPayments = $this->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);
+
+        return ScheduledPayment::sumScheduledPaymentAmounts($scheduledPayments);
+    }
+
+    public function arePolicyScheduledPaymentsCorrect(\DateTime $date = null)
     {
         $scheduledPayments = $this->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);
 
@@ -3141,7 +3400,7 @@ abstract class Policy
             }
         }
 
-        $totalScheduledPayments = ScheduledPayment::sumScheduledPaymentAmounts($scheduledPayments, $prefix);
+        $totalScheduledPayments = ScheduledPayment::sumScheduledPaymentAmounts($scheduledPayments);
         $outstanding = $this->getYearlyPremiumPrice() - $this->getTotalSuccessfulPayments($date);
         //print sprintf("%f ?= %f\n", $outstanding, $totalScheduledPayments);
 
@@ -3330,10 +3589,13 @@ abstract class Policy
     public function getUnconnectedUserPolicies()
     {
         $unconnectedPolicies = [];
+        if (!$this->isActive()) {
+            return $unconnectedPolicies;
+        }
         foreach ($this->getUser()->getValidPolicies() as $policy) {
             if ($policy->getId() != $this->getId()) {
                 $connectionFound = false;
-                foreach ($this->getConnections() as $connection) {
+                foreach ($this->getStandardConnections() as $connection) {
                     $connectionFound = $connectionFound ||
                         $connection->getLinkedPolicy()->getId() == $policy->getId();
                 }
@@ -3356,7 +3618,7 @@ abstract class Policy
             $date = new \DateTime();
         }
 
-        if (in_array($this->getStatus(), [Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID])) {
+        if ($this->isActive(true)) {
             $diff = $this->getEnd()->diff($date);
             $notPastDate = $diff->days > 0 || ($diff->days == 0 && $diff->invert == 1);
             if ($diff->days <= self::RENEWAL_DAYS && $notPastDate) {
@@ -3459,6 +3721,51 @@ abstract class Policy
         ]);
     }
 
+    public function isRenewal()
+    {
+        if (!$this->hasPreviousPolicy()) {
+            return false;
+        }
+
+        // Typically would expect renewal status
+        // however, if checked post active, then the status would be active/unpaid
+        // or various other statuses
+        // however, if pending renewal or unrenewed, then policy has definitely not been renewed
+        // so a safer assumption
+        return !in_array($this->getStatus(), [
+            Policy::STATUS_PENDING_RENEWAL,
+            Policy::STATUS_UNRENEWED,
+        ]);
+    }
+
+    /**
+     * Display is about displaying repurchase button in general
+     */
+    public function displayRepurchase()
+    {
+        if (!$this->canRepurchase()) {
+            return false;
+        }
+
+        // Expired policies that are unrenewed
+        if (in_array($this->getStatus(), [
+            self::STATUS_EXPIRED,
+            self::STATUS_EXPIRED_CLAIMABLE,
+            self::STATUS_EXPIRED_WAIT_CLAIM,
+        ]) && $this->hasNextPolicy() && $this->getNextPolicy()->getStatus() == self::STATUS_UNRENEWED) {
+            return true;
+        }
+
+        if ($this->getStatus() == self::STATUS_CANCELLED && in_array($this->getCancelledReason(), [
+            self::CANCELLED_COOLOFF,
+            self::CANCELLED_USER_REQUESTED,
+        ])) {
+            return true;
+        }
+
+        return false;
+    }
+
     /**
      * Can the user re-purchase this specific policy
      * This is different than if a user is allowed to purchase an additional policy
@@ -3475,6 +3782,10 @@ abstract class Policy
         ])) {
             return false;
         }
+
+        // we could check the status on the next policy as well, but if next status is pending renewal
+        // then current status *should* always be active/unpaid
+        // TODO: what about a pending renewal that is then cancelled?
 
         // In case user was disallowed after pending renewal was created
         if (!$this->getUser()->canRepurchasePolicy($this)) {
@@ -3548,8 +3859,7 @@ abstract class Policy
         foreach ($policies as $policy) {
             if ($policy->isValidPolicy($prefix)) {
                 $includePolicy = true;
-                if ($activeUnpaidOnly &&
-                    !in_array($policy->getStatus(), [Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID])) {
+                if ($activeUnpaidOnly && !$policy->isActive(true)) {
                     $includePolicy = false;
                 }
                 if ($includePolicy) {

@@ -6,8 +6,10 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
 use AppBundle\Document\Cashback;
+use AppBundle\Document\Claim;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Policy;
+use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\Payment\GocardlessPayment;
@@ -29,12 +31,15 @@ use AppBundle\Service\SalvaExportService;
 
 /**
  * @group functional-nonet
+ *
+ * AppBundle\\Tests\\Service\\PolicyServiceTest
  */
 class PolicyServiceTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     use \AppBundle\Document\DateTrait;
+    use \AppBundle\Document\CurrencyTrait;
 
     protected static $container;
     protected static $policyService;
@@ -355,6 +360,7 @@ class PolicyServiceTest extends WebTestCase
             $payment = new GocardlessPayment();
             $payment->setAmount($policy->getPhone()->getCurrentPhonePrice($date)->getMonthlyPremiumPrice($date));
             $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+            $payment->setDate($date);
             $policy->addPayment($payment);
 
             static::$policyService->create($policy, $date);
@@ -364,6 +370,7 @@ class PolicyServiceTest extends WebTestCase
             for ($i = 0; $i < 11; $i++) {
                 $scheduledDate = $updatedPolicy->getScheduledPayments()[$i]->getScheduled();
                 $this->assertEquals($expectedDay, $scheduledDate->format('d'));
+                $this->assertTrue($scheduledDate->diff($policy->getStart())->days >= 28);
             }
         }
     }
@@ -1156,6 +1163,132 @@ class PolicyServiceTest extends WebTestCase
 
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-06-01'), true);
+        static::$policyService->setEnvironment('test');
+        static::$dm->flush();
+        $this->assertEquals(new \DateTimeZone(Salva::SALVA_TIMEZONE), $policy->getStart()->getTimeZone());
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+
+        $renewalPolicy = static::$policyService->createPendingRenewal(
+            $policy,
+            new \DateTime('2017-05-15')
+        );
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
+
+        static::$policyService->renew($policy, 12, null, new \DateTime('2017-05-30'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicy->getStatus());
+        $this->assertNull($policy->getCashback());
+        $this->assertEquals(
+            new \DateTime('2017-06-01 00:00:00', new \DateTimeZone(Salva::SALVA_TIMEZONE)),
+            $renewalPolicy->getStart()
+        );
+        $this->assertEquals(new \DateTimeZone(Salva::SALVA_TIMEZONE), $renewalPolicy->getStart()->getTimeZone());
+    }
+
+    public function testPolicyRepurchase()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPolicyRepurchase', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-01-01'), true);
+        static::$policyService->setEnvironment('test');
+        static::$dm->flush();
+        $this->assertEquals(new \DateTimeZone(Salva::SALVA_TIMEZONE), $policy->getStart()->getTimeZone());
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+
+        $policy->expire(new \DateTime('2017-01-01'));
+
+        $repurchase = static::$policyService->repurchase($policy);
+        $this->assertNotEquals($policy->getId(), $repurchase->getId());
+        $this->assertEquals($policy->getImei(), $repurchase->getImei());
+        $this->assertNull($repurchase->getStatus());
+
+        $repurchase2 = static::$policyService->repurchase($policy);
+        $this->assertEquals($repurchase->getId(), $repurchase2->getId());
+    }
+
+    public function testCreatePendingRenewalPolicies()
+    {
+        $policies = static::$policyService->createPendingRenewalPolicies(
+            'TEST',
+            false,
+            new \DateTime('2016-12-15')
+        );
+
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testCreatePendingRenewalPolicies', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->create($policy, new \DateTime('2016-01-01'), true);
+        static::$dm->flush();
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+
+        $policies = static::$policyService->createPendingRenewalPolicies(
+            'TEST',
+            false,
+            new \DateTime('2016-12-01')
+        );
+        $this->assertEquals(0, count($policies));
+
+        $policies = static::$policyService->createPendingRenewalPolicies(
+            'TEST',
+            false,
+            new \DateTime('2016-12-15')
+        );
+        $this->assertEquals(1, count($policies));
+    }
+
+    public function testActivateRenewalPolicies()
+    {
+        $policies = static::$policyService->activateRenewalPolicies(
+            'TEST',
+            false,
+            new \DateTime('2017-01-02')
+        );
+
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testActivateRenewalPolicies', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
         static::$policyService->create($policy, new \DateTime('2016-01-01'), true);
         static::$policyService->setEnvironment('test');
         static::$dm->flush();
@@ -1170,165 +1303,1629 @@ class PolicyServiceTest extends WebTestCase
 
         static::$policyService->renew($policy, 12, null, new \DateTime('2016-12-30'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicy->getStatus());
+
+        $policies = static::$policyService->activateRenewalPolicies(
+            'TEST',
+            false,
+            new \DateTime('2017-01-02')
+        );
+        $this->assertEquals(1, count($policies));
+    }
+
+    public function testUnRenewPolicies()
+    {
+        $policies = static::$policyService->unrenewPolicies(
+            'TEST',
+            false,
+            new \DateTime('2017-01-02')
+        );
+
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testUnRenewPolicies', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-01-01'), true);
+        static::$policyService->setEnvironment('test');
+        static::$dm->flush();
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+
+        $renewalPolicy = static::$policyService->createPendingRenewal(
+            $policy,
+            new \DateTime('2016-12-15')
+        );
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
+
+        $policies = static::$policyService->unrenewPolicies(
+            'TEST',
+            false,
+            new \DateTime('2016-12-31')
+        );
+        $this->assertEquals(0, count($policies));
+
+        $policies = static::$policyService->unrenewPolicies(
+            'TEST',
+            false,
+            new \DateTime('2017-01-02')
+        );
+        $this->assertEquals(1, count($policies));
     }
 
     public function testPolicyRenewCashback()
     {
-        $user = static::createUser(
-            static::$userManager,
-            static::generateEmail('testPolicyRenewCashback', $this),
-            'bar',
-            static::$dm
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyRenewCashbackA', $this),
+            static::generateEmail('testPolicyRenewCashbackB', $this)
         );
-        $policy = static::initPolicy(
-            $user,
-            static::$dm,
-            $this->getRandomPhone(static::$dm),
-            new \DateTime('2016-01-01'),
-            true
-        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
 
-        $policy->setStatus(PhonePolicy::STATUS_PENDING);
-        static::$policyService->setEnvironment('prod');
-        static::$policyService->create($policy, new \DateTime('2016-01-01'), true);
-        static::$policyService->setEnvironment('test');
-        static::$dm->flush();
-
-        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
-
-        $renewalPolicy = static::$policyService->createPendingRenewal(
-            $policy,
-            new \DateTime('2016-12-15')
-        );
-        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
-
-        $cashback = $this->getCashback($policy);
+        $cashback = $this->getCashback($policyA);
         $cashback->setAccountName('a');
         $exceptionThrown = false;
         try {
-            static::$policyService->renew($policy, 12, $cashback, new \DateTime('2016-12-30'));
+            static::$policyService->renew($policyA, 12, $cashback, new \DateTime('2016-12-30'));
         } catch (ValidationException $e) {
             $exceptionThrown = true;
         }
         $this->assertTrue($exceptionThrown);
 
-        $cashback = $this->getCashback($policy);
+        $cashback = $this->getCashback($policyA);
         $cashback->setSortCode('1');
         $exceptionThrown = false;
         try {
-            static::$policyService->renew($policy, 12, $cashback, new \DateTime('2016-12-30'));
+            static::$policyService->renew($policyA, 12, $cashback, new \DateTime('2016-12-30'));
         } catch (ValidationException $e) {
             $exceptionThrown = true;
         }
         $this->assertTrue($exceptionThrown);
 
-        $cashback = $this->getCashback($policy);
+        $cashback = $this->getCashback($policyA);
         $cashback->setAccountNumber('1');
         $exceptionThrown = false;
         try {
-            static::$policyService->renew($policy, 12, $cashback, new \DateTime('2016-12-30'));
+            static::$policyService->renew($policyA, 12, $cashback, new \DateTime('2016-12-30'));
         } catch (ValidationException $e) {
             $exceptionThrown = true;
         }
         $this->assertTrue($exceptionThrown);
 
-        $cashback = $this->getCashback($policy);
-        static::$policyService->renew($policy, 12, $cashback, new \DateTime('2016-12-30'));
-        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicy->getStatus());
+        $cashback = $this->getCashback($policyA);
+        static::$policyService->renew($policyA, 12, $cashback, new \DateTime('2016-12-30'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+        $this->assertNotNull($policyA->getCashback());
+        $this->assertEquals(Cashback::STATUS_PENDING_CLAIMABLE, $policyA->getCashback()->getStatus());
+        
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+        $this->assertEquals(Cashback::STATUS_PENDING_CLAIMABLE, $policyA->getCashback()->getStatus());
+
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+
+        $this->assertEquals(
+            $renewalPolicyA->getPremium()->getMonthlyPremiumPrice(),
+            $renewalPolicyA->getNextScheduledPayment()->getAmount()
+        );
+
+        static::$policyService->fullyExpire($policyA, new \DateTime('2017-01-29'));
+        $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
+        $this->assertEquals(Cashback::STATUS_PENDING_PAYMENT, $policyA->getCashback()->getStatus());
     }
 
     public function testPolicyCashbackThenRenew()
     {
-        $user = static::createUser(
-            static::$userManager,
-            static::generateEmail('testPolicyCashbackThenRenew', $this),
-            'bar',
-            static::$dm
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyCashbackThenRenewA', $this),
+            static::generateEmail('testPolicyCashbackThenRenewB', $this)
         );
-        $policy = static::initPolicy(
-            $user,
-            static::$dm,
-            $this->getRandomPhone(static::$dm),
-            new \DateTime('2016-01-01'),
-            true
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+
+        $cashback = $this->getCashback($policyA);
+        static::$policyService->cashback($policyA, $cashback);
+
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyA->getStatus());
+
+        $this->assertEquals($cashback->getAccountNumber(), $policyA->getCashback()->getAccountNumber());
+        $this->assertEquals(Cashback::STATUS_PENDING_CLAIMABLE, $policyA->getCashback()->getStatus());
+
+        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-30'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+
+        $this->assertNull($policyA->getCashback());
+        $this->assertNotEquals(
+            $renewalPolicyA->getPremium()->getMonthlyPremiumPrice(),
+            $renewalPolicyA->getPremium()->getAdjustedStandardMonthlyPremiumPrice()
         );
-
-        $policy->setStatus(PhonePolicy::STATUS_PENDING);
-        static::$policyService->setEnvironment('prod');
-        static::$policyService->create($policy, new \DateTime('2016-01-01'), true);
-        static::$policyService->setEnvironment('test');
-        static::$dm->flush();
-
-        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
-
-        $renewalPolicy = static::$policyService->createPendingRenewal(
-            $policy,
-            new \DateTime('2016-12-15')
+        $this->assertEquals(
+            $renewalPolicyA->getPremium()->getAdjustedStandardMonthlyPremiumPrice(),
+            $renewalPolicyA->getNextScheduledPayment()->getAmount()
         );
-        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
-
-        $cashback = $this->getCashback($policy);
-        static::$policyService->cashback($policy, $cashback);
-
-        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
-        $policyRepo = $dm->getRepository(Policy::class);
-        $updatedPolicy = $policyRepo->find($policy->getId());
-
-        $this->assertEquals($cashback->getAccountNumber(), $updatedPolicy->getCashback()->getAccountNumber());
-
-        static::$policyService->renew($updatedPolicy, 12, null, new \DateTime('2016-12-30'));
-        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicy->getStatus());
-
-        $this->assertNull($policy->getCashback());
     }
 
     public function testPolicyCashbackThenRenewWithCashback()
     {
-        $user = static::createUser(
-            static::$userManager,
-            static::generateEmail('testPolicyCashbackThenRenewWithCashback', $this),
-            'bar',
-            static::$dm
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyCashbackThenRenewWithCashbackA', $this),
+            static::generateEmail('testPolicyCashbackThenRenewWithCashbackB', $this)
         );
-        $policy = static::initPolicy(
-            $user,
-            static::$dm,
-            $this->getRandomPhone(static::$dm),
-            new \DateTime('2016-01-01'),
-            true
-        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
 
-        $policy->setStatus(PhonePolicy::STATUS_PENDING);
-        static::$policyService->setEnvironment('prod');
-        static::$policyService->create($policy, new \DateTime('2016-01-01'), true);
-        static::$policyService->setEnvironment('test');
-        static::$dm->flush();
-
-        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
-
-        $renewalPolicy = static::$policyService->createPendingRenewal(
-            $policy,
-            new \DateTime('2016-12-15')
-        );
-        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
-
-        $cashback = $this->getCashback($policy);
-        static::$policyService->cashback($policy, $cashback);
+        $cashback = $this->getCashback($policyA);
+        static::$policyService->cashback($policyA, $cashback);
 
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $policyRepo = $dm->getRepository(Policy::class);
-        $updatedPolicy = $policyRepo->find($policy->getId());
+        $updatedPolicyA = $policyRepo->find($policyA->getId());
 
-        $this->assertEquals($cashback->getAccountNumber(), $updatedPolicy->getCashback()->getAccountNumber());
+        $this->assertEquals($cashback->getAccountNumber(), $updatedPolicyA->getCashback()->getAccountNumber());
 
-        $cashback = $this->getCashback($policy);
+        $cashback = $this->getCashback($policyA);
         $cashback->setAccountNumber('87654321');
-        static::$policyService->renew($updatedPolicy, 12, $cashback, new \DateTime('2016-12-30'));
-        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicy->getStatus());
+        static::$policyService->renew($updatedPolicyA, 12, $cashback, new \DateTime('2016-12-30'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
 
-        $this->assertEquals($cashback->getAccountNumber(), $updatedPolicy->getCashback()->getAccountNumber());
+        $this->assertEquals($cashback->getAccountNumber(), $updatedPolicyA->getCashback()->getAccountNumber());
+        $this->assertEquals(Cashback::STATUS_PENDING_CLAIMABLE, $updatedPolicyA->getCashback()->getStatus());
+        $this->assertEquals(
+            $renewalPolicyA->getPremium()->getMonthlyPremiumPrice(),
+            $renewalPolicyA->getPremium()->getAdjustedStandardMonthlyPremiumPrice()
+        );
+        $this->assertEquals(
+            $renewalPolicyA->getPremium()->getAdjustedStandardMonthlyPremiumPrice(),
+            $renewalPolicyA->getNextScheduledPayment()->getAmount()
+        );
     }
 
+    public function testPolicyCashbackThenRenewWithDiscount()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyCashbackThenRenewWithDiscountA', $this),
+            static::generateEmail('testPolicyCashbackThenRenewWithDiscountB', $this)
+        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+
+        $cashback = $this->getCashback($policyA);
+        static::$policyService->cashback($policyA, $cashback);
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(Policy::class);
+        $updatedPolicyA = $policyRepo->find($policyA->getId());
+
+        $this->assertEquals($cashback->getAccountNumber(), $updatedPolicyA->getCashback()->getAccountNumber());
+
+        static::$policyService->renew($updatedPolicyA, 12, null, new \DateTime('2016-12-30'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+
+        $this->assertNull($updatedPolicyA->getCashback());
+        $this->assertNotEquals(
+            $renewalPolicyA->getPremium()->getMonthlyPremiumPrice(),
+            $renewalPolicyA->getPremium()->getAdjustedStandardMonthlyPremiumPrice()
+        );
+        $this->assertEquals(
+            $renewalPolicyA->getPremium()->getAdjustedStandardMonthlyPremiumPrice(),
+            $renewalPolicyA->getNextScheduledPayment()->getAmount()
+        );
+    }
+
+    public function testPolicyCashbackUnrenew()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyCashbackUnrenewA', $this),
+            static::generateEmail('testPolicyCashbackUnrenewB', $this)
+        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+
+        $cashback = $this->getCashback($policyA);
+        static::$policyService->cashback($policyA, $cashback);
+
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyA->getStatus());
+
+        $this->assertEquals($cashback->getAccountNumber(), $policyA->getCashback()->getAccountNumber());
+        $this->assertEquals(Cashback::STATUS_PENDING_CLAIMABLE, $policyA->getCashback()->getStatus());
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        static::$policyService->unrenew($renewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_UNRENEWED, $renewalPolicyA->getStatus());
+
+        static::$policyService->fullyExpire($policyA, new \DateTime('2017-01-29'));
+        $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
+        $this->assertEquals(Cashback::STATUS_PENDING_PAYMENT, $policyA->getCashback()->getStatus());
+    }
+
+    public function testPolicyUnrenew()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyUnrenewA', $this),
+            static::generateEmail('testPolicyUnrenewB', $this)
+        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        static::$policyService->unrenew($renewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_UNRENEWED, $renewalPolicyA->getStatus());
+        $this->assertEquals(Cashback::STATUS_MISSING, $policyA->getCashback()->getStatus());
+
+        static::$policyService->fullyExpire($policyA, new \DateTime('2017-01-29'));
+        $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
+    }
+
+    public function testPolicyPurchaseAgain()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyPurchaseAgainA', $this),
+            static::generateEmail('testPolicyPurchaseAgainB', $this)
+        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        static::$policyService->unrenew($renewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_UNRENEWED, $renewalPolicyA->getStatus());
+        $this->assertEquals(Cashback::STATUS_MISSING, $policyA->getCashback()->getStatus());
+
+        static::$policyService->fullyExpire($policyA, new \DateTime('2017-01-29'));
+        $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
+
+        $newPolicyA = new SalvaPhonePolicy();
+        $newPolicyA->setImei($policyA->getImei());
+        $newPolicyA->setPhone($policyA->getPhone(), new \DateTime('2017-01-01'));
+        $newPolicyA->init($policyA->getUser(), self::getLatestPolicyTerms(static::$dm));
+        $newPolicyA->setPremiumInstallments(12);
+        self::addPayment(
+            $newPolicyA,
+            $newPolicyA->getPremium(new \DateTime('2017-01-01'))->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            new \DateTime('2017-01-01')
+        );
+        static::$dm->persist($newPolicyA);
+
+        $newPolicyA->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($newPolicyA, new \DateTime('2017-01-01'), true);
+        static::$policyService->setEnvironment('test');
+        static::$dm->flush();
+    }
+
+    public function testPolicyRenewalConnections()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyRenewalConnectionsA', $this),
+            static::generateEmail('testPolicyRenewalConnectionsB', $this),
+            true,
+            new \DateTime('2016-01-01'),
+            new \DateTime('2016-01-15')
+        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+
+        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-30'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        $this->assertNotNull($policyB->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertEquals(
+            $renewalPolicyA->getId(),
+            $policyB->getConnections()[0]->getLinkedPolicyRenewal()->getId()
+        );
+
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+
+        $this->assertEquals(10, $renewalPolicyA->getPotValue());
+
+        static::$policyService->renew($policyB, 12, null, new \DateTime('2017-01-10'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
+
+        static::$policyService->expire($policyB, new \DateTime('2017-01-15'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyB->getStatus());
+
+        $this->assertNotNull($renewalPolicyA->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertEquals(
+            $renewalPolicyB->getId(),
+            $renewalPolicyA->getConnections()[0]->getLinkedPolicyRenewal()->getId()
+        );
+
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-01-15'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
+
+        $this->assertEquals(10, $renewalPolicyB->getPotValue());
+    }
+
+    public function testPolicyRenewalConnectionsSingleReconnect()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyRenewalConnectionsNoReconnectA', $this),
+            static::generateEmail('testPolicyRenewalConnectionsNoReconnectB', $this),
+            true,
+            new \DateTime('2016-01-01'),
+            new \DateTime('2016-01-15')
+        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+
+        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-30'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(Policy::class);
+        $updatedRenewalPolicyA = $policyRepo->find($renewalPolicyA->getId());
+
+        $this->assertNotNull($policyB->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertEquals(
+            $renewalPolicyA->getId(),
+            $policyB->getConnections()[0]->getLinkedPolicyRenewal()->getId()
+        );
+        $this->assertTrue(count($updatedRenewalPolicyA->getAcceptedConnectionsRenewal()) > 0);
+
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+
+        $this->assertEquals(10, $renewalPolicyA->getPotValue());
+
+        static::$policyService->renew($policyB, 12, null, new \DateTime('2017-01-10'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
+
+        $foundRenewalConnection = false;
+        foreach ($renewalPolicyB->getRenewalConnections() as $connection) {
+            $this->assertTrue($connection->getRenew());
+            $foundRenewalConnection = true;
+            $connection->setRenew(false);
+        }
+        $this->assertTrue($foundRenewalConnection);
+        static::$dm->flush();
+
+        $updatedPolicyB = $policyRepo->find($policyB->getId());
+        static::$policyService->expire($policyB, new \DateTime('2017-01-15'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $updatedPolicyB->getStatus());
+
+        $updatedRenewalPolicyB = $policyRepo->find($renewalPolicyB->getId());
+        $this->assertNull($policyA->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertTrue(count($updatedRenewalPolicyB->getAcceptedConnectionsRenewal()) > 0);
+
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-01-15'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
+
+        $this->assertEquals(0, $updatedRenewalPolicyA->getPotValue());
+        $this->assertEquals(0, $updatedRenewalPolicyB->getPotValue());
+    }
+
+    public function testPolicyRenewalConnectionsSingleReconnectReverse()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyRenewalConnectionsSingleReconnectReverseA', $this),
+            static::generateEmail('testPolicyRenewalConnectionsSingleReconnectReverseB', $this),
+            true,
+            new \DateTime('2016-01-01'),
+            new \DateTime('2016-01-05')
+        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+
+        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-12-29'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
+
+        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-30'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+
+        $foundRenewalConnection = false;
+        foreach ($renewalPolicyA->getRenewalConnections() as $connection) {
+            $this->assertTrue($connection->getRenew());
+            $foundRenewalConnection = true;
+            $connection->setRenew(false);
+        }
+        $this->assertTrue($foundRenewalConnection);
+        static::$dm->flush();
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(Policy::class);
+        $updatedRenewalPolicyA = $policyRepo->find($renewalPolicyA->getId());
+
+        $this->assertNotNull($policyB->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertEquals(
+            $renewalPolicyA->getId(),
+            $policyB->getConnections()[0]->getLinkedPolicyRenewal()->getId()
+        );
+        $this->assertTrue(count($updatedRenewalPolicyA->getAcceptedConnectionsRenewal()) > 0);
+
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+
+        $this->assertEquals(0, $renewalPolicyA->getPotValue());
+
+        $updatedPolicyB = $policyRepo->find($policyB->getId());
+        static::$policyService->expire($policyB, new \DateTime('2017-01-05'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $updatedPolicyB->getStatus());
+
+        $updatedRenewalPolicyB = $policyRepo->find($renewalPolicyB->getId());
+        $this->assertNull($policyA->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertTrue(count($updatedRenewalPolicyB->getAcceptedConnectionsRenewal()) == 0);
+
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-01-05'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
+
+        $this->assertEquals(0, $updatedRenewalPolicyA->getPotValue());
+        $this->assertEquals(0, $updatedRenewalPolicyB->getPotValue());
+
+        $this->assertEquals(10, $policyA->getPotValue());
+        $this->assertEquals(9.17, $policyB->getPotValue());
+    }
+
+    public function testPolicyRenewalConnectionsUnder60()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyRenewalConnectionsUnder60A', $this),
+            static::generateEmail('testPolicyRenewalConnectionsUnder60B', $this),
+            true,
+            new \DateTime('2016-01-01'),
+            new \DateTime('2016-02-28')
+        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+
+        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-12-29'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
+
+        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-02-28'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+
+        $foundRenewalConnection = false;
+        foreach ($renewalPolicyA->getRenewalConnections() as $connection) {
+            $this->assertTrue($connection->getRenew());
+            $foundRenewalConnection = true;
+        }
+        $this->assertTrue($foundRenewalConnection);
+        static::$dm->flush();
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(Policy::class);
+        $updatedRenewalPolicyA = $policyRepo->find($renewalPolicyA->getId());
+
+        $this->assertNotNull($policyB->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertEquals(
+            $renewalPolicyA->getId(),
+            $policyB->getConnections()[0]->getLinkedPolicyRenewal()->getId()
+        );
+        $this->assertTrue(count($updatedRenewalPolicyA->getAcceptedConnectionsRenewal()) > 0);
+
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+
+        $this->assertEquals(10, $renewalPolicyA->getPotValue());
+
+        $updatedPolicyB = $policyRepo->find($policyB->getId());
+        static::$policyService->expire($policyB, new \DateTime('2017-02-28'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $updatedPolicyB->getStatus());
+
+        $updatedRenewalPolicyB = $policyRepo->find($renewalPolicyB->getId());
+        $this->assertNull($policyA->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertTrue(count($updatedRenewalPolicyB->getAcceptedConnectionsRenewal()) > 0);
+
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-02-28'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
+
+        $this->assertEquals(10, $updatedRenewalPolicyA->getPotValue());
+        $this->assertEquals(10, $updatedRenewalPolicyB->getPotValue());
+
+        $this->assertEquals(10, $policyA->getPotValue());
+        $this->assertEquals(10, $policyB->getPotValue());
+    }
+
+    public function testPolicyRenewalConnectionsSingleReconnectUnder60()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyRenewalConnectionsSingleReconnectUnder60A', $this),
+            static::generateEmail('testPolicyRenewalConnectionsSingleReconnectUnder60B', $this),
+            true,
+            new \DateTime('2016-01-01'),
+            new \DateTime('2016-02-28')
+        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+
+        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(Policy::class);
+        $updatedRenewalPolicyA = $policyRepo->find($renewalPolicyA->getId());
+
+        $this->assertNotNull($policyB->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertEquals(
+            $renewalPolicyA->getId(),
+            $policyB->getConnections()[0]->getLinkedPolicyRenewal()->getId()
+        );
+        $this->assertTrue(count($updatedRenewalPolicyA->getAcceptedConnectionsRenewal()) > 0);
+
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+
+        $this->assertEquals(10, $renewalPolicyA->getPotValue());
+
+        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-02-27'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
+
+        $foundRenewalConnection = false;
+        foreach ($renewalPolicyB->getRenewalConnections() as $connection) {
+            $this->assertTrue($connection->getRenew());
+            $foundRenewalConnection = true;
+            $connection->setRenew(false);
+        }
+        $this->assertTrue($foundRenewalConnection);
+        static::$dm->flush();
+
+        $updatedPolicyB = $policyRepo->find($policyB->getId());
+        static::$policyService->expire($policyB, new \DateTime('2017-02-28'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $updatedPolicyB->getStatus());
+
+        $updatedRenewalPolicyB = $policyRepo->find($renewalPolicyB->getId());
+        $this->assertNull($policyA->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertTrue(count($updatedRenewalPolicyB->getAcceptedConnectionsRenewal()) > 0);
+
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-02-28'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
+
+        $this->assertEquals(0, $updatedRenewalPolicyA->getPotValue());
+        $this->assertEquals(0, $updatedRenewalPolicyB->getPotValue());
+
+        $this->assertEquals(10, $policyA->getPotValue());
+        $this->assertEquals(10, $policyB->getPotValue());
+    }
+
+    public function testPolicyRenewalConnectionsSingleReconnectReverseUnder60()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyRenewalConnectionsSingleReconnectReverseUnder60A', $this),
+            static::generateEmail('testPolicyRenewalConnectionsSingleReconnectReverseUnder60B', $this),
+            true,
+            new \DateTime('2016-01-01'),
+            new \DateTime('2016-02-28')
+        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+
+        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+
+        $foundRenewalConnection = false;
+        foreach ($renewalPolicyA->getRenewalConnections() as $connection) {
+            $this->assertTrue($connection->getRenew());
+            $foundRenewalConnection = true;
+            $connection->setRenew(false);
+        }
+        $this->assertTrue($foundRenewalConnection);
+        static::$dm->flush();
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+
+        $this->assertEquals(0, $renewalPolicyA->getPotValue());
+
+        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-02-27'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
+
+        $foundRenewalConnection = false;
+        foreach ($renewalPolicyB->getRenewalConnections() as $connection) {
+            $this->assertTrue($connection->getRenew());
+            $foundRenewalConnection = true;
+        }
+        $this->assertFalse($foundRenewalConnection);
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(Policy::class);
+        $updatedRenewalPolicyA = $policyRepo->find($renewalPolicyA->getId());
+        $updatedRenewalPolicyB = $policyRepo->find($renewalPolicyB->getId());
+
+        $this->assertTrue(count($updatedRenewalPolicyB->getAcceptedConnectionsRenewal()) == 0);
+
+        $updatedPolicyB = $policyRepo->find($policyB->getId());
+        static::$policyService->expire($policyB, new \DateTime('2017-02-28'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $updatedPolicyB->getStatus());
+
+        $updatedRenewalPolicyB = $policyRepo->find($renewalPolicyB->getId());
+        $this->assertNull($policyA->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertTrue(count($updatedRenewalPolicyB->getAcceptedConnectionsRenewal()) == 0);
+
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-02-28'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
+
+        $this->assertEquals(0, $updatedRenewalPolicyA->getPotValue());
+        $this->assertEquals(0, $updatedRenewalPolicyB->getPotValue());
+
+        $this->assertEquals(10, $policyA->getPotValue());
+        // 12-2=10 months connected ; £10 * 10/12 = 8.33
+        $this->assertEquals(8.33, $policyB->getPotValue());
+    }
+
+    public function testPolicyRenewalConnections5Months()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyRenewalConnections5MonthsA', $this),
+            static::generateEmail('testPolicyRenewalConnections5MonthsB', $this),
+            true,
+            new \DateTime('2016-01-01'),
+            new \DateTime('2016-06-01')
+        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+
+        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+
+        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-05-28'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
+
+        $foundRenewalConnection = false;
+        foreach ($renewalPolicyA->getRenewalConnections() as $connection) {
+            $this->assertTrue($connection->getRenew());
+            $foundRenewalConnection = true;
+        }
+        $this->assertTrue($foundRenewalConnection);
+        static::$dm->flush();
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(Policy::class);
+        $updatedRenewalPolicyA = $policyRepo->find($renewalPolicyA->getId());
+
+        $this->assertNotNull($policyB->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertEquals(
+            $renewalPolicyA->getId(),
+            $policyB->getConnections()[0]->getLinkedPolicyRenewal()->getId()
+        );
+        $this->assertTrue(count($updatedRenewalPolicyA->getAcceptedConnectionsRenewal()) > 0);
+
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+
+        $this->assertEquals(10, $renewalPolicyA->getPotValue());
+
+        $updatedPolicyB = $policyRepo->find($policyB->getId());
+        static::$policyService->expire($policyB, new \DateTime('2017-06-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $updatedPolicyB->getStatus());
+
+        $updatedRenewalPolicyB = $policyRepo->find($renewalPolicyB->getId());
+        $this->assertNull($policyA->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertTrue(count($updatedRenewalPolicyB->getAcceptedConnectionsRenewal()) > 0);
+
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-06-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
+
+        $this->assertEquals(10, $updatedRenewalPolicyA->getPotValue());
+        $this->assertEquals(10, $updatedRenewalPolicyB->getPotValue());
+
+        $this->assertEquals(10, $policyA->getPotValue());
+        $this->assertEquals(10, $policyB->getPotValue());
+    }
+
+    public function testPolicyRenewalConnectionsSingleReconnect5Months()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyRenewalConnectionsSingleReconnect5MonthsA', $this),
+            static::generateEmail('testPolicyRenewalConnectionsSingleReconnect5MonthsB', $this),
+            true,
+            new \DateTime('2016-01-01'),
+            new \DateTime('2016-06-01')
+        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+
+        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(Policy::class);
+        $updatedRenewalPolicyA = $policyRepo->find($renewalPolicyA->getId());
+
+        $this->assertNotNull($policyB->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertEquals(
+            $renewalPolicyA->getId(),
+            $policyB->getConnections()[0]->getLinkedPolicyRenewal()->getId()
+        );
+        $this->assertTrue(count($updatedRenewalPolicyA->getAcceptedConnectionsRenewal()) > 0);
+
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+
+        $this->assertEquals(10, $renewalPolicyA->getPotValue());
+
+        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-05-27'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
+
+        $foundRenewalConnection = false;
+        foreach ($renewalPolicyB->getRenewalConnections() as $connection) {
+            $this->assertTrue($connection->getRenew());
+            $foundRenewalConnection = true;
+            $connection->setRenew(false);
+        }
+        $this->assertTrue($foundRenewalConnection);
+        static::$dm->flush();
+
+        $updatedPolicyB = $policyRepo->find($policyB->getId());
+        static::$policyService->expire($policyB, new \DateTime('2017-06-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $updatedPolicyB->getStatus());
+
+        $updatedRenewalPolicyB = $policyRepo->find($renewalPolicyB->getId());
+        $this->assertNull($policyA->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertTrue(count($updatedRenewalPolicyB->getAcceptedConnectionsRenewal()) > 0);
+
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-06-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
+
+        $this->assertEquals(0, $updatedRenewalPolicyA->getPotValue());
+        $this->assertEquals(0, $updatedRenewalPolicyB->getPotValue());
+
+        $this->assertEquals(10, $policyA->getPotValue());
+        $this->assertEquals(10, $policyB->getPotValue());
+    }
+
+    public function testPolicyRenewalConnectionsSingleReconnectReverse5Months()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyRenewalConnectionsSingleReconnectReverse5MonthsA', $this),
+            static::generateEmail('testPolicyRenewalConnectionsSingleReconnectReverse5MonthsB', $this),
+            true,
+            new \DateTime('2016-01-01'),
+            new \DateTime('2016-06-01')
+        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+
+        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+
+        $foundRenewalConnection = false;
+        foreach ($renewalPolicyA->getRenewalConnections() as $connection) {
+            $this->assertTrue($connection->getRenew());
+            $foundRenewalConnection = true;
+            $connection->setRenew(false);
+        }
+        $this->assertTrue($foundRenewalConnection);
+        static::$dm->flush();
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+
+        $this->assertEquals(0, $renewalPolicyA->getPotValue());
+
+        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-05-27'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
+
+        $foundRenewalConnection = false;
+        foreach ($renewalPolicyB->getRenewalConnections() as $connection) {
+            $this->assertTrue($connection->getRenew());
+            $foundRenewalConnection = true;
+        }
+        $this->assertFalse($foundRenewalConnection);
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(Policy::class);
+        $updatedRenewalPolicyA = $policyRepo->find($renewalPolicyA->getId());
+        $updatedRenewalPolicyB = $policyRepo->find($renewalPolicyB->getId());
+
+        $this->assertTrue(count($updatedRenewalPolicyB->getAcceptedConnectionsRenewal()) == 0);
+
+        $updatedPolicyB = $policyRepo->find($policyB->getId());
+        static::$policyService->expire($policyB, new \DateTime('2017-06-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $updatedPolicyB->getStatus());
+
+        $updatedRenewalPolicyB = $policyRepo->find($renewalPolicyB->getId());
+        $this->assertNull($policyA->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertTrue(count($updatedRenewalPolicyB->getAcceptedConnectionsRenewal()) == 0);
+
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-06-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
+
+        $this->assertEquals(0, $updatedRenewalPolicyA->getPotValue());
+        $this->assertEquals(0, $updatedRenewalPolicyB->getPotValue());
+
+        $this->assertEquals(10, $policyA->getPotValue());
+        // 12-5=7 months connected ; £10 * 7/12 = 5.83
+        $this->assertEquals(5.83, $policyB->getPotValue());
+    }
+
+    public function testPolicyRenewalConnections7Months()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyRenewalConnections7MonthsA', $this),
+            static::generateEmail('testPolicyRenewalConnections7MonthsB', $this),
+            true,
+            new \DateTime('2016-01-01'),
+            new \DateTime('2016-08-01')
+        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+
+        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+
+        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-07-28'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
+
+        $foundRenewalConnection = false;
+        foreach ($renewalPolicyA->getRenewalConnections() as $connection) {
+            $this->assertTrue($connection->getRenew());
+            $foundRenewalConnection = true;
+        }
+        $this->assertTrue($foundRenewalConnection);
+        static::$dm->flush();
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(Policy::class);
+        $updatedRenewalPolicyA = $policyRepo->find($renewalPolicyA->getId());
+
+        $this->assertNotNull($policyB->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertEquals(
+            $renewalPolicyA->getId(),
+            $policyB->getConnections()[0]->getLinkedPolicyRenewal()->getId()
+        );
+        $this->assertTrue(count($updatedRenewalPolicyA->getAcceptedConnectionsRenewal()) > 0);
+
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+
+        $this->assertEquals(10, $renewalPolicyA->getPotValue());
+
+        $updatedPolicyB = $policyRepo->find($policyB->getId());
+        static::$policyService->expire($policyB, new \DateTime('2017-08-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $updatedPolicyB->getStatus());
+
+        $updatedRenewalPolicyB = $policyRepo->find($renewalPolicyB->getId());
+        $this->assertNull($policyA->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertTrue(count($updatedRenewalPolicyB->getAcceptedConnectionsRenewal()) > 0);
+
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-08-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
+
+        $this->assertEquals(10, $updatedRenewalPolicyA->getPotValue());
+        $this->assertEquals(10, $updatedRenewalPolicyB->getPotValue());
+
+        $this->assertEquals(10, $policyA->getPotValue());
+        $this->assertEquals(10, $policyB->getPotValue());
+    }
+
+    public function testPolicyRenewalConnectionsSingleReconnect7Months()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyRenewalConnectionsSingleReconnect7MonthsA', $this),
+            static::generateEmail('testPolicyRenewalConnectionsSingleReconnect7MonthsB', $this),
+            true,
+            new \DateTime('2016-01-01'),
+            new \DateTime('2016-08-01')
+        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+
+        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(Policy::class);
+        $updatedRenewalPolicyA = $policyRepo->find($renewalPolicyA->getId());
+
+        $this->assertNotNull($policyB->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertEquals(
+            $renewalPolicyA->getId(),
+            $policyB->getConnections()[0]->getLinkedPolicyRenewal()->getId()
+        );
+        $this->assertTrue(count($updatedRenewalPolicyA->getAcceptedConnectionsRenewal()) > 0);
+
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+
+        $this->assertEquals(10, $renewalPolicyA->getPotValue());
+
+        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-07-27'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
+
+        $foundRenewalConnection = false;
+        foreach ($renewalPolicyB->getRenewalConnections() as $connection) {
+            $this->assertTrue($connection->getRenew());
+            $foundRenewalConnection = true;
+            $connection->setRenew(false);
+        }
+        $this->assertTrue($foundRenewalConnection);
+        static::$dm->flush();
+
+        $updatedPolicyB = $policyRepo->find($policyB->getId());
+        static::$policyService->expire($policyB, new \DateTime('2017-08-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $updatedPolicyB->getStatus());
+
+        $updatedRenewalPolicyB = $policyRepo->find($renewalPolicyB->getId());
+        $this->assertNull($policyA->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertTrue(count($updatedRenewalPolicyB->getAcceptedConnectionsRenewal()) > 0);
+
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-08-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
+
+        // 7 months connected ; £10 * 7/12 = 5.83
+        $this->assertEquals(5.83, $updatedRenewalPolicyA->getPotValue());
+        $this->assertEquals(0, $updatedRenewalPolicyB->getPotValue());
+
+        $this->assertEquals(10, $policyA->getPotValue());
+        $this->assertEquals(10, $policyB->getPotValue());
+    }
+
+    public function testPolicyRenewalConnectionsSingleReconnectReverse7Months()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyRenewalConnectionsSingleReconnectReverse7MonthsA', $this),
+            static::generateEmail('testPolicyRenewalConnectionsSingleReconnectReverse7MonthsB', $this),
+            true,
+            new \DateTime('2016-01-01'),
+            new \DateTime('2016-08-01')
+        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+
+        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+
+        $foundRenewalConnection = false;
+        foreach ($renewalPolicyA->getRenewalConnections() as $connection) {
+            $this->assertTrue($connection->getRenew());
+            $foundRenewalConnection = true;
+            $connection->setRenew(false);
+        }
+        $this->assertTrue($foundRenewalConnection);
+        static::$dm->flush();
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+
+        $this->assertEquals(0, $renewalPolicyA->getPotValue());
+
+        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-07-27'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
+
+        $foundRenewalConnection = false;
+        foreach ($renewalPolicyB->getRenewalConnections() as $connection) {
+            $this->assertTrue($connection->getRenew());
+            $foundRenewalConnection = true;
+        }
+        $this->assertFalse($foundRenewalConnection);
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(Policy::class);
+        $updatedRenewalPolicyA = $policyRepo->find($renewalPolicyA->getId());
+        $updatedRenewalPolicyB = $policyRepo->find($renewalPolicyB->getId());
+
+        $this->assertTrue(count($updatedRenewalPolicyB->getAcceptedConnectionsRenewal()) == 0);
+
+        $updatedPolicyB = $policyRepo->find($policyB->getId());
+        static::$policyService->expire($policyB, new \DateTime('2017-08-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $updatedPolicyB->getStatus());
+
+        $updatedRenewalPolicyB = $policyRepo->find($renewalPolicyB->getId());
+        $this->assertNull($policyA->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertTrue(count($updatedRenewalPolicyB->getAcceptedConnectionsRenewal()) == 0);
+
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-08-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
+
+        $this->assertEquals(0, $updatedRenewalPolicyA->getPotValue());
+        $this->assertEquals(0, $updatedRenewalPolicyB->getPotValue());
+
+        $this->assertEquals(10, $policyA->getPotValue());
+        // 12-7=5 months connected ; £0
+        $this->assertEquals(0, $policyB->getPotValue());
+    }
+
+    public function testPolicyRenewalConnections11Months()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyRenewalConnections11MonthsA', $this),
+            static::generateEmail('testPolicyRenewalConnections11MonthsB', $this),
+            true,
+            new \DateTime('2016-01-01'),
+            new \DateTime('2016-12-01')
+        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+
+        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+
+        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-11-28'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
+
+        $foundRenewalConnection = false;
+        foreach ($renewalPolicyA->getRenewalConnections() as $connection) {
+            $this->assertTrue($connection->getRenew());
+            $foundRenewalConnection = true;
+        }
+        $this->assertTrue($foundRenewalConnection);
+        static::$dm->flush();
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(Policy::class);
+        $updatedRenewalPolicyA = $policyRepo->find($renewalPolicyA->getId());
+
+        $this->assertNotNull($policyB->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertEquals(
+            $renewalPolicyA->getId(),
+            $policyB->getConnections()[0]->getLinkedPolicyRenewal()->getId()
+        );
+        $this->assertTrue(count($updatedRenewalPolicyA->getAcceptedConnectionsRenewal()) > 0);
+
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+
+        $this->assertEquals(10, $renewalPolicyA->getPotValue());
+
+        $updatedPolicyB = $policyRepo->find($policyB->getId());
+        static::$policyService->expire($policyB, new \DateTime('2017-12-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $updatedPolicyB->getStatus());
+
+        $updatedRenewalPolicyB = $policyRepo->find($renewalPolicyB->getId());
+        $this->assertNull($policyA->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertTrue(count($updatedRenewalPolicyB->getAcceptedConnectionsRenewal()) > 0);
+
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-12-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
+
+        $this->assertEquals(10, $updatedRenewalPolicyA->getPotValue());
+        $this->assertEquals(10, $updatedRenewalPolicyB->getPotValue());
+
+        $this->assertEquals(10, $policyA->getPotValue());
+        $this->assertEquals(10, $policyB->getPotValue());
+    }
+
+    public function testPolicyRenewalConnectionsSingleReconnect11Months()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyRenewalConnectionsSingleReconnect11MonthsA', $this),
+            static::generateEmail('testPolicyRenewalConnectionsSingleReconnect11MonthsB', $this),
+            true,
+            new \DateTime('2016-01-01'),
+            new \DateTime('2016-12-01')
+        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+
+        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(Policy::class);
+        $updatedRenewalPolicyA = $policyRepo->find($renewalPolicyA->getId());
+
+        $this->assertNotNull($policyB->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertEquals(
+            $renewalPolicyA->getId(),
+            $policyB->getConnections()[0]->getLinkedPolicyRenewal()->getId()
+        );
+        $this->assertTrue(count($updatedRenewalPolicyA->getAcceptedConnectionsRenewal()) > 0);
+
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+
+        $this->assertEquals(10, $renewalPolicyA->getPotValue());
+
+        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-11-27'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
+
+        $foundRenewalConnection = false;
+        foreach ($renewalPolicyB->getRenewalConnections() as $connection) {
+            $this->assertTrue($connection->getRenew());
+            $foundRenewalConnection = true;
+            $connection->setRenew(false);
+        }
+        $this->assertTrue($foundRenewalConnection);
+        static::$dm->flush();
+
+        $updatedPolicyB = $policyRepo->find($policyB->getId());
+        static::$policyService->expire($policyB, new \DateTime('2017-12-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $updatedPolicyB->getStatus());
+
+        $updatedRenewalPolicyB = $policyRepo->find($renewalPolicyB->getId());
+        $this->assertNull($policyA->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertTrue(count($updatedRenewalPolicyB->getAcceptedConnectionsRenewal()) > 0);
+
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-12-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
+
+        // 11 months connected ; £10 * 11/12 = 9.17
+        $this->assertEquals(9.17, $updatedRenewalPolicyA->getPotValue());
+        $this->assertEquals(0, $updatedRenewalPolicyB->getPotValue());
+
+        $this->assertEquals(10, $policyA->getPotValue());
+        $this->assertEquals(10, $policyB->getPotValue());
+    }
+
+    public function testPolicyRenewalConnectionsSingleReconnectReverse11Months()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyRenewalConnectionsSingleReconnectReverse11MonthsA', $this),
+            static::generateEmail('testPolicyRenewalConnectionsSingleReconnectReverse11MonthsB', $this),
+            true,
+            new \DateTime('2016-01-01'),
+            new \DateTime('2016-12-01')
+        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+
+        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+
+        $foundRenewalConnection = false;
+        foreach ($renewalPolicyA->getRenewalConnections() as $connection) {
+            $this->assertTrue($connection->getRenew());
+            $foundRenewalConnection = true;
+            $connection->setRenew(false);
+        }
+        $this->assertTrue($foundRenewalConnection);
+        static::$dm->flush();
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+
+        $this->assertEquals(0, $renewalPolicyA->getPotValue());
+
+        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-11-27'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
+
+        $foundRenewalConnection = false;
+        foreach ($renewalPolicyB->getRenewalConnections() as $connection) {
+            $this->assertTrue($connection->getRenew());
+            $foundRenewalConnection = true;
+        }
+        $this->assertFalse($foundRenewalConnection);
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(Policy::class);
+        $updatedRenewalPolicyA = $policyRepo->find($renewalPolicyA->getId());
+        $updatedRenewalPolicyB = $policyRepo->find($renewalPolicyB->getId());
+
+        $this->assertTrue(count($updatedRenewalPolicyB->getAcceptedConnectionsRenewal()) == 0);
+
+        $updatedPolicyB = $policyRepo->find($policyB->getId());
+        static::$policyService->expire($policyB, new \DateTime('2017-12-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $updatedPolicyB->getStatus());
+
+        $updatedRenewalPolicyB = $policyRepo->find($renewalPolicyB->getId());
+        $this->assertNull($policyA->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertTrue(count($updatedRenewalPolicyB->getAcceptedConnectionsRenewal()) == 0);
+
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-12-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
+
+        $this->assertEquals(0, $updatedRenewalPolicyA->getPotValue());
+        $this->assertEquals(0, $updatedRenewalPolicyB->getPotValue());
+
+        $this->assertEquals(10, $policyA->getPotValue());
+        // 12-11=1 months connected ; £0
+        $this->assertEquals(0, $policyB->getPotValue());
+    }
+
+    public function testPolicyRenewalSelfClaim()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyRenewalSelfClaimA', $this),
+            static::generateEmail('testPolicyRenewalSelfClaimB', $this),
+            true,
+            new \DateTime('2016-01-01'),
+            new \DateTime('2016-01-01')
+        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+
+        $claimA = new Claim();
+        $claimA->setLossDate(new \DateTime('2016-12-31'));
+        $claimA->setStatus(Claim::STATUS_SETTLED);
+        $claimA->setType(Claim::TYPE_LOSS);
+        $policyA->addClaim($claimA);
+
+        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+
+        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-12-29'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+
+        static::$policyService->expire($policyB, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyB->getStatus());
+
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
+
+        $this->assertEquals(10, $renewalPolicyA->getPotValue());
+        $this->assertEquals(10, $renewalPolicyB->getPotValue());
+
+        $this->assertEquals(0, $policyA->getPotValue());
+        $this->assertEquals(0, $policyB->getPotValue());
+    }
+
+    public function testPolicyRenewalNetworkClaim50()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyRenewalNetworkClaim40A', $this),
+            static::generateEmail('testPolicyRenewalNetworkClaim40B', $this),
+            true,
+            new \DateTime('2016-01-01'),
+            new \DateTime('2016-01-01'),
+            4
+        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+        $this->assertEquals(50, $policyA->getPotValue());
+
+        $claimB = new Claim();
+        $claimB->setStatus(Claim::STATUS_SETTLED);
+        $claimB->setType(Claim::TYPE_LOSS);
+        $claimB->setLossDate(new \DateTime('2016-12-30'));
+        $policyB->addClaim($claimB);
+
+        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+
+        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-12-29'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+
+        static::$policyService->expire($policyB, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyB->getStatus());
+
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
+
+        $this->assertEquals(50, $renewalPolicyA->getPotValue());
+        $this->assertEquals(10, $renewalPolicyB->getPotValue());
+
+        $this->assertEquals(10, $policyA->getPotValue());
+        $this->assertEquals(0, $policyB->getPotValue());
+    }
+
+    public function testPolicyRenewalNetworkClaim50WithDiscount()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyRenewalNetworkClaim40WithDiscountA', $this),
+            static::generateEmail('testPolicyRenewalNetworkClaim40WithDiscountB', $this),
+            true,
+            new \DateTime('2016-01-01'),
+            new \DateTime('2016-01-01'),
+            4
+        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+        $this->assertEquals(50, $policyA->getPotValue());
+
+        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+
+        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-12-29'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+
+        static::$policyService->expire($policyB, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyB->getStatus());
+
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
+
+        $this->assertEquals(50, $renewalPolicyA->getPotValue());
+        $this->assertEquals(10, $renewalPolicyB->getPotValue());
+
+        $this->assertEquals(50, $policyA->getPotValue());
+        $this->assertEquals(10, $policyB->getPotValue());
+
+        $claimB = new Claim();
+        $claimB->setStatus(Claim::STATUS_SETTLED);
+        $claimB->setType(Claim::TYPE_LOSS);
+        $claimB->setLossDate(new \DateTime('2016-12-30'));
+        $policyB->addClaim($claimB);
+
+        $paymentA = new JudoPayment();
+        $paymentA->setDate(new \DateTime('2017-01-01'));
+        $paymentA->setAmount($renewalPolicyA->getPremium()->getAdjustedStandardMonthlyPremiumPrice());
+        $paymentA->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        $scheduledPaymentA = $renewalPolicyA->getNextScheduledPayment();
+        $scheduledPaymentA->setStatus(ScheduledPayment::STATUS_SUCCESS);
+        $scheduledPaymentA->setPayment($paymentA);
+        $paymentA->setResult(JudoPayment::RESULT_SUCCESS);
+        $policyA->getNextPolicy()->addPayment($paymentA);
+
+        static::$policyService->fullyExpire($policyA, new \DateTime('2017-01-29'));
+        $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
+
+        $paymentB = new JudoPayment();
+        $paymentB->setDate(new \DateTime('2017-01-01'));
+        $paymentB->setAmount($renewalPolicyB->getPremium()->getAdjustedStandardMonthlyPremiumPrice());
+        $paymentB->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        $scheduledPaymentB = $renewalPolicyB->getNextScheduledPayment();
+        $scheduledPaymentB->setStatus(ScheduledPayment::STATUS_SUCCESS);
+        $scheduledPaymentB->setPayment($paymentB);
+        $paymentB->setResult(JudoPayment::RESULT_SUCCESS);
+        $policyB->getNextPolicy()->addPayment($paymentB);
+        static::$dm->flush();
+
+        static::$policyService->fullyExpire($policyB, new \DateTime('2017-01-29'));
+        $this->assertEquals(Policy::STATUS_EXPIRED, $policyB->getStatus());
+
+        $this->assertEquals(10, $policyA->getPotValue());
+        $this->assertEquals(0, $policyB->getPotValue());
+
+        $this->assertEquals(
+            $renewalPolicyA->getPremium()->getAdjustedYearlyPremiumPrice() - $paymentA->getAmount(),
+            $renewalPolicyA->getOutstandingPremium()
+        );
+
+        // 12 original scheduled (1 paid, 11 cancelled)
+        // 11 new scheduled (monthly) as 1 already paid
+        // 1 adjustment to rebate
+        $this->assertEquals(24, count($renewalPolicyA->getScheduledPayments()));
+        // 10/12 = 0.83
+        $this->assertEquals(
+            $policyA->getNextPolicy()->getPremium()->getAdjustedStandardMonthlyPremiumPrice() + 0.83,
+            $paymentA->getAmount() + $policyA->getNextPolicy()->getNextScheduledPayment()->getAmount()
+        );
+    }
+
+    public function testPolicyRenewalNetworkClaim10WithDiscount()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyRenewalNetworkClaim10WithDiscountA', $this),
+            static::generateEmail('testPolicyRenewalNetworkClaim10WithDiscountB', $this),
+            true,
+            new \DateTime('2016-01-01'),
+            new \DateTime('2016-01-01')
+        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+        $this->assertEquals(10, $policyA->getPotValue());
+
+        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+
+        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-12-29'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+
+        static::$policyService->expire($policyB, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyB->getStatus());
+
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
+
+        $this->assertEquals(10, $renewalPolicyA->getPotValue());
+        $this->assertEquals(10, $renewalPolicyB->getPotValue());
+
+        $this->assertEquals(10, $policyA->getPotValue());
+        $this->assertEquals(10, $policyB->getPotValue());
+
+        $claimB = new Claim();
+        $claimB->setStatus(Claim::STATUS_SETTLED);
+        $claimB->setType(Claim::TYPE_LOSS);
+        $claimB->setLossDate(new \DateTime('2016-12-30'));
+        $policyB->addClaim($claimB);
+
+        $paymentA = new JudoPayment();
+        $paymentA->setDate(new \DateTime('2017-01-01'));
+        $paymentA->setAmount($renewalPolicyA->getPremium()->getAdjustedStandardMonthlyPremiumPrice());
+        $paymentA->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        $scheduledPaymentA = $renewalPolicyA->getNextScheduledPayment();
+        $scheduledPaymentA->setStatus(ScheduledPayment::STATUS_SUCCESS);
+        $scheduledPaymentA->setPayment($paymentA);
+        $paymentA->setResult(JudoPayment::RESULT_SUCCESS);
+        $policyA->getNextPolicy()->addPayment($paymentA);
+
+        static::$policyService->fullyExpire($policyA, new \DateTime('2017-01-29'));
+        $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
+
+        $paymentB = new JudoPayment();
+        $paymentB->setDate(new \DateTime('2017-01-01'));
+        $paymentB->setAmount($renewalPolicyB->getPremium()->getAdjustedStandardMonthlyPremiumPrice());
+        $paymentB->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        $scheduledPaymentB = $renewalPolicyB->getNextScheduledPayment();
+        $scheduledPaymentB->setStatus(ScheduledPayment::STATUS_SUCCESS);
+        $scheduledPaymentB->setPayment($paymentB);
+        $paymentB->setResult(JudoPayment::RESULT_SUCCESS);
+        $policyB->getNextPolicy()->addPayment($paymentB);
+        static::$dm->flush();
+
+        static::$policyService->fullyExpire($policyB, new \DateTime('2017-01-29'));
+        $this->assertEquals(Policy::STATUS_EXPIRED, $policyB->getStatus());
+
+        $this->assertEquals(0, $policyA->getPotValue());
+        $this->assertEquals(0, $policyB->getPotValue());
+
+        $this->assertEquals(
+            $renewalPolicyA->getPremium()->getAdjustedYearlyPremiumPrice() - $paymentA->getAmount(),
+            $renewalPolicyA->getOutstandingPremium()
+        );
+
+        // 12 original scheduled (1 paid, 11 cancelled)
+        // 11 new scheduled (monthly) as 1 already paid
+        // 1 adjustment to rebate
+        $this->assertEquals(24, count($renewalPolicyA->getScheduledPayments()));
+        $this->assertEquals(
+            $policyA->getNextPolicy()->getPremium()->getAdjustedStandardMonthlyPremiumPrice(),
+            $paymentA->getAmount() + $policyA->getNextPolicy()->getNextScheduledPayment()->getAmount()
+        );
+    }
+
+    /**
+    public function testPolicyRenewalPreNetworkClaim10()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyRenewalPreNetworkClaim10A', $this),
+            static::generateEmail('testPolicyRenewalPreNetworkClaim10B', $this),
+            true,
+            new \DateTime('2016-01-01'),
+            new \DateTime('2016-01-01')
+        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+        $this->assertEquals(10, $policyA->getPotValue());
+
+        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+
+        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-12-29'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+
+        $claimB = new Claim();
+        $claimB->setStatus(Claim::STATUS_SETTLED);
+        $claimB->setType(Claim::TYPE_LOSS);
+        $claimB->setLossDate(new \DateTime('2016-12-30'));
+        $policyB->addClaim($claimB);
+
+        static::$policyService->expire($policyB, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyB->getStatus());
+
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(Policy::class);
+        $updatedPolicyA = $policyRepo->find($policyA->getId());
+
+        $this->assertEquals(10, $renewalPolicyA->getPotValue());
+        $this->assertEquals(10, $renewalPolicyB->getPotValue());
+
+        $this->assertEquals(0, $updatedPolicyA->getPotValue());
+        $this->assertEquals(0, $policyB->getPotValue());
+
+        $paymentA = new JudoPayment();
+        $paymentA->setDate(new \DateTime('2017-01-01'));
+        $paymentA->setAmount($renewalPolicyA->getPremium()->getAdjustedStandardMonthlyPremiumPrice());
+        $paymentA->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        $scheduledPaymentA = $renewalPolicyA->getNextScheduledPayment();
+        $scheduledPaymentA->setStatus(ScheduledPayment::STATUS_SUCCESS);
+        $scheduledPaymentA->setPayment($paymentA);
+        $paymentA->setResult(JudoPayment::RESULT_SUCCESS);
+        $policyA->getNextPolicy()->addPayment($paymentA);
+
+        static::$policyService->fullyExpire($policyA, new \DateTime('2017-01-29'));
+        $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
+
+        $paymentB = new JudoPayment();
+        $paymentB->setDate(new \DateTime('2017-01-01'));
+        $paymentB->setAmount($renewalPolicyB->getPremium()->getAdjustedStandardMonthlyPremiumPrice());
+        $paymentB->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        $scheduledPaymentB = $renewalPolicyB->getNextScheduledPayment();
+        $scheduledPaymentB->setStatus(ScheduledPayment::STATUS_SUCCESS);
+        $scheduledPaymentB->setPayment($paymentB);
+        $paymentB->setResult(JudoPayment::RESULT_SUCCESS);
+        $policyB->getNextPolicy()->addPayment($paymentB);
+        static::$dm->flush();
+
+        static::$policyService->fullyExpire($policyB, new \DateTime('2017-01-29'));
+        $this->assertEquals(Policy::STATUS_EXPIRED, $policyB->getStatus());
+
+        $this->assertEquals(0, $policyA->getPotValue());
+        $this->assertEquals(0, $policyB->getPotValue());
+
+        $this->assertEquals(
+            $renewalPolicyA->getPremium()->getAdjustedYearlyPremiumPrice() - $paymentA->getAmount(),
+            $renewalPolicyA->getOutstandingPremium()
+        );
+
+        // 12 original scheduled (1 paid, 11 cancelled)
+        $this->assertEquals(12, count($renewalPolicyA->getScheduledPayments()));
+        $this->assertEquals(
+            $policyA->getNextPolicy()->getPremium()->getAdjustedStandardMonthlyPremiumPrice(),
+            $paymentA->getAmount()
+        );
+    }
+    */
+
+    /**
+     *
+     */
     private function getCashback($policy)
     {
         $cashback = new Cashback();
@@ -1344,84 +2941,431 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyActive()
     {
-        $user = static::createUser(
-            static::$userManager,
-            static::generateEmail('testPolicyActive', $this),
-            'bar',
-            static::$dm
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyActiveA', $this),
+            static::generateEmail('testPolicyActiveB', $this),
+            false
         );
-        $policy = static::initPolicy(
-            $user,
-            static::$dm,
-            $this->getRandomPhone(static::$dm),
-            new \DateTime('2016-01-01'),
-            true
-        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
 
-        $policy->setStatus(PhonePolicy::STATUS_PENDING);
-        static::$policyService->setEnvironment('prod');
-        static::$policyService->create($policy, new \DateTime('2016-01-01'), true);
-        static::$policyService->setEnvironment('test');
-        static::$dm->flush();
+        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-30'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+        $this->assertNull($renewalPolicyA->getPendingCancellation());
 
-        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
 
-        $renewalPolicy = static::$policyService->createPendingRenewal(
-            $policy,
-            new \DateTime('2016-12-15')
-        );
-        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
-
-        static::$policyService->renew($policy, 12, null, new \DateTime('2016-12-30'));
-        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicy->getStatus());
-        $this->assertNull($renewalPolicy->getPendingCancellation());
-
-        static::$policyService->activate($renewalPolicy, new \DateTime('2017-01-01'));
-        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicy->getStatus());
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
 
         $this->assertEquals(
             new \DateTime('2017-01-31'),
-            $renewalPolicy->getPolicyExpirationDate(new \DateTime('2017-01-01'))
+            $renewalPolicyA->getPolicyExpirationDate(new \DateTime('2017-01-01'))
         );
 
         for ($i = 1; $i <= 11; $i++) {
             static::addPayment(
-                $renewalPolicy,
-                $renewalPolicy->getPremium()->getMonthlyPremiumPrice(),
+                $renewalPolicyA,
+                $renewalPolicyA->getPremium()->getMonthlyPremiumPrice(),
                 Salva::MONTHLY_TOTAL_COMMISSION
             );
         }
         static::addPayment(
-            $renewalPolicy,
-            $renewalPolicy->getPremium()->getMonthlyPremiumPrice(),
+            $renewalPolicyA,
+            $renewalPolicyA->getPremium()->getMonthlyPremiumPrice(),
             Salva::FINAL_MONTHLY_TOTAL_COMMISSION
         );
 
-        $premium = $renewalPolicy->getPremium();
-        $this->assertEquals($premium->getYearlyPremiumPrice(), $renewalPolicy->getTotalPremiumPrice());
-        $this->assertEquals($premium->getYearlyGwp(), $renewalPolicy->getTotalGwp());
-        $this->assertEquals($premium->getYearlyGwp(), $renewalPolicy->getUsedGwp());
-        $this->assertEquals($premium->getYearlyIpt(), $renewalPolicy->getTotalIpt());
-        $this->assertEquals(Salva::YEARLY_TOTAL_COMMISSION, $renewalPolicy->getTotalBrokerFee());
+        $premium = $renewalPolicyA->getPremium();
+        $this->assertEquals($premium->getYearlyPremiumPrice(), $renewalPolicyA->getTotalPremiumPrice());
+        $this->assertEquals($premium->getYearlyGwp(), $renewalPolicyA->getTotalGwp());
+        $this->assertEquals($premium->getYearlyGwp(), $renewalPolicyA->getUsedGwp());
+        $this->assertEquals($premium->getYearlyIpt(), $renewalPolicyA->getTotalIpt());
+        $this->assertEquals(Salva::YEARLY_TOTAL_COMMISSION, $renewalPolicyA->getTotalBrokerFee());
+        $this->assertEquals(0, $renewalPolicyA->getOutstandingPremium());
 
-        static::$policyService->expire($policy, new \DateTime('2017-01-01'));
-        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policy->getStatus());
-
-        static::$policyService->fullyExpire($policy, new \DateTime('2017-01-29'));
-        $this->assertEquals(Policy::STATUS_EXPIRED, $policy->getStatus());
+        static::$policyService->fullyExpire($policyA, new \DateTime('2017-01-29'));
+        $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
     }
 
-    public function testPolicyActiveWithConnections()
-    {
+    public function getPendingRenewalPolicies(
+        $emailA,
+        $emailB,
+        $connect = true,
+        $dateA = null,
+        $dateB = null,
+        $additional = null
+    ) {
+        if (!$dateA) {
+            $dateA = new \DateTime('2016-01-01');
+        }
+        $renewalDateA = clone $dateA;
+        $renewalDateA = $renewalDateA->add(new \DateInterval('P350D'));
+        if (!$dateB) {
+            $dateB = new \DateTime('2016-01-01');
+        }
+        $renewalDateB = clone $dateB;
+        $renewalDateB = $renewalDateB->add(new \DateInterval('P350D'));
         $userA = static::createUser(
             static::$userManager,
-            static::generateEmail('testPolicyActiveWithConnectionsA', $this),
+            $emailA,
             'bar',
             static::$dm
         );
         $userB = static::createUser(
             static::$userManager,
-            static::generateEmail('testPolicyActiveWithConnectionsB', $this),
+            $emailB,
+            'bar',
+            static::$dm
+        );
+        $policyA = static::initPolicy(
+            $userA,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            clone $dateA,
+            true
+        );
+        $policyB = static::initPolicy(
+            $userB,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            clone $dateB,
+            true
+        );
+
+        $policyA->setStatus(PhonePolicy::STATUS_PENDING);
+        $policyB->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policyA, clone $dateA, true);
+        static::$policyService->create($policyB, clone $dateB, true);
+        static::$policyService->setEnvironment('test');
+        static::$dm->flush();
+        $this->assertEquals($this->getCurrentIptRate($dateA), $policyA->getPremium()->getIptRate());
+        $this->assertEquals($this->getCurrentIptRate($dateB), $policyB->getPremium()->getIptRate());
+
+        if ($connect) {
+            list($connectionA, $connectionB) = $this->createLinkedConnections(
+                $policyA,
+                $policyB,
+                10,
+                10,
+                clone $dateA,
+                clone $dateB
+            );
+        }
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policyA->getStatus());
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policyB->getStatus());
+
+        $renewalPolicyA = static::$policyService->createPendingRenewal(
+            $policyA,
+            $renewalDateA
+        );
+        $renewalPolicyB = static::$policyService->createPendingRenewal(
+            $policyB,
+            $renewalDateB
+        );
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyA->getStatus());
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyB->getStatus());
+        $this->assertEquals($this->getCurrentIptRate($dateA), $policyA->getPremium()->getIptRate());
+        $this->assertEquals($this->getCurrentIptRate($dateB), $policyB->getPremium()->getIptRate());
+        $this->assertEquals($this->getCurrentIptRate($policyA->getEnd()), $renewalPolicyA->getPremium()->getIptRate());
+        $this->assertEquals($this->getCurrentIptRate($policyB->getEnd()), $renewalPolicyB->getPremium()->getIptRate());
+
+        if ($additional) {
+            for ($i = 0; $i < $additional; $i++) {
+                $user = static::createUser(
+                    static::$userManager,
+                    sprintf("%d%s", $i, $emailB),
+                    'bar',
+                    static::$dm
+                );
+                $policy = static::initPolicy(
+                    $user,
+                    static::$dm,
+                    $this->getRandomPhone(static::$dm),
+                    clone $dateB,
+                    true
+                );
+                $policy->setStatus(PhonePolicy::STATUS_PENDING);
+                static::$policyService->setEnvironment('prod');
+                static::$policyService->create($policy, clone $dateB, true);
+                static::$policyService->setEnvironment('test');
+                static::$dm->flush();
+
+                if ($connect) {
+                    list($connectionA, $connectionB) = $this->createLinkedConnections(
+                        $policyA,
+                        $policy,
+                        10,
+                        10,
+                        clone $dateA,
+                        clone $dateB
+                    );
+                }
+
+                $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+
+                $renewalPolicy = static::$policyService->createPendingRenewal(
+                    $policy,
+                    $renewalDateB
+                );
+            }
+        }
+
+        return [$policyA, $policyB];
+    }
+
+    public function testPolicyActiveWithConnections()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyActiveWithConnectionsA', $this),
+            static::generateEmail('testPolicyActiveWithConnectionsB', $this)
+        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyA->getStatus());
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyB->getStatus());
+
+        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-30'));
+        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-12-30'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
+        $this->assertNull($renewalPolicyA->getPendingCancellation());
+        $this->assertNull($renewalPolicyB->getPendingCancellation());
+
+        $this->assertNull($policyA->getCashback());
+        $this->assertNull($policyB->getCashback());
+        $this->assertNotEquals(
+            $renewalPolicyA->getPremium()->getMonthlyPremiumPrice(),
+            $renewalPolicyA->getPremium()->getAdjustedStandardMonthlyPremiumPrice()
+        );
+        $this->assertEquals(
+            $renewalPolicyA->getPremium()->getAdjustedStandardMonthlyPremiumPrice(),
+            $renewalPolicyA->getNextScheduledPayment()->getAmount()
+        );
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(Policy::class);
+        $updatedRenewalPolicyA = $policyRepo->find($renewalPolicyA->getId());
+
+        $foundRenewalConnection = false;
+        foreach ($updatedRenewalPolicyA->getRenewalConnections() as $connection) {
+            $this->assertTrue($connection->getRenew());
+            $foundRenewalConnection = true;
+        }
+        $this->assertTrue($foundRenewalConnection);
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        static::$policyService->expire($policyB, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyB->getStatus());
+
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
+
+        $this->assertEquals(10, $renewalPolicyA->getPotValue());
+        $this->assertEquals(10, $renewalPolicyB->getPotValue());
+        $this->assertEquals(
+            new \DateTime('2017-01-31'),
+            $renewalPolicyA->getPolicyExpirationDate(new \DateTime('2017-01-01'))
+        );
+        $this->assertEquals(
+            new \DateTime('2017-01-31'),
+            $renewalPolicyB->getPolicyExpirationDate(new \DateTime('2017-01-01'))
+        );
+
+        static::$policyService->fullyExpire($policyA, new \DateTime('2017-01-29'));
+        $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
+    }
+
+    public function testPolicyPaymentsRenewalWithConnections()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyPaymentsRenewalWithConnectionsA', $this),
+            static::generateEmail('testPolicyPaymentsRenewalWithConnectionsB', $this)
+        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyA->getStatus());
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyB->getStatus());
+
+        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-30'));
+        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-12-30'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
+        $this->assertNull($renewalPolicyA->getPendingCancellation());
+        $this->assertNull($renewalPolicyB->getPendingCancellation());
+
+        $this->assertNull($policyA->getCashback());
+        $this->assertNull($policyB->getCashback());
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        static::$policyService->expire($policyB, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyB->getStatus());
+
+        static::$policyService->fullyExpire($policyA, new \DateTime('2017-01-29'));
+        $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
+
+        static::$policyService->fullyExpire($policyB, new \DateTime('2017-01-29'));
+        $this->assertEquals(Policy::STATUS_EXPIRED, $policyB->getStatus());
+
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
+
+        $this->assertNotEquals(
+            $renewalPolicyA->getPremium()->getMonthlyPremiumPrice(),
+            $renewalPolicyA->getPremium()->getAdjustedStandardMonthlyPremiumPrice()
+        );
+        $this->assertEquals(
+            $renewalPolicyA->getPremium()->getAdjustedStandardMonthlyPremiumPrice(),
+            $renewalPolicyA->getNextScheduledPayment()->getAmount()
+        );
+        $this->assertEquals(
+            10,
+            $renewalPolicyA->getPremium()->getAnnualDiscount()
+        );
+
+        $this->assertEquals(
+            $renewalPolicyA->getPremium()->getAdjustedYearlyPremiumPrice(),
+            $renewalPolicyA->getOutstandingPremium()
+        );
+
+        for ($i = 1; $i <= 11; $i++) {
+            $scheduledPayment = $renewalPolicyA->getNextScheduledPayment();
+            $this->assertEquals(
+                $scheduledPayment->getAmount(),
+                $renewalPolicyA->getPremium()->getAdjustedStandardMonthlyPremiumPrice()
+            );
+            $payment = static::addPayment(
+                $renewalPolicyA,
+                $renewalPolicyA->getPremium()->getAdjustedStandardMonthlyPremiumPrice(),
+                Salva::MONTHLY_TOTAL_COMMISSION
+            );
+            $scheduledPayment->setStatus(ScheduledPayment::STATUS_SUCCESS);
+            $scheduledPayment->setPayment($payment);
+        }
+        $scheduledPayment = $renewalPolicyA->getNextScheduledPayment();
+        $this->assertEquals(
+            $scheduledPayment->getAmount(),
+            $renewalPolicyA->getPremium()->getAdjustedFinalMonthlyPremiumPrice()
+        );
+        $payment = static::addPayment(
+            $renewalPolicyA,
+            $renewalPolicyA->getPremium()->getAdjustedFinalMonthlyPremiumPrice(),
+            Salva::FINAL_MONTHLY_TOTAL_COMMISSION
+        );
+        $scheduledPayment->setStatus(ScheduledPayment::STATUS_SUCCESS);
+        $scheduledPayment->setPayment($payment);
+
+        $premium = $renewalPolicyA->getPremium();
+        $this->assertEquals($premium->getYearlyPremiumPrice(), $renewalPolicyA->getTotalPremiumPrice());
+        $this->assertEquals($premium->getYearlyGwp(), $renewalPolicyA->getTotalGwp());
+        $this->assertEquals($premium->getYearlyGwp(), $renewalPolicyA->getUsedGwp());
+        $this->assertEquals($premium->getYearlyIpt(), $renewalPolicyA->getTotalIpt());
+        $this->assertEquals(Salva::YEARLY_TOTAL_COMMISSION, $renewalPolicyA->getTotalBrokerFee());
+        //\Doctrine\Common\Util\Debug::dump($renewalPolicyA->getPayments(), 3);
+        $this->assertEquals(0, $renewalPolicyA->getOutstandingPremium());
+    }
+
+    public function testYearlyPolicyPaymentsRenewalWithConnections()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testYearlyPolicyPaymentsRenewalWithConnectionsA', $this),
+            static::generateEmail('testYearlyPolicyPaymentsRenewalWithConnectionsB', $this)
+        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyA->getStatus());
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyB->getStatus());
+
+        static::$policyService->renew($policyA, 1, null, new \DateTime('2016-12-30'));
+        static::$policyService->renew($policyB, 1, null, new \DateTime('2016-12-30'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
+        $this->assertNull($renewalPolicyA->getPendingCancellation());
+        $this->assertNull($renewalPolicyB->getPendingCancellation());
+
+        $this->assertNull($policyA->getCashback());
+        $this->assertNull($policyB->getCashback());
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        static::$policyService->expire($policyB, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyB->getStatus());
+
+        static::$policyService->fullyExpire($policyA, new \DateTime('2017-01-29'));
+        $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
+
+        static::$policyService->fullyExpire($policyB, new \DateTime('2017-01-29'));
+        $this->assertEquals(Policy::STATUS_EXPIRED, $policyB->getStatus());
+
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
+
+        $this->assertNotEquals(
+            $renewalPolicyA->getPremium()->getYearlyPremiumPrice(),
+            $renewalPolicyA->getPremium()->getAdjustedYearlyPremiumPrice()
+        );
+        $this->assertEquals(
+            $renewalPolicyA->getPremium()->getAdjustedYearlyPremiumPrice(),
+            $renewalPolicyA->getNextScheduledPayment()->getAmount()
+        );
+        $this->assertEquals(
+            10,
+            $renewalPolicyA->getPremium()->getAnnualDiscount()
+        );
+
+        $this->assertEquals(
+            $renewalPolicyA->getPremium()->getAdjustedYearlyPremiumPrice(),
+            $renewalPolicyA->getOutstandingPremium()
+        );
+
+        $scheduledPayment = $renewalPolicyA->getNextScheduledPayment();
+        $this->assertEquals(
+            $scheduledPayment->getAmount(),
+            $renewalPolicyA->getPremium()->getAdjustedYearlyPremiumPrice()
+        );
+        $payment = static::addPayment(
+            $renewalPolicyA,
+            $renewalPolicyA->getPremium()->getAdjustedYearlyPremiumPrice(),
+            Salva::YEARLY_TOTAL_COMMISSION
+        );
+        $scheduledPayment->setStatus(ScheduledPayment::STATUS_SUCCESS);
+        $scheduledPayment->setPayment($payment);
+
+        $premium = $renewalPolicyA->getPremium();
+        $this->assertEquals($premium->getYearlyPremiumPrice(), $renewalPolicyA->getTotalPremiumPrice());
+        $this->assertEquals($premium->getYearlyGwp(), $renewalPolicyA->getTotalGwp());
+        $this->assertEquals($premium->getYearlyGwp(), $renewalPolicyA->getUsedGwp());
+        $this->assertEquals($premium->getYearlyIpt(), $renewalPolicyA->getTotalIpt());
+        $this->assertEquals(Salva::YEARLY_TOTAL_COMMISSION, $renewalPolicyA->getTotalBrokerFee());
+        //\Doctrine\Common\Util\Debug::dump($renewalPolicyA->getPayments(), 3);
+        $this->assertEquals(0, $renewalPolicyA->getOutstandingPremium());
+    }
+
+    public function testPotRewardWithClaim()
+    {
+        $userA = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPotRewardWithClaimA', $this),
+            'bar',
+            static::$dm
+        );
+        $userB = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPotRewardWithClaimB', $this),
             'bar',
             static::$dm
         );
@@ -1471,21 +3415,18 @@ class PolicyServiceTest extends WebTestCase
         $this->assertNull($renewalPolicyA->getPendingCancellation());
         $this->assertNull($renewalPolicyB->getPendingCancellation());
 
-        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
-        $policyRepo = $dm->getRepository(Policy::class);
-        $updatedRenewalPolicyA = $policyRepo->find($renewalPolicyA->getId());
-        
-        $foundRenewalConnection = false;
-        foreach ($updatedRenewalPolicyA->getRenewalConnections() as $connection) {
-            $this->assertTrue($connection->getRenew());
-            $foundRenewalConnection = true;
-        }
-        $this->assertTrue($foundRenewalConnection);
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        static::$policyService->expire($policyB, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyB->getStatus());
 
         static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
         static::$policyService->activate($renewalPolicyB, new \DateTime('2017-01-01'));
         $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
         $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
+        $this->assertEquals(12, count($renewalPolicyA->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED)));
+        $this->assertEquals(12, count($renewalPolicyB->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED)));
 
         $this->assertEquals(10, $renewalPolicyA->getPotValue());
         $this->assertEquals(10, $renewalPolicyB->getPotValue());
@@ -1498,11 +3439,63 @@ class PolicyServiceTest extends WebTestCase
             $renewalPolicyB->getPolicyExpirationDate(new \DateTime('2017-01-01'))
         );
 
-        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
-        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+        $paymentA = new JudoPayment();
+        $paymentA->setDate(new \DateTime('2017-01-01'));
+        $paymentA->setAmount($renewalPolicyA->getPremium()->getAdjustedStandardMonthlyPremiumPrice());
+        $paymentA->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        $scheduledPaymentA = $renewalPolicyA->getNextScheduledPayment();
+        $scheduledPaymentA->setStatus(ScheduledPayment::STATUS_SUCCESS);
+        $scheduledPaymentA->setPayment($paymentA);
+        $paymentA->setResult(JudoPayment::RESULT_SUCCESS);
+        $policyA->getNextPolicy()->addPayment($paymentA);
+        static::$dm->flush();
+        $this->assertNotEquals(
+            $policyA->getNextPolicy()->getPremium()->getMonthlyPremiumPrice(),
+            $policyA->getNextPolicy()->getPremium()->getAdjustedStandardMonthlyPremiumPrice()
+        );
+        //\Doctrine\Common\Util\Debug::dump($policyA->getNextPolicy()->getPayments(), 3);
+        //\Doctrine\Common\Util\Debug::dump($paymentA);
+
+        $this->assertEquals(
+            10 + $paymentA->getAmount(),
+            $policyA->getNextPolicy()->getTotalSuccessfulPayments(new \DateTime('2017-01-02'))
+        );
+
+        $paymentB = new JudoPayment();
+        $paymentB->setDate(new \DateTime('2017-01-01'));
+        $paymentB->setAmount($renewalPolicyB->getPremium()->getMonthlyPremiumPrice());
+        $paymentB->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+        $paymentB->setResult(JudoPayment::RESULT_SUCCESS);
+        $scheduledPaymentB = $renewalPolicyB->getNextScheduledPayment();
+        $scheduledPaymentB->setStatus(ScheduledPayment::STATUS_SUCCESS);
+        $scheduledPaymentB->setPayment($paymentB);
+        $policyB->getNextPolicy()->addPayment($paymentB);
+        $this->assertNotEquals(
+            $policyB->getNextPolicy()->getPremium()->getMonthlyPremiumPrice(),
+            $policyB->getNextPolicy()->getPremium()->getAdjustedStandardMonthlyPremiumPrice()
+        );
+        $this->assertEquals(
+            10 + $paymentB->getAmount(),
+            $policyB->getNextPolicy()->getTotalSuccessfulPayments(new \DateTime('2017-01-01'))
+        );
+
+        $claimA = new Claim();
+        $claimA->setStatus(Claim::STATUS_SETTLED);
+        $claimA->setType(Claim::TYPE_LOSS);
+        $policyA->addClaim($claimA);
 
         static::$policyService->fullyExpire($policyA, new \DateTime('2017-01-29'));
         $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
+        // use policyA->getNextPolicy to avoid having to flush/reload from db
+        $due = $policyA->getNextPolicy()->getPremium()->getYearlyPremiumPrice() -
+            $paymentA->getAmount();
+        $this->assertEquals(
+            $due,
+            $policyA->getNextPolicy()->getOutstandingScheduledPaymentsAmount()
+        );
+
+        static::$policyService->fullyExpire($policyB, new \DateTime('2017-01-29'));
+        $this->assertEquals(Policy::STATUS_EXPIRED, $policyB->getStatus());
     }
 
     public function testUpdateCashback()
@@ -1598,73 +3591,17 @@ class PolicyServiceTest extends WebTestCase
         }
     }
 
-    public function testPolicyActiveWithConnectionsNoRenewal()
+    public function testPolicyActiveWithConnectionsNoReconnect()
     {
-        $userA = static::createUser(
-            static::$userManager,
-            static::generateEmail('testPolicyActiveWithConnectionsNoRenewalA', $this),
-            'bar',
-            static::$dm
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyActiveWithConnectionsNoReconnectA', $this),
+            static::generateEmail('testPolicyActiveWithConnectionsNoReconnectB', $this)
         );
-        $userB = static::createUser(
-            static::$userManager,
-            static::generateEmail('testPolicyActiveWithConnectionsNoRenewalB', $this),
-            'bar',
-            static::$dm
-        );
-        $policyA = static::initPolicy(
-            $userA,
-            static::$dm,
-            $this->getRandomPhone(static::$dm),
-            new \DateTime('2016-01-01'),
-            true
-        );
-        $policyB = static::initPolicy(
-            $userB,
-            static::$dm,
-            $this->getRandomPhone(static::$dm),
-            new \DateTime('2016-01-01'),
-            true
-        );
-
-        $policyA->setStatus(PhonePolicy::STATUS_PENDING);
-        $policyB->setStatus(PhonePolicy::STATUS_PENDING);
-        static::$policyService->setEnvironment('prod');
-        static::$policyService->create($policyA, new \DateTime('2016-01-01'), true);
-        static::$policyService->create($policyB, new \DateTime('2016-01-01'), true);
-        static::$policyService->setEnvironment('test');
-        static::$dm->flush();
-
-        list($connectionA, $connectionB) = $this->createLinkedConnections(
-            $policyA,
-            $policyB,
-            10,
-            10,
-            new \DateTime('2016-01-01'),
-            new \DateTime('2016-01-01')
-        );
-
-        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
-        $policyRepo = $dm->getRepository(Policy::class);
-        $policyA = $policyRepo->find($policyA->getId());
-        $policyB = $policyRepo->find($policyB->getId());
-
-        $this->assertEquals(Policy::STATUS_ACTIVE, $policyA->getStatus());
-        $this->assertEquals(Policy::STATUS_ACTIVE, $policyB->getStatus());
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
 
         $this->assertEquals(10, $policyA->getPotValue());
         $this->assertEquals(10, $policyB->getPotValue());
-
-        $renewalPolicyA = static::$policyService->createPendingRenewal(
-            $policyA,
-            new \DateTime('2016-12-15')
-        );
-        $renewalPolicyB = static::$policyService->createPendingRenewal(
-            $policyB,
-            new \DateTime('2016-12-15')
-        );
-        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyA->getStatus());
-        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyB->getStatus());
 
         $cashbackB = new Cashback();
         $cashbackB->setDate(new \DateTime());
@@ -1685,6 +3622,8 @@ class PolicyServiceTest extends WebTestCase
         $this->assertTrue($policyA->isRenewed());
         $this->assertTrue($policyB->isRenewed());
 
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(Policy::class);
         $updatedRenewalPolicyA = $policyRepo->find($renewalPolicyA->getId());
 
         $foundRenewalConnection = false;
@@ -1695,6 +3634,9 @@ class PolicyServiceTest extends WebTestCase
         }
         $this->assertTrue($foundRenewalConnection);
         static::$dm->flush();
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        static::$policyService->expire($policyB, new \DateTime('2017-01-01'));
 
         static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
         static::$policyService->activate($renewalPolicyB, new \DateTime('2017-01-01'));
@@ -1717,14 +3659,10 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(10, $policyA->getPotValue());
         $this->assertEquals(10, $policyB->getPotValue());
 
-        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
-
         $this->assertTrue($policyA->isRenewed());
         $this->assertEquals(10, $policyA->getPotValue());
         $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
         $this->assertNull($policyA->getCashback());
-
-        static::$policyService->expire($policyB, new \DateTime('2017-01-01'));
 
         $this->assertTrue($policyB->isRenewed());
         $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyB->getStatus());
@@ -1741,60 +3679,39 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_EXPIRED, $policyB->getStatus());
         $this->assertEquals(10, $policyB->getCashback()->getAmount());
         $this->assertEquals(Cashback::STATUS_PENDING_PAYMENT, $policyB->getCashback()->getStatus());
+
+        $this->assertTrue($renewalPolicyA->getPremium()->hasAnnualDiscount());
+        $this->assertEquals(10, $renewalPolicyA->getPremium()->getAnnualDiscount());
+
+        $total = 0;
+        $premium = $renewalPolicyA->getPremium();
+        $foundStartDate = false;
+        foreach ($renewalPolicyA->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED) as $scheduledPayment) {
+            //print_r($scheduledPayment->getScheduled()->diff($renewalPolicyA->getStart()));
+            if (abs($scheduledPayment->getScheduled()->diff($renewalPolicyA->getStart())->days) == 0) {
+                $foundStartDate = true;
+            }
+            $this->assertTrue(
+                $scheduledPayment->getAmount() == $premium->getAdjustedStandardMonthlyPremiumPrice() ||
+                $scheduledPayment->getAmount() == $premium->getAdjustedFinalMonthlyPremiumPrice()
+            );
+            $total += $scheduledPayment->getAmount();
+        }
+        $this->assertEquals($total, $renewalPolicyA->getPremium()->getAdjustedYearlyPremiumPrice());
+        $this->assertTrue($foundStartDate);
     }
 
     public function testNotReconnectedDoesNotAppear()
     {
-        $userA = static::createUser(
-            static::$userManager,
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testNotReconnectedDoesNotAppearA', $this),
-            'bar',
-            static::$dm
-        );
-        $userB = static::createUser(
-            static::$userManager,
             static::generateEmail('testNotReconnectedDoesNotAppearB', $this),
-            'bar',
-            static::$dm
-        );
-        $policyA = static::initPolicy(
-            $userA,
-            static::$dm,
-            $this->getRandomPhone(static::$dm),
+            true,
             new \DateTime('2016-01-01'),
-            true
+            new \DateTime('2016-02-15')
         );
-        $policyB = static::initPolicy(
-            $userB,
-            static::$dm,
-            $this->getRandomPhone(static::$dm),
-            new \DateTime('2016-02-15'),
-            true
-        );
-
-        $policyA->setStatus(PhonePolicy::STATUS_PENDING);
-        $policyB->setStatus(PhonePolicy::STATUS_PENDING);
-        static::$policyService->setEnvironment('prod');
-        static::$policyService->create($policyA, new \DateTime('2016-01-01'), true);
-        static::$policyService->create($policyB, new \DateTime('2016-02-15'), true);
-        static::$policyService->setEnvironment('test');
-        static::$dm->flush();
-
-        list($connectionA, $connectionB) = $this->createLinkedConnections($policyA, $policyB, 10, 10);
-
-        $this->assertEquals(Policy::STATUS_ACTIVE, $policyA->getStatus());
-        $this->assertEquals(Policy::STATUS_ACTIVE, $policyB->getStatus());
-
-        $renewalPolicyA = static::$policyService->createPendingRenewal(
-            $policyA,
-            new \DateTime('2016-12-15')
-        );
-        $renewalPolicyB = static::$policyService->createPendingRenewal(
-            $policyB,
-            new \DateTime('2017-02-01')
-        );
-        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyA->getStatus());
-        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyB->getStatus());
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
 
         static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-30'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
@@ -1817,7 +3734,7 @@ class PolicyServiceTest extends WebTestCase
         $this->assertTrue($foundRenewalConnection);
         static::$dm->flush();
 
-        static::$policyService->renew($policyB, 12, null, new \DateTime('2017-01-30'));
+        static::$policyService->renew($policyB, 12, null, new \DateTime('2017-02-14'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
         $this->assertNull($renewalPolicyB->getPendingCancellation());
 
@@ -1826,6 +3743,8 @@ class PolicyServiceTest extends WebTestCase
             $foundRenewalConnection = true;
         }
         $this->assertFalse($foundRenewalConnection);
+
+        static::$policyService->expire($policyB, new \DateTime('2017-02-15'));
 
         static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
         static::$policyService->activate($renewalPolicyB, new \DateTime('2017-02-15'));
@@ -1836,6 +3755,10 @@ class PolicyServiceTest extends WebTestCase
         $updatedRenewalPolicyB = $policyRepo->find($renewalPolicyB->getId());
         $this->assertEquals(0, $updatedRenewalPolicyA->getPotValue());
         $this->assertEquals(0, $updatedRenewalPolicyB->getPotValue());
+
+        $this->assertEquals(10, $policyA->getPotValue());
+        // 10 months connected
+        $this->assertEquals(8.33, $policyB->getPotValue());
     }
 
     public function testSalvaRenewalCooloff()

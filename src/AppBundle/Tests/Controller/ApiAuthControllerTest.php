@@ -1990,8 +1990,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice(), $policyData['premium']);
         $this->assertEquals('monthly', $policyData['premium_plan']);
         $environment = self::$client->getContainer()->getParameter('kernel.environment');
-        $prefix = $policy->getPolicyPrefix($environment);
-        $this->assertTrue($policy->arePolicyScheduledPaymentsCorrect($prefix));
+        $this->assertTrue($policy->arePolicyScheduledPaymentsCorrect());
         $this->assertEquals(1, count($policy->getAllScheduledPayments(ScheduledPayment::STATUS_CANCELLED)));
     }
 
@@ -2177,6 +2176,18 @@ class ApiAuthControllerTest extends BaseControllerTest
             'account_name' => 'foo',
             'sort_code' => '123456',
             'account_number' => '12345678',
+        ]);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals('pending-claimable', $data['cashback_status']);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(SalvaPhonePolicy::class);
+        $policy = $repo->find($policyData['id']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'account_name' => 'bar',
+            'sort_code' => '654321',
+            'account_number' => '87654321',
         ]);
         $data = $this->verifyResponse(200);
         $this->assertEquals('pending-claimable', $data['cashback_status']);
@@ -3639,7 +3650,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $url = sprintf('/api/v1/auth/user?_method=GET');
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(200);
-        $this->assertEquals(0, count($data['policies']));
+        $this->assertEquals(1, count($data['policies']));
         $this->assertFalse($data['has_cancelled_policy']);
         $this->assertFalse($data['has_valid_policy']);
     }

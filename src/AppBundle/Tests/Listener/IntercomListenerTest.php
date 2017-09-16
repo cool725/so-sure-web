@@ -82,24 +82,65 @@ class IntercomListenerTest extends WebTestCase
         $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
         $this->assertEquals($user->getId(), $data['userId']);
 
-        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
         $this->assertEquals(1, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
         $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
         $this->assertEquals($user->getId(), $data['userId']);
 
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');
-        static::$policyService->create($policy);
+        static::$policyService->create($policy, new \DateTime('2016-01-01'), true);
         static::$policyService->setEnvironment('test');
 
         $this->assertTrue($policy->isValidPolicy());
 
-        // Expect a user update + a policy create event
+        // Expect a policy create event + a policy start event + user update
+        $this->assertEquals(3, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+        $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
+        $this->assertEquals($user->getId(), $data['userId']);
+
+        static::$redis->del(IntercomService::KEY_INTERCOM_QUEUE);
+        $this->assertEquals(0, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+
+        $renewalPolicy = static::$policyService->createPendingRenewal(
+            $policy,
+            new \DateTime('2016-12-15')
+        );
+
+        // Expect a policy pending renewal event + user update
         $this->assertEquals(2, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
         $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
         $this->assertEquals($user->getId(), $data['userId']);
+
+        static::$redis->del(IntercomService::KEY_INTERCOM_QUEUE);
+        $this->assertEquals(0, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+
+        static::$policyService->renew($policy, 12, null, new \DateTime('2016-12-30'));
+
+        // Expect a policy pending created event + user update
+        $this->assertEquals(2, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+        $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
+        $this->assertEquals($user->getId(), $data['userId']);
+
+        static::$policyService->expire($policy, new \DateTime('2017-01-01'));
+
+        static::$redis->del(IntercomService::KEY_INTERCOM_QUEUE);
+        $this->assertEquals(0, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+
+        static::$policyService->activate($renewalPolicy, new \DateTime('2017-01-01'));
+
+        // Expect a policy start event + policy created event + user update
+        $this->assertEquals(3, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+        $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
+        $this->assertEquals($user->getId(), $data['userId']);
     }
-    
+
     public function testIntercomQueuePolicyPot()
     {
         $user = static::createUser(
@@ -139,10 +180,8 @@ class IntercomListenerTest extends WebTestCase
         $listener = new IntercomListener(static::$intercomService);
         $listener->onPolicyCreatedEvent(new PolicyEvent($policy));
 
-        // Expect a user update + a policy create event
-        $this->assertEquals(2, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
-        $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
-        $this->assertEquals($user->getId(), $data['userId']);
+        // No events anymore - moved to started
+        $this->assertEquals(0, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
     }
 
     public function testIntercomQueueCancelled()

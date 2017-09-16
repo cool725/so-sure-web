@@ -37,6 +37,10 @@
                         <a href="{{ s3DownloadLink(policyItem.getPolicyScheduleFiles[0].bucket, policyItem.getPolicyScheduleFiles[0].key) }}"
                         class="btn btn-primary"><i class="fa fa-download"></i> Policy Schedule</a>
                     {% endif %}
+                    {% if policyItem.displayRepurchase %}
+                        <a href="{{ path('user_repurchase_policy', {'id': policyItem.id }) }}"
+                        class="btn btn-primary"> Repurchase Policy</a>
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}
@@ -53,6 +57,12 @@
                       <h4>{{ cashback.policy.policyNumber }} <span class="badge">{{ cashback.getDisplayableStatus }}</span></h4>
                       <p>£{{ cashback.getDisplayableAmount|number_format(2, '.', ',') }}</p>
                     </div>
+                    {% if cashback.status == 'missing' or cashback.status == 'failed' %}
+                    <div class="col-md-4">
+                        <a href="{{ path('user_cashback', {'id': cashback.id }) }}"
+                        class="btn btn-primary">Add/Update Bank Details</a>
+                    </div>
+                    {% endif %}
                 </div>
                 {% endfor %}
             {% endif %}

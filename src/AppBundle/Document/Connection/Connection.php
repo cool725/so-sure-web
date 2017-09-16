@@ -71,6 +71,12 @@ class Connection
     protected $linkedPolicy;
 
     /**
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy", inversedBy="acceptedConnectionsRenewal")
+     * @Gedmo\Versioned
+     */
+    protected $linkedPolicyRenewal;
+
+    /**
      * @Assert\DateTime()
      * @MongoDB\Date()
      * @Gedmo\Versioned
@@ -106,10 +112,10 @@ class Connection
     protected $initialPromoValue;
 
     /**
-     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User")
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Connection\Connection")
      * @Gedmo\Versioned
      */
-    protected $replacementUser;
+    protected $replacementConnection;
 
     /**
      * @Assert\Type("bool")
@@ -180,9 +186,7 @@ class Connection
 
     public function setSourcePolicy(Policy $policy)
     {
-        if ($this->getId() && $this->getLinkedPolicy() && $this->getLinkedPolicy()->getId() == $policy->getId()) {
-            throw new \Exception('Policy can not be linked to itself');
-        }
+        $this->validateSelfConnection($policy, $this->getLinkedPolicy());
 
         $this->sourcePolicy = $policy;
     }
@@ -194,12 +198,42 @@ class Connection
 
     public function setLinkedPolicy(Policy $policy)
     {
+        $this->validateSelfConnection($policy, $this->getSourcePolicy());
+
+        $this->linkedPolicy = $policy;
+        $policy->addAcceptedConnection($this);
+    }
+
+    private function validateSelfConnection($policyA, $policyB)
+    {
+        if (!$policyA || !$policyB || !$policyA->getId() || !$policyB->getId()) {
+            return;
+        }
+
+        if ($policyB->getId() == $policyA->getId()) {
+            throw new \Exception('Policy can not be linked to itself');
+        } elseif ($policyB->getNextPolicy() &&
+            $policyB->getNextPolicy()->getId() == $policyA->getId()) {
+            throw new \Exception('Policy can not be linked to its renewal policy');
+        } elseif ($policyB->getPreviousPolicy() &&
+            $policyB->getPreviousPolicy()->getId() == $policyA->getId()) {
+            throw new \Exception('Policy can not be linked to its previous policy');
+        }
+    }
+
+    public function getLinkedPolicyRenewal()
+    {
+        return $this->linkedPolicyRenewal;
+    }
+
+    public function setLinkedPolicyRenewal(Policy $policy)
+    {
         if ($this->getId() && $this->getSourcePolicy() && $this->getSourcePolicy()->getId() == $policy->getId()) {
             throw new \Exception('Policy can not be linked to itself');
         }
 
-        $this->linkedPolicy = $policy;
-        $policy->addAcceptedConnection($this);
+        $this->linkedPolicyRenewal = $policy;
+        $policy->addAcceptedConnectionRenewal($this);
     }
 
     public function getDate()
@@ -270,15 +304,15 @@ class Connection
         $diff = $date->diff($this->getDate());
         // print $date->format(\DateTime::ATOM) . PHP_EOL;
         // print_r($diff);
-        if ($diff->m < 6) {
+        $totalMonths = $diff->y * 12 + $diff->m;
+        if ($totalMonths < 6) {
             return $this->clearValue();
-        } elseif ($diff->m >= 11) {
+        } elseif ($totalMonths <= 11) {
             // TODO: consider this case - if less than 30 days to replace your connection, shouldn't you get it?
-            \AppBundle\Classes\NoOp::ignore([]);
+            $this->value = $this->toTwoDp($this->value * $totalMonths / 12);
+            $this->promoValue = $this->toTwoDp($this->promoValue * $totalMonths / 12);
         }
-
-        $this->value = $this->toTwoDp($this->value * $diff->m / 12);
-        $this->promoValue = $this->toTwoDp($this->promoValue * $diff->m / 12);
+        // >= 12 months should just keep value
     }
 
     public function getInitialValue()
@@ -291,14 +325,14 @@ class Connection
         return $this->initialPromoValue;
     }
 
-    public function getReplacementUser()
+    public function getReplacementConnection()
     {
-        return $this->replacementUser;
+        return $this->replacementConnection;
     }
 
-    public function setReplacementUser($replacementUser)
+    public function setReplacementConnection($replacementConnection)
     {
-        $this->replacementUser = $replacementUser;
+        $this->replacementConnection = $replacementConnection;
     }
 
     public function toApiArray($claims)
@@ -308,6 +342,10 @@ class Connection
             foreach ($claims as $claim) {
                 if ($this->getLinkedPolicy() &&
                     $claim->getPolicy()->getId() == $this->getLinkedPolicy()->getId() &&
+                    $claim->getClosedDate()) {
+                    $claimDates[] =  $claim->getClosedDate()->format(\DateTime::ATOM);
+                } elseif ($this->getLinkedPolicyRenewal() &&
+                    $claim->getPolicy()->getId() == $this->getLinkedPolicyRenewal()->getId() &&
                     $claim->getClosedDate()) {
                     $claimDates[] =  $claim->getClosedDate()->format(\DateTime::ATOM);
                 }
@@ -330,7 +368,11 @@ class Connection
     public function createRenewal()
     {
         $renewalConnection = new RenewalConnection();
-        $renewalConnection->setLinkedPolicy($this->getLinkedPolicy());
+        if ($this->getLinkedPolicyRenewal()) {
+            $renewalConnection->setLinkedPolicy($this->getLinkedPolicyRenewal());
+        } else {
+            $renewalConnection->setLinkedPolicy($this->getLinkedPolicy());
+        }
         $renewalConnection->setLinkedUser($this->getLinkedUser());
 
         // default to renew the connection
@@ -344,15 +386,13 @@ class Connection
         if (!$this->getSourcePolicy()) {
             return;
         }
+        foreach ($this->getSourcePolicy()->getAcceptedConnectionsRenewal() as $connection) {
+            if ($connection->getLinkedPolicyRenewal() &&
+                $connection->getLinkedPolicyRenewal()->getId() == $this->getSourcePolicy()->getId()) {
+                return $connection;
+            }
+        }
         foreach ($this->getSourcePolicy()->getAcceptedConnections() as $connection) {
-            /*
-            print sprintf("%s/%s : %s -> %s\n",
-                $this->getSourcePolicy()->getId(),
-                $this->getLinkedPolicy()->getId(),
-                $connection->getSourcePolicy()->getId(),
-                $connection->getLinkedPolicy()->getId()
-            );
-            */
             if ($this->getLinkedPolicy() &&
                 $this->getLinkedPolicy()->getId() == $connection->getSourcePolicy()->getId()) {
                 return $connection;
@@ -360,5 +400,30 @@ class Connection
         }
 
         return null;
+    }
+
+    public function getLinkedClaimsDuringPeriod()
+    {
+        $claims = [];
+        $periodStart = clone $this->getSourcePolicy()->getStart();
+        $periodEnd = clone $this->getSourcePolicy()->getEnd();
+        if ($policy = $this->getLinkedPolicyRenewal()) {
+            foreach ($policy->getClaims() as $claim) {
+                if ($claim->getLossDate() && $claim->getLossDate() >= $periodStart &&
+                    $claim->getLossDate() < $periodEnd) {
+                    $claims[] = $claim;
+                }
+            }
+        }
+        if ($policy = $this->getLinkedPolicy()) {
+            foreach ($policy->getClaims() as $claim) {
+                if ($claim->getLossDate() && $claim->getLossDate() >= $periodStart &&
+                    $claim->getLossDate() < $periodEnd) {
+                    $claims[] = $claim;
+                }
+            }
+        }
+
+        return $claims;
     }
 }

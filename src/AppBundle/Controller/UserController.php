@@ -66,7 +66,8 @@ class UserController extends BaseController
         $user = $this->getUser();
         if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
             // mainly for facebook registration, although makes sense for all users
-            if ($this->getSessionQuotePhone($request)) {
+            // check for canPurchasePolicy is necessary to prevent redirect loop
+            if ($this->getSessionQuotePhone($request) && $user->canPurchasePolicy()) {
                 // TODO: If possible to detect if the user came via the purchase page or via the login page
                 // login page would be nice to add a flash message saying their policy has not yet been purchased
                 return new RedirectResponse($this->generateUrl('purchase_step_policy'));
@@ -87,28 +88,31 @@ class UserController extends BaseController
         }
         $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
 
-        $feature = $this->get('app.feature');
-        if ($feature->isEnabled(Feature::FEATURE_RENEWAL)) {
-            // Not able to perform any actions with renewed policies yet
-            if ($policy->getStatus() == Policy::STATUS_RENEWAL) {
-                return new RedirectResponse(
-                    $this->generateUrl('user_renew_policy', ['id' => $policy->getPreviousPolicy()->getId()])
-                );
-            }
+        if ($policy->getStatus() == Policy::STATUS_RENEWAL) {
+            return new RedirectResponse(
+                $this->generateUrl('user_renew_policy', ['id' => $policy->getPreviousPolicy()->getId()])
+            );
+        }
 
-            foreach ($user->getValidPolicies(true) as $checkPolicy) {
-                if ($checkPolicy->notifyRenewal() && !$checkPolicy->isRenewed() && !$checkPolicy->hasCashback()) {
-                    $this->addFlash(
-                        'success',
-                        sprintf(
-                            '%s is ready for <a href="%s">renewal</a>',
-                            $checkPolicy->getPolicyNumber(),
-                            $this->generateUrl('user_renew_policy', ['id' => $checkPolicy->getId()])
-                        )
-                    );
-                }
+        $renewMessage = false;
+        foreach ($user->getValidPolicies(true) as $checkPolicy) {
+            if ($checkPolicy->notifyRenewal() && !$checkPolicy->isRenewed() && !$checkPolicy->hasCashback()) {
+                $this->addFlash(
+                    'success',
+                    sprintf(
+                        '%s is ready for <a href="%s">renewal</a>',
+                        $checkPolicy->getPolicyNumber(),
+                        $this->generateUrl('user_renew_policy', ['id' => $checkPolicy->getId()])
+                    )
+                );
+                $renewMessage = true;
             }
         }
+        if (!$renewMessage) {
+            $this->addCashbackFlash();
+        }
+        $this->addRepurchaseExpiredPolicyFlash();
+        $this->addUnInitPolicyInsureFlash();
 
         $scode = null;
         if ($session = $this->get('session')) {
@@ -382,6 +386,26 @@ class UserController extends BaseController
     }
 
     /**
+     * @Route("/repurchase/{id}", name="user_repurchase_policy")
+     */
+    public function repurchasePolicyAction($id)
+    {
+        $dm = $this->getManager();
+        $policyRepo = $dm->getRepository(Policy::class);
+        $policy = $policyRepo->find($id);
+        if (!$policy) {
+            throw $this->createNotFoundException('Policy not found');
+        }
+
+        $this->denyAccessUnlessGranted(PolicyVoter::REPURCHASE, $policy);
+
+        $policyService = $this->get('app.policy');
+        $newPolicy = $policyService->repurchase($policy);
+
+        return $this->redirectToRoute('purchase_step_policy_id', ['id' => $newPolicy->getId()]);
+    }
+
+    /**
      * @Route("/renew", name="user_renew_policy_any")
      * @Route("/renew/{id}", name="user_renew_policy")
      * @Template
@@ -597,8 +621,6 @@ class UserController extends BaseController
                     $policyService = $this->get('app.policy');
                     $policyService->cashback($policy, $cashback);
 
-                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_CASHBACK);
-
                     $message = sprintf(
                         'Your request for cashback has been accepted.'
                     );
@@ -669,7 +691,7 @@ class UserController extends BaseController
                 $this->addFlash('success', 'Your connections have been updated');
 
                 return new RedirectResponse(
-                    $this->generateUrl('user_renew_completed', ['id' => $id])
+                    $this->generateUrl('user_home')
                 );
             } else {
                 $this->addFlash(
@@ -729,7 +751,7 @@ class UserController extends BaseController
                 $cashback->getId()
             ));
         }
-        $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $cashback->getPolicy());
+        $this->denyAccessUnlessGranted(PolicyVoter::CASHBACK, $cashback->getPolicy());
         $cashbackForm = $this->get('form.factory')
             ->createNamedBuilder('cashback_form', CashbackType::class, $cashback)
             ->getForm();
@@ -738,19 +760,15 @@ class UserController extends BaseController
                 $cashbackForm->handleRequest($request);
                 if ($cashbackForm->isValid()) {
                     $policyService = $this->get('app.policy');
-                    if ($cashback->getPolicy()->getStatus() == Policy::STATUS_EXPIRED) {
-                        $policyService->updateCashback($cashback, Cashback::STATUS_PENDING_PAYMENT);
-                    } elseif (in_array($cashback->getPolicy()->getStatus(), [Policy::STATUS_EXPIRED_CLAIMABLE])) {
-                        // Don't think this case should occur, but the 2 combinations should work if it does
-                        $policyService->updateCashback($cashback, Cashback::STATUS_PENDING_CLAIMABLE);
-                    } elseif (in_array($cashback->getPolicy()->getStatus(), [Policy::STATUS_EXPIRED_WAIT_CLAIM])) {
-                        // Don't think this case should occur, but the 2 combinations should work if it does
-                        $policyService->updateCashback($cashback, Cashback::STATUS_PENDING_WAIT_CLAIM);
+                    if (in_array($cashback->getPolicy()->getStatus(), [
+                        Policy::STATUS_EXPIRED,
+                        Policy::STATUS_EXPIRED_CLAIMABLE,
+                        Policy::STATUS_EXPIRED_WAIT_CLAIM,
+                    ])) {
+                        $policyService->updateCashback($cashback, $cashback->getExpectedStatus());
                     } else {
                         throw new \Exception(sprintf('Unexpected policy status for cashback %s', $cashback->getId()));
                     }
-
-                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_CASHBACK);
 
                     $message = sprintf(
                         'Your request for cashback has been accepted.'
@@ -792,14 +810,61 @@ class UserController extends BaseController
             throw new \Exception('Attempting to access invalid policy page with active/unpaid policy');
         }
 
-        // If there are any policies in progress, redirect to the purchase
-        $unInitPolicies = $user->getUnInitPolicies();
-        if (count($unInitPolicies) > 0) {
-            return $this->redirectToRoute('purchase_step_policy');
-        }
+        $this->addRepurchaseExpiredPolicyFlash();
+
+        $this->addUnInitPolicyInsureFlash();
+
+        $this->addCashbackFlash();
 
         return array(
         );
+    }
+
+    private function addRepurchaseExpiredPolicyFlash()
+    {
+        $user = $this->getUser();
+        $excludePolicyImei = [];
+        foreach ($user->getUnInitPolicies() as $unInitPolicy) {
+            $excludePolicyImei[] = $unInitPolicy->getImei();
+        }
+        foreach ($user->getPolicies() as $policy) {
+            if ($policy->isPolicyExpiredWithin30Days() && !in_array($policy->getImei(), $excludePolicyImei)) {
+                $message = sprintf(
+                    'Re-purchase insurance for your <a href="%s">%s phone</a>',
+                    $this->generateUrl('user_repurchase_policy', ['id' => $policy->getId()]),
+                    $policy->getPhone()->__toString()
+                );
+                $this->addFlash('success', $message);
+            }
+        }
+    }
+
+    private function addUnInitPolicyInsureFlash()
+    {
+        $user = $this->getUser();
+        foreach ($user->getUnInitPolicies() as $unInitPolicy) {
+            $message = sprintf(
+                'Insure your <a href="%s">%s phone</a>',
+                $this->generateUrl('purchase_step_policy_id', ['id' => $unInitPolicy->getId()]),
+                $unInitPolicy->getPhone()->__toString()
+            );
+            $this->addFlash('success', $message);
+        }
+    }
+
+    private function addCashbackFlash()
+    {
+        $user = $this->getUser();
+        foreach ($user->getDisplayableCashbackSorted() as $cashback) {
+            if (in_array($cashback->getStatus(), [Cashback::STATUS_MISSING, Cashback::STATUS_FAILED])) {
+                $message = sprintf(
+                    'You have £%0.2f cashback just waiting for you. <a href="%s">Add/Update your banking details</a>.',
+                    $cashback->getAmount(),
+                    $this->generateUrl('user_cashback', ['id' => $cashback->getId()])
+                );
+                $this->addFlash('success', $message);
+            }
+        }
     }
 
     /**
@@ -1009,7 +1074,9 @@ class UserController extends BaseController
         } else {
             $policy = $user->getLatestPolicy();
         }
-        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+        if ($policy) {
+            $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+        }
 
         return [
             'user' => $user,

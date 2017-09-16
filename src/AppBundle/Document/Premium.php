@@ -95,26 +95,48 @@ abstract class Premium
         return $this->getAnnualDiscount() > 0 && !$this->areEqualToTwoDp(0, $this->getAnnualDiscount());
     }
 
-    public function getMonthlyDiscount()
+    /**
+     * @param float $discount Only use pre-renewal to indicate possible monthly premium values
+     */
+    public function getMonthlyDiscount($discount = null)
     {
-        return floor(100 * $this->annualDiscount / 12) / 100;
+        if (!$discount) {
+            $discount = $this->annualDiscount;
+        }
+        return floor(100 * $discount / 12) / 100;
     }
 
-    public function getAdjustedInitialMonthlyPremiumPrice()
+    /**
+     * @param float $discount Only use pre-renewal to indicate possible monthly premium values
+     */
+    public function getAdjustedFinalMonthlyPremiumPrice($discount = null)
     {
-        $monthlyAdjustment = $this->annualDiscount - ($this->getMonthlyDiscount() * 11);
+        if (!$discount) {
+            $discount = $this->annualDiscount;
+        }
+        $monthlyAdjustment = $discount - ($this->getMonthlyDiscount($discount) * 11);
 
         return $this->toTwoDp($this->getMonthlyPremiumPrice() - $monthlyAdjustment);
     }
 
-    public function getAdjustedStandardMonthlyPremiumPrice()
+    /**
+     * @param float $discount Only use pre-renewal to indicate possible monthly premium values
+     */
+    public function getAdjustedStandardMonthlyPremiumPrice($discount = null)
     {
-        return $this->toTwoDp($this->getMonthlyPremiumPrice() - $this->getMonthlyDiscount());
+        return $this->toTwoDp($this->getMonthlyPremiumPrice() - $this->getMonthlyDiscount($discount));
     }
 
-    public function getAdjustedYearlyPremiumPrice()
+    /**
+     * @param float $discount Only use pre-renewal to indicate possible monthly premium values
+     */
+    public function getAdjustedYearlyPremiumPrice($discount = null)
     {
-        return $this->toTwoDp($this->getYearlyPremiumPrice() - $this->annualDiscount);
+        if (!$discount) {
+            $discount = $this->annualDiscount;
+        }
+
+        return $this->toTwoDp($this->getYearlyPremiumPrice() - $discount);
     }
 
     public function getMonthlyPremiumPrice()
@@ -149,9 +171,16 @@ abstract class Premium
         return $this->getYearlyGwpActual() * $this->getIptRate();
     }
 
-    public function isEvenlyDivisible($amount)
+    public function isEvenlyDivisible($amount, $accountInitial = false)
     {
-        $divisible = $amount / $this->getMonthlyPremiumPrice();
+        if (!$accountInitial) {
+            $divisible = $amount / $this->getMonthlyPremiumPrice();
+        } elseif ($amount > $this->getAdjustedStandardMonthlyPremiumPrice()) {
+            $divisible = ($amount - $this->getAdjustedFinalMonthlyPremiumPrice()) /
+                $this->getAdjustedStandardMonthlyPremiumPrice();
+        } else {
+            $divisible = $amount / $this->getAdjustedStandardMonthlyPremiumPrice();
+        }
         $evenlyDivisbile = $this->areEqualToFourDp(0, $divisible - floor($divisible)) ||
                     $this->areEqualToFourDp(0, ceil($divisible) - $divisible);
 
@@ -160,13 +189,33 @@ abstract class Premium
 
     public function getNumberOfMonthlyPayments($amount)
     {
-        if (!$this->isEvenlyDivisible($amount)) {
+        if ($this->isEvenlyDivisible($amount)) {
+            $divisible = $amount / $this->getAdjustedStandardMonthlyPremiumPrice();
+            $numPayments = round($divisible, 0);
+
+            return $numPayments;
+        } elseif ($this->isEvenlyDivisible($amount, true)) {
+            if ($amount > $this->getAdjustedStandardMonthlyPremiumPrice()) {
+                $divisible = ($amount - $this->getAdjustedFinalMonthlyPremiumPrice()) /
+                    $this->getAdjustedStandardMonthlyPremiumPrice();
+                $numPayments = round($divisible, 0) + 1;
+            } else {
+                $divisible = $amount / $this->getAdjustedStandardMonthlyPremiumPrice();
+                $numPayments = round($divisible, 0);
+            }
+
+            return $numPayments;
+        } else {
             return null;
         }
+    }
 
-        $divisible = $amount / $this->getMonthlyPremiumPrice();
-        $numPayments = round($divisible, 0);
+    public function getNumberOfScheduledMonthlyPayments($amount)
+    {
+        if ($monthlyPayments = $this->getNumberOfMonthlyPayments($amount)) {
+            return 13 - $monthlyPayments;
+        }
 
-        return $numPayments;
+        return null;
     }
 }

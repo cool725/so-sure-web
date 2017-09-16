@@ -36,6 +36,9 @@ class IntercomService
 
     const QUEUE_EVENT_POLICY_CREATED = 'policy-created';
     const QUEUE_EVENT_POLICY_CANCELLED = 'policy-cancelled';
+    const QUEUE_EVENT_POLICY_PENDING_RENEWAL = 'policy-renewal-ready';
+    const QUEUE_EVENT_POLICY_RENEWED = 'policy-renewed';
+    const QUEUE_EVENT_POLICY_START = 'policy-start';
 
     const QUEUE_EVENT_PAYMENT_SUCCESS = 'payment-succeed';
     const QUEUE_EVENT_PAYMENT_FAILED = 'payment-failed';
@@ -276,6 +279,14 @@ class IntercomService
         $data['custom_attributes']['Pending Invites'] = count($user->getUnprocessedReceivedInvitations());
         $data['custom_attributes']['Number of Policies'] = $analytics['numberPolicies'];
         $data['custom_attributes']['Account Paid To Date'] = $analytics['accountPaidToDate'];
+        $data['custom_attributes']['Renewal Monthly Premium'] =
+            $this->toTwoDp($analytics['renewalMonthlyPremiumNoPot']);
+        $data['custom_attributes']['Displayable Renewal Monthly Premium'] =
+            (string) sprintf('%.2f', $this->toTwoDp($analytics['renewalMonthlyPremiumNoPot']));
+        $data['custom_attributes']['Renewal Monthly Premium With Pot'] =
+            $this->toTwoDp($analytics['renewalMonthlyPremiumWithPot']);
+        $data['custom_attributes']['Displayable Renewal Monthly Premium With Pot'] =
+            (string) sprintf('%.2f', $this->toTwoDp($analytics['renewalMonthlyPremiumWithPot']));
         $data['custom_attributes']['Card Details'] = $user->getPaymentMethod() ?
             $user->getPaymentMethod()->__toString() :
             null;
@@ -547,8 +558,13 @@ class IntercomService
                     }
 
                     $this->sendClaimEvent($this->getClaim($data['claimId']), $action);
-                } elseif ($action == self::QUEUE_EVENT_POLICY_CREATED ||
-                          $action == self::QUEUE_EVENT_POLICY_CANCELLED) {
+                } elseif (in_array($action, [
+                    self::QUEUE_EVENT_POLICY_CREATED,
+                    self::QUEUE_EVENT_POLICY_CANCELLED,
+                    self::QUEUE_EVENT_POLICY_PENDING_RENEWAL,
+                    self::QUEUE_EVENT_POLICY_RENEWED,
+                    self::QUEUE_EVENT_POLICY_START,
+                ])) {
                     if (!isset($data['policyId'])) {
                         throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
                     }

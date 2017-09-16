@@ -79,8 +79,8 @@ class DaviesServiceTest extends WebTestCase
 
         $davies = new DaviesClaim();
 
-        self::$daviesService->updatePolicy($claim, $davies);
-        $this->assertEquals($imeiOld, $policy->getImei());
+        self::$daviesService->updatePolicy($claim, $davies, false);
+        $this->assertEquals($imeiOld, $policy->getImei(), false);
         $this->assertEquals(self::$phoneA->getId(), $policy->getPhone()->getId());
 
         $claimB = new Claim();
@@ -93,7 +93,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesB->replacementMake = 'Apple';
         $daviesB->replacementModel = 'iPhone 4';
 
-        self::$daviesService->updatePolicy($claimB, $daviesB);
+        self::$daviesService->updatePolicy($claimB, $daviesB, false);
         $this->assertEquals($imeiNew, $policy->getImei());
         $this->assertEquals(self::$phoneB->getId(), $policy->getPhone()->getId());
     }
@@ -117,7 +117,7 @@ class DaviesServiceTest extends WebTestCase
 
         $davies = new DaviesClaim();
 
-        self::$daviesService->updatePolicy($claim, $davies);
+        self::$daviesService->updatePolicy($claim, $davies, false);
         $this->assertEquals($imeiOld, $policy->getImei());
         $this->assertEquals(self::$phoneA->getId(), $policy->getPhone()->getId());
 
@@ -133,14 +133,58 @@ class DaviesServiceTest extends WebTestCase
         $daviesB->replacementMake = 'Apple';
         $daviesB->replacementModel = 'iPhone 4';
 
-        self::$daviesService->updatePolicy($claimB, $daviesB);
+        self::$daviesService->updatePolicy($claimB, $daviesB, false);
         $this->assertEquals($imeiNew, $policy->getImei());
         $this->assertEquals(self::$phoneB->getId(), $policy->getPhone()->getId());
 
         // Rerunning old settled claim should keep the newer imei
         $this->assertEquals(Claim::STATUS_SETTLED, $claim->getStatus());
-        self::$daviesService->updatePolicy($claim, $davies);
+        self::$daviesService->updatePolicy($claim, $davies, false);
         $this->assertEquals($imeiNew, $policy->getImei());
+        $this->assertEquals(self::$phoneB->getId(), $policy->getPhone()->getId());
+    }
+
+    public function testUpdatePolicyManyOpenClaims()
+    {
+        $imeiOriginal = self::generateRandomImei();
+        $imeiOld = self::generateRandomImei();
+        $imeiNew = self::generateRandomImei();
+
+        $policy = new PhonePolicy();
+        $policy->setId('1');
+        $policy->setImei($imeiOriginal);
+        $policy->setPhone(self::$phoneA);
+
+        $claim = new Claim();
+        $claim->setReplacementPhone(self::$phoneA);
+        $claim->setReplacementImei($imeiOld);
+        $claim->setStatus(Claim::STATUS_APPROVED);
+        $policy->addClaim($claim);
+
+        $davies = new DaviesClaim();
+
+        self::$daviesService->updatePolicy($claim, $davies, false);
+        $this->assertEquals($imeiOld, $policy->getImei());
+        $this->assertEquals(self::$phoneA->getId(), $policy->getPhone()->getId());
+
+        $claimB = new Claim();
+        $claimB->setReplacementPhone(self::$phoneB);
+        $claimB->setReplacementImei($imeiNew);
+        $claimB->setStatus(Claim::STATUS_APPROVED);
+        $policy->addClaim($claimB);
+
+        $daviesB = new DaviesClaim();
+        $daviesB->replacementMake = 'Apple';
+        $daviesB->replacementModel = 'iPhone 4';
+
+        self::$daviesService->updatePolicy($claimB, $daviesB, true);
+        $this->assertEquals($imeiOld, $policy->getImei());
+        $this->assertEquals(self::$phoneB->getId(), $policy->getPhone()->getId());
+
+        // Rerunning old settled claim should keep the newer imei
+        $this->assertEquals(Claim::STATUS_APPROVED, $claim->getStatus());
+        self::$daviesService->updatePolicy($claim, $davies, true);
+        $this->assertEquals($imeiOld, $policy->getImei());
         $this->assertEquals(self::$phoneB->getId(), $policy->getPhone()->getId());
     }
 
@@ -177,13 +221,13 @@ class DaviesServiceTest extends WebTestCase
         $daviesOpen->policyNumber = '1';
         $daviesOpen->status = 'Open';
 
-        self::$daviesService->clearWarnings();
+        self::$daviesService->clearErrors();
 
-        $this->assertEquals(0, count(self::$daviesService->getWarnings()));
+        $this->assertEquals(0, count(self::$daviesService->getErrors()));
         self::$daviesService->saveClaims(1, [$daviesOpen, $daviesOpen]);
-        $this->assertEquals(1, count(self::$daviesService->getWarnings()));
+        $this->assertEquals(1, count(self::$daviesService->getErrors()));
 
-        $this->insureWarningExists('/multiple open claims against policy/');
+        $this->insureErrorExists('/multiple open claims against policy/');
     }
 
     public function testSaveClaimsSaveException()
@@ -674,7 +718,7 @@ class DaviesServiceTest extends WebTestCase
         $claim = new Claim();
         $claim->setNumber(rand(1, 999999));
         $claim->setType(Claim::TYPE_LOSS);
-        $claim->setStatus(Claim::STATUS_APPROVED);
+        $claim->setStatus(Claim::STATUS_INREVIEW);
         $policy->addClaim($claim);
         static::$dm->persist($policy->getUser());
         static::$dm->persist($policy);
@@ -690,7 +734,8 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->status = DaviesClaim::STATUS_OPEN;
         $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
         $daviesClaim->replacementReceivedDate = new \DateTime('2016-01-02');
-        static::$daviesService->saveClaim($daviesClaim);
+        static::$daviesService->saveClaim($daviesClaim, false);
+        $this->assertNotNull($claim->getApprovedDate());
         $this->assertEquals(new \DateTime('2016-01-01'), $claim->getApprovedDate());
     }
 
@@ -717,14 +762,14 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->status = DaviesClaim::STATUS_OPEN;
         $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
         $daviesClaim->replacementReceivedDate = new \DateTime('2016-01-02');
-        static::$daviesService->saveClaim($daviesClaim);
+        static::$daviesService->saveClaim($daviesClaim, false);
         $this->assertEquals(new \DateTime('2016-01-01'), $claim->getApprovedDate());
         $this->assertEquals(0, $claim->getIncurred());
 
         // fail validation
         $daviesClaim->location = '☺';
         $daviesClaim->incurred = 1;
-        static::$daviesService->saveClaim($daviesClaim);
+        static::$daviesService->saveClaim($daviesClaim, false);
 
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(Claim::class);
@@ -733,7 +778,7 @@ class DaviesServiceTest extends WebTestCase
 
         $daviesClaim->location = null;
         $daviesClaim->incurred = 2;
-        static::$daviesService->saveClaim($daviesClaim);
+        static::$daviesService->saveClaim($daviesClaim, false);
 
         $updatedClaim = $repo->find($claim->getId());
         $this->assertEquals(2, $updatedClaim->getIncurred());
@@ -762,7 +807,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->insuredName = 'Mr foo bar';
         $daviesClaim->status = DaviesClaim::STATUS_OPEN;
         $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
-        static::$daviesService->saveClaim($daviesClaim);
+        static::$daviesService->saveClaim($daviesClaim, false);
         $this->assertEquals(Claim::STATUS_APPROVED, $claim->getStatus());
         $now = new \DateTime();
         $yesterday = $this->subBusinessDays($now, 1);
@@ -791,7 +836,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->insuredName = 'Mr foo bar';
         $daviesClaim->status = DaviesClaim::STATUS_OPEN;
         $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
-        static::$daviesService->saveClaim($daviesClaim);
+        static::$daviesService->saveClaim($daviesClaim, false);
         $now = new \DateTime();
         $yesterday = $this->subBusinessDays($now, 1);
         $this->assertEquals($yesterday, $claim->getApprovedDate());

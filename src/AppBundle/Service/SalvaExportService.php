@@ -239,7 +239,7 @@ class SalvaExportService
         return $lines;
     }
 
-    public function exportPayments($s3, \DateTime $date = null)
+    public function exportPayments($s3, $includeBrokerFee, \DateTime $date = null)
     {
         if (!$date) {
             $date = new \DateTime();
@@ -250,13 +250,13 @@ class SalvaExportService
         $total = 0;
         $numPayments = 0;
         $repo = $this->dm->getRepository(Payment::class);
-        $lines[] = sprintf("%s", $this->formatLine($this->transformPayment(null)));
+        $lines[] = sprintf("%s", $this->formatLine($this->transformPayment(null, $includeBrokerFee)));
         foreach ($repo->getAllPaymentsForExport($date) as $payment) {
             // For prod, skip invalid policies
             if ($this->environment == 'prod' && !$payment->getPolicy()->isValidPolicy()) {
                 continue;
             }
-            $data = $this->transformPayment($payment);
+            $data = $this->transformPayment($payment, $includeBrokerFee);
             $total += $data[2];
             $numPayments++;
             $lines[] = sprintf("%s", $this->formatLine($data));
@@ -334,7 +334,7 @@ class SalvaExportService
         return $s3Key;
     }
 
-    public function transformPayment(Payment $payment = null)
+    public function transformPayment(Payment $payment = null, $includeBrokerFee = true)
     {
         if ($payment) {
             if (!$payment->isSuccess()) {
@@ -347,6 +347,9 @@ class SalvaExportService
                 $this->toTwoDp($payment->getAmount()),
                 $payment->getNotes() ? $payment->getNotes() : '',
             ];
+            if ($includeBrokerFee) {
+                $data[] = $this->toTwoDp($payment->getTotalCommission());
+            }
         } else {
             $data = [
                 'PolicyNumber',
@@ -354,6 +357,9 @@ class SalvaExportService
                 'PaymentAmount',
                 'Notes',
             ];
+            if ($includeBrokerFee) {
+                $data[] = 'BrokerFee';
+            }
         }
 
         return $data;
@@ -432,14 +438,18 @@ class SalvaExportService
         return $responseId;
     }
 
-    public function cancelPolicy(SalvaPhonePolicy $phonePolicy, $reason = null)
+    public function cancelPolicy(SalvaPhonePolicy $phonePolicy, $reason = null, $version = null)
     {
         $date = $phonePolicy->getEnd();
 
         // We should only bump the salva version if we're replacing a policy
         if ($reason && $reason == self::CANCELLED_REPLACE) {
             // latest start date same as previous termination date
-            $date = $phonePolicy->getLatestSalvaStartDate();
+            if ($version) {
+                $date = $phonePolicy->getSalvaStartDate($version + 1);
+            } else {
+                $date = $phonePolicy->getLatestSalvaStartDate();
+            }
         }
 
         if (!$reason) {
@@ -467,7 +477,7 @@ class SalvaExportService
             }
         }
 
-        $cancelXml = $this->cancelXml($phonePolicy, $reason, $date);
+        $cancelXml = $this->cancelXml($phonePolicy, $reason, $date, $version);
         $xml = $cancelXml['xml'];
         $this->logger->info($xml);
         if (!$this->validate($xml, self::SCHEMA_POLICY_TERMINATE)) {
@@ -687,19 +697,21 @@ class SalvaExportService
         }
     }
 
-    public function cancelXml(SalvaPhonePolicy $phonePolicy, $reason, $date)
+    public function cancelXml(SalvaPhonePolicy $phonePolicy, $reason, $date, $version = null)
     {
-        if ($reason == self::CANCELLED_REPLACE) {
-            // Make sure policy was incremented prior to calling
-            $version = $phonePolicy->getLatestSalvaPolicyNumberVersion() - 1;
-            if (!isset($phonePolicy->getPaymentsForSalvaVersions()[$version])) {
-                throw new \Exception(sprintf(
-                    'Missing version %s for salva. Was version incremented prior to cancellation?',
-                    $version
-                ));
+        if (!$version) {
+            if ($reason == self::CANCELLED_REPLACE) {
+                // Make sure policy was incremented prior to calling
+                $version = $phonePolicy->getLatestSalvaPolicyNumberVersion() - 1;
+                if (!isset($phonePolicy->getPaymentsForSalvaVersions()[$version])) {
+                    throw new \Exception(sprintf(
+                        'Missing version %s for salva. Was version incremented prior to cancellation?',
+                        $version
+                    ));
+                }
+            } else {
+                    $version = $phonePolicy->getLatestSalvaPolicyNumberVersion();
             }
-        } else {
-            $version = $phonePolicy->getLatestSalvaPolicyNumberVersion();
         }
 
         $policyNumber = $phonePolicy->getSalvaPolicyNumber($version);
@@ -805,7 +817,7 @@ class SalvaExportService
         $insuredObjects->appendChild($insuredObject);
         $insuredObject->appendChild($dom->createElement('ns2:productObjectCode', 'ss_phone'));
         $insuredObject->appendChild(
-            $dom->createElement('ns2:tariffDate', $this->adjustDate($phonePolicy->getStart()))
+            $dom->createElement('ns2:tariffDate', $this->adjustDate($phonePolicy->getIssueDate()))
         );
 
         $objectCustomers = $dom->createElement('ns2:objectCustomers');

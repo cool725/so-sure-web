@@ -14,6 +14,8 @@ class PolicyVoter extends Voter
     const SEND_INVITATION = 'send-invitation';
     const CONNECT = 'connect';
     const RENEW = 'renew';
+    const CASHBACK = 'cashback';
+    const REPURCHASE = 'repurchase';
 
     public function supports($attribute, $subject)
     {
@@ -22,8 +24,10 @@ class PolicyVoter extends Voter
             self::VIEW,
             self::EDIT,
             self::SEND_INVITATION,
+            self::CASHBACK,
             self::CONNECT,
             self::RENEW,
+            self::REPURCHASE,
         ])) {
             return false;
         }
@@ -51,6 +55,12 @@ class PolicyVoter extends Voter
 
         if ($attribute == self::RENEW) {
             if (!$policy->canRenew()) {
+                return false;
+            }
+        }
+
+        if ($attribute == self::REPURCHASE) {
+            if (!$policy->canRepurchase()) {
                 return false;
             }
         }

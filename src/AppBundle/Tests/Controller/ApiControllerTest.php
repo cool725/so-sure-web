@@ -1220,9 +1220,27 @@ class ApiControllerTest extends BaseControllerTest
     /**
      *
      */
-    public function testVersionOk()
+    public function testVersionTooOldiOS()
     {
-        $crawler = self::$client->request('GET', '/api/v1/version?platform=ios&version=0.0.1');
+        $crawler = self::$client->request('GET', '/api/v1/version?platform=ios&version=1.5.4');
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_UPGRADE_APP);
+    }
+
+    public function testVersionTooOldAndroid()
+    {
+        $crawler = self::$client->request('GET', '/api/v1/version?platform=android&version=1.5.7');
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_UPGRADE_APP);
+    }
+
+    public function testVersionOkiOS()
+    {
+        $crawler = self::$client->request('GET', '/api/v1/version?platform=ios&version=1.5.5');
+        $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
+    }
+
+    public function testVersionOkAndroid()
+    {
+        $crawler = self::$client->request('GET', '/api/v1/version?platform=android&version=1.5.8');
         $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
     }
 
@@ -1269,13 +1287,13 @@ class ApiControllerTest extends BaseControllerTest
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
 
-        $url = '/api/v1/version?platform=ios&version=0.0.1&device=iPhone%205c&memory=32&uuid=1&_method=GET';
+        $url = '/api/v1/version?platform=ios&version=2.0.1&device=iPhone%205c&memory=32&uuid=1&_method=GET';
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
         $redis = self::$client->getContainer()->get('snc_redis.default');
         $data = json_decode($redis->get(sprintf("device:%s", $cognitoIdentityId)), true);
         $this->assertEquals('ios', $data['platform']);
-        $this->assertEquals('0.0.1', $data['version']);
+        $this->assertEquals('2.0.1', $data['version']);
         $this->assertEquals(1, $data['uuid']);
         $this->assertEquals('iPhone 5c', $data['device']);
         $this->assertEquals(32, $data['memory']);
@@ -1290,7 +1308,7 @@ class ApiControllerTest extends BaseControllerTest
         );
         $cognitoIdentityId = $this->getAuthUser($user);
 
-        $url = '/api/v1/version?platform=ios&version=0.0.1&device=iPhone%205c&memory=32&uuid=1&_method=GET';
+        $url = '/api/v1/version?platform=ios&version=2.0.1&device=iPhone%205c&memory=32&uuid=1&_method=GET';
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
 
@@ -1300,7 +1318,7 @@ class ApiControllerTest extends BaseControllerTest
         $identityLog = $updatedUser->getLatestMobileIdentityLog();
 
         $this->assertEquals('ios', $identityLog->getPlatform());
-        $this->assertEquals('0.0.1', $identityLog->getVersion());
+        $this->assertEquals('2.0.1', $identityLog->getVersion());
         $this->assertEquals(1, $identityLog->getUuid());
         $this->assertNotNull($identityLog->getPhone());
     }
@@ -1317,7 +1335,7 @@ class ApiControllerTest extends BaseControllerTest
         $cognitoIdentityId = $this->getAuthUser($user);
 
         $url = sprintf(
-            '/api/v1/version?platform=ios&version=0.0.1&device=%s&memory=%d&uuid=1&_method=GET',
+            '/api/v1/version?platform=ios&version=2.0.1&device=%s&memory=%d&uuid=1&_method=GET',
             $phone->getDevices()[0],
             $phone->getMemory()
         );
@@ -1343,14 +1361,14 @@ class ApiControllerTest extends BaseControllerTest
 
     public function testVersion2NoInclude()
     {
-        $crawler = self::$client->request('GET', '/api/v1/version/v2?platform=ios&version=0.0.1');
+        $crawler = self::$client->request('GET', '/api/v1/version/v2?platform=ios&version=2.0.1');
         $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
         $this->assertFalse(isset($data['feature_flags']));
     }
 
     public function testVersion2Include()
     {
-        $crawler = self::$client->request('GET', '/api/v1/version/v2?platform=ios&version=0.0.1&include=feature-flags');
+        $crawler = self::$client->request('GET', '/api/v1/version/v2?platform=ios&version=2.0.1&include=feature-flags');
         $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
         $this->assertTrue(count($data['feature_flags']['flags']) > 0);
     }

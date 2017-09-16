@@ -20,6 +20,9 @@ class MailerService
     /** @var string */
     protected $defaultSenderName;
 
+    /** @var string */
+    protected $baseUrl;
+
     public function setMailer($mailer)
     {
         $this->mailer = $mailer;
@@ -32,6 +35,7 @@ class MailerService
      * @param               $router
      * @param string        $defaultSenderAddress
      * @param string        $defaultSenderName
+     * @param string        $baseUrl
      */
     public function __construct(
         \Swift_Mailer $mailer,
@@ -39,7 +43,8 @@ class MailerService
         $templating,
         $router,
         $defaultSenderAddress,
-        $defaultSenderName
+        $defaultSenderName,
+        $baseUrl
     ) {
         $this->mailer = $mailer;
         $this->smtp = $smtp;
@@ -47,6 +52,7 @@ class MailerService
         $this->router = $router->getRouter();
         $this->defaultSenderAddress = $defaultSenderAddress;
         $this->defaultSenderName = $defaultSenderName;
+        $this->baseUrl = $baseUrl;
     }
 
     public function sendTemplate(
@@ -182,5 +188,14 @@ class MailerService
                 unlink($attachmentFile);
             }
         }
+    }
+
+    public function generateUrl($route, $params)
+    {
+        return sprintf(
+            "%s%s",
+            $this->baseUrl,
+            $this->router->generate($route, $params)
+        );
     }
 }

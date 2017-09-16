@@ -75,11 +75,61 @@ class SalvaExportServiceTest extends WebTestCase
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
         $policy->setStatus(SalvaPhonePolicy::STATUS_PENDING);
+
+        $issueDate = new \DateTime();
         static::$policyService->create($policy);
+        $issueDate2 = clone $issueDate;
+        $issueDate2->add(new \DateInterval('PT1S'));
 
         $xml = static::$salva->createXml($policy);
         $this->assertTrue(static::$salva->validate($xml, SalvaExportService::SCHEMA_POLICY_IMPORT));
         $this->assertGreaterThan(0, stripos($xml, $user->getId()));
+
+        $tariff = sprintf('<ns2:tariffDate>%s</ns2:tariffDate>', static::$salva->adjustDate($issueDate));
+        $tariff2 = sprintf('<ns2:tariffDate>%s</ns2:tariffDate>', static::$salva->adjustDate($issueDate2));
+        $this->assertTrue(stripos($xml, $tariff) !== false || stripos($xml, $tariff2) !== false);
+
+        $startDate = sprintf(
+            '<ns2:insurancePeriodStart>%s</ns2:insurancePeriodStart>',
+            static::$salva->adjustDate($issueDate)
+        );
+        $startDate2 = sprintf(
+            '<ns2:insurancePeriodStart>%s</ns2:insurancePeriodStart>',
+            static::$salva->adjustDate($issueDate2)
+        );
+        $this->assertTrue(stripos($xml, $startDate) !== false || stripos($xml, $startDate2) !== false);
+    }
+
+    public function testCreateXmlRenewal()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testCreateXmlRenewal', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $policy->setStatus(SalvaPhonePolicy::STATUS_PENDING);
+
+        $futureDate = new \DateTime();
+        $futureDate = $futureDate->add(new \DateInterval('P20D'));
+        $issueDate = new \DateTime();
+        static::$policyService->create($policy, $futureDate);
+        $issueDate2 = clone $issueDate;
+        $issueDate2->add(new \DateInterval('PT1S'));
+
+        $xml = static::$salva->createXml($policy);
+        $this->assertTrue(static::$salva->validate($xml, SalvaExportService::SCHEMA_POLICY_IMPORT));
+        $this->assertGreaterThan(0, stripos($xml, $user->getId()));
+
+        $tariff = sprintf('<ns2:tariffDate>%s</ns2:tariffDate>', static::$salva->adjustDate($issueDate));
+        $tariff2 = sprintf('<ns2:tariffDate>%s</ns2:tariffDate>', static::$salva->adjustDate($issueDate2));
+        $this->assertTrue(stripos($xml, $tariff) !== false || stripos($xml, $tariff2) !== false);
+
+        $startDate = sprintf(
+            '<ns2:insurancePeriodStart>%s</ns2:insurancePeriodStart>',
+            static::$salva->adjustDate($futureDate)
+        );
+        $this->assertContains($startDate, $xml);
     }
 
     public function testCreateXmlCompany()

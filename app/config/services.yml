@@ -387,6 +387,7 @@ services:
             router:               "@api.router"
             defaultSenderAddress: "%default_sender_address%"
             defaultSenderName:    "%default_sender_name%"
+            baseUrl:              "%api_base_url%"
 
     app.ratelimit:
         class: AppBundle\Service\RateLimitService
@@ -647,6 +648,9 @@ services:
             -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
             -  { name: kernel.event_listener, event: event.policy.pot, method: onPolicyPotEvent }
             -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
+            -  { name: kernel.event_listener, event: event.policy.pending-renewal, method: onPolicyPendingRenewedEvent }
+            -  { name: kernel.event_listener, event: event.policy.renewed, method: onPolicyRenewedEvent }
+            -  { name: kernel.event_listener, event: event.policy.start, method: onPolicyStartEvent }
             -  { name: kernel.event_listener, event: event.invitation.accepted, method: onInvitationAcceptedEvent }
             -  { name: kernel.event_listener, event: event.connection.connected, method: onConnectionConnectedEvent }
             -  { name: kernel.event_listener, event: event.payment.success, method: onPaymentSuccessEvent }
@@ -666,6 +670,7 @@ services:
             -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
             -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
             -  { name: kernel.event_listener, event: event.policy.renewed, method: onPolicyRenewedEvent }
+            -  { name: kernel.event_listener, event: event.policy.cashback, method: onPolicyCashbackEvent }
 
     app.listener.push:
         class:   AppBundle\Listener\PushListener

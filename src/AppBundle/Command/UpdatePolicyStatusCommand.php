@@ -14,7 +14,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\User;
 
-class UpdatePolicyStatusCommand extends ContainerAwareCommand
+class UpdatePolicyStatusCommand extends BaseCommand
 {
     protected function configure()
     {
@@ -33,6 +33,18 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
                 InputOption::VALUE_REQUIRED,
                 'Policy prefix'
             )
+            ->addOption(
+                'id',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Policy Id - will ignore feature flags'
+            )
+            ->addOption(
+                'skip-email',
+                null,
+                InputOption::VALUE_NONE,
+                'Skip sending email. Development use only!'
+            )
         ;
     }
 
@@ -43,10 +55,15 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
         $lines[] = '';
         $ignoreLineCount++;
         $dryRun = true === $input->getOption('dry-run');
+        $skipEmail = true === $input->getOption('skip-email');
         $prefix = $input->getOption('prefix');
+        $policyId = $input->getOption('id');
 
         $policyService = $this->getContainer()->get('app.policy');
         $featureService = $this->getContainer()->get('app.feature');
+        if ($skipEmail) {
+            $policyService->setMailer(null);
+        }
 
         // Unpaid Policies - Cancel
         $cancelled = $policyService->cancelUnpaidPolicies($prefix, $dryRun);
@@ -76,7 +93,23 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
         $lines[] = '';
         $ignoreLineCount++;
 
-        if ($featureService->isEnabled(Feature::FEATURE_RENEWAL)) {
+        if ($policyId) {
+            $repo = $this->getManager()->getRepository(Policy::class);
+            $policy = $repo->find($policyId);
+            if (!$policy) {
+                throw new \Exception('Unable to find policy');
+            }
+            if ($policy->canCreatePendingRenewal()) {
+                if (!$dryRun) {
+                    $policyService->createPendingRenewal($policy);
+                    $lines[] = sprintf(
+                        'Created partial policy for %s/%s',
+                        $policy->getPolicyNumber(),
+                        $policy->getId()
+                    );
+                }
+            }
+        } elseif ($featureService->isEnabled(Feature::FEATURE_RENEWAL)) {
             // Create Polices - Pending Renewal
             $pendingRenewal = $policyService->createPendingRenewalPolicies($prefix, $dryRun);
             $copy = 'Partial Renewal Policy';
@@ -90,40 +123,40 @@ class UpdatePolicyStatusCommand extends ContainerAwareCommand
             $ignoreLineCount++;
             $lines[] = '';
             $ignoreLineCount++;
-
-            // Activate Policies - Renewed
-            $renewal = $policyService->activateRenewalPolicies($prefix, $dryRun);
-            $copy = 'Activated Renewal Policy';
-            if ($dryRun) {
-                $copy = 'Dry Run - Should activate Renewal Policy';
-            }
-            foreach ($renewal as $id => $number) {
-                $lines[] = sprintf('%s %s / %s', $copy, $number, $id);
-            }
-            $lines[] = sprintf('%s activated renewal policies processed', count($renewal));
-            $ignoreLineCount++;
-            $lines[] = '';
-            $ignoreLineCount++;
-
-            // Unrenew Policies (Pending Renewal -> UnRenewed)
-            $unrenewed = $policyService->unrenewPolicies($prefix, $dryRun);
-            $copy = 'Unrenewed Policy';
-            if ($dryRun) {
-                $copy = 'Dry Run - Should unrenew Policy';
-            }
-            foreach ($unrenewed as $id => $number) {
-                $lines[] = sprintf('%s %s / %s', $copy, $number, $id);
-            }
-            $lines[] = sprintf('%s unrenewed policies processed', count($unrenewed));
-            $ignoreLineCount++;
-            $lines[] = '';
-            $ignoreLineCount++;
         } else {
-            $lines[] = 'Renewal feature flag not enabled. Skipping partial policy creation & renewal activation.';
+            $lines[] = 'Renewal feature flag not enabled. Skipping pending renewal policy creation.';
             $ignoreLineCount++;
             $lines[] = '';
             $ignoreLineCount++;
         }
+
+        // Activate Policies - Renewed
+        $renewal = $policyService->activateRenewalPolicies($prefix, $dryRun);
+        $copy = 'Activated Renewal Policy';
+        if ($dryRun) {
+            $copy = 'Dry Run - Should activate Renewal Policy';
+        }
+        foreach ($renewal as $id => $number) {
+            $lines[] = sprintf('%s %s / %s', $copy, $number, $id);
+        }
+        $lines[] = sprintf('%s activated renewal policies processed', count($renewal));
+        $ignoreLineCount++;
+        $lines[] = '';
+        $ignoreLineCount++;
+
+        // Unrenew Policies (Pending Renewal -> UnRenewed)
+        $unrenewed = $policyService->unrenewPolicies($prefix, $dryRun);
+        $copy = 'Unrenewed Policy';
+        if ($dryRun) {
+            $copy = 'Dry Run - Should unrenew Policy';
+        }
+        foreach ($unrenewed as $id => $number) {
+            $lines[] = sprintf('%s %s / %s', $copy, $number, $id);
+        }
+        $lines[] = sprintf('%s unrenewed policies processed', count($unrenewed));
+        $ignoreLineCount++;
+        $lines[] = '';
+        $ignoreLineCount++;
 
         // Expire Policies - (Active/Unpaid)
         $expired = $policyService->expireEndingPolicies($prefix, $dryRun);

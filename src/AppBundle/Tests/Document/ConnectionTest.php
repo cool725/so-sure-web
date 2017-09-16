@@ -41,6 +41,65 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(15, $connection->getTotalValue());
     }
 
+    /**
+     * @expectedException \Exception
+     */
+    public function testConnectionSelf()
+    {
+        $userA = new User();
+        $policyA = new PhonePolicy();
+        $policyA->setId(1);
+        $policyA->setUser($userA);
+
+        $connectionAA = new StandardConnection();
+        $connectionAA->setId(12);
+        $connectionAA->setSourcePolicy($policyA);
+        $connectionAA->setLinkedPolicy($policyA);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testConnectionPrevious()
+    {
+        $userA = new User();
+        $policyA = new PhonePolicy();
+        $policyA->setId(1);
+        $policyA->setUser($userA);
+
+        $policyB = new PhonePolicy();
+        $policyB->setId(2);
+        $policyB->setUser($userA);
+        $policyB->link($policyA);
+
+        $connectionAB = new StandardConnection();
+        $connectionAB->setId(12);
+        $connectionAB->setSourcePolicy($policyA);
+        $connectionAB->setLinkedPolicy($policyB);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testConnectionNext()
+    {
+        $userA = new User();
+        $policyA = new PhonePolicy();
+        $policyA->setId(1);
+        $policyA->setUser($userA);
+
+        $policyB = new PhonePolicy();
+        $policyB->setId(2);
+        $policyB->setUser($userA);
+
+        $policyA->link($policyB);
+
+        $connectionAB = new StandardConnection();
+        $connectionAB->setId(12);
+        $connectionAB->setSourcePolicy($policyA);
+        $connectionAB->setLinkedPolicy($policyB);
+    }
+
     public function testInversedConnection()
     {
         $userA = new User();

@@ -1,0 +1,25 @@
+{% extends 'AppBundle:Email:base.txt.twig' %}
+{% block body %}
+Important information about your Reward Pot.
+
+**
+------------------------------------------------------------
+Hi {{ policy.user.name }},
+
+Your so-sure Reward Pot value has been updated as you or one of your connections have made a claim with us.
+
+The claim has been successful and you’ve helped your connection replace their device, however, that means that your Reward Pot has been reduced to £{{ policy.getAdjustedRewardPotPaymentAmount|number_format(2,'.',',') }}. 
+
+As you have used your Reward Pot to discount your renewal policy, there is now an outstanding amount of £{{ additional_amount|number_format(2,'.',',') }} due on your renwal policy, which we have billed to your card on file.
+
+{% if policy.premiumPlan == 'monthly' %}
+Additionally, as you are making monthly payments, we have adjusted your monthly bill to £{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} which is the standard premium for your {{ policy.phone }} without the reward pot discount.
+{% endif %}
+
+Changes in the Reward Pot values have been applied to all of the policyholders connected to this claimant.
+
+If you have any further questions on this, please do not hesitate to contact us.
+
+Best,
+SO-SURE Team
+{% endblock body %}

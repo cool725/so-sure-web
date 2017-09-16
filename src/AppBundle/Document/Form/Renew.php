@@ -68,34 +68,32 @@ class Renew
 
     public function getMonthlyPremiumPrice()
     {
-        // TODO: Current Price or new policy price? Depends on IPT
-        $price = $this->getPolicy()->getPhone()->getCurrentPhonePrice();
-        return $price->getMonthlyPremiumPrice();
+        $premium = $this->getPolicy()->getNextPolicy()->getPremium();
+
+        return $premium->getMonthlyPremiumPrice();
     }
 
     public function getYearlyPremiumPrice()
     {
-        // TODO: Current Price or new policy price? Depends on IPT
-        $price = $this->getPolicy()->getPhone()->getCurrentPhonePrice();
-        return $price->getYearlyPremiumPrice();
+        $premium = $this->getPolicy()->getNextPolicy()->getPremium();
+
+        return $premium->getYearlyPremiumPrice();
     }
 
     public function getAdjustedStandardMonthlyPremiumPrice()
     {
         $potValue = $this->getPolicy()->getPotValue();
-        // TODO: Current Price or new policy price? Depends on IPT
-        $price = $this->getPolicy()->getPhone()->getCurrentPhonePrice();
+        $premium = $this->getPolicy()->getNextPolicy()->getPremium();
 
-        return $price->getAdjustedStandardMonthlyPremiumPrice($potValue);
+        return $premium->getAdjustedStandardMonthlyPremiumPrice($potValue);
     }
 
     public function getAdjustedYearlyPremiumPrice()
     {
         $potValue = $this->getPolicy()->getPotValue();
-        // TODO: Current Price or new policy price? Depends on IPT
-        $price = $this->getPolicy()->getPhone()->getCurrentPhonePrice();
+        $premium = $this->getPolicy()->getNextPolicy()->getPremium();
 
-        return $price->getAdjustedYearlyPremiumPrice($potValue);
+        return $premium->getAdjustedYearlyPremiumPrice($potValue);
     }
 
     public function useSimpleAmount()
@@ -115,23 +113,21 @@ class Renew
         $usePot = filter_var($data[2], FILTER_VALIDATE_BOOLEAN);
 
         $potValue = $this->getPolicy()->getPotValue();
-        // TODO: allow discounted price as well
-        // TODO: Current Price or new policy price? Depends on IPT
-        $price = $this->getPolicy()->getPhone()->getCurrentPhonePrice();
-        $monthlyPrice = $price->getMonthlyPremiumPrice();
-        $monthlyInitialAdjustedPrice = $price->getAdjustedInitialMonthlyPremiumPrice($potValue);
-        $monthlyStandardAdjustedPrice = $price->getAdjustedStandardMonthlyPremiumPrice($potValue);
-        $yearlyPrice = $price->getYearlyPremiumPrice();
-        $yearlyAdjustedPrice = $price->getAdjustedYearlyPremiumPrice($potValue);
+        $premium = $this->getPolicy()->getNextPolicy()->getPremium();
+        $monthlyPrice = $premium->getMonthlyPremiumPrice();
+        $monthlyFinalAdjustedPrice = $premium->getAdjustedFinalMonthlyPremiumPrice($potValue);
+        $monthlyStandardAdjustedPrice = $premium->getAdjustedStandardMonthlyPremiumPrice($potValue);
+        $yearlyPrice = $premium->getYearlyPremiumPrice();
+        $yearlyAdjustedPrice = $premium->getAdjustedYearlyPremiumPrice($potValue);
 
         if ($usePot &&
-            !$this->areEqualToTwoDp($amount, $monthlyInitialAdjustedPrice) &&
+            !$this->areEqualToTwoDp($amount, $monthlyFinalAdjustedPrice) &&
             !$this->areEqualToTwoDp($amount, $monthlyStandardAdjustedPrice) &&
             !$this->areEqualToTwoDp($amount, $yearlyAdjustedPrice)) {
             throw new \InvalidArgumentException(sprintf(
                 'Amount must be a monthly or annual figure. Not %f. Expected: [%f, %f, %f]',
                 $amount,
-                $monthlyInitialAdjustedPrice,
+                $monthlyFinalAdjustedPrice,
                 $monthlyStandardAdjustedPrice,
                 $yearlyAdjustedPrice
             ));

@@ -344,6 +344,9 @@ class PolicyService
     {
         $this->statsd->startTiming("policy.create");
         try {
+            if (!$date) {
+                $date = new \DateTime();
+            }
             $user = $policy->getUser();
 
             $prefix = $policy->getPolicyPrefix($this->environment);
@@ -362,7 +365,9 @@ class PolicyService
                 $user->addPayerPolicy($policy);
             }
 
-            $this->generateScheduledPayments($policy, $date, $numPayments);
+            if ($numPayments === null) {
+                $this->generateScheduledPayments($policy, $date, $numPayments);
+            }
 
             // Generate/set scode prior to creating policy as policy create has a fallback scode creation
             $scode = null;
@@ -414,6 +419,9 @@ class PolicyService
             // Dispatch should be last as there may be events that assume the policy is active
             // (e.g. intercom)
             $this->dispatchEvent(PolicyEvent::EVENT_CREATED, new PolicyEvent($policy));
+            if ($setActive) {
+                $this->dispatchEvent(PolicyEvent::EVENT_START, new PolicyEvent($policy));
+            }
         } catch (\Exception $e) {
             $this->logger->error(sprintf('Error creating policy %s', $policy->getId()), ['exception' => $e]);
             throw $e;
@@ -622,7 +630,7 @@ class PolicyService
 
         $this->snappyPdf->setOption('orientation', 'Portrait');
         $this->snappyPdf->setOption('page-size', 'A4');
-        $this->snappyPdf->setOption('margin-top', '20mm');
+        $this->snappyPdf->setOption('margin-top', '0mm');
         $this->snappyPdf->generateFromHtml(
             $this->templating->render($template, ['policy' => $policy]),
             $tmpFile
@@ -666,8 +674,7 @@ class PolicyService
     public function adjustScheduledPayments(Policy $policy, $expectSingleAdjustment = false, \DateTime $date = null)
     {
         $log = [];
-        $prefix = $policy->getPolicyPrefix($this->environment);
-        if ($policy->arePolicyScheduledPaymentsCorrect($prefix, $date)) {
+        if ($policy->arePolicyScheduledPaymentsCorrect($date)) {
             return null;
         }
 
@@ -684,14 +691,15 @@ class PolicyService
                 $scheduledPayment->setScheduled($adjustedScheduledDay);
             }
         }
-        if ($policy->arePolicyScheduledPaymentsCorrect($prefix, $date)) {
+
+        if ($policy->arePolicyScheduledPaymentsCorrect($date)) {
             $this->dm->flush();
             return null;
         }
 
         $scheduledPayments = [];
         // Try cancellating scheduled payments until amount matches
-        while (!$policy->arePolicyScheduledPaymentsCorrect($prefix, $date) &&
+        while (!$policy->arePolicyScheduledPaymentsCorrect($date) &&
                 ($scheduledPayment = $policy->getNextScheduledPayment()) !== null) {
             $scheduledPayments[] = $scheduledPayment;
             $scheduledPayment->cancel();
@@ -704,7 +712,7 @@ class PolicyService
             );
         }
 
-        if ($policy->arePolicyScheduledPaymentsCorrect($prefix, $date)) {
+        if ($policy->arePolicyScheduledPaymentsCorrect($date)) {
             $this->dm->flush();
             // If user has manually paid, there should be a single adjustment made, so reduce log level
             if ($expectSingleAdjustment && count($scheduledPayments) == 1) {
@@ -733,75 +741,98 @@ class PolicyService
         }
     }
 
-    public function generateScheduledPayments(Policy $policy, \DateTime $date = null, $numPayments = null)
-    {
+    public function regenerateScheduledPayments(
+        Policy $policy,
+        \DateTime $date = null,
+        $numPayments = null,
+        $billingOffset = null
+    ) {
+        $policy->cancelScheduledPayments();
+        $this->generateScheduledPayments($policy, $date, $numPayments, $billingOffset);
+    }
+
+    public function generateScheduledPayments(
+        Policy $policy,
+        \DateTime $date = null,
+        $numPayments = null,
+        $billingOffset = null
+    ) {
+        // initial purchase is payment received then create policy
+        // vs renewal which will have the number of payments requested
+        $isInitialPurchase = $numPayments === null;
         if (!$date) {
-            // TODO: Should this be policy start date?
-            $date = new \DateTime();
+            if (!$policy->getStart()) {
+                throw new \Exception('Unable to generate payments if policy does not have a start date');
+            }
+            $date = clone $policy->getStart();
         } else {
             $date = clone $date;
         }
+
+        // To determine any payments made
+        $initialDate = clone $date;
 
         // To allow billing on same date every month, 28th is max allowable day on month
         if ($date->format('d') > 28) {
             $date->sub(new \DateInterval(sprintf('P%dD', $date->format('d') - 28)));
         }
 
-        $payment = null;
-        $paymentItem = null;
-        foreach ($policy->getPayments() as $paymentItem) {
-            if (!$paymentItem->isSuccess()) {
-                $paymentItem = null;
-                continue;
+        if (!$numPayments) {
+            if ($policy->getPremiumInstallments()) {
+                $numPayments = $policy->getPremiumInstallments();
+            } elseif ($paymentItem = $policy->getLastSuccessfulUserPaymentCredit()) {
+                $premium = $policy->getPremium();
+                $numPayments = $premium->getNumberOfScheduledMonthlyPayments($paymentItem->getAmount());
             }
         }
 
-        if (!$numPayments && $paymentItem) {
-            if ($this->areEqualToFourDp(
-                $paymentItem->getAmount(),
-                $policy->getPremium()->getYearlyPremiumPrice()
-            )) {
-                $numPayments = 1;
-            } elseif ($this->areEqualToFourDp(
-                $paymentItem->getAmount(),
-                $policy->getPremium()->getMonthlyPremiumPrice()
-            )) {
-                $numPayments = 12;
-            }
-        }
-
-        if ($numPayments) {
-            if ($numPayments == 1) {
-                $policy->setPremiumInstallments(1);
-            } elseif ($numPayments == 12) {
-                $policy->setPremiumInstallments(12);
-                for ($i = 1; $i <= 11; $i++) {
-                    $scheduledDate = clone $date;
-                    $scheduledDate->add(new \DateInterval(sprintf('P%dM', $i)));
-
-                    $scheduledPayment = new ScheduledPayment();
-                    $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
-                    $scheduledPayment->setScheduled($scheduledDate);
-                    $scheduledPayment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
-                    $policy->addScheduledPayment($scheduledPayment);
-                }
-            } else {
-                throw new InvalidPremiumException(sprintf(
-                    'Invalid payment %f for policy %s [Expected %f or %f]',
-                    $paymentItem ? $paymentItem->getAmount() : $numPayments,
-                    $policy->getId(),
-                    $policy->getPremium()->getYearlyPremiumPrice(),
-                    $policy->getPremium()->getMonthlyPremiumPrice()
-                ));
-            }
-        } else {
+        if (!$numPayments || $numPayments < 1 || $numPayments > 12) {
             throw new InvalidPremiumException(sprintf(
-                'Invalid payment %f for policy %s [Expected %f or %f]',
-                $paymentItem ? $paymentItem->getAmount() : $numPayments,
+                'Invalid payment %f (%d) for policy %s [Expected %f or %f]',
+                $paymentItem ? $paymentItem->getAmount() : null,
+                $numPayments,
                 $policy->getId(),
                 $policy->getPremium()->getYearlyPremiumPrice(),
                 $policy->getPremium()->getMonthlyPremiumPrice()
             ));
+        }
+
+        // premium installments must either be 1 or 12
+        $policy->setPremiumInstallments($numPayments == 1 ? 1 : 12);
+        $paid = $policy->getTotalSuccessfulPayments($initialDate);
+        if ($billingOffset) {
+            $paid += $billingOffset;
+        }
+        $numPaidPayments = $policy->getPremium()->getNumberOfMonthlyPayments($paid);
+        if (!$numPaidPayments) {
+            if ($paid > 0) {
+                // There were some payments applied to the policy, but amounts don't split
+                throw new \Exception(sprintf(
+                    'Unable to determine correct payment schedule for policy %s (%f / %d)',
+                    $policy->getId(),
+                    $paid,
+                    $numPaidPayments
+                ));
+            }
+            $numPaidPayments = 0;
+        }
+        $numScheduledPayments = $numPayments - $numPaidPayments;
+        for ($i = 1; $i <= $numScheduledPayments; $i++) {
+            $scheduledDate = clone $date;
+            // initial purchase should start at 1 month from initial purchase
+            $scheduledDate->add(new \DateInterval(sprintf('P%dM', $isInitialPurchase ? $i : $i - 1)));
+
+            $scheduledPayment = new ScheduledPayment();
+            $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+            $scheduledPayment->setScheduled($scheduledDate);
+            if ($i == 1 && $numPayments == 1) {
+                $scheduledPayment->setAmount($policy->getPremium()->getAdjustedYearlyPremiumPrice());
+            } elseif ($i <= 11) {
+                $scheduledPayment->setAmount($policy->getPremium()->getAdjustedStandardMonthlyPremiumPrice());
+            } else {
+                $scheduledPayment->setAmount($policy->getPremium()->getAdjustedFinalMonthlyPremiumPrice());
+            }
+            $policy->addScheduledPayment($scheduledPayment);
         }
     }
 
@@ -890,6 +921,10 @@ class PolicyService
      */
     public function newPolicyEmail(Policy $policy, $attachmentFiles = null, $bcc = null)
     {
+        if (!$this->mailer) {
+            return;
+        }
+
         $baseTemplate = 'AppBundle:Email:policy/new';
         if ($policy->getPreviousPolicy()) {
             $baseTemplate = 'AppBundle:Email:policy/renew';
@@ -916,6 +951,10 @@ class PolicyService
      */
     public function weeklyEmail(Policy $policy)
     {
+        if (!$this->mailer) {
+            return;
+        }
+
         // No need to send weekly email if pot is full
         if ($policy->isPotCompletelyFilled()) {
             return;
@@ -957,6 +996,10 @@ class PolicyService
      */
     public function cancelledPolicyEmail(Policy $policy)
     {
+        if (!$this->mailer) {
+            return;
+        }
+
         $baseTemplate = sprintf('AppBundle:Email:policy-cancellation/%s', $policy->getCancelledReason());
         if ($policy->getCancelledReason() == Policy::CANCELLED_UNPAID && $policy->hasMonetaryClaimed()) {
             $baseTemplate = sprintf('%sWithClaim', $baseTemplate);
@@ -978,6 +1021,10 @@ class PolicyService
 
     public function claimPendingClosedEmail(Claim $claim)
     {
+        if (!$this->mailer) {
+            return;
+        }
+
         $baseTemplate = sprintf('AppBundle:Email:davies/claimCancellation');
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
@@ -999,6 +1046,10 @@ class PolicyService
      */
     public function networkCancelledPolicyEmails(Policy $policy)
     {
+        if (!$this->mailer) {
+            return;
+        }
+
         $cancelledUser = $policy->getUser();
         foreach ($policy->getConnections() as $networkConnection) {
             if ($networkConnection instanceof RewardConnection) {
@@ -1026,6 +1077,10 @@ class PolicyService
      */
     public function expiredPolicyEmail(Policy $policy)
     {
+        if (!$this->mailer) {
+            return;
+        }
+
         if ($policy->isRenewed()) {
             // No need to send an email as the renewal email should cover both expiry and renewal
             return;
@@ -1200,7 +1255,7 @@ class PolicyService
         return $cancelled;
     }
 
-    public function activateRenewalPolicies($prefix, $dryRun = false)
+    public function activateRenewalPolicies($prefix, $dryRun = false, \DateTime $date = null)
     {
         $renewals = [];
         $policyRepo = $this->dm->getRepository(Policy::class);
@@ -1209,7 +1264,7 @@ class PolicyService
             $renewals[$policy->getId()] = $policy->getPolicyNumber();
             if (!$dryRun) {
                 try {
-                    $this->activate($policy);
+                    $this->activate($policy, $date);
                 } catch (\Exception $e) {
                     $msg = sprintf(
                         'Error activating Policy %s / %s',
@@ -1294,48 +1349,84 @@ class PolicyService
      */
     public function fullyExpire(Policy $policy, \DateTime $date = null)
     {
-        try {
-            $initialStatus = $policy->getStatus();
-            $policy->fullyExpire($date);
-            $this->dm->flush();
+        $initialStatus = $policy->getStatus();
+        $policy->fullyExpire($date);
+        $this->dm->flush();
 
-            // If no change in wait claim, then don't proceed as may resend emails for cashback
-            if ($policy->getStatus() == Policy::STATUS_EXPIRED_WAIT_CLAIM &&
-                $initialStatus == Policy::STATUS_EXPIRED_WAIT_CLAIM) {
-                return;
-            }
-
-            if ($policy->hasCashback() && !in_array($policy->getCashback()->getStatus(), [
-                Cashback::STATUS_MISSING,
-                Cashback::STATUS_FAILED,
-                Cashback::STATUS_PAID,
-            ])) {
-                if ($policy->getStatus() == Policy::STATUS_EXPIRED_WAIT_CLAIM) {
-                    $this->updateCashback($policy->getCashback(), Cashback::STATUS_PENDING_WAIT_CLAIM);
-                } elseif ($this->areEqualToTwoDp(0, $policy->getCashback()->getAmount())) {
-                    $this->updateCashback($policy->getCashback(), Cashback::STATUS_CLAIMED);
-                } else {
-                    $this->updateCashback($policy->getCashback(), Cashback::STATUS_PENDING_PAYMENT);
-                }
-            }
-
-            if ($policy->hasAdjustedRewardPotPayment()) {
-                // TODO: notify user about reduced/0 pot
-                \AppBundle\Classes\NoOp::ignore([]);
-            }
-        } catch (ClaimException $e) {
-            // TODO: If cashback is available, notify user about delay
-            \AppBundle\Classes\NoOp::ignore([]);
+        // If no change in wait claim, then don't proceed as may resend emails for cashback
+        if ($policy->getStatus() == Policy::STATUS_EXPIRED_WAIT_CLAIM &&
+            $initialStatus == Policy::STATUS_EXPIRED_WAIT_CLAIM) {
+            return;
         }
+
+        if ($policy->hasCashback() && !in_array($policy->getCashback()->getStatus(), [
+            Cashback::STATUS_MISSING,
+            Cashback::STATUS_FAILED,
+            Cashback::STATUS_PAID,
+        ])) {
+            if ($policy->getStatus() == Policy::STATUS_EXPIRED_WAIT_CLAIM) {
+                $this->updateCashback($policy->getCashback(), Cashback::STATUS_PENDING_WAIT_CLAIM);
+            } elseif ($this->areEqualToTwoDp(0, $policy->getCashback()->getAmount())) {
+                $this->updateCashback($policy->getCashback(), Cashback::STATUS_CLAIMED);
+            } else {
+                $this->updateCashback($policy->getCashback(), Cashback::STATUS_PENDING_PAYMENT);
+            }
+        }
+
+        if ($policy->isRenewed() && $policy->hasAdjustedRewardPotPayment()) {
+            $outstanding = $policy->getNextPolicy()->getOutstandingPremiumToDate($date ? $date : new \DateTime(), true);
+            $this->regenerateScheduledPayments($policy->getNextPolicy(), $date, null, $outstanding);
+
+            // bill for outstanding payments due
+            $outstanding = $policy->getNextPolicy()->getOutstandingUserPremiumToDate($date ? $date : new \DateTime());
+            $scheduledPayment = new ScheduledPayment();
+            $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+            $scheduledPayment->setScheduled($date ? $date : new \DateTime());
+            $scheduledPayment->setAmount($outstanding);
+            $policy->getNextPolicy()->addScheduledPayment($scheduledPayment);
+            $this->dm->flush();
+            //\Doctrine\Common\Util\Debug::dump($scheduledPayment);
+
+            $this->adjustPotRewardEmail($policy->getNextPolicy(), $outstanding);
+        }
+    }
+    
+    public function adjustPotRewardEmail(Policy $policy, $additionalAmount)
+    {
+        if (!$this->mailer) {
+            return;
+        }
+
+        $baseTemplate = sprintf('AppBundle:Email:potReward/adjusted');
+        $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
+        $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
+
+        $subject = sprintf('Important information about your Reward Pot');
+        $this->mailer->sendTemplate(
+            $subject,
+            $policy->getUser()->getEmail(),
+            $htmlTemplate,
+            ['policy' => $policy, 'additional_amount' => $additionalAmount],
+            $textTemplate,
+            ['policy' => $policy, 'additional_amount' => $additionalAmount],
+            null,
+            'bcc@so-sure.com'
+        );
     }
 
     public function cashback(Policy $policy, Cashback $cashback)
     {
         // TODO: Validate cashback amount
         $policy->setCashback($cashback);
-        //$this->dm->persist($cashback);
         $this->dm->flush();
-        // TODO: email user
+
+        if ($cashback->getAmount()) {
+            // cashback needs id, so flush is required above
+            $this->updateCashback($cashback, $cashback->getExpectedStatus());
+            $this->dm->flush();
+        }
+
+        $this->dispatchEvent(PolicyEvent::EVENT_CASHBACK, new PolicyEvent($policy));
     }
 
     /**
@@ -1345,6 +1436,8 @@ class PolicyService
     {
         $policy->activate($date);
         $this->dm->flush();
+
+        $this->dispatchEvent(PolicyEvent::EVENT_START, new PolicyEvent($policy));
 
         // Not necessary to email as already received docs at time of renewal
     }
@@ -1361,16 +1454,16 @@ class PolicyService
         // although the policy end status is probably set at the same time
     }
 
-    public function createPendingRenewalPolicies($prefix, $dryRun = false)
+    public function createPendingRenewalPolicies($prefix, $dryRun = false, \DateTime $date = null)
     {
         $pendingRenewal = [];
         $policyRepo = $this->dm->getRepository(Policy::class);
-        $policies = $policyRepo->findPoliciesForPendingRenewal($prefix);
+        $policies = $policyRepo->findPoliciesForPendingRenewal($prefix, $date);
         foreach ($policies as $policy) {
-            if ($policy->canCreatePendingRenewal()) {
+            if ($policy->canCreatePendingRenewal($date)) {
                 $pendingRenewal[$policy->getId()] = $policy->getPolicyNumber();
                 if (!$dryRun) {
-                    $this->createPendingRenewal($policy);
+                    $this->createPendingRenewal($policy, $date);
                 }
             }
         }
@@ -1417,6 +1510,10 @@ class PolicyService
 
     public function pendingCancellationEmail(Claim $claim, $cancellationDate)
     {
+        if (!$this->mailer) {
+            return;
+        }
+
         $baseTemplate = sprintf('AppBundle:Email:davies/pendingCancellation');
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
@@ -1454,6 +1551,10 @@ class PolicyService
 
     public function pendingRenewalEmail(Policy $policy)
     {
+        if (!$this->mailer) {
+            return;
+        }
+
         $baseTemplate = sprintf('AppBundle:Email:policy/pendingRenewal');
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
@@ -1509,19 +1610,50 @@ class PolicyService
         }
 
         $startDate = $this->endOfDay($policy->getEnd());
-        $this->create($newPolicy, $startDate, null, $numPayments);
         $discount = 0;
         if (!$cashback && $policy->getPotValue() > 0) {
             $discount = $policy->getPotValue();
         }
+
+        $this->create($newPolicy, $startDate, false, $numPayments);
         $newPolicy->renew($discount, $date);
+        $this->generateScheduledPayments($newPolicy, $startDate, $numPayments);
+
         $this->dm->flush();
 
-        if (!$cashback && $policy->getPotValue() > 0) {
-            $this->adjustScheduledPayments($newPolicy, false, $date);
+        $this->dispatchEvent(PolicyEvent::EVENT_RENEWED, new PolicyEvent($policy));
+
+        return $newPolicy;
+    }
+
+    public function repurchase(Policy $policy, \DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
         }
 
-        $this->dispatchEvent(PolicyEvent::EVENT_RENEWED, new PolicyEvent($policy));
+        if (!$policy->canRepurchase()) {
+            throw new \Exception(sprintf(
+                'Unable to repurchase policy %s',
+                $policy->getId()
+            ));
+        }
+
+        $repo = $this->dm->getRepository(PhonePolicy::class);
+        $policies = $repo->findDuplicateImei($policy->getImei());
+        foreach ($policies as $checkPolicy) {
+            if (!$checkPolicy->getStatus() &&
+                $checkPolicy->getUser()->getId() == $policy->getUser()->getId()) {
+                return $checkPolicy;
+            }
+        }
+
+        $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
+        $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
+        $newPolicy = $policy->createRepurchase($latestTerms, $date);
+
+        $this->dm->persist($newPolicy);
+        $this->dm->flush();
 
         return $newPolicy;
     }
@@ -1531,10 +1663,9 @@ class PolicyService
         // @codingStandardsIgnoreStart
         $body = sprintf(
             "Policy: <a href='%s'>%s/%s</a> has requested a billing date change to the %d. Verify policy id match in system.",
-            $this->router->generate(
+            $this->mailer->generateUrl(
                 'admin_policy',
-                ['id' => $policy->getId()],
-                UrlGeneratorInterface::ABSOLUTE_URL
+                ['id' => $policy->getId()]
             ),
             $policy->getPolicyNumber(),
             $policy->getId(),
@@ -1583,6 +1714,10 @@ class PolicyService
 
     public function cashbackEmail(Cashback $cashback)
     {
+        if (!$this->mailer) {
+            return;
+        }
+
         if ($cashback->getStatus() == Cashback::STATUS_PAID) {
             $baseTemplate = sprintf('AppBundle:Email:cashback/paid');
             $subject = sprintf('Your Reward Pot has been paid out');

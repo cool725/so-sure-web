@@ -12,6 +12,8 @@ class PolicyEvent extends Event
     const EVENT_EXPIRED = 'event.policy.expired';
     const EVENT_PENDING_RENEWAL = 'event.policy.pending-renewal';
     const EVENT_RENEWED = 'event.policy.renewed';
+    const EVENT_START = 'event.policy.start';
+    const EVENT_CASHBACK = 'event.policy.cashback';
 
     // Certain changes to a policy (user) should trigger a new salva version
     const EVENT_SALVA_INCREMENT = 'event.policy.salva_increment';

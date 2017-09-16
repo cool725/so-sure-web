@@ -277,6 +277,17 @@ class InvitationService
         }
     }
 
+    public function validateNotRenewalPolicy(Policy $sourcePolicy, Policy $linkedPolicy)
+    {
+        if ($sourcePolicy->getNextPolicy() &&
+            $sourcePolicy->getNextPolicy()->getId() == $linkedPolicy->getId()) {
+            throw new SelfInviteException('Policy can not be linked to its renewal policy');
+        } elseif ($sourcePolicy->getPreviousPolicy() &&
+            $sourcePolicy->getPreviousPolicy()->getId() == $linkedPolicy->getId()) {
+            throw new SelfInviteException('Policy can not be linked to its previous policy');
+        }
+    }
+
     public function inviteByEmail(Policy $policy, $email, $name = null, $skipSend = null)
     {
         $this->validatePolicy($policy);
@@ -987,6 +998,9 @@ class InvitationService
         $this->validateNotConnectedByPolicy($policyA, $policyB);
         $this->validateNotConnectedByPolicy($policyB, $policyA);
 
+        $this->validateNotRenewalPolicy($policyA, $policyB);
+        $this->validateNotRenewalPolicy($policyB, $policyA);
+
         $connectionA = $this->addConnection(
             $policyA,
             $policyB->getUser(),
@@ -1017,15 +1031,18 @@ class InvitationService
 
         $connectionValue = $policy->getAllowedConnectionValue($date);
         $promoConnectionValue = $policy->getAllowedPromoConnectionValue($date);
+
+        $connection = new StandardConnection();
+
         // If there was a concellation in the network, new connection should replace the cancelled connection
         if ($replacementConnection = $policy->getUnreplacedConnectionCancelledPolicyInLast30Days($date)) {
             $connectionValue = $replacementConnection->getInitialValue();
             $promoConnectionValue = $replacementConnection->getInitialPromoValue();
-            $replacementConnection->setReplacementUser($linkedUser);
+            $replacementConnection->setReplacementConnection($connection);
             $replacementConnection->setValue(0);
             $replacementConnection->setPromoValue(0);
         }
-        $connection = new StandardConnection();
+
         $connection->setLinkedUser($linkedUser);
         $connection->setLinkedPolicy($linkedPolicy);
         $connection->setValue($connectionValue);

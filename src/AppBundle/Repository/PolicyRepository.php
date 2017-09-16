@@ -64,12 +64,11 @@ class PolicyRepository extends BaseDocumentRepository
 
     public function findPoliciesForPendingRenewal($policyPrefix, \DateTime $date = null)
     {
-        $now = $date;
         if (!$date) {
             $date = new \DateTime();
-            $now = new \DateTime();
-            $date = $date->add(new \DateInterval(sprintf('P%dD', Policy::RENEWAL_DAYS)));
         }
+        $renewalDate = clone $date;
+        $renewalDate = $renewalDate->add(new \DateInterval(sprintf('P%dD', Policy::RENEWAL_DAYS)));
 
         $qb = $this->createQueryBuilder()
             ->field('status')->in([
@@ -78,8 +77,8 @@ class PolicyRepository extends BaseDocumentRepository
             ])
             ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policyPrefix)))
             ->field('nextPolicy.$id')->equals(null)
-            ->field('end')->lte($date)
-            ->field('end')->gte($now);
+            ->field('end')->lte($renewalDate)
+            ->field('end')->gte($date);
 
         return $qb
             ->getQuery()

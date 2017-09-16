@@ -37,16 +37,15 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
                 'Only display payments that should be run'
             )
             ->addOption(
-                'prefix',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Policy prefix'
-            )
-            ->addOption(
                 'date',
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Pretent its this date'
+            )
+            ->addArgument(
+                'prefix',
+                InputArgument::REQUIRED,
+                'Prefix'
             )
         ;
     }
@@ -57,7 +56,7 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
         $policyNumber = $input->getOption('policyNumber');
         $date = $input->getOption('date');
         $show = true === $input->getOption('show');
-        $prefix = $input->getOption('prefix');
+        $prefix = $input->getArgument('prefix');
         $scheduledDate = null;
         if ($date) {
             $scheduledDate = new \DateTime($date);
@@ -92,10 +91,20 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
                     $this->displayScheduledPayment($scheduledPayment, $output);
                     continue;
                 }
+                if (!$scheduledPayment->getPolicy()->isValidPolicy($prefix)) {
+                    $output->writeln(sprintf(
+                        'Skipping Scheduled Payment %s/%s as policy is not valid for prefix %s',
+                        $scheduledPayment->getPolicy()->getPolicyNumber(),
+                        $scheduledPayment->getId(),
+                        $prefix
+                    ));
+                    $this->displayScheduledPayment($scheduledPayment, $output);
+                    continue;
+                }
 
                 try {
                     if (!$show) {
-                        $scheduledPayment = $judoPay->scheduledPayment($scheduledPayment);
+                        $scheduledPayment = $judoPay->scheduledPayment($scheduledPayment, $prefix);
                     }
                     $this->displayScheduledPayment($scheduledPayment, $output);
                 } catch (\Exception $e) {

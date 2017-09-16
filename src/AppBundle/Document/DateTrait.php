@@ -41,7 +41,8 @@ trait DateTrait
             $date = new \DateTime();
         }
         $startMonth = new \DateTime(
-            sprintf('%d-%d-%d 00:00:00', $date->format('Y'), $date->format('m'), $date->format('d'))
+            sprintf('%d-%d-%d 00:00:00', $date->format('Y'), $date->format('m'), $date->format('d')),
+            $date->getTimezone()
         );
 
         return $startMonth;

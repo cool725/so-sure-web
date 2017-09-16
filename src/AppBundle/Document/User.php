@@ -433,6 +433,8 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     public function getPolicies()
     {
+        return $this->policies;
+        /*
         $policies = [];
         foreach ($this->policies as $policy) {
             // If the user is declined we want to have the policy in the list
@@ -443,6 +445,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         }
 
         return $policies;
+        */
     }
 
     public function getNamedPolicies()
@@ -804,6 +807,18 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $policies;
     }
 
+    public function getPendingRenewalPolicies()
+    {
+        $policies = [];
+        foreach ($this->getPolicies() as $policy) {
+            if (in_array($policy->getStatus(), [Policy::STATUS_PENDING_RENEWAL])) {
+                $policies[] = $policy;
+            }
+        }
+
+        return $policies;
+    }
+
     public function getFirstPolicy()
     {
         $policies = $this->getValidPolicies(true);
@@ -856,7 +871,12 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $data['approvedClaims'] = 0;
         $data['approvedNetworkClaims'] = 0;
         $data['accountPaidToDate'] = true;
+        $data['renewalMonthlyPremiumNoPot'] = 0;
+        $data['renewalMonthlyPremiumWithPot'] = 0;
         foreach ($this->getValidPolicies(true) as $policy) {
+            if (!$policy->isActive()) {
+                continue;
+            }
             $data['connections'] += count($policy->getConnections());
             $data['rewardPot'] += $policy->getPotValue();
             $data['approvedClaims'] += count($policy->getApprovedClaims());
@@ -873,7 +893,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                 $data['monthlyPremium'] += $policy->getPremium()->getMonthlyPremiumPrice();
                 $data['paymentsReceived'] += count($policy->getSuccessfulPaymentCredits());
 
-                if ($payment = $policy->getLastSuccessfulPaymentCredit()) {
+                if ($payment = $policy->getLastSuccessfulUserPaymentCredit()) {
                     if (!$data['lastPaymentReceived'] || $data['lastPaymentReceived'] < $payment->getDate()) {
                         $data['lastPaymentReceived'] = $payment->getDate();
                     }
@@ -892,6 +912,11 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             if ($policy->getStatus() == Policy::STATUS_UNPAID) {
                 $data['accountPaidToDate'] = false;
             }
+        }
+        foreach ($this->getPendingRenewalPolicies() as $policy) {
+            $data['renewalMonthlyPremiumNoPot'] += $policy->getPremium()->getMonthlyPremiumPrice();
+            $data['renewalMonthlyPremiumWithPot'] +=
+                $policy->getPremium()->getAdjustedStandardMonthlyPremiumPrice($policy->getPotValue());
         }
         $data['firstPolicy'] = [];
         $data['firstPolicy']['promoCode'] = null;
@@ -1388,7 +1413,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             'mobile_number' => $this->getMobileNumber(),
             'policies' => $this->eachApiArray($this->getPolicies()),
             'received_invitations' => $this->eachApiArray($this->getUnprocessedReceivedInvitations(), true, $debug),
-            'has_cancelled_policy' => $this->hasCancelledPolicy(),
+            'has_cancelled_policy' => $this->hasCancelledPolicyWithUserDeclined(),
             'has_unpaid_policy' => $this->hasUnpaidPolicy(),
             'has_valid_policy' => $this->hasActivePolicy(), // poor initial naming :(
             'birthday' => $this->getBirthday() ? $this->getBirthday()->format(\DateTime::ATOM) : null,

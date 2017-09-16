@@ -69,22 +69,25 @@ class DaviesService extends S3EmailService
     {
         $success = true;
         $claims = [];
+        $multiple = [];
         foreach ($daviesClaims as $daviesClaim) {
             if (isset($claims[$daviesClaim->getPolicyNumber()]) &&
                 $claims[$daviesClaim->getPolicyNumber()]) {
                 if ($daviesClaim->isOpen()) {
                     $msg = sprintf(
-                        'There are multiple open claims against policy %s. Validate status of all.',
+                        'There are multiple open claims against policy %s. Please manually update the IMEI.',
                         $daviesClaim->getPolicyNumber()
                     );
-                    $this->warnings[$daviesClaim->claimNumber][] = $msg;
+                    $this->errors[$daviesClaim->claimNumber][] = $msg;
+                    $multiple[] = $daviesClaim->getPolicyNumber();
                 }
             }
             $claims[$daviesClaim->getPolicyNumber()] = $daviesClaim->isOpen();
         }
         foreach ($daviesClaims as $daviesClaim) {
             try {
-                $this->saveClaim($daviesClaim);
+                $skipImeiUpdate = in_array($daviesClaim->getPolicyNumber(), $multiple);
+                $this->saveClaim($daviesClaim, $skipImeiUpdate);
             } catch (\Exception $e) {
                 //$success = false;
                 $this->errors[$daviesClaim->claimNumber][] = $e->getMessage();
@@ -136,7 +139,7 @@ class DaviesService extends S3EmailService
         return $claim;
     }
 
-    public function saveClaim($daviesClaim)
+    public function saveClaim($daviesClaim, $skipImeiUpdate)
     {
         if ($daviesClaim->hasError()) {
             throw new \Exception(sprintf('Claim %s has error status. Skipping', $daviesClaim->claimNumber));
@@ -155,6 +158,9 @@ class DaviesService extends S3EmailService
             $claim->setStatus($daviesClaim->getClaimStatus());
         } elseif ($daviesClaim->replacementImei && $claim->getStatus() == Claim::STATUS_INREVIEW) {
             // If there's a replacement IMEI, the claim has definitely been approved
+            $claim->setStatus(Claim::STATUS_APPROVED);
+        } elseif ($daviesClaim->replacementReceivedDate && $claim->getStatus() == Claim::STATUS_INREVIEW) {
+            // If there's a replacement received date, the claim has definitely been approved
             $claim->setStatus(Claim::STATUS_APPROVED);
         } elseif ($daviesClaim->phoneReplacementCost < 0 && $claim->getStatus() == Claim::STATUS_INREVIEW) {
             // If phone replacement value is negative, an excess payment has been applied to the account
@@ -209,7 +215,7 @@ class DaviesService extends S3EmailService
 
         $claim->setShippingAddress($daviesClaim->shippingAddress);
 
-        $this->updatePolicy($claim, $daviesClaim);
+        $this->updatePolicy($claim, $daviesClaim, $skipImeiUpdate);
 
         $errors = $this->validator->validate($claim);
         if (count($errors) > 0) {
@@ -401,7 +407,7 @@ class DaviesService extends S3EmailService
         return $phone;
     }
 
-    public function updatePolicy(Claim $claim, DaviesClaim $daviesClaim)
+    public function updatePolicy(Claim $claim, DaviesClaim $daviesClaim, $skipImeiUpdate)
     {
         $policy = $claim->getPolicy();
         // Closed claims should not replace the imei as if there are multiple claims
@@ -411,7 +417,10 @@ class DaviesService extends S3EmailService
             if ($claim->getReplacementImei() &&
                 $claim->getReplacementImei() != $policy->getImei()) {
                 // Imei has changed, but we can't change their policy premium, which is fixed
-                $policy->setImei($claim->getReplacementImei());
+                // If there are multiple open claims, don't update the imei!
+                if (!$skipImeiUpdate) {
+                    $policy->setImei($claim->getReplacementImei());
+                }
                 // If phone has been updated (unlikely at the moment)
                 if ($claim->getReplacementPhone()) {
                     $policy->setPhone($claim->getReplacementPhone());

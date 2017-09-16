@@ -14,6 +14,7 @@ use AppBundle\Document\Payment\SoSurePayment;
 use AppBundle\Document\ImeiTrait;
 use AppBundle\Document\Reward;
 use AppBundle\Document\Connection\StandardConnection;
+use AppBundle\Document\Connection\RenewalConnection;
 use AppBundle\Classes\Salva;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
@@ -156,7 +157,6 @@ trait UserClassTrait
             $newDate = null;
             if ($date) {
                 $newDate = clone $date;
-                $newDate->add(new \DateInterval('PT1S'));
             }
             if ($monthly) {
                 $policy->setPremiumInstallments(12);
@@ -348,9 +348,20 @@ trait UserClassTrait
         return $reward;
     }
 
-    protected function createLinkedConnections($policyA, $policyB, $valueA, $valueB, $dateA = null, $dateB = null)
-    {
-        $connectionA = new StandardConnection();
+    protected function createLinkedConnections(
+        $policyA,
+        $policyB,
+        $valueA,
+        $valueB,
+        $dateA = null,
+        $dateB = null,
+        $standard = true
+    ) {
+        if ($standard) {
+            $connectionA = new StandardConnection();
+        } else {
+            $connectionA = new RenewalConnection();
+        }
         $connectionA->setValue($valueA);
         if ($valueA > 10) {
             $connectionA->setValue(10);
@@ -361,10 +372,18 @@ trait UserClassTrait
         if ($dateA) {
             $connectionA->setDate($dateA);
         }
-        $policyA->addConnection($connectionA);
+        if ($standard) {
+            $policyA->addConnection($connectionA);
+        } else {
+            $policyA->addRenewalConnection($connectionA);
+        }
         $policyA->updatePotValue();
 
-        $connectionB = new StandardConnection();
+        if ($standard) {
+            $connectionB = new StandardConnection();
+        } else {
+            $connectionB = new RenewalConnection();
+        }
         $connectionB->setValue($valueB);
         if ($valueB > 10) {
             $connectionB->setValue(10);
@@ -375,7 +394,11 @@ trait UserClassTrait
         if ($dateB) {
             $connectionB->setDate($dateB);
         }
-        $policyB->addConnection($connectionB);
+        if ($standard) {
+            $policyB->addConnection($connectionB);
+        } else {
+            $policyB->addRenewalConnection($connectionB);
+        }
         $policyB->updatePotValue();
 
         return [$connectionA, $connectionB];

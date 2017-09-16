@@ -12,6 +12,8 @@ use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Document\User;
 use AppBundle\Document\SCode;
 use AppBundle\Document\Policy;
+use AppBundle\Document\Cashback;
+use AppBundle\Document\Phone;
 use AppBundle\Service\MixpanelService;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use AppBundle\Document\Invitation\EmailInvitation;
@@ -95,8 +97,23 @@ class OpsController extends BaseController
         $invitationRepo = $dm->getRepository(EmailInvitation::class);
         $invitation = $invitationRepo->findOneBy(['accepted' => null, 'rejected' => null, 'cancelled' => null]);
 
+        $phoneRepo = $dm->getRepository(Phone::class);
+        $upcomingPhone = $phoneRepo->findOneBy(['active' => true, 'phonePrices' => null]);
+
         $policyRepo = $dm->getRepository(Policy::class);
-        $expiredPolicy = $policyRepo->findOneBy(['status' => Policy::STATUS_EXPIRED]);
+        $expiredPolicies = $policyRepo->findBy(['status' => Policy::STATUS_EXPIRED_CLAIMABLE]);
+        $expiredPolicyNoCashback = null;
+        $expiredPolicyCashback = null;
+        foreach ($expiredPolicies as $expiredPolicy) {
+            if ($expiredPolicy->getCashback()) {
+                if ($expiredPolicy->getCashback()->getStatus() == Cashback::STATUS_CLAIMED) {
+                    $expiredPolicyNoCashback = $expiredPolicy;
+                }
+                if ($expiredPolicy->getCashback()->getStatus() == Cashback::STATUS_MISSING) {
+                    $expiredPolicyCashback = $expiredPolicy;
+                }
+            }
+        }
         $unpaidPolicy = $policyRepo->findOneBy(['status' => Policy::STATUS_UNPAID]);
         $validPolicies = $policyRepo->findBy(['status' => Policy::STATUS_ACTIVE]);
         $position = rand(1, count($validPolicies));
@@ -169,13 +186,21 @@ class OpsController extends BaseController
                 $claimedPolicy = null;
             }
         }
-        $cancelledPolicy = $policyRepo->findOneBy(['status' => Policy::STATUS_CANCELLED]);
+        $cancelledFraudPolicy = $policyRepo->findOneBy([
+            'status' => Policy::STATUS_CANCELLED,
+            'cancelledReason' => Policy::CANCELLED_ACTUAL_FRAUD,
+        ]);
+        $cancelledPolicy = $policyRepo->findOneBy([
+            'status' => Policy::STATUS_CANCELLED,
+            'cancelledReason' => Policy::CANCELLED_USER_REQUESTED,
+        ]);
 
         return [
             'scode' => $scode->getCode(),
             'invitation' => $invitation,
             'unpaid_policy' => $unpaidPolicy,
             'valid_policy' => $validPolicy,
+            'cancelled_fraud_policy' => $cancelledFraudPolicy,
             'cancelled_policy' => $cancelledPolicy,
             'valid_multiple_policy' => $validMultiplePolicy,
             'valid_renewal_policy_monthly_no_pot' => $validRenwalPolicyMonthlyNoPot,
@@ -186,7 +211,9 @@ class OpsController extends BaseController
             'valid_renewal_policy_yearly_only_with_pot' => $validRenwalPolicyYearlyOnlyWithPot,
             'valid_remainder_policy' => $validRemainderPolicy,
             'claimed_policy' => $claimedPolicy,
-            'expired_policy' => $expiredPolicy,
+            'expired_policy_nocashback' => $expiredPolicyNoCashback,
+            'expired_policy_cashback' => $expiredPolicyCashback,
+            'upcoming_phone' => $upcomingPhone,
         ];
     }
 

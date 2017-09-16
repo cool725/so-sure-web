@@ -324,11 +324,14 @@ class PhonePolicy extends Policy
             return 0;
         }
 
-        // Extra Case for Salva's 10 minute buffer
-        if ($this->isPolicyWithin60Days($date) || $this->isBeforePolicyStarted($date)) {
-            if ($this->getUser()->isPreLaunch() ||
-                in_array($this->getPromoCode(), [self::PROMO_LAUNCH, self::PROMO_LAUNCH_FREE_NOV])) {
-                return self::PROMO_LAUNCH_VALUE;
+        // applied for past cases
+        if ($date < new \DateTime('2017-09-01')) {
+            // Extra Case for Salva's 10 minute buffer
+            if ($this->isPolicyWithin60Days($date) || $this->isBeforePolicyStarted($date)) {
+                if ($this->getUser()->isPreLaunch() ||
+                    in_array($this->getPromoCode(), [self::PROMO_LAUNCH, self::PROMO_LAUNCH_FREE_NOV])) {
+                    return self::PROMO_LAUNCH_VALUE;
+                }
             }
         }
 
@@ -425,11 +428,24 @@ class PhonePolicy extends Policy
         }
     }
 
-    public function setPolicyDetailsForPendingRenewal(Policy $policy)
+    public function setPolicyDetailsForPendingRenewal(Policy $policy, \DateTime $startDate)
     {
         $policy->setPhone($this->getPhone());
         $policy->setImei($this->getImei());
         $policy->setSerialNumber($this->getSerialNumber());
+
+        // make sure ipt rate is set to ipt rate at the start of the policy
+        $policy->validatePremium(true, $startDate);
+    }
+
+    public function setPolicyDetailsForRepurchase(Policy $policy, \DateTime $startDate)
+    {
+        $policy->setPhone($this->getPhone());
+        $policy->setImei($this->getImei());
+        $policy->setSerialNumber($this->getSerialNumber());
+
+        // make sure ipt rate is set to ipt rate at the start of the policy
+        $policy->validatePremium(true, $startDate);
     }
 
     /**
