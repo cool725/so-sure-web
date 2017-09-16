@@ -391,7 +391,8 @@ class PurchaseControllerTest extends BaseControllerTest
             $policy->getPremium()->getMonthlyPremiumPrice()
         );
 
-        $this->login($email, $password, 'purchase/step-policy');
+        // change to use a flash message for purchase
+        $this->login($email, $password, 'user/invalid');
 
         $crawler = self::$client->request('POST', '/purchase/cc/success', [
             'Reference' => $policy->getId(),
@@ -435,7 +436,8 @@ class PurchaseControllerTest extends BaseControllerTest
             $policy->getPremium()->getMonthlyPremiumPrice()
         );
 
-        $this->login($email, $password, 'purchase/step-policy');
+        // change to use a flash message for purchase
+        $this->login($email, $password, 'user/invalid');
 
         $crawler = self::$client->request('POST', '/purchase/cc/success', [
             'Reference' => $policy->getId(),
