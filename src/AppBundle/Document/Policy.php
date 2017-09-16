@@ -3783,6 +3783,10 @@ abstract class Policy
             return false;
         }
 
+        // we could check the status on the next policy as well, but if next status is pending renewal
+        // then current status *should* always be active/unpaid
+        // TODO: what about a pending renewal that is then cancelled?
+
         // In case user was disallowed after pending renewal was created
         if (!$this->getUser()->canRepurchasePolicy($this)) {
             return false;
