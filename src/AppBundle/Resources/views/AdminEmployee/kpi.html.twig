@@ -89,6 +89,13 @@
                             {% endfor %}
                         </tr>
                         <tr>
+                            <td>Total Policy Expired [KPI: 29]
+                            </td>
+                            {% for week in weeks %}
+                                <td>{{ week.period.data['totalEndingPolicies'] }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
                             <td>Total Cancellations - User Requested [KPI: 45]</td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['endingUserRequestedPolicies'] }}</td>
@@ -148,6 +155,13 @@
                             </td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['endingEndingPolicies'] }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td>Policy Renewed [KPI: 60]
+                            </td>
+                            {% for week in weeks %}
+                                <td>{{ week.period.data['endingPoliciesRenewed'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>

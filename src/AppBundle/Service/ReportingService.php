@@ -192,6 +192,18 @@ class ReportingService
         $data['endingEndingFNOLPoliciesAdjUpgrade'] = $data['endingEndingFNOLPolicies'] -
             $data['endingUpgradeFNOLPolicies'];
 
+        $renewalPolicies = $policyRepo->findAllEndingPolicies(
+            null,
+            $start,
+            $end
+        );
+        $data['endingPoliciesRenewed'] = 0;
+        foreach ($renewalPolicies as $renewalPolicy) {
+            if ($renewalPolicy->isRenewed()) {
+                $data['endingPoliciesRenewed']++;
+            }
+        }
+
         $data['newPolicies'] = $policyRepo->countAllNewPolicies($end, $start);
         $data['newPoliciesAdjUpgrade'] = $data['newPolicies'] - $data['endingUpgradePolicies'];
         $data['newPoliciesPremium'] = $data['newDirectPoliciesPremium'] + $data['newInvitationPoliciesPremium'] +
