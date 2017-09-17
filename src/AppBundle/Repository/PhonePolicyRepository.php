@@ -236,7 +236,7 @@ class PhonePolicyRepository extends PolicyRepository
         $cancellationReason,
         \DateTime $startDate = null,
         \DateTime $endDate = null,
-        $emptyCancellation
+        $emptyCancellation = true
     ) {
         return $this->findAllEndingPolicies(
             $cancellationReason,
