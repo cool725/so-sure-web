@@ -185,6 +185,13 @@ class ReportingService
                 true
             ));
         }
+        $data[sprintf('endingExpiredPolicies', $key)] = $policyRepo->countAllEndingPolicies(
+            null,
+            $start,
+            $end,
+            false
+        );
+
         $data['totalEndingPoliciesAdjUpgrade'] = $data['totalEndingPolicies'] - $data['totalUpgradePolicies'];
         $data['endingEndingPoliciesAdjUpgrade'] = $data['endingEndingPolicies'] - $data['endingUpgradePolicies'];
         $data['totalEndingFNOLPoliciesAdjUpgrade'] = $data['totalEndingFNOLPolicies'] -
@@ -196,7 +203,9 @@ class ReportingService
             null,
             false,
             $start,
-            $end
+            $end,
+            false,
+            false
         );
         $data['endingPoliciesRenewed'] = 0;
         foreach ($renewalPolicies as $renewalPolicy) {
