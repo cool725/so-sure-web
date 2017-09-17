@@ -832,6 +832,11 @@ services:
         tags:
             - { name: validator.constraint_validator }
 
+    app.validator.renewalconnectionsamount:
+        class: AppBundle\Validator\Constraints\RenewalConnectionsAmount
+        tags:
+            - { name: validator.constraint_validator }
+
     app.validator.alphanumeric:
         class: AppBundle\Validator\Constraints\AlphanumericValidator
         tags:

@@ -220,6 +220,7 @@ abstract class Policy
     protected $connections = array();
 
     /**
+     * @AppAssert\RenewalConnectionsAmount()
      * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Connection\RenewalConnection", cascade={"persist"})
      */
     protected $renewalConnections = array();
@@ -2789,14 +2790,15 @@ abstract class Policy
         }
 
         foreach ($this->getPreviousPolicy()->getStandardConnections() as $connection) {
+            $renew = count($this->getRenewalConnections()) < $this->getMaxConnections($date);
             if ($connection->getLinkedPolicy()->isActive(true) &&
                 $connection->getLinkedPolicy()->isConnected($this->getPreviousPolicy())) {
-                $this->addRenewalConnection($connection->createRenewal());
+                $this->addRenewalConnection($connection->createRenewal($renew));
             } elseif ($connection->getLinkedPolicyRenewal() &&
                 $connection->getLinkedPolicyRenewal()->isActive(true) &&
                 $connection->getLinkedPolicyRenewal()->isConnected($this->getPreviousPolicy())
             ) {
-                $this->addRenewalConnection($connection->createRenewal());
+                $this->addRenewalConnection($connection->createRenewal($renew));
             }
         }
     }
