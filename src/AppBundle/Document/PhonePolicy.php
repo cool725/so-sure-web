@@ -305,6 +305,9 @@ class PhonePolicy extends Policy
         } elseif ($this->isBeforePolicyStarted($date)) {
             // Case for Salva's 10 minute buffer
             return self::STANDARD_VALUE;
+        } elseif (in_array($this->getStatus(), [self::STATUS_PENDING_RENEWAL, self::STATUS_RENEWAL])) {
+            // Renewals should assume standard (max) value
+            return self::STANDARD_VALUE;
         } else {
             return self::AGED_VALUE;
         }

@@ -365,7 +365,7 @@ class Connection
         ];
     }
 
-    public function createRenewal()
+    public function createRenewal($renew = true)
     {
         $renewalConnection = new RenewalConnection();
         if ($this->getLinkedPolicyRenewal()) {
@@ -376,7 +376,7 @@ class Connection
         $renewalConnection->setLinkedUser($this->getLinkedUser());
 
         // default to renew the connection
-        $renewalConnection->setRenew(true);
+        $renewalConnection->setRenew($renew);
 
         return $renewalConnection;
     }

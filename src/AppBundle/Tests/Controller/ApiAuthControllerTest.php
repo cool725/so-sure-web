@@ -2956,6 +2956,101 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertTrue($data['connections'][0]['reconnect_on_renewal']);
     }
 
+    public function testApiReconnectTooMany()
+    {
+        $userA = self::createUser(
+            self::$userManager,
+            self::generateEmail('testApiReconnectTooManyA', $this),
+            'foo'
+        );
+        $cognitoIdentityIdA = $this->getAuthUser($userA);
+
+        $lastYear = new \DateTime();
+        $lastYear = $lastYear->sub(new \DateInterval('P350D'));
+        $policyA = static::initPolicy(
+            $userA,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            $lastYear,
+            true
+        );
+        $this->payPolicy($userA, $policyA->getId(), null, $lastYear);
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policyA->getStatus());
+
+        for ($i = 1; $i < 15; $i++) {
+            $userB = self::createUser(
+                self::$userManager,
+                self::generateEmail(sprintf('testApiReconnectB%d', $i), $this),
+                'foo'
+            );
+            $cognitoIdentityIdB = $this->getAuthUser($userB);
+            $lastYear = new \DateTime();
+            $lastYear = $lastYear->sub(new \DateInterval('P290D'));
+            $policyB = static::initPolicy(
+                $userB,
+                static::$dm,
+                $this->getRandomPhone(static::$dm),
+                $lastYear,
+                true
+            );
+            $this->payPolicy($userB, $policyB->getId(), null, $lastYear);
+            //$this->assertEquals(Policy::STATUS_ACTIVE, $policyB->getStatus());
+
+            $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyA->getId());
+
+            $crawler = static::postRequest(self::$client, $cognitoIdentityIdA, $url, [
+                'email' => $userB->getEmail(),
+                'name' => 'invite accept test',
+            ]);
+            $invitationData = $this->verifyResponse(200);
+
+            $url = sprintf("/api/v1/auth/invitation/%s", $invitationData['id']);
+            $crawler = static::postRequest(self::$client, $cognitoIdentityIdB, $url, [
+                'action' => 'accept',
+                'policy_id' => $policyB->getId()
+            ]);
+            $data = $this->verifyResponse(200);
+        }
+
+        $renewalPolicyA = static::$policyService->createPendingRenewal(
+            $policyA,
+            new \DateTime()
+        );
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyA->getStatus());
+
+        $url = sprintf("/api/v1/auth/policy/%s/renew", $policyA->getId());
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityIdA, $url, [
+            'number_payments' => '12',
+        ]);
+        $data = $this->verifyResponse(200);
+
+        $url = sprintf("/api/v1/auth/policy/%s?_method=GET", $renewalPolicyA->getId());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityIdA, $url, [
+        ]);
+        $data = $this->verifyResponse(200);
+
+        $url = sprintf("/api/v1/auth/policy/%s/reconnect", $renewalPolicyA->getId());
+        $count = 0;
+        foreach ($data['connections'] as $connection) {
+            if (!$connection['reconnect_on_renewal']) {
+                $crawler = static::postRequest(self::$client, $cognitoIdentityIdA, $url, [
+                    'renew' => true,
+                    'connection_id' => $connection['id'],
+                ]);
+                $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+                $count++;
+            }
+        }
+
+        $this->assertGreaterThan(4, $count);
+
+        $url = sprintf("/api/v1/auth/policy/%s?_method=GET", $renewalPolicyA->getId());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityIdA, $url, [
+        ]);
+        $data = $this->verifyResponse(200);
+    }
+
     // policy/{id}/renew
 
     /**

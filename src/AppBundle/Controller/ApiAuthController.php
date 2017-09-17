@@ -1080,6 +1080,9 @@ class ApiAuthController extends BaseController
                 throw new NotFoundHttpException();
             }
             $connection->setRenew($renew);
+
+            $this->validateObject($policy);
+
             $dm->flush();
 
             return new JsonResponse($policy->toApiArray());
@@ -1090,6 +1093,13 @@ class ApiAuthController extends BaseController
                 ApiErrorCode::ERROR_NOT_FOUND,
                 'Unable to find policy/connection',
                 404
+            );
+        } catch (ValidationException $e) {
+            $this->get('logger')->info(sprintf('Failed reconnect'), ['exception' => $e]);
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_INVALD_DATA_FORMAT,
+                'Invalid reconnection',
+                422
             );
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api reconnectAction.', ['exception' => $e]);
