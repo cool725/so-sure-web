@@ -232,9 +232,20 @@ class PhonePolicyRepository extends PolicyRepository
     /**
      * All policies that are 'ending' (e.g. cancelled) during time period (excluding so-sure test ones)
      */
-    public function countAllEndingPolicies($cancellationReason, \DateTime $startDate = null, \DateTime $endDate = null)
-    {
-        return $this->findAllEndingPolicies($cancellationReason, false, $startDate, $endDate)->count();
+    public function countAllEndingPolicies(
+        $cancellationReason,
+        \DateTime $startDate = null,
+        \DateTime $endDate = null,
+        $emptyCancellation = true
+    ) {
+        return $this->findAllEndingPolicies(
+            $cancellationReason,
+            false,
+            $startDate,
+            $endDate,
+            false,
+            $emptyCancellation
+        )->count();
     }
 
     /**
@@ -245,7 +256,8 @@ class PhonePolicyRepository extends PolicyRepository
         $onlyWithFNOL = false,
         \DateTime $startDate = null,
         \DateTime $endDate = null,
-        $requestedCancellation = false
+        $requestedCancellation = false,
+        $emptyCancellation = true
     ) {
         if (!$endDate) {
             $endDate = new \DateTime();
@@ -262,7 +274,9 @@ class PhonePolicyRepository extends PolicyRepository
             Policy::STATUS_EXPIRED,
             Policy::STATUS_EXPIRED_WAIT_CLAIM,
         ]);
-        $qb->field('cancelledReason')->equals($cancellationReason);
+        if ($emptyCancellation || $cancellationReason) {
+            $qb->field('cancelledReason')->equals($cancellationReason);
+        }
         $qb->field('end')->lte($endDate);
         if ($startDate) {
             $qb->field('end')->gte($startDate);
