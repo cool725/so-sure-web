@@ -630,7 +630,6 @@ services:
     app.listener.policy:
         class:   AppBundle\Listener\PolicyListener
         arguments:
-            dm:                   "@doctrine_mongodb.odm.default_document_manager"
             policyService:        "@app.policy"
             logger:               "@logger"
         tags:

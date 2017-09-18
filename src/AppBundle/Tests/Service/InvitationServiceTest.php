@@ -1751,13 +1751,11 @@ class InvitationServiceTest extends WebTestCase
             $policyInviteeA,
             Policy::CANCELLED_ACTUAL_FRAUD,
             false,
-            false,
             new \DateTime('2016-04-03')
         );
         self::$policyService->cancel(
             $policyInviteeB,
             Policy::CANCELLED_ACTUAL_FRAUD,
-            false,
             false,
             new \DateTime('2016-04-02')
         );

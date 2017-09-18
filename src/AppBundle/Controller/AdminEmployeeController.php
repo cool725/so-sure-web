@@ -438,8 +438,7 @@ class AdminEmployeeController extends BaseController
                     if ($policy->canCancel($cancel->getCancellationReason())) {
                         $policyService->cancel(
                             $policy,
-                            $cancel->getCancellationReason(),
-                            $cancel->getSkipNetworkEmail()
+                            $cancel->getCancellationReason()
                         );
                         $this->addFlash(
                             'success',

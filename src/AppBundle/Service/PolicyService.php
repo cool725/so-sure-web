@@ -18,7 +18,7 @@ use AppBundle\Document\SCode;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
-use AppBundle\Document\RewardConnection;
+use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\OptOut\SmsOptOut;
 use AppBundle\Document\Invitation\EmailInvitation;
@@ -847,7 +847,6 @@ class PolicyService
     public function cancel(
         Policy $policy,
         $reason,
-        $skipNetworkEmail = false,
         $closeOpenClaims = false,
         \DateTime $date = null
     ) {
@@ -1047,13 +1046,19 @@ class PolicyService
             return;
         }
 
+        // Upgrades should not send cancellation emails
+        if ($connection->getLinkedPolicy()->isCancelled() &&
+            $connection->getLinkedPolicy()->getCancelledReason() == Policy::CANCELLED_UPGRADE) {
+            return;
+        }
+
         // Policy with the reduced connection value
         $policy = $connection->getSourcePolicy();
         // User who caused the reduction
         $causalUser = $policy->getUser();
         $this->mailer->sendTemplate(
             sprintf('Important Information about your so-sure Reward Pot'),
-            $policy->getSourceUser()->getEmail(),
+            $policy->getUser()->getEmail(),
             'AppBundle:Email:policy/connectionReduction.html.twig',
             ['connection' => $connection, 'policy' => $policy, 'causalUser' => $causalUser],
             'AppBundle:Email:policy/connectionReduction.txt.twig',
@@ -1178,7 +1183,7 @@ class PolicyService
             $cancelled[$policy->getId()] = $policy->getPolicyNumber();
             if (!$dryRun) {
                 try {
-                    $this->cancel($policy, Policy::CANCELLED_USER_REQUESTED, false, true, $date);
+                    $this->cancel($policy, Policy::CANCELLED_USER_REQUESTED, true, $date);
                 } catch (\Exception $e) {
                     $msg = sprintf(
                         'Error Cancelling Policy %s / %s',
@@ -1228,7 +1233,7 @@ class PolicyService
                 $cancelled[$policy->getId()] = $policy->getPolicyNumber();
                 if (!$dryRun) {
                     try {
-                        $this->cancel($policy, Policy::CANCELLED_UNPAID, false, true);
+                        $this->cancel($policy, Policy::CANCELLED_UNPAID, true);
                     } catch (\Exception $e) {
                         $msg = sprintf(
                             'Error Cancelling Policy %s / %s',

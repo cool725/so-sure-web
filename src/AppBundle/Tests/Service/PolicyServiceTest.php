@@ -460,7 +460,6 @@ class PolicyServiceTest extends WebTestCase
             $policy,
             PhonePolicy::CANCELLED_ACTUAL_FRAUD,
             false,
-            false,
             new \DateTime('2016-02-02')
         );
         // 6.99 / month
@@ -717,7 +716,6 @@ class PolicyServiceTest extends WebTestCase
         static::$policyService->cancel(
             $policy,
             PhonePolicy::CANCELLED_COOLOFF,
-            false,
             false,
             new \DateTime('2016-01-10')
         );
@@ -3799,7 +3797,6 @@ class PolicyServiceTest extends WebTestCase
         static::$policyService->cancel(
             $renewalPolicy,
             PhonePolicy::CANCELLED_COOLOFF,
-            false,
             false,
             new \DateTime('2016-12-30')
         );

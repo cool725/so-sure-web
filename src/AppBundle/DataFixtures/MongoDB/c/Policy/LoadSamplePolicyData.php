@@ -158,12 +158,12 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             if (count($policy->getClaims()) == 0 && count($policy->getUser()->getPolicies()) == 1) {
                 if (!$fraud && $policy->canCancel(Policy::CANCELLED_ACTUAL_FRAUD)) {
                     $fraud = true;
-                    $policyService->cancel($policy, Policy::CANCELLED_ACTUAL_FRAUD, true, true);
+                    $policyService->cancel($policy, Policy::CANCELLED_ACTUAL_FRAUD, true);
                     $policy->getUser()->setEnabled(true);
                 } elseif (!$unpaid) {
                     if ($policy->canCancel(Policy::CANCELLED_USER_REQUESTED)) {
                         $unpaid = true;
-                        $policyService->cancel($policy, Policy::CANCELLED_USER_REQUESTED, true, true);
+                        $policyService->cancel($policy, Policy::CANCELLED_USER_REQUESTED, true);
                         $policy->getUser()->setEnabled(true);
                     }
                 } else {
