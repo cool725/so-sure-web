@@ -78,7 +78,7 @@ doctrine_mongodb:
             server: "%mongodb_url%"
             options: {}
         census:
-            server: "%mongodb_url%"
+            server: "%census_mongodb_url%"
             options: {}
     default_database: "%mongodb_db%"
     document_managers:
