@@ -26,21 +26,22 @@
 
 {% block body %}
 
-    <section class="section--pad section--arrow section--arrow__blue text-center intro">
+    <section class="section--pad section--arrow section--arrow__blue text-center learn-more--intro">
         <div class="container">
             <h1 class="text-white">Connections &amp; Cashback</h1>
             <p class="lead">Invite trusted friends, family, collegues to sign up and connect with you on so-sure. <br> Once connected, save money on your premium when you and your connections don’t claim. <br> Sounds simple enough, but how does that work? Let us show you:</p>
         </div>
     </section>
 
-    <section class="section--pad slider">
+    {# TODO Create Partial #}
+    <section class="section--pad learn-more--slider">
         <div class="container">
 
-            <h1 class="h2">
-                <span class="text-blue">Insurance for your</span>
+            <h3 class="phone-title text-center">
+                <span class="text-blue">Insurance for a</span>
                 <div class="dropdown memory-dropdown-list">
                     <a href="#"
-                       class="dropdown-toggle text-nowrap"
+                       class="dropdown-toggle"
                        type="button"
                        id="memoryDropdownList"
                        data-toggle="dropdown"
@@ -54,7 +55,7 @@
                             <li class="dropdown-header">Select alternate model</li>
                             {% for phone_mem in phones if phone_mem.id != phone.id %}
                                 <li>
-                                    <a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class=""> {{ phone.model }} - {{ phone_mem.memory }}GB</a>
+                                    <a href="{{ path('learn_more_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class=""> {{ phone.model }} - {{ phone_mem.memory }}GB</a>
                                 </li>
                             {% endfor %}
                             <li role="separator" class="divider"></li>
@@ -62,15 +63,62 @@
                         <li><a href="#" data-toggle="modal" data-target="#quoteModal"> I have a different phone</a></li>
                     </ul>
                 </div>
-                <br>
-                <span class="text-nowrap">only <span class="text-blue">£{{ phone_price.monthlyPremiumPrice }}</span> per month</span>
-            </h1>
+            </h3>
 
+            <h4 class="text-center">Effective monthly premium after cashback:<br><small>(Cashback paid out end of policy year)</small></h4>
+
+            {# Set the start friends amount #}
+            {% set start_friends = max_connections / 2 %}
+
+            {# Set the amount of cashback #}
+            {% set start_value = start_friends * connection_value %}
+
+            {# If greater than max pot, pot max is start value #}
+            {% if start_value > max_pot %}
+                {% set start_value = max_pot %}
+            {% endif %}
+
+            {# Start amount and work out monthly #}
+            {% set start_premium = annual_premium - start_value %}
+            {% set monthly_premium = start_premium / 12 %}
+
+            <div class="reward-slider">
+                <output for="range" class="rewardslider__output">
+                    <span id="premium" class="h3 text-white">£{{ monthly_premium|number_format(2, '.', ',') }}</span><br>
+                    <small class="text-nowrap">per month</small>
+                </output>
+                <input type="range"
+                       id="reward-slider"
+                       min="0"
+                       max="{{ max_connections }}"
+                       value="{{ start_friends }}"
+                       data-maxpot="{{ max_pot }}"
+                       data-connection-value="{{ connection_value }}"
+                       data-premium="{{ annual_premium }}"
+                       data-monthly-premium="{{ monthly_premium }}">
+            </div>
+            <h4 class="text-blue text-center">Number of connections</h4>
+        </div>
+    </section>
+
+    {# TODO Create Partial #}
+    <section class="section--pad learn-more--effective-monthly-premium">
+        <div class="container">
+            <h3>What is an effective monthly premium?</h3>
+            <p>Your effective monthly premium is calculated by taking into account the potential cashback</p>
+            <span class="h2 text-blue">Effectve monthly premium = Monthly Premium - Cashback</span>
+            <p><small><small>(Cashback paid out end of policy year)</small></small></p>
+        </div>
+    </section>
+
+    <section class="section--pad learn-more--how-to-get-cashback">
+        <div class="container">
+            <h3>How do I get cashback?</h3>
         </div>
     </section>
 
     {# Page Modals #}
-    {% include 'AppBundle::Default/modalQuote.html.twig' with {'selectPhoneMakeType': 'other_pages'} %}
+    {% include 'AppBundle::Default/modalQuote.html.twig' with {'selectPhoneMakeType': 'learn_more'} %}
     {# End Page Modals #}
 
 {% endblock %}
@@ -78,13 +126,11 @@
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
-    'components/vimeo-player-js/player.min.js'
     'components/typeahead.js/typeahead.bundle.min.js'
     'components/fuse.js/fuse.min.js'
     'components/rangeslider.js/rangeslider.min.js'
-    '@AppBundle/Resources/public/js/Default/modalVideo.js'
     '@AppBundle/Resources/public/js/Default/index.js'
-    '@AppBundle/Resources/public/js/Default/slider.js'
+    '@AppBundle/Resources/public/js/Default/sliderNew.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
     '@AppBundle/Resources/public/js/Default/bannerSticky.js' %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}

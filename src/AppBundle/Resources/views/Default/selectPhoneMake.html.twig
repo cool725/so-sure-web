@@ -30,6 +30,8 @@
                 </div>
             {% endif %}
         </form>
+    {% elseif type == 'learn_more' %}
+        form here
     {% else %}
         <form {% if type == 'inline' %} class="form-inline" {% endif %}  method="get" id="search-phone-form" {% if phone %}action="{{ path('quote_phone', {'id': phone.id }) }}"{% endif %} data-base-path="{{ basePath }}">
             <div class="form-group">
