@@ -864,9 +864,6 @@ class PolicyService
         $this->dm->flush();
 
         $this->cancelledPolicyEmail($policy);
-        if (!$skipNetworkEmail) {
-            $this->networkCancelledPolicyEmails($policy);
-        }
 
         $this->dispatchEvent(PolicyEvent::EVENT_CANCELLED, new PolicyEvent($policy));
     }
@@ -1042,34 +1039,26 @@ class PolicyService
     }
 
     /**
-     * @param Policy $policy
+     * @param Connection $connection
      */
-    public function networkCancelledPolicyEmails(Policy $policy)
+    public function connectionReduced(Connection $connection)
     {
         if (!$this->mailer) {
             return;
         }
 
-        $cancelledUser = $policy->getUser();
-        foreach ($policy->getConnections() as $networkConnection) {
-            if ($networkConnection instanceof RewardConnection) {
-                continue;
-            }
-            // if that user has already claimed, there's no point in telling them that their friend cancelled,
-            // as they can't do anything to improve their pot
-            if ($networkConnection->getLinkedPolicy() &&
-                $networkConnection->getLinkedPolicy()->hasMonetaryClaimed()) {
-                continue;
-            }
-            $this->mailer->sendTemplate(
-                sprintf('Your friend, %s, cancelled their so-sure policy', $cancelledUser->getName()),
-                $networkConnection->getLinkedUser()->getEmail(),
-                'AppBundle:Email:policy-cancellation/network.html.twig',
-                ['policy' => $networkConnection->getLinkedPolicy(), 'cancelledUser' => $cancelledUser],
-                'AppBundle:Email:policy-cancellation/network.txt.twig',
-                ['policy' => $networkConnection->getLinkedPolicy(), 'cancelledUser' => $cancelledUser]
-            );
-        }
+        // Policy with the reduced connection value
+        $policy = $connection->getSourcePolicy();
+        // User who caused the reduction
+        $causalUser = $policy->getUser();
+        $this->mailer->sendTemplate(
+            sprintf('Important Information about your so-sure Reward Pot'),
+            $policy->getSourceUser()->getEmail(),
+            'AppBundle:Email:policy/connectionReduction.html.twig',
+            ['connection' => $connection, 'policy' => $policy, 'causalUser' => $causalUser],
+            'AppBundle:Email:policy/connectionReduction.txt.twig',
+            ['connection' => $connection, 'policy' => $policy, 'causalUser' => $causalUser]
+        );
     }
 
     /**

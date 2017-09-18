@@ -627,6 +627,15 @@ services:
         tags:
             -  { name: kernel.event_listener, event: event.validate, method: onValidateEvent }
 
+    app.listener.policy:
+        class:   AppBundle\Listener\PolicyListener
+        arguments:
+            dm:                   "@doctrine_mongodb.odm.default_document_manager"
+            policyService:        "@app.policy"
+            logger:               "@logger"
+        tags:
+            -  { name: kernel.event_listener, event: event.connection.reduced, method: onConnectionReducedEvent }
+
     app.listener.user:
         class:   AppBundle\Listener\UserListener
         arguments:
