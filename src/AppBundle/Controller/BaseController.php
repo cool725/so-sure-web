@@ -95,6 +95,11 @@ abstract class BaseController extends Controller
         return $this->get('doctrine_mongodb.odm.default_document_manager');
     }
 
+    protected function getCensusManager()
+    {
+        return $this->get('doctrine_mongodb.odm.census_document_manager');
+    }
+
     protected function getCognitoIdentityId(Request $request)
     {
         $auth = $this->get('app.user.cognitoidentity.authenticator');

@@ -88,6 +88,7 @@ use Pagerfanta\Pagerfanta;
 use Pagerfanta\Adapter\DoctrineODMMongoDBAdapter;
 use MongoRegex;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use CensusBundle\Document\Postcode;
 
 /**
  * @Route("/admin")
@@ -772,6 +773,15 @@ class AdminEmployeeController extends BaseController
         if (!$user) {
             throw $this->createNotFoundException('User not found');
         }
+        $censusDM = $this->getCensusManager();
+        $postcodeRepo = $censusDM->getRepository(PostCode::class);
+        $postcode = null;
+        $census = null;
+        if ($user->getBillingAddress()) {
+            $search = $this->get('census.search');
+            $postcode = $search->getPostcode($user->getBillingAddress()->getPostcode());
+            $census = $search->findNearest($user->getBillingAddress()->getPostcode());
+        }
 
         $resetForm = $this->get('form.factory')
             ->createNamedBuilder('reset_form')
@@ -921,6 +931,8 @@ class AdminEmployeeController extends BaseController
             'user_email_form' => $userEmailForm->createView(),
             'user_permission_form' => $userPermissionForm->createView(),
             'makemodel_form' => $makeModelForm->createView(),
+            'postcode' => $postcode,
+            'census' => $census,
         ];
     }
 

@@ -60,7 +60,21 @@
                 </tr>
                 <tr>
                     <td>Billing Address</td>
-                    <td>{{ user.billingAddress }}</td>
+                    <td>{{ user.billingAddress }}
+                        [<a target="blank" href="http://maps.google.com/?q={{ user.billingAddress.postcode }}">{{ user.billingAddress.postcode }}</a>]
+                    {% if postcode and postcode.location %}
+                        [<a target="blank" href="http://maps.google.com/?ll={{ postcode.location.coordinates[1]}},{{ postcode.location.coordinates[0]}}">
+                            Postcode match
+                        </a>]
+                    {% endif %}
+                    {% if census %}
+                        [<a target="blank" href="http://maps.google.com/?ll={{ census.location.coordinates[1]}},{{ census.location.coordinates[0]}}">
+                            Census match
+                        </a>]
+                        <br>
+                        {{ census.getSuperGroup }} / {{ census.getGroup }} / {{ census.getSubGroup }}
+                    {% endif%}
+                    </td>
                     <td></td>
                 </tr>
                 <tr>
