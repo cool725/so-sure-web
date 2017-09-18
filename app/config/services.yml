@@ -922,3 +922,8 @@ services:
         class: Twig_Extensions_Extension_Intl
         tags:
             - { name: twig.extension }
+
+    census.search:
+        class: CensusBundle\Service\SearchService
+        arguments:
+            dm:          "@doctrine_mongodb.odm.census_document_manager"

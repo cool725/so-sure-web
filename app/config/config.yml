@@ -77,6 +77,9 @@ doctrine_mongodb:
         default:
             server: "%mongodb_url%"
             options: {}
+        census:
+            server: "%mongodb_url%"
+            options: {}
     default_database: "%mongodb_db%"
     document_managers:
         default:
@@ -90,6 +93,12 @@ doctrine_mongodb:
                     dir: "%kernel.root_dir%/../vendor/gedmo/doctrine-extensions/lib/Gedmo/Loggable/Document"
                     alias: GedmoLoggable
                     is_bundle: false
+        census:
+            database: census
+            mappings:
+                CensusBundle: ~
+            retry_connect: 5
+            retry_query: 1
     default_commit_options:
         timeout: 2000  # integer >= -1
 

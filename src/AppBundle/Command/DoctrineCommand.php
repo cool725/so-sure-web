@@ -24,5 +24,8 @@ class DoctrineCommand extends ContainerAwareCommand
     {
         $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
         $dm->getSchemaManager()->ensureIndexes();
+
+        $censusDm = $this->getContainer()->get('doctrine_mongodb.odm.census_document_manager');
+        $censusDm->getSchemaManager()->ensureIndexes();
     }
 }
