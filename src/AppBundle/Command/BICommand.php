@@ -53,6 +53,7 @@ class BICommand extends ContainerAwareCommand
 
     private function exportClaims()
     {
+        $search = $this->getContainer()->get('census.search');
         $repo = $this->getManager()->getRepository(Claim::class);
         $claims = $repo->findAll();
         $lines = [];
@@ -70,10 +71,12 @@ class BICommand extends ContainerAwareCommand
             '"Claim Suspected Fraud"',
             '"Policy upgraded"',
             '"Age of Policy Holder"',
+            '"Pen Portrait"',
         ]);
         foreach ($claims as $claim) {
             $policy = $claim->getPolicy();
             $user = $policy->getUser();
+            $census = $search->findNearest($user->getBillingAddress()->getPostcode());
             $lines[] = implode(',', [
                 sprintf('"%s"', $policy->getPolicyNumber()),
                 sprintf('"%s"', $policy->getStart()->format('Y-m-d H:i:s')),
@@ -96,6 +99,7 @@ class BICommand extends ContainerAwareCommand
                         'no'
                 ),
                 sprintf('"%d"', $user->getAge()),
+                sprintf('"%s"', $census ? $census->getSubgrp() : ''),
             ]);
         }
         $this->uploadS3(implode(PHP_EOL, $lines), 'claims.csv');
@@ -105,6 +109,7 @@ class BICommand extends ContainerAwareCommand
 
     private function exportPolicies($prefix)
     {
+        $search = $this->getContainer()->get('census.search');
         $repo = $this->getManager()->getRepository(PhonePolicy::class);
         $policies = $repo->findAllStartedPolicies($prefix);
         $lines = [];
@@ -121,9 +126,11 @@ class BICommand extends ContainerAwareCommand
             '"Total Number of Claims"',
             '"Number of Approved/Settled Claims"',
             '"Number of Withdrawn/Declined Claims"',
+            '"Pen Portrait"',
         ]);
         foreach ($policies as $policy) {
             $user = $policy->getUser();
+            $census = $search->findNearest($user->getBillingAddress()->getPostcode());
             $lines[] = implode(',', [
                 sprintf('"%s"', $policy->getPolicyNumber()),
                 sprintf('"%d"', $user->getAge()),
@@ -137,6 +144,7 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', count($policy->getClaims()) + count($policy->getLinkedClaims())),
                 sprintf('"%s"', count($policy->getApprovedClaims(true, true))),
                 sprintf('"%s"', count($policy->getWithdrawnDeclinedClaims(true))),
+                sprintf('"%s"', $census ? $census->getSubgrp() : ''),
             ]);
         }
         $this->uploadS3(implode(PHP_EOL, $lines), 'policies.csv');
