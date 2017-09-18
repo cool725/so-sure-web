@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{# Set vars #}
+{% set include_emoji = 1 %}
+{% set white_logo = true %}
+
+{% block title %}so-sure -
+    {{ phone }}{% endblock %}
+{% block meta %}
+    <meta name="description" content="For a small monthly fee your phone is covered for theft, loss, accidental damage and unauthorised usage."/>
+    <meta name="keywords" content="mobile insurance, phone insurance, mobile phone insurance, cheap mobile phone insurance, cheap phone insurance, cheap mobile insurance, better phone insurance, better mobile phone insurance"/>
+    <link rel="canonical" href="{{ url('quote_make_model', {'make': phone.make, 'model': phone.encodedModel}) }}" />
+
+    <meta property="og:video" content="https://cdn.so-sure.com/video/explainer-subtitle-640.mp4" />
+    <meta property="og:video:secure_url" content="https://cdn.so-sure.com/video/explainer-subtitle-640.mp4" />
+    <meta property="og:video:type" content="video/mp4" />
+    <meta property="og:video:width" content="640" />
+    <meta property="og:video:height" content="360" />
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    'components/vimeo-player-js/player.min.js'
+    'components/typeahead.js/typeahead.bundle.min.js'
+    'components/fuse.js/fuse.min.js'
+    'components/rangeslider.js/rangeslider.min.js'
+    '@AppBundle/Resources/public/js/Default/modalVideo.js'
+    '@AppBundle/Resources/public/js/Default/index.js'
+    '@AppBundle/Resources/public/js/Default/slider.js'
+    '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
+    '@AppBundle/Resources/public/js/Default/bannerSticky.js' %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets output='css/*.css'
+    '@AppBundle//Resources/public/sass/page/quote.scss'
+    %}
+    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{% block body %}
+
+    {# Page Modals #}
+    {% include 'AppBundle::Default/modalQuote.html.twig' with {'selectPhoneMakeType': 'other_pages'} %}
+    {# End Page Modals #}
+
+{% endblock %}
