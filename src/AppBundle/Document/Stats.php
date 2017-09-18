@@ -43,7 +43,6 @@ class Stats
      * @AppAssert\Alphanumeric()
      * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
-     * @MongoDB\Index(unique=true)
      */
     protected $name;
 
