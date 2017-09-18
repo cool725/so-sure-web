@@ -1,0 +1,17 @@
+// learnMore.scss
+
+@import "../mixins";
+@import "../common/paletteNew";
+
+.navbar {
+    background-color: $white;
+}
+
+.intro {
+	background-color: $primary-blue;
+	color: $white;
+
+	.lead {
+		line-height: 1.5;
+	}
+}

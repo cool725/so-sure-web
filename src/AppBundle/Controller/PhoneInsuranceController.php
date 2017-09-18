@@ -172,6 +172,7 @@ class PhoneInsuranceController extends BaseController
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
      * @Route("/insure/{make}+{model}", name="insure_make_model",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
+     * @Route("/phone-insurance/learn-more", name="phone_insurance_learn_more")
      */
     public function quoteAction(Request $request, $id = null, $make = null, $model = null, $memory = null)
     {

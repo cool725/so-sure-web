@@ -1,21 +1,78 @@
 {% extends 'base.html.twig' %}
 
 {# Set vars #}
-{% set include_emoji = 1 %}
-{% set white_logo = true %}
+{% set new_stylesheet = 1 %}
 
-{% block title %}so-sure -
-    {{ phone }}{% endblock %}
+{% block title %}so-sure - learn more{% endblock %}
 {% block meta %}
     <meta name="description" content="For a small monthly fee your phone is covered for theft, loss, accidental damage and unauthorised usage."/>
     <meta name="keywords" content="mobile insurance, phone insurance, mobile phone insurance, cheap mobile phone insurance, cheap phone insurance, cheap mobile insurance, better phone insurance, better mobile phone insurance"/>
-    <link rel="canonical" href="{{ url('quote_make_model', {'make': phone.make, 'model': phone.encodedModel}) }}" />
+    {# <link rel="canonical" href="{{ url('quote_make_model', {'make': phone.make, 'model': phone.encodedModel}) }}" /> #}
 
     <meta property="og:video" content="https://cdn.so-sure.com/video/explainer-subtitle-640.mp4" />
     <meta property="og:video:secure_url" content="https://cdn.so-sure.com/video/explainer-subtitle-640.mp4" />
     <meta property="og:video:type" content="video/mp4" />
     <meta property="og:video:width" content="640" />
     <meta property="og:video:height" content="360" />
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets output='css/*.css'
+    '@AppBundle//Resources/public/sass/page/learnMore.scss'
+    %}
+    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{% block body %}
+
+    <section class="section--pad section--arrow section--arrow__blue text-center intro">
+        <div class="container">
+            <h1 class="text-white">Connections &amp; Cashback</h1>
+            <p class="lead">Invite trusted friends, family, collegues to sign up and connect with you on so-sure. <br> Once connected, save money on your premium when you and your connections don’t claim. <br> Sounds simple enough, but how does that work? Let us show you:</p>
+        </div>
+    </section>
+
+    <section class="section--pad slider">
+        <div class="container">
+
+            <h1 class="h2">
+                <span class="text-blue">Insurance for your</span>
+                <div class="dropdown memory-dropdown-list">
+                    <a href="#"
+                       class="dropdown-toggle text-nowrap"
+                       type="button"
+                       id="memoryDropdownList"
+                       data-toggle="dropdown"
+                       aria-haspopup="true"
+                       aria-expanded="true">
+                        {{ phone }}
+                        <i class="fa fa-caret-down" aria-hidden="true"></i>
+                    </a>
+                    <ul class="dropdown-menu memory-dropdown" aria-labelledby="memoryDropdownList">
+                        {% if phones | length > 1 %}
+                            <li class="dropdown-header">Select alternate model</li>
+                            {% for phone_mem in phones if phone_mem.id != phone.id %}
+                                <li>
+                                    <a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class=""> {{ phone.model }} - {{ phone_mem.memory }}GB</a>
+                                </li>
+                            {% endfor %}
+                            <li role="separator" class="divider"></li>
+                        {% endif %}
+                        <li><a href="#" data-toggle="modal" data-target="#quoteModal"> I have a different phone</a></li>
+                    </ul>
+                </div>
+                <br>
+                <span class="text-nowrap">only <span class="text-blue">£{{ phone_price.monthlyPremiumPrice }}</span> per month</span>
+            </h1>
+
+        </div>
+    </section>
+
+    {# Page Modals #}
+    {% include 'AppBundle::Default/modalQuote.html.twig' with {'selectPhoneMakeType': 'other_pages'} %}
+    {# End Page Modals #}
+
 {% endblock %}
 
 {% block javascripts %}
@@ -31,20 +88,4 @@
     '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
     '@AppBundle/Resources/public/js/Default/bannerSticky.js' %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
-{% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-    '@AppBundle//Resources/public/sass/page/quote.scss'
-    %}
-    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
-{% endblock %}
-
-{% block body %}
-
-    {# Page Modals #}
-    {% include 'AppBundle::Default/modalQuote.html.twig' with {'selectPhoneMakeType': 'other_pages'} %}
-    {# End Page Modals #}
-
 {% endblock %}
