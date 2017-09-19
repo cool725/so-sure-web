@@ -1717,7 +1717,7 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(0, $updatedRenewalPolicyB->getPotValue());
     }
 
-    public function testPolicyRenewalConnectionsSingleReconnectReverse()
+    public function testPolicyRenewalConnectionsSingleReconnectReverseUnder15()
     {
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyRenewalConnectionsSingleReconnectReverseA', $this),
@@ -1772,6 +1772,70 @@ class PolicyServiceTest extends WebTestCase
         $this->assertTrue(count($updatedRenewalPolicyB->getAcceptedConnectionsRenewal()) == 0);
 
         static::$policyService->activate($renewalPolicyB, new \DateTime('2017-01-05'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
+
+        $this->assertEquals(0, $updatedRenewalPolicyA->getPotValue());
+        $this->assertEquals(0, $updatedRenewalPolicyB->getPotValue());
+
+        $this->assertEquals(10, $policyA->getPotValue());
+        $this->assertEquals(10, $policyB->getPotValue());
+    }
+
+    public function testPolicyRenewalConnectionsSingleReconnectReverseOver15()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyRenewalConnectionsSingleReconnectReverseOver15A', $this),
+            static::generateEmail('testPolicyRenewalConnectionsSingleReconnectReverseOver15B', $this),
+            true,
+            new \DateTime('2016-01-01'),
+            new \DateTime('2016-01-18')
+        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+
+        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-12-29'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
+
+        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-30'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+
+        $foundRenewalConnection = false;
+        foreach ($renewalPolicyA->getRenewalConnections() as $connection) {
+            $this->assertTrue($connection->getRenew());
+            $foundRenewalConnection = true;
+            $connection->setRenew(false);
+        }
+        $this->assertTrue($foundRenewalConnection);
+        static::$dm->flush();
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(Policy::class);
+        $updatedRenewalPolicyA = $policyRepo->find($renewalPolicyA->getId());
+
+        $this->assertNotNull($policyB->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertEquals(
+            $renewalPolicyA->getId(),
+            $policyB->getConnections()[0]->getLinkedPolicyRenewal()->getId()
+        );
+        $this->assertTrue(count($updatedRenewalPolicyA->getAcceptedConnectionsRenewal()) > 0);
+
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+
+        $this->assertEquals(0, $renewalPolicyA->getPotValue());
+
+        $updatedPolicyB = $policyRepo->find($policyB->getId());
+        static::$policyService->expire($policyB, new \DateTime('2017-01-18'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $updatedPolicyB->getStatus());
+
+        $updatedRenewalPolicyB = $policyRepo->find($renewalPolicyB->getId());
+        $this->assertNull($policyA->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertTrue(count($updatedRenewalPolicyB->getAcceptedConnectionsRenewal()) == 0);
+
+        static::$policyService->activate($renewalPolicyB, new \DateTime('2017-01-18'));
         $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
 
         $this->assertEquals(0, $updatedRenewalPolicyA->getPotValue());

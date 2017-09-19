@@ -203,6 +203,24 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
         $connection->prorateValue(new \DateTime('2016-12-01 00:00:01'));
         $this->assertEquals(9.17, $connection->getValue());
         $this->assertEquals(13.75, $connection->getTotalValue());
+
+        // reset
+        $connection->setValue(10);
+        $connection->setPromoValue(5);
+
+        // 11 months + 16 days (>15 days to expirey)
+        $connection->prorateValue(new \DateTime('2016-12-15 23:59:00'));
+        $this->assertEquals(9.17, $connection->getValue());
+        $this->assertEquals(13.75, $connection->getTotalValue());
+
+        // reset
+        $connection->setValue(10);
+        $connection->setPromoValue(5);
+
+        // 11 months + 17 days (15 days to expirey)
+        $connection->prorateValue(new \DateTime('2016-12-16 01:00:01'));
+        $this->assertEquals(10, $connection->getValue());
+        $this->assertEquals(15, $connection->getTotalValue());
     }
 
     public function testConnectionApi()
