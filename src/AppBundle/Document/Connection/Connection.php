@@ -299,7 +299,7 @@ class Connection
     public function prorateValue(\DateTime $date = null)
     {
         // only prorate connection value if the policy is still active
-        if (!$this->getSourcePolicy()->isActive()) {
+        if ($this->getSourcePolicy() && !$this->getSourcePolicy()->isActive()) {
             return;
         }
 
