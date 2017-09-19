@@ -13,6 +13,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Cashback;
+use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Classes\SoSure;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -71,6 +72,17 @@ class EmailDebugCommand extends BaseCommand
             $data = [
                 'policy' => $repo->findOneBy([]),
                 'additional_amount' => 10,
+            ];
+        } elseif (in_array($template, [
+            'policy/connectionReduction',
+        ])) {
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(StandardConnection::class);
+            $connection = $repo->findOneBy(['value' => ['$gt' => 0]]);
+            $data = [
+                'connection' => $connection,
+                'policy' => $connection->getSourcePolicy(),
+                'causalUser' => $connection->getLinkedUser(),
             ];
         } else {
             throw new \Exception(sprintf('Unsupported template %s for email debug. Add data', $template));

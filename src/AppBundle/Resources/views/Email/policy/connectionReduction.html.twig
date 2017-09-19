@@ -1,0 +1,26 @@
+{% extends 'AppBundle:Email:base.html.twig' %}
+{% import "AppBundle:Email:macros.html.twig" as macros %}
+{% block title %}Your friend, {{ causalUser.name }}, is no longer connected with you.{% endblock %}
+{% block body %}
+	{{ macros.start_table() }}
+		<h1>
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		</h1>
+		<div style="font-size: 14px; text-align: left;">
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+            Hi {{ policy.user.name }},<br><br>
+            Your so-sure Reward Pot value has been updated as your connection with {{ causalUser.name }} no longer exists.
+            <br><br>
+            {% if connection.value > 0 %}
+            As you were connected for at least 6 months, we're giving you a monthly pro-rata amount of £{{ connection.value|number_format(2, '.', ',') }} for the time that you were connected.
+            <br><br>
+            {% endif %}
+            You can keep the original connection value of £{{ connection.getInitialValue|number_format(2, '.', ',') }} by connecting with someone else in the next 30 days.
+            <br><br>
+			If you have any questions, please don't hesitate to
+				<a href="mailto:support@wearesosure.com?subject=I%20have%20a%20question" target="_blank"><span style="color:#3399ff">contact us</span></a>.
+		   </div>
+		</div>
+	{{ macros.end_table() }}
+{% endblock %}

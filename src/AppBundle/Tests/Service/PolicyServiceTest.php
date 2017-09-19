@@ -460,7 +460,6 @@ class PolicyServiceTest extends WebTestCase
             $policy,
             PhonePolicy::CANCELLED_ACTUAL_FRAUD,
             false,
-            false,
             new \DateTime('2016-02-02')
         );
         // 6.99 / month
@@ -717,7 +716,6 @@ class PolicyServiceTest extends WebTestCase
         static::$policyService->cancel(
             $policy,
             PhonePolicy::CANCELLED_COOLOFF,
-            false,
             false,
             new \DateTime('2016-01-10')
         );
@@ -3800,7 +3798,6 @@ class PolicyServiceTest extends WebTestCase
             $renewalPolicy,
             PhonePolicy::CANCELLED_COOLOFF,
             false,
-            false,
             new \DateTime('2016-12-30')
         );
         $this->assertEquals(0, $renewalPolicy->getTotalPremiumPrice());
@@ -3808,5 +3805,198 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(0, $renewalPolicy->getUsedGwp());
         $this->assertEquals(0, $renewalPolicy->getTotalIpt());
         $this->assertEquals(0, $renewalPolicy->getTotalBrokerFee());
+    }
+
+    public function testPolicyCancellationEmail()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyCancellationEmailA', $this),
+            static::generateEmail('testPolicyCancellationEmailB', $this)
+        );
+        $mailer = $this->getMockBuilder('Swift_Mailer')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        // Should be the cancellation email and notification about pot reduction
+        $cancellationEmail = $policyA->getUser()->getEmail();
+        $potReductionEmail = $policyB->getUser()->getEmail();
+
+        $this->expectPotRewardEmail($mailer, 0, $potReductionEmail);
+        $this->expectCancellationEmail($mailer, 1, $cancellationEmail);
+
+        self::$policyService->setMailerMailer($mailer);
+
+        self::$policyService->cancel($policyA, Policy::CANCELLED_USER_REQUESTED, false, new \DateTime('2016-10-01'));
+    }
+
+    public function testPolicyCancellationEmailUpgrade()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyCancellationEmailUpgradeA', $this),
+            static::generateEmail('testPolicyCancellationEmailUpgradeB', $this)
+        );
+        $mailer = $this->getMockBuilder('Swift_Mailer')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        // Should just be the cancellation email
+        $cancellationEmail = $policyA->getUser()->getEmail();
+        $this->expectCancellationEmail($mailer, 0, $cancellationEmail);
+        self::$policyService->setMailerMailer($mailer);
+
+        self::$policyService->cancel($policyA, Policy::CANCELLED_UPGRADE);
+    }
+
+    private function expectPotRewardEmail($mailer, $at, $email)
+    {
+        $mailer->expects($this->at($at))
+            ->method('send')
+            ->with($this->callback(
+                function ($mail) use ($email) {
+                    return in_array($email, array_keys($mail->getTo())) &&
+                        stripos($mail->getSubject(), 'your so-sure Reward Pot') !== false;
+                }
+            ));
+    }
+
+    private function expectCancellationEmail($mailer, $at, $email)
+    {
+        $mailer->expects($this->at($at))
+            ->method('send')
+            ->with($this->callback(
+                function ($mail) use ($email) {
+                    return in_array($email, array_keys($mail->getTo())) &&
+                        stripos($mail->getSubject(), 'is now cancelled') !== false;
+                }
+            ));
+    }
+
+    private function expectExpirationEmail($mailer, $at, $email)
+    {
+        $mailer->expects($this->at($at))
+            ->method('send')
+            ->with($this->callback(
+                function ($mail) use ($email) {
+                    return in_array($email, array_keys($mail->getTo())) &&
+                        stripos($mail->getSubject(), 'is now finished') !== false;
+                }
+            ));
+    }
+
+    public function testPolicyCancellationEmailNotRenewed()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyCancellationEmailNotRenewedA', $this),
+            static::generateEmail('testPolicyCancellationEmailNotRenewedB', $this),
+            true,
+            new \DateTime('2016-01-01'),
+            new \DateTime('2016-02-01')
+        );
+        $mailer = $this->getMockBuilder('Swift_Mailer')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        // Should be the cancellation email and notification about pot reduction
+        $cancellationEmail = $policyA->getUser()->getEmail();
+        $potReductionEmail = $policyB->getUser()->getEmail();
+
+        $this->expectPotRewardEmail($mailer, 0, $potReductionEmail);
+        $this->expectExpirationEmail($mailer, 1, $cancellationEmail);
+
+        self::$policyService->setMailerMailer($mailer);
+
+        self::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+    }
+
+    public function testPolicyCancellationEmailNotReconnected()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyCancellationEmailNotReconnectedA', $this),
+            static::generateEmail('testPolicyCancellationEmailNotReconnectedB', $this),
+            true,
+            new \DateTime('2016-01-01'),
+            new \DateTime('2016-02-01')
+        );
+
+        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-20'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $policyA->getNextPolicy()->getStatus());
+
+        $foundRenewalConnection = false;
+        foreach ($policyA->getNextPolicy()->getRenewalConnections() as $connection) {
+            $this->assertTrue($connection->getRenew());
+            $foundRenewalConnection = true;
+            $connection->setRenew(false);
+        }
+        $this->assertTrue($foundRenewalConnection);
+        static::$dm->flush();
+
+        $policyRepo = static::$dm->getRepository(Policy::class);
+        $updatedPolicyA = $policyRepo->find($policyA->getId());
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $updatedPolicyA->getStatus());
+
+        $updatedRenewalPolicyA = $policyRepo->find($policyA->getNextPolicy()->getId());
+        $this->assertNotNull($policyB->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertTrue(count($updatedRenewalPolicyA->getAcceptedConnectionsRenewal()) > 0);
+
+        $mailer = $this->getMockBuilder('Swift_Mailer')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        // Should be the cancellation email and notification about pot reduction
+        $cancellationEmail = $policyA->getUser()->getEmail();
+        $potReductionEmail = $policyB->getUser()->getEmail();
+
+        $this->expectPotRewardEmail($mailer, 0, $potReductionEmail);
+
+        self::$policyService->setMailerMailer($mailer);
+
+        static::$policyService->activate($updatedRenewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $updatedRenewalPolicyA->getStatus());
+    }
+
+    public function testPolicyCancellationEmailReconnected()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyCancellationEmailReconnectedA', $this),
+            static::generateEmail('testPolicyCancellationEmailReconnectedB', $this),
+            true,
+            new \DateTime('2016-01-01'),
+            new \DateTime('2016-02-01')
+        );
+
+        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-20'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $policyA->getNextPolicy()->getStatus());
+
+        $foundRenewalConnection = false;
+        foreach ($policyA->getNextPolicy()->getRenewalConnections() as $connection) {
+            $this->assertTrue($connection->getRenew());
+            $foundRenewalConnection = true;
+        }
+        $this->assertTrue($foundRenewalConnection);
+        static::$dm->flush();
+
+        $policyRepo = static::$dm->getRepository(Policy::class);
+        $updatedPolicyA = $policyRepo->find($policyA->getId());
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $updatedPolicyA->getStatus());
+
+        $updatedRenewalPolicyA = $policyRepo->find($policyA->getNextPolicy()->getId());
+        $this->assertNotNull($policyB->getConnections()[0]->getLinkedPolicyRenewal());
+        $this->assertTrue(count($updatedRenewalPolicyA->getAcceptedConnectionsRenewal()) > 0);
+
+        $mailer = $this->getMockBuilder('Swift_Mailer')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        // Should be the cancellation email and notification about pot reduction
+        $cancellationEmail = $policyA->getUser()->getEmail();
+        $potReductionEmail = $policyB->getUser()->getEmail();
+
+        $mailer->expects($this->never())->method('send');
+        self::$policyService->setMailerMailer($mailer);
+
+        static::$policyService->activate($updatedRenewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $updatedRenewalPolicyA->getStatus());
     }
 }

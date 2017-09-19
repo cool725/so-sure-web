@@ -2701,7 +2701,7 @@ abstract class Policy
                 continue;
             }
             if ($inversedConnection = $networkConnection->findInversedConnection()) {
-                $inversedConnection->prorateValue();
+                $inversedConnection->prorateValue($date);
                 // listener on connection will notify user
             }
             $networkConnection->getLinkedPolicy()->updatePotValue();

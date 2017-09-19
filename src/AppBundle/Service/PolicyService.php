@@ -18,7 +18,7 @@ use AppBundle\Document\SCode;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
-use AppBundle\Document\RewardConnection;
+use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\OptOut\SmsOptOut;
 use AppBundle\Document\Invitation\EmailInvitation;
@@ -99,6 +99,11 @@ class PolicyService
     public function setMailer($mailer)
     {
         $this->mailer = $mailer;
+    }
+
+    public function setMailerMailer($mailer)
+    {
+        $this->mailer->setMailer($mailer);
     }
 
     public function setDispatcher($dispatcher)
@@ -839,15 +844,13 @@ class PolicyService
     /**
      * @param Policy    $policy
      * @param string    $reason
-     * @param boolean   $skipNetworkEmail
-     * @param boolean   $closeOpenClaims  Where we are required to cancel the policy (binder),
-     *                                    we need to close out claims
+     * @param boolean   $closeOpenClaims Where we are required to cancel the policy (binder),
+     *                                   we need to close out claims
      * @param \DateTime $date
      */
     public function cancel(
         Policy $policy,
         $reason,
-        $skipNetworkEmail = false,
         $closeOpenClaims = false,
         \DateTime $date = null
     ) {
@@ -864,9 +867,6 @@ class PolicyService
         $this->dm->flush();
 
         $this->cancelledPolicyEmail($policy);
-        if (!$skipNetworkEmail) {
-            $this->networkCancelledPolicyEmails($policy);
-        }
 
         $this->dispatchEvent(PolicyEvent::EVENT_CANCELLED, new PolicyEvent($policy));
     }
@@ -1042,34 +1042,34 @@ class PolicyService
     }
 
     /**
-     * @param Policy $policy
+     * @param Connection $connection
      */
-    public function networkCancelledPolicyEmails(Policy $policy)
+    public function connectionReduced(Connection $connection)
     {
         if (!$this->mailer) {
             return;
         }
 
-        $cancelledUser = $policy->getUser();
-        foreach ($policy->getConnections() as $networkConnection) {
-            if ($networkConnection instanceof RewardConnection) {
-                continue;
-            }
-            // if that user has already claimed, there's no point in telling them that their friend cancelled,
-            // as they can't do anything to improve their pot
-            if ($networkConnection->getLinkedPolicy() &&
-                $networkConnection->getLinkedPolicy()->hasMonetaryClaimed()) {
-                continue;
-            }
-            $this->mailer->sendTemplate(
-                sprintf('Your friend, %s, cancelled their so-sure policy', $cancelledUser->getName()),
-                $networkConnection->getLinkedUser()->getEmail(),
-                'AppBundle:Email:policy-cancellation/network.html.twig',
-                ['policy' => $networkConnection->getLinkedPolicy(), 'cancelledUser' => $cancelledUser],
-                'AppBundle:Email:policy-cancellation/network.txt.twig',
-                ['policy' => $networkConnection->getLinkedPolicy(), 'cancelledUser' => $cancelledUser]
-            );
+        // Upgrades should not send cancellation emails
+        if ($connection->getSourcePolicy()->isCancelled() &&
+            $connection->getSourcePolicy()->getCancelledReason() == Policy::CANCELLED_UPGRADE) {
+            return;
         }
+
+        // Policy with the reduced connection value
+        $policy = $connection->getSourcePolicy();
+        // User who caused the reduction
+        $causalUser = $policy->getUser();
+        $this->mailer->sendTemplate(
+            sprintf('Important Information about your so-sure Reward Pot'),
+            $policy->getUser()->getEmail(),
+            'AppBundle:Email:policy/connectionReduction.html.twig',
+            ['connection' => $connection, 'policy' => $policy, 'causalUser' => $causalUser],
+            'AppBundle:Email:policy/connectionReduction.txt.twig',
+            ['connection' => $connection, 'policy' => $policy, 'causalUser' => $causalUser],
+            null,
+            'bcc@so-sure.com'
+        );
     }
 
     /**
@@ -1189,7 +1189,7 @@ class PolicyService
             $cancelled[$policy->getId()] = $policy->getPolicyNumber();
             if (!$dryRun) {
                 try {
-                    $this->cancel($policy, Policy::CANCELLED_USER_REQUESTED, false, true, $date);
+                    $this->cancel($policy, Policy::CANCELLED_USER_REQUESTED, true, $date);
                 } catch (\Exception $e) {
                     $msg = sprintf(
                         'Error Cancelling Policy %s / %s',
@@ -1239,7 +1239,7 @@ class PolicyService
                 $cancelled[$policy->getId()] = $policy->getPolicyNumber();
                 if (!$dryRun) {
                     try {
-                        $this->cancel($policy, Policy::CANCELLED_UNPAID, false, true);
+                        $this->cancel($policy, Policy::CANCELLED_UNPAID, true);
                     } catch (\Exception $e) {
                         $msg = sprintf(
                             'Error Cancelling Policy %s / %s',
