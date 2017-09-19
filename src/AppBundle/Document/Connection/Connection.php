@@ -307,11 +307,11 @@ class Connection
         $totalMonths = $diff->y * 12 + $diff->m;
         if ($totalMonths < 6) {
             return $this->clearValue();
-        } elseif ($totalMonths <= 11) {
-            // TODO: consider this case - if less than 30 days to replace your connection, shouldn't you get it?
+        } elseif ($totalMonths <= 11 && $diff->days < (365-15)) {
             $this->value = $this->toTwoDp($this->value * $totalMonths / 12);
             $this->promoValue = $this->toTwoDp($this->promoValue * $totalMonths / 12);
         }
+        // 15 days to expiration or less should just keep value
         // >= 12 months should just keep value
     }
 
