@@ -3856,8 +3856,7 @@ class PolicyServiceTest extends WebTestCase
                     return in_array($email, array_keys($mail->getTo())) &&
                         stripos($mail->getSubject(), 'your so-sure Reward Pot') !== false;
                 }
-            )
-        );
+            ));
     }
 
     private function expectCancellationEmail($mailer, $at, $email)
@@ -3869,8 +3868,7 @@ class PolicyServiceTest extends WebTestCase
                     return in_array($email, array_keys($mail->getTo())) &&
                         stripos($mail->getSubject(), 'is now cancelled') !== false;
                 }
-            )
-        );
+            ));
     }
 
     private function expectExpirationEmail($mailer, $at, $email)
@@ -3882,8 +3880,7 @@ class PolicyServiceTest extends WebTestCase
                     return in_array($email, array_keys($mail->getTo())) &&
                         stripos($mail->getSubject(), 'is now finished') !== false;
                 }
-            )
-        );
+            ));
     }
 
     public function testPolicyCancellationEmailNotRenewed()
