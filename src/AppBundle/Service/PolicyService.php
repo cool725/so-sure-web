@@ -1066,7 +1066,9 @@ class PolicyService
             'AppBundle:Email:policy/connectionReduction.html.twig',
             ['connection' => $connection, 'policy' => $policy, 'causalUser' => $causalUser],
             'AppBundle:Email:policy/connectionReduction.txt.twig',
-            ['connection' => $connection, 'policy' => $policy, 'causalUser' => $causalUser]
+            ['connection' => $connection, 'policy' => $policy, 'causalUser' => $causalUser],
+            null,
+            'bcc@so-sure.com'
         );
     }
 
