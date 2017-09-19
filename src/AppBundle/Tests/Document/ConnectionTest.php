@@ -6,6 +6,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\Policy;
 use AppBundle\Document\User;
 use AppBundle\Document\PolicyTerms;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -219,6 +220,53 @@ class ConnectionTest extends \PHPUnit_Framework_TestCase
 
         // 11 months + 17 days (15 days to expirey)
         $connection->prorateValue(new \DateTime('2016-12-16 01:00:01'));
+        $this->assertEquals(10, $connection->getValue());
+        $this->assertEquals(15, $connection->getTotalValue());
+    }
+
+    public function testConnectionProrateSourcePolicy()
+    {
+        $policy = new PhonePolicy();
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $connection = new StandardConnection();
+        $connection->setSourcePolicy($policy);
+        $connection->setDate(new \DateTime('2016-01-01'));
+
+        // reset
+        $connection->setValue(10);
+        $connection->setPromoValue(5);
+
+        // 5 months
+        $connection->prorateValue(new \DateTime('2016-06-01 00:00:01'));
+        $this->assertEquals(0, $connection->getValue());
+        $this->assertEquals(0, $connection->getTotalValue());
+
+        // reset
+        $connection->setValue(10);
+        $connection->setPromoValue(5);
+
+        $policy->setStatus(Policy::STATUS_UNPAID);
+
+        // 5 months
+        $connection->prorateValue(new \DateTime('2016-06-01 00:00:01'));
+        $this->assertEquals(0, $connection->getValue());
+        $this->assertEquals(0, $connection->getTotalValue());
+
+        // reset
+        $connection->setValue(10);
+        $connection->setPromoValue(5);
+
+        $policy->setStatus(Policy::STATUS_CANCELLED);
+
+        // 5 months
+        $connection->prorateValue(new \DateTime('2016-06-01 00:00:01'));
+        $this->assertEquals(10, $connection->getValue());
+        $this->assertEquals(15, $connection->getTotalValue());
+
+        $policy->setStatus(Policy::STATUS_EXPIRED);
+
+        // 5 months
+        $connection->prorateValue(new \DateTime('2016-06-01 00:00:01'));
         $this->assertEquals(10, $connection->getValue());
         $this->assertEquals(15, $connection->getTotalValue());
     }

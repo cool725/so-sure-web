@@ -1084,6 +1084,9 @@ class PhonePolicyTest extends WebTestCase
         static::$dm->persist($policyB->getUser());
         static::$dm->persist($policyC);
         static::$dm->persist($policyC->getUser());
+        $policyA->setStatus(Policy::STATUS_ACTIVE);
+        $policyB->setStatus(Policy::STATUS_ACTIVE);
+        $policyC->setStatus(Policy::STATUS_ACTIVE);
         static::$dm->flush();
         list($connectionAB, $connectionBA) = $this->createLinkedConnections($policyA, $policyB, 10, 10);
         list($connectionAC, $connectionCA) = $this->createLinkedConnections($policyA, $policyC, 10, 10);
@@ -1091,6 +1094,9 @@ class PhonePolicyTest extends WebTestCase
         $policyA->updatePotValue();
         $policyB->updatePotValue();
         $policyC->updatePotValue();
+        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyA->getStatus());
+        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyB->getStatus());
+        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyC->getStatus());
 
         $this->assertEquals(20, $policyA->getPotValue());
         $this->assertEquals(20, $policyB->getPotValue());

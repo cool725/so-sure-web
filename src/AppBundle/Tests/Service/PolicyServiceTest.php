@@ -3795,6 +3795,8 @@ class PolicyServiceTest extends WebTestCase
         }
         $this->assertTrue($foundRenewalConnection);
         static::$dm->flush();
+        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
 
         static::$policyService->renew($policyB, 12, null, new \DateTime('2017-02-14'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
@@ -3806,11 +3808,10 @@ class PolicyServiceTest extends WebTestCase
         }
         $this->assertFalse($foundRenewalConnection);
 
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policyB->getStatus());
         static::$policyService->expire($policyB, new \DateTime('2017-02-15'));
 
-        static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
         static::$policyService->activate($renewalPolicyB, new \DateTime('2017-02-15'));
-        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
         $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyB->getStatus());
 
         $updatedRenewalPolicyA = $policyRepo->find($renewalPolicyA->getId());
