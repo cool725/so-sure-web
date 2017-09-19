@@ -505,6 +505,7 @@ services:
             environment:    "%kernel.environment%"
             apiSecret:      "%mixpanel_apisecret%"
             stats:          "@app.stats"
+            censusService:  "@census.search"
 
     app.sixpack:
         class: AppBundle\Service\SixpackService
