@@ -12,6 +12,7 @@ use Mixpanel;
 use UAParser\Parser;
 use Jaam\Mixpanel\DataExportApi;
 use Jaam\Mixpanel\DataExportApiException;
+use CensusBundle\Service\CensusService;
 
 class MixpanelService
 {
@@ -88,6 +89,9 @@ class MixpanelService
     /** @var StatsService */
     protected $stats;
 
+    /** @var CensusService */
+    protected $censusService;
+
     public function setEnvironment($environment)
     {
         $this->environment = $environment;
@@ -102,6 +106,7 @@ class MixpanelService
      * @param string          $environment
      * @param string          $apiSecret
      * @param StatsService    $stats
+     * @param CensusService   $censusService
      */
     public function __construct(
         DocumentManager  $dm,
@@ -111,7 +116,8 @@ class MixpanelService
         RequestService $requestService,
         $environment,
         $apiSecret,
-        $stats
+        $stats,
+        CensusService $censusService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -121,6 +127,7 @@ class MixpanelService
         $this->environment = $environment;
         $this->mixpanelData = new DataExportApi($apiSecret);
         $this->stats = $stats;
+        $this->censusService = $censusService;
     }
 
     private function canSend()
@@ -567,6 +574,7 @@ class MixpanelService
         }
         if ($user->getBillingAddress()) {
             $userData['Billing Address'] = $user->getBillingAddress()->__toString();
+            $userData['PenPortrait'] = $this->censusService->findNearest($user->getBillingAddress()->getPostcode());
         }
         if ($user->getFacebookId()) {
             $userData['Facebook'] = true;
