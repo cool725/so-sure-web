@@ -495,7 +495,7 @@ class PhoneInsuranceController extends BaseController
      * @Route("/phone-insurance/{make}+{model}/learn-more", name="learn_more_make_model",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
      */
-    public function learnMoreAction(Request $request, $id = null, $make = null, $model = null, $memory = null)
+    public function learnMoreAction($id = null, $make = null, $model = null, $memory = null)
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
