@@ -5,6 +5,13 @@ redirect_quote_samsung_7_edge:
         path: /phone-insurance/Samsung+Galaxy+S7+Edge+32GB
         permanent: true
 
+redirect_iphone8:
+    path: /iphone8
+    defaults:
+        _controller: FrameworkBundle:Redirect:urlRedirect
+        path: /phone-insurance/Apple+iPhone+8
+        permanent: true
+
 app:
     resource: "@AppBundle/Controller/"
     type:     annotation
