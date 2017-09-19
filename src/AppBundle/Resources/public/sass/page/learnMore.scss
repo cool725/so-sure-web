@@ -10,6 +10,12 @@
     background-color: $white;
 }
 
+p {
+	max-width: 800px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
 .learn-more {
 
 	&--intro {
@@ -82,7 +88,7 @@
 
 		@include breakpoint(tablet) {
 			padding-bottom: 150px;
-			margin-bottom: 350px;
+			margin-bottom: 300px;
 		}
 	}
 

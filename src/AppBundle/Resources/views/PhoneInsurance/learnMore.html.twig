@@ -30,7 +30,7 @@
     <section class="section--pad section--arrow section--arrow__blue text-center learn-more--intro">
         <div class="container">
             <h1 class="text-white">Connections &amp; Cashback</h1>
-            <p class="lead">Invite trusted friends, family, collegues to sign up and connect with you on so-sure. <br> Once connected, save money on your premium when you and your connections don’t claim. <br> Sounds simple enough, but how does that work? Let us show you:</p>
+            <p class="lead">Invite trusted friends, family, collegues to sign up and connect with you on so-sure. Once connected, save money on your premium when you and your connections don’t claim. Sounds simple enough, but how does that work? Let us show you:</p>
         </div>
     </section>
 
@@ -68,6 +68,7 @@
 
             <h4 class="text-center">Effective monthly premium after cashback:<br><small>(Cashback paid out end of policy year)</small></h4>
 
+
             {# Set the start friends amount #}
             {% set start_friends = max_connections / 2 %}
 
@@ -84,6 +85,11 @@
             {% set monthly_premium = start_premium / 12 %}
 
             <div class="reward-slider">
+
+                <div class="slide-me">
+                    <img src="{{ cdn_url }}/images/quote-page/so-sure_arrow-slide-me.svg" alt="">
+                </div>
+
                 <output for="range" class="rewardslider__output">
                     <span id="premium" class="h3 text-white">£{{ monthly_premium|number_format(2, '.', ',') }}</span><br>
                     <small class="text-nowrap">per month</small>
@@ -158,6 +164,18 @@
     <section class="section--pad learn-more--download">
         <div class="container">
             <h3>Download our award winning app</h3>
+            <p>Our app takes all the hassle out of insuring your phone, download and pay it’s as simple as that. Also add additional phones, invite and connect or get in touch when you need us most.</p>
+            <ul class="list-inline text-center">
+                <br>
+                <li>
+                    <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('footer') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download so-sure on the App Store" />
+                    </a>
+                </li>
+                <li>
+                    <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('footer') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get so-sure on Google Play" />
+                    </a>
+                </li>
+            </ul>
         </div>
     </section>
 
