@@ -36,6 +36,12 @@
     }
 }
 
+.section--arrow__off-white {
+    &:after {
+        border-top: 20px solid $off-white;
+    }
+}
+
 // Row Centred
 /* centered columns styles */
 .row-centered {

@@ -7,6 +7,7 @@
 {% block meta %}
     <meta name="description" content="For a small monthly fee your phone is covered for theft, loss, accidental damage and unauthorised usage."/>
     <meta name="keywords" content="mobile insurance, phone insurance, mobile phone insurance, cheap mobile phone insurance, cheap phone insurance, cheap mobile insurance, better phone insurance, better mobile phone insurance"/>
+    {# TODO #}
     {# <link rel="canonical" href="{{ url('quote_make_model', {'make': phone.make, 'model': phone.encodedModel}) }}" /> #}
 
     <meta property="og:video" content="https://cdn.so-sure.com/video/explainer-subtitle-640.mp4" />
@@ -102,7 +103,7 @@
     </section>
 
     {# TODO Create Partial #}
-    <section class="section--pad learn-more--effective-monthly-premium">
+    <section class="section--pad section--arrow section--arrow__off-white learn-more--effective-monthly-premium">
         <div class="container">
             <h3>What is an effective monthly premium?</h3>
             <p>Your effective monthly premium is calculated by taking into account the potential cashback</p>
@@ -112,7 +113,7 @@
     </section>
 
     {# TODO Create Partial #}
-    <section class="section--pad learn-more--how-to-get-cashback">
+    <section class="section--pad section--arrow learn-more--how-to-get-cashback">
         <div class="container">
             <h3>How do I get cashback?</h3>
             <p>Here at so-sure, we like to reward people who are sensible with their phones.</p>
@@ -148,9 +149,15 @@
         <div class="container">
             <h3 class="text-white">Still unsure of how it works?</h3>
             <p class="text-white">Watch this short 1 minute video that explains our connections process:</p>
-{#             <div class="responsive-container">
-                <iframe id="exp-vid" src="https://player.vimeo.com/video/185840373??api=1&player_id=vimeoplayer&title=0&byline=0&portrait=0" width="800" height="600"  frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
-            </div> #}
+            <div class="video-container">
+                <iframe id="exp-vid" src="https://player.vimeo.com/video/185840373??api=1&player_id=vimeoplayer&title=0&byline=0&portrait=0" width="800" height="450"  frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+            </div>
+        </div>
+    </section>
+
+    <section class="section--pad learn-more--download">
+        <div class="container">
+            <h3>Download our award winning app</h3>
         </div>
     </section>
 
