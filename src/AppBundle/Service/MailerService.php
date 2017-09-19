@@ -68,7 +68,7 @@ class MailerService
         $from = null
     ) {
         $this->addUnsubsribeHash($to, $htmlData, $emailType);
-
+print $subject;
         // base campaign on template name
         // AppBundle:Email:quote/priceGuarentee.html.twig
         $campaign = $htmlTemplate;

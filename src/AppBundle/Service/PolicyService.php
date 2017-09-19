@@ -101,6 +101,11 @@ class PolicyService
         $this->mailer = $mailer;
     }
 
+    public function setMailerMailer($mailer)
+    {
+        $this->mailer->setMailer($mailer);
+    }
+
     public function setDispatcher($dispatcher)
     {
         $this->dispatcher = $dispatcher;
@@ -839,9 +844,8 @@ class PolicyService
     /**
      * @param Policy    $policy
      * @param string    $reason
-     * @param boolean   $skipNetworkEmail
-     * @param boolean   $closeOpenClaims  Where we are required to cancel the policy (binder),
-     *                                    we need to close out claims
+     * @param boolean   $closeOpenClaims Where we are required to cancel the policy (binder),
+     *                                   we need to close out claims
      * @param \DateTime $date
      */
     public function cancel(
@@ -1047,8 +1051,8 @@ class PolicyService
         }
 
         // Upgrades should not send cancellation emails
-        if ($connection->getLinkedPolicy()->isCancelled() &&
-            $connection->getLinkedPolicy()->getCancelledReason() == Policy::CANCELLED_UPGRADE) {
+        if ($connection->getSourcePolicy()->isCancelled() &&
+            $connection->getSourcePolicy()->getCancelledReason() == Policy::CANCELLED_UPGRADE) {
             return;
         }
 

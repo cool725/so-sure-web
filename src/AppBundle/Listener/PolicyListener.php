@@ -5,6 +5,7 @@ namespace AppBundle\Listener;
 use AppBundle\Service\PolicyService;
 use Psr\Log\LoggerInterface;
 use AppBundle\Event\ConnectionEvent;
+use AppBundle\Document\Policy;
 
 class PolicyListener
 {
@@ -39,8 +40,15 @@ class PolicyListener
 
         // Claims should not affect the connection value itself, but rather impact on the pot value
 
-        // The connection affected should the source policy and the linked policy is the policy
-        // that was actually cancelled/not renewed/etc
+        // The linked policy should be the policy that was actually cancelled/not renewed/etc
+        // so inversely, if the source policy is active/unpaid, its the connection we are not interested
+        // in notifying about
+        if (!in_array($connection->getSourcePolicy()->getStatus(), [
+            Policy::STATUS_ACTIVE,
+            Policy::STATUS_UNPAID,
+        ])) {
+            return;
+        }
 
         $this->policyService->connectionReduced($connection);
     }
