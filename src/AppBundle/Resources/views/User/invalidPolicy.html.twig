@@ -37,14 +37,14 @@
                   {% endif %}
                 </div>
                 <div class="col-md-12">
-                    {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':'other_pages'})) }}
+                    {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':'old-inline'})) }}
                 </div>
               {% else %}
                 <div class="col-md-12">
                     <h2>You've reached the maximum number of allowed policies.</h2>
                     <p class="lead">Contact us for more details.</p>
                 </div>
-              {% endif %} 
+              {% endif %}
             </div>
         </div>
     </section>
