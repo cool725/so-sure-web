@@ -574,7 +574,9 @@ class MixpanelService
         }
         if ($user->getBillingAddress()) {
             $userData['Billing Address'] = $user->getBillingAddress()->__toString();
-            $userData['PenPortrait'] = $this->searchService->findNearest($user->getBillingAddress()->getPostcode());
+            if ($census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode())) {
+                $userData['PenPortrait'] = $census->getSubGroup();
+            }
         }
         if ($user->getFacebookId()) {
             $userData['Facebook'] = true;
