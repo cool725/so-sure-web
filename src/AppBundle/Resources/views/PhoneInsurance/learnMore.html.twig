@@ -40,17 +40,29 @@
         </div>
     </section>
 
-    {# Effective monthly premium #}
-    {% include 'AppBundle::Default/_effectiveMonthlyPremium.html.twig' %}
+    <section class="section--pad section--arrow section--arrow__off-white learn-more--effective-monthly-premium">
+        <div class="container">
+            {% include 'AppBundle::Default/_effectiveMonthlyPremium.html.twig' %}
+        </div>
+    </section>
 
-    {# How to get cashback #}
-    {% include 'AppBundle::Default/_howToGetCashback.html.twig' %}
+    <section class="section--pad section--arrow learn-more--how-to-get-cashback">
+        <div class="container">
+            {% include 'AppBundle::Default/_howToGetCashback.html.twig' %}
+        </div>
+    </section>
 
-    {# Explainer video #}
-    {% include 'AppBundle::Default/_explainerVideo.html.twig' %}
+    <section class="section--pad learn-more--video">
+        <div class="container">
+            {% include 'AppBundle::Default/_explainerVideo.html.twig' %}
+        </div>
+    </section>
 
-    {# App download #}
-    {% include 'AppBundle::Default/_appDownload.html.twig' %}
+    <section class="section--pad learn-more--download">
+        <div class="container">
+            {% include 'AppBundle::Default/_appDownload.html.twig' %}
+        </div>
+    </section>
 
     {# Page Modals #}
     {% include 'AppBundle::Default/modalQuote.html.twig' with {'selectPhoneMakeType': 'learn-more'} %}
