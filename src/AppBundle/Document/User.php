@@ -31,6 +31,10 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     const MAX_POLICIES_PER_USER = 2;
 
+    const GENDER_MALE = 'male';
+    const GENDER_FEMALE = 'female';
+    const GENDER_UNKNOWN = 'unknown';
+
     /**
      * @MongoDB\Id
      */
@@ -117,6 +121,13 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @Gedmo\Versioned
      */
     protected $lastName;
+
+    /**
+     * @Assert\Choice({"male", "female", "unknown"}, strict=true)
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $gender;
 
     /**
      * @AppAssert\Token()
@@ -1067,6 +1078,16 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function getName()
     {
         return sprintf("%s %s", $this->getFirstName(), $this->getLastName());
+    }
+
+    public function setGender($gender)
+    {
+        $this->gender = $gender;
+    }
+
+    public function getGender()
+    {
+        return $this->gender;
     }
 
     public function setEmail($email)

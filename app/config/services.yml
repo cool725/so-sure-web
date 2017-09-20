@@ -936,3 +936,9 @@ services:
         class: CensusBundle\Service\SearchService
         arguments:
             dm:          "@doctrine_mongodb.odm.census_document_manager"
+
+    app.gender:
+        class: AppBundle\Service\GenderizeService
+        arguments:
+            dm:          "@doctrine_mongodb.odm.default_document_manager"
+            logger:      "@logger"
