@@ -25,7 +25,7 @@
 {% endblock %}
 
 {% block body %}
-<div class="container"{% if policy.isEnded %}style="background-color: #F2DEDE; opacity: 0.7"{% endif %}>
+<div class="container"{% if policy.isEnded %}style="border:2px solid #ff6666;"{% endif %}>
     <h2>so-sure Admin - <a href="{{ path('admin_user', {'id': policy.user.id}) }}">{{policy.user.name }}</a> {% if policy.isEnded %} - {{ policy.status|upper }} POLICY{% endif %}</h2>
   {% if not policy.isEnded %}
         <div class="row">
