@@ -30,7 +30,11 @@
 
 
 {# Set the start friends amount #}
-{% set start_friends = max_connections / 2 %}
+{% if max_connections is divisible by(2) %}
+  {% set start_friends = max_connections / 2 %}
+{% else %}
+  {% set start_friends = 4 %}
+{% endif %}
 
 {# Set the amount of cashback #}
 {% set start_value = start_friends * connection_value %}
