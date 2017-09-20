@@ -5,6 +5,7 @@
 {% set buttonText   = 'Quote me' %}
 {% set buttonCSS    = 'btn btn-green btn-pad' %}
 {% set basePath     = '/phone-insurance/' %}
+{% set phonePath    = 'quote_phone' %}
 {% set formID       = 'search-phone-form' %}
 {% set formClass    = '' %}
 
@@ -30,13 +31,19 @@
     {% set buttonText = 'Select Phone' %}
     {% set buttonCSS    = 'btn btn-green btn-block btn-pad' %}
     {% set basePath = '/select-phone/purchase-change/' %}
+{% elseif type == 'learn-more' %}
+    {# TODO - Add route action back to learn more #}
+    {% set phonePath    = 'learn_more_phone' %}
+    {% set buttonCSS    = 'btn btn-green btn-block btn-pad' %}
 {% endif %}
 
 <div id="select-phone-data" data-phones='{{ phones|json_encode|raw }}'>
 
     <form method="get"
           id="{{ formID }}"
-          {% if phone %}action="{{ path('quote_phone', {'id': phone.id }) }}"{% endif %}
+          {% if phone %}
+            action="{{ path('quote_phone', {'id': phone.id }) }}"
+          {% endif %}
           data-base-path={{ basePath }}
           class="{{ formClass }}">
         <div class="form-group">

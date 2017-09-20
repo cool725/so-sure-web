@@ -34,161 +34,26 @@
         </div>
     </section>
 
-    {# TODO Create Partial #}
     <section class="section--pad section--arrow learn-more--slider">
         <div class="container">
-
-            <h3 class="phone-title text-center">
-                <span class="text-blue">Insurance for a</span>
-                <div class="dropdown memory-dropdown-list">
-                    <a href="#"
-                       class="dropdown-toggle"
-                       type="button"
-                       id="memoryDropdownList"
-                       data-toggle="dropdown"
-                       aria-haspopup="true"
-                       aria-expanded="true">
-                        {{ phone }}
-                        <i class="fa fa-caret-down" aria-hidden="true"></i>
-                    </a>
-                    <ul class="dropdown-menu memory-dropdown" aria-labelledby="memoryDropdownList">
-                        {% if phones | length > 1 %}
-                            <li class="dropdown-header">Select alternate model</li>
-                            {% for phone_mem in phones if phone_mem.id != phone.id %}
-                                <li>
-                                    <a href="{{ path('learn_more_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class=""> {{ phone.model }} - {{ phone_mem.memory }}GB</a>
-                                </li>
-                            {% endfor %}
-                            <li role="separator" class="divider"></li>
-                        {% endif %}
-                        <li><a href="#" data-toggle="modal" data-target="#quoteModal"> I have a different phone</a></li>
-                    </ul>
-                </div>
-            </h3>
-
-            <h4 class="text-center">Effective monthly premium after cashback:<br><small>(Cashback paid out end of policy year)</small></h4>
-
-
-            {# Set the start friends amount #}
-            {% set start_friends = max_connections / 2 %}
-
-            {# Set the amount of cashback #}
-            {% set start_value = start_friends * connection_value %}
-
-            {# If greater than max pot, pot max is start value #}
-            {% if start_value > max_pot %}
-                {% set start_value = max_pot %}
-            {% endif %}
-
-            {# Start amount and work out monthly #}
-            {% set start_premium = annual_premium - start_value %}
-            {% set monthly_premium = start_premium / 12 %}
-
-            <div class="reward-slider">
-
-                <div class="slide-me">
-                    <img src="{{ cdn_url }}/images/quote-page/so-sure_arrow-slide-me.svg" alt="">
-                </div>
-
-                <output for="range" class="rewardslider__output">
-                    <span id="premium" class="h3 text-white">£{{ monthly_premium|number_format(2, '.', ',') }}</span><br>
-                    <small class="text-nowrap">per month</small>
-                </output>
-                <input type="range"
-                       id="reward-slider"
-                       min="0"
-                       max="{{ max_connections }}"
-                       value="{{ start_friends }}"
-                       data-maxpot="{{ max_pot }}"
-                       data-connection-value="{{ connection_value }}"
-                       data-premium="{{ annual_premium }}"
-                       data-monthly-premium="{{ monthly_premium }}">
-            </div>
-            <h4 class="text-blue text-center">Number of connections</h4>
+            {% include 'AppBundle::Default/_rewardSlider.html.twig' %}
         </div>
     </section>
 
-    {# TODO Create Partial #}
-    <section class="section--pad section--arrow section--arrow__off-white learn-more--effective-monthly-premium">
-        <div class="container">
-            <h3>What is an effective monthly premium?</h3>
-            <p>Your effective monthly premium is calculated by taking into account the potential cashback</p>
-            <span class="h2 text-blue">Effectve monthly premium = Monthly Premium - Cashback</span>
-            <p><small>(Cashback paid out end of policy year)</small></p>
-        </div>
-    </section>
+    {# Effective monthly premium #}
+    {% include 'AppBundle::Default/_effectiveMonthlyPremium.html.twig' %}
 
-    {# TODO Create Partial #}
-    <section class="section--pad section--arrow learn-more--how-to-get-cashback">
-        <div class="container">
-            <h3>How do I get cashback?</h3>
-            <p>Here at so-sure, we like to reward people who are sensible with their phones.</p>
-            <p class="visible-xs visible-sm">Tap to find out more:</p>
-            <p class="hidden-xs hidden-sm">Hover on the steps to find out more:</p>
+    {# How to get cashback #}
+    {% include 'AppBundle::Default/_howToGetCashback.html.twig' %}
 
-            <div class="row">
-                <div class="col-sm-6 col-md-3">
-                    <div class="cashback-step">
-                        <img src="{{ cdn_url }}/images/animations/start-frame-1.png" data-src="{{ cdn_url }}/images/animations/1sc.gif" class="img-responsive img-animation">
-                        <span class="h4 text-blue">Get instant cover</span>
-                        <p class="text-blue">Sign up in minutes online or download the app</p>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-md-3">
-                    <div class="cashback-step">
-                        <img src="{{ cdn_url }}/images/animations/start-frame-2.png"  data-src="{{ cdn_url }}/images/animations/2sc.gif" class="img-responsive img-animation">
-                        <span class="h4 text-blue">Invite friends &amp; family</span>
-                        <p class="text-blue">Share your unique code online or in app</p>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-md-3">
-                    <div class="cashback-step">
-                        <img src="{{ cdn_url }}/images/animations/start-frame-3.png"  data-src="{{ cdn_url }}/images/animations/3sc.gif" class="img-responsive img-animation">
-                        <span class="h4 text-blue">Get connected</span>
-                        <p class="text-blue">Earn £10 per connection for the first two months</p>
-                    </div>
-                </div>
-                <div class="col-sm-6 col-md-3">
-                    <div class="cashback-step">
-                        <img src="{{ cdn_url }}/images/animations/start-frame-4.png"  data-src="{{ cdn_url }}/images/animations/4sc.gif" class="img-responsive img-animation">
-                        <span class="h4 text-blue">Collect annual cashback</span>
-                        <p class="text-blue">When you and your connections don’t claim</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    {# Explainer video #}
+    {% include 'AppBundle::Default/_explainerVideo.html.twig' %}
 
-    <section class="section--pad learn-more--video">
-        <div class="container">
-            <h3 class="text-white">Still unsure of how it works?</h3>
-            <p class="text-white">Watch this short 1 minute video that explains our connections process:</p>
-            <div class="video-container">
-                <iframe id="exp-vid" src="https://player.vimeo.com/video/185840373??api=1&player_id=vimeoplayer&title=0&byline=0&portrait=0" width="800" height="450"  frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
-            </div>
-        </div>
-    </section>
-
-    <section class="section--pad learn-more--download">
-        <div class="container">
-            <h3>Download our award winning app</h3>
-            <p>Our app takes all the hassle out of insuring your phone, download and pay it’s as simple as that. Also add additional phones, invite and connect or get in touch when you need us most.</p>
-            <ul class="list-inline text-center">
-                <br>
-                <li>
-                    <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('footer') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download so-sure on the App Store" />
-                    </a>
-                </li>
-                <li>
-                    <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('footer') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get so-sure on Google Play" />
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </section>
+    {# App download #}
+    {% include 'AppBundle::Default/_appDownload.html.twig' %}
 
     {# Page Modals #}
-    {% include 'AppBundle::Default/modalQuote.html.twig' with {'selectPhoneMakeType': 'learn_more'} %}
+    {% include 'AppBundle::Default/modalQuote.html.twig' with {'selectPhoneMakeType': 'learn-more'} %}
     {# End Page Modals #}
 
 {% endblock %}
