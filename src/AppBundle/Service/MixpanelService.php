@@ -569,6 +569,9 @@ class MixpanelService
         if ($user->getMobileNumber()) {
             $userData['$phone'] = $user->getMobileNumber();
         }
+        if ($user->getGender()) {
+            $userData['Gender'] = $user->getGender();
+        }
         if ($user->getBirthday()) {
             $userData['Date of Birth'] = $user->getBirthday()->format(\DateTime::ATOM);
         }
