@@ -1023,7 +1023,7 @@ class DefaultController extends BaseController
     /**
      * @Route("/iphone8", name="iphone8_redirect")
      */
-    public function iPhone8RedirectAction(Request $request)
+    public function iPhone8RedirectAction()
     {
         return new RedirectResponse($this->generateUrl('quote_make_model', [
             'make' => 'Apple',
