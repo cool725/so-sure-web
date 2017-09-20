@@ -47,6 +47,13 @@ p {
 
 	&--how-to-get-cashback {
 		text-align: center;
+
+		.cashback-step {
+
+			p {
+				opacity: 0;
+			}
+		}
 	}
 
 	&--video {
@@ -125,6 +132,6 @@ h3.phone-title {
 	}
 }
 
-.img-animation {
-	border: 1px dotted black;
-}
+// .img-animation {
+// 	border: 1px dotted black;
+// }
