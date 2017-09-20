@@ -72,6 +72,7 @@ class BICommand extends ContainerAwareCommand
             '"Policy upgraded"',
             '"Age of Policy Holder"',
             '"Pen Portrait"',
+            '"Gender"'
         ]);
         foreach ($claims as $claim) {
             $policy = $claim->getPolicy();
@@ -100,6 +101,7 @@ class BICommand extends ContainerAwareCommand
                 ),
                 sprintf('"%d"', $user->getAge()),
                 sprintf('"%s"', $census ? $census->getSubgrp() : ''),
+                sprintf('"%s"', $user->getGender() ? $user->getGender() : ''),
             ]);
         }
         $this->uploadS3(implode(PHP_EOL, $lines), 'claims.csv');
@@ -127,6 +129,7 @@ class BICommand extends ContainerAwareCommand
             '"Number of Approved/Settled Claims"',
             '"Number of Withdrawn/Declined Claims"',
             '"Pen Portrait"',
+            '"Gender"',
         ]);
         foreach ($policies as $policy) {
             $user = $policy->getUser();
@@ -145,6 +148,7 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', count($policy->getApprovedClaims(true, true))),
                 sprintf('"%s"', count($policy->getWithdrawnDeclinedClaims(true))),
                 sprintf('"%s"', $census ? $census->getSubgrp() : ''),
+                sprintf('"%s"', $user->getGender() ? $user->getGender() : ''),
             ]);
         }
         $this->uploadS3(implode(PHP_EOL, $lines), 'policies.csv');

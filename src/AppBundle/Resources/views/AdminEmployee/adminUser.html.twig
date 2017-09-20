@@ -41,6 +41,10 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>Gender</td>
+                    <td>{{ user.gender }}</td>
+                </tr>
+                <tr>
                     <td>Birthday</td>
                     <td>{% if user.birthday %}{{ user.birthday|date('d M Y', 'Europe/London') }}{% else %}Not set{% endif %}
                     </td>
