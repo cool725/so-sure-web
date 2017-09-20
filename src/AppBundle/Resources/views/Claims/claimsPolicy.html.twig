@@ -21,7 +21,7 @@
 {% endblock %}
 
 {% block body %}
-<div class="container"{% if not policy.isClaimable %}style="background-color: #F2DEDE; opacity: 0.7"{% endif %}>
+<div class="container"{% if not policy.isClaimable %}style="border:2px solid #ff6666;"{% endif %}>
     <h2>{{policy.user.name }}'s Policy{% if policy.isEnded %} - {{ policy.status|upper }} POLICY{% endif %}</h2>
     {% if policy.claimsWarnings|length > 0 %}
     <div class="bg-danger" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
