@@ -5,6 +5,7 @@ namespace AppBundle\DataFixtures\MongoDB\b\PlayDevice;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use AppBundle\Document\PlayDevice;
+use AppBundle\Validator\Constraints\TokenValidator;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -47,17 +48,24 @@ class LoadPlayDeviceData implements FixtureInterface, ContainerAwareInterface
     private function newPlayDevice($manager, $retailBranding, $marketingName, $device, $model)
     {
         $playDevice = new PlayDevice();
-        $playDevice->init($this->strip($retailBranding), $this->strip($marketingName), $this->strip($device), $this->strip($model));
+        $playDevice->init(
+            $this->strip($retailBranding, 150),
+            $this->strip($marketingName, 150),
+            $this->strip($device, 50),
+            $this->strip($model, 100)
+        );
         $manager->persist($playDevice);
     }
 
-    private function strip($data)
+    private function strip($data, $length)
     {
         $data = preg_replace('/\\x[a-f0-9]{2,2}/', '', $data);
         $data = str_replace("'", "", $data);
         $data = str_replace("\\t", "", $data);
         $data = str_replace("\\", "", $data);
 
-        return $data;
+        $validator = new TokenValidator();
+
+        return $validator->conform(substr($data, 0, $length));
     }
 }
