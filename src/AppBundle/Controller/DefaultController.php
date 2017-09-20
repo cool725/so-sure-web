@@ -1019,4 +1019,18 @@ class DefaultController extends BaseController
 
         return new RedirectResponse($this->generateUrl('user_home'));
     }
+
+    /**
+     * @Route("/iphone8", name="iphone8_redirect")
+     */
+    public function iPhone8RedirectAction()
+    {
+        return new RedirectResponse($this->generateUrl('quote_make_model', [
+            'make' => 'Apple',
+            'model' => 'iPhone+8',
+            'utm_medium' => 'flyer',
+            'utm_source' => 'sosure',
+            'utm_campaign' => 'iPhone8',
+        ]));
+    }
 }
