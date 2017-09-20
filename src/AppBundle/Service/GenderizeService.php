@@ -80,5 +80,4 @@ class GenderizeService
 
         return $data['gender'];
     }
-
 }
