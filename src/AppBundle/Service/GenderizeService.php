@@ -52,7 +52,7 @@ class GenderizeService
                 return null;
             }
     
-            if ($gender = $this->query($user->getFirstName())) {
+            if ($gender = $this->query($user->getFirstName(), $threshold)) {
                 $user->setGender($gender);
             } else {
                 $user->setGender(User::GENDER_UNKNOWN);
