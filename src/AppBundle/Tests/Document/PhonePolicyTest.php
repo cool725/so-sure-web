@@ -1769,6 +1769,47 @@ class PhonePolicyTest extends WebTestCase
         $this->assertTrue($policy->shouldCancelPolicy(null, new \DateTime("2016-01-01")));
     }
 
+    public function testShouldCancelRenewalPolicyMissingPayment()
+    {
+        $policy = new SalvaPhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $user = new User();
+        $user->setEmail(static::generateEmail('expire-policy-missing-payment', $this));
+        self::addAddress($user);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $policy->create(rand(1, 999999), null, new \DateTime("2016-01-01"), rand(1, 9999));
+        $policy->setPremiumInstallments(12);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        
+        $renewal = new SalvaPhonePolicy();
+        $renewal->setPhone(static::$phone);
+        $renewal->init($user, static::getLatestPolicyTerms(self::$dm));
+        $renewal->create(rand(1, 999999), null, new \DateTime("2017-01-01"), rand(1, 9999));
+        $renewal->setPremiumInstallments(12);
+        $renewal->setStatus(Policy::STATUS_ACTIVE);
+
+        $policy->link($renewal);
+        
+        $this->assertEquals(new \DateTime('2017-01-01'), $renewal->getNextBillingDate(new \DateTime('2017-01-01')));
+        $this->assertEquals(new \DateTime('2017-02-01'), $renewal->getNextBillingDate(new \DateTime('2017-01-02')));
+
+        $this->assertEquals(
+            new \DateTime('2017-01-31'),
+            $renewal->getPolicyExpirationDate(new \DateTime('2017-01-01'))
+        );
+        $this->assertEquals(
+            new \DateTime('2017-01-31'),
+            $renewal->getPolicyExpirationDate(new \DateTime('2017-01-02'))
+        );
+
+        // Renewal doesn't have a payment, so should be expired after 30 days
+        $this->assertFalse($renewal->shouldCancelPolicy(null, new \DateTime("2017-01-01")));
+        $this->assertFalse($renewal->shouldCancelPolicy(null, new \DateTime("2017-01-30 23:59:00")));
+        $this->assertTrue($renewal->shouldCancelPolicy(null, new \DateTime("2017-01-31 00:01:00")));
+        $this->assertTrue($renewal->shouldCancelPolicy(null, new \DateTime("2017-03-01")));
+    }
+
     public function testShouldCancelPolicy()
     {
         $policy = new SalvaPhonePolicy();
@@ -2500,6 +2541,18 @@ class PhonePolicyTest extends WebTestCase
                 $monthlyPolicy->getTotalExpectedPaidToDate($date)
             );
         }
+        $date->add(new \DateInterval('P1M'));
+        $this->assertEquals(
+            $monthlyPolicy->getPremium()->getMonthlyPremiumPrice() * 12,
+            $monthlyPolicy->getTotalExpectedPaidToDate($date)
+        );
+
+        // even far into the future, max of 12 months payment
+        $date->add(new \DateInterval('P1Y'));
+        $this->assertEquals(
+            $monthlyPolicy->getPremium()->getMonthlyPremiumPrice() * 12,
+            $monthlyPolicy->getTotalExpectedPaidToDate($date)
+        );
     }
 
     public function testIsUnRenewalAllowed()
@@ -2691,6 +2744,35 @@ class PhonePolicyTest extends WebTestCase
 
         // expected payment 1/3/16 + 1 month = 1/4/16 + 30 days = 1/5/16
         $this->assertEquals(new \DateTime('2016-05-01'), $policy->getPolicyExpirationDate());
+    }
+
+    public function testPolicyExpirationDateYearly()
+    {
+        $date = new \DateTime('2016-01-01');
+        $policy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice($date),
+            Salva::YEARLY_TOTAL_COMMISSION,
+            1,
+            $date
+        );
+        $this->assertEquals(new \DateTime('2017-01-01'), $policy->getPolicyExpirationDate(new \DateTime('2016-01-01')));
+        $this->assertEquals(new \DateTime('2017-01-01'), $policy->getPolicyExpirationDate(new \DateTime('2016-12-31')));
+        $this->assertEquals(new \DateTime('2017-01-01'), $policy->getPolicyExpirationDate(new \DateTime('2017-01-01')));
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testPolicyExpirationDateYearlyInvalidAmount()
+    {
+        $date = new \DateTime('2016-01-01');
+        $policy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getYearlyPremiumPrice($date) - 1,
+            Salva::YEARLY_TOTAL_COMMISSION,
+            1,
+            $date
+        );
+        $this->assertEquals(new \DateTime('2017-01-01'), $policy->getPolicyExpirationDate(new \DateTime('2016-01-01')));
     }
 
     public function testPolicyIsPaidToDateStandard()
