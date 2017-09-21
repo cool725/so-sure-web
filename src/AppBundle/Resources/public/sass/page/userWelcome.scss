@@ -1,0 +1,61 @@
+// userWelcome.scss
+
+@import "../mixins";
+@import "../common/palette";
+@import "../common/paletteNew";
+@import "../common/type";
+@import "rewardCalculatorNew";
+
+.navbar {
+    background-color: $white;
+}
+
+.btn-block {
+    margin-bottom: 15px;
+
+    @include breakpoint(tablet) {
+        margin-bottom: 0;
+    }
+}
+
+.user-welcome {
+
+    &--intro {
+        background-color: $primary-blue;
+
+        .container {
+            position: relative;
+        }
+
+        // TODO make a generic class???
+        .policy-roundup {
+            background-color: $white;
+            margin-left: -15px;
+            margin-right: -15px;
+
+            @include breakpoint(tablet) {
+                width: 800px;
+                position: absolute;
+                left: 50%;
+                margin-left: -400px;
+                @include border-radius(10px);
+                box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.2);
+                margin-right: 0;
+            }
+
+            &--inner {
+                padding: 30px 15px;
+
+                @include breakpoint(desktop) {
+                    padding: 30px;
+                }
+            }
+        }
+
+        @include breakpoint(tablet) {
+            margin-bottom: 400px;
+            padding-bottom: 250px;
+        }
+    }
+
+}
