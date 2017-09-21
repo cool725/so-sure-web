@@ -15,14 +15,18 @@ use AppBundle\Event\PolicyEvent;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Tests\UserClassTrait;
 use AppBundle\Classes\Salva;
+use AppBundle\Document\DateTrait;
 
 /**
  * @group functional-nonet
+ *
+ * AppBundle\\Tests\\Document\\SalvaPhonePolicyTest
  */
 class SalvaPhonePolicyTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     use UserClassTrait;
+    use DateTrait;
 
     protected static $container;
     protected static $dm;
@@ -120,12 +124,59 @@ class SalvaPhonePolicyTest extends WebTestCase
         $this->assertEquals(new \DateTime('2016-01-01'), $policy->getSalvaStartDate(1));
     }
 
+    public function testGetSalvaStartDateSaved()
+    {
+        $policy = new SalvaPhonePolicy();
+        $date = new \DateTime('2017-08-08 23:09:00');
+        $date->setTimezone(new \DateTimeZone('Europe/London'));
+        $policy->setStart($date);
+        static::$dm->persist($policy);
+        static::$dm->flush();
+
+        $repo = static::$dm->getRepository(SalvaPhonePolicy::class);
+        $updatedPolicy = $repo->find($policy->getId());
+        $this->assertEquals(
+            new \DateTime('2017-08-09 00:09:00', new \DateTimeZone('Europe/London')),
+            $updatedPolicy->getSalvaStartDate()
+        );
+
+        $this->assertEquals(
+            new \DateTime('2017-08-09 00:00:00', new \DateTimeZone('Europe/London')),
+            $this->startOfDay($updatedPolicy->getSalvaStartDate())
+        );
+    }
+
     public function testGetTotalPremiumPrices()
     {
         $date = new \DateTime('2016-01-01');
         $policy = static::createUserPolicy(true, $date);
-        $this->assertEquals(1, $policy->getSalvaProrataMultiplier());
-        $this->assertEquals(83.88, $policy->getTotalPremiumPrice());
+        $this->assertEquals(1, $policy->getSalvaProrataMultiplier(null));
+        $this->assertEquals($policy->getPremium()->getYearlyPremiumPrice(), $policy->getTotalPremiumPrice(null));
+        $this->assertEquals(366, $policy->getDaysInPolicyYear());
+        $this->assertEquals(366, $policy->getSalvaDaysInPolicy());
+    }
+
+    public function testGetTotalPremiumPrices2017()
+    {
+        $date = new \DateTime('2017-08-09 00:09:09', new \DateTimeZone('Europe/London'));
+        $policy = static::createUserPolicy(true, $date);
+        $this->assertEquals(1, $policy->getSalvaProrataMultiplier(null));
+        $this->assertEquals($policy->getPremium()->getYearlyPremiumPrice(), $policy->getTotalPremiumPrice(null));
+        $this->assertEquals(365, $policy->getDaysInPolicyYear());
+        $this->assertEquals(365, $policy->getSalvaDaysInPolicy());
+        $this->assertEquals($policy->getStaticEnd(), $policy->getEnd());
+    }
+
+    public function testGetTotalPremiumPricesCancelled()
+    {
+        $date = new \DateTime('2017-08-09 00:09:09', new \DateTimeZone('Europe/London'));
+        $policy = static::createUserPolicy(true, $date);
+        $policy->setId(rand(1, 9999999));
+        $policy->cancel(SalvaPhonePolicy::CANCELLED_SUSPECTED_FRAUD, new \DateTime('2018-08-01'));
+        $this->assertEquals(1, $policy->getSalvaProrataMultiplier(null));
+        $this->assertEquals($policy->getPremium()->getYearlyPremiumPrice(), $policy->getTotalPremiumPrice(null));
+        $this->assertEquals(365, $policy->getDaysInPolicyYear());
+        $this->assertEquals(365, $policy->getSalvaDaysInPolicy());
     }
 
     public function testGetTotalGwpPrices()

@@ -1883,6 +1883,10 @@ abstract class Policy
         $diff = $start->diff($date);
         $days = $diff->days;
 
+        if ($days > $this->getDaysInPolicyYear()) {
+            $days = $this->getDaysInPolicyYear();
+        }
+
         return $days;
     }
 
