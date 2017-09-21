@@ -27,19 +27,19 @@
                   <h4>{{ policyItem.phone }} <span class="badge">{{ policyItem.status|capitalize }}</span></h4>
                   <p>{{ policyItem.policyNumber }} ({{ policyItem.start|date('dS M Y') }} - {{ policyItem.end|date('dS M Y') }})</p>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <br />
                     {% if policyItem.getPolicyTermsFiles|length > 0 %}
                         <a href="{{ s3DownloadLink(policyItem.getPolicyTermsFiles[0].bucket, policyItem.getPolicyTermsFiles[0].key) }}"
-                        class="btn btn-primary"><i class="fa fa-download"></i> Policy Terms</a>
+                        class="btn btn-primary btn-xs"><i class="fa fa-download"></i> Policy Terms</a>
                     {% endif %}
                     {% if policyItem.getPolicyScheduleFiles|length > 0 %}
                         <a href="{{ s3DownloadLink(policyItem.getPolicyScheduleFiles[0].bucket, policyItem.getPolicyScheduleFiles[0].key) }}"
-                        class="btn btn-primary"><i class="fa fa-download"></i> Policy Schedule</a>
+                        class="btn btn-primary btn-xs"><i class="fa fa-download"></i> Policy Schedule</a>
                     {% endif %}
                     {% if policyItem.displayRepurchase %}
                         <a href="{{ path('user_repurchase_policy', {'id': policyItem.id }) }}"
-                        class="btn btn-primary"> Repurchase Policy</a>
+                        class="btn btn-primary btn-xs"> Repurchase Policy</a>
                     {% endif %}
                 </div>
             </div>
@@ -58,9 +58,9 @@
                       <p>£{{ cashback.getDisplayableAmount|number_format(2, '.', ',') }}</p>
                     </div>
                     {% if cashback.status == 'missing' or cashback.status == 'failed' %}
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <a href="{{ path('user_cashback', {'id': cashback.id }) }}"
-                        class="btn btn-primary">Add/Update Bank Details</a>
+                        class="btn btn-primary btn-xs">Add/Update Bank Details</a>
                     </div>
                     {% endif %}
                 </div>
