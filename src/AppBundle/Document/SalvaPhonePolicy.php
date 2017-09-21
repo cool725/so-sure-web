@@ -333,9 +333,12 @@ class SalvaPhonePolicy extends PhonePolicy
                 $endDate = $this->getNextBillingDate(clone $this->getEnd(), false);
 
                 // Ensure next billing date does not exceed the end policy date
+                // TODO - reenable after checking implications
+                /*
                 if ($endDate > $this->getStaticEnd()) {
                     $endDate = clone $this->getStaticEnd();
                 }
+                */
             }
         }
 
