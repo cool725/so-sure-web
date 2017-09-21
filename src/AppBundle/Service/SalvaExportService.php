@@ -533,8 +533,8 @@ class SalvaExportService
         } else {
             throw new \Exception(sprintf(
                 'Unknown action %s for policyId: %s',
-                $data['action'],
-                $data['policyId']
+                $action,
+                $policy->getId()
             ));
         }
         $this->dm->flush();
