@@ -383,7 +383,7 @@ class SalvaPhonePolicy extends PhonePolicy
         }
 
         if ($days > $this->getDaysInPolicyYear()) {
-            $days = $this->getDaysInPolicyYear();
+            // $days = $this->getDaysInPolicyYear();
             /*
             throw new \Exception(sprintf(
                 '%d %s/%s %s %s',
