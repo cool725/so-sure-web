@@ -30,6 +30,7 @@ class SalvaExportServiceTest extends WebTestCase
     protected static $policyRepo;
     protected static $dispatcher;
     protected static $phone;
+    protected static $judopay;
 
     public static function setUpBeforeClass()
     {
@@ -48,6 +49,7 @@ class SalvaExportServiceTest extends WebTestCase
         self::$policyRepo = self::$dm->getRepository(Policy::class);
         self::$userManager = self::$container->get('fos_user.user_manager');
         self::$policyService = self::$container->get('app.policy');
+        self::$judopay = self::$container->get('app.judopay');
         self::$xmlFile = sprintf(
             "%s/../src/AppBundle/Tests/Resources/salva-example-boat.xml",
             self::$container->getParameter('kernel.root_dir')
@@ -244,17 +246,57 @@ class SalvaExportServiceTest extends WebTestCase
         static::$policyService->setEnvironment('prod');
         static::$policyService->create($policy);
         static::$policyService->setEnvironment('test');
-        try {
-            static::$policyService->cancel($policy, SalvaPhonePolicy::CANCELLED_COOLOFF);
-        } catch (\Exception $e) {
-            // expected a failed judopay exception as we haven't paid, we're simulating a failed judopay refund anyway
-            $noop = 1;
-        }
+
+        // expected a failed judopay exception as we haven't paid, we're simulating a failed judopay refund anyway
+        // we no longer throw an exception, so just expect same status
+        static::$policyService->cancel($policy, SalvaPhonePolicy::CANCELLED_COOLOFF);
 
         $updatedPolicy = static::$policyRepo->find($policy->getId());
         // cancellation above should set to wait cancelled
         $this->assertEquals(SalvaPhonePolicy::SALVA_STATUS_WAIT_CANCELLED, $updatedPolicy->getSalvaStatus());
         static::$salva->processPolicy($updatedPolicy, '', null);
+    }
+
+    public function testProcessPaidPolicyWait()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testProcessPaidPolicyWait', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime(),
+            true
+        );
+        static::addJudoPayPayment(self::$judopay, $policy, new \DateTime());
+
+        $policy->setStatus(Policy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime(), true);
+        static::$policyService->setEnvironment('test');
+        static::$dm->flush();
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+
+        // expected a failed judopay exception as we haven't paid, we're simulating a failed judopay refund anyway
+        // we no longer throw an exception, so just expect same status
+        static::$policyService->cancel($policy, SalvaPhonePolicy::CANCELLED_COOLOFF);
+
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+        // cancellation above should set to wait cancelled
+        $this->assertEquals(SalvaPhonePolicy::SALVA_STATUS_PENDING_CANCELLED, $updatedPolicy->getSalvaStatus());
+        $exceptionThrown = false;
+        try {
+            static::$salva->processPolicy($updatedPolicy, '', null);
+        } catch (\Exception $e) {
+            $this->assertContains('Unknown action', $e->getMessage());
+            $exceptionThrown = true;
+        }
+        $this->assertTrue($exceptionThrown);
     }
 
     public function testBasicExportPolicies()

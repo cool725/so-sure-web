@@ -101,6 +101,7 @@ class RefundListener
                     ),
                     ['exception' => $e]
                 );
+                return;
             }
         }
 
