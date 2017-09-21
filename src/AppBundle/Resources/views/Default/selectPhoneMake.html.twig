@@ -6,8 +6,12 @@
 {% set buttonCSS    = 'btn btn-green btn-pad' %}
 {% set basePath     = '/phone-insurance/' %}
 {% set phonePath    = 'quote_phone' %}
+{% set pathSuffix   = '' %}
 {% set formID       = 'search-phone-form' %}
 {% set formClass    = '' %}
+{% if phone %}
+  {% set formAction   = path('quote_phone', {'id': phone.id }) %}
+{% endif %}
 
 {% if type is defined and type == 'homepage' %}
     {% set secondaryBtn = true %}
@@ -33,8 +37,13 @@
     {% set basePath = '/select-phone/purchase-change/' %}
 {% elseif type == 'learn-more' %}
     {# TODO - Add route action back to learn more #}
+    {% set buttonText   = 'Learn more' %}
     {% set phonePath    = 'learn_more_phone' %}
     {% set buttonCSS    = 'btn btn-green btn-block btn-pad' %}
+    {% if phone %}
+      {% set formAction   = path('learn_more_phone', {'id': phone.id }) %}
+    {% endif %}
+    {% set pathSuffix   = '/learn-more' %}
 {% endif %}
 
 <div id="select-phone-data" data-phones='{{ phones|json_encode|raw }}'>
@@ -42,9 +51,10 @@
     <form method="get"
           id="{{ formID }}"
           {% if phone %}
-            action="{{ path('quote_phone', {'id': phone.id }) }}"
+            action="{{ formAction }}"
           {% endif %}
           data-base-path={{ basePath }}
+          data-path-suffix={{ pathSuffix }}
           class="{{ formClass }}">
         <div class="form-group">
             <input type="text"

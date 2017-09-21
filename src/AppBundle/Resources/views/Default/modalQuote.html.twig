@@ -11,7 +11,9 @@
                 <h3 class="text-center">Select Make &amp; Model</h3>
             </div>
             <div class="modal-body">
-                {% if selectPhoneMakeType is defined and selectPhoneMakeType %}
+                {% if selectPhoneMakeType is defined and selectPhoneMakeType and phoneId is defined and phoneId %}
+                    {{ render(controller('AppBundle:Default:selectPhoneMake', {'type': selectPhoneMakeType, 'id': phoneId})) }}
+                {% elseif selectPhoneMakeType is defined and selectPhoneMakeType %}
                     {{ render(controller('AppBundle:Default:selectPhoneMake', {'type': selectPhoneMakeType})) }}
                 {% else %}
                     {{ render(controller('AppBundle:Default:selectPhoneMake')) }}
