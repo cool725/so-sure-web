@@ -334,11 +334,9 @@ class SalvaPhonePolicy extends PhonePolicy
 
                 // Ensure next billing date does not exceed the end policy date
                 // TODO - reenable after checking implications
-                /*
                 if ($endDate > $this->getStaticEnd()) {
                     $endDate = clone $this->getStaticEnd();
                 }
-                */
             }
         }
 
@@ -383,7 +381,7 @@ class SalvaPhonePolicy extends PhonePolicy
         }
 
         if ($days > $this->getDaysInPolicyYear()) {
-            // $days = $this->getDaysInPolicyYear();
+            $days = $this->getDaysInPolicyYear();
             /*
             throw new \Exception(sprintf(
                 '%d %s/%s %s %s',
