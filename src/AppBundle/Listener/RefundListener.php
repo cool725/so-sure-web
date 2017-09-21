@@ -87,10 +87,21 @@ class RefundListener
 
                 return;
             }
-            $this->judopayService->refund($payment, $refundAmount, $refundCommissionAmount, sprintf(
-                'cancelled %s',
-                $policy->getCancelledReason()
-            ));
+            try {
+                $this->judopayService->refund($payment, $refundAmount, $refundCommissionAmount, sprintf(
+                    'cancelled %s',
+                    $policy->getCancelledReason()
+                ));
+            } catch (\Exception $e) {
+                $this->logger->error(
+                    sprintf(
+                        'Failed to refund policy %s for %0.2f. Fix issue, then manually cancel at salva.',
+                        $policy->getId(),
+                        $refundAmount
+                    ),
+                    ['exception' => $e]
+                );
+            }
         }
 
         if ($policy instanceof SalvaPhonePolicy) {
