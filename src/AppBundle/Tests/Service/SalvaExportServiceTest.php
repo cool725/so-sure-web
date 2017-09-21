@@ -89,7 +89,10 @@ class SalvaExportServiceTest extends WebTestCase
 
         $tariff = sprintf('<ns2:tariffDate>%s</ns2:tariffDate>', static::$salva->adjustDate($issueDate));
         $tariff2 = sprintf('<ns2:tariffDate>%s</ns2:tariffDate>', static::$salva->adjustDate($issueDate2));
-        $this->assertTrue(stripos($xml, $tariff) !== false || stripos($xml, $tariff2) !== false);
+        $this->assertTrue(
+            stripos($xml, $tariff) !== false || stripos($xml, $tariff2) !== false,
+            sprintf('%s or %s not found in %s', $tariff, $tariff2, $xml)
+        );
 
         $startDate = sprintf(
             '<ns2:insurancePeriodStart>%s</ns2:insurancePeriodStart>',

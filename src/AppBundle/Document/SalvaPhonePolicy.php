@@ -138,6 +138,9 @@ class SalvaPhonePolicy extends PhonePolicy
         }
 
         if (!isset($this->getSalvaPolicyNumbers()[$version])) {
+            // so, so strange, but seems like on rare occasions, doctrine will randomly load as UTC
+            $this->getStart()->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
+
             return $this->getStart();
         }
 
@@ -326,7 +329,13 @@ class SalvaPhonePolicy extends PhonePolicy
             } elseif ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
                 // TODO: Not sure how filtered will affect salva days in policy
                 // should investigate....
+                // TODO: Add more test cases if user changes their billing date
                 $endDate = $this->getNextBillingDate(clone $this->getEnd(), false);
+
+                // Ensure next billing date does not exceed the end policy date
+                if ($endDate > $this->getStaticEnd()) {
+                    $endDate = clone $this->getStaticEnd();
+                }
             }
         }
 
@@ -341,8 +350,10 @@ class SalvaPhonePolicy extends PhonePolicy
 
         // due to adjusting the end date to beginning of next day below,
         // TODO: Refactor
+        $adjustEndDate = false;
         if (!$version && count($this->getSalvaPolicyNumbers()) > 0) {
             $endDate = $endDate->sub(new \DateInterval('P1D'));
+            $adjustEndDate = true;
         }
 
         // always bill to end of day (next day 00:00) to account for partial days
@@ -353,7 +364,11 @@ class SalvaPhonePolicy extends PhonePolicy
 
         /*
         print PHP_EOL . $version . '=> ' . $days . PHP_EOL;
-        print $startDate->format(\DateTime::ATOM) . PHP_EOL;
+        print $this->getId() . PHP_EOL;
+        print $adjustEndDate ? 'adjusted end date' : 'not adjusted end date';
+        print PHP_EOL . $startDate->format(\DateTime::ATOM) . PHP_EOL;
+        print $this->getStart()->format(\DateTime::ATOM) . PHP_EOL;
+        print $this->getStaticEnd()->format(\DateTime::ATOM) . PHP_EOL;
         print $endDate->format(\DateTime::ATOM) . PHP_EOL;
         print_r($diff);
         */
@@ -362,6 +377,21 @@ class SalvaPhonePolicy extends PhonePolicy
         if ($days == 0 && $version == 1) {
             $days = 1;
             // print 'special adjustment for 0 days' . PHP_EOL;
+        }
+
+        if ($days > $this->getDaysInPolicyYear()) {
+            $days = $this->getDaysInPolicyYear();
+            /*
+            throw new \Exception(sprintf(
+                '%d %s/%s %s %s',
+                $days,
+                $startDate->format(\DateTime::ATOM),
+                json_encode($startDate->getTimezone()),
+                $this->getStart()->format(\DateTime::ATOM),
+                json_encode($this->getStart()->getTimezone()),
+                $this->getId()
+            ));
+            */
         }
 
         return $days;
