@@ -41,8 +41,8 @@
                             <ul class="list-unstyled">
                                 <li class="h4 h-light">Your <strong>{{ policy.phone.make }} {{ policy.phone.model }}</strong> in now insured!</li>
                                 <li class="h4 h-light">Your policy number is <strong>{{ policy.policyNumber }}</strong></li>
-                                <li class="h4 h-light">Your phone is now protected against Theft, Loss, Accidental Damage and Breakdown.</li>
-                                <li class="h4">Is your phone already damaged? <a href="#">Click here</a></li>
+                                <li class="h4 h-light">Your phone is now protected against: <br> <strong>Theft</strong>, <strong>Loss</strong>, <strong>Accidental Damage</strong> and <strong>Breakdown</strong>.</li>
+                                {# <li class="h4 text-red">Is your phone already damaged? <a href="#">Click here</a></li> #}
                             </ul>
                         </div>
                     </div>
@@ -55,43 +55,51 @@
                             <a href="{{ path('user_home') }}" class="btn btn-blue btn-block btn-pad">Account page</a>
                         </div>
                         <div class="col-sm-4">
-                            <a href="#" class="btn btn-green btn-block btn-pad">How to get cashback</a>
+                            <a href="#"
+                               class="btn btn-green btn-block btn-pad scroll-to"
+                               data-scroll-to-anchor="#how-to-get-cashback">
+                               How to get cashback</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-{#
-    <section class="section--pad section--arrow learn-more--slider">
+
+    <section id="how-to-get-cashback" class="section--pad section--arrow section--arrow__off-white user-welcome--how-to-get-cashback">
         <div class="container">
-            {% include 'AppBundle::Default/_rewardSlider.html.twig' %}
+            How do I get cashback
+            {# {% include 'AppBundle::Default/_howToGetCashback.html.twig' %} #}
         </div>
     </section>
 
-    <section class="section--pad section--arrow section--arrow__off-white learn-more--effective-monthly-premium">
+    <section class="section--pad section--arrow user-welcome--slider">
         <div class="container">
-            {% include 'AppBundle::Default/_effectiveMonthlyPremium.html.twig' %}
+            Reward slider
+            {# {% include 'AppBundle::Default/_rewardSlider.html.twig' %} #}
         </div>
     </section>
 
-    <section class="section--pad section--arrow learn-more--how-to-get-cashback">
+    <section class="section--pad section--arrow section--arrow__off-white user-welcome--effective-monthly-premium">
         <div class="container">
-            {% include 'AppBundle::Default/_howToGetCashback.html.twig' %}
+            Effective monthly premium
+            {# {% include 'AppBundle::Default/_effectiveMonthlyPremium.html.twig' %} #}
         </div>
     </section>
 
-    <section class="section--pad learn-more--video">
+    <section class="section--pad user-welcome--video">
         <div class="container">
-            {% include 'AppBundle::Default/_explainerVideo.html.twig' %}
+            Video
+            {# {% include 'AppBundle::Default/_explainerVideo.html.twig' %} #}
         </div>
     </section>
 
-    <section class="section--pad learn-more--download">
+    <section class="section--pad user-welcome--download">
         <div class="container">
-            {% include 'AppBundle::Default/_appDownload.html.twig' %}
+            Download
+            {# {% include 'AppBundle::Default/_appDownload.html.twig' %} #}
         </div>
-    </section> #}
+    </section>
 
     {# Page Modals #}
     {# {% include 'AppBundle::Default/modalQuote.html.twig' with {'selectPhoneMakeType': 'learn-more', 'phoneId': phone.id} %} #}
