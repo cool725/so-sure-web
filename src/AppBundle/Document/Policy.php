@@ -2016,6 +2016,18 @@ abstract class Policy
         }
     }
 
+    public function getRiskColourText()
+    {
+        $risk = $this->getRisk();
+        if ($risk == self::RISK_LEVEL_LOW) {
+            return 'green';
+        } elseif ($risk == self::RISK_LEVEL_MEDIUM) {
+            return 'amber';
+        } elseif ($risk == self::RISK_LEVEL_HIGH) {
+            return 'red';
+        }
+    }
+
     public function getRisk($date = null)
     {
         if (!isset(static::$riskLevels[$this->getRiskReason($date)])) {
