@@ -34,7 +34,9 @@ abstract class Policy
     use CurrencyTrait;
     use DateTrait;
 
+    const ADJUST_TIMEZONE = false;
     const RENEWAL_DAYS = 21;
+    const TIMEZONE = "Europe/London";
 
     const RISK_LEVEL_HIGH = 'high';
     const RISK_LEVEL_MEDIUM = 'medium';
@@ -756,6 +758,13 @@ abstract class Policy
 
     public function getStart()
     {
+        if ($this->start) {
+            if (self::ADJUST_TIMEZONE) {
+                $this->start->setTimezone(new \DateTimeZone(self::TIMEZONE));
+            } elseif ($this->start->format('H') == 23) {
+                $this->start->setTimezone(new \DateTimeZone(self::TIMEZONE));
+            }
+        }
         return $this->start;
     }
 
@@ -776,6 +785,9 @@ abstract class Policy
     public function getBilling()
     {
         if ($this->billing) {
+            if (self::ADJUST_TIMEZONE) {
+                $this->billing->setTimezone(new \DateTimeZone(self::TIMEZONE));
+            }
             return $this->billing;
         } else {
             return $this->getStartForBilling();
@@ -798,6 +810,11 @@ abstract class Policy
 
     public function getEnd()
     {
+        if ($this->end) {
+            if (self::ADJUST_TIMEZONE) {
+                $this->end->setTimezone(new \DateTimeZone(self::TIMEZONE));
+            }
+        }
         return $this->end;
     }
 
@@ -808,6 +825,11 @@ abstract class Policy
 
     public function getStaticEnd()
     {
+        if ($this->staticEnd) {
+            if (self::ADJUST_TIMEZONE) {
+                $this->staticEnd->setTimezone(new \DateTimeZone(self::TIMEZONE));
+            }
+        }
         return $this->staticEnd;
     }
 
