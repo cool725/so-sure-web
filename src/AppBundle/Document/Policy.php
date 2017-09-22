@@ -62,6 +62,7 @@ abstract class Policy
     const STATUS_MULTIPAY_REJECTED = 'multipay-rejected';
     const STATUS_RENEWAL = 'renewal';
     const STATUS_PENDING_RENEWAL = 'pending-renewal';
+    const STATUS_DECLINED_RENEWAL = 'declined-renewal';
     const STATUS_UNRENEWED = 'unrenewed';
 
     const CANCELLED_UNPAID = 'unpaid';
@@ -153,7 +154,7 @@ abstract class Policy
     /**
      * @Assert\Choice({"pending", "active", "cancelled", "expired", "expired-claimable", "expired-wait-claim",
      *                  "unpaid", "multipay-requested", "multipay-rejected", "renewal",
-     *                  "pending-renewal", "unrenewed"}, strict=true)
+     *                  "pending-renewal", "declined-renewal", "unrenewed"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -2824,6 +2825,24 @@ abstract class Policy
         }
 
         return true;
+    }
+
+    public function declineRenew(\DateTime $date = null)
+    {
+        if ($date == null) {
+            $date = new \DateTime();
+        }
+
+        if (!in_array($this->getStatus(), [
+            self::STATUS_PENDING_RENEWAL,
+        ])) {
+            throw new \Exception(sprintf(
+                'Policy %s can only be declined if it is pending renewal',
+                $this->getId()
+            ));
+        }
+
+        $this->setStatus(Policy::STATUS_DECLINED_RENEWAL);
     }
 
     public function renew($discount, \DateTime $date = null)

@@ -3127,6 +3127,32 @@ class PhonePolicyTest extends WebTestCase
         $this->assertTrue($policy->isRenewed());
     }
 
+    public function testDeclineRenew()
+    {
+        $policy = $this->getPolicy(static::generateEmail('testDeclineRenew', $this));
+
+        $this->assertFalse($policy->isRenewed());
+
+        $renewalPolicy = $this->getRenewalPolicy($policy);
+        $renewalPolicy->declineRenew();
+        $this->assertEquals(Policy::STATUS_DECLINED_RENEWAL, $renewalPolicy->getStatus());
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testDeclineRenewInvalidStatus()
+    {
+        $policy = $this->getPolicy(static::generateEmail('testDeclineRenew', $this));
+
+        $this->assertFalse($policy->isRenewed());
+
+        $renewalPolicy = $this->getRenewalPolicy($policy);
+        $renewalPolicy->setStatus(Policy::STATUS_RENEWAL);
+        $renewalPolicy->declineRenew();
+        $this->assertEquals(Policy::STATUS_DECLINED_RENEWAL, $renewalPolicy->getStatus());
+    }
+
     public function testGetUnconnectedUserPolicies()
     {
         $policy = $this->getPolicy(static::generateEmail('testGetUnconnectedUserPolicies', $this));

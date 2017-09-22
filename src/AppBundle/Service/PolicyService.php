@@ -1626,6 +1626,42 @@ class PolicyService
         return $newPolicy;
     }
 
+    public function declineRenew(Policy $policy, Cashback $cashback = null, \DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        $newPolicy = $policy->getNextPolicy();
+        if (!$newPolicy) {
+            throw new \Exception(sprintf(
+                'Policy %s does not have a next policy (decline renewal not allowed)',
+                $policy->getId()
+            ));
+        }
+
+        if (!$policy->isRenewed()) {
+            throw new \Exception(sprintf(
+                'Policy %s (pending %s) has been renewed. Renewal should be cancelled instead',
+                $policy->getId(),
+                $newPolicy->getId()
+            ));
+        }
+
+        if ($cashback) {
+            $this->cashback($policy, $cashback);
+        } else {
+            $policy->clearCashback();
+        }
+
+        $newPolicy->declineRenew($date);
+        $this->dm->flush();
+
+        $this->dispatchEvent(PolicyEvent::EVENT_DECLINED_RENEWAL, new PolicyEvent($policy));
+
+        return $newPolicy;
+    }
+
     public function repurchase(Policy $policy, \DateTime $date = null)
     {
         if (!$date) {
