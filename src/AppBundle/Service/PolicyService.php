@@ -1640,14 +1640,6 @@ class PolicyService
             ));
         }
 
-        if (!$policy->isRenewed()) {
-            throw new \Exception(sprintf(
-                'Policy %s (pending %s) has been renewed. Renewal should be cancelled instead',
-                $policy->getId(),
-                $newPolicy->getId()
-            ));
-        }
-
         if ($cashback) {
             $this->cashback($policy, $cashback);
         } else {
