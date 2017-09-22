@@ -1,6 +1,6 @@
 <div id="claimPolicyItem">
     <div class="text-center" style="{% if policy.active %}background-color: {{ policy.riskColour }}; color: white;{% endif %} font-weight: bold; border-radius: 4px; margin-bottom: 20px; padding: 10px;">
-      Risk: {{ policy.riskReason }} ({{ policy.risk|capitalize }} / <span style="{% if not policy.active %}color: {{policy.riskColour }}{% endif %}">{{ policy.riskColour|capitalize }}</span>)
+      Risk: {{ policy.riskReason }} ({{ policy.risk|capitalize }} / <span style="{% if not policy.active %}color: {{policy.riskColour }}{% endif %}">{{ policy.getRiskColourText|capitalize }}</span>)
     </div>
     <ul class="nav nav-tabs nav-justified">
       <li role="presentation" class="active"><a href="#user">User</a></li>
