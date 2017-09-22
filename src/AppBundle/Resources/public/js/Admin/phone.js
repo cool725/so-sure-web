@@ -96,3 +96,18 @@ $('.phone-highlight').click(function() {
         });
     }
 });
+
+$('.phone-newhighdemand').click(function() {
+    if (confirm('Are you sure you want to set/unset this phone new & in high demand?')) {
+        var url = $(this).data('newhighdemand');
+        var token = $(this).data('token');
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: { token: token },
+            success: function(result) {
+                window.location = window.location;
+            }
+        });
+    }
+});

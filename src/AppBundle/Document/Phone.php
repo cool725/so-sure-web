@@ -212,6 +212,12 @@ class Phone
      */
     protected $highlight;
 
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     */
+    protected $newHighDemand;
+
     public function __construct()
     {
     }
@@ -587,6 +593,16 @@ class Phone
     public function setHighlight($highlight)
     {
         $this->highlight = $highlight;
+    }
+
+    public function isNewHighDemand()
+    {
+        return $this->newHighDemand;
+    }
+
+    public function setNewHighDemand($newHighDemand)
+    {
+        $this->newHighDemand = $newHighDemand;
     }
 
     public function getMonthAge()

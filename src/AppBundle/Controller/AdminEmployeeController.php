@@ -1501,6 +1501,37 @@ class AdminEmployeeController extends BaseController
     }
 
     /**
+     * @Route("/phone/{id}/newhighdemand", name="admin_phone_newhighdemand")
+     * @Method({"POST"})
+     */
+    public function phoneNewHighDemandAction(Request $request, $id)
+    {
+        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
+            throw new \InvalidArgumentException('Invalid csrf token');
+        }
+
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phone = $repo->find($id);
+        if ($phone) {
+            if ($phone->isNewHighDemand()) {
+                $phone->setNewHighDemand(false);
+                $message = 'Phone is no longer set to new high demand';
+            } else {
+                $phone->setNewHighDemand(true);
+                $message = 'Phone is now set to new high demand';
+            }
+            $dm->flush();
+            $this->addFlash(
+                'notice',
+                $message
+            );
+        }
+
+        return new RedirectResponse($this->generateUrl('admin_phones'));
+    }
+
+    /**
      * @Route("/payments", name="admin_payments")
      * @Route("/payments/{year}/{month}", name="admin_payments_date")
      * @Template
