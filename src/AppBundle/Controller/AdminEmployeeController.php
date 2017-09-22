@@ -1419,6 +1419,8 @@ class AdminEmployeeController extends BaseController
             $count++;
             $reporting = $this->get('app.reporting');
             $week['period'] = $reporting->report($start, $end, true);
+            $totalStart = clone $end;
+            $totalStart = $totalStart->sub(new \DateInterval('P1Y'));
             $week['total'] = $reporting->report(new \DateTime(SoSure::POLICY_START), $end, true);
             $week['sumPolicies'] = $reporting->sumTotalPoliciesPerWeek($end);
 
