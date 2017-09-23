@@ -226,6 +226,15 @@ class SalvaPhonePolicy extends PhonePolicy
         return $version;
     }
 
+    public function getPaymentsPerYearCode(\DateTime $date = null)
+    {
+        if ($this->isFullyPaid($date)) {
+            return 1;
+        } else {
+            return $this->getPremiumInstallmentCount();
+        }
+    }
+
     public function getSalvaVersion(\DateTime $date = null)
     {
         if (!$date) {
