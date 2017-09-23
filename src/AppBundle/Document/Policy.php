@@ -3834,6 +3834,13 @@ abstract class Policy
             return true;
         }
 
+        // For the rare case where a policy is cancelled for another reason (e.g. unpaid)
+        // but we want to allow repurchase, so we set the flag to igore the claim
+        if ($this->getStatus() == self::STATUS_CANCELLED && count($this->getApprovedClaims()) > 0 &&
+            count($this->getApprovedClaims(true, true, true)) == 0) {
+            return true;
+        }
+
         return false;
     }
 

@@ -3232,6 +3232,17 @@ class PhonePolicyTest extends WebTestCase
 
         $policy->setCancelledReason(SalvaPhonePolicy::CANCELLED_USER_REQUESTED);
         $this->assertTrue($policy->displayRepurchase());
+
+        $policy->setStatus(SalvaPhonePolicy::STATUS_CANCELLED);
+        $policy->setCancelledReason(SalvaPhonePolicy::CANCELLED_UNPAID);
+        $this->assertFalse($policy->displayRepurchase());
+
+        $claim = new Claim();
+        $claim->setStatus(Claim::STATUS_APPROVED);
+        $claim->setIgnoreWarningFlags(Claim::WARNING_FLAG_IGNORE_USER_DECLINED);
+        $policy->addClaim($claim);
+        $this->assertFalse($policy->isCancelledWithUserDeclined());
+        $this->assertTrue($policy->displayRepurchase());
     }
 
     public function testCreateRepurchase()
