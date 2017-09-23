@@ -116,6 +116,9 @@ class IntercomService
         if ($user->hasSoSureEmail() && !$allowSoSure) {
             return ['skipped' => true];
         }
+        if (!$user->hasEmail()) {
+            return ['skipped' => true];
+        }
 
         if (!$undelete && $this->isDeleted($user)) {
             return ['deleted' => true];
@@ -147,6 +150,10 @@ class IntercomService
 
     private function leadExists(User $user)
     {
+        if (!$user->hasEmail()) {
+            return false;
+        }
+
         try {
             $resp = $this->client->leads->getLeads(['email' => $user->getEmail()]);
             return count($resp->contacts) > 0;
@@ -158,6 +165,9 @@ class IntercomService
     public function getIntercomUser(User $user)
     {
         if (!$user->getIntercomId()) {
+            return null;
+        }
+        if (!$user->hasEmail()) {
             return null;
         }
 
@@ -180,6 +190,9 @@ class IntercomService
         if (!$user->getIntercomId()) {
             return false;
         }
+        if (!$user->hasEmail()) {
+            return false;
+        }
 
         try {
             $resp = $this->client->users->getUser($user->getIntercomId());
@@ -198,6 +211,9 @@ class IntercomService
     public function convertLead(User $user)
     {
         $results = [];
+        if (!$user->hasEmail()) {
+            return $results;
+        }
         $resp = $this->client->leads->getLeads(['email' => $user->getEmail()]);
         $results[] = $resp;
         foreach ($resp->contacts as $lead) {
@@ -248,6 +264,10 @@ class IntercomService
 
     private function updateUser(User $user, $isConverted = false)
     {
+        if (!$user->hasEmail()) {
+            return;
+        }
+
         $data = array(
             'email' => $user->getEmail(),
             'name' => $user->getName(),
@@ -323,6 +343,10 @@ class IntercomService
 
     public function updateLead(Lead $lead, $data = null)
     {
+        if (!$lead->hasEmail()) {
+            return;
+        }
+
         if (!$data) {
             $data = [];
         }
