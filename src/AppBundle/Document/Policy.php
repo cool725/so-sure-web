@@ -1153,19 +1153,40 @@ abstract class Policy
         return false;
     }
 
-    public function getApprovedClaims($includeSettled = true, $includeLinkedClaims = false)
-    {
+    public function getApprovedClaims(
+        $includeSettled = true,
+        $includeLinkedClaims = false,
+        $excludeIgnoreUserDeclined = false
+    ) {
         $claims = [];
         foreach ($this->getClaims() as $claim) {
-            if ($claim->getStatus() == Claim::STATUS_APPROVED ||
-                ($includeSettled && $claim->getStatus() == Claim::STATUS_SETTLED)) {
+            $addClaim = false;
+            if ($claim->getStatus() == Claim::STATUS_APPROVED) {
+                $addClaim = true;
+            }
+            if ($includeSettled && $claim->getStatus() == Claim::STATUS_SETTLED) {
+                $addClaim = true;
+            }
+            if ($excludeIgnoreUserDeclined && $claim->hasIgnoreUserDeclined()) {
+                $addClaim = false;
+            }
+            if ($addClaim) {
                 $claims[] = $claim;
             }
         }
         if ($includeLinkedClaims) {
             foreach ($this->getLinkedClaims() as $claim) {
-                if ($claim->getStatus() == Claim::STATUS_APPROVED ||
-                    ($includeSettled && $claim->getStatus() == Claim::STATUS_SETTLED)) {
+                $addClaim = false;
+                if ($claim->getStatus() == Claim::STATUS_APPROVED) {
+                    $addClaim = true;
+                }
+                if ($includeSettled && $claim->getStatus() == Claim::STATUS_SETTLED) {
+                    $addClaim = true;
+                }
+                if ($excludeIgnoreUserDeclined && $claim->hasIgnoreUserDeclined()) {
+                    $addClaim = false;
+                }
+                if ($addClaim) {
                     $claims[] = $claim;
                 }
             }
@@ -2276,7 +2297,7 @@ abstract class Policy
         }
 
         // User has a cancelled policy for any reason w/approved claimed and policy was not paid in full
-        if (count($this->getApprovedClaims()) > 0 && !$this->isFullyPaid()) {
+        if (count($this->getApprovedClaims(true, true, true)) > 0 && !$this->isFullyPaid()) {
             return true;
         }
 
