@@ -15,6 +15,8 @@ use AppBundle\Classes\Salva;
 
 /**
  * @group functional-net
+ *
+ * AppBundle\\Tests\\Service\\SalvaExportServiceTest
  */
 class SalvaExportServiceTest extends WebTestCase
 {
@@ -79,6 +81,7 @@ class SalvaExportServiceTest extends WebTestCase
         $policy->setStatus(SalvaPhonePolicy::STATUS_PENDING);
 
         $issueDate = new \DateTime();
+        $issueDate->setTimezone(new \DateTimeZone('Europe/London'));
         static::$policyService->create($policy);
         $issueDate2 = clone $issueDate;
         $issueDate2->add(new \DateInterval('PT1S'));

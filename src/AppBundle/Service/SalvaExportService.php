@@ -794,7 +794,7 @@ class SalvaExportService
         ));
         $policy->appendChild($dom->createElement(
             'ns2:paymentsPerYearCode',
-            $phonePolicy->getPremiumInstallmentCount()
+            $phonePolicy->getPaymentsPerYearCode()
         ));
         $policy->appendChild($dom->createElement('ns2:issuerUser', 'so_sure'));
         $policy->appendChild($dom->createElement('ns2:deliveryModeCode', 'undefined'));

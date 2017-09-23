@@ -146,6 +146,33 @@ class SalvaPhonePolicyTest extends WebTestCase
         );
     }
 
+    public function testGetPaymentsPerYearCodeAnnual()
+    {
+        $date = new \DateTime('2016-01-01');
+        $policy = static::createUserPolicy(true, $date);
+        $policy->setPremiumInstallments(1);
+        static::addPayment($policy, 83.88, Salva::YEARLY_TOTAL_COMMISSION);
+        $this->assertEquals(1, $policy->getPaymentsPerYearCode());
+    }
+
+    public function testGetPaymentsPerYearCodeMonthlyPaid()
+    {
+        $date = new \DateTime('2016-01-01');
+        $policy = static::createUserPolicy(true, $date);
+        $policy->setPremiumInstallments(12);
+        static::addPayment($policy, 83.88, Salva::YEARLY_TOTAL_COMMISSION);
+        $this->assertEquals(1, $policy->getPaymentsPerYearCode());
+    }
+
+    public function testGetPaymentsPerYearCodeMonthly()
+    {
+        $date = new \DateTime('2016-01-01');
+        $policy = static::createUserPolicy(true, $date);
+        $policy->setPremiumInstallments(12);
+        static::addPayment($policy, 6.99, Salva::MONTHLY_TOTAL_COMMISSION);
+        $this->assertEquals(12, $policy->getPaymentsPerYearCode());
+    }
+
     public function testGetTotalPremiumPrices()
     {
         $date = new \DateTime('2016-01-01');
