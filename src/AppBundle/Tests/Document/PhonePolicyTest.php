@@ -1178,6 +1178,9 @@ class PhonePolicyTest extends WebTestCase
         $policyE->addClaim($claimE);
         $this->assertTrue($policyE->isCancelledWithUserDeclined());
 
+        $claimE->setIgnoreWarningFlags(Claim::WARNING_FLAG_IGNORE_USER_DECLINED);
+        $this->assertFalse($policyE->isCancelledWithUserDeclined());
+
         $this->assertFalse($policyF->isCancelledWithUserDeclined());
         $claimF = new Claim();
         $claimF->setStatus(Claim::STATUS_WITHDRAWN);

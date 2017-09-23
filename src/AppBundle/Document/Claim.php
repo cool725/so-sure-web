@@ -34,12 +34,16 @@ class Claim
     const WARNING_FLAG_DAVIES_POSTCODE = 'davies-postcode';
     const WARNING_FLAG_BRIGHTSTAR_NAME_MATCH = 'brightstar-name-match';
     const WARNING_FLAG_BRIGHTSTAR_POSTCODE = 'brighstar-postcode';
+    // technically not a warning flag, but fits nicely under that for UI with little change required
+    // and very little usage envisioned
+    const WARNING_FLAG_IGNORE_USER_DECLINED = 'ignore-user-declined';
 
     public static $warningFlags = [
         self::WARNING_FLAG_DAVIES_NAME_MATCH => self::WARNING_FLAG_DAVIES_NAME_MATCH,
         self::WARNING_FLAG_DAVIES_POSTCODE => self::WARNING_FLAG_DAVIES_POSTCODE,
         self::WARNING_FLAG_BRIGHTSTAR_NAME_MATCH => self::WARNING_FLAG_BRIGHTSTAR_NAME_MATCH,
         self::WARNING_FLAG_BRIGHTSTAR_POSTCODE => self::WARNING_FLAG_BRIGHTSTAR_POSTCODE,
+        self::WARNING_FLAG_IGNORE_USER_DECLINED => self::WARNING_FLAG_IGNORE_USER_DECLINED
     ];
 
     /**
@@ -906,6 +910,11 @@ class Claim
     public function clearIgnoreWarningFlags()
     {
         $this->ignoreWarningFlags = array();
+    }
+
+    public function hasIgnoreUserDeclined()
+    {
+        return  $this->isIgnoreWarningFlagSet(self::WARNING_FLAG_IGNORE_USER_DECLINED);
     }
 
     public static function sumClaims($claims)
