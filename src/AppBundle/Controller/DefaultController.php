@@ -353,9 +353,9 @@ class DefaultController extends BaseController
                 if ($claimForm->isValid()) {
                     $mailer = $this->get('app.mailer');
                     $subject = sprintf(
-                            'New Claim from %s/%s',
-                            $claimForm->getData()['name'],
-                            $claimForm->getData()['policyNumber']
+                        'New Claim from %s/%s',
+                        $claimForm->getData()['name'],
+                        $claimForm->getData()['policyNumber']
                     );
                     $mailer->sendTemplate(
                         $subject,
