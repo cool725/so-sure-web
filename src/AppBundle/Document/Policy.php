@@ -3420,7 +3420,8 @@ abstract class Policy
             self::STATUS_EXPIRED_CLAIMABLE,
             self::STATUS_EXPIRED_WAIT_CLAIM,
             self::STATUS_MULTIPAY_REJECTED,
-            self::STATUS_MULTIPAY_REQUESTED
+            self::STATUS_MULTIPAY_REQUESTED,
+            self::STATUS_PENDING_RENEWAL,
         ];
 
         // mostly concerned with Active vs Unpaid
@@ -3435,7 +3436,7 @@ abstract class Policy
         if ($this->isPolicyPaidToDate($date)) {
             return $this->getStatus() == self::STATUS_ACTIVE;
         } else {
-            return $this->getStatus() == self::STATUS_UNPAID;
+            return in_array($this->getStatus(), [self::STATUS_UNPAID, self::STATUS_RENEWAL]);
         }
     }
 
