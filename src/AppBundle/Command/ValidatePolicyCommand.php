@@ -171,9 +171,10 @@ class ValidatePolicyCommand extends ContainerAwareCommand
     private function validatePolicy(Policy $policy, &$policies, &$lines, $data)
     {
         $closeToExpiration = false;
-        if ($data['validateDate'] && $policy->getPolicyExpirationDate()) {
-            $diff = $policy->getPolicyExpirationDate()->diff($data['validateDate']);
-            $closeToExpiration = $diff->days < 14;
+        if ($policy->getPolicyExpirationDate()) {
+            $date = $data['validateDate'] ? $data['validateDate'] : new \DateTime();
+            $diff = $date->diff($policy->getPolicyExpirationDate());
+            $closeToExpiration = $diff->days < 14 && $diff->invert == 0;
         }
         if ($policy->isPolicyPaidToDate($data['validateDate']) === false) {
             if ($data['all'] || $closeToExpiration) {
