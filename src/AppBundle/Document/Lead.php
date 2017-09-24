@@ -99,6 +99,11 @@ class Lead
         $this->email = strtolower($email);
     }
 
+    public function hasEmail()
+    {
+        return strlen(trim($this->getEmail())) > 0;
+    }
+
     public function getName()
     {
         return $this->name;

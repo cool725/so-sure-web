@@ -34,7 +34,9 @@ abstract class Policy
     use CurrencyTrait;
     use DateTrait;
 
+    const ADJUST_TIMEZONE = false;
     const RENEWAL_DAYS = 21;
+    const TIMEZONE = "Europe/London";
 
     const RISK_LEVEL_HIGH = 'high';
     const RISK_LEVEL_MEDIUM = 'medium';
@@ -756,6 +758,13 @@ abstract class Policy
 
     public function getStart()
     {
+        if ($this->start) {
+            if (self::ADJUST_TIMEZONE) {
+                $this->start->setTimezone(new \DateTimeZone(self::TIMEZONE));
+            } elseif ($this->start->format('H') == 23) {
+                $this->start->setTimezone(new \DateTimeZone(self::TIMEZONE));
+            }
+        }
         return $this->start;
     }
 
@@ -776,6 +785,9 @@ abstract class Policy
     public function getBilling()
     {
         if ($this->billing) {
+            if (self::ADJUST_TIMEZONE) {
+                $this->billing->setTimezone(new \DateTimeZone(self::TIMEZONE));
+            }
             return $this->billing;
         } else {
             return $this->getStartForBilling();
@@ -798,6 +810,11 @@ abstract class Policy
 
     public function getEnd()
     {
+        if ($this->end) {
+            if (self::ADJUST_TIMEZONE) {
+                $this->end->setTimezone(new \DateTimeZone(self::TIMEZONE));
+            }
+        }
         return $this->end;
     }
 
@@ -808,6 +825,11 @@ abstract class Policy
 
     public function getStaticEnd()
     {
+        if ($this->staticEnd) {
+            if (self::ADJUST_TIMEZONE) {
+                $this->staticEnd->setTimezone(new \DateTimeZone(self::TIMEZONE));
+            }
+        }
         return $this->staticEnd;
     }
 
@@ -1131,19 +1153,40 @@ abstract class Policy
         return false;
     }
 
-    public function getApprovedClaims($includeSettled = true, $includeLinkedClaims = false)
-    {
+    public function getApprovedClaims(
+        $includeSettled = true,
+        $includeLinkedClaims = false,
+        $excludeIgnoreUserDeclined = false
+    ) {
         $claims = [];
         foreach ($this->getClaims() as $claim) {
-            if ($claim->getStatus() == Claim::STATUS_APPROVED ||
-                ($includeSettled && $claim->getStatus() == Claim::STATUS_SETTLED)) {
+            $addClaim = false;
+            if ($claim->getStatus() == Claim::STATUS_APPROVED) {
+                $addClaim = true;
+            }
+            if ($includeSettled && $claim->getStatus() == Claim::STATUS_SETTLED) {
+                $addClaim = true;
+            }
+            if ($excludeIgnoreUserDeclined && $claim->hasIgnoreUserDeclined()) {
+                $addClaim = false;
+            }
+            if ($addClaim) {
                 $claims[] = $claim;
             }
         }
         if ($includeLinkedClaims) {
             foreach ($this->getLinkedClaims() as $claim) {
-                if ($claim->getStatus() == Claim::STATUS_APPROVED ||
-                    ($includeSettled && $claim->getStatus() == Claim::STATUS_SETTLED)) {
+                $addClaim = false;
+                if ($claim->getStatus() == Claim::STATUS_APPROVED) {
+                    $addClaim = true;
+                }
+                if ($includeSettled && $claim->getStatus() == Claim::STATUS_SETTLED) {
+                    $addClaim = true;
+                }
+                if ($excludeIgnoreUserDeclined && $claim->hasIgnoreUserDeclined()) {
+                    $addClaim = false;
+                }
+                if ($addClaim) {
                     $claims[] = $claim;
                 }
             }
@@ -1883,6 +1926,10 @@ abstract class Policy
         $diff = $start->diff($date);
         $days = $diff->days;
 
+        if ($days > $this->getDaysInPolicyYear()) {
+            $days = $this->getDaysInPolicyYear();
+        }
+
         return $days;
     }
 
@@ -1985,6 +2032,18 @@ abstract class Policy
             return 'green';
         } elseif ($risk == self::RISK_LEVEL_MEDIUM) {
             return '#ff9500';
+        } elseif ($risk == self::RISK_LEVEL_HIGH) {
+            return 'red';
+        }
+    }
+
+    public function getRiskColourText()
+    {
+        $risk = $this->getRisk();
+        if ($risk == self::RISK_LEVEL_LOW) {
+            return 'green';
+        } elseif ($risk == self::RISK_LEVEL_MEDIUM) {
+            return 'amber';
         } elseif ($risk == self::RISK_LEVEL_HIGH) {
             return 'red';
         }
@@ -2238,7 +2297,7 @@ abstract class Policy
         }
 
         // User has a cancelled policy for any reason w/approved claimed and policy was not paid in full
-        if (count($this->getApprovedClaims()) > 0 && !$this->isFullyPaid()) {
+        if (count($this->getApprovedClaims(true, true, true)) > 0 && !$this->isFullyPaid()) {
             return true;
         }
 
@@ -3361,7 +3420,8 @@ abstract class Policy
             self::STATUS_EXPIRED_CLAIMABLE,
             self::STATUS_EXPIRED_WAIT_CLAIM,
             self::STATUS_MULTIPAY_REJECTED,
-            self::STATUS_MULTIPAY_REQUESTED
+            self::STATUS_MULTIPAY_REQUESTED,
+            self::STATUS_PENDING_RENEWAL,
         ];
 
         // mostly concerned with Active vs Unpaid
@@ -3376,7 +3436,7 @@ abstract class Policy
         if ($this->isPolicyPaidToDate($date)) {
             return $this->getStatus() == self::STATUS_ACTIVE;
         } else {
-            return $this->getStatus() == self::STATUS_UNPAID;
+            return in_array($this->getStatus(), [self::STATUS_UNPAID, self::STATUS_RENEWAL]);
         }
     }
 
@@ -3772,6 +3832,13 @@ abstract class Policy
             self::CANCELLED_COOLOFF,
             self::CANCELLED_USER_REQUESTED,
         ])) {
+            return true;
+        }
+
+        // For the rare case where a policy is cancelled for another reason (e.g. unpaid)
+        // but we want to allow repurchase, so we set the flag to igore the claim
+        if ($this->getStatus() == self::STATUS_CANCELLED && count($this->getApprovedClaims()) > 0 &&
+            count($this->getApprovedClaims(true, true, true)) == 0) {
             return true;
         }
 

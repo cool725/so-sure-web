@@ -533,8 +533,8 @@ class SalvaExportService
         } else {
             throw new \Exception(sprintf(
                 'Unknown action %s for policyId: %s',
-                $data['action'],
-                $data['policyId']
+                $action,
+                $policy->getId()
             ));
         }
         $this->dm->flush();
@@ -794,7 +794,7 @@ class SalvaExportService
         ));
         $policy->appendChild($dom->createElement(
             'ns2:paymentsPerYearCode',
-            $phonePolicy->getPremiumInstallmentCount()
+            $phonePolicy->getPaymentsPerYearCode()
         ));
         $policy->appendChild($dom->createElement('ns2:issuerUser', 'so_sure'));
         $policy->appendChild($dom->createElement('ns2:deliveryModeCode', 'undefined'));

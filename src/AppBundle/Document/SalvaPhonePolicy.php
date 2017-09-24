@@ -14,6 +14,9 @@ use AppBundle\Classes\Salva;
  */
 class SalvaPhonePolicy extends PhonePolicy
 {
+    const ADJUST_TIMEZONE = false;
+    const DEBUG = false;
+
     // Policy shouldn't be set to salva
     const SALVA_STATUS_SKIPPED = 'skipped';
 
@@ -70,6 +73,26 @@ class SalvaPhonePolicy extends PhonePolicy
         return $this->salvaPolicyNumbers;
     }
 
+    public function getSalvaPolicyNumberVersion($version)
+    {
+        if (!isset($this->getSalvaPolicyNumbers()[$version])) {
+            return null;
+        }
+
+        if (self::ADJUST_TIMEZONE) {
+            $date = new \DateTime($this->getSalvaPolicyNumbers()[$version]);
+            // There was a bug historically in the time calculations where the salva dates
+            // were loaded as europe/london, but everything else in utc
+            // now that everythign else is going to europe/london for calcs, need to bump
+            // the timezone to 1 more than london
+            $date->setTimezone(new \DateTimeZone('Europe/Paris'));
+
+            return $date;
+        } else {
+            return new \DateTime($this->getSalvaPolicyNumbers()[$version]);
+        }
+    }
+
     public function getSalvaPolicyResults()
     {
         return $this->salvaPolicyResults;
@@ -78,6 +101,26 @@ class SalvaPhonePolicy extends PhonePolicy
     public function getSalvaFirstBillingDates()
     {
         return $this->salvaFirstBillingDates;
+    }
+
+    public function getSalvaFirstBillingDateVersion($version)
+    {
+        if (!isset($this->getSalvaFirstBillingDates()[$version])) {
+            return null;
+        }
+
+        if (self::ADJUST_TIMEZONE) {
+            $date = new \DateTime($this->getSalvaFirstBillingDates()[$version]);
+            // There was a bug historically in the time calculations where the salva dates
+            // were loaded as europe/london, but everything else in utc
+            // now that everythign else is going to europe/london for calcs, need to bump
+            // the timezone to 1 more than london
+            $date->setTimezone(new \DateTimeZone('Europe/Paris'));
+
+            return $date;
+        } else {
+            return new \DateTime($this->getSalvaFirstBillingDates()[$version]);
+        }
     }
 
     public function getSalvaPolicyResultsUnserialized()
@@ -137,11 +180,13 @@ class SalvaPhonePolicy extends PhonePolicy
             $version = $version - 1;
         }
 
-        if (!isset($this->getSalvaPolicyNumbers()[$version])) {
+        // if (!isset($this->getSalvaPolicyNumbers()[$version])) {
+        if (!$this->getSalvaPolicyNumberVersion($version)) {
             return $this->getStart();
         }
 
-        return new \DateTime($this->getSalvaPolicyNumbers()[$version]);
+        return $this->getSalvaPolicyNumberVersion($version);
+        //return new \DateTime($this->getSalvaPolicyNumbers()[$version]);
     }
 
     public function getSalvaTerminationDate($version = null)
@@ -150,9 +195,10 @@ class SalvaPhonePolicy extends PhonePolicy
             return null;
         }
 
-        return new \DateTime($this->getSalvaPolicyNumbers()[$version]);
+        return $this->getSalvaPolicyNumberVersion($version);
+        //return new \DateTime($this->getSalvaPolicyNumbers()[$version]);
     }
-    
+
     public function incrementSalvaPolicyNumber(\DateTime $date = null)
     {
         if (!$date) {
@@ -178,6 +224,15 @@ class SalvaPhonePolicy extends PhonePolicy
         }
 
         return $version;
+    }
+
+    public function getPaymentsPerYearCode(\DateTime $date = null)
+    {
+        if ($this->isFullyPaid($date)) {
+            return 1;
+        } else {
+            return $this->getPremiumInstallmentCount();
+        }
     }
 
     public function getSalvaVersion(\DateTime $date = null)
@@ -212,11 +267,13 @@ class SalvaPhonePolicy extends PhonePolicy
         }
 
         // Default to start date
-        if (!isset($this->getSalvaFirstBillingDates()[$version])) {
+        // if (!isset($this->getSalvaFirstBillingDates()[$version])) {
+        if (!$this->getSalvaFirstBillingDateVersion($version)) {
             return $this->getStart();
         }
 
-        return new \DateTime($this->getSalvaFirstBillingDates()[$version]);
+        //return new \DateTime($this->getSalvaFirstBillingDates()[$version]);
+        return $this->getSalvaFirstBillingDateVersion($version);
     }
 
     public function getSalvaFirstDueDateByDate(\DateTime $date)
@@ -320,13 +377,21 @@ class SalvaPhonePolicy extends PhonePolicy
             }
 
             $endDate = $this->getSalvaTerminationDate($version);
+            //print_r($endDate);
         } elseif ($this->getStatus() == SalvaPhonePolicy::STATUS_CANCELLED) {
             if ($this->isRefundAllowed()) {
                 $endDate = clone $this->getEnd();
             } elseif ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
                 // TODO: Not sure how filtered will affect salva days in policy
                 // should investigate....
+                // TODO: Add more test cases if user changes their billing date
                 $endDate = $this->getNextBillingDate(clone $this->getEnd(), false);
+
+                // Ensure next billing date does not exceed the end policy date
+                // TODO - reenable after checking implications
+                if ($endDate > $this->getStaticEnd()) {
+                    $endDate = clone $this->getStaticEnd();
+                }
             }
         }
 
@@ -341,8 +406,10 @@ class SalvaPhonePolicy extends PhonePolicy
 
         // due to adjusting the end date to beginning of next day below,
         // TODO: Refactor
+        $adjustEndDate = false;
         if (!$version && count($this->getSalvaPolicyNumbers()) > 0) {
             $endDate = $endDate->sub(new \DateInterval('P1D'));
+            $adjustEndDate = true;
         }
 
         // always bill to end of day (next day 00:00) to account for partial days
@@ -352,10 +419,16 @@ class SalvaPhonePolicy extends PhonePolicy
         $days = $diff->days;
 
         /*
-        print PHP_EOL . $version . '=> ' . $days . PHP_EOL;
-        print $startDate->format(\DateTime::ATOM) . PHP_EOL;
-        print $endDate->format(\DateTime::ATOM) . PHP_EOL;
-        print_r($diff);
+        if (self::DEBUG) {
+            print PHP_EOL . $version . '=> ' . $days . PHP_EOL;
+            print $this->getId() . PHP_EOL;
+            print $adjustEndDate ? 'adjusted end date' : 'not adjusted end date';
+            print PHP_EOL . $startDate->format(\DateTime::ATOM) . PHP_EOL;
+            print $this->getStart()->format(\DateTime::ATOM) . PHP_EOL;
+            print $this->getStaticEnd()->format(\DateTime::ATOM) . PHP_EOL;
+            print $endDate->format(\DateTime::ATOM) . PHP_EOL;
+            print_r($diff);
+        }
         */
 
         // special case to count first day, if versioned on first day
@@ -364,13 +437,35 @@ class SalvaPhonePolicy extends PhonePolicy
             // print 'special adjustment for 0 days' . PHP_EOL;
         }
 
+        if ($days > $this->getDaysInPolicyYear()) {
+            $days = $this->getDaysInPolicyYear();
+            /*
+            throw new \Exception(sprintf(
+                '%d %s/%s %s %s',
+                $days,
+                $startDate->format(\DateTime::ATOM),
+                json_encode($startDate->getTimezone()),
+                $this->getStart()->format(\DateTime::ATOM),
+                json_encode($this->getStart()->getTimezone()),
+                $this->getId()
+            ));
+            */
+        }
+
         return $days;
     }
 
     public function getSalvaProrataMultiplier($version = null)
     {
         // TODO: in the case of policies that don't have a refund, the max version should continue to end of year
-        return $this->getSalvaDaysInPolicy($version) / $this->getDaysInPolicyYear();
+        $multiplier = $this->getSalvaDaysInPolicy($version) / $this->getDaysInPolicyYear();
+        /*
+        if (self::DEBUG) {
+            print '-- * ' . $multiplier . PHP_EOL;
+        }
+        */
+
+        return $multiplier;
     }
 
     public function getTotalPremiumPrice($version = null)
