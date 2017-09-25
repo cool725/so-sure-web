@@ -39,8 +39,8 @@
                         </div>
                         <div class="col-sm-8">
                             <ul class="list-unstyled">
-                                <li class="h4 h-light">Your <strong>{{ policy.phone.make }} {{ policy.phone.model }}</strong> in now insured!</li>
-                                <li class="h4 h-light">Your policy number is <strong>{{ policy.policyNumber }}</strong></li>
+                                <li class="h3 h-light">Your <strong>{{ policy.phone.make }} {{ policy.phone.model }}</strong> is now insured!</li>
+                                <li class="h3 h-light">Your policy number is <strong>{{ policy.policyNumber }}</strong></li>
                                 <li class="h4 h-light">Your phone is now protected against: <br> <strong>Theft</strong>, <strong>Loss</strong>, <strong>Accidental Damage</strong> and <strong>Breakdown</strong>.</li>
                                 {# <li class="h4 text-red">Is your phone already damaged? <a href="#">Click here</a></li> #}
                             </ul>
@@ -49,16 +49,17 @@
                     <h4 class="text-center h-light">Here’s a few links to help you get started:</h4>
                     <div class="row text-center">
                         <div class="col-sm-4">
-                            <a data-toggle="modal" data-target="#policy-modal" class="btn btn-blue btn-block btn-pad">Policy details</a>
+                            <a data-toggle="modal"
+                               data-target="#policy-modal" class="btn btn-blue-hollow btn-block btn-pad">
+                            <i class="fa fa-file-text-o" aria-hidden="true"></i> Policy details</a>
                         </div>
                         <div class="col-sm-4">
-                            <a href="{{ path('user_home') }}" class="btn btn-blue btn-block btn-pad">Account page</a>
+                            <a href="{{ path('user_home') }}" class="btn btn-blue-hollow btn-block btn-pad"><i class="fa fa-user-circle-o" aria-hidden="true"></i> Account page</a>
                         </div>
                         <div class="col-sm-4">
                             <a href="#"
-                               class="btn btn-green btn-block btn-pad scroll-to"
-                               data-scroll-to-anchor="#how-to-get-cashback">
-                               How to get cashback</a>
+                               class="btn btn-blue-hollow btn-block btn-pad scroll-to"
+                               data-scroll-to-anchor="#how-to-get-cashback">How do I get cashback?</a>
                         </div>
                     </div>
                 </div>
@@ -100,6 +101,28 @@
 
     {# Page Modals #}
     {# {% include 'AppBundle::Default/modalQuote.html.twig' with {'selectPhoneMakeType': 'learn-more', 'phoneId': phone.id} %} #}
+
+    <div class="modal modal-fullscreen fade"
+         id="policy-modal"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="So-Sure Policy Terms"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <i class="fa fa-times fa-lg" aria-hidden="true"></i>
+                        <span class="sr-only">Close</span>
+                    </button>
+                    <h3>So-Sure Policy Terms</h3>
+                </div>
+                <div class="modal-body modal-policy">
+                    {{ render(controller('AppBundle:ApiView:policyTerms', {'id': policy.id, 'policy_key': policy_key, 'maxPotValue':  policy.maxPot, 'include': true })) }}
+                </div>
+            </div>
+        </div>
+    </div>
     {# End Page Modals #}
 
 {% endblock %}
