@@ -3173,7 +3173,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(200);
     }
 
-    public function testApiRenewCashbackDecline()
+    public function testApiRenewCashbackDeclineThenRenew()
     {
         $user = self::createUser(
             self::$userManager,
@@ -3219,6 +3219,13 @@ class ApiAuthControllerTest extends BaseControllerTest
             'number_payments' => '0',
             'cashback' => ['account_name' => 'foo', 'sort_code' => '123456', 'account_number' => '12345678'],
             'decline' => true
+        ]);
+        $data = $this->verifyResponse(200);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'number_payments' => '12',
+            'cashback' => ['account_name' => 'foo', 'sort_code' => '123456', 'account_number' => '12345678'],
+            'decline' => false
         ]);
         $data = $this->verifyResponse(200);
     }

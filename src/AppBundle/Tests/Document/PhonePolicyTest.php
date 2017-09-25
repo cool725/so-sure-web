@@ -3138,6 +3138,21 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_DECLINED_RENEWAL, $renewalPolicy->getStatus());
     }
 
+    public function testDeclineRenewThenRenew()
+    {
+        $policy = $this->getPolicy(static::generateEmail('testDeclineRenewThenRenew', $this));
+
+        $this->assertFalse($policy->isRenewed());
+
+        $renewalPolicy = $this->getRenewalPolicy($policy);
+        $renewalPolicy->declineRenew();
+        $this->assertEquals(Policy::STATUS_DECLINED_RENEWAL, $renewalPolicy->getStatus());
+
+        // should be able to renew after declining if still within timeframe
+        $renewalPolicy->renew(0);
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicy->getStatus());
+    }
+
     /**
      * @expectedException \Exception
      */

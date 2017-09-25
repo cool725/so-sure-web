@@ -1587,6 +1587,7 @@ abstract class Policy
             null,
             self::STATUS_PENDING,
             self::STATUS_PENDING_RENEWAL,
+            self::STATUS_DECLINED_RENEWAL,
             self::STATUS_MULTIPAY_REQUESTED,
             self::STATUS_MULTIPAY_REJECTED,
         ])) {
@@ -2797,6 +2798,7 @@ abstract class Policy
 
         if (!in_array($this->getStatus(), [
             self::STATUS_PENDING_RENEWAL,
+            self::STATUS_DECLINED_RENEWAL,
         ])) {
             return false;
         }
