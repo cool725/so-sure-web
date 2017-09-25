@@ -9,7 +9,9 @@ use AppBundle\Classes\Salva;
 use AppBundle\Event\PolicyEvent;
 use AppBundle\Document\Policy;
 use AppBundle\Document\SalvaPhonePolicy;
+use AppBundle\Document\Cashback;
 use AppBundle\Document\Payment\SoSurePayment;
+use AppBundle\Document\Payment\PolicyDiscountPayment;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\CurrencyTrait;
@@ -70,6 +72,32 @@ class RefundListener
                 ));
                 $policy->addPayment($sosurePayment);
                 $this->dm->flush();
+            }
+        }
+
+        if ($policy->isRefundAllowed() && $policy->hasPolicyDiscountPresent()) {
+            $totalDiscount = Payment::sumPayments($policy->getPayments(), false, PolicyDiscountPayment::class);
+            $total = $totalDiscount['total'];
+            $total = $this->toTwoDp($total - ($total * $policy->getProrataMultiplier($event->getDate())));
+            if ($this->greaterThanZero($total)) {
+                if ($policy->hasCashback()) {
+                    throw new \Exception(sprintf(
+                        'Unable to cancel w/cashback as already has cashback. %s %0.2f',
+                        $policy->getId(),
+                        $total
+                    ));
+                }
+                // Offset the policy discount
+                $policyDiscountPayment = new PolicyDiscountPayment();
+                $policyDiscountPayment->setAmount(0 - $total);
+                $policyDiscountPayment->setDate($event->getDate());
+                $policy->addPayment($policyDiscountPayment);
+
+                // and convert to cashback
+                $cashback = new Cashback();
+                $cashback->setStatus(Cashback::STATUS_MISSING);
+                $cashback->setAmount($total);
+                $policy->setCashback($cashback);
             }
         }
 

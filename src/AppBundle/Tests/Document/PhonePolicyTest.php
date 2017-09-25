@@ -4066,24 +4066,4 @@ class PhonePolicyTest extends WebTestCase
 
         return $policy;
     }
-
-    private function getRenewalPolicy($policy, $create = true)
-    {
-        $renewalPolicy = new SalvaPhonePolicy();
-        $renewalPolicy->setPhone(static::$phone);
-
-        $renewalPolicy->init($policy->getUser(), static::getLatestPolicyTerms(self::$dm));
-        if ($create) {
-            $renewalPolicy->create(rand(1, 999999), null, null, rand(1, 9999));
-            $renewalPolicy->setStart(new \DateTime("2017-01-01"));
-            $renewalPolicy->setEnd(new \DateTime("2017-12-31 23:59:59"));
-        } else {
-            $renewalPolicy->setPendingRenewalExpiration(new \DateTime("2016-12-31 23:59:59"));
-        }
-        $renewalPolicy->setStatus(Policy::STATUS_PENDING_RENEWAL);
-
-        $policy->link($renewalPolicy);
-
-        return $renewalPolicy;
-    }
 }
