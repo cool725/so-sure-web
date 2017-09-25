@@ -157,6 +157,26 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             if (count($pending) == 0) {
                 $lines[] = 'No pending cancellations';
             }
+
+            $lines[] = '';
+            $lines[] = '';
+            $lines[] = '';
+            $lines[] = 'Wait Claims';
+            $lines[] = '-------------';
+            $lines[] = '';
+            $repo = $dm->getRepository(Policy::class);
+            $waitClaimPolicies = $repo->findBy(['status' => Policy::STATUS_EXPIRED_WAIT_CLAIM]);
+            foreach ($waitClaimPolicies as $policy) {
+                $lines[] = sprintf(
+                    'Policy %s is expired with an active claim that needs resolving ASAP',
+                    $policy->getPolicyNumber()
+                );
+            }
+            if (count($waitClaimPolicies) == 0) {
+                $lines[] = 'No wait claimable policies';
+            }
+            $lines[] = '';
+            $lines[] = '';
         }
 
         if (!$skipEmail) {
