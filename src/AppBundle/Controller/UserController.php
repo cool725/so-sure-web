@@ -432,7 +432,7 @@ class UserController extends BaseController
         if ($policy->isRenewed()) {
             return $this->redirectToRoute('user_renew_completed', ['id' => $id]);
         } elseif ($policy->hasCashback()) {
-            return $this->redirectToRoute('user_renew_only_cashback', ['id' => $id]);
+            return $this->redirectToRoute('user_renew_declined', ['id' => $id]);
         }
 
         $this->denyAccessUnlessGranted(PolicyVoter::RENEW, $policy);
@@ -510,7 +510,7 @@ class UserController extends BaseController
             if ($policy->isRenewed()) {
                 return $this->redirectToRoute('user_renew_completed', ['id' => $id]);
             } elseif ($policy->hasCashback()) {
-                return $this->redirectToRoute('user_renew_only_cashback', ['id' => $id]);
+                return $this->redirectToRoute('user_renew_declined', ['id' => $id]);
             }
         }
 
@@ -537,6 +537,9 @@ class UserController extends BaseController
         $cashback->setStatus(Cashback::STATUS_PENDING_CLAIMABLE);
         $cashbackForm = $this->get('form.factory')
             ->createNamedBuilder('cashback_form', CashbackType::class, $cashback)
+            ->getForm();
+        $declineForm = $this->get('form.factory')
+            ->createNamedBuilder('decline_form')->add('decline', SubmitType::class)
             ->getForm();
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('renew_form')) {
@@ -620,6 +623,7 @@ class UserController extends BaseController
                 if ($cashbackForm->isValid()) {
                     $policyService = $this->get('app.policy');
                     $policyService->cashback($policy, $cashback);
+                    $policyService->declineRenew($policy);
 
                     $message = sprintf(
                         'Your request for cashback has been accepted.'
@@ -638,9 +642,33 @@ class UserController extends BaseController
                         )
                     );
                 }
+            } elseif ($request->request->has('decline_form')) {
+                $declineForm->handleRequest($request);
+                if ($declineForm->isValid()) {
+                    $policyService = $this->get('app.policy');
+                    $policyService->decline($policy);
+
+                    $message = sprintf(
+                        'Your request to terminate your policy has been accepted.'
+                    );
+                    $this->addFlash('success', $message);
+
+                    return new RedirectResponse(
+                        $this->generateUrl('user_renew_custom_policy', ['id' => $id])
+                    );
+                } else {
+                    $this->addFlash(
+                        'error',
+                        sprintf(
+                            "Sorry, there's a problem terminating your policy. Please try again or contact us. %s",
+                            $declineForm->getErrors()
+                        )
+                    );
+                }
             }
         }
 
+        // TODO: Adjust for declined
         if ($request->get('_route') != 'user_renew_retry_policy') {
             $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_RENEWAL, [
                 'Renew Type' => 'Custom',
@@ -658,6 +686,7 @@ class UserController extends BaseController
             'renew_form' => $renewForm->createView(),
             'renew_cashback_form' => $renewCashbackForm->createView(),
             'cashback_form' => $cashbackForm->createView(),
+            'decline_form' => $declineForm->createView(),
             'is_postback' => 'POST' === $request->getMethod(),
             'renew' => $renew,
         ];
@@ -711,10 +740,10 @@ class UserController extends BaseController
     }
 
     /**
-     * @Route("/renew/{id}/only-cashback", name="user_renew_only_cashback")
+     * @Route("/renew/{id}/declined", name="user_renew_declined")
      * @Template
      */
-    public function renewPolicyOnlyCashbackAction($id)
+    public function renewPolicyDeclinedAction($id)
     {
         $dm = $this->getManager();
         $policyRepo = $dm->getRepository(Policy::class);

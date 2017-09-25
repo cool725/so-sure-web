@@ -210,6 +210,10 @@
                     <div class="form-group">
                         <a href="#" data-toggle="modal" data-target="#cashbackModal" class="btn btn-blue btn-block btn-pad">Don't renew, just get cashback</a>
                     </div>
+                {% else %}
+                    <div class="form-group">
+                        <a href="#" data-toggle="modal" data-target="#declineModal" class="btn btn-blue btn-block btn-pad">Don't renew my policy</a>
+                    </div>                    
                 {% endif %}
                 <div class="form-group">
                     <a href="{{ path('user_renew_policy', {'id': policy.id}) }}" class="btn btn-blue-hollow btn-block btn-pad">Back</a>
@@ -318,12 +322,18 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h3 class="modal-title text-blue">Request cashback</h3>
+                <h3 class="modal-title text-blue">Terminate policy and request cashback</h3>
             </div>
             <div class="modal-body">
                 <p>
-                    Please use this form to request cashback. Note that it will take 28-45 days
-                    from the end of your policy before the bacs transfer will be sent.
+                    Use this form to terminate your policy and request cashback. 
+                </p>
+                <p>
+                    Note the following:
+                    <ul>
+                        <li>You entered into an annual contract for your policy. Your policy will end on {{ policy.end|date('d M Y', 'Europe/London')  }} and not be renewed.</li>
+                        <li>It will take 28-45 days from the end of your policy before the bacs transfer will be sent.</li>
+                    </ul>
                 </p>
                 {{ form_start(cashback_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form-cashback', 'autocomplete': 'off'}}) }}
                 <div class="form-group cashback--item">
@@ -339,10 +349,41 @@
                     <div class="help-block with-errors">{{ form_errors(cashback_form.accountNumber) }}</div>
                 </div>
                 <div class="form-group">
-                    {{ form_widget(cashback_form.cashback, {'label': 'Request cashback', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
+                    {{ form_widget(cashback_form.cashback, {'label': 'Terminate Policy & Request cashback', 'attr': {'class': 'btn btn-danger btn-block btn-pad'}}) }}
 
                 </div>
                 {{ form_end(cashback_form) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal modal-purchase fade"
+     id="declineModal"
+     tabindex="-1"
+     role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h3 class="modal-title text-blue">Terminate policy</h3>
+            </div>
+            <div class="modal-body">
+                <p>
+                    Use this form to terminate your policy. 
+                </p>
+                <p>
+                    Note the following:
+                    <ul>
+                        <li>You entered into an annual contract for your policy. Your policy will end on {{ policy.end|date('d M Y', 'Europe/London')  }} and not be renewed.</li>
+                    </ul>
+                </p>
+                {{ form_start(decline_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form-cashback', 'autocomplete': 'off'}}) }}
+                <div class="form-group">
+                    {{ form_widget(decline_form.decline, {'label': 'Terminate Policy', 'attr': {'class': 'btn btn-danger btn-block btn-pad'}}) }}
+
+                </div>
+                {{ form_end(decline_form) }}
             </div>
         </div>
     </div>

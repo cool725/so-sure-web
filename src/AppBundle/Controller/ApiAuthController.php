@@ -1146,6 +1146,7 @@ class ApiAuthController extends BaseController
             }
             $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
 
+            $policyService = $this->get('app.policy');
             $cashback = null;
             if (isset($data['cashback'])) {
                 $cashback = new Cashback();
@@ -1154,10 +1155,9 @@ class ApiAuthController extends BaseController
                 $cashback->setSortCode($this->getDataString($data['cashback'], 'sort_code'));
                 $cashback->setAccountNumber($this->getDataString($data['cashback'], 'account_number'));
                 $cashback->setStatus(Cashback::STATUS_PENDING_CLAIMABLE);
-                $cashback->setPolicy($policy);
+                $policyService->cashback($policy, $cashback);
             }
 
-            $policyService = $this->get('app.policy');
             if ($decline) {
                 $policyService->declineRenew($policy);
             } else {
