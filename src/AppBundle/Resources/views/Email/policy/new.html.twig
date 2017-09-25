@@ -17,6 +17,19 @@
 
 		   </div>
 		</div>
+	    {% if policy.phone.newHighDemand %}
+		<div style="font-size: 14px; text-align: left;">
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+			   Your {{ policy.phone }} has recently been released. Sadly this means that there is a market shortage
+			   of parts/phones available over the coming few weeks. Hence, we might be delayed in providing you a next
+			   day replacement or repair. As we know you can't live without a phone, if we can't fulfil your claim
+			   promptly, we will loan you an older model phone until we are able to get a replacement device to you.
+			   <br><br>
+		   </div>
+		</div>
+	    {% endif %}
+
 		<div style="font-size: 14px; text-align: left;">
 		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
 		   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">

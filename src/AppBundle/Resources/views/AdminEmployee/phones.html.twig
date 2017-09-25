@@ -19,6 +19,10 @@
           data-active="{{ path('admin_phone_active', {'id': phone.id}) }}"><i class="fa fa-power-off"></i></button>
   <button title="(Un)Highlight Phone" type="button" class="btn {% if phone.highlight %}btn-danger{% else %}btn-warning{% endif %} phone-highlight" data-token="{{ csrf_token('default') }}"
           data-highlight="{{ path('admin_phone_highlight', {'id': phone.id}) }}"><i class="fa fa-flash"></i></button>
+  <button title="Notify users there will be a delay with claims due to the phone being new and in high demand" type="button"
+          class="btn {% if phone.isNewHighDemand %}btn-danger{% else %}btn-warning{% endif %} phone-newhighdemand" data-token="{{ csrf_token('default') }}"
+          data-newhighdemand="{{ path('admin_phone_newhighdemand', {'id': phone.id}) }}">
+        <i class="fa fa-gift"></i></button>
 {% endmacro display_actions %}
 
 {% block stylesheets %}
@@ -434,6 +438,7 @@
             </div>
           </div>
           <div class="modal-footer">
+            <p>Remember to set active afterwards!</p>
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             {{ form_widget(new_phone.add, {'attr':{'class': 'btn btn-success'}}) }}
           </div>
