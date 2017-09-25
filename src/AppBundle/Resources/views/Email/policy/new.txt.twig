@@ -10,6 +10,10 @@ Your policy is for {{ policy.phone }} and runs from {{ policy.start | date('d M 
 
 We've also attached a copy of all your key documents, including your policy terms for reference. If you have any questions, please don't hesitate to contact us (support@wearesosure.com).
 
+{% if policy.phone.newHighDemand %}
+Your {{ policy.phone }} has recently beeen released and is high demand. This means that should you need to claim on your phone over the next couple of weeks, we may have delays in sourcing parts and/or a replacement device for you. In the case of repairs, this might involve an additional couple of days, or in the case of replacement, we will be able to offer you a slight older model phone as loan for a week or 2 until we are able to get a replacement device to you. 
+
+{% endif %}
 Cancel your policy now if your phone already has a cracked screen.
 
 We take fraud very seriously and do prosecute. When you purchased your policy, you confirmed that your phone was in full working condition and without a cracked screen. If you failed to disclose the state of your phone accurately, we may exercise our right to cancel the policy and will report any instance of fraud to the police.
