@@ -351,30 +351,28 @@ class DefaultController extends BaseController
             if ($request->request->has('claim_form')) {
                 $claimForm->handleRequest($request);
                 if ($claimForm->isValid()) {
-                    // @codingStandardsIgnoreStart
-                    $body = sprintf(
-                        "Name: %s<br>Policy Number: %s<br>Email: %s<br>Contact #: %s<br># Best time to reach: %s<br>Type of claim: %s<br>Message: %s<br>Signature: %s",
+                    $mailer = $this->get('app.mailer');
+                    $subject = sprintf(
+                        'New Claim from %s/%s',
                         $claimForm->getData()['name'],
-                        $claimForm->getData()['policyNumber'],
-                        $claimForm->getData()['email'],
-                        $claimForm->getData()['phone'],
-                        $claimForm->getData()['timeToReach'],
-                        $claimForm->getData()['type'],
-                        $claimForm->getData()['message'],
-                        $claimForm->getData()['signature']
+                        $claimForm->getData()['policyNumber']
                     );
-                    // @codingStandardsIgnoreEnd
+                    $mailer->sendTemplate(
+                        $subject,
+                        'claims@wearesosure.com',
+                        'AppBundle:Email:claim/fnolToClaims.html.twig',
+                        ['data' => $claimForm->getData()]
+                    );
 
-                    $message = \Swift_Message::newInstance()
-                        ->setSubject(sprintf(
-                            'New Claim from %s/%s',
-                            $claimForm->getData()['name'],
-                            $claimForm->getData()['policyNumber']
-                        ))
-                        ->setFrom('info@so-sure.com')
-                        ->setTo('claims@wearesosure.com')
-                        ->setBody($body, 'text/html');
-                    $this->get('mailer')->send($message);
+                    $mailer->sendTemplate(
+                        'Your claim with so-sure',
+                        $claimForm->getData()['email'],
+                        'AppBundle:Email:claim/fnolResponse.html.twig',
+                        ['data' => $claimForm->getData()],
+                        'AppBundle:Email:claim/fnolResponse.txt.twig',
+                        ['data' => $claimForm->getData()]
+                    );
+
                     $this->addFlash(
                         'success',
                         "Thanks. We'll be in touch shortly"
