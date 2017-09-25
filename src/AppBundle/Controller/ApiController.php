@@ -464,7 +464,7 @@ class ApiController extends BaseController
                 ],
                 false
             );
-            $policyTermsUrl = sprintf("%s%s", $this->getParameter('api_base_url'), $policyTermsRoute);
+            $policyTermsUrl = sprintf("%s%s", $this->getParameter('web_base_url'), $policyTermsRoute);
 
             return new JsonResponse($latestTerms->toApiArray($policyTermsUrl));
         } catch (ValidationException $ex) {

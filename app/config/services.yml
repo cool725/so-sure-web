@@ -387,7 +387,7 @@ services:
             router:               "@api.router"
             defaultSenderAddress: "%default_sender_address%"
             defaultSenderName:    "%default_sender_name%"
-            baseUrl:              "%api_base_url%"
+            baseUrl:              "%web_base_url%"
 
     app.ratelimit:
         class: AppBundle\Service\RateLimitService
