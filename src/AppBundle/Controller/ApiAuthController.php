@@ -1449,7 +1449,7 @@ class ApiAuthController extends BaseController
                 ],
                 false
             );
-            $policyTermsUrl = sprintf("%s%s", $this->getParameter('api_base_url'), $policyTermsRoute);
+            $policyTermsUrl = sprintf("%s%s", $this->getParameter('web_base_url'), $policyTermsRoute);
 
             return new JsonResponse($policy->getPolicyTerms()->toApiArray($policyTermsUrl));
         } catch (AccessDeniedException $ade) {

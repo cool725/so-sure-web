@@ -71,6 +71,8 @@ twig:
         environment: "%kernel.environment%"
         digits_consumer_key: "%digits_consumer_key%"
         form_client_validation: true
+        api_base_url: "%api_base_url%"
+        web_base_url: "%web_base_url%"
 
 doctrine_mongodb:
     connections:

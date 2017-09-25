@@ -5,7 +5,7 @@ so-sure - Reset your password
 {% endblock %}
 {% block body_text %}
 {% autoescape false %}
-You recently requested to reset your password on wearesosure.com. Please visit the following link to reset your password: {{confirmationUrl }}
+You recently requested to reset your password on wearesosure.com. Please visit the following link to reset your password: {{confirmationUrl|replace({api_base_url: web_base_url}) }}
 {% endautoescape %}
 {% endblock %}
 {% block body_html %}{% endblock %}
