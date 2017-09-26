@@ -13,7 +13,9 @@
     </li>
     <li>
         {% if upcoming_phone %}
-        <a href="{{ url('quote_make_model', {'make': upcoming_phone.make,'model': upcoming_phone.model}) }}">Quote - Upcoming Phone</a>
+        <a href="{{ url('quote_make_model', {'make': upcoming_phone.make,'model': upcoming_phone.model, 'force': 'old'}) }}">Quote - Upcoming Phone (old)</a>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="{{ url('quote_make_model', {'make': upcoming_phone.make,'model': upcoming_phone.model, 'force': 'split'}) }}">Quote - Upcoming Phone (split)</a>
         {% else %}
             No Upcoming Phone in DB
         {% endif %}
