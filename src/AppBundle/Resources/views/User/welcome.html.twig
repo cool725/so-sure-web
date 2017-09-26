@@ -104,10 +104,15 @@
 
     <section class="section--pad section--arrow user-welcome--slider">
         <div class="container">
-            <h4 class="text-center">Effective monthly premium after cashback:<br><small>(Cashback paid out end of policy year)</small></h4>
+            <h4 class="text-center">Effective monthly premium for your {{ policy.phone.make }} {{ policy.phone.model }} after cashback:<br><small>(Cashback paid out end of policy year)</small></h4>
 
             {# Set the start friends amount #}
-            {% set start_friends = policy.maxConnections / 2 %}
+            {% if policy.maxConnections is divisible by(2) %}
+                {% set start_friends = policy.maxConnections / 2 %}
+            {% else %}
+                {% set start_friends = policy.maxConnections / 3 %}
+            {% endif %}
+
 
             {# Set the amount of cashback #}
             {% set start_value = start_friends * policy.ConnectionValue %}
