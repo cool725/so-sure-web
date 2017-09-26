@@ -330,11 +330,11 @@
                 </p>
                 <p>
                     Note the following:
-                    <ul>
-                        <li>You entered into an annual contract for your policy. Your policy will end on {{ policy.end|date('d M Y', 'Europe/London')  }} and will not be renewed.</li>
-                        <li>It will take 28-45 days from the end of your policy before the bacs transfer will be sent.</li>
-                    </ul>
                 </p>
+                <ul style="margin-bottom: 20px;">
+                    <li>You entered into an annual contract for your policy. Your policy will end on {{ policy.end|date('d M Y', 'Europe/London')  }} and will not be renewed.</li>
+                    <li>It will take 28-45 days from the end of your policy before the bacs transfer will be sent.</li>
+                </ul>
                 {{ form_start(cashback_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form-cashback', 'autocomplete': 'off'}}) }}
                 <div class="form-group cashback--item">
                     {{ form_widget(cashback_form.accountName, {'attr': {'placeholder': 'Account Name', 'class': 'form-control'}}) }}
