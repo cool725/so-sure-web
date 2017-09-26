@@ -25,12 +25,23 @@
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
+{% block gtm_data %}
+    ,
+    'policy': {
+        'id': '{{ policy.id }}'
+    },
+    'affilinet': {
+        'rate': {% if policy.getPremiumPlan == 'monthly'%}1{% elseif policy.getPremiumPlan == 'yearly' %}2{% else %}-1{% endif %},
+        'gwp': {% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.gwp }}{% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyGwp }}{% else %}0{% endif %}
+    }
+{% endblock %}
+
 {% block body %}
 
     <section class="section--pad user-welcome--intro">
         <div class="container">
             <h1 class="text-white text-center">Welcome to so-sure, {{ policy.user.firstname }}</h1>
-            <p class="lead text-white text-center">You'll receive a confirmation email with full details of your policy shortly, but here's a summary:</p>
+            <p class="lead text-white text-center">Your <strong>{{ policy.phone.make }} {{ policy.phone.model }}</strong> is now protected against Theft, Loss, Accidental Damage and Breakdown. You'll receive a confirmation email with full details of your policy shortly, but here's a summary:</p>
             <div class="policy-roundup">
                 <div class="policy-roundup--inner">
                     <div class="row">
@@ -39,10 +50,28 @@
                         </div>
                         <div class="col-sm-8">
                             <ul class="list-unstyled">
-                                <li class="h3 h-light">Your <strong>{{ policy.phone.make }} {{ policy.phone.model }}</strong> is now insured!</li>
-                                <li class="h3 h-light">Your policy number is <strong>{{ policy.policyNumber }}</strong></li>
-                                <li class="h4 h-light">Your phone is now protected against: <br> <strong>Theft</strong>, <strong>Loss</strong>, <strong>Accidental Damage</strong> and <strong>Breakdown</strong>.</li>
-                                {# <li class="h4 text-red">Is your phone already damaged? <a href="#">Click here</a></li> #}
+                                <li class="h4 h-light">
+                                    Phone:<br>
+                                    <strong>{{ policy.phone.make }} {{ policy.phone.model }} {{ policy.phone.memory }}GB</strong>
+                                </li>
+                                <li class="h4 h-light">
+                                    Policy number:<br>
+                                    <strong>{{ policy.policyNumber }}</strong>
+                                </li>
+                                <li class="h4 h-light">
+                                    Cost:<br>
+                                    {% if policy.getPremiumPlan == 'monthly'%}
+                                        <strong>&pound;{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }}</strong> per month
+                                    {% elseif policy.getPremiumPlan == 'yearly' %}
+                                        <strong>&pound;{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }}</strong> a year
+                                    {% else %}
+                                        Unknown
+                                    {% endif %}
+                                </li>
+                                <li class="h4 h-light">
+                                    Start/End Date:<br>
+                                    <strong>{{ policy.start|date('jS F Y') }}</strong> - <strong>{{ policy.end|date('jS F Y') }}</strong>
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -75,9 +104,9 @@
 
     <section class="section--pad section--arrow user-welcome--slider">
         <div class="container">
-            Reward slider
+            Reward slider TODO
             {# TODO #}
-            {% include 'AppBundle::Default/_rewardSlider.html.twig' %}
+            {% include 'AppBundle::Default/_rewardSliderUser.html.twig' %}
         </div>
     </section>
 

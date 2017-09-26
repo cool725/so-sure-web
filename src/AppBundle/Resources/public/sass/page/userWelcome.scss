@@ -28,6 +28,7 @@ p {
 
     &--intro {
         background-color: $primary-blue;
+        padding-bottom: 0;
 
         .container {
             position: relative;
@@ -82,7 +83,7 @@ p {
 
         @include breakpoint(tablet) {
             // margin-bottom: 400px;
-            padding-top: 300px;
+            padding-top: 350px;
         }
     }
 
