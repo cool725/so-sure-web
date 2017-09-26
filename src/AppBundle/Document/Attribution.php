@@ -9,6 +9,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 use VasilDakov\Postcode\Postcode;
+use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 
 /**
  * @MongoDB\EmbeddedDocument
@@ -116,7 +117,9 @@ class Attribution
 
     public function setReferer($referer)
     {
-        $this->referer = $referer;
+        $validator = new AlphanumericSpaceDotValidator();
+
+        $this->referer = $validator->conform(substr($referer, 0, 1500));
     }
 
     public function getReferer()
