@@ -314,7 +314,7 @@ abstract class Policy
      * @MongoDB\Date()
      * @Gedmo\Versioned
      */
-    protected $pendingRenewalExpiration;
+    protected $renewalExpiration;
 
     /**
      * @Assert\Range(min=0,max=200)
@@ -849,14 +849,14 @@ abstract class Policy
         $this->pendingCancellation = $pendingCancellation;
     }
 
-    public function getPendingRenewalExpiration()
+    public function getRenewalExpiration()
     {
-        return $this->pendingRenewalExpiration;
+        return $this->renewalExpiration;
     }
 
-    public function setPendingRenewalExpiration(\DateTime $pendingRenewalExpiration = null)
+    public function setRenewalExpiration(\DateTime $renewalExpiration = null)
     {
-        $this->pendingRenewalExpiration = $pendingRenewalExpiration;
+        $this->renewalExpiration = $renewalExpiration;
     }
 
     public function getStatus()
@@ -2803,7 +2803,7 @@ abstract class Policy
             return false;
         }
 
-        if ($this->getPendingRenewalExpiration() && $date > $this->getPendingRenewalExpiration()) {
+        if ($this->getRenewalExpiration() && $date > $this->getRenewalExpiration()) {
             return false;
         }
 
@@ -2822,7 +2822,7 @@ abstract class Policy
             return false;
         }
 
-        if (!$this->getPendingRenewalExpiration() || $date < $this->getPendingRenewalExpiration()) {
+        if (!$this->getRenewalExpiration() || $date < $this->getRenewalExpiration()) {
             return false;
         }
 
@@ -2862,7 +2862,7 @@ abstract class Policy
 
         $this->setStatus(Policy::STATUS_RENEWAL);
         // clear the max allowed renewal date
-        $this->setPendingRenewalExpiration(null);
+        $this->setRenewalExpiration(null);
 
         if ($discount && $discount > 0) {
             if (!$this->areEqualToTwoDp($discount, $this->getPreviousPolicy()->getPotValue())) {
@@ -2989,7 +2989,7 @@ abstract class Policy
         $this->setPolicyDetailsForPendingRenewal($newPolicy, $this->getEnd());
         $newPolicy->setStatus(Policy::STATUS_PENDING_RENEWAL);
         // don't allow renewal after the end the current policy
-        $newPolicy->setPendingRenewalExpiration($this->getEnd());
+        $newPolicy->setRenewalExpiration($this->getEnd());
 
         $newPolicy->init($this->getUser(), $terms);
 

@@ -1178,7 +1178,14 @@ class PolicyService
     {
         $repo = $this->dm->getRepository(Policy::class);
 
-        return $repo->findPendingRenewalPoliciesForUnRenewed($date);
+        return $repo->findDeclinedRenewalPoliciesForUnRenewed($date);
+    }
+
+    public function getPoliciesForRenew(\DateTime $date = null)
+    {
+        $repo = $this->dm->getRepository(Policy::class);
+
+        return $repo->findPendingRenewalPoliciesForRenewed($date);
     }
 
     public function cancelPoliciesPendingCancellation($prefix = null, $dryRun = false, \DateTime $date = null)
@@ -1227,6 +1234,31 @@ class PolicyService
         }
 
         return $expired;
+    }
+
+    public function renewPolicies($prefix = null, $dryRun = false, \DateTime $date = null)
+    {
+        // Have a feeling I will need prefix in the future here
+        \AppBundle\Classes\NoOp::ignore([$prefix]);
+
+        $renewed = [];
+        $policies = $this->getPoliciesForRenew($date);
+        foreach ($policies as $policy) {
+            $renewed[$policy->getId()] = $policy->getPolicyNumber();
+            if (!$dryRun) {
+                try {
+                    $this->renewDefault($policy, $date);
+                } catch (\Exception $e) {
+                    $msg = sprintf(
+                        'Error Renewing Policy %s',
+                        $policy->getId()
+                    );
+                    $this->logger->error($msg, ['exception' => $e]);
+                }
+            }
+        }
+
+        return $renewed;
     }
 
     public function cancelUnpaidPolicies($prefix, $dryRun = false)
@@ -1579,6 +1611,11 @@ class PolicyService
             $textTemplate,
             $data
         );
+    }
+
+    public function renewDefault(Policy $policy, \DateTime $date = null)
+    {
+        return $this->renew($policy, $policy->getPremiumInstallmentCount(), null, $date);
     }
 
     public function renew(Policy $policy, $numPayments, Cashback $cashback = null, \DateTime $date = null)

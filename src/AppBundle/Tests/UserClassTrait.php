@@ -424,7 +424,7 @@ trait UserClassTrait
             $renewalPolicy->setStart($date);
             $renewalPolicy->setEnd($end);
         } else {
-            $renewalPolicy->setPendingRenewalExpiration($exp);
+            $renewalPolicy->setRenewalExpiration($exp);
         }
         $renewalPolicy->setStatus(Policy::STATUS_PENDING_RENEWAL);
 

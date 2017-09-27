@@ -2566,7 +2566,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->setStatus(Policy::STATUS_PENDING_RENEWAL);
         $this->assertFalse($policy->isUnRenewalAllowed());
 
-        $policy->setPendingRenewalExpiration(new \DateTime('2017-09-13 23:59:00'));
+        $policy->setRenewalExpiration(new \DateTime('2017-09-13 23:59:00'));
         $this->assertTrue($policy->isUnRenewalAllowed());
         $this->assertTrue($policy->isUnRenewalAllowed(new \DateTime('2017-09-14 00:00')));
         $this->assertFalse($policy->isUnRenewalAllowed(new \DateTime('2017-09-13 23:00')));
@@ -3594,13 +3594,13 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($policy->isRenewed());
 
         $renewalPolicy = $this->getRenewalPolicy($policy, false);
-        $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $renewalPolicy->getPendingRenewalExpiration());
+        $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $renewalPolicy->getRenewalExpiration());
 
         $this->assertTrue($renewalPolicy->isRenewalAllowed(new \DateTime('2016-12-31 23:59')));
         $this->assertFalse($renewalPolicy->isRenewalAllowed(new \DateTime('2017-01-01')));
 
         $renewalPolicy->renew(0, new \DateTime('2016-12-15'));
-        $this->assertNull($renewalPolicy->getPendingRenewalExpiration());
+        $this->assertNull($renewalPolicy->getRenewalExpiration());
     }
 
     public function testUnRenew()
@@ -3610,7 +3610,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($policy->isRenewed());
 
         $renewalPolicy = $this->getRenewalPolicy($policy, false);
-        $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $renewalPolicy->getPendingRenewalExpiration());
+        $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $renewalPolicy->getRenewalExpiration());
 
         $this->assertTrue($renewalPolicy->isRenewalAllowed(new \DateTime('2016-12-31 23:59')));
         $this->assertFalse($renewalPolicy->isRenewalAllowed(new \DateTime('2017-01-01')));
@@ -3629,7 +3629,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($policy->isRenewed());
 
         $renewalPolicy = $this->getRenewalPolicy($policy, false);
-        $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $renewalPolicy->getPendingRenewalExpiration());
+        $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $renewalPolicy->getRenewalExpiration());
 
         $this->assertTrue($renewalPolicy->isRenewalAllowed(new \DateTime('2016-12-31 23:59')));
         $this->assertFalse($renewalPolicy->isRenewalAllowed(new \DateTime('2017-01-01')));
@@ -3650,7 +3650,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($policy->isRenewed());
 
         $renewalPolicy = $this->getRenewalPolicy($policy, false);
-        $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $renewalPolicy->getPendingRenewalExpiration());
+        $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $renewalPolicy->getRenewalExpiration());
 
         $this->assertTrue($renewalPolicy->isRenewalAllowed(new \DateTime('2016-12-31 23:59')));
         $this->assertFalse($renewalPolicy->isRenewalAllowed(new \DateTime('2017-01-01')));
@@ -3679,7 +3679,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($policy->isRenewed());
 
         $renewalPolicy = $this->getRenewalPolicy($policy, false);
-        $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $renewalPolicy->getPendingRenewalExpiration());
+        $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $renewalPolicy->getRenewalExpiration());
 
         $renewalPolicy->setStatus(Policy::STATUS_RENEWAL);
 
@@ -3696,7 +3696,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($policy->isRenewed());
 
         $renewalPolicy = $this->getRenewalPolicy($policy, false);
-        $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $renewalPolicy->getPendingRenewalExpiration());
+        $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $renewalPolicy->getRenewalExpiration());
 
         $this->assertTrue($renewalPolicy->isRenewalAllowed(new \DateTime('2016-12-31 23:59')));
         $this->assertFalse($renewalPolicy->isRenewalAllowed(new \DateTime('2017-01-01')));
@@ -3717,7 +3717,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($policy->isRenewed());
 
         $renewalPolicy = $this->getRenewalPolicy($policy, false);
-        $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $renewalPolicy->getPendingRenewalExpiration());
+        $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $renewalPolicy->getRenewalExpiration());
 
         $this->assertTrue($renewalPolicy->isRenewalAllowed(new \DateTime('2016-12-31 23:59')));
         $this->assertFalse($renewalPolicy->isRenewalAllowed(new \DateTime('2017-01-01')));
