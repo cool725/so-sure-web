@@ -10,13 +10,13 @@
     background-color: $white;
 }
 
-p {
-	max-width: 800px;
-	margin-left: auto;
-	margin-right: auto;
-}
-
 .learn-more {
+
+	p {
+		max-width: 800px;
+		margin-left: auto;
+		margin-right: auto;
+	}
 
 	&--intro {
 		background-color: $primary-blue;
