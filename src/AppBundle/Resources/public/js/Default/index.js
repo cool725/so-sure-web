@@ -15,8 +15,6 @@ $(function(){
 
         e.preventDefault();
 
-        console.log(nav);
-
         var anchor = $(this).data('scroll-to-anchor');
         var focus  = $(this).data('scroll-to-focus');
 
