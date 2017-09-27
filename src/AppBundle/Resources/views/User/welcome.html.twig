@@ -104,50 +104,13 @@
 
     <section class="section--pad section--arrow user-welcome--slider">
         <div class="container">
-            <h4 class="text-center">Effective monthly premium for your {{ policy.phone.make }} {{ policy.phone.model }} after cashback:<br><small>(Cashback paid out end of policy year)</small></h4>
-
-            {# Set the start friends amount #}
-            {% if policy.maxConnections is divisible by(2) %}
-                {% set start_friends = policy.maxConnections / 2 %}
-            {% else %}
-                {% set start_friends = policy.maxConnections / 3 %}
-            {% endif %}
-
-
-            {# Set the amount of cashback #}
-            {% set start_value = start_friends * policy.ConnectionValue %}
-
-            {# If greater than max pot, pot max is start value #}
-            {% if start_value > policy.MaxPot %}
-                {% set start_value = policy.MaxPot %}
-            {% endif %}
-
-            {# Start amount and work out monthly #}
-            {% set start_premium = policy.premium.yearlyPremiumPrice - start_value %}
-            {% set monthly_premium = start_premium / 12 %}
-
-            <div class="reward-slider">
-
-                <div class="slide-me">
-                    <img src="{{ cdn_url }}/images/quote-page/so-sure_arrow-slide-me.svg" alt="">
-                </div>
-
-                <output for="range" class="rewardslider__output">
-                    <span id="premium" class="h3 text-white">£{{ monthly_premium|number_format(2, '.', ',') }}</span><br>
-                    <small class="text-nowrap">per month</small>
-                </output>
-                <input type="range"
-                       id="reward-slider"
-                       min="0"
-                       max="{{ policy.maxConnections }}"
-                       value="{{ start_friends }}"
-                       data-maxpot="{{ policy.maxPot }}"
-                       data-connection-value="{{ policy.connectionValue }}"
-                       data-premium="{{ policy.premium.yearlyPremiumPrice }}"
-                       data-monthly-premium="{{ monthly_premium }}"
-                       >
-            </div>
-            <h4 class="text-blue text-center">Number of connections</h4>
+            {# Set vars for slider #}
+            {% set max_connections = policy.maxConnections %}
+            {% set connection_value = policy.ConnectionValue %}
+            {% set max_pot = policy.MaxPot %}
+            {% set annual_premium = policy.premium.yearlyPremiumPrice %}
+            {# Include reward slider hide title #}
+            {% include 'AppBundle::Default/_rewardSlider.html.twig' with { show_title: false} %}
         </div>
     </section>
 
