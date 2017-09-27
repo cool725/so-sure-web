@@ -136,7 +136,7 @@
                         </div>
                         {{ form_end(renew_form) }}
                     </div>
-                    <div id="#policy-doc" class="modal-body__policy-doc" style="display:none;">
+                    <div id="policy-doc" class="modal-body__policy-doc" style="display:none;">
                         <button type="button" class="close policy-doc-toggle" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                         {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot, 'include': true })) }}
                     </div>

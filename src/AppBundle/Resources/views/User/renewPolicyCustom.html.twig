@@ -253,7 +253,7 @@
                     <ol>
                         <li>My phone is in full working condition and my screen is not cracked.</li>
                         <li>I am a resident of the United Kingdom.</li>
-                        <li>I have read &amp; understood the <a class="policy-doc-toggle" href="#policy-doc">so-sure policy document</a>.</li>
+                        <li>I have read &amp; understood the <a class="policy-doc-toggle" href="#policy-doc-1">so-sure policy document</a>.</li>
                     </ol>
                     <p>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</p>
                     <div class="form-group">
@@ -261,9 +261,9 @@
                     </div>
                     {{ form_end(renew_form) }}
                 </div>
-                <div id="#policy-doc" class="modal-body__policy-doc" style="display:none;">
+                <div id="policy-doc-1" class="modal-body__policy-doc" style="display:none;">
                     <button type="button" class="close policy-doc-toggle" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot })) }}
+                    {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot, 'include': true })) }}
                 </div>
             </div>
         </div>
@@ -285,7 +285,7 @@
                     <ol>
                         <li>My phone is in full working condition and my screen is not cracked.</li>
                         <li>I am a resident of the United Kingdom.</li>
-                        <li>I have read &amp; understood the <a class="policy-doc-toggle" href="#policy-doc">so-sure policy document</a>.</li>
+                        <li>I have read &amp; understood the <a class="policy-doc-toggle" href="#policy-doc-2">so-sure policy document</a>.</li>
                     </ol>
                     <p>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</p>
                     <div class="form-group">
@@ -305,9 +305,9 @@
                     </div>
                     {{ form_end(renew_cashback_form) }}
                 </div>
-                <div id="#policy-doc" class="modal-body__policy-doc" style="display:none;">
+                <div id="policy-doc-2" class="modal-body__policy-doc" style="display:none;">
                     <button type="button" class="close policy-doc-toggle" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot })) }}
+                    {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot, 'include': true })) }}
                 </div>
             </div>
         </div>
@@ -378,7 +378,7 @@
                 <ul style="margin-bottom: 20px;">
                     <li>You entered into an annual contract for your policy. Your policy will end on {{ policy.end|date('d M Y', 'Europe/London')  }} and will not be renewed.</li>
                 </ul>
-                {{ form_start(decline_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form-cashback', 'autocomplete': 'off'}}) }}
+                {{ form_start(decline_form) }}
                 <div class="form-group">
                     {{ form_widget(decline_form.decline, {'label': 'Terminate Policy', 'attr': {'class': 'btn btn-danger btn-block btn-pad'}}) }}
                 </div>
