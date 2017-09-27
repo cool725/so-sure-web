@@ -3827,6 +3827,18 @@ abstract class Policy
         ]);
     }
 
+    public function isRenewalDeclined()
+    {
+        // partial renewal policy wasn't created
+        if (!$this->hasNextPolicy()) {
+            return false;
+        }
+
+        return in_array($this->getNextPolicy()->getStatus(), [
+            Policy::STATUS_DECLINED_RENEWAL,
+        ]);
+    }
+
     public function isRenewal()
     {
         if (!$this->hasPreviousPolicy()) {

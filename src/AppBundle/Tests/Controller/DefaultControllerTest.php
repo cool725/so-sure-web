@@ -77,7 +77,6 @@ class DefaultControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(301);
         $this->assertTrue(self::$client->getResponse()->isRedirect($redirectUrl));
-        self::verifyResponse(302);
         $crawler = self::$client->followRedirect();
         self::verifyResponse(200);
     }

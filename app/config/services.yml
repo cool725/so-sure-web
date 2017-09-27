@@ -680,6 +680,7 @@ services:
             -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
             -  { name: kernel.event_listener, event: event.policy.renewed, method: onPolicyRenewedEvent }
             -  { name: kernel.event_listener, event: event.policy.cashback, method: onPolicyCashbackEvent }
+            -  { name: kernel.event_listener, event: event.policy.declined-renewal, method: onPolicyDeclineRenewedEvent }
 
     app.listener.push:
         class:   AppBundle\Listener\PushListener

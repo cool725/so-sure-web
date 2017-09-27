@@ -431,7 +431,7 @@ class UserController extends BaseController
 
         if ($policy->isRenewed()) {
             return $this->redirectToRoute('user_renew_completed', ['id' => $id]);
-        } elseif ($policy->hasCashback()) {
+        } elseif ($policy->hasCashback() || $policy->isRenewalDeclined()) {
             return $this->redirectToRoute('user_renew_declined', ['id' => $id]);
         }
 
@@ -653,7 +653,7 @@ class UserController extends BaseController
                     $this->addFlash('success', $message);
 
                     return new RedirectResponse(
-                        $this->generateUrl('user_renew_custom_policy', ['id' => $id])
+                        $this->generateUrl('user_renew_declined', ['id' => $id])
                     );
                 } else {
                     $this->addFlash(
@@ -751,10 +751,11 @@ class UserController extends BaseController
             throw $this->createNotFoundException('Policy not found');
         }
 
-        if (!$policy->hasCashback()) {
-            return $this->redirectToRoute('user_renew_policy', ['id' => $id]);
-        }
-        $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
+        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+
+        $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_RENEWAL, [
+            'Renew Type' => 'Declined',
+        ]);
 
         return [
             'policy' => $policy,

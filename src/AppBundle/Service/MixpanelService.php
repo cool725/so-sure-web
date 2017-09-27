@@ -55,6 +55,7 @@ class MixpanelService
     const EVENT_RENEWAL = 'Renewal Page';
     const EVENT_RENEW = 'Renew Policy';
     const EVENT_CASHBACK = 'Cashback';
+    const EVENT_DECLINE_RENEW = 'Decline Renew Policy';
 
     const CUSTOM_TOTAL_SITE_VISITORS = '$custom_event:379938';
     const CUSTOM_QUOTE_PAGE_UK = '$custom_event:458980';
