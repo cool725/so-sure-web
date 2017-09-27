@@ -81,7 +81,7 @@
                     </a></li>
                     {% if policy is defined and policy %}
                         {% if policy.displayRenewal %}
-                            <li role="presentation" class="{% if app.request.get('_route') == 'user_renew_policy' or app.request.get('_route') == 'user_renew_policy_any' or app.request.get('_route') == 'user_renew_custom_policy' %}active{% endif %}"><a href="{{ path('user_renew_policy', {'id': policy.id }) }}">Renew your policy</a></li>
+                            <li id="user-homepage--nav-renew" role="presentation" class="{% if app.request.get('_route') == 'user_renew_policy' or app.request.get('_route') == 'user_renew_policy_any' or app.request.get('_route') == 'user_renew_custom_policy' %}active{% endif %}"><a href="{{ path('user_renew_policy', {'id': policy.id }) }}">Renew your policy</a></li>
                         {% endif %}
                     {% endif %}
                 </ul>

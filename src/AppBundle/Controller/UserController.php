@@ -622,8 +622,7 @@ class UserController extends BaseController
                 $cashbackForm->handleRequest($request);
                 if ($cashbackForm->isValid()) {
                     $policyService = $this->get('app.policy');
-                    $policyService->cashback($policy, $cashback);
-                    $policyService->declineRenew($policy);
+                    $policyService->declineRenew($policy, $cashback);
 
                     $message = sprintf(
                         'Your request for cashback has been accepted.'
@@ -646,7 +645,7 @@ class UserController extends BaseController
                 $declineForm->handleRequest($request);
                 if ($declineForm->isValid()) {
                     $policyService = $this->get('app.policy');
-                    $policyService->decline($policy);
+                    $policyService->declineRenew($policy);
 
                     $message = sprintf(
                         'Your request to terminate your policy has been accepted.'

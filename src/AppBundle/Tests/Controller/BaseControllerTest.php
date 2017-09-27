@@ -19,6 +19,7 @@ class BaseControllerTest extends WebTestCase
     protected static $router;
     protected static $redis;
     protected static $policyService;
+    protected static $invitationService;
 
     public function tearDown()
     {
@@ -35,6 +36,7 @@ class BaseControllerTest extends WebTestCase
         self::$jwt = self::$container->get('app.jwt');
         self::$redis = self::$container->get('snc_redis.default');
         self::$policyService = self::$container->get('app.policy');
+        self::$invitationService = self::$container->get('app.invitation');
     }
     
     public function setUp()
@@ -139,5 +141,7 @@ class BaseControllerTest extends WebTestCase
                 self::$client->getHistory()->current()->getUri()
             );
         }
+
+        return $crawler;
     }
 }
