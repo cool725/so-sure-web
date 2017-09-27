@@ -46,8 +46,8 @@
     <section id="quote" class="quote-container">
 
         {% if coming_soon %}
-        <h1 class="h2">Better cover for your <span class="text-white">{{ phone }} is coming soon!</span>
-        </h1>
+            <h1 class="h2">Better cover for your <span class="text-white">{{ phone }} is coming soon!</span>
+            </h1>
         {% else %}
         <h1 class="h2">
             Insurance for your
@@ -84,44 +84,37 @@
             <div class="row">
                 <div class="col-md-12">
                     <div id="cover-price" class="quote-cost text-center">
-                        {{ form_start(buy_form) }}
-                        <div class="text-center h4">
-                            {% if phone.initialPrice > 0 %}
-                                If your phone is stolen/lost, replacing it costs <strong>£{{ phone.initialPrice }}</strong> 😧
-                            {% endif %}
-                            Get peace of mind for:</div>
-                        <div class="row">
-                            {% if coming_soon %}
-                                <div class="col-sm-6">
-                                    <div class="h1 price">
-                                        Pricing coming soon!
-                                        <strong>£4.99 - £9.99</strong>
-                                        <small>per month (typical policy pricing)</small><br>
+                        {% if coming_soon %}
+                            <h2>Pricing coming soon!</h2>
+                            <p class="h2"><strong>£4.99 - £9.99 per month</strong><p>
+                            <p>(typical policy pricing)</p>
+                        {% else %}
+                            {{ form_start(buy_form) }}
+                                <div class="text-center h4">
+                                    {% if phone.initialPrice > 0 %}
+                                        If your phone is stolen/lost, replacing it costs <strong>£{{ phone.initialPrice }}</strong> 😧
+                                    {% endif %}
+                                    Get peace of mind for:
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="h1 price">
+                                            <strong>£{{ phone_price.monthlyPremiumPrice }}</strong>
+                                            <small>per month</small><br>
+                                        </div>
+                                        <span>£50 Excess (£70 for Theft &amp; Loss)</span>
                                     </div>
-                                    <span>£50 Excess (£70 for Theft &amp; Loss)</span>
-                                </div>
-                                <div class="col-sm-6">
-                                    {{ form_widget(buy_form.buy_tablet, {'label': 'COMING SOON!', 'attr': {'class': 'btn btn-success  btn-block disabled'}}) }}
-                                </div>
-                            {% else %}
-                                <div class="col-sm-6">
-                                    <div class="h1 price">
-                                        <strong>£{{ phone_price.monthlyPremiumPrice }}</strong>
-                                        <small>per month</small><br>
+                                    <div class="col-sm-6">
+                                        {{ form_widget(buy_form.buy_tablet, {'label': 'Get Started', 'attr': {'class': 'btn btn-success btn-lg  btn-block'}}) }}
+                                        <ul class="list-inline">
+                                            <li>
+                                                <small><a href="#" data-toggle="modal" data-target="#policy-modal" id="policy-modal-trigger">Full Terms &amp; Conditions</a></small>
+                                            </li>
+                                        </ul>
                                     </div>
-                                    <span>£50 Excess (£70 for Theft &amp; Loss)</span>
                                 </div>
-                                <div class="col-sm-6">
-                                    {{ form_widget(buy_form.buy_tablet, {'label': 'Get Started', 'attr': {'class': 'btn btn-success btn-lg  btn-block'}}) }}
-                                    <ul class="list-inline">
-                                        <li>
-                                            <small><a href="#" data-toggle="modal" data-target="#policy-modal" id="policy-modal-trigger">Full Terms &amp; Conditions</a></small>
-                                        </li>
-                                    </ul>
-                                </div>
-                            {% endif %}
-                        </div>
-                        {{ form_end(buy_form) }}
+                            {{ form_end(buy_form) }}
+                        {% endif %}
                     </div>
                 </div>
             </div>
