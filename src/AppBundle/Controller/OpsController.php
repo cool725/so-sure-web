@@ -251,7 +251,6 @@ class OpsController extends BaseController
         return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'Queued', 200);
     }
 
-
     /**
      * @Route("/csp", name="ops_csp")
      */
@@ -338,5 +337,23 @@ class OpsController extends BaseController
         );
 
         return new Response('', 204);
+    }
+
+    /**
+     * @Route("/validation", name="ops_validation")
+     */
+    public function validationAction(Request $request)
+    {
+        $logger = $this->get('logger');
+        $validation = $request->getContent();
+        if (empty($validation)) {
+            $logger->debug('Validation Endpoint called without data');
+
+            return new JsonResponse();
+        }
+        // TODO: Check client ip and escilate to warning if retried several times
+        $logger->info(sprintf('Validation Endpoint %s', $validation));
+
+        return new JsonResponse();
     }
 }

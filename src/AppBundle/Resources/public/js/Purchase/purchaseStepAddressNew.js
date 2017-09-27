@@ -82,8 +82,22 @@ sosure.purchaseStepAddress = (function() {
 
             submitHandler: function(form) {
                 form.submit();
-            }
+            },
 
+            showErrors: function(errorMap, errorList) {
+                this.defaultShowErrors();
+                var vals = [];
+                for (var err in errorMap) {
+                    var val = $('body').find('input[name="' + err + '"]').val()
+                    vals.push({'name': err, 'value': val, 'message': errorMap[err]});
+                }
+                $.ajax({
+                  method: "POST",
+                  dataType: "json",
+                  url: "/ops/validation",
+                  data: { 'errors': vals }
+                });
+            }
         });
     }
 
