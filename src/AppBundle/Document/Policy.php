@@ -3811,6 +3811,19 @@ abstract class Policy
         return !in_array($this->getNextPolicy()->getStatus(), [
             Policy::STATUS_PENDING_RENEWAL,
             Policy::STATUS_UNRENEWED,
+            Policy::STATUS_DECLINED_RENEWAL,
+        ]);
+    }
+
+    public function isRenewalPending()
+    {
+        // partial renewal policy wasn't created
+        if (!$this->hasNextPolicy()) {
+            return false;
+        }
+
+        return in_array($this->getNextPolicy()->getStatus(), [
+            Policy::STATUS_PENDING_RENEWAL,
         ]);
     }
 

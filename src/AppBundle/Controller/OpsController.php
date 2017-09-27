@@ -221,7 +221,7 @@ class OpsController extends BaseController
     {
         $user = $policy->getUser();
         if ($user->canRenewPolicy($policy) && $policy->isInRenewalTimeframe() &&
-            !$policy->isRenewed() && !$policy->hasCashback()) {
+            $policy->isRenewalPending() && !$policy->hasCashback()) {
             if ((!$hasPot && $policy->getPotValue() == 0) || ($hasPot && $policy->getPotValue() > 0)) {
                 if ((!$yearlyOnly && $user->allowedMonthlyPayments()) ||
                     ($yearlyOnly && !$user->allowedMonthlyPayments())) {
