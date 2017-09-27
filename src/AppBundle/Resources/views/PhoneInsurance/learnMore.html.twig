@@ -58,7 +58,14 @@
 
     <section class="section--pad learn-more--download">
         <div class="container">
-            {% include 'AppBundle::Default/_appDownload.html.twig' %}
+            {% if phone.isITunes %}
+                {% set set_type = 'apple' %}
+            {% elseif phone.isGooglePlay %}
+                {% set set_type = 'play' %}
+            {% else %}
+                {% set set_type = '' %}
+            {% endif %}
+            {% include 'AppBundle::Default/_appDownload.html.twig' with { type: set_type } %}
         </div>
     </section>
 
