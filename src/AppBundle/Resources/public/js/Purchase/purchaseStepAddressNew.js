@@ -6,6 +6,7 @@ sosure.purchaseStepAddress = (function() {
     self.delayTimer = null;
     self.focusTimer = null;
     self.name_email_changed = null;
+    self.url = null;
 
     self.init = function() {
         self.form = $('.validate-form');
@@ -13,6 +14,7 @@ sosure.purchaseStepAddress = (function() {
         if (self.form.data('client-validation')) {
             self.addValidation();
         }
+        self.url = window.location.href;
     }
 
     self.dobMask = function () {
@@ -93,9 +95,10 @@ sosure.purchaseStepAddress = (function() {
                 }
                 $.ajax({
                   method: "POST",
-                  dataType: "json",
                   url: "/ops/validation",
-                  data: { 'errors': vals }
+                  contentType:"application/json; charset=utf-8",
+                  dataType:"json",
+                  data: JSON.stringify({ 'errors': vals, 'url': self.url })
                 });
             }
         });

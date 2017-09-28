@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -341,18 +342,15 @@ class OpsController extends BaseController
 
     /**
      * @Route("/validation", name="ops_validation")
+     * @Method({"POST"})
      */
     public function validationAction(Request $request)
     {
         $logger = $this->get('logger');
-        $validation = $request->getContent();
-        if (empty($validation)) {
-            $logger->debug('Validation Endpoint called without data');
-
-            return new JsonResponse();
-        }
-        // TODO: Check client ip and escilate to warning if retried several times
-        $logger->info(sprintf('Validation Endpoint %s', $validation));
+        $data = json_decode($request->getContent(), true);
+        $now = new \DateTime();
+        $this->get('snc_redis.default')->hset('client-validation', json_encode($data), $now->format('U'));
+        $logger->debug(sprintf('Validation Endpoint %s', json_encode($data)));
 
         return new JsonResponse();
     }
