@@ -132,7 +132,7 @@ class SlackCommand extends ContainerAwareCommand
         $lines = [];
         $now = new \DateTime();
         foreach ($policies as $policy) {
-            $diff = $now->diff($policy->getPendingRenewalExpiration());
+            $diff = $now->diff($policy->getRenewalExpiration());
             if (!in_array($diff->days, [5])) {
                 continue;
             }

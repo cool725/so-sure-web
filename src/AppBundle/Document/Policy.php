@@ -62,6 +62,7 @@ abstract class Policy
     const STATUS_MULTIPAY_REJECTED = 'multipay-rejected';
     const STATUS_RENEWAL = 'renewal';
     const STATUS_PENDING_RENEWAL = 'pending-renewal';
+    const STATUS_DECLINED_RENEWAL = 'declined-renewal';
     const STATUS_UNRENEWED = 'unrenewed';
 
     const CANCELLED_UNPAID = 'unpaid';
@@ -153,7 +154,7 @@ abstract class Policy
     /**
      * @Assert\Choice({"pending", "active", "cancelled", "expired", "expired-claimable", "expired-wait-claim",
      *                  "unpaid", "multipay-requested", "multipay-rejected", "renewal",
-     *                  "pending-renewal", "unrenewed"}, strict=true)
+     *                  "pending-renewal", "declined-renewal", "unrenewed"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -313,7 +314,7 @@ abstract class Policy
      * @MongoDB\Date()
      * @Gedmo\Versioned
      */
-    protected $pendingRenewalExpiration;
+    protected $renewalExpiration;
 
     /**
      * @Assert\Range(min=0,max=200)
@@ -848,14 +849,14 @@ abstract class Policy
         $this->pendingCancellation = $pendingCancellation;
     }
 
-    public function getPendingRenewalExpiration()
+    public function getRenewalExpiration()
     {
-        return $this->pendingRenewalExpiration;
+        return $this->renewalExpiration;
     }
 
-    public function setPendingRenewalExpiration(\DateTime $pendingRenewalExpiration = null)
+    public function setRenewalExpiration(\DateTime $renewalExpiration = null)
     {
-        $this->pendingRenewalExpiration = $pendingRenewalExpiration;
+        $this->renewalExpiration = $renewalExpiration;
     }
 
     public function getStatus()
@@ -1586,6 +1587,7 @@ abstract class Policy
             null,
             self::STATUS_PENDING,
             self::STATUS_PENDING_RENEWAL,
+            self::STATUS_DECLINED_RENEWAL,
             self::STATUS_MULTIPAY_REQUESTED,
             self::STATUS_MULTIPAY_REJECTED,
         ])) {
@@ -2796,11 +2798,12 @@ abstract class Policy
 
         if (!in_array($this->getStatus(), [
             self::STATUS_PENDING_RENEWAL,
+            self::STATUS_DECLINED_RENEWAL,
         ])) {
             return false;
         }
 
-        if ($this->getPendingRenewalExpiration() && $date > $this->getPendingRenewalExpiration()) {
+        if ($this->getRenewalExpiration() && $date > $this->getRenewalExpiration()) {
             return false;
         }
 
@@ -2819,11 +2822,29 @@ abstract class Policy
             return false;
         }
 
-        if (!$this->getPendingRenewalExpiration() || $date < $this->getPendingRenewalExpiration()) {
+        if (!$this->getRenewalExpiration() || $date < $this->getRenewalExpiration()) {
             return false;
         }
 
         return true;
+    }
+
+    public function declineRenew(\DateTime $date = null)
+    {
+        if ($date == null) {
+            $date = new \DateTime();
+        }
+
+        if (!in_array($this->getStatus(), [
+            self::STATUS_PENDING_RENEWAL,
+        ])) {
+            throw new \Exception(sprintf(
+                'Policy %s can only be declined if it is pending renewal',
+                $this->getId()
+            ));
+        }
+
+        $this->setStatus(Policy::STATUS_DECLINED_RENEWAL);
     }
 
     public function renew($discount, \DateTime $date = null)
@@ -2841,7 +2862,7 @@ abstract class Policy
 
         $this->setStatus(Policy::STATUS_RENEWAL);
         // clear the max allowed renewal date
-        $this->setPendingRenewalExpiration(null);
+        $this->setRenewalExpiration(null);
 
         if ($discount && $discount > 0) {
             if (!$this->areEqualToTwoDp($discount, $this->getPreviousPolicy()->getPotValue())) {
@@ -2968,7 +2989,7 @@ abstract class Policy
         $this->setPolicyDetailsForPendingRenewal($newPolicy, $this->getEnd());
         $newPolicy->setStatus(Policy::STATUS_PENDING_RENEWAL);
         // don't allow renewal after the end the current policy
-        $newPolicy->setPendingRenewalExpiration($this->getEnd());
+        $newPolicy->setRenewalExpiration($this->getEnd());
 
         $newPolicy->init($this->getUser(), $terms);
 
@@ -3790,6 +3811,31 @@ abstract class Policy
         return !in_array($this->getNextPolicy()->getStatus(), [
             Policy::STATUS_PENDING_RENEWAL,
             Policy::STATUS_UNRENEWED,
+            Policy::STATUS_DECLINED_RENEWAL,
+        ]);
+    }
+
+    public function isRenewalPending()
+    {
+        // partial renewal policy wasn't created
+        if (!$this->hasNextPolicy()) {
+            return false;
+        }
+
+        return in_array($this->getNextPolicy()->getStatus(), [
+            Policy::STATUS_PENDING_RENEWAL,
+        ]);
+    }
+
+    public function isRenewalDeclined()
+    {
+        // partial renewal policy wasn't created
+        if (!$this->hasNextPolicy()) {
+            return false;
+        }
+
+        return in_array($this->getNextPolicy()->getStatus(), [
+            Policy::STATUS_DECLINED_RENEWAL,
         ]);
     }
 

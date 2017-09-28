@@ -130,7 +130,21 @@ class UpdatePolicyStatusCommand extends BaseCommand
             $ignoreLineCount++;
         }
 
-        // Activate Policies - Renewed
+        // Renew Policies (Pending Renewal -> Renewed)
+        $renewed = $policyService->renewPolicies($prefix, $dryRun);
+        $copy = 'Renewed Policy';
+        if ($dryRun) {
+            $copy = 'Dry Run - Should renew Policy';
+        }
+        foreach ($renewed as $id => $number) {
+            $lines[] = sprintf('%s %s / %s', $copy, $number, $id);
+        }
+        $lines[] = sprintf('%s renewed policies processed', count($renewed));
+        $ignoreLineCount++;
+        $lines[] = '';
+        $ignoreLineCount++;
+
+        // Activate Policies (Renewed -> Active)
         $renewal = $policyService->activateRenewalPolicies($prefix, $dryRun);
         $copy = 'Activated Renewal Policy';
         if ($dryRun) {
@@ -144,7 +158,7 @@ class UpdatePolicyStatusCommand extends BaseCommand
         $lines[] = '';
         $ignoreLineCount++;
 
-        // Unrenew Policies (Pending Renewal -> UnRenewed)
+        // Unrenew Policies (Renew Declined -> UnRenewed)
         $unrenewed = $policyService->unrenewPolicies($prefix, $dryRun);
         $copy = 'Unrenewed Policy';
         if ($dryRun) {

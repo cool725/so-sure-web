@@ -1346,6 +1346,9 @@ class PolicyServiceTest extends WebTestCase
         );
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
 
+        static::$policyService->declineRenew($policy, null, new \DateTime('2016-12-17'));
+        $this->assertEquals(Policy::STATUS_DECLINED_RENEWAL, $renewalPolicy->getStatus());
+
         $policies = static::$policyService->unrenewPolicies(
             'TEST',
             false,
@@ -1354,6 +1357,57 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(0, count($policies));
 
         $policies = static::$policyService->unrenewPolicies(
+            'TEST',
+            false,
+            new \DateTime('2017-01-02')
+        );
+        $this->assertEquals(1, count($policies));
+    }
+
+    public function testRenewPolicies()
+    {
+        $policies = static::$policyService->renewPolicies(
+            'TEST',
+            false,
+            new \DateTime('2017-01-02')
+        );
+
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testRenewPolicies', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-01-01'), true);
+        static::$policyService->setEnvironment('test');
+        static::$dm->flush();
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+
+        $renewalPolicy = static::$policyService->createPendingRenewal(
+            $policy,
+            new \DateTime('2016-12-15')
+        );
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
+
+        $policies = static::$policyService->renewPolicies(
+            'TEST',
+            false,
+            new \DateTime('2016-12-31')
+        );
+        $this->assertEquals(0, count($policies));
+
+        $policies = static::$policyService->renewPolicies(
             'TEST',
             false,
             new \DateTime('2017-01-02')
