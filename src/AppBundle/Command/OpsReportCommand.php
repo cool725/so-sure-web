@@ -25,7 +25,7 @@ class OpsReportCommand extends ContainerAwareCommand
         $redis = $this->getContainer()->get('snc_redis.default');
         $mailer = $this->getContainer()->get('app.mailer');
 
-        //$this->sendCsp($redis, $mailer);
+        $this->sendCsp($redis, $mailer);
         $this->sendClientValidation($redis, $mailer);
         $output->writeln('Sent');
     }
