@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -251,7 +252,6 @@ class OpsController extends BaseController
         return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'Queued', 200);
     }
 
-
     /**
      * @Route("/csp", name="ops_csp")
      */
@@ -338,5 +338,20 @@ class OpsController extends BaseController
         );
 
         return new Response('', 204);
+    }
+
+    /**
+     * @Route("/validation", name="ops_validation")
+     * @Method({"POST"})
+     */
+    public function validationAction(Request $request)
+    {
+        $logger = $this->get('logger');
+        $data = json_decode($request->getContent(), true);
+        $now = new \DateTime();
+        $this->get('snc_redis.default')->hset('client-validation', json_encode($data), $now->format('U'));
+        $logger->debug(sprintf('Validation Endpoint %s', json_encode($data)));
+
+        return new JsonResponse();
     }
 }
