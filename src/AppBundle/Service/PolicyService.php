@@ -1592,8 +1592,7 @@ class PolicyService
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
 
         $subject = sprintf(
-            'Your so-sure Policy %s is ready for renewal',
-            $policy->getPolicyNumber()
+            'Your so-sure insurance renewal'
         );
         $data = [
             'policy' => $policy,
@@ -1602,6 +1601,7 @@ class PolicyService
                 ['id' => $policy->getId()],
                 UrlGeneratorInterface::ABSOLUTE_URL
             ),
+            'start_date' => $this->endOfDay($policy->getEnd()),
         ];
         $this->mailer->sendTemplate(
             $subject,
