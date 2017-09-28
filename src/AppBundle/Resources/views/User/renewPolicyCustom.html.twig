@@ -4,7 +4,7 @@
     <h1>
         <span class="title-top">Renew your</span>
         <br class="visible-xs">
-        <span class="title-phone text-blue text-nowrap">{{ policy.phone.make }} {{ policy.phone.model }} {% if policy.phone.memory %}{{ policy.phone.memory }}GB{% endif %} </span>
+        <span class="title-phone title-phone_renew text-blue text-nowrap">{{ policy.phone.make }} {{ policy.phone.model }} {% if policy.phone.memory %}{{ policy.phone.memory }}GB{% endif %} </span>
         <br class="visible-xs">
         <span class="title-top">insurance</span><br>
         {% if policy.getPremiumPlan == 'monthly' %}
@@ -208,8 +208,12 @@
                            class="btn btn-green btn-block btn-pad">Continue</a>
                     </div>
                     <div class="form-group">
-                        <a href="#" data-toggle="modal" data-target="#cashbackModal" class="btn btn-blue btn-block btn-pad">Don't renew, just get cashback</a>
+                        <a href="#" data-toggle="modal" data-target="#cashbackModal" class="btn btn-blue btn-block btn-pad">Don't keep me insured, just get cashback</a>
                     </div>
+                {% else %}
+                    <div class="form-group">
+                        <a href="#" data-toggle="modal" data-target="#declineModal" class="btn btn-blue btn-block btn-pad">Don't keep me insured</a>
+                    </div>                    
                 {% endif %}
                 <div class="form-group">
                     <a href="{{ path('user_renew_policy', {'id': policy.id}) }}" class="btn btn-blue-hollow btn-block btn-pad">Back</a>
@@ -249,7 +253,7 @@
                     <ol>
                         <li>My phone is in full working condition and my screen is not cracked.</li>
                         <li>I am a resident of the United Kingdom.</li>
-                        <li>I have read &amp; understood the <a class="policy-doc-toggle" href="#policy-doc">so-sure policy document</a>.</li>
+                        <li>I have read &amp; understood the <a class="policy-doc-toggle" href="#policy-doc-1">so-sure policy document</a>.</li>
                     </ol>
                     <p>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</p>
                     <div class="form-group">
@@ -257,9 +261,9 @@
                     </div>
                     {{ form_end(renew_form) }}
                 </div>
-                <div id="#policy-doc" class="modal-body__policy-doc" style="display:none;">
+                <div id="policy-doc-1" class="modal-body__policy-doc" style="display:none;">
                     <button type="button" class="close policy-doc-toggle" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot })) }}
+                    {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot, 'include': true })) }}
                 </div>
             </div>
         </div>
@@ -281,7 +285,7 @@
                     <ol>
                         <li>My phone is in full working condition and my screen is not cracked.</li>
                         <li>I am a resident of the United Kingdom.</li>
-                        <li>I have read &amp; understood the <a class="policy-doc-toggle" href="#policy-doc">so-sure policy document</a>.</li>
+                        <li>I have read &amp; understood the <a class="policy-doc-toggle" href="#policy-doc-2">so-sure policy document</a>.</li>
                     </ol>
                     <p>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</p>
                     <div class="form-group">
@@ -301,9 +305,9 @@
                     </div>
                     {{ form_end(renew_cashback_form) }}
                 </div>
-                <div id="#policy-doc" class="modal-body__policy-doc" style="display:none;">
+                <div id="policy-doc-2" class="modal-body__policy-doc" style="display:none;">
                     <button type="button" class="close policy-doc-toggle" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot })) }}
+                    {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot, 'include': true })) }}
                 </div>
             </div>
         </div>
@@ -318,13 +322,19 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h3 class="modal-title text-blue">Request cashback</h3>
+                <h3 class="modal-title text-blue">Terminate policy</h3>
             </div>
             <div class="modal-body">
                 <p>
-                    Please use this form to request cashback. Note that it will take 28-45 days
-                    from the end of your policy before the bacs transfer will be sent.
+                    Use this form to terminate your policy and request transfer of your reward pot cashback. 
                 </p>
+                <p>
+                    Note the following:
+                </p>
+                <ul style="margin-bottom: 20px;">
+                    <li>You entered into an annual contract for your policy. Your policy will end on {{ policy.end|date('d M Y', 'Europe/London')  }} and will not be renewed.</li>
+                    <li>It will take 28-45 days from the end of your policy before the bacs transfer will be sent.</li>
+                </ul>
                 {{ form_start(cashback_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form-cashback', 'autocomplete': 'off'}}) }}
                 <div class="form-group cashback--item">
                     {{ form_widget(cashback_form.accountName, {'attr': {'placeholder': 'Account Name', 'class': 'form-control'}}) }}
@@ -339,10 +349,40 @@
                     <div class="help-block with-errors">{{ form_errors(cashback_form.accountNumber) }}</div>
                 </div>
                 <div class="form-group">
-                    {{ form_widget(cashback_form.cashback, {'label': 'Request cashback', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
+                    {{ form_widget(cashback_form.cashback, {'label': 'Terminate Policy', 'attr': {'class': 'btn btn-danger btn-block btn-pad'}}) }}
 
                 </div>
                 {{ form_end(cashback_form) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal modal-purchase fade"
+     id="declineModal"
+     tabindex="-1"
+     role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h3 class="modal-title text-blue">Terminate policy</h3>
+            </div>
+            <div class="modal-body">
+                <p>
+                    Use this form to terminate your policy. 
+                </p>
+                <p>
+                    Note the following:
+                </p>
+                <ul style="margin-bottom: 20px;">
+                    <li>You entered into an annual contract for your policy. Your policy will end on {{ policy.end|date('d M Y', 'Europe/London')  }} and will not be renewed.</li>
+                </ul>
+                {{ form_start(decline_form) }}
+                <div class="form-group">
+                    {{ form_widget(decline_form.decline, {'label': 'Terminate Policy', 'attr': {'class': 'btn btn-danger btn-block btn-pad'}}) }}
+                </div>
+                {{ form_end(decline_form) }}
             </div>
         </div>
     </div>

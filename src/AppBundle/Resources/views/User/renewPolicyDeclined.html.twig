@@ -1,11 +1,17 @@
 {% extends 'AppBundle:User:baseRenewPolicy.html.twig' %}
 
 {% block titleArea %}
+    {% if policy.cashback %}
     <h1 class="h2">
         <span class="title-top">Your cashback request was received</span>
     </h1>
     <h4 class="text-center">Your cashback request will be processed <span class="text-blue">28-45</span> days after your policy has ended.</h4>
     <h3 class="text-center">We’re sorry you’re leaving</h3>
+    {% else %}
+    <h1 class="h2">
+        <span class="title-top">We’re sorry you’re leaving</span>
+    </h1>
+    {% endif %}
 {% endblock %}
 
 {% block content %}
