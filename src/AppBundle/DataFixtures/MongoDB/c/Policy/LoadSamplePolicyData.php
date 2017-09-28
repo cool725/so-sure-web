@@ -290,7 +290,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     private function getAndroidUI($manager)
     {
         $phoneRepo = $manager->getRepository(Phone::class);
-        $phone = $phoneRepo->findOneBy(['devices' => 'iPhone8,4', 'memory' => 16]);
+        $phone = $phoneRepo->findOneBy(['devices' => 'marmite']);
 
         return $phone;
     }
