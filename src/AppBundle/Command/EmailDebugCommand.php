@@ -141,7 +141,8 @@ class EmailDebugCommand extends BaseCommand
             $policy = null;
             foreach ($policies as $pendingRenewal) {
                 $prevPolicy = $pendingRenewal->getPreviousPolicy();
-                if (!$prevPolicy || !$prevPolicy->getPremium() || !$prevPolicy->getNextPolicy() || !$prevPolicy->getNextPolicy()->getPremium()) {
+                if (!$prevPolicy || !$prevPolicy->getPremium() || !$prevPolicy->getNextPolicy() ||
+                    !$prevPolicy->getNextPolicy()->getPremium()) {
                     continue;
                 }
                 if ($prevPolicy->getPotValue() > 0) {
@@ -153,7 +154,8 @@ class EmailDebugCommand extends BaseCommand
                         continue;
                     }
                 }
-                if ($prevPolicy->getNextPolicy()->getPremium()->getMonthlyPremiumPrice() < $prevPolicy->getPremium()->getMonthlyPremiumPrice()) {
+                if ($prevPolicy->getNextPolicy()->getPremium()->getMonthlyPremiumPrice() <
+                    $prevPolicy->getPremium()->getMonthlyPremiumPrice()) {
                     if (in_array($variation, ['noPotIncrease', 'potIncrease'])) {
                         continue;
                     }
@@ -165,7 +167,8 @@ class EmailDebugCommand extends BaseCommand
                 $policy = $prevPolicy;
                 break;
             }
-            if (!$policy || !$policy->getPremium() && !$policy->getNextPolicy() && !$policy->getNextPolicy()->getPremium()) {
+            if (!$policy || !$policy->getPremium() && !$policy->getNextPolicy() &&
+                !$policy->getNextPolicy()->getPremium()) {
                 throw new \Exception('Unable to find matching policy');
             }
             $policyService = $this->getContainer()->get('app.policy');
