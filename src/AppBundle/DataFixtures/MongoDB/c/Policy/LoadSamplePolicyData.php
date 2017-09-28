@@ -96,6 +96,25 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             }
         }
 
+        $phones = [];
+        foreach ($expUsersB as $user) {
+            $phones[] = $user->getPolicies()[0]->getPhone();
+        }
+        foreach ($expUsersC as $user) {
+            $phones[] = $user->getPolicies()[0]->getPhone();
+        }
+        $sixMonthsAgo = new \DateTime();
+        $sixMonthsAgo = $sixMonthsAgo->sub(new \DateInterval('P6M'));
+        $adjusted = [];
+        for ($i = 0; $i < 5; $i++) {
+            $phone = $phones[rand(0, count($phones) - 1)];
+            if (isset($adjusted[$phone->getId()])) {
+                continue;
+            }
+            $adjusted[] = $phone->getId();
+            $phone->changePrice($phone->getCurrentPhonePrice()->getGwp() - 0.30, $sixMonthsAgo, null, null, $sixMonthsAgo);
+        }
+
         // Sample user for apple
         $user = $this->newUser('julien+apple@so-sure.com', true);
         $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
