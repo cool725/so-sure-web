@@ -59,9 +59,14 @@ class OpsReportCommand extends ContainerAwareCommand
                     $items[] = sprintf('%s : %s', $time ? $time->format(\DateTime::ATOM) : '?', $data['url']);
                     foreach ($data['errors'] as $error) {
                         if (isset($error['name']) && isset($error['message'])) {
-                            $items[] = sprintf('%s => %s (%s)', $error['name'], isset($error['value']) ? $error['value'] : '', $error['message']);
+                            $items[] = sprintf(
+                                '%s => %s (%s)',
+                                $error['name'],
+                                isset($error['value']) ? $error['value'] : '',
+                                $error['message']
+                            );
                         } else {
-                            $items[] = sprintf('Unknown format: %s', $item);                            
+                            $items[] = sprintf('Unknown format: %s', $item);
                         }
                     }
                 } else {
