@@ -123,71 +123,20 @@ class AdminController extends BaseController
             $gwp = $request->get('gwp');
             $now = new \DateTime();
             $from = new \DateTime($request->get('from'), new \DateTimeZone(SoSure::TIMEZONE));
-            if ($from < $now) {
-                $this->addFlash('error', sprintf(
-                    'New Price From Date must be in the future'
-                ));
-
-                return new RedirectResponse($this->generateUrl('admin_phones'));
-            }
-
             $to = null;
             if ($request->get('to')) {
                 $to = new \DateTime($request->get('to'), new \DateTimeZone(SoSure::TIMEZONE));
-                $now = new \DateTime();
-                if ($to < $now) {
-                    $this->addFlash('error', sprintf(
-                        'New Price To Date must be in the future'
-                    ));
-
-                    return new RedirectResponse($this->generateUrl('admin_phones'));
-                }
             }
-
-            $price = new PhonePrice();
-            $price->setGwp($request->get('gwp'));
-            $price->setValidFrom($from);
             $notes = $this->conformAlphanumericSpaceDot($this->getRequestString($request, 'notes'), 1500);
-            $price->setNotes($notes);
-            if ($request->get('to')) {
-                $price->setValidTo($to);
-            }
-
-            if ($price->getMonthlyPremiumPrice($from) < $phone->getSalvaMiniumumBinderMonthlyPremium()) {
-                $this->addFlash('error', sprintf(
-                    '£%.2f is less than allowed min binder £%.2f',
-                    $price->getMonthlyPremiumPrice($from),
-                    $phone->getSalvaMiniumumBinderMonthlyPremium()
-                ));
-
-                return new RedirectResponse($this->generateUrl('admin_phones'));
-            }
-            if ($to && $to < $from) {
-                $this->addFlash('error', sprintf(
-                    '%s must be after %s',
-                    $from->format(\DateTime::ATOM),
-                    $to->format(\DateTime::ATOM)
-                ));
+            try {
+                $phone->changePrice($gwp, $from, $to, $notes);
+            } catch (\Exception $e) {
+                $this->addFlash('error', $e->getMessage());
 
                 return new RedirectResponse($this->generateUrl('admin_phones'));
             }
 
-            if (!$phone->getCurrentPhonePrice()->getValidTo()) {
-                if ($phone->getCurrentPhonePrice()->getValidFrom() > $from) {
-                    $this->addFlash('error', sprintf(
-                        '%s must be after current pricing start date %s',
-                        $from->format(\DateTime::ATOM),
-                        $phone->getCurrentPhonePrice()->getValidFrom()->format(\DateTime::ATOM)
-                    ));
-
-                    return new RedirectResponse($this->generateUrl('admin_phones'));
-                }
-                $phone->getCurrentPhonePrice()->setValidTo($from);
-            }
-
-            $phone->addPhonePrice($price);
             $dm->flush();
-
             $this->addFlash(
                 'notice',
                 'Your changes were saved!'

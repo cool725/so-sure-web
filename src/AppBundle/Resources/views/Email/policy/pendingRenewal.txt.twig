@@ -1,33 +1,32 @@
 {% extends 'AppBundle:Email:base.txt.twig' %}
 {% block body %}
-Your SO-SURE policy is due to expire on {{ policy.end | date('d M Y H:i', 'Europe/London') }}.
+Your so-sure insurance renewal.
 
 **
 ------------------------------------------------------------
-Your SO-SURE policy is due to expire on {{ policy.end | date('d M Y H:i', 'Europe/London') }}.
-{% if policy.nextPolicy.premium.monthlyPremiumPrice < policy.premium.monthlyPremiumPrice %}
-We have great news...
+Dear {{ policy.user.name }},
 
-Your monthly premium has decreased from £{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} to £{{ policy.nextPolicy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month!
+Your SO-SURE policy {{ policy.policyNumber }} is due to expire on {{ policy.end | date('d M Y', 'Europe/London') }}. Please find your quotation for next year's cover below. We will automatically renew your policy unless you contact us before your renewal date.
+
+{% if policy.nextPolicy.premium.monthlyPremiumPrice < policy.premium.monthlyPremiumPrice %}
+We have great news! Your monthly premium has decreased from £{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} to £{{ policy.nextPolicy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month!
 
 So for only £{{ policy.nextPolicy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month, your phone can remain protected from loss, theft, accidental damage & out of warranty breakdown.
 {% else %}
 For only £{{ policy.nextPolicy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month, your phone can remain protected from loss, theft, accidental damage & out of warranty breakdown.
 
-Unfortunately, our pricing has slightly increased due to the government mandated increase in IPT to 12% (June 2017). By way of comparison, your premium last year was £{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month.
+Unfortunately, our pricing may have slightly increased due to the government mandated increase in IPT to 12% (June 2017). By way of comparison, your premium last year was £{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month.
 {% endif %}
-
-For your information, your current policy details are:
-
-{{ policy.policyNumber }}
-
-Expiring on: {{ policy.end|date('d M Y H:i', 'Europe/London') }}
 {% if policy.potValue > 0 %}
 
-Provided that you and your connections haven't claimed, you may also be eligible to receive cashback from your Reward Pot!
+Your Reward Pot is worth £{{ policy.potValue|number_format(2, '.', ',') }}. Provided that neither you nor your connections claim, you can either get this paid out to you or you can reduce your monthly payments for your premium to only £{{ policy.nextPolicy.premium.getAdjustedStandardMonthlyPremiumPrice(policy.potValue)|number_format(2, '.', ',') }} per month.
 {% endif %}
 
-So make sure to renew your policy by clicking the link below! {% if policy.potValue > 0 %}You can also use that link to check your cashback.{% endif %}
+{% if policy.potValue > 0 %}
+If you prefer a different arrangement (lump sum payment or policy termination) visit the link below. Otherwise, we will renew your policy and use your Reward Pot to reduce your premium for the coming year, starting on {{ start_date | date('d M Y', 'Europe/London') }}. Once your policy is renewed, we will send you a confirmation email along with your new policy documents.
+{% else %}
+If you prefer a different arrangement (lump sum payment or policy termination) visit the link below. Otherwise, we will renew your policy for the coming year, starting on {{ start_date | date('d M Y', 'Europe/London') }}. Once your policy is renewed, we will send you a confirmation email along with your new policy documents.
+{% endif %}
 
 {{ renew_url }}
 {% endblock body %}

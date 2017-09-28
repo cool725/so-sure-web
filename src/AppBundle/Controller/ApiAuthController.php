@@ -1115,14 +1115,26 @@ class ApiAuthController extends BaseController
     public function renewAction(Request $request, $id)
     {
         try {
+            $decline = false;
+            $numberPayments = null;
             $data = json_decode($request->getContent(), true)['body'];
             if (!$this->validateFields($data, ['number_payments'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
+            $numberPayments = $this->getDataString($data, 'number_payments');
 
             if (isset($data['cashback'])) {
                 if (!$this->validateFields($data['cashback'], ['account_number', 'sort_code', 'account_name'])) {
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+                }
+            }
+            if (isset($data['decline'])) {
+                if (!$this->validateFields($data, ['decline'])) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+                }
+                $decline = $this->getDataBool($data, 'decline');
+                if ($decline && $numberPayments > 0) {
+                    throw new ValidationException('If declined, number of payment should be 0');
                 }
             }
 
@@ -1134,6 +1146,7 @@ class ApiAuthController extends BaseController
             }
             $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
 
+            $policyService = $this->get('app.policy');
             $cashback = null;
             if (isset($data['cashback'])) {
                 $cashback = new Cashback();
@@ -1142,15 +1155,14 @@ class ApiAuthController extends BaseController
                 $cashback->setSortCode($this->getDataString($data['cashback'], 'sort_code'));
                 $cashback->setAccountNumber($this->getDataString($data['cashback'], 'account_number'));
                 $cashback->setStatus(Cashback::STATUS_PENDING_CLAIMABLE);
-                $cashback->setPolicy($policy);
+                $policyService->cashback($policy, $cashback);
             }
 
-            $policyService = $this->get('app.policy');
-            $policyService->renew(
-                $policy,
-                $this->getDataString($data, 'number_payments'),
-                $cashback
-            );
+            if ($decline) {
+                $policyService->declineRenew($policy);
+            } else {
+                $policyService->renew($policy, $numberPayments, $cashback);
+            }
 
             return new JsonResponse($policy->toApiArray());
         } catch (AccessDeniedException $ade) {
