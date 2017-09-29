@@ -1,24 +1,24 @@
 {% extends 'base.html.twig' %}
 
-{% set white_logo = true %}
+{# Set vars #}
+{% set new_stylesheet = 1 %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-    'components/vimeo-player-js/player.min.js'
-    '@AppBundle/Resources/public/js/Default/index.js'
-    '@AppBundle/Resources/public/js/Default/modalVideo.js'  %}
-    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% block title %}so-sure - learn more{% endblock %}
+{% block meta %}
+    <meta property="og:video" content="{{ cdn_url }}/video/explainer-subtitle-640.mp4" />
+    <meta property="og:video:secure_url" content="{{ cdn_url }}/video/explainer-subtitle-640.mp4" />
+    <meta property="og:video:type" content="video/mp4" />
+    <meta property="og:video:width" content="640" />
+    <meta property="og:video:height" content="360" />
 {% endblock %}
-
 
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets output='css/*.css'
-    '@AppBundle/Resources/public/sass/page/user.scss'%}
-    <link rel="stylesheet" href="{{ asset_url }}"> {% endstylesheets %}
+    '@AppBundle//Resources/public/sass/page/userWelcome.scss'
+    %}
+    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
-
 
 {% block gtm_data %}
     ,
@@ -33,96 +33,101 @@
 
 {% block body %}
 
-    <section class="user-welcome--info">
+    <section class="section--pad user-welcome--intro">
         <div class="container">
-            <h1 class="text-center text-white">Welcome to so-sure {{ policy.user.firstname }}</h1>
-            <p class="lead text-center text-white">You'll receive a confirmation email with full details of your policy shortly, but here's a summary:</p>
-            <div class="row">
-                <div class="col-sm-6 col-sm-offset-3">
-                    <div class="box-border-grey">
-                        <h3>Cover</h3>
-                        <ul class="list-unstyled lead">
-                            <li>Your <strong>{{ policy.phone.make }} {{ policy.phone.model }} ({{ policy.phone.memory }}GB)</strong> is now insured!</li>
-                            <li>Your policy number is <strong>{{ policy.policyNumber }}</strong></li>
-                            <li>Your phone is now protected against Theft, Loss, Accidental Damage and Breakdown 😄</li>
-                        </ul>
-                        <ul class="list-inline text-center">
-                            <li><a data-toggle="modal" data-target="#policy-modal" class="btn btn-primary ">Policy Details</a></li>
-                            <li><a href="{{ path('user_home') }}" class="btn btn-primary ">Go to my account</a></li>
-                        </ul>
+            <h1 class="text-white text-center">Welcome to so-sure, {{ policy.user.firstname }}</h1>
+            <p class="lead text-white text-center">Your <strong>{{ policy.phone.make }} {{ policy.phone.model }}</strong> is now protected against Theft, Loss, Accidental Damage and Breakdown. You'll receive a confirmation email with full details of your policy shortly, but here's a summary:</p>
+            <div class="policy-roundup">
+                <div class="policy-roundup--inner">
+                    <div class="row">
+                        <div class="col-sm-4 text-center">
+                            <img src="{{ cdn_url }}/images/library_phones/so-sure_phone-placeholder.png" alt="{{ policy.phone.make }} - {{ policy.phone.model }}">
+                        </div>
+                        <div class="col-sm-8">
+                            <ul class="list-unstyled">
+                                <li class="h4 h-light">
+                                    Phone:<br>
+                                    <strong>{{ policy.phone.make }} {{ policy.phone.model }} {{ policy.phone.memory }}GB</strong>
+                                </li>
+                                <li class="h4 h-light">
+                                    Policy number:<br>
+                                    <strong>{{ policy.policyNumber }}</strong>
+                                </li>
+                                <li class="h4 h-light">
+                                    Cost:<br>
+                                    {% if policy.getPremiumPlan == 'monthly'%}
+                                        <strong>&pound;{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }}</strong> per month
+                                    {% elseif policy.getPremiumPlan == 'yearly' %}
+                                        <strong>&pound;{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }}</strong> a year
+                                    {% else %}
+                                        Unknown
+                                    {% endif %}
+                                </li>
+                                <li class="h4 h-light">
+                                    Start/End Date:<br>
+                                    <strong>{{ policy.start|date('jS F Y', 'Europe/London') }}</strong> - <strong>{{ policy.end|date('jS F Y', 'Europe/London') }}</strong>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
-                </div>
-                <div class="col-sm-6 col-sm-offset-3">
-                    <div class="box-border-grey">
-                        <h3>Cost</h3>
-                        <ul class="list-inline">
-                            <li>
-                                You have chosen to pay
-                                &pound;{% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} per month
-                                {% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }} for your policy
-                                {% else %}Unknown{% endif %}
-                                and your policy is in effect from {{ policy.start|date('jS F Y') }} until {{ policy.end|date('jS F Y') }}.
-                            </li>
-                            {% if policy.user.paymentMethod.cardType is defined %}
-                            <li>
-                                {% if policy.getPremiumPlan == 'monthly'%}
-                                    Your card {{ policy.user.paymentMethod.cardType }} (ending in {{ policy.user.paymentMethod.cardLastFour }}) will be billed &pound;{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} every month on the {{ policy.billing|date('jS') }}.
-                                {% elseif policy.getPremiumPlan == 'yearly' %}
-                                    Your card {{ policy.user.paymentMethod.cardType }} (ending in {{ policy.user.paymentMethod.cardLastFour }}) was billed &pound;{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }}.
-                                {% endif %}
-                            </li>
-                            {% endif %}
-                        </ul>
+                    <h4 class="text-center h-light">Here’s a few links to help you get started:</h4>
+                    <div class="row text-center">
+                        <div class="col-sm-4">
+                            <a data-toggle="modal"
+                               data-target="#policy-modal" class="btn btn-blue-hollow btn-block btn-pad">
+                            <i class="fa fa-file-text-o" aria-hidden="true"></i> Policy details</a>
+                        </div>
+                        <div class="col-sm-4">
+                            <a href="{{ path('user_home') }}" class="btn btn-blue-hollow btn-block btn-pad"><i class="fa fa-user-circle-o" aria-hidden="true"></i> Account page</a>
+                        </div>
+                        <div class="col-sm-4">
+                            <a href="#"
+                               class="btn btn-blue-hollow btn-block btn-pad scroll-to"
+                               data-scroll-to-anchor="#how-to-get-cashback">How do I get cashback?</a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="start-saving section--pad">
-        <div class="row">
-            <h2 class="text-center text-light-blue">Together we're better.<br/>Start Sharing&nbsp;&nbsp;<span class="fa fa-arrow-right" aria-hidden="true"></span>&nbsp;&nbsp;Start Saving</h2>
-        </div>
-    </section>
-
-    <section class="user-welcome--steps">
+    <section id="how-to-get-cashback" class="section--pad section--arrow user-welcome--how-to-get-cashback">
         <div class="container">
-            <div class="row">
-                <div class="col-sm-6 col-sm-offset-3">
-                    <div class="box-border-grey">
-                        <h3>1. Download our Award Winning App</h3>
-                        <p class="lead">Install the app and login to start saving money!</p>
-                        {% if policy.phone.isITunes %}
-                        <div class="download-btn center">
-                            <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('welcome') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/badge-app-store-dark.svg" alt="Download so-sure on the App Store" />
-                            </a>
-                        </div>
-                        {% endif %}
-                        {% if policy.phone.isGooglePlay %}
-                        <div class="download-btn text-center">
-                            <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('welcome') }}" target="_blank"><img src="{{ cdn_url }}/images/icons/badge-google-play-dark.svg" alt="Get so-sure on Google Play" />
-                            </a>
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="col-sm-6 col-sm-offset-3">
-                    <div class="box-border-grey">
-                        <h3 class="text-center">2. Sign up friends &amp; connect</h3>
-                        <p class="lead text-center">Get up to 80% cashback <br>Watch our video below to learn more. 📺👀</p>
-                        <div class="explainer-video-thumb">
-                            <a class="explainer-video-view-thumb" data-toggle="modal" data-target="#modal-fullscreen">
-                                <img src="{{ cdn_url }}/images/home/explainer-video/explainer-video-frame-2.png" class="img-responsive">
-                            </a>
-                        </div>
-                        <p class="text-center">
-                        <a href="{{ path('user_home') }}" class="btn btn-primary ">3. Go to my account to get started</a></p>
-                    </div>
-                </div>
-            </div>
+            {% include 'AppBundle::Default/_howToGetCashback.html.twig' %}
         </div>
     </section>
 
+    <section class="section--pad section--arrow user-welcome--slider">
+        <div class="container">
+            {# Set vars for slider #}
+            {% set max_connections = policy.maxConnections %}
+            {% set connection_value = policy.ConnectionValue %}
+            {% set max_pot = policy.MaxPot %}
+            {% set annual_premium = policy.premium.yearlyPremiumPrice %}
+            {# Include reward slider hide title #}
+            {% include 'AppBundle::Default/_rewardSlider.html.twig' with { show_title: false} %}
+        </div>
+    </section>
+
+    <section class="section--pad section--arrow section--arrow__off-white user-welcome--effective-monthly-premium">
+        <div class="container">
+            {% include 'AppBundle::Default/_effectiveMonthlyPremium.html.twig' %}
+        </div>
+    </section>
+
+    <section class="section--pad user-welcome--video">
+        <div class="container">
+            {% include 'AppBundle::Default/_explainerVideo.html.twig' %}
+        </div>
+    </section>
+
+    <section class="section--pad user-welcome--download">
+        <div class="container">
+            {% include 'AppBundle::Default/_appDownload.html.twig' with { 'phone': policy.phone, 'location': 'user-welcome' } %}
+        </div>
+    </section>
+
+    {# Page Modals #}
     <div class="modal modal-fullscreen fade"
          id="policy-modal"
          tabindex="-1"
@@ -144,9 +149,19 @@
             </div>
         </div>
     </div>
+    {# End Page Modals #}
 
-    {# Page Modals #}
+{% endblock %}
 
-    {% include 'AppBundle::Default/modalVideo.html.twig' %}
-
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    'components/typeahead.js/typeahead.bundle.min.js'
+    'components/fuse.js/fuse.min.js'
+    'components/rangeslider.js/rangeslider.min.js'
+    '@AppBundle/Resources/public/js/Default/index.js'
+    '@AppBundle/Resources/public/js/Default/animations.js'
+    '@AppBundle/Resources/public/js/Default/sliderNew.js'
+    '@AppBundle/Resources/public/js/Default/selectPhoneMake.js' %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}

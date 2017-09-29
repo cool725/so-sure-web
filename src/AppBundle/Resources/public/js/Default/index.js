@@ -9,6 +9,8 @@ $(function(){
     // SCROLL TO - Wahoooooo
     // Add anchor - data-scroll-to-anchor
     // To focus   - data-scroll-to-focus
+    var nav = '';
+
     $('.scroll-to').click(function(e) {
 
         e.preventDefault();
@@ -17,8 +19,11 @@ $(function(){
         var focus  = $(this).data('scroll-to-focus');
 
         $('html, body').animate({
-            scrollTop: $(anchor).offset().top
+            scrollTop: $(anchor).offset().top - nav
         }, 1500);
+
+        // Unfocus the button!
+        $(this).blur();
 
         if (typeof focus !== 'undefined') {
             $(focus).focus();
@@ -39,6 +44,7 @@ $(function(){
     }
 
     if ($('.navbar-fixed-top').length) {
+        var nav = 50;
         $(window).scroll(navbarFixed);
     }
 
@@ -55,6 +61,7 @@ $(function(){
     }
 
     if ($('.secondary-nav').length) {
+        nav = 50;
         $(window).scroll(stickyNav);
     }
 

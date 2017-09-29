@@ -13,16 +13,45 @@
 
 }
 
+.section--arrow {
+    position: relative;
+
+    &:after {
+        width: 0; height: 0;
+        content: '';
+        position: absolute;
+        z-index: 100;
+        top: 100%; left: 50%;
+        margin-left: -20px;
+        border-left: 20px solid transparent;
+        border-right: 20px solid transparent;
+
+        border-top: 20px solid $white;
+    }
+}
+
+.section--arrow__blue {
+    &:after {
+        border-top: 20px solid $primary-blue;
+    }
+}
+
+.section--arrow__off-white {
+    &:after {
+        border-top: 20px solid $off-white;
+    }
+}
+
 // Row Centred
 /* centered columns styles */
 .row-centered {
-    text-align:center;
+    text-align: center;
 }
 .col-centered {
-    display:inline-block;
-    float:none;
+    display: inline-block;
+    float: none;
     /* reset the text-align */
-    text-align:left;
+    text-align: left;
     /* inline-block space fix */
-    margin-right:-4px;
+    margin-right: -4px;
 }

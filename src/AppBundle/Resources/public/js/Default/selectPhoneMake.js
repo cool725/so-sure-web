@@ -18,7 +18,7 @@ sosure.selectPhoneMake = (function() {
         self.fuse = new Fuse([], self.fuse_options);
         self.load_fuse();
     }
-    
+
     self.sendSearch = function(page) {
         clearTimeout(self.delayTimer);
         self.delayTimer = setTimeout(function() {
@@ -41,7 +41,7 @@ sosure.selectPhoneMake = (function() {
             success: function(result) {
                 self.fuse = new Fuse(result, self.fuse_options);
             }.bind(self)
-        });        
+        });
     }
 
     self.searchPhonesWithGa = function (q, sync) {
@@ -71,10 +71,11 @@ sosure.selectPhoneMake = (function() {
 
     self.setFormAction = function (id) {
         var base_path = $('#search-phone-form').data('base-path');
+        var path_suffix = $('#search-phone-form').data('path-suffix');
         if (!base_path) {
             base_path = '/phone-insurance/';
         }
-        $('#search-phone-form').attr('action', base_path + id);
+        $('#search-phone-form').attr('action', base_path + id + path_suffix);
     }
 
     self.setFormActionVal = function () {
@@ -151,5 +152,5 @@ $(function(){
     $('#search-phone').bind('typeahead:change', function(ev, suggestion) {
         sosure.selectPhoneMake.setFormActionVal();
     });
-    
+
 });

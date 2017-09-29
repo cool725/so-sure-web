@@ -184,6 +184,11 @@ class DefaultController extends BaseController
             $session->set('quote', $phone->getId());
 
             return $this->redirectToRoute('purchase_step_policy');
+        } elseif ($phone && in_array($type, ['learn-more'])) {
+            $session = $request->getSession();
+            $session->set('quote', $phone->getId());
+
+           // return $this->redirectToRoute('learn_more_phone', ['id' => $id]);
         }
 
         return [
