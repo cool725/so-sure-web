@@ -58,13 +58,7 @@
 
     <section class="section--pad learn-more--download">
         <div class="container">
-            {% set set_type = '' %}
-            {% if policy.phone.isITunes %}
-                {% set set_type = 'apple' %}
-            {% elseif policy.phone.isGooglePlay %}
-                {% set set_type = 'play' %}
-            {% endif %}
-            {% include 'AppBundle::Default/_appDownload.html.twig' with { type: set_type } %}
+            {% include 'AppBundle::Default/_appDownload.html.twig' with { 'phone': phone, 'location': 'learn-more' } %}
         </div>
     </section>
 
