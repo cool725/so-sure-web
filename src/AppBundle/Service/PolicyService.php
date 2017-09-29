@@ -1059,7 +1059,7 @@ class PolicyService
         // Policy with the reduced connection value
         $policy = $connection->getSourcePolicy();
         // User who caused the reduction
-        $causalUser = $policy->getUser();
+        $causalUser = $connection->getLinkedPolicy()->getUser();
         $this->mailer->sendTemplate(
             sprintf('Important Information about your so-sure Reward Pot'),
             $policy->getUser()->getEmail(),
