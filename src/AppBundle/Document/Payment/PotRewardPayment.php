@@ -28,4 +28,9 @@ class PotRewardPayment extends Payment
     {
         return false;
     }
+
+    public function isStandardPayment()
+    {
+        return false;
+    }
 }

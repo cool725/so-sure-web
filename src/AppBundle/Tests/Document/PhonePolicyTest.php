@@ -3394,7 +3394,7 @@ class PhonePolicyTest extends WebTestCase
         $policyA->fullyExpire(new \DateTime("2017-01-29"));
         $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
         $foundReward = false;
-        foreach ($policyA->getPayments() as $payment) {
+        foreach ($policyA->getAllPayments() as $payment) {
             if ($payment instanceof PotRewardPayment) {
                 $this->assertEquals(-10, $payment->getAmount());
                 $foundReward = true;
@@ -3446,7 +3446,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
         $foundReward = false;
         $foundRefund = false;
-        foreach ($policyA->getPayments() as $payment) {
+        foreach ($policyA->getAllPayments() as $payment) {
             if ($payment instanceof PotRewardPayment && $payment->getAmount() == -10) {
                 $foundReward = true;
             }
@@ -3510,7 +3510,7 @@ class PhonePolicyTest extends WebTestCase
 
         $foundReward = false;
         $foundRefund = false;
-        foreach ($policyA->getPayments() as $payment) {
+        foreach ($policyA->getAllPayments() as $payment) {
             if ($payment instanceof PotRewardPayment && $payment->getAmount() == -10) {
                 $foundReward = true;
             }
@@ -3564,7 +3564,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
         $foundReward = false;
         $foundDiscount = false;
-        foreach ($policyA->getPayments() as $payment) {
+        foreach ($policyA->getAllPayments() as $payment) {
             if ($payment instanceof PotRewardPayment) {
                 $this->assertEquals(-10, $payment->getAmount());
                 $foundReward = true;
@@ -3843,7 +3843,7 @@ class PhonePolicyTest extends WebTestCase
 
         $foundSoSure = false;
         $foundPot = false;
-        foreach ($updatedPolicyA->getPayments() as $payment) {
+        foreach ($updatedPolicyA->getAllPayments() as $payment) {
             if ($payment instanceof SoSurePotRewardPayment) {
                 $this->assertTrue($this->areEqualToTwoDp(-5, $payment->getAmount()));
                 $foundSoSure = true;
@@ -3892,7 +3892,7 @@ class PhonePolicyTest extends WebTestCase
         $foundSoSureRefund = false;
         $foundPot = false;
         $foundPotRefund = false;
-        foreach ($updatedPolicyA->getPayments() as $payment) {
+        foreach ($updatedPolicyA->getAllPayments() as $payment) {
             if ($payment instanceof SoSurePotRewardPayment && $payment->getAmount() == -5) {
                 $foundSoSure = true;
             }
@@ -3945,7 +3945,7 @@ class PhonePolicyTest extends WebTestCase
 
         $foundSoSure = false;
         $foundPot = false;
-        foreach ($updatedPolicyA->getPayments() as $payment) {
+        foreach ($updatedPolicyA->getAllPayments() as $payment) {
             if ($payment instanceof SoSurePotRewardPayment) {
                 $foundSoSure = true;
             }
@@ -4036,7 +4036,7 @@ class PhonePolicyTest extends WebTestCase
         $foundSoSure = false;
         $foundPot = false;
         $foundDiscount = false;
-        foreach ($updatedPolicyA->getPayments() as $payment) {
+        foreach ($updatedPolicyA->getAllPayments() as $payment) {
             if ($payment instanceof SoSurePotRewardPayment) {
                 $foundSoSure = true;
             }
@@ -4048,6 +4048,61 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($foundSoSure);
         $this->assertTrue($foundPot);
         $this->assertNull($updatedPolicyA->getCashback());
+    }
+
+    public function testCorrectFiguresAfterPotReward()
+    {
+        $policyA = $this->getPolicy(static::generateEmail('testCorrectFiguresAfterPotRewardA', $this));
+        $policyB = $this->getPolicy(static::generateEmail('testCorrectFiguresAfterPotRewardB', $this));
+        $policyA->setStatus(Policy::STATUS_ACTIVE);
+        $policyB->setStatus(Policy::STATUS_ACTIVE);
+        $this->createLinkedConnections($policyA, $policyB, 10, 10);
+
+        $paymentA = new JudoPayment();
+        $paymentA->setAmount($policyA->getPremium()->getYearlyPremiumPrice());
+        $paymentA->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
+        $paymentA->setResult(JudoPayment::RESULT_SUCCESS);
+        $paymentA->setReceipt(rand(1, 999999));
+        $paymentA->setDate(new \DateTime('2016-01-01'));
+        $policyA->addPayment($paymentA);
+
+        $renewalPolicy = $policyA->createPendingRenewal($policyA->getPolicyTerms(), new \DateTime('2016-12-15'));
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
+        //\Doctrine\Common\Util\Debug::dump($policyA);
+        $renewalPolicy->renew(10, new \DateTime('2016-12-16'));
+
+        $policyA->expire(new \DateTime("2017-01-01"));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+        static::$dm->persist($policyA->getUser());
+        static::$dm->persist($policyB->getUser());
+        static::$dm->persist($policyA);
+        static::$dm->persist($policyB);
+        static::$dm->persist($renewalPolicy);
+        static::$dm->flush();
+        $this->assertNotNull($policyA->getId());
+        $this->assertNotNull($policyB->getId());
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = self::$dm->getRepository(Policy::class);
+        $updatedPolicyA = $repo->find($policyA->getId());
+
+        $foundSoSure = false;
+        $foundPot = false;
+        $foundDiscount = false;
+        foreach ($updatedPolicyA->getAllPayments() as $payment) {
+            if ($payment instanceof SoSurePotRewardPayment) {
+                $foundSoSure = true;
+            }
+            if ($payment instanceof PotRewardPayment) {
+                $this->assertTrue($this->areEqualToTwoDp(-10, $payment->getAmount()));
+                $foundPot = true;
+            }
+        }
+        $this->assertFalse($foundSoSure);
+        $this->assertTrue($foundPot);
+        $this->assertNull($updatedPolicyA->getCashback());
+        $this->assertTrue($policyA->arePolicyScheduledPaymentsCorrect());
+        $this->assertTrue($policyA->hasCorrectCommissionPayments(new \DateTime('2017-01-01')));
     }
 
     public function testRenewTooMany()
