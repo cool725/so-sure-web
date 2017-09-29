@@ -33,35 +33,41 @@
                 {# Quote Left #}
                 <div class="col-md-8">
                     <div class="quote__left">
-                        <h1 class="h2">
-                            <span class="text-blue">Insurance for your</span>
-                            <div class="dropdown memory-dropdown-list">
-                                <a href="#"
-                                   class="dropdown-toggle text-nowrap"
-                                   type="button"
-                                   id="memoryDropdownList"
-                                   data-toggle="dropdown"
-                                   aria-haspopup="true"
-                                   aria-expanded="true">
-                                    {{ phone }}
-                                    <i class="fa fa-caret-down" aria-hidden="true"></i>
-                                </a>
-                                <ul class="dropdown-menu memory-dropdown" aria-labelledby="memoryDropdownList">
-                                    {% if phones | length > 1 %}
-                                        <li class="dropdown-header">Select alternate model</li>
-                                        {% for phone_mem in phones if phone_mem.id != phone.id %}
-                                            <li>
-                                                <a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class=""> {{ phone.model }} - {{ phone_mem.memory }}GB</a>
-                                            </li>
-                                        {% endfor %}
-                                        <li role="separator" class="divider"></li>
-                                    {% endif %}
-                                    <li><a href="#" data-toggle="modal" data-target="#quoteModal"> I have a different phone</a></li>
-                                </ul>
-                            </div>
-                            <br>
-                            <span class="text-nowrap h2">only £{{ phone_price.monthlyPremiumPrice }} per month</span>
-                        </h1>
+                        {% if coming_soon %}
+                            <h1 class="h2">Better cover for your {{ phone }} is coming soon!</h1>
+                            <h2>£4.99 - £9.99 per month <br><small>(typical policy pricing)</small></h2>
+                        {% else %}
+                            <h1 class="h2">
+                                <span class="text-blue">Insurance for your</span>
+                                <div class="dropdown memory-dropdown-list">
+                                    <a href="#"
+                                       class="dropdown-toggle text-nowrap"
+                                       type="button"
+                                       id="memoryDropdownList"
+                                       data-toggle="dropdown"
+                                       aria-haspopup="true"
+                                       aria-expanded="true">
+                                        {{ phone }}
+                                        <i class="fa fa-caret-down" aria-hidden="true"></i>
+                                    </a>
+                                    <ul class="dropdown-menu memory-dropdown" aria-labelledby="memoryDropdownList">
+                                        {% if phones | length > 1 %}
+                                            <li class="dropdown-header">Select alternate model</li>
+                                            {% for phone_mem in phones if phone_mem.id != phone.id %}
+                                                <li>
+                                                    <a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class=""> {{ phone.model }} - {{ phone_mem.memory }}GB</a>
+                                                </li>
+                                            {% endfor %}
+                                            <li role="separator" class="divider"></li>
+                                        {% endif %}
+                                        <li><a href="#" data-toggle="modal" data-target="#quoteModal"> I have a different phone</a></li>
+                                    </ul>
+                                </div>
+                                <br>
+                                <span class="text-nowrap h2">only £{{ phone_price.monthlyPremiumPrice }} per month</span>
+                            </h1>
+                        {% endif %}
+
                         <h4 class="text-blue" style="margin-top: 10px">Effective monthly premium after cashback:<br><small>(Cashback paid out end of policy year)</small></h4>
 
                         {# Slider #}
@@ -106,20 +112,24 @@
                         </div>
                         <h4 class="text-blue">Number of connections</h4>
                         <p class="lead">Get cashback by connecting to friends. <br> Save money on your premium when you and your friends don't claim.</p>
-                        {# CTA #}
-                        <div class="quote__cta">
-                            <div class="form-group">
-                                {{ form_start(buy_form) }}
-                                    {{ form_widget(buy_form.buy_tablet, {'label': 'Get Started', 'attr': {'class': 'btn btn-green btn-block btn-pad btn-big-text'}}) }}
-                                {{ form_end(buy_form) }}
+
+                        {% if not coming_soon %}
+                            {# CTA #}
+                            <div class="quote__cta">
+                                <div class="form-group">
+                                    {{ form_start(buy_form) }}
+                                        {{ form_widget(buy_form.buy_tablet, {'label': 'Get Started', 'attr': {'class': 'btn btn-green btn-block btn-pad btn-big-text'}}) }}
+                                    {{ form_end(buy_form) }}
+                                </div>
+                                <a href="#"
+                                   data-toggle="modal"
+                                   data-target="#policy-modal"
+                                   id="policy-modal-trigger"
+                                   class="text-underline">
+                                   <small>Full Terms &amp; Conditions</small></a>
                             </div>
-                            <a href="#"
-                               data-toggle="modal"
-                               data-target="#policy-modal"
-                               id="policy-modal-trigger"
-                               class="text-underline">
-                               <small>Full Terms &amp; Conditions</small></a>
-                        </div>
+                        {% endif %}
+
                         {# Save Quote #}
                         {% if feature_enabled('quote-lead') %}
                             <h3>Guarantee this price for the next 7 days</h3>
