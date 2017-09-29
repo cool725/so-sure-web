@@ -363,4 +363,74 @@ class RefundListenerTest extends WebTestCase
         $this->assertTrue($total['received'] > 0);
         $this->assertTrue($total['refunded'] < 0);
     }
+
+    public function testRefundListenerPolicyDiscountPaidCooloff()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testRefundListenerPolicyDiscountPaidCooloff', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, false);
+        static::addJudoPayPayment(self::$judopayService, $policy, new \DateTime('2016-01-01'));
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-01-01'));
+        static::$policyService->setEnvironment('test');
+
+        $renewalPolicy = $this->getRenewalPolicy($policy);
+        static::$dm->persist($renewalPolicy);
+
+        $policy->setPotValue(10);
+        $renewalPolicy->renew(10, new \DateTime('2016-12-15'));
+
+        // TODO: create actual connection on initial policy, and expire that here
+        // instead of creating payment to avoid triggering the updatepot which will wipe
+        // the simulated pot value
+        $discount = new PolicyDiscountPayment();
+        $discount->setAmount(10);
+        $discount->setDate(new \DateTime('2017-01-01'));
+        $renewalPolicy->addPayment($discount);
+        static::$dm->persist($discount);
+
+        $this->assertEquals(
+            10,
+            Payment::sumPayments($renewalPolicy->getPayments(), false, PolicyDiscountPayment::class)['total']
+        );
+
+        static::addJudoPayPayment(self::$judopayService, $renewalPolicy, new \DateTime('2017-01-01'));
+
+        $renewalPolicy->setCancelledReason(PhonePolicy::CANCELLED_COOLOFF);
+        $renewalPolicy->setStatus(PhonePolicy::STATUS_CANCELLED);
+        $renewalPolicy->setEnd(new \DateTime('2017-01-05'));
+        static::$dm->flush();
+
+        $this->assertTrue($renewalPolicy->isRefundAllowed());
+        $this->assertTrue($renewalPolicy->hasPolicyDiscountPresent());
+
+        $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger, 'test');
+        $listener->onPolicyCancelledEvent(new PolicyEvent($renewalPolicy, new \DateTime('2017-01-05')));
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $updatedRenewalPolicy = $repo->find($renewalPolicy->getId());
+        $this->assertNotNull($updatedRenewalPolicy->getCashback());
+        // 10 - (10 * 5/365) = 9.86
+        $this->assertTrue($this->areEqualToTwoDp(9.86, $updatedRenewalPolicy->getCashback()->getAmount()));
+
+        $judo = Payment::sumPayments($updatedRenewalPolicy->getPayments(), false, JudoPayment::class);
+        $this->assertEquals(1, $judo['numRefunded']);
+        $this->assertEquals(0, $judo['total']);
+        $this->assertTrue($judo['received'] > 0);
+        $this->assertTrue($judo['refunded'] < 0);
+        $this->assertEquals($judo['received'], 0 - $judo['refunded']);
+
+        $total = Payment::sumPayments($updatedRenewalPolicy->getPayments(), false);
+        $this->assertEquals(2, $total['numReceived']);
+        $this->assertEquals(2, $total['numRefunded']);
+        $this->assertTrue($total['total'] > 0);
+        $this->assertTrue($total['received'] > 0);
+        $this->assertTrue($total['refunded'] < 0);
+    }
 }
