@@ -1222,25 +1222,25 @@ class ApiControllerTest extends BaseControllerTest
      */
     public function testVersionTooOldiOS()
     {
-        $crawler = self::$client->request('GET', '/api/v1/version?platform=ios&version=1.5.4');
+        $crawler = self::$client->request('GET', '/api/v1/version?platform=ios&version=1.5.8');
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_UPGRADE_APP);
     }
 
     public function testVersionTooOldAndroid()
     {
-        $crawler = self::$client->request('GET', '/api/v1/version?platform=android&version=1.5.7');
+        $crawler = self::$client->request('GET', '/api/v1/version?platform=android&version=1.5.10.0');
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_UPGRADE_APP);
     }
 
     public function testVersionOkiOS()
     {
-        $crawler = self::$client->request('GET', '/api/v1/version?platform=ios&version=1.5.5');
+        $crawler = self::$client->request('GET', '/api/v1/version?platform=ios&version=1.5.9');
         $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
     }
 
     public function testVersionOkAndroid()
     {
-        $crawler = self::$client->request('GET', '/api/v1/version?platform=android&version=1.5.8');
+        $crawler = self::$client->request('GET', '/api/v1/version?platform=android&version=1.5.11.0');
         $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
     }
 
