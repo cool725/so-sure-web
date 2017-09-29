@@ -676,7 +676,7 @@ class PolicyService
      * $policy = $this->dm->merge($policy);
      * TODO: Fix that
      */
-    public function adjustScheduledPayments(Policy $policy, $expectSingleAdjustment = false, \DateTime $date = null)
+    public function adjustScheduledPayments(Policy $policy, $expectSingleAdjustment = false)
     {
         $log = [];
         if ($policy->arePolicyScheduledPaymentsCorrect()) {

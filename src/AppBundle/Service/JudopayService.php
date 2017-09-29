@@ -302,7 +302,7 @@ class JudopayService
         } else {
             // Existing policy - add payment + prevent duplicate billing
             $this->createPayment($policy, $receiptId, $consumerToken, $cardToken, $source, $deviceDna, $date);
-            if (!$this->policyService->adjustScheduledPayments($policy, true, $date)) {
+            if (!$this->policyService->adjustScheduledPayments($policy, true)) {
                 // Reload object from db
                 $policy = $this->dm->merge($policy);
             }
