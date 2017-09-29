@@ -129,11 +129,9 @@ class EmailDebugCommand extends BaseCommand
             $dm = $this->getManager();
             $repo = $dm->getRepository(StandardConnection::class);
             $connection = $repo->findOneBy(['value' => ['$gt' => 0]]);
-            $data = [
-                'connection' => $connection,
-                'policy' => $connection->getSourcePolicy(),
-                'causalUser' => $connection->getLinkedUser(),
-            ];
+            $policyService = $this->getContainer()->get('app.policy');
+
+            return $policyService->connectionReduced($connection);
         } elseif (in_array($template, $templates['policyRenewal'])) {
             $dm = $this->getManager();
             $repo = $dm->getRepository(Policy::class);
