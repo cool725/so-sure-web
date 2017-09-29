@@ -142,7 +142,7 @@ class PolicyRepository extends BaseDocumentRepository
             ->execute();
     }
 
-    public function findPendingRenewalPoliciesForUnRenewed(\DateTime $date = null)
+    public function findPendingRenewalPoliciesForRenewed(\DateTime $date = null)
     {
         if (!$date) {
             $date = new \DateTime();
@@ -152,7 +152,24 @@ class PolicyRepository extends BaseDocumentRepository
             ->field('status')->in([
                 Policy::STATUS_PENDING_RENEWAL,
             ])
-            ->field('pendingRenewalExpiration')->lte($date);
+            ->field('renewalExpiration')->lte($date);
+
+        return $qb
+            ->getQuery()
+            ->execute();
+    }
+
+    public function findDeclinedRenewalPoliciesForUnRenewed(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        $qb = $this->createQueryBuilder()
+            ->field('status')->in([
+                Policy::STATUS_DECLINED_RENEWAL,
+            ])
+            ->field('renewalExpiration')->lte($date);
 
         return $qb
             ->getQuery()

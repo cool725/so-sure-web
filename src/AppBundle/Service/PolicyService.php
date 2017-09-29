@@ -1178,7 +1178,14 @@ class PolicyService
     {
         $repo = $this->dm->getRepository(Policy::class);
 
-        return $repo->findPendingRenewalPoliciesForUnRenewed($date);
+        return $repo->findDeclinedRenewalPoliciesForUnRenewed($date);
+    }
+
+    public function getPoliciesForRenew(\DateTime $date = null)
+    {
+        $repo = $this->dm->getRepository(Policy::class);
+
+        return $repo->findPendingRenewalPoliciesForRenewed($date);
     }
 
     public function cancelPoliciesPendingCancellation($prefix = null, $dryRun = false, \DateTime $date = null)
@@ -1227,6 +1234,31 @@ class PolicyService
         }
 
         return $expired;
+    }
+
+    public function renewPolicies($prefix = null, $dryRun = false, \DateTime $date = null)
+    {
+        // Have a feeling I will need prefix in the future here
+        \AppBundle\Classes\NoOp::ignore([$prefix]);
+
+        $renewed = [];
+        $policies = $this->getPoliciesForRenew($date);
+        foreach ($policies as $policy) {
+            $renewed[$policy->getId()] = $policy->getPolicyNumber();
+            if (!$dryRun) {
+                try {
+                    $this->renewDefault($policy, $date);
+                } catch (\Exception $e) {
+                    $msg = sprintf(
+                        'Error Renewing Policy %s',
+                        $policy->getId()
+                    );
+                    $this->logger->error($msg, ['exception' => $e]);
+                }
+            }
+        }
+
+        return $renewed;
     }
 
     public function cancelUnpaidPolicies($prefix, $dryRun = false)
@@ -1560,8 +1592,7 @@ class PolicyService
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
 
         $subject = sprintf(
-            'Your so-sure Policy %s is ready for renewal',
-            $policy->getPolicyNumber()
+            'Your so-sure insurance renewal'
         );
         $data = [
             'policy' => $policy,
@@ -1570,6 +1601,7 @@ class PolicyService
                 ['id' => $policy->getId()],
                 UrlGeneratorInterface::ABSOLUTE_URL
             ),
+            'start_date' => $this->endOfDay($policy->getEnd()),
         ];
         $this->mailer->sendTemplate(
             $subject,
@@ -1579,6 +1611,11 @@ class PolicyService
             $textTemplate,
             $data
         );
+    }
+
+    public function renewDefault(Policy $policy, \DateTime $date = null)
+    {
+        return $this->renew($policy, $policy->getPremiumInstallmentCount(), null, $date);
     }
 
     public function renew(Policy $policy, $numPayments, Cashback $cashback = null, \DateTime $date = null)
@@ -1622,6 +1659,34 @@ class PolicyService
         $this->dm->flush();
 
         $this->dispatchEvent(PolicyEvent::EVENT_RENEWED, new PolicyEvent($policy));
+
+        return $newPolicy;
+    }
+
+    public function declineRenew(Policy $policy, Cashback $cashback = null, \DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        $newPolicy = $policy->getNextPolicy();
+        if (!$newPolicy) {
+            throw new \Exception(sprintf(
+                'Policy %s does not have a next policy (decline renewal not allowed)',
+                $policy->getId()
+            ));
+        }
+
+        if ($cashback) {
+            $this->cashback($policy, $cashback);
+        } else {
+            $policy->clearCashback();
+        }
+
+        $newPolicy->declineRenew($date);
+        $this->dm->flush();
+
+        $this->dispatchEvent(PolicyEvent::EVENT_DECLINED_RENEWAL, new PolicyEvent($policy));
 
         return $newPolicy;
     }

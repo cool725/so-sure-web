@@ -404,18 +404,27 @@ trait UserClassTrait
         return [$connectionA, $connectionB];
     }
 
-    protected static function getRenewalPolicy($policy, $create = true)
+    protected static function getRenewalPolicy($policy, $create = true, $date = null)
     {
+        if (!$date) {
+            $date = new \DateTime("2017-01-01");
+        }
+        $exp = clone $date;
+        $exp = $exp->sub(new \DateInterval('PT1S'));
+        $end = clone $date;
+        $end = $end->add(new \DateInterval('P1Y'));
+        $end = $end->sub(new \DateInterval('PT1S'));
+
         $renewalPolicy = new SalvaPhonePolicy();
-        $renewalPolicy->setPhone(static::$phone);
+        $renewalPolicy->setPhone($policy->getPhone());
 
         $renewalPolicy->init($policy->getUser(), static::getLatestPolicyTerms(self::$dm));
         if ($create) {
             $renewalPolicy->create(rand(1, 999999), null, null, rand(1, 9999));
-            $renewalPolicy->setStart(new \DateTime("2017-01-01"));
-            $renewalPolicy->setEnd(new \DateTime("2017-12-31 23:59:59"));
+            $renewalPolicy->setStart($date);
+            $renewalPolicy->setEnd($end);
         } else {
-            $renewalPolicy->setPendingRenewalExpiration(new \DateTime("2016-12-31 23:59:59"));
+            $renewalPolicy->setRenewalExpiration($exp);
         }
         $renewalPolicy->setStatus(Policy::STATUS_PENDING_RENEWAL);
 

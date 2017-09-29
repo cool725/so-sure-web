@@ -133,19 +133,17 @@ a {
 
 // Fixes (Overide external plugins etc)
 
-// Fixes (Overide external plugins etc)
+/* Hide the ProdPad Got Feedback button floating at bottom of page */
+#pp-cfp-trigger {
+    display: none !important;
+}
 
-	/* Hide the ProdPad Got Feedback button floating at bottom of page */
-	#pp-cfp-trigger {
-	    display: none !important;
+.login-box {
+	min-height: 250px;
+	max-width: 345px;
+	margin: 0 auto;
+
+	&--controls {
+		min-height: 0;
 	}
-
-	.login-box {
-		min-height: 250px;
-		max-width: 345px;
-		margin: 0 auto;
-
-		&--controls {
-			min-height: 0;
-		}
-	}
+}

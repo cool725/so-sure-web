@@ -283,6 +283,15 @@ class UserControllerTest extends BaseControllerTest
         }
     }
 
+    private function validateRenewalAllowed($crawler, $allowed)
+    {
+        $count = 0;
+        if ($allowed) {
+            $count = 1;
+        }
+        $this->assertEquals($count, $crawler->evaluate('count(//li[@id="user-homepage--nav-renew"])')[0]);
+    }
+
     public function testUserUnpaidPolicy()
     {
         $email = self::generateEmail('testUserUnpaid', $this);
@@ -363,5 +372,262 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = self::$client->request('GET', sprintf('/user/%s', $policyB->getId()));
         self::verifyResponse(403);
+    }
+
+    public function testUserRenewSimple()
+    {
+        $email = self::generateEmail('testUserRenewSimple', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $date = new \DateTime();
+        $date = $date->sub(new \DateInterval('P350D'));
+        $policy = self::initPolicy($user, self::$dm, $phone, $date, true, true, false);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        static::$dm->flush();
+
+        $this->assertFalse($policy->isRenewed());
+
+        $tomorrow = new \DateTime();
+        $tomorrow = $tomorrow->add(new \DateInterval('P1D'));
+        $renewalPolicy = $this->getRenewalPolicy($policy, false, $tomorrow);
+        static::$dm->persist($renewalPolicy);
+        static::$dm->flush();
+
+        $crawler = $this->login($email, $password, 'user/');
+
+        $this->validateRenewalAllowed($crawler, 1);
+
+        $crawler = self::$client->request('GET', '/user/renew');
+
+        $form = $crawler->selectButton('renew_form[renew]')->form();
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(302);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $updatedRenewalPolicy = $repo->find($renewalPolicy->getId());
+        $this->assertEquals(Policy::STATUS_RENEWAL, $updatedRenewalPolicy->getStatus());
+    }
+
+    public function testUserRenewCustomMonthly()
+    {
+        $email = self::generateEmail('testUserRenewCustomMonthly', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $date = new \DateTime();
+        $date = $date->sub(new \DateInterval('P350D'));
+        $policy = self::initPolicy($user, self::$dm, $phone, $date, true, true, false);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        static::$dm->flush();
+
+        $this->assertFalse($policy->isRenewed());
+
+        $tomorrow = new \DateTime();
+        $tomorrow = $tomorrow->add(new \DateInterval('P1D'));
+        $renewalPolicy = $this->getRenewalPolicy($policy, false, $tomorrow);
+        static::$dm->persist($renewalPolicy);
+        static::$dm->flush();
+
+        $crawler = $this->login($email, $password, 'user/');
+
+        $this->validateRenewalAllowed($crawler, 1);
+
+        $crawler = self::$client->request('GET', sprintf('/user/renew/%s/custom', $policy->getId()));
+
+        $form = $crawler->selectButton('renew_form[renew]')->form();
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(302);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $updatedRenewalPolicy = $repo->find($renewalPolicy->getId());
+        $this->assertEquals(Policy::STATUS_RENEWAL, $updatedRenewalPolicy->getStatus());
+    }
+
+    public function testUserRenewCustomMonthlyDecline()
+    {
+        $email = self::generateEmail('testUserRenewCustomMonthlyDecline', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $date = new \DateTime();
+        $date = $date->sub(new \DateInterval('P350D'));
+        $policy = self::initPolicy($user, self::$dm, $phone, $date, true, true, false);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        static::$dm->flush();
+
+        $this->assertFalse($policy->isRenewed());
+
+        $tomorrow = new \DateTime();
+        $tomorrow = $tomorrow->add(new \DateInterval('P1D'));
+        $renewalPolicy = $this->getRenewalPolicy($policy, false, $tomorrow);
+        static::$dm->persist($renewalPolicy);
+        static::$dm->flush();
+
+        $crawler = $this->login($email, $password, 'user/');
+
+        $this->validateRenewalAllowed($crawler, 1);
+
+        $crawler = self::$client->request('GET', sprintf('/user/renew/%s/custom', $policy->getId()));
+
+        $form = $crawler->selectButton('decline_form[decline]')->form();
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(302);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $updatedRenewalPolicy = $repo->find($renewalPolicy->getId());
+        $this->assertEquals(Policy::STATUS_DECLINED_RENEWAL, $updatedRenewalPolicy->getStatus());
+        $this->assertNull($updatedRenewalPolicy->getPreviousPolicy()->getCashback());
+    }
+
+    public function testUserRenewCashbackCustomMonthly()
+    {
+        $emailA = self::generateEmail('testUserRenewCashbackCustomMonthlyA', $this);
+        $emailB = self::generateEmail('testUserRenewCashbackCustomMonthlyB', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $userA = self::createUser(
+            self::$userManager,
+            $emailA,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $userB = self::createUser(
+            self::$userManager,
+            $emailB,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $date = new \DateTime();
+        $date = $date->sub(new \DateInterval('P350D'));
+        $policyA = self::initPolicy($userA, self::$dm, $phone, $date, true, true, false);
+        $policyB = self::initPolicy($userB, self::$dm, $phone, $date, true, true, false);
+        $policyA->setStatus(Policy::STATUS_ACTIVE);
+        $policyB->setStatus(Policy::STATUS_ACTIVE);
+        static::$dm->flush();
+
+        $this->assertFalse($policyA->isRenewed());
+        $this->assertFalse($policyB->isRenewed());
+        
+        self::connectPolicies(self::$invitationService, $policyA, $policyB, $date);
+
+        $tomorrow = new \DateTime();
+        $tomorrow = $tomorrow->add(new \DateInterval('P1D'));
+        $renewalPolicyA = $this->getRenewalPolicy($policyA, false, $tomorrow);
+        $renewalPolicyB = $this->getRenewalPolicy($policyB, false, $tomorrow);
+        static::$dm->persist($renewalPolicyA);
+        static::$dm->persist($renewalPolicyB);
+        static::$dm->flush();
+        
+        $this->assertEquals(10, $policyA->getPotValue());
+        $this->assertEquals(10, $policyB->getPotValue());
+
+        $crawler = $this->login($emailA, $password, 'user/');
+
+        $this->validateRenewalAllowed($crawler, 1);
+
+        $crawler = self::$client->request('GET', sprintf('/user/renew/%s/custom', $policyA->getId()));
+
+        $form = $crawler->selectButton('renew_cashback_form[renew]')->form();
+        $form['renew_cashback_form[accountName]'] = 'foo bar';
+        $form['renew_cashback_form[sortCode]'] = '123456';
+        $form['renew_cashback_form[accountNumber]'] = '12345678';
+        $form['renew_cashback_form[encodedAmount]'] =
+            sprintf('%0.2f|12|0', $renewalPolicyA->getPremium()->getYearlyPremiumPrice());
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(302);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $updatedRenewalPolicyA = $repo->find($renewalPolicyA->getId());
+        $this->assertEquals(Policy::STATUS_RENEWAL, $updatedRenewalPolicyA->getStatus());
+        $this->assertNotNull($updatedRenewalPolicyA->getPreviousPolicy()->getCashback());
+    }
+
+    public function testUserRenewCashbackCustomDeclined()
+    {
+        $emailA = self::generateEmail('testUserRenewCashbackCustomDeclinedA', $this);
+        $emailB = self::generateEmail('testUserRenewCashbackCustomDeclinedB', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $userA = self::createUser(
+            self::$userManager,
+            $emailA,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $userB = self::createUser(
+            self::$userManager,
+            $emailB,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $date = new \DateTime();
+        $date = $date->sub(new \DateInterval('P350D'));
+        $policyA = self::initPolicy($userA, self::$dm, $phone, $date, true, true, false);
+        $policyB = self::initPolicy($userB, self::$dm, $phone, $date, true, true, false);
+        $policyA->setStatus(Policy::STATUS_ACTIVE);
+        $policyB->setStatus(Policy::STATUS_ACTIVE);
+        static::$dm->flush();
+
+        $this->assertFalse($policyA->isRenewed());
+        $this->assertFalse($policyB->isRenewed());
+        
+        self::connectPolicies(self::$invitationService, $policyA, $policyB, $date);
+
+        $tomorrow = new \DateTime();
+        $tomorrow = $tomorrow->add(new \DateInterval('P1D'));
+        $renewalPolicyA = $this->getRenewalPolicy($policyA, false, $tomorrow);
+        $renewalPolicyB = $this->getRenewalPolicy($policyB, false, $tomorrow);
+        static::$dm->persist($renewalPolicyA);
+        static::$dm->persist($renewalPolicyB);
+        static::$dm->flush();
+        
+        $this->assertEquals(10, $policyA->getPotValue());
+        $this->assertEquals(10, $policyB->getPotValue());
+
+        $crawler = $this->login($emailA, $password, 'user/');
+
+        $this->validateRenewalAllowed($crawler, 1);
+
+        $crawler = self::$client->request('GET', sprintf('/user/renew/%s/custom', $policyA->getId()));
+
+        $form = $crawler->selectButton('cashback_form[cashback]')->form();
+        $form['cashback_form[accountName]'] = 'foo bar';
+        $form['cashback_form[sortCode]'] = '123456';
+        $form['cashback_form[accountNumber]'] = '12345678';
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(302);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $updatedRenewalPolicyA = $repo->find($renewalPolicyA->getId());
+        $this->assertEquals(Policy::STATUS_DECLINED_RENEWAL, $updatedRenewalPolicyA->getStatus());
+        $this->assertNotNull($updatedRenewalPolicyA->getPreviousPolicy()->getCashback());
     }
 }

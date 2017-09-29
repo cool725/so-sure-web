@@ -55,6 +55,7 @@ class MixpanelService
     const EVENT_RENEWAL = 'Renewal Page';
     const EVENT_RENEW = 'Renew Policy';
     const EVENT_CASHBACK = 'Cashback';
+    const EVENT_DECLINE_RENEW = 'Decline Renew Policy';
 
     const CUSTOM_TOTAL_SITE_VISITORS = '$custom_event:379938';
     const CUSTOM_QUOTE_PAGE_UK = '$custom_event:458980';
@@ -579,6 +580,9 @@ class MixpanelService
             $userData['Billing Address'] = $user->getBillingAddress()->__toString();
             if ($census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode())) {
                 $userData['PenPortrait'] = $census->getSubGroup();
+            }
+            if ($income = $this->searchService->findIncome($user->getBillingAddress()->getPostcode())) {
+                $userData['Total Weekly Income'] = $income->getTotal()->getIncome();
             }
         }
         if ($user->getFacebookId()) {

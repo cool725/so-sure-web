@@ -96,6 +96,25 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             }
         }
 
+        $phones = [];
+        foreach ($expUsersB as $user) {
+            $phones[] = $user->getPolicies()[0]->getPhone();
+        }
+        foreach ($expUsersC as $user) {
+            $phones[] = $user->getPolicies()[0]->getPhone();
+        }
+        $sixMonthsAgo = new \DateTime();
+        $sixMonthsAgo = $sixMonthsAgo->sub(new \DateInterval('P6M'));
+        $adjusted = [];
+        for ($i = 0; $i < 5; $i++) {
+            $phone = $phones[rand(0, count($phones) - 1)];
+            if (isset($adjusted[$phone->getId()])) {
+                continue;
+            }
+            $adjusted[] = $phone->getId();
+            $phone->changePrice($phone->getCurrentPhonePrice()->getGwp() - 0.30, $sixMonthsAgo, null, null, $sixMonthsAgo);
+        }
+
         // Sample user for apple
         $user = $this->newUser('julien+apple@so-sure.com', true);
         $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
@@ -119,24 +138,46 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $this->addConnections($manager, $user, [$networkUser], 1);
 
         // Users for iOS Testing
-        $iphoneSE = $this->getIPhoneSE($manager);
+        $iphoneUI = $this->getIPhoneUI($manager);
         $userInviter = $this->newUser('ios-testing+inviter@so-sure.com', true);
         $userInviter->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
         $userInviter->setEnabled(true);
         $manager->persist($userInviter);
-        $this->newPolicy($manager, $userInviter, $count++, false, null, null, $iphoneSE, true);
+        $this->newPolicy($manager, $userInviter, $count++, false, null, null, $iphoneUI, true);
 
         $userInvitee = $this->newUser('ios-testing+invitee@so-sure.com', true);
         $userInvitee->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
         $userInvitee->setEnabled(true);
         $manager->persist($userInvitee);
-        $this->newPolicy($manager, $userInvitee, $count++, false, null, null, $iphoneSE, true, false);
+        $this->newPolicy($manager, $userInvitee, $count++, false, null, null, $iphoneUI, true, false);
 
         $user = $this->newUser('ios-testing+scode@so-sure.com', true);
         $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $manager->persist($user);
-        $this->newPolicy($manager, $user, $count++, false, null, 'IOS-TEST', $iphoneSE, true);
+        $this->newPolicy($manager, $user, $count++, false, null, 'IOS-TEST', $iphoneUI, true);
+
+        $this->invite($manager, $userInviter, $userInvitee, false);
+
+        // Users for Android Testing
+        $androidUI = $this->getAndroidUI($manager);
+        $userInviter = $this->newUser('android-testing+inviter@so-sure.com', true);
+        $userInviter->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $userInviter->setEnabled(true);
+        $manager->persist($userInviter);
+        $this->newPolicy($manager, $userInviter, $count++, false, null, null, $androidUI, true);
+
+        $userInvitee = $this->newUser('android-testing+invitee@so-sure.com', true);
+        $userInvitee->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $userInvitee->setEnabled(true);
+        $manager->persist($userInvitee);
+        $this->newPolicy($manager, $userInvitee, $count++, false, null, null, $androidUI, true, false);
+
+        $user = $this->newUser('android-testing+scode@so-sure.com', true);
+        $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $user->setEnabled(true);
+        $manager->persist($user);
+        $this->newPolicy($manager, $user, $count++, false, null, 'AND-TEST', $androidUI, true);
 
         $this->invite($manager, $userInviter, $userInvitee, false);
 
@@ -238,10 +279,18 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         return $user;
     }
 
-    private function getIPhoneSE($manager)
+    private function getIPhoneUI($manager)
     {
         $phoneRepo = $manager->getRepository(Phone::class);
         $phone = $phoneRepo->findOneBy(['devices' => 'iPhone8,4', 'memory' => 16]);
+
+        return $phone;
+    }
+
+    private function getAndroidUI($manager)
+    {
+        $phoneRepo = $manager->getRepository(Phone::class);
+        $phone = $phoneRepo->findOneBy(['devices' => 'marmite']);
 
         return $phone;
     }

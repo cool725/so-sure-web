@@ -12,6 +12,7 @@ class PolicyEvent extends Event
     const EVENT_EXPIRED = 'event.policy.expired';
     const EVENT_PENDING_RENEWAL = 'event.policy.pending-renewal';
     const EVENT_RENEWED = 'event.policy.renewed';
+    const EVENT_DECLINED_RENEWAL = 'event.policy.declined-renewal';
     const EVENT_START = 'event.policy.start';
     const EVENT_CASHBACK = 'event.policy.cashback';
 
