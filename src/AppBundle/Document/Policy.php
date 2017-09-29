@@ -450,6 +450,18 @@ abstract class Policy
      */
     public function getPayments()
     {
+        $payments = [];
+        foreach ($this->payments as $payment) {
+            if ($payment->isStandardPayment()) {
+                $payments[] = $payment;
+            }
+        }
+
+        return $payments;
+    }
+
+    public function getAllPayments()
+    {
         return $this->payments;
     }
 
@@ -484,11 +496,11 @@ abstract class Policy
 
     public function getPaymentsByType($type)
     {
-        $payments = $this->getPayments();
+        $payments = $this->getAllPayments();
         if (is_object($payments)) {
             $payments = $payments->toArray();
         }
-        if (!$this->getPayments()) {
+        if (!$payments) {
             return [];
         }
 
@@ -3482,7 +3494,7 @@ abstract class Policy
         return ScheduledPayment::sumScheduledPaymentAmounts($scheduledPayments);
     }
 
-    public function arePolicyScheduledPaymentsCorrect(\DateTime $date = null)
+    public function arePolicyScheduledPaymentsCorrect()
     {
         $scheduledPayments = $this->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);
 
@@ -3494,10 +3506,14 @@ abstract class Policy
         }
 
         $totalScheduledPayments = ScheduledPayment::sumScheduledPaymentAmounts($scheduledPayments);
-        $outstanding = $this->getYearlyPremiumPrice() - $this->getTotalSuccessfulPayments($date);
-        //print sprintf("%f ?= %f\n", $outstanding, $totalScheduledPayments);
+        /*
+        print $totalScheduledPayments . PHP_EOL;
+        print $this->getOutstandingPremium() . PHP_EOL;
+        print $this->getPremium()->getYearlyPremiumPrice() . PHP_EOL;
+        print $this->getPremiumPaid() . PHP_EOL;
+        */
 
-        return $this->areEqualToTwoDp($outstanding, $totalScheduledPayments);
+        return $this->areEqualToTwoDp($this->getOutstandingPremium(), $totalScheduledPayments);
     }
 
     public function getClaimsText()
@@ -3663,7 +3679,13 @@ abstract class Policy
         $numPayments = $premium->getNumberOfMonthlyPayments($this->getTotalSuccessfulPayments($date));
         $expectedCommission = $salva->sumBrokerFee($numPayments, $numPayments == 12);
 
-        return $this->areEqualToTwoDp($this->getTotalCommissionPaid($date), $expectedCommission);
+        /*
+        print $numPayments . PHP_EOL;
+        print $expectedCommission . PHP_EOL;
+        print $this->getTotalCommissionPaid() . PHP_EOL;
+        */
+
+        return $this->areEqualToTwoDp($this->getTotalCommissionPaid(), $expectedCommission);
     }
 
     public function getPremiumPayments()

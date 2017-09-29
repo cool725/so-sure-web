@@ -679,7 +679,7 @@ class PolicyService
     public function adjustScheduledPayments(Policy $policy, $expectSingleAdjustment = false, \DateTime $date = null)
     {
         $log = [];
-        if ($policy->arePolicyScheduledPaymentsCorrect($date)) {
+        if ($policy->arePolicyScheduledPaymentsCorrect()) {
             return null;
         }
 
@@ -697,14 +697,14 @@ class PolicyService
             }
         }
 
-        if ($policy->arePolicyScheduledPaymentsCorrect($date)) {
+        if ($policy->arePolicyScheduledPaymentsCorrect()) {
             $this->dm->flush();
             return null;
         }
 
         $scheduledPayments = [];
         // Try cancellating scheduled payments until amount matches
-        while (!$policy->arePolicyScheduledPaymentsCorrect($date) &&
+        while (!$policy->arePolicyScheduledPaymentsCorrect() &&
                 ($scheduledPayment = $policy->getNextScheduledPayment()) !== null) {
             $scheduledPayments[] = $scheduledPayment;
             $scheduledPayment->cancel();
@@ -717,7 +717,7 @@ class PolicyService
             );
         }
 
-        if ($policy->arePolicyScheduledPaymentsCorrect($date)) {
+        if ($policy->arePolicyScheduledPaymentsCorrect()) {
             $this->dm->flush();
             // If user has manually paid, there should be a single adjustment made, so reduce log level
             if ($expectSingleAdjustment && count($scheduledPayments) == 1) {

@@ -239,7 +239,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             $data['warnClaim'] = true;
             $lines[] = $this->failureStatusMessage($policy, $data['prefix'], $data['validateDate']);
         }
-        if ($policy->arePolicyScheduledPaymentsCorrect($data['validateDate']) === false) {
+        if ($policy->arePolicyScheduledPaymentsCorrect() === false) {
             $this->header($policy, $policies, $lines);
             $data['warnClaim'] = true;
             if ($data['adjustScheduledPayments']) {
