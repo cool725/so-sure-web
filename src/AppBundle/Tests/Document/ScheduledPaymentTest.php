@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Document;
 
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\SalvaPhonePolicy;
+use AppBundle\Document\PhonePremium;
 use AppBundle\Document\User;
 
 /**
@@ -34,5 +35,34 @@ class ScheduledPaymentTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($scheduledPayment->getStatus());
         $scheduledPayment->cancel();
         $this->assertEquals(ScheduledPayment::STATUS_CANCELLED, $scheduledPayment->getStatus());
+    }
+
+    public function testIsBillable()
+    {
+        $premium = new PhonePremium();
+        $policy = new SalvaPhonePolicy();
+        $policy->setPremium($premium);
+        $policy->setStatus(SalvaPhonePolicy::STATUS_ACTIVE);
+        $this->assertTrue($policy->isBillablePolicy());
+
+        $scheduledPayment = new ScheduledPayment();
+        $scheduledPayment->setType(ScheduledPayment::TYPE_SCHEDULED);
+        $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+        $policy->addScheduledPayment($scheduledPayment);
+
+        $this->assertTrue($scheduledPayment->isBillable());
+
+        $scheduledPayment->setStatus(ScheduledPayment::STATUS_CANCELLED);
+        $this->assertFalse($scheduledPayment->isBillable());
+
+        $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+        $policy->setStatus(SalvaPhonePolicy::STATUS_CANCELLED);
+        $this->assertFalse($scheduledPayment->isBillable());
+
+        $scheduledPayment->setType(ScheduledPayment::TYPE_ADMIN);
+        $this->assertTrue($scheduledPayment->isBillable());
+
+        $scheduledPayment->setStatus(ScheduledPayment::STATUS_CANCELLED);
+        $this->assertFalse($scheduledPayment->isBillable());
     }
 }

@@ -23,6 +23,7 @@ class ScheduledPayment
 
     const TYPE_SCHEDULED = 'scheduled';
     const TYPE_RESCHEDULED = 'rescheduled';
+    const TYPE_ADMIN = 'admin';
 
     /**
      * @MongoDB\Id
@@ -44,7 +45,7 @@ class ScheduledPayment
     protected $status;
 
     /**
-     * @Assert\Choice({"scheduled", "rescheduled"}, strict=true)
+     * @Assert\Choice({"scheduled", "rescheduled", "admin"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -179,9 +180,15 @@ class ScheduledPayment
 
     public function isBillable()
     {
-        return $this->getStatus() == self::STATUS_SCHEDULED &&
-                $this->getPolicy()->isPolicy() &&
-                $this->getPolicy()->isBillablePolicy();
+        // Admin should ignore billable status to allow an expired policy to be billed
+        if ($this->getType() == self::TYPE_ADMIN) {
+            return $this->getStatus() == self::STATUS_SCHEDULED &&
+                    $this->getPolicy()->isPolicy();
+        } else {
+            return $this->getStatus() == self::STATUS_SCHEDULED &&
+                    $this->getPolicy()->isPolicy() &&
+                    $this->getPolicy()->isBillablePolicy();
+        }
     }
 
     public function canBeRun(\DateTime $date = null)
