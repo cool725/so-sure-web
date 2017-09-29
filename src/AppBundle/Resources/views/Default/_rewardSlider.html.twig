@@ -48,7 +48,7 @@
 
 {# Start amount and work out monthly #}
 {% set start_premium = annual_premium - start_value %}
-{% set monthly_premium = start_premium / 12 %}
+{% set monthly_premium = (start_premium / 12)|round(2, 'common') %}
 
 <div class="reward-slider">
 
