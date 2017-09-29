@@ -77,7 +77,11 @@
                         </a>]
                         <br>
                         {{ census.getSuperGroup }} / {{ census.getGroup }} / {{ census.getSubGroup }}
-                    {% endif%}
+                    {% endif %}
+                    {% if income %}
+                        <br>
+                        £{{ income.total.income|number_format(0, '.', ',') }} weekly income
+                    {% endif %}
                     </td>
                     <td></td>
                 </tr>

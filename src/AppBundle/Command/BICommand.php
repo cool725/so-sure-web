@@ -72,12 +72,14 @@ class BICommand extends ContainerAwareCommand
             '"Policy upgraded"',
             '"Age of Policy Holder"',
             '"Pen Portrait"',
-            '"Gender"'
+            '"Gender"',
+            '"Total Weekly Income"',
         ]);
         foreach ($claims as $claim) {
             $policy = $claim->getPolicy();
             $user = $policy->getUser();
             $census = $search->findNearest($user->getBillingAddress()->getPostcode());
+            $income = $search->findIncome($user->getBillingAddress()->getPostcode());
             $lines[] = implode(',', [
                 sprintf('"%s"', $policy->getPolicyNumber()),
                 sprintf('"%s"', $policy->getStart()->format('Y-m-d H:i:s')),
@@ -102,6 +104,7 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%d"', $user->getAge()),
                 sprintf('"%s"', $census ? $census->getSubgrp() : ''),
                 sprintf('"%s"', $user->getGender() ? $user->getGender() : ''),
+                $income ? sprintf('"%0.0f"', $income->getTotal()->getIncome()) : '""',
             ]);
         }
         $this->uploadS3(implode(PHP_EOL, $lines), 'claims.csv');
@@ -130,10 +133,12 @@ class BICommand extends ContainerAwareCommand
             '"Number of Withdrawn/Declined Claims"',
             '"Pen Portrait"',
             '"Gender"',
+            '"Total Weekly Income"',
         ]);
         foreach ($policies as $policy) {
             $user = $policy->getUser();
             $census = $search->findNearest($user->getBillingAddress()->getPostcode());
+            $income = $search->findIncome($user->getBillingAddress()->getPostcode());
             $lines[] = implode(',', [
                 sprintf('"%s"', $policy->getPolicyNumber()),
                 sprintf('"%d"', $user->getAge()),
@@ -149,6 +154,7 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', count($policy->getWithdrawnDeclinedClaims(true))),
                 sprintf('"%s"', $census ? $census->getSubgrp() : ''),
                 sprintf('"%s"', $user->getGender() ? $user->getGender() : ''),
+                $income ? sprintf('"%0.0f"', $income->getTotal()->getIncome()) : '""',
             ]);
         }
         $this->uploadS3(implode(PHP_EOL, $lines), 'policies.csv');

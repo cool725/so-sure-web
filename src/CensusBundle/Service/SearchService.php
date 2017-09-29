@@ -2,6 +2,8 @@
 namespace CensusBundle\Service;
 
 use CensusBundle\Document\Postcode;
+use CensusBundle\Document\OutputArea;
+use CensusBundle\Document\Income;
 use GeoJson\Geometry\Point;
 
 class SearchService
@@ -38,5 +40,24 @@ class SearchService
             ->getQuery();
 
         return $searchQuery->getSingleResult();
+    }
+
+    public function findOutputArea($code)
+    {
+        $outputAreaRepo = $this->dm->getRepository(OutputArea::class);
+
+        return $outputAreaRepo->findOneBy(['Postcode' => $code]);
+    }
+
+    public function findIncome($code)
+    {
+        $outputArea = $this->findOutputArea($code);
+        if (!$outputArea) {
+            return null;
+        }
+
+        $incomeRepo = $this->dm->getRepository(Income::class);
+
+        return $incomeRepo->findOneBy(['MSOA' => $outputArea->getMSOA()]);
     }
 }

@@ -776,10 +776,12 @@ class AdminEmployeeController extends BaseController
         $postcodeRepo = $censusDM->getRepository(PostCode::class);
         $postcode = null;
         $census = null;
+        $income = null;
         if ($user->getBillingAddress()) {
             $search = $this->get('census.search');
             $postcode = $search->getPostcode($user->getBillingAddress()->getPostcode());
             $census = $search->findNearest($user->getBillingAddress()->getPostcode());
+            $income = $search->findIncome($user->getBillingAddress()->getPostcode());
         }
 
         $resetForm = $this->get('form.factory')
@@ -932,6 +934,7 @@ class AdminEmployeeController extends BaseController
             'makemodel_form' => $makeModelForm->createView(),
             'postcode' => $postcode,
             'census' => $census,
+            'income' => $income,
         ];
     }
 
