@@ -16,6 +16,7 @@ use AppBundle\Classes\DaviesClaim;
 
 /**
  * @group functional-nonet
+ * AppBundle\\Tests\\Service\\DaviesServiceTest
  */
 class DaviesServiceTest extends WebTestCase
 {
@@ -296,30 +297,28 @@ class DaviesServiceTest extends WebTestCase
         $this->assertEquals(2, $updatedClaim2->getReservedValue());
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testValidateClaimDetailsPolicyNumber()
     {
         $policy = new PhonePolicy();
         $claim = new Claim();
         $policy->addClaim($claim);
-        $policy->setPolicyNumber(1);
+        $policy->setPolicyNumber('TEST/2016/123456');
 
         $daviesClaim = new DaviesClaim();
-        $daviesClaim->policyNumber = 2;
+        $daviesClaim->policyNumber = 'TEST/2017/123456';
 
-        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->validateClaimsDetailsThrowsException(
+            $claim,
+            $daviesClaim,
+            'does not match policy number '
+        );
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testValidateClaimDetailsInvalidStatus()
     {
         $address = new Address();
         $address->setType(Address::TYPE_BILLING);
-        $address->setPostCode('AAA');
+        $address->setPostCode('BX11LT');
         $user = new User();
         $user->setBillingAddress($address);
         $user->setFirstName('foo');
@@ -328,21 +327,81 @@ class DaviesServiceTest extends WebTestCase
         $user->addPolicy($policy);
         $claim = new Claim();
         $policy->addClaim($claim);
-        $policy->setPolicyNumber(1);
+        $policy->setPolicyNumber('TEST/2017/123456');
 
         $daviesClaim = new DaviesClaim();
-        $daviesClaim->policyNumber = 1;
+        $daviesClaim->policyNumber = 'TEST/2017/123456';
         $daviesClaim->replacementImei = '123';
         $daviesClaim->status = 'Closed';
         $daviesClaim->miStatus = 'Withdrawn';
         $daviesClaim->insuredName = 'Mr Foo Bar';
 
-        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->validateClaimsDetailsThrowsException(
+            $claim,
+            $daviesClaim,
+            'replacement IMEI Number, yet has a withdrawn/declined status'
+        );
     }
 
-    /**
-     * @expectedException \Exception
-     */
+    public function testValidateClaimDetailsMissingPhone()
+    {
+        $address = new Address();
+        $address->setType(Address::TYPE_BILLING);
+        $address->setPostCode('BX11LT');
+        $user = new User();
+        $user->setBillingAddress($address);
+        $user->setFirstName('foo');
+        $user->setLastName('bar');
+        $policy = new PhonePolicy();
+        $user->addPolicy($policy);
+        $claim = new Claim();
+        $policy->addClaim($claim);
+        $policy->setPolicyNumber('TEST/2017/123456');
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->policyNumber = 'TEST/2017/123456';
+        $daviesClaim->status = 'Open';
+        $daviesClaim->miStatus = '';
+        $daviesClaim->insuredName = 'Mr Foo Bar';
+        $daviesClaim->lossDate = new \DateTime('2017-07-01');
+        $daviesClaim->replacementReceivedDate = new \DateTime('2017-07-02');
+
+        $this->validateClaimsDetailsThrowsException(
+            $claim,
+            $daviesClaim,
+            'replacement received date without a replacement make/model'
+        );
+    }
+
+    public function testValidateClaimDetailsReplacementDateMissingImei()
+    {
+        $address = new Address();
+        $address->setType(Address::TYPE_BILLING);
+        $address->setPostCode('BX11LT');
+        $user = new User();
+        $user->setBillingAddress($address);
+        $user->setFirstName('foo');
+        $user->setLastName('bar');
+        $policy = new PhonePolicy();
+        $user->addPolicy($policy);
+        $claim = new Claim();
+        $policy->addClaim($claim);
+        $policy->setPolicyNumber('TEST/2017/123456');
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->policyNumber = 'TEST/2017/123456';
+        $daviesClaim->status = 'Open';
+        $daviesClaim->miStatus = '';
+        $daviesClaim->insuredName = 'Mr Foo Bar';
+        $daviesClaim->lossDate = new \DateTime('2017-07-01');
+        $daviesClaim->replacementReceivedDate = new \DateTime('2017-07-02');
+        $daviesClaim->replacementMake = 'Apple';
+        $daviesClaim->replacementModel = 'iPhone 8';
+
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->insureErrorExists('/replacement received date without a replacement imei/');
+    }
+
     public function testValidateClaimDetailsName()
     {
         $user = new User();
@@ -352,14 +411,18 @@ class DaviesServiceTest extends WebTestCase
         $user->addPolicy($policy);
         $claim = new Claim();
         $policy->addClaim($claim);
-        $policy->setPolicyNumber(3);
+        $policy->setPolicyNumber('TEST/2017/1234569');
 
         $daviesClaim = new DaviesClaim();
-        $daviesClaim->policyNumber = 3;
+        $daviesClaim->policyNumber = 'TEST/2017/1234569';
         $daviesClaim->insuredName = 'Mr Bar Foo';
         $daviesClaim->status = DaviesClaim::STATUS_OPEN;
 
-        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->validateClaimsDetailsThrowsException(
+            $claim,
+            $daviesClaim,
+            'does not match expected insuredName'
+        );
     }
 
     public function testValidateClaimDetails()
@@ -389,9 +452,6 @@ class DaviesServiceTest extends WebTestCase
         $this->assertEquals(0, count(self::$daviesService->getErrors()));
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testValidateClaimDetailsInvalidPolicyNumber()
     {
         $policy = static::createUserPolicy(true);
@@ -402,12 +462,13 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->policyNumber = -1;
         $daviesClaim->status = DaviesClaim::STATUS_OPEN;
 
-        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->validateClaimsDetailsThrowsException(
+            $claim,
+            $daviesClaim,
+            'does not match policy number'
+        );
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testValidateClaimDetailsInvalidName()
     {
         $policy = static::createUserPolicy(true);
@@ -419,12 +480,13 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->insuredName = 'Mr Patrick McAndrew';
         $daviesClaim->status = DaviesClaim::STATUS_OPEN;
 
-        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->validateClaimsDetailsThrowsException(
+            $claim,
+            $daviesClaim,
+            'does not match expected insuredName'
+        );
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testValidateClaimDetailsInvalidReceivedDate()
     {
         $policy = static::createUserPolicy(true);
@@ -442,7 +504,11 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->insuredName = 'Mr foo bar';
         $daviesClaim->status = DaviesClaim::STATUS_OPEN;
 
-        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->validateClaimsDetailsThrowsException(
+            $claim,
+            $daviesClaim,
+            'replacement received date prior to loss date'
+        );
     }
 
     public function testValidateClaimDetailsInvalidPostcode()
@@ -690,6 +756,8 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->reserved = 0;
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr foo bar';
+        $daviesClaim->replacementMake = 'Apple';
+        $daviesClaim->replacementModel = 'iPhone 8';
         $daviesClaim->replacementReceivedDate = new \DateTime('2016-01-01');
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
@@ -734,6 +802,8 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->status = DaviesClaim::STATUS_OPEN;
         $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
         $daviesClaim->replacementReceivedDate = new \DateTime('2016-01-02');
+        $daviesClaim->replacementMake = 'Apple';
+        $daviesClaim->replacementModel = 'iPhone 4';
         static::$daviesService->saveClaim($daviesClaim, false);
         $this->assertNotNull($claim->getApprovedDate());
         $this->assertEquals(new \DateTime('2016-01-01'), $claim->getApprovedDate());
@@ -762,6 +832,8 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->status = DaviesClaim::STATUS_OPEN;
         $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
         $daviesClaim->replacementReceivedDate = new \DateTime('2016-01-02');
+        $daviesClaim->replacementMake = 'Apple';
+        $daviesClaim->replacementModel = 'iPhone 4';
         static::$daviesService->saveClaim($daviesClaim, false);
         $this->assertEquals(new \DateTime('2016-01-01'), $claim->getApprovedDate());
         $this->assertEquals(0, $claim->getIncurred());
@@ -894,11 +966,23 @@ class DaviesServiceTest extends WebTestCase
         }
     }
 
+    private function validateClaimsDetailsThrowsException($claim, $daviesClaim, $message)
+    {
+        $exception = false;
+        try {
+            self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        } catch (\Exception $e) {
+            $exception = true;
+            $this->assertContains($message, $e->getMessage());
+        }
+        $this->assertTrue($exception);
+    }
+
     private function generateUserPolicyClaim($email, $policyNumber)
     {
         $address = new Address();
         $address->setType(Address::TYPE_BILLING);
-        $address->setPostCode('AAA');
+        $address->setPostCode('BX11LT');
         $user = new User();
         $user->setBillingAddress($address);
         $user->setFirstName('foo');
