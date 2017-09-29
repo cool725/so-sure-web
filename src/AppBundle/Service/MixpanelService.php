@@ -581,7 +581,7 @@ class MixpanelService
             if ($census = $this->searchService->findNearest($user->getBillingAddress()->getPostcode())) {
                 $userData['PenPortrait'] = $census->getSubGroup();
             }
-            if ($income = $search->findIncome($user->getBillingAddress()->getPostcode())) {
+            if ($income = $this->searchService->findIncome($user->getBillingAddress()->getPostcode())) {
                 $userData['Total Weekly Income'] = $income->getTotal()->getIncome();
             }
         }
