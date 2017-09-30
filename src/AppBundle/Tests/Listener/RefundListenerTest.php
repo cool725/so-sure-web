@@ -257,7 +257,7 @@ class RefundListenerTest extends WebTestCase
         static::$dm->persist($renewalPolicy);
 
         $policy->setPotValue(10);
-        $renewalPolicy->renew(10, new \DateTime('2016-12-15'));
+        $renewalPolicy->renew(10, false, new \DateTime('2016-12-15'));
 
         // TODO: create actual connection on initial policy, and expire that here
         // instead of creating payment to avoid triggering the updatepot which will wipe
@@ -314,7 +314,7 @@ class RefundListenerTest extends WebTestCase
         static::$dm->persist($renewalPolicy);
 
         $policy->setPotValue(10);
-        $renewalPolicy->renew(10, new \DateTime('2016-12-15'));
+        $renewalPolicy->renew(10, false, new \DateTime('2016-12-15'));
 
         // TODO: create actual connection on initial policy, and expire that here
         // instead of creating payment to avoid triggering the updatepot which will wipe
@@ -383,7 +383,7 @@ class RefundListenerTest extends WebTestCase
         static::$dm->persist($renewalPolicy);
 
         $policy->setPotValue(10);
-        $renewalPolicy->renew(10, new \DateTime('2016-12-15'));
+        $renewalPolicy->renew(10, false, new \DateTime('2016-12-15'));
 
         // TODO: create actual connection on initial policy, and expire that here
         // instead of creating payment to avoid triggering the updatepot which will wipe

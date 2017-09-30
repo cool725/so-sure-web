@@ -1099,7 +1099,7 @@ class InvitationServiceTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
 
         static::$policyService->setEnvironment('prod');
-        static::$policyService->renew($policy, 12, null, new \DateTime('2017-05-30'));
+        static::$policyService->renew($policy, 12, null, false, new \DateTime('2017-05-30'));
         static::$policyService->setEnvironment('test');
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicy->getStatus());
         $this->assertNull($policy->getCashback());

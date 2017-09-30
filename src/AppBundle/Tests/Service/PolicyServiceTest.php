@@ -1174,7 +1174,48 @@ class PolicyServiceTest extends WebTestCase
         );
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
 
-        static::$policyService->renew($policy, 12, null, new \DateTime('2017-05-30'));
+        static::$policyService->renew($policy, 12, null, false, new \DateTime('2017-05-30'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicy->getStatus());
+        $this->assertNull($policy->getCashback());
+        $this->assertEquals(
+            new \DateTime('2017-06-01 00:00:00', new \DateTimeZone(Salva::SALVA_TIMEZONE)),
+            $renewalPolicy->getStart()
+        );
+        $this->assertEquals(new \DateTimeZone(Salva::SALVA_TIMEZONE), $renewalPolicy->getStart()->getTimeZone());
+    }
+
+    public function testPolicyAutoRenew()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPolicyAutoRenew', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-06-01'), true);
+        static::$policyService->setEnvironment('test');
+        static::$dm->flush();
+        $this->assertEquals(new \DateTimeZone(Salva::SALVA_TIMEZONE), $policy->getStart()->getTimeZone());
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+
+        $renewalPolicy = static::$policyService->createPendingRenewal(
+            $policy,
+            new \DateTime('2017-05-15')
+        );
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
+
+        static::$policyService->autoRenew($policy, new \DateTime('2017-06-01'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicy->getStatus());
         $this->assertNull($policy->getCashback());
         $this->assertEquals(
@@ -1299,7 +1340,7 @@ class PolicyServiceTest extends WebTestCase
         );
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
 
-        static::$policyService->renew($policy, 12, null, new \DateTime('2016-12-30'));
+        static::$policyService->renew($policy, 12, null, false, new \DateTime('2016-12-30'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicy->getStatus());
 
         $policies = static::$policyService->activateRenewalPolicies(
@@ -1307,7 +1348,7 @@ class PolicyServiceTest extends WebTestCase
             false,
             new \DateTime('2017-01-02')
         );
-        $this->assertEquals(1, count($policies));
+        $this->assertGreaterThan(0, count($policies));
     }
 
     public function testUnRenewPolicies()
@@ -1412,7 +1453,7 @@ class PolicyServiceTest extends WebTestCase
             false,
             new \DateTime('2017-01-02')
         );
-        $this->assertEquals(1, count($policies));
+        $this->assertGreaterThan(0, count($policies));
     }
 
     public function testPolicyRenewCashback()
@@ -1428,7 +1469,7 @@ class PolicyServiceTest extends WebTestCase
         $cashback->setAccountName('a');
         $exceptionThrown = false;
         try {
-            static::$policyService->renew($policyA, 12, $cashback, new \DateTime('2016-12-30'));
+            static::$policyService->renew($policyA, 12, $cashback, false, new \DateTime('2016-12-30'));
         } catch (ValidationException $e) {
             $exceptionThrown = true;
         }
@@ -1438,7 +1479,7 @@ class PolicyServiceTest extends WebTestCase
         $cashback->setSortCode('1');
         $exceptionThrown = false;
         try {
-            static::$policyService->renew($policyA, 12, $cashback, new \DateTime('2016-12-30'));
+            static::$policyService->renew($policyA, 12, $cashback, false, new \DateTime('2016-12-30'));
         } catch (ValidationException $e) {
             $exceptionThrown = true;
         }
@@ -1448,14 +1489,14 @@ class PolicyServiceTest extends WebTestCase
         $cashback->setAccountNumber('1');
         $exceptionThrown = false;
         try {
-            static::$policyService->renew($policyA, 12, $cashback, new \DateTime('2016-12-30'));
+            static::$policyService->renew($policyA, 12, $cashback, false, new \DateTime('2016-12-30'));
         } catch (ValidationException $e) {
             $exceptionThrown = true;
         }
         $this->assertTrue($exceptionThrown);
 
         $cashback = $this->getCashback($policyA);
-        static::$policyService->renew($policyA, 12, $cashback, new \DateTime('2016-12-30'));
+        static::$policyService->renew($policyA, 12, $cashback, false, new \DateTime('2016-12-30'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
         $this->assertNotNull($policyA->getCashback());
         $this->assertEquals(Cashback::STATUS_PENDING_CLAIMABLE, $policyA->getCashback()->getStatus());
@@ -1494,7 +1535,7 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals($cashback->getAccountNumber(), $policyA->getCashback()->getAccountNumber());
         $this->assertEquals(Cashback::STATUS_PENDING_CLAIMABLE, $policyA->getCashback()->getStatus());
 
-        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-30'));
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-30'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
 
         $this->assertNull($policyA->getCashback());
@@ -1528,7 +1569,7 @@ class PolicyServiceTest extends WebTestCase
 
         $cashback = $this->getCashback($policyA);
         $cashback->setAccountNumber('87654321');
-        static::$policyService->renew($updatedPolicyA, 12, $cashback, new \DateTime('2016-12-30'));
+        static::$policyService->renew($updatedPolicyA, 12, $cashback, false, new \DateTime('2016-12-30'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
 
         $this->assertEquals($cashback->getAccountNumber(), $updatedPolicyA->getCashback()->getAccountNumber());
@@ -1561,7 +1602,7 @@ class PolicyServiceTest extends WebTestCase
 
         $this->assertEquals($cashback->getAccountNumber(), $updatedPolicyA->getCashback()->getAccountNumber());
 
-        static::$policyService->renew($updatedPolicyA, 12, null, new \DateTime('2016-12-30'));
+        static::$policyService->renew($updatedPolicyA, 12, null, false, new \DateTime('2016-12-30'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
 
         $this->assertNull($updatedPolicyA->getCashback());
@@ -1612,6 +1653,8 @@ class PolicyServiceTest extends WebTestCase
         $renewalPolicyA = $policyA->getNextPolicy();
         $renewalPolicyB = $policyB->getNextPolicy();
 
+        static::$policyService->declineRenew($policyA, null, new \DateTime('2016-12-31'));
+
         static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
         $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
 
@@ -1631,6 +1674,8 @@ class PolicyServiceTest extends WebTestCase
         );
         $renewalPolicyA = $policyA->getNextPolicy();
         $renewalPolicyB = $policyB->getNextPolicy();
+
+        static::$policyService->declineRenew($policyA, null, new \DateTime('2016-12-31'));
 
         static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
         $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
@@ -1675,7 +1720,7 @@ class PolicyServiceTest extends WebTestCase
         $renewalPolicyA = $policyA->getNextPolicy();
         $renewalPolicyB = $policyB->getNextPolicy();
 
-        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-30'));
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-30'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
 
         static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
@@ -1692,7 +1737,7 @@ class PolicyServiceTest extends WebTestCase
 
         $this->assertEquals(10, $renewalPolicyA->getPotValue());
 
-        static::$policyService->renew($policyB, 12, null, new \DateTime('2017-01-10'));
+        static::$policyService->renew($policyB, 12, null, false, new \DateTime('2017-01-10'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
 
         static::$policyService->expire($policyB, new \DateTime('2017-01-15'));
@@ -1722,7 +1767,7 @@ class PolicyServiceTest extends WebTestCase
         $renewalPolicyA = $policyA->getNextPolicy();
         $renewalPolicyB = $policyB->getNextPolicy();
 
-        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-30'));
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-30'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
 
         static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
@@ -1744,7 +1789,7 @@ class PolicyServiceTest extends WebTestCase
 
         $this->assertEquals(10, $renewalPolicyA->getPotValue());
 
-        static::$policyService->renew($policyB, 12, null, new \DateTime('2017-01-10'));
+        static::$policyService->renew($policyB, 12, null, false, new \DateTime('2017-01-10'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
 
         $foundRenewalConnection = false;
@@ -1783,10 +1828,10 @@ class PolicyServiceTest extends WebTestCase
         $renewalPolicyA = $policyA->getNextPolicy();
         $renewalPolicyB = $policyB->getNextPolicy();
 
-        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-12-29'));
+        static::$policyService->renew($policyB, 12, null, false, new \DateTime('2016-12-29'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
 
-        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-30'));
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-30'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
 
         $foundRenewalConnection = false;
@@ -1847,10 +1892,10 @@ class PolicyServiceTest extends WebTestCase
         $renewalPolicyA = $policyA->getNextPolicy();
         $renewalPolicyB = $policyB->getNextPolicy();
 
-        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-12-29'));
+        static::$policyService->renew($policyB, 12, null, false, new \DateTime('2016-12-29'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
 
-        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-30'));
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-30'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
 
         $foundRenewalConnection = false;
@@ -1911,10 +1956,10 @@ class PolicyServiceTest extends WebTestCase
         $renewalPolicyA = $policyA->getNextPolicy();
         $renewalPolicyB = $policyB->getNextPolicy();
 
-        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-12-29'));
+        static::$policyService->renew($policyB, 12, null, false, new \DateTime('2016-12-29'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
 
-        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-02-28'));
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-02-28'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
 
         $foundRenewalConnection = false;
@@ -1974,7 +2019,7 @@ class PolicyServiceTest extends WebTestCase
         $renewalPolicyA = $policyA->getNextPolicy();
         $renewalPolicyB = $policyB->getNextPolicy();
 
-        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-29'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
 
         static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
@@ -1996,7 +2041,7 @@ class PolicyServiceTest extends WebTestCase
 
         $this->assertEquals(10, $renewalPolicyA->getPotValue());
 
-        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-02-27'));
+        static::$policyService->renew($policyB, 12, null, false, new \DateTime('2016-02-27'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
 
         $foundRenewalConnection = false;
@@ -2038,7 +2083,7 @@ class PolicyServiceTest extends WebTestCase
         $renewalPolicyA = $policyA->getNextPolicy();
         $renewalPolicyB = $policyB->getNextPolicy();
 
-        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-29'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
 
         $foundRenewalConnection = false;
@@ -2058,7 +2103,7 @@ class PolicyServiceTest extends WebTestCase
 
         $this->assertEquals(0, $renewalPolicyA->getPotValue());
 
-        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-02-27'));
+        static::$policyService->renew($policyB, 12, null, false, new \DateTime('2016-02-27'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
 
         $foundRenewalConnection = false;
@@ -2106,10 +2151,10 @@ class PolicyServiceTest extends WebTestCase
         $renewalPolicyA = $policyA->getNextPolicy();
         $renewalPolicyB = $policyB->getNextPolicy();
 
-        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-29'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
 
-        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-05-28'));
+        static::$policyService->renew($policyB, 12, null, false, new \DateTime('2016-05-28'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
 
         $foundRenewalConnection = false;
@@ -2169,7 +2214,7 @@ class PolicyServiceTest extends WebTestCase
         $renewalPolicyA = $policyA->getNextPolicy();
         $renewalPolicyB = $policyB->getNextPolicy();
 
-        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-29'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
 
         static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
@@ -2191,7 +2236,7 @@ class PolicyServiceTest extends WebTestCase
 
         $this->assertEquals(10, $renewalPolicyA->getPotValue());
 
-        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-05-27'));
+        static::$policyService->renew($policyB, 12, null, false, new \DateTime('2016-05-27'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
 
         $foundRenewalConnection = false;
@@ -2233,7 +2278,7 @@ class PolicyServiceTest extends WebTestCase
         $renewalPolicyA = $policyA->getNextPolicy();
         $renewalPolicyB = $policyB->getNextPolicy();
 
-        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-29'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
 
         $foundRenewalConnection = false;
@@ -2253,7 +2298,7 @@ class PolicyServiceTest extends WebTestCase
 
         $this->assertEquals(0, $renewalPolicyA->getPotValue());
 
-        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-05-27'));
+        static::$policyService->renew($policyB, 12, null, false, new \DateTime('2016-05-27'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
 
         $foundRenewalConnection = false;
@@ -2301,10 +2346,10 @@ class PolicyServiceTest extends WebTestCase
         $renewalPolicyA = $policyA->getNextPolicy();
         $renewalPolicyB = $policyB->getNextPolicy();
 
-        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-29'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
 
-        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-07-28'));
+        static::$policyService->renew($policyB, 12, null, false, new \DateTime('2016-07-28'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
 
         $foundRenewalConnection = false;
@@ -2364,7 +2409,7 @@ class PolicyServiceTest extends WebTestCase
         $renewalPolicyA = $policyA->getNextPolicy();
         $renewalPolicyB = $policyB->getNextPolicy();
 
-        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-29'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
 
         static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
@@ -2386,7 +2431,7 @@ class PolicyServiceTest extends WebTestCase
 
         $this->assertEquals(10, $renewalPolicyA->getPotValue());
 
-        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-07-27'));
+        static::$policyService->renew($policyB, 12, null, false, new \DateTime('2016-07-27'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
 
         $foundRenewalConnection = false;
@@ -2429,7 +2474,7 @@ class PolicyServiceTest extends WebTestCase
         $renewalPolicyA = $policyA->getNextPolicy();
         $renewalPolicyB = $policyB->getNextPolicy();
 
-        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-29'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
 
         $foundRenewalConnection = false;
@@ -2449,7 +2494,7 @@ class PolicyServiceTest extends WebTestCase
 
         $this->assertEquals(0, $renewalPolicyA->getPotValue());
 
-        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-07-27'));
+        static::$policyService->renew($policyB, 12, null, false, new \DateTime('2016-07-27'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
 
         $foundRenewalConnection = false;
@@ -2497,10 +2542,10 @@ class PolicyServiceTest extends WebTestCase
         $renewalPolicyA = $policyA->getNextPolicy();
         $renewalPolicyB = $policyB->getNextPolicy();
 
-        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-29'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
 
-        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-11-28'));
+        static::$policyService->renew($policyB, 12, null, false, new \DateTime('2016-11-28'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
 
         $foundRenewalConnection = false;
@@ -2560,7 +2605,7 @@ class PolicyServiceTest extends WebTestCase
         $renewalPolicyA = $policyA->getNextPolicy();
         $renewalPolicyB = $policyB->getNextPolicy();
 
-        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-29'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
 
         static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
@@ -2582,7 +2627,7 @@ class PolicyServiceTest extends WebTestCase
 
         $this->assertEquals(10, $renewalPolicyA->getPotValue());
 
-        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-11-27'));
+        static::$policyService->renew($policyB, 12, null, false, new \DateTime('2016-11-27'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
 
         $foundRenewalConnection = false;
@@ -2625,7 +2670,7 @@ class PolicyServiceTest extends WebTestCase
         $renewalPolicyA = $policyA->getNextPolicy();
         $renewalPolicyB = $policyB->getNextPolicy();
 
-        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-29'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
 
         $foundRenewalConnection = false;
@@ -2645,7 +2690,7 @@ class PolicyServiceTest extends WebTestCase
 
         $this->assertEquals(0, $renewalPolicyA->getPotValue());
 
-        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-11-27'));
+        static::$policyService->renew($policyB, 12, null, false, new \DateTime('2016-11-27'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
 
         $foundRenewalConnection = false;
@@ -2699,10 +2744,10 @@ class PolicyServiceTest extends WebTestCase
         $claimA->setType(Claim::TYPE_LOSS);
         $policyA->addClaim($claimA);
 
-        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-29'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
 
-        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-12-29'));
+        static::$policyService->renew($policyB, 12, null, false, new \DateTime('2016-12-29'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
 
         static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
@@ -2744,10 +2789,10 @@ class PolicyServiceTest extends WebTestCase
         $claimB->setLossDate(new \DateTime('2016-12-30'));
         $policyB->addClaim($claimB);
 
-        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-29'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
 
-        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-12-29'));
+        static::$policyService->renew($policyB, 12, null, false, new \DateTime('2016-12-29'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
 
         static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
@@ -2783,10 +2828,10 @@ class PolicyServiceTest extends WebTestCase
         $renewalPolicyB = $policyB->getNextPolicy();
         $this->assertEquals(50, $policyA->getPotValue());
 
-        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-29'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
 
-        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-12-29'));
+        static::$policyService->renew($policyB, 12, null, false, new \DateTime('2016-12-29'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
 
         static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
@@ -2872,10 +2917,10 @@ class PolicyServiceTest extends WebTestCase
         $renewalPolicyB = $policyB->getNextPolicy();
         $this->assertEquals(10, $policyA->getPotValue());
 
-        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-29'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
 
-        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-12-29'));
+        static::$policyService->renew($policyB, 12, null, false, new \DateTime('2016-12-29'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
 
         static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
@@ -2961,10 +3006,10 @@ class PolicyServiceTest extends WebTestCase
         $renewalPolicyB = $policyB->getNextPolicy();
         $this->assertEquals(10, $policyA->getPotValue());
 
-        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-29'));
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-29'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
 
-        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-12-29'));
+        static::$policyService->renew($policyB, 12, null, false, new \DateTime('2016-12-29'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
 
         static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
@@ -3065,7 +3110,7 @@ class PolicyServiceTest extends WebTestCase
         $renewalPolicyA = $policyA->getNextPolicy();
         $renewalPolicyB = $policyB->getNextPolicy();
 
-        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-30'));
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-30'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
         $this->assertNull($renewalPolicyA->getPendingCancellation());
 
@@ -3244,8 +3289,8 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyA->getStatus());
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyB->getStatus());
 
-        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-30'));
-        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-12-30'));
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-30'));
+        static::$policyService->renew($policyB, 12, null, false, new \DateTime('2016-12-30'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
         $this->assertNull($renewalPolicyA->getPendingCancellation());
@@ -3310,8 +3355,8 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyA->getStatus());
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyB->getStatus());
 
-        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-30'));
-        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-12-30'));
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-30'));
+        static::$policyService->renew($policyB, 12, null, false, new \DateTime('2016-12-30'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
         $this->assertNull($renewalPolicyA->getPendingCancellation());
@@ -3403,8 +3448,8 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyA->getStatus());
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyB->getStatus());
 
-        static::$policyService->renew($policyA, 1, null, new \DateTime('2016-12-30'));
-        static::$policyService->renew($policyB, 1, null, new \DateTime('2016-12-30'));
+        static::$policyService->renew($policyA, 1, null, false, new \DateTime('2016-12-30'));
+        static::$policyService->renew($policyB, 1, null, false, new \DateTime('2016-12-30'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
         $this->assertNull($renewalPolicyA->getPendingCancellation());
@@ -3524,8 +3569,8 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyA->getStatus());
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyB->getStatus());
 
-        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-30'));
-        static::$policyService->renew($policyB, 12, null, new \DateTime('2016-12-30'));
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-30'));
+        static::$policyService->renew($policyB, 12, null, false, new \DateTime('2016-12-30'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
         $this->assertNull($renewalPolicyA->getPendingCancellation());
@@ -3729,8 +3774,8 @@ class PolicyServiceTest extends WebTestCase
         static::$dm->persist($cashbackB);
         static::$dm->flush();
 
-        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-30'));
-        static::$policyService->renew($policyB, 12, $cashbackB, new \DateTime('2016-12-30'));
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-30'));
+        static::$policyService->renew($policyB, 12, $cashbackB, false, new \DateTime('2016-12-30'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
         $this->assertNull($renewalPolicyA->getPendingCancellation());
@@ -3829,7 +3874,7 @@ class PolicyServiceTest extends WebTestCase
         $renewalPolicyA = $policyA->getNextPolicy();
         $renewalPolicyB = $policyB->getNextPolicy();
 
-        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-30'));
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-30'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
         $this->assertNull($renewalPolicyA->getPendingCancellation());
 
@@ -3852,7 +3897,7 @@ class PolicyServiceTest extends WebTestCase
         static::$policyService->activate($renewalPolicyA, new \DateTime('2017-01-01'));
         $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
 
-        static::$policyService->renew($policyB, 12, null, new \DateTime('2017-02-14'));
+        static::$policyService->renew($policyB, 12, null, false, new \DateTime('2017-02-14'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyB->getStatus());
         $this->assertNull($renewalPolicyB->getPendingCancellation());
 
@@ -3909,7 +3954,7 @@ class PolicyServiceTest extends WebTestCase
         );
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
 
-        static::$policyService->renew($policy, 12, null, new \DateTime('2016-12-25'));
+        static::$policyService->renew($policy, 12, null, false, new \DateTime('2016-12-25'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicy->getStatus());
         $this->assertNull($renewalPolicy->getPendingCancellation());
 
@@ -4024,6 +4069,7 @@ class PolicyServiceTest extends WebTestCase
 
         self::$policyService->setMailerMailer($mailer);
 
+        self::$policyService->declineRenew($policyA, null, new \DateTime('2016-12-17'));
         self::$policyService->expire($policyA, new \DateTime('2017-01-01'));
     }
 
@@ -4037,7 +4083,7 @@ class PolicyServiceTest extends WebTestCase
             new \DateTime('2016-02-01')
         );
 
-        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-20'));
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-20'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $policyA->getNextPolicy()->getStatus());
 
         $foundRenewalConnection = false;
@@ -4084,7 +4130,7 @@ class PolicyServiceTest extends WebTestCase
             new \DateTime('2016-02-01')
         );
 
-        static::$policyService->renew($policyA, 12, null, new \DateTime('2016-12-20'));
+        static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-20'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $policyA->getNextPolicy()->getStatus());
 
         $foundRenewalConnection = false;

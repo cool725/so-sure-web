@@ -121,7 +121,7 @@ class IntercomListenerTest extends WebTestCase
         static::$redis->del(IntercomService::KEY_INTERCOM_QUEUE);
         $this->assertEquals(0, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
 
-        static::$policyService->renew($policy, 12, null, new \DateTime('2016-12-30'));
+        static::$policyService->renew($policy, 12, null, false, new \DateTime('2016-12-30'));
 
         // Expect a policy pending created event + user update
         $this->assertEquals(2, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
