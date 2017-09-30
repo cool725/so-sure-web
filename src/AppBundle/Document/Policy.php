@@ -2801,8 +2801,11 @@ abstract class Policy
             }
         }
     }
-    
-    public function isRenewalAllowed(\DateTime $date = null)
+
+    /**
+     * @param $autoRenew Autorenewal needs a bit of leeway in terms of timing in case of process failure
+     */
+    public function isRenewalAllowed($autoRenew = false, \DateTime $date = null)
     {
         if (!$date) {
             $date = new \DateTime();
@@ -2815,8 +2818,17 @@ abstract class Policy
             return false;
         }
 
-        if ($this->getRenewalExpiration() && $date > $this->getRenewalExpiration()) {
-            return false;
+        if ($this->getRenewalExpiration()) {
+            $tooLate = clone $this->getRenewalExpiration();
+            if ($autoRenew) {
+                // Give a bit of leeway in case we have problems with process, but
+                // if the policy is supposed to be renewed and its more than 7 days
+                // then we really do have an issue and probably need to manually sort out
+                $tooLate = $tooLate->add(new \DateInterval('P7D'));
+            }
+            if ($date > $tooLate) {
+                return false;
+            }
         }
 
         return true;
@@ -2830,6 +2842,7 @@ abstract class Policy
 
         if (!in_array($this->getStatus(), [
             self::STATUS_PENDING_RENEWAL,
+            self::STATUS_DECLINED_RENEWAL,
         ])) {
             return false;
         }
@@ -2859,13 +2872,13 @@ abstract class Policy
         $this->setStatus(Policy::STATUS_DECLINED_RENEWAL);
     }
 
-    public function renew($discount, \DateTime $date = null)
+    public function renew($discount, $autoRenew = false, \DateTime $date = null)
     {
         if ($date == null) {
             $date = new \DateTime();
         }
 
-        if (!$this->isRenewalAllowed($date)) {
+        if (!$this->isRenewalAllowed($autoRenew, $date)) {
             throw new \Exception(sprintf(
                 'Unable to renew policy %s as status is incorrect or its too late',
                 $this->getId()
@@ -3089,7 +3102,7 @@ abstract class Policy
                 $this->getCashback()->setDate(new \DateTime());
                 $this->getCashback()->setStatus(Cashback::STATUS_PENDING_CLAIMABLE);
                 $this->getCashback()->setAmount($this->getPotValue());
-            } elseif ($this->getNextPolicy() && $this->getNextPolicy()->getPremium()->hasAnnualDiscount()) {
+            } elseif ($this->isRenewalPending() || $this->isRenewed()) {
                 $discount = new PolicyDiscountPayment();
                 $discount->setAmount($this->getPotValue());
                 if ($this->getNextPolicy()->getStart()) {
@@ -3117,15 +3130,8 @@ abstract class Policy
             }
         }
 
-        if (!$this->isRenewed()) {
-            foreach ($this->getStandardConnections() as $connection) {
-                if ($inversedConnection = $connection->findInversedConnection()) {
-                    $inversedConnection->prorateValue($date);
-                    $inversedConnection->getSourcePolicy()->updatePotValue();
-                    // listener on connection will notify user
-                }
-            }
-        } else {
+        if ($this->isRenewalPending() || $this->isRenewed()) {
+        //if ($this->isRenewed()) {
             foreach ($this->getAcceptedConnections() as $connection) {
                 if ($connection instanceof StandardConnection &&
                     ($connection->getSourcePolicy()->isActive(true) ||
@@ -3138,13 +3144,14 @@ abstract class Policy
                     $connection->setLinkedPolicy($this->getNextPolicy());
                 }
             }
-            /*
+        } else {
             foreach ($this->getStandardConnections() as $connection) {
                 if ($inversedConnection = $connection->findInversedConnection()) {
-                    $inversedConnection->setLinkedPolicyRenewal($this->getNextPolicy());
+                    $inversedConnection->prorateValue($date);
+                    $inversedConnection->getSourcePolicy()->updatePotValue();
+                    // listener on connection will notify user
                 }
             }
-            */
         }
     }
 

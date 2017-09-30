@@ -3178,7 +3178,7 @@ class PhonePolicyTest extends WebTestCase
 
         $this->assertFalse($policy->isRenewed());
 
-        $renewalPolicy->renew(0, new \DateTime('2016-12-15'));
+        $renewalPolicy->renew(0, false, new \DateTime('2016-12-15'));
         $this->assertTrue($policy->isRenewed());
         static::$dm->persist($policy);
         static::$dm->persist($policy->getUser());
@@ -3309,9 +3309,9 @@ class PhonePolicyTest extends WebTestCase
         $renewalPolicy = $this->getRenewalPolicy($policy);
 
         $this->assertFalse($policy->isRenewed());
-        $this->assertTrue($renewalPolicy->isRenewalAllowed(new \DateTime('2016-12-15')));
+        $this->assertTrue($renewalPolicy->isRenewalAllowed(false, new \DateTime('2016-12-15')));
 
-        $renewalPolicy->renew(0, new \DateTime('2016-12-15'));
+        $renewalPolicy->renew(0, false, new \DateTime('2016-12-15'));
 
         $this->assertTrue($policy->isRenewed());
 
@@ -3343,9 +3343,9 @@ class PhonePolicyTest extends WebTestCase
         $renewalPolicy = $this->getRenewalPolicy($policy);
 
         $this->assertFalse($policy->isRenewed());
-        $this->assertTrue($renewalPolicy->isRenewalAllowed(new \DateTime('2016-12-15')));
+        $this->assertTrue($renewalPolicy->isRenewalAllowed(false, new \DateTime('2016-12-15')));
 
-        $renewalPolicy->renew(0, new \DateTime('2016-12-15'));
+        $renewalPolicy->renew(0, false, new \DateTime('2016-12-15'));
 
         $this->assertTrue($policy->isRenewed());
 
@@ -3374,14 +3374,15 @@ class PhonePolicyTest extends WebTestCase
         $policyB = $this->getPolicy(static::generateEmail('testRenewActivateExpireWithPot-B', $this));
         list($connectionA, $connectionB) = $this->createLinkedConnections($policyA, $policyB, 10, 10);
 
+        $this->assertEquals(10, $policyA->getPotValue());
         $this->assertFalse($policyA->isRenewed());
 
         $renewalPolicyA = $this->getRenewalPolicy($policyA);
 
         $this->assertFalse($policyA->isRenewed());
-        $this->assertTrue($renewalPolicyA->isRenewalAllowed(new \DateTime('2016-12-15')));
+        $this->assertTrue($renewalPolicyA->isRenewalAllowed(false, new \DateTime('2016-12-15')));
 
-        $renewalPolicyA->renew(10, new \DateTime('2016-12-15'));
+        $renewalPolicyA->renew(10, false, new \DateTime('2016-12-15'));
 
         $this->assertTrue($policyA->isRenewed());
 
@@ -3390,9 +3391,60 @@ class PhonePolicyTest extends WebTestCase
 
         $renewalPolicyA->activate(new \DateTime('2017-01-01'));
         $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+        $this->assertEquals(10, $renewalPolicyA->getPotValue());
 
         $policyA->fullyExpire(new \DateTime("2017-01-29"));
         $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
+
+        $foundReward = false;
+        foreach ($policyA->getAllPayments() as $payment) {
+            if ($payment instanceof PotRewardPayment) {
+                $this->assertEquals(-10, $payment->getAmount());
+                $foundReward = true;
+            }
+        }
+
+        $this->assertTrue($foundReward);
+
+        $foundRenewalDiscount = false;
+        foreach ($renewalPolicyA->getPayments() as $payment) {
+            if ($payment instanceof PolicyDiscountPayment) {
+                $this->assertEquals(10, $payment->getAmount());
+                $foundRenewalDiscount = true;
+            }
+        }
+
+        $this->assertTrue($foundRenewalDiscount);
+    }
+
+    public function testAutoRenewActivateExpireWithPot()
+    {
+        $policyA = $this->getPolicy(static::generateEmail('testAutoRenewActivateExpireWithPot-A', $this));
+        $policyB = $this->getPolicy(static::generateEmail('testAutoRenewActivateExpireWithPot-B', $this));
+        list($connectionA, $connectionB) = $this->createLinkedConnections($policyA, $policyB, 10, 10);
+
+        $this->assertEquals(10, $policyA->getPotValue());
+        $this->assertFalse($policyA->isRenewed());
+
+        $renewalPolicyA = $this->getRenewalPolicy($policyA);
+
+        $this->assertFalse($policyA->isRenewed());
+        $this->assertTrue($renewalPolicyA->isRenewalAllowed(false, new \DateTime('2016-12-15')));
+
+        $policyA->expire(new \DateTime("2017-01-01"));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        $renewalPolicyA->renew(10, true, new \DateTime('2017-01-01'));
+        $this->assertTrue($policyA->isRenewed());
+
+        $renewalPolicyA->activate(new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+        $this->assertEquals(10, $renewalPolicyA->getPotValue());
+        $this->assertEquals(10, $policyB->getPotValue());
+
+        $policyA->fullyExpire(new \DateTime("2017-01-29"));
+        $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
+
         $foundReward = false;
         foreach ($policyA->getAllPayments() as $payment) {
             if ($payment instanceof PotRewardPayment) {
@@ -3425,9 +3477,9 @@ class PhonePolicyTest extends WebTestCase
         $renewalPolicyA = $this->getRenewalPolicy($policyA);
 
         $this->assertFalse($policyA->isRenewed());
-        $this->assertTrue($renewalPolicyA->isRenewalAllowed(new \DateTime('2016-12-15')));
+        $this->assertTrue($renewalPolicyA->isRenewalAllowed(false, new \DateTime('2016-12-15')));
 
-        $renewalPolicyA->renew(10, new \DateTime('2016-12-15'));
+        $renewalPolicyA->renew(10, false, new \DateTime('2016-12-15'));
 
         $this->assertTrue($policyA->isRenewed());
 
@@ -3484,9 +3536,14 @@ class PhonePolicyTest extends WebTestCase
         $renewalPolicyA = $this->getRenewalPolicy($policyA);
 
         $this->assertFalse($policyA->isRenewed());
-        $this->assertTrue($renewalPolicyA->isRenewalAllowed(new \DateTime('2016-12-15')));
+        $this->assertTrue($renewalPolicyA->isRenewalAllowed(false, new \DateTime('2016-12-15')));
 
-        $renewalPolicyA->renew(0, new \DateTime('2016-12-15'));
+        $cashback = new Cashback();
+        $cashback->setDate(new \DateTime('2016-12-15'));
+        $cashback->setStatus(Cashback::STATUS_MISSING);
+        $cashback->setAmount(10);
+        $policyA->setCashback($cashback);
+        $renewalPolicyA->renew(0, false, new \DateTime('2016-12-15'));
 
         $this->assertTrue($policyA->isRenewed());
 
@@ -3496,6 +3553,7 @@ class PhonePolicyTest extends WebTestCase
         $renewalPolicyA->activate(new \DateTime('2017-01-01'));
         $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
 
+        $this->assertNotNull($policyA->getCashback());
         $this->assertEquals(10, $policyA->getCashback()->getAmount());
 
         $claimA = new Claim();
@@ -3550,7 +3608,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($policyA->isRenewed());
         $this->assertTrue($renewalPolicyA->isRenewalAllowed(new \DateTime('2016-12-15')));
 
-        $renewalPolicyA->renew(0, new \DateTime('2016-12-15'));
+        $renewalPolicyA->renew(0, false, new \DateTime('2016-12-15'));
 
         $this->assertTrue($policyA->isRenewed());
 
@@ -3596,10 +3654,12 @@ class PhonePolicyTest extends WebTestCase
         $renewalPolicy = $this->getRenewalPolicy($policy, false);
         $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $renewalPolicy->getRenewalExpiration());
 
-        $this->assertTrue($renewalPolicy->isRenewalAllowed(new \DateTime('2016-12-31 23:59')));
-        $this->assertFalse($renewalPolicy->isRenewalAllowed(new \DateTime('2017-01-01')));
+        $this->assertTrue($renewalPolicy->isRenewalAllowed(false, new \DateTime('2016-12-31 23:59')));
+        $this->assertFalse($renewalPolicy->isRenewalAllowed(false, new \DateTime('2017-01-01')));
+        $this->assertTrue($renewalPolicy->isRenewalAllowed(true, new \DateTime('2017-01-07')));
+        $this->assertFalse($renewalPolicy->isRenewalAllowed(true, new \DateTime('2017-01-08')));
 
-        $renewalPolicy->renew(0, new \DateTime('2016-12-15'));
+        $renewalPolicy->renew(0, false, new \DateTime('2016-12-15'));
         $this->assertNull($renewalPolicy->getRenewalExpiration());
     }
 
@@ -3612,8 +3672,8 @@ class PhonePolicyTest extends WebTestCase
         $renewalPolicy = $this->getRenewalPolicy($policy, false);
         $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $renewalPolicy->getRenewalExpiration());
 
-        $this->assertTrue($renewalPolicy->isRenewalAllowed(new \DateTime('2016-12-31 23:59')));
-        $this->assertFalse($renewalPolicy->isRenewalAllowed(new \DateTime('2017-01-01')));
+        $this->assertTrue($renewalPolicy->isRenewalAllowed(false, new \DateTime('2016-12-31 23:59')));
+        $this->assertFalse($renewalPolicy->isRenewalAllowed(false, new \DateTime('2017-01-01')));
 
         $renewalPolicy->unrenew(new \DateTime('2017-01-01'));
         $this->assertEquals(Policy::STATUS_UNRENEWED, $renewalPolicy->getStatus());
@@ -3631,8 +3691,8 @@ class PhonePolicyTest extends WebTestCase
         $renewalPolicy = $this->getRenewalPolicy($policy, false);
         $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $renewalPolicy->getRenewalExpiration());
 
-        $this->assertTrue($renewalPolicy->isRenewalAllowed(new \DateTime('2016-12-31 23:59')));
-        $this->assertFalse($renewalPolicy->isRenewalAllowed(new \DateTime('2017-01-01')));
+        $this->assertTrue($renewalPolicy->isRenewalAllowed(false, new \DateTime('2016-12-31 23:59')));
+        $this->assertFalse($renewalPolicy->isRenewalAllowed(false, new \DateTime('2017-01-01')));
 
         $renewalPolicy->unrenew(new \DateTime('2017-01-01'));
         $this->assertEquals(Policy::STATUS_UNRENEWED, $renewalPolicy->getStatus());
@@ -3652,8 +3712,8 @@ class PhonePolicyTest extends WebTestCase
         $renewalPolicy = $this->getRenewalPolicy($policy, false);
         $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $renewalPolicy->getRenewalExpiration());
 
-        $this->assertTrue($renewalPolicy->isRenewalAllowed(new \DateTime('2016-12-31 23:59')));
-        $this->assertFalse($renewalPolicy->isRenewalAllowed(new \DateTime('2017-01-01')));
+        $this->assertTrue($renewalPolicy->isRenewalAllowed(false, new \DateTime('2016-12-31 23:59')));
+        $this->assertFalse($renewalPolicy->isRenewalAllowed(false, new \DateTime('2017-01-01')));
 
         $renewalPolicy->unrenew(new \DateTime('2016-12-15'));
     }
@@ -3698,13 +3758,13 @@ class PhonePolicyTest extends WebTestCase
         $renewalPolicy = $this->getRenewalPolicy($policy, false);
         $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $renewalPolicy->getRenewalExpiration());
 
-        $this->assertTrue($renewalPolicy->isRenewalAllowed(new \DateTime('2016-12-31 23:59')));
-        $this->assertFalse($renewalPolicy->isRenewalAllowed(new \DateTime('2017-01-01')));
+        $this->assertTrue($renewalPolicy->isRenewalAllowed(false, new \DateTime('2016-12-31 23:59')));
+        $this->assertFalse($renewalPolicy->isRenewalAllowed(false, new \DateTime('2017-01-01')));
 
         $renewalPolicy->unrenew(new \DateTime('2017-01-01'));
         $this->assertEquals(Policy::STATUS_UNRENEWED, $renewalPolicy->getStatus());
 
-        $renewalPolicy->renew(0, new \DateTime('2017-12-15'));
+        $renewalPolicy->renew(0, false, new \DateTime('2017-12-15'));
     }
 
     /**
@@ -3719,8 +3779,8 @@ class PhonePolicyTest extends WebTestCase
         $renewalPolicy = $this->getRenewalPolicy($policy, false);
         $this->assertEquals(new \DateTime('2016-12-31 23:59:59'), $renewalPolicy->getRenewalExpiration());
 
-        $this->assertTrue($renewalPolicy->isRenewalAllowed(new \DateTime('2016-12-31 23:59')));
-        $this->assertFalse($renewalPolicy->isRenewalAllowed(new \DateTime('2017-01-01')));
+        $this->assertTrue($renewalPolicy->isRenewalAllowed(false, new \DateTime('2016-12-31 23:59')));
+        $this->assertFalse($renewalPolicy->isRenewalAllowed(false, new \DateTime('2017-01-01')));
 
         $renewalPolicy->unrenew(new \DateTime('2017-01-01'));
         $this->assertEquals(Policy::STATUS_UNRENEWED, $renewalPolicy->getStatus());
@@ -3736,7 +3796,7 @@ class PhonePolicyTest extends WebTestCase
         $policy = $this->getPolicy(static::generateEmail('testRenewInvalidStatus', $this));
         $renewalPolicy = $this->getRenewalPolicy($policy);
         $renewalPolicy->setStatus(Policy::STATUS_ACTIVE);
-        $this->assertFalse($renewalPolicy->isRenewalAllowed(new \DateTime('2016-12-15')));
+        $this->assertFalse($renewalPolicy->isRenewalAllowed(false, new \DateTime('2016-12-15')));
         $renewalPolicy->renew(0);
     }
 
@@ -3973,7 +4033,7 @@ class PhonePolicyTest extends WebTestCase
 
         // in policy service, renew calls create
         $renewalPolicy->create(rand(1, 999999), null, new \DateTime('2017-06-02'));
-        $renewalPolicy->renew(0, new \DateTime('2017-05-30'));
+        $renewalPolicy->renew(0, false, new \DateTime('2017-05-30'));
         $this->assertEquals(0.12, $renewalPolicy->getPremium()->getIptRate());
         $this->assertEquals(0.095, $policy->getPremium()->getIptRate());
 
@@ -4016,10 +4076,56 @@ class PhonePolicyTest extends WebTestCase
         $renewalPolicy = $policyA->createPendingRenewal($policyA->getPolicyTerms(), new \DateTime('2016-12-15'));
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
         //\Doctrine\Common\Util\Debug::dump($policyA);
-        $renewalPolicy->renew(10, new \DateTime('2016-12-16'));
+        $renewalPolicy->renew(10, false, new \DateTime('2016-12-16'));
 
         $policyA->expire(new \DateTime("2017-01-01"));
         $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+        static::$dm->persist($policyA->getUser());
+        static::$dm->persist($policyB->getUser());
+        static::$dm->persist($policyA);
+        static::$dm->persist($policyB);
+        static::$dm->persist($renewalPolicy);
+        static::$dm->flush();
+        $this->assertNotNull($policyA->getId());
+        $this->assertNotNull($policyB->getId());
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = self::$dm->getRepository(Policy::class);
+        $updatedPolicyA = $repo->find($policyA->getId());
+
+        $foundSoSure = false;
+        $foundPot = false;
+        $foundDiscount = false;
+        foreach ($updatedPolicyA->getAllPayments() as $payment) {
+            if ($payment instanceof SoSurePotRewardPayment) {
+                $foundSoSure = true;
+            }
+            if ($payment instanceof PotRewardPayment) {
+                $this->assertTrue($this->areEqualToTwoDp(-10, $payment->getAmount()));
+                $foundPot = true;
+            }
+        }
+        $this->assertFalse($foundSoSure);
+        $this->assertTrue($foundPot);
+        $this->assertNull($updatedPolicyA->getCashback());
+    }
+
+    public function testExpireAutoRenewed()
+    {
+        $policyA = $this->getPolicy(static::generateEmail('testExpireAutoRenewedA', $this));
+        $policyB = $this->getPolicy(static::generateEmail('testExpireAutoRenewedB', $this));
+        $policyA->setStatus(Policy::STATUS_ACTIVE);
+        $policyB->setStatus(Policy::STATUS_ACTIVE);
+        $this->createLinkedConnections($policyA, $policyB, 10, 10);
+
+        $renewalPolicy = $policyA->createPendingRenewal($policyA->getPolicyTerms(), new \DateTime('2016-12-15'));
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
+        //\Doctrine\Common\Util\Debug::dump($policyA);
+
+        $policyA->expire(new \DateTime("2017-01-01"));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        $renewalPolicy->renew(10, true, new \DateTime('2017-01-01'));
         static::$dm->persist($policyA->getUser());
         static::$dm->persist($policyB->getUser());
         static::$dm->persist($policyA);
@@ -4069,7 +4175,7 @@ class PhonePolicyTest extends WebTestCase
         $renewalPolicy = $policyA->createPendingRenewal($policyA->getPolicyTerms(), new \DateTime('2016-12-15'));
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
         //\Doctrine\Common\Util\Debug::dump($policyA);
-        $renewalPolicy->renew(10, new \DateTime('2016-12-16'));
+        $renewalPolicy->renew(10, false, new \DateTime('2016-12-16'));
 
         $policyA->expire(new \DateTime("2017-01-01"));
         $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
@@ -4118,7 +4224,7 @@ class PhonePolicyTest extends WebTestCase
         $renewalPolicy = $policy->createPendingRenewal($policy->getPolicyTerms(), new \DateTime('2016-12-15'));
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
         //\Doctrine\Common\Util\Debug::dump($policyA);
-        $renewalPolicy->renew(0, new \DateTime('2016-12-16'));
+        $renewalPolicy->renew(0, false, new \DateTime('2016-12-16'));
         $renewed = 0;
         $unrenewed = 0;
         foreach ($renewalPolicy->getRenewalConnections() as $connection) {

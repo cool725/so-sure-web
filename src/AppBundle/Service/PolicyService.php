@@ -1247,7 +1247,7 @@ class PolicyService
             $renewed[$policy->getId()] = $policy->getPolicyNumber();
             if (!$dryRun) {
                 try {
-                    $this->renewDefault($policy, $date);
+                    $this->autoRenew($policy, $date);
                 } catch (\Exception $e) {
                     $msg = sprintf(
                         'Error Renewing Policy %s',
@@ -1613,13 +1613,18 @@ class PolicyService
         );
     }
 
-    public function renewDefault(Policy $policy, \DateTime $date = null)
+    public function autoRenew(Policy $policy, \DateTime $date = null)
     {
-        return $this->renew($policy, $policy->getPremiumInstallmentCount(), null, $date);
+        return $this->renew($policy, $policy->getPremiumInstallmentCount(), null, true, $date);
     }
 
-    public function renew(Policy $policy, $numPayments, Cashback $cashback = null, \DateTime $date = null)
-    {
+    public function renew(
+        Policy $policy,
+        $numPayments,
+        Cashback $cashback = null,
+        $autoRenew = false,
+        \DateTime $date = null
+    ) {
         if (!$date) {
             $date = new \DateTime();
         }
@@ -1632,7 +1637,7 @@ class PolicyService
             ));
         }
 
-        if (!$newPolicy->isRenewalAllowed($date)) {
+        if (!$newPolicy->isRenewalAllowed($autoRenew, $date)) {
             throw new \Exception(sprintf(
                 'Unable to renew policy %s (pending %s) as status is incorrect or its too late',
                 $policy->getId(),
@@ -1653,7 +1658,7 @@ class PolicyService
         }
 
         $this->create($newPolicy, $startDate, false, $numPayments);
-        $newPolicy->renew($discount, $date);
+        $newPolicy->renew($discount, $autoRenew, $date);
         $this->generateScheduledPayments($newPolicy, $startDate, $numPayments);
 
         $this->dm->flush();
