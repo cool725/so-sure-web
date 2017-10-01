@@ -1244,14 +1244,15 @@ class PolicyService
         $renewed = [];
         $policies = $this->getPoliciesForRenew($date);
         foreach ($policies as $policy) {
-            $renewed[$policy->getId()] = $policy->getPolicyNumber();
+            $prevPolicy = $policy->getPreviousPolicy();
+            $renewed[$prevPolicy->getId()] = $prevPolicy->getPolicyNumber();
             if (!$dryRun) {
                 try {
-                    $this->autoRenew($policy, $date);
+                    $this->autoRenew($prevPolicy, $date);
                 } catch (\Exception $e) {
                     $msg = sprintf(
                         'Error Renewing Policy %s',
-                        $policy->getId()
+                        $prevPolicy->getId()
                     );
                     $this->logger->error($msg, ['exception' => $e]);
                 }
