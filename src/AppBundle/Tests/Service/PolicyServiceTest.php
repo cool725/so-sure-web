@@ -1453,7 +1453,8 @@ class PolicyServiceTest extends WebTestCase
             false,
             new \DateTime('2017-01-02')
         );
-        $this->assertGreaterThan(0, count($policies));
+        $this->assertEquals(1, count($policies));
+        $this->assertEquals($policy->getId(), array_keys($policies)[0]);
     }
 
     public function testPolicyRenewCashback()
