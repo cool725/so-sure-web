@@ -109,6 +109,9 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 'all' => true,
             ];
             $this->validatePolicy($policy, $policies, $lines, $data);
+            if ($updatePotValue || $adjustScheduledPayments) {
+                $dm->flush();
+            }
         } else {
             $policies = $policyRepo->findAll();
             $lines[] = 'Policy Validation';
@@ -225,7 +228,6 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             $lines[] = $this->failurePotValueMessage($policy);
             if ($data['updatePotValue']) {
                 $policy->updatePotValue();
-                $dm->flush();
                 $lines[] = 'Updated pot value';
                 $lines[] = $this->failurePotValueMessage($policy);
             }
