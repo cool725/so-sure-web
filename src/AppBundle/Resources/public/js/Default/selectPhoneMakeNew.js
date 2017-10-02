@@ -69,6 +69,28 @@ sosure.selectPhoneMake = (function() {
         }
     }
 
+    self.setFormAction = function (id, form) {
+        var base_path = $(form).data('base-path');
+        var path_suffix = $(form).data('path-suffix');
+        if (!base_path) {
+            base_path = '/phone-insurance/';
+        }
+        $(form).attr('action', base_path + id + path_suffix);
+    }
+
+    self.setFormActionVal = function (form, input) {
+        if ($(form).attr('action')) {
+            return;
+        }
+        var q = $(input).val();
+        sosure.selectPhoneMake.searchExact(q, function(result) {
+            if (result && result.id) {
+                sosure.selectPhoneMake.setFormAction(result.id);
+                $(form).unbind('submit', sosure.selectPhoneMake.preventDefault);
+            }
+        });
+    }
+
     // Twitter Typeahead
     self.preventDefault = function(e) {
         e.preventDefault();
@@ -91,32 +113,10 @@ $(function(){
         var input   = $(this).find('.search-phone');
         var loading = $(this).next('.loading-search-phone');
 
-        setFormAction = function (id) {
-            var base_path = $(form).data('base-path');
-            var path_suffix = $(form).data('path-suffix');
-            if (!base_path) {
-                base_path = '/phone-insurance/';
-            }
-            $(form).attr('action', base_path + id + path_suffix);
-        }
-
-        setFormActionVal = function () {
-            if ($(form).attr('action')) {
-                return;
-            }
-            var q = $(input).val();
-            sosure.selectPhoneMake.searchExact(q, function(result) {
-                if (result && result.id) {
-                    setFormAction(result.id);
-                    $(form).unbind('submit');
-                }
-            });
-        }
-
         // If the form action is already defined, then allow the form to submit
         if (!$(form).attr('action')) {
-            $(form).bind('submit');
-            setTimeout(function () { setFormActionVal(); }, 3000);
+            $(form).bind('submit', sosure.selectPhoneMake.preventDefault);
+            setTimeout(function () { sosure.selectPhoneMake.setFormActionVal(form, input); }, 3000);
         }
 
         $(input).typeahead({
@@ -150,18 +150,17 @@ $(function(){
         });
 
         $(input).bind('typeahead:selected', function(ev, suggestion) {
-            $(form).unbind('submit');
+            $(form).unbind('submit', sosure.selectPhoneMake.preventDefault);
         });
 
         $(input).bind('typeahead:select', function(ev, suggestion) {
-            setFormAction(id);
+            sosure.selectPhoneMake.setFormAction(suggestion.id, form);
         });
 
         $(input).bind('typeahead:change', function(ev, suggestion) {
-            setFormActionVal();
+            sosure.selectPhoneMake.setFormActionVal(form, input);
         });
+
     });
-
-
 
 });
