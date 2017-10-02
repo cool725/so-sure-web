@@ -2,7 +2,7 @@
 
 {# default to #}
 {% set buttonText   = 'Instant Quote' %}
-{% set buttonCSS    = 'btn btn-blue btn-pad' %}
+{% set buttonCSS    = 'btn btn-blue btn-pad btn-block' %}
 {% set basePath     = '/phone-insurance/' %}
 {% set phonePath    = 'quote_phone' %}
 {% set pathSuffix   = '' %}
@@ -13,13 +13,13 @@
 {% endif %}
 
 {% if type is defined and type == 'homepage' %}
-    {% set formID = 'search-phone-form-homepage' %}
+    {% set formID    = 'search-phone-form-homepage' %}
 {% elseif type == 'footer' %}
-    {% set formID = 'search-phone-form-footer' %}
+    {% set formID    = 'search-phone-form-footer' %}
 {% endif %}
 
 <div id="select-phone-data"
-     class="search-phone-form"
+     class="search-phone-form search-phone-form--homepage"
      data-phones='{{ phones|json_encode|raw }}'>
 
     <form method="get"
@@ -30,15 +30,18 @@
           data-base-path="{{ basePath }}"
           data-path-suffix="{{ pathSuffix }}"
           class="{{ formClass }}">
-        <div class="form-group">
-            <input type="text"
-                   class="required search-phone-text search-phone"
-                   {# id="search-phone" #}
-                   placeholder="Find your phone (e.g. iPhone 7)"
-                   value="{% if phone %}{{ phone }}{% endif %}" />
-        </div>
-        <div class="form-group">
-            <button type="submit" class="btn {{ buttonCSS }}">{{ buttonText }}</button>
+
+        <div class="row">
+            <div class="form-group col-sm-8">
+                <input type="text"
+                       class="required search-phone-text search-phone"
+                       {# id="search-phone" #}
+                       placeholder="Find your phone (e.g. iPhone 7)"
+                       value="{% if phone %}{{ phone }}{% endif %}" />
+            </div>
+            <div class="form-group col-sm-4">
+                <button type="submit" class="btn {{ buttonCSS }}">{{ buttonText }}</button>
+            </div>
         </div>
     </form>
 

@@ -12,7 +12,21 @@
 .homepage {
 
     &--hero {
+        text-align: center;
 
+        // Set max width on container
+        .container {
+            max-width: 800px;
+        }
+
+        h1 {
+            color: $primary-blue;
+
+            @include breakpoint(desktop) {
+                font-size: 72px;
+                line-height: 1;
+            }
+        }
     }
 
     &--what-is-so-sure {
@@ -59,3 +73,95 @@
 
     }
 }
+
+
+// TODO: Move!
+.search-phone-form--homepage {
+    padding: 10px;
+
+    @include border-radius(4px);
+    box-shadow: 0 0 15px $grey;
+
+    // Hide the form on load
+    .select-phone-form {
+        display: none;
+    }
+
+    .search-phone-text {
+        border-color: transparent;
+    }
+
+    .form-inline {
+
+        .form-control {
+            vertical-align: initial;
+            border-color: transparent;
+            padding-left: 35px;
+        }
+
+    }
+
+    .twitter-typeahead {
+        width: 100%;
+        font-size: 20px;
+
+        .tt-hint,
+        .tt-input {
+            height: 52px;
+            padding-left: 50px;
+        }
+
+        &:before {
+            content: '\f002';
+            color: $primary-blue;
+            font-family: FontAwesome;
+            font-size: 36px;
+            position: absolute;
+            z-index: 10;
+            left: 5px; top: 0;
+        }
+    }
+
+    .tt-menu {
+        max-height: 176px;
+        margin: 10px 0 0;
+        // border-top: none;
+    }
+}
+
+
+
+// .twitter-typeahead,
+.tt-input,
+.tt-menu,
+.tt-hint {
+    width: 100%;
+}
+
+// .tt-menu {
+//     max-height: 176px;
+//     margin: -2px 0 0;
+//     background-color: $white;
+//     border: 1px solid $grey-light;
+//     @include border-bottom-radius(4px);
+//     overflow-y: scroll;
+//     cursor: pointer;
+// }
+
+// .tt-suggestion {
+//     color: $black;
+//     text-align: left;
+//     padding: 10px 15px;
+//     transition: all 0.3s ease;
+
+//     &:hover {
+//         background-color: $blue-lightest;
+//     }
+// }
+
+// .empty-message {
+//     padding: 5px 10px;
+//     text-align: center;
+//     color: $black;
+//     cursor: default;
+// }
