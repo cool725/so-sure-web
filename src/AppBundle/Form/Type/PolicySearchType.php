@@ -49,6 +49,7 @@ class PolicySearchType extends AbstractType
             Policy::STATUS_UNPAID => Policy::STATUS_UNPAID,
             Policy::STATUS_PENDING_RENEWAL => Policy::STATUS_PENDING_RENEWAL,
             Policy::STATUS_RENEWAL => Policy::STATUS_RENEWAL,
+            'Past Due (cancelled polices w/claim)' => 'past-due',
         ];
         $builder
             ->add('email', TextType::class, ['required' => false])

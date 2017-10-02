@@ -736,6 +736,10 @@ abstract class BaseController extends Controller
             $policiesQb = $policiesQb->addAnd(
                 $policiesQb->expr()->field('status')->in([Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID])
             );
+        } elseif ($status == 'past-due') {
+            $policiesQb = $policiesQb->addAnd(
+                $policiesQb->expr()->field('status')->in([Policy::STATUS_CANCELLED])
+            );
         } elseif ($status == Policy::STATUS_EXPIRED_CLAIMABLE) {
             $policiesQb = $policiesQb->addAnd(
                 $policiesQb->expr()->field('status')->in([Policy::STATUS_EXPIRED_CLAIMABLE])
@@ -785,6 +789,16 @@ abstract class BaseController extends Controller
 
         if ($status == Policy::STATUS_UNPAID) {
             $policies = $policiesQb->getQuery()->execute()->toArray();
+            // sort older to more recent
+            usort($policies, function ($a, $b) {
+                return $a->getPolicyExpirationDate() > $b->getPolicyExpirationDate();
+            });
+            $pager = $this->arrayPager($request, $policies);
+        } elseif ($status == 'past-due') {
+            $policies = $policiesQb->getQuery()->execute()->toArray();
+            $policies = array_filter($policies, function ($policy) {
+                return !$policy->isFullyPaid() && count($policy->getApprovedClaims(true, true)) > 0;
+            });
             // sort older to more recent
             usort($policies, function ($a, $b) {
                 return $a->getPolicyExpirationDate() > $b->getPolicyExpirationDate();
