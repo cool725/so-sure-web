@@ -97,7 +97,17 @@
         border-color: transparent;
     }
 
-    .form-inline {
+    .form-inline--homepage {
+
+        @include breakpoint(tablet) {
+
+            .form-group {
+                display: inline-block;
+                margin-bottom: 0;
+                vertical-align: middle;
+            }
+
+        }
 
         .form-control {
             vertical-align: initial;
