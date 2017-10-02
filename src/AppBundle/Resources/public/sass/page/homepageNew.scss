@@ -71,16 +71,22 @@
 
     &--instant-quote {
 
+        // Set max width on container
+        .container {
+            max-width: 800px;
+        }
     }
 }
 
 
 // TODO: Move!
 .search-phone-form--homepage {
-    padding: 10px;
 
-    @include border-radius(4px);
-    box-shadow: 0 0 15px $grey;
+    @include breakpoint(tablet) {
+        padding: 10px;
+        @include border-radius(4px);
+        box-shadow: 0 0 15px $grey;
+    }
 
     // Hide the form on load
     .select-phone-form {

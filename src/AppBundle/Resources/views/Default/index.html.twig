@@ -269,11 +269,13 @@
 
     {# Instant Quote #}
     <section class="homepage--instant-quote">
-        {% if phone %}
-            {{ render(controller('AppBundle:Default:selectPhoneMakeNew', {'type':'footer', 'id': phone.id })) }}
-        {% else %}
-            {{ render(controller('AppBundle:Default:selectPhoneMakeNew', {'type':'footer'})) }}
-        {% endif %}
+        <div class="container">
+            {% if phone %}
+                {{ render(controller('AppBundle:Default:selectPhoneMakeNew', {'type':'footer', 'id': phone.id })) }}
+            {% else %}
+                {{ render(controller('AppBundle:Default:selectPhoneMakeNew', {'type':'footer'})) }}
+            {% endif %}
+        </div>
     </section>
 
     {# Page Modals #}
