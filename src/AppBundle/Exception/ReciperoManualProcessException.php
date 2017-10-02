@@ -7,5 +7,5 @@ namespace AppBundle\Exception;
 class ReciperoManualProcessException extends \Exception
 {
     const CODE_UNKNOWN = 0;
-    CONST CODE_SKIP_LOGGING = 1;
+    const CODE_SKIP_LOGGING = 1;
 }
