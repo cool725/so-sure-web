@@ -1,0 +1,29 @@
+// homepageNew.scss
+
+@import "../mixins";
+@import "../common/palette";
+@import "../common/paletteNew";
+@import "../common/type";
+
+.navbar {
+    background-color: $white;
+}
+
+.homepage {
+
+    &--hero {
+
+    }
+
+    &--what-is-so-sure {
+
+    }
+
+    &--press {
+
+    }
+
+    &--why-we-are-better {
+
+    }
+}

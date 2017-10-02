@@ -1,10 +1,7 @@
-{% if referral != '' %}
-    {% set og_title = 'Join today & get rewarded' %}
-    {% set og_image = cdn_url ~ '/images/so-sure-welcome.png' %}
-{% endif %}
 {% extends 'base.html.twig' %}
 
-{% set white_logo = true %}
+{# Set vars #}
+{% set new_stylesheet = 1 %}
 
 {% block title %}so-sure - Welcome to Social Insurance{% endblock %}
 {% block meta %}
@@ -15,9 +12,117 @@
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets output='css/*.css'
-    '@AppBundle/Resources/public/sass/page/homepage.scss'
+    '@AppBundle/Resources/public/sass/page/homepageNew.scss'
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
+
+{% block body %}
+
+    {# Hero #}
+    <section class="section--pad homepage--hero">
+        <div class="container">
+            <h1>Smartphone Insurance <br> How it Should Be</h1>
+            <ul class="list-unstyled">
+                <li>Next working day replacement phone or repair when you claim</li>
+                <li>Up to 80% mone back when you don't</li>
+            </ul>
+            {% if phone %}
+                {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':'homepage', 'id': phone.id })) }}
+            {% else %}
+                {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':'homepage'})) }}
+            {% endif %}
+        </div>
+    </section>
+
+    {# What is so-sure? #}
+    <section class="section--pad homepage--what-is-so-sure">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-7">
+                    <h2>What is so-sure?</h2>
+                    <p>Insurance used to be great. It was designed to have your back when something bad happens, not take advantage of your good character. </p>
+                    <p>so-sure is going back to insurance's roots, providing you with insurance how it should be. We’re the first truly customer-centric insurance company - one that is less focused on profits and more on creating an all-round value: rewarding customers when they don't claim and providing exceptional service when they do.</p>
+                </div>
+                <div class="col-md-5">
+                    <div class="text-center"><br><br><br><br><br><br>[IMAGE]</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Press #}
+    <section class="section--pad homepage--press">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-7">
+                    <h4>As Seen In</h4>
+                    <ul class="list-inline">
+                        <li><img src="{{ cdn_url }}/images/home/press-images/so-sure_the-guardian.svg" alt="The Guardian - Why Facebook and Microsoft say chatbots are the talk of the town" class="img-responsive"></li>
+                        <li><img src="{{ cdn_url }}/images/home/press-images/so-sure_financial-times.svg" alt="Financial Times - Innovation to watch: Friends based insurance" class="img-responsive"></li>
+                        <li><img src="{{ cdn_url }}/images/home/press-images/so-sure_insurance-post.svg" alt="Insurance Post - so-sure to launch revolutionary social peer-to-peer mobile insurance app" class="img-responsive"></li>
+                    </ul>
+                </div>
+                <div class="col-md-5">
+                    <h4>Awards</h4>
+                    <ul class="list-inline">
+                        {# TODO: Add 2017 #}
+                        <li><img src="{{ cdn_url }}/images/home/press-images/so-sure_digital-insurance-awards.svg" alt="Post Digital Insurance Awards 2016 - so-sure nominated for The New Kid on the Block Award" class="img-responsive"></li>
+                        <li><img src="{{ cdn_url }}/images/home/press-images/so-sure_digital-top-50.svg" alt="Digital Top 50 Awards 2016 - B2C Start-up" class="img-responsive"></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Why we're better than the rest #}
+    <section class="section--pad homepage--why-we-are-better">
+        <div class="container">
+            <h2>Why we're better than the rest</h2>
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="text-center"><br><br><br><br><br><br>[IMAGE]</div>
+                </div>
+                <div class="col-md-7">
+                    <ol>
+                        <li>
+                            <span class="h4">We don’t hide behind the small print and painful claims process</span><br>
+                            <span class="p-body">We’re upfront and honest with our customers on what is covered, what is not, and what the claims process looks like. This means that there’s no nasty surprises when you have an issue with your device. You don’t need a law degree to understand our policy - everything is explained in plain English.</span>
+                        </li>
+                        <li>
+                            <span class="h4">If something bad happens, we aim to provide next day repair or replacement</span><br><span class="p-body">As simple as that. It sucks to be without your phone, we understand it and work with a global phone provider and world-class logistics company who help us get a model back in your hands the next working day.</span>
+                        </li>
+                        <li>
+                            <span class="h4">We insure refurbished and second-hand devices up to 3 years old</span><br>
+                            <span class="p-body">Doesn’t matter where you got it from, what matters is that you care about it. We are happy to insure any legitimate devices that do not exceed 3 years in age.</span>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+            <h3>And on top of that, we're still up to 40% cheaper than traditional insurers</h3>
+        </div>
+    </section>
+
+    {# Cover Details #}
+
+    {# Travel When Abroad #}
+
+    {# What we don't cover #}
+
+    {# How do the reward pot work? #}
+
+    {# Claims procss #}
+
+    {# Comparisson #}
+
+    {# Quotes #}
+
+    {# Page Modals #}
+
+    {# End Page Modals #}
+
+{% endblock %}
+
+{% block footer %}{% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
@@ -32,89 +137,3 @@
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
 
-{% block body %}
-
-    <section class="hero {% if sixpack == 'phone-image' %} hero-search-container {% endif %}" id="get-quote">
-        <div class="container">
-            <div class="row">
-                {% if sixpack == 'phone-image' %}
-                <div class="col-md-5">
-                    <div class="hero-search clearfix">
-                        <div class="hero-search--left">
-                            <a href="{{ path('quote_make', {'make':'Apple'}) }}"><img src="{{ cdn_url }}/images/home/search/so-sure_search-iPhone.svg"
-                                   data-orig-src="{{ cdn_url }}/images/home/search/so-sure_search-iPhone.svg"
-                                   data-hover-src="{{ cdn_url }}/images/home/search/so-sure_search-iPhone-hover.svg"
-                                   alt="Apple iPhone Insurance"
-                                   class="image-swap"></a>
-                        </div>
-                        <div class="hero-search--right">
-                            <a href="{{ path('quote_make', {'make':'Samsung'}) }}"><img src="{{ cdn_url }}/images/home/search/so-sure_search-samsung.svg"
-                                     data-orig-src="{{ cdn_url }}/images/home/search/so-sure_search-samsung.svg"
-                                     data-hover-src="{{ cdn_url }}/images/home/search/so-sure_search-samsung-hover.svg" alt="Samsung Insurance"
-                                     class="image-swap"></a>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-                <div class="{% if sixpack == 'phone-image' %}col-md-7{% else %}col-md-12{% endif %}">
-                    <h1>The insurance revolution is here</h1>
-                    <h3 class="text-light-blue">Mobile phone insurance is finally worthwhile</h3>
-                    <ul class="list-unstyled fa-list-bullet">
-                        <li class="text-white"><i class="fa fa-check-circle fa-lg" aria-hidden="true"></i> Up to 40% cheaper than traditional insurers</li>
-                        <li class="text-white"><i class="fa fa-check-circle fa-lg" aria-hidden="true"></i> Next working day replacement or repair</li>
-                        <li class="text-white"><i class="fa fa-check-circle fa-lg" aria-hidden="true"></i> Get cashback when no claims</li>
-                    </ul>
-                    {% if phone %}
-                        {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':'homepage', 'id': phone.id })) }}
-                    {% else %}
-                        {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':'homepage'})) }}
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </section>
-
-    {% include 'AppBundle::Default/press.html.twig' %}
-
-    {% include 'AppBundle::Default/whySoSure.html.twig' %}
-
-    {% include 'AppBundle::Default/saveMoney.html.twig' %}
-
-    {% include 'AppBundle::Default/fasterClaims.html.twig' %}
-
-    {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}
-
-    <section class="footer-cta brand-gradient">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-8">
-                    <h2>Ready for better phone insurance?</h2>
-                    <p class="lead">You can't always have better in life, but you can have better phone insurance.</p>
-                </div>
-                <div class="col-md-4">
-                    <ul class="list-inline">
-                        <li><a href="mailto:hello@wearesosure.com" class="btn btn-default-hollow btn-block open-intercom">Chat with us <i class="fa fa-comments"></i></a></li>
-                        <li>
-                            <a class="btn btn-black btn-block scroll-to"
-                               id="get-quote-btn"
-                               data-scroll-to-anchor="#get-quote"
-                               data-scroll-to-focus="#search-phone">Get a quote</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-
-    {% include 'AppBundle::Default/partnership.html.twig' %}
-
-    {# Page Modals #}
-
-    {% include 'AppBundle::Default/modalVideo.html.twig' %}
-
-    {# {% include 'AppBundle::Default/modalQuote.html.twig' %}     #}
-
-    {# End Page Modals #}
-
-{% endblock %}

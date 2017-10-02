@@ -15,7 +15,8 @@
 
 {% if type is defined and type == 'homepage' %}
     {% set secondaryBtn = true %}
-    {% set buttonCSS    = 'btn btn-success btn-search' %}
+    {% set buttonText   = 'Instant Quote' %}
+    {% set buttonCSS    = 'btn btn-blue btn-search btn-pad' %}
     {% set formClass    = 'form-inline' %}
 {% elseif type == 'new-homepage' %}
     {% set secondaryBtn = true %}
@@ -60,7 +61,7 @@
             <input type="text"
                    class="required search-phone-text"
                    id="search-phone"
-                   placeholder="Find your phone e.g. iPhone 7"
+                   placeholder="Find your phone (e.g. iPhone 7)"
                    value="{% if phone %}{{ phone }}{% endif %}" />
         </div>
         <div class="form-group">
