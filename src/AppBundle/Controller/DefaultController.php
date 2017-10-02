@@ -199,6 +199,40 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/select-phone", name="select_phone_make_new")
+     * @Route("/select-phone/{type}", name="select_phone_make_new_type")
+     * @Route("/select-phone/{type}/{id}", name="select_phone_make_new_type_id")
+     * @Template()
+     */
+    public function selectPhoneMakeNewAction(Request $request, $type = null, $id = null)
+    {
+        $dm = $this->getManager();
+        $phoneRepo = $dm->getRepository(Phone::class);
+        $phone = null;
+        if ($id) {
+            $phone = $phoneRepo->find($id);
+        }
+
+        if ($phone && in_array($type, ['purchase-select', 'purchase-change'])) {
+            $session = $request->getSession();
+            $session->set('quote', $phone->getId());
+
+            return $this->redirectToRoute('purchase_step_policy');
+        } elseif ($phone && in_array($type, ['learn-more'])) {
+            $session = $request->getSession();
+            $session->set('quote', $phone->getId());
+
+           // return $this->redirectToRoute('learn_more_phone', ['id' => $id]);
+        }
+
+        return [
+            'phones' => $this->getPhonesArray(),
+            'type' => $type,
+            'phone' => $phone,
+        ];
+    }
+
+    /**
      * @Route("/search-phone", name="search_phone_data")
      */
     public function searchPhoneAction()

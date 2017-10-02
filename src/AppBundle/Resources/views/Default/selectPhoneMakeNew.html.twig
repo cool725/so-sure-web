@@ -1,0 +1,53 @@
+{# Set type of form dependant where used or default #}
+
+{# default to #}
+{% set buttonText   = 'Instant Quote' %}
+{% set buttonCSS    = 'btn btn-blue btn-pad' %}
+{% set basePath     = '/phone-insurance/' %}
+{% set phonePath    = 'quote_phone' %}
+{% set pathSuffix   = '' %}
+{% set formID       = '' %}
+{% set formClass    = 'form-inline' %}
+{% if phone %}
+  {% set formAction   = path('quote_phone', {'id': phone.id }) %}
+{% endif %}
+
+{% if type is defined and type == 'homepage' %}
+    {% set formID = 'search-phone-form-homepage' %}
+{% elseif type == 'footer' %}
+    {% set formID = 'search-phone-form-footer' %}
+{% endif %}
+
+<div id="select-phone-data"
+     class="search-phone-form"
+     data-phones='{{ phones|json_encode|raw }}'>
+
+    <form method="get"
+          id="{{ formID }}"
+          {% if phone %}
+            action="{{ formAction }}"
+          {% endif %}
+          data-base-path="{{ basePath }}"
+          data-path-suffix="{{ pathSuffix }}"
+          class="{{ formClass }}">
+        <div class="form-group">
+            <input type="text"
+                   class="required search-phone-text search-phone"
+                   id="search-phone"
+                   placeholder="Find your phone (e.g. iPhone 7)"
+                   value="{% if phone %}{{ phone }}{% endif %}" />
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn {{ buttonCSS }}">{{ buttonText }}</button>
+        </div>
+    </form>
+
+    {% if type is not defined or not type  %}
+        <p><a href="mailto:hello@wearesosure.com" class="btn btn-link text-black open-intercom"><i class="fa fa-comments"></i> Don't see your device? Let us know.</a></p>
+    {% endif %}
+
+    <div class="loading-search-phone" class="text-center">
+        <p><small>loading...</small></p>
+    </div>
+
+</div>

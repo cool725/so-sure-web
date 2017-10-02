@@ -27,9 +27,9 @@
                 <li>Up to 80% mone back when you don't</li>
             </ul>
             {% if phone %}
-                {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':'homepage', 'id': phone.id })) }}
+                {{ render(controller('AppBundle:Default:selectPhoneMakeNew', {'type':'homepage', 'id': phone.id })) }}
             {% else %}
-                {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':'homepage'})) }}
+                {{ render(controller('AppBundle:Default:selectPhoneMakeNew', {'type':'homepage'})) }}
             {% endif %}
         </div>
     </section>
@@ -270,9 +270,9 @@
     {# Instant Quote #}
     <section class="homepage--instant-quote">
         {% if phone %}
-            {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':'homepage', 'id': phone.id })) }}
+            {{ render(controller('AppBundle:Default:selectPhoneMakeNew', {'type':'footer', 'id': phone.id })) }}
         {% else %}
-            {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':'homepage'})) }}
+            {{ render(controller('AppBundle:Default:selectPhoneMakeNew', {'type':'footer'})) }}
         {% endif %}
     </section>
 
@@ -320,12 +320,10 @@
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
-    'components/vimeo-player-js/player.min.js'
     'components/typeahead.js/typeahead.bundle.min.js'
     'components/fuse.js/fuse.min.js'
     '@AppBundle/Resources/public/js/Default/index.js'
-    '@AppBundle/Resources/public/js/Default/modalVideo.js'
-    '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
+    '@AppBundle/Resources/public/js/Default/selectPhoneMakeNew.js'
  %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
