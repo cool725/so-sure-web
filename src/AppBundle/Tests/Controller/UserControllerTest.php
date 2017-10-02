@@ -13,6 +13,8 @@ use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 
 /**
  * @group functional-net
+ *
+ * AppBundle\\Tests\\Controller\\UserControllerTest
  */
 class UserControllerTest extends BaseControllerTest
 {
@@ -313,6 +315,34 @@ class UserControllerTest extends BaseControllerTest
 
         $crawler = self::$client->request('GET', '/user/invalid');
         self::verifyResponse(500);
+    }
+
+    public function testUserUnpaidPolicyPaymentDetails()
+    {
+        $email = self::generateEmail('testUserUnpaidPolicyPaymentDetails', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_UNPAID);
+        self::$dm->flush();
+        //print_r($policy->getClaimsWarnings());
+        $this->assertFalse($policy->getUser()->hasActivePolicy());
+        $this->login($email, $password, 'user/unpaid', '/user/payment-details');
+
+        self::$client->followRedirects();
+        $crawler = self::$client->request('GET', '/user/payment-details');
+        self::$client->followRedirects(false);
+        $this->assertEquals(
+            sprintf('http://localhost/user/unpaid'),
+            self::$client->getHistory()->current()->getUri()
+        );
     }
 
     public function testUserInvalidPolicy()
