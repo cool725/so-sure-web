@@ -124,10 +124,28 @@ class BaseControllerTest extends WebTestCase
         }
     }
 
-    protected function login($username, $password, $location = null)
-    {
-        $crawler = self::$client->request('GET', '/login');
+    protected function login(
+        $username,
+        $password,
+        $expectedLocation = null,
+        $loginLocation = null
+    ) {
+        if ($loginLocation) {
+            self::$client->followRedirects();
+            $crawler = self::$client->request('GET', '/logout');
+            self::$client->followRedirects(false);
+        } else {
+            $loginLocation = '/login';
+        }
+        self::$client->followRedirects();
+        $crawler = self::$client->request('GET', $loginLocation);
+        self::$client->followRedirects(false);
         self::verifyResponse(200);
+        $this->assertEquals(
+            sprintf('http://localhost/login'),
+            self::$client->getHistory()->current()->getUri()
+        );
+
         $form = $crawler->selectButton('_submit')->form();
         $form['_username'] = $username;
         $form['_password'] = $password;
@@ -135,9 +153,9 @@ class BaseControllerTest extends WebTestCase
         $crawler = self::$client->submit($form);
         self::verifyResponse(200);
         self::$client->followRedirects(false);
-        if ($location) {
+        if ($expectedLocation) {
             $this->assertEquals(
-                sprintf('http://localhost/%s', $location),
+                sprintf('http://localhost/%s', $expectedLocation),
                 self::$client->getHistory()->current()->getUri()
             );
         }
