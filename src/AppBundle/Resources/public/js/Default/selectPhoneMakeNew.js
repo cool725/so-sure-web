@@ -69,28 +69,6 @@ sosure.selectPhoneMake = (function() {
         }
     }
 
-    self.setFormAction = function (id) {
-        var base_path = $('#search-phone-form').data('base-path');
-        var path_suffix = $('#search-phone-form').data('path-suffix');
-        if (!base_path) {
-            base_path = '/phone-insurance/';
-        }
-        $('.search-phone-form').attr('action', base_path + id + path_suffix);
-    }
-
-    self.setFormActionVal = function () {
-        if ($('.search-phone-form').attr('action')) {
-            return;
-        }
-        var q = $('.search-phone').val();
-        sosure.selectPhoneMake.searchExact(q, function(result) {
-            if (result && result.id) {
-                sosure.selectPhoneMake.setFormAction(result.id);
-                $('.search-phone-form').unbind('submit', sosure.selectPhoneMake.preventDefault);
-            }
-        });
-    }
-
     // Twitter Typeahead
     self.preventDefault = function(e) {
         e.preventDefault();
@@ -105,52 +83,85 @@ $(function(){
 
 $(function(){
 
-    // If the form action is already defined, then allow the form to submit
-    if (!$('.search-phone-form').attr('action')) {
-        $('.search-phone-form').bind('submit', sosure.selectPhoneMake.preventDefault);
-        setTimeout(function () { sosure.selectPhoneMake.setFormActionVal(); }, 3000);
-    }
+    var $typeahead = $('[id^=search-phone-form]');
 
-    $('.search-phone').typeahead({
-        highlight: true,
-        minLength: 1,
-        hint: true,
-    },
-    {
-        name: 'searchPhonesWithGa',
-        source: sosure.selectPhoneMake.searchPhonesWithGa,
-        display: 'name',
-        limit: 100,
-        templates: {
-            notFound: [
-              '<div class="empty-message">',
-                'We couldn\x27t find that phone. Try searching for the make (e.g. iPhone 7), or <a href="mailto:hello@wearesosure.com" class="open-intercom">ask us</a>',
-              '</div>'
-            ].join('\n')
+    $.each($typeahead, function (index, typeahead){
+
+        var form    = $(this);
+        var input   = $(this).find('.search-phone');
+        var loading = $(this).next('.loading-search-phone');
+
+        setFormAction = function (id) {
+            var base_path = $(form).data('base-path');
+            var path_suffix = $(form).data('path-suffix');
+            if (!base_path) {
+                base_path = '/phone-insurance/';
+            }
+            $(form).attr('action', base_path + id + path_suffix);
         }
+
+        setFormActionVal = function () {
+            if ($(form).attr('action')) {
+                return;
+            }
+            var q = $(input).val();
+            sosure.selectPhoneMake.searchExact(q, function(result) {
+                if (result && result.id) {
+                    setFormAction(result.id);
+                    $(form).unbind('submit');
+                }
+            });
+        }
+
+        // If the form action is already defined, then allow the form to submit
+        if (!$(form).attr('action')) {
+            $(form).bind('submit');
+            setTimeout(function () { setFormActionVal(); }, 3000);
+        }
+
+        $(input).typeahead({
+            highlight: true,
+            minLength: 1,
+            hint: true,
+        },
+        {
+            name: 'searchPhonesWithGa',
+            source: sosure.selectPhoneMake.searchPhonesWithGa,
+            display: 'name',
+            limit: 100,
+            templates: {
+                notFound: [
+                  '<div class="empty-message">',
+                    'We couldn\x27t find that phone. Try searching for the make (e.g. iPhone 7), or <a href="mailto:hello@wearesosure.com" class="open-intercom">ask us</a>',
+                  '</div>'
+                ].join('\n')
+            }
+        });
+
+        // Stop the content flash when rendering the input
+        $(loading).fadeOut(function() {
+
+            $(form).fadeIn();
+
+            if(window.location.href.indexOf('?quote=1') != -1) {
+                $(input).focus();
+                sosure.track.byName('Get A Quote Link');
+            }
+        });
+
+        $(input).bind('typeahead:selected', function(ev, suggestion) {
+            $(form).unbind('submit');
+        });
+
+        $(input).bind('typeahead:select', function(ev, suggestion) {
+            setFormAction(id);
+        });
+
+        $(input).bind('typeahead:change', function(ev, suggestion) {
+            setFormActionVal();
+        });
     });
 
-    // Stop the content flash when rendering the input
-    $('.loading-search-phone').fadeOut('fast', function() {
 
-        $('.search-phone-form').fadeIn();
-
-        // if(window.location.href.indexOf('?quote=1') != -1) {
-        //     $('.search-phone').focus();
-        //     sosure.track.byName('Get A Quote Link');
-        // }
-    });
-
-    $('.search-phone').bind('typeahead:selected', function(ev, suggestion) {
-        $('.search-phone-form').unbind('submit', sosure.selectPhoneMake.preventDefault);
-    });
-
-    $('.search-phone').bind('typeahead:select', function(ev, suggestion) {
-        sosure.selectPhoneMake.setFormAction(suggestion.id);
-    });
-
-    $('.search-phone').bind('typeahead:change', function(ev, suggestion) {
-        sosure.selectPhoneMake.setFormActionVal();
-    });
 
 });
