@@ -6,4 +6,6 @@ namespace AppBundle\Exception;
  */
 class ReciperoManualProcessException extends \Exception
 {
+    const CODE_UNKNOWN = 0;
+    const CODE_SKIP_LOGGING = 1;
 }
