@@ -37,6 +37,10 @@
         align-items: center;
         justify-content: center;
     }
+
+    &--show {
+        display: block;
+    }
 }
 
 // Text line break

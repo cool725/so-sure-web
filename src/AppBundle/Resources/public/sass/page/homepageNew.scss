@@ -129,7 +129,7 @@
 
         &:before {
             content: '\f002';
-            color: $primary-blue;
+            color: $light-blue;
             font-family: FontAwesome;
             font-size: 36px;
             position: absolute;
@@ -141,7 +141,6 @@
     .tt-menu {
         max-height: 176px;
         margin: 10px 0 0;
-        // border-top: none;
     }
 }
 

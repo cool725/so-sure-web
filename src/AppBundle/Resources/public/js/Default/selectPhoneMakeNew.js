@@ -111,7 +111,7 @@ $(function(){
 
         var form    = $(this);
         var input   = $(this).find('.search-phone');
-        var loading = $(this).next('.loading-search-phone');
+        var loading = $(this).next('.so-sure-loading');
 
         // If the form action is already defined, then allow the form to submit
         if (!$(form).attr('action')) {

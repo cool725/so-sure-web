@@ -1,0 +1,4 @@
+// homepage.js
+$(function(){
+
+});
