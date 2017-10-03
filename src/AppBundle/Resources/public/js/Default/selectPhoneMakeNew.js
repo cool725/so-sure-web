@@ -139,15 +139,13 @@ $(function(){
         });
 
         // Stop the content flash when rendering the input
-        $(loading).fadeOut(function() {
+        $(loading).fadeOut('slow');
+        $(form).fadeIn('fast');
 
-            $(form).fadeIn();
-
-            if(window.location.href.indexOf('?quote=1') != -1) {
-                $(input).focus();
-                sosure.track.byName('Get A Quote Link');
-            }
-        });
+        if(window.location.href.indexOf('?quote=1') != -1) {
+            $(input).focus();
+            sosure.track.byName('Get A Quote Link');
+        }
 
         $(input).bind('typeahead:selected', function(ev, suggestion) {
             $(form).unbind('submit', sosure.selectPhoneMake.preventDefault);

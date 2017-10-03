@@ -12,20 +12,62 @@
 .homepage {
 
     &--hero {
+        position: relative;
         text-align: center;
 
         // Set max width on container
         .container {
             max-width: 800px;
+            position: relative;
+            z-index: 10;
         }
 
         h1 {
+            font-size: 26px;
             color: $primary-blue;
+            line-height: 1;
+
+            @include breakpoint(tablet) {
+                font-size: 42px;
+            }
 
             @include breakpoint(desktop) {
                 font-size: 72px;
                 line-height: 1;
             }
+        }
+
+        @include breakpoint(tablet) {
+
+            &:before, &:after {
+                width: 50%; height: 100%;
+                content: '';
+                position: absolute;
+                bottom: 0;
+                z-index: 8;
+                background-repeat: no-repeat;
+                background-size: 99%;
+            }
+
+            &:before {
+                background-image: url('https://cdn.so-sure.com/images/homepage/so-sure_homepage-hero-left-smaller.svg');
+                background-position: left bottom;
+                left: -50px;
+            }
+
+            &:after {
+                background-image: url('https://cdn.so-sure.com/images/homepage/so-sure_homepage-hero-right-smaller.svg');
+                background-position: right bottom;
+                right: -20px;
+            }
+
+            padding-top: 100px;
+            padding-bottom: 250px;
+        }
+
+        @include breakpoint(desktop) {
+            padding-top: 100px;
+            padding-bottom: 250px;
         }
     }
 
@@ -81,12 +123,9 @@
 
 // TODO: Move!
 .search-phone-form--homepage {
-
-    @include breakpoint(tablet) {
-        padding: 10px;
-        @include border-radius(4px);
-        box-shadow: 0 0 15px $grey;
-    }
+    background-color: $white;
+    position: relative;
+    z-index: 12;
 
     // Hide the form on load
     .select-phone-form {
@@ -141,6 +180,28 @@
     .tt-menu {
         max-height: 176px;
         margin: 10px 0 0;
+    }
+
+    @include breakpoint(tablet) {
+        padding: 10px;
+        @include border-radius(4px);
+        box-shadow: 0 0 15px $grey;
+        transition: box-shadow 0.3s ease-in-out;
+    }
+}
+
+.search-phone-form--focus {
+
+    .twitter-typeahead {
+
+        &:before {
+            color: $primary-blue;
+        }
+    }
+
+    @include breakpoint(tablet) {
+        box-shadow: 0 0 40px $light-blue;
+        transition: box-shadow 0.5s ease-in-out;
     }
 }
 
