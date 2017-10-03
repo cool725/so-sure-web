@@ -128,6 +128,42 @@
     }
 
     &--why-we-are-better {
+        background-color: $lightest-blue;
+
+        .img-container {
+            text-align: center;
+        }
+
+        ol {
+            list-style: none;
+
+            li {
+                counter-increment: item;
+                margin-bottom: 25px;
+                position: relative;
+
+                span.h4 {
+                    color: $primary-blue;
+                }
+
+                &:before {
+                    width: 30px; height: 30px;
+                    display: inline-block;
+                    content: counter(item);
+                    position: absolute;
+                    top: 0; left: -45px;
+                    text-align: center;
+                    color: $white;
+                    font-family: $avenir-heavy;
+                    font-size: 20px;
+                    line-height: 1.7;
+
+
+                    background-color: $primary-blue;
+                    @include border-radius(100%);
+                }
+            }
+        }
 
     }
 
