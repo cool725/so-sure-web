@@ -1378,11 +1378,7 @@ class PolicyService
                             sprintf('Unclaimed cashback %s', $cashbackItem->getPolicy()->getPolicyNumber()),
                             'tech@so-sure.com',
                             'AppBundle:Email:cashback/admin_missing.html.twig',
-                            ['cashback' => $cashbackItem],
-                            null,
-                            null,
-                            null,
-                            'bcc@so-sure.com'
+                            ['cashback' => $cashbackItem]
                         );
                     }
                 } catch (\Exception $e) {
