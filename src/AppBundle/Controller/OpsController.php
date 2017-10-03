@@ -102,19 +102,30 @@ class OpsController extends BaseController
         $upcomingPhone = $phoneRepo->findOneBy(['active' => true, 'phonePrices' => null]);
 
         $policyRepo = $dm->getRepository(Policy::class);
+        $fullyExpiredPolicies = $policyRepo->findBy(['status' => Policy::STATUS_EXPIRED]);
+        $fullyExpiredPolicyNoCashback = null;
+        $fullyExpiredPolicyCashback = null;
+        foreach ($fullyExpiredPolicies as $fullyExpiredPolicy) {
+            if (!$fullyExpiredPolicy->getCashback()) {
+                $fullyExpiredPolicyNoCashback = $fullyExpiredPolicy;
+            } elseif ($fullyExpiredPolicy->getCashback() &&
+                $fullyExpiredPolicy->getCashback()->getStatus() == Cashback::STATUS_MISSING) {
+                    $fullyExpiredPolicyCashback = $fullyExpiredPolicy;
+            }
+        }
+
         $expiredPolicies = $policyRepo->findBy(['status' => Policy::STATUS_EXPIRED_CLAIMABLE]);
         $expiredPolicyNoCashback = null;
         $expiredPolicyCashback = null;
         foreach ($expiredPolicies as $expiredPolicy) {
-            if ($expiredPolicy->getCashback()) {
-                if ($expiredPolicy->getCashback()->getStatus() == Cashback::STATUS_CLAIMED) {
-                    $expiredPolicyNoCashback = $expiredPolicy;
-                }
-                if ($expiredPolicy->getCashback()->getStatus() == Cashback::STATUS_MISSING) {
+            if (!$expiredPolicy->getCashback()) {
+                $expiredPolicyNoCashback = $expiredPolicy;
+            } elseif ($expiredPolicy->getCashback() &&
+                $expiredPolicy->getCashback()->getStatus() == Cashback::STATUS_MISSING) {
                     $expiredPolicyCashback = $expiredPolicy;
-                }
             }
         }
+
         $unpaidPolicy = $policyRepo->findOneBy(['status' => Policy::STATUS_UNPAID]);
         $validPolicies = $policyRepo->findBy(['status' => Policy::STATUS_ACTIVE]);
         $position = rand(1, count($validPolicies));
@@ -214,6 +225,8 @@ class OpsController extends BaseController
             'claimed_policy' => $claimedPolicy,
             'expired_policy_nocashback' => $expiredPolicyNoCashback,
             'expired_policy_cashback' => $expiredPolicyCashback,
+            'fully_expired_policy_nocashback' => $fullyExpiredPolicyNoCashback,
+            'fully_expired_policy_cashback' => $fullyExpiredPolicyCashback,
             'upcoming_phone' => $upcomingPhone,
         ];
     }

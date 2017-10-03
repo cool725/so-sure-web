@@ -47,6 +47,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $expUsersA = $this->newUsers($manager, 40);
         $expUsersB = $this->newUsers($manager, 40, true);
         $expUsersC = $this->newUsers($manager, 40);
+        $expUsersD = $this->newUsers($manager, 40);
         $manager->flush();
 
         $count = 0;
@@ -67,17 +68,22 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
 
         foreach ($expUsersA as $user) {
-            $this->newPolicy($manager, $user, $count, null, null, null, null, null, true, false);
+            $this->newPolicy($manager, $user, $count, null, null, null, null, null, true, 345);
             $user->setEnabled(true);
             $count++;
         }
         foreach ($expUsersB as $user) {
-            $this->newPolicy($manager, $user, $count, null, null, null, null, null, true, false);
+            $this->newPolicy($manager, $user, $count, null, null, null, null, null, true, 345);
             $user->setEnabled(true);
             $count++;
         }
         foreach ($expUsersC as $user) {
-            $this->newPolicy($manager, $user, $count, null, null, null, null, null, true, null);
+            $this->newPolicy($manager, $user, $count, null, null, null, null, null, true, 366);
+            $user->setEnabled(true);
+            $count++;
+        }
+        foreach ($expUsersD as $user) {
+            $this->newPolicy($manager, $user, $count, null, null, null, null, null, true, 396);
             $user->setEnabled(true);
             $count++;
         }
@@ -93,6 +99,12 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $rand = rand(0, 1);
             if ($rand == 0) {
                 $this->addConnections($manager, $user, $expUsersB);
+            }
+        }
+        foreach ($expUsersD as $user) {
+            $rand = rand(0, 1);
+            if ($rand == 0) {
+                $this->addConnections($manager, $user, $expUsersD);
             }
         }
 
@@ -320,7 +332,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $phone = null,
         $paid = null,
         $sendInvitation = true,
-        $recent = true
+        $days = null
     ) {
         if (!$phone) {
             $phone = $this->getRandomPhone($manager);
@@ -330,12 +342,10 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
 
         $startDate = new \DateTime();
-        if ($recent) {
+        if ($days === null) {
             $days = sprintf("P%dD", rand(0, 120));
-        } elseif ($recent === false) {
-            $days = sprintf("P345D");
         } else {
-            $days = sprintf("P366D");
+            $days = sprintf("P%dD", $days);
         }
         $startDate->sub(new \DateInterval($days));
         $policy = new SalvaPhonePolicy();
@@ -366,7 +376,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $claimStatus = Claim::STATUS_SETTLED;
             $claimType = Claim::TYPE_LOSS;
         }
-        if ($claim && $recent !== null) {
+        if ($claim && $days <= 365) {
             $this->addClaim($dm, $policy, $claimType, $claimStatus);
         }
         if ($promo === null) {
@@ -431,7 +441,9 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $manager->persist($invitation);
         }
 
-        if ($recent === null) {
+        if ($days > 393) {
+            $policy->setStatus(SalvaPhonePolicy::STATUS_EXPIRED);
+        } elseif ($days > 365) {
             $policy->setStatus(SalvaPhonePolicy::STATUS_EXPIRED_CLAIMABLE);
         } elseif ($policy->isPolicyPaidToDate($now)) {
             $policy->setStatus(SalvaPhonePolicy::STATUS_ACTIVE);
