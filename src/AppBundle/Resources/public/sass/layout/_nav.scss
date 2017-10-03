@@ -79,7 +79,8 @@
 }
 
 .navbar-sticky {
-    border-bottom: 2px solid $blue;
+    // border-bottom: 2px solid $blue;
+    box-shadow: 0 2px 15px 0px $grey;
 }
 
 // Secondary Nav

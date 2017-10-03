@@ -17,7 +17,6 @@
 
         // Set max width on container
         .container {
-            max-width: 800px;
             position: relative;
             z-index: 10;
         }
@@ -37,7 +36,12 @@
             }
         }
 
+        // Background Stuff
         @include breakpoint(tablet) {
+            background-image: url('https://cdn.so-sure.com/images/homepage/so-sure_homepage-hero-clouds-combined.svg');
+            background-repeat: repeat-x;
+            background-position: left 20px;
+            background-size: 100%;
 
             &:before, &:after {
                 width: 50%; height: 100%;
@@ -50,25 +54,48 @@
             }
 
             &:before {
-                background-image: url('https://cdn.so-sure.com/images/homepage/so-sure_homepage-hero-left-smaller.svg');
+                background-image: url('https://cdn.so-sure.com/images/homepage/so-sure_homepage-hero-left-with-characters.svg');
                 background-position: left bottom;
                 left: -50px;
             }
 
             &:after {
-                background-image: url('https://cdn.so-sure.com/images/homepage/so-sure_homepage-hero-right-smaller.svg');
+                background-image: url('https://cdn.so-sure.com/images/homepage/so-sure_homepage-hero-right-with-characters.svg');
                 background-position: right bottom;
                 right: -20px;
             }
 
+            padding-top: 80px;
+            padding-bottom: 150px;
+        }
+
+        @include breakpoint(laptop) {
             padding-top: 100px;
-            padding-bottom: 250px;
+            padding-bottom: 200px;
+            background-position: left 15px;
         }
 
         @include breakpoint(desktop) {
-            padding-top: 100px;
+            padding-top: 120px;
             padding-bottom: 250px;
+            background-position: left 5px;
         }
+
+        // Characters
+        // .hero--character {
+        //     display: none;
+
+        //     @include breakpoint(laptop) {
+        //         position: absolute;
+        //         bottom: 0;
+        //         z-index: 10;
+        //     }
+        // }
+
+        // #so-sure_character-selfie {
+        //     left: 20px;
+        // }
+
     }
 
     &--what-is-so-sure {
@@ -113,18 +140,18 @@
 
     &--instant-quote {
 
-        // Set max width on container
-        .container {
-            max-width: 800px;
-        }
     }
 }
 
 
 // TODO: Move!
 .search-phone-form--homepage {
+    max-width: 450px;
     background-color: $white;
+    padding: 0;
+
     position: relative;
+    margin: 0 auto;
     z-index: 12;
 
     // Hide the form on load
@@ -138,11 +165,14 @@
 
     .form-inline--homepage {
 
-        @include breakpoint(tablet) {
+        .form-group {
+            margin-bottom: 0;
+        }
+
+        @include breakpoint(desktop) {
 
             .form-group {
                 display: inline-block;
-                margin-bottom: 0;
                 vertical-align: middle;
             }
 
@@ -154,6 +184,10 @@
             padding-left: 35px;
         }
 
+        .btn {
+            font-size: 18px;
+        }
+
     }
 
     .twitter-typeahead {
@@ -162,8 +196,8 @@
 
         .tt-hint,
         .tt-input {
-            height: 52px;
-            padding-left: 50px;
+            height: 57px;
+            padding-left: 60px;
         }
 
         &:before {
@@ -182,11 +216,23 @@
         margin: 10px 0 0;
     }
 
+    // Add style to search form - set width
     @include breakpoint(tablet) {
+        max-width: 450px;
         padding: 10px;
         @include border-radius(4px);
         box-shadow: 0 0 15px $grey;
         transition: box-shadow 0.3s ease-in-out;
+    }
+
+    // search form - set width
+    @include breakpoint(laptop) {
+        max-width: 550px;
+    }
+
+    // search form - set width
+    @include breakpoint(desktop) {
+        max-width: 650px;
     }
 }
 
@@ -200,9 +246,8 @@
     }
 
     @include breakpoint(tablet) {
-        box-shadow: 0 0 40px $light-blue;
+        box-shadow: 0 0 40px $primary-blue;
         transition: box-shadow 0.5s ease-in-out;
     }
 }
-
 
