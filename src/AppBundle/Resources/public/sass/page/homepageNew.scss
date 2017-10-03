@@ -100,10 +100,31 @@
 
     &--what-is-so-sure {
 
+        .img-container {
+            text-align: center;
+        }
+
+        @include breakpoint(laptop) {
+
+            .img-container {
+                padding-top: 80px;
+            }
+
+        }
+
     }
 
     &--press {
+        text-align: center;
 
+        h4 {
+            margin-bottom: 0;
+            padding-left: 10px;
+        }
+
+        @include breakpoint(laptop) {
+            text-align: left;
+        }
     }
 
     &--why-we-are-better {

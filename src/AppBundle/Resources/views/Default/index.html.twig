@@ -22,7 +22,7 @@
     <section class="section--pad homepage--hero">
         <div class="container">
             <h1>Smartphone Insurance <br> How it Should Be</h1>
-            <p class="lead">Next working day replacement phone or repair when you claim, <br> Up to 80% mone back when you don't</p>
+            <p class="lead">Next working day replacement phone or repair when you claim <br> Up to 80% mone back when you don't</p>
             {% if phone %}
                 {{ render(controller('AppBundle:Default:selectPhoneMakeNew', {'type':'homepage', 'id': phone.id })) }}
             {% else %}
@@ -41,8 +41,8 @@
                     <p>Insurance used to be great. It was designed to have your back when something bad happens, not take advantage of your good character. </p>
                     <p>so-sure is going back to insurance's roots, providing you with insurance how it should be. We’re the first truly customer-centric insurance company - one that is less focused on profits and more on creating an all-round value: rewarding customers when they don't claim and providing exceptional service when they do.</p>
                 </div>
-                <div class="col-md-5">
-                    <div class="text-center"><br><br><br><br><br><br>[IMAGE]</div>
+                <div class="col-md-5 img-container">
+                    <img src="{{ cdn_url }}/images/homepage/so-sure_homepage-what-is-so-sure.svg" width="340px" alt="">
                 </div>
             </div>
         </div>
@@ -55,17 +55,17 @@
                 <div class="col-md-7">
                     <h4>As Seen In</h4>
                     <ul class="list-inline">
-                        <li><img src="{{ cdn_url }}/images/home/press-images/so-sure_the-guardian.svg" alt="The Guardian - Why Facebook and Microsoft say chatbots are the talk of the town" class="img-responsive"></li>
-                        <li><img src="{{ cdn_url }}/images/home/press-images/so-sure_financial-times.svg" alt="Financial Times - Innovation to watch: Friends based insurance" class="img-responsive"></li>
-                        <li><img src="{{ cdn_url }}/images/home/press-images/so-sure_insurance-post.svg" alt="Insurance Post - so-sure to launch revolutionary social peer-to-peer mobile insurance app" class="img-responsive"></li>
+                        <li><img src="{{ cdn_url }}/images/home/press-images/so-sure_the-guardian.svg" alt="The Guardian - Why Facebook and Microsoft say chatbots are the talk of the town" class=""></li>
+                        <li><img src="{{ cdn_url }}/images/home/press-images/so-sure_financial-times.svg" alt="Financial Times - Innovation to watch: Friends based insurance" class=""></li>
+                        <li><img src="{{ cdn_url }}/images/home/press-images/so-sure_insurance-post.svg" alt="Insurance Post - so-sure to launch revolutionary social peer-to-peer mobile insurance app" class=""></li>
                     </ul>
                 </div>
                 <div class="col-md-5">
                     <h4>Awards</h4>
                     <ul class="list-inline">
                         {# TODO: Add 2017 #}
-                        <li><img src="{{ cdn_url }}/images/home/press-images/so-sure_digital-insurance-awards.svg" alt="Post Digital Insurance Awards 2016 - so-sure nominated for The New Kid on the Block Award" class="img-responsive"></li>
-                        <li><img src="{{ cdn_url }}/images/home/press-images/so-sure_digital-top-50.svg" alt="Digital Top 50 Awards 2016 - B2C Start-up" class="img-responsive"></li>
+                        <li><img src="{{ cdn_url }}/images/home/press-images/so-sure_digital-top-50.svg" alt="Digital Top 50 Awards 2016 - B2C Start-up" class=""></li>
+                        <li><img src="{{ cdn_url }}/images/home/press-images/so-sure_digital-insurance-awards.svg" alt="Post Digital Insurance Awards 2016 - so-sure nominated for The New Kid on the Block Award" class=""></li>
                     </ul>
                 </div>
             </div>
