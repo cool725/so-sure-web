@@ -317,6 +317,52 @@ ol {
 
     &--we-compare-well {
         background-color: $lightest-blue;
+
+        table {
+            max-width: 960px;
+            margin: 0 auto 50px;
+
+            thead {
+                td {
+                    padding: 30px 15px;
+                    text-align: center;
+                    vertical-align: middle;
+                }
+            }
+
+            tr {
+                td:nth-child(even) {
+                    background-color: $white;
+                }
+
+                td:nth-child(odd) {
+                    background-color: lighten($lightest-blue, 6%);
+                    opacity: 0.7;
+                }
+            }
+
+            tbody {
+                td {
+                    padding: 25px 20px 25px 90px;
+                    border-color: darken($lightest-blue, 6%);
+                    vertical-align: middle;
+
+                    &:nth-child(even) {
+                        background-image: url('https://cdn.so-sure.com/images/logo/so-sure-blue-smile.svg');
+                        background-size: 40px 40px;
+                        background-repeat: no-repeat;
+                        background-position: 30px center;
+                    }
+
+                    &:nth-child(odd) {
+                        background-image: url('https://cdn.so-sure.com/images/logo/so-sure_blue-frown.svg');
+                        background-size: 40px 40px;
+                        background-repeat: no-repeat;
+                        background-position: 30px center;
+                    }
+                }
+            }
+        }
     }
 
     &--feedback {
