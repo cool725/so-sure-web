@@ -374,9 +374,36 @@ ol {
     }
 
     &--instant-quote {
+        position: relative;
+        padding-bottom: 40px;
 
+        .form-rocket {
+            display: none;
+            width: 200px;
+            position: absolute;
+            top: 20px; right: 10%;
+
+            @include breakpoint(tablet) {
+                display: inline;
+            }
+
+            @include breakpoint(desktop) {
+                right: 25%;
+            }
+        }
+
+        @include breakpoint(tablet) {
+            padding-bottom: 0;
+        }
     }
 
+}
+
+.footer-new {
+    @include breakpoint(tablet) {
+        padding-top: 100px;
+        margin-top: -40px;
+    }
 }
 
 
