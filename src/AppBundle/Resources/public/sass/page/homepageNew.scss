@@ -9,10 +9,12 @@
     background-color: $white;
 }
 
+// TODO: Move!
 .img-responsive--center {
     margin: 0 auto;
 }
 
+// TODO: Move!
 ol {
     list-style: none;
     padding-bottom: 30px;
@@ -197,7 +199,7 @@ ol {
         .so-sure_airways {
             margin-bottom: 25px;
 
-            @include breakpoint(tablet){
+            @include breakpoint(tablet) {
                 max-width: 500px;
             }
         }
@@ -219,7 +221,7 @@ ol {
                 width: 1000px;
             }
 
-            @include breakpoint(tablet){
+            @include breakpoint(tablet) {
                 margin-left: -1000px;
 
                 img {
@@ -236,10 +238,51 @@ ol {
 
     &--what-we-dont-cover {
 
+        ol {
+            max-width: 600px;
+            margin: 0 auto;
+        }
     }
 
     &--how-does-the-reward-pot-work {
+        background-color: $lightest-blue;
 
+        h2 {
+            margin-bottom: 30px;
+        }
+
+        ol {
+            li {
+                padding-left: 30px;
+                margin-bottom: 25px;
+
+                &:before {
+                    width: 60px; height: 60px;
+                    display: inline-block;
+                    position: absolute;
+                    top: 0; left: -45px;
+                    text-align: center;
+                    color: $white;
+                    font-family: $avenir-heavy;
+                    font-size: 34px;
+                    line-height: 1.7;
+
+                    border: 6px solid $amber;
+                    text-shadow: 0 2px 0 darken($amber, 15%);
+                    box-shadow: 0 2px 0 darken($amber, 15%), darken($amber, 15%) 0px 2px 0 inset;
+                    background-color: darken($amber, 10%);
+                }
+            }
+        }
+
+        .so-sure_piggy_bank {
+            max-width: 200px;
+            margin-bottom: 25px;
+
+            @include breakpoint(tablet) {
+                max-width: 300px;
+            }
+        }
     }
 
     &--claims-process {
