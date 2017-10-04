@@ -3,7 +3,7 @@
 blockquote {
 	position: relative;
 	margin: 25px 0;
-	padding: 10px 0;
+	padding: 10px 15px;
 	border: none;
 
 	text-align: center;
@@ -14,6 +14,8 @@ blockquote {
 
 	footer {
 		text-align: center;
+		font-weight: bold;
+		color: $primary-blue;
 
 		&:before {
 			content: '';
@@ -25,14 +27,14 @@ blockquote {
 		}
 	}
 
-	&:before {
-		width: 25px;
-		position: absolute;
-		left: 50%; top: -25px;
-		margin-left: -12.5px;
-		font-family: FontAwesome;
-		font-size: 60px;
-		line-height: 1;
-	    content: '\201C';
-	}
+	// &:before {
+	// 	width: 25px;
+	// 	position: absolute;
+	// 	left: 50%; top: -25px;
+	// 	margin-left: -12.5px;
+	// 	font-family: FontAwesome;
+	// 	font-size: 60px;
+	// 	line-height: 1;
+	//     content: '\201C';
+	// }
 }

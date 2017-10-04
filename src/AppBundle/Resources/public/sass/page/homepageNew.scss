@@ -366,12 +366,17 @@ ol {
     }
 
     &--feedback {
+        text-align: center;
 
+        h2 {
+            margin-bottom: 30px;
+        }
     }
 
     &--instant-quote {
 
     }
+
 }
 
 

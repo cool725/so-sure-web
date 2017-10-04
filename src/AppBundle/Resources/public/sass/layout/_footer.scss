@@ -41,5 +41,26 @@
 
 .footer-new {
 	padding: 40px 0;
-	background-color: $off-white;
+	background-color: $primary-blue;
+
+	ul, p {
+		color: $white;
+	}
+
+	a {
+		color: $white;
+		text-decoration: underline;
+
+		&:hover, &:focus {
+			color: $lightest-blue;
+		}
+	}
+
+	&--list {
+		margin-bottom: 20px;
+
+		li {
+			vertical-align: middle;
+		}
+	}
 }
