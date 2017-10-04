@@ -9,6 +9,45 @@
     background-color: $white;
 }
 
+.img-responsive--center {
+    margin: 0 auto;
+}
+
+ol {
+    list-style: none;
+    padding-bottom: 30px;
+
+    li {
+        counter-increment: item;
+        margin-bottom: 25px;
+        position: relative;
+        line-height: 1.7;
+
+        span.h4 {
+            color: $primary-blue;
+            display: inline-block;
+            margin: 0 0 10px;
+        }
+
+        &:before {
+            width: 30px; height: 30px;
+            display: inline-block;
+            content: counter(item);
+            position: absolute;
+            top: 0; left: -45px;
+            text-align: center;
+            color: $white;
+            font-family: $avenir-heavy;
+            font-size: 20px;
+            line-height: 1.7;
+
+
+            background-color: $primary-blue;
+            @include border-radius(100%);
+        }
+    }
+}
+
 .homepage {
 
     &--hero {
@@ -100,8 +139,8 @@
 
     &--what-is-so-sure {
 
-        .img-container {
-            text-align: center;
+        .so-sure_homepage-what-is-so-sure {
+            max-width: 300px;
         }
 
         @include breakpoint(laptop) {
@@ -130,49 +169,69 @@
     &--why-we-are-better {
         background-color: $lightest-blue;
 
-        .img-container {
-            text-align: center;
+        h2 {
+            margin-bottom: 30px;
         }
 
-        ol {
-            list-style: none;
-
-            li {
-                counter-increment: item;
-                margin-bottom: 25px;
-                position: relative;
-
-                span.h4 {
-                    color: $primary-blue;
-                }
-
-                &:before {
-                    width: 30px; height: 30px;
-                    display: inline-block;
-                    content: counter(item);
-                    position: absolute;
-                    top: 0; left: -45px;
-                    text-align: center;
-                    color: $white;
-                    font-family: $avenir-heavy;
-                    font-size: 20px;
-                    line-height: 1.7;
-
-
-                    background-color: $primary-blue;
-                    @include border-radius(100%);
-                }
-            }
+        .so-sure_homepage-balloon {
+            max-width: 260px;
         }
 
     }
 
     &--cover-details {
-
+        text-align: center;
     }
 
     &--when-you-travel {
+        padding: 100px 0 200px;
+        position: relative;
+        background-color: $lightest-blue;
+        text-align: center;
+        overflow-x: hidden;
 
+        h2 {
+            margin-bottom: 0;
+        }
+
+        .so-sure_airways {
+            margin-bottom: 25px;
+
+            @include breakpoint(tablet){
+                max-width: 500px;
+            }
+        }
+
+        .cloud {
+            position: absolute;
+            left: 50%;
+            margin-left: -500px;
+
+            &--top {
+                top: 0;
+            }
+
+            &--bottom {
+                bottom: -5px;
+            }
+
+            img {
+                width: 1000px;
+            }
+
+            @include breakpoint(tablet){
+                margin-left: -1000px;
+
+                img {
+                    width: 2000px;
+                }
+
+            }
+        }
+
+        @include breakpoint(tablet) {
+            padding: 200px 0 300px;
+        }
     }
 
     &--what-we-dont-cover {
