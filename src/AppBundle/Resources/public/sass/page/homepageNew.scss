@@ -56,6 +56,7 @@ ol {
     &--hero {
         position: relative;
         text-align: center;
+        padding-top: 40px;
 
         // Set max width on container
         .container {
@@ -79,6 +80,11 @@ ol {
         }
 
         // Background Stuff
+        // background-image: url('https://cdn.so-sure.com/images/homepage/so-sure_cloud_hero_small.svg');
+        // background-repeat: no-repeat;
+        // background-position: center top;
+        // background-size: 60%;
+
         @include breakpoint(tablet) {
             background-image: url('https://cdn.so-sure.com/images/homepage/so-sure_homepage-hero-clouds-combined.svg');
             background-repeat: repeat-x;
@@ -226,7 +232,7 @@ ol {
             }
 
             &--bottom {
-                bottom: -5px;
+                bottom: -15px;
             }
 
             img {
