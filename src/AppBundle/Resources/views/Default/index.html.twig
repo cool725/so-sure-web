@@ -23,7 +23,7 @@
     <section class="section--pad homepage--hero">
         <div class="container">
             <h1>Smartphone Insurance <br> How it Should Be</h1>
-            <p class="lead">Next working day replacement phone or repair when you claim <br> Up to 80% mone back when you don't</p>
+            <p class="lead">Next working day replacement phone or repair when you claim<br class="hidden-xs"><span class="visible-xs-inline">,</span> Up to 80% money back when you don't</p>
             {% if phone %}
                 {{ render(controller('AppBundle:Default:selectPhoneMakeNew', {'type':'homepage', 'id': phone.id })) }}
             {% else %}
@@ -39,7 +39,7 @@
             <div class="row">
                 <div class="col-md-7">
                     <h2>What is so-sure?</h2>
-                    <p class="lead">Insurance used to be great. It was designed to have your back when something bad happens, not take advantage of your good character. </p>
+                    <p>Insurance used to be great. It was designed to have your back when something bad happens, not take advantage of your good character. </p>
                     <p>so-sure is going back to insurance's roots, providing you with insurance how it should be. We’re the first truly customer-centric insurance company - one that is less focused on profits and more on creating an all-round value: rewarding customers when they don't claim and providing exceptional service when they do.</p>
                 </div>
                 <div class="col-md-5">
@@ -86,7 +86,7 @@
                     </div>
                 </div>
                 <div class="col-md-7">
-                    <ol>
+                    <ol class="ol--blue-counter">
                         <li>
                             <span class="h4">We don’t hide behind the small print and painful claims process</span><br>
                             <span class="p-body">We’re upfront and honest with our customers on what is covered, what is not, and what the claims process looks like. This means that there’s no nasty surprises when you have an issue with your device. You don’t need a law degree to understand our policy - everything is explained in plain English.</span>
@@ -160,7 +160,7 @@
     <section class="section--pad homepage--what-we-dont-cover">
         <div class="container">
             <h2 class="text-center">What We Don't Cover</h2>
-            <ol>
+            <ol class="ol--blue-counter">
                 <li>Excess: £70 for Theft/Loss and £50 for Accidental Damage/Breakdown</li>
                 <li>Theft, Loss, Accidental Damage or Breakdown where you have knowingly put your phone at risk</li>
                 <li>3+ claims for Loss and/or Theft in any policy year</li>
@@ -178,7 +178,7 @@
                 </div>
                 <div class="col-md-7">
                     <p class="lead">If you and your friends take good care of your phone and don’t need to claim, we’ll give you up to 80% of your premium back in your Reward Pot.</p>
-                    <ol class="lead">
+                    <ol class="lead ol--blue-counter">
                         <li>Connect to your friends and family and receive up to £10 each in your individual Reward Pots</li>
                         <li>At the end of the year, when you and your connections haven’t claimed, your Reward Pot is paid out to you.</li>
                     </ol>

@@ -15,7 +15,7 @@
 }
 
 // TODO: Move!
-ol {
+.ol--blue-counter {
     list-style: none;
     padding-bottom: 30px;
     padding-left: 50px;
@@ -56,7 +56,6 @@ ol {
     &--hero {
         position: relative;
         text-align: center;
-        padding-top: 40px;
 
         // Set max width on container
         .container {
@@ -65,25 +64,30 @@ ol {
         }
 
         h1 {
-            font-size: 26px;
+            font-size: 34px;
+            line-height: 1.2;
             color: $primary-blue;
-            line-height: 1;
 
             @include breakpoint(tablet) {
                 font-size: 42px;
+                line-height: 1.1;
             }
 
             @include breakpoint(desktop) {
                 font-size: 72px;
-                line-height: 1;
             }
         }
 
-        // Background Stuff
-        // background-image: url('https://cdn.so-sure.com/images/homepage/so-sure_cloud_hero_small.svg');
-        // background-repeat: no-repeat;
-        // background-position: center top;
-        // background-size: 60%;
+        background-image: url('https://cdn.so-sure.com/images/homepage/so-sure_homepage-hero-mobile.svg');
+        background-repeat: no-repeat;
+        background-position: center bottom;
+        background-size: 90%;
+        padding-bottom: 130px;
+
+        @include breakpoint(midtablet) {
+            padding-bottom: 150px;
+            background-size: 80%;
+        }
 
         @include breakpoint(tablet) {
             background-image: url('https://cdn.so-sure.com/images/homepage/so-sure_homepage-hero-clouds-combined.svg');
@@ -499,13 +503,11 @@ ol {
     }
 
     // Add style to search form - set width
-    @include breakpoint(tablet) {
-        max-width: 450px;
-        padding: 10px;
-        @include border-radius(4px);
-        box-shadow: 0 0 15px $grey;
-        transition: box-shadow 0.3s ease-in-out;
-    }
+    max-width: 450px;
+    padding: 10px;
+    @include border-radius(4px);
+    box-shadow: 0 0 15px $grey;
+    transition: box-shadow 0.3s ease-in-out;
 
     // search form - set width
     @include breakpoint(laptop) {
@@ -518,6 +520,7 @@ ol {
     }
 }
 
+// Style input on focus
 .search-phone-form--focus {
 
     .twitter-typeahead {
@@ -527,9 +530,7 @@ ol {
         }
     }
 
-    @include breakpoint(tablet) {
-        box-shadow: 0 0 1px $primary-blue;
-        transition: box-shadow 0.5s ease-in-out;
-    }
+    box-shadow: 0 0 1px $primary-blue;
+    transition: box-shadow 0.5s ease-in-out;
 }
 
