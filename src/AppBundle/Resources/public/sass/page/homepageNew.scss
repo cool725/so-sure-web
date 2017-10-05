@@ -262,7 +262,7 @@
         padding-top: 0;
 
         ol {
-            max-width: 600px;
+            max-width: 700px;
             margin: 0 auto;
         }
     }
@@ -474,7 +474,7 @@
 
     .twitter-typeahead {
         width: 100%;
-        font-size: 20px;
+        font-size: 16px;
 
         .tt-hint,
         .tt-input {
@@ -490,6 +490,10 @@
             position: absolute;
             z-index: 10;
             left: 5px; top: 0;
+        }
+
+        @include breakpoint(tablet) {
+            font-size: 20px;
         }
     }
 
