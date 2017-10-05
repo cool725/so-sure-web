@@ -1,6 +1,8 @@
 // homepage.js
 $(function(){
 
+    // Defer images for faster page speed
+
     // Enhance the focus on the search box when input focused
     $('.search-phone').each(function(index, el) {
         var container = $(this).parents('.search-phone-form');
