@@ -64,7 +64,7 @@
         }
 
         h1 {
-            font-size: 34px;
+            font-size: 32px;
             line-height: 1.2;
             color: $primary-blue;
 
@@ -82,11 +82,11 @@
         background-repeat: no-repeat;
         background-position: center bottom;
         background-size: 90%;
-        padding-bottom: 130px;
+        padding-bottom: 120px;
 
         @include breakpoint(midtablet) {
-            padding-bottom: 150px;
             background-size: 80%;
+            padding-bottom: 170px;
         }
 
         @include breakpoint(tablet) {
@@ -538,4 +538,11 @@
     box-shadow: 0 0 1px $primary-blue;
     transition: box-shadow 0.5s ease-in-out;
 }
+
+.search-phone-form--sticky {
+    position: fixed;
+    top: 60px; left: 0; right: 0;
+    z-index: 999;
+}
+
 
