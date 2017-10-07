@@ -740,6 +740,9 @@ abstract class BaseController extends Controller
             $policiesQb = $policiesQb->addAnd(
                 $policiesQb->expr()->field('status')->in([Policy::STATUS_CANCELLED])
             );
+            $policiesQb = $policiesQb->addAnd(
+                $policiesQb->expr()->field('cancelledReason')->notIn([Policy::CANCELLED_UPGRADE])
+            );
         } elseif ($status == Policy::STATUS_EXPIRED_CLAIMABLE) {
             $policiesQb = $policiesQb->addAnd(
                 $policiesQb->expr()->field('status')->in([Policy::STATUS_EXPIRED_CLAIMABLE])
