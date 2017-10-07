@@ -407,7 +407,7 @@ trait UserClassTrait
     protected static function getRenewalPolicy($policy, $create = true, $date = null)
     {
         if (!$date) {
-            $date = new \DateTime("2017-01-01");
+            $date = new \DateTime("2017-01-01 15:00");
         }
         $exp = clone $date;
         $exp = $exp->sub(new \DateInterval('PT1S'));
