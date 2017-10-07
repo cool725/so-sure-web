@@ -60,7 +60,7 @@ class OpsReportCommand extends ContainerAwareCommand
                     foreach ($data['errors'] as $error) {
                         if (isset($error['name']) && isset($error['message'])) {
                             $items[] = sprintf(
-                                '%s => %s (%s)',
+                                '%s => "%s" [Err Msg: %s]',
                                 $error['name'],
                                 isset($error['value']) ? $error['value'] : '',
                                 $error['message']
