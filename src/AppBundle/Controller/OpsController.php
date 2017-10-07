@@ -362,6 +362,7 @@ class OpsController extends BaseController
         $logger = $this->get('logger');
         $data = json_decode($request->getContent(), true);
         $now = new \DateTime();
+        $data['browser'] = $request->headers->get('User-Agent');
         $this->get('snc_redis.default')->hset('client-validation', json_encode($data), $now->format('U'));
         $logger->debug(sprintf('Validation Endpoint %s', json_encode($data)));
 
