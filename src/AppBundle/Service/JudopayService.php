@@ -1030,7 +1030,8 @@ class JudopayService
         if ($this->areEqualToFourDp($payment->getAmount(), $policy->getPremium()->getYearlyPremiumPrice())) {
             $commission = $salva->sumBrokerFee(12, true);
             $payment->setTotalCommission($commission);
-        } elseif ($premium->isEvenlyDivisible($payment->getAmount())) {
+        } elseif ($premium->isEvenlyDivisible($payment->getAmount()) ||
+            $premium->isEvenlyDivisible($payment->getAmount(), true)) {
             // payment should already be credited at this point
             $includeFinal = $this->areEqualToTwoDp(0, $policy->getOutstandingPremium());
 
