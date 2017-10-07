@@ -77,6 +77,11 @@ abstract class BaseController extends Controller
     {
         return filter_var($this->getRequestString($request, $field), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
     }
+    
+    protected function getFormBool($form, $field)
+    {
+        return filter_var($form->get($field)->getData(), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+    }
 
     protected function findRewardUser($email)
     {
@@ -851,6 +856,18 @@ abstract class BaseController extends Controller
                 $usersQb,
                 $formField,
                 $dataField
+            );
+        }
+        $allSanctions = $this->getFormBool($form, 'allSanctions');
+        $waitingSanctions = $this->getFormBool($form, 'waitingSanctions');
+        if ($allSanctions || $waitingSanctions) {
+            $usersQb = $usersQb->addAnd(
+                $usersQb->expr()->field('sanctionsMatches')->notEqual(null)
+            );
+        }
+        if ($waitingSanctions) {
+            $usersQb = $usersQb->addAnd(
+                $usersQb->expr()->field('sanctionsMatches.0.manuallyVerified')->notEqual(true)
             );
         }
 

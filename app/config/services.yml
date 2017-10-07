@@ -212,6 +212,12 @@ services:
             redis:         "@snc_redis.default"
             mailerService: "@app.mailer"
 
+    app.sanctions:
+        class: AppBundle\Service\SanctionsService
+        arguments:
+            dm:            "@doctrine_mongodb.odm.default_document_manager"
+            logger:        "@logger"
+
     app.sms:
         class: AppBundle\Service\SmsService
         arguments:
@@ -581,6 +587,13 @@ services:
             -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
             -  { name: doctrine_mongodb.odm.event_listener, event: postUpdate  }
 
+    doctrine.listener.company:
+        class:   AppBundle\Listener\DoctrineCompanyListener
+        arguments:
+            dispatcher: "@event_dispatcher"
+        tags:
+            -  { name: doctrine_mongodb.odm.event_listener, event: postPersist }
+
     doctrine.listener.claim:
         class:   AppBundle\Listener\DoctrineClaimListener
         arguments:
@@ -645,6 +658,7 @@ services:
             mailer:               "@app.mailer"
             redis:                "@snc_redis.default"
         tags:
+            -  { name: kernel.event_listener, event: event.user.created, method: onUserCreatedEvent }
             -  { name: kernel.event_listener, event: event.user.updated, method: onUserUpdatedEvent }
             -  { name: kernel.event_listener, event: event.user.email.changed, method: onUserEmailChangedEvent }
 
@@ -654,6 +668,7 @@ services:
             intercom: "@app.intercom"
         tags:
             -  { name: kernel.event_listener, event: event.lead.updated, method: onLeadUpdatedEvent }
+            -  { name: kernel.event_listener, event: event.user.created, method: onUserCreatedEvent }
             -  { name: kernel.event_listener, event: event.user.updated, method: onUserUpdatedEvent }
             -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
             -  { name: kernel.event_listener, event: event.policy.pot, method: onPolicyPotEvent }
@@ -670,6 +685,17 @@ services:
             -  { name: kernel.event_listener, event: event.claim.created, method: onClaimCreatedEvent }
             -  { name: kernel.event_listener, event: event.claim.approved, method: onClaimApprovedEvent }
             -  { name: kernel.event_listener, event: event.claim.settled, method: onClaimSettledEvent }
+
+    app.listener.sanctions:
+        class:   AppBundle\Listener\SanctionsListener
+        arguments:
+            dm:                   "@doctrine_mongodb.odm.default_document_manager"
+            logger:               "@logger"
+            mailer:               "@app.mailer"
+            sanctions:            "@app.sanctions"
+        tags:
+            -  { name: kernel.event_listener, event: event.user.created, method: onUserCreatedEvent }
+            -  { name: kernel.event_listener, event: event.company.created, method: onCompanyCreatedEvent }
 
     app.listener.mixpanel:
         class:   AppBundle\Listener\MixpanelListener

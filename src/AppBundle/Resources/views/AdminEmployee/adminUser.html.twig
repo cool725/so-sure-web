@@ -65,7 +65,9 @@
                 <tr>
                     <td>Billing Address</td>
                     <td>{{ user.billingAddress }}
+                        {% if user.billingAddress%}
                         [<a target="blank" href="http://maps.google.com/?q={{ user.billingAddress.postcode }}">{{ user.billingAddress.postcode }}</a>]
+                        {% endif %}
                     {% if postcode and postcode.location %}
                         [<a target="blank" href="http://maps.google.com/?ll={{ postcode.location.coordinates[1]}},{{ postcode.location.coordinates[0]}}">
                             Postcode match
@@ -131,6 +133,32 @@
                         {{ form_end(makemodel_form)}}
                         <br>
                         £0.05 to run check
+                    </td>
+                </tr>
+                <tr>
+                    <td>Sanctions</td>
+                    <td>
+                        {% if user.sanctionsChecks|length == 0%}
+                            No checks run
+                        {% endif %}
+                        {% for check in user.sanctionsChecks %}
+                            Ran: {{ check|date }}<br>
+                        {% endfor %}
+                        {% if user.sanctionsMatches|length == 0%}
+                            No matches
+                        {% endif %}
+                        {% for match in user.sanctionsMatches %}
+                            {% if match.manuallyVerified %}
+                            Confirmed not match: <del>{{ match.sanctions.name }} ({{ match.distance }})</del>
+                            {% else %}
+                            Possible match: {{ match.sanctions.name }}  ({{ match.distance }})
+                            {% endif %}
+                            <br>
+                        {% endfor %}
+                    </td>
+                    <td>{{ form_start(sanctions_form)}}
+                        {{ form_widget(sanctions_form.confirm, {'label': 'Confirm NO match', 'attr': {'class': 'btn btn-info'}})}}
+                        {{ form_end(sanctions_form)}}
                     </td>
                 </tr>
             </table>

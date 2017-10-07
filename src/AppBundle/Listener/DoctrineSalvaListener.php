@@ -57,7 +57,10 @@ class DoctrineSalvaListener
                         if ($field == 'premium') {
                             $oldPremium = $eventArgs->getOldValue('premium');
                             $newPremium = $eventArgs->getNewValue('premium');
-                            if (!$this->areEqualToTwoDp($oldPremium->getGwp(), $newPremium->getGwp())
+                            if (!$oldPremium && !$newPremium) {
+                                $changed = false;
+                            } elseif ((!$oldPremium && $newPremium)
+                                || !$this->areEqualToTwoDp($oldPremium->getGwp(), $newPremium->getGwp())
                                 || !$this->areEqualToTwoDp($oldPremium->getIpt(), $newPremium->getIpt())
                                 || !$this->areEqualToTwoDp($oldPremium->getIptRate(), $newPremium->getIptRate())) {
                                 $changed = true;

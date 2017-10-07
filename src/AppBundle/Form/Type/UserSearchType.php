@@ -51,6 +51,8 @@ class UserSearchType extends AbstractType
                     ]
                 ]
             ])
+            ->add('waitingSanctions', CheckboxType::class, ['required' => false])
+            ->add('allSanctions', CheckboxType::class, ['required' => false])
             ->add('search', SubmitType::class)
         ;
 
@@ -62,6 +64,8 @@ class UserSearchType extends AbstractType
             $form->get('postcode')->setData($currentRequest->query->get('postcode'));
             $form->get('lastname')->setData($currentRequest->query->get('lastname'));
             $form->get('facebookId')->setData($currentRequest->query->get('facebookId'));
+            $form->get('waitingSanctions')->setData($currentRequest->query->get('waitingSanctions'));
+            $form->get('allSanctions')->setData($currentRequest->query->get('allSanctions'));
         });
     }
 

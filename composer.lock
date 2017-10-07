@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "80f2cbe3d9a4ec3a651e571827fc0fd1",
-    "content-hash": "71e0d1aff4501e977d4d1178ffc57384",
+    "hash": "d2a9a628b8320b2bcae875eb6d00881e",
+    "content-hash": "d499a12d3bf7d45f98cfe8d241d2d05b",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
@@ -4035,6 +4035,40 @@
             ],
             "description": "Symfony bundle integration of maknz/slack library",
             "time": "2016-12-23 14:54:38"
+        },
+        {
+            "name": "noodlesnz/double-metaphone",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/NoodlesNZ/double-metaphone.git",
+                "reference": "6c310f65650472efef10fde994dff69787fb1b06"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/NoodlesNZ/double-metaphone/zipball/6c310f65650472efef10fde994dff69787fb1b06",
+                "reference": "6c310f65650472efef10fde994dff69787fb1b06",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Nick Le Mouton",
+                    "email": "nick@noodles.net.nz"
+                }
+            ],
+            "description": "This class implements a \"sounds like\" algorithm developed by Lawrence Philips which he published in the June, 2000 issue of C/C++ Users Journal. Double Metaphone is an improved version of Philips' original Metaphone algorithm.",
+            "homepage": "https://github.com/NoodlesNZ/double-metaphone",
+            "time": "2016-04-08 23:31:47"
         },
         {
             "name": "ocramius/package-versions",
