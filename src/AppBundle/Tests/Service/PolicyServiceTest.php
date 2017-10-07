@@ -1717,8 +1717,8 @@ class PolicyServiceTest extends WebTestCase
         $startDate = $startDate->add(new \DateInterval('P10D'));
 
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
-            static::generateEmail('testPolicyRenewalConnectionsA', $this),
-            static::generateEmail('testPolicyRenewalConnectionsB', $this),
+            static::generateEmail('testPolicyRenewStartDateA', $this),
+            static::generateEmail('testPolicyRenewStartDateB', $this),
             true,
             $startDate,
             $startDate
