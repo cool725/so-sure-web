@@ -55,7 +55,7 @@ class PhonePolicyTest extends WebTestCase
         //each test method, do this in setUp() instead
         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $phoneRepo = self::$dm->getRepository(Phone::class);
-        self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
+        self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 6s', 'memory' => 64]);
         self::$invitationService = self::$container->get('app.invitation');
         self::$invitationService->setDebug(true);
         self::$userManager = self::$container->get('fos_user.user_manager');

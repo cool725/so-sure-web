@@ -53,7 +53,7 @@ class DefaultControllerTest extends BaseControllerTest
     {
         $url = self::$router->generate('quote_make_model_memory', [
             'make' => 'Apple',
-            'model' => 'iPhone+5S',
+            'model' => 'iPhone+6S',
             'memory' => 64,
         ]);
 
@@ -65,12 +65,12 @@ class DefaultControllerTest extends BaseControllerTest
     {
         $url = self::$router->generate('quote_make_model_memory', [
             'make' => 'Apple',
-            'model' => 'iPhone 5S',
+            'model' => 'iPhone 6S',
             'memory' => 64,
         ]);
         $redirectUrl = self::$router->generate('quote_make_model_memory', [
             'make' => 'Apple',
-            'model' => 'iPhone+5S',
+            'model' => 'iPhone+6S',
             'memory' => 64,
         ]);
 
@@ -85,7 +85,7 @@ class DefaultControllerTest extends BaseControllerTest
     {
         $crawler = self::$client->request('GET', self::$router->generate('quote_make_model', [
             'make' => 'Apple',
-            'model' => 'iPhone+5S',
+            'model' => 'iPhone+6S',
         ]));
         self::verifyResponse(200);
     }
@@ -94,11 +94,11 @@ class DefaultControllerTest extends BaseControllerTest
     {
         $url = self::$router->generate('quote_make_model', [
             'make' => 'Apple',
-            'model' => 'iPhone 5S',
+            'model' => 'iPhone 6S',
         ]);
         $redirectUrl = self::$router->generate('quote_make_model', [
             'make' => 'Apple',
-            'model' => 'iPhone+5S',
+            'model' => 'iPhone+6S',
         ]);
 
         $crawler = self::$client->request('GET', $url);
