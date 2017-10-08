@@ -151,4 +151,9 @@ class Sanctions
             return $this->lastName;
         }
     }
+
+    public function getBirthday()
+    {
+        return $this->birthday;
+    }
 }
