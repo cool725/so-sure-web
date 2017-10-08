@@ -417,6 +417,7 @@ class AdminController extends BaseController
             'activePolicies' => $reportingService->getActivePoliciesCount($date),
             'activePoliciesWithDiscount' => $reportingService->getActivePoliciesWithPolicyDiscountCount($date),
             'rewardPotLiability' => $reportingService->getRewardPotLiability($date),
+            'rewardPromoPotLiability' => $reportingService->getRewardPotLiability($date, true),
             'files' => $s3FileRepo->getAllFiles($date),
         ];
     }
