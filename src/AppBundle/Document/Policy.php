@@ -3185,7 +3185,7 @@ abstract class Policy
             $this->updatePotValue();
             if ($this->hasCashback()) {
                 $this->getCashback()->setAmount($this->getPotValue());
-                $this->getCashback()->setDate(new \DateTime());
+                $this->getCashback()->setDate(clone $date);
             }
 
             return;
@@ -3203,7 +3203,7 @@ abstract class Policy
         if ($promoPotReward && !$this->areEqualToTwoDp($promoPotReward->getAmount(), $promoPotValue)) {
             // pot changed (due to claim) - issue refund if applicable
             $reward = new SoSurePotRewardPayment();
-            $reward->setDate(new \DateTime());
+            $reward->setDate(clone $date);
             $reward->setAmount($this->toTwoDp($promoPotValue - $promoPotReward->getAmount()));
             $this->addPayment($reward);
         }
