@@ -84,10 +84,15 @@ class SanctionsCommand extends BaseCommand
         } else {
             $users = $userRepo->findAll();
         }
+        $count = 0;
         foreach ($users as $user) {
             $matches = $sanctions->checkUser($user, true);
             if ($matches) {
                 print sprintf('%s %s', $user->getName(), json_encode($matches)) . PHP_EOL;
+            }
+            $count++;
+            if ($count % 1000 == 0) {
+                $dm->flush();
             }
         }
         $dm->flush();

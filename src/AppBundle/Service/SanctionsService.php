@@ -72,20 +72,22 @@ class SanctionsService
         $this->loadSanctions();
 
         $matches = [];
-        $metaphone = [
-            'first' => new \DoubleMetaphone($user->getFirstName()),
-            'last' => new \DoubleMetaphone($user->getLastName())
-        ];
-        foreach ($this->sanctions as $data) {
-            $distance = $this->getMinLevenshteinDoupleMetaphone($metaphone['first'], $data['first']) +
-                $this->getMinLevenshteinDoupleMetaphone($metaphone['last'], $data['last']);
+        if ($user->getFirstName() && $user->getLastName()) {
+            $metaphone = [
+                'first' => new \DoubleMetaphone($user->getFirstName()),
+                'last' => new \DoubleMetaphone($user->getLastName())
+            ];
+            foreach ($this->sanctions as $data) {
+                $distance = $this->getMinLevenshteinDoupleMetaphone($metaphone['first'], $data['first']) +
+                    $this->getMinLevenshteinDoupleMetaphone($metaphone['last'], $data['last']);
 
-            if ($distance <= self::MATCH_THRESHOLD) {
-                $matches[] = array_merge($data, ['distance' => $distance]);
-                $sanctionsMatch = new SanctionsMatch();
-                $sanctionsMatch->setSanctions($sanctionsRepo->find($data['id']));
-                $sanctionsMatch->setDistance($distance);
-                $user->addSanctionsMatch($sanctionsMatch);
+                if ($distance <= self::MATCH_THRESHOLD) {
+                    $matches[] = array_merge($data, ['distance' => $distance]);
+                    $sanctionsMatch = new SanctionsMatch();
+                    $sanctionsMatch->setSanctions($sanctionsRepo->find($data['id']));
+                    $sanctionsMatch->setDistance($distance);
+                    $user->addSanctionsMatch($sanctionsMatch);
+                }
             }
         }
 
