@@ -31,22 +31,22 @@
     <tr>
         <td width="{{ indent_width }}"></td>
         <td width="{{ text_width }}">Refunded (cards)</td>
-        <td>£{{ (0 - paymentTotals.judo.refunded)|number_format(2, '.', ',') }}</td>
+        <td>(£{{ (0 - paymentTotals.judo.refunded)|number_format(2, '.', ',') }})</td>
     </tr>
     <tr>
         <td width="{{ indent_width }}"></td>
         <td width="{{ text_width }}">Refunded (bacs)</td>
-        <td>£{{ (0 - paymentTotals.bacs.refunded)|number_format(2, '.', ',') }}</td>
+        <td>(£{{ (0 - paymentTotals.bacs.refunded)|number_format(2, '.', ',') }})</td>
     </tr>
     <tr>
         <td width="{{ indent_width }}"></td>
         <td width="{{ text_width }}">Refunded (so-sure)</td>
-        <td>£{{ (0 - paymentTotals.sosure.refunded)|number_format(2, '.', ',') }}</td>
+        <td>(£{{ (0 - paymentTotals.sosure.refunded)|number_format(2, '.', ',') }})</td>
     </tr>
     <tr>
         <td width="{{ indent_width }}"></td>
         <td width="{{ text_width }}"><strong>Premium refunds in month</strong></td>
-        <td><strong>£{{ (0 - paymentTotals.all.refunded)|number_format(2, '.', ',') }}</strong></td>
+        <td><strong>(£{{ (0 - paymentTotals.all.refunded)|number_format(2, '.', ',') }})</strong></td>
     </tr>
     <tr>
         <td colspan="3">&nbsp;</td>
