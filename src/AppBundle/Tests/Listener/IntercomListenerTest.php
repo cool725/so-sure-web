@@ -78,7 +78,10 @@ class IntercomListenerTest extends WebTestCase
             static::generateEmail('intercom-queue-actual', $this),
             'bar'
         );
-        $this->assertEquals(1, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+        // create + update
+        $this->assertEquals(2, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+        $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
+        $this->assertEquals($user->getId(), $data['userId']);
         $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
         $this->assertEquals($user->getId(), $data['userId']);
 

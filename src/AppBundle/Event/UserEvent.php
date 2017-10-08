@@ -7,6 +7,7 @@ use AppBundle\Document\User;
 
 class UserEvent extends Event
 {
+    const EVENT_CREATED = 'event.user.created';
     const EVENT_UPDATED = 'event.user.updated';
 
     /** @var User */

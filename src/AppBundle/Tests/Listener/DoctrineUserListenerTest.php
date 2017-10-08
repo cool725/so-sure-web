@@ -71,7 +71,7 @@ class DoctrineUserListenerTest extends WebTestCase
     {
         $user = new User();
         $user->setEmail('dul2@listener.so-sure.com');
-        $listener = $this->createUserEventListener($user, $this->once(), UserEvent::EVENT_UPDATED);
+        $listener = $this->createUserEventListener($user, $this->once(), UserEvent::EVENT_CREATED);
     
         $events = new LifecycleEventArgs($user, self::$dm);
         $listener->postPersist($events);
