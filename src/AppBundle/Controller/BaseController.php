@@ -864,6 +864,9 @@ abstract class BaseController extends Controller
             $usersQb = $usersQb->addAnd(
                 $usersQb->expr()->field('sanctionsMatches')->notEqual(null)
             );
+            $usersQb = $usersQb->addAnd(
+                $usersQb->expr()->field('sanctionsMatches')->not(['$size' => 0])
+            );
         }
         if ($waitingSanctions) {
             $usersQb = $usersQb->addAnd(
