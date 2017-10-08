@@ -346,11 +346,15 @@ class AdminController extends BaseController
         $snappyPdf = $this->get('knp_snappy.pdf');
         $snappyPdf->setOption('orientation', 'Portrait');
         $snappyPdf->setOption('page-size', 'A4');
+        $reportingService = $this->get('app.reporting');
         $html = $templating->render('AppBundle:Pdf:adminAccounts.html.twig', [
             'year' => $year,
             'month' => $month,
-            'paymentTotals' => $this->get('app.reporting')->getAllPaymentTotals($this->isProduction(), $date),
-            'activePolicies' => $this->get('app.reporting')->getActivePoliciesCount($date),
+            'paymentTotals' => $reportingService->getAllPaymentTotals($this->isProduction(), $date),
+            'activePolicies' => $reportingService->getActivePoliciesCount($date),
+            'activePoliciesWithDiscount' => $reportingService->getActivePoliciesWithPolicyDiscountCount($date),
+            'rewardPotLiability' => $reportingService->getRewardPotLiability($date),
+            'rewardPromoPotLiability' => $reportingService->getRewardPotLiability($date, true),
         ]);
 
         return new Response(
