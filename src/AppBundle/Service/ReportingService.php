@@ -20,6 +20,7 @@ use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Payment\SoSurePayment;
 use AppBundle\Document\Payment\PotRewardPayment;
 use AppBundle\Document\Payment\SoSurePotRewardPayment;
+use AppBundle\Document\Payment\PolicyDiscountPayment;
 
 class ReportingService
 {
