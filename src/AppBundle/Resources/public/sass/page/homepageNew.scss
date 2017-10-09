@@ -181,8 +181,8 @@
 
         h4 {
             margin-bottom: 0;
-            padding-left: 10px;
             color: $grey;
+            text-align: center;
         }
 
         @include breakpoint(laptop) {
