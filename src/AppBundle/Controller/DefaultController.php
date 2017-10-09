@@ -199,12 +199,12 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/select-phone", name="select_phone_make_new")
-     * @Route("/select-phone/{type}", name="select_phone_make_new_type")
-     * @Route("/select-phone/{type}/{id}", name="select_phone_make_new_type_id")
+     * @Route("/select-phone-v2", name="select_phone_make_v2")
+     * @Route("/select-phone-v2/{type}", name="select_phone_make_v2_type")
+     * @Route("/select-phone-v2/{type}/{id}", name="select_phone_make_v2_type_id")
      * @Template()
      */
-    public function selectPhoneMakeNewAction(Request $request, $type = null, $id = null)
+    public function selectPhoneMakeV2Action(Request $request, $type = null, $id = null)
     {
         $dm = $this->getManager();
         $phoneRepo = $dm->getRepository(Phone::class);

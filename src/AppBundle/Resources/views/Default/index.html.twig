@@ -25,9 +25,9 @@
             <h1>Smartphone Insurance <br> How it Should Be</h1>
             <p class="lead">Next working day replacement phone or repair when you claim<br class="hidden-xs"><span class="visible-xs-inline">,</span> Up to 80% money back when you don't</p>
             {% if phone %}
-                {{ render(controller('AppBundle:Default:selectPhoneMakeNew', {'type':'homepage', 'id': phone.id })) }}
+                {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'homepage', 'id': phone.id })) }}
             {% else %}
-                {{ render(controller('AppBundle:Default:selectPhoneMakeNew', {'type':'homepage'})) }}
+                {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'homepage'})) }}
             {% endif %}
         </div>
     </section>
@@ -380,9 +380,9 @@
         <div class="container">
             <h2 class="text-center h1">Get Your Instant Quote</h2>
             {% if phone %}
-                {{ render(controller('AppBundle:Default:selectPhoneMakeNew', {'type':'footer', 'id': phone.id })) }}
+                {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'footer', 'id': phone.id })) }}
             {% else %}
-                {{ render(controller('AppBundle:Default:selectPhoneMakeNew', {'type':'footer'})) }}
+                {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'footer'})) }}
             {% endif %}
             <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
                  data-src="{{ cdn_url }}/images/homepage/so-sure_form_rocket.svg"
