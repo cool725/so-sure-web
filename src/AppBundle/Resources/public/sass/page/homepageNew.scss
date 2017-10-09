@@ -65,17 +65,23 @@
 
         h1 {
             font-size: 32px;
-            line-height: 1.2;
+            line-height: 39px;
             color: $primary-blue;
+            margin-bottom: 15px;
 
             @include breakpoint(tablet) {
                 font-size: 42px;
-                line-height: 1.1;
+                line-height: 49px;
             }
 
             @include breakpoint(desktop) {
                 font-size: 72px;
+                line-height: 79px;
             }
+        }
+
+        p {
+            margin-bottom: 0 0 25px;
         }
 
         background-image: url('https://cdn.so-sure.com/images/homepage/so-sure_homepage-hero-mobile.svg');
@@ -95,6 +101,7 @@
             background-position: left 20px;
             background-size: 100%;
 
+            // Add building images
             &:before, &:after {
                 width: 50%; height: 100%;
                 content: '';
@@ -108,7 +115,7 @@
             &:before {
                 background-image: url('https://cdn.so-sure.com/images/homepage/so-sure_homepage-hero-left-with-characters.svg');
                 background-position: left bottom;
-                left: -50px;
+                left: -20px;
             }
 
             &:after {
@@ -125,6 +132,14 @@
             padding-top: 100px;
             padding-bottom: 200px;
             background-position: left 15px;
+
+            &:before {
+                left: 0;
+            }
+
+            &:after {
+                right: 0;
+            }
         }
 
         @include breakpoint(desktop) {
@@ -134,30 +149,12 @@
         }
 
         @include breakpoint(hd) {
-            // padding-top: 120px;
             padding-bottom: 400px;
-            // background-position: left 5px;
 
             &:before, &:after {
                 background-size: 70%;
             }
         }
-
-        // Characters
-        // .hero--character {
-        //     display: none;
-
-        //     @include breakpoint(laptop) {
-        //         position: absolute;
-        //         bottom: 0;
-        //         z-index: 10;
-        //     }
-        // }
-
-        // #so-sure_character-selfie {
-        //     left: 20px;
-        // }
-
     }
 
     &--what-is-so-sure {
