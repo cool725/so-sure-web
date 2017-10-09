@@ -26,6 +26,12 @@
         position: relative;
         line-height: 1.7;
 
+        span.h3 {
+            color: $primary-blue;
+            display: inline-block;
+            margin: 0 0 10px;
+        }
+
         span.h4 {
             color: $primary-blue;
             display: inline-block;
