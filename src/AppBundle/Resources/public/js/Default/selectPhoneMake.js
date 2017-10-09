@@ -113,6 +113,10 @@ $(function(){
     //     sosure.track.byName('Get A Quote Link');
     // }
 
+    if ($typeahead.length) {
+        console.log('YES');
+    }
+
     $.each($typeahead, function (index, typeahead){
 
         var form    = $(this);
