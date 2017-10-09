@@ -53,10 +53,6 @@ class DefaultController extends BaseController
      */
     public function indexAction(Request $request)
     {
-        $sixpack = $this->get('app.sixpack')
-            ->participate(SixpackService::EXPERIMENT_HOMEPAGE_PHONE_IMAGE, ['phone-image', 'plain']);
-        // $sixpack = $this->get('app.sixpack')
-            // ->participate(SixpackService::EXPERIMENT_HOMEPAGE_PHONE_IMAGE, ['plain', 'phone-image']);
         $geoip = $this->get('app.geoip');
         //$ip = "72.229.28.185";
         $ip = $request->getClientIp();
@@ -144,6 +140,7 @@ class DefaultController extends BaseController
             'memory' => (int) 32
         ]);
 
+        $exp = $this->sixpack($request, SixpackService::EXPERIMENT_HOMEPAGE_V1_V2, ['v2', 'v1']);
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         $data = array(
@@ -154,14 +151,17 @@ class DefaultController extends BaseController
             'i7' => $i7,
             'phone' => $phone,
             's7' => $s7,
-            'sixpack' => $sixpack,
+            'sixpack' => 'phone-image',
         );
 
         if (in_array($request->get('_route'), ['discount-vouchers'])) {
             return $this->render('AppBundle:Default:discountVouchers.html.twig', $data);
         } else {
-            // return $this->render('AppBundle:Default:index.html.twig', $data);
-            return $this->render('AppBundle:Default:indexV2.html.twig', $data);
+            if ($exp == 'v2') {
+                return $this->render('AppBundle:Default:indexV2.html.twig', $data);
+            } else {
+                return $this->render('AppBundle:Default:index.html.twig', $data);
+            }
         }
     }
 
