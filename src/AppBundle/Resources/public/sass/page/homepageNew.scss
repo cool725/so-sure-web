@@ -160,7 +160,7 @@
     &--what-is-so-sure {
 
         .so-sure_homepage-what-is-so-sure {
-            max-width: 300px;
+            max-width: 320px;
         }
 
         @include breakpoint(laptop) {
@@ -177,9 +177,19 @@
         text-align: center;
 
         h4 {
-            margin-bottom: 0;
-            color: $grey;
-            text-align: center;
+            margin: 0 0 0 5px;
+        }
+
+        img {
+            width: 180px;
+        }
+
+        ul {
+            li {
+                &:first-of-type {
+                    margin-left: 0;
+                }
+            }
         }
 
         @include breakpoint(laptop) {
