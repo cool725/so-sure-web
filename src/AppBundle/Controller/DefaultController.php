@@ -49,7 +49,6 @@ class DefaultController extends BaseController
 
     /**
      * @Route("/", name="homepage", options={"sitemap"={"priority":"1.0","changefreq":"daily"}})
-     * @Route("/discount-vouchers", name="discount-vouchers")
      */
     public function indexAction(Request $request)
     {
@@ -154,14 +153,10 @@ class DefaultController extends BaseController
             'sixpack' => 'phone-image',
         );
 
-        if (in_array($request->get('_route'), ['discount-vouchers'])) {
-            return $this->render('AppBundle:Default:discountVouchers.html.twig', $data);
+        if ($exp == 'v2') {
+            return $this->render('AppBundle:Default:indexV2.html.twig', $data);
         } else {
-            if ($exp == 'v2') {
-                return $this->render('AppBundle:Default:indexV2.html.twig', $data);
-            } else {
-                return $this->render('AppBundle:Default:index.html.twig', $data);
-            }
+            return $this->render('AppBundle:Default:index.html.twig', $data);
         }
     }
 

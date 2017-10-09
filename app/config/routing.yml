@@ -252,3 +252,10 @@ redirect_about_social_what_is_social_insurance:
         _controller: FrameworkBundle:Redirect:redirect
         route: about_home
         permanent: true
+
+redirect_discount_vouchers:
+    path: /discount-vouchers
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: homepage
+        permanent: true
