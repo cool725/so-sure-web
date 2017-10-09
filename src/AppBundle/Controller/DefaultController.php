@@ -160,8 +160,8 @@ class DefaultController extends BaseController
         if (in_array($request->get('_route'), ['discount-vouchers'])) {
             return $this->render('AppBundle:Default:discountVouchers.html.twig', $data);
         } else {
-            // return $this->render('AppBundle:Default:index.html.twig', $data);
-            return $this->render('AppBundle:Default:indexV2.html.twig', $data);
+            return $this->render('AppBundle:Default:index.html.twig', $data);
+            // return $this->render('AppBundle:Default:indexV2.html.twig', $data);
         }
     }
 
