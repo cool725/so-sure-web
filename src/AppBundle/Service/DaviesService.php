@@ -101,7 +101,13 @@ class DaviesService extends S3EmailService
             } catch (\Exception $e) {
                 //$success = false;
                 $this->errors[$daviesClaim->claimNumber][] = $e->getMessage();
-                $this->logger->error(sprintf('Skipped import. Fatal error processing file (%s)', $key), ['exception' => $e]);
+                $this->logger->error(
+                    sprintf(
+                        'Skipped import. Fatal error processing file (%s)',
+                        $key
+                    ),
+                    ['exception' => $e]
+                );
                 // In case any of the db data failed validation, clear the changeset
                 if ($claim = $this->getClaim($daviesClaim)) {
                     $this->dm->refresh($claim);
