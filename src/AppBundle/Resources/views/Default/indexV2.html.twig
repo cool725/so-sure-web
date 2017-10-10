@@ -204,20 +204,19 @@
         </div>
     </section>
 
-    <div class="curved-background hidden-xs">
+    <div class="curved-background curved-background__bg-blue hidden-xs">
         <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 2000 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
             <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
                 <g id="Artboard" fill="#ffffff">
-                    <path d="M0,0 L2000,0 L2000,139.921588 C1890.08746,181.703317 1753.08746,201.692115 1589,199.887983 C1424.91254,198.083852 1258.91254,174.763587 1091,129.927189 C918.666667,89.9495926 740,69.9607942 555,69.9607942 C370,69.9607942 185,113.269857 0,199.887983 L0,0 Z" id="Rectangle"></path>
+                    <path d="M0,0 L2000,0 L2000,139.921588 C1890.08746,181.703317 1753.08746,201.692115 1589,199.887983 C1424.91254,198.083852 1258.91254,174.763587 1091,129.927189 C918.666667,89.9495926 740,69.9607942 555,69.9607942 C370,69.9607942 185,113.269857 0,199.887983 L0,0 Z" id="Rectangle" transform="translate(1000.000000, 100.000000) scale(-1, 1) translate(-1000.000000, -100.000000) "></path>
                 </g>
             </g>
         </svg>
     </div>
 
     {# How do the reward pot work? #}
-    <section class="section--pad homepage--how-does-the-reward-pot-work">
+    <section class="homepage--how-does-the-reward-pot-work">
         <div class="container">
-            <h2 class="text-center h1">How Does the Reward Pot Work?</h2>
             <div class="row">
                 <div class="col-md-5">
                     <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
@@ -226,15 +225,26 @@
                          class="img-responsive img-responsive--center so-sure_piggy_bank">
                 </div>
                 <div class="col-md-7">
+                    <h2 class="h1">How Does the Reward Pot Work?</h2>
                     <p class="lead">If you and your friends take good care of your phone and don’t need to claim, we’ll give you up to 80% of your premium back at the end of your policy year.</p>
-                    <ol>
-                        <li>Connect to your friends and family and receive up to £10 each in your individual Reward Pots</li>
-                        <li>At the end of the year, when you and your connections haven’t claimed, your Reward Pot is paid out to you.</li>
+                    <ol class="ol--blue-counter">
+                        <li class="lead">Connect to your friends and family and receive up to £10 each in your individual Reward Pots</li>
+                        <li class="lead">At the end of the year, when you and your connections haven’t claimed, your Reward Pot is paid out to you.</li>
                     </ol>
                 </div>
             </div>
         </div>
     </section>
+
+    <div class="curved-background hidden-xs">
+        <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 2000 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g id="Artboard" fill="#d6ebff">
+                    <path d="M0,0 L2000,0 L2000,139.921588 C1890.08746,181.703317 1753.08746,201.692115 1589,199.887983 C1424.91254,198.083852 1258.91254,174.763587 1091,129.927189 C918.666667,89.9495926 740,69.9607942 555,69.9607942 C370,69.9607942 185,113.269857 0,199.887983 L0,0 Z" id="Rectangle" transform="translate(1000.000000, 100.000000) scale(-1, 1) translate(-1000.000000, -100.000000) "></path>
+                </g>
+            </g>
+        </svg>
+    </div>
 
     {# Claims procss #}
     <section class="section--pad homepage--claims-process">
@@ -274,7 +284,8 @@
                             <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
                                  data-src="{{ cdn_url }}/images/logo/so-sure_so-sure-full-logo-blue-flat.svg"
                                  alt="so-sure"
-                                 width="120px"></td>
+                                 width="120px">
+                        </td>
                     </tr>
                 </thead>
                 <tbody>
