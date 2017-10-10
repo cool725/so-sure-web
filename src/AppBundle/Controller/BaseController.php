@@ -962,4 +962,14 @@ abstract class BaseController extends Controller
             ->setBody($body, 'text/html');
         $this->get('mailer')->send($message);
     }
+
+    protected function sixpack($request, $name, $options)
+    {
+        $exp = $this->get('app.sixpack')->participate($name, $options);
+        if ($request->get('force')) {
+            $exp = $request->get('force');
+        }
+
+        return $exp;
+    }
 }

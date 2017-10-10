@@ -17,13 +17,14 @@ class SixpackService
     //const EXPERIMENT_LANDING_HOME = 'landing-or-home';
     //const EXPERIMENT_CPC_QUOTE_MANUFACTURER = 'cpc-quote-or-manufacturer';
     const EXPERIMENT_SHARE_MESSAGE = 'share-message';
-    const EXPERIMENT_HOMEPAGE_PHONE_IMAGE = 'homepage-phone-image';
+    //const EXPERIMENT_HOMEPAGE_PHONE_IMAGE = 'homepage-phone-image';
     // const EXPERIMENT_QUOTE_SLIDER = 'quote-slider';
     const EXPERIMENT_PYG_HOME= 'pyg-or-home';
     const EXPERIMENT_QUOTE_SIMPLE_COMPLEX_SPLIT = 'quote-simple-complex-split';
     const EXPERIMENT_QUOTE_SIMPLE_SPLIT = 'quote-simple-split';
     //const EXPERIMENT_CPC_MANUFACTURER_HOME = 'cpc-manufacturer-or-home';
     const EXPERIMENT_CPC_MANUFACTURER_WITH_HOME = 'cpc-manufacturer-with-home';
+    const EXPERIMENT_HOMEPAGE_V1_V2 = 'homepage-v1-v2';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_SHARE_MESSAGE_ORIGINAL = 'original';

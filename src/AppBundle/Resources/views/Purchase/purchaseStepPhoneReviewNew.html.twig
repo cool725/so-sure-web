@@ -18,8 +18,7 @@
 
 {% block body %}
 
-{% include 'AppBundle::Default/loadingWidget.html.twig' %}
-
+{% include 'AppBundle::Default/loadingWidget.html.twig' with { 'class': ''} %}
 <section id="purchase-step-review" class="checkout">
 
     {% include 'AppBundle::Purchase/purchaseNavNew.html.twig' %}

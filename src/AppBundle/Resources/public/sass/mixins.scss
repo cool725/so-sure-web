@@ -6,6 +6,9 @@
 // Tablet
 // Mobile
 @mixin breakpoint($point) {
+  @if $point == hd {
+    @media (min-width: 2000px) { @content ; }
+  }
 	@if $point == desktop {
 		@media (min-width: 1200px) { @content ; }
 	}

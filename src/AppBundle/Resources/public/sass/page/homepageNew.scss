@@ -1,0 +1,602 @@
+// homepageNew.scss
+
+@import "../mixins";
+@import "../common/palette";
+@import "../common/paletteNew";
+@import "../common/type";
+
+.navbar {
+    background-color: $white;
+}
+
+// TODO: Move!
+.img-responsive--center {
+    margin: 0 auto;
+}
+
+.curved-background {
+    height: 200px;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+
+    background-color: $white;
+
+    svg {
+        width: 100%;
+        position: absolute;
+        top: 0; left: 0;
+
+        // @include breakpoint(tablet) {
+        //     bottom: 0;
+        // }
+    }
+
+    &__bg-blue {
+        background-color: $lightest-blue;
+    }
+}
+
+// TODO: Move!
+.ol--blue-counter {
+    list-style: none;
+    padding-bottom: 30px;
+    padding-left: 60px;
+
+    li {
+        counter-increment: item;
+        position: relative;
+
+        &:before {
+            width: 40px; height: 40px;
+            display: inline-block;
+            content: counter(item);
+            position: absolute;
+            top: 0; left: -55px;
+            text-align: center;
+            color: $white;
+            font-family: $avenir-heavy;
+            font-size: 24px;
+            line-height: 1.8;
+
+
+            background-color: $primary-blue;
+            @include border-radius(100%);
+        }
+    }
+}
+
+.homepage {
+
+    &--hero {
+        position: relative;
+        text-align: center;
+
+        // Set max width on container
+        .container {
+            position: relative;
+            z-index: 10;
+        }
+
+        h1 {
+            line-height: 41px;
+            color: $primary-blue;
+            margin-bottom: 15px;
+
+            @include breakpoint(tablet) {
+                font-size: 42px;
+                line-height: 49px;
+            }
+
+            @include breakpoint(desktop) {
+                font-size: 72px;
+                line-height: 79px;
+            }
+        }
+
+        p {
+            margin-bottom: 0 0 30px;
+            line-height: 1.7;
+        }
+
+        // Backgrounds
+
+        // - Mobile
+        background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_homepage-hero-mobile.svg') no-repeat center bottom;
+        background-size: 90%;
+        padding-top: 40px;
+        padding-bottom: 120px;
+
+        // - Midtablet
+        @include breakpoint(midtablet) {
+            background-size: 80%;
+            padding-bottom: 170px;
+        }
+
+        // - Tablet
+        @include breakpoint(tablet) {
+            // Clouds
+            background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_homepage-hero-clouds-combined.svg') repeat-x left 20px;
+            background-size: 100%;
+            padding-top: 100px;
+            padding-bottom: 150px;
+            z-index: 2;
+
+            &:before {
+                width: 100%; height: 100%;
+                content: '';
+                position: absolute;
+                bottom: 0; left: 50%;
+                margin-left: -50%;
+                z-index: 1;
+                background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_hero_background.svg') no-repeat center bottom;
+
+                background-size: 1300px;
+            }
+        }
+
+        // - Laptop
+        @include breakpoint(laptop) {
+            padding-top: 100px;
+            padding-bottom: 200px;
+            background-position: left 15px;
+
+            &:before {
+                background-size: 1600px;
+            }
+        }
+
+        // - Desktop
+        @include breakpoint(desktop) {
+            padding-top: 120px;
+            padding-bottom: 250px;
+            background-position: left 5px;
+
+            &:before {
+                background-size: 2000px;
+            }
+        }
+
+        // - HD
+        @include breakpoint(hd) {
+            padding-top: 200px;
+            padding-bottom: 400px;
+
+            &:before {
+                background-size: 3000px;
+            }
+        }
+    }
+
+    &--what-is-so-sure {
+
+        @include breakpoint(laptop) {
+
+            .img-container {
+                padding-top: 80px;
+            }
+
+            .so-sure_homepage-what-is-so-sure {
+                max-width: 400px;
+            }
+
+        }
+
+    }
+
+    &--press {
+        text-align: center;
+
+        h4 {
+            margin: 0 0 0 5px;
+        }
+
+        li.fix-img {
+            &:first-of-type {
+                margin-left: -5px;
+            }
+        }
+
+        @include breakpoint(laptop) {
+            text-align: left;
+        }
+    }
+
+    &--why-we-are-better {
+        background-color: $lightest-blue;
+
+        h2 {
+            margin-bottom: 40px;
+        }
+
+        .so-sure_homepage-balloon {
+            max-width: 300px;
+            margin-bottom: 25px;
+        }
+
+    }
+
+    &--cover-details {
+        text-align: center;
+
+        img {
+            width: 200px;
+        }
+    }
+
+    &--when-you-travel {
+        padding: 100px 0 200px;
+        position: relative;
+        background-color: $lightest-blue;
+        text-align: center;
+        overflow-x: hidden;
+
+        h2 {
+            margin-bottom: 0;
+        }
+
+        .so-sure_airways {
+            margin-bottom: 25px;
+
+            @include breakpoint(tablet) {
+                max-width: 500px;
+            }
+        }
+
+        .cloud {
+            position: absolute;
+            left: 50%;
+            margin-left: -500px;
+
+            &--top {
+                top: 0;
+            }
+
+            &--bottom {
+                bottom: 0;
+            }
+
+            img {
+                width: 1000px;
+                display: block;
+            }
+
+            @include breakpoint(tablet) {
+                margin-left: -1000px;
+
+                img {
+                    width: 2000px;
+                }
+
+            }
+        }
+
+        @include breakpoint(tablet) {
+            padding: 200px 0 300px;
+        }
+    }
+
+    &--what-we-dont-cover {
+        position: relative;
+
+        .container {
+            position: relative;
+            z-index: 2;
+        }
+
+        ol {
+            max-width: 860px;
+            margin: 0 auto;
+
+            li {
+                margin-bottom: 15px;
+                padding-top: 5px;
+            }
+        }
+    }
+
+    &--how-does-the-reward-pot-work {
+        background-color: $lightest-blue;
+        position: relative;
+
+        h2 {
+            margin: 0 0 30px;
+        }
+
+        ol {
+            padding-left: 75px;
+
+            li {
+                margin-bottom: 35px;
+
+                &:before {
+                    width: 60px; height: 60px;
+                    display: inline-block;
+                    position: absolute;
+                    top: 0; left: -75px;
+                    text-align: center;
+                    color: $white;
+                    font-family: $avenir-heavy;
+                    font-size: 34px;
+                    line-height: 1.7;
+
+                    border: 6px solid $amber;
+                    text-shadow: 0 2px 0 darken($amber, 15%);
+                    box-shadow: 0 2px 0 darken($amber, 15%), darken($amber, 15%) 0px 2px 0 inset;
+                    background-color: darken($amber, 10%);
+                }
+            }
+        }
+
+        .so-sure_piggy_bank {
+            max-width: 200px;
+            margin-bottom: 25px;
+
+            @include breakpoint(tablet) {
+                max-width: 300px;
+            }
+        }
+
+        padding-top: 40px;
+
+        @include breakpoint(tablet) {
+            padding-top: 0;
+        }
+    }
+
+    &--claims-process {
+        text-align: center;
+
+        .large-no {
+            display: inline-block;
+            font-size: 128px;
+            font-family: $avenir-heavy;
+            line-height: 1;
+            color: $primary-blue;
+            margin-top: 20px;
+        }
+
+        h4 {
+            margin: 0;
+        }
+
+        p {
+            max-width: 800px;
+            margin: 15px auto;
+        }
+
+        @include breakpoint(tablet) {
+            padding-top: 0;
+        }
+    }
+
+    &--we-compare-well {
+        background-color: $lightest-blue;
+
+        table {
+            max-width: 960px;
+            margin: 0 auto 50px;
+
+            thead {
+                td {
+                    padding: 30px 15px;
+                    text-align: center;
+                    vertical-align: middle;
+                }
+            }
+
+            tr {
+                td.sosure {
+                    background-color: $white;
+                }
+
+                td.contrast {
+                    background-color: lighten($lightest-blue, 6%);
+                    opacity: 0.7;
+                }
+            }
+
+            tbody {
+
+                tr {
+                    td {
+                        padding: 25px 20px 25px 90px;
+                        border-color: darken($lightest-blue, 6%);
+                        vertical-align: middle;
+                    }
+
+
+                    td.sosure  {
+                        background-image: url('https://cdn.so-sure.com/images/logo/so-sure-blue-smile.svg');
+                        background-size: 40px 40px;
+                        background-repeat: no-repeat;
+                        background-position: 30px center;
+                    }
+
+                    td.contrast {
+                        background-image: url('https://cdn.so-sure.com/images/logo/so-sure_blue-frown.svg');
+                        background-size: 40px 40px;
+                        background-repeat: no-repeat;
+                        background-position: 30px center;
+                    }
+                }
+            }
+        }
+    }
+
+    &--feedback {
+        text-align: center;
+
+        h2 {
+            margin-bottom: 30px;
+        }
+
+        p {
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        img {
+            border-radius: 50%;
+            border: 15px solid $off-white;
+
+            &:hover {
+                border-color: $lightest-blue;
+            }
+        }
+    }
+
+    &--instant-quote {
+        position: relative;
+        padding-bottom: 40px;
+
+        .form-rocket {
+            display: none;
+            width: 200px;
+            position: absolute;
+            top: 20px; right: 10%;
+
+            @include breakpoint(tablet) {
+                display: inline;
+            }
+
+            @include breakpoint(desktop) {
+                right: 25%;
+            }
+        }
+
+        @include breakpoint(tablet) {
+            padding-bottom: 0;
+        }
+    }
+
+}
+
+.footer-new {
+    @include breakpoint(tablet) {
+        padding-top: 100px;
+        margin-top: -40px;
+    }
+}
+
+
+// TODO: Move!
+.search-phone-form--homepage {
+    max-width: 450px;
+    background-color: $white;
+    padding: 0;
+
+    position: relative;
+    margin: 0 auto;
+    z-index: 12;
+
+    // Hide the form on load
+    .select-phone-form {
+        display: none;
+    }
+
+    .search-phone-text {
+        border-color: transparent;
+    }
+
+    .form-inline--homepage {
+
+        .form-group {
+            margin-bottom: 0;
+        }
+
+        @include breakpoint(desktop) {
+
+            .form-group {
+                display: inline-block;
+                vertical-align: middle;
+            }
+
+        }
+
+        .form-control {
+            vertical-align: initial;
+            border-color: transparent;
+            padding-left: 35px;
+        }
+
+        .btn {
+            font-size: 18px;
+        }
+
+    }
+
+    .twitter-typeahead {
+        width: 100%;
+        font-size: 16px;
+
+        .tt-hint,
+        .tt-input {
+            height: 57px;
+            padding-left: 60px;
+        }
+
+        &:before {
+            content: '\f002';
+            color: $light-blue;
+            font-family: FontAwesome;
+            font-size: 36px;
+            position: absolute;
+            z-index: 10;
+            left: 5px; top: 0;
+        }
+
+        @include breakpoint(tablet) {
+            font-size: 20px;
+        }
+    }
+
+    .tt-menu {
+        max-height: 200px;
+        margin: 0;
+
+        @include breakpoint(tablet) {
+            margin: 10px 0 0;
+        }
+    }
+
+    // Add style to search form - set width
+    max-width: 450px;
+    padding: 10px;
+    @include border-radius(4px);
+    box-shadow: 0 0 15px $grey;
+    transition: box-shadow 0.3s ease-in-out;
+
+    // search form - set width
+    @include breakpoint(laptop) {
+        max-width: 550px;
+    }
+
+    // search form - set width
+    @include breakpoint(desktop) {
+        max-width: 650px;
+    }
+}
+
+// Style input on focus
+.search-phone-form--focus {
+
+    .twitter-typeahead {
+
+        &:before {
+            color: $primary-blue;
+        }
+    }
+
+    box-shadow: 0 0 1px $primary-blue;
+    transition: box-shadow 0.5s ease-in-out;
+}
+
+.search-phone-form--sticky {
+    position: fixed;
+    top: 60px; left: 0; right: 0;
+    z-index: 999;
+}
+
+
