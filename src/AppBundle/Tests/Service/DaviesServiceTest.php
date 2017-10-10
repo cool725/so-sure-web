@@ -224,11 +224,11 @@ class DaviesServiceTest extends WebTestCase
 
         self::$daviesService->clearErrors();
 
-        $this->assertEquals(0, count(self::$daviesService->getErrors()));
+        $this->assertEquals(0, count(self::$daviesService->getWarnings()));
         self::$daviesService->saveClaims(1, [$daviesOpen, $daviesOpen]);
-        $this->assertEquals(1, count(self::$daviesService->getErrors()));
+        $this->assertEquals(1, count(self::$daviesService->getWarnings()));
 
-        $this->insureErrorExists('/multiple open claims against policy/');
+        $this->insureWarningExists('/multiple open claims against policy/');
     }
 
     public function testSaveClaimsSaveException()
