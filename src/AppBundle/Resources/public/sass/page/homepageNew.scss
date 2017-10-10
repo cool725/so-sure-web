@@ -166,85 +166,18 @@
                 background-size: 3000px;
             }
         }
-
-
-        //     // Add building images
-        //     &:before, &:after {
-        //         width: 50%; height: 100%;
-        //         content: '';
-        //         position: absolute;
-        //         bottom: 0;
-        //         z-index: 8;
-        //         background-repeat: no-repeat;
-        //         background-size: 99%;
-        //     }
-
-        //     // Building Left
-        //     &:before {
-        //         background-image: url('https://cdn.so-sure.com/images/homepage/so-sure_homepage-hero-left-with-characters.svg');
-        //         background-position: left bottom;
-        //         left: -20px;
-        //     }
-
-        //     // Building Right
-        //     &:after {
-        //         background-image: url('https://cdn.so-sure.com/images/homepage/so-sure_homepage-hero-right-with-characters.svg');
-        //         background-position: right bottom;
-        //         right: -20px;
-        //     }
-        // }
-
-        // - Laptop
-        // @include breakpoint(laptop) {
-        //     padding-top: 100px;
-        //     padding-bottom: 200px;
-        //     background-position: left 15px;
-
-        //     &:before {
-        //         left: 0;
-        //     }
-
-        //     &:after {
-        //         right: 0;
-        //     }
-        // }
-
-        // - Desktop
-        // @include breakpoint(desktop) {
-        //     padding-top: 120px;
-        //     padding-bottom: 250px;
-        //     background-position: left 5px;
-        // }
-
-        // - HD
-        // @include breakpoint(hd) {
-        //     padding-top: 200px;
-        //     padding-bottom: 400px;
-
-        //     &:before, &:after {
-        //         background-size: 90%;
-        //     }
-
-        //     &:before {
-        //         left: 100px;
-        //     }
-
-        //     &:after {
-        //         right: 100px;
-        //     }
-        // }
     }
 
     &--what-is-so-sure {
-
-        .so-sure_homepage-what-is-so-sure {
-            max-width: 400px;
-        }
 
         @include breakpoint(laptop) {
 
             .img-container {
                 padding-top: 80px;
+            }
+
+            .so-sure_homepage-what-is-so-sure {
+                max-width: 400px;
             }
 
         }
@@ -331,6 +264,7 @@
 
             img {
                 width: 1000px;
+                display: block;
             }
 
             @include breakpoint(tablet) {
@@ -407,6 +341,12 @@
             @include breakpoint(tablet) {
                 max-width: 300px;
             }
+        }
+
+        padding-top: 40px;
+
+        @include breakpoint(tablet) {
+            padding-top: 0;
         }
     }
 
