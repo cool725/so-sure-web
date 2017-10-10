@@ -741,6 +741,13 @@ abstract class BaseController extends Controller
             $policiesQb = $policiesQb->addAnd(
                 $policiesQb->expr()->field('status')->in([Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID])
             );
+        } elseif ($status == 'current-discounted') {
+            $policiesQb = $policiesQb->addAnd(
+                $policiesQb->expr()->field('status')->in([Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID])
+            );
+            $policiesQb = $policiesQb->addAnd(
+                $policiesQb->expr()->field('policyDiscountPresent')->equals(true)
+            );
         } elseif ($status == 'past-due') {
             $policiesQb = $policiesQb->addAnd(
                 $policiesQb->expr()->field('status')->in([Policy::STATUS_CANCELLED])
