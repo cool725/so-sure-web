@@ -36,37 +36,23 @@
 .ol--blue-counter {
     list-style: none;
     padding-bottom: 30px;
-    padding-left: 50px;
+    padding-left: 60px;
 
     li {
         counter-increment: item;
-        margin-bottom: 25px;
         position: relative;
-        line-height: 1.7;
-
-        span.h3 {
-            color: $primary-blue;
-            display: inline-block;
-            margin: 0 0 10px;
-        }
-
-        span.h4 {
-            color: $primary-blue;
-            display: inline-block;
-            margin: 0 0 10px;
-        }
 
         &:before {
-            width: 30px; height: 30px;
+            width: 40px; height: 40px;
             display: inline-block;
             content: counter(item);
             position: absolute;
-            top: 0; left: -45px;
+            top: 0; left: -55px;
             text-align: center;
             color: $white;
             font-family: $avenir-heavy;
-            font-size: 20px;
-            line-height: 1.7;
+            font-size: 24px;
+            line-height: 1.8;
 
 
             background-color: $primary-blue;
@@ -199,7 +185,7 @@
     &--what-is-so-sure {
 
         .so-sure_homepage-what-is-so-sure {
-            max-width: 320px;
+            max-width: 400px;
         }
 
         @include breakpoint(laptop) {
@@ -318,8 +304,13 @@
         }
 
         ol {
-            max-width: 700px;
+            max-width: 860px;
             margin: 0 auto;
+
+            li {
+                margin-bottom: 15px;
+                padding-top: 5px;
+            }
         }
     }
 
@@ -332,15 +323,16 @@
         }
 
         ol {
+            padding-left: 70px;
+
             li {
-                padding-left: 30px;
                 margin-bottom: 25px;
 
                 &:before {
                     width: 60px; height: 60px;
                     display: inline-block;
                     position: absolute;
-                    top: 0; left: -45px;
+                    top: 0; left: -70px;
                     text-align: center;
                     color: $white;
                     font-family: $avenir-heavy;

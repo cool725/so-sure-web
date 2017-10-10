@@ -23,7 +23,7 @@
     <section class="homepage--hero">
         <div class="container">
             <h1>Smartphone Insurance <br> How it Should Be</h1>
-            <p class="lead">&bull; Next working day replacement phone or repair when you claim <br> &bull; Up to 80% money back when you don't</p>
+            <p class="lead">Next working day replacement phone or repair when you claim <br> Up to 80% money back when you don't</p>
             {% if phone %}
                 {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'homepage', 'id': phone.id })) }}
             {% else %}
@@ -62,13 +62,13 @@
                     <h4>As Seen In</h4>
                     <ul class="list-inline">
                         <li><img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-                                 data-src="{{ cdn_url }}/images/homepage/so-sure_press_the_guardian.svg"
+                                 data-src="{{ cdn_url }}/images/home/press-images/so-sure_the-guardian.svg"
                                  alt="The Guardian - Why Facebook and Microsoft say chatbots are the talk of the town"></li>
                         <li><img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-                                 data-src="{{ cdn_url }}/images/homepage/so-sure_press_ft.svg"
+                                 data-src="{{ cdn_url }}/images/home/press-images/so-sure_financial-times.svg"
                                  alt="Financial Times - Innovation to watch: Friends based insurance"></li>
                         <li><img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-                                 data-src="{{ cdn_url }}/images/homepage/so-sure_press_insurance_post.svg"
+                                 data-src="{{ cdn_url }}/images/home/press-images/so-sure_insurance-post.svg"
                                  alt="Insurance Post - so-sure to launch revolutionary social peer-to-peer mobile insurance app"></li>
                     </ul>
                 </div>
@@ -77,11 +77,11 @@
                     <ul class="list-inline">
                         {# TODO: Add 2017 #}
                         <li><img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-                                 data-src="{{ cdn_url }}/images/homepage/so-sure_press_digital_top_50.png"
-                                 alt="Digital Top 50 Awards 2016 - B2C Start-up"></li>
-                        <li><img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-                                 data-src="{{ cdn_url }}/images/homepage/so-sure_press_digital_insurtech_awards.png"
+                                 data-src="{{ cdn_url }}/images/home/press-images/so-sure_digital-top-50.svg"
                                  alt="Post Digital Insurance Awards 2016 - so-sure nominated for The New Kid on the Block Award"></li>
+                        <li><img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                                 data-src="{{ cdn_url }}/images/home/press-images/so-sure_digital-insurance-awards.svg"
+                                 alt="Digital Top 50 Awards 2016 - B2C Start-up"></li>
                     </ul>
                 </div>
             </div>
@@ -103,15 +103,16 @@
                 <div class="col-md-7">
                     <ol class="ol--blue-counter">
                         <li>
-                            <span class="h3">We don’t hide behind the small print and painful claims process</span><br>
-                            <span class="lead">We’re upfront and honest with our customers on what is covered, what is not, and what the claims process looks like. This means that there’s no nasty surprises when you have an issue with your device. You don’t need a law degree to understand our policy - everything is explained in plain English.</span>
+                            <h3 class="text-blue">We don’t hide behind the small print and painful claims process</h3>
+                            <p>We’re upfront and honest with our customers on what is covered, what is not, and what the claims process looks like. This means that there’s no nasty surprises when you have an issue with your device. You don’t need a law degree to understand our policy - everything is explained in plain English.</p>
                         </li>
                         <li>
-                            <span class="h3">If something bad happens, we aim to provide next day repair or replacement</span><br><span class="lead">As simple as that. It sucks to be without your phone, we understand it and work with a global phone provider and world-class logistics company who help us get a model back in your hands the next working day.</span>
+                            <h3 class="text-blue">If something bad happens, we aim to provide next day repair or replacement</h3>
+                            <p>As simple as that. It sucks to be without your phone, we understand it and work with a global phone provider and world-class logistics company who help us get a model back in your hands the next working day.</p>
                         </li>
                         <li>
-                            <span class="h3">We insure refurbished and second-hand devices up to 3 years old</span><br>
-                            <span class="lead">Doesn’t matter where you got it from, what matters is that you care about it. We are happy to insure legitimate devices that do not exceed 3 years in age.</span>
+                            <h3 class="text-blue">We insure refurbished and second-hand devices up to 3 years old</h3>
+                            <p>Doesn’t matter where you got it from, what matters is that you care about it. We are happy to insure legitimate devices that do not exceed 3 years in age.</p>
                         </li>
                     </ol>
                 </div>
@@ -126,41 +127,45 @@
             <h2 class="h1">Cover Details</h2>
             <p class="lead">We give you peace of mind and cover you for:</p>
             <div class="row">
-                <div class="col-sm-6 col-md-4">
-                    <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-                         data-src="{{ cdn_url }}/images/homepage/so-sure_theft.svg"
-                         alt="so-sure cover - Theft">
-                    <h4>Theft <br><small class="hidden-xs">&nbsp;</small></h4>
-                </div>
-                <div class="col-sm-6 col-md-4">
-                    <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-                         data-src="{{ cdn_url }}/images/homepage/so-sure_loss.svg"
-                         alt="so-sure cover - Loss">
-                    <h4>Loss <br><small class="hidden-xs">&nbsp;</small></h4>
-                </div>
-                <div class="col-sm-6 col-md-4">
-                    <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-                         data-src="{{ cdn_url }}/images/homepage/so-sure_accidental_damage.svg"
-                         alt="so-sure cover - Accidental Damage">
-                    <h4>Accidental Damage <br><small>Including cracked screen &amp; water damage </small></h4>
-                </div>
-                <div class="col-sm-6 col-md-4">
-                    <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-                         data-src="{{ cdn_url }}/images/homepage/so-sure_out_of_warranty_breakdown.svg"
-                         alt="so-sure cover - Out fo Warranty Breakdown">
-                    <h4>Out of Warranty Breakdown <br><small class="hidden-xs">&nbsp;</small></h4>
-                </div>
-                <div class="col-sm-6 col-md-4">
-                    <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-                         data-src="{{ cdn_url }}/images/homepage/so-sure_unauthorised_network_charges.svg"
-                         alt="so-sure cover - Unauthorised Network Charges">
-                    <h4>Unauthorised Network Charges <br><small >Up to the value of £1000 inc. VAT</small></h4>
-                </div>
-                <div class="col-sm-6 col-md-4">
-                    <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-                         data-src="{{ cdn_url }}/images/homepage/so-sure_accessories.svg"
-                         alt="so-sure cover - Accessories">
-                    <h4>Accessories <br><small>Up to the value of £100 inc. VAT for theft or loss claims</small></h4>
+                <div class="col-md-10 col-md-offset-1">
+                    <div class="row">
+                        <div class="col-sm-6 col-md-4">
+                            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                                 data-src="{{ cdn_url }}/images/homepage/so-sure_theft.svg"
+                                 alt="so-sure cover - Theft">
+                            <h4>Theft <br><small class="hidden-xs">&nbsp;</small></h4>
+                        </div>
+                        <div class="col-sm-6 col-md-4">
+                            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                                 data-src="{{ cdn_url }}/images/homepage/so-sure_loss.svg"
+                                 alt="so-sure cover - Loss">
+                            <h4>Loss <br><small class="hidden-xs">&nbsp;</small></h4>
+                        </div>
+                        <div class="col-sm-6 col-md-4">
+                            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                                 data-src="{{ cdn_url }}/images/homepage/so-sure_accidental_damage.svg"
+                                 alt="so-sure cover - Accidental Damage">
+                            <h4>Accidental Damage <br><small>Including cracked screen &amp; water damage </small></h4>
+                        </div>
+                        <div class="col-sm-6 col-md-4">
+                            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                                 data-src="{{ cdn_url }}/images/homepage/so-sure_out_of_warranty_breakdown.svg"
+                                 alt="so-sure cover - Out fo Warranty Breakdown">
+                            <h4>Out of Warranty Breakdown <br><small class="hidden-xs">&nbsp;</small></h4>
+                        </div>
+                        <div class="col-sm-6 col-md-4">
+                            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                                 data-src="{{ cdn_url }}/images/homepage/so-sure_unauthorised_network_charges.svg"
+                                 alt="so-sure cover - Unauthorised Network Charges">
+                            <h4>Unauthorised Network Charges <br><small >Up to the value of £1000 inc. VAT</small></h4>
+                        </div>
+                        <div class="col-sm-6 col-md-4">
+                            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                                 data-src="{{ cdn_url }}/images/homepage/so-sure_accessories.svg"
+                                 alt="so-sure cover - Accessories">
+                            <h4>Accessories <br><small>Up to the value of £100 inc. VAT for theft or loss claims</small></h4>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -192,9 +197,9 @@
         <div class="container">
             <h2 class="text-center h1">What We Don't Cover</h2>
             <ol class="ol--blue-counter">
-                <li class="lead">Excess: £70 for Theft/Loss and £50 for Accidental Damage/Breakdown</li>
-                <li class="lead">Theft, Loss, Accidental Damage or Breakdown where you have knowingly put your phone at risk</li>
-                <li class="lead">3+ claims for Loss and/or Theft in any policy year</li>
+                <li class="h4 h-light">Excess: £70 for Theft/Loss and £50 for Accidental Damage/Breakdown</li>
+                <li class="h4 h-light">Theft, Loss, Accidental Damage or Breakdown where you have knowingly put your phone at risk</li>
+                <li class="h4 h-light">3+ claims for Loss and/or Theft in any policy year</li>
             </ol>
         </div>
     </section>
@@ -222,7 +227,7 @@
                 </div>
                 <div class="col-md-7">
                     <p class="lead">If you and your friends take good care of your phone and don’t need to claim, we’ll give you up to 80% of your premium back at the end of your policy year.</p>
-                    <ol class="lead ol--blue-counter">
+                    <ol>
                         <li>Connect to your friends and family and receive up to £10 each in your individual Reward Pots</li>
                         <li>At the end of the year, when you and your connections haven’t claimed, your Reward Pot is paid out to you.</li>
                     </ol>
