@@ -14,6 +14,24 @@
     margin: 0 auto;
 }
 
+.curved-background {
+    height: 200px;
+    background-color: $lightest-blue;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+
+    svg {
+        width: 100%;
+        position: absolute;
+        top: 0; left: 0;
+
+        // @include breakpoint(tablet) {
+        //     bottom: 0;
+        // }
+    }
+}
+
 // TODO: Move!
 .ol--blue-counter {
     list-style: none;
@@ -292,7 +310,12 @@
     }
 
     &--what-we-dont-cover {
-        padding-top: 0;
+        position: relative;
+
+        .container {
+            position: relative;
+            z-index: 2;
+        }
 
         ol {
             max-width: 700px;
@@ -302,9 +325,10 @@
 
     &--how-does-the-reward-pot-work {
         background-color: $lightest-blue;
+        position: relative;
 
         h2 {
-            margin-bottom: 30px;
+            margin: 0 0 30px;
         }
 
         ol {
