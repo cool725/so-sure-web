@@ -191,15 +191,9 @@
             margin: 0 0 0 5px;
         }
 
-        img {
-            width: 180px;
-        }
-
-        ul {
-            li {
-                &:first-of-type {
-                    margin-left: 0;
-                }
+        li.fix-img {
+            &:first-of-type {
+                margin-left: -5px;
             }
         }
 
