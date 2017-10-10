@@ -79,4 +79,10 @@ trait CurrencyTrait
     {
         return $float > 0 && !$this->areEqualToTwoDp(0, $float);
     }
+
+    public function isWholeInteger($value)
+    {
+        return $this->areEqualToFourDp(0, $value - floor($value)) ||
+                    $this->areEqualToFourDp(0, ceil($value) - $value);
+    }
 }

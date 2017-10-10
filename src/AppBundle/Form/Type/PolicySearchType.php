@@ -40,6 +40,7 @@ class PolicySearchType extends AbstractType
         $statuses = [
             'Any' => null,
             'Current' => 'current',
+            'Current w/Discount' => 'current-discounted',
             Policy::STATUS_PENDING => Policy::STATUS_PENDING,
             Policy::STATUS_ACTIVE => Policy::STATUS_ACTIVE,
             Policy::STATUS_CANCELLED => Policy::STATUS_CANCELLED,
@@ -49,6 +50,7 @@ class PolicySearchType extends AbstractType
             Policy::STATUS_UNPAID => Policy::STATUS_UNPAID,
             Policy::STATUS_PENDING_RENEWAL => Policy::STATUS_PENDING_RENEWAL,
             Policy::STATUS_RENEWAL => Policy::STATUS_RENEWAL,
+            'Past Due (cancelled polices w/claim)' => 'past-due',
         ];
         $builder
             ->add('email', TextType::class, ['required' => false])

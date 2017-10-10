@@ -94,12 +94,37 @@ $(function(){
     $('[data-toggle="popover"]').popover();
 
     // Policy Modal
+
+    // Find the headings to add class
     $('#policy-modal, .modal-policy').find('h2').addClass('section-header');
+    // Find the tables to add some styling classes
     $('#policy-modal, .modal-policy').find('table').addClass('table, table-bordered');
-    $('.section-header').nextAll().not('h1').not('h2').hide();
-    $('.section-header').click(function(e) {
-        $(this).nextUntil('section-header').toggle();
-        $(this).toggleClass('section-open');
+    // Hide the sections content
+    $('.section-header').nextAll().not('h1').not('.section-header').hide();
+    // Click function
+    $('.section-header').each(function(index) {
+
+        $(this).on('click', function(event) {
+            $(this).nextUntil('.section-header').toggle();
+            $(this).toggleClass('section-open');
+        });
+
     });
+
+
+
+
+    // $('.section-header').nextAll().not('h1').not('h2').hide();
+    // $('.section-header').each(function(index, el) {
+    //     $(this).click(function(event) {
+    //         $(this).nextUntil().toggle();
+    //     });
+    // });
+
+    // $('.section-header').nextAll().not('h1').not('h2').hide();
+    // $('.section-header').click(function(e) {
+    //     $(this).nextUntil('section-header').toggle();
+    //     $(this).toggleClass('section-open');
+    // });
 
 });

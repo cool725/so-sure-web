@@ -1360,6 +1360,41 @@ class PolicyService
         return $fullyExpired;
     }
 
+    public function cashbackReminder($dryRun)
+    {
+        $now = new \DateTime();
+        $cashback = [];
+        $cashbackRepo = $this->dm->getRepository(Cashback::class);
+        $cashbackItems = $cashbackRepo->findBy(['status' => Cashback::STATUS_MISSING]);
+        foreach ($cashbackItems as $cashbackItem) {
+            $cashback[$cashbackItem->getId()] = $cashbackItem->getPolicy()->getPolicyNumber();
+            if (!$dryRun) {
+                try {
+                    $diff = $now->diff($cashbackItem->getDate());
+                    if ($diff->days < 90) {
+                        $this->cashbackEmail($cashbackItem);
+                    } else {
+                        $this->mailer->sendTemplate(
+                            sprintf('Unclaimed cashback %s', $cashbackItem->getPolicy()->getPolicyNumber()),
+                            'tech@so-sure.com',
+                            'AppBundle:Email:cashback/admin_missing.html.twig',
+                            ['cashback' => $cashbackItem]
+                        );
+                    }
+                } catch (\Exception $e) {
+                    $msg = sprintf(
+                        'Error Cashback Reminder %s / %s',
+                        $cashbackItem->getPolicy()->getPolicyNumber(),
+                        $cashbackItem->getId()
+                    );
+                    $this->logger->error($msg, ['exception' => $e]);
+                }
+            }
+        }
+
+        return $cashback;
+    }
+
     /**
      * @param Policy    $policy
      * @param \DateTime $date
@@ -1652,7 +1687,11 @@ class PolicyService
             $policy->clearCashback();
         }
 
-        $startDate = $this->endOfDay($policy->getEnd());
+        // Until Policy::ADJUST_TIMEZONE is true, ensure we have correct timezone set
+        $endDate = clone $policy->getEnd();
+        $endDate = $endDate->setTimezone(new \DateTimeZone(Policy::TIMEZONE));
+        $startDate = $this->endOfDay($endDate);
+        //$startDate = $this->endOfDay($policy->getEnd());
         $discount = 0;
         if (!$cashback && $policy->getPotValue() > 0) {
             $discount = $policy->getPotValue();

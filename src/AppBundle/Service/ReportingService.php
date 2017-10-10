@@ -20,6 +20,7 @@ use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Payment\SoSurePayment;
 use AppBundle\Document\Payment\PotRewardPayment;
 use AppBundle\Document\Payment\SoSurePotRewardPayment;
+use AppBundle\Document\Payment\PolicyDiscountPayment;
 
 class ReportingService
 {
@@ -555,13 +556,17 @@ class ReportingService
         return $phonePolicyRepo->countAllActivePoliciesWithPolicyDiscountToEndOfMonth($date);
     }
 
-    public function getRewardPotLiability($date)
+    public function getRewardPotLiability($date, $promoOnly = false)
     {
         $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
         $policies = $phonePolicyRepo->findPoliciesForRewardPotLiability($this->endOfMonth($date));
         $rewardPotLiability = 0;
         foreach ($policies as $policy) {
-            $rewardPotLiability += $policy->getPotValue();
+            if ($promoOnly) {
+                $rewardPotLiability += $policy->getPromoPotValue();
+            } else {
+                $rewardPotLiability += $policy->getPotValue();
+            }
         }
 
         return $rewardPotLiability;

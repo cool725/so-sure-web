@@ -59,7 +59,8 @@
         "vasildakov/postcode": "^1.1",
         "twig/extensions": "^1.4",
         "jaam/mixpanel-data-export-api": "^0.1.1",
-        "mobiledetect/mobiledetectlib": "^2.8"
+        "mobiledetect/mobiledetectlib": "^2.8",
+        "NoodlesNZ/double-metaphone": "^1.0"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",

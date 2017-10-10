@@ -11,6 +11,8 @@ use AppBundle\Service\ReceperioService;
 
 /**
  * @group functional-nonet
+ *
+ * AppBundle\\Tests\\Service\\ReceperioServiceTest
  */
 class ReceperioServiceTest extends WebTestCase
 {

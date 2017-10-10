@@ -646,23 +646,29 @@ class ReceperioService extends BaseImeiService
         try {
             return $this->runCheckSerial($phone, $serialNumber, $user, $warnMismatch);
         } catch (ReciperoManualProcessException $e) {
-            $this->logger->error(
-                sprintf("Unable to check serial number '%s'", $serialNumber),
-                ['exception' => $e]
-            );
             // If apple serial number doesn't work, try imei to get a non-memory match
             if ($phone->getMake() == 'Apple' && $imei) {
                 try {
                     return $this->runCheckSerial($phone, $imei, $user, $warnMismatch);
                 } catch (ReciperoManualProcessException $e) {
+                    if ($e->getCode() != ReciperoManualProcessException::CODE_SKIP_LOGGING) {
+                        $this->logger->error(
+                            sprintf("Unable to recheck iPhone using imei as serial number '%s'", $imei),
+                            ['exception' => $e]
+                        );
+                    }
+                }
+            } else {
+                if ($e->getCode() != ReciperoManualProcessException::CODE_SKIP_LOGGING) {
                     $this->logger->error(
-                        sprintf("Unable to recheck iPhone using imei as serial number '%s'", $imei),
+                        sprintf("Unable to check serial number '%s'", $serialNumber),
                         ['exception' => $e]
                     );
-                    return true;
                 }
             }
 
+            // For most recipero errors where the data isn't what we expect, go ahead and allow the
+            // purchase to go ahead
             return true;
         }
     }
@@ -769,8 +775,13 @@ class ReceperioService extends BaseImeiService
                 sprintf("A recent make/model query for %s returned a successful response but without any data in the makes field. If apple, verify at https://checkcoverage.apple.com/gb/en/?sn=%s Email support@recipero.com\n\n--------------\n\nDear Recipero Support,\nA recent make/model query for %s returned a successful response but without any data present for the makes field. Can you please investigate and add to your db if its a valid serial number.  If it is a valid serial number, can you also confirm the make/model/colour & memory?", $serialNumber, $serialNumber, $serialNumber)
             );
             // @codingStandardsIgnoreEnd
+            $this->statsd->increment('recipero.makeModelEmptyMakes');
 
-            throw new ReciperoManualProcessException(sprintf('Missing make data %s', json_encode($data)));
+            // Sending email to process, so no need to log exception
+            throw new ReciperoManualProcessException(
+                sprintf('Missing make data %s', json_encode($data)),
+                ReciperoManualProcessException::CODE_SKIP_LOGGING
+            );
         }
 
         if (!isset($data['makes']) || count($data['makes']) != 1) {
@@ -825,10 +836,11 @@ class ReceperioService extends BaseImeiService
                 );
                 // @codingStandardsIgnoreEnd
 
-                throw new ReciperoManualProcessException(sprintf(
-                    'Missing modelreference data %s',
-                    json_encode($data)
-                ));
+                // Sending email to process, so no need to log exception
+                throw new ReciperoManualProcessException(
+                    sprintf('Missing modelreference data %s', json_encode($data)),
+                    ReciperoManualProcessException::CODE_SKIP_LOGGING
+                );
             }
         }
     }
@@ -887,7 +899,8 @@ class ReceperioService extends BaseImeiService
         if ($modelData['storage'] == sprintf('%sGB', $phone->getMemory())) {
             return true;
         } else {
-            $this->logger->error(sprintf(
+            $this->statsd->increment('recipero.makeModelMemoryMismatch');
+            $this->logger->info(sprintf(
                 "Error validating check serial number %s for memory %s. Data: %s",
                 $serialNumber,
                 $phone->getMemory(),

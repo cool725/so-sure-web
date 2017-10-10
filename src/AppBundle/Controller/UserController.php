@@ -1000,6 +1000,12 @@ class UserController extends BaseController
         }
         $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
 
+        // If a user has an unpaid policy, then avoid updating card details (email directing to here)
+        // as its then in a very odd state - card correct, but unpaid. better to take the payment immediately
+        if ($user->hasUnpaidPolicy()) {
+            return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
+        }
+
         $webpay = $this->get('app.judopay')->webRegister(
             $user,
             $request->getClientIp(),

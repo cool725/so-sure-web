@@ -807,6 +807,10 @@ class AdminEmployeeController extends BaseController
         $policyForm = $this->get('form.factory')
             ->createNamedBuilder('policy_form', PartialPolicyType::class, $policyData)
             ->getForm();
+        $sanctionsForm = $this->get('form.factory')
+            ->createNamedBuilder('sanctions_form')
+            ->add('confirm', SubmitType::class)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('reset_form')) {
@@ -921,6 +925,20 @@ class AdminEmployeeController extends BaseController
 
                     return $this->redirectToRoute('admin_user', ['id' => $id]);
                 }
+            } elseif ($request->request->has('sanctions_form')) {
+                $sanctionsForm->handleRequest($request);
+                if ($sanctionsForm->isValid()) {
+                    foreach ($user->getSanctionsMatches() as $match) {
+                        $match->setManuallyVerified(true);
+                    }
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        'Verified Sanctions'
+                    );
+
+                    return $this->redirectToRoute('admin_user', ['id' => $id]);
+                }
             }
         }
 
@@ -932,6 +950,7 @@ class AdminEmployeeController extends BaseController
             'user_email_form' => $userEmailForm->createView(),
             'user_permission_form' => $userPermissionForm->createView(),
             'makemodel_form' => $makeModelForm->createView(),
+            'sanctions_form' => $sanctionsForm->createView(),
             'postcode' => $postcode,
             'census' => $census,
             'income' => $income,

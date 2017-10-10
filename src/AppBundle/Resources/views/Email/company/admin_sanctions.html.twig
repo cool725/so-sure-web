@@ -1,0 +1,18 @@
+{% extends 'AppBundle:Email:base.html.twig' %}
+{% import "AppBundle:Email:macros.html.twig" as macros %}
+{% block title %}Sanctions check required{% endblock %}
+{% block body %}
+	{{ macros.start_table() }}
+	<h1>
+	   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+	</h1>
+	<div style="font-size: 14px; text-align: left;">
+	   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+	   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+        {{ company.name }} triggered a sanctions warning. Please manually verify.<br><br>
+        {{ matches }}
+	   </div>
+	</div>
+	{{ macros.end_table() }}
+	{{ macros.email_button_table(url('admin_company', {'name': company.name}), "View Company", "View Company")}}
+{% endblock %}

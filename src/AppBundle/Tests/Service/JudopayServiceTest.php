@@ -15,12 +15,14 @@ use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Classes\Salva;
 use AppBundle\Exception\InvalidPremiumException;
+use AppBundle\Document\Payment\PolicyDiscountPayment;
 
 /**
  * @group functional-net
  */
 class JudopayServiceTest extends WebTestCase
 {
+    use \AppBundle\Document\CurrencyTrait;
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
@@ -1173,6 +1175,66 @@ class JudopayServiceTest extends WebTestCase
         $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice() * 1.5);
         self::$judopay->setCommission($policy, $payment);
         $this->assertNull($payment->getTotalCommission());
+    }
+
+    public function testJudoCommissionAmountsWithDiscount()
+    {
+        $user = $this->createValidUser(static::generateEmail('testJudoCommissionAmountsWithDiscount', $this));
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
+
+        $discount = new PolicyDiscountPayment();
+        $discount->setAmount(10);
+        $discount->setDate(new \DateTime());
+        $policy->addPayment($discount);
+        $policy->getPremium()->setAnnualDiscount($discount->getAmount());
+
+        $payment = new JudoPayment();
+        $payment->setAmount($policy->getPremium()->getAdjustedYearlyPremiumPrice());
+        self::$judopay->setCommission($policy, $payment);
+        $this->assertEquals(
+            Salva::YEARLY_TOTAL_COMMISSION,
+            $payment->getTotalCommission()
+        );
+
+        $payment = new JudoPayment();
+        $payment->setAmount($policy->getPremium()->getAdjustedStandardMonthlyPremiumPrice());
+        self::$judopay->setCommission($policy, $payment);
+        $this->assertEquals(
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            $payment->getTotalCommission()
+        );
+
+        $payment = new JudoPayment();
+        $payment->setAmount($policy->getPremium()->getAdjustedStandardMonthlyPremiumPrice() * 3);
+        self::$judopay->setCommission($policy, $payment);
+        $this->assertEquals(
+            Salva::MONTHLY_TOTAL_COMMISSION * 3,
+            $payment->getTotalCommission()
+        );
+
+        $payment = new JudoPayment();
+        $payment->setAmount($policy->getPremium()->getAdjustedStandardMonthlyPremiumPrice() * 1.5);
+        self::$judopay->setCommission($policy, $payment);
+        $this->assertNull($payment->getTotalCommission());
+
+        $payment = new JudoPayment();
+        $payment->setSuccess(true);
+        $payment->setAmount($policy->getPremium()->getAdjustedStandardMonthlyPremiumPrice() * 11);
+        $policy->addPayment($payment);
+        self::$judopay->setCommission($policy, $payment);
+
+        $payment = new JudoPayment();
+        $payment->setSuccess(true);
+        $payment->setAmount($policy->getPremium()->getAdjustedFinalMonthlyPremiumPrice());
+        $policy->addPayment($payment);
+        $this->assertEquals(0, $policy->getOutstandingPremium());
+
+        self::$judopay->setCommission($policy, $payment);
+        $this->assertEquals(
+            Salva::FINAL_MONTHLY_TOTAL_COMMISSION,
+            $payment->getTotalCommission()
+        );
     }
 
     public function testJudoCommissionActual()

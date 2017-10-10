@@ -224,11 +224,62 @@ class DaviesServiceTest extends WebTestCase
 
         self::$daviesService->clearErrors();
 
-        $this->assertEquals(0, count(self::$daviesService->getErrors()));
+        $this->assertEquals(0, count(self::$daviesService->getWarnings()));
         self::$daviesService->saveClaims(1, [$daviesOpen, $daviesOpen]);
+        $this->assertEquals(1, count(self::$daviesService->getWarnings()));
+
+        $this->insureWarningExists('/multiple open claims against policy/');
+    }
+
+    private function getRandomPolicyNumber()
+    {
+        return sprintf('TEST/2017/%6d', rand(1, 999999));
+    }
+
+    public function testSaveClaimsOpenClosed()
+    {
+        $daviesOpen = new DaviesClaim();
+        $daviesOpen->policyNumber = $this->getRandomPolicyNumber();
+        $daviesOpen->claimNumber = 'a';
+        $daviesOpen->status = 'Open';
+        $daviesOpen->lossDate = new \DateTime('2017-01-01');
+
+        $daviesClosed = new DaviesClaim();
+        $daviesClosed->policyNumber = $daviesOpen->getPolicyNumber();
+        $daviesClosed->claimNumber = 'a';
+        $daviesClosed->status = 'Closed';
+        $daviesClosed->lossDate = new \DateTime('2017-02-01');
+
+        self::$daviesService->clearErrors();
+
+        $this->assertEquals(0, count(self::$daviesService->getErrors()));
+        self::$daviesService->saveClaims(1, [$daviesOpen, $daviesClosed]);
         $this->assertEquals(1, count(self::$daviesService->getErrors()));
 
-        $this->insureErrorExists('/multiple open claims against policy/');
+        $this->insureErrorExists('/older then the closed claim/');
+    }
+
+    public function testSaveClaimsClosedOpen()
+    {
+        $daviesOpen = new DaviesClaim();
+        $daviesOpen->policyNumber = $this->getRandomPolicyNumber();
+        $daviesOpen->claimNumber = 'a';
+        $daviesOpen->status = 'Open';
+        $daviesOpen->lossDate = new \DateTime('2017-02-01');
+
+        $daviesClosed = new DaviesClaim();
+        $daviesClosed->policyNumber = $daviesOpen->getPolicyNumber();
+        $daviesClosed->claimNumber = 'a';
+        $daviesClosed->status = 'Closed';
+        $daviesClosed->lossDate = new \DateTime('2017-01-01');
+
+        self::$daviesService->clearErrors();
+
+        $this->assertEquals(0, count(self::$daviesService->getErrors()));
+        self::$daviesService->saveClaims(1, [$daviesOpen, $daviesClosed]);
+        $this->assertEquals(1, count(self::$daviesService->getErrors()));
+        $this->insureErrorDoesNotExist('/older then the closed claim/');
+        $this->insureErrorExists('/Unable to locate claim/');
     }
 
     public function testSaveClaimsSaveException()
@@ -762,6 +813,41 @@ class DaviesServiceTest extends WebTestCase
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
         $this->insureWarningExists('/delayed replacement date/');
+    }
+
+    public function testValidateClaimDetailsReceivedDateTooOld()
+    {
+        $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        $claim->setApprovedDate(new \DateTime('2016-01-02'));
+        $policy->addClaim($claim);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = 1;
+        $daviesClaim->status = 'open';
+        $daviesClaim->incurred = 1;
+        $daviesClaim->unauthorizedCalls = 1.01;
+        $daviesClaim->accessories = 1.03;
+        $daviesClaim->phoneReplacementCost = 1.07;
+        $daviesClaim->transactionFees = 1.11;
+        $daviesClaim->handlingFees = 1.19;
+        $daviesClaim->reciperoFee = 1.27;
+        $daviesClaim->excess = 6;
+        $daviesClaim->reserved = 0;
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+        $daviesClaim->replacementMake = 'Apple';
+        $daviesClaim->replacementModel = 'iPhone 8';
+        $daviesClaim->replacementReceivedDate = new \DateTime('2016-01-01');
+
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->insureErrorExists('/should be closed. Replacement was delivered more than 2 months ago/');
+
+        self::$daviesService->clearErrors();
+
+        $daviesClaim->replacementReceivedDate = new \DateTime('-20 days');
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->insureErrorDoesNotExist('/should be closed. Replacement was delivered more than 1 month ago/');
     }
 
     public function testPostValidateClaimDetailsReceivedDate()

@@ -12,6 +12,7 @@ use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\Connection\Connection;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 use AppBundle\Document\CurrencyTrait;
 
@@ -80,6 +81,7 @@ class IntercomService
     protected $secureAndroid;
     protected $secureIOS;
     protected $mailer;
+    protected $router;
 
     /**
      * @param DocumentManager $dm
@@ -90,6 +92,7 @@ class IntercomService
      * @param string          $secureAndroid
      * @param string          $secureIOS
      * @param                 $mailer
+     * @param                 $router
      */
     public function __construct(
         DocumentManager $dm,
@@ -99,7 +102,8 @@ class IntercomService
         $secure,
         $secureAndroid,
         $secureIOS,
-        $mailer
+        $mailer,
+        $router
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -109,6 +113,7 @@ class IntercomService
         $this->secureAndroid = $secureAndroid;
         $this->secureIOS = $secureIOS;
         $this->mailer = $mailer;
+        $this->router = $router;
     }
 
     public function update(User $user, $allowSoSure = false, $undelete = false)
@@ -312,6 +317,12 @@ class IntercomService
             null;
         if (isset($analytics['devices'])) {
             $data['custom_attributes']['Insured Devices'] = join(';', $analytics['devices']);
+        }
+        if ($user->getFirstPolicy() && $user->getFirstPolicy()->getPhone()) {
+            $data['custom_attributes']['First Policy Learn More'] =
+                $this->router->generate('learn_more_phone', [
+                    'id' => $user->getFirstPolicy()->getPhone()->getId()
+                ], UrlGeneratorInterface::ABSOLUTE_URL);
         }
         // Only set the first time, or if the user was converted from a lead
         if (!$user->getIntercomId() || $isConverted) {

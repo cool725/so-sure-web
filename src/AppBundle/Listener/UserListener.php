@@ -80,7 +80,20 @@ class UserListener
     /**
      * @param UserEvent $event
      */
+    public function onUserCreatedEvent(UserEvent $event)
+    {
+        $this->onUserCreatedUpdated($event);
+    }
+
+    /**
+     * @param UserEvent $event
+     */
     public function onUserUpdatedEvent(UserEvent $event)
+    {
+        $this->onUserCreatedUpdated($event);
+    }
+    
+    private function onUserCreatedUpdated(UserEvent $event)
     {
         $user = $event->getUser();
         $email = $user->getEmailCanonical();

@@ -507,7 +507,7 @@ class ApiControllerTest extends BaseControllerTest
     {
         $crawler = self::$client->request(
             'GET',
-            '/api/v1/quote?make=Apple&device=iPhone5,3&memory=63&rooted=false&debug=true'
+            '/api/v1/quote?make=Apple&device=iPhone8,2&memory=63&rooted=false&debug=true'
         );
         $data = $this->verifyResponse(200);
         $this->assertEquals(true, $data['device_found']);
@@ -1308,7 +1308,7 @@ class ApiControllerTest extends BaseControllerTest
         );
         $cognitoIdentityId = $this->getAuthUser($user);
 
-        $url = '/api/v1/version?platform=ios&version=2.0.1&device=iPhone%205c&memory=32&uuid=1&_method=GET';
+        $url = '/api/v1/version?platform=ios&version=2.0.1&device=iPhone%206s&memory=64&uuid=1&_method=GET';
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(200, ApiErrorCode::SUCCESS);
 

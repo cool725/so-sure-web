@@ -35,6 +35,11 @@ class IntercomListener
         }
     }
 
+    public function onUserCreatedEvent(UserEvent $event)
+    {
+        $this->intercom->queue($event->getUser());
+    }
+
     public function onUserUpdatedEvent(UserEvent $event)
     {
         $this->intercom->queue($event->getUser());
