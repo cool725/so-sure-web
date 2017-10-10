@@ -324,6 +324,7 @@ services:
             - [setBucket, ['ops.so-sure.com']]
             - [setPath, ['claims-report']]
             - [setValidator, ['@validator']]
+            - [setFeature, ['@app.feature']]
         tags:
             - { name: monolog.logger, channel: davies }
 

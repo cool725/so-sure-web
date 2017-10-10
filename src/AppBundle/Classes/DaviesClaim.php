@@ -40,6 +40,7 @@ class DaviesClaim extends DaviesExcel
     const MISTATUS_SUPPLIER_CORRESPONDENCE = "Supplier Correspondence";
     const MISTATUS_SUPPLIER_FEE = "Supplier Fee";
     const MISTATUS_ERROR = "Error";
+    const MISTATUS_DMS_ERROR = "DMS Error";
     const MISTATUS_COMPLAINT = "Complaint";
     const MISTATUS_INSURER = "Contact from insurer";
 
@@ -60,6 +61,16 @@ class DaviesClaim extends DaviesExcel
         'accounts.payable@davies-group.com',
         'laura.harvey@davies-group.com',
         'Louisa.Luxton@davies-group.com',
+        'patrick@so-sure.com',
+        'dylan@so-sure.com',
+    ];
+
+    public static $errorEmailAddresses = [
+        'laura.harvey@davies-group.com',
+        'Louisa.Luxton@davies-group.com',
+        'Owen.Pugh@davies-group.com',
+        'Simon.Harvey@davies-group.com',
+        'Sarah.Aston@davies-group.com',
         'patrick@so-sure.com',
         'dylan@so-sure.com',
     ];
@@ -156,7 +167,10 @@ class DaviesClaim extends DaviesExcel
 
     public function hasError()
     {
-        return strtolower($this->miStatus) == strtolower(self::MISTATUS_ERROR);
+        return in_array(strtolower($this->miStatus), [
+            strtolower(self::MISTATUS_ERROR),
+            strtolower(self::MISTATUS_DMS_ERROR),
+        ]);
     }
 
     public function getExpectedExcess($validated = true)
@@ -431,6 +445,7 @@ class DaviesClaim extends DaviesExcel
                 strtolower(self::MISTATUS_SUPPLIER_CORRESPONDENCE),
                 strtolower(self::MISTATUS_SUPPLIER_FEE),
                 strtolower(self::MISTATUS_ERROR),
+                strtolower(self::MISTATUS_DMS_ERROR),
                 strtolower(self::MISTATUS_COMPLAINT),
                 strtolower(self::MISTATUS_INSURER),
             ])) {

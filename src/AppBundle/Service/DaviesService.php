@@ -6,6 +6,7 @@ use Aws\S3\S3Client;
 use AppBundle\Classes\DaviesClaim;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Phone;
+use AppBundle\Document\Feature;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\DaviesFile;
@@ -22,6 +23,9 @@ class DaviesService extends S3EmailService
     /** @var ClaimsService */
     protected $claimsService;
 
+    /** @var FeatureService */
+    protected $featureService;
+
     protected $mailer;
     protected $validator;
 
@@ -33,6 +37,11 @@ class DaviesService extends S3EmailService
     public function setMailer($mailer)
     {
         $this->mailer = $mailer;
+    }
+
+    public function setFeature($featureService)
+    {
+        $this->featureService = $featureService;
     }
 
     public function setValidator($validator)
@@ -48,6 +57,7 @@ class DaviesService extends S3EmailService
     public function postProcess()
     {
         $this->claimsDailyEmail();
+        $this->claimsDailyErrors();
     }
 
     public function getNewS3File()
@@ -78,7 +88,7 @@ class DaviesService extends S3EmailService
                         'There are multiple open claims against policy %s. Please manually update the IMEI.',
                         $daviesClaim->getPolicyNumber()
                     );
-                    $this->errors[$daviesClaim->claimNumber][] = $msg;
+                    $this->warnings[$daviesClaim->claimNumber][] = $msg;
                     $multiple[] = $daviesClaim->getPolicyNumber();
                 }
             }
@@ -91,7 +101,13 @@ class DaviesService extends S3EmailService
             } catch (\Exception $e) {
                 //$success = false;
                 $this->errors[$daviesClaim->claimNumber][] = $e->getMessage();
-                $this->logger->error(sprintf('Error processing file %s', $key), ['exception' => $e]);
+                $this->logger->error(
+                    sprintf(
+                        'Skipped import. Fatal error processing file (%s)',
+                        $key
+                    ),
+                    ['exception' => $e]
+                );
                 // In case any of the db data failed validation, clear the changeset
                 if ($claim = $this->getClaim($daviesClaim)) {
                     $this->dm->refresh($claim);
@@ -486,7 +502,7 @@ class DaviesService extends S3EmailService
         $claims = $claimsRepo->findOutstanding();
 
         $this->mailer->sendTemplate(
-            sprintf('Daily Claims'),
+            sprintf('Daily Claims Report'),
             'tech@so-sure.com',
             'AppBundle:Email:davies/dailyEmail.html.twig',
             [
@@ -495,9 +511,46 @@ class DaviesService extends S3EmailService
                 'successFile' => $successFile,
                 'warnings' => $this->warnings,
                 'errors' => $this->errors,
+                'title' => 'Daily Claims Report',
             ]
         );
 
         return count($claims);
+    }
+
+    public function claimsDailyErrors()
+    {
+        $fileRepo = $this->dm->getRepository(DaviesFile::class);
+        $latestFiles = $fileRepo->findBy([], ['created' => 'desc'], 1);
+        $latestFile = count($latestFiles) > 0 ? $latestFiles[0] : null;
+
+        $successFiles = $fileRepo->findBy(['success' => true], ['created' => 'desc'], 1);
+        $successFile = count($successFiles) > 0 ? $successFiles[0] : null;
+
+        $claimsRepo = $this->dm->getRepository(Claim::class);
+        $claims = $claimsRepo->findOutstanding();
+
+        if (count($this->errors) > 0) {
+            $emails = 'tech@so-sure.com';
+            if ($this->featureService->isEnabled(Feature::FEATURE_DAVIES_IMPORT_ERROR_EMAIL)) {
+                $emails = DaviesClaim::$errorEmailAddresses;
+            }
+
+            $this->mailer->sendTemplate(
+                sprintf('Errors in So-Sure Mobile - Daily Claims Report'),
+                $emails,
+                'AppBundle:Email:davies/dailyEmail.html.twig',
+                [
+                    'latestFile' => $latestFile,
+                    'successFile' => $successFile,
+                    'errors' => $this->errors,
+                    'warnings' => null,
+                    'claims' => null,
+                    'title' => 'Errors in So-Sure Mobile - Daily Claims Report',
+                ]
+            );
+        }
+
+        return count($this->errors);
     }
 }
