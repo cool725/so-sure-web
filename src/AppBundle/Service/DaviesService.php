@@ -79,8 +79,16 @@ class DaviesService extends S3EmailService
     {
         $success = true;
         $claims = [];
+        $openClaims = [];
         $multiple = [];
         foreach ($daviesClaims as $daviesClaim) {
+            // get the most recent claim that's open
+            if ($daviesClaim->isOpen()) {
+                if (!isset($openClaims[$daviesClaim->getPolicyNumber()]) ||
+                    $daviesClaim->lossDate > $openClaims[$daviesClaim->getPolicyNumber()]) {
+                    $openClaims[$daviesClaim->getPolicyNumber()] = $daviesClaim->lossDate;
+                }
+            }
             if (isset($claims[$daviesClaim->getPolicyNumber()]) &&
                 $claims[$daviesClaim->getPolicyNumber()]) {
                 if ($daviesClaim->isOpen()) {
@@ -94,6 +102,24 @@ class DaviesService extends S3EmailService
             }
             $claims[$daviesClaim->getPolicyNumber()] = $daviesClaim->isOpen();
         }
+
+        // Check for any claims that are closed that appear after an open claim
+        foreach ($daviesClaims as $daviesClaim) {
+            if (!$daviesClaim->isOpen() &&
+                isset($openClaims[$daviesClaim->getPolicyNumber()]) &&
+                $daviesClaim->lossDate > $openClaims[$daviesClaim->getPolicyNumber()]) {
+                    // @codingStandardsIgnoreStart
+                    $msg = sprintf(
+                        'There is open claim against policy %s that is older then the closed claim of %s and needs to be closed. Unable to determine imei',
+                        $daviesClaim->getPolicyNumber(),
+                        $daviesClaim->claimNumber
+                    );
+                    // @codingStandardsIgnoreEnd
+                    $this->errors[$daviesClaim->claimNumber][] = $msg;
+                    $multiple[] = $daviesClaim->getPolicyNumber();
+            }
+        }
+
         foreach ($daviesClaims as $daviesClaim) {
             try {
                 $skipImeiUpdate = in_array($daviesClaim->getPolicyNumber(), $multiple);
@@ -407,6 +433,18 @@ class DaviesService extends S3EmailService
                 );
                 $this->warnings[$daviesClaim->claimNumber][] = $msg;
             }
+        }
+
+        $oneMonthsAgo = new \DateTime();
+        $oneMonthsAgo = $oneMonthsAgo->sub(new \DateInterval('P1M'));
+        if ($daviesClaim->isOpen() && $daviesClaim->replacementReceivedDate &&
+            $daviesClaim->replacementReceivedDate < $oneMonthsAgo) {
+            $msg = sprintf(
+                'Claim %s should be closed. Replacement was delivered more than 1 month ago on %s.',
+                $daviesClaim->claimNumber,
+                $daviesClaim->replacementReceivedDate->format(\DateTime::ATOM)
+            );
+            $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
     }
 
