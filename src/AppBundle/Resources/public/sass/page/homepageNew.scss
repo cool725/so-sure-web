@@ -87,24 +87,27 @@
         }
 
         p {
-            margin-bottom: 0 0 25px;
+            margin-bottom: 0 0 30px;
         }
 
-        background-image: url('https://cdn.so-sure.com/images/homepage/so-sure_homepage-hero-mobile.svg');
-        background-repeat: no-repeat;
-        background-position: center bottom;
+        // Backgrounds
+        // - Mobile
+        background: $white url('https://cdn.so-sure.com/images/homepage/so-sure_homepage-hero-mobile.svg') no-repeat center bottom;
         background-size: 90%;
         padding-bottom: 120px;
 
+        // - Midtablet
         @include breakpoint(midtablet) {
             background-size: 80%;
             padding-bottom: 170px;
         }
 
+        // - Tablet
         @include breakpoint(tablet) {
-            background-image: url('https://cdn.so-sure.com/images/homepage/so-sure_homepage-hero-clouds-combined.svg');
-            background-repeat: repeat-x;
-            background-position: left 20px;
+            padding-top: 80px;
+            padding-bottom: 150px;
+
+            background: $white url('https://cdn.so-sure.com/images/homepage/so-sure_homepage-hero-clouds-combined.svg') repeat-x left 20px;
             background-size: 100%;
 
             // Add building images
@@ -118,22 +121,22 @@
                 background-size: 99%;
             }
 
+            // Building Left
             &:before {
                 background-image: url('https://cdn.so-sure.com/images/homepage/so-sure_homepage-hero-left-with-characters.svg');
                 background-position: left bottom;
                 left: -20px;
             }
 
+            // Building Right
             &:after {
                 background-image: url('https://cdn.so-sure.com/images/homepage/so-sure_homepage-hero-right-with-characters.svg');
                 background-position: right bottom;
                 right: -20px;
             }
-
-            padding-top: 80px;
-            padding-bottom: 150px;
         }
 
+        // - Laptop
         @include breakpoint(laptop) {
             padding-top: 100px;
             padding-bottom: 200px;
@@ -148,17 +151,28 @@
             }
         }
 
+        // - Desktop
         @include breakpoint(desktop) {
             padding-top: 120px;
             padding-bottom: 250px;
             background-position: left 5px;
         }
 
+        // - HD
         @include breakpoint(hd) {
+            padding-top: 200px;
             padding-bottom: 400px;
 
             &:before, &:after {
-                background-size: 70%;
+                background-size: 90%;
+            }
+
+            &:before {
+                left: 100px;
+            }
+
+            &:after {
+                right: 100px;
             }
         }
     }
