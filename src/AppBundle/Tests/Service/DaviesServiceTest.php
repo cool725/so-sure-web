@@ -841,7 +841,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->replacementReceivedDate = new \DateTime('2016-01-01');
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $this->insureErrorExists('/should be closed. Replacement was delivered more than 1 month ago/');
+        $this->insureErrorExists('/should be closed. Replacement was delivered more than 2 months ago/');
 
         self::$daviesService->clearErrors();
 

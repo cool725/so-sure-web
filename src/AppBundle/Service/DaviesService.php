@@ -435,12 +435,12 @@ class DaviesService extends S3EmailService
             }
         }
 
-        $oneMonthsAgo = new \DateTime();
-        $oneMonthsAgo = $oneMonthsAgo->sub(new \DateInterval('P1M'));
+        $twoMonthsAgo = new \DateTime();
+        $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
         if ($daviesClaim->isOpen() && $daviesClaim->replacementReceivedDate &&
-            $daviesClaim->replacementReceivedDate < $oneMonthsAgo) {
+            $daviesClaim->replacementReceivedDate < $twoMonthsAgo) {
             $msg = sprintf(
-                'Claim %s should be closed. Replacement was delivered more than 1 month ago on %s.',
+                'Claim %s should be closed. Replacement was delivered more than 2 months ago on %s.',
                 $daviesClaim->claimNumber,
                 $daviesClaim->replacementReceivedDate->format(\DateTime::ATOM)
             );
