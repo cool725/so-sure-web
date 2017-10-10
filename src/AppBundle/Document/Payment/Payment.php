@@ -22,6 +22,7 @@ use AppBundle\Document\ScheduledPayment;
  *      "gocardless"="GocardlessPayment",
  *      "sosure"="SoSurePayment",
  *      "bacs"="BacsPayment",
+ *      "chargeback"="ChargebackPayment",
  *      "potReward"="PotRewardPayment",
  *      "policyDiscount"="PolicyDiscountPayment",
  *      "sosurePotReward"="SoSurePotRewardPayment"
@@ -62,6 +63,12 @@ abstract class Payment
             return 'sosure';
         } elseif ($this instanceof BacsPayment) {
             return 'bacs';
+        } elseif ($this instanceof ChargebackPayment) {
+            return 'chargeback';
+        } elseif ($this instanceof PotRewardPayment) {
+            return 'potReward';
+        } elseif ($this instanceof SoSurePotRewardPayment) {
+            return 'sosurePotReward';
         } else {
             return null;
         }

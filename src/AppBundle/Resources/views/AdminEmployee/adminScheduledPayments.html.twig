@@ -11,7 +11,7 @@
     {% javascripts
         'components/moment/moment.min.js'
         'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.js'
-        '@AppBundle/Resources/public/js/Admin/scheduledPayments.js'
+        '@AppBundle/Resources/public/js/Admin/month.js'
     %}
     <script src="{{ asset_url }}"></script>
     {% endjavascripts %}
@@ -25,20 +25,20 @@
             <h1>Scheduled Payments {{ month }} / {{ year }}</h1>
             <h4>Total: £{{ total|number_format(2, '.', ',') }} <i class="fa fa-question-circle" title="Total of payments that are either successful or scheduled" style="cursor: pointer"></i></h4>
         </div>
-        <form id='scheduled-payments-form' method="POST">
-            <div class="col-md-2">
+    <form class="month-form form-inline" method="POST" autocomplete="off">
+            <div class="col-md-4">
                 <div class="form-group" style="padding-top: 15px;">
-                    <div class='input-group date' id='scheduled-payments'>
+                    <div class="input-group date month" data-url="{{ path('admin_scheduled_payments') }}">
                         <input name="scheduled-payments" type='text' class="form-control" value="{{month}}-{{year}}" />
                         <span class="input-group-addon">
                             <span class="fa fa-calendar"></span>
                         </span>
                     </div>
-                </div>
-            </div>
-            <div class="col-md-2">
-                <div class="form-group" style="padding-top: 15px;">
-                    <button class="btn btn-primary">View Scheduled Payments</button>
+                    <div class="input-group">
+                        <div class="input-group-btn">
+                            <button class="btn btn-success"><i class="fa fa-arrow-right"></i></button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </form>
