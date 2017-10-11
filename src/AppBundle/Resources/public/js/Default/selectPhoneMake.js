@@ -107,12 +107,6 @@ $(function(){
 
     var $typeahead = $('[id^=search-phone-form]');
 
-    // Needs work
-    // if(window.location.href.indexOf('?quote=1') != -1) {
-    //     $('.search-phone:first').focus();
-    //     sosure.track.byName('Get A Quote Link');
-    // }
-
     $.each($typeahead, function (index, typeahead){
 
         var form    = $(this);
@@ -161,5 +155,13 @@ $(function(){
         });
 
     });
+
+    // Focus Search Box if url param
+    if (window.location.href.indexOf('?quote=1') != -1) {
+        // Wait till page loads then focus
+        setTimeout(function(){
+            $('#search-phone-1').focus();
+        }, 1000);
+    }
 
 });
