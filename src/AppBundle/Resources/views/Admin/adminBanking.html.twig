@@ -12,7 +12,7 @@
     {% javascripts
         'components/moment/moment.min.js'
         'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.js'
-        '@AppBundle/Resources/public/js/Admin/banking.js'
+        '@AppBundle/Resources/public/js/Admin/month.js'
     %}
     <script src="{{ asset_url }}"></script>
     {% endjavascripts %}
@@ -22,27 +22,35 @@
 <div class="container" style="margin-bottom: 50px">
 
 <div class="row">
-    <div class="col-md-6">
-        <h1>so-sure Banking for {{ month }} / {{ year }}</h1>
+    <div class="col-md-5">
+        <h1>Banking for {{ month }} / {{ year }}</h1>
     </div>
-    <form id='banking-form' method="POST">
-    <div class="col-md-2">
+    <form class="month-form form-inline" method="POST" autocomplete="off">
+    <div class="col-md-3">
         <div class="form-group" style="padding-top: 15px;">
-            <div class='input-group date' id='banking'>
+            <div class="input-group date month" data-url="{{ path('admin_banking') }}">
                 <input name="banking" type='text' class="form-control" value="{{month}}-{{year}}" />
                 <span class="input-group-addon">
                     <span class="fa fa-calendar"></span>
                 </span>
             </div>
+            <div class="input-group">
+                <div class="input-group-btn">
+                    <button class="btn btn-success"><i class="fa fa-arrow-right"></i></button>
+                </div>
+            </div>
         </div>
     </div>
     <div class="col-md-4">
         <div class="form-group" style="padding-top: 15px;">
-            <button class="btn btn-primary">View Banking</button>
-            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#barclaysModal"
-                ><i class="fa fa-plus"></i> Barclays</button>
-            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#lloydsModal"
-                ><i class="fa fa-plus"></i> Lloyds</button>
+            <div class="btn-group">
+                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#barclaysModal"
+                    > B Transaction</button>
+                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#barclaysStatementModal"
+                    > B Statement</button>
+                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#lloydsModal"
+                    > Lloyds</button>
+            </div>
         </div>
     </div>
     </form>
@@ -228,7 +236,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Barclays Upload</h4>
+            <h4 class="modal-title">Barclays Transaction Upload</h4>
           </div>
           <div class="modal-body">
                 {% for barclaysFile in barclaysFiles %}
@@ -244,6 +252,32 @@
                     {{ form_widget(barclaysForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-success'}}) }}
                 </div>
             {{ form_end(barclaysForm) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="barclaysStatementModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Barclays Statement Upload</h4>
+          </div>
+          <div class="modal-body">
+                {% for barclaysStatementFile in barclaysStatementFiles %}
+                    <p>{{ barclaysStatementFile.fileName }}</p>
+                {% endfor %}
+            {{ form_start(barclaysStatementForm) }}
+                <div class="form-group">
+                    {{ form_label(barclaysStatementForm.file, 'File') }}
+                    {{ form_errors(barclaysStatementForm.file) }}
+                    {{ form_widget(barclaysStatementForm.file) }}
+                </div>
+                <div class="form-group">
+                    {{ form_widget(barclaysStatementForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-success'}}) }}
+                </div>
+            {{ form_end(barclaysStatementForm) }}
           </div>
         </div>
       </div>

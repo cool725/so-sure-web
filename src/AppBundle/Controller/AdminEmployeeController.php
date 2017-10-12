@@ -51,11 +51,13 @@ use AppBundle\Document\File\ImeiUploadFile;
 use AppBundle\Document\File\ScreenUploadFile;
 use AppBundle\Document\Form\Cancel;
 use AppBundle\Document\Form\BillingDay;
+use AppBundle\Document\Form\Chargebacks;
 use AppBundle\Form\Type\BillingDayType;
 use AppBundle\Form\Type\CancelPolicyType;
 use AppBundle\Form\Type\BacsType;
 use AppBundle\Form\Type\ClaimType;
 use AppBundle\Form\Type\ClaimSearchType;
+use AppBundle\Form\Type\ChargebacksType;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\ImeiType;
 use AppBundle\Form\Type\NoteType;
@@ -379,6 +381,11 @@ class AdminEmployeeController extends BaseController
             ->getForm();
         $phoneForm = $this->get('form.factory')
             ->createNamedBuilder('phone_form', PhoneType::class, $policy)
+            ->getForm();
+        $chargebacks = new Chargebacks();
+        $chargebacks->setPolicy($policy);
+        $chargebacksForm = $this->get('form.factory')
+            ->createNamedBuilder('chargebacks_form', ChargebacksType::class, $chargebacks)
             ->getForm();
         $bacsPayment = new BacsPayment();
         $bacsPayment->setSource(Payment::SOURCE_ADMIN);
@@ -727,6 +734,28 @@ class AdminEmployeeController extends BaseController
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
+            } elseif ($request->request->has('chargebacks_form')) {
+                $chargebacksForm->handleRequest($request);
+                if ($chargebacksForm->isValid()) {
+                    if ($chargeback = $chargebacks->getChargeback()) {
+                        // To appear for the correct account month, should be when we assign
+                        // the chargeback to the policy
+                        $chargeback->setDate(new \DateTime());
+                        $policy->addPayment($chargeback);
+                        $dm->flush();
+                        $this->addFlash(
+                            'success',
+                            sprintf('Added chargeback %s to policy', $chargeback->getReference())
+                        );
+                    } else {
+                        $this->addFlash(
+                            'error',
+                            'Unknown chargeback'
+                        );
+                    }
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
             }
         }
         $checks = $fraudService->runChecks($policy);
@@ -752,6 +781,7 @@ class AdminEmployeeController extends BaseController
             'resend_email_form' => $resendEmailForm->createView(),
             'regenerate_policy_schedule_form' => $regeneratePolicyScheduleForm->createView(),
             'makemodel_form' => $makeModelForm->createView(),
+            'chargebacks_form' => $chargebacksForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),
