@@ -67,28 +67,28 @@ class UpdatePolicyStatusCommand extends BaseCommand
 
         // Unpaid Policies - Cancel
         $cancelled = $policyService->cancelUnpaidPolicies($prefix, $dryRun);
-        $copy = 'Cancelled Policy';
+        $copy = 'Unpaid cancelled policy';
         if ($dryRun) {
             $copy = 'Dry Run - Should cancel Policy (unpaid)';
         }
         foreach ($cancelled as $id => $number) {
             $lines[] = sprintf('%s %s / %s', $copy, $number, $id);
         }
-        $lines[] = sprintf('%s cancelled policies processed', count($cancelled));
+        $lines[] = sprintf('%s unpaid cancelled policies processed', count($cancelled));
         $ignoreLineCount++;
         $lines[] = '';
         $ignoreLineCount++;
 
         // Pending Cancellation Policies - Cancel
         $pendingCancellation = $policyService->cancelPoliciesPendingCancellation($prefix, $dryRun);
-        $copy = 'Pending Cancellation Policy';
+        $copy = 'User Requested Cancellation Policy';
         if ($dryRun) {
-            $copy = 'Dry Run - Should cancel Policy (pending cancellation)';
+            $copy = 'Dry Run - Should cancel Policy (user requested [pending] cancellation)';
         }
         foreach ($pendingCancellation as $id => $number) {
             $lines[] = sprintf('%s %s / %s', $copy, $number, $id);
         }
-        $lines[] = sprintf('%s pending cancellation policies processed', count($pendingCancellation));
+        $lines[] = sprintf('%s user requested (pending) cancellation policies processed', count($pendingCancellation));
         $ignoreLineCount++;
         $lines[] = '';
         $ignoreLineCount++;

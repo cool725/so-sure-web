@@ -21,6 +21,7 @@ use AppBundle\Document\Payment\SoSurePayment;
 use AppBundle\Document\Payment\PotRewardPayment;
 use AppBundle\Document\Payment\SoSurePotRewardPayment;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
+use AppBundle\Document\Payment\ChargebackPayment;
 
 class ReportingService
 {
@@ -584,6 +585,7 @@ class ReportingService
             'all' => Payment::sumPayments($payments, $isProd),
             'judo' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
             'sosure' => Payment::sumPayments($payments, $isProd, SoSurePayment::class),
+            'chargebacks' => Payment::sumPayments($payments, $isProd, ChargebackPayment::class),
             'bacs' => Payment::sumPayments($payments, $isProd, BacsPayment::class),
             'potReward' => Payment::sumPayments($potRewardPayments, $isProd, PotRewardPayment::class),
             'sosurePotReward' => Payment::sumPayments($soSurePotRewardPayments, $isProd, SoSurePotRewardPayment::class),
