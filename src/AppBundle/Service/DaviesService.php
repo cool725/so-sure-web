@@ -184,7 +184,10 @@ class DaviesService extends S3EmailService
     public function saveClaim($daviesClaim, $skipImeiUpdate)
     {
         if ($daviesClaim->hasError()) {
-            throw new \Exception(sprintf('Claim %s has error status. Skipping', $daviesClaim->claimNumber));
+            throw new \Exception(sprintf(
+                'Claim %s has error status. Skipping, but claim should not be in the export most likely.',
+                $daviesClaim->claimNumber
+            ));
         }
         $claim = $this->getClaim($daviesClaim);
         if (!$claim) {
@@ -435,12 +438,12 @@ class DaviesService extends S3EmailService
             }
         }
 
-        $twoMonthsAgo = new \DateTime();
-        $twoMonthsAgo = $twoMonthsAgo->sub(new \DateInterval('P2M'));
+        $threeMonthsAgo = new \DateTime();
+        $threeMonthsAgo = $threeMonthsAgo->sub(new \DateInterval('P3M'));
         if ($daviesClaim->isOpen() && $daviesClaim->replacementReceivedDate &&
-            $daviesClaim->replacementReceivedDate < $twoMonthsAgo) {
+            $daviesClaim->replacementReceivedDate < $threeMonthsAgo) {
             $msg = sprintf(
-                'Claim %s should be closed. Replacement was delivered more than 2 months ago on %s.',
+                'Claim %s should be closed. Replacement was delivered more than 3 months ago on %s.',
                 $daviesClaim->claimNumber,
                 $daviesClaim->replacementReceivedDate->format(\DateTime::ATOM)
             );
