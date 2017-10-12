@@ -537,6 +537,11 @@ class AdminEmployeeController extends BaseController
                         $imeiService->checkImei($policy->getPhone(), $policy->getImei(), $policy->getUser());
                         $policy->addCheckmendCertData($imeiService->getCertId(), $imeiService->getResponseData());
 
+                        // clear out the cache - if we're re-checking it likely
+                        // means that recipero has updated their data
+                        $imeiService->clearMakeModelCheckCache($policy->getSerialNumber());
+                        $imeiService->clearMakeModelCheckCache($policy->getImei());
+
                         $serialNumber = $policy->getSerialNumber();
                         if (!$serialNumber) {
                             $serialNumber= $policy->getImei();

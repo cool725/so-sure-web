@@ -686,6 +686,15 @@ class ReceperioService extends BaseImeiService
         return $this->validateSamePhone($phone, $serialNumber, $this->responseData, $warnMismatch);
     }
 
+    /**
+     * Delete the make model check cache
+     */
+    public function clearMakeModelCheckCache($serialNumber)
+    {
+        $key = sprintf(self::KEY_MAKEMODEL_FORMAT, $serialNumber);
+        $this->redis->del($key);
+    }
+
     public function runMakeModelCheck(
         $serialNumber,
         User $user = null
