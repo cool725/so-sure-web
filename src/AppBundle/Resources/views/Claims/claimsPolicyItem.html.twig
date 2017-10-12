@@ -792,6 +792,18 @@
                         {{ form_end(connect_form)}}
                     </td>
                 </tr>
+                <tr>
+                    <td><i class="fa fa-lock" title="Admin only"></i> Chargebacks</td>
+                    <td>
+                        {{ form_start(chargebacks_form, {'attr': {'class': 'form-inline'}}) }}
+                        <div class="form-group">
+                            {{ form_errors(chargebacks_form.chargeback) }}
+                            {{ form_widget(chargebacks_form.chargeback) }}
+                        </div>
+                        {{ form_widget(chargebacks_form.add, {'Add': 'Update', 'attr': {'class': 'btn btn-danger confirm-chargeback'}}) }}
+                        {{ form_end(chargebacks_form)}}
+                    </td>
+                </tr>                
               {% endif %}
             </table>
         </div>
@@ -828,6 +840,12 @@
                                 <i class="fa fa-smile-o"" title="so-sure Credit/Debit"></i>
                             {% elseif payment.type == 'bacs' %}
                                 <i class="fa fa-bank"" title="BACS"></i>
+                            {% elseif payment.type == 'chargeback' %}
+                                <i class="fa fa-reply"" title="Barclays Chargeback"></i>
+                            {% elseif payment.type == 'potReward' %}
+                                <i class="fa fa-gbp"" title="Pot Reward"></i>
+                            {% elseif payment.type == 'sosurePotReward' %}
+                                <i class="fa fa-gbp"" title="so-sure Pot Reward"></i>
                             {% else %}
                                 <i class="fa fa-question" title="Type: {{ payment.type }}"></i>
                             {% endif %}
@@ -843,6 +861,10 @@
                                 <i class="fa fa-android" title="Android Payment"></i>
                             {% elseif payment.source == 'sosure' %}
                                 <i class="fa fa-exchange" title="so-sure Auto Payment (not scheduled)"></i>
+                            {% elseif payment.source == 'system' %}
+                                <i class="fa fa-exchange" title="so-sure Auto Payment (not scheduled)"></i>
+                            {% elseif payment.source == 'admin' %}
+                                <i class="fa fa-user-plus" title="so-sure Admin"></i>
                             {% elseif payment.source == 'bacs' %}
                                 <i class="fa fa-bank" title="BACS"></i>
                             {% else %}
