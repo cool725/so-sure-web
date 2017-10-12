@@ -154,14 +154,11 @@ $(function(){
             sosure.selectPhoneMake.setFormActionVal(form, input);
         });
 
+        if (index == 0) {
+            // Focus Search Box if url param
+            if (window.location.href.indexOf('?quote=1') != -1) {
+                $(input).focus();
+            }
+        }
     });
-
-    // Focus Search Box if url param
-    if (window.location.href.indexOf('?quote=1') != -1) {
-        // Wait till page loads then focus
-        setTimeout(function(){
-            $('#search-phone-1').focus();
-        }, 1000);
-    }
-
 });
