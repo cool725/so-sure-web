@@ -75,6 +75,10 @@ class SCodeController extends BaseController
                 $code,
                 SixpackService::EXPERIMENT_SHARE_MESSAGE
             );
+            $this->get('app.sixpack')->convertByClientId(
+                $code,
+                SixpackService::EXPERIMENT_APP_SHARE_METHOD
+            );
         }
 
         if ($scode && $this->getUser()) {

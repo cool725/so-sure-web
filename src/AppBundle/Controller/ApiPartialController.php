@@ -76,6 +76,29 @@ class ApiPartialController extends BaseController
                     'option' => $experiment,
                     'text' => $text
                 ]);
+            } elseif ($name == SixpackService::EXPERIMENT_APP_SHARE_METHOD) {
+                $user = $this->getUser();
+                if (!$user || !$user instanceof User || !$user->hasActivePolicy()) {
+                    throw new NotFoundHttpException();
+                }
+                // all policies should have the same scode
+                $scode = $user->getPolicies()[0]->getStandardSCode();
+
+                $experiment = $sixpack->participate(
+                    SixpackService::EXPERIMENT_APP_SHARE_METHOD,
+                    [
+                        SixpackService::ALTERNATIVES_APP_SHARE_METHOD_NATIVE,
+                        SixpackService::ALTERNATIVES_APP_SHARE_METHOD_API
+                    ],
+                    false,
+                    1,
+                    $scode->getCode()
+                );
+
+                return new JsonResponse([
+                    'option' => $experiment,
+                    'text' => null,
+                ]);
             } else {
                 throw new NotFoundHttpException();
             }
@@ -111,6 +134,24 @@ class ApiPartialController extends BaseController
                 } else {
                     $experiment = $sixpack->convert(
                         SixpackService::EXPERIMENT_SHARE_MESSAGE
+                    );
+                }
+
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::SUCCESS,
+                    '',
+                    200
+                );
+            } elseif ($name == SixpackService::EXPERIMENT_APP_SHARE_METHOD) {
+                $id = $this->getRequestString($request, 'id');
+                if ($id) {
+                    $experiment = $sixpack->convertByClientId(
+                        $id,
+                        SixpackService::EXPERIMENT_APP_SHARE_METHOD
+                    );
+                } else {
+                    $experiment = $sixpack->convert(
+                        SixpackService::EXPERIMENT_APP_SHARE_METHOD
                     );
                 }
 
