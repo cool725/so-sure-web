@@ -35,6 +35,7 @@ class ClaimSearchType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
+            ->add('number', TextType::class, ['required' => false])
             ->add('status', ChoiceType::class, [
                 'multiple' => true,
                 'expanded' => true,

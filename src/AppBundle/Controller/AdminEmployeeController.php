@@ -1000,13 +1000,20 @@ class AdminEmployeeController extends BaseController
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(Claim::class);
-        $qb = $repo->createQueryBuilder()->sort('notificationDate', 'desc');
+        $qb = $repo->createQueryBuilder();
 
         $form = $this->createForm(ClaimSearchType::class, null, ['method' => 'GET']);
         $form->handleRequest($request);
-        $data = $form->get('status')->getData();
-        $qb = $qb->field('status')->in($data);
-
+        $status = $form->get('status')->getData();
+        $claimNumber = $form->get('number')->getData();
+        $qb = $qb->field('status')->in($status);
+        if (strlen($claimNumber) > 0) {
+            $qb = $qb->field('number')->equals(new MongoRegex(sprintf("/.*%s.*/i", $claimNumber)));
+        }
+        $qb = $qb->sort('replacementReceivedDate', 'desc')
+                ->sort('approvedDate', 'desc')
+                ->sort('lossDate', 'desc')
+                ->sort('notificationDate', 'desc');
         $pager = $this->pager($request, $qb);
         $phoneRepo = $dm->getRepository(Phone::class);
         $phones = $phoneRepo->findActive()->getQuery()->execute();
