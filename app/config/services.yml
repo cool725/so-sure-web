@@ -764,7 +764,9 @@ services:
     app.listener.mailer:
         class:  AppBundle\Listener\MailerListener
         # for now, comment out to avoid circular ref - add back once swift log emailer not in use
-        # arguments: ["@logger"]
+        arguments:
+            logger:   "@logger"
+            spoolDir: "%kernel.root_dir%/../app/spool/requeue"
         tags:
           - { name: monolog.logger, channel: mailer }
           - { name: "swiftmailer.default.plugin" }

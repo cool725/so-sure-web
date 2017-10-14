@@ -207,5 +207,6 @@ class EmailDebugCommand extends BaseCommand
             sprintf('AppBundle:Email:%s.txt.twig', $template),
             $data
         );
+        $output->writeln(sprintf('Queued email to %s', $email));
     }
 }
