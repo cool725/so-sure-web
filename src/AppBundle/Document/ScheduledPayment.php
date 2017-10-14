@@ -7,6 +7,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 use AppBundle\Document\Payment\Payment;
+use AppBundle\Classes\SoSure;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\ScheduledPaymentRepository")
@@ -126,6 +127,10 @@ class ScheduledPayment
 
     public function getScheduled()
     {
+        if ($this->scheduled) {
+            $this->scheduled->setTimezone(new \DateTimeZone(SoSure::TIMEZONE));
+        }
+
         return $this->scheduled;
     }
 
