@@ -819,7 +819,8 @@ class DaviesServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $claim = new Claim();
-        $claim->setApprovedDate(new \DateTime('2016-01-02'));
+        // 3 months!
+        $claim->setApprovedDate(new \DateTime('2016-04-01'));
         $policy->addClaim($claim);
 
         $daviesClaim = new DaviesClaim();
@@ -841,7 +842,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->replacementReceivedDate = new \DateTime('2016-01-01');
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $this->insureErrorExists('/should be closed. Replacement was delivered more than 2 months ago/');
+        $this->insureErrorExists('/should be closed. Replacement was delivered more than/');
 
         self::$daviesService->clearErrors();
 
