@@ -131,7 +131,14 @@
                         {% if policy.isPolicy %}
                         <tr>
                             <td>Policy Installments</td>
-                            <td>{{ policy.premiumInstallmentCount }} installment(s) of £{{ policy.premiumInstallmentPrice| number_format(2, '.', ',') }}</td>
+                            <td>
+                                {{ policy.premiumInstallmentCount }} installment(s) of £{{ policy.premiumInstallmentPrice| number_format(2, '.', ',') }}
+                                {% if policy.hasPolicyDiscountPresent %}
+                                    £{{ policy.premium.annualDiscount|number_format(2, '.', ',')}} discount applied for
+                                    11 monthly payments of £{{ policy.premium.getAdjustedStandardMonthlyPremiumPrice|number_format(2, '.', ',')}}
+                                    & 1 final monthly payment of £{{ policy.premium.getAdjustedFinalMonthlyPremiumPrice|number_format(2, '.', ',')}}
+                                {% endif %}
+                            </td>
                         </tr>
                         {% endif %}
                         {% if policy.hasCashback %}
