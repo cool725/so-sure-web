@@ -65,4 +65,25 @@ class ScheduledPaymentTest extends \PHPUnit_Framework_TestCase
         $scheduledPayment->setStatus(ScheduledPayment::STATUS_CANCELLED);
         $this->assertFalse($scheduledPayment->isBillable());
     }
+
+    public function testHasCorrectBillingDay()
+    {
+        $premium = new PhonePremium();
+        $policy = new SalvaPhonePolicy();
+        $policy->setBilling(new \DateTime('2017-01-15 15:00'));
+
+        $scheduledPayment = new ScheduledPayment();
+        $scheduledPayment->setType(ScheduledPayment::TYPE_SCHEDULED);
+        $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+        $scheduledPayment->setScheduled(new \DateTime('2017-02-15 12:00'));
+        $policy->addScheduledPayment($scheduledPayment);
+
+        $this->assertTrue($scheduledPayment->hasCorrectBillingDay());
+
+        $scheduledPayment->setScheduled(new \DateTime('2017-02-16 12:00'));
+        $this->assertFalse($scheduledPayment->hasCorrectBillingDay());
+
+        $scheduledPayment->setType(ScheduledPayment::TYPE_RESCHEDULED);
+        $this->assertNull($scheduledPayment->hasCorrectBillingDay());
+    }
 }
