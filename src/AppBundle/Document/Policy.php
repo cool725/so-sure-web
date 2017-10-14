@@ -3209,7 +3209,7 @@ abstract class Policy
         }
 
         // Standard pot reward
-        $standardPotValue = 0 - $this->getPotValue() - $this->getPromoPotValue();
+        $standardPotValue = 0 - ($this->getPotValue() - $this->getPromoPotValue());
         if ($potReward && !$this->areEqualToTwoDp($potReward->getAmount(), $standardPotValue)) {
             // pot changed (due to claim) - issue refund if applicable
             $reward = new PotRewardPayment();
