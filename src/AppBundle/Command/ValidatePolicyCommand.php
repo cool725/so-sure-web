@@ -356,11 +356,15 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         $scheduledPayments = $policy->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);
         $totalScheduledPayments = ScheduledPayment::sumScheduledPaymentAmounts($scheduledPayments);
 
+        // @codingStandardsIgnoreStart
         return sprintf(
-            'Total Premium £%0.2f Payments Made £%0.2f Scheduled Payments £%0.2f',
+            'Total Premium £%0.2f Payments Made £%0.2f (£%0.2f credited) Scheduled Payments £%0.2f Outstanding Premium £%0.2f',
             $policy->getYearlyPremiumPrice(),
             $policy->getTotalSuccessfulPayments($date),
-            $totalScheduledPayments
+            $policy->getPremiumPaid(),
+            $totalScheduledPayments,
+            $policy->getOutstandingPremium()
         );
+        // @codingStandardsIgnoreEnd
     }
 }
