@@ -122,7 +122,7 @@ class EmailDebugCommand extends BaseCommand
             $dm = $this->getManager();
             $repo = $dm->getRepository(Policy::class);
             $data = [
-                'policy' => $repo->findOneBy([]),
+                'policy' => $repo->findOneBy(['nextPolicy' => ['$ne' => null]]),
                 'additional_amount' => 10,
             ];
         } elseif (in_array($template, $templates['policyConnection'])) {
