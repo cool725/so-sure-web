@@ -41,7 +41,6 @@ class MailerListener implements Swift_Events_SendListener
             $result = 'Failed';
             $level = 'error';
             $respool = true;
-
         }
 
         if ($respool && $this->spoolPath) {
