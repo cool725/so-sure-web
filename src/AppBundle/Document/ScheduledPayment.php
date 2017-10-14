@@ -127,7 +127,9 @@ class ScheduledPayment
 
     public function getScheduled()
     {
-        $this->scheduled->setTimezone(new \DateTimeZone(SoSure::TIMEZONE));
+        if ($this->scheduled) {
+            $this->scheduled->setTimezone(new \DateTimeZone(SoSure::TIMEZONE));
+        }
 
         return $this->scheduled;
     }
