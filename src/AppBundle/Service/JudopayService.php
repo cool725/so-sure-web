@@ -26,6 +26,7 @@ use AppBundle\Event\PaymentEvent;
 use AppBundle\Exception\InvalidPremiumException;
 use AppBundle\Exception\PaymentDeclinedException;
 use AppBundle\Exception\ProcessedException;
+use AppBundle\Exception\SameDayPaymentException;
 
 class JudopayService
 {
@@ -652,7 +653,7 @@ class JudopayService
         }
     }
 
-    public function scheduledPayment(ScheduledPayment $scheduledPayment, $prefix = null, $date = null)
+    public function scheduledPayment(ScheduledPayment $scheduledPayment, $prefix = null, \DateTime $date = null)
     {
         if (!$scheduledPayment->getPolicy()->isValidPolicy($prefix)) {
             throw new \Exception(sprintf(
@@ -696,7 +697,16 @@ class JudopayService
                 ));
             }
 
-            $payment = $this->tokenPay($policy, $scheduledPayment->getAmount(), $scheduledPayment->getType());
+            $payment = $this->tokenPay(
+                $policy,
+                $scheduledPayment->getAmount(),
+                $scheduledPayment->getType(),
+                true,
+                $date
+            );
+        } catch (SameDayPaymentException $e) {
+            $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+            throw $e;
         } catch (\Exception $e) {
             // TODO: Nicer handling if Judo has an issue
             $this->logger->error(sprintf(
@@ -960,8 +970,33 @@ class JudopayService
         return $tokenPaymentDetails;
     }
 
-    protected function tokenPay(Policy $policy, $amount = null, $notes = null)
-    {
+    protected function tokenPay(
+        Policy $policy,
+        $amount = null,
+        $notes = null,
+        $abortOnMultipleSameDayPayment = true,
+        \DateTime $date = null
+    ) {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+        foreach ($policy->getAllPayments() as $payment) {
+            $diff = $date->diff($payment->getDate());
+            if ($payment instanceof JudoPayment && $payment->getAmount() > 0 &&
+                $diff->days == 0) {
+                $msg = sprintf(
+                    'Attempting to run addition payment for policy %s on the same day. %s',
+                    $policy->getId(),
+                    $abortOnMultipleSameDayPayment ? 'Aborting' : 'Please verify.'
+                );
+                if ($abortOnMultipleSameDayPayment) {
+                    throw new SameDayPaymentException($msg);
+                } else {
+                    $this->logger->warning($msg);
+                }
+            }
+        }
+
         if (!$amount) {
             $amount = $policy->getPremium()->getMonthlyPremiumPrice();
         }
@@ -1312,7 +1347,7 @@ class JudopayService
         $multiPay->getPayer()->addPayerPolicy($policy);
         $this->dm->flush();
 
-        $payment = $this->tokenPay($policy, $amount);
+        $payment = $this->tokenPay($policy, $amount, null, false);
         if (!$payment->isSuccess()) {
             return false;
         }
@@ -1352,7 +1387,7 @@ class JudopayService
             $policy->setPayer($policy->getUser());
         }
 
-        $payment = $this->tokenPay($policy, $amount);
+        $payment = $this->tokenPay($policy, $amount, null, false);
         if (!$payment->isSuccess()) {
             return false;
         }
