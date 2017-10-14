@@ -53,6 +53,8 @@ class EmailDebugCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $redis = $this->getContainer()->get('snc_redis.mailer');
+        $output->writeln(sprintf('%d emails in queue (prior to this)', $redis->llen('swiftmailer')));
         $env = $this->getContainer()->getParameter('kernel.environment');
         if (!in_array($env, ['vagrant', 'staging', 'testing'])) {
             throw new \Exception('Only able to run in vagrant/testing/staging environments');
@@ -132,23 +134,18 @@ class EmailDebugCommand extends BaseCommand
             $repo = $dm->getRepository(Policy::class);
             $policies = $repo->findBy(['nextPolicy' => ['$ne' => null]]);
             $policy = null;
-            $count = 0;
-            $rnd = rand(0, 5);
             foreach ($policies as $checkPolicy) {
                 if ($variation && $checkPolicy->getNextPolicy()->getPremiumPlan() != $variation) {
                     continue;
                 }
-                //if ($count == $rnd) {
-                    $policy = $checkPolicy;
-                    break;
-                //}
-                $count++;
+                $policy = $checkPolicy;
+                break;
             }
             if (!$policy) {
                 throw new \Exception(sprintf('Unable to find policy with a next policy for %s', $variation));
             }
             $data = [
-                'policy' => $policy,
+                'policy' => $policy->getNextPolicy(),
                 'additional_amount' => 10,
             ];
         } elseif (in_array($template, $templates['policyConnection'])) {

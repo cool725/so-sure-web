@@ -3670,6 +3670,8 @@ class PolicyServiceTest extends WebTestCase
         $claimA->setType(Claim::TYPE_LOSS);
         $policyA->addClaim($claimA);
 
+        $this->assertNotNull($policyA->getNextPolicy());
+        $this->assertNotNull($policyA->getNextPolicy()->getUser());
         static::$policyService->fullyExpire($policyA, new \DateTime('2017-01-29'));
         $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
         // use policyA->getNextPolicy to avoid having to flush/reload from db

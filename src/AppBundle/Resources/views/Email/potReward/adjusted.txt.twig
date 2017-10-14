@@ -4,7 +4,7 @@ Important information about your Reward Pot.
 
 **
 ------------------------------------------------------------
-Hi {{ policy.nextPolicy.user.name }},
+Hi {{ policy.user.name }},
 
 Your so-sure Reward Pot value has been updated as you or one of your connections have made a claim with us.
 
@@ -12,8 +12,8 @@ The claim has been successful and you’ve helped your connection replace their 
 
 As you have used your Reward Pot to discount your renewal policy, there is now an outstanding amount of £{{ additional_amount|number_format(2,'.',',') }} due on your renewal policy, which we have billed to your card on file.
 
-{% if policy.nextPolicy.premiumPlan == 'monthly' %}
-Additionally, as you are making monthly payments, we have adjusted your monthly bill to £{{ policy.nextPolicy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} which is the standard premium for your {{ policy.nextPolicy.phone }} without the reward pot discount.
+{% if policy.premiumPlan == 'monthly' %}
+Additionally, as you are making monthly payments, we have adjusted your monthly bill to £{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }} which is the standard premium for your {{ policy.phone }} without the reward pot discount.
 {% endif %}
 
 Changes in the Reward Pot values have been applied to all of the policyholders connected to this claimant.
