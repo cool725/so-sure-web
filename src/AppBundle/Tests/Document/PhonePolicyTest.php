@@ -3417,6 +3417,65 @@ class PhonePolicyTest extends WebTestCase
         $this->assertTrue($foundRenewalDiscount);
     }
 
+    public function testRenewActivateExpireWithPotPromo()
+    {
+        $policyA = $this->getPolicy(static::generateEmail('testRenewActivateExpireWithPotPromo-A', $this));
+        $policyB = $this->getPolicy(static::generateEmail('testRenewActivateExpireWithPotPromo-B', $this));
+        list($connectionA, $connectionB) = $this->createLinkedConnections($policyA, $policyB, 15, 15);
+
+        $this->assertEquals(15, $policyA->getPotValue());
+        $this->assertFalse($policyA->isRenewed());
+
+        $renewalPolicyA = $this->getRenewalPolicy($policyA);
+
+        $this->assertFalse($policyA->isRenewed());
+        $this->assertTrue($renewalPolicyA->isRenewalAllowed(false, new \DateTime('2016-12-15')));
+
+        $renewalPolicyA->renew(15, false, new \DateTime('2016-12-15'));
+
+        $this->assertTrue($policyA->isRenewed());
+
+        $policyA->expire(new \DateTime("2017-01-01"));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        $renewalPolicyA->activate(new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicyA->getStatus());
+        $this->assertEquals(10, $renewalPolicyA->getPotValue());
+
+        $policyA->fullyExpire(new \DateTime("2017-01-29"));
+        $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
+
+        $foundReward = false;
+        $foundSoSureReward = false;
+        foreach ($policyA->getAllPayments() as $payment) {
+            if ($payment instanceof PotRewardPayment) {
+                $this->assertEquals(-10, $payment->getAmount());
+                // only expected once
+                $this->assertFalse($foundReward);
+                $foundReward = true;
+            }
+            if ($payment instanceof SoSurePotRewardPayment) {
+                $this->assertEquals(-5, $payment->getAmount());
+                // only expected once
+                $this->assertFalse($foundSoSureReward);
+                $foundSoSureReward = true;
+            }
+        }
+
+        $this->assertTrue($foundReward);
+        $this->assertTrue($foundSoSureReward);
+
+        $foundRenewalDiscount = false;
+        foreach ($renewalPolicyA->getPayments() as $payment) {
+            if ($payment instanceof PolicyDiscountPayment) {
+                $this->assertEquals(15, $payment->getAmount());
+                $foundRenewalDiscount = true;
+            }
+        }
+
+        $this->assertTrue($foundRenewalDiscount);
+    }
+
     public function testAutoRenewActivateExpireWithPot()
     {
         $policyA = $this->getPolicy(static::generateEmail('testAutoRenewActivateExpireWithPot-A', $this));
@@ -3449,6 +3508,8 @@ class PhonePolicyTest extends WebTestCase
         foreach ($policyA->getAllPayments() as $payment) {
             if ($payment instanceof PotRewardPayment) {
                 $this->assertEquals(-10, $payment->getAmount());
+                // expected only once
+                $this->assertFalse($foundReward);
                 $foundReward = true;
             }
         }
@@ -3500,9 +3561,13 @@ class PhonePolicyTest extends WebTestCase
         $foundRefund = false;
         foreach ($policyA->getAllPayments() as $payment) {
             if ($payment instanceof PotRewardPayment && $payment->getAmount() == -10) {
+                // expected only once
+                $this->assertFalse($foundReward);
                 $foundReward = true;
             }
             if ($payment instanceof PotRewardPayment && $payment->getAmount() == 10) {
+                // expected only once
+                $this->assertFalse($foundRefund);
                 $foundRefund = true;
             }
         }
@@ -3514,9 +3579,13 @@ class PhonePolicyTest extends WebTestCase
         $foundRenewalRefund = false;
         foreach ($renewalPolicyA->getPayments() as $payment) {
             if ($payment instanceof PolicyDiscountPayment && $payment->getAmount() == 10) {
+                // expected only once
+                $this->assertFalse($foundRenewalDiscount);
                 $foundRenewalDiscount = true;
             }
             if ($payment instanceof PolicyDiscountPayment && $payment->getAmount() == -10) {
+                // expected only once
+                $this->assertFalse($foundRenewalRefund);
                 $foundRenewalRefund = true;
             }
         }
@@ -3584,9 +3653,13 @@ class PhonePolicyTest extends WebTestCase
         $foundRenewalRefund = false;
         foreach ($renewalPolicyA->getPayments() as $payment) {
             if ($payment instanceof PolicyDiscountPayment && $payment->getAmount() == 10) {
+                // expected only once
+                $this->assertFalse($foundRenewalDiscount);
                 $foundRenewalDiscount = true;
             }
             if ($payment instanceof PolicyDiscountPayment && $payment->getAmount() == -10) {
+                // expected only once
+                $this->assertFalse($foundRenewalRefund);
                 $foundRenewalRefund = true;
             }
         }
@@ -3625,9 +3698,13 @@ class PhonePolicyTest extends WebTestCase
         foreach ($policyA->getAllPayments() as $payment) {
             if ($payment instanceof PotRewardPayment) {
                 $this->assertEquals(-10, $payment->getAmount());
+                // expected only once
+                $this->assertFalse($foundReward);
                 $foundReward = true;
             }
             if ($payment instanceof PolicyDiscountPayment) {
+                // expected only once
+                $this->assertFalse($foundDiscount);
                 $foundDiscount = true;
             }
         }
@@ -3906,10 +3983,14 @@ class PhonePolicyTest extends WebTestCase
         foreach ($updatedPolicyA->getAllPayments() as $payment) {
             if ($payment instanceof SoSurePotRewardPayment) {
                 $this->assertTrue($this->areEqualToTwoDp(-5, $payment->getAmount()));
+                // expected only once
+                $this->assertFalse($foundSoSure);
                 $foundSoSure = true;
             }
             if ($payment instanceof PotRewardPayment) {
                 $this->assertTrue($this->areEqualToTwoDp(-10, $payment->getAmount()));
+                // expected only once
+                $this->assertFalse($foundPot);
                 $foundPot = true;
             }
         }
@@ -3954,15 +4035,23 @@ class PhonePolicyTest extends WebTestCase
         $foundPotRefund = false;
         foreach ($updatedPolicyA->getAllPayments() as $payment) {
             if ($payment instanceof SoSurePotRewardPayment && $payment->getAmount() == -5) {
+                // expected only once
+                $this->assertFalse($foundSoSure);
                 $foundSoSure = true;
             }
             if ($payment instanceof SoSurePotRewardPayment && $payment->getAmount() == 5) {
+                // expected only once
+                $this->assertFalse($foundSoSureRefund);
                 $foundSoSureRefund = true;
             }
             if ($payment instanceof PotRewardPayment && $payment->getAmount() == -10) {
+                // expected only once
+                $this->assertFalse($foundPot);
                 $foundPot = true;
             }
             if ($payment instanceof PotRewardPayment && $payment->getAmount() == 10) {
+                // expected only once
+                $this->assertFalse($foundPotRefund);
                 $foundPotRefund = true;
             }
         }
@@ -4007,10 +4096,14 @@ class PhonePolicyTest extends WebTestCase
         $foundPot = false;
         foreach ($updatedPolicyA->getAllPayments() as $payment) {
             if ($payment instanceof SoSurePotRewardPayment) {
+                // expected only once
+                $this->assertFalse($foundSoSure);
                 $foundSoSure = true;
             }
             if ($payment instanceof PotRewardPayment) {
                 $this->assertTrue($this->areEqualToTwoDp(-10, $payment->getAmount()));
+                // expected only once
+                $this->assertFalse($foundPot);
                 $foundPot = true;
             }
         }
