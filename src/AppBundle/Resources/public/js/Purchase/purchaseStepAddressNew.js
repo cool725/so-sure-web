@@ -212,21 +212,24 @@ $(function(){
         if (!addr) {
             return;
         }
+        var address = '';
         if (addr.Line1) {
-            $('.addressLine1').val(addr.Line1);
+            //$('.addressLine1').val(addr.Line1);
+            address = addr.Line1;
         }
         if (addr.Line2) {
-            $('.addressLine2').val(addr.Line2);
+            //$('.addressLine2').val(addr.Line2);
         }
         if (addr.Line3) {
-            $('.addressLine3').val(addr.Line3);
+            //$('.addressLine3').val(addr.Line3);
         }
         if (addr.City) {
-            $('.city').val(addr.City);
+            //$('.city').val(addr.City);
         }
         if (addr.PostalCode) {
-            $('.postcode').val(addr.PostalCode);
+            //$('.postcode').val(addr.PostalCode);
         }
+        $('#display-address').html(address);
     }
 
     var capture = new Bloodhound({

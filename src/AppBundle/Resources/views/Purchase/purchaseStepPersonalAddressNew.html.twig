@@ -165,11 +165,21 @@
                         <div class="address-search" style="{% if showAddress %}display: none;{% endif %}">
                             <div class="form-group {% if is_postback %}has-error{% endif %}">
                                 <label class="sr-only">Billing Address:</label>
-                                <input class="typeahead form-control" type="text" placeholder="Enter postcode to find address..." {% if not showAddress %} required="required" {% endif %}>
+                                {% if postcode == 'split' %}
+                                    <div class="form-inline">
+                                      <input type="form-control form-inline" type="text" placeholder="House Number">
+                                        <input type="form-control form-inline" type="text" placeholder="Postcode">
+                                    </div>
+                                {% else %}
+                                    <input class="typeahead form-control" type="text" placeholder="{% if postcode == 'type' %}Type your address (eg. 10 Downing Street, SW1A 2AA){% elseif postcode == 'comma' %}House Number, Postcode (eg. 10, SW1A 2AA){% endif %}" {% if not showAddress %} required="required" {% endif %}>
+                                {% endif %}
                                 {% if is_postback %}
                                     <div class="help-block with-errors"><ul><li>Your address is required</li></ul></div>
                                 {% endif %}
+                                <a id="address-enter" href="#">Enter address manually</a>
                             </div>
+                            <span id="display-address">
+                            </span>
                             <span class="help-block text-center">
                                 <a id="address-manual" href="#" class="btn btn-green btn-block btn-pad">Continue</a>
                             </span>

@@ -231,6 +231,7 @@ class PurchaseController extends BaseController
                 ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
                 ['memory' => 'asc']
             ) : null,
+            'postcode' => $this->sixpack($request, SixpackService::EXPERIMENT_POSTCODE, ['comma', 'split', 'type']),
         );
 
         return $this->render('AppBundle:Purchase:purchaseStepPersonalAddressNew.html.twig', $data);
