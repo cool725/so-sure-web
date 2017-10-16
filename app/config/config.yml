@@ -426,6 +426,7 @@ nelmio_security:
                 - https://*.licdn.com # linkedin
                 - https://*.linkedin.com
                 - https://sdk.accountkit.com
+                - https://*.doubleclick.net
                 # linked in
                 - https://secure.adnxs.com
                 - https://www.workable.com
