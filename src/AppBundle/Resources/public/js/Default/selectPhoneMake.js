@@ -107,12 +107,6 @@ $(function(){
 
     var $typeahead = $('[id^=search-phone-form]');
 
-    // Needs work
-    // if(window.location.href.indexOf('?quote=1') != -1) {
-    //     $('.search-phone:first').focus();
-    //     sosure.track.byName('Get A Quote Link');
-    // }
-
     $.each($typeahead, function (index, typeahead){
 
         var form    = $(this);
@@ -160,6 +154,11 @@ $(function(){
             sosure.selectPhoneMake.setFormActionVal(form, input);
         });
 
+        if (index == 0) {
+            // Focus Search Box if url param
+            if (window.location.href.indexOf('?quote=1') != -1) {
+                $(input).focus();
+            }
+        }
     });
-
 });
