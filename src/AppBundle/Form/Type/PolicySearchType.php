@@ -81,6 +81,8 @@ class PolicySearchType extends AbstractType
                     ]
                 ]
             ])
+            ->add('serial', TextType::class, ['required' => false])
+            ->add('id', TextType::class, ['required' => false])
             ->add('invalid', CheckboxType::class, ['required' => false])
             ->add('search', SubmitType::class)
         ;
@@ -96,6 +98,8 @@ class PolicySearchType extends AbstractType
             $form->get('status')->setData($currentRequest->query->get('status'));
             $form->get('imei')->setData($currentRequest->query->get('imei'));
             $form->get('facebookId')->setData($currentRequest->query->get('facebookId'));
+            $form->get('serial')->setData($currentRequest->query->get('serial'));
+            $form->get('id')->setData($currentRequest->query->get('id'));
             if ($currentRequest->query->get('invalid') !== null) {
                 $form->get('invalid')->setData((bool) $currentRequest->query->get('invalid'));
             } else {

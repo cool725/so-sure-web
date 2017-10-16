@@ -773,6 +773,8 @@ abstract class BaseController extends Controller
 
         $this->formToMongoSearch($form, $policiesQb, 'policy', 'policyNumber');
         $this->formToMongoSearch($form, $policiesQb, 'imei', 'imei');
+        $this->formToMongoSearch($form, $policiesQb, 'id', '_id', false, true);
+        $this->formToMongoSearch($form, $policiesQb, 'serial', 'serialNumber');
         if (!$includeInvalidPolicies) {
             $policy = new PhonePolicy();
             $search = sprintf('%s/', $policy->getPolicyNumberPrefix());
