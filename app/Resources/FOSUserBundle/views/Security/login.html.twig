@@ -63,6 +63,12 @@
     <div class="form-group">
         <a href="#" onclick="fb_login();" class="btn btn-facebook btn-block"><i class="fa fa-facebook-official"></i> &nbsp;Login with Facebook</a>
     </div>
+
+    {% if feature_enabled('starling') %}
+    <div class="form-group">
+        <a href="/login/starling"><img src="{{ cdn_url }}/images/Starling-Button.png" width="100%"></a>
+    </div>
+    {% endif %}
 </div>
 
 <script src="https://sdk.accountkit.com/en_US/sdk.js"></script>

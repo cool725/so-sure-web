@@ -16,6 +16,7 @@ class Feature
     const FEATURE_PICSURE = 'picsure';
     const FEATURE_PAYMENT_PROBLEM_INTERCOM = 'payment-problem-intercom';
     const FEATURE_DAVIES_IMPORT_ERROR_EMAIL = 'davies-import-error-email';
+    const FEATURE_STARLING = 'starling';
 
     public static $features = [
         self::FEATURE_QUOTE_LEAD,
@@ -23,6 +24,7 @@ class Feature
         self::FEATURE_PICSURE,
         self::FEATURE_PAYMENT_PROBLEM_INTERCOM,
         self::FEATURE_DAVIES_IMPORT_ERROR_EMAIL,
+        self::FEATURE_STARLING,
     ];
 
     /**

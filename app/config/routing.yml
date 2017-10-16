@@ -76,6 +76,9 @@ hwi_oauth_connect:
 facebook_login:
     path: /login/check-facebook
 
+starling_login:
+    path: /login/check-starling
+
 redirect_homepage:
     path: /index.html
     defaults:

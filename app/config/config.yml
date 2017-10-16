@@ -156,6 +156,7 @@ hwi_oauth:
         properties:
             # these properties will be used/redefined later in the custom FOSUBUserProvider service.
             facebook: facebook_id
+            starling: starlingId
     resource_owners:
         facebook:
             type:                facebook
@@ -171,6 +172,27 @@ hwi_oauth:
                 email:     email
                 firstname: first_name
                 lastname:  last_name
+        starling:
+            type:              oauth2
+            class:             'AppBundle\Classes\StarlingResourceOwner'
+            client_id:         '%starling_client_id%'
+            client_secret:     '%starling_client_secret%'
+            scope:             'customer:read'
+            authorization_url: '%starling_auth_url%'
+            access_token_url:  '%starling_token_url%'
+            infos_url:         '%starling_info_url%'
+            options:
+                    csrf: true
+                    use_bearer_authorization: true
+            paths:
+                identifier: customerUid
+                username: customerUid
+                nickname: firstName
+                realname: firstName
+                firstname: firstName
+                lastname: lastName
+                email: email
+
 jms_di_extra:
     locations:
         all_bundles: false
@@ -694,6 +716,7 @@ nelmio_security:
             - facebook.com
             - sosure.test-app.link
             - bnc.lt
+            - starlingbank.com
 
     # forced HTTPS handling, don't combine with flexible mode
     # and make sure you have SSL working on your site before enabling this

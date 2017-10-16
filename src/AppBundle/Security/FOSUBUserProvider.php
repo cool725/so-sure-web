@@ -8,6 +8,7 @@ use AppBundle\Service\FacebookService;
 use HWI\Bundle\OAuthBundle\Security\Core\Exception\AccountNotLinkedException;
 use AppBundle\Validator\Constraints\AlphanumericValidator;
 use Symfony\Component\HttpFoundation\RequestStack;
+use AppBundle\Validator\Constraints\UkMobileValidator;
 
 class FOSUBUserProvider extends BaseClass
 {
@@ -53,10 +54,18 @@ class FOSUBUserProvider extends BaseClass
      */
     public function loadUserByOAuthUserResponse(UserResponseInterface $response)
     {
+        $service = $response->getResourceOwner()->getName();
         $username = $response->getUsername();
         $search = $this->getProperty($response);
-        if ($search == "facebook_id") {
-            $search = "facebookId";
+        #if ($search == "facebook_id") {
+        #    $search = "facebookId";
+        #}
+        if (!$username || !$search || strlen(trim($username)) == 0 || strlen(trim($search)) == 0) {
+            // if username or search is empty, it could return the first in the db
+            throw new \Exception(sprintf(
+                'Unable to detect search %s',
+                json_encode($response->getResponse())
+            ));
         }
         $user = $this->userManager->findUserBy(array($search => $username));
         //when the user is registrating
@@ -78,7 +87,6 @@ class FOSUBUserProvider extends BaseClass
 
                 throw new AccountNotLinkedException($msg);
             }
-            $service = $response->getResourceOwner()->getName();
             $setter = 'set'.ucfirst($service);
             $setter_id = $setter.'Id';
             $setter_token = $setter.'AccessToken';
@@ -90,6 +98,20 @@ class FOSUBUserProvider extends BaseClass
             $user->setEmail($response->getEmail());
             $user->setFirstName($this->conformAlphanumeric(explode(' ', $response->getFirstName())[0], 50));
             $user->setLastName($this->conformAlphanumeric(explode(' ', $response->getLastName())[0], 50));
+
+            // Starling
+            if ($service == 'starling') {
+                if (isset($response->getResponse()['dateOfBirth'])) {
+                    $birthday = \DateTime::createFromFormat('Y-m-d', $response->getResponse()['dateOfBirth']);
+                    $birthday = $birthday->setTime(0, 0, 0);
+                    $user->setBirthday($birthday);
+                }
+                if (isset($response->getResponse()['phone'])) {
+                    $validator = new UkMobileValidator();
+                    $user->setMobileNumber($validator->conform($response->getResponse()['phone']));
+                }
+            }
+
             $user->setEnabled(true);
 
             $this->userManager->updateUser($user);

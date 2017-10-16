@@ -147,6 +147,22 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     /**
      * @AppAssert\Token()
+     * @Assert\Length(min="0", max="100")
+     * @MongoDB\Field(type="string")
+     * @MongoDB\Index(unique=true, sparse=true)
+     * @Gedmo\Versioned
+     */
+    protected $starlingId;
+
+    /**
+     * @AppAssert\Token()
+     * @Assert\Length(min="0", max="500")
+     * @MongoDB\Field(type="string")
+     */
+    protected $starlingAccessToken;
+
+    /**
+     * @AppAssert\Token()
      * @Assert\Length(min="1", max="250")
      * @MongoDB\Field(type="string")
      * @MongoDB\Index(unique=true, sparse=true)
@@ -371,6 +387,21 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function setFacebookId($facebookId)
     {
         $this->facebookId = $facebookId;
+    }
+
+    public function setStarlingId($starlingId)
+    {
+        $this->starlingId = $starlingId;
+    }
+
+    public function setStarlingAccessToken($starlingAccessToken)
+    {
+        $this->starlingAccessToken = $starlingAccessToken;
+    }
+
+    public function getStarlingAccessToken()
+    {
+        return $this->starlingAccessToken;
     }
 
     public function getReferralId()

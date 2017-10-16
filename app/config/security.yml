@@ -45,6 +45,7 @@ security:
             oauth:
                 resource_owners:
                     facebook:           "/login/check-facebook"
+                    starling:           "/login/check-starling"
                 login_path:        /login
                 check_path:        /login
                 use_forward:       false
