@@ -3078,12 +3078,14 @@ abstract class Policy
             // Promo pot reward
             if ($this->greaterThanZero($this->getPromoPotValue())) {
                 $reward = new SoSurePotRewardPayment();
+                $reward->setDate(clone $date);
                 $reward->setAmount($this->toTwoDp(0 - $this->getPromoPotValue()));
                 $this->addPayment($reward);
             }
 
             // Normal pot reward
             $reward = new PotRewardPayment();
+            $reward->setDate(clone $date);
             $reward->setAmount($this->toTwoDp(0 - ($this->getPotValue() - $this->getPromoPotValue())));
             $this->addPayment($reward);
 
@@ -3099,7 +3101,7 @@ abstract class Policy
 
             if ($this->hasCashback()) {
                 // TODO: Should we be checking cashback status?
-                $this->getCashback()->setDate(new \DateTime());
+                $this->getCashback()->setDate(clone $date);
                 $this->getCashback()->setStatus(Cashback::STATUS_PENDING_CLAIMABLE);
                 $this->getCashback()->setAmount($this->getPotValue());
             } elseif ($this->isRenewalPending() || $this->isRenewed()) {
@@ -3108,7 +3110,7 @@ abstract class Policy
                 if ($this->getNextPolicy()->getStart()) {
                     $discount->setDate($this->getNextPolicy()->getStart());
                 } else {
-                    $discount->setDate($date);
+                    $discount->setDate(clone $date);
                 }
                 $this->getNextPolicy()->addPayment($discount);
             } else {
@@ -3116,7 +3118,7 @@ abstract class Policy
                 // so money was in the pot but user has completely ignored
                 // create a cashback entry and try to find the user
                 $cashback = new Cashback();
-                $cashback->setDate(new \DateTime());
+                $cashback->setDate(clone $date);
                 $cashback->setStatus(Cashback::STATUS_MISSING);
                 $cashback->setAmount($this->getPotValue());
                 $this->setCashback($cashback);
@@ -3126,7 +3128,7 @@ abstract class Policy
             if ($this->hasCashback()) {
                 // If there's no money in the pot, then someone has claimed - so cashback is rejected
                 $this->getCashback()->setStatus(Cashback::STATUS_CLAIMED);
-                $this->getCashback()->setDate(new \DateTime());
+                $this->getCashback()->setDate(clone $date);
             }
         }
 
@@ -3183,7 +3185,7 @@ abstract class Policy
             $this->updatePotValue();
             if ($this->hasCashback()) {
                 $this->getCashback()->setAmount($this->getPotValue());
-                $this->getCashback()->setDate(new \DateTime());
+                $this->getCashback()->setDate(clone $date);
             }
 
             return;
@@ -3201,15 +3203,17 @@ abstract class Policy
         if ($promoPotReward && !$this->areEqualToTwoDp($promoPotReward->getAmount(), $promoPotValue)) {
             // pot changed (due to claim) - issue refund if applicable
             $reward = new SoSurePotRewardPayment();
+            $reward->setDate(clone $date);
             $reward->setAmount($this->toTwoDp($promoPotValue - $promoPotReward->getAmount()));
             $this->addPayment($reward);
         }
 
         // Standard pot reward
-        $standardPotValue = 0 - $this->getPotValue() - $this->getPromoPotValue();
+        $standardPotValue = 0 - ($this->getPotValue() - $this->getPromoPotValue());
         if ($potReward && !$this->areEqualToTwoDp($potReward->getAmount(), $standardPotValue)) {
             // pot changed (due to claim) - issue refund if applicable
             $reward = new PotRewardPayment();
+            $reward->setDate(clone $date);
             $reward->setAmount($this->toTwoDp($standardPotValue - $potReward->getAmount()));
             $this->addPayment($reward);
         }
@@ -3217,7 +3221,7 @@ abstract class Policy
         // Ensure cashback has the correct amount
         if ($this->hasCashback()) {
             $this->getCashback()->setAmount($this->getPotValue());
-            $this->getCashback()->setDate(new \DateTime());
+            $this->getCashback()->setDate(clone $date);
         }
 
         if ($this->getNextPolicy()) {
@@ -3225,7 +3229,7 @@ abstract class Policy
             if ($discount && !$this->areEqualToTwoDp($discount->getAmount(), $this->getPotValue())) {
                 // pot changed (due to claim) - issue refund if applicable
                 $adjustedDiscount = new PolicyDiscountPayment();
-                $adjustedDiscount->setDate($date);
+                $adjustedDiscount->setDate(clone $date);
                 $adjustedDiscount->setAmount($this->toTwoDp($this->getPotValue() - $discount->getAmount()));
                 $this->getNextPolicy()->addPayment($adjustedDiscount);
                 $this->getNextPolicy()->getPremium()->setAnnualDiscount($this->getPotValue());

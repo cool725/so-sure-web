@@ -22,6 +22,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Payment\Payment;
+use AppBundle\Document\Payment\ChargebackPayment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Payment\SoSurePayment;
@@ -40,12 +41,14 @@ use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\File\S3File;
 use AppBundle\Document\File\JudoFile;
 use AppBundle\Document\File\BarclaysFile;
+use AppBundle\Document\File\BarclaysStatementFile;
 use AppBundle\Document\File\LloydsFile;
 use AppBundle\Document\Form\Cancel;
 use AppBundle\Form\Type\CancelPolicyType;
 use AppBundle\Form\Type\ClaimType;
 use AppBundle\Form\Type\CashbackSearchType;
 use AppBundle\Form\Type\ClaimFlagsType;
+use AppBundle\Form\Type\ChargebackType;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\ImeiType;
 use AppBundle\Form\Type\NoteType;
@@ -57,6 +60,7 @@ use AppBundle\Form\Type\PhoneSearchType;
 use AppBundle\Form\Type\JudoFileType;
 use AppBundle\Form\Type\FacebookType;
 use AppBundle\Form\Type\BarclaysFileType;
+use AppBundle\Form\Type\BarclaysStatementFileType;
 use AppBundle\Form\Type\LloydsFileType;
 use AppBundle\Form\Type\PendingPolicyCancellationType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -346,11 +350,15 @@ class AdminController extends BaseController
         $snappyPdf = $this->get('knp_snappy.pdf');
         $snappyPdf->setOption('orientation', 'Portrait');
         $snappyPdf->setOption('page-size', 'A4');
+        $reportingService = $this->get('app.reporting');
         $html = $templating->render('AppBundle:Pdf:adminAccounts.html.twig', [
             'year' => $year,
             'month' => $month,
-            'paymentTotals' => $this->get('app.reporting')->getAllPaymentTotals($this->isProduction(), $date),
-            'activePolicies' => $this->get('app.reporting')->getActivePoliciesCount($date),
+            'paymentTotals' => $reportingService->getAllPaymentTotals($this->isProduction(), $date),
+            'activePolicies' => $reportingService->getActivePoliciesCount($date),
+            'activePoliciesWithDiscount' => $reportingService->getActivePoliciesWithPolicyDiscountCount($date),
+            'rewardPotLiability' => $reportingService->getRewardPotLiability($date),
+            'rewardPromoPotLiability' => $reportingService->getRewardPotLiability($date, true),
         ]);
 
         return new Response(
@@ -417,6 +425,7 @@ class AdminController extends BaseController
             'activePolicies' => $reportingService->getActivePoliciesCount($date),
             'activePoliciesWithDiscount' => $reportingService->getActivePoliciesWithPolicyDiscountCount($date),
             'rewardPotLiability' => $reportingService->getRewardPotLiability($date),
+            'rewardPromoPotLiability' => $reportingService->getRewardPotLiability($date, true),
             'files' => $s3FileRepo->getAllFiles($date),
         ];
     }
@@ -439,6 +448,7 @@ class AdminController extends BaseController
 
         $dm = $this->getManager();
         $paymentRepo = $dm->getRepository(Payment::class);
+        $barclaysStatementFileRepo = $dm->getRepository(BarclaysStatementFile::class);
         $barclaysFileRepo = $dm->getRepository(BarclaysFile::class);
         $lloydsFileRepo = $dm->getRepository(LloydsFile::class);
 
@@ -454,6 +464,10 @@ class AdminController extends BaseController
         $barclaysFile = new BarclaysFile();
         $barclaysForm = $this->get('form.factory')
             ->createNamedBuilder('barclays', BarclaysFileType::class, $barclaysFile)
+            ->getForm();
+        $barclaysStatementFile = new BarclaysStatementFile();
+        $barclaysStatementForm = $this->get('form.factory')
+            ->createNamedBuilder('barclays_statement', BarclaysStatementFileType::class, $barclaysStatementFile)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
@@ -486,6 +500,24 @@ class AdminController extends BaseController
                     $data = $barclaysService->processCsv($barclaysFile);
 
                     $dm->persist($barclaysFile);
+                    $dm->flush();
+
+                    return $this->redirectToRoute('admin_banking_date', [
+                        'year' => $date->format('Y'),
+                        'month' => $date->format('n'),
+                    ]);
+                }
+            } elseif ($request->request->has('barclays_statement')) {
+                $barclaysStatementForm->handleRequest($request);
+                if ($barclaysStatementForm->isSubmitted() && $barclaysStatementForm->isValid()) {
+                    $dm = $this->getManager();
+                    $barclaysStatementFile->setBucket('admin.so-sure.com');
+                    $barclaysStatementFile->setKeyFormat($this->getParameter('kernel.environment') . '/upload/%s');
+
+                    $barclaysService = $this->get('app.barclays');
+                    $data = $barclaysService->processStatementCsv($barclaysStatementFile);
+
+                    $dm->persist($barclaysStatementFile);
                     $dm->flush();
 
                     return $this->redirectToRoute('admin_banking_date', [
@@ -531,6 +563,7 @@ class AdminController extends BaseController
         return [
             'lloydsForm' => $lloydsForm->createView(),
             'barclaysForm' => $barclaysForm->createView(),
+            'barclaysStatementForm' => $barclaysStatementForm->createView(),
             'year' => $year,
             'month' => $month,
             'days_in_month' => cal_days_in_month(CAL_GREGORIAN, $month, $year),
@@ -545,6 +578,7 @@ class AdminController extends BaseController
             'dailyLloydsProcessing' => $dailyLloydsProcessing,
             'dailyReceived' => $dailyReceived,
             'barclaysFiles' => $barclaysFiles,
+            'barclaysStatementFiles' => [],
             'lloydsFiles' => $lloydsFiles,
         ];
     }
@@ -788,6 +822,67 @@ class AdminController extends BaseController
             'month' => $month,
             'cashback' => $qb->getQuery()->execute(),
             'cashback_search_form' => $cashbackSearchForm->createView(),
+        ];
+    }
+
+    /**
+     * @Route("/chargeback", name="admin_chargeback")
+     * @Route("/chargeback/{year}/{month}", name="admin_chargeback_date")
+     * @Template
+     */
+    public function chargebackAction(Request $request, $year = null, $month = null)
+    {
+        $now = new \DateTime();
+        if (!$year) {
+            $year = $now->format('Y');
+        }
+        if (!$month) {
+            $month = $now->format('m');
+        }
+
+        $dm = $this->getManager();
+        $chargeback = new ChargebackPayment();
+        $chargeback->setSource(Payment::SOURCE_ADMIN);
+        $chargebackForm = $this->get('form.factory')
+            ->createNamedBuilder('chargeback_form', ChargebackType::class, $chargeback)
+            ->getForm();
+
+        if ($request->request->has('chargeback_form')) {
+            $chargebackForm->handleRequest($request);
+            if ($chargebackForm->isValid()) {
+                $chargeback->setAmount(0 - abs($chargeback->getAmount()));
+                $dm->persist($chargeback);
+                $dm->flush();
+                $this->addFlash(
+                    'success',
+                    sprintf('Added chargeback %s', $chargeback->getReference())
+                );
+            } else {
+                $this->addFlash(
+                    'error',
+                    'Error adding chargeback'
+                );
+            }
+        }
+
+        $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
+        $nextMonth = clone $date;
+        $nextMonth = $nextMonth->add(new \DateInterval('P1M'));
+
+        $repo = $dm->getRepository(ChargebackPayment::class);
+        $qb = $repo->createQueryBuilder();
+        if ($request->get('_route') == 'admin_chargeback_date') {
+            $qb = $qb->field('date')->gte($this->startOfDay($date));
+            $qb = $qb->field('date')->lt($this->startOfDay($nextMonth));
+        } else {
+            $qb = $qb->field('policy')->equals(null);
+        }
+
+        return [
+            'year' => $year,
+            'month' => $month,
+            'chargebacks' => $qb->getQuery()->execute(),
+            'chargeback_form' => $chargebackForm->createView(),
         ];
     }
 }

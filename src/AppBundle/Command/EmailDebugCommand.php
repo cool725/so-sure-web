@@ -53,6 +53,13 @@ class EmailDebugCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $redis = $this->getContainer()->get('snc_redis.mailer');
+        $output->writeln(sprintf('%d emails in queue (prior to this)', $redis->llen('swiftmailer')));
+        $env = $this->getContainer()->getParameter('kernel.environment');
+        if (!in_array($env, ['vagrant', 'staging', 'testing'])) {
+            throw new \Exception('Only able to run in vagrant/testing/staging environments');
+        }
+
         $template = $input->getArgument('template');
         $email = $input->getOption('email');
         $options = true === $input->getOption('options');
@@ -85,6 +92,10 @@ class EmailDebugCommand extends BaseCommand
                 'noPotIncrease',
                 'noPotDecrease',
             ],
+            'potReward' => [
+                'monthly',
+                'yearly',
+            ]
         ];
 
         if ($options) {
@@ -121,8 +132,20 @@ class EmailDebugCommand extends BaseCommand
         } elseif (in_array($template, $templates['potReward'])) {
             $dm = $this->getManager();
             $repo = $dm->getRepository(Policy::class);
+            $policies = $repo->findBy(['nextPolicy' => ['$ne' => null]]);
+            $policy = null;
+            foreach ($policies as $checkPolicy) {
+                if ($variation && $checkPolicy->getNextPolicy()->getPremiumPlan() != $variation) {
+                    continue;
+                }
+                $policy = $checkPolicy;
+                break;
+            }
+            if (!$policy) {
+                throw new \Exception(sprintf('Unable to find policy with a next policy for %s', $variation));
+            }
             $data = [
-                'policy' => $repo->findOneBy([]),
+                'policy' => $policy->getNextPolicy(),
                 'additional_amount' => 10,
             ];
         } elseif (in_array($template, $templates['policyConnection'])) {
@@ -184,5 +207,6 @@ class EmailDebugCommand extends BaseCommand
             sprintf('AppBundle:Email:%s.txt.twig', $template),
             $data
         );
+        $output->writeln(sprintf('Queued email to %s', $email));
     }
 }

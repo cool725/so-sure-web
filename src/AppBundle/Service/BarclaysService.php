@@ -3,11 +3,15 @@ namespace AppBundle\Service;
 
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use AppBundle\Document\DateTrait;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\Payment\JudoPayment;
+use AppBundle\Document\Payment\ChargebackPayment;
+use AppBundle\Document\Payment\Payment;
 
 class BarclaysService
 {
+    use DateTrait;
     use CurrencyTrait;
 
     /** @var LoggerInterface */
@@ -149,5 +153,76 @@ class BarclaysService
         $barclaysFile->setDailyProcessing($data['dailyProcessing']);
 
         return $data;
+    }
+
+    public function processStatementCsv($barclaysStatementFile)
+    {
+        $repo = $this->dm->getRepository(ChargebackPayment::class);
+
+        $filename = $barclaysStatementFile->getFile();
+
+        $header = null;
+        $lines = array();
+        $chargebacks = array();
+
+        $invoiceTotal = 0;
+        $transactionTotal = 0;
+        $date = null;
+
+        if (($handle = fopen($filename, 'r')) !== false) {
+            while (($row = fgetcsv($handle, 1000)) !== false) {
+                if (!$header) {
+                    $updatedRow = [];
+                    foreach ($row as $item) {
+                        // there are a few (£) items that don't import properly, so strip out
+                        $updatedRow[] = trim(preg_replace('/\([^\)]*\)/', '', $item));
+                    }
+                    $header = $updatedRow;
+                } elseif (count($header) != count($row)) {
+                    continue;
+                } else {
+                    $line = array_combine($header, $row);
+                    $lines[] = $line;
+                    if ($line['Record'] == 'Merchant Invoice Total') {
+                        $date = \DateTime::createFromFormat('jS M Y', trim($line['Account Period From']));
+                        $date = $this->startOfDay($date);
+                        $invoiceTotal = $line['TOTAL'];
+                    } elseif ($line['Record'] == 'Transaction Charges Total') {
+                        // throw new \Exception(print_r($line, true));
+                        $transactionTotal = $line['TOTAL'];
+                    } elseif ($line['Record'] == 'Statement of Account Details' &&
+                        stripos($line['charge Description'], 'Chargeback') !== false) {
+                        $ref = trim(str_replace('Chargeback - Ref ', '', $line['charge Description']));
+                        $amount = $this->toTwoDp(0 - $line['TOTAL']);
+                        $id = null;
+                        $data = ['reference' => $ref, 'amount' => $amount, 'date' => $date];
+                        $chargeback = $repo->findOneBy($data);
+                        if (!$chargeback) {
+                            $chargeback = new ChargebackPayment();
+                            $chargeback->setSource(Payment::SOURCE_ADMIN);
+                            $chargeback->setReference($ref);
+                            $chargeback->setAmount($amount);
+                            $chargeback->setDate($date);
+                            $this->dm->persist($chargeback);
+                            $this->dm->flush();
+                            $this->logger->warning(sprintf(
+                                'Barclays Statement Upload for %s has an unprocessed chargeback ref %s for %0.2f',
+                                $date->format(\DateTime::ATOM),
+                                $ref,
+                                $amount
+                            ));
+                        }
+                        $data['id'] = $chargeback->getId();
+                        $chargebacks[$ref] = $data;
+                    }
+                }
+            }
+            fclose($handle);
+        }
+
+        $barclaysStatementFile->addMetadata('invoiceTotal', $invoiceTotal);
+        $barclaysStatementFile->addMetadata('transactionTotal', $transactionTotal);
+        $barclaysStatementFile->setDate($date);
+        $barclaysStatementFile->setChargebacks($chargebacks);
     }
 }

@@ -20,9 +20,9 @@
         ><i class="fa fa-plus"></i> New Company</button>
     </div>
 </div>
-<div class="row">
-    <div class="col-md-8">
-    <table class="table table-stripped">
+<div class="row" style="margin-top: 20px">
+    <div class="col-md-12">
+    <table class="table table-stripped" width="100%">
         <tr>
             <th>Name</th>
             <th>Employees</th>
@@ -30,14 +30,37 @@
         </tr>
         {% for company in companies %}
             <tr>
-                <td>{{ company.name }}</td>
-                <td>{% for user in company.users %}
+                <td width="20%">{{ company.name }}</td>
+                <td width="70%">{% for user in company.users %}
                     <a href="{{ path('admin_user', {'id': user.id })}}">{{ user.email }}</a>
                     {% endfor %}
                 </td>
-                <td>
+                <td width="10%">
                     <button type="button" class="btn btn-info" data-company-name="{{ company.name }}" data-company-id="{{ company.id }}" data-toggle="modal" data-target="#belongModal"
                     ><i class="fa fa-plus"></i> Add User To Company</button>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    Sanctions: 
+                        {% if company.sanctionsChecks|length == 0%}
+                            No checks run
+                        {% endif %}
+                        {% for check in company.sanctionsChecks %}
+                            Ran: {{ check|date }}<br>
+                        {% endfor %}
+                        {% if company.sanctionsMatches|length == 0%}
+                            No matches
+                        {% endif %}
+                        {% for match in company.sanctionsMatches %}
+                            {% if match.manuallyVerified %}
+                            Confirmed not match: <del>{{ match.sanctions.company }} ({{ match.distance }})</del>
+                            {% else %}
+                            Possible match: {{ match.sanctions.company }}  ({{ match.distance }})
+                            {% endif %}
+                            <br>
+                        {% endfor %}
                 </td>
             </tr>
         {% endfor %}

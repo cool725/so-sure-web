@@ -51,11 +51,13 @@ use AppBundle\Document\File\ImeiUploadFile;
 use AppBundle\Document\File\ScreenUploadFile;
 use AppBundle\Document\Form\Cancel;
 use AppBundle\Document\Form\BillingDay;
+use AppBundle\Document\Form\Chargebacks;
 use AppBundle\Form\Type\BillingDayType;
 use AppBundle\Form\Type\CancelPolicyType;
 use AppBundle\Form\Type\BacsType;
 use AppBundle\Form\Type\ClaimType;
 use AppBundle\Form\Type\ClaimSearchType;
+use AppBundle\Form\Type\ChargebacksType;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\ImeiType;
 use AppBundle\Form\Type\NoteType;
@@ -380,6 +382,11 @@ class AdminEmployeeController extends BaseController
         $phoneForm = $this->get('form.factory')
             ->createNamedBuilder('phone_form', PhoneType::class, $policy)
             ->getForm();
+        $chargebacks = new Chargebacks();
+        $chargebacks->setPolicy($policy);
+        $chargebacksForm = $this->get('form.factory')
+            ->createNamedBuilder('chargebacks_form', ChargebacksType::class, $chargebacks)
+            ->getForm();
         $bacsPayment = new BacsPayment();
         $bacsPayment->setSource(Payment::SOURCE_ADMIN);
         $bacsPayment->setDate(new \DateTime());
@@ -529,6 +536,11 @@ class AdminEmployeeController extends BaseController
                     if ($policy->getImei()) {
                         $imeiService->checkImei($policy->getPhone(), $policy->getImei(), $policy->getUser());
                         $policy->addCheckmendCertData($imeiService->getCertId(), $imeiService->getResponseData());
+
+                        // clear out the cache - if we're re-checking it likely
+                        // means that recipero has updated their data
+                        $imeiService->clearMakeModelCheckCache($policy->getSerialNumber());
+                        $imeiService->clearMakeModelCheckCache($policy->getImei());
 
                         $serialNumber = $policy->getSerialNumber();
                         if (!$serialNumber) {
@@ -727,6 +739,28 @@ class AdminEmployeeController extends BaseController
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
+            } elseif ($request->request->has('chargebacks_form')) {
+                $chargebacksForm->handleRequest($request);
+                if ($chargebacksForm->isValid()) {
+                    if ($chargeback = $chargebacks->getChargeback()) {
+                        // To appear for the correct account month, should be when we assign
+                        // the chargeback to the policy
+                        $chargeback->setDate(new \DateTime());
+                        $policy->addPayment($chargeback);
+                        $dm->flush();
+                        $this->addFlash(
+                            'success',
+                            sprintf('Added chargeback %s to policy', $chargeback->getReference())
+                        );
+                    } else {
+                        $this->addFlash(
+                            'error',
+                            'Unknown chargeback'
+                        );
+                    }
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
             }
         }
         $checks = $fraudService->runChecks($policy);
@@ -752,6 +786,7 @@ class AdminEmployeeController extends BaseController
             'resend_email_form' => $resendEmailForm->createView(),
             'regenerate_policy_schedule_form' => $regeneratePolicyScheduleForm->createView(),
             'makemodel_form' => $makeModelForm->createView(),
+            'chargebacks_form' => $chargebacksForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),
@@ -806,6 +841,10 @@ class AdminEmployeeController extends BaseController
         $policyData = new SalvaPhonePolicy();
         $policyForm = $this->get('form.factory')
             ->createNamedBuilder('policy_form', PartialPolicyType::class, $policyData)
+            ->getForm();
+        $sanctionsForm = $this->get('form.factory')
+            ->createNamedBuilder('sanctions_form')
+            ->add('confirm', SubmitType::class)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
@@ -921,6 +960,20 @@ class AdminEmployeeController extends BaseController
 
                     return $this->redirectToRoute('admin_user', ['id' => $id]);
                 }
+            } elseif ($request->request->has('sanctions_form')) {
+                $sanctionsForm->handleRequest($request);
+                if ($sanctionsForm->isValid()) {
+                    foreach ($user->getSanctionsMatches() as $match) {
+                        $match->setManuallyVerified(true);
+                    }
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        'Verified Sanctions'
+                    );
+
+                    return $this->redirectToRoute('admin_user', ['id' => $id]);
+                }
             }
         }
 
@@ -932,6 +985,7 @@ class AdminEmployeeController extends BaseController
             'user_email_form' => $userEmailForm->createView(),
             'user_permission_form' => $userPermissionForm->createView(),
             'makemodel_form' => $makeModelForm->createView(),
+            'sanctions_form' => $sanctionsForm->createView(),
             'postcode' => $postcode,
             'census' => $census,
             'income' => $income,
@@ -946,13 +1000,20 @@ class AdminEmployeeController extends BaseController
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(Claim::class);
-        $qb = $repo->createQueryBuilder()->sort('notificationDate', 'desc');
+        $qb = $repo->createQueryBuilder();
 
         $form = $this->createForm(ClaimSearchType::class, null, ['method' => 'GET']);
         $form->handleRequest($request);
-        $data = $form->get('status')->getData();
-        $qb = $qb->field('status')->in($data);
-
+        $status = $form->get('status')->getData();
+        $claimNumber = $form->get('number')->getData();
+        $qb = $qb->field('status')->in($status);
+        if (strlen($claimNumber) > 0) {
+            $qb = $qb->field('number')->equals(new MongoRegex(sprintf("/.*%s.*/i", $claimNumber)));
+        }
+        $qb = $qb->sort('replacementReceivedDate', 'desc')
+                ->sort('approvedDate', 'desc')
+                ->sort('lossDate', 'desc')
+                ->sort('notificationDate', 'desc');
         $pager = $this->pager($request, $qb);
         $phoneRepo = $dm->getRepository(Phone::class);
         $phones = $phoneRepo->findActive()->getQuery()->execute();

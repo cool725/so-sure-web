@@ -1709,6 +1709,30 @@ class PolicyServiceTest extends WebTestCase
         static::$dm->flush();
     }
 
+    public function testPolicyRenewStartDate()
+    {
+        $now = new \DateTime('now', new \DateTimeZone('Europe/London'));
+        $weekAhead = $now->add(new \DateInterval('P10D'));
+        $startDate = new \DateTime('-1 year', new \DateTimeZone('Europe/London'));
+        $startDate = $startDate->add(new \DateInterval('P10D'));
+
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyRenewStartDateA', $this),
+            static::generateEmail('testPolicyRenewStartDateB', $this),
+            true,
+            $startDate,
+            $startDate
+        );
+        $renewalPolicyA = $policyA->getNextPolicy();
+        $renewalPolicyB = $policyB->getNextPolicy();
+
+        $renewedPolicyA = static::$policyService->renew($policyA, 12, null, false);
+        $this->assertEquals($this->startOfDay($weekAhead), $renewedPolicyA->getStart());
+        $this->assertEquals(0, $renewedPolicyA->getStart()->format('H'));
+        $this->assertEquals(new \DateTimeZone('Europe/London'), $renewedPolicyA->getStart()->getTimezone());
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewedPolicyA ->getStatus());
+    }
+
     public function testPolicyRenewalConnections()
     {
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
@@ -3646,6 +3670,8 @@ class PolicyServiceTest extends WebTestCase
         $claimA->setType(Claim::TYPE_LOSS);
         $policyA->addClaim($claimA);
 
+        $this->assertNotNull($policyA->getNextPolicy());
+        $this->assertNotNull($policyA->getNextPolicy()->getUser());
         static::$policyService->fullyExpire($policyA, new \DateTime('2017-01-29'));
         $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
         // use policyA->getNextPolicy to avoid having to flush/reload from db

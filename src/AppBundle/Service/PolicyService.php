@@ -1687,7 +1687,11 @@ class PolicyService
             $policy->clearCashback();
         }
 
-        $startDate = $this->endOfDay($policy->getEnd());
+        // Until Policy::ADJUST_TIMEZONE is true, ensure we have correct timezone set
+        $endDate = clone $policy->getEnd();
+        $endDate = $endDate->setTimezone(new \DateTimeZone(Policy::TIMEZONE));
+        $startDate = $this->endOfDay($endDate);
+        //$startDate = $this->endOfDay($policy->getEnd());
         $discount = 0;
         if (!$cashback && $policy->getPotValue() > 0) {
             $discount = $policy->getPotValue();

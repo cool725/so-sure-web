@@ -2,11 +2,48 @@
 
 <footer class="footer-new">
     <div class="container">
-        <p class="text-center">
-        <small>We are a company registered in England &amp; Wales (No. 09365669) and our registered address is 10 Finsbury Square, London EC2A 1AF.</small></p>
-        <p class="text-center"><small>so-sure Limited is an appointed representative of AFL Insurance Brokers Limited which is authorised and regulated by the Financial Conduct Authority. Our firm's Registration Number is <a href="https://register.fca.org.uk/ShPo_FirmDetailsPage?id=001b000003MOOUGAA5" target="_blank" style="text-decoration: underline !important;">744729</a>.  We are permitted to arrange, deal as an agent of insurers and clients, and assist in claims handling.</small></p>
+        <div class="row">
+            <div class="col-md-10">
+                <p><img src="{{ cdn_url }}/images/logo/so-sure_so-sure-full-logo-white-flat.svg" alt="" width="120px"></p>
+                <ul class="list-inline footer-new--list">
+                    <li><a href="{{ path('about_home') }}">About Us</a></li>
+                    <li><a href="/help">Help Centre</a></li>
+                    <li><a href="{{ path('claim') }}">Make a Claim</a></li>
+                    <li><a href="{{ path('about_how_to_contact_so_sure') }}">Contact Us</a></li>
+                    <li><a href="{{ path('mobile_phone_insurance_for_your_company') }}">Company Phones</a></li>
+                </ul>
+                <ul class="list-inline footer-new--list">
+                    <li>
+                        <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('footer') }}" target="_blank" rel="noopener">
+                            <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download so-sure on the App Store" /><span class="sr-only">so-sure app - Apple App Store</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('footer') }}" target="_blank" rel="noopener">
+                            <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get so-sure on Google Play" /><span class="sr-only">so-sure app - Google Play</span>
+                        </a>
+                    </li>
+                    <li class="visible-xs-inline"><br><br></li>
+                    <li>
+                        <a href="https://twitter.com/wearesosure" class="icon-twitter" name="Follow us on Twitter" target="_blank" rel="noopener"><i class="fa fa-twitter fa-2x" aria-hidden="true"></i><span class="sr-only">so-sure - Twitter</span></a>
+                    </li>
+                    <li>
+                        <a href="https://www.facebook.com/wearesosure" class="icon-facebook" name="Like us on Facebook" target="_blank" rel="noopener"><i class="fa fa-facebook-official fa-2x" aria-hidden="true"></i><span class="sr-only">so-sure Facebook</span></a>
+                    </li>
+                </ul>
+                <ul class="list-inline footer-new--list">
+                    <li>&copy; {{ 'now'|date('Y') }} <a href="/">so-sure</a> Limited</li>
+                    <li><a href="{{ path('terms') }}">Terms</a></li>
+                    <li>{{ macros.iubenda() }}</li>
+                    <li><a href="https://www.iubenda.com/privacy-policy/7805295/cookie-policy"  rel="noopener" target="_blank">Cookie Policy</a></li>
+                </ul>
+                <p><small>We are a company registered in England &amp; Wales (No. 09365669) and our registered address is 10 Finsbury Square, London EC2A 1AF.</small></p>
+                <p><small>so-sure Limited is an appointed representative of AFL Insurance Brokers Limited which is authorised and regulated by the Financial Conduct Authority. Our firm's Registration Number is <a href="https://register.fca.org.uk/ShPo_FirmDetailsPage?id=001b000003MOOUGAA5" target="_blank" rel="noopener">744729</a>.  We are permitted to arrange, deal as an agent of insurers and clients, and assist in claims handling.</small></p>
+            </div>
+        </div>
     </div>
 </footer>
+
 
 {# Loading Overlay #}
 <div id="loading-overlay--spinner" class="loading-overlay">
@@ -15,6 +52,7 @@
         <span class="sr-only">Loading...</span>
     </div>
 </div>
+
 
 <!-- Analytics -->
 <div id="fb-root"></div>

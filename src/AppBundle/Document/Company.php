@@ -48,6 +48,19 @@ class Company
      */
     protected $users;
 
+    /**
+     * @MongoDB\Field(type="hash")
+     * @Gedmo\Versioned
+     */
+    protected $sanctionsChecks = array();
+
+    /**
+     * @MongoDB\EmbedMany(
+     *  targetDocument="AppBundle\Document\SanctionsMatch"
+     * )
+     */
+    protected $sanctionsMatches = array();
+
     public function __construct()
     {
         $this->created = new \DateTime();
@@ -98,5 +111,36 @@ class Company
     {
         $user->setCompany($this);
         $this->users[] = $user;
+    }
+
+    public function addSanctionsCheck(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+        $timestamp = $date->format('U');
+        $this->sanctionsChecks[] = $timestamp;
+    }
+
+    public function getSanctionsChecks()
+    {
+        return $this->sanctionsChecks;
+    }
+
+    public function addSanctionsMatch(SanctionsMatch $sanctionsMatch)
+    {
+        // only ever allow one match per sanctions record
+        foreach ($this->sanctionsMatches as $match) {
+            if ($match->getSanctions()->getId() == $sanctionsMatch->getSanctions()->getId()) {
+                return;
+            }
+        }
+
+        $this->sanctionsMatches[] = $sanctionsMatch;
+    }
+
+    public function getSanctionsMatches()
+    {
+        return $this->sanctionsMatches;
     }
 }

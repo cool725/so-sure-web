@@ -364,6 +364,7 @@ nelmio_security:
                 - https://*.googlesyndication.com
                 - https://*.google.com/
                 - https://platform.twitter.com
+                - https://syndication.twitter.com
                 - 'data:'
             font-src:
                 - 'self'
@@ -386,6 +387,7 @@ nelmio_security:
                 - https://*.iubenda.com
                 - https://*.googlesyndication.com
                 - https://*.google.com/
+                - https://platform.twitter.com
             script-src:
                 - 'self'
                 - 'unsafe-inline'
@@ -426,6 +428,7 @@ nelmio_security:
                 - https://sdk.accountkit.com
                 # linked in
                 - https://secure.adnxs.com
+                - https://www.workable.com
                 - 'data:'
             style-src:
                 - 'self'
@@ -474,6 +477,7 @@ nelmio_security:
                 # linkedin
                 - https://secure.adnxs.com
                 - https://www.accountkit.com
+                - https://www.glassdoor.co.uk
                 - 'data:'
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com

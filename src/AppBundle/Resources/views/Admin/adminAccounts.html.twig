@@ -11,7 +11,7 @@
     {% javascripts
         'components/moment/moment.min.js'
         'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.js'
-        '@AppBundle/Resources/public/js/Admin/accounts.js'
+        '@AppBundle/Resources/public/js/Admin/month.js'
     %}
     <script src="{{ asset_url }}"></script>
     {% endjavascripts %}
@@ -24,27 +24,31 @@
     <div class="col-md-6">
         <h1>so-sure Accounts for {{ month }} / {{ year }}</h1>
     </div>
-    <form id='accounts-form' method="POST">
-    <div class="col-md-2">
+    <form class="month-form form-inline" method="POST" autocomplete="off">
+    <div class="col-md-4">
         <div class="form-group" style="padding-top: 15px;">
-            <div class='input-group date' id='accounts'>
+            <div class="input-group date month" data-url="{{ path('admin_accounts') }}">
                 <input name="accounts" type='text' class="form-control" value="{{month}}-{{year}}" />
                 <span class="input-group-addon">
                     <span class="fa fa-calendar"></span>
                 </span>
             </div>
-        </div>
-    </div>
-    <div class="col-md-2">
-        <div class="form-group" style="padding-top: 15px;">
-            <button class="btn btn-primary">View Accounts</button>
-            &nbsp;
-            <a target="_blank" href="{{ path('admin_accounts_print', {'year': year, 'month': month}) }}"><i class="fa fa-print"></i></a>
+            <div class="input-group">
+                <div class="input-group-btn">
+                    <button class="btn btn-success"><i class="fa fa-arrow-right"></i></button>
+                </div>
+            </div>
+            <div class="input-group" style="margin-left: 10px;">
+                <div class="input-group-btn">
+                    <a class="btn btn-info" target="_blank" href="{{ path('admin_accounts_print', {'year': year, 'month': month}) }}">
+                        &nbsp;<i class="fa fa-print"></i>&nbsp;
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
     </form>
 </div>
-<h4>Note that # of policies may not be accurate when viewed historically until <a href="https://app.clubhouse.io/sosure/story/787/past-reporting">ch787</a> is complete.</h4>
 
 {% include 'AppBundle:Admin:adminAccountsData.html.twig' %}
 

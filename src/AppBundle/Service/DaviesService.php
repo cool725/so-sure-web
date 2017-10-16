@@ -6,6 +6,7 @@ use Aws\S3\S3Client;
 use AppBundle\Classes\DaviesClaim;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Phone;
+use AppBundle\Document\Feature;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\DaviesFile;
@@ -22,6 +23,9 @@ class DaviesService extends S3EmailService
     /** @var ClaimsService */
     protected $claimsService;
 
+    /** @var FeatureService */
+    protected $featureService;
+
     protected $mailer;
     protected $validator;
 
@@ -33,6 +37,11 @@ class DaviesService extends S3EmailService
     public function setMailer($mailer)
     {
         $this->mailer = $mailer;
+    }
+
+    public function setFeature($featureService)
+    {
+        $this->featureService = $featureService;
     }
 
     public function setValidator($validator)
@@ -48,6 +57,7 @@ class DaviesService extends S3EmailService
     public function postProcess()
     {
         $this->claimsDailyEmail();
+        $this->claimsDailyErrors();
     }
 
     public function getNewS3File()
@@ -69,8 +79,16 @@ class DaviesService extends S3EmailService
     {
         $success = true;
         $claims = [];
+        $openClaims = [];
         $multiple = [];
         foreach ($daviesClaims as $daviesClaim) {
+            // get the most recent claim that's open
+            if ($daviesClaim->isOpen()) {
+                if (!isset($openClaims[$daviesClaim->getPolicyNumber()]) ||
+                    $daviesClaim->lossDate > $openClaims[$daviesClaim->getPolicyNumber()]) {
+                    $openClaims[$daviesClaim->getPolicyNumber()] = $daviesClaim->lossDate;
+                }
+            }
             if (isset($claims[$daviesClaim->getPolicyNumber()]) &&
                 $claims[$daviesClaim->getPolicyNumber()]) {
                 if ($daviesClaim->isOpen()) {
@@ -78,12 +96,30 @@ class DaviesService extends S3EmailService
                         'There are multiple open claims against policy %s. Please manually update the IMEI.',
                         $daviesClaim->getPolicyNumber()
                     );
-                    $this->errors[$daviesClaim->claimNumber][] = $msg;
+                    $this->warnings[$daviesClaim->claimNumber][] = $msg;
                     $multiple[] = $daviesClaim->getPolicyNumber();
                 }
             }
             $claims[$daviesClaim->getPolicyNumber()] = $daviesClaim->isOpen();
         }
+
+        // Check for any claims that are closed that appear after an open claim
+        foreach ($daviesClaims as $daviesClaim) {
+            if (!$daviesClaim->isOpen() &&
+                isset($openClaims[$daviesClaim->getPolicyNumber()]) &&
+                $daviesClaim->lossDate > $openClaims[$daviesClaim->getPolicyNumber()]) {
+                    // @codingStandardsIgnoreStart
+                    $msg = sprintf(
+                        'There is open claim against policy %s that is older then the closed claim of %s and needs to be closed. Unable to determine imei',
+                        $daviesClaim->getPolicyNumber(),
+                        $daviesClaim->claimNumber
+                    );
+                    // @codingStandardsIgnoreEnd
+                    $this->errors[$daviesClaim->claimNumber][] = $msg;
+                    $multiple[] = $daviesClaim->getPolicyNumber();
+            }
+        }
+
         foreach ($daviesClaims as $daviesClaim) {
             try {
                 $skipImeiUpdate = in_array($daviesClaim->getPolicyNumber(), $multiple);
@@ -91,7 +127,13 @@ class DaviesService extends S3EmailService
             } catch (\Exception $e) {
                 //$success = false;
                 $this->errors[$daviesClaim->claimNumber][] = $e->getMessage();
-                $this->logger->error(sprintf('Error processing file %s', $key), ['exception' => $e]);
+                $this->logger->error(
+                    sprintf(
+                        'Skipped import. Fatal error processing file (%s)',
+                        $key
+                    ),
+                    ['exception' => $e]
+                );
                 // In case any of the db data failed validation, clear the changeset
                 if ($claim = $this->getClaim($daviesClaim)) {
                     $this->dm->refresh($claim);
@@ -142,7 +184,10 @@ class DaviesService extends S3EmailService
     public function saveClaim($daviesClaim, $skipImeiUpdate)
     {
         if ($daviesClaim->hasError()) {
-            throw new \Exception(sprintf('Claim %s has error status. Skipping', $daviesClaim->claimNumber));
+            throw new \Exception(sprintf(
+                'Claim %s has error status. Skipping, but claim should not be in the export most likely.',
+                $daviesClaim->claimNumber
+            ));
         }
         $claim = $this->getClaim($daviesClaim);
         if (!$claim) {
@@ -392,6 +437,18 @@ class DaviesService extends S3EmailService
                 $this->warnings[$daviesClaim->claimNumber][] = $msg;
             }
         }
+
+        $threeMonthsAgo = new \DateTime();
+        $threeMonthsAgo = $threeMonthsAgo->sub(new \DateInterval('P3M'));
+        if ($daviesClaim->isOpen() && $daviesClaim->replacementReceivedDate &&
+            $daviesClaim->replacementReceivedDate < $threeMonthsAgo) {
+            $msg = sprintf(
+                'Claim %s should be closed. Replacement was delivered more than 3 months ago on %s.',
+                $daviesClaim->claimNumber,
+                $daviesClaim->replacementReceivedDate->format(\DateTime::ATOM)
+            );
+            $this->errors[$daviesClaim->claimNumber][] = $msg;
+        }
     }
 
     public function postValidateClaimDetails(Claim $claim, DaviesClaim $daviesClaim)
@@ -486,7 +543,7 @@ class DaviesService extends S3EmailService
         $claims = $claimsRepo->findOutstanding();
 
         $this->mailer->sendTemplate(
-            sprintf('Daily Claims'),
+            sprintf('Daily Claims Report'),
             'tech@so-sure.com',
             'AppBundle:Email:davies/dailyEmail.html.twig',
             [
@@ -495,9 +552,46 @@ class DaviesService extends S3EmailService
                 'successFile' => $successFile,
                 'warnings' => $this->warnings,
                 'errors' => $this->errors,
+                'title' => 'Daily Claims Report',
             ]
         );
 
         return count($claims);
+    }
+
+    public function claimsDailyErrors()
+    {
+        $fileRepo = $this->dm->getRepository(DaviesFile::class);
+        $latestFiles = $fileRepo->findBy([], ['created' => 'desc'], 1);
+        $latestFile = count($latestFiles) > 0 ? $latestFiles[0] : null;
+
+        $successFiles = $fileRepo->findBy(['success' => true], ['created' => 'desc'], 1);
+        $successFile = count($successFiles) > 0 ? $successFiles[0] : null;
+
+        $claimsRepo = $this->dm->getRepository(Claim::class);
+        $claims = $claimsRepo->findOutstanding();
+
+        if (count($this->errors) > 0) {
+            $emails = 'tech@so-sure.com';
+            if ($this->featureService->isEnabled(Feature::FEATURE_DAVIES_IMPORT_ERROR_EMAIL)) {
+                $emails = DaviesClaim::$errorEmailAddresses;
+            }
+
+            $this->mailer->sendTemplate(
+                sprintf('Errors in So-Sure Mobile - Daily Claims Report'),
+                $emails,
+                'AppBundle:Email:davies/dailyEmail.html.twig',
+                [
+                    'latestFile' => $latestFile,
+                    'successFile' => $successFile,
+                    'errors' => $this->errors,
+                    'warnings' => null,
+                    'claims' => null,
+                    'title' => 'Errors in So-Sure Mobile - Daily Claims Report',
+                ]
+            );
+        }
+
+        return count($this->errors);
     }
 }

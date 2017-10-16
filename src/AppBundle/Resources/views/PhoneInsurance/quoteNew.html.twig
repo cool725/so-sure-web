@@ -102,6 +102,7 @@
                             </output>
                             <input type="range"
                                    id="reward-slider"
+                                   autocomplete="off"
                                    min="0"
                                    max="{{ max_connections }}"
                                    value="{{ start_friends_rounded }}"
@@ -266,7 +267,7 @@
         </div>
     </div>
 
-    {% include 'AppBundle::Default/modalQuote.html.twig' with {'selectPhoneMakeType': ''} %}
+    {% include 'AppBundle::Default/modalQuote.html.twig' with {'selectPhoneMakeType': 'purchase-select'} %}
     {# End Page Modals #}
 
 {% endblock %}

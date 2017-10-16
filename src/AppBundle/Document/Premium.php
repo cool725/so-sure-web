@@ -175,16 +175,22 @@ abstract class Premium
     {
         if (!$accountInitial) {
             $divisible = $amount / $this->getMonthlyPremiumPrice();
+        } elseif ($this->areEqualToTwoDp($this->getAdjustedFinalMonthlyPremiumPrice(), $amount)) {
+            $divisible = $amount / $this->getAdjustedFinalMonthlyPremiumPrice();
         } elseif ($amount > $this->getAdjustedStandardMonthlyPremiumPrice()) {
+            // most likely if amount is more than one payment, it would be a full payoff
             $divisible = ($amount - $this->getAdjustedFinalMonthlyPremiumPrice()) /
                 $this->getAdjustedStandardMonthlyPremiumPrice();
+
+            // but just in case its 2 months (for example), allow that as well
+            if (!$this->isWholeInteger($divisible)) {
+                $divisible = $amount / $this->getAdjustedStandardMonthlyPremiumPrice();
+            }
         } else {
             $divisible = $amount / $this->getAdjustedStandardMonthlyPremiumPrice();
         }
-        $evenlyDivisbile = $this->areEqualToFourDp(0, $divisible - floor($divisible)) ||
-                    $this->areEqualToFourDp(0, ceil($divisible) - $divisible);
 
-        return $evenlyDivisbile;
+        return $this->isWholeInteger($divisible);
     }
 
     public function getNumberOfMonthlyPayments($amount)
@@ -195,7 +201,9 @@ abstract class Premium
 
             return $numPayments;
         } elseif ($this->isEvenlyDivisible($amount, true)) {
-            if ($amount > $this->getAdjustedStandardMonthlyPremiumPrice()) {
+            if ($this->areEqualToTwoDp($this->getAdjustedFinalMonthlyPremiumPrice(), $amount)) {
+                $numPayments = 1;
+            } elseif ($amount > $this->getAdjustedStandardMonthlyPremiumPrice()) {
                 $divisible = ($amount - $this->getAdjustedFinalMonthlyPremiumPrice()) /
                     $this->getAdjustedStandardMonthlyPremiumPrice();
                 $numPayments = round($divisible, 0) + 1;

@@ -49,14 +49,9 @@ class DefaultController extends BaseController
 
     /**
      * @Route("/", name="homepage", options={"sitemap"={"priority":"1.0","changefreq":"daily"}})
-     * @Route("/discount-vouchers", name="discount-vouchers")
      */
     public function indexAction(Request $request)
     {
-        $sixpack = $this->get('app.sixpack')
-            ->participate(SixpackService::EXPERIMENT_HOMEPAGE_PHONE_IMAGE, ['phone-image', 'plain']);
-        // $sixpack = $this->get('app.sixpack')
-            // ->participate(SixpackService::EXPERIMENT_HOMEPAGE_PHONE_IMAGE, ['plain', 'phone-image']);
         $geoip = $this->get('app.geoip');
         //$ip = "72.229.28.185";
         $ip = $request->getClientIp();
@@ -144,6 +139,7 @@ class DefaultController extends BaseController
             'memory' => (int) 32
         ]);
 
+        $exp = $this->sixpack($request, SixpackService::EXPERIMENT_HOMEPAGE_V1_V2, ['v2', 'v1']);
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         $data = array(
@@ -154,11 +150,11 @@ class DefaultController extends BaseController
             'i7' => $i7,
             'phone' => $phone,
             's7' => $s7,
-            'sixpack' => $sixpack,
+            'sixpack' => 'phone-image',
         );
 
-        if (in_array($request->get('_route'), ['discount-vouchers'])) {
-            return $this->render('AppBundle:Default:discountVouchers.html.twig', $data);
+        if ($exp == 'v2') {
+            return $this->render('AppBundle:Default:indexV2.html.twig', $data);
         } else {
             return $this->render('AppBundle:Default:index.html.twig', $data);
         }
@@ -171,6 +167,40 @@ class DefaultController extends BaseController
      * @Template()
      */
     public function selectPhoneMakeAction(Request $request, $type = null, $id = null)
+    {
+        $dm = $this->getManager();
+        $phoneRepo = $dm->getRepository(Phone::class);
+        $phone = null;
+        if ($id) {
+            $phone = $phoneRepo->find($id);
+        }
+
+        if ($phone && in_array($type, ['purchase-select', 'purchase-change'])) {
+            $session = $request->getSession();
+            $session->set('quote', $phone->getId());
+
+            return $this->redirectToRoute('purchase_step_policy');
+        } elseif ($phone && in_array($type, ['learn-more'])) {
+            $session = $request->getSession();
+            $session->set('quote', $phone->getId());
+
+           // return $this->redirectToRoute('learn_more_phone', ['id' => $id]);
+        }
+
+        return [
+            'phones' => $this->getPhonesArray(),
+            'type' => $type,
+            'phone' => $phone,
+        ];
+    }
+
+    /**
+     * @Route("/select-phone-v2", name="select_phone_make_v2")
+     * @Route("/select-phone-v2/{type}", name="select_phone_make_v2_type")
+     * @Route("/select-phone-v2/{type}/{id}", name="select_phone_make_v2_type_id")
+     * @Template()
+     */
+    public function selectPhoneMakeV2Action(Request $request, $type = null, $id = null)
     {
         $dm = $this->getManager();
         $phoneRepo = $dm->getRepository(Phone::class);

@@ -40,6 +40,7 @@ class PolicySearchType extends AbstractType
         $statuses = [
             'Any' => null,
             'Current' => 'current',
+            'Current w/Discount' => 'current-discounted',
             Policy::STATUS_PENDING => Policy::STATUS_PENDING,
             Policy::STATUS_ACTIVE => Policy::STATUS_ACTIVE,
             Policy::STATUS_CANCELLED => Policy::STATUS_CANCELLED,

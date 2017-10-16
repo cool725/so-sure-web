@@ -23,7 +23,7 @@ class DoctrineUserListener
     {
         $document = $eventArgs->getDocument();
         if ($document instanceof User) {
-            $this->triggerEvent($document, UserEvent::EVENT_UPDATED);
+            $this->triggerEvent($document, UserEvent::EVENT_CREATED);
         }
     }
 

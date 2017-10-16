@@ -1,0 +1,57 @@
+{# Set type of form dependant where used or default #}
+
+{# default to #}
+{% set uid          = '' %}
+{% set buttonText   = 'Instant Quote' %}
+{% set buttonCSS    = 'btn btn-blue btn-pad btn-block' %}
+{% set basePath     = '/phone-insurance/' %}
+{% set phonePath    = 'quote_phone' %}
+{% set pathSuffix   = '' %}
+{% set formID       = '' %}
+{% set formClass    = 'form-inline--homepage select-phone-form' %}
+{% if phone %}
+  {% set formAction   = path('quote_phone', {'id': phone.id }) %}
+{% endif %}
+
+{% if type is defined and type == 'homepage' %}
+    {% set formID = 'search-phone-form-homepage' %}
+    {% set uid    = '-1' %}
+{% elseif type == 'footer' %}
+    {% set formID    = 'search-phone-form-footer' %}
+    {% set uid    = '-2' %}
+{% endif %}
+
+<div id="select-phone-data{{ uid }}"
+     class="search-phone-form search-phone-form--homepage"
+     data-phones='{{ phones|json_encode|raw }}'>
+
+    <form method="get"
+          id="{{ formID }}{{ uid }}"
+          {% if phone %}
+            action="{{ formAction }}"
+          {% endif %}
+          data-base-path="{{ basePath }}"
+          data-path-suffix="{{ pathSuffix }}"
+          class="{{ formClass }}">
+
+        <div class="row">
+            <div class="form-group col-md-8">
+                <input type="text"
+                       class="required search-phone-text search-phone"
+                       placeholder="Find your phone eg. iPhone 8"
+                       value="{% if phone %}{{ phone }}{% endif %}" />
+            </div>
+            <div class="form-group col-md-4">
+                <button type="submit" class="btn {{ buttonCSS }}">{{ buttonText }} &nbsp;<i class="fa fa-angle-right" aria-hidden="true"></i></button>
+            </div>
+        </div>
+    </form>
+
+    {% if type is not defined or not type  %}
+        <p><a href="mailto:hello@wearesosure.com" class="btn btn-link text-black open-intercom"><i class="fa fa-comments"></i> Don't see your device? Let us know.</a></p>
+    {% endif %}
+
+    {# TODO: Move to footer #}
+    {% include 'AppBundle::Default/loadingWidget.html.twig' with { 'class': 'loading-overlay-widget--show'} %}
+
+</div>

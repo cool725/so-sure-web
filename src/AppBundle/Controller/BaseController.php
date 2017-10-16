@@ -77,6 +77,11 @@ abstract class BaseController extends Controller
     {
         return filter_var($this->getRequestString($request, $field), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
     }
+    
+    protected function getFormBool($form, $field)
+    {
+        return filter_var($form->get($field)->getData(), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+    }
 
     protected function findRewardUser($email)
     {
@@ -736,9 +741,19 @@ abstract class BaseController extends Controller
             $policiesQb = $policiesQb->addAnd(
                 $policiesQb->expr()->field('status')->in([Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID])
             );
+        } elseif ($status == 'current-discounted') {
+            $policiesQb = $policiesQb->addAnd(
+                $policiesQb->expr()->field('status')->in([Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID])
+            );
+            $policiesQb = $policiesQb->addAnd(
+                $policiesQb->expr()->field('policyDiscountPresent')->equals(true)
+            );
         } elseif ($status == 'past-due') {
             $policiesQb = $policiesQb->addAnd(
                 $policiesQb->expr()->field('status')->in([Policy::STATUS_CANCELLED])
+            );
+            $policiesQb = $policiesQb->addAnd(
+                $policiesQb->expr()->field('cancelledReason')->notIn([Policy::CANCELLED_UPGRADE])
             );
         } elseif ($status == Policy::STATUS_EXPIRED_CLAIMABLE) {
             $policiesQb = $policiesQb->addAnd(
@@ -850,6 +865,21 @@ abstract class BaseController extends Controller
                 $dataField
             );
         }
+        $allSanctions = $this->getFormBool($form, 'allSanctions');
+        $waitingSanctions = $this->getFormBool($form, 'waitingSanctions');
+        if ($allSanctions || $waitingSanctions) {
+            $usersQb = $usersQb->addAnd(
+                $usersQb->expr()->field('sanctionsMatches')->notEqual(null)
+            );
+            $usersQb = $usersQb->addAnd(
+                $usersQb->expr()->field('sanctionsMatches')->not(['$size' => 0])
+            );
+        }
+        if ($waitingSanctions) {
+            $usersQb = $usersQb->addAnd(
+                $usersQb->expr()->field('sanctionsMatches.0.manuallyVerified')->notEqual(true)
+            );
+        }
 
         $pager = $this->pager($request, $usersQb);
 
@@ -931,5 +961,15 @@ abstract class BaseController extends Controller
             ->setTo('tech@so-sure.com')
             ->setBody($body, 'text/html');
         $this->get('mailer')->send($message);
+    }
+
+    protected function sixpack($request, $name, $options)
+    {
+        $exp = $this->get('app.sixpack')->participate($name, $options);
+        if ($request->get('force')) {
+            $exp = $request->get('force');
+        }
+
+        return $exp;
     }
 }

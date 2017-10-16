@@ -15,12 +15,16 @@ use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Classes\Salva;
 use AppBundle\Exception\InvalidPremiumException;
+use AppBundle\Document\Payment\PolicyDiscountPayment;
 
 /**
  * @group functional-net
+ *
+ * AppBundle\\Tests\\Service\\JudopayServiceTest
  */
 class JudopayServiceTest extends WebTestCase
 {
+    use \AppBundle\Document\CurrencyTrait;
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
@@ -702,6 +706,60 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals(4, $repo->countUnpaidScheduledPayments($policy));
     }
 
+    /**
+     * @expectedException AppBundle\Exception\SameDayPaymentException
+     */
+    public function testMultipleSameDayPayments()
+    {
+        $this->clearEmail(static::$container);
+        $user = $this->createValidUser(static::generateEmail('testMultipleSameDayPayments', $this));
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone);
+        static::$dm->persist($policy);
+
+        $details = self::$judopay->testPayDetails(
+            $user,
+            $policy->getId(),
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
+        );
+        if (!isset($details['cardDetails']) || !isset($details['cardDetails']['cardToken'])) {
+            throw new \Exception('Payment failed');
+        }
+
+        // @codingStandardsIgnoreStart
+        self::$judopay->add(
+            $policy,
+            $details['receiptId'],
+            $details['consumer']['consumerToken'],
+            $details['cardDetails']['cardToken'],
+            Payment::SOURCE_WEB_API,
+            "{\"clientDetails\":{\"OS\":\"Android OS 6.0.1\",\"kDeviceID\":\"da471ee402afeb24\",\"vDeviceID\":\"03bd3e3c-66d0-4e46-9369-cc45bb078f5f\",\"culture_locale\":\"en_GB\",\"deviceModel\":\"Nexus 5\",\"countryCode\":\"826\"}}"
+        );
+        // @codingStandardsIgnoreEnd
+
+        $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
+        $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
+        $this->assertEquals(11, count($policy->getScheduledPayments()));
+        $this->assertEquals(self::$JUDO_TEST_CARD_LAST_FOUR, $policy->getPayments()[0]->getCardLastFour());
+
+        $scheduledPayment = $policy->getNextScheduledPayment();
+        $payment = new JudoPayment();
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setPolicy($policy);
+
+        self::$judopay->processScheduledPaymentResult($scheduledPayment, $payment);
+        $this->assertEquals(ScheduledPayment::STATUS_SUCCESS, $scheduledPayment->getStatus());
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+        $this->assertEquals(11, count($policy->getScheduledPayments()));
+
+        $initialScheduledPayment = $policy->getNextScheduledPayment();
+        $initialScheduledPayment->setScheduled(new \DateTime());
+        self::$judopay->scheduledPayment($initialScheduledPayment, 'TEST');
+    }
+
     public function testPaymentFirstProblem()
     {
         $this->clearEmail(static::$container);
@@ -1173,6 +1231,66 @@ class JudopayServiceTest extends WebTestCase
         $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice() * 1.5);
         self::$judopay->setCommission($policy, $payment);
         $this->assertNull($payment->getTotalCommission());
+    }
+
+    public function testJudoCommissionAmountsWithDiscount()
+    {
+        $user = $this->createValidUser(static::generateEmail('testJudoCommissionAmountsWithDiscount', $this));
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
+
+        $discount = new PolicyDiscountPayment();
+        $discount->setAmount(10);
+        $discount->setDate(new \DateTime());
+        $policy->addPayment($discount);
+        $policy->getPremium()->setAnnualDiscount($discount->getAmount());
+
+        $payment = new JudoPayment();
+        $payment->setAmount($policy->getPremium()->getAdjustedYearlyPremiumPrice());
+        self::$judopay->setCommission($policy, $payment);
+        $this->assertEquals(
+            Salva::YEARLY_TOTAL_COMMISSION,
+            $payment->getTotalCommission()
+        );
+
+        $payment = new JudoPayment();
+        $payment->setAmount($policy->getPremium()->getAdjustedStandardMonthlyPremiumPrice());
+        self::$judopay->setCommission($policy, $payment);
+        $this->assertEquals(
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            $payment->getTotalCommission()
+        );
+
+        $payment = new JudoPayment();
+        $payment->setAmount($policy->getPremium()->getAdjustedStandardMonthlyPremiumPrice() * 3);
+        self::$judopay->setCommission($policy, $payment);
+        $this->assertEquals(
+            Salva::MONTHLY_TOTAL_COMMISSION * 3,
+            $payment->getTotalCommission()
+        );
+
+        $payment = new JudoPayment();
+        $payment->setAmount($policy->getPremium()->getAdjustedStandardMonthlyPremiumPrice() * 1.5);
+        self::$judopay->setCommission($policy, $payment);
+        $this->assertNull($payment->getTotalCommission());
+
+        $payment = new JudoPayment();
+        $payment->setSuccess(true);
+        $payment->setAmount($policy->getPremium()->getAdjustedStandardMonthlyPremiumPrice() * 11);
+        $policy->addPayment($payment);
+        self::$judopay->setCommission($policy, $payment);
+
+        $payment = new JudoPayment();
+        $payment->setSuccess(true);
+        $payment->setAmount($policy->getPremium()->getAdjustedFinalMonthlyPremiumPrice());
+        $policy->addPayment($payment);
+        $this->assertEquals(0, $policy->getOutstandingPremium());
+
+        self::$judopay->setCommission($policy, $payment);
+        $this->assertEquals(
+            Salva::FINAL_MONTHLY_TOTAL_COMMISSION,
+            $payment->getTotalCommission()
+        );
     }
 
     public function testJudoCommissionActual()
