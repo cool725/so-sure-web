@@ -25,9 +25,13 @@ class SixpackService
     //const EXPERIMENT_CPC_MANUFACTURER_HOME = 'cpc-manufacturer-or-home';
     const EXPERIMENT_CPC_MANUFACTURER_WITH_HOME = 'cpc-manufacturer-with-home';
     const EXPERIMENT_HOMEPAGE_V1_V2 = 'homepage-v1-v2';
+    const EXPERIMENT_APP_SHARE_METHOD = 'app-share-method';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_SHARE_MESSAGE_ORIGINAL = 'original';
+
+    const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';
+    const ALTERNATIVES_APP_SHARE_METHOD_API = 'api';
 
     // Completed test - SW-45
     // const EXPERIMENT_QUOTE_CALC_LOWER = 'quote-calc-lower';

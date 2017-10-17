@@ -251,6 +251,14 @@ class UserController extends BaseController
                             '%s has been invited',
                             $invitation->getInvitee()->getName()
                         );
+                        $this->get('app.sixpack')->convertByClientId(
+                            $code,
+                            SixpackService::EXPERIMENT_SHARE_MESSAGE
+                        );
+                        $this->get('app.sixpack')->convertByClientId(
+                            $code,
+                            SixpackService::EXPERIMENT_APP_SHARE_METHOD
+                        );
                     } else {
                         $message = sprintf(
                             'Your bonus has been added'
