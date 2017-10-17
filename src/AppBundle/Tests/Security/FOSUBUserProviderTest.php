@@ -7,6 +7,8 @@ use AppBundle\Controller\OpsController;
 
 /**
  * @group functional-net
+ *
+ * AppBundle\\Tests\\Security\\FOSUBUserProviderTest
  */
 class FOSUBUserProviderTest extends WebTestCase
 {
@@ -46,6 +48,26 @@ class FOSUBUserProviderTest extends WebTestCase
         $this->assertNull(self::$userService->loadUserByOAuthUserResponse($mock));
     }
 
+    /**
+     * @expectedException \Exception
+     */
+    public function testLoadUserByOAuthUserResponseFacebookEmpty()
+    {
+        $mock = $this->createUserResponseMock('', 'facebook');
+
+        $this->assertNull(self::$userService->loadUserByOAuthUserResponse($mock));
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testLoadUserByOAuthUserResponseStarlingEmpty()
+    {
+        $mock = $this->createUserResponseMock('', 'starling');
+
+        $this->assertNull(self::$userService->loadUserByOAuthUserResponse($mock));
+    }
+
     public function testLoadUserByOAuthUserResponseFacebook()
     {
         $email = static::generateEmail('testLoadUserByOAuthUserResponseFacebook', $this);
@@ -69,6 +91,64 @@ class FOSUBUserProviderTest extends WebTestCase
         $this->assertEquals('Foo', $user->getLastName());
     }
 
+    public function testLoadUserByOAuthUserResponseStarlingFull()
+    {
+        $email = static::generateEmail('starling-full', $this);
+        $mock = $this->createUserResponseMock($email, 'starling');
+        $mock
+            ->expects($this->any())
+            ->method('getEmail')
+            ->will($this->returnValue($email));
+        $mock
+            ->expects($this->any())
+            ->method('getFirstName')
+            ->will($this->returnValue('A.'));
+        $mock
+            ->expects($this->any())
+            ->method('getLastName')
+            ->will($this->returnValue('Foo Bar'));
+        $mock
+            ->expects($this->any())
+            ->method('getResponse')
+            ->will($this->returnValue(['phone' => '07775740400', 'dateOfBirth' => '1980-06-01']));
+
+        $user = self::$userService->loadUserByOAuthUserResponse($mock);
+        $this->assertEquals($email, $user->getEmail());
+        $this->assertEquals('A', $user->getFirstName());
+        $this->assertEquals('Foo', $user->getLastName());
+        $this->assertEquals('+447775740400', $user->getMobileNumber());
+        $this->assertEquals(new \DateTime('1980-06-01 00:00:00'), $user->getBirthday());
+    }
+
+    public function testLoadUserByOAuthUserResponseStarlingSimple()
+    {
+        $email = static::generateEmail('starlign-simple', $this);
+        $mock = $this->createUserResponseMock($email, 'starling');
+        $mock
+            ->expects($this->any())
+            ->method('getEmail')
+            ->will($this->returnValue($email));
+        $mock
+            ->expects($this->any())
+            ->method('getFirstName')
+            ->will($this->returnValue('A.'));
+        $mock
+            ->expects($this->any())
+            ->method('getLastName')
+            ->will($this->returnValue('Foo Bar'));
+        $mock
+            ->expects($this->any())
+            ->method('getResponse')
+            ->will($this->returnValue([]));
+
+        $user = self::$userService->loadUserByOAuthUserResponse($mock);
+        $this->assertEquals($email, $user->getEmail());
+        $this->assertEquals('A', $user->getFirstName());
+        $this->assertEquals('Foo', $user->getLastName());
+        $this->assertEquals('', $user->getMobileNumber());
+        $this->assertEquals(null, $user->getBirthday());
+    }
+
     /**
      * @expectedException \HWI\Bundle\OAuthBundle\Security\Core\Exception\AccountNotLinkedException
      */
@@ -82,6 +162,27 @@ class FOSUBUserProviderTest extends WebTestCase
         );
 
         $mock = $this->createUserResponseMock($email, 'facebook');
+        $mock
+            ->expects($this->any())
+            ->method('getEmail')
+            ->will($this->returnValue($email));
+
+        $existingUser = self::$userService->loadUserByOAuthUserResponse($mock);
+    }
+
+    /**
+     * @expectedException \HWI\Bundle\OAuthBundle\Security\Core\Exception\AccountNotLinkedException
+     */
+    public function testLoadUserByOAuthUserResponseStarlingExistingUser()
+    {
+        $email = static::generateEmail('testLoadUserByOAuthUserResponseStarlingExistingUser', $this);
+        $user = static::createUser(
+            static::$userManager,
+            $email,
+            'bar'
+        );
+
+        $mock = $this->createUserResponseMock($email, 'starling');
         $mock
             ->expects($this->any())
             ->method('getEmail')

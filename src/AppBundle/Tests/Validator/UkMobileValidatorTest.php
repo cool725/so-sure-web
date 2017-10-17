@@ -64,6 +64,25 @@ class UkMobileValidatorTest extends \PHPUnit_Framework_TestCase
         $validator->validate('+4477757404000', self::$constraint);
     }
 
+    public function testConform()
+    {
+        $validator = new UkMobileValidator();
+        $this->assertEquals('', $validator->conform('+447775 740400'));
+        $this->assertEquals('+447775740400', $validator->conform('+447775740400'));
+        $this->assertEquals('+447775740400', $validator->conform('+447775740400123'));
+        $this->assertEquals('', $validator->conform('+44777574040'));
+
+        $this->assertEquals('', $validator->conform('00447775 740400'));
+        $this->assertEquals('00447775740400', $validator->conform('00447775740400'));
+        $this->assertEquals('00447775740400', $validator->conform('00447775740400123'));
+        $this->assertEquals('', $validator->conform('0044777574040'));
+
+        $this->assertEquals('', $validator->conform('07775 740400'));
+        $this->assertEquals('07775740400', $validator->conform('07775740400'));
+        $this->assertEquals('07775740400', $validator->conform('07775740400123'));
+        $this->assertEquals('', $validator->conform('0777574040'));
+    }
+
     /**
      * Configure a MobileValidator.
      *

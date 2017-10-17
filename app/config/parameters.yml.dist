@@ -37,6 +37,12 @@ parameters:
     fb_og_namespace: 'wearesosure-dev'
     account_kit_secret: changeme
 
+    starling_client_id:      'changeme'
+    starling_client_secret:  'changeme'
+    starling_auth_url:       'http://localhost'
+    starling_token_url:      'http://localhost'
+    starling_info_url:       'http://localhost'
+
     mailchimp_apikey: bad-mailchimp # exception thrown if - not present in param
     mailchimp_prelaunch_list:
     appannie_apikey:
