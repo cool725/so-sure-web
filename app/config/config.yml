@@ -194,23 +194,12 @@ hwi_oauth:
                 lastname: lastName
                 email: email
         accountkit:
-            type:              facebook
-            class:             'AppBundle\Classes\AccountKitResourceOwner'
+            type:              accountkit
             client_id:         '%fb_appid%'
             client_secret:     '%account_kit_secret%'
-            authorization_url: 'https://www.accountkit.com/v1.0/basic/dialog/sms_login'
-            access_token_url:  'https://graph.accountkit.com/v1.2/access_token'
-            infos_url:         'https://graph.accountkit.com/v1.2/me'
             options:
                 display: page
-                auth_type: rerequest # Re-asking for Declined Permissions
                 appsecret_proof: true
-                use_bearer_authorization: false
-            paths:
-                identifier: id
-                username: id
-                nickname: id
-                realname: id
 
 jms_di_extra:
     locations:

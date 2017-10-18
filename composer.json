@@ -78,6 +78,10 @@
         {
             "type": "vcs",
             "url":  "https://github.com/so-sure/DpnXmlSitemapBundle.git"
+        },
+        {
+            "type": "vcs",
+            "url":  "https://github.com/so-sure/HWIOAuthBundle.git"
         }
     ],
     "scripts": {
