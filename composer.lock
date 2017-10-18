@@ -2267,16 +2267,16 @@
         },
         {
             "name": "hwi/oauth-bundle",
-            "version": "0.5.4",
+            "version": "0.5.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/so-sure/HWIOAuthBundle.git",
-                "reference": "809565c2865529975ead898bdd60b23ac99affeb"
+                "reference": "1a83c2a33734ee19d203b04c4b1f67ee1a48b7d1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/so-sure/HWIOAuthBundle/zipball/809565c2865529975ead898bdd60b23ac99affeb",
-                "reference": "809565c2865529975ead898bdd60b23ac99affeb",
+                "url": "https://api.github.com/repos/so-sure/HWIOAuthBundle/zipball/1a83c2a33734ee19d203b04c4b1f67ee1a48b7d1",
+                "reference": "1a83c2a33734ee19d203b04c4b1f67ee1a48b7d1",
                 "shasum": ""
             },
             "require": {
@@ -2419,9 +2419,9 @@
                 "youtube"
             ],
             "support": {
-                "source": "https://github.com/so-sure/HWIOAuthBundle/tree/0.5.4"
+                "source": "https://github.com/so-sure/HWIOAuthBundle/tree/0.5.3.1"
             },
-            "time": "2017-10-18 13:16:37"
+            "time": "2017-10-18 13:58:29"
         },
         {
             "name": "incenteev/composer-parameter-handler",
