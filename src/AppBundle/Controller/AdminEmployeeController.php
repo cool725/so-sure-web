@@ -1176,7 +1176,7 @@ class AdminEmployeeController extends BaseController
         if ($form->isSubmitted() && $form->isValid()) {
             $imei = $form->getData()['imei'];
             $history = $logRepo->findBy([
-                'data.imei' => (int)$imei
+                'data.imei' => (int) $imei
             ]);
             $charges = $chargeRepo->findBy(['data' => $imei]);
         }
