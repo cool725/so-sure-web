@@ -77,6 +77,7 @@
                     <tr>
                         <th>Charge</th>
                         <th>Policy</th>
+                        <th>User</th>
                         <th>Charge Date</th>
                     </tr>
                     </thead>
@@ -85,7 +86,18 @@
                         <tr>
                             <td>{{ charge.type }}</td>
                             <td>
+                                {% if charge.policy %}
                                 <a href="{{ path('admin_policy', {'id': charge.policy.id }) }}">{% if charge.policy.policyNumber %}{{ charge.policy.policyNumber }} / {% endif %}{{ charge.policy.id }}</a>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if charge.user %}
+                                <a href="{{ path('admin_user', {'id': charge.user.id }) }}">{{ charge.user.name }}</a>
+                                {% else %}
+                                    -
+                                {% endif %}
                             </td>
                             <td>
                                 {{ charge.createdDate | date}}
