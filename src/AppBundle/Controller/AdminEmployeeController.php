@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Gedmo\Loggable\Document\LogEntry;
 use AppBundle\Classes\ClientUrl;
 use AppBundle\Classes\SoSure;
 use AppBundle\Classes\Salva;
@@ -1148,6 +1149,43 @@ class AdminEmployeeController extends BaseController
         $response->headers->set('Content-Disposition', 'attachment; filename="so-sure-connections.csv"');
 
         return $response;
+    }
+
+    /**
+     * @Route("/imei", name="admin_imei")
+     * @Template
+     */
+    public function imeiAction(Request $request)
+    {
+        $dm = $this->getManager();
+        $logRepo = $dm->getRepository(LogEntry::class);
+        $chargeRepo = $dm->getRepository(Charge::class);
+
+        $form = $this->createFormBuilder()
+            ->add('imei', TextType::class, array(
+                'label' => "IMEI",
+            ))
+            ->add('search', SubmitType::class, array(
+                'label' => "Search",
+            ))
+            ->getForm();
+        $history = null;
+        $charges = null;
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $imei = $form->getData()['imei'];
+            $history = $logRepo->findBy([
+                'data.imei' => (int) $imei
+            ]);
+            $charges = $chargeRepo->findBy(['data' => $imei]);
+        }
+
+        return [
+            'history' => $history,
+            'charges' => $charges,
+            'form' => $form->createView(),
+        ];
     }
 
     private function getConnectionData()
