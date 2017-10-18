@@ -1159,6 +1159,7 @@ class AdminEmployeeController extends BaseController
     {
         $dm = $this->getManager();
         $logRepo = $dm->getRepository(LogEntry::class);
+        $chargeRepo = $dm->getRepository(Charge::class);
 
         $form = $this->createFormBuilder()
             ->add('imei', TextType::class, array(
@@ -1169,6 +1170,7 @@ class AdminEmployeeController extends BaseController
             ))
             ->getForm();
         $history = null;
+        $charges = null;
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -1176,10 +1178,12 @@ class AdminEmployeeController extends BaseController
             $history = $logRepo->findBy([
                 'data.imei' => (int)$imei
             ]);
+            $charges = $chargeRepo->findBy(['data' => $imei]);
         }
 
         return [
             'history' => $history,
+            'charges' => $charges,
             'form' => $form->createView(),
         ];
     }

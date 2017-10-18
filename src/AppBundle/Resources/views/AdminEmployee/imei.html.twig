@@ -10,7 +10,7 @@
 {% block body %}
 <div class="container">
     <div class="bg-info" style="border-radius: 10px; padding: 10px;">
-    <h4 class="text-center"><strong>IMEI</strong></h4>
+    <h4 class="text-center"><strong>Search IMEI</strong></h4>
     {{ form_start(form, {'attr': {'class': 'form-inline'}})  }}
         <div class="row">
             <div class="form-group col-sm-10">
@@ -24,11 +24,13 @@
               </div>
             </div>
         </div>
-        {{ form_end(form) }}
-  </div>
+    {{ form_end(form) }}
+    </div>
+
+    <h2>History</h2>
     {% if not history or history|length == 0 %}
     <div class="row-fluid">
-        <h2>No records found</h2>
+        <h3>No records found</h3>
     </div>
     {% else %}
     <div class="row-fluid">
@@ -60,7 +62,42 @@
         </div>
     </div>
     {% endif %}
-    </form>
+
+    <h2>Charges</h2>
+    {% if not charges or charges|length == 0 %}
+    <div class="row-fluid">
+        <h3>No records found</h3>
+    </div>
+    {% else %}
+    <div class="row-fluid">
+        <div class="col-md-11">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Charge</th>
+                        <th>Policy</th>
+                        <th>Charge Date</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for charge in charges %}
+                        <tr>
+                            <td>{{ charge.type }}</td>
+                            <td>
+                                <a href="{{ path('admin_policy', {'id': charge.policy.id }) }}">{% if charge.policy.policyNumber %}{{ charge.policy.policyNumber }} / {% endif %}{{ charge.policy.id }}</a>
+                            </td>
+                            <td>
+                                {{ charge.createdDate | date}}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
 </div>
 
