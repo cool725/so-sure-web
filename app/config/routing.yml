@@ -79,6 +79,9 @@ facebook_login:
 starling_login:
     path: /login/check-starling
 
+accountkit_login:
+    path: /login/check-accountkit
+
 redirect_homepage:
     path: /index.html
     defaults:

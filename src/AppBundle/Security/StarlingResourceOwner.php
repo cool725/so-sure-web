@@ -1,5 +1,5 @@
 <?php
-namespace AppBundle\Classes;
+namespace AppBundle\Security;
 
 use HWI\Bundle\OAuthBundle\Security\Core\Authentication\Token\OAuthToken;
 use Psr\Http\Message\RequestInterface;

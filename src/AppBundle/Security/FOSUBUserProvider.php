@@ -57,6 +57,12 @@ class FOSUBUserProvider extends BaseClass
         $service = $response->getResourceOwner()->getName();
         $username = $response->getUsername();
         $search = $this->getProperty($response);
+        if ($service == 'accountkit') {
+            $search = 'mobileNumber';
+            if (isset($response->getResponse()['phone'])) {
+                $username = $response->getResponse()['phone']['number'];
+            }
+        }
         #if ($search == "facebook_id") {
         #    $search = "facebookId";
         #}
@@ -72,8 +78,19 @@ class FOSUBUserProvider extends BaseClass
         if (null === $user) {
             // Not guarenteed an email address
             if (!$response->getEmail()) {
+                $msg = sprintf('Unable to find an account matching your %s details.', $service);
+
+                if ($request = $this->requestStack->getCurrentRequest()) {
+                    if ($session = $request->getSession()) {
+                        if ($session->isStarted()) {
+                            $session->getFlashBag()->add('error', $msg);
+                        }
+                    }
+                }
+
                 return null;
             }
+
             if ($this->userManager->findUserBy(['emailCanonical' => strtolower($response->getEmail())])) {
                 $msg = 'You appear to already have an account, but its not connected. Please login and connect.';
 
@@ -87,13 +104,17 @@ class FOSUBUserProvider extends BaseClass
 
                 throw new AccountNotLinkedException($msg);
             }
-            $setter = 'set'.ucfirst($service);
-            $setter_id = $setter.'Id';
-            $setter_token = $setter.'AccessToken';
+
             // create new user here
             $user = $this->userManager->createUser();
-            $user->$setter_id($username);
-            $user->$setter_token($this->getLongLivedAccessToken($response));
+
+            if ($service != 'accountkit') {
+                $setter = 'set'.ucfirst($service);
+                $setter_id = $setter.'Id';
+                $setter_token = $setter.'AccessToken';
+                $user->$setter_id($username);
+                $user->$setter_token($this->getLongLivedAccessToken($response));
+            }
 
             $user->setEmail($response->getEmail());
             $user->setFirstName($this->conformAlphanumeric(explode(' ', $response->getFirstName())[0], 50));
@@ -121,11 +142,11 @@ class FOSUBUserProvider extends BaseClass
         //if user exists - go with the HWIOAuth way
         //$user = parent::loadUserByOAuthUserResponse($response);
 
-        $serviceName = $response->getResourceOwner()->getName();
-        $setter = 'set' . ucfirst($serviceName) . 'AccessToken';
-
-        //update access token
-        $user->$setter($this->getLongLivedAccessToken($response));
+        if ($service != 'accountkit') {
+            $setter = 'set' . ucfirst($service) . 'AccessToken';
+            //update access token
+            $user->$setter($this->getLongLivedAccessToken($response));
+        }
 
         return $user;
     }

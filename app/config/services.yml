@@ -5,7 +5,7 @@ parameters:
 services:
     app.user:
         class: AppBundle\Security\FOSUBUserProvider
-        arguments: ["@fos_user.user_manager",{facebook: facebookId, starling: starlingId}]
+        arguments: ["@fos_user.user_manager",{facebook: facebookId, starling: starlingId, accountkit: id}]
         calls:
             - [setFacebook, ['@app.facebook']]
             - [setRequestStack, ['@request_stack']]
