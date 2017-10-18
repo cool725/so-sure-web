@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets output='css/*.css'
+    '@AppBundle/Resources/public/sass/page/admin.scss'
+ %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="bg-info" style="border-radius: 10px; padding: 10px;">
+    <h4 class="text-center"><strong>IMEI</strong></h4>
+    {{ form_start(form, {'attr': {'class': 'form-inline'}})  }}
+        <div class="row">
+            <div class="form-group col-sm-10">
+                {{ form_label(form.imei, 'IMEI', {'label_attr': {'class': 'col-sm-2'}}) }}
+                {{ form_errors(form.imei) }}
+                {{ form_widget(form.imei, {'attr': {'class': 'col-sm-10'}}) }}
+            </div>
+            <div class="form-group">
+              <div class="col-sm-2 text-center">
+                {{ form_widget(form.search, {'label': 'Search', 'attr': {'class': 'btn btn-success'}}) }}
+              </div>
+            </div>
+        </div>
+        {{ form_end(form) }}
+  </div>
+    {% if not history or history|length == 0 %}
+    <div class="row-fluid">
+        <h2>No records found</h2>
+    </div>
+    {% else %}
+    <div class="row-fluid">
+        <div class="col-md-11">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Version</th>
+                        <th>Policy</th>
+                        <th>Version Date</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for record in history %}
+                        <tr>
+                            <td>{{ record.version }}</td>
+                            <td>
+                                <a href="{{ path('admin_policy', {'id': record.objectId }) }}">{% if record.data.policyNumber %}{{ record.data.policyNumber }} / {% endif %}{{ record.objectId }}</a>
+                            </td>
+                            <td>
+                                {{ record.loggedAt | date}}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    </form>
+
+</div>
+
+
+{% endblock %}
