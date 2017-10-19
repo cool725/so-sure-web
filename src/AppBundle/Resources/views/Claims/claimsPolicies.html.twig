@@ -179,12 +179,3 @@
     <div style="padding-bottom: 50px"></div>
 </div>
 {% endblock %}
-
-        {% block javascripts %}
-             {{ parent() }}
-    {% javascripts
-        '@AppBundle/Resources/public/js/Admin/phone.js'
-    %}
-        <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}
-        {% endblock %}

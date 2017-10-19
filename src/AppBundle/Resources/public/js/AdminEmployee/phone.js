@@ -38,7 +38,9 @@ $('#phoneModal').on('show.bs.modal', function (event) {
         { title: 'Valid From', data: 'valid_from' },
         { title: 'Valid To', data: 'valid_to' },
         { title: 'GWP', data: 'gwp' },
-        { title: 'Premium', data: 'premium' },
+        { title: 'Premium (current)', data: 'premium' },
+        { title: 'Initial Premium', data: 'initial_premium' },
+        { title: 'Final Premium', data: 'final_premium' },
         { title: 'Notes', data: 'notes' }
       ]
     });

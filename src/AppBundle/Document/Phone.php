@@ -822,7 +822,7 @@ class Phone
             'memory' => $this->getMemory(),
             'gwp' => $this->getCurrentPhonePrice() ? $this->getCurrentPhonePrice()->getGwp() : null,
             'active' => $this->getActive(),
-            'prices' => $this->eachApiArray($this->getPhonePrices(), $date),
+            'prices' => $this->eachApiMethod($this->getPhonePrices(), 'toPriceArray', $date),
         ];
     }
 
