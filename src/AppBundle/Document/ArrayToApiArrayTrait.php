@@ -25,12 +25,16 @@ trait ArrayToApiArrayTrait
         return $results;
     }
 
-    public function eachApiMethod($array, $method, $isDate = true)
+    public function eachApiMethod($array, $method, $isDate = true, $param1 = null)
     {
         $results = [];
         if ($array) {
             foreach ($array as $item) {
-                $result = call_user_func([$item, $method]);
+                if ($param1) {
+                    $result = call_user_func([$item, $method], $param1);
+                } else {
+                    $result = call_user_func([$item, $method]);
+                }
                 if ($result) {
                     if ($isDate) {
                         $results[] = $result->format(\DateTime::ATOM);

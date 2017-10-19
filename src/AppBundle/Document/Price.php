@@ -148,4 +148,12 @@ abstract class Price
             'notes' => $this->getNotes(),
         ];
     }
+
+    public function toPriceArray(\DateTime $date = null)
+    {
+        return array_merge($this->toApiArray($date), [
+            'initial_premium' => $this->getMonthlyPremiumPrice($this->getValidFrom()),
+            'final_premium' => $this->getValidTo() ? $this->getMonthlyPremiumPrice($this->getValidTo()) : null,
+        ]);
+    }
 }
