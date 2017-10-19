@@ -347,6 +347,7 @@ class PurchaseController extends BaseController
         $webpay = null;
         $allowPayment = true;
 
+        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_POSTCODE);
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('purchase_form')) {
                 $purchaseForm->handleRequest($request);

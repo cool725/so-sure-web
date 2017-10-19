@@ -167,7 +167,7 @@
                                 <label class="sr-only">Billing Address:</label>
                                 {% if postcode == 'split' %}
                                     <div class="form-inline">
-                                      <input type="form-control form-inline" type="text" placeholder="House Number">
+                                        <input type="form-control form-inline" type="text" placeholder="House Number">
                                         <input type="form-control form-inline" type="text" placeholder="Postcode">
                                     </div>
                                 {% else %}
@@ -176,12 +176,12 @@
                                 {% if is_postback %}
                                     <div class="help-block with-errors"><ul><li>Your address is required</li></ul></div>
                                 {% endif %}
-                                <a id="address-enter" href="#">Enter address manually</a>
+                                <a id="address-manual" href="#">Enter address manually</a>
                             </div>
                             <span id="display-address">
                             </span>
                             <span class="help-block text-center">
-                                <a id="address-manual" href="#" class="btn btn-green btn-block btn-pad">Continue</a>
+                                <a id="address-find" href="#" class="btn btn-green btn-block btn-pad">Continue</a>
                             </span>
                         </div>
 

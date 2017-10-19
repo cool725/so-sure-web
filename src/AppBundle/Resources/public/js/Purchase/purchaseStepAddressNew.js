@@ -208,6 +208,23 @@ $(function(){
     var maxAddresses = 50; // more than 50 causes the find api to returns an error 'unrecognised country code'
     var key = $('#ss-root').data('pca-key');
 
+    var displayAddress = function() {
+        var display = $('.addressLine1');
+        if ($('.addressLine2').length > 0) {
+            display = display + "<br>" + $('.addressLine2');
+        }
+        if ($('.addressLine3').length > 0) {
+            display = display + "<br>" + $('.addressLine2');
+        }
+        if ($('.city').length > 0) {
+            display = display + "<br>" + $('.city');
+        }
+        if ($('.postcode').length > 0) {
+            display = display + "<br>" + $('.postcode');
+        }
+        $('#display-address').innerHtml(display);
+    }
+    
     var setAddress = function(addr) {
         if (!addr) {
             return;
