@@ -139,13 +139,13 @@
                                formnovalidate="formnovalidate"
                                class="btn btn-facebook btn-block btn-pad"
                                {% if app.user %}disabled{% endif %}>
-                                Login with Facebook
+                                <i class="fa fa-facebook-official"></i> &nbsp;Login with Facebook
                             </a>
                             {% if feature_enabled('starling') %}
                                 <div class="text-break text-grey">
                                     <div class="line"></div>OR<div class="line"></div>
                                 </div>
-                                <a href="/login/starling"><img src="{{ cdn_url }}/images/Starling-Button.png" width="100%"></a>        
+                                <a class="btn btn-block btn-starling btn-pad" href="/login/starling"><img src="{{ cdn_url }}/images/StarlingMarkIcon.png" height="20px"> &nbsp;Login with Starling</a>
                             {% endif %}
                         </div>
                     </div>
