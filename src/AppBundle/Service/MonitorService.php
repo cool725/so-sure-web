@@ -123,11 +123,11 @@ class MonitorService
         }
 
         $now = $this->startOfDay(new \DateTime());
-        $diff = $now->diff($successFile->getDate());
+        $diff = $now->diff($successFile->getCreated());
         if ($diff->days >= 1) {
             throw new \Exception(sprintf(
                 'Last successful import on %s',
-                $successFile->getDate()->format(\DateTime::ATOM)
+                $successFile->getCreated()->format(\DateTime::ATOM)
             ));
         }
     }
