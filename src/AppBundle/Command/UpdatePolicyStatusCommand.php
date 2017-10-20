@@ -144,6 +144,20 @@ class UpdatePolicyStatusCommand extends BaseCommand
         $lines[] = '';
         $ignoreLineCount++;
 
+        // Expire Policies - (Active/Unpaid)
+        $expired = $policyService->expireEndingPolicies($prefix, $dryRun);
+        $copy = 'Expire Policy';
+        if ($dryRun) {
+            $copy = 'Dry Run - Should expire Policy';
+        }
+        foreach ($expired as $id => $number) {
+            $lines[] = sprintf('%s %s / %s', $copy, $number, $id);
+        }
+        $lines[] = sprintf('%s expire (claimable) policies processed', count($expired));
+        $ignoreLineCount++;
+        $lines[] = '';
+        $ignoreLineCount++;
+
         // Activate Policies (Renewed -> Active)
         $renewal = $policyService->activateRenewalPolicies($prefix, $dryRun);
         $copy = 'Activated Renewal Policy';
@@ -168,20 +182,6 @@ class UpdatePolicyStatusCommand extends BaseCommand
             $lines[] = sprintf('%s %s / %s', $copy, $number, $id);
         }
         $lines[] = sprintf('%s unrenewed policies processed', count($unrenewed));
-        $ignoreLineCount++;
-        $lines[] = '';
-        $ignoreLineCount++;
-
-        // Expire Policies - (Active/Unpaid)
-        $expired = $policyService->expireEndingPolicies($prefix, $dryRun);
-        $copy = 'Expire Policy';
-        if ($dryRun) {
-            $copy = 'Dry Run - Should expire Policy';
-        }
-        foreach ($expired as $id => $number) {
-            $lines[] = sprintf('%s %s / %s', $copy, $number, $id);
-        }
-        $lines[] = sprintf('%s expire (claimable) policies processed', count($expired));
         $ignoreLineCount++;
         $lines[] = '';
         $ignoreLineCount++;
