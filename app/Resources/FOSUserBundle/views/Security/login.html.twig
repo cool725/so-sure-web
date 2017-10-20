@@ -2,7 +2,6 @@
 {% block fos_user_content %}
 
 <h1>Welcome back!</h1>
-
 {# Account Kit Login #}
 <div class="login-account-kit login-box" data-key="{{ fb_appid }}" data-csrf="{{ csrf_token('account-kit') }}" data-toggle="{% if app.request.clientIp == davies_ip %}1{% else %}0{% endif %}">
     <form method="get" action="https://www.accountkit.com/v1.0/basic/dialog/sms_login/">
@@ -11,7 +10,7 @@
         <input type="hidden" value="+44" id="country_code" class="form-control" />
         <input type="hidden" name="app_id" value="{{ fb_appid }}">
         <input type="hidden" name="redirect" value="{{ app.request.schemeAndHttpHost }}/login/check-accountkit">
-        <input type="hidden" name="state" value="{{ csrf_token('default') }}">
+        <input type="hidden" name="state" value="{{ accountkit_state() }}">
         <input type="hidden" name="fbAppEventsEnabled" value=true>
         <input type="hidden" name="debug" value=false>
     </div>
@@ -19,6 +18,9 @@
         <input placeholder="Mobile number" id="phone_number" name="phone_number" class="form-control input-lg" type="tel" />
         <span class="help-block text-center"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> UK numbers only</span>
     </div>
+    {% if error %}
+        <div class="error-text" style="padding-bottom: 10px;">Sorry, we were unable to log you in. You can try again, or <a href="mailto:support@wearesosure.com" class="open-intercom">contact us</a> for help.</div>
+    {% endif %}
     <div class="form-group">
           <button class="btn btn-success btn-block">
                 <span id="btn-spinner" style="display:none;"><i class="fa fa-refresh fa-spin"></i></span>

@@ -75,6 +75,7 @@ $(function() {
         e.preventDefault();
         $('.login-email, .login-account-kit').toggle();
         $(this).find('span').toggleText('mobile', 'email');
+        $('.error-text').hide();
     });
 
     // Check the data attr for account kit || check the url

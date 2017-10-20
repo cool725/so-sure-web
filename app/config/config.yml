@@ -200,6 +200,7 @@ hwi_oauth:
             options:
                 display: page
                 appsecret_proof: true
+                csrf: true
 
 jms_di_extra:
     locations:
