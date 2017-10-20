@@ -50,7 +50,12 @@ sosure.purchaseStepAddress = (function() {
                     checkDateIsValid: true
                 },
                 "purchase_form[mobileNumber]" : {
-                    required: true,
+                    required: {
+                        depends:function(){
+                            $(this).val($.trim($(this).val()));
+                            return true;
+                        }
+                    },
                     phoneUK: true,
                 },
                 "purchase_form[addressLine1]" : {
