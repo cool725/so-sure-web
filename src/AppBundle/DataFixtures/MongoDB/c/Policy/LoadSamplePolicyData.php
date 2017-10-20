@@ -53,7 +53,8 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $this->faker = Faker\Factory::create('en_GB');
 
         $users = $this->newUsers($manager, 150);
-        $appPreExpireUsers = $this->newUsers($manager, 40);
+        $iosPreExpireUsers = $this->newUsers($manager, 40);
+        $androidPreExpireUsers = $this->newUsers($manager, 40);
         $preExpireUsers = $this->newUsers($manager, 40);
         $preExpireYearlyUsers = $this->newUsers($manager, 40, true);
         $expiredUsers = $this->newUsers($manager, 40);
@@ -77,9 +78,12 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $this->addConnections($manager, $user, $users);
         }
 
-        foreach ($appPreExpireUsers as $user) {
-            $this->newPolicy($manager, $user, $count, self::CLAIM_NONE, null, null, null, true, true, 345);
-            $user->setEnabled(true);
+        foreach ($iosPreExpireUsers as $user) {
+            $this->newPolicy($manager, $user, $count, self::CLAIM_NONE, null, null, null, true, true);
+            $count++;
+        }
+        foreach ($androidPreExpireUsers as $user) {
+            $this->newPolicy($manager, $user, $count, self::CLAIM_NONE, null, null, null, true, true);
             $count++;
         }
         foreach ($preExpireUsers as $user) {
@@ -139,7 +143,11 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 continue;
             }
             $adjusted[] = $phone->getId();
-            $phone->changePrice($phone->getCurrentPhonePrice()->getGwp() - 0.30, $sixMonthsAgo, null, null, $sixMonthsAgo);
+            $adjustedPrice = $phone->getCurrentPhonePrice()->getGwp() - 0.01;
+            if ($phone->getSalvaMiniumumBinderMonthlyPremium() < $phone->getCurrentPhonePrice()->getGwp() - 0.30) {
+                $adjustedPrice = $phone->getCurrentPhonePrice()->getGwp() - 0.30;
+            }
+            $phone->changePrice($adjustedPrice, $sixMonthsAgo, null, null, $sixMonthsAgo);
         }
 
         // Sample user for apple
@@ -191,10 +199,10 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $user->setEnabled(true);
         $manager->persist($user);
         $policy = $this->newPolicy($manager, $user, $count++, self::CLAIM_NONE, null, null, $iphoneUI, true, false, 345);
-        $maxAttempts = 10;
+        $maxAttempts = 20;
         while ($policy->getPotValue() == 0) {
             $maxAttempts--;
-            $this->addConnections($manager, $user, $appPreExpireUsers, self::CONNECTIONS_RANDOM);
+            $this->addConnections($manager, $user, $iosPreExpireUsers, self::CONNECTIONS_RANDOM);
             if ($maxAttempts < 0) {
                 throw new \Exception(sprintf('0 pot value policy %s', $user->getEmail()));
             }
@@ -205,10 +213,10 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $user->setEnabled(true);
         $manager->persist($user);
         $policy = $this->newPolicy($manager, $user, $count++, self::CLAIM_NONE, null, null, $iphoneUI, true, false, 345);
-        $maxAttempts = 10;
+        $maxAttempts = 20;
         while ($policy->getPotValue() == 0) {
             $maxAttempts--;
-            $this->addConnections($manager, $user, $appPreExpireUsers, self::CONNECTIONS_RANDOM);
+            $this->addConnections($manager, $user, $iosPreExpireUsers, self::CONNECTIONS_RANDOM);
             if ($maxAttempts < 0) {
                 throw new \Exception(sprintf('0 pot value policy %s', $user->getEmail()));
             }
@@ -219,10 +227,10 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $user->setEnabled(true);
         $manager->persist($user);
         $policy = $this->newPolicy($manager, $user, $count++, self::CLAIM_NONE, null, null, $iphoneUI, true, false, 345);
-        $maxAttempts = 10;
+        $maxAttempts = 20;
         while ($policy->getPotValue() == 0) {
             $maxAttempts--;
-            $this->addConnections($manager, $user, $appPreExpireUsers, self::CONNECTIONS_RANDOM);
+            $this->addConnections($manager, $user, $iosPreExpireUsers, self::CONNECTIONS_RANDOM);
             if ($maxAttempts < 0) {
                 throw new \Exception(sprintf('0 pot value policy %s', $user->getEmail()));
             }
@@ -255,10 +263,10 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $user->setEnabled(true);
         $manager->persist($user);
         $policy = $this->newPolicy($manager, $user, $count++, self::CLAIM_NONE, null, null, $androidUI, true, false, 345);
-        $maxAttempts = 10;
+        $maxAttempts = 20;
         while ($policy->getPotValue() == 0) {
             $maxAttempts--;
-            $this->addConnections($manager, $user, $appPreExpireUsers, self::CONNECTIONS_RANDOM);
+            $this->addConnections($manager, $user, $androidPreExpireUsers, self::CONNECTIONS_RANDOM);
             if ($maxAttempts < 0) {
                 throw new \Exception(sprintf('0 pot value policy %s', $user->getEmail()));
             }
@@ -269,10 +277,10 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $user->setEnabled(true);
         $manager->persist($user);
         $policy = $this->newPolicy($manager, $user, $count++, self::CLAIM_NONE, null, null, $androidUI, true, false, 345);
-        $maxAttempts = 10;
+        $maxAttempts = 20;
         while ($policy->getPotValue() == 0) {
             $maxAttempts--;
-            $this->addConnections($manager, $user, $appPreExpireUsers, self::CONNECTIONS_RANDOM);
+            $this->addConnections($manager, $user, $androidPreExpireUsers, self::CONNECTIONS_RANDOM);
             if ($maxAttempts < 0) {
                 throw new \Exception(sprintf('0 pot value policy %s', $user->getEmail()));
             }
@@ -283,10 +291,10 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $user->setEnabled(true);
         $manager->persist($user);
         $policy = $this->newPolicy($manager, $user, $count++, self::CLAIM_NONE, null, null, $androidUI, true, false, 345);
-        $maxAttempts = 10;
+        $maxAttempts = 20;
         while ($policy->getPotValue() == 0) {
             $maxAttempts--;
-            $this->addConnections($manager, $user, $appPreExpireUsers, self::CONNECTIONS_RANDOM);
+            $this->addConnections($manager, $user, $androidPreExpireUsers, self::CONNECTIONS_RANDOM);
             if ($maxAttempts < 0) {
                 throw new \Exception(sprintf('0 pot value policy %s', $user->getEmail()));
             }
