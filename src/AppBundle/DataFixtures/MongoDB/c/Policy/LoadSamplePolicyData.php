@@ -27,12 +27,20 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 {
     use \AppBundle\Tests\UserClassTrait;
 
+    const CLAIM_NONE = 'none';
+    const CLAIM_RANDOM = 'random';
+    const CLAIM_SETTLED_LOSS = 'settled-loss';
+
+    const CONNECTIONS_RANDOM_OR_NONE = 'random-or-none';
+    const CONNECTIONS_RANDOM = 'random';
+
      /**
      * @var ContainerInterface
      */
     private $container;
 
     private $faker;
+    private $emails = [];
 
     public function setContainer(ContainerInterface $container = null)
     {
@@ -44,10 +52,11 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $this->faker = Faker\Factory::create('en_GB');
 
         $users = $this->newUsers($manager, 150);
-        $expUsersA = $this->newUsers($manager, 40);
-        $expUsersB = $this->newUsers($manager, 40, true);
-        $expUsersC = $this->newUsers($manager, 40);
-        $expUsersD = $this->newUsers($manager, 40);
+        $appPreExpireUsers = $this->newUsers($manager, 40);
+        $preExpireUsers = $this->newUsers($manager, 40);
+        $preExpireYearlyUsers = $this->newUsers($manager, 40, true);
+        $expiredUsers = $this->newUsers($manager, 40);
+        $fullyExpiredUsers = $this->newUsers($manager, 40);
         $manager->flush();
 
         $count = 0;
@@ -67,52 +76,57 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $this->addConnections($manager, $user, $users);
         }
 
-        foreach ($expUsersA as $user) {
-            $this->newPolicy($manager, $user, $count, null, null, null, null, null, true, 345);
+        foreach ($appPreExpireUsers as $user) {
+            $this->newPolicy($manager, $user, $count, self::CLAIM_NONE, null, null, null, true, true, 345);
             $user->setEnabled(true);
             $count++;
         }
-        foreach ($expUsersB as $user) {
-            $this->newPolicy($manager, $user, $count, null, null, null, null, null, true, 345);
+        foreach ($preExpireUsers as $user) {
+            $this->newPolicy($manager, $user, $count, self::CLAIM_RANDOM, null, null, null, null, true, 345);
             $user->setEnabled(true);
             $count++;
         }
-        foreach ($expUsersC as $user) {
-            $this->newPolicy($manager, $user, $count, null, null, null, null, null, true, 366);
+        foreach ($preExpireYearlyUsers as $user) {
+            $this->newPolicy($manager, $user, $count, self::CLAIM_RANDOM, null, null, null, null, true, 345);
             $user->setEnabled(true);
             $count++;
         }
-        foreach ($expUsersD as $user) {
-            $this->newPolicy($manager, $user, $count, null, null, null, null, null, true, 396);
+        foreach ($expiredUsers as $user) {
+            $this->newPolicy($manager, $user, $count, self::CLAIM_NONE, null, null, null, null, true, 366);
+            $user->setEnabled(true);
+            $count++;
+        }
+        foreach ($fullyExpiredUsers as $user) {
+            $this->newPolicy($manager, $user, $count, self::CLAIM_NONE, null, null, null, null, true, 396);
             $user->setEnabled(true);
             $count++;
         }
         $manager->flush();
 
-        foreach ($expUsersA as $user) {
+        foreach ($preExpireUsers as $user) {
             $rand = rand(0, 1);
             if ($rand == 0) {
-                $this->addConnections($manager, $user, $expUsersA);
+                $this->addConnections($manager, $user, $preExpireUsers);
             }
         }
-        foreach ($expUsersB as $user) {
+        foreach ($preExpireYearlyUsers as $user) {
             $rand = rand(0, 1);
             if ($rand == 0) {
-                $this->addConnections($manager, $user, $expUsersB);
+                $this->addConnections($manager, $user, $preExpireYearlyUsers);
             }
         }
-        foreach ($expUsersD as $user) {
+        foreach ($fullyExpiredUsers as $user) {
             $rand = rand(0, 1);
             if ($rand == 0) {
-                $this->addConnections($manager, $user, $expUsersD);
+                $this->addConnections($manager, $user, $fullyExpiredUsers);
             }
         }
 
         $phones = [];
-        foreach ($expUsersB as $user) {
+        foreach ($preExpireYearlyUsers as $user) {
             $phones[] = $user->getPolicies()[0]->getPhone();
         }
-        foreach ($expUsersC as $user) {
+        foreach ($preExpireYearlyUsers as $user) {
             $phones[] = $user->getPolicies()[0]->getPhone();
         }
         $sixMonthsAgo = new \DateTime();
@@ -139,14 +153,14 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $networkUser->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
         $networkUser->setEnabled(true);
         $manager->persist($networkUser);
-        $this->newPolicy($manager, $networkUser, $count++, false);
+        $this->newPolicy($manager, $networkUser, $count++, self::CLAIM_SETTLED_LOSS);
         //\Doctrine\Common\Util\Debug::dump($networkUser);
 
         $user = $this->newUser('user-claimed@so-sure.com', true);
         $user->setPlainPassword('w3ares0sure!');
         $user->setEnabled(true);
         $manager->persist($user);
-        $this->newPolicy($manager, $user, $count++, true);
+        $this->newPolicy($manager, $user, $count++, self::CLAIM_SETTLED_LOSS);
         $this->addConnections($manager, $user, [$networkUser], 1);
 
         // Users for iOS Testing
@@ -155,21 +169,51 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $userInviter->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
         $userInviter->setEnabled(true);
         $manager->persist($userInviter);
-        $this->newPolicy($manager, $userInviter, $count++, false, null, null, $iphoneUI, true);
+        $this->newPolicy($manager, $userInviter, $count++, self::CLAIM_NONE, null, null, $iphoneUI, true);
 
         $userInvitee = $this->newUser('ios-testing+invitee@so-sure.com', true);
         $userInvitee->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
         $userInvitee->setEnabled(true);
         $manager->persist($userInvitee);
-        $this->newPolicy($manager, $userInvitee, $count++, false, null, null, $iphoneUI, true, false);
+        $this->newPolicy($manager, $userInvitee, $count++, self::CLAIM_NONE, null, null, $iphoneUI, true, false);
 
         $user = $this->newUser('ios-testing+scode@so-sure.com', true);
         $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $manager->persist($user);
-        $this->newPolicy($manager, $user, $count++, false, null, 'IOS-TEST', $iphoneUI, true);
+        $this->newPolicy($manager, $user, $count++, self::CLAIM_NONE, null, 'IOS-TEST', $iphoneUI, true);
 
         $this->invite($manager, $userInviter, $userInvitee, false);
+
+        $user = $this->newUser('ios-testing+renew+pot@so-sure.com', true);
+        $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $user->setEnabled(true);
+        $manager->persist($user);
+        $policy = $this->newPolicy($manager, $user, $count++, self::CLAIM_NONE, null, null, $iphoneUI, true, false, 345);
+        $this->addConnections($manager, $user, $appPreExpireUsers, self::CONNECTIONS_RANDOM);
+        if ($policy->getPotValue() == 0) {
+            throw new \Exception(sprintf('0 pot value policy %s', $user->getEmail()));
+        }
+
+        $user = $this->newUser('ios-testing+renew+nopot@so-sure.com', true);
+        $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $user->setEnabled(true);
+        $manager->persist($user);
+        $policy = $this->newPolicy($manager, $user, $count++, self::CLAIM_NONE, null, null, $iphoneUI, true, false, 345);
+        $this->addConnections($manager, $user, $appPreExpireUsers, self::CONNECTIONS_RANDOM);
+        if ($policy->getPotValue() == 0) {
+            throw new \Exception(sprintf('0 pot value policy %s', $user->getEmail()));
+        }
+
+        $user = $this->newUser('ios-testing+cashback@so-sure.com', true);
+        $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $user->setEnabled(true);
+        $manager->persist($user);
+        $policy = $this->newPolicy($manager, $user, $count++, self::CLAIM_NONE, null, null, $iphoneUI, true, false, 345);
+        $this->addConnections($manager, $user, $appPreExpireUsers, self::CONNECTIONS_RANDOM);
+        if ($policy->getPotValue() == 0) {
+            throw new \Exception(sprintf('0 pot value policy %s', $user->getEmail()));
+        }
 
         // Users for Android Testing
         $androidUI = $this->getAndroidUI($manager);
@@ -177,21 +221,51 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $userInviter->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
         $userInviter->setEnabled(true);
         $manager->persist($userInviter);
-        $this->newPolicy($manager, $userInviter, $count++, false, null, null, $androidUI, true);
+        $this->newPolicy($manager, $userInviter, $count++, self::CLAIM_NONE, null, null, $androidUI, true);
 
         $userInvitee = $this->newUser('android-testing+invitee@so-sure.com', true);
         $userInvitee->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
         $userInvitee->setEnabled(true);
         $manager->persist($userInvitee);
-        $this->newPolicy($manager, $userInvitee, $count++, false, null, null, $androidUI, true, false);
+        $this->newPolicy($manager, $userInvitee, $count++, self::CLAIM_NONE, null, null, $androidUI, true, false);
 
         $user = $this->newUser('android-testing+scode@so-sure.com', true);
         $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $manager->persist($user);
-        $this->newPolicy($manager, $user, $count++, false, null, 'AND-TEST', $androidUI, true);
+        $this->newPolicy($manager, $user, $count++, self::CLAIM_NONE, null, 'AND-TEST', $androidUI, true);
 
         $this->invite($manager, $userInviter, $userInvitee, false);
+
+        $user = $this->newUser('android-testing+renew+pot@so-sure.com', true);
+        $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $user->setEnabled(true);
+        $manager->persist($user);
+        $policy = $this->newPolicy($manager, $user, $count++, self::CLAIM_NONE, null, null, $androidUI, true, false, 345);
+        $this->addConnections($manager, $user, $appPreExpireUsers, self::CONNECTIONS_RANDOM);
+        if ($policy->getPotValue() == 0) {
+            throw new \Exception(sprintf('0 pot value policy %s', $user->getEmail()));
+        }
+
+        $user = $this->newUser('android-testing+renew+nopot@so-sure.com', true);
+        $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $user->setEnabled(true);
+        $manager->persist($user);
+        $policy = $this->newPolicy($manager, $user, $count++, self::CLAIM_NONE, null, null, $androidUI, true, false, 345);
+        $this->addConnections($manager, $user, $appPreExpireUsers, self::CONNECTIONS_RANDOM);
+        if ($policy->getPotValue() == 0) {
+            throw new \Exception(sprintf('0 pot value policy %s', $user->getEmail()));
+        }
+
+        $user = $this->newUser('android-testing+cashback@so-sure.com', true);
+        $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $user->setEnabled(true);
+        $manager->persist($user);
+        $policy = $this->newPolicy($manager, $user, $count++, self::CLAIM_NONE, null, null, $androidUI, true, false, 345);
+        $this->addConnections($manager, $user, $appPreExpireUsers, self::CONNECTIONS_RANDOM);
+        if ($policy->getPotValue() == 0) {
+            throw new \Exception(sprintf('0 pot value policy %s', $user->getEmail()));
+        }
 
         $manager->flush();
 
@@ -237,9 +311,10 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $users = [];
         for ($i = 1; $i <= $number; $i++) {
             $email = $this->faker->email;
-            while ($userRepo->findOneBy(['email' => $email])) {
+            while (in_array($email, $this->emails)) {
                 $email = $this->faker->email;
             }
+            $emails[] = $email;
             $user = $this->newUser($email, false, $yearlyOnlyPostcode);
             $manager->persist($user);
             $users[] = $user;
@@ -326,7 +401,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $manager,
         $user,
         $count,
-        $claim = null,
+        $claim = self::CLAIM_RANDOM,
         $promo = null,
         $code = null,
         $phone = null,
@@ -370,13 +445,13 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         $claimStatus = null;
         $claimType = null;
-        if ($claim === null) {
+        if ($claim == self::CLAIM_RANDOM) {
             $claim = rand(0, 3) == 0;
-        } else {
+        } elseif ($claim == self::CLAIM_SETTLED_LOSS) {
             $claimStatus = Claim::STATUS_SETTLED;
             $claimType = Claim::TYPE_LOSS;
         }
-        if ($claim && $days <= 365) {
+        if (in_array($claim, [self::CLAIM_RANDOM, self::CLAIM_SETTLED_LOSS])) {
             $this->addClaim($dm, $policy, $claimType, $claimStatus);
         }
         if ($promo === null) {
@@ -450,6 +525,8 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         } else {
             $policy->setStatus(SalvaPhonePolicy::STATUS_UNPAID);
         }
+
+        return $policy;
     }
 
     private function invite($manager, $userA, $userB, $accepted = true)
@@ -471,23 +548,35 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $manager->persist($invitation);        
     }
 
-    private function addConnections($manager, $userA, $users, $connections = null)
+    private function addConnections($manager, $userA, $users, $connections = self::CONNECTIONS_RANDOM_OR_NONE)
     {
         $policyA = $userA->getPolicies()[0];
-        if ($connections === null) {
+        if ($connections == self::CONNECTIONS_RANDOM_OR_NONE) {
             $connections = rand(0, $policyA->getMaxConnections() - 2);
+        } elseif ($connections == self::CONNECTIONS_RANDOM) {
+            $connections = rand(1, $policyA->getMaxConnections() - 2);
         }
+
         //$connections = rand(0, 3);
+        $maxRetries = 10;
         for ($i = 0; $i < $connections; $i++) {
             $userB = $users[rand(0, count($users) - 1)];
             $policyB = $userB->getPolicies()[0];
             if ($policyA->getId() == $policyB->getId() || count($policyB->getConnections()) > 0) {
+                $maxRetries--;
+                if ($maxRetries > 0) {
+                    $i--;
+                }
                 continue;
             }
 
             // only 1 connection for user
             foreach ($policyA->getConnections() as $connection) {
                 if ($connection->getLinkedPolicy()->getId() == $policyB->getId()) {
+                    $maxRetries--;
+                    if ($maxRetries > 0) {
+                        $i--;
+                    }
                     continue;
                 }
             }
@@ -515,7 +604,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     
             $policyB->addConnection($connectionA);
             $policyB->updatePotValue();
-    
+
             $manager->persist($connectionA);
             $manager->persist($connectionB);            
         }
