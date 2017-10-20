@@ -1610,7 +1610,7 @@ class ApiAuthController extends BaseController
             $facebookCheck = null;
             if ($this->isDataStringPresent($data, 'facebook_id') &&
                 $user->getFacebookId() != $facebookId) {
-                $facebookCheck = $user->getFacebookId();
+                $facebookCheck = $facebookId;
             }
 
             $userExists = $repo->existsAnotherUser($user, $emailCheck, $facebookCheck, $mobileCheck);
