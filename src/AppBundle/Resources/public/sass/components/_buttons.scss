@@ -106,6 +106,16 @@
 	}
 }
 
+.btn-starling {
+	@include btn($starling, $white);
+
+	&:hover,
+	&:focus,
+	&:active {
+		color: $white;
+	}
+}
+
 .input-group .btn {
 	@include border-right-radius(4px);
 	padding: 5px;

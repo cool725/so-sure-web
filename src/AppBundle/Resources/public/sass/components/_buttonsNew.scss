@@ -68,6 +68,10 @@
 	@include btn($facebook, $white, $white);
 }
 
+.btn-starling {
+	@include btn($starling, $white, $white);
+}
+
 .btn-pad {
 	padding-top: 15px;
 	padding-bottom: 15px;
