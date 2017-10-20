@@ -598,8 +598,8 @@ class JudopayService
     {
         // TODO: Should we issue a refund in this case??
         $premium = $payment->getPolicy()->getPremium();
-        if (!$premium->isEvenlyDivisible($payment->getAmount()) ||
-            !$premium->isEvenlyDivisible($payment->getAmount(), true) ||
+        if (!$premium->isEvenlyDivisible($payment->getAmount()) &&
+            !$premium->isEvenlyDivisible($payment->getAmount(), true) &&
             !$this->areEqualToTwoDp($payment->getAmount(), $payment->getPolicy()->getOutstandingPremium())) {
             $errMsg = sprintf(
                 'ADJUSTMENT NEEDED!! Expected %f or %f (or maybe %f), not %f for payment id: %s',
