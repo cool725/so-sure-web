@@ -4191,4 +4191,21 @@ class PolicyServiceTest extends WebTestCase
         static::$policyService->activate($updatedRenewalPolicyA, new \DateTime('2017-01-01'));
         $this->assertEquals(Policy::STATUS_ACTIVE, $updatedRenewalPolicyA->getStatus());
     }
+
+    public function testPolicyConnectionReduction()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPolicyRenewalConnectionsA', $this),
+            static::generateEmail('testPolicyRenewalConnectionsB', $this),
+            true,
+            new \DateTime('2016-01-01'),
+            new \DateTime('2016-01-15')
+        );
+        $connection = $policyA->getConnections()[0];
+        $connection->setValue(5);
+        $this->assertTrue(self::$policyService->connectionReduced($connection));
+
+        self::$policyService->cancel($policyB, Policy::CANCELLED_UPGRADE);
+        $this->assertFalse(self::$policyService->connectionReduced($connection));
+    }
 }
