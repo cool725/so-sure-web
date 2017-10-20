@@ -3893,7 +3893,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = [
             'first_name' => 'bar',
             'last_name' => 'foo',
-            'email' => 'barfoo@auth-api.so-sure.com',
+            'email' => self::$testUser3->getEmail(),
             'mobile_number' => '+447700900000',
             'facebook_id' => 'abcd',
             'facebook_access_token' => 'zy',
@@ -3919,6 +3919,23 @@ class ApiAuthControllerTest extends BaseControllerTest
         ]);
         $result = $this->verifyResponse(200);
         $this->assertEquals('barfoo', $result['facebook_id']);
+
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('user-facebook', $this),
+            'foo',
+            null,
+            static::$dm
+        );
+        $user->setFacebookId('facebook1234');
+        //$dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        static::$dm->flush();
+
+        $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, [
+            'facebook_id' => 'facebook1234',
+            'facebook_access_token' => 'lala'
+        ]);
+        $result = $this->verifyResponse(422, ApiErrorCode::ERROR_USER_EXISTS);
     }
 
     public function testUpdateUserValidation()
