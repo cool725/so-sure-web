@@ -532,6 +532,9 @@ class DaviesService extends S3EmailService
 
     public function claimsDailyEmail()
     {
+        $phoneRepo = $this->dm->getRepository(Phone::class);
+        $highDemandPhones = $phoneRepo->findBy(['newHighDemand' => true]);
+
         $fileRepo = $this->dm->getRepository(DaviesFile::class);
         $latestFiles = $fileRepo->findBy([], ['created' => 'desc'], 1);
         $latestFile = count($latestFiles) > 0 ? $latestFiles[0] : null;
@@ -553,6 +556,7 @@ class DaviesService extends S3EmailService
                 'warnings' => $this->warnings,
                 'errors' => $this->errors,
                 'title' => 'Daily Claims Report',
+                'highDemandPhones' => $highDemandPhones,
             ]
         );
 

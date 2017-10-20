@@ -10,12 +10,28 @@
 		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
 		   <div style="font-size: 14px; text-align: center;"><font face="arial, helvetica neue, helvetica, sans-serif">
            <h2>{{ title }}</h2>
+		   <hr>
            <h3>Last received daily export: {% if latestFile %}{{ latestFile.created|date('d M Y H:i', 'Europe/London') }}{% else %}Unknown{%endif%}</h3>
            <h3>Last successful daily export: {% if successFile %}{{ successFile.created|date('d M Y H:i', 'Europe/London') }}{% else %}Unknown{%endif%}</h3>
 
+		  {% if highDemandPhones is defined %}
+		   <div style="font-size: 14px; text-align: left; margin-top: 30px;"><font face="arial, helvetica neue, helvetica, sans-serif">
+			   <h3>High Demand Phones</h3>
+	 		   <hr>
+	 		   {% if highDemandPhones|length == 0 %}
+					<h4>None</h4>
+			   {% else %}
+					{% for phone in highDemandPhones %}
+						 <p>Phone: {{ phone.name }} (Released {{ phone.releaseDate|date('M Y') }})</p>
+					{% endfor %}
+	 		   {% endif %}
+		   </div>
+	 	  {% endif %}
+
 		   {% if errors|length > 0 %}
-		   <div style="font-size: 14px; text-align: left;"><font face="arial, helvetica neue, helvetica, sans-serif">
+		   <div style="font-size: 14px; text-align: left; margin-top: 30px;"><font face="arial, helvetica neue, helvetica, sans-serif">
 			   <h3>Errors in last import</h3>
+	 		   <hr>
 			{% for claimNumber,msgs in errors %}
 				 <p>Claim: {{ claimNumber }}</p>
 					 <ul>
@@ -28,8 +44,9 @@
 		   {% endif %}
 
 		   {% if warnings|length > 0 %}
-		   <div style="font-size: 14px; text-align: left;"><font face="arial, helvetica neue, helvetica, sans-serif">
+		   <div style="font-size: 14px; text-align: left; margin-top: 30px;"><font face="arial, helvetica neue, helvetica, sans-serif">
 			   <h3>Warnings in last import</h3>
+	 		   <hr>
 			{% for claimNumber,msgs in warnings %}
 				 <p>Claim: {{ claimNumber }}</p>
 					 <ul>
@@ -41,20 +58,23 @@
 		   </div>
 		   {% endif %}
 
-           {% for claim in claims %}
-                <p>
-                    {# Use claims, so we can forward email to claims team - admins will be redirected #}
-                    <a href="{{ url('claims_policy', {'id': claim.policy.id}) }}">
-                    {{ claim.policy.policyNumber }}
-					</a>
-				</p>
-				<ul style="text-align: left;">
-					<li>Claim: {{ claim.number }}</li>
-					<li>Recorded: {{ claim.recordedDate|date('d M Y H:i', 'Europe/London') }}</li>
-					<li>Status: {{ claim.status }}</li>
-					<li>Type: {{ claim.type }}</li>
-				</ul>
-           {% endfor %}
+		   <div style="font-size: 14px; text-align: left; margin-top: 30px;"><font face="arial, helvetica neue, helvetica, sans-serif">
+			   <h3>Outstanding claims</h3>
+			   <hr>
+			   {% for claim in claims %}
+					<p>
+						{# Use claims, so we can forward email to claims team - admins will be redirected #}
+						<a href="{{ url('claims_policy', {'id': claim.policy.id}) }}">
+						{{ claim.policy.policyNumber }}
+						</a>
+					</p>
+					<ul style="text-align: left;">
+						<li>Claim: {{ claim.number }}</li>
+						<li>Recorded: {{ claim.recordedDate|date('d M Y H:i', 'Europe/London') }}</li>
+						<li>Status: {{ claim.status }}</li>
+						<li>Type: {{ claim.type }}</li>
+					</ul>
+			   {% endfor %}
 		   </div>
 
 		</div>
