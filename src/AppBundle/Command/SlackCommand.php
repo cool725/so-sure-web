@@ -127,7 +127,7 @@ class SlackCommand extends ContainerAwareCommand
         $router = $this->getContainer()->get('router');
         $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
         $repo = $dm->getRepository(PhonePolicy::class);
-        $policies = $repo->findBy(['status' => Policy::STATUS_PENDING_RENEWAL]);
+        $policies = $repo->findBy(['status' => Policy::STATUS_DECLINED_RENEWAL]);
 
         $lines = [];
         $now = new \DateTime();
@@ -142,7 +142,7 @@ class SlackCommand extends ContainerAwareCommand
 
             // @codingStandardsIgnoreStart
             $text = sprintf(
-                "Policy <%s|%s> will be expired in %d days and is NOT renewed. Please call customer.",
+                "Policy <%s|%s> will be expired in %d days and customer has declined to renew. Please call customer.",
                 $router->generate('admin_policy', ['id' => $policy->getPreviousPolicy()->getId()], UrlGeneratorInterface::ABSOLUTE_URL),
                 $policy->getPreviousPolicy()->getPolicyNumber(),
                 $diff->days
