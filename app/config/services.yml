@@ -5,7 +5,7 @@ parameters:
 services:
     app.user:
         class: AppBundle\Security\FOSUBUserProvider
-        arguments: ["@fos_user.user_manager",{facebook: facebookId, starling: starlingId}]
+        arguments: ["@fos_user.user_manager",{facebook: facebookId, starling: starlingId, accountkit: id}]
         calls:
             - [setFacebook, ['@app.facebook']]
             - [setRequestStack, ['@request_stack']]
@@ -255,6 +255,15 @@ services:
             branch:         "@app.branch"
             logger:         "@logger"
             requestService: "@app.request"
+        public: true
+        tags:
+            - { name: twig.extension }
+
+    app.twig.accountkit:
+        class: AppBundle\Service\AccountkitTwigExtension
+        arguments:
+            oauth:          "@hwi_oauth.resource_owner.accountkit"
+            logger:         "@logger"
         public: true
         tags:
             - { name: twig.extension }

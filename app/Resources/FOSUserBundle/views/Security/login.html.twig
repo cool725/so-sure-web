@@ -2,23 +2,32 @@
 {% block fos_user_content %}
 
 <h1>Welcome back!</h1>
-
 {# Account Kit Login #}
 <div class="login-account-kit login-box" data-key="{{ fb_appid }}" data-csrf="{{ csrf_token('account-kit') }}" data-toggle="{% if app.request.clientIp == davies_ip %}1{% else %}0{% endif %}">
+    <form method="get" action="https://www.accountkit.com/v1.0/basic/dialog/sms_login/">
     <p>If you click on Log In via SMS, a popup will appear.</p>
     <div class="form-group">
         <input type="hidden" value="+44" id="country_code" class="form-control" />
+        <input type="hidden" name="app_id" value="{{ fb_appid }}">
+        <input type="hidden" name="redirect" value="{{ app.request.schemeAndHttpHost }}/login/check-accountkit">
+        <input type="hidden" name="state" value="{{ accountkit_state() }}">
+        <input type="hidden" name="fbAppEventsEnabled" value=true>
+        <input type="hidden" name="debug" value=false>
     </div>
     <div class="form-group">
-        <input placeholder="Mobile number" id="phone_number" class="form-control input-lg" type="tel" />
+        <input placeholder="Mobile number" id="phone_number" name="phone_number" class="form-control input-lg" type="tel" />
         <span class="help-block text-center"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> UK numbers only</span>
     </div>
+    {% if error %}
+        <div class="error-text" style="padding-bottom: 10px;">Sorry, we were unable to log you in. You can try again, or <a href="mailto:support@wearesosure.com" class="open-intercom">contact us</a> for help.</div>
+    {% endif %}
     <div class="form-group">
-        <button id="sms-login__btn" class="btn btn-success btn-block">
-            <span id="btn-spinner" style="display:none;"><i class="fa fa-refresh fa-spin"></i></span>
-            Login via SMS
-        </button>
+          <button class="btn btn-success btn-block">
+                <span id="btn-spinner" style="display:none;"><i class="fa fa-refresh fa-spin"></i></span>
+                Login via SMS
+            </button>
     </div>
+    </form>
     <div id="sms-login__warning" class="form-group" style="display:none;">
         <div class="help-block">
             <small>There may be a small delay whilst we open a new window.<br><br></small>

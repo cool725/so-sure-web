@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "d2a9a628b8320b2bcae875eb6d00881e",
-    "content-hash": "d499a12d3bf7d45f98cfe8d241d2d05b",
+    "hash": "a0ae77f8d800b9b298b8de228fbff51c",
+    "content-hash": "b9bfc4bbf35d2c3be46845fdbd16a3c3",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
@@ -2267,16 +2267,16 @@
         },
         {
             "name": "hwi/oauth-bundle",
-            "version": "0.5.3",
+            "version": "0.5.3.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/hwi/HWIOAuthBundle.git",
-                "reference": "50f4bcbe5c217cfdf0f7f40a174b87199b76d1e1"
+                "url": "https://github.com/so-sure/HWIOAuthBundle.git",
+                "reference": "1a83c2a33734ee19d203b04c4b1f67ee1a48b7d1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hwi/HWIOAuthBundle/zipball/50f4bcbe5c217cfdf0f7f40a174b87199b76d1e1",
-                "reference": "50f4bcbe5c217cfdf0f7f40a174b87199b76d1e1",
+                "url": "https://api.github.com/repos/so-sure/HWIOAuthBundle/zipball/1a83c2a33734ee19d203b04c4b1f67ee1a48b7d1",
+                "reference": "1a83c2a33734ee19d203b04c4b1f67ee1a48b7d1",
                 "shasum": ""
             },
             "require": {
@@ -2323,38 +2323,41 @@
                     "/Tests/"
                 ]
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "autoload-dev": {
+                "psr-4": {
+                    "HWI\\Bundle\\OAuthBundle\\Tests\\": "Tests/"
+                }
+            },
             "license": [
                 "MIT"
             ],
             "authors": [
                 {
-                    "name": "Contributors",
-                    "homepage": "https://github.com/hwi/HWIOAuthBundle/contributors"
+                    "name": "Alexander",
+                    "email": "iam.asm89@gmail.com"
                 },
                 {
                     "name": "Joseph Bielawski",
                     "email": "stloyd@gmail.com"
                 },
                 {
-                    "name": "Alexander",
-                    "email": "iam.asm89@gmail.com"
-                },
-                {
                     "name": "Geoffrey Bachelet",
                     "email": "geoffrey.bachelet@gmail.com"
+                },
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/hwi/HWIOAuthBundle/contributors"
                 }
             ],
             "description": "Support for authenticating users using both OAuth1.0a and OAuth2 in Symfony2.",
             "homepage": "http://github.com/hwi/HWIOAuthBundle",
             "keywords": [
                 "37signals",
-                "Authentication",
-                "Deezer",
-                "EVE Online",
+                "accountkit",
                 "amazon",
                 "asana",
                 "auth0",
+                "authentication",
                 "azure",
                 "bitbucket",
                 "bitly",
@@ -2362,10 +2365,12 @@
                 "bufferapp",
                 "clever",
                 "dailymotion",
+                "deezer",
                 "deviantart",
                 "discogs",
                 "disqus",
                 "dropbox",
+                "eve online",
                 "eventbrite",
                 "facebook",
                 "firewall",
@@ -2413,7 +2418,10 @@
                 "yandex",
                 "youtube"
             ],
-            "time": "2017-01-08 14:13:58"
+            "support": {
+                "source": "https://github.com/so-sure/HWIOAuthBundle/tree/0.5.3.1"
+            },
+            "time": "2017-10-18 13:58:29"
         },
         {
             "name": "incenteev/composer-parameter-handler",

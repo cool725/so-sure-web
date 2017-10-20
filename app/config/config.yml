@@ -157,6 +157,7 @@ hwi_oauth:
             # these properties will be used/redefined later in the custom FOSUBUserProvider service.
             facebook: facebook_id
             starling: starlingId
+            accountkit: accountkitId
     resource_owners:
         facebook:
             type:                facebook
@@ -192,6 +193,14 @@ hwi_oauth:
                 firstname: firstName
                 lastname: lastName
                 email: email
+        accountkit:
+            type:              accountkit
+            client_id:         '%fb_appid%'
+            client_secret:     '%account_kit_secret%'
+            options:
+                display: page
+                appsecret_proof: true
+                csrf: true
 
 jms_di_extra:
     locations:
