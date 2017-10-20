@@ -1047,13 +1047,13 @@ class PolicyService
     public function connectionReduced(Connection $connection)
     {
         if (!$this->mailer) {
-            return;
+            return null;
         }
 
         // Upgrades should not send cancellation emails
-        if ($connection->getSourcePolicy()->isCancelled() &&
-            $connection->getSourcePolicy()->getCancelledReason() == Policy::CANCELLED_UPGRADE) {
-            return;
+        if ($connection->getLinkedPolicy()->isCancelled() &&
+            $connection->getLinkedPolicy()->getCancelledReason() == Policy::CANCELLED_UPGRADE) {
+            return false;
         }
 
         // Policy with the reduced connection value
@@ -1070,6 +1070,8 @@ class PolicyService
             null,
             'bcc@so-sure.com'
         );
+
+        return true;
     }
 
     /**
