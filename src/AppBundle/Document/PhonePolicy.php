@@ -327,14 +327,10 @@ class PhonePolicy extends Policy
             return 0;
         }
 
-        // applied for past cases
-        if ($date < new \DateTime('2017-09-01')) {
-            // Extra Case for Salva's 10 minute buffer
-            if ($this->isPolicyWithin60Days($date) || $this->isBeforePolicyStarted($date)) {
-                if ($this->getUser()->isPreLaunch() ||
-                    in_array($this->getPromoCode(), [self::PROMO_LAUNCH, self::PROMO_LAUNCH_FREE_NOV])) {
-                    return self::PROMO_LAUNCH_VALUE;
-                }
+        // Extra Case for Salva's 10 minute buffer
+        if ($this->isPolicyWithin60Days($date) || $this->isBeforePolicyStarted($date)) {
+            if ($this->isPreLaunchPolicy()) {
+                return self::PROMO_LAUNCH_VALUE;
             }
         }
 
@@ -413,6 +409,16 @@ class PhonePolicy extends Policy
         return (int) ceil($this->getMaxPot() / $this->getTotalConnectionValue($date));
     }
 
+    private function isPreLaunchPolicy()
+    {
+        if ($this->getUser()->isPreLaunch() && $this->getStart()
+            && $this->getStart() < new \DateTime('2017-09-01')) {
+            return true;
+        }
+
+        return in_array($this->getPromoCode(), [self::PROMO_LAUNCH, self::PROMO_LAUNCH_FREE_NOV]);
+    }
+
     public function getMaxPot()
     {
         if (!$this->isPolicy()) {
@@ -422,8 +428,7 @@ class PhonePolicy extends Policy
             throw new \Exception('Policy is missing a user');
         }
 
-        if ($this->getUser()->isPreLaunch() ||
-            in_array($this->getPromoCode(), [self::PROMO_LAUNCH, self::PROMO_LAUNCH_FREE_NOV])) {
+        if ($this->isPreLaunchPolicy()) {
             // 100% of policy
             return $this->getPremium()->getYearlyPremiumPrice();
         } else {
