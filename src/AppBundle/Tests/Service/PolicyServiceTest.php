@@ -606,6 +606,80 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(new \DateTime('2017-05-15'), $policy->getPolicyExpirationDate());
     }
 
+    public function testPolicyCancelledTooEarlyBug()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPolicyCancelledTooEarlyBug', $this),
+            'bar',
+            static::$dm
+        );
+        $date = new \DateTime('2017-04-15 00:16:00', new \DateTimeZone('Europe/London'));
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            $date,
+            true
+        );
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->create($policy, $date);
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+
+        $this->assertEquals(new \DateTime('2017-05-15'), $policy->getNextBillingDate(new \DateTime('2017-04-16')));
+        $this->assertEquals(new \DateTime('2017-06-14'), $policy->getPolicyExpirationDate(new \DateTime('2017-06-15')));
+
+        static::addPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            new \DateTime('2017-05-22 00:22:00', new \DateTimeZone('Europe/London'))
+        );
+        $this->assertEquals(new \DateTime('2017-07-15'), $policy->getPolicyExpirationDate());
+
+        static::addPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            new \DateTime('2017-06-15 00:20:00', new \DateTimeZone('Europe/London'))
+        );
+        $this->assertEquals(new \DateTime('2017-08-14'), $policy->getPolicyExpirationDate());
+        $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2017-06-20')));
+
+        static::addPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            new \DateTime('2017-07-15 00:20:00', new \DateTimeZone('Europe/London'))
+        );
+        $this->assertEquals(new \DateTime('2017-09-14'), $policy->getPolicyExpirationDate());
+        $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2017-07-20')));
+
+        static::addPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            new \DateTime('2017-08-30 14:52:00', new \DateTimeZone('Europe/London'))
+        );
+        $this->assertEquals(new \DateTime('2017-10-15'), $policy->getPolicyExpirationDate());
+        $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2017-08-31')));
+
+        static::addPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            new \DateTime('2017-09-15 00:20:00', new \DateTimeZone('Europe/London'))
+        );
+        $this->assertEquals(new \DateTime('2017-11-14'), $policy->getPolicyExpirationDate());
+        $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2017-10-14')));
+        $this->assertFalse($policy->isPolicyPaidToDate(new \DateTime('2017-10-20')));
+    }
+
     /**
      * @expectedException \Exception
      */
