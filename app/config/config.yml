@@ -357,6 +357,7 @@ nexy_slack:
 nelmio_security:
     csp:
         report_logger_service: monolog.logger.security
+        content_types: ['text/html']
         enforce:
             # see full description below
             level1_fallback: true
