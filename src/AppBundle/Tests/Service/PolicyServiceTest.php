@@ -1453,7 +1453,7 @@ class PolicyServiceTest extends WebTestCase
             false,
             new \DateTime('2017-01-02')
         );
-        $this->assertEquals(1, count($policies));
+        $this->assertGreaterThan(0, count($policies));
         $this->assertEquals($policy->getId(), array_keys($policies)[0]);
     }
 
@@ -4195,8 +4195,8 @@ class PolicyServiceTest extends WebTestCase
     public function testPolicyConnectionReduction()
     {
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
-            static::generateEmail('testPolicyRenewalConnectionsA', $this),
-            static::generateEmail('testPolicyRenewalConnectionsB', $this),
+            static::generateEmail('testPolicyRenewalConnectionA', $this),
+            static::generateEmail('testPolicyRenewalConnectionB', $this),
             true,
             new \DateTime('2016-01-01'),
             new \DateTime('2016-01-15')
