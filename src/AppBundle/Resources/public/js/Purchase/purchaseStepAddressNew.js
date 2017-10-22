@@ -7,6 +7,9 @@ sosure.purchaseStepAddress = (function() {
     self.focusTimer = null;
     self.name_email_changed = null;
     self.url = null;
+    self.bloodhound = null;
+    self.maxAddresses = 50; // more than 50 causes the find api to returns an error 'unrecognised country code'
+    self.key = null;
 
     self.init = function() {
         self.form = $('.validate-form');
@@ -15,6 +18,8 @@ sosure.purchaseStepAddress = (function() {
             self.addValidation();
         }
         self.url = window.location.href;
+        self.key = $('#ss-root').data('pca-key');
+        self.init_bloodhound();
     }
 
     self.dobMask = function () {
@@ -62,6 +67,10 @@ sosure.purchaseStepAddress = (function() {
                 "purchase_form[postcode]" : {
                     required: true,
                     postcodeUK: true
+                },
+                "search_postcode" : {
+                    required: true,
+                    postcodeUK: true                    
                 }
             },
             messages: {
@@ -165,6 +174,81 @@ sosure.purchaseStepAddress = (function() {
         }, 300);
     }
 
+    self.init_bloodhound = function() {
+      self.bloodhound = new Bloodhound({
+        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        remote: {
+          url: "https://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Find/v2.10/json3.ws",
+          prepare: function (query, settings) {
+              if (query && (query.toLowerCase() == "bx11lt" || query.toLowerCase() == "bx1 1lt")) {
+                  //sosure.purchaseStepAddress.showAddress();
+                  self.setAddress({'Line1': '123 test', 'City': 'Unknown', 'PostalCode': 'bx1 1lt'});
+                  $('.typeahead .with-errors').html('');
+              }
+              settings.type = "POST";
+              settings.data = {
+                  Key: sosure.purchaseStepAddress.key,
+                  SearchTerm: query,
+                  Country : "GBR",
+                  MaxSuggestions: sosure.purchaseStepAddress.maxAddresses
+              };
+              return settings;
+          },
+          transform: function (response) {
+              if (response.Items && response.Items.length > 0 && response.Items[0].Error) {
+                  sosure.purchaseStepAddress.showAddress("Sorry, there's an error with our address lookup. Please type in manually below.");
+              }
+              return response.Items;
+          }
+        }
+      });
+    }
+
+    self.setAddress = function(addr) {
+        if (!addr) {
+            return;
+        }
+        var address = '';
+        if (addr.Line1) {
+            $('.addressLine1').val(addr.Line1);
+            address = addr.Line1;
+        }
+        if (addr.Line2) {
+            $('.addressLine2').val(addr.Line2);
+            address = address + '<br>' + addr.Line2;
+        }
+        if (addr.Line3) {
+            $('.addressLine3').val(addr.Line3);
+            address = address + '<br>' + addr.Line3;
+        }
+        if (addr.City) {
+            $('.city').val(addr.City);
+            address = address + '<br>' + addr.City;
+        }
+        if (addr.PostalCode) {
+            $('.postcode').val(addr.PostalCode);
+            address = address + '<br>' + addr.PostalCode;
+        }
+        $('#display-address').html(address);
+        $('.typeahead .with-errors').html('');
+    }
+
+    self.selectAddress = function(suggestion) {
+        $.ajax({
+        method: "POST",
+        url: "https://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Retrieve/v2.10/json3.ws",
+        data: {
+            Key: sosure.purchaseStepAddress.key,
+            Id: suggestion.Id,
+        }
+      })
+        .done(function( msg ) {
+            var addr = msg.Items[0];
+            sosure.purchaseStepAddress.setAddress(addr);
+      });
+    }
+    
     return self;
 })();
 
@@ -192,6 +276,22 @@ $(function(){
             sosure.purchaseStepAddress.focusBirthday();
         }
     });
+    
+    $('#search_address_button').click(function(e) {
+        e.preventDefault();
+        var search_number = $('#search_address_number').val();
+        var search_postcode = $('#search_address_postcode').val();
+        var allow_search = search_number.length > 0 && search_postcode.length > 0;
+
+        if (!allow_search) {
+            return sosure.purchaseStepAddress.step_address_continue();
+        }
+
+        var search = search_number + ", " + search_postcode;
+        sosure.purchaseStepAddress.bloodhound.search(search, function(sync) {}, function(async) {
+            sosure.purchaseStepAddress.selectAddress(async[0]);
+        });
+    });
 
     // Click check validate form?
     // Case: user clicks continue before filling in any fields
@@ -204,98 +304,15 @@ $(function(){
         e.preventDefault();
         return sosure.purchaseStepAddress.step_address_continue();
     });
-
-    var maxAddresses = 50; // more than 50 causes the find api to returns an error 'unrecognised country code'
-    var key = $('#ss-root').data('pca-key');
-
-    var displayAddress = function() {
-        var display = $('.addressLine1');
-        if ($('.addressLine2').length > 0) {
-            display = display + "<br>" + $('.addressLine2');
-        }
-        if ($('.addressLine3').length > 0) {
-            display = display + "<br>" + $('.addressLine2');
-        }
-        if ($('.city').length > 0) {
-            display = display + "<br>" + $('.city');
-        }
-        if ($('.postcode').length > 0) {
-            display = display + "<br>" + $('.postcode');
-        }
-        $('#display-address').innerHtml(display);
-    }
     
-    var setAddress = function(addr) {
-        if (!addr) {
-            return;
-        }
-        var address = '';
-        if (addr.Line1) {
-            //$('.addressLine1').val(addr.Line1);
-            address = addr.Line1;
-        }
-        if (addr.Line2) {
-            //$('.addressLine2').val(addr.Line2);
-        }
-        if (addr.Line3) {
-            //$('.addressLine3').val(addr.Line3);
-        }
-        if (addr.City) {
-            //$('.city').val(addr.City);
-        }
-        if (addr.PostalCode) {
-            //$('.postcode').val(addr.PostalCode);
-        }
-        $('#display-address').html(address);
-    }
-
-    var capture = new Bloodhound({
-      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
-      queryTokenizer: Bloodhound.tokenizers.whitespace,
-      remote: {
-        url: "https://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Find/v2.10/json3.ws",
-        prepare: function (query, settings) {
-            if (query && (query.toLowerCase() == "bx11lt" || query.toLowerCase() == "bx1 1lt")) {
-                sosure.purchaseStepAddress.showAddress();
-                setAddress({'Line1': '123 test', 'City': 'Unknown', 'PostalCode': 'bx1 1lt'});
-            }
-            settings.type = "POST";
-            settings.data = {
-				Key: key,
-				SearchTerm: query,
-				Country : "GBR",
-                MaxSuggestions: maxAddresses
-            };
-            return settings;
-        },
-        transform: function (response) {
-            if (response.Items && response.Items.length > 0 && response.Items[0].Error) {
-                sosure.purchaseStepAddress.showAddress("Sorry, there's an error with our address lookup. Please type in manually below.");
-            }
-            return response.Items;
-        }
-      }
-    });
     $('.typeahead').typeahead(null, {
       name: 'capture',
       display: 'Text',
-      source: capture,
+      source: sosure.purchaseStepAddress.bloodhound,
       highlight: true,
       limit: 100 // below 100 typeahead stops showing results for less than 4 characters entered
     });
     $('.typeahead').bind('typeahead:select', function(ev, suggestion) {
-        sosure.purchaseStepAddress.showAddress();
-        $.ajax({
-            method: "POST",
-            url: "https://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Retrieve/v2.10/json3.ws",
-            data: {
-				Key: key,
-				Id: suggestion.Id,
-            }
-          })
-            .done(function( msg ) {
-                var addr = msg.Items[0];
-                setAddress(addr);
-          });
+        sosure.purchaseStepAddress.selectAddress(suggestion);
     });
 });
