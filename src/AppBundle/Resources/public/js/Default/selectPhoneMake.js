@@ -36,7 +36,7 @@ sosure.selectPhoneMake = (function() {
 
     self.load_fuse = function() {
         $.ajax({
-            url: '/search-phone',
+            url: '/search-phone-combined',
             type: 'GET',
             success: function(result) {
                 self.fuse = new Fuse(result, self.fuse_options);
@@ -134,7 +134,9 @@ $(function(){
                   '<div class="empty-message">',
                     'We couldn\x27t find that phone. Try searching for the make (e.g. iPhone 7), or <a href="mailto:hello@wearesosure.com" class="open-intercom">ask us</a>',
                   '</div>'
-                ].join('\n')
+                ].join('\n'),
+                //suggestion: function(e) { console.log(e); }
+                suggestion: doT.template('<div>{{=it.name}} {{~it.sizes :value}}<a href="/phone-insurance/{{=value.id}}">{{=value.memory}}</a> {{~}}</div>')
             }
         });
 

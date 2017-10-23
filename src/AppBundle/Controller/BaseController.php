@@ -149,7 +149,7 @@ abstract class BaseController extends Controller
         return $phones;
     }
 
-    protected function getPhonesSearchArray()
+    protected function getPhonesSearchArray($simple = true)
     {
         $makes = [];
         $phones = [];
@@ -157,7 +157,20 @@ abstract class BaseController extends Controller
         $repo = $dm->getRepository(Phone::class);
         $items = $repo->findActive()->getQuery()->execute();
         foreach ($items as $phone) {
-            $phones[] = ['id' => $phone->getId(), 'name' => $phone->__toString()];
+            if ($simple) {
+                $phones[] = ['id' => $phone->getId(), 'name' => $phone->__toString()];
+            } else {
+                $phones[sprintf('%s %s', $phone->getMake(), $phone->getModel())][] = ['id' => $phone->getId(), 'memory' => $phone->getMemory()];                
+            }
+        }
+        
+        if (!$simple) {
+            $transformedPhones = [];
+            foreach ($phones as $name => $data) {
+                $transformedPhones[] = ['id' => $data[0]['id'], 'name' => $name, 'sizes' => $data];
+            }
+            
+            $phones = $transformedPhones;
         }
 
         return $phones;
