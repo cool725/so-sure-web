@@ -573,7 +573,11 @@ class PolicyServiceTest extends WebTestCase
         static::$policyService->create($policy, new \DateTime('2017-01-29'));
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
 
-        $this->assertEquals(new \DateTime('2017-03-30'), $policy->getPolicyExpirationDate());
+        $timezone = new \DateTimeZone('Europe/London');
+        $this->assertEquals(
+            new \DateTime('2017-03-30', $timezone),
+            $policy->getPolicyExpirationDate()
+        );
 
         static::addPayment(
             $policy,
@@ -582,7 +586,10 @@ class PolicyServiceTest extends WebTestCase
             null,
             new \DateTime('2017-02-28')
         );
-        $this->assertEquals(new \DateTime('2017-04-27'), $policy->getPolicyExpirationDate());
+        $this->assertEquals(
+            new \DateTime('2017-04-27', $timezone),
+            $policy->getPolicyExpirationDate()
+        );
 
         // in previous case, payment was on 16/4, which was after the change in billing date
         // and cause the problem. as exception will prevent, no point in testing that case here
@@ -593,7 +600,10 @@ class PolicyServiceTest extends WebTestCase
             null,
             new \DateTime('2017-04-12')
         );
-        $this->assertEquals(new \DateTime('2017-05-28'), $policy->getPolicyExpirationDate());
+        $this->assertEquals(
+            new \DateTime('2017-05-28', $timezone),
+            $policy->getPolicyExpirationDate()
+        );
         $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2017-04-20')));
 
         $billingDate = $this->setDayOfMonth($policy->getBilling(), '15');
@@ -603,7 +613,10 @@ class PolicyServiceTest extends WebTestCase
         $scheduledPayments = $policy->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);
         $this->assertEquals(15, $scheduledPayments[0]->getScheduledDay());
 
-        $this->assertEquals(new \DateTime('2017-05-15'), $policy->getPolicyExpirationDate());
+        $this->assertEquals(
+            new \DateTime('2017-05-15', $timezone),
+            $policy->getPolicyExpirationDate()
+        );
     }
 
     public function testPolicyCancelledTooEarlyBug()
