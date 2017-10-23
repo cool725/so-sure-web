@@ -28,6 +28,7 @@ use AppBundle\Exception\InvalidPremiumException;
 use AppBundle\Exception\ValidationException;
 use AppBundle\Classes\Salva;
 use AppBundle\Service\SalvaExportService;
+use Gedmo\Loggable\Document\LogEntry;
 
 /**
  * @group functional-nonet
@@ -51,20 +52,20 @@ class PolicyServiceTest extends WebTestCase
 
     public static function setUpBeforeClass()
     {
-         //start the symfony kernel
-         $kernel = static::createKernel();
-         $kernel->boot();
+        //start the symfony kernel
+        $kernel = static::createKernel();
+        $kernel->boot();
 
-         //get the DI container
-         self::$container = $kernel->getContainer();
+        //get the DI container
+        self::$container = $kernel->getContainer();
 
-         //now we can instantiate our service (if you want a fresh one for
-         //each test method, do this in setUp() instead
-         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
-         self::$policyRepo = self::$dm->getRepository(Policy::class);
-         self::$userManager = self::$container->get('fos_user.user_manager');
-         self::$policyService = self::$container->get('app.policy');
-         self::$judopay = self::$container->get('app.judopay');
+        //now we can instantiate our service (if you want a fresh one for
+        //each test method, do this in setUp() instead
+        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$policyRepo = self::$dm->getRepository(Policy::class);
+        self::$userManager = self::$container->get('fos_user.user_manager');
+        self::$policyService = self::$container->get('app.policy');
+        self::$judopay = self::$container->get('app.judopay');
 
         $phoneRepo = self::$dm->getRepository(Phone::class);
         self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
@@ -1766,6 +1767,97 @@ class PolicyServiceTest extends WebTestCase
         static::$policyService->fullyExpire($policyA, new \DateTime('2017-01-29'));
         $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
         $this->assertEquals(Cashback::STATUS_PENDING_PAYMENT, $policyA->getCashback()->getStatus());
+    }
+
+    public function testCancelPolicyUnpaidUnder15()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testCancelPolicyUnpaidUnder15', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->create($policy, new \DateTime('2016-01-01'), true);
+        $policy->setStatus(PhonePolicy::STATUS_UNPAID);
+        static::$dm->flush();
+
+        // Simulate the correct time for the log history
+        $dm = clone self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $dm->createQueryBuilder(LogEntry::class)
+        ->findAndUpdate()
+        ->field('objectId')->equals($policy->getId())
+        ->field('data.status')->equals(Policy::STATUS_UNPAID)
+        ->field('loggedAt')->set(new \DateTime('2016-01-01'))
+        ->getQuery()
+        ->execute();
+        $dm->flush();
+        $dm->close();
+        //static::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+
+        $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $repo->find($policy->getId());
+        $exception = false;
+        try {
+            static::$policyService->cancel($updatedPolicy, Policy::CANCELLED_UNPAID, true, new \DateTime('2016-01-14'));
+        } catch (\Exception $e) {
+            $exception = true;
+            $this->assertTrue(stripos($e->getMessage(), 'less than 15 days in unpaid state') > 0);
+        }
+        $this->assertTrue($exception);
+    }
+    
+    public function testCancelPolicyUnpaidAfter15()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testCancelPolicyUnpaidAfter15', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->create($policy, new \DateTime('2016-01-01'), true);
+        $policy->setStatus(PhonePolicy::STATUS_UNPAID);
+        static::$dm->flush();
+
+        // Simulate the correct time for the log history
+        $dm = clone self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $dm->createQueryBuilder(LogEntry::class)
+        ->findAndUpdate()
+        ->field('objectId')->equals($policy->getId())
+        ->field('data.status')->equals(Policy::STATUS_UNPAID)
+        ->field('loggedAt')->set(new \DateTime('2016-01-01'))
+        ->getQuery()
+        ->execute();
+        $dm->flush();
+        $dm->close();
+        //static::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+
+        $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $repo->find($policy->getId());
+        static::$policyService->cancel($updatedPolicy, Policy::CANCELLED_UNPAID, true, new \DateTime('2016-01-16'));
     }
 
     public function testPolicyUnrenew()
