@@ -161,4 +161,10 @@ $(function(){
             }
         }
     });
+
+    if ($('#quoteModal').length) {
+        $(this).on('shown.bs.modal', function() {
+            $('.search-phone-text').focus();
+        });
+    }
 });
