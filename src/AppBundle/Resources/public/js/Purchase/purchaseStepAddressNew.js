@@ -302,9 +302,33 @@ $(function(){
 
     $('#address-manual').click(function(e) {
         e.preventDefault();
-        return sosure.purchaseStepAddress.step_address_continue();
+        $('#address-select').rules("remove");
+        $('#address-select').removeAttr("required");
+        if (!sosure.purchaseStepAddress.step_address_continue()) {
+            $('#address-select').attr("required", true);
+
+            return false;
+        }
+
+        return true;
     });
     
+    $('#search-address-manual').click(function(e) {
+        e.preventDefault();
+        $('#search_address_number').removeAttr("required");
+        $('#search_address_number').rules("remove");
+        $('#search_address_postcode').removeAttr("required");
+        $('#search_address_postcode').rules("remove");
+        if (!sosure.purchaseStepAddress.step_address_continue()) {
+            $('#search_address_number').attr("required", true);
+            $('#search_address_postcode').attr("required", true);
+
+            return false;
+        }
+
+        return true;
+    });
+
     $('.typeahead').typeahead(null, {
       name: 'capture',
       display: 'Text',

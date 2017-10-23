@@ -167,22 +167,22 @@
                                 <label class="sr-only">Billing Address:</label>
                                 {% if postcode == 'split' %}
                                     <div class="form-group input-group">
-                                            <input id="search_address_number" class="form-control" type="text" placeholder="House Number" {% if not showAddress %} required="required" {% endif %}>
-                                            <input id="search_address_postcode" class="form-control" name="search_postcode" type="text" placeholder="Postcode" {% if not showAddress %} required="required" {% endif %}>
-                                            <div class="input-group-addon">
-                                                <a id="search_address_button" href="#" class="btn btn-info"><i class="fa fa-search"></i></a>
-                                            </div>
-                                        </div> 
+                                        <input id="search_address_number" class="form-control" type="text" placeholder="House Number" {% if not showAddress %} required="required" {% endif %}>
+                                        <input id="search_address_postcode" class="form-control" name="search_postcode" type="text" placeholder="Postcode" {% if not showAddress %} required="required" {% endif %}>
+                                        <div class="input-group-addon">
+                                            <a id="search_address_button" href="#" class="btn btn-info"><i class="fa fa-search"></i></a>
+                                        </div>
                                     </div>
                                     {% if is_postback %}
                                         {% if form_errors(purchase_form.addressLine1)|length > 0 or
                                             form_errors(purchase_form.city)|length > 0 or
                                             form_errors(purchase_form.postcode)|length > 0 %}
-                                            <div class="help-block with-errors"></div>
+                                            <div id="search_address_errors" class="help-block with-errors"></div>
                                         {% endif %}
                                     {% endif %}
+                                    <a id="search-address-manual" href="#">Enter address manually</a>
                                 {% else %}
-                                    <input class="typeahead form-control" type="text" placeholder="{% if postcode == 'type' %}Type your address (eg. 10 Downing Street, SW1A 2AA){% elseif postcode == 'comma' %}House Number, Postcode (eg. 10, SW1A 2AA){% endif %}" {% if not showAddress %} required="required" {% endif %}>
+                                    <input id="address-select" class="typeahead form-control" type="text" placeholder="{% if postcode == 'type' %}Type your address (eg. 10 Downing Street, SW1A 2AA){% elseif postcode == 'comma' %}House Number, Postcode (eg. 10, SW1A 2AA){% endif %}" {% if not showAddress %} required="required" {% endif %}>
                                     {% if is_postback %}
                                         {% if form_errors(purchase_form.addressLine1)|length > 0 or
                                             form_errors(purchase_form.city)|length > 0 or
@@ -190,8 +190,8 @@
                                             <div class="help-block with-errors">Select an address from the dropdown after searching</div>
                                         {% endif %}
                                     {% endif %}
+                                    <a id="address-manual" href="#">Enter address manually</a>
                                 {% endif %}
-                                <a id="address-manual" href="#">Enter address manually</a>
                             </div>
                             <div id="display-address" style="margin-bottom: 20px">
                                 {% if purchase_form.vars.data.addressLine1|length > 0 %}{{ purchase_form.vars.data.addressLine1 }}<br>{% endif %}
