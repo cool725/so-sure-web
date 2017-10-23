@@ -1546,7 +1546,7 @@ abstract class Policy
 
     public function getNextBillingDate($date, $filtered = true)
     {
-        $nextDate = new \DateTime();
+        $nextDate = new \DateTime('now', new \DateTimeZone(self::TIMEZONE));
         $this->clearTime($nextDate);
         if ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
             $nextDate->setDate($date->format('Y'), $date->format('m'), $this->getBilling()->format('d'));
@@ -3368,6 +3368,7 @@ abstract class Policy
         if (!$date) {
             $date = new \DateTime();
         }
+        //$date->setTimezone(new \DateTimeZone(self::TIMEZONE));
         $date = $this->adjustDayForBilling($date, true);
 
         $expectedPaid = 0;
@@ -3378,10 +3379,12 @@ abstract class Policy
             if ($months > 12) {
                 $months = 12;
             }
-            // print PHP_EOL;
-            // print $date->format(\DateTime::ATOM) . PHP_EOL;
-            // print $this->getBilling()->format(\DateTime::ATOM) . PHP_EOL;
-            // print $months . PHP_EOL;
+            /*
+            print PHP_EOL;
+            print $date->format(\DateTime::ATOM) . PHP_EOL;
+            print $this->getBilling()->format(\DateTime::ATOM) . PHP_EOL;
+            print $months . PHP_EOL;
+            */
             $expectedPaid = $this->getPremiumInstallmentPrice() * $months;
         } else {
             throw new \Exception('Unknown premium plan');

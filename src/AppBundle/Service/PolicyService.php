@@ -42,6 +42,8 @@ use AppBundle\Exception\ImeiBlacklistedException;
 use AppBundle\Exception\ImeiPhoneMismatchException;
 use AppBundle\Exception\RateLimitException;
 
+use Gedmo\Loggable\Document\LogEntry;
+
 class PolicyService
 {
     use CurrencyTrait;
@@ -844,16 +846,42 @@ class PolicyService
     /**
      * @param Policy    $policy
      * @param string    $reason
-     * @param boolean   $closeOpenClaims Where we are required to cancel the policy (binder),
-     *                                   we need to close out claims
+     * @param boolean   $closeOpenClaims             Where we are required to cancel the policy (binder),
+     *                                               we need to close out claims
      * @param \DateTime $date
+     * @param boolean   $skipUnpaidMinTimeframeCheck Require at least 15 days from last unpaid status change
      */
     public function cancel(
         Policy $policy,
         $reason,
         $closeOpenClaims = false,
-        \DateTime $date = null
+        \DateTime $date = null,
+        $skipUnpaidMinTimeframeCheck = false
     ) {
+        if ($reason == Policy::CANCELLED_UNPAID && !$skipUnpaidMinTimeframeCheck) {
+            $logRepo = $this->dm->getRepository(LogEntry::class);
+            $history = $logRepo->findOneBy([
+                'objectId' => $policy->getId(),
+                'data.status' => Policy::STATUS_UNPAID,
+            ], ['loggedAt' => 'desc']);
+            $now = $date;
+            if (!$now) {
+                $now = new \DateTime();
+            }
+            $loggedAt = new \DateTime();
+            if ($history) {
+                $loggedAt = $history->getLoggedAt();
+            }
+            $diff = $now->diff($loggedAt);
+            if ($diff->days < 15) {
+                throw new \Exception(sprintf(
+                    'Unable to cancel unpaid policy %s/%s as less than 15 days in unpaid state.',
+                    $policy->getPolicyNumber(),
+                    $policy->getId()
+                ));
+            }
+        }
+
         if ($closeOpenClaims && $policy->hasOpenClaim()) {
             foreach ($policy->getClaims() as $claim) {
                 if ($claim->isOpen()) {
