@@ -625,9 +625,30 @@ class PolicyServiceTest extends WebTestCase
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
         static::$policyService->create($policy, $date);
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+        $this->assertEquals($date, $policy->getBilling());
 
-        $this->assertEquals(new \DateTime('2017-05-15'), $policy->getNextBillingDate(new \DateTime('2017-04-16')));
-        $this->assertEquals(new \DateTime('2017-06-14'), $policy->getPolicyExpirationDate(new \DateTime('2017-06-15')));
+        $timezone = new \DateTimeZone('Europe/London');
+        $this->assertEquals(
+            new \DateTime('2017-05-15', $timezone),
+            $policy->getNextBillingDate(new \DateTime('2017-04-16'))
+        );
+        $this->assertEquals(
+            new \DateTime('2017-06-15', $timezone),
+            $policy->getNextBillingDate(new \DateTime('2017-06-14'))
+        );
+        $this->assertEquals(
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            $policy->getTotalSuccessfulPayments(new \DateTime('2017-05-15', $timezone))
+        );
+        $this->assertEquals(
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            $policy->getTotalExpectedPaidToDate(new \DateTime('2017-05-15', $timezone))
+        );
+        $this->assertEquals(0, $policy->getOutstandingPremiumToDate(new \DateTime('2017-05-15', $timezone)));
+        $this->assertEquals(
+            new \DateTime('2017-06-14', $timezone),
+            $policy->getPolicyExpirationDate(new \DateTime('2017-06-15', $timezone))
+        );
 
         static::addPayment(
             $policy,
@@ -636,7 +657,10 @@ class PolicyServiceTest extends WebTestCase
             null,
             new \DateTime('2017-05-22 00:22:00', new \DateTimeZone('Europe/London'))
         );
-        $this->assertEquals(new \DateTime('2017-07-15'), $policy->getPolicyExpirationDate());
+        $this->assertEquals(
+            new \DateTime('2017-07-15', $timezone),
+            $policy->getPolicyExpirationDate(new \DateTime('2017-06-15', $timezone))
+        );
 
         static::addPayment(
             $policy,
@@ -645,7 +669,10 @@ class PolicyServiceTest extends WebTestCase
             null,
             new \DateTime('2017-06-15 00:20:00', new \DateTimeZone('Europe/London'))
         );
-        $this->assertEquals(new \DateTime('2017-08-14'), $policy->getPolicyExpirationDate());
+        $this->assertEquals(
+            new \DateTime('2017-08-14', $timezone),
+            $policy->getPolicyExpirationDate(new \DateTime('2017-07-15', $timezone))
+        );
         $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2017-06-20')));
 
         static::addPayment(
@@ -655,7 +682,10 @@ class PolicyServiceTest extends WebTestCase
             null,
             new \DateTime('2017-07-15 00:20:00', new \DateTimeZone('Europe/London'))
         );
-        $this->assertEquals(new \DateTime('2017-09-14'), $policy->getPolicyExpirationDate());
+        $this->assertEquals(
+            new \DateTime('2017-09-14', $timezone),
+            $policy->getPolicyExpirationDate(new \DateTime('2017-08-15', $timezone))
+        );
         $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2017-07-20')));
 
         static::addPayment(
@@ -665,7 +695,10 @@ class PolicyServiceTest extends WebTestCase
             null,
             new \DateTime('2017-08-30 14:52:00', new \DateTimeZone('Europe/London'))
         );
-        $this->assertEquals(new \DateTime('2017-10-15'), $policy->getPolicyExpirationDate());
+        $this->assertEquals(
+            new \DateTime('2017-10-15', $timezone),
+            $policy->getPolicyExpirationDate(new \DateTime('2017-09-15', $timezone))
+        );
         $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2017-08-31')));
 
         static::addPayment(
@@ -675,7 +708,10 @@ class PolicyServiceTest extends WebTestCase
             null,
             new \DateTime('2017-09-15 00:20:00', new \DateTimeZone('Europe/London'))
         );
-        $this->assertEquals(new \DateTime('2017-11-14'), $policy->getPolicyExpirationDate());
+        $this->assertEquals(
+            new \DateTime('2017-11-14', $timezone),
+            $policy->getPolicyExpirationDate(new \DateTime('2017-10-15', $timezone))
+        );
         $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2017-10-14')));
         $this->assertFalse($policy->isPolicyPaidToDate(new \DateTime('2017-10-20')));
     }
