@@ -2660,17 +2660,31 @@ class PhonePolicyTest extends WebTestCase
 
     public function testGetNextBillingDateMonthly()
     {
+        $timezone = new \DateTimeZone('Europe/London');
+
         $policy = new SalvaPhonePolicy();
         $policy->setPremiumInstallments(12);
         $policy->setStart(new \DateTime('2016-01-15'));
-        $this->assertEquals(new \DateTime('2016-02-15'), $policy->getNextBillingDate(new \DateTime('2016-02-14')));
-        $this->assertEquals(new \DateTime('2016-03-15'), $policy->getNextBillingDate(new \DateTime('2016-02-16')));
+        $this->assertEquals(
+            new \DateTime('2016-02-15', $timezone),
+            $policy->getNextBillingDate(new \DateTime('2016-02-14'))
+        );
+        $this->assertEquals(
+            new \DateTime('2016-03-15', $timezone),
+            $policy->getNextBillingDate(new \DateTime('2016-02-16'))
+        );
 
         $policy = new SalvaPhonePolicy();
         $policy->setPremiumInstallments(12);
         $policy->setStart(new \DateTime('2016-03-29'));
-        $this->assertEquals(new \DateTime('2016-04-28'), $policy->getNextBillingDate(new \DateTime('2016-04-14')));
-        $this->assertEquals(new \DateTime('2016-05-28'), $policy->getNextBillingDate(new \DateTime('2016-04-30')));
+        $this->assertEquals(
+            new \DateTime('2016-04-28', $timezone),
+            $policy->getNextBillingDate(new \DateTime('2016-04-14'))
+        );
+        $this->assertEquals(
+            new \DateTime('2016-05-28', $timezone),
+            $policy->getNextBillingDate(new \DateTime('2016-04-30'))
+        );
     }
 
     public function testGetNextBillingDateYearly()
@@ -2720,7 +2734,11 @@ class PhonePolicyTest extends WebTestCase
             12
         );
         // starts 1/1/16 + 1 month = 1/2/16 + 30 days = 2/3/16
-        $this->assertEquals(new \DateTime('2016-03-02'), $policy->getPolicyExpirationDate());
+        $timezone = new \DateTimeZone('Europe/London');
+        $this->assertEquals(
+            new \DateTime('2016-03-02', $timezone),
+            $policy->getPolicyExpirationDate()
+        );
         $this->assertEquals(1, $policy->getPolicyExpirationDateDays(new \DateTime('2016-03-01')));
         $this->assertEquals(30, $policy->getPolicyExpirationDateDays(new \DateTime('2016-02-01')));
 
@@ -2734,7 +2752,10 @@ class PhonePolicyTest extends WebTestCase
         );
 
         // expected payment 1/2/16 + 1 month = 1/3/16 + 30 days = 31/3/16
-        $this->assertEquals(new \DateTime('2016-03-31'), $policy->getPolicyExpirationDate());
+        $this->assertEquals(
+            new \DateTime('2016-03-31', $timezone),
+            $policy->getPolicyExpirationDate()
+        );
     
         // add a late payment
         self::addPayment(
@@ -2746,7 +2767,10 @@ class PhonePolicyTest extends WebTestCase
         );
 
         // expected payment 1/3/16 + 1 month = 1/4/16 + 30 days = 1/5/16
-        $this->assertEquals(new \DateTime('2016-05-01'), $policy->getPolicyExpirationDate());
+        $this->assertEquals(
+            new \DateTime('2016-05-01', $timezone),
+            $policy->getPolicyExpirationDate()
+        );
     }
 
     public function testPolicyExpirationDateYearly()
