@@ -7,9 +7,8 @@
                     {# TODO: put policy in session #}
                     {% if policy is defined and policy %}
                         {% if policy.user.getValidPolicies(true) | length == 1 %}
-                        <div class="h3 text-white">
-                            <span class="">{{ policy.phone }}</span>
-                        </div>
+                        <div class="h3 text-white">{{ policy.phone }}</div>
+                        <div class="h4 text-light-blue">IMEI: {{ policy.imei }}</div>
                         {% else %}
                         <div class="dropdown policy-dropdown-list">
                             <a href="#"
@@ -22,6 +21,7 @@
                                title="Switch policy">
                                 <span class="text-nowrap">{{ policy.phone }} <i class="fa fa-caret-down" aria-hidden="true"></i></span>
                             </a>
+                            <div class="h4 text-light-blue">IMEI: {{ policy.imei }}</div>
                             <ul class="dropdown-menu policy-dropdown" aria-labelledby="policyDropdownList">
                                 <li class="dropdown-header">My policies</li>
                                 {% for policyItem in policy.user.getValidPolicies(true) %}
