@@ -65,7 +65,11 @@
                         </ul>
                     </div>
                     <br>
-                    <span class="title-price">for just <span class="text-blue">£{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}</span> a month</span>
+                    {% if not app.user or app.user.allowedMonthlyPayments %}
+                        <span class="title-price">for just <span class="text-blue">£{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}</span> a month</span>
+                    {% else %}
+                        <span class="title-price">for just <span class="text-blue">£{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}</span> a year</span>
+                    {% endif %}
                 </h1>
             </div>
         </div>
