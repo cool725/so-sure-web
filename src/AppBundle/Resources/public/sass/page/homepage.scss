@@ -59,11 +59,29 @@ body {
 .tt-input,
 .tt-menu,
 .tt-hint {
-    width: 215px;
+    width: 100%;
 
     @include breakpoint(tablet) {
-        // width: 100%;
         width: 320px;
+    }
+}
+
+.homepage-hero-text {
+    text-align: center;
+
+    @include breakpoint(tablet) {
+        text-align: left;
+    }
+}
+
+.homepage-hero-search {
+    max-width: 420px;
+    margin: 0 auto;
+    text-align: center;
+
+    @include breakpoint(tablet) {
+        max-width: none;
+        text-align: left;
     }
 }
 
