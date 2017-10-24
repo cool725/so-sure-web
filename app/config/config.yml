@@ -676,6 +676,7 @@ nelmio_security:
                 - https://maxcdn.bootstrapcdn.com
                 - http://maxcdn.bootstrapcdn.com
                 - https://cdn-images.mailchimp.com
+                - https://*.vimeocdn.com
             img-src:
                 - 'self'
                 - https://wearesosure.com

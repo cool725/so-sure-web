@@ -32,10 +32,13 @@ abstract class LoadPhoneData implements ContainerAwareInterface
             $filename
         );
         $row = 0;
+        $newPhones = [];
         if (($handle = fopen($file, "r")) !== FALSE) {
             while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
                 if ($row > 0) {
-                    $this->newPhoneFromRow($manager, $data, $date);
+                    if ($phone = $this->newPhoneFromRow($manager, $data, $date)) {
+                        $newPhones[$phone->getDevices()[0]] = $phone;
+                    }
                 }
                 if ($row % 1000 == 0) {
                     $manager->flush();
@@ -59,6 +62,35 @@ abstract class LoadPhoneData implements ContainerAwareInterface
         }
 
         $manager->flush();
+
+        $this->notifyNewPhones($newPhones);
+    }
+
+    private function notifyNewPhones($newPhones)
+    {
+        $env = $this->container->getParameter('kernel.environment');
+        if ($env != 'prod') {
+            return;
+        }
+
+        $lines = [];
+        foreach ($newPhones as $device => $phone) {
+            $lines[] = sprintf('"%s %s" as "%s"', $phone->getMake(), $phone->getModel(), $device);
+        }
+        $body = sprintf(
+            'Please add the following modelreferences to the make/model checks<br><br>%s',
+            implode('<br>', $lines)
+        );
+        $mailer = $this->container->get('app.mailer');
+        $mailer->send(
+            'New Model References',
+            'support@recipero.com',
+            $body,
+            null,
+            null,
+            'tech@so-sure.com',
+            'tech@so-sure.com'
+        );
     }
 
     private function setSuggestedReplacement($manager, $data)
@@ -167,10 +199,14 @@ abstract class LoadPhoneData implements ContainerAwareInterface
             if (!$phone->getCurrentPhonePrice()) {
                 throw new \Exception('Failed to init phone');
             }
+
+            return $phone;
         } catch (\Exception $e) {
             print sprintf('Ex: %s. Failed to import %s', $e->getMessage(), json_encode($data));
             throw $e;
         }
+
+        return null;
     }
 
     protected function newPhone($manager, $make, $model, $policyPrice, $memory = null, $devices = null)
