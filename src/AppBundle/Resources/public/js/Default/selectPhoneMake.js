@@ -132,11 +132,17 @@ $(function(){
             templates: {
                 notFound: [
                   '<div class="empty-message">',
-                    'We couldn\x27t find that phone. Try searching for the make (e.g. iPhone 7), or <a href="mailto:hello@wearesosure.com" class="open-intercom">ask us</a>',
+                    'We couldn\x27t find that phone. <br> Try searching for the make (e.g. iPhone 7), or <a href="mailto:hello@wearesosure.com" class="open-intercom">ask us</a>',
                   '</div>'
                 ].join('\n'),
-                //suggestion: function(e) { console.log(e); }
-                suggestion: doT.template('<div>{{=it.name}} {{~it.sizes :value}}<a href="/phone-insurance/{{=value.id}}">{{=value.memory}}</a> {{~}}</div>')
+                header: [
+                    '<div class="tt-menu-header clearfix">',
+                        '<div class="tt-menu-left">MODEL</div>',
+                        '<div class="tt-menu-right">SELECT SIZE</div>',
+                    '</div>'
+                ].join('\n'),
+                // //suggestion: function(e) { console.log(e); }
+                suggestion: doT.template('<div class="clearfix"><div class="tt-menu-left">{{=it.name}}</div><div class="tt-menu-right">{{~it.sizes :value}}<a href="/phone-insurance/{{=value.id}}" class="btn-tt">{{=value.memory}}GB</a> {{~}}</div></div>')
             }
         });
 
