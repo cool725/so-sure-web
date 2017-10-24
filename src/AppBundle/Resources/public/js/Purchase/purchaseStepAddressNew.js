@@ -205,6 +205,10 @@ sosure.purchaseStepAddress = (function() {
       });
     }
 
+    self.clearAddress = function() {
+        self.setAddress({'Line1': '', 'Line2': '', 'Line3': '', 'City': '', 'Postcode': ''});
+    }
+
     self.setAddress = function(addr) {
         if (!addr) {
             return;
@@ -234,7 +238,24 @@ sosure.purchaseStepAddress = (function() {
         $('.typeahead .with-errors').html('');
     }
 
+    self.toggleSearch = function() {
+        if ($('#search_address_button').length > 0) {
+            if ($('#search_address_button').html().indexOf('fa-search') >= 0) {
+                $('#search_address_button').html('<i class="fa fa-spinner fa-spin"></i>');
+            } else {
+                $('#search_address_button').html('<i class="fa fa-search"></i>');
+            }
+        }
+    }
+
     self.selectAddress = function(suggestion) {
+        if (!suggestion) {
+            $('#search_address_errors').show();
+            $('#select_address_errors').show();
+            self.toggleSearch();
+
+            return self.clearAddress();
+        }
         if (suggestion.Next == "Retrieve") {
             return self.selectAddressFinal(suggestion);
         }
@@ -264,6 +285,9 @@ sosure.purchaseStepAddress = (function() {
             }
         })
         .done(function( msg ) {
+            $('#search_address_errors').hide();
+            $('#select_address_errors').hide();
+            self.toggleSearch();
             var addr = msg.Items[0];
             sosure.purchaseStepAddress.setAddress(addr);
         });
@@ -307,9 +331,27 @@ $(function(){
             return sosure.purchaseStepAddress.step_address_continue();
         }
 
-        var search = search_number + ", " + search_postcode;
-        sosure.purchaseStepAddress.bloodhound.search(search, function(sync) {}, function(async) {
-            sosure.purchaseStepAddress.selectAddress(async[0]);
+        sosure.purchaseStepAddress.toggleSearch();
+
+        $.ajax({
+          method: "POST",
+          url: "/ops/postcode",
+          contentType:"application/json; charset=utf-8",
+          dataType:"json",
+          data: JSON.stringify({ 'postcode': search_postcode })
+        }).done(function (response) {
+            if (response.postcode.length == 0) {
+                return sosure.purchaseStepAddress.step_address_continue();
+            }
+
+            var search = search_number + ", " + response.postcode;
+            sosure.purchaseStepAddress.bloodhound.search(search, function(sync) {}, function(async) {
+                if (async.length > 0) {
+                    sosure.purchaseStepAddress.selectAddress(async[0]);
+                } else {
+                    sosure.purchaseStepAddress.selectAddress(null);
+                }
+            });
         });
     });
 
@@ -350,11 +392,18 @@ $(function(){
     });
 
     $('.typeahead').typeahead(null, {
-      name: 'capture',
-      display: 'Text',
-      source: sosure.purchaseStepAddress.bloodhound,
-      highlight: true,
-      limit: 100 // below 100 typeahead stops showing results for less than 4 characters entered
+        name: 'capture',
+        display: 'Text',
+        source: sosure.purchaseStepAddress.bloodhound,
+        highlight: true,
+        limit: 100, // below 100 typeahead stops showing results for less than 4 characters entered
+        templates: {
+            notFound: [
+              '<div class="empty-message">',
+                'We couldn\x27t find that address. Make sure you have a space in the postcode (e.g SW1A 2AA). Or use manual entry.',
+              '</div>'
+            ].join('\n')
+        }
     });
     $('.typeahead').bind('typeahead:select', function(ev, suggestion) {
         sosure.purchaseStepAddress.selectAddress(suggestion);
