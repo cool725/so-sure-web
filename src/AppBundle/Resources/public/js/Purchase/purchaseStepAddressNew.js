@@ -235,18 +235,38 @@ sosure.purchaseStepAddress = (function() {
     }
 
     self.selectAddress = function(suggestion) {
-        $.ajax({
-        method: "POST",
-        url: "https://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Retrieve/v2.10/json3.ws",
-        data: {
-            Key: sosure.purchaseStepAddress.key,
-            Id: suggestion.Id,
+        if (suggestion.Next == "Retrieve") {
+            return self.selectAddressFinal(suggestion);
         }
-      })
+        $.ajax({
+            method: "POST",
+            url: "https://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Find/v2.10/json3.ws",
+            data: {
+                Key: sosure.purchaseStepAddress.key,
+                LastId: suggestion.Id,
+                SearchTerm: suggestion.Text,
+                Country : "GBR",
+                MaxSuggestions: sosure.purchaseStepAddress.maxAddresses
+            }
+        })
+        .done(function( msg ) {
+            sosure.purchaseStepAddress.selectAddressFinal(msg.Items[0]);
+        });
+    }
+
+    self.selectAddressFinal = function(suggestion) {
+        $.ajax({
+            method: "POST",
+            url: "https://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Retrieve/v2.10/json3.ws",
+            data: {
+                Key: sosure.purchaseStepAddress.key,
+                Id: suggestion.Id,
+            }
+        })
         .done(function( msg ) {
             var addr = msg.Items[0];
             sosure.purchaseStepAddress.setAddress(addr);
-      });
+        });
     }
     
     return self;
