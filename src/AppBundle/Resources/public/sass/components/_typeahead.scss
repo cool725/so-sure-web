@@ -39,8 +39,8 @@
     .tt-menu {
         max-height: 200px;
         background-color: $white;
-        // border: 1px solid $grey-light;
-        box-shadow: 0 5px 15px $grey;
+        border: 1px solid $grey-light;
+        // box-shadow: 0 5px 15px $grey;
         @include border-bottom-radius(4px);
         overflow-y: scroll;
 
@@ -76,21 +76,46 @@
 }
 
 .tt-menu-left, .tt-menu-right {
-    float: left;
+
+    @include breakpoint(laptop) {
+        float: left;
+        width: 50%;
+    }
 }
 
 .tt-menu-left {
-    width: 60%;
+    @include breakpoint(laptop) {
+        margin-bottom: 0;
+    }
 }
 
 .tt-menu-right {
-    width: 40%;
-    text-align: right;
+    @include breakpoint(laptop) {
+        text-align: right;
+    }
 }
 
+// Style button move to all eventually
 .btn-tt {
+    display: inline-block;
+    background-color: $grey;
+    color: $black;
+    font-family: $avenir-heavy;
     font-size: 12px;
     padding: 2px 3px;
+
+    vertical-align: middle;
+    line-height: 1.4;
+
+    padding: 5px 10px;
+
+    @include border-radius(2px);
+
+    &:hover {
+        text-decoration: none;
+        color: $black;
+        background-color: darken($grey, 10%);
+    }
 }
 
 .empty-message {

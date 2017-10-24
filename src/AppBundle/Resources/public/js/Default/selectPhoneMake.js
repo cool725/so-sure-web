@@ -138,7 +138,7 @@ $(function(){
                 header: [
                     '<div class="tt-menu-header clearfix">',
                         '<div class="tt-menu-left">MODEL</div>',
-                        '<div class="tt-menu-right">SELECT SIZE</div>',
+                        '<div class="tt-menu-right hidden-xs hidden-sm">SELECT SIZE</div>',
                     '</div>'
                 ].join('\n'),
                 // //suggestion: function(e) { console.log(e); }

@@ -42,24 +42,24 @@ label {
 }
 
 // Form Inline
-@include breakpoint(mobileonly) {
+// @include breakpoint(mobileonly) {
 
-    .form-inline {
+//     .form-inline {
 
-        .form-control {
-            display: inline-block;
-            width: auto;
-            vertical-align: middle;
-        }
+//         .form-control {
+//             display: inline-block;
+//             width: auto;
+//             vertical-align: middle;
+//         }
 
-        .form-group {
-            display: inline-block;
-            margin-bottom: 0;
-            vertical-align: middle;
-        }
-    }
+//         .form-group {
+//             display: inline-block;
+//             margin-bottom: 0;
+//             vertical-align: middle;
+//         }
+//     }
 
-}
+// }
 
 // Select Phone Make Overide
 .tt-menu {

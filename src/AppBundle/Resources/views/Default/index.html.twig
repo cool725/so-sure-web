@@ -56,14 +56,15 @@
                     </div>
                 </div>
                 {% endif %}
-                <div class="{% if sixpack == 'phone-image' %}col-md-7{% else %}col-md-12{% endif %}">
+                <div class="homepage-hero-text {% if sixpack == 'phone-image' %}col-md-7{% else %}col-md-12{% endif %}">
                     <h1>The insurance revolution is here</h1>
                     <h3 class="text-light-blue">Mobile phone insurance is finally worthwhile</h3>
-                    <ul class="list-unstyled fa-list-bullet">
+                    <ul class="list-unstyled fa-list-bullet hidden-xs">
                         <li class="text-white"><i class="fa fa-check-circle fa-lg" aria-hidden="true"></i> Up to 40% cheaper than traditional insurers</li>
                         <li class="text-white"><i class="fa fa-check-circle fa-lg" aria-hidden="true"></i> Next working day replacement or repair</li>
                         <li class="text-white"><i class="fa fa-check-circle fa-lg" aria-hidden="true"></i> Get cashback when no claims</li>
                     </ul>
+                    <p class="visible-block-inline lead">Up to 40% cheaper than traditional insurers, Next working day replacement or repair, Get cashback when no claims</p>
                     {% if phone %}
                         {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':'homepage', 'id': phone.id })) }}
                     {% else %}
