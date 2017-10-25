@@ -92,7 +92,7 @@ body {
 @include breakpoint(laptop) {
 
     .hero.hero-search-container {
-        padding: 20px 0 0 0;
+        padding: 20px 0;
     }
 }
 
