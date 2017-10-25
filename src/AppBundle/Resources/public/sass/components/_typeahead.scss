@@ -35,6 +35,10 @@
 
     }
 
+    .tt-menu-pad {
+        padding: 2px 3px;
+    }
+
     // Menu
     .tt-menu {
         max-height: 200px;
@@ -71,7 +75,7 @@
 .tt-menu-header {
     font-family: $avenir-heavy;
     font-size: 13px;
-    background-color: $grey;
+    background-color: $off-white;
     padding: 5px 15px 3px;
 }
 
@@ -98,9 +102,10 @@
 // Style button move to all eventually
 .btn-tt {
     display: inline-block;
-    background-color: $grey;
-    color: $black;
-    font-family: $avenir-heavy;
+    background-color: transparent;
+    border: 1px solid $primary-blue;
+    color: $primary-blue;
+    // font-family: $avenir-heavy;
     font-size: 12px;
     padding: 2px 3px;
 
@@ -113,8 +118,9 @@
 
     &:hover {
         text-decoration: none;
-        color: $black;
-        background-color: darken($grey, 10%);
+        color: $white;
+        background-color: darken($primary-blue, 10%);
+        border-color: darken($primary-blue, 10%);
     }
 }
 
