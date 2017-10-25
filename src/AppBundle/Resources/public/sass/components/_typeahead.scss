@@ -1,0 +1,101 @@
+// typeahead.scss
+
+// Our input
+.search-phone-text {
+    width: 100%;
+    padding: 10px 15px;
+    background-color: $white;
+    border: 1px solid $grey-light;
+    color: $black;
+
+    @include border-radius(4px);
+
+    &:focus, &:active {
+        outline: none;
+    }
+}
+
+// Dynamic addition
+.twitter-typeahead {
+    width: 100%;
+    text-align: left;
+
+    > * {
+        width: 100%;
+        color: $black;
+    }
+
+    // Input style
+    .tt-input {
+
+    }
+
+    // Hint in input
+    .tt-hint {
+
+    }
+
+    // Menu
+    .tt-menu {
+        max-height: 200px;
+        background-color: $white;
+        // border: 1px solid $grey-light;
+        box-shadow: 0 5px 15px $grey;
+        @include border-bottom-radius(4px);
+        overflow-y: scroll;
+
+        @include breakpoint(laptop) {
+            max-height: 300px;
+        }
+    }
+
+    // Menu List
+    .tt-suggestion {
+        padding: 15px;
+        border-bottom: 1px solid $grey-light;
+        vertical-align: middle;
+        cursor: pointer;
+
+        &:last-of-type {
+            border-bottom: none;
+        }
+
+        &:hover {
+            background-color: lighten($blue-lightest, 5%);
+        }
+    }
+
+}
+
+// Header / Content Addition
+.tt-menu-header {
+    font-family: $avenir-heavy;
+    font-size: 13px;
+    background-color: $grey;
+    padding: 5px 15px 3px;
+}
+
+.tt-menu-left, .tt-menu-right {
+    float: left;
+}
+
+.tt-menu-left {
+    width: 60%;
+}
+
+.tt-menu-right {
+    width: 40%;
+    text-align: right;
+}
+
+.btn-tt {
+    font-size: 12px;
+    padding: 2px 3px;
+}
+
+.empty-message {
+    padding: 15px;
+    text-align: center;
+    color: $black;
+    cursor: default;
+}
