@@ -147,4 +147,13 @@ $(function(){
     $('#policy-modal, .modal-policy').on('hide.bs.modal', function (event) {
         $('.modal-body__policy-doc').hide();
     });
+
+    $('#purchase_form_file').on('change', function() {
+        $('#upload-file-info').html('<i class="fa fa-file"></i> ' + this.files[0].name)         
+        $('#purchase_form_imei').rules("remove");
+        $('#purchase_form_imei').removeAttr("required");
+        $('#purchase_form_serialNumber').rules("remove");
+        $('#purchase_form_serialNumber').removeAttr("required");
+        $('#step--validate').click();
+    });
 });
