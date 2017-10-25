@@ -37,6 +37,11 @@
 
     .tt-menu-pad {
         padding: 2px 3px;
+        margin-bottom: 5px;
+
+        @include breakpoint(laptop) {
+            margin-bottom: 0;
+        }
     }
 
     // Menu
