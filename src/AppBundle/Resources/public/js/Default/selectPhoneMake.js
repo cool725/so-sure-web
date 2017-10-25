@@ -142,7 +142,7 @@ $(function(){
                     '</div>'
                 ].join('\n'),
                 // //suggestion: function(e) { console.log(e); }
-                suggestion: doT.template('<div class="clearfix"><div class="tt-menu-left">{{=it.name}}</div><div class="tt-menu-right">{{~it.sizes :value}}<a href="/phone-insurance/{{=value.id}}" class="btn-tt">{{=value.memory}}GB</a> {{~}}</div></div>')
+                suggestion: doT.template('<div class="clearfix"><div class="tt-menu-left tt-menu-pad">{{=it.name}}</div><div class="tt-menu-right">{{~it.sizes :value}}<a href="/phone-insurance/{{=value.id}}" class="btn-tt">{{=value.memory}}GB</a> {{~}}</div></div>')
             }
         });
 
