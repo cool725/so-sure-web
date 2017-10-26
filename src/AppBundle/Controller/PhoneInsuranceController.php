@@ -237,12 +237,6 @@ class PhoneInsuranceController extends BaseController
             }
         }
         if (!$phone) {
-            $phone = $repo->findOneBy([
-                'make' => $make,
-                'model' => $decodedModel,
-                'memory' => (int) $memory
-            ]);
-
             $this->get('logger')->info(sprintf(
                 'Failed to find phone for id: %s make: %s model: %s mem: %s',
                 $id,
