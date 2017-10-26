@@ -169,5 +169,12 @@ $(function(){
             }
         }
     });
+
+    if ($('#quoteModal').length) {
+        $('#quoteModal').on('shown.bs.modal', function() {
+            $('.search-phone-text').focus();
+        });
+    }
+
 });
 
