@@ -100,7 +100,7 @@ redirect_jobs_html:
     path: /jobs.html
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
-        route: jobs
+        route: careers
         permanent: true
 
 _security_logout:
@@ -151,7 +151,14 @@ redirect_jobs:
     path: /jobs
     defaults:
         _controller: FrameworkBundle:Redirect:redirect
-        route: jobs
+        route: careers
+        permanent: true
+
+redirect_about_jobs:
+    path: /about/social-insurance/jobs
+    defaults:
+        _controller: FrameworkBundle:Redirect:redirect
+        route: careers
         permanent: true
 
 redirect_terms:
