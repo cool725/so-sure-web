@@ -9,6 +9,8 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\Address;
 use AppBundle\Document\Attribution;
 use AppBundle\Document\SalvaPhonePolicy;
+use AppBundle\Document\PhonePremium;
+use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Tests\UserClassTrait;
 
@@ -382,5 +384,51 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $policy->addClaim($claim);
         $user->addPolicy($policy);
         $this->assertEquals(1.5, $user->getAvgPolicyClaims());
+    }
+
+    public function testHasPolicyCancelledAndPaymentOwed()
+    {
+        $premium = new PhonePremium();
+        $premium->setGwp(5);
+        $premium->setIpt(1);
+        $userA = new User();
+        $policyA = new PhonePolicy();
+        $policyA->setPremium($premium);
+        $userA->addPolicy($policyA);
+        $userB = new User();
+        $policyB = new PhonePolicy();
+        $policyB->setPremium($premium);
+        $userB->addPolicy($policyB);
+        $claimB = new Claim();
+        $claimB->setStatus(Claim::STATUS_APPROVED);
+        $policyB->addClaim($claimB);
+
+        $this->assertFalse($policyA->isCancelledAndPaymentOwed());
+        $this->assertFalse($policyB->isCancelledAndPaymentOwed());
+
+        $policyB->setStatus(Policy::STATUS_CANCELLED);
+        $policyB->setCancelledReason(Policy::CANCELLED_UNPAID);
+
+        $this->assertFalse($policyA->isCancelledAndPaymentOwed());
+        $this->assertTrue($policyB->isCancelledAndPaymentOwed());
+
+        $this->assertFalse($policyA->getUser()->hasPolicyCancelledAndPaymentOwed());
+        $this->assertTrue($policyB->getUser()->hasPolicyCancelledAndPaymentOwed());
+
+        $bacsA = new BacsPayment();
+        $bacsA->setAmount($policyA->getPremium()->getMonthlyPremiumPrice() * 12);
+        $policyA->addPayment($bacsA);
+        $bacsB = new BacsPayment();
+        $bacsB->setAmount($policyB->getPremium()->getMonthlyPremiumPrice() * 12);
+        $policyB->addPayment($bacsB);
+
+        $this->assertTrue($policyA->isFullyPaid());
+        $this->assertTrue($policyB->isFullyPaid());
+
+        $this->assertFalse($policyA->isCancelledAndPaymentOwed());
+        $this->assertFalse($policyB->isCancelledAndPaymentOwed());
+
+        $this->assertFalse($policyA->getUser()->hasPolicyCancelledAndPaymentOwed());
+        $this->assertFalse($policyB->getUser()->hasPolicyCancelledAndPaymentOwed());
     }
 }

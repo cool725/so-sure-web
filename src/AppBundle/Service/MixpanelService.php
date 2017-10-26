@@ -68,6 +68,7 @@ class MixpanelService
     const CUSTOM_CPC_COMPETITOR_PAGE_UK = '$custom_event:599266';
     const CUSTOM_INVITATION_PAGE_SCODE = '$custom_event:591840';
     const CUSTOM_INVITATION_PAGE_EMAIL = '$custom_event:591838';
+    const CUSTOM_PURCHASE_POLICY_APP_ATTRIB = '$custom_event:674827';
 
     /** @var DocumentManager */
     protected $dm;
@@ -286,6 +287,7 @@ class MixpanelService
             self::CUSTOM_CPC_COMPETITOR_PAGE_UK,
             self::CUSTOM_INVITATION_PAGE_SCODE,
             self::CUSTOM_INVITATION_PAGE_EMAIL,
+            self::CUSTOM_PURCHASE_POLICY_APP_ATTRIB,
         ];
         $data = $this->mixpanelData->data('events', [
             'event' => $events,
@@ -329,6 +331,9 @@ class MixpanelService
             } elseif ($event == self::CUSTOM_INVITATION_PAGE_EMAIL) {
                 $stats['View Invitation Email'] = $results[$key];
                 $this->stats->set(Stats::MIXPANEL_VIEW_INVITATION_EMAIL, $start, $results[$key]);
+            } elseif ($event == self::CUSTOM_PURCHASE_POLICY_APP_ATTRIB) {
+                $stats['Purchase Policy App Attrib'] = $results[$key];
+                $this->stats->set(Stats::MIXPANEL_PURCHASE_POLICY_APP_ATTRIB, $start, $results[$key]);
             }
         }
 

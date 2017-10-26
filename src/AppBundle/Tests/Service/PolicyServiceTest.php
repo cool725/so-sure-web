@@ -28,6 +28,7 @@ use AppBundle\Exception\InvalidPremiumException;
 use AppBundle\Exception\ValidationException;
 use AppBundle\Classes\Salva;
 use AppBundle\Service\SalvaExportService;
+use Gedmo\Loggable\Document\LogEntry;
 
 /**
  * @group functional-nonet
@@ -51,20 +52,20 @@ class PolicyServiceTest extends WebTestCase
 
     public static function setUpBeforeClass()
     {
-         //start the symfony kernel
-         $kernel = static::createKernel();
-         $kernel->boot();
+        //start the symfony kernel
+        $kernel = static::createKernel();
+        $kernel->boot();
 
-         //get the DI container
-         self::$container = $kernel->getContainer();
+        //get the DI container
+        self::$container = $kernel->getContainer();
 
-         //now we can instantiate our service (if you want a fresh one for
-         //each test method, do this in setUp() instead
-         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
-         self::$policyRepo = self::$dm->getRepository(Policy::class);
-         self::$userManager = self::$container->get('fos_user.user_manager');
-         self::$policyService = self::$container->get('app.policy');
-         self::$judopay = self::$container->get('app.judopay');
+        //now we can instantiate our service (if you want a fresh one for
+        //each test method, do this in setUp() instead
+        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$policyRepo = self::$dm->getRepository(Policy::class);
+        self::$userManager = self::$container->get('fos_user.user_manager');
+        self::$policyService = self::$container->get('app.policy');
+        self::$judopay = self::$container->get('app.judopay');
 
         $phoneRepo = self::$dm->getRepository(Phone::class);
         self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
@@ -573,7 +574,11 @@ class PolicyServiceTest extends WebTestCase
         static::$policyService->create($policy, new \DateTime('2017-01-29'));
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
 
-        $this->assertEquals(new \DateTime('2017-03-30'), $policy->getPolicyExpirationDate());
+        $timezone = new \DateTimeZone('Europe/London');
+        $this->assertEquals(
+            new \DateTime('2017-03-30', $timezone),
+            $policy->getPolicyExpirationDate()
+        );
 
         static::addPayment(
             $policy,
@@ -582,7 +587,10 @@ class PolicyServiceTest extends WebTestCase
             null,
             new \DateTime('2017-02-28')
         );
-        $this->assertEquals(new \DateTime('2017-04-27'), $policy->getPolicyExpirationDate());
+        $this->assertEquals(
+            new \DateTime('2017-04-27', $timezone),
+            $policy->getPolicyExpirationDate()
+        );
 
         // in previous case, payment was on 16/4, which was after the change in billing date
         // and cause the problem. as exception will prevent, no point in testing that case here
@@ -593,7 +601,10 @@ class PolicyServiceTest extends WebTestCase
             null,
             new \DateTime('2017-04-12')
         );
-        $this->assertEquals(new \DateTime('2017-05-28'), $policy->getPolicyExpirationDate());
+        $this->assertEquals(
+            new \DateTime('2017-05-28', $timezone),
+            $policy->getPolicyExpirationDate()
+        );
         $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2017-04-20')));
 
         $billingDate = $this->setDayOfMonth($policy->getBilling(), '15');
@@ -603,7 +614,120 @@ class PolicyServiceTest extends WebTestCase
         $scheduledPayments = $policy->getAllScheduledPayments(ScheduledPayment::STATUS_SCHEDULED);
         $this->assertEquals(15, $scheduledPayments[0]->getScheduledDay());
 
-        $this->assertEquals(new \DateTime('2017-05-15'), $policy->getPolicyExpirationDate());
+        $this->assertEquals(
+            new \DateTime('2017-05-15', $timezone),
+            $policy->getPolicyExpirationDate()
+        );
+    }
+
+    public function testPolicyCancelledTooEarlyBug()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPolicyCancelledTooEarlyBug', $this),
+            'bar',
+            static::$dm
+        );
+        $date = new \DateTime('2017-04-15 00:16:00', new \DateTimeZone('Europe/London'));
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            $date,
+            true
+        );
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->create($policy, $date);
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+        $this->assertEquals($date, $policy->getBilling());
+
+        $timezone = new \DateTimeZone('Europe/London');
+        $this->assertEquals(
+            new \DateTime('2017-05-15', $timezone),
+            $policy->getNextBillingDate(new \DateTime('2017-04-16'))
+        );
+        $this->assertEquals(
+            new \DateTime('2017-06-15', $timezone),
+            $policy->getNextBillingDate(new \DateTime('2017-06-14'))
+        );
+        $this->assertEquals(
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            $policy->getTotalSuccessfulPayments(new \DateTime('2017-05-15', $timezone))
+        );
+        $this->assertEquals(
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            $policy->getTotalExpectedPaidToDate(new \DateTime('2017-05-15', $timezone))
+        );
+        $this->assertEquals(0, $policy->getOutstandingPremiumToDate(new \DateTime('2017-05-15', $timezone)));
+        $this->assertEquals(
+            new \DateTime('2017-06-14', $timezone),
+            $policy->getPolicyExpirationDate(new \DateTime('2017-06-15', $timezone))
+        );
+
+        static::addPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            new \DateTime('2017-05-22 00:22:00', new \DateTimeZone('Europe/London'))
+        );
+        $this->assertEquals(
+            new \DateTime('2017-07-15', $timezone),
+            $policy->getPolicyExpirationDate(new \DateTime('2017-06-15', $timezone))
+        );
+
+        static::addPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            new \DateTime('2017-06-15 00:20:00', new \DateTimeZone('Europe/London'))
+        );
+        $this->assertEquals(
+            new \DateTime('2017-08-14', $timezone),
+            $policy->getPolicyExpirationDate(new \DateTime('2017-07-15', $timezone))
+        );
+        $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2017-06-20')));
+
+        static::addPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            new \DateTime('2017-07-15 00:20:00', new \DateTimeZone('Europe/London'))
+        );
+        $this->assertEquals(
+            new \DateTime('2017-09-14', $timezone),
+            $policy->getPolicyExpirationDate(new \DateTime('2017-08-15', $timezone))
+        );
+        $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2017-07-20')));
+
+        static::addPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            new \DateTime('2017-08-30 14:52:00', new \DateTimeZone('Europe/London'))
+        );
+        $this->assertEquals(
+            new \DateTime('2017-10-15', $timezone),
+            $policy->getPolicyExpirationDate(new \DateTime('2017-09-15', $timezone))
+        );
+        $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2017-08-31')));
+
+        static::addPayment(
+            $policy,
+            $policy->getPremium()->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            new \DateTime('2017-09-15 00:20:00', new \DateTimeZone('Europe/London'))
+        );
+        $this->assertEquals(
+            new \DateTime('2017-11-14', $timezone),
+            $policy->getPolicyExpirationDate(new \DateTime('2017-10-15', $timezone))
+        );
+        $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2017-10-14')));
+        $this->assertFalse($policy->isPolicyPaidToDate(new \DateTime('2017-10-20')));
     }
 
     /**
@@ -1643,6 +1767,97 @@ class PolicyServiceTest extends WebTestCase
         static::$policyService->fullyExpire($policyA, new \DateTime('2017-01-29'));
         $this->assertEquals(Policy::STATUS_EXPIRED, $policyA->getStatus());
         $this->assertEquals(Cashback::STATUS_PENDING_PAYMENT, $policyA->getCashback()->getStatus());
+    }
+
+    public function testCancelPolicyUnpaidUnder15()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testCancelPolicyUnpaidUnder15', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->create($policy, new \DateTime('2016-01-01'), true);
+        $policy->setStatus(PhonePolicy::STATUS_UNPAID);
+        static::$dm->flush();
+
+        // Simulate the correct time for the log history
+        $dm = clone self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $dm->createQueryBuilder(LogEntry::class)
+        ->findAndUpdate()
+        ->field('objectId')->equals($policy->getId())
+        ->field('data.status')->equals(Policy::STATUS_UNPAID)
+        ->field('loggedAt')->set(new \DateTime('2016-01-01'))
+        ->getQuery()
+        ->execute();
+        $dm->flush();
+        $dm->close();
+        //static::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+
+        $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $repo->find($policy->getId());
+        $exception = false;
+        try {
+            static::$policyService->cancel($updatedPolicy, Policy::CANCELLED_UNPAID, true, new \DateTime('2016-01-14'));
+        } catch (\Exception $e) {
+            $exception = true;
+            $this->assertTrue(stripos($e->getMessage(), 'less than 15 days in unpaid state') > 0);
+        }
+        $this->assertTrue($exception);
+    }
+    
+    public function testCancelPolicyUnpaidAfter15()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testCancelPolicyUnpaidAfter15', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->create($policy, new \DateTime('2016-01-01'), true);
+        $policy->setStatus(PhonePolicy::STATUS_UNPAID);
+        static::$dm->flush();
+
+        // Simulate the correct time for the log history
+        $dm = clone self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $dm->createQueryBuilder(LogEntry::class)
+        ->findAndUpdate()
+        ->field('objectId')->equals($policy->getId())
+        ->field('data.status')->equals(Policy::STATUS_UNPAID)
+        ->field('loggedAt')->set(new \DateTime('2016-01-01'))
+        ->getQuery()
+        ->execute();
+        $dm->flush();
+        $dm->close();
+        //static::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+
+        $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $repo->find($policy->getId());
+        static::$policyService->cancel($updatedPolicy, Policy::CANCELLED_UNPAID, true, new \DateTime('2016-01-16'));
     }
 
     public function testPolicyUnrenew()
