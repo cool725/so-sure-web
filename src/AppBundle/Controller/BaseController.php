@@ -814,7 +814,7 @@ abstract class BaseController extends Controller
         } elseif ($status == 'past-due') {
             $policies = $policiesQb->getQuery()->execute()->toArray();
             $policies = array_filter($policies, function ($policy) {
-                return !$policy->isFullyPaid() && count($policy->getApprovedClaims(true, true)) > 0;
+                return $policy->isCancelledAndPaymentOwed();
             });
             // sort older to more recent
             usort($policies, function ($a, $b) {
