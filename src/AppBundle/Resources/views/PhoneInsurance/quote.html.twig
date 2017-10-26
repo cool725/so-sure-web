@@ -45,12 +45,12 @@
 
     <section id="quote" class="quote-container">
 
-        {% if coming_soon %}
-            <h1 class="h2">Better cover for your <span class="text-white">{{ phone }} is coming soon!</span>
-            </h1>
-        {% else %}
         <h1 class="h2">
-            Insurance for your
+            {% if coming_soon %}
+                Better cover for your
+            {% else %}
+                Insurance for your
+            {% endif %}
             <div class="dropdown memory-dropdown-list">
                 <a href="#"
                    class="dropdown-toggle text-white"
@@ -77,7 +77,6 @@
                 </ul>
             </div>
         </h1>
-        {% endif %}
 
         <div class="quote">
 
@@ -85,9 +84,16 @@
                 <div class="col-md-12">
                     <div id="cover-price" class="quote-cost text-center">
                         {% if coming_soon %}
-                            <h2>Pricing coming soon!</h2>
-                            <p class="h2"><strong>£4.99 - £9.99 per month</strong><p>
-                            <p>(typical policy pricing)</p>
+                            {% if phone.make == 'Apple' and phone.model =='iPhone X' %}
+                                <h2>Coming soon!</h2>
+                                <p><a href="mailto:hello@wearesosure.com?subject=Let me know about the iPhone X 256GB Model" class="open-intercom">Tell me when</a> it's available.</p>
+                                <p><strong>IMPORTANT!</strong> If you have the 256GB model, <strong>DO NOT</strong> purchase insurance for the iPhone X 64GB. We will not be able to cover you.</strong></p>
+                            {% else %}
+                                <h2>Pricing coming soon!</h2>
+                                <p class="h2"><strong>£4.99 - £9.99 per month</strong><p>
+                                <p>(typical policy pricing)</p>
+                                <p><a href="mailto:hello@wearesosure.com" class="open-intercom">Tell me when</a> its available.</p>
+                            {% endif %}
                         {% else %}
                             {{ form_start(buy_form) }}
                                 <div class="text-center h4">
