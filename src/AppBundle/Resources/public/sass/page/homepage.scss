@@ -66,6 +66,19 @@ body {
     }
 }
 
+.tt-menu-left, .tt-menu-right {
+    width: 100%;
+
+    @include breakpoint(laptop) {
+        float: none;
+        text-align: left;
+    }
+}
+
+.tt-menu-header  .tt-menu-right {
+    display: none;
+}
+
 .homepage-hero-text {
     text-align: center;
 
