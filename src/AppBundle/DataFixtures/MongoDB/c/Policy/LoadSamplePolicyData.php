@@ -419,7 +419,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     private function getRandomPhone($manager)
     {
         $phoneRepo = $manager->getRepository(Phone::class);
-        $phones = $phoneRepo->findAll();
+        $phones = $phoneRepo->findAll(['active' => true]);
         $phone = null;
         while ($phone == null) {
             $phone = $phones[rand(0, count($phones) - 1)];

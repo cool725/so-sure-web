@@ -31,10 +31,10 @@ class AboutController extends BaseController
     }
 
     /**
-     * @Route("/jobs", name="jobs", options={"sitemap"={"priority":"0.5","changefreq":"daily"}})
+     * @Route("/careers", name="careers", options={"sitemap"={"priority":"0.5","changefreq":"daily"}})
      * @Template
      */
-    public function jobsAction()
+    public function careersAction()
     {
         return array();
     }

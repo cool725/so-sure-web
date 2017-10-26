@@ -27,6 +27,9 @@ $(function(){
         // Remove unicode characters
         phone_number = phone_number.replace(/[^ -~]/g, '');
 
+        // Remove whitespace
+        phone_number = phone_number.replace(/\s+/g, '');
+
         return this.optional(element) || phone_number.length > 9 &&
         phone_number.match(/^(0044\s?7\d{3}|\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$/);
     }, 'Valid UK Mobile Number (Sorry for those outside the UK, but for now, we can only insure UK residents)');

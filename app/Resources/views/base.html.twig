@@ -101,7 +101,20 @@
         <!-- End Google Tag Manager -->
 
         {% if environment != 'prod' and app.request.get('hide_env') != '1' %}
-            <div style="background-color: red; text-align: center; color: white;"><strong>{{ environment }}</strong> <a href="{{ path('ops_pages') }}"><i class="fa fa-wrench"></i></a>&nbsp;&nbsp;&nbsp;<a href="{{ path('quote_make_model_memory', {'make':'Apple','model':'iPhone 7','memory':128}) }}"><i class="fa fa-mobile" title="Quick Quote"></i></a></div>
+            <div style="background-color: red; text-align: center; color: white;">
+                <strong>{{ environment }}</strong>
+                <a href="{{ path('ops_pages') }}"><i class="fa fa-wrench"></i></a>
+                &nbsp;&nbsp;&nbsp;
+                <a href="{{ path('quote_make_model_memory', {'make':'Apple','model':'iPhone 7','memory':128}) }}"><i class="fa fa-mobile" title="Quick Quote"></i></a>
+                {% if distraction_free is defined and distraction_free == 1 and app.user is not null and app.user %}
+                    &nbsp;&nbsp;&nbsp;
+                    {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
+                        <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}">Exit <strong>{{ app.user.email }}</strong></a>
+                    {% else %}
+                        <a href="{{ path('fos_user_security_logout') }}">Logout <strong>{{ app.user.email }}</strong></a>
+                    {% endif %}
+                {% endif %}
+            </div>
         {% endif %}
 
         {% block nav %}

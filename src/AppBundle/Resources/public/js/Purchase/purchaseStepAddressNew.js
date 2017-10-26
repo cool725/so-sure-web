@@ -7,6 +7,9 @@ sosure.purchaseStepAddress = (function() {
     self.focusTimer = null;
     self.name_email_changed = null;
     self.url = null;
+    self.bloodhound = null;
+    self.maxAddresses = 50; // more than 50 causes the find api to returns an error 'unrecognised country code'
+    self.key = null;
 
     self.init = function() {
         self.form = $('.validate-form');
@@ -15,6 +18,8 @@ sosure.purchaseStepAddress = (function() {
             self.addValidation();
         }
         self.url = window.location.href;
+        self.key = $('#ss-root').data('pca-key');
+        self.init_bloodhound();
     }
 
     self.dobMask = function () {
@@ -67,6 +72,10 @@ sosure.purchaseStepAddress = (function() {
                 "purchase_form[postcode]" : {
                     required: true,
                     postcodeUK: true
+                },
+                "search_postcode" : {
+                    required: true,
+                    postcodeUK: true                    
                 }
             },
             messages: {
@@ -170,6 +179,125 @@ sosure.purchaseStepAddress = (function() {
         }, 300);
     }
 
+    self.init_bloodhound = function() {
+      self.bloodhound = new Bloodhound({
+        datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+        queryTokenizer: Bloodhound.tokenizers.whitespace,
+        remote: {
+          url: "https://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Find/v2.10/json3.ws",
+          prepare: function (query, settings) {
+              if (query && (query.toLowerCase() == "bx11lt" || query.toLowerCase() == "bx1 1lt")) {
+                  //sosure.purchaseStepAddress.showAddress();
+                  self.setAddress({'Line1': '123 test', 'City': 'Unknown', 'PostalCode': 'bx1 1lt'});
+                  $('.typeahead .with-errors').html('');
+              }
+              settings.type = "POST";
+              settings.data = {
+                  Key: sosure.purchaseStepAddress.key,
+                  SearchTerm: query,
+                  Country : "GBR",
+                  MaxSuggestions: sosure.purchaseStepAddress.maxAddresses
+              };
+              return settings;
+          },
+          transform: function (response) {
+              if (response.Items && response.Items.length > 0 && response.Items[0].Error) {
+                  sosure.purchaseStepAddress.showAddress("Sorry, there's an error with our address lookup. Please type in manually below.");
+              }
+              return response.Items;
+          }
+        }
+      });
+    }
+
+    self.clearAddress = function() {
+        self.setAddress({'Line1': '', 'Line2': '', 'Line3': '', 'City': '', 'Postcode': ''});
+    }
+
+    self.setAddress = function(addr) {
+        if (!addr) {
+            return;
+        }
+        var address = '';
+        if (addr.Line1) {
+            $('.addressLine1').val(addr.Line1);
+            address = addr.Line1;
+        }
+        if (addr.Line2) {
+            $('.addressLine2').val(addr.Line2);
+            address = address + '<br>' + addr.Line2;
+        }
+        if (addr.Line3) {
+            $('.addressLine3').val(addr.Line3);
+            address = address + '<br>' + addr.Line3;
+        }
+        if (addr.City) {
+            $('.city').val(addr.City);
+            address = address + '<br>' + addr.City;
+        }
+        if (addr.PostalCode) {
+            $('.postcode').val(addr.PostalCode);
+            address = address + '<br>' + addr.PostalCode;
+        }
+        $('#display-address').html(address);
+        $('.typeahead .with-errors').html('');
+    }
+
+    self.toggleSearch = function() {
+        if ($('#search_address_button').length > 0) {
+            if ($('#search_address_button').html().indexOf('fa-search') >= 0) {
+                $('#search_address_button').html('<i class="fa fa-spinner fa-spin"></i>');
+            } else {
+                $('#search_address_button').html('<i class="fa fa-search"></i>');
+            }
+        }
+    }
+
+    self.selectAddress = function(suggestion) {
+        if (!suggestion) {
+            $('#search_address_errors').show();
+            $('#select_address_errors').show();
+            self.toggleSearch();
+
+            return self.clearAddress();
+        }
+        if (suggestion.Next == "Retrieve") {
+            return self.selectAddressFinal(suggestion);
+        }
+        $.ajax({
+            method: "POST",
+            url: "https://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Find/v2.10/json3.ws",
+            data: {
+                Key: sosure.purchaseStepAddress.key,
+                LastId: suggestion.Id,
+                SearchTerm: suggestion.Text,
+                Country : "GBR",
+                MaxSuggestions: sosure.purchaseStepAddress.maxAddresses
+            }
+        })
+        .done(function( msg ) {
+            sosure.purchaseStepAddress.selectAddressFinal(msg.Items[0]);
+        });
+    }
+
+    self.selectAddressFinal = function(suggestion) {
+        $.ajax({
+            method: "POST",
+            url: "https://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Retrieve/v2.10/json3.ws",
+            data: {
+                Key: sosure.purchaseStepAddress.key,
+                Id: suggestion.Id,
+            }
+        })
+        .done(function( msg ) {
+            $('#search_address_errors').hide();
+            $('#select_address_errors').hide();
+            self.toggleSearch();
+            var addr = msg.Items[0];
+            sosure.purchaseStepAddress.setAddress(addr);
+        });
+    }
+    
     return self;
 })();
 
@@ -197,6 +325,40 @@ $(function(){
             sosure.purchaseStepAddress.focusBirthday();
         }
     });
+    
+    $('#search_address_button').click(function(e) {
+        e.preventDefault();
+        var search_number = $('#search_address_number').val();
+        var search_postcode = $('#search_address_postcode').val();
+        var allow_search = search_number.length > 0 && search_postcode.length > 0;
+
+        if (!allow_search) {
+            return sosure.purchaseStepAddress.step_address_continue();
+        }
+
+        sosure.purchaseStepAddress.toggleSearch();
+
+        $.ajax({
+          method: "POST",
+          url: "/ops/postcode",
+          contentType:"application/json; charset=utf-8",
+          dataType:"json",
+          data: JSON.stringify({ 'postcode': search_postcode })
+        }).done(function (response) {
+            if (response.postcode.length == 0) {
+                return sosure.purchaseStepAddress.step_address_continue();
+            }
+
+            var search = search_number + ", " + response.postcode;
+            sosure.purchaseStepAddress.bloodhound.search(search, function(sync) {}, function(async) {
+                if (async.length > 0) {
+                    sosure.purchaseStepAddress.selectAddress(async[0]);
+                } else {
+                    sosure.purchaseStepAddress.selectAddress(null);
+                }
+            });
+        });
+    });
 
     // Click check validate form?
     // Case: user clicks continue before filling in any fields
@@ -207,80 +369,48 @@ $(function(){
 
     $('#address-manual').click(function(e) {
         e.preventDefault();
-        return sosure.purchaseStepAddress.step_address_continue();
+        $('#address-select').rules("remove");
+        $('#address-select').removeAttr("required");
+        if (!sosure.purchaseStepAddress.step_address_continue()) {
+            $('#address-select').attr("required", true);
+
+            return false;
+        }
+
+        return true;
+    });
+    
+    $('#search-address-manual').click(function(e) {
+        e.preventDefault();
+        $('#search_address_number').removeAttr("required");
+        $('#search_address_number').rules("remove");
+        $('#search_address_postcode').removeAttr("required");
+        $('#search_address_postcode').rules("remove");
+        if (!sosure.purchaseStepAddress.step_address_continue()) {
+            $('#search_address_number').attr("required", true);
+            $('#search_address_postcode').attr("required", true);
+
+            return false;
+        }
+
+        return true;
     });
 
-    var maxAddresses = 50; // more than 50 causes the find api to returns an error 'unrecognised country code'
-    var key = $('#ss-root').data('pca-key');
-
-    var setAddress = function(addr) {
-        if (!addr) {
-            return;
-        }
-        if (addr.Line1) {
-            $('.addressLine1').val(addr.Line1);
-        }
-        if (addr.Line2) {
-            $('.addressLine2').val(addr.Line2);
-        }
-        if (addr.Line3) {
-            $('.addressLine3').val(addr.Line3);
-        }
-        if (addr.City) {
-            $('.city').val(addr.City);
-        }
-        if (addr.PostalCode) {
-            $('.postcode').val(addr.PostalCode);
-        }
-    }
-
-    var capture = new Bloodhound({
-      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
-      queryTokenizer: Bloodhound.tokenizers.whitespace,
-      remote: {
-        url: "https://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Find/v2.10/json3.ws",
-        prepare: function (query, settings) {
-            if (query && (query.toLowerCase() == "bx11lt" || query.toLowerCase() == "bx1 1lt")) {
-                sosure.purchaseStepAddress.showAddress();
-                setAddress({'Line1': '123 test', 'City': 'Unknown', 'PostalCode': 'bx1 1lt'});
-            }
-            settings.type = "POST";
-            settings.data = {
-				Key: key,
-				SearchTerm: query,
-				Country : "GBR",
-                MaxSuggestions: maxAddresses
-            };
-            return settings;
-        },
-        transform: function (response) {
-            if (response.Items && response.Items.length > 0 && response.Items[0].Error) {
-                sosure.purchaseStepAddress.showAddress("Sorry, there's an error with our address lookup. Please type in manually below.");
-            }
-            return response.Items;
-        }
-      }
-    });
     $('.typeahead').typeahead(null, {
-      name: 'capture',
-      display: 'Text',
-      source: capture,
-      highlight: true,
-      limit: 100 // below 100 typeahead stops showing results for less than 4 characters entered
+        name: 'capture',
+        display: 'Text',
+        source: sosure.purchaseStepAddress.bloodhound,
+        highlight: true,
+        limit: 100, // below 100 typeahead stops showing results for less than 4 characters entered
+        templates: {
+            notFound: [
+              '<div class="empty-message">',
+                'We couldn\x27t find that address. Make sure you have a space in the postcode (e.g SW1A 2AA). Or use manual entry.',
+              '</div>'
+            ].join('\n')
+        }
     });
     $('.typeahead').bind('typeahead:select', function(ev, suggestion) {
-        sosure.purchaseStepAddress.showAddress();
-        $.ajax({
-            method: "POST",
-            url: "https://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Retrieve/v2.10/json3.ws",
-            data: {
-				Key: key,
-				Id: suggestion.Id,
-            }
-          })
-            .done(function( msg ) {
-                var addr = msg.Items[0];
-                setAddress(addr);
-          });
+        sosure.purchaseStepAddress.selectAddress(suggestion);
     });
 });

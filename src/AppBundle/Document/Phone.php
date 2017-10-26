@@ -245,13 +245,15 @@ class Phone
         $this->replacementPrice = strlen($replacementPrice) > 0 ? $replacementPrice : null;
         $this->initialPriceUrl = strlen($initialPriceUrl) > 0 ? $initialPriceUrl : null;
 
-        $phonePrice = $this->getCurrentPhonePrice();
-        if (!$phonePrice) {
-            $phonePrice = new PhonePrice();
-            $phonePrice->setValidFrom($date);
-            $this->addPhonePrice($phonePrice);
+        if ($premium > 0) {
+            $phonePrice = $this->getCurrentPhonePrice();
+            if (!$phonePrice) {
+                $phonePrice = new PhonePrice();
+                $phonePrice->setValidFrom($date);
+                $this->addPhonePrice($phonePrice);
+            }
+            $phonePrice->setMonthlyPremiumPrice($premium, $date);
         }
-        $phonePrice->setMonthlyPremiumPrice($premium, $date);
     }
 
     public function setDetails(
