@@ -66,7 +66,7 @@
     {{ form_end(form) }}
     <div class="row" style="margin-top: 20px">
         <div class="col-md-8">
-            <h2>{{ users.count }} Results</h2>            
+            <h2>{{ pager.nbResults }} Results</h2>
         </div>
         <div class="col-md-4">
             <a href="#" class="btn btn-info" data-toggle="modal" data-target="#addUserModal">
@@ -76,7 +76,7 @@
     </div>
     {% if users.count == 0 %}
     <div class="row-fluid">
-        <h2>No policies found</h2>
+        <h2>No users found</h2>
     </div>
     {% else %}
     <div class="row-fluid">

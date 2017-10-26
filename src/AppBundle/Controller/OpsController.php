@@ -19,6 +19,7 @@ use AppBundle\Service\MixpanelService;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use AppBundle\Document\Invitation\EmailInvitation;
 use Symfony\Component\HttpFoundation\Response;
+use VasilDakov\Postcode\Postcode;
 
 /**
  * @Route("/ops")
@@ -367,5 +368,17 @@ class OpsController extends BaseController
         $logger->debug(sprintf('Validation Endpoint %s', json_encode($data)));
 
         return new JsonResponse();
+    }
+
+    /**
+     * @Route("/postcode", name="ops_postocde")
+     * @Method({"POST"})
+     */
+    public function postcodeAction(Request $request)
+    {
+        $data = json_decode($request->getContent(), true);
+        $postcode = new Postcode($data['postcode']);
+
+        return new JsonResponse(['postcode' => $postcode->normalise()]);
     }
 }

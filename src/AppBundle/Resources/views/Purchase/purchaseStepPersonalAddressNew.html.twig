@@ -169,14 +169,44 @@
                         <div class="address-search" style="{% if showAddress %}display: none;{% endif %}">
                             <div class="form-group {% if is_postback %}has-error{% endif %}">
                                 <label class="sr-only">Billing Address:</label>
-                                <input class="typeahead form-control" type="text" placeholder="Enter postcode to find address..." {% if not showAddress %} required="required" {% endif %}>
-                                {% if is_postback %}
-                                    <div class="help-block with-errors"><ul><li>Your address is required</li></ul></div>
+                                {% if postcode == 'split' %}
+                                    <div class="form-group input-group">
+                                        <input id="search_address_number" class="form-control" type="text" placeholder="House Number" {% if not showAddress %} required="required" {% endif %}>
+                                        <input id="search_address_postcode" class="form-control" name="search_postcode" type="text" placeholder="Postcode" {% if not showAddress %} required="required" {% endif %}>
+                                        <div class="input-group-addon">
+                                            <a id="search_address_button" href="#" class="btn btn-info"><i class="fa fa-search"></i></a>
+                                        </div>
+                                    </div>
+                                    {% set display_error = false %}
+                                    {% if is_postback and (form_errors(purchase_form.addressLine1)|length > 0 or
+                                        form_errors(purchase_form.city)|length > 0 or
+                                        form_errors(purchase_form.postcode)|length > 0) %}
+                                        {% set display_error = true %}
+                                    {% endif %}
+                                    <div id="search_address_errors" class="help-block with-errors" style="{% if not display_error %}display: none;{% endif %}">Unable to find the address. Try using manual entry.</div>
+                                    <a id="search-address-manual" href="#">Enter address manually</a>
+                                {% else %}
+                                    <input id="address-select" class="typeahead form-control" type="text" placeholder="{% if postcode == 'type' %}Type your address (eg. 10 Downing Street, SW1A 2AA){% elseif postcode == 'comma' %}House Number, Postcode (eg. 10, SW1A 2AA){% endif %}" {% if not showAddress %} required="required" {% endif %}>
+                                    {% set display_error = false %}
+                                    {% if is_postback and (form_errors(purchase_form.addressLine1)|length > 0 or
+                                        form_errors(purchase_form.city)|length > 0 or
+                                        form_errors(purchase_form.postcode)|length > 0) %}
+                                        {% set display_error = true %}
+                                    {% endif %}
+                                    <div id="select_address_errors" class="help-block with-errors" style="{% if not display_error %}display: none;{% endif %}">Select an address from the dropdown after searching</div>
+                                    <a id="address-manual" href="#">Enter address manually</a>
                                 {% endif %}
                             </div>
-                            <span class="help-block text-center">
-                                <a id="address-manual" href="#" class="btn btn-green btn-block btn-pad">Continue</a>
-                            </span>
+                            <div id="display-address" style="margin-bottom: 20px">
+                                {% if purchase_form.vars.data.addressLine1|length > 0 %}{{ purchase_form.vars.data.addressLine1 }}<br>{% endif %}
+                                {% if purchase_form.vars.data.addressLine2|length > 0 %}{{ purchase_form.vars.data.addressLine2 }}<br>{% endif %}
+                                {% if purchase_form.vars.data.addressLine3|length > 0 %}{{ purchase_form.vars.data.addressLine3 }}<br>{% endif %}
+                                {% if purchase_form.vars.data.city|length > 0 %}{{ purchase_form.vars.data.city }}<br>{% endif %}
+                                {% if purchase_form.vars.data.postcode|length > 0 %}{{ purchase_form.vars.data.postcode }}{% endif %}
+                            </div>
+                            <div class="form-group">
+                                {{ form_widget(purchase_form.next, {'label': 'Continue', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
+                            </div>
                         </div>
 
                         <div class="address-show" style="{% if not showAddress %}display: none;{% endif %}">
@@ -219,7 +249,7 @@
                                 {% endif %}
                             </div>
                             <div class="form-group">
-                                {{ form_widget(purchase_form.next, {'label': 'Continue', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
+                                {{ form_widget(purchase_form.manual_next, {'label': 'Continue', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
                             </div>
                         </div>
                     </div>

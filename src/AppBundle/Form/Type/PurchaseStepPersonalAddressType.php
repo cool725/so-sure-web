@@ -67,6 +67,7 @@ class PurchaseStepPersonalAddressType extends AbstractType
             ->add('city', TextType::class, ['required' => $this->required])
             ->add('postcode', TextType::class, ['required' => $this->required])
             ->add('next', SubmitType::class)
+            ->add('manual_next', SubmitType::class)
         ;
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
             $purchaseStepData = $event->getData();
