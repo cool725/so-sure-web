@@ -77,7 +77,7 @@ abstract class BaseController extends Controller
     {
         return filter_var($this->getRequestString($request, $field), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
     }
-    
+
     protected function getFormBool($form, $field)
     {
         return filter_var($form->get($field)->getData(), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
@@ -125,7 +125,7 @@ abstract class BaseController extends Controller
 
         return $cognitoIdentity->getCognitoIdToken($user, $this->getCognitoIdentityId($request));
     }
-    
+
     protected function getPhonesArray()
     {
         $makes = [];
@@ -160,16 +160,17 @@ abstract class BaseController extends Controller
             if ($simple) {
                 $phones[] = ['id' => $phone->getId(), 'name' => $phone->__toString()];
             } else {
-                $phones[sprintf('%s %s', $phone->getMake(), $phone->getModel())][] = ['id' => $phone->getId(), 'memory' => $phone->getMemory()];                
+                $phones[sprintf('%s %s', $phone->getMake(), $phone->getModel())
+                ][] = ['id' => $phone->getId(), 'memory' => $phone->getMemory()];
             }
         }
-        
+
         if (!$simple) {
             $transformedPhones = [];
             foreach ($phones as $name => $data) {
                 $transformedPhones[] = ['id' => $data[0]['id'], 'name' => $name, 'sizes' => $data];
             }
-            
+
             $phones = $transformedPhones;
         }
 
