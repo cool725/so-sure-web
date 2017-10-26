@@ -33,12 +33,12 @@
                 {# Quote Left #}
                 <div class="col-md-8">
                     <div class="quote__left">
-                        {% if coming_soon %}
-                            <h1 class="h2">Better cover for your {{ phone }} is coming soon!</h1>
-                            <h2>£4.99 - £9.99 per month <br><small>(typical policy pricing)</small></h2>
-                        {% else %}
                             <h1 class="h2">
-                                <span class="text-blue">Insurance for your</span>
+                                {% if coming_soon %}
+                                    <span class="text-blue">Better cover for your</span>
+                                {% else %}
+                                    <span class="text-blue">Insurance for your</span>
+                                {% endif %}
                                 <div class="dropdown memory-dropdown-list">
                                     <a href="#"
                                        class="dropdown-toggle text-nowrap"
@@ -64,9 +64,22 @@
                                     </ul>
                                 </div>
                                 <br>
-                                <span class="text-nowrap h2">only £{{ phone_price.monthlyPremiumPrice }} per month</span>
+
+                                {% if coming_soon %}
+                                    {% if phone.make == 'Apple' and phone.model =='iPhone X' %}
+                                        <span class="text-nowrap h2">is coming soon!</span>
+                                        <p><a href="mailto:hello@wearesosure.com?subject=Let me know about the iPhone X 256GB Model" class="open-intercom">Tell me when</a> it's available.</p>
+                                        <h4 class="text-blue" style="margin-top: 10px">IMPORTANT! <small>If you have the 256GB model, </small>DO NOT<small> purchase insurance for the iPhone X 64GB. We will not be able to cover you.</small></h4>
+                                    {% else %}
+                                        <span class="text-nowrap h2">is coming soon!</span>
+                                        <p><a href="mailto:hello@wearesosure.com" class="open-intercom">Tell me when</a> it's available.</p>
+                                        <p class="h2"><strong>£4.99 - £9.99 per month</strong><p>
+                                        <p>(typical policy pricing)</p>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="text-nowrap h2">only £{{ phone_price.monthlyPremiumPrice }} per month</span>
+                                {% endif %}
                             </h1>
-                        {% endif %}
 
                         <h4 class="text-blue" style="margin-top: 10px">Effective monthly premium after cashback:<br><small>(Cashback paid out end of policy year)</small></h4>
 
