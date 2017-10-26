@@ -3578,6 +3578,14 @@ abstract class Policy
         return $text;
     }
 
+    public function isCancelledAndPaymentOwed()
+    {
+        return !$this->isFullyPaid() &&
+            count($this->getApprovedClaims(true, true)) > 0 &&
+            $this->getStatus() == self::STATUS_CANCELLED &&
+            $this->getCancelledReason() != self::CANCELLED_UPGRADE;
+    }
+
     public function getSupportWarnings()
     {
         // @codingStandardsIgnoreStart
