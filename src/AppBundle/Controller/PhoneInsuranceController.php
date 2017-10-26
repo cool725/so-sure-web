@@ -242,7 +242,6 @@ class PhoneInsuranceController extends BaseController
                 'model' => $decodedModel,
                 'memory' => (int) $memory
             ]);
-            if ($phone )
 
             $this->get('logger')->info(sprintf(
                 'Failed to find phone for id: %s make: %s model: %s mem: %s',
