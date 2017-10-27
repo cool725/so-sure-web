@@ -106,24 +106,24 @@
             display: none;
         }
 
-        // - Mobile
+        // - Mobile - Show smaller image no characters
         background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_homepage-hero-mobile.svg') no-repeat center bottom;
         background-size: 90%;
         padding-top: 40px;
         padding-bottom: 120px;
 
-        // - Midtablet
+        // - Midtablet - Show smaller image no characters increase size
         @include breakpoint(midtablet) {
             background-size: 80%;
             padding-bottom: 170px;
         }
 
-        // - Tablet
+        // - Tablet Show smaller image no characters increase size
         @include breakpoint(tablet) {
             background-size: 70%;
         }
 
-        // - Laptop
+        // - Laptop Show characters image no characters
         @include breakpoint(laptop) {
             padding-top: 50px;
             padding-bottom: 200px;
@@ -150,6 +150,7 @@
 
             // Characters
             &__character {
+                width: 70px; height: 160px;
                 display: block;
                 position: absolute;
                 z-index: 13;
@@ -170,7 +171,7 @@
 
                     // box-shadow: 0 0 15px $grey;
 
-                    @include border-radius(4px);
+                    @include border-radius(2px);
 
                     transform: scale3d(.2,.2,1);
                     transition: all .2s ease-in-out;
@@ -181,6 +182,7 @@
 
                 &:hover {
                     cursor: pointer;
+                    z-index: 40;
 
                     &:after {
                         pointer-events: auto;
@@ -191,18 +193,97 @@
             }
 
             #hero-character_1 {
-                width: 81px; height: 185px;
-                bottom: 0; left: 100px;
+                // width: 81px; height: 185px;
+                bottom: 0; left: 10%;
 
-                background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_character_1.svg') no-repeat 0 0;
+                background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_character_hero_1.svg') no-repeat 0 0;
                 background-size: cover;
 
                 &:after {
-                    bottom: 130px; left: 20px;
+                    bottom: 120px; left: 20px;
                 }
 
                 &:hover {
-                    background-position: -82px 0;
+                    background-position: -70px 0;
+                }
+            }
+
+            #hero-character_2 {
+                // width: 69px; height: 195px;
+                bottom: -20px; left: 20%;
+
+                background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_character_hero_2.svg') no-repeat 0 0;
+                background-size: cover;
+
+                &:after {
+                    bottom: 120px; left: 0px;
+                }
+
+                &:hover {
+                    background-position: -70px 0;
+                }
+            }
+
+            #hero-character_3 {
+                width: 150px; height: 160px;
+                bottom: 0; left: 30%;
+
+                background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_character_hero_3.svg') no-repeat 0 0;
+                background-size: cover;
+
+                &:after {
+                    bottom: 120px; left: 0px;
+                }
+
+                &:hover {
+                    background-position: -150px 0;
+                }
+            }
+
+            #hero-character_4 {
+                width: 120px; height: 160px;
+                bottom: -10px; right: 40%;
+
+                background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_character_hero_4.svg') no-repeat 0 0;
+                background-size: cover;
+
+                &:after {
+                    bottom: 120px; left: 0px;
+                }
+
+                &:hover {
+                    background-position: -120px 0;
+                }
+            }
+
+            #hero-character_5 {
+                width: 120px; height: 160px;
+                bottom: 10px; right: 25%;
+
+                background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_character_hero_5.svg') no-repeat 0 0;
+                background-size: cover;
+
+                &:after {
+                    bottom: 70px; right: 0px;
+                }
+
+                &:hover {
+                    background-position: -120px 0;
+                }
+            }
+
+            #hero-character_6 {
+                bottom: -10px; right: 10%;
+
+                background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_character_hero_6.svg') no-repeat 0 0;
+                background-size: cover;
+
+                &:after {
+                    bottom: 110px; right: 0px;
+                }
+
+                &:hover {
+                    background-position: -70px 0;
                 }
             }
         }
