@@ -113,8 +113,10 @@ $(function(){
         var input   = $(this).find('.search-phone');
         var loading = $(this).next('.so-sure-loading');
 
-        // Clear the input to avoid back button issues
-        input.val('');
+        // Clear the input to avoid back button issues w/Firefox Autofil
+        if (input.val() == '') {
+            input.val('');
+        }
 
         // If the form action is already defined, then allow the form to submit
         if (!$(form).attr('action')) {
