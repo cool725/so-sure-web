@@ -68,6 +68,21 @@
              border-top-left-radius: $radius;
 }
 
+@mixin transform($transforms) {
+  -webkit-transform: $transforms;
+  -moz-transform: $transforms;
+  -ms-transform: $transforms;
+  transform: $transforms;
+}
+
+@mixin transition($args) {
+  -webkit-transition: $args;
+  -moz-transition: $args;
+  -ms-transition: $args;
+  -o-transition: $args;
+  transition: $args;
+}
+
 // Gradient Mixin
 /// Convert angle
 /// @author Chris Eppstein
