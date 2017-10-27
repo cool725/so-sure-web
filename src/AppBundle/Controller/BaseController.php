@@ -171,15 +171,28 @@ abstract class BaseController extends Controller
 
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
-        $phones = $repo->findBy(['devices' => $device, 'active' => true]);
+        $phones = $repo->findBy(['devices' => $device]);
 
+        $anyActive = false;
+        $anyRetired = false;
+        $anyPricing = false;
         $memoryFound = null;
+
         if ($memory !== null) {
             $memoryFound = false;
-            foreach ($phones as $phone) {
-                if ($memory <= $phone->getMemory()) {
-                    $memoryFound = true;
-                }
+        }
+        foreach ($phones as $phone) {
+            if ($phone->getActive()) {
+                $anyActive = true;
+            }
+            if ($phone->shouldBeRetired()) {
+                $anyRetired = true;
+            }
+            if ($phone->getCurrentPhonePrice() && $phone->getCurrentPhonePrice()->getYearlyGwp() > 0) {
+                $anyPricing = true;
+            }
+            if ($memory !== null && $memory <= $phone->getMemory()) {
+                $memoryFound = true;
             }
         }
 
@@ -205,7 +218,10 @@ abstract class BaseController extends Controller
             'phones' => $phones,
             'deviceFound' => $deviceFound,
             'memoryFound' => $memoryFound,
-            'differentMake' => $differentMake
+            'differentMake' => $differentMake,
+            'anyActive' => $anyActive,
+            'anyRetired' => $anyRetired,
+            'anyPricing' => $anyPricing,
         ];
     }
 
@@ -223,7 +239,7 @@ abstract class BaseController extends Controller
     {
         $quotes = $this->getQuotes($make, $device, null, null, $ignoreMake);
         $phones = $quotes['phones'];
-        if (count($phones) == 0) {
+        if (count($phones) == 0 || !$quotes['anyActive']) {
             return null;
         }
 

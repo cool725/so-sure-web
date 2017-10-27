@@ -910,6 +910,17 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $policies[0];
     }
 
+    public function hasPolicyWithSamePhone(Phone $phone)
+    {
+        foreach ($this->getPolicies() as $policy) {
+            if ($policy instanceof PhonePolicy && $policy->getPhone()->getId() == $phone->getId()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
     public function hasPolicyCancelledAndPaymentOwed()
     {
         foreach ($this->getAllPolicies() as $policy) {

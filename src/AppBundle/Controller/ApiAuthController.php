@@ -377,6 +377,13 @@ class ApiAuthController extends BaseController
                     404
                 );
             }
+            if (!$phone->getActive()) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_NOT_FOUND,
+                    'Unable to provide policy for this phone',
+                    404
+                );
+            }
 
             $imei = $this->normalizeImei($this->getDataString($phonePolicyData, 'imei'));
             $serialNumber = $this->getDataString($phonePolicyData, 'serial_number');
@@ -1883,7 +1890,9 @@ class ApiAuthController extends BaseController
             }
 
             $quotes = [];
+            $hasPolicyWithSamePhone = false;
             foreach ($phones as $phone) {
+                $hasPolicyWithSamePhone = $hasPolicyWithSamePhone || $user->hasPolicyWithSamePhone($phone);
                 if ($quote = $phone->asQuoteApiArray($user)) {
                     $quotes[] = $quote;
                 }
@@ -1891,6 +1900,13 @@ class ApiAuthController extends BaseController
 
             if ($rooted) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_QUOTE_UNABLE_TO_INSURE, 'Unable to insure', 422);
+            }
+            if (!$quoteData['anyActive']) {
+                if ($quoteData['anyRetired'] && !$hasPolicyWithSamePhone) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_QUOTE_EXPIRED, 'Phone(s) are retired', 422);
+                } elseif (!$quoteData['anyPricing']) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_QUOTE_COMING_SOON, 'Coming soon', 422);
+                }
             }
 
             $response = [

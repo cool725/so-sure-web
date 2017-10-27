@@ -257,6 +257,13 @@ class ApiController extends BaseController
             if ($rooted) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_QUOTE_UNABLE_TO_INSURE, 'Unable to insure', 422);
             }
+            if (!$quoteData['anyActive']) {
+                if ($quoteData['anyRetired']) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_QUOTE_EXPIRED, 'Phone(s) are retired', 422);
+                } elseif (!$quoteData['anyPricing']) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_QUOTE_COMING_SOON, 'Coming soon', 422);
+                }
+            }
 
             $response = [
                 'quotes' => $quotes,
