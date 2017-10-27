@@ -439,12 +439,18 @@ class ApiControllerTest extends BaseControllerTest
     public function testQuoteInactivePhonePreLaunch()
     {
         $crawler = self::$client->request('GET', '/api/v1/quote?make=Apple&device=iPhone%204');
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_QUOTE_EXPIRED);
+
+        $crawler = self::$client->request('GET', '/api/v1/quote?make=Apple&device=iPhone');
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_QUOTE_PHONE_UNKNOWN);
     }
 
     public function testQuoteInactivePhoneMvp()
     {
         $crawler = self::$client->request('GET', '/api/v1/quote?make=Apple&device=iPhone%204&rooted=false&debug=true');
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_QUOTE_EXPIRED);
+
+        $crawler = self::$client->request('GET', '/api/v1/quote?make=Apple&device=iPhone&rooted=false&debug=true');
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_QUOTE_PHONE_UNKNOWN);
     }
 
@@ -452,6 +458,29 @@ class ApiControllerTest extends BaseControllerTest
     {
         $crawler = self::$client->request('GET', '/api/v1/quote?make=One&device=foo&debug=true');
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_QUOTE_PHONE_UNKNOWN);
+    }
+
+    public function testQuotePartialUpcoming()
+    {
+        $crawler = self::$client->request('GET', '/api/v1/quote?make=Apple&device=upcoming-z&rooted=false&debug=true');
+        $data = $this->verifyResponse(200);
+        $this->assertEquals(true, $data['device_found']);
+        $this->assertEquals(true, $data['memory_found']);
+        $this->assertEquals(false, $data['different_make']);
+        $this->assertEquals(false, $data['rooted']);
+        $found64 = false;
+        $found256 = false;
+        foreach ($data['quotes'] as $quote) {
+            if ($quote['phone']['memory'] == 64) {
+                $this->assertEquals(1, $quote['can_purchase']);
+                $found64 = true;
+            } elseif ($quote['phone']['memory'] == 256) {
+                $this->assertEquals(0, $quote['can_purchase']);
+                $found256 = true;
+            }
+        }
+        $this->assertTrue($found64);
+        $this->assertTrue($found256);
     }
 
     public function testQuoteUnknownDeviceMvp()
