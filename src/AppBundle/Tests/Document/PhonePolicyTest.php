@@ -1235,6 +1235,78 @@ class PhonePolicyTest extends WebTestCase
         $this->assertTrue($policyA->isFullyPaid());
     }
 
+    public function testIsCancelledAndPaymentOwed()
+    {
+        $policyA = static::createUserPolicy(true);
+        $policyA->getUser()->setEmail(static::generateEmail('testIsCancelledAndPaymentOwedA', $this));
+        $policyB = static::createUserPolicy(true);
+        $policyB->getUser()->setEmail(static::generateEmail('testIsCancelledAndPaymentOwedB', $this));
+        $policyC = static::createUserPolicy(true);
+        $policyC->getUser()->setEmail(static::generateEmail('testIsCancelledAndPaymentOwedC', $this));
+        $claimB = new Claim();
+        $claimB->setStatus(Claim::STATUS_APPROVED);
+        $policyB->addClaim($claimB);
+        $claimC = new Claim();
+        $claimC->setStatus(Claim::STATUS_APPROVED);
+        $policyC->addClaim($claimC);
+        static::$dm->persist($policyA);
+        static::$dm->persist($policyA->getUser());
+        static::$dm->persist($policyB);
+        static::$dm->persist($policyB->getUser());
+        static::$dm->persist($policyC);
+        static::$dm->persist($policyC->getUser());
+        static::$dm->flush();
+
+        $this->assertFalse($policyA->isCancelledAndPaymentOwed());
+        $this->assertFalse($policyB->isCancelledAndPaymentOwed());
+        $this->assertFalse($policyC->isCancelledAndPaymentOwed());
+
+        $bacsA = new BacsPayment();
+        $bacsA->setAmount($policyA->getPremium()->getMonthlyPremiumPrice());
+        $policyA->addPayment($bacsA);
+        $bacsB = new BacsPayment();
+        $bacsB->setAmount($policyB->getPremium()->getMonthlyPremiumPrice());
+        $policyB->addPayment($bacsB);
+        $bacsC = new BacsPayment();
+        $bacsC->setAmount($policyC->getPremium()->getMonthlyPremiumPrice());
+        $policyC->addPayment($bacsC);
+
+        $this->assertFalse($policyA->isFullyPaid());
+        $this->assertFalse($policyB->isFullyPaid());
+        $this->assertFalse($policyC->isFullyPaid());
+
+        $this->assertFalse($policyA->isCancelledAndPaymentOwed());
+        $this->assertFalse($policyB->isCancelledAndPaymentOwed());
+        $this->assertFalse($policyC->isCancelledAndPaymentOwed());
+
+        $policyB->setStatus(Policy::STATUS_CANCELLED);
+        $policyB->setCancelledReason(Policy::CANCELLED_UNPAID);
+        $policyC->setStatus(Policy::STATUS_CANCELLED);
+        $policyC->setCancelledReason(Policy::CANCELLED_UPGRADE);
+
+        $this->assertFalse($policyA->isCancelledAndPaymentOwed());
+        $this->assertTrue($policyB->isCancelledAndPaymentOwed());
+        $this->assertFalse($policyC->isCancelledAndPaymentOwed());
+
+        $bacsA = new BacsPayment();
+        $bacsA->setAmount($policyA->getPremium()->getMonthlyPremiumPrice() * 11);
+        $policyA->addPayment($bacsA);
+        $bacsB = new BacsPayment();
+        $bacsB->setAmount($policyB->getPremium()->getMonthlyPremiumPrice() * 11);
+        $policyB->addPayment($bacsB);
+        $bacsC = new BacsPayment();
+        $bacsC->setAmount($policyC->getPremium()->getMonthlyPremiumPrice() * 11);
+        $policyC->addPayment($bacsC);
+
+        $this->assertTrue($policyA->isFullyPaid());
+        $this->assertTrue($policyB->isFullyPaid());
+        $this->assertTrue($policyC->isFullyPaid());
+
+        $this->assertFalse($policyA->isCancelledAndPaymentOwed());
+        $this->assertFalse($policyB->isCancelledAndPaymentOwed());
+        $this->assertFalse($policyC->isCancelledAndPaymentOwed());
+    }
+
     public function testCancelPolicyUpgrade()
     {
         $policyA = static::createUserPolicy(true);
