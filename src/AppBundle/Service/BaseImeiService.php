@@ -115,4 +115,69 @@ class BaseImeiService
         }
         return array_sum(str_split($str)) % 10 === 0;
     }
+
+    public function ocr($filename, $make)
+    {
+        $ocr = new \TesseractOCR($filename);
+        $results = $ocr
+            ->psm(6) // singleBlock
+            ->lang('eng')
+            ->config('tessedit_ocr_engine_mode', '2') // tesseractCubeCombined
+            ->run();
+        $noSpace = str_replace(' ', '', $results);
+        
+        if ($make == "Apple") {
+            if (preg_match('/SerialNumber([A-Z0-9]+).*(IMEI|lMEI)(\d{15})/s', $noSpace, $matches)) {
+                return ['imei' => $matches[3], 'serialNumber' => $matches[1]];
+            } elseif (preg_match('/(IMEI|lMEI)(\d{15})/', $noSpace, $matches)) {
+                // for non-english language settings
+                // find imei line (will always be IMEI regardless of language)
+                // and go up 3 lines
+                $imeiLine = 0;
+                $lines = preg_split("/\\r\\n|\\r|\\n/", $results);
+                foreach ($lines as $line) {
+                    $line = str_replace(' ', '', $line);
+                    if (stripos($line, $matches[2]) !== false) {
+                        break;
+                    }
+                    $imeiLine++;
+                }
+                $serialLine = $lines[$imeiLine - 3];
+                $serialLineData = explode(' ', $serialLine);
+                foreach ($serialLineData as $serialNumber) {
+                    if (preg_match('/[A-Z0-9]{12}/', $serialNumber)) {
+                        break;
+                    } else {
+                        $serialNumber = null;
+                    }
+                }
+                return ['imei' => $matches[2], 'serialNumber' => $serialNumber];
+            } elseif (preg_match('/(\d{15})/', $noSpace, $matches)) {
+                // might be a screenshot of *#06# rather than settings
+                if ($this->isImei($matches[1])) {
+                    return ['imei' => $matches[1], 'serialNumber' => null];
+                }
+            }
+        } else {
+            if (preg_match('/(\d{15})/', $noSpace, $matches)) {
+                if ($this->isImei($matches[1])) {
+                    return ['imei' => $matches[1]];
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public function ocrRaw($filename)
+    {
+        $ocr = new \TesseractOCR($filename);
+        $results = $ocr
+            ->psm(6) // singleBlock
+            ->lang('eng')
+            ->config('tessedit_ocr_engine_mode', '2') // tesseractCubeCombined
+            ->run();
+
+        return $results;
+    }
 }
