@@ -1083,4 +1083,33 @@ class DaviesServiceTest extends WebTestCase
         
         return $claim;
     }
+
+    public function testSaveClaimsInvalidReplacementImei()
+    {
+        $policy = static::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('testSaveClaimsInvalidReplacementImei', $this));
+        $claim = new Claim();
+        $claim->setNumber(rand(1, 999999));
+        $claim->setType(Claim::TYPE_LOSS);
+        $claim->setStatus(Claim::STATUS_APPROVED);
+        $policy->addClaim($claim);
+        static::$dm->persist($policy->getUser());
+        static::$dm->persist($policy);
+        static::$dm->persist($claim);
+        static::$dm->flush();
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = $claim->getNumber();
+        $daviesClaim->incurred = 0;
+        $daviesClaim->reserved = 0;
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
+        $daviesClaim->replacementMake = 'Apple';
+        $daviesClaim->replacementModel = 'iPhone 4';
+        $daviesClaim->replacementImei = '123 Bx11lt';
+        $daviesClaim->replacementReceivedDate = new \DateTime();
+        $this->assertFalse(static::$daviesService->saveClaim($daviesClaim, false));
+    }
 }

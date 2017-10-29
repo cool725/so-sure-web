@@ -279,6 +279,8 @@ class DaviesService extends S3EmailService
         $this->postValidateClaimDetails($claim, $daviesClaim);
 
         $this->claimsService->processClaim($claim);
+
+        return count($errors) == 0;
     }
 
     public function validateClaimDetails(Claim $claim, DaviesClaim $daviesClaim)
