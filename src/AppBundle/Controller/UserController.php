@@ -133,6 +133,7 @@ class UserController extends BaseController
                         )
                     );
                 } else {
+                    // @codingStandardsIgnoreStart
                     $this->addFlash(
                         'warning',
                         sprintf(
@@ -140,6 +141,7 @@ class UserController extends BaseController
                             $checkPolicy->getPolicyNumber()
                         )
                     );
+                    // @codingStandardsIgnoreEnd
                 }
             }
         }
