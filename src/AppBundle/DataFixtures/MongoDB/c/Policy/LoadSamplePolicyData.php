@@ -301,14 +301,23 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
 
         $manager->flush();
+        $policyService = $this->container->get('app.policy');
 
         $policyRepo = $manager->getRepository(Policy::class);
         if (!$policyRepo->findOneBy(['status' => Policy::STATUS_UNPAID])) {
             throw new \Exception('missing unpaid policy');
         }
 
+        // cancelled policy with outstanding payment due
+        $user = $this->newUser('cancelled-policy-unpaid@so-sure.com');
+        $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $user->setEnabled(true);
+        $manager->persist($user);
+        $policy = $this->newPolicy($manager, $user, $count++, self::CLAIM_SETTLED_LOSS, null, null, null, false);
+        $policy->setStatus(Policy::STATUS_UNPAID);
+        $policyService->cancel($policy, Policy::CANCELLED_UNPAID, true, null, true);
+
         $policyRepo = $manager->getRepository(Policy::class);
-        $policyService = $this->container->get('app.policy');
         $fraud = null;
         $unpaid = null;
         $maxAttempts = 0;
@@ -511,7 +520,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $payment->setNotes('LoadSamplePolicyData');
             $policy->addPayment($payment);
         } else {
-            $months = rand(1, 12);
+            $months = rand(1, 11);
             for ($i = 1; $i <= $months; $i++) {
                 $payment = new JudoPayment();
                 $payment->setDate(clone $paymentDate);

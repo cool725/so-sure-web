@@ -129,6 +129,7 @@ class OpsController extends BaseController
 
         $unpaidPolicy = $policyRepo->findOneBy(['status' => Policy::STATUS_UNPAID]);
         $validPolicies = $policyRepo->findBy(['status' => Policy::STATUS_ACTIVE]);
+        $cancelledPolicies = $policyRepo->findBy(['status' => Policy::STATUS_CANCELLED]);
         $position = rand(1, count($validPolicies));
         foreach ($validPolicies as $validPolicy) {
             if ($position <= 0 && !$validPolicy->hasMonetaryClaimed()) {
@@ -199,6 +200,13 @@ class OpsController extends BaseController
                 $claimedPolicy = null;
             }
         }
+        foreach ($cancelledPolicies as $policyCancelledAndPaymentOwed) {
+            if ($policyCancelledAndPaymentOwed->isCancelledAndPaymentOwed()) {
+                break;
+            } else {
+                $policyCancelledAndPaymentOwed = null;
+            }
+        }
         $cancelledFraudPolicy = $policyRepo->findOneBy([
             'status' => Policy::STATUS_CANCELLED,
             'cancelledReason' => Policy::CANCELLED_ACTUAL_FRAUD,
@@ -223,6 +231,7 @@ class OpsController extends BaseController
             'valid_renewal_policy_yearly_with_pot' => $validRenwalPolicyYearlyWithPot,
             'valid_renewal_policy_yearly_only_with_pot' => $validRenwalPolicyYearlyOnlyWithPot,
             'valid_remainder_policy' => $validRemainderPolicy,
+            'policy_cancelled_payment_owed' => $policyCancelledAndPaymentOwed,
             'claimed_policy' => $claimedPolicy,
             'expired_policy_nocashback' => $expiredPolicyNoCashback,
             'expired_policy_cashback' => $expiredPolicyCashback,

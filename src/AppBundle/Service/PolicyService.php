@@ -1292,7 +1292,7 @@ class PolicyService
         return $renewed;
     }
 
-    public function cancelUnpaidPolicies($prefix, $dryRun = false)
+    public function cancelUnpaidPolicies($prefix, $dryRun = false, $skipUnpaidMinTimeframeCheck = false)
     {
         $cancelled = [];
         $policyRepo = $this->dm->getRepository(Policy::class);
@@ -1302,7 +1302,7 @@ class PolicyService
                 $cancelled[$policy->getId()] = $policy->getPolicyNumber();
                 if (!$dryRun) {
                     try {
-                        $this->cancel($policy, Policy::CANCELLED_UNPAID, true);
+                        $this->cancel($policy, Policy::CANCELLED_UNPAID, true, null, $skipUnpaidMinTimeframeCheck);
                     } catch (\Exception $e) {
                         $msg = sprintf(
                             'Error Cancelling Policy %s / %s',
