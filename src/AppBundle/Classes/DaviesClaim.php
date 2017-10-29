@@ -455,6 +455,11 @@ class DaviesClaim extends DaviesExcel
             if ($this->getClaimType() === null) {
                 throw new \Exception('Unknown or missing claim type');
             }
+
+            if ($this->replacementImei && strlen($this->replacementImei) > 0 &&
+                !preg_match('/^[0-9]{15}$/', $this->replacementImei)) {
+                throw new \Exception(sprintf('Invalid replacement imei %s', $this->replacementImei));
+            }
         } catch (\Exception $e) {
             throw new \Exception(sprintf('%s claim: %s %s', $e->getMessage(), json_encode($this), json_encode($data)));
         }
