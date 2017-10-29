@@ -45,6 +45,12 @@ class UpdatePolicyStatusCommand extends BaseCommand
                 InputOption::VALUE_NONE,
                 'Skip sending email. Development use only!'
             )
+            ->addOption(
+                'skip-unpaid-timecheck',
+                null,
+                InputOption::VALUE_NONE,
+                'Skip a timeframe check for unpaid policy cancellations (15 min days in unpaid state)'
+            )
         ;
     }
 
@@ -58,6 +64,7 @@ class UpdatePolicyStatusCommand extends BaseCommand
         $skipEmail = true === $input->getOption('skip-email');
         $prefix = $input->getOption('prefix');
         $policyId = $input->getOption('id');
+        $skipUnpaidMinTimeframeCheck = $input->getOption('skip-unpaid-timecheck');
 
         $policyService = $this->getContainer()->get('app.policy');
         $featureService = $this->getContainer()->get('app.feature');
@@ -66,7 +73,7 @@ class UpdatePolicyStatusCommand extends BaseCommand
         }
 
         // Unpaid Policies - Cancel
-        $cancelled = $policyService->cancelUnpaidPolicies($prefix, $dryRun);
+        $cancelled = $policyService->cancelUnpaidPolicies($prefix, $dryRun, $skipUnpaidMinTimeframeCheck);
         $copy = 'Unpaid cancelled policy';
         if ($dryRun) {
             $copy = 'Dry Run - Should cancel Policy (unpaid)';

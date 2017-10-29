@@ -93,6 +93,13 @@
         <a href="{{ url('user_home') }}?_impersonate={{ unpaid_policy.user.email }}">User Unpaid Page</a> <b>(auto impersonate {{ unpaid_policy.user.email }})</b>
     </li>
     <li>
+        {% if policy_cancelled_payment_owed %}
+        <a href="{{ url('user_home') }}?_impersonate={{ policy_cancelled_payment_owed.user.email }}">User Home Page Redirect (Policy Cancelled & Payment Owed)</a> <b>(auto impersonate {{ policy_cancelled_payment_owed.user.email }})</b>
+        {% else %}
+            No policy cancelled w/payment owed available
+        {% endif %}
+    </li>
+    <li>
         {% if valid_remainder_policy %}
         <a href="{{ url('purchase_remainder_policy', {'id': valid_remainder_policy.id }) }}?_impersonate={{ valid_remainder_policy.user.email }}">User Remainder Payment Page</a> <b>(auto impersonate {{ valid_remainder_policy.user.email }})</b>
         {% else %}

@@ -64,7 +64,15 @@ class UserController extends BaseController
         $policyRepo = $dm->getRepository(Policy::class);
         $scodeRepo = $dm->getRepository(SCode::class);
         $user = $this->getUser();
-        if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
+        if ($user->hasPolicyCancelledAndPaymentOwed()) {
+            foreach ($user->getAllPolicies() as $policy) {
+                if ($policy->isCancelledAndPaymentOwed()) {
+                    return new RedirectResponse(
+                        $this->generateUrl('purchase_remainder_policy', ['id' => $policy->getId()])
+                    );
+                }
+            }
+        } elseif (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
             // mainly for facebook registration, although makes sense for all users
             // check for canPurchasePolicy is necessary to prevent redirect loop
             if ($this->getSessionQuotePhone($request) && $user->canPurchasePolicy()) {
