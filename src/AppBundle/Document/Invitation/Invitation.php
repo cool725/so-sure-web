@@ -4,6 +4,7 @@ namespace AppBundle\Document\Invitation;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use AppBundle\Document\User;
+use AppBundle\Document\Policy;
 use AppBundle\Document\GravatarTrait;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
@@ -261,6 +262,13 @@ abstract class Invitation
     {
         if (!$date) {
             $date = new \DateTime();
+        }
+
+        if (!$this->getPolicy() || !in_array($this->getPolicy()->getStatus(), [
+            Policy::STATUS_ACTIVE,
+            Policy::STATUS_UNPAID,
+        ])) {
+            return false;
         }
 
         return $this->getReinvitedCount() <= $this->getMaxReinvitations() &&
