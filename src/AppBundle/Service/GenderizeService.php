@@ -74,7 +74,7 @@ class GenderizeService
         $body = (string) $res->getBody();
         $this->logger->info(sprintf('Genderize response: %s', $body));
         $data = json_decode($body, true);
-        if ($data['probability'] < $threshold) {
+        if (!isset($data['probability']) || $data['probability'] < $threshold) {
             return null;
         }
 
