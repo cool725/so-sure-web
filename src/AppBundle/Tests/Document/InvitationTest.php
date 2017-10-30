@@ -7,9 +7,12 @@ use AppBundle\Document\Invitation\SmsInvitation;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\Policy;
 
 /**
  * @group functional-nonet
+ *
+ * AppBundle\\Tests\\Document\\InvitationTest
  */
 class InvitationTest extends WebTestCase
 {
@@ -37,7 +40,12 @@ class InvitationTest extends WebTestCase
 
     public function testInviteSetsReinvite()
     {
+        $user = new User();
+        $policy = new PhonePolicy();
+        $user->addPolicy($policy);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
         $invitation = new EmailInvitation();
+        $invitation->setPolicy($policy);
         $this->assertEquals(0, $invitation->getReinvitedCount());
         $date = new \DateTime('2016-01-01');
         $invitation->invite($date);
@@ -47,14 +55,24 @@ class InvitationTest extends WebTestCase
 
     public function testInviteCannotImmediatelyReinvite()
     {
+        $user = new User();
+        $policy = new PhonePolicy();
+        $user->addPolicy($policy);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
         $invitation = new EmailInvitation();
+        $invitation->setPolicy($policy);
         $invitation->invite();
         $this->assertFalse($invitation->canReinvite());
     }
 
     public function testReinvite()
     {
+        $user = new User();
+        $policy = new PhonePolicy();
+        $user->addPolicy($policy);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
         $invitation = new EmailInvitation();
+        $invitation->setPolicy($policy);
         $this->assertEquals(0, $invitation->getReinvitedCount());
         $date = new \DateTime('2016-01-01');
         for ($i = 0; $i < $invitation->getMaxReinvitations(); $i++) {
@@ -76,9 +94,29 @@ class InvitationTest extends WebTestCase
      */
     public function testTooManyReinvite()
     {
+        $user = new User();
+        $policy = new PhonePolicy();
+        $user->addPolicy($policy);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
         $invitation = new EmailInvitation();
+        $invitation->setPolicy($policy);
         $this->assertEquals(0, $invitation->getReinvitedCount());
         $invitation->reinvite();
+        $invitation->reinvite();
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testReinviteCancelledPolicy()
+    {
+        $user = new User();
+        $policy = new PhonePolicy();
+        $user->addPolicy($policy);
+        $policy->setStatus(Policy::STATUS_CANCELLED);
+        $invitation = new EmailInvitation();
+        $invitation->setPolicy($policy);
+        $this->assertEquals(0, $invitation->getReinvitedCount());
         $invitation->reinvite();
     }
 
