@@ -386,8 +386,14 @@ class OpsController extends BaseController
     public function postcodeAction(Request $request)
     {
         $data = json_decode($request->getContent(), true);
-        $postcode = new Postcode($data['postcode']);
+        try {
+            $postcode = new Postcode($data['postcode']);
 
-        return new JsonResponse(['postcode' => $postcode->normalise()]);
+            return new JsonResponse(['postcode' => $postcode->normalise()]);
+        } catch (\Exception $e) {
+            $this->get('logger')->info(sprintf('Invalid postcode %s', json_encode($data)), ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Invalid postcode', 500);
+        }
     }
 }
