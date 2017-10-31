@@ -70,11 +70,21 @@ sosure.purchaseStepAddress = (function() {
                     required: true
                 },
                 "purchase_form[postcode]" : {
-                    required: true,
+                    required: {
+                        depends:function(){
+                            $(this).val($.trim($(this).val()));
+                            return true;
+                        }
+                    },
                     postcodeUK: true
                 },
                 "search_postcode" : {
-                    required: true,
+                    required: {
+                        depends:function(){
+                            $(this).val($.trim($(this).val()));
+                            return true;
+                        }
+                    },
                     postcodeUK: true                    
                 }
             },
