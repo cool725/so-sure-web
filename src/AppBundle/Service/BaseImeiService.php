@@ -11,6 +11,8 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 
 class BaseImeiService
 {
+    use \AppBundle\Document\ImeiTrait;
+
     /** @var LoggerInterface */
     protected $logger;
 
@@ -118,40 +120,59 @@ class BaseImeiService
 
     public function ocr($filename, $make)
     {
-        $ocr = new \TesseractOCR($filename);
-        $results = $ocr
-            ->psm(6) // singleBlock
-            ->lang('eng')
-            ->config('tessedit_ocr_engine_mode', '2') // tesseractCubeCombined
-            ->run();
+        $results = $this->ocrRaw($filename);
+
+        return $this->parseOcr($results, $make);
+    }
+
+    private function findSerialNumberByLinePosition($results, $imei)
+    {
+        // for non-english language settings
+        // find imei line (will always be IMEI regardless of language)
+        // and go up 3 lines
+        $imeiLine = 0;
+        $lines = preg_split("/\\r\\n|\\r|\\n/", $results);
+        foreach ($lines as $line) {
+            $line = str_replace(' ', '', $line);
+            if (stripos($line, $imei) !== false) {
+                break;
+            }
+            $imeiLine++;
+        }
+        $serialLine = $lines[$imeiLine - 3];
+        $serialLineData = explode(' ', $serialLine);
+        foreach ($serialLineData as $serialNumber) {
+            if (preg_match('/[A-Z0-9]{12}/', $serialNumber)) {
+                break;
+            } else {
+                $serialNumber = null;
+            }
+        }
+
+        return $serialNumber;
+    }
+
+    public function parseOcr($results, $make)
+    {
         $noSpace = str_replace(' ', '', $results);
         
         if ($make == "Apple") {
             if (preg_match('/SerialNumber([A-Z0-9]+).*(IMEI|lMEI)(\d{15})/s', $noSpace, $matches)) {
+                // Expected case
                 return ['imei' => $matches[3], 'serialNumber' => $matches[1]];
             } elseif (preg_match('/(IMEI|lMEI)(\d{15})/', $noSpace, $matches)) {
-                // for non-english language settings
-                // find imei line (will always be IMEI regardless of language)
-                // and go up 3 lines
-                $imeiLine = 0;
-                $lines = preg_split("/\\r\\n|\\r|\\n/", $results);
-                foreach ($lines as $line) {
-                    $line = str_replace(' ', '', $line);
-                    if (stripos($line, $matches[2]) !== false) {
-                        break;
-                    }
-                    $imeiLine++;
-                }
-                $serialLine = $lines[$imeiLine - 3];
-                $serialLineData = explode(' ', $serialLine);
-                foreach ($serialLineData as $serialNumber) {
-                    if (preg_match('/[A-Z0-9]{12}/', $serialNumber)) {
-                        break;
-                    } else {
-                        $serialNumber = null;
-                    }
-                }
+                // Expected case if non-english language (serial number copy is different)
+                $serialNumber = $this->findSerialNumberByLinePosition($results, $matches[2]);
+
                 return ['imei' => $matches[2], 'serialNumber' => $serialNumber];
+            } elseif (preg_match('/SerialNumber([A-Z0-9]+).*(IMEI|lMEI)(\d{14})A/s', $noSpace, $matches)) {
+                // 14 digit IMEI followed by A
+                return ['imei' => $this->luhnGenerate($matches[3]), 'serialNumber' => $matches[1]];
+            } elseif (preg_match('/(IMEI|lMEI)(\d{14})A/', $noSpace, $matches)) {
+                // 14 digit IMEI followed by A with non-english language (serial number copy is different)
+                $serialNumber = $this->findSerialNumberByLinePosition($results, $matches[2]);
+
+                return ['imei' => $this->luhnGenerate($matches[2]), 'serialNumber' => $serialNumber];
             } elseif (preg_match('/(\d{15})/', $noSpace, $matches)) {
                 // might be a screenshot of *#06# rather than settings
                 if ($this->isImei($matches[1])) {
