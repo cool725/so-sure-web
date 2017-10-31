@@ -154,50 +154,70 @@
                 display: block;
                 position: absolute;
                 z-index: 13;
-                font-family: $avenir-heavy;
 
-                &:after {
-                    width: 180px;
-                    padding: 10px;
-
-                    display: inline-block;
-                    content: attr(data-content);
-                    position: absolute;
-                    z-index: 100;
-                    background-color: $primary-blue;
-                    color: $white;
+                // Bubble
+                &:before, &:after {
+                    display: block;
                     opacity: 0;
                     pointer-events: none;
+                    position: absolute;
+                    z-index: 100;
+                }
 
-                    // box-shadow: 0 0 15px $grey;
+                &:before {
+                    min-width: 150px;
+                    padding: 15px 10px;
+                    font-size: 14px;
+                    content: attr(data-content);
+                    background-color: $darkest-blue;
+                    color: $white;
+                    @include border-radius(3px);
 
-                    @include border-radius(2px);
+                    @include transform(scale3d(.2,.2,1));
+                    @include transition(all .2s ease-in-out);
+                }
 
-                    transform: scale3d(.2,.2,1);
-                    transition: all .2s ease-in-out;
+                &:after {
+                    content: '';
+                    border-left: 10px solid transparent;
+                    border-right: 10px solid transparent;
+                    border-top: 10px solid $darkest-blue;
+
+                    @include transform(translate3d(0,-6px,0));
+                    @include transition(all .3s ease-in-out);
                 }
 
                 &:hover {
                     cursor: pointer;
                     z-index: 40;
 
-                    &:after {
+                    &:before, &:after {
                         pointer-events: auto;
                         opacity: 1;
-                        transform: scale3d(1,1,1);
+                        @include transform(scale3d(1,1,1));
+                    }
+
+                    &:before,  {
+                    }
+
+                    &:after {
+                        @include transition(all .2s .1s ease-in-out);
                     }
                 }
             }
 
             #hero-character_1 {
-                // width: 81px; height: 185px;
                 bottom: 0; left: 10%;
 
                 background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_character_hero_1.svg') no-repeat 0 0;
                 background-size: cover;
 
+                &:before {
+                    bottom: 121px; left: 0;
+                }
+
                 &:after {
-                    bottom: 120px; left: 20px;
+                    bottom: 111px; left: 23px;
                 }
 
                 &:hover {
@@ -206,14 +226,17 @@
             }
 
             #hero-character_2 {
-                // width: 69px; height: 195px;
                 bottom: -20px; left: 20%;
 
                 background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_character_hero_2.svg') no-repeat 0 0;
                 background-size: cover;
 
+                &:before {
+                    bottom: 122px; left: 0px;
+                }
+
                 &:after {
-                    bottom: 120px; left: 0px;
+                    bottom: 112px; left: 16px;
                 }
 
                 &:hover {
@@ -228,8 +251,12 @@
                 background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_character_hero_3.svg') no-repeat 0 0;
                 background-size: cover;
 
+                &:before {
+                    bottom: 113px; left: 0px;
+                }
+
                 &:after {
-                    bottom: 120px; left: 0px;
+                    bottom: 103px; right: 38px;
                 }
 
                 &:hover {
@@ -244,8 +271,12 @@
                 background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_character_hero_4.svg') no-repeat 0 0;
                 background-size: cover;
 
-                &:after {
+                &:before {
                     bottom: 120px; left: 0px;
+                }
+
+                &:after {
+                    bottom: 110px; right: 36px;
                 }
 
                 &:hover {
@@ -260,8 +291,12 @@
                 background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_character_hero_5.svg') no-repeat 0 0;
                 background-size: cover;
 
+                &:before {
+                    bottom: 75px; right: 0px;
+                }
+
                 &:after {
-                    bottom: 70px; right: 0px;
+                    bottom: 65px; left: 45px;
                 }
 
                 &:hover {
@@ -275,8 +310,12 @@
                 background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_character_hero_6.svg') no-repeat 0 0;
                 background-size: cover;
 
+                &:before {
+                    bottom: 120px; right: 0px;
+                }
+
                 &:after {
-                    bottom: 110px; right: 0px;
+                    bottom: 110px; left: 20px;
                 }
 
                 &:hover {
