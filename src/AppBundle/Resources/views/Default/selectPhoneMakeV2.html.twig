@@ -34,17 +34,18 @@
           data-path-suffix="{{ pathSuffix }}"
           class="{{ formClass }}">
 
-        <input type="text"
+{#         <input type="text"
              id="search-phone{{ uid }}"
              class="required search-phone-text search-phone"
              placeholder="Find your phone eg. iPhone 8..."
              autocomplete="off"
              value="{% if phone %}{{ phone }}{% endif %}" />
-
-{#         <div class="row">
+ #}
+        <div class="row">
             <div class="form-group col-md-8">
                 <input type="text"
                        id="search-phone{{ uid }}"
+                       autocomplete="off"
                        class="required search-phone-text search-phone"
                        placeholder="Find your phone eg. iPhone 8"
                        value="{% if phone %}{{ phone }}{% endif %}" />
@@ -52,7 +53,7 @@
             <div class="form-group col-md-4">
                 <button type="submit" class="btn {{ buttonCSS }}">{{ buttonText }} &nbsp;<i class="fa fa-angle-right" aria-hidden="true"></i></button>
             </div>
-        </div> #}
+        </div>
     </form>
 
     {% if type is not defined or not type  %}
