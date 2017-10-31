@@ -226,4 +226,24 @@ class BaseImeiServiceTest extends WebTestCase
         $results = self::$imei->ocr($image, 'Apple');
         $this->assertNull($results);
     }
+
+    public function testOcrError()
+    {
+        $data = ". vodafone UK as 4:20 pm 1: 24% E]-
+< General About
+Version 11.0.3 (15A432)
+Carrier vodafone UK 29.0
+Model MQéJZB/A
+Serial Number C77QMB7SGRY9
+Wi-Fi Address D0228220178263208
+Bluetooth D012Br29278I622D6
+IMEI 35 542407 341708 A
+ICCID 89441000362956405088
+Modem Firmware 106.63
+SEID";
+
+        $results = self::$imei->parseOcr($data, 'Apple');
+        $this->assertEquals('355424073417084', $results['imei']);
+        $this->assertEquals('C77QMB7SGRY9', $results['serialNumber']);
+    }
 }
