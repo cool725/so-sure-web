@@ -26,9 +26,11 @@ use AppBundle\Form\Type\RegisterUserType;
 use AppBundle\Form\Type\PhoneMakeType;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\SmsAppLinkType;
+use AppBundle\Form\Type\ClaimFnolType;
 
 use AppBundle\Document\Form\Register;
 use AppBundle\Document\Form\PhoneMake;
+use AppBundle\Document\Form\ClaimFnol;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Lead;
@@ -361,25 +363,9 @@ class DefaultController extends BaseController
      */
     public function claimAction(Request $request)
     {
+        $claimFnol = new ClaimFnol();
         $claimForm = $this->get('form.factory')
-            ->createNamedBuilder('claim_form')
-            ->add('email', EmailType::class)
-            ->add('name', TextType::class)
-            ->add('policyNumber', TextType::class)
-            ->add('phone', TextType::class)
-            ->add('timeToReach', TextType::class)
-            ->add('signature', TextType::class)
-            ->add('type', ChoiceType::class, [
-                'required' => true,
-                'placeholder' => 'My phone is...',
-                'choices' => [
-                    'My phone is lost' => Claim::TYPE_LOSS,
-                    'My phone was stolen' => Claim::TYPE_THEFT,
-                    'My phone is damaged or not working' => Claim::TYPE_DAMAGE,
-                ],
-            ])
-            ->add('message', TextareaType::class)
-            ->add('submit', SubmitType::class)
+            ->createNamedBuilder('claim_form', ClaimFnolType::class, $claimFnol)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
@@ -389,23 +375,23 @@ class DefaultController extends BaseController
                     $mailer = $this->get('app.mailer');
                     $subject = sprintf(
                         'New Claim from %s/%s',
-                        $claimForm->getData()['name'],
-                        $claimForm->getData()['policyNumber']
+                        $claimFnol->getName(),
+                        $claimFnol->getPolicyNumber()
                     );
                     $mailer->sendTemplate(
                         $subject,
                         'claims@wearesosure.com',
                         'AppBundle:Email:claim/fnolToClaims.html.twig',
-                        ['data' => $claimForm->getData()]
+                        ['data' => $claimFnol]
                     );
 
                     $mailer->sendTemplate(
                         'Your claim with so-sure',
-                        $claimForm->getData()['email'],
+                        $claimForm->getEmail(),
                         'AppBundle:Email:claim/fnolResponse.html.twig',
-                        ['data' => $claimForm->getData()],
+                        ['data' => $claimFnol],
                         'AppBundle:Email:claim/fnolResponse.txt.twig',
-                        ['data' => $claimForm->getData()]
+                        ['data' => $claimFnol]
                     );
 
                     $this->addFlash(
