@@ -172,7 +172,7 @@
                 &:before {
                     min-width: 150px;
                     padding: 15px 10px;
-                    font-size: 14px;
+                    font-size: 15px;
                     font-family: $avenir-heavy;
                     content: attr(data-content);
                     background-color: $darkest-blue;
@@ -185,9 +185,9 @@
 
                 &:after {
                     content: '';
-                    border-left: 10px solid transparent;
-                    border-right: 10px solid transparent;
-                    border-top: 10px solid $darkest-blue;
+                    border-left: 8px solid transparent;
+                    border-right: 8px solid transparent;
+                    border-top: 8px solid $darkest-blue;
 
                     @include transform(translate3d(0,-6px,0));
                     @include transition(all .1s ease-in-out);
@@ -223,7 +223,7 @@
                 }
 
                 &:after {
-                    bottom: 111px; left: 23px;
+                    bottom: 113px; left: 23px;
                 }
 
                 &:hover {
@@ -242,7 +242,7 @@
                 }
 
                 &:after {
-                    bottom: 112px; left: 16px;
+                    bottom: 115px; left: 16px;
                 }
 
                 &:hover {
@@ -262,7 +262,7 @@
                 }
 
                 &:after {
-                    bottom: 103px; right: 38px;
+                    bottom: 105px; right: 38px;
                 }
 
                 &:hover {
@@ -282,7 +282,7 @@
                 }
 
                 &:after {
-                    bottom: 110px; right: 36px;
+                    bottom: 112px; right: 36px;
                 }
 
                 &:hover {
@@ -302,7 +302,7 @@
                 }
 
                 &:after {
-                    bottom: 65px; left: 45px;
+                    bottom: 67px; left: 45px;
                 }
 
                 &:hover {
@@ -321,7 +321,7 @@
                 }
 
                 &:after {
-                    bottom: 110px; left: 20px;
+                    bottom: 112px; left: 20px;
                 }
 
                 &:hover {
