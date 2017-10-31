@@ -79,6 +79,7 @@
         }
 
         h1 {
+            font-size: 30px;
             line-height: 41px;
             color: $primary-blue;
             margin-bottom: 15px;
@@ -107,32 +108,36 @@
         }
 
         // - Mobile - Show smaller image no characters
-        background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_homepage-hero-mobile.svg') no-repeat center bottom;
-        background-size: 90%;
-        padding-top: 40px;
-        padding-bottom: 120px;
+        background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_homepage_hero_mobile_background.svg') no-repeat center bottom;
+        background-size: 100%;
+        padding-top: 20px;
+        padding-bottom: 110px;
+
+        // - Large Mobile
+        @include breakpoint(mobileishup) {
+            padding-bottom: 170px;
+        }
 
         // - Midtablet - Show smaller image no characters increase size
         @include breakpoint(midtablet) {
-            background-size: 80%;
-            padding-bottom: 170px;
+            background-size: 99%;
+            padding-bottom: 200px;
         }
 
         // - Tablet Show smaller image no characters increase size
         @include breakpoint(tablet) {
-            background-size: 70%;
+            padding-bottom: 220px;
         }
 
         // - Laptop Show characters image no characters
         @include breakpoint(laptop) {
             padding-top: 50px;
-            padding-bottom: 200px;
+            padding-bottom: 240px;
             background-position: left 15px;
 
             // Clouds
             background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_homepage-hero-clouds-combined.svg') repeat-x left 20px;
             background-size: 100%;
-
             z-index: 2;
 
             // Buildings
@@ -168,6 +173,7 @@
                     min-width: 150px;
                     padding: 15px 10px;
                     font-size: 14px;
+                    font-family: $avenir-heavy;
                     content: attr(data-content);
                     background-color: $darkest-blue;
                     color: $white;
@@ -184,7 +190,7 @@
                     border-top: 10px solid $darkest-blue;
 
                     @include transform(translate3d(0,-6px,0));
-                    @include transition(all .3s ease-in-out);
+                    @include transition(all .1s ease-in-out);
                 }
 
                 &:hover {
