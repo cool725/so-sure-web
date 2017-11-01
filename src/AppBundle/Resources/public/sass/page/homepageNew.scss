@@ -171,15 +171,11 @@
     &--what-is-so-sure {
 
         @include breakpoint(laptop) {
-
-            .img-container {
-                padding-top: 80px;
-            }
-
+            padding-top: 80px;
         }
 
         .so-sure_homepage-what-is-so-sure {
-            max-width: 550px;
+            // max-width: 50px;
         }
 
     }
