@@ -139,7 +139,7 @@ $(function(){
                 header: [
                     '<div class="tt-menu-header clearfix">',
                         '<div class="tt-menu-left">FIND YOUR MODEL</div>',
-                        '<div class="tt-menu-right hidden-xs hidden-sm"><i class="fa fa-angle-down" aria-hidden="true"></i>  CLICK FOR INSTANT QUOTE <i class="fa fa-angle-down" aria-hidden="true"></i></div>',
+                        '<div class="tt-menu-right hidden-xs hidden-sm"><i class="fa fa-angle-down" aria-hidden="true"></i>  SELECT FOR INSTANT QUOTE <i class="fa fa-angle-down" aria-hidden="true"></i></div>',
                     '</div>'
                 ].join('\n'),
                 suggestion: doT.template('<div class="clearfix"><div class="tt-menu-left tt-menu-pad">{{=it.name}}</div><div class="tt-menu-right">{{~it.sizes :value}}<a href="/phone-insurance/{{=value.id}}" class="btn-tt">{{=value.memory}}GB</a> {{~}}</div></div>')
