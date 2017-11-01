@@ -41,7 +41,7 @@ class ClaimFnol
     protected $policyNumber;
 
     /**
-     * @AppAssert\PhoneNumber()
+     * @AppAssert\PhoneNumber(message="Please enter a valid phone number")
      */
     protected $phone;
 
@@ -61,6 +61,8 @@ class ClaimFnol
      * @Assert\Length(min="5", max="100")
      */
     protected $timeToReach;
+
+    protected $when;
 
     public function getEmail()
     {
@@ -150,5 +152,25 @@ class ClaimFnol
     public function setPolicy(Policy $policy)
     {
         $this->policy = $policy;
+    }
+
+    public function getWhen()
+    {
+        return $this->when;
+    }
+
+    public function setWhen($when)
+    {
+        $this->when = $when;
+    }
+
+    public function getWhere()
+    {
+        return $this->where;
+    }
+
+    public function setWhere($where)
+    {
+        $this->where = $where;
     }
 }
