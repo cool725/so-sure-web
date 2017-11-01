@@ -450,8 +450,10 @@ nelmio_security:
                 - https://*.intercomcdn.com
                 - https://*.ads-twitter.com
                 - https://*.hotjar.com
+                - http://*.hotjar.com
                 - https://*.pcapredict.com
                 - http://*.pcapredict.com
+                - http://*.googleadservices.com
                 - https://*.googleadservices.com
                 - https://*.googlesyndication.com
                 - https://code.jquery.com
