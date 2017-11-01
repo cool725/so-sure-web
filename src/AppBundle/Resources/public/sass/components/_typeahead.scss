@@ -37,7 +37,7 @@
     }
 
     .tt-menu-pad {
-        padding: 2px 3px;
+        padding: 5px 3px;
         margin-bottom: 5px;
 
         @include breakpoint(laptop) {
@@ -64,15 +64,16 @@
         padding: 15px;
         border-bottom: 1px solid $grey-light;
         vertical-align: middle;
-        cursor: pointer;
+        // cursor: pointer;
 
         &:last-of-type {
             border-bottom: none;
         }
+    }
 
-        &:hover {
-            background-color: lighten($blue-lightest, 5%);
-        }
+    .tt-highlight {
+        font-family: $avenir-heavy;
+        color: $primary-blue;
     }
 
 }

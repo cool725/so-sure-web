@@ -30,7 +30,7 @@ sosure.selectPhoneMake = (function() {
         }, 1000);
         if (!self.sentMixpanel) {
             self.sentMixpanel = true;
-            sosure.track.byName('Start Search');
+            // sosure.track.byName('Start Search');
         }
     }
 
@@ -138,8 +138,8 @@ $(function(){
                 ].join('\n'),
                 header: [
                     '<div class="tt-menu-header clearfix">',
-                        '<div class="tt-menu-left">MODEL</div>',
-                        '<div class="tt-menu-right hidden-xs hidden-sm">SELECT SIZE</div>',
+                        '<div class="tt-menu-left">FIND YOUR MODEL</div>',
+                        '<div class="tt-menu-right hidden-xs hidden-sm">CLICK SIZE FOR QUOTE</div>',
                     '</div>'
                 ].join('\n'),
                 suggestion: doT.template('<div class="clearfix"><div class="tt-menu-left tt-menu-pad">{{=it.name}}</div><div class="tt-menu-right">{{~it.sizes :value}}<a href="/phone-insurance/{{=value.id}}" class="btn-tt">{{=value.memory}}GB</a> {{~}}</div></div>')
@@ -155,11 +155,16 @@ $(function(){
         });
 
         $(input).bind('typeahead:select', function(ev, suggestion) {
+            // $('input').typeahead('open');
             sosure.selectPhoneMake.setFormAction(suggestion.id, form);
         });
 
         $(input).bind('typeahead:change', function(ev, suggestion) {
             sosure.selectPhoneMake.setFormActionVal(form, input);
+        });
+
+        $(input).bind('typeahead:beforeclose', function(ev, suggestion) {
+            ev.preventDefault();
         });
 
         if (index == 0) {
