@@ -69,13 +69,18 @@ sosure.selectPhoneMake = (function() {
         }
     }
 
-    self.setFormAction = function (id, form) {
+    self.getFormAction = function (id, form) {
         var base_path = $(form).data('base-path');
         var path_suffix = $(form).data('path-suffix');
         if (!base_path) {
             base_path = '/phone-insurance/';
         }
-        $(form).attr('action', base_path + id + path_suffix);
+        // $(form).attr('action', base_path + id + path_suffix);
+        return base_path + id + path_suffix;
+    }
+
+    self.setFormAction = function (id, form) {
+        $(form).attr('action', self.getFormAction(id, form));
     }
 
     self.setFormActionVal = function (form, input) {
@@ -160,8 +165,11 @@ $(function(){
         });
 
         $(input).bind('typeahead:select', function(ev, suggestion) {
-            // $('input').typeahead('open');
             sosure.selectPhoneMake.setFormAction(suggestion.id, form);
+
+            var path_suggestion = sosure.selectPhoneMake.getFormAction(suggestion.id, form);
+
+            $('.tt-suggestion').find('a[href="'+path_suggestion+'"]').parent().parent().addClass('tt-selected').siblings().removeClass('tt-selected');
         });
 
         $(input).bind('typeahead:change', function(ev, suggestion) {
