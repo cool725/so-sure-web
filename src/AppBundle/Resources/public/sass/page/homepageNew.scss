@@ -555,11 +555,6 @@
                 font-size: 34px;
                 top: 2px;
             }
-
-            // @include breakpoint(tablet) {
-            //     font-size: 36px;
-            //     left: 5px;
-            // }
         }
 
         @include breakpoint(tablet) {
@@ -568,16 +563,16 @@
     }
 
     .tt-menu {
-        margin-top: 49px;
+        margin-top: 10px;
 
         @include breakpoint(tablet) {
             width: 430px;
-            margin-top: 67px;
+            // margin-top: 67px;
         }
 
         @include breakpoint(laptop) {
             width: 530px;
-            margin-top: 10px;
+            // margin-top: 10px;
         }
 
         @include breakpoint(desktop) {

@@ -130,6 +130,17 @@
     }
 }
 
+.tt-cursor {
+    .btn-tt {
+        background-color: $primary-blue;
+        color: $white;
+
+        &:hover, &:focus {
+            background-color: darken($primary-blue, 15%);
+        }
+    }
+}
+
 .empty-message {
     padding: 15px;
     text-align: center;
