@@ -8,7 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -21,6 +21,19 @@ use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
 
 class ClaimFnolType extends AbstractType
 {
+    /**
+     * @var boolean
+     */
+    private $required;
+
+    /**
+     * @param boolean      $required
+     */
+    public function __construct($required)
+    {
+        $this->required = $required;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -28,7 +41,15 @@ class ClaimFnolType extends AbstractType
             ->add('name', TextType::class)
             ->add('policyNumber', TextType::class)
             ->add('phone', TextType::class)
-            ->add('when', DateTimeType::class)
+            ->add('when', DateType::class, [
+                  'required' => $this->required,
+                  'format'   => 'dd/MM/yyyy',
+                  'widget' => 'single_text',
+                  'placeholder' => array(
+                      'year' => 'YYYY', 'month' => 'MM', 'day' => 'DD',
+                  ),
+            ])
+            ->add('time', TextType::class)
             ->add('where', TextType::class)
             ->add('timeToReach', TextType::class)
             ->add('signature', TextType::class)

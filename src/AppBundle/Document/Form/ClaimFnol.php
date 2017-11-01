@@ -3,6 +3,7 @@
 namespace AppBundle\Document\Form;
 
 use AppBundle\Document\Policy;
+use AppBundle\Document\User;
 use AppBundle\Document\DateTrait;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
@@ -13,9 +14,13 @@ class ClaimFnol
 
     /**
      * @var Policy
-     * @Assert\NotNull(message="Policy is required.")
      */
     protected $policy;
+
+    /**
+     * @var User
+     */
+    protected $user;
 
     /**
      * @Assert\Email(strict=false)
@@ -36,7 +41,7 @@ class ClaimFnol
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
-     * @Assert\Length(min="1", max="100")
+     * @Assert\Length(min="1", max="50")
      */
     protected $policyNumber;
 
@@ -58,11 +63,26 @@ class ClaimFnol
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
-     * @Assert\Length(min="5", max="100")
+     * @Assert\Length(min="4", max="100")
      */
     protected $timeToReach;
 
+    /**
+     * @Assert\DateTime()
+     */
     protected $when;
+
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="4", max="100")
+     */
+    protected $time;
+
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="10", max="200")
+     */
+    protected $where;
 
     public function getEmail()
     {
@@ -152,8 +172,21 @@ class ClaimFnol
     public function setPolicy(Policy $policy)
     {
         $this->policy = $policy;
+        if ($policy) {
+            $this->policyNumber = $policy->getPolicyNumber();
+            $this->setUser($policy->getUser());
+        }
     }
 
+    public function setUser(User $user)
+    {
+        if ($user) {
+            $this->name = $user->getName();
+            $this->email = $user->getEmail();
+            $this->phone = $user->getMobileNumber();
+        }
+    }
+    
     public function getWhen()
     {
         return $this->when;
@@ -162,6 +195,16 @@ class ClaimFnol
     public function setWhen($when)
     {
         $this->when = $when;
+    }
+
+    public function getTime()
+    {
+        return $this->time;
+    }
+
+    public function setTime($time)
+    {
+        $this->time = $time;
     }
 
     public function getWhere()

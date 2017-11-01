@@ -359,11 +359,22 @@ class DefaultController extends BaseController
 
     /**
      * @Route("/claim", name="claim")
+     * @Route("/claim/{policyId}", name="claim_policy")
      * @Template
      */
-    public function claimAction(Request $request)
+    public function claimAction(Request $request, $policyId = null)
     {
+        $user = $this->getUser();
         $claimFnol = new ClaimFnol();
+        
+        if ($policyId) {
+            $repo = $this->getManager()->getRepository(Policy::class);
+            $policy = $repo->find($policyId);
+            $claimFnol->setPolicy($policy);
+        } elseif ($user) {
+            $claimFnol->setUser($user);
+        }
+
         $claimForm = $this->get('form.factory')
             ->createNamedBuilder('claim_form', ClaimFnolType::class, $claimFnol)
             ->getForm();
@@ -387,7 +398,7 @@ class DefaultController extends BaseController
 
                     $mailer->sendTemplate(
                         'Your claim with so-sure',
-                        $claimForm->getEmail(),
+                        $claimFnol->getEmail(),
                         'AppBundle:Email:claim/fnolResponse.html.twig',
                         ['data' => $claimFnol],
                         'AppBundle:Email:claim/fnolResponse.txt.twig',
