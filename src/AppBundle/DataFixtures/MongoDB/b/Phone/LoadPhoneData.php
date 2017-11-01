@@ -119,9 +119,13 @@ abstract class LoadPhoneData implements ContainerAwareInterface
     protected function newPhoneFromRow($manager, $data, $date)
     {
         try {
-            // price
-            if (!$data[5]) {
+            if (!$data[0] || !$data[1]) {
                 return;
+            }
+            // price
+            $premium = 0;
+            if ($data[5]) {
+                $premium = $data[5] + 1.5;
             }
             /*
             // devices
@@ -141,7 +145,7 @@ abstract class LoadPhoneData implements ContainerAwareInterface
             $phone->init(
                 $data[0], // $make
                 $data[1], // $model
-                $data[5] + 1.5, // $premium
+                $premium, // $premium
                 $data[3], // $memory
                 $devices, // $devices
                 str_replace('£', '', $data[7]), // $initialPrice
@@ -191,12 +195,12 @@ abstract class LoadPhoneData implements ContainerAwareInterface
                 $releaseDate // $releaseDate
             );
 
-            if ($phone->shouldBeRetired()) {
+            if ($phone->shouldBeRetired() || $premium == 0) {
                 $phone->setActive(false);
             }
 
             $manager->persist($phone);
-            if (!$phone->getCurrentPhonePrice()) {
+            if (!$phone->getCurrentPhonePrice() && $premium > 0) {
                 throw new \Exception('Failed to init phone');
             }
 

@@ -245,13 +245,15 @@ class Phone
         $this->replacementPrice = strlen($replacementPrice) > 0 ? $replacementPrice : null;
         $this->initialPriceUrl = strlen($initialPriceUrl) > 0 ? $initialPriceUrl : null;
 
-        $phonePrice = $this->getCurrentPhonePrice();
-        if (!$phonePrice) {
-            $phonePrice = new PhonePrice();
-            $phonePrice->setValidFrom($date);
-            $this->addPhonePrice($phonePrice);
+        if ($premium > 0) {
+            $phonePrice = $this->getCurrentPhonePrice();
+            if (!$phonePrice) {
+                $phonePrice = new PhonePrice();
+                $phonePrice->setValidFrom($date);
+                $this->addPhonePrice($phonePrice);
+            }
+            $phonePrice->setMonthlyPremiumPrice($premium, $date);
         }
-        $phonePrice->setMonthlyPremiumPrice($premium, $date);
     }
 
     public function setDetails(
@@ -841,7 +843,21 @@ class Phone
     {
         $currentPhonePrice = $this->getCurrentPhonePrice();
         if (!$currentPhonePrice) {
-            return null;
+            if ($this->getActive()) {
+                return null;
+            }
+            return [
+                'phone' => $this->toApiArray(),
+                'can_purchase' => $this->getActive(),
+                'monthly_premium' => null,
+                'monthly_loss' => null,
+                'yearly_premium' => null,
+                'yearly_loss' => null,
+                'connection_value' => null,
+                'max_connections' => null,
+                'max_pot' => null,
+                'valid_to' => null,
+            ];
         }
 
         // If there is an end date, then quote should be valid until then
@@ -862,7 +878,7 @@ class Phone
         if ($user && !$user->allowedYearlyPayments()) {
             $yearlyPremium = null;
         }
-        
+
         return [
             'monthly_premium' => $monthlyPremium,
             'monthly_loss' => 0,
@@ -873,6 +889,7 @@ class Phone
             'max_connections' => $currentPhonePrice->getMaxConnections($promoAddition, $isPromoLaunch),
             'max_pot' => $currentPhonePrice->getMaxPot($isPromoLaunch),
             'valid_to' => $quoteValidTo->format(\DateTime::ATOM),
+            'can_purchase' => $this->getActive(),
         ];
     }
 

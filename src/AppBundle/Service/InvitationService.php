@@ -1096,6 +1096,13 @@ class InvitationService
 
     public function reinvite(Invitation $invitation)
     {
+        if (!$invitation->getPolicy() || !in_array($invitation->getPolicy()->getStatus(), [
+            Policy::STATUS_ACTIVE,
+            Policy::STATUS_UNPAID,
+        ])) {
+            return false;
+        }
+
         if ($invitation->isProcessed()) {
             throw new ProcessedException("Invitation has already been processed");
         }

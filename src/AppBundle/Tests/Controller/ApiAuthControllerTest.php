@@ -8,6 +8,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\Charge;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\Phone;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\LostPhone;
 use AppBundle\Document\Payment\JudoPayment;
@@ -38,6 +39,7 @@ class ApiAuthControllerTest extends BaseControllerTest
     protected static $testUser3;
     protected static $testUserDisabled;
     protected static $reward;
+    protected static $expiredPhone;
 
     public function tearDown()
     {
@@ -78,6 +80,10 @@ class ApiAuthControllerTest extends BaseControllerTest
         self::$reward->setSCode($scode);
         static::$dm->persist(self::$reward);
         static::$dm->persist($scode);
+
+        $phoneRepo = static::$dm->getRepository(Phone::class);
+        self::$expiredPhone = $phoneRepo->findOneBy(['make' => 'Apple', 'model' => 'iPhone 4']);
+
         static::$dm->flush();
     }
 
@@ -1221,6 +1227,17 @@ class ApiAuthControllerTest extends BaseControllerTest
             'imei' => $imei,
             'make' => 'Apple',
             'device' => 'iPhone 4',
+            'memory' => 15,
+            'rooted' => false,
+            'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
+            'serial_number' => "23423423342",
+        ]]);
+        $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
+            'imei' => $imei,
+            'make' => 'Apple',
+            'device' => 'iPhone',
             'memory' => 15,
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
@@ -4533,6 +4550,62 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals(true, $data['device_found']);
         $this->assertTrue(count($data['quotes']) > 1);
         $this->assertNull($data['quotes'][0]['monthly_premium']);
+        $this->assertGreaterThan(0, $data['quotes'][0]['yearly_premium']);
+    }
+
+    public function testUserQuoteHasPolicy()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testUserQuoteHasPolicy', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $this->updateUserDetails($cognitoIdentityId, $user);
+
+        $url = sprintf('/api/v1/auth/user/%s/address', $user->getId());
+        $data = [
+            'type' => 'billing',
+            'line1' => 'address line 1',
+            'city' => 'London',
+            'postcode' => 'BX11LT'
+        ];
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $this->verifyResponse(200);
+
+        $url = sprintf(
+            '/api/v1/auth/user/%s/quote?_method=GET&%s',
+            $user->getId(),
+            'make=Apple&device=iPhone%204&rooted=false'
+        );
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_QUOTE_EXPIRED);
+
+        $url = sprintf(
+            '/api/v1/auth/user/%s/quote?_method=GET&%s',
+            $user->getId(),
+            'make=Apple&device=iPhone%204&rooted=false&has_policy=true'
+        );
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_QUOTE_EXPIRED);
+
+        $policy = new PhonePolicy();
+        $policy->setPhone(static::$expiredPhone);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $user->addPolicy($policy);
+        static::$dm->persist($policy);
+        static::$dm->flush();
+
+        $url = sprintf(
+            '/api/v1/auth/user/%s/quote?_method=GET&%s',
+            $user->getId(),
+            'make=Apple&device=iPhone%204&rooted=false&has_policy=true'
+        );
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals(true, $data['device_found']);
+        $this->assertTrue(count($data['quotes']) > 1);
+        $this->assertGreaterThan(0, $data['quotes'][0]['monthly_premium']);
         $this->assertGreaterThan(0, $data['quotes'][0]['yearly_premium']);
     }
 

@@ -364,6 +364,30 @@ class UserControllerTest extends BaseControllerTest
         self::verifyResponse(200);
     }
 
+    public function testUserPolicyCancelledAndPaymentOwed()
+    {
+        $email = self::generateEmail('testUserPolicyCancelledAndPaymentOwed', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $claim = new Claim();
+        $claim->setStatus(Claim::STATUS_APPROVED);
+        $policy->addClaim($claim);
+        $policy->setStatus(Policy::STATUS_CANCELLED);
+        $policy->setCancelledReason(Policy::CANCELLED_UNPAID);
+        self::$dm->flush();
+        //print_r($policy->getClaimsWarnings());
+        $this->assertTrue($policy->isCancelledAndPaymentOwed());
+        $this->login($email, $password, sprintf('purchase/remainder/%s', $policy->getId()));
+    }
+
     public function testUserAccessDenied()
     {
         $emailA = self::generateEmail('testUserAccessDenied-A', $this);

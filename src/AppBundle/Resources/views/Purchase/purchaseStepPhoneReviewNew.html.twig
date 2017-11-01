@@ -161,22 +161,6 @@
                     </div>
                 </div>
 
-                {% if not policy is defined or not policy or policy.imei|length == 0 %}
-                    <div class="form-group">
-                        <div class="text-break text-grey">
-                            <div class="line"></div>OR<div class="line"></div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <a href="#"
-                           id="imei-screenshot"
-                           class="btn btn-blue btn-block btn-pad"
-                           data-intercom-msg="Hi, I want to take a screenshot of my IMEI number to send to you. Can you let me know what to do? 🙂"
-                        >Send us a screenshot of your IMEI</a><br>
-                    </div>
-                {% endif %}
-
                 {% if purchase_form.serialNumber is defined %}
                     <div class="form-group {% if form_errors(purchase_form.serialNumber) %}has-error{% endif %}">
                         {{ form_label(purchase_form.serialNumber, 'Serial Number:', { 'label_attr': {'class': 'sr-only'} }) }}
@@ -190,6 +174,26 @@
                         </div>
                     </div>
                 {% endif %}
+
+                <div class="form-group">
+                    <div class="text-break text-grey">
+                        <div class="line"></div>OR<div class="line"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="btn btn-blue btn-block btn-pad" for="purchase_form_file">
+                        {{ form_widget(purchase_form.file, {'attr': {'style':'display:none'}}) }}
+                        <i class="fa fa-upload"></i> Upload a screenshot
+                    </label>
+                    <div class="text-center text-info" style="margin-top: 15px;" id="upload-file-info"></div>
+                </div>
+                <div class="form-group {% if form_errors(purchase_form.fileValid) %}has-error{% endif %}">
+                    <div style="display:none">
+                        {{ form_widget(purchase_form.fileValid) }}
+                    </div>
+                    <div class="help-block with-errors">{{ form_errors(purchase_form.fileValid) }}</div>
+                </div>
 
                 <div class="form-group form-group-break">
                     <a href="#"

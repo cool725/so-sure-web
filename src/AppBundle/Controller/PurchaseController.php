@@ -26,6 +26,7 @@ use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\User;
 use AppBundle\Document\Lead;
 use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\File\ImeiUploadFile;
 use AppBundle\Document\Form\Purchase;
 use AppBundle\Document\Form\PurchaseStepPersonalAddress;
 use AppBundle\Document\Form\PurchaseStepPersonal;
@@ -33,6 +34,7 @@ use AppBundle\Document\Form\PurchaseStepAddress;
 use AppBundle\Document\Form\PurchaseStepPhone;
 use AppBundle\Document\Form\PurchaseStepPhoneNoPhone;
 
+use AppBundle\Form\Type\ImeiUploadFileType;
 use AppBundle\Form\Type\BasicUserType;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\PurchaseStepPersonalAddressType;
@@ -351,7 +353,22 @@ class PurchaseController extends BaseController
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('purchase_form')) {
                 $purchaseForm->handleRequest($request);
-                if ($purchaseForm->isValid()) {
+
+                // as we may recreate the form, make sure to get everything we need from the form first
+                $purchaseFormValid = $purchaseForm->isValid();
+                $purchaseFormExistingClicked = $purchaseForm->has('existing') &&
+                    $purchaseForm->get('existing')->isClicked();
+
+                // If there's a file upload, the form submit event bind should have already run the ocr
+                // and data object has the imei/serial
+                // however, we need to re-create the form so the fields will display the updated data
+                if ($filename = $purchase->getFile()) {
+                    $purchaseForm = $this->get('form.factory')
+                        ->createNamedBuilder('purchase_form', PurchaseStepPhoneType::class, $purchase)
+                        ->getForm();
+                }
+
+                if ($purchaseFormValid) {
                     if ($policy) {
                         // TODO: How can we preserve imei & make/model check results across policies
                         // If any policy data has changed, delete/re-create
@@ -376,6 +393,16 @@ class PurchaseController extends BaseController
                                 $this->getIdentityLogWeb($request)
                             );
                             $dm->persist($policy);
+
+                            if ($purchase->getFile()) {
+                                $imeiUploadFile = new ImeiUploadFile();
+                                $policy->setPhoneVerified(true);
+                                $imeiUploadFile->setFile($purchase->getFile());
+                                $imeiUploadFile->setPolicy($policy);
+                                $imeiUploadFile->setBucket('policy.so-sure.com');
+                                $imeiUploadFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
+                                $policy->addPolicyFile($imeiUploadFile);
+                            }
                         } catch (InvalidPremiumException $e) {
                             // Nothing the user can do, so rethow
                             throw $e;
@@ -454,7 +481,7 @@ class PurchaseController extends BaseController
                             // There was an odd case of next not being detected as clicked
                             // perhaps a brower issue with multiple buttons
                             // just in case, assume judo pay if we don't detect existing
-                            if ($purchaseForm->has('existing') && $purchaseForm->get('existing')->isClicked()) {
+                            if ($purchaseFormExistingClicked) {
                                 // TODO: Try/catch
                                 if ($this->get('app.judopay')->existing(
                                     $policy,
@@ -471,7 +498,6 @@ class PurchaseController extends BaseController
                                     // @codingStandardsIgnoreEnd
                                 }
                             } else {
-                                //if ($purchaseForm->has('next') && $purchaseForm->get('next')->isClicked()) {
                                 $webpay = $this->get('app.judopay')->webpay(
                                     $policy,
                                     $purchase->getAmount(),

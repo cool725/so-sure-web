@@ -8,6 +8,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\PhoneTrait;
+use AppBundle\Document\File\ImeiUploadFile;
 
 class PurchaseStepPhone
 {
@@ -19,6 +20,13 @@ class PurchaseStepPhone
 
     /** @var User */
     protected $user;
+
+    protected $file;
+    
+    /**
+     * @Assert\IsTrue(message="Unable to find an IMEI number in the file")
+     */
+    protected $fileValid = true;
 
     /**
      * @Assert\Range(
@@ -141,6 +149,26 @@ class PurchaseStepPhone
         }
 
         return !$this->isAgreed();
+    }
+
+    public function getFile()
+    {
+        return $this->file;
+    }
+
+    public function setFile($file)
+    {
+        $this->file = $file;
+    }
+
+    public function getFileValid()
+    {
+        return $this->fileValid;
+    }
+
+    public function setFileValid($fileValid)
+    {
+        $this->fileValid = $fileValid;
     }
 
     public function toApiArray()

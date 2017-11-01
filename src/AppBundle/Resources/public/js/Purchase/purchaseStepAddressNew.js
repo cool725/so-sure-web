@@ -70,11 +70,21 @@ sosure.purchaseStepAddress = (function() {
                     required: true
                 },
                 "purchase_form[postcode]" : {
-                    required: true,
+                    required: {
+                        depends:function(){
+                            $(this).val($.trim($(this).val()));
+                            return true;
+                        }
+                    },
                     postcodeUK: true
                 },
                 "search_postcode" : {
-                    required: true,
+                    required: {
+                        depends:function(){
+                            $(this).val($.trim($(this).val()));
+                            return true;
+                        }
+                    },
                     postcodeUK: true                    
                 }
             },
@@ -257,6 +267,7 @@ sosure.purchaseStepAddress = (function() {
         if (!suggestion) {
             $('#search_address_errors').show();
             $('#select_address_errors').show();
+            $('.address-search').addClass('has-error');
             self.toggleSearch();
 
             return self.clearAddress();
@@ -292,6 +303,7 @@ sosure.purchaseStepAddress = (function() {
         .done(function( msg ) {
             $('#search_address_errors').hide();
             $('#select_address_errors').hide();
+            $('.address-search').removeClass('has-error');
             self.toggleSearch();
             var addr = msg.Items[0];
             sosure.purchaseStepAddress.setAddress(addr);
@@ -345,7 +357,7 @@ $(function(){
           dataType:"json",
           data: JSON.stringify({ 'postcode': search_postcode })
         }).done(function (response) {
-            if (response.postcode.length == 0) {
+            if (!response.postcode || response.postcode.length == 0) {
                 return sosure.purchaseStepAddress.step_address_continue();
             }
 
@@ -357,6 +369,11 @@ $(function(){
                     sosure.purchaseStepAddress.selectAddress(null);
                 }
             });
+        }).fail(function (response) {
+            if (!response.postcode || response.postcode.length == 0) {
+                sosure.purchaseStepAddress.selectAddress(null);
+                return sosure.purchaseStepAddress.step_address_continue();
+            }
         });
     });
 

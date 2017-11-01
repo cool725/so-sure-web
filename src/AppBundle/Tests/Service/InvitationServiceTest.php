@@ -35,6 +35,8 @@ use AppBundle\Exception\DuplicateInvitationException;
 
 /**
  * @group functional-nonet
+ *
+ * AppBundle\\Tests\\Service\\InvitationServiceTest
  */
 class InvitationServiceTest extends WebTestCase
 {
@@ -782,6 +784,32 @@ class InvitationServiceTest extends WebTestCase
         $this->assertTrue($invitation instanceof EmailInvitation);
 
         self::$invitationService->reinvite($invitation);
+    }
+
+    public function testEmailReinviteCancelledPolicy()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testEmailReinviteCancelledPolicy', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+
+        $userInvitee = static::createUser(
+            static::$userManager,
+            static::generateEmail('testEmailReinviteCancelledPolicy-invitee', $this),
+            'bar'
+        );
+        $invitation = self::$invitationService->inviteByEmail(
+            $policy,
+            static::generateEmail('testEmailReinviteCancelledPolicy-invitee', $this)
+        );
+        $this->assertTrue($invitation instanceof EmailInvitation);
+
+        $policy->setStatus(Policy::STATUS_CANCELLED);
+
+        $this->assertFalse(self::$invitationService->reinvite($invitation));
     }
 
     public function testEmailInvitationAccept()
