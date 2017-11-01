@@ -27,7 +27,7 @@ class ClaimFnolType extends AbstractType
     private $required;
 
     /**
-     * @param boolean      $required
+     * @param boolean $required
      */
     public function __construct($required)
     {
