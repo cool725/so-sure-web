@@ -27,7 +27,7 @@
 
     // Input style
     .tt-input {
-        // font-family: $avenir-heavy;
+        margin-bottom: 0 !important;
     }
 
     // Hint in input
@@ -73,7 +73,7 @@
 
     .tt-highlight {
         font-family: $avenir-heavy;
-        color: $primary-blue;
+        // color: $primary-blue;
     }
 
 }
