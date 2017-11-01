@@ -9,24 +9,24 @@
   @if $point == hd {
     @media (min-width: 2000px) { @content ; }
   }
-	@if $point == desktop {
-		@media (min-width: 1200px) { @content ; }
-	}
-	@else if $point == laptop {
-		@media (min-width: 992px) { @content ; }
-	}
-	@else if $point == tablet {
-		@media (min-width: 768px) { @content ; }
-	}
-	@else if $point == mobileonly {
-		@media (max-width: 767px)  { @content ; }
-	}
-	@else if $point == mobileish {
-		@media (max-width: 340px)  { @content ; }
-	}
-	@else if $point == mobileishup {
-		@media (min-width: 400px)  { @content ; }
-	}
+  @if $point == desktop {
+    @media (min-width: 1200px) { @content ; }
+  }
+  @else if $point == laptop {
+    @media (min-width: 992px) { @content ; }
+  }
+  @else if $point == tablet {
+    @media (min-width: 768px) { @content ; }
+  }
+  @else if $point == mobileonly {
+    @media (max-width: 767px)  { @content ; }
+  }
+  @else if $point == mobileish {
+    @media (max-width: 340px)  { @content ; }
+  }
+  @else if $point == mobileishup {
+    @media (min-width: 400px)  { @content ; }
+  }
   @else if $point == midtablet {
     @media (min-width: 600px)  { @content ; }
   }
@@ -66,6 +66,21 @@
           border-bottom-left-radius: $radius;
      -webkit-border-top-left-radius: $radius;
              border-top-left-radius: $radius;
+}
+
+@mixin transform($transforms) {
+  -webkit-transform: $transforms;
+  -moz-transform: $transforms;
+  -ms-transform: $transforms;
+  transform: $transforms;
+}
+
+@mixin transition($args) {
+  -webkit-transition: $args;
+  -moz-transition: $args;
+  -ms-transition: $args;
+  -o-transition: $args;
+  transition: $args;
 }
 
 // Gradient Mixin
