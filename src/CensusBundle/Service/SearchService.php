@@ -80,8 +80,9 @@ class SearchService
                     $excluded = [];
                 }
                 $excluded = array_merge($excluded, [$code]);
-                $nearest = $this->findNearestPostcode($code, $excluded)->getPostcode();
-                return $this->findIncome($nearest, $excluded);
+                if ($nearest = $this->findNearestPostcode($code, $excluded)) {
+                    return $this->findIncome($nearest->getPostcode(), $excluded);
+                }
             }
             return null;
         }
