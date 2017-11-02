@@ -23,31 +23,35 @@
     <section class="homepage--hero">
         <div class="container">
             <h1 class="homepage--hero-h1">Mobile Phone Insurance <br class="hidden-xs"> How it Should Be</h1>
-            {# <p class="lead">Providing exceptional experience when you claim, and rewarding you and your friends when you don't</p> #}
-{#             {% if phone %}
+            <p class="lead">Providing exceptional experience when you claim, <br class="hidden-xs">and rewarding you and your friends when you don't</p>
+            {% if phone %}
                 {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'homepage', 'id': phone.id })) }}
             {% else %}
                 {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'homepage'})) }}
-            {% endif %} #}
+            {% endif %}
         </div>
-        {# <div id="hero-character_1"
+        <div id="hero-character_1"
              class="homepage--hero__character"
-             data-content="Accidental damage, including cracked screen and water damage"></div>
+             data-content=""></div>
         <div id="hero-character_2"
              class="homepage--hero__character"
-             data-content="Worldwide travel for trips not exceeding 90 days"></div>
-        <div id="hero-character_3"
+             data-content=""></div>
+        <div id="hero-character_3_and_4"
+             class="homepage--hero__character clearfix">
+            <div class="left" data-content=""></div>
+            <div class="right" data-content=""></div>
+        </div>
+        <div id="hero-character_5_and_6"
+             class="homepage--hero__character clearfix">
+            <div class="left" data-content=""></div>
+            <div class="right" data-content=""></div>
+        </div>
+        <div id="hero-character_7"
              class="homepage--hero__character"
-             data-content="Out of warranty breakdown"></div>
-        <div id="hero-character_4"
+             data-content=""></div>
+        <div id="hero-character_8"
              class="homepage--hero__character"
-             data-content="Unauthorised network charges (up to £1000 inc. VAT)"></div>
-        <div id="hero-character_5"
-             class="homepage--hero__character"
-             data-content="Theft and Loss cover as standard"></div>
-        <div id="hero-character_6"
-             class="homepage--hero__character"
-             data-content="Accessories cover (up to £100 inc. VAT) for theft and loss claims"></div> #}
+             data-content=""></div>
     </section>
 
     {# What is so-sure? #}
