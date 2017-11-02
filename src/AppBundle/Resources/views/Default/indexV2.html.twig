@@ -13,6 +13,7 @@
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets output='css/*.css'
+    'components/animate.css/animate.min.css'
     '@AppBundle/Resources/public/sass/page/homepageNew.scss'
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
@@ -31,27 +32,47 @@
             {% endif %}
         </div>
         <div id="hero-character_1"
-             class="homepage--hero__character"
-             data-content=""></div>
+             class="homepage--hero__character">
+            <div class="homepage--hero__tooltip animated bounce"
+                 data-content="Accidental damage cover, including cracked screen and water damage"></div>
+        </div>
         <div id="hero-character_2"
-             class="homepage--hero__character"
-             data-content=""></div>
+             class="homepage--hero__character">
+            <div class="homepage--hero__tooltip"
+                 data-content="Worldwide travel cover for trips not exceeding 90 days"></div>
+        </div>
         <div id="hero-character_3_and_4"
              class="homepage--hero__character clearfix">
-            <div class="left" data-content=""></div>
-            <div class="right" data-content=""></div>
+            <div class="left">
+                <div class="homepage--hero__tooltip"
+                 data-content="Refurbished and second-hand device cover, for phones up to 3 years old"></div>
+            </div>
+            <div class="right">
+                <div class="homepage--hero__tooltip"
+                 data-content="Out of warranty breakdown cover"></div>
+            </div>
         </div>
         <div id="hero-character_5_and_6"
              class="homepage--hero__character clearfix">
-            <div class="left" data-content=""></div>
-            <div class="right" data-content=""></div>
+            <div class="left">
+                <div class="homepage--hero__tooltip"
+                 data-content="Theft and Loss cover as standard"></div>
+            </div>
+            <div class="right">
+                <div class="homepage--hero__tooltip"
+                 data-content="Unauthorised network charges cover (up to £1000 inc. VAT)"></div>
+            </div>
         </div>
         <div id="hero-character_7"
-             class="homepage--hero__character"
-             data-content=""></div>
+             class="homepage--hero__character">
+            <div class="homepage--hero__tooltip homepage--hero__tooltip__reward"
+                 data-content="Next day phone replacement/repair or up to 80% of your money back when you and your friends don't claim"></div>
+             </div>
         <div id="hero-character_8"
-             class="homepage--hero__character"
-             data-content=""></div>
+             class="homepage--hero__character">
+            <div class="homepage--hero__tooltip"
+                 data-content="Accessories cover (up to £100 inc. VAT) for theft and loss claim"></div>
+        </div>
     </section>
 
     {# What is so-sure? #}
