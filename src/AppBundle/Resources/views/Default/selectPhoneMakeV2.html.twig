@@ -34,18 +34,12 @@
           data-path-suffix="{{ pathSuffix }}"
           class="{{ formClass }}">
 
-        <div class="row">
-            <div class="form-group col-md-8">
-                <input type="text"
-                       id="search-phone{{ uid }}"
-                       class="required search-phone-text search-phone"
-                       placeholder="Find your phone eg. iPhone 8"
-                       value="{% if phone %}{{ phone }}{% endif %}" />
-            </div>
-            <div class="form-group col-md-4">
-                <button type="submit" class="btn {{ buttonCSS }}">{{ buttonText }} &nbsp;<i class="fa fa-angle-right" aria-hidden="true"></i></button>
-            </div>
-        </div>
+        <input type="text"
+             id="search-phone{{ uid }}"
+             class="required search-phone-text search-phone"
+             placeholder="Find your phone e.g. iPhone 8 Plus..."
+             autocomplete="off"
+             value="{% if phone %}{{ phone }}{% endif %}" />
     </form>
 
     {% if type is not defined or not type  %}
@@ -54,5 +48,4 @@
 
     {# TODO: Move to footer #}
     {% include 'AppBundle::Default/loadingWidget.html.twig' with { 'class': 'loading-overlay-widget--show'} %}
-
 </div>
