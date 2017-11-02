@@ -23,7 +23,7 @@
     {% set formClass    = 'form-inline' %}
 {% elseif type == 'old-inline' %}
     {% set buttonCSS    = 'btn btn-success btn-search' %}
-    {% set formClass    = 'form-inline' %}
+    {% set formClass    = 'form-inline text-center' %}
 {% elseif type == 'old-block' %}
     {% set buttonCSS    = 'btn btn-success btn-search' %}
 {% elseif type == 'new-inline' %}
@@ -63,9 +63,6 @@
                    placeholder="Find your phone (e.g. iPhone 7)"
                    autocomplete="off"
                    value="{% if phone %}{{ phone }}{% endif %}" />
-        </div>
-        <div class="form-group">
-            <button type="submit" class="btn {{ buttonCSS }}">{{ buttonText }}</button>
         </div>
         {% if secondaryBtn == true  %}
             {# TODO #}
