@@ -23,15 +23,14 @@
     <section class="homepage--hero">
         <div class="container">
             <h1>Mobile Phone Insurance <br> How it Should Be</h1>
-            <p class="lead hidden-xs">Next working day replacement phone or repair when you claim <br> Up to 80% money back when you don't</p>
-            <p class="lead hidden-sm hidden-md hidden-lg">Next working day replacement phone or repair when you claim, up to 80% money back when you don't</p>
+            <p class="lead">Providing exceptional experience when you claim, and rewarding you and your friends when you don't</p>
             {% if phone %}
                 {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'homepage', 'id': phone.id })) }}
             {% else %}
                 {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'homepage'})) }}
             {% endif %}
         </div>
-        <div id="hero-character_1"
+        {# <div id="hero-character_1"
              class="homepage--hero__character"
              data-content="Accidental damage, including cracked screen and water damage"></div>
         <div id="hero-character_2"
@@ -48,7 +47,7 @@
              data-content="Theft and Loss cover as standard"></div>
         <div id="hero-character_6"
              class="homepage--hero__character"
-             data-content="Accessories cover (up to £100 inc. VAT) for theft and loss claims"></div>
+             data-content="Accessories cover (up to £100 inc. VAT) for theft and loss claims"></div> #}
     </section>
 
     {# What is so-sure? #}
