@@ -72,35 +72,71 @@
         position: relative;
         text-align: center;
 
-        // Set max width on container
         .container {
             position: relative;
             z-index: 99;
         }
 
-        h1 {
-            font-size: 30px;
-            line-height: 41px;
+        // Heading
+        &-h1 {
             color: $primary-blue;
-            margin-bottom: 15px;
+
+            font-size: 28px;
+            line-height: 36px;
+            margin: 0 0 15px;
+
+            @include breakpoint(mobileishup) {
+                font-size: 30px;
+                line-height: 38px;
+            }
 
             @include breakpoint(tablet) {
                 font-size: 42px;
-                line-height: 49px;
+                line-height: 50px;
             }
 
             @include breakpoint(desktop) {
                 font-size: 72px;
-                line-height: 79px;
+                line-height: 80px;
             }
         }
+
+        // Background
+
+            // Mobile
+
+            // Large Mobile
+
+            // Tablet
+
+            // Laptop
+
+            // Desktop
+
+        // Characters
+
+        // h1 {
+        //     font-size: 30px;
+        //     line-height: 41px;
+        //     color: $primary-blue;
+        //     margin-bottom: 15px;
+
+        //     @include breakpoint(tablet) {
+        //         font-size: 42px;
+        //         line-height: 49px;
+        //     }
+
+        //     @include breakpoint(desktop) {
+        //         font-size: 72px;
+        //         line-height: 79px;
+        //     }
+        // }
 
         p {
             margin-bottom: 0 0 30px;
             line-height: 1.7;
         }
 
-        // Backgrounds
 
         // Characters
         &__character {
@@ -108,50 +144,49 @@
         }
 
         // - Mobile - Show smaller image no characters
-        background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_homepage_hero_mobile_background.svg') no-repeat center bottom;
-        background-size: 100%;
-        padding-top: 20px;
-        padding-bottom: 110px;
+        // background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_homepage_hero_mobile_background.svg') no-repeat center bottom;
+        // background-size: 100%;
+
 
         // - Large Mobile
         @include breakpoint(mobileishup) {
-            padding-bottom: 170px;
+            // padding-bottom: 170px;
         }
 
         // - Midtablet - Show smaller image no characters increase size
         @include breakpoint(midtablet) {
-            background-size: 99%;
-            padding-bottom: 200px;
+            // background-size: 99%;
+            // padding-bottom: 200px;
         }
 
         // - Tablet Show smaller image no characters increase size
         @include breakpoint(tablet) {
-            padding-bottom: 220px;
+            // padding-bottom: 220px;
         }
 
         // - Laptop Show characters image no characters
         @include breakpoint(laptop) {
-            padding-top: 50px;
-            padding-bottom: 240px;
-            background-position: left 15px;
+            // padding-top: 100px;
+            // padding-bottom: 240px;
+            // background-position: left 15px;
 
             // Clouds
-            background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_homepage-hero-clouds-combined.svg') repeat-x left 20px;
-            background-size: 100%;
-            z-index: 2;
+            // background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_homepage-hero-clouds-combined.svg') repeat-x left 20px;
+            // background-size: 100%;
+            // z-index: 2;
 
             // Buildings
-            &:before {
-                width: 100%; height: 100%;
-                content: '';
-                position: absolute;
-                bottom: 0; left: 50%;
-                margin-left: -50%;
-                z-index: 1;
-                background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_hero_background_empty.svg') no-repeat center bottom;
+            // &:before {
+            //     width: 100%; height: 100%;
+            //     content: '';
+            //     position: absolute;
+            //     bottom: 0; left: 50%;
+            //     margin-left: -50%;
+            //     z-index: 1;
+            //     background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_hero_background_empty.svg') no-repeat center bottom;
 
-                background-size: 2000px;
-            }
+            //     background-size: 1900px;
+            // }
 
             // Characters
             &__character {
@@ -332,13 +367,13 @@
 
         // - Desktop
         @include breakpoint(desktop) {
-            padding-top: 80px;
-            padding-bottom: 250px;
-            background-position: left 5px;
+            // padding-top: 100px;
+            // padding-bottom: 220px;
+            // background-position: left 5px;
 
-            &:before {
-                background-size: 2000px;
-            }
+            // &:before {
+            //     background-size: 1900px;
+            // }
         }
     }
 
@@ -686,7 +721,7 @@
 // TODO: Move!
 .search-phone-form--homepage {
     max-width: 450px;
-    background-color: $white;
+    // background-color: $white;
     padding: 0;
 
     position: relative;
