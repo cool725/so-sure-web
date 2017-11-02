@@ -201,8 +201,7 @@
                 .homepage--hero__tooltip {
                     bottom: 92px; left: 20px;
                     animation-duration: 1s;
-                    // animation-delay: 2s;
-                    animation-iteration-count: 2;
+                    animation-iteration-count: 3;
                 }
             }
 
@@ -312,6 +311,7 @@
                 // Tablet
                 @include breakpoint(tablet) {
                     padding: 20px 0 200px;
+                    background-size: 70%;
                 }
 
                 // Laptop
@@ -332,7 +332,7 @@
                     // Add the Buildings
                     &:before {
                         bottom: 0;
-                        background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_hero_background_empty_bench.svg') no-repeat center bottom;
+                        background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_hero_background_empty_space_for_bench.svg') no-repeat center bottom;
 
                         background-size: 1900px;
                     }
