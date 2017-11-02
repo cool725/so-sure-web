@@ -42,6 +42,7 @@ use AppBundle\Form\Type\PurchaseStepPersonalType;
 use AppBundle\Form\Type\PurchaseStepAddressType;
 use AppBundle\Form\Type\PurchaseStepPhoneType;
 use AppBundle\Form\Type\PurchaseStepPhoneNoPhoneType;
+use AppBundle\Form\Type\UserCancelType;
 
 use AppBundle\Service\MixpanelService;
 use AppBundle\Service\SixpackService;
@@ -809,44 +810,50 @@ class PurchaseController extends BaseController
             $dm->flush();
         }
         $cancelForm = $this->get('form.factory')
-            ->createNamedBuilder('cancel_form')
-            ->add('cancel', SubmitType::class)
+            ->createNamedBuilder('cancel_form', UserCancelType::class)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('cancel_form')) {
                 $cancelForm->handleRequest($request);
                 if ($cancelForm->isValid()) {
-                    if (!$policy->hasRequestedCancellation()) {
-                        $policy->setRequestedCancellation(new \DateTime());
-                        $dm->flush();
-                    }
+                    $reason = $cancelForm->getData()['reason'];
+
                     // @codingStandardsIgnoreStart
                     $body = sprintf(
-                        "This is a so-sure generated message. Policy: <a href='%s'>%s/%s</a> requested a cancellation via the site as phone was damaged prior to purchase. so-sure support team: Please verify policy id match in system and directly cancel policy immediately without DPA validation.",
+                        "This is a so-sure generated message. Policy: <a href='%s'>%s/%s</a> requested a cancellation via the site as phone was damaged (%s) prior to purchase. so-sure support team: Please verify policy id match in system and directly cancel policy immediately without DPA validation.",
                         $this->generateUrl(
                             'admin_policy',
                             ['id' => $policy->getId()],
                             UrlGeneratorInterface::ABSOLUTE_URL
                         ),
                         $policy->getPolicyNumber(),
-                        $policy->getId()
+                        $policy->getId(),
+                        $reason
                     );
                     // @codingStandardsIgnoreEnd
+
+                    if (!$policy->hasRequestedCancellation()) {
+                        $policy->setRequestedCancellation(new \DateTime());
+                        $policy->setRequestedCancellationReason($reason);
+                        $dm->flush();
+                        $intercom = $this->get('app.intercom');
+                        $intercom->queueMessage($policy->getUser()->getEmail(), $body);
+                    }
+
                     $message = \Swift_Message::newInstance()
                         ->setSubject(sprintf('Requested Policy Cancellation'))
                         ->setFrom('info@so-sure.com')
                         ->setTo('bcc@wearesosure.com')
                         ->setBody($body, 'text/html');
 
-                    $intercom = $this->get('app.intercom');
-                    $intercom->queueMessage($policy->getUser()->getEmail(), $body);
-
                     $this->get('mailer')->send($message);
+
                     $this->get('app.mixpanel')->queueTrack(
                         MixpanelService::EVENT_REQUEST_CANCEL_POLICY,
-                        ['Policy Id' => $policy->getId()]
+                        ['Policy Id' => $policy->getId(), 'Reason' => $reason]
                     );
+
                     // @codingStandardsIgnoreStart
                     $this->addFlash(
                         'success',
