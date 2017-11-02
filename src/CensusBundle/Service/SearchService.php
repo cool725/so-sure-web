@@ -42,6 +42,28 @@ class SearchService
         return $searchQuery->getSingleResult();
     }
 
+    public function findNearestPostcode($code, $excluded = null)
+    {
+        if (!$excluded) {
+            $excluded = [$code];
+        }
+        $postcode = $this->getPostcode($code);
+        if (!$postcode) {
+            return null;
+        }
+
+        $searchQuery = $this->dm->createQueryBuilder('CensusBundle:Postcode')
+            ->field('Postcode')->notIn($excluded)
+            ->field('Location')
+            ->geoNear($postcode->getLocation()->asPoint())
+            ->spherical(true)
+            // in meters
+            ->distanceMultiplier(0.001)
+            ->getQuery();
+
+        return $searchQuery->getSingleResult();
+    }
+
     public function findOutputArea($code)
     {
         $outputAreaRepo = $this->dm->getRepository(OutputArea::class);
@@ -49,10 +71,25 @@ class SearchService
         return $outputAreaRepo->findOneBy(['Postcode' => $code]);
     }
 
-    public function findIncome($code)
+    public function findClosestOutputArea($location, $code)
+    {
+        $outputAreaRepo = $this->dm->getRepository(OutputArea::class);
+
+        return $outputAreaRepo->findOneBy(['Postcode' => $code]);
+    }
+
+    public function findIncome($code, $excluded = null)
     {
         $outputArea = $this->findOutputArea($code);
         if (!$outputArea) {
+            if (count($excluded) < 3) {
+                if (!$excluded) {
+                    $excluded = [];
+                }
+                $excluded = array_merge($excluded, [$code]);
+                $nearest = $this->findNearestPostcode($code, $excluded)->getPostcode();
+                return $this->findIncome($nearest, $excluded);
+            }
             return null;
         }
 
