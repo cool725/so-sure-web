@@ -71,13 +71,6 @@ class SearchService
         return $outputAreaRepo->findOneBy(['Postcode' => $code]);
     }
 
-    public function findClosestOutputArea($location, $code)
-    {
-        $outputAreaRepo = $this->dm->getRepository(OutputArea::class);
-
-        return $outputAreaRepo->findOneBy(['Postcode' => $code]);
-    }
-
     public function findIncome($code, $excluded = null)
     {
         $outputArea = $this->findOutputArea($code);
