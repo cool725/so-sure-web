@@ -816,6 +816,12 @@ services:
         tags:
             - { name: form.type }
 
+    app.form.type.claimfnol:
+        class: AppBundle\Form\Type\ClaimFnolType
+        arguments: ["%form_required%"]
+        tags:
+            - { name: form.type }
+
     app.form.type.phonesearch:
         class: AppBundle\Form\Type\PhoneSearchType
         arguments: ["@request_stack"]

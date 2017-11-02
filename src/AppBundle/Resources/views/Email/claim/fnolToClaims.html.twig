@@ -1,15 +1,19 @@
-Name: {{ data['name'] }}
+Name: {{ data.name }}
 <br>
-Policy Number: {{ data['policyNumber'] }}
+Policy Number: {{ data.policyNumber }}
 <br>
-Email: {{ data['email'] }}
+Email: {{ data.email }}
 <br>
-Contact #: {{ data['phone'] }}
+Contact #: {{ data.phone }}
 <br>
-Best time to reach: {{ data['timeToReach'] }}
+Best time to reach: {{ data.timeToReach }}
 <br>
-Type of claim: {{ data['type'] }}
+Type of claim: {{ data.type }}
 <br>
-Message: {{ data['message'] }}
+When did it occur: {{ data.when|date('d M Y') }} {{ data.time }}
 <br>
-Signature: {{ data['signature'] }}
+Where did it occur: {{ data.where }}
+<br>
+Story: {{ data.message }}
+<br>
+Signature: {{ data.signature }}
