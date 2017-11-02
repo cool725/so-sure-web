@@ -64,6 +64,7 @@ class SalvaExportService
     protected $redis;
     protected $s3;
     protected $environment;
+    protected $featureService;
 
     public function setEnvironment($environment)
     {
@@ -80,6 +81,7 @@ class SalvaExportService
      * @param                 $redis
      * @param                 $s3
      * @param                 $environment
+     * @param FeatureService  $featureService
      */
     public function __construct(
         DocumentManager  $dm,
@@ -90,7 +92,8 @@ class SalvaExportService
         $rootDir,
         $redis,
         $s3,
-        $environment
+        $environment,
+        FeatureService $featureService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -101,6 +104,7 @@ class SalvaExportService
         $this->redis = $redis;
         $this->s3 = $s3;
         $this->environment = $environment;
+        $this->featureService = $featureService;
     }
 
     public function transformPolicy(SalvaPhonePolicy $policy = null, $version = null)
@@ -518,17 +522,10 @@ class SalvaExportService
         } elseif ($action == self::QUEUE_CANCELLED) {
             $this->cancelPolicy($policy, $cancelReason);
         } elseif ($action == self::QUEUE_UPDATED) {
-            // If exception thrown in the middle of an update, log and avoid re-queueing policy actions
-            try {
-                $this->incrementPolicyNumber($policy);
-
-                $this->queueMessage($policy->getId(), self::QUEUE_CANCELLED, 0, self::CANCELLED_REPLACE);
-                $this->queueMessage($policy->getId(), self::QUEUE_CREATED, 0);
-            } catch (\Exception $e) {
-                $this->logger->error(
-                    sprintf('Error running QUEUE_UPDATED for policy %s', $policy->getId()),
-                    ['exception' => $e]
-                );
+            if ($this->featureService->isEnabled(Feature::FEATURE_SALVA_POLICY_UPDATE)) {
+                $this->updatePolicyDirect($policy);
+            } else {
+                $this->updatePolicyCancelCreate($policy);
             }
         } else {
             throw new \Exception(sprintf(
@@ -538,6 +535,44 @@ class SalvaExportService
             ));
         }
         $this->dm->flush();
+    }
+
+    public function updatePolicyDirect(Policy $policy)
+    {
+        $phonePolicy->setSalvaStatus(SalvaPhonePolicy::SALVA_STATUS_PENDING_UPDATE);
+        $this->dm->flush();
+
+        $xml = $this->updateXml($phonePolicy);
+        $this->logger->info($xml);
+        if (!$this->validate($xml, self::SCHEMA_POLICY_IMPORT)) {
+            throw new \Exception('Failed to validate policy');
+        }
+        $response = $this->send($xml, self::SCHEMA_POLICY_IMPORT);
+        $this->logger->info($response);
+        $responseId = $this->getResponseId($response);
+        $phonePolicy->addSalvaPolicyResults($responseId, false, [
+            'ss_phone_base_tariff' => $phonePolicy->getTotalGwp()
+        ]);
+        $phonePolicy->setSalvaStatus(SalvaPhonePolicy::SALVA_STATUS_ACTIVE);
+        $this->dm->flush();
+
+        return $responseId;
+    }
+
+    public function updatePolicyCancelCreate(Policy $policy)
+    {
+        // If exception thrown in the middle of an update, log and avoid re-queueing policy actions
+        try {
+            $this->incrementPolicyNumber($policy);
+
+            $this->queueMessage($policy->getId(), self::QUEUE_CANCELLED, 0, self::CANCELLED_REPLACE);
+            $this->queueMessage($policy->getId(), self::QUEUE_CREATED, 0);
+        } catch (\Exception $e) {
+            $this->logger->error(
+                sprintf('Error running QUEUE_UPDATED for policy %s', $policy->getId()),
+                ['exception' => $e]
+            );
+        }
     }
 
     public function process($max, $prefix = null)
@@ -819,6 +854,80 @@ class SalvaExportService
         $insuredObject->appendChild(
             $dom->createElement('ns2:tariffDate', $this->adjustDate($phonePolicy->getIssueDate()))
         );
+
+        $objectCustomers = $dom->createElement('ns2:objectCustomers');
+        $insuredObject->appendChild($objectCustomers);
+        $objectCustomers->appendChild($this->createCustomer($dom, $phonePolicy, 'insured_person'));
+
+        $objectFields = $dom->createElement('ns2:objectFields');
+        $insuredObject->appendChild($objectFields);
+        $phone = $phonePolicy->getPhone();
+        $objectFields->appendChild($this->createObjectFieldText($dom, 'ss_phone_make', $phone->getMake()));
+        $objectFields->appendChild($this->createObjectFieldText($dom, 'ss_phone_model', $phone->getModel()));
+        $objectFields->appendChild($this->createObjectFieldText($dom, 'ss_phone_memory', $phone->getMemory()));
+        $objectFields->appendChild($this->createObjectFieldText($dom, 'ss_phone_imei', $phonePolicy->getImei()));
+        $objectFields->appendChild($this->createObjectFieldMoney($dom, 'ss_phone_value', $phone->getInitialPrice()));
+
+        $tariff = $phonePolicy->getTotalGwp();
+        $objectFields->appendChild($this->createObjectFieldMoney($dom, 'ss_phone_base_tariff', $tariff));
+
+        return $dom->saveXML();
+    }
+
+    public function updateXml(SalvaPhonePolicy $phonePolicy)
+    {
+        $dom = new DOMDocument('1.0', 'UTF-8');
+
+        $root = $dom->createElement('ns3:serviceRequest');
+        $dom->appendChild($root);
+        $root->setAttributeNS(
+            'http://www.w3.org/2000/xmlns/',
+            'xmlns:ns3',
+            'http://sims.salva.ee/service/schema/policy/import/v1'
+        );
+        $root->setAttributeNS(
+            'http://www.w3.org/2000/xmlns/',
+            'xmlns:ns2',
+            'http://sims.salva.ee/service/schema/policy/v1'
+        );
+        $root->setAttributeNS(
+            'http://www.w3.org/2000/xmlns/',
+            'xmlns:ns1',
+            'http://sims.salva.ee/service/schema/v1'
+        );
+        $root->setAttribute('ns3:mode', 'policy_change');
+        $root->setAttribute('ns3:includeInvoiceRows', 'true');
+
+        $policy = $dom->createElement('ns3:policy');
+        $root->appendChild($policy);
+
+        $policy->appendChild($dom->createElement('ns2:renewable', 'false'));
+        $policy->appendChild($dom->createElement(
+            'ns2:insurancePeriodStart',
+            $this->adjustDate($phonePolicy->getLatestSalvaStartDate())
+        ));
+
+        $policy->appendChild($dom->createElement(
+            'ns2:insurancePeriodEnd',
+            $this->adjustDate($phonePolicy->getEnd())
+        ));
+        $policy->appendChild($dom->createElement(
+            'ns2:paymentsPerYearCode',
+            $phonePolicy->getPaymentsPerYearCode()
+        ));
+        $policy->appendChild($dom->createElement('ns2:issuerUser', 'so_sure'));
+        $policy->appendChild($dom->createElement('ns2:deliveryModeCode', 'undefined'));
+        $policy->appendChild($dom->createElement('ns2:policyNo', $phonePolicy->getSalvaPolicyNumber()));
+
+        $policyCustomers = $dom->createElement('ns2:policyCustomers');
+        $policy->appendChild($policyCustomers);
+        $policyCustomers->appendChild($this->createCustomer($dom, $phonePolicy, 'policyholder'));
+
+        $insuredObjects = $dom->createElement('ns2:insuredObjects');
+        $policy->appendChild($insuredObjects);
+        $insuredObject = $dom->createElement('ns2:insuredObject');
+        $insuredObjects->appendChild($insuredObject);
+        $insuredObject->appendChild($dom->createElement('ns2:productObjectCode', 'ss_phone'));
 
         $objectCustomers = $dom->createElement('ns2:objectCustomers');
         $insuredObject->appendChild($objectCustomers);

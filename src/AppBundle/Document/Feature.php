@@ -17,6 +17,7 @@ class Feature
     const FEATURE_PAYMENT_PROBLEM_INTERCOM = 'payment-problem-intercom';
     const FEATURE_DAVIES_IMPORT_ERROR_EMAIL = 'davies-import-error-email';
     const FEATURE_STARLING = 'starling';
+    const FEATURE_SALVA_POLICY_UPDATE = 'salva-policy-update';
 
     public static $features = [
         self::FEATURE_QUOTE_LEAD,
