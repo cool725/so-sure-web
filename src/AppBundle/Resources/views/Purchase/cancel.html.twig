@@ -63,7 +63,7 @@
                     {{ form_widget(cancel_form.reason) }}
                 </p>
                 <p>
-                    {{ form_widget(cancel_form.cancel, {'label': 'Please cancel my policy', 'attr': {'class': 'btn btn-success'}}) }}
+                    {{ form_widget(cancel_form.cancel, {'label': 'Please cancel my policy', 'attr': {'class': 'btn btn-danger'}}) }}
                 </p>
                 {{ form_end(cancel_form) }}
             </div>
@@ -71,4 +71,11 @@
     </div>
 </div>
 
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    '@AppBundle/Resources/public/js/Purchase/cancel.js' %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
