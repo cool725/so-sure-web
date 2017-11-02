@@ -332,22 +332,12 @@
 
         // - Desktop
         @include breakpoint(desktop) {
-            padding-top: 120px;
+            padding-top: 80px;
             padding-bottom: 250px;
             background-position: left 5px;
 
             &:before {
                 background-size: 2000px;
-            }
-        }
-
-        // - HD
-        @include breakpoint(hd) {
-            padding-top: 200px;
-            padding-bottom: 400px;
-
-            &:before {
-                background-size: 3000px;
             }
         }
     }
