@@ -151,6 +151,7 @@ class DefaultController extends BaseController
             'phone' => $phone,
             's7' => $s7,
             'sixpack' => 'phone-image',
+            'device_category' => $this->get('app.request')->getDeviceCategory()
         );
 
         if ($exp == 'v2') {

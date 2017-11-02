@@ -19,13 +19,17 @@ $(function(){
     //     $(window).scroll(stickySearch);
     // }
 
+    var device = $('#ss-root').data('device-category');
+
     // Enhance the focus on the search box when input focused
     $('.search-phone').each(function(index, el) {
         var container = $(this).parents('.search-phone-form');
         $(this).on('focus', function(){
             $(container).addClass('search-phone-form--focus');
-            if (/Mobi/.test(navigator.userAgent)) {
-            $('html,body').animate({scrollTop: $(this).offset().top - 100}, 800);
+
+            if (device == 'Mobile') {
+                console.log('Mobile');
+                $('html,body').animate({scrollTop: $(this).offset().top - 100}, 800);
             }
         });
         $(this).on('blur', function(){

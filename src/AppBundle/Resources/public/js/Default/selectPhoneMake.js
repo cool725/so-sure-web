@@ -30,7 +30,7 @@ sosure.selectPhoneMake = (function() {
         }, 1000);
         if (!self.sentMixpanel) {
             self.sentMixpanel = true;
-            // sosure.track.byName('Start Search');
+            sosure.track.byName('Start Search');
         }
     }
 
@@ -75,7 +75,6 @@ sosure.selectPhoneMake = (function() {
         if (!base_path) {
             base_path = '/phone-insurance/';
         }
-        // $(form).attr('action', base_path + id + path_suffix);
         return base_path + id + path_suffix;
     }
 
@@ -164,21 +163,33 @@ $(function(){
             $(form).unbind('submit', sosure.selectPhoneMake.preventDefault);
         });
 
+        // On select add class to row
         $(input).bind('typeahead:select', function(ev, suggestion) {
             sosure.selectPhoneMake.setFormAction(suggestion.id, form);
 
             var path_suggestion = sosure.selectPhoneMake.getFormAction(suggestion.id, form);
 
             $('.tt-suggestion').find('a[href="'+path_suggestion+'"]').parent().parent().addClass('tt-selected').siblings().removeClass('tt-selected');
+
+            menuHold();
         });
 
         $(input).bind('typeahead:change', function(ev, suggestion) {
             sosure.selectPhoneMake.setFormActionVal(form, input);
         });
 
-        $(input).bind('typeahead:beforeclose', function(ev, suggestion) {
-            ev.preventDefault();
-        });
+        // On open prevent close use document click to close menu
+        function menuHold() {
+            // Prevent default behaviour
+            $(input).bind('typeahead:beforeclose', function(ev, suggestion) {
+                ev.preventDefault();
+
+                // Add back behavior on click off
+                $(document).click(function(event) {
+                    $(input).unbind('typeahead:beforeclose');
+                });
+            });
+        }
 
         if (index == 0) {
             // Focus Search Box if url param

@@ -61,7 +61,7 @@
 
     // Menu List
     .tt-suggestion {
-        padding: 15px;
+        padding: 18px 15px 15px;
         border-bottom: 1px solid $grey-light;
         vertical-align: middle;
         // cursor: pointer;
@@ -112,8 +112,8 @@
     background-color: transparent;
     border: 1px solid $primary-blue;
     color: $primary-blue;
-    font-size: 12px;
-    margin-bottom: 3px;
+    font-size: 13px;
+    margin: 0 3px 5px 0;
 
     vertical-align: middle;
     line-height: 1.4;
@@ -139,19 +139,7 @@
 // Click on suggestion and highlight calls to action
 .tt-selected {
     .btn-tt {
-        background-color: $green;
-        border-color: $green;
-        color: $white;
 
-        &:hover, &:focus {
-            background-color: darken($green, 10%);
-            border-color: darken($green, 10%);
-        }
-
-        &:active {
-            background-color: darken($green, 15%);
-            border-color: darken($green, 15%);
-        }
     }
 }
 
