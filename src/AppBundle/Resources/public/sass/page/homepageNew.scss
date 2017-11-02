@@ -26,10 +26,6 @@
         width: 100%;
         position: absolute;
         top: 0; left: 0;
-
-        // @include breakpoint(tablet) {
-        //     bottom: 0;
-        // }
     }
 
     &__bg-blue {
@@ -618,7 +614,7 @@
 
     @include border-radius(4px);
     box-shadow: 0 0 15px $grey;
-    transition: box-shadow 0.3s ease-in-out;
+    @include transition(box-shadow 0.3s ease-in-out);
 
     // search form - set width
     @include breakpoint(laptop) {
@@ -640,9 +636,6 @@
             color: $primary-blue;
         }
     }
-
-    box-shadow: 0 0 1px $primary-blue;
-    transition: box-shadow 0.5s ease-in-out;
 }
 
 .search-phone-form--sticky {
