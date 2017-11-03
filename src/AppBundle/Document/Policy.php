@@ -423,6 +423,14 @@ abstract class Policy
      */
     protected $requestedCancellation;
 
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="100")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $requestedCancellationReason;
+
     public function __construct()
     {
         $this->created = new \DateTime();
@@ -1697,6 +1705,16 @@ abstract class Policy
     public function hasRequestedCancellation()
     {
         return $this->requestedCancellation != null;
+    }
+
+    public function setRequestedCancellationReason($requestedCancellationReason)
+    {
+        $this->requestedCancellationReason = $requestedCancellationReason;
+    }
+
+    public function getRequestedCancellationReason()
+    {
+        return $this->requestedCancellationReason;
     }
 
     abstract public function validatePremium($adjust, \DateTime $date);

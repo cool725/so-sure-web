@@ -88,6 +88,13 @@
                             <li id="user-homepage--nav-renew" role="presentation" class="{% if app.request.get('_route') == 'user_renew_policy' or app.request.get('_route') == 'user_renew_policy_any' or app.request.get('_route') == 'user_renew_custom_policy' %}active{% endif %}"><a href="{{ path('user_renew_policy', {'id': policy.id }) }}">Renew your policy</a></li>
                         {% endif %}
                     {% endif %}
+                    <li role="presentation">
+                        {% if policy is defined and policy %}
+                            <a href="{{ path('claim_policy', {'policyId': policy.id}) }}">Make a claim</a>
+                        {% else %}
+                            <a href="{{ path('claim') }}">Make a claim</a>
+                        {% endif %}
+                    </li>
                 </ul>
             </nav>
         </div>

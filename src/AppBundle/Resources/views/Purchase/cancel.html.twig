@@ -32,13 +32,10 @@
                     <p>
                         Keep in mind that we take fraud very seriously and do prosecute.
                         When you purchased your policy, you confirmed that your phone was in full working condition and without a cracked screen.
-                        If you failed to disclose the state of your phone accurately, we may exercise our right to cancel the policy and will report any instance of fraud to the police.
-                        
+                        If you failed to disclose the state of your phone accurately, we may exercise our right to cancel the policy and will report any instance of fraud to the police.                        
                     </p>
                     <p>
-                        {{ form_start(cancel_form, {'attr': {'class': 'form-inline'}}) }}
-                        {{ form_widget(cancel_form.cancel, {'label': 'Please cancel my policy', 'attr': {'class': 'btn btn-success'}}) }}
-                        {{ form_end(cancel_form) }}
+                        <a href="#" class="btn btn-success" data-target="#cancelModal" data-toggle="modal">Please cancel my policy</a>
                     </p>
                 </div>
             </div>
@@ -46,4 +43,39 @@
         </div>
     </section>
 
+<div class="modal modal-middle fade"
+     id="cancelModal"
+     tabindex="-1"
+     role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Cancel your so-sure policy</h4>
+            </div>
+            <div class="modal-body">
+                {{ form_start(cancel_form, {'attr': {'class': 'form-inline'}}) }}
+                <p>
+                    Completing this form will send a request to our team to cancel your policy.
+                </p>
+                <p>
+                    Why do you want to cancel?
+                    {{ form_widget(cancel_form.reason) }}
+                </p>
+                <p>
+                    {{ form_widget(cancel_form.cancel, {'label': 'Please cancel my policy', 'attr': {'class': 'btn btn-danger'}}) }}
+                </p>
+                {{ form_end(cancel_form) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    '@AppBundle/Resources/public/js/Purchase/cancel.js' %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
