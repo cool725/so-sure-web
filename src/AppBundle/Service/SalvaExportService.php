@@ -14,6 +14,7 @@ use AppBundle\Document\Payment\Payment;
 use AppBundle\Classes\Salva;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\User;
+use AppBundle\Document\Feature;
 use AppBundle\Document\File\SalvaPolicyFile;
 use AppBundle\Document\File\SalvaPaymentFile;
 
@@ -537,7 +538,7 @@ class SalvaExportService
         $this->dm->flush();
     }
 
-    public function updatePolicyDirect(Policy $policy)
+    public function updatePolicyDirect(SalvaPhonePolicy $phonePolicy)
     {
         $phonePolicy->setSalvaStatus(SalvaPhonePolicy::SALVA_STATUS_PENDING_UPDATE);
         $this->dm->flush();
