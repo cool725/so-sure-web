@@ -679,6 +679,7 @@
             width: 200px;
             position: absolute;
             top: 20px; right: 10%;
+            z-index: 1;
 
             @include breakpoint(tablet) {
                 display: inline;
@@ -711,6 +712,7 @@
     padding: 0;
     position: relative;
     margin: 0 auto;
+    z-index: 5;
 
     // Hide the form on load
     .select-phone-form {
