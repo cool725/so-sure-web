@@ -26,6 +26,7 @@ class Feature
         self::FEATURE_PAYMENT_PROBLEM_INTERCOM,
         self::FEATURE_DAVIES_IMPORT_ERROR_EMAIL,
         self::FEATURE_STARLING,
+        self::FEATURE_SALVA_POLICY_UPDATE,
     ];
 
     /**
