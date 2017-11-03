@@ -195,6 +195,7 @@
     }
 
     &--why-we-are-better {
+        padding-bottom: 60px;
         background-color: $lightest-blue;
 
         h2 {
@@ -202,8 +203,7 @@
         }
 
         .so-sure_homepage-balloon {
-            max-width: 300px;
-            margin-bottom: 25px;
+            margin: 25px auto;
         }
 
     }
