@@ -38,6 +38,7 @@
     "fuse.js": "^3.0.4",
     "jquery-mask-plugin": "^1.14.11",
     "parsleyjs": "^2.7.2",
+    "animate.css": "^3.5.2",
     "corejs-typeahead": "^1.2.1",
     "dot": "doT#^1.1.2"
   },
@@ -128,6 +129,9 @@
       ],
       "fuse.js": [
         "bower_components/fuse.js/dist/fuse.min.js"
+      ],
+      "animate": [
+        "bower_components/animate.css/animate.min.css"
       ],
       "doT": [
         "bower_components/dot/doT.min.js"

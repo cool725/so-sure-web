@@ -13,6 +13,7 @@
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets output='css/*.css'
+    'components/animate.css/animate.min.css'
     '@AppBundle/Resources/public/sass/page/homepageNew.scss'
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
@@ -21,15 +22,54 @@
 
     {# Hero #}
     <section class="homepage--hero">
-        <div class="container">
-            <h1>Mobile Phone Insurance <br> How it Should Be</h1>
-            <p class="lead hidden-xs">Next working day replacement phone or repair when you claim <br> Up to 80% money back when you don't</p>
-            <p class="lead hidden-sm hidden-md hidden-lg">Next working day replacement phone or repair when you claim, up to 80% money back when you don't</p>
-            {% if phone %}
-                {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'homepage', 'id': phone.id })) }}
-            {% else %}
-                {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'homepage'})) }}
-            {% endif %}
+        <h1 class="homepage--hero-h1">Mobile Phone Insurance <br class="hidden-xs"> How it Should Be</h1>
+        <p class="lead">Providing exceptional experience when you claim, <br class="hidden-xs">and rewarding you and your friends when you don't</p>
+        {% if phone %}
+            {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'homepage', 'id': phone.id })) }}
+        {% else %}
+            {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'homepage'})) }}
+        {% endif %}
+        <div id="hero-character_1"
+             class="homepage--hero__character">
+            <div class="homepage--hero__tooltip animated bounce"
+                 data-content="Accidental damage cover, including cracked screen and water damage"></div>
+        </div>
+        <div id="hero-character_2"
+             class="homepage--hero__character">
+            <div class="homepage--hero__tooltip"
+                 data-content="Worldwide travel cover for trips not exceeding 90 days"></div>
+        </div>
+        <div id="hero-character_3_and_4"
+             class="homepage--hero__character clearfix">
+            <div class="left">
+                <div class="homepage--hero__tooltip"
+                 data-content="Refurbished and second-hand device cover, for phones up to 3 years old"></div>
+            </div>
+            <div class="right">
+                <div class="homepage--hero__tooltip"
+                 data-content="Out of warranty breakdown cover"></div>
+            </div>
+        </div>
+        <div id="hero-character_5_and_6"
+             class="homepage--hero__character clearfix">
+            <div class="left">
+                <div class="homepage--hero__tooltip"
+                 data-content="Theft and Loss cover as standard"></div>
+            </div>
+            <div class="right">
+                <div class="homepage--hero__tooltip"
+                 data-content="Unauthorised network charges cover (up to £1000 inc. VAT)"></div>
+            </div>
+        </div>
+        <div id="hero-character_7"
+             class="homepage--hero__character">
+            <div class="homepage--hero__tooltip homepage--hero__tooltip__reward"
+                 data-content="Next day phone replacement/repair or up to 80% of your money back when you and your friends don't claim"></div>
+             </div>
+        <div id="hero-character_8"
+             class="homepage--hero__character">
+            <div class="homepage--hero__tooltip"
+                 data-content="Accessories cover (up to £100 inc. VAT) for theft and loss claim"></div>
         </div>
     </section>
 
