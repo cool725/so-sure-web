@@ -1,0 +1,151 @@
+// typeahead.scss
+
+// Our input
+.search-phone-text {
+    width: 100%;
+    padding: 10px 15px;
+    background-color: $white;
+    border: 1px solid $grey-light;
+    color: $black;
+
+    @include border-radius(4px);
+
+    &:focus, &:active {
+        outline: none;
+    }
+}
+
+// Dynamic addition
+.twitter-typeahead {
+    width: 100%;
+    text-align: left;
+
+    > * {
+        width: 100%;
+        color: $black;
+    }
+
+    // Input style
+    .tt-input {
+        margin-bottom: 0 !important;
+    }
+
+    // Hint in input
+    .tt-hint {
+        font-family: $avenir-heavy;
+        color: $primary-blue;
+    }
+
+    .tt-menu-pad {
+        padding: 5px 3px;
+        margin-bottom: 5px;
+
+        @include breakpoint(laptop) {
+            margin-bottom: 0;
+        }
+    }
+
+    // Menu
+    .tt-menu {
+        max-height: 300px;
+        background-color: $white;
+        border: 2px solid $grey-light;
+        border-top-width: 1px;
+        overflow-y: scroll;
+
+        @include border-bottom-radius(4px);
+        @include breakpoint(laptop) {
+            max-height: 400px;
+        }
+    }
+
+    // Menu List
+    .tt-suggestion {
+        padding: 18px 15px 15px;
+        border-bottom: 1px solid $grey-light;
+        vertical-align: middle;
+        // cursor: pointer;
+
+        &:last-of-type {
+            border-bottom: none;
+        }
+    }
+
+    .tt-highlight {
+        font-family: $avenir-heavy;
+        // color: $primary-blue;
+    }
+
+}
+
+// Header / Content Addition
+.tt-menu-header {
+    font-family: $avenir-heavy;
+    font-size: 13px;
+    background-color: $off-white;
+    padding: 5px 15px 3px;
+}
+
+.tt-menu-left, .tt-menu-right {
+
+    @include breakpoint(laptop) {
+        float: left;
+        width: 50%;
+    }
+}
+
+.tt-menu-left {
+    @include breakpoint(laptop) {
+        margin-bottom: 0;
+    }
+}
+
+.tt-menu-right {
+    @include breakpoint(laptop) {
+        text-align: right;
+    }
+}
+
+// Style button move to all eventually
+.btn-tt {
+    display: inline-block;
+    background-color: transparent;
+    border: 1px solid $lightest-blue;
+    color: $primary-blue;
+    font-size: 13px;
+    margin: 0 3px 5px 0;
+
+    vertical-align: middle;
+    line-height: 1.4;
+
+    padding: 5px 10px;
+
+    @include border-radius(2px);
+    @include transition(background-color 0.5s ease);
+
+    &:hover, &:focus {
+        text-decoration: none;
+        color: $white;
+        background-color: $primary-blue;
+        border-color: $primary-blue;
+    }
+
+    &:active {
+        background-color: darken($primary-blue, 10%);
+        border-color: darken($primary-blue, 10%);
+    }
+}
+
+// Click on suggestion and highlight calls to action
+.tt-selected {
+    .btn-tt {
+        border-color: $primary-blue;
+    }
+}
+
+.empty-message {
+    padding: 15px;
+    text-align: center;
+    color: $black;
+    cursor: default;
+}

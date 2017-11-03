@@ -26,10 +26,6 @@
         width: 100%;
         position: absolute;
         top: 0; left: 0;
-
-        // @include breakpoint(tablet) {
-        //     bottom: 0;
-        // }
     }
 
     &__bg-blue {
@@ -380,15 +376,11 @@
     &--what-is-so-sure {
 
         @include breakpoint(laptop) {
+            padding-top: 80px;
+        }
 
-            .img-container {
-                padding-top: 80px;
-            }
-
-            .so-sure_homepage-what-is-so-sure {
-                max-width: 400px;
-            }
-
+        .so-sure_homepage-what-is-so-sure {
+            // max-width: 50px;
         }
 
     }
@@ -765,23 +757,33 @@
     }
 
     .twitter-typeahead {
-        width: 100%;
-        font-size: 16px;
 
         .tt-hint,
         .tt-input {
-            height: 57px;
-            padding-left: 60px;
+            height: 40px;
+            padding-left: 40px;
+            margin-bottom: 10px;
+
+            @include breakpoint(laptop) {
+                height: 57px;
+                padding-left: 60px;
+                margin-bottom: 0;
+            }
         }
 
         &:before {
             content: '\f002';
             color: $light-blue;
             font-family: FontAwesome;
-            font-size: 36px;
+            font-size: 24px;
             position: absolute;
             z-index: 10;
-            left: 5px; top: 0;
+            left: 10px; top: 0;
+
+            @include breakpoint(laptop) {
+                font-size: 34px;
+                top: 2px;
+            }
         }
 
         @include breakpoint(tablet) {
@@ -790,20 +792,34 @@
     }
 
     .tt-menu {
-        max-height: 200px;
-        margin: 0;
+        margin-top: 10px;
 
         @include breakpoint(tablet) {
-            margin: 10px 0 0;
+            width: 430px;
+            // margin-top: 67px;
         }
+
+        @include breakpoint(laptop) {
+            width: 530px;
+            // margin-top: 10px;
+        }
+
+        @include breakpoint(desktop) {
+            width: 630px;
+        }
+    }
+
+    .tt-suggestion {
+        font-size: 16px;
     }
 
     // Add style to search form - set width
     max-width: 450px;
     padding: 10px;
+
     @include border-radius(4px);
     box-shadow: 0 0 15px $grey;
-    transition: box-shadow 0.3s ease-in-out;
+    @include transition(box-shadow 0.3s ease-in-out);
 
     // search form - set width
     @include breakpoint(laptop) {
@@ -825,9 +841,6 @@
             color: $primary-blue;
         }
     }
-
-    box-shadow: 0 0 1px $primary-blue;
-    transition: box-shadow 0.5s ease-in-out;
 }
 
 .search-phone-form--sticky {

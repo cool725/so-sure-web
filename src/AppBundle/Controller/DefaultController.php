@@ -153,6 +153,7 @@ class DefaultController extends BaseController
             'phone' => $phone,
             's7' => $s7,
             'sixpack' => 'phone-image',
+            'device_category' => $this->get('app.request')->getDeviceCategory()
         );
 
         if ($exp == 'v2') {
@@ -232,11 +233,17 @@ class DefaultController extends BaseController
 
     /**
      * @Route("/search-phone", name="search_phone_data")
+     * @Route("/search-phone-combined", name="search_phone_combined_data")
      */
-    public function searchPhoneAction()
+    public function searchPhoneAction(Request $request)
     {
+        $simple = true;
+        if ($request->get('_route') == 'search_phone_combined_data') {
+            $simple = false;
+        }
+
         return new JsonResponse(
-            $this->getPhonesSearchArray()
+            $this->getPhonesSearchArray($simple)
         );
     }
 

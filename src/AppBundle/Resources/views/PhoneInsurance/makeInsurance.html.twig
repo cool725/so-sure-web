@@ -209,8 +209,9 @@
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
+    'components/dot/doT.js'
     'components/jquery_lazyload/jquery.lazyload.js'
-    'components/typeahead.js/typeahead.bundle.min.js'
+    'components/corejs-typeahead/typeahead.bundle.min.js'
     'components/fuse.js/fuse.min.js'
     'components/owl.carousel/owl.carousel.min.js'
     '@AppBundle/Resources/public/js/Default/index.js'

@@ -73,8 +73,11 @@
 }
 
 .btn-pad {
-	padding-top: 15px;
-	padding-bottom: 15px;
+
+	@include breakpoint(tablet) {
+		padding-top: 15px;
+		padding-bottom: 15px;
+	}
 }
 
 .btn-big-text {

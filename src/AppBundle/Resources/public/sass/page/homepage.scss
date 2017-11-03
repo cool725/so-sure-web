@@ -59,11 +59,42 @@ body {
 .tt-input,
 .tt-menu,
 .tt-hint {
-    width: 215px;
+    width: 100%;
 
     @include breakpoint(tablet) {
-        // width: 100%;
         width: 320px;
+    }
+}
+
+.tt-menu-left, .tt-menu-right {
+    width: 100%;
+
+    @include breakpoint(laptop) {
+        float: none;
+        text-align: left;
+    }
+}
+
+.tt-menu-header  .tt-menu-right {
+    display: none;
+}
+
+.homepage-hero-text {
+    text-align: center;
+
+    @include breakpoint(tablet) {
+        text-align: left;
+    }
+}
+
+.homepage-hero-search {
+    max-width: 420px;
+    margin: 0 auto;
+    text-align: center;
+
+    @include breakpoint(tablet) {
+        max-width: none;
+        text-align: left;
     }
 }
 
@@ -74,7 +105,7 @@ body {
 @include breakpoint(laptop) {
 
     .hero.hero-search-container {
-        padding: 20px 0 0 0;
+        padding: 20px 0;
     }
 }
 

@@ -36,7 +36,7 @@ sosure.selectPhoneMake = (function() {
 
     self.load_fuse = function() {
         $.ajax({
-            url: '/search-phone',
+            url: '/search-phone-combined',
             type: 'GET',
             success: function(result) {
                 self.fuse = new Fuse(result, self.fuse_options);
@@ -69,13 +69,17 @@ sosure.selectPhoneMake = (function() {
         }
     }
 
-    self.setFormAction = function (id, form) {
+    self.getFormAction = function (id, form) {
         var base_path = $(form).data('base-path');
         var path_suffix = $(form).data('path-suffix');
         if (!base_path) {
             base_path = '/phone-insurance/';
         }
-        $(form).attr('action', base_path + id + path_suffix);
+        return base_path + id + path_suffix;
+    }
+
+    self.setFormAction = function (id, form) {
+        $(form).attr('action', self.getFormAction(id, form));
     }
 
     self.setFormActionVal = function (form, input) {
@@ -128,6 +132,7 @@ $(function(){
             highlight: true,
             minLength: 1,
             hint: true,
+            autoselect: false,
         },
         {
             name: 'searchPhonesWithGa',
@@ -137,9 +142,16 @@ $(function(){
             templates: {
                 notFound: [
                   '<div class="empty-message">',
-                    'We couldn\x27t find that phone. Try searching for the make (e.g. iPhone 7), or <a href="mailto:hello@wearesosure.com" class="open-intercom">ask us</a>',
+                    'We couldn\x27t find that phone. <br> Try searching for the make (e.g. iPhone 7), or <a href="mailto:hello@wearesosure.com" class="open-intercom">ask us</a>',
                   '</div>'
-                ].join('\n')
+                ].join('\n'),
+                header: [
+                    '<div class="tt-menu-header clearfix">',
+                        '<div class="tt-menu-left">FIND YOUR MODEL</div>',
+                        '<div class="tt-menu-right hidden-xs hidden-sm"><i class="fa fa-angle-down" aria-hidden="true"></i>  SELECT FOR INSTANT QUOTE <i class="fa fa-angle-down" aria-hidden="true"></i></div>',
+                    '</div>'
+                ].join('\n'),
+                suggestion: doT.template('<div class="clearfix"><div class="tt-menu-left tt-menu-pad">{{=it.name}}</div><div class="tt-menu-right">{{~it.sizes :value}}<a href="/phone-insurance/{{=value.id}}" class="btn-tt">{{=value.memory}}GB</a> {{~}}</div></div>')
             }
         });
 
@@ -151,13 +163,33 @@ $(function(){
             $(form).unbind('submit', sosure.selectPhoneMake.preventDefault);
         });
 
+        // On select add class to row
         $(input).bind('typeahead:select', function(ev, suggestion) {
             sosure.selectPhoneMake.setFormAction(suggestion.id, form);
+
+            var path_suggestion = sosure.selectPhoneMake.getFormAction(suggestion.id, form);
+
+            $('.tt-suggestion').find('a[href="'+path_suggestion+'"]').parent().parent().addClass('tt-selected').siblings().removeClass('tt-selected');
+
+            menuHold();
         });
 
         $(input).bind('typeahead:change', function(ev, suggestion) {
             sosure.selectPhoneMake.setFormActionVal(form, input);
         });
+
+        // On open prevent close use document click to close menu
+        function menuHold() {
+            // Prevent default behaviour
+            $(input).bind('typeahead:beforeclose', function(ev, suggestion) {
+                ev.preventDefault();
+
+                // Add back behavior on click off
+                $(document).click(function(event) {
+                    $(input).unbind('typeahead:beforeclose');
+                });
+            });
+        }
 
         if (index == 0) {
             // Focus Search Box if url param
@@ -172,4 +204,6 @@ $(function(){
             $('.search-phone-text').focus();
         });
     }
+
 });
+

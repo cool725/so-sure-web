@@ -71,6 +71,10 @@
 	@include btn($blue-lighter, $white);
 }
 
+.btn-grey {
+	@include btn($grey, $black);
+}
+
 .btn-black {
 	@include btn($black, $white);
 

@@ -70,19 +70,4 @@ label {
         vertical-align: initial;
     }
 
-    @include breakpoint(tablet) {
-        .twitter-typeahead {
-            width: 320px;
-
-            .tt-input,
-            .tt-hint {
-                height: 52px;
-            }
-        }
-
-    }
-}
-
-.search-phone-text {
-    border-color: $grey;
 }
