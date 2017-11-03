@@ -311,6 +311,7 @@ services:
             redis:          "@snc_redis.default"
             s3:             "@aws.s3"
             environment:    "%kernel.environment%"
+            featureService: "@app.feature"
         tags:
             - { name: monolog.logger, channel: salva }
 

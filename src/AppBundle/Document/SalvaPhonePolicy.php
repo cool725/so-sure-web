@@ -41,9 +41,12 @@ class SalvaPhonePolicy extends PhonePolicy
         // Policy needs to be replaced (cancelled/created) at salva - will change to active after acceptance
     const SALVA_STATUS_PENDING_REPLACEMENT_CREATE = 'replacement-create';
 
+        // Policy needs to be updated (direct update) at salva - will change to active after acceptance
+    const SALVA_STATUS_PENDING_UPDATE = 'pending-update';
+
     /**
      * @Assert\Choice({"pending", "active", "cancelled", "wait-cancelled", "pending-cancelled",
-     *      "replacement-cancel", "replacement-create", "skipped"}, strict=true)
+     *      "replacement-cancel", "replacement-create", "skipped", "pending-update"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
