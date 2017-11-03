@@ -196,7 +196,11 @@
             #hero-character_1 {
                 width: 50px; height: 90px;
                 background-position: 0 0;
-                bottom: 5px; left: 10%;
+                bottom: 5px; left: 5%;
+
+                @include breakpoint(desktop) {
+                    left: 10%;
+                }
 
                 .homepage--hero__tooltip {
                     bottom: 92px; left: 20px;
@@ -248,7 +252,11 @@
 
             #hero-character_5_and_6 {
                 width: 100px; height: 90px;
-                bottom: -8px; right: 40%;
+                bottom: -8px; right: 35%;
+
+                @include breakpoint(desktop) {
+                    right: 40%;
+                }
 
                 // Reset to split!
                 background: transparent;
@@ -280,7 +288,11 @@
             #hero-character_7 {
                 width: 109px; height: 90px;
                 background-position: -368px 0;
-                bottom: 15px; right: 30%;
+                bottom: 15px; right: 20%;
+
+                @include breakpoint(desktop) {
+                    right: 30%;
+                }
 
                 .homepage--hero__tooltip {
                     bottom: 70px; left: 31px;
@@ -290,7 +302,11 @@
             #hero-character_8 {
                 width: 55px; height: 90px;
                 background-position: -200px 0;
-                bottom: -5px; right: 10%;
+                bottom: 0px; right: 5%;
+
+                @include breakpoint(desktop) {
+                    right: 10%;
+                }
 
                 .homepage--hero__tooltip {
                     bottom: 90px; right: 20px;
