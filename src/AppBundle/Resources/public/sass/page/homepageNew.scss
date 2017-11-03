@@ -68,11 +68,6 @@
         position: relative;
         text-align: center;
 
-        .container {
-            position: relative;
-            z-index: 99;
-        }
-
         // Heading
         &-h1 {
             color: $primary-blue;
@@ -110,7 +105,7 @@
         // Background
 
             // Mobile
-            padding: 20px 0 100px;
+            padding: 20px 15px 100px;
             background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_homepage_hero_mobile_background.svg') no-repeat center bottom;
             background-size: 85%;
 
@@ -118,7 +113,7 @@
             &__tooltip {
                 width: 40px; height: 47px;
                 position: absolute;
-                z-index: 101;
+                z-index: 2;
                 background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_hero_pin_alt.svg') no-repeat center;
 
                 &:before, &:after {
@@ -126,7 +121,6 @@
                     opacity: 0;
                     pointer-events: none;
                     position: absolute;
-                    z-index: 102;
                 }
 
                 &:before {
@@ -162,11 +156,12 @@
                 &:hover {
                     cursor: pointer;
                     background: transparent;
-                    z-index: 104;
+                    z-index: 100;
 
                     &:before, &:after {
                         pointer-events: auto;
                         opacity: 1;
+                        z-index: 100;
                         @include transform(scale3d(1,1,1));
                     }
 
@@ -183,7 +178,6 @@
 
                 // Shared
                 position: absolute;
-                z-index: 100;
 
                 // Sprite
                 background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_characters_sprites.svg') no-repeat;
@@ -336,7 +330,7 @@
                         width: 100%; height: 100%;
                         content: '';
                         position: absolute;
-                        z-index: 1;
+                        z-index: 0;
                         left: 50%;
                         margin-left: -50%;
                     }
@@ -715,10 +709,8 @@
     max-width: 450px;
     background-color: $white;
     padding: 0;
-
     position: relative;
     margin: 0 auto;
-    z-index: 99;
 
     // Hide the form on load
     .select-phone-form {
@@ -757,6 +749,7 @@
     }
 
     .twitter-typeahead {
+        z-index: 99;
 
         .tt-hint,
         .tt-input {

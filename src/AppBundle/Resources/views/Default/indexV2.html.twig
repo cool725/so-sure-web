@@ -22,15 +22,13 @@
 
     {# Hero #}
     <section class="homepage--hero">
-        <div class="container">
-            <h1 class="homepage--hero-h1">Mobile Phone Insurance <br class="hidden-xs"> How it Should Be</h1>
-            <p class="lead">Providing exceptional experience when you claim, <br class="hidden-xs">and rewarding you and your friends when you don't</p>
-            {% if phone %}
-                {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'homepage', 'id': phone.id })) }}
-            {% else %}
-                {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'homepage'})) }}
-            {% endif %}
-        </div>
+        <h1 class="homepage--hero-h1">Mobile Phone Insurance <br class="hidden-xs"> How it Should Be</h1>
+        <p class="lead">Providing exceptional experience when you claim, <br class="hidden-xs">and rewarding you and your friends when you don't</p>
+        {% if phone %}
+            {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'homepage', 'id': phone.id })) }}
+        {% else %}
+            {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'homepage'})) }}
+        {% endif %}
         <div id="hero-character_1"
              class="homepage--hero__character">
             <div class="homepage--hero__tooltip animated bounce"
