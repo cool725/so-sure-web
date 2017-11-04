@@ -56,9 +56,9 @@
                                 <li class="h4 h-light">
                                     Cost:<br>
                                     {% if policy.getPremiumPlan == 'monthly'%}
-                                        <strong>&pound;{{ policy.premium.monthlyPremiumPrice|number_format(2, '.', ',') }}</strong> per month
+                                        <strong>&pound;{{ policy.premium.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</strong> per month
                                     {% elseif policy.getPremiumPlan == 'yearly' %}
-                                        <strong>&pound;{{ policy.premium.yearlyPremiumPrice|number_format(2, '.', ',') }}</strong> a year
+                                        <strong>&pound;{{ policy.premium.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</strong> a year
                                     {% else %}
                                         Unknown
                                     {% endif %}
@@ -103,7 +103,7 @@
             {% set max_connections = policy.maxConnections %}
             {% set connection_value = policy.ConnectionValue %}
             {% set max_pot = policy.MaxPot %}
-            {% set annual_premium = policy.premium.yearlyPremiumPrice %}
+            {% set annual_premium = policy.premium.yearlyPremiumPrice(app.user.additionalPremium) %}
             {# Include reward slider hide title #}
             {% include 'AppBundle::Default/_rewardSlider.html.twig' with { show_title: false} %}
         </div>

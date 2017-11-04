@@ -15,13 +15,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\OptOut\EmailOptOut;
 
-class UserPermissionType extends AbstractType
+class UserHighRiskType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('enabled', ChoiceType::class, ['expanded' => true, 'choices' => ['Yes' => true, 'No' => false]])
-            ->add('locked', ChoiceType::class, ['expanded' => true, 'choices' => ['Yes' => true, 'No' => false]])
+            ->add('highRisk', ChoiceType::class, ['expanded' => true, 'choices' => ['Yes' => true, 'No' => false]])
             ->add('update', SubmitType::class)
         ;
     }

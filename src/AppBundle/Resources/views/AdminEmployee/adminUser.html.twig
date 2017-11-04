@@ -102,6 +102,20 @@
                     </td>
                 </tr>
                 <tr>
+                    <td>User High Risk</td>
+                    <td>
+                        {% if user.highRisk %}
+                            <strong>Yes (additional £500 premium / yearly only)</strong>
+                        {% else %}
+                            No
+                        {%endif %}
+                    </td>
+                    <td>
+                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#userHighRiskModal"
+                            ><i class="fa fa-edit"></i> Edit User High Risk</button>
+                    </td>
+                </tr>
+                <tr>
                     <td>Policies</td>
                     <td>
                         {% for policy in user.allPolicies %}
@@ -317,12 +331,6 @@
                         {{ form_widget(user_permission_form.locked) }}
                         <strong>Too many login attempts - Will disable user from logging in until password reset</strong>
                     </div>
-                    <div class="form-group">
-                        {{ form_label(user_permission_form.disallowRenewal) }}
-                        {{ form_errors(user_permission_form.disallowRenewal) }}
-                        {{ form_widget(user_permission_form.disallowRenewal) }}
-                        <strong>If yes, will prevent user from being able to renew their policy. Only disallow in rare cases.</strong>
-                    </div>
                 </div>
             </div>
           </div>
@@ -330,6 +338,34 @@
                 {{ form_widget(user_permission_form.update, {'label': 'Update User Permissions', 'attr': {'class': 'btn btn-success'}}) }}
           </div>
           {{ form_end(user_permission_form )}}
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="userHighRiskModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document" style="width: 60%;">
+        <div class="modal-content">
+            {{ form_start(user_high_risk_form )}}
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Change User High Risk</h4>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        {{ form_label(user_high_risk_form.highRisk) }}
+                        {{ form_errors(user_high_risk_form.highRisk) }}
+                        {{ form_widget(user_high_risk_form.highRisk) }}
+                        <strong>Will add £500 to premium & yearly only purchase</strong>
+                    </div>
+                </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+                {{ form_widget(user_high_risk_form.update, {'label': 'Update User High Risk', 'attr': {'class': 'btn btn-success'}}) }}
+          </div>
+          {{ form_end(user_high_risk_form )}}
         </div>
       </div>
     </div>

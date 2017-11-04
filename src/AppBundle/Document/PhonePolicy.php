@@ -113,7 +113,12 @@ class PhonePolicy extends Policy
 
         // Only set premium if not already present
         if (!$this->getPremium()) {
-            $this->setPremium($phone->getCurrentPhonePrice($date)->createPremium($date));
+            $additionalPremium = null;
+            if ($this->getUser()) {
+                $additionalPremium = $this->getUser()->getAdditionalPremium();
+            }
+            $price = $phone->getCurrentPhonePrice($date);
+            $this->setPremium($price->createPremium($additionalPremium, $date));
         }
     }
 
@@ -466,7 +471,11 @@ class PhonePolicy extends Policy
         if (!$phonePrice) {
             throw new \UnexpectedValueException(sprintf('Missing phone price'));
         }
-        $expectedPremium = $phonePrice->createPremium($date);
+        $additionalPremium = null;
+        if ($this->getUser()) {
+            $additionalPremium = $this->getUser()->getAdditionalPremium();
+        }
+        $expectedPremium = $phonePrice->createPremium($additionalPremium, $date);
 
         if ($this->getPremium()!= $expectedPremium) {
             if ($adjust) {
