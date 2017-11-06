@@ -480,9 +480,13 @@
         }
 
         ul {
+            padding-left: 30px;
+            margin-bottom: 30px;
 
             h4 {
                 cursor: pointer;
+                margin: 0;
+                padding: 20px 0;
 
                 &:after {
                     display: inline-block;
