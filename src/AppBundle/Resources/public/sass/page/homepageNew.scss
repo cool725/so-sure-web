@@ -418,6 +418,10 @@
     &--cover-details {
         text-align: center;
 
+        &__item {
+            cursor: pointer;
+        }
+
         img {
             width: 200px;
         }

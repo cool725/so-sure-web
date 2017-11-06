@@ -175,22 +175,34 @@
                 <div class="col-md-10 col-md-offset-1">
                     <div class="row">
                         <div class="col-sm-6 col-md-4">
-                            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-                                 data-src="{{ cdn_url }}/images/homepage/so-sure_theft.svg"
-                                 alt="so-sure cover - Theft">
-                            <h4>Theft</h4>
+                            <div class="homepage--cover-details__item"
+                                 data-toggle="modal"
+                                 data-target="#theft-modal">
+                                <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                                     data-src="{{ cdn_url }}/images/homepage/so-sure_theft.svg"
+                                     alt="so-sure cover - Theft">
+                                <h4>Theft</h4>
+                            </div>
                         </div>
                         <div class="col-sm-6 col-md-4">
-                            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-                                 data-src="{{ cdn_url }}/images/homepage/so-sure_loss.svg"
-                                 alt="so-sure cover - Loss">
-                            <h4>Loss</h4>
+                            <div class="homepage--cover-details__item"
+                                 data-toggle="modal"
+                                 data-target="#loss-modal">
+                                <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                                     data-src="{{ cdn_url }}/images/homepage/so-sure_loss.svg"
+                                     alt="so-sure cover - Loss">
+                                <h4>Loss</h4>
+                            </div>
                         </div>
                         <div class="col-sm-6 col-md-4">
-                            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-                                 data-src="{{ cdn_url }}/images/homepage/so-sure_accidental_damage.svg"
-                                 alt="so-sure cover - Accidental Damage">
-                            <h4>Accidental Damage</h4>
+                            <div class="homepage--cover-details__item"
+                                 data-toggle="modal"
+                                 data-target="#accidental-damage-modal">
+                                <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                                     data-src="{{ cdn_url }}/images/homepage/so-sure_accidental_damage.svg"
+                                     alt="so-sure cover - Accidental Damage">
+                                <h4>Accidental Damage</h4>
+                            </div>
                         </div>
                         <div class="col-sm-6 col-md-4">
                             <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
@@ -291,11 +303,6 @@
                     <p class="lead">This means that there’s no nasty surprises when you have an issue with your device.</p>
                 </div>
             </div>
-{#             <ol class="ol--blue-counter">
-                <li class="h4 h-light">Excess: £70 for Theft/Loss and £50 for Accidental Damage/Breakdown</li>
-                <li class="h4 h-light">Theft, Loss, Accidental Damage or Breakdown where you have knowingly put your phone at risk</li>
-                <li class="h4 h-light">3+ claims for Loss and/or Theft in any policy year</li>
-            </ol> #}
         </div>
     </section>
 
@@ -506,7 +513,7 @@
     </section>
 
     {# Page Modals #}
-
+    {% include 'AppBundle::Default/_coverModals.html.twig' %}
     {# End Page Modals #}
 
 {% endblock %}

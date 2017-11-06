@@ -160,3 +160,42 @@
 	}
 
 }
+
+.modal-blue {
+
+	.modal-content {
+		background-color: $light-blue;
+		@include border-radius(8px);
+	}
+
+	.modal-body {
+		font-size: 14px;
+
+		.highlight-text {
+			background-color: $lightest-blue;
+			padding: 10px 15px;
+			@include border-radius(4px);
+		}
+
+		> * {
+			margin-bottom: 15px;
+		}
+	}
+
+	.close {
+		width: 30px; height: 30px;
+		position: absolute;
+		font-size: 14px;
+		top: 10px; right: 10px;
+
+		color: $white;
+		text-shadow: none;
+		background: $primary-blue;
+
+		@include border-radius(50%);
+
+		&:hover {
+			background-color: darken($primary-blue, 10%);
+		}
+	}
+}
