@@ -484,10 +484,10 @@
         }
 
         ul {
-            padding-left: 30px;
             margin-bottom: 30px;
 
             h4 {
+                color: $primary-blue;
                 cursor: pointer;
                 margin: 0;
                 padding: 20px 0;
@@ -495,8 +495,8 @@
                 &:after {
                     display: inline-block;
                     font-family: FontAwesome;
+                    color: $black;
                     content: '\f106';
-                    color: $primary-blue;
                     padding-left: 10px;
                 }
             }
@@ -511,6 +511,10 @@
                 background-color: $lightest-blue;
                 padding: 15px;
                 @include border-radius(8px);
+            }
+
+            @include breakpoint(tablet) {
+                padding-left: 30px;
             }
         }
     }
