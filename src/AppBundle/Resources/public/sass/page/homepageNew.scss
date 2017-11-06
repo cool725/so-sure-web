@@ -479,14 +479,32 @@
             z-index: 2;
         }
 
-        ol {
-            max-width: 860px;
-            margin: 0 auto;
+        ul {
 
-            li {
-                margin-bottom: 15px;
-                padding-top: 5px;
+            h4 {
+                cursor: pointer;
+
+                &:after {
+                    display: inline-block;
+                    font-family: FontAwesome;
+                    content: '\f106';
+                    color: $primary-blue;
+                    padding-left: 10px;
+                }
             }
+
+            h4.collapsed {
+                &:after {
+                    content: '\f107';
+                }
+            }
+
+            p {
+                background-color: $lightest-blue;
+                padding: 15px;
+                @include border-radius(8px);
+            }
+
         }
     }
 
