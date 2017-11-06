@@ -942,6 +942,13 @@ abstract class BaseController extends Controller
             return false;
         }
 
+        $redis = $this->get('snc_redis.default');
+        $key = sprintf('UNKNOWN-DEVICE:%s', $device);
+        if ($redis->get($key)) {
+            return false;
+        }
+        $redis->setex($key, '1', 3600);
+
         $body = sprintf(
             'Unknown device queried: %s (%s GB). If device exists, memory may be higher than expected',
             $device,
