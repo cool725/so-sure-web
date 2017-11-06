@@ -575,12 +575,32 @@
         text-align: center;
 
         .large-no {
+            position: relative;
             display: inline-block;
             font-size: 128px;
             font-family: $avenir-heavy;
             line-height: 1;
             color: $primary-blue;
             margin-top: 20px;
+
+            &--arrow {
+
+                @include breakpoint(laptop) {
+                    &:after {
+                        width: 163px; height: 26px;
+                        content: '';
+                        position: absolute;
+                        right: -203px; top: 40px;
+                        background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_arrow_right.svg') no-repeat center;
+                    }
+                }
+
+                @include breakpoint(desktop) {
+                    &:after {
+                        right: -233px;
+                    }
+                }
+            }
         }
 
         h4 {
