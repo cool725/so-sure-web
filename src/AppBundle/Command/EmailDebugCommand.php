@@ -46,7 +46,7 @@ class EmailDebugCommand extends BaseCommand
             ->addArgument(
                 'template',
                 InputArgument::REQUIRED,
-                'Template (e.g. cashback/approved'
+                'Template (e.g. cashback/approved)'
             )
         ;
     }
@@ -80,6 +80,9 @@ class EmailDebugCommand extends BaseCommand
             ],
             'policyConnection' => [
                 'policy/connectionReduction',
+            ],
+            'policy' => [
+                'policy/new',
             ],
             'policyRenewal' => [
                 'policy/pendingRenewal',
@@ -155,6 +158,19 @@ class EmailDebugCommand extends BaseCommand
             $policyService = $this->getContainer()->get('app.policy');
 
             return $policyService->connectionReduced($connection);
+        } elseif (in_array($template, $templates['policy'])) {
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(Policy::class);
+            $policies = $repo->findBy(['status' => Policy::STATUS_ACTIVE]);
+            foreach ($policies as $policy) {
+                break;
+            }
+            if (!$policy) {
+                throw new \Exception('Unable to find matching policy');
+            }
+            $policyService = $this->getContainer()->get('app.policy');
+
+            return $policyService->resendPolicyEmail($policy);
         } elseif (in_array($template, $templates['policyRenewal'])) {
             $dm = $this->getManager();
             $repo = $dm->getRepository(Policy::class);

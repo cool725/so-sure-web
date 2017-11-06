@@ -970,7 +970,10 @@ class PolicyService
             );
             $policy->setLastEmailed(new \DateTime());
         } catch (\Exception $e) {
-            $this->logger->error(sprintf('Failed sending policy email to %s', $policy->getUser()->getEmail()));
+            $this->logger->error(
+                sprintf('Failed sending policy email to %s', $policy->getUser()->getEmail()),
+                ['exception' => $e]
+            );
         }
     }
 
