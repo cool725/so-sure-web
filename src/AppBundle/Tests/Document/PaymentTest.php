@@ -28,7 +28,7 @@ class PaymentTest extends \PHPUnit_Framework_TestCase
         $phonePrice = new PhonePrice();
         $phonePrice->setGwp(5);
         $date = new \DateTime('2016-05-01');
-        $premium = $phonePrice->createPremium($date);
+        $premium = $phonePrice->createPremium(null, $date);
 
         $phonePolicy = new SalvaPhonePolicy();
         $phonePolicy->setPremium($premium);

@@ -112,7 +112,7 @@ class RefundListenerTest extends WebTestCase
         // simulate a free month - judo refund + so-sure addition
         static::addPayment(
             $policy,
-            0 - $policy->getPremium()->getMonthlyPremiumPrice(new \DateTime('2016-11-01')),
+            0 - $policy->getPremium()->getMonthlyPremiumPrice(null, new \DateTime('2016-11-01')),
             0 - Salva::MONTHLY_TOTAL_COMMISSION,
             null,
             new \DateTime('2016-11-01')
@@ -166,7 +166,7 @@ class RefundListenerTest extends WebTestCase
         // simulate a free month - judo refund + so-sure addition
         static::addPayment(
             $policy,
-            0 - $policy->getPremium()->getMonthlyPremiumPrice(new \DateTime('2016-11-01')),
+            0 - $policy->getPremium()->getMonthlyPremiumPrice(null, new \DateTime('2016-11-01')),
             0 - Salva::MONTHLY_TOTAL_COMMISSION,
             null,
             new \DateTime('2016-11-01')

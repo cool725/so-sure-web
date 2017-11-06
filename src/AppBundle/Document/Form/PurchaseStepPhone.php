@@ -91,9 +91,10 @@ class PurchaseStepPhone
 
     public function setAmount($amount)
     {
+        $additionalPremium = $this->getUser()->getAdditionalPremium();
         $price = $this->getPhone()->getCurrentPhonePrice();
-        if (!$this->areEqualToTwoDp($amount, $price->getMonthlyPremiumPrice()) &&
-            !$this->areEqualToTwoDp($amount, $price->getYearlyPremiumPrice())) {
+        if (!$this->areEqualToTwoDp($amount, $price->getMonthlyPremiumPrice($additionalPremium)) &&
+            !$this->areEqualToTwoDp($amount, $price->getYearlyPremiumPrice($additionalPremium))) {
             throw new \InvalidArgumentException(sprintf('Amount must be a monthly or annual figure'));
         }
         $this->amount = $amount;

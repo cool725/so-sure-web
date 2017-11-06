@@ -298,12 +298,6 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $user->setEnabled(true);
         $this->assertTrue($user->canRenewPolicy($policy));
 
-        $user->setDisallowRenewal(true);
-        $this->assertFalse($user->canRenewPolicy($policy));
-
-        $user->setDisallowRenewal(false);
-        $this->assertTrue($user->canRenewPolicy($policy));
-
         $policyB = new PhonePolicy();
         $user = new User();
         $user->setLocked(false);

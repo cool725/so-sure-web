@@ -34,10 +34,10 @@ class PhonePrice extends Price
         return PhonePolicy::STANDARD_VALUE + $promoAddition;
     }
 
-    public function createPremium(\DateTime $date = null)
+    public function createPremium($additionalGwp = null, \DateTime $date = null)
     {
         $premium = new PhonePremium();
-        $this->populatePremium($premium, $date);
+        $this->populatePremium($premium, $additionalGwp, $date);
 
         return $premium;
     }
