@@ -1072,14 +1072,14 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/tm", name="tm_redirect")
+     * @Route("/trinitiymaxwell", name="trinitiymaxwell_redirect")
      */
     public function tmAction()
     {
         return new RedirectResponse($this->generateUrl('homepage', [
             'utm_medium' => 'flyer',
             'utm_source' => 'sosure',
-            'utm_campaign' => 'tm',
+            'utm_campaign' => 'trinitiymaxwell',
         ]));
     }
 }
