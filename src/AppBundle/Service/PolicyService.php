@@ -1061,8 +1061,8 @@ class PolicyService
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
 
         $this->mailer->sendTemplate(
-            sprintf('Claim %s should be closed', $claim->getNumber()),
-            'claims@wearesosure.com',
+            sprintf('@%s Claim should be closed', $claim->getNumber()),
+            'update-claim@wearesosure.com',
             $htmlTemplate,
             ['claim' => $claim],
             null,
@@ -1620,12 +1620,12 @@ class PolicyService
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
 
         $subject = sprintf(
-            'Claim %s should be finalised',
+            '@%s Claim should be finalised',
             $claim->getNumber()
         );
         $this->mailer->sendTemplate(
             $subject,
-            'claims@wearesosure.com',
+            'update-claim@wearesosure.com',
             $htmlTemplate,
             ['claim' => $claim, 'cancellationDate' => $cancellationDate],
             null,
