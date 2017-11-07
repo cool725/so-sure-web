@@ -514,15 +514,15 @@
                     position: absolute;
                     top: 0; left: -75px;
                     text-align: center;
-                    color: $white;
-                    font-family: $avenir-heavy;
+                    color: $grey;
+                    font-family: 'arial black';
                     font-size: 34px;
-                    line-height: 1.7;
+                    line-height: 1.4;
 
-                    border: 6px solid $amber;
-                    text-shadow: 0 2px 0 darken($amber, 15%);
-                    box-shadow: 0 2px 0 darken($amber, 15%), darken($amber, 15%) 0px 2px 0 inset;
-                    background-color: darken($amber, 10%);
+                    border: 6px solid $gold;
+                    text-shadow: 1px 1px 0 $off-white;
+                    box-shadow: 0 2px 0 $gold-dark, $gold-dark 0px 2px 0 inset;
+                    background-color: $silver;
                 }
             }
         }
@@ -533,6 +533,20 @@
 
             @include breakpoint(tablet) {
                 max-width: 300px;
+            }
+        }
+
+        .link-text {
+            display: inline-block;
+            background-color: darken($lightest-blue, 5%);
+            padding: 20px 30px;
+            font-weight: bold;
+            color: $primary-blue;
+            @include border-radius(4px);
+
+            a {
+                text-decoration: underline;
+                font-family: $avenir-heavy;
             }
         }
 

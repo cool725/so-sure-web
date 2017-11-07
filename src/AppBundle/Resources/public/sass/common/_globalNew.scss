@@ -165,6 +165,13 @@ hr {
 		text-decoration: underline !important;
 	}
 
+	.text-highlight {
+		display: inline-block;
+		padding: 3px 10px;
+        background-color: darken($lightest-blue, 5%);
+		@include border-radius(3px);
+	}
+
 	// Backgrounds
 	.background-white {
 		background-color: $white;
