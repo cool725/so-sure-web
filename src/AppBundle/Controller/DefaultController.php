@@ -398,7 +398,7 @@ class DefaultController extends BaseController
                     );
                     $mailer->sendTemplate(
                         $subject,
-                        'claims@wearesosure.com',
+                        'new-claim@wearesosure.com',
                         'AppBundle:Email:claim/fnolToClaims.html.twig',
                         ['data' => $claimFnol]
                     );
