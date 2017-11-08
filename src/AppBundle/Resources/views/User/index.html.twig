@@ -262,7 +262,7 @@
                     <h4>Email an invite:</h4>
                     <p><small>Just enter their email below and we'll do the rest..</small></p>
                     <div class="row">
-                        {{ form_start(email_form, {'attr': {'class': 'col-sm-8 col-sm-offset-2', 'autocomplete': 'off'}}) }}
+                        {{ form_start(email_form, {'attr': {'class': 'col-sm-8 col-sm-offset-2', 'autocomplete': 'nope'}}) }}
                             <div class="form-group">
                                 {{ form_errors(email_form.email) }}
                                 <div class="input-group">
