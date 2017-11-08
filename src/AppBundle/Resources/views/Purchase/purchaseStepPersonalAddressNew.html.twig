@@ -10,6 +10,11 @@
 {% set showAddress = purchase_form.addressLine1.vars.data | length > 0 or purchase_form.postcode.vars.data | length > 0 %}
 {% set showDOB = purchase_form.name.vars.data | length > 0 and purchase_form.email.vars.data | length > 0 %}
 
+{% set starling = false %}
+{% if app is not null and app.session.isStarted and app.session.get('partner') == 'starling' %}
+    {% set starling = true %}
+{% endif %}
+
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets output='css/*.css'
@@ -120,6 +125,13 @@
                 {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'data-client-validation': form_client_validation}}) }}
 
                     <div class="form-step">
+                        {% if feature_enabled('starling') and starling %}
+                            <a class="btn btn-block btn-starling btn-pad" href="/login/starling"><img src="{{ cdn_url }}/images/StarlingMarkIcon.png" height="20px"> &nbsp;Login with Starling</a>
+                            <div class="text-break text-grey">
+                                <div class="line"></div>OR<div class="line"></div>
+                            </div>
+                        {% endif %}
+
                         <div class="form-group {% if form_errors(purchase_form.firstName) %}has-error{% endif %}">
                             {{ form_label(purchase_form.name, 'Full Name:', { 'label_attr': {'class': 'sr-only'} }) }}
                             {{ form_widget(purchase_form.name, {'attr':{'class':'form-control', 'placeholder': 'Full Name'}}) }}
@@ -145,7 +157,7 @@
                                {% if app.user %}disabled{% endif %}>
                                 <i class="fa fa-facebook-official"></i> &nbsp;Login with Facebook
                             </a>
-                            {% if feature_enabled('starling') %}
+                            {% if feature_enabled('starling') and not starling %}
                                 <div class="text-break text-grey">
                                     <div class="line"></div>OR<div class="line"></div>
                                 </div>
