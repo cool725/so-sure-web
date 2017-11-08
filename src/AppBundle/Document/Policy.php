@@ -3950,6 +3950,11 @@ abstract class Policy
             return true;
         }
 
+        // If user forgot to pay and doesn't have a claim we will allow re-purchase
+        if ($this->getStatus() == self::STATUS_CANCELLED && count($this->getClaims()) == 0) {
+            return true;
+        }
+
         return false;
     }
 
