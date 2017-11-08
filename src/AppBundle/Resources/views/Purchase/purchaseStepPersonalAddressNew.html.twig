@@ -126,10 +126,11 @@
 
                     <div class="form-step">
                         {% if feature_enabled('starling') and starling %}
-                            <a class="btn btn-block btn-starling btn-pad" href="/login/starling"><img src="{{ cdn_url }}/images/StarlingMarkIcon.png" height="20px"> &nbsp;Login with Starling</a>
+                            <a class="btn btn-block btn-starling btn-pad" href="/login/starling"><img src="{{ cdn_url }}/images/StarlingMarkIcon.png" height="20px"> &nbsp;Continue with Starling</a>
                             <div class="text-break text-grey">
                                 <div class="line"></div>OR<div class="line"></div>
                             </div>
+                            <p class="help-block text-center">If you prefer you can enter your details manually</p>
                         {% endif %}
 
                         <div class="form-group {% if form_errors(purchase_form.firstName) %}has-error{% endif %}">
@@ -155,7 +156,7 @@
                                formnovalidate="formnovalidate"
                                class="btn btn-facebook btn-block btn-pad"
                                {% if app.user %}disabled{% endif %}>
-                                <i class="fa fa-facebook-official"></i> &nbsp;Login with Facebook
+                                <i class="fa fa-facebook-official"></i> &nbsp;Continue with Facebook
                             </a>
                             {% if feature_enabled('starling') and not starling %}
                                 <div class="text-break text-grey">
