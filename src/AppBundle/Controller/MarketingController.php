@@ -34,9 +34,9 @@ class MarketingController extends BaseController
     }
 
     /**
-     * @Route("/trinitiymaxwell", name="trinitiymaxwell_redirect")
+     * @Route("/trinitymaxwell", name="trinitiymaxwell_redirect")
      */
-    public function tmAction()
+    public function trinityMaxwellAction()
     {
         return new RedirectResponse($this->generateUrl('homepage', [
             'utm_medium' => 'flyer',
