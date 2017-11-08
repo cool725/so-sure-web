@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-        <div class="container">
+        <div class="container" style="margin-bottom: 50px;">
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-12 text-center">
                     <h3>Pay the Remainder of Your Policy Premium</h3>
                     {% if webpay_action and webpay_reference and amount > 0 %}
                     <p class="lead">Click below to pay for the remainder (£{{ amount|number_format(2, '.', ',') }}) of your {{ policy.policyNumber }} policy for your {{ policy.phone }}.</p>
@@ -15,6 +15,9 @@
                             </div>
                         </div>
                     </form>
+                    {% if policy.displayRepurchase %}
+                        <a href="{{ path('user_repurchase_policy', {'id': policy.id }) }}" class="btn btn-info">Repurchase your policy</a>
+                    {% endif %}
                   {% elseif amount == 0 %}
                     <h3>Your {{ policy.policyNumber }} policy for your {{ policy.phone }} has been fully paid.</h3>
                   {% endif %}
