@@ -112,7 +112,7 @@ class AdminEmployeeController extends BaseController
     {
         return ['randomImei' => self::generateRandomImei()];
     }
-    
+
     /**
      * @Route("/phones", name="admin_phones")
      * @Template
@@ -1293,7 +1293,7 @@ class AdminEmployeeController extends BaseController
                             $this->addFlash('success', sprintf(
                                 'Added reward connection'
                             ));
-    
+
                             return new RedirectResponse($this->generateUrl('admin_rewards'));
                         } else {
                             throw new \InvalidArgumentException(sprintf(
@@ -1334,7 +1334,7 @@ class AdminEmployeeController extends BaseController
                         $this->addFlash('success', sprintf(
                             'Added reward'
                         ));
-    
+
                         return new RedirectResponse($this->generateUrl('admin_rewards'));
                     } else {
                         throw new \InvalidArgumentException(sprintf(
