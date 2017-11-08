@@ -15,7 +15,7 @@ class ChargebackPaymentRepository extends PaymentRepository
         $qb = $this->createQueryBuilder()
             ->field('policy')->equals(null);
         if ($amount) {
-            $qb->field('amount')->equals($amount);
+            $qb->field('amount')->equals((float) $amount);
         }
 
         return $qb;
