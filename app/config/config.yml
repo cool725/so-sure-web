@@ -716,6 +716,7 @@ nelmio_security:
                 - https://chart.googleapis.com
                 # linkedin
                 - https://secure.adnxs.com
+                - https://*.bizographics.com
                 - https://www.accountkit.com
                 - https://www.glassdoor.co.uk
                 - 'data:'
