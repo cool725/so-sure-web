@@ -23,8 +23,12 @@
     {# Hero #}
     <section class="homepage--hero">
         <h1 class="homepage--hero-h1">Mobile Phone Insurance <br class="hidden-xs"> How it Should Be</h1>
-        <p class="lead">Providing exceptional experience when you claim, <br class="hidden-xs">and rewarding you and your friends when you don't</p>
-        {% if phone %}
+        {% if partner is defined and partner == 'starling' %}
+            <p class="lead">in partnership with starling</p>
+        {% else %}
+            <p class="lead">Providing exceptional experience when you claim, <br class="hidden-xs">and rewarding you and your friends when you don't</p>
+        {% endif %}
+        {% if phone is defined and phone %}
             {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'homepage', 'id': phone.id })) }}
         {% else %}
             {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'homepage'})) }}
@@ -449,7 +453,7 @@
     <section class="homepage--instant-quote">
         <div class="container">
             <h2 class="text-center h1">Get Your Instant Quote</h2>
-            {% if phone %}
+            {% if phone is defined and phone %}
                 {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'footer', 'id': phone.id })) }}
             {% else %}
                 {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'footer'})) }}
