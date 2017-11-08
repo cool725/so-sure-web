@@ -26,6 +26,7 @@ class PhonePolicy extends Policy
     const PICSURE_STATUS_REJECTED = 'rejected';
     const PICSURE_STATUS_MANUAL = 'manual';
     const PICSURE_STATUS_INVALID = 'invalid';
+    const PICSURE_STATUS_DISABLED = 'disabled';
 
     use ArrayToApiArrayTrait;
 
@@ -497,6 +498,10 @@ class PhonePolicy extends Policy
 
     public function getPicSureStatus()
     {
+        if (!$this->picSureStatus && $this->getPolicyTerms() && !$this->getPolicyTerms()->isPicSureEnabled()) {
+            return self::PICSURE_STATUS_DISABLED;
+        }
+
         return $this->picSureStatus;
     }
 
