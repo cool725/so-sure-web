@@ -32,7 +32,7 @@
             <a id="corporate-get-quote"
                href="#"
                class="btn btn-green btn-lg scroll-to"
-               data-scroll-to-anchor="#corporate-get-quote-form">Make a claim</a>
+               data-scroll-to-anchor="#claim-form">Make a claim</a>
         </div>
     </section>
 
@@ -44,7 +44,7 @@
                     <h2 class="text-blue text-center">Let us know a few more details and one of our claim handlers
                     will call you during business hours</h2>
 
-                    {{ form_start(claim_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'data-client-validation': form_client_validation }}) }}
+                    {{ form_start(claim_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'id':'claim-form', 'data-client-validation': form_client_validation }}) }}
                         <div class="row">
                             <div class="col-sm-12 text-center">
                                 <div class="form-group {% if form_errors(claim_form.signature) %}has-error{% endif %}">
@@ -164,6 +164,7 @@
     'components/jquery-mask-plugin/jquery.mask.min.js'
     'components/jquery-validation/jquery.validate.js'
     '@AppBundle/Resources/public/js/Default/jqueryValidatorMethods.js'
+    '@AppBundle/Resources/public/js/Default/index.js'
     '@AppBundle/Resources/public/js/Default/claim.js' %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
