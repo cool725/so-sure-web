@@ -56,12 +56,12 @@
           {% endif %}
           data-base-path="{{ basePath }}"
           data-path-suffix="{{ pathSuffix }}"
-          class="{{ formClass }}">
+          class="{{ formClass }}"
+          autocomplete="off">
         <div class="form-group">
             <input type="text"
                    class="required search-phone-text search-phone"
                    placeholder="Find your phone (e.g. iPhone 7)"
-                   autocomplete="off"
                    value="{% if phone %}{{ phone }}{% endif %}" />
         </div>
         {% if secondaryBtn == true  %}
