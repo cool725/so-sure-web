@@ -77,9 +77,9 @@ class PolicyPayCommand extends ContainerAwareCommand
         $phone = $policy->getPhone();
 
         if ($payments == 12) {
-            $amount = $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice($date);
+            $amount = $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(null, $date);
         } elseif ($payments = 1) {
-            $amount = $phone->getCurrentPhonePrice()->getYearlyPremiumPrice($date);
+            $amount = $phone->getCurrentPhonePrice()->getYearlyPremiumPrice(null, $date);
         } else {
             throw new \Exception('1 or 12 payments only');
         }
