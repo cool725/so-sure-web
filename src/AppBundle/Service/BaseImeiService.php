@@ -118,9 +118,9 @@ class BaseImeiService
         return array_sum(str_split($str)) % 10 === 0;
     }
 
-    public function ocr($filename, $make)
+    public function ocr($filename, $make, $extension = null)
     {
-        $results = $this->ocrRaw($filename);
+        $results = $this->ocrRaw($filename, $extension);
 
         return $this->parseOcr($results, $make);
     }
@@ -155,20 +155,20 @@ class BaseImeiService
     public function parseOcr($results, $make)
     {
         $noSpace = str_replace(' ', '', $results);
-        
+        // print_r($noSpace);
         if ($make == "Apple") {
-            if (preg_match('/SerialNumber([A-Z0-9]+).*(IMEI|lMEI)(\d{15})/s', $noSpace, $matches)) {
+            if (preg_match('/SerialNumber([A-Z0-9]+).*([Il]ME[Il])(\d{15})/s', $noSpace, $matches)) {
                 // Expected case
                 return ['imei' => $matches[3], 'serialNumber' => $matches[1]];
-            } elseif (preg_match('/(IMEI|lMEI)(\d{15})/', $noSpace, $matches)) {
+            } elseif (preg_match('/([Il]ME[Il])(\d{15})/', $noSpace, $matches)) {
                 // Expected case if non-english language (serial number copy is different)
                 $serialNumber = $this->findSerialNumberByLinePosition($results, $matches[2]);
 
                 return ['imei' => $matches[2], 'serialNumber' => $serialNumber];
-            } elseif (preg_match('/SerialNumber([A-Z0-9]+).*(IMEI|lMEI)(\d{14})A/s', $noSpace, $matches)) {
+            } elseif (preg_match('/SerialNumber([A-Z0-9]+).*([Il]ME[Il])(\d{14})A/s', $noSpace, $matches)) {
                 // 14 digit IMEI followed by A
                 return ['imei' => $this->luhnGenerate($matches[3]), 'serialNumber' => $matches[1]];
-            } elseif (preg_match('/(IMEI|lMEI)(\d{14})A/', $noSpace, $matches)) {
+            } elseif (preg_match('/([Il]ME[Il])(\d{14})A/', $noSpace, $matches)) {
                 // 14 digit IMEI followed by A with non-english language (serial number copy is different)
                 $serialNumber = $this->findSerialNumberByLinePosition($results, $matches[2]);
 
@@ -190,14 +190,27 @@ class BaseImeiService
         return null;
     }
 
-    public function ocrRaw($filename)
+    public function ocrRaw($filename, $extension = null)
     {
-        $ocr = new \TesseractOCR($filename);
+        $imagine = new \Imagine\Gd\Imagine();
+        $image = $imagine->open($filename);
+        $image->effects()
+            ->grayscale();
+        $path = pathinfo($filename);
+        $file = sprintf('%s/gray-%s-%s', sys_get_temp_dir(), time(), $path['basename']);
+        if ($extension) {
+            $file = sprintf('%s.%s', $file, $extension);
+        }
+        $image->save($file);
+
+        $ocr = new \TesseractOCR($file);
         $results = $ocr
             ->psm(6) // singleBlock
             ->lang('eng')
             ->config('tessedit_ocr_engine_mode', '2') // tesseractCubeCombined
             ->run();
+    
+        unlink($file);
 
         return $results;
     }

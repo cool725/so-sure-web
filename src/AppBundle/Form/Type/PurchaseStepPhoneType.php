@@ -106,7 +106,11 @@ class PurchaseStepPhoneType extends AbstractType
             $form = $event->getForm();
 
             if ($filename = $purchase->getFile()) {
-                $ocr = $this->imeiService->ocr($filename, $purchase->getPhone()->getMake());
+                $ocr = $this->imeiService->ocr(
+                    $filename,
+                    $purchase->getPhone()->getMake(),
+                    $filename->guessExtension()
+                );
                 if ($ocr === null) {
                     $purchase->setFileValid(false);
                     $raw = $this->imeiService->ocrRaw($filename);
