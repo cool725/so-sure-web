@@ -50,6 +50,12 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 'If policy number is present, adjust scheduled payments'
             )
             ->addOption(
+                'create',
+                null,
+                InputOption::VALUE_NONE,
+                'If policy number is present, create policy. WARNING - will skip payment'
+            )
+            ->addOption(
                 'skip-email',
                 null,
                 InputOption::VALUE_NONE,
@@ -71,6 +77,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         $date = $input->getOption('date');
         $prefix = $input->getOption('prefix');
         $policyNumber = $input->getOption('policyNumber');
+        $create = true === $input->getOption('create');
         $updatePotValue = $input->getOption('update-pot-value');
         $adjustScheduledPayments = $input->getOption('adjust-scheduled-payments');
         $skipEmail = true === $input->getOption('skip-email');
@@ -88,6 +95,11 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             $policy = $policyRepo->findOneBy(['policyNumber' => $policyNumber]);
             if (!$policy) {
                 throw new \Exception(sprintf('Unable to find policy for %s', $policyNumber));
+            }
+            if ($create) {
+                $policyService->create($policy, null, true);
+                $output->writeln(sprintf('Policy %s created', $policy->getPolicyNumber()));
+                return;
             }
 
             $blank = [];
