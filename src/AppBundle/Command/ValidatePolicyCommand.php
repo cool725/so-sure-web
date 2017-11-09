@@ -38,6 +38,12 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 'Show scheduled payments for a policy'
             )
             ->addOption(
+                'policyId',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Show scheduled payments for a policy'
+            )
+            ->addOption(
                 'update-pot-value',
                 null,
                 InputOption::VALUE_NONE,
@@ -77,6 +83,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         $date = $input->getOption('date');
         $prefix = $input->getOption('prefix');
         $policyNumber = $input->getOption('policyNumber');
+        $policyId = $input->getOption('policyId');
         $create = true === $input->getOption('create');
         $updatePotValue = $input->getOption('update-pot-value');
         $adjustScheduledPayments = $input->getOption('adjust-scheduled-payments');
@@ -91,8 +98,13 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
         $policyRepo = $dm->getRepository(Policy::class);
 
-        if ($policyNumber) {
-            $policy = $policyRepo->findOneBy(['policyNumber' => $policyNumber]);
+        if ($policyNumber || $policyId) {
+            $policy = null;
+            if ($policyNumber) {
+                $policy = $policyRepo->findOneBy(['policyNumber' => $policyNumber]);
+            } elseif ($policyId) {
+                $policy = $policyRepo->find($policyId);
+            }
             if (!$policy) {
                 throw new \Exception(sprintf('Unable to find policy for %s', $policyNumber));
             }
