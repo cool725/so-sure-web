@@ -22,6 +22,7 @@ use AppBundle\Document\Payment\PotRewardPayment;
 use AppBundle\Document\Payment\SoSurePotRewardPayment;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
 use AppBundle\Document\Payment\ChargebackPayment;
+use AppBundle\Document\PolicyTerms;
 
 class ReportingService
 {
@@ -307,6 +308,12 @@ class ReportingService
             $newToDateInvitationPolicies,
             $newToDateSCodePolicies
         );
+
+        $termsRepo = $this->dm->getRepository(PolicyTerms::class);
+        $allTerms = $termsRepo->findAll();
+        $data['picsureApproved'] = $policyRepo->countPicSurePolicies(PhonePolicy::PICSURE_STATUS_APPROVED, $allTerms);
+        $data['picsureRejected'] = $policyRepo->countPicSurePolicies(PhonePolicy::PICSURE_STATUS_REJECTED, $allTerms);
+        $data['picsureUnstarted'] = $policyRepo->countPicSurePolicies(null, $allTerms);
 
         return [
             'start' => $start,
