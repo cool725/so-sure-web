@@ -196,7 +196,7 @@
                                         {% set display_error = true %}
                                     {% endif %}
                                     <div id="search_address_errors" class="help-block with-errors" style="{% if not display_error %}display: none;{% endif %}">Unable to find the address. Try using manual entry.</div>
-                                    <a id="search-address-manual" href="#" class="btn btn-linl btn-block btn-pad">Enter address manually</a>
+                                    <a id="search-address-manual" href="#" class="btn btn-link btn-block btn-pad">Enter address manually</a>
                                 {% else %}
                                     <input id="address-select" class="typeahead form-control" type="text" placeholder="{% if postcode == 'type' %}Type your address (eg. 10 Downing Street, SW1A 2AA){% elseif postcode == 'comma' %}House Number, Postcode (eg. 10, SW1A 2AA){% endif %}" {% if not showAddress %} required="required" {% endif %}>
                                     {% set display_error = false %}
