@@ -390,7 +390,8 @@ class PhonePolicyRepository extends PolicyRepository
     /**
      * All pic-sure policies that have been created (excluding so-sure test ones) with given pic-sure status
      *
-     * @param string $policyPrefix
+     * @param string $picSureStatus
+     * @param array  $allTerms
      */
     public function countPicSurePolicies($picSureStatus, array $allTerms)
     {
