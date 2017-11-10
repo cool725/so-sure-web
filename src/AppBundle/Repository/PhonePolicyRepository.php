@@ -399,7 +399,7 @@ class PhonePolicyRepository extends PolicyRepository
         $picsureTermsIds = [];
         foreach ($allTerms as $term) {
             if ($term->isPicSureEnabled()) {
-                $picsureTermsIds[] = $term->getId();
+                $picsureTermsIds[] = new \MongoId($term->getId());
             }
         }
 
