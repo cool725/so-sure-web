@@ -15,12 +15,7 @@
     <div class="col-md-3">
         <h4><a href="{{ path('admin_policy', {'id': policy.id}) }}">{{ policy.policyNumber }}</a></h4>
     </div>
-    <div class="col-md-4">
-        {% for file in policy.getPolicyPicSureFiles %}
-            <a href="{{ s3DownloadLink(file.bucket, file.key) }}">{{ file.key }}</a>
-        {% endfor %}
-    </div>
-    <div class="col-md-5">
+    <div class="col-md-7">
         <a class="btn btn-success"
                 href="{{ path('admin_picsure_approve', {'id': policy.id}) }}"><i class="fa fa-check"></i> Undamaged</a>
         <a class="btn btn-warning"
@@ -30,6 +25,18 @@
         
     </div>
 </div>
+<div class="row" style="margin-top: 20px;">
+    {% for file in policy.getPolicyPicSureFiles %}
+    <div class="col-md-12 text-center">
+            <a href="{{ s3DownloadLink(file.bucket, file.key) }}" target="_blank">
+                <i class="fa fa-external-link"></i> {{ file.key }}
+                <br>
+                <img src="{{ path('admin_picsure_image', {'file': file.key }) }}" style="max-width: 100%">
+            </a>
+    </div>
+    {% endfor %}
+</div>
+<hr style="border-bottom: 3px solid black">
 {% endfor %}
 </div>
 {% endblock %}
