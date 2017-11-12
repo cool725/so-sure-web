@@ -1748,7 +1748,7 @@ class AdminEmployeeController extends BaseController
      * @Route("/picsure/image/{file}", name="admin_picsure_image", requirements={"file"=".*"})
      * @Template()
      */
-    public function picsureImageAction(Request $request, $file = null)
+    public function picsureImageAction($file)
     {
         $filesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3policy_fs');
         $environment = $this->getParameter('kernel.environment');
