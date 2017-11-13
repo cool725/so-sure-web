@@ -122,7 +122,7 @@
         <div class="checkout--step">
             <div class="container">
 
-                {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'data-client-validation': form_client_validation}}) }}
+                {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'data-client-validation': form_client_validation, 'autocomplete': 'off'}}) }}
 
                     <div class="form-step">
                         {% if feature_enabled('starling') and starling %}
