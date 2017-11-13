@@ -69,6 +69,7 @@
                                      data-scroll-to-adjust="200"
                                      >
                                 <h2 class="h5 text-center memory-select">{{ phone.model }}</h2>
+                                <small>Select size:</small>
                                 {% for mem, url in phone.mem %}
                                     <a href="{{ url }}" class="btn btn-blue-hollow btn-block">{{ mem }}GB</a>
                                 {% endfor %}
