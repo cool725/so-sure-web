@@ -190,7 +190,7 @@ class BaseImeiServiceTest extends WebTestCase
         $this->assertNull($results['serialNumber']);
     }
 
-    public function testOcrIPhone()
+    public function testOcrIPhoneStandard()
     {
         $image = sprintf(
             "%s/../src/AppBundle/Tests/Resources/iPhoneSettings.png",
