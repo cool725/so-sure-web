@@ -32,13 +32,13 @@
           {% endif %}
           data-base-path="{{ basePath }}"
           data-path-suffix="{{ pathSuffix }}"
-          class="{{ formClass }}">
+          class="{{ formClass }}"
+          autocomplete="off">
 
         <input type="text"
              id="search-phone{{ uid }}"
              class="required search-phone-text search-phone"
              placeholder="Find your phone e.g. iPhone 8 Plus..."
-             autocomplete="off"
              value="{% if phone %}{{ phone }}{% endif %}" />
     </form>
 

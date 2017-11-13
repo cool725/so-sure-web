@@ -4,7 +4,7 @@
 <h1>Welcome back!</h1>
 {# Account Kit Login #}
 <div class="login-account-kit login-box" data-key="{{ fb_appid }}" data-csrf="{{ csrf_token('account-kit') }}" data-toggle="{% if app.request.clientIp == davies_ip %}1{% else %}0{% endif %}">
-    <form method="get" action="https://www.accountkit.com/v1.0/basic/dialog/sms_login/">
+    <form method="get" action="https://www.accountkit.com/v1.0/basic/dialog/sms_login/" autocomplete="off">
     <p>If you click on Log In via SMS, a popup will appear.</p>
     <div class="form-group">
         <input type="hidden" value="+44" id="country_code" class="form-control" />
@@ -38,7 +38,7 @@
 {# Email Login #}
 <div class="login-email login-box" style="display: none;">
     <p>Please login below.</p>
-    <form class="" action="{{ path("fos_user_security_check") }}#email" method="post">
+    <form class="" action="{{ path("fos_user_security_check") }}#email" method="post" autocomplete="off">
         <input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
         <div class="form-group">
             <input type="email" id="username" name="_username" value="{{ last_username }}" required="required" placeholder="Email Address" class="form-control input-lg" />
