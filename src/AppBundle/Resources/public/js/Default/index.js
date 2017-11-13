@@ -9,7 +9,7 @@ $(function(){
     // SCROLL TO - Wahoooooo
     // Add anchor - data-scroll-to-anchor
     // To focus   - data-scroll-to-focus
-    var nav = '';
+    var adjust = '';
 
     $('.scroll-to').click(function(e) {
 
@@ -17,9 +17,10 @@ $(function(){
 
         var anchor = $(this).data('scroll-to-anchor');
         var focus  = $(this).data('scroll-to-focus');
+        var adjust = $(this).data('scroll-to-adjust');
 
         $('html, body').animate({
-            scrollTop: $(anchor).offset().top - nav
+            scrollTop: $(anchor).offset().top - adjust
         }, 1500);
 
         // Unfocus the button!
@@ -44,7 +45,7 @@ $(function(){
     }
 
     if ($('.navbar-fixed-top').length) {
-        var nav = 50;
+        var adjust = 50;
         $(window).scroll(navbarFixed);
     }
 
@@ -61,7 +62,7 @@ $(function(){
     }
 
     if ($('.secondary-nav').length) {
-        nav = 50;
+        adjust = 50;
         $(window).scroll(stickyNav);
     }
 

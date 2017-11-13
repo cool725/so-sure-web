@@ -54,11 +54,25 @@
                 {% for phone in phones %}
                     <div class="item">
                         <div class="item-inner">
-                            <img src="{{ phone.imageUrlWithFallback }}" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance">
-                            <h2 class="h5 text-center">{{ phone.model }}</h2>
-                            {% for mem, url in phone.mem %}
-                                <a href="{{ url }}" class="btn btn-blue btn-30">{{ mem }}GB</a>
-                            {% endfor %}
+                            {% if phone.mem|length <= 1 %}
+                                {% for mem, url in phone.mem %}
+                                    <a href="{{ url }}">
+                                        <img src="{{ phone.imageUrlWithFallback }}" alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance">
+                                         <h2 class="h5 text-center">{{ phone.model }} {{ mem }}GB</h2>
+                                    </a>
+                                {% endfor %}
+                            {% else %}
+                                <img src="{{ phone.imageUrlWithFallback }}"
+                                     alt="so-sure - {{ make|capitalize }} {{ phone.model }} insurance"
+                                     class="scroll-to"
+                                     data-scroll-to-anchor=".memory-select"
+                                     data-scroll-to-adjust="200"
+                                     >
+                                <h2 class="h5 text-center memory-select">{{ phone.model }}</h2>
+                                {% for mem, url in phone.mem %}
+                                    <a href="{{ url }}" class="btn btn-blue-hollow btn-block">{{ mem }}GB</a>
+                                {% endfor %}
+                            {% endif %}
                         </div>
                     </div>
                 {% endfor %}
