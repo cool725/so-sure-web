@@ -552,6 +552,61 @@
             }
         }
 
+        .speech-bubble {
+            max-width: 400px;
+            background: $white url('https://cdn.so-sure.com/images/homepage/so-sure_logo_speech_bubble.png') no-repeat 20px center;
+            position: relative;
+            @include border-radius(6px);
+            font-size: 14px;
+
+            padding: 20px 20px 20px 80px;
+            margin: 0 auto 30px;
+
+            &:after {
+                position: absolute;
+                top: 100%;
+                content: '';
+                border-left: 8px solid transparent;
+                border-right: 8px solid transparent;
+                border-top: 8px solid $white;
+            }
+
+            &--1 {
+                &:after {
+                    left: 15px;
+                }
+            }
+
+            &--2 {
+                &:after {
+                    right: 15px;
+                }
+            }
+
+            &--3 {
+                &:after {
+                    left: 15px;
+                }
+            }
+
+            @include breakpoint(laptop) {
+                max-width: 320px;
+                margin: 0 auto 30px;
+
+                &--1 {
+
+                }
+
+                &--2 {
+                    margin-top: 20px;
+                }
+
+                &--3 {
+
+                }
+            }
+        }
+
         .video-container {
             height: 0;
             overflow: hidden;
