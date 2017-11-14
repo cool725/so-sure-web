@@ -63,15 +63,17 @@ class PurchaseStepPhoneType extends AbstractType
  
             if ($purchase->getPhone()) {
                 $price = $purchase->getPhone()->getCurrentPhonePrice();
+                $additionalPremium = $purchase->getUser()->getAdditionalPremium();
                 $choices = [];
                 if ($purchase->getUser()->allowedMonthlyPayments()) {
-                    $choices[sprintf('£%.2f Monthly', $price->getMonthlyPremiumPrice())] =
-                            sprintf('%.2f', $price->getMonthlyPremiumPrice());
+                    $choices[sprintf('£%.2f Monthly', $price->getMonthlyPremiumPrice($additionalPremium))] =
+                            sprintf('%.2f', $price->getMonthlyPremiumPrice($additionalPremium));
                 }
                 if ($purchase->getUser()->allowedYearlyPayments()) {
-                    $choices[sprintf('£%.2f Yearly', $price->getYearlyPremiumPrice())] =
-                            sprintf('%.2f', $price->getYearlyPremiumPrice());
+                    $choices[sprintf('£%.2f Yearly', $price->getYearlyPremiumPrice($additionalPremium))] =
+                            sprintf('%.2f', $price->getYearlyPremiumPrice($additionalPremium));
                 }
+
                 if (count($choices) > 0) {
                     $form->add('amount', ChoiceType::class, [
                         'choices' => $choices,
@@ -104,7 +106,11 @@ class PurchaseStepPhoneType extends AbstractType
             $form = $event->getForm();
 
             if ($filename = $purchase->getFile()) {
-                $ocr = $this->imeiService->ocr($filename, $purchase->getPhone()->getMake());
+                $ocr = $this->imeiService->ocr(
+                    $filename,
+                    $purchase->getPhone()->getMake(),
+                    $filename->guessExtension()
+                );
                 if ($ocr === null) {
                     $purchase->setFileValid(false);
                     $raw = $this->imeiService->ocrRaw($filename);

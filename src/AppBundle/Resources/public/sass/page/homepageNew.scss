@@ -67,6 +67,8 @@
     &--hero {
         position: relative;
         text-align: center;
+        padding-left: 15px;
+        padding-right: 15px;
 
         // Heading
         &-h1 {
@@ -311,18 +313,18 @@
 
                 // Large Mobile
                 @include breakpoint(mobileishup) {
-                    padding: 20px 0 140px;
+                    padding: 20px 15px 140px;
                 }
 
                 // Tablet
                 @include breakpoint(tablet) {
-                    padding: 20px 0 200px;
+                    padding: 20px 15px 200px;
                     background-size: 70%;
                 }
 
                 // Laptop
                 @include breakpoint(laptop) {
-                    padding: 100px 0 200px;
+                    padding: 100px 15px 200px;
                     // Reset background
                     background: transparent;
 
@@ -358,11 +360,11 @@
 
                 // Desktop
                 @include breakpoint(desktop) {
-                    padding: 120px 0 200px;
+                    padding: 120px 15px 200px;
                 }
 
                 @include breakpoint(hd) {
-                    padding: 200px 0;
+                    padding: 200px 15px;
                 }
 
     }

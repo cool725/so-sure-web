@@ -201,11 +201,11 @@ trait UserClassTrait
     {
         if ($monthly) {
             $policy->setPremiumInstallments(12);
-            $premium = $policy->getPremium()->getMonthlyPremiumPrice($date);
+            $premium = $policy->getPremium()->getMonthlyPremiumPrice(null, $date);
             $commission = Salva::MONTHLY_TOTAL_COMMISSION;
         } else {
             $policy->setPremiumInstallments(1);
-            $premium = $policy->getPremium()->getYearlyPremiumPrice($date);
+            $premium = $policy->getPremium()->getYearlyPremiumPrice(null, $date);
             $commission = Salva::YEARLY_TOTAL_COMMISSION;
         }
 
@@ -247,10 +247,10 @@ trait UserClassTrait
     public static function addSoSureStandardPayment($policy, $date = null, $refund = true, $monthly = true)
     {
         if ($monthly) {
-            $premium = $policy->getPremium()->getMonthlyPremiumPrice($date);
+            $premium = $policy->getPremium()->getMonthlyPremiumPrice(null, $date);
             $commission = Salva::MONTHLY_TOTAL_COMMISSION;
         } else {
-            $premium = $policy->getPremium()->getYearlyPremiumPrice($date);
+            $premium = $policy->getPremium()->getYearlyPremiumPrice(null, $date);
             $commission = Salva::YEARLY_TOTAL_COMMISSION;
         }
         if (!$refund) {

@@ -111,7 +111,7 @@ Vagrant.configure("2") do |config|
     dev1604_config.vm.network "forwarded_port", guest: 5001, host: 5001 # sixpack-web
     dev1604_config.vm.network "private_network", ip: "10.0.4.2"
     #dev1604_config.vm.synced_folder ".", "/vagrant", owner: "www-data"
-    dev1604_config.vm.synced_folder ".", "/vagrant", nfs: true, mount_options: ['actimeo=1']
+    dev1604_config.vm.synced_folder ".", "/vagrant", nfs: true, mount_options: ['rw,vers=3,tcp,fsc,actimeo=1']
     #dev1604_config.vm.synced_folder ".", "/vagrant"
     dev1604_config.ssh.forward_agent = true
     dev1604_config.vm.provision "shell",

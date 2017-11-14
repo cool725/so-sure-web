@@ -1086,7 +1086,7 @@ class Phone
             $price->setValidTo($to);
         }
 
-        if ($price->getMonthlyPremiumPrice($from) < $this->getSalvaMiniumumBinderMonthlyPremium()) {
+        if ($price->getMonthlyPremiumPrice(null, $from) < $this->getSalvaMiniumumBinderMonthlyPremium()) {
             throw new \Exception(sprintf(
                 '£%.2f is less than allowed min binder £%.2f',
                 $price->getMonthlyPremiumPrice($from),

@@ -77,6 +77,7 @@ use AppBundle\Form\Type\PendingPolicyCancellationType;
 use AppBundle\Form\Type\UserDetailType;
 use AppBundle\Form\Type\UserEmailType;
 use AppBundle\Form\Type\UserPermissionType;
+use AppBundle\Form\Type\UserHighRiskType;
 use AppBundle\Form\Type\ClaimFlagsType;
 use AppBundle\Exception\RedirectException;
 use AppBundle\Service\PushService;
@@ -111,7 +112,7 @@ class AdminEmployeeController extends BaseController
     {
         return ['randomImei' => self::generateRandomImei()];
     }
-    
+
     /**
      * @Route("/phones", name="admin_phones")
      * @Template
@@ -833,6 +834,9 @@ class AdminEmployeeController extends BaseController
         $userPermissionForm = $this->get('form.factory')
             ->createNamedBuilder('user_permission_form', UserPermissionType::class, $user)
             ->getForm();
+        $userHighRiskForm = $this->get('form.factory')
+            ->createNamedBuilder('user_high_risk_form', UserHighRiskType::class, $user)
+            ->getForm();
         $makeModelForm = $this->get('form.factory')
             ->createNamedBuilder('makemodel_form')
             ->add('serial', TextType::class)
@@ -941,6 +945,17 @@ class AdminEmployeeController extends BaseController
 
                     return $this->redirectToRoute('admin_user', ['id' => $id]);
                 }
+            } elseif ($request->request->has('user_high_risk_form')) {
+                $userHighRiskForm->handleRequest($request);
+                if ($userHighRiskForm->isValid()) {
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        'Updated User High Risk'
+                    );
+
+                    return $this->redirectToRoute('admin_user', ['id' => $id]);
+                }
             } elseif ($request->request->has('makemodel_form')) {
                 $makeModelForm->handleRequest($request);
                 if ($makeModelForm->isValid()) {
@@ -985,6 +1000,7 @@ class AdminEmployeeController extends BaseController
             'user_detail_form' => $userDetailForm->createView(),
             'user_email_form' => $userEmailForm->createView(),
             'user_permission_form' => $userPermissionForm->createView(),
+            'user_high_risk_form' => $userHighRiskForm->createView(),
             'makemodel_form' => $makeModelForm->createView(),
             'sanctions_form' => $sanctionsForm->createView(),
             'postcode' => $postcode,
@@ -1277,7 +1293,7 @@ class AdminEmployeeController extends BaseController
                             $this->addFlash('success', sprintf(
                                 'Added reward connection'
                             ));
-    
+
                             return new RedirectResponse($this->generateUrl('admin_rewards'));
                         } else {
                             throw new \InvalidArgumentException(sprintf(
@@ -1318,7 +1334,7 @@ class AdminEmployeeController extends BaseController
                         $this->addFlash('success', sprintf(
                             'Added reward'
                         ));
-    
+
                         return new RedirectResponse($this->generateUrl('admin_rewards'));
                     } else {
                         throw new \InvalidArgumentException(sprintf(
@@ -1726,5 +1742,31 @@ class AdminEmployeeController extends BaseController
         return [
             'policies' => $policies,
         ];
+    }
+
+    /**
+     * @Route("/picsure/image/{file}", name="admin_picsure_image", requirements={"file"=".*"})
+     * @Template()
+     */
+    public function picsureImageAction($file)
+    {
+        $filesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3policy_fs');
+        $environment = $this->getParameter('kernel.environment');
+        $file = str_replace(sprintf('%s/', $environment), '', $file);
+
+        if (!$filesystem->has($file)) {
+            throw $this->createNotFoundException(sprintf('URL not found %s', $file));
+        }
+
+        $mimetype = $filesystem->getMimetype($file);
+        return StreamedResponse::create(
+            function () use ($file, $filesystem) {
+                $stream = $filesystem->readStream($file);
+                echo stream_get_contents($stream);
+                flush();
+            },
+            200,
+            array('Content-Type' => $mimetype)
+        );
     }
 }

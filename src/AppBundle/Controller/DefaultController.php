@@ -398,7 +398,7 @@ class DefaultController extends BaseController
                     );
                     $mailer->sendTemplate(
                         $subject,
-                        'claims@wearesosure.com',
+                        'new-claim@wearesosure.com',
                         'AppBundle:Email:claim/fnolToClaims.html.twig',
                         ['data' => $claimFnol]
                     );
@@ -1068,6 +1068,18 @@ class DefaultController extends BaseController
             'utm_medium' => 'flyer',
             'utm_source' => 'sosure',
             'utm_campaign' => 'iPhone8',
+        ]));
+    }
+
+    /**
+     * @Route("/trinitiymaxwell", name="trinitiymaxwell_redirect")
+     */
+    public function tmAction()
+    {
+        return new RedirectResponse($this->generateUrl('homepage', [
+            'utm_medium' => 'flyer',
+            'utm_source' => 'sosure',
+            'utm_campaign' => 'trinitiymaxwell',
         ]));
     }
 }

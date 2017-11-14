@@ -61,7 +61,8 @@
         "jaam/mixpanel-data-export-api": "^0.1.1",
         "mobiledetect/mobiledetectlib": "^2.8",
         "NoodlesNZ/double-metaphone": "^1.0",
-        "thiagoalessio/tesseract_ocr": "^1.1"
+        "thiagoalessio/tesseract_ocr": "^1.1",
+        "imagine/imagine": "^0.7.1"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",
