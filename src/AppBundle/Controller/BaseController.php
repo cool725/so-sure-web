@@ -22,6 +22,8 @@ use AppBundle\Document\PhoneTrait;
 use AppBundle\Document\IdentityLog;
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Exception\ValidationException;
+use AppBundle\Exception\InvalidEmailException;
+use AppBundle\Exception\InvalidFullNameException;
 use AppBundle\Exception\RedirectException;
 use AppBundle\Form\Type\UserSearchType;
 use AppBundle\Form\Type\PolicySearchType;
@@ -573,7 +575,18 @@ abstract class BaseController extends Controller
     {
         $validator = $this->get('validator');
         $errors = $validator->validate($object);
+
         if (count($errors) > 0) {
+            foreach ($errors as $error) {
+                switch (get_class($error->getConstraint())) {
+                    case 'AppBundle\Validator\Constraints\Email':
+                        throw new InvalidEmailException($error->getMessage());
+                        break;
+                    case 'AppBundle\Validator\Constraints\FullName':
+                            throw new InvalidFullNameException($error->getMessage());
+                        break;
+                }
+            }
             throw new ValidationException((string) $errors);
         }
     }
