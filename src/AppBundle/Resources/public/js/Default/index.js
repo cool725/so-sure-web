@@ -9,15 +9,18 @@ $(function(){
     // SCROLL TO - Wahoooooo
     // Add anchor - data-scroll-to-anchor
     // To focus   - data-scroll-to-focus
-    var adjust = '';
+    var adjust = 0;
 
     $('.scroll-to').click(function(e) {
 
         e.preventDefault();
 
-        var anchor = $(this).data('scroll-to-anchor');
-        var focus  = $(this).data('scroll-to-focus');
-        var adjust = $(this).data('scroll-to-adjust');
+        var anchor  = $(this).data('scroll-to-anchor');
+        var focus   = $(this).data('scroll-to-focus');
+
+        if ($(this).data('scroll-to-adjust') !== undefined) {
+            adjust = adjust + $(this).data('scroll-to-adjust');
+        }
 
         $('html, body').animate({
             scrollTop: $(anchor).offset().top - adjust
@@ -45,7 +48,7 @@ $(function(){
     }
 
     if ($('.navbar-fixed-top').length) {
-        var adjust = 50;
+        adjust = 50;
         $(window).scroll(navbarFixed);
     }
 
