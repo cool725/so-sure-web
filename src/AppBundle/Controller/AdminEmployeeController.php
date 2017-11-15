@@ -1694,11 +1694,21 @@ class AdminEmployeeController extends BaseController
         if ($request->get('_route') == "admin_picsure_approve") {
             $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
             $dm->flush();
+            $mailer = $this->get('app.mailer');
+            $mailer->sendTemplate(
+                'pic-sure is successfully validated',
+                $policy->getUser()->getEmail(),
+                'AppBundle:Email:picsure/accepted.html.twig',
+                ['policy' => $policy],
+                'AppBundle:Email:picsure/accepted.txt.twig',
+                ['policy' => $policy]
+            );
+
             try {
                 $push = $this->get('app.push');
                 // @codingStandardsIgnoreStart
                 $push->sendToUser(PushService::PSEUDO_MESSAGE_PICSURE, $policy->getUser(), sprintf(
-                    'Your pic-sure image has been approved and your phone is now valided.'
+                    'Your pic-sure image has been approved and your phone is now validated.'
                 ), null, null, $policy);
                 // @codingStandardsIgnoreEnd
             } catch (\Exception $e) {
