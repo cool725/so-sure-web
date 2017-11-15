@@ -168,7 +168,7 @@ hr {
 	.text-highlight {
 		display: inline-block;
 		padding: 3px 10px;
-        background-color: darken($lightest-blue, 5%);
+        background-color: $off-white;
 		@include border-radius(3px);
 	}
 

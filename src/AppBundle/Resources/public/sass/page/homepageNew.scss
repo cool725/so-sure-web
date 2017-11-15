@@ -554,7 +554,7 @@
 
         .speech-bubble {
             max-width: 400px;
-            background: $white url('https://cdn.so-sure.com/images/homepage/so-sure_quote_bubble.svg') no-repeat 15px 20px;
+            background: $white url('https://cdn.so-sure.com/images/homepage/so-sure_logo_speech_bubble.png') no-repeat 15px 20px;
             position: relative;
             @include border-radius(6px);
             font-size: 14px;
@@ -609,6 +609,7 @@
 
         h3 {
             color: $light-blue;
+            margin-top: 80px;
         }
 
         .video-container {
@@ -627,7 +628,7 @@
 
             @include breakpoint(laptop) {
                 width: 800px; height: 450px;
-                margin: 15px auto;
+                margin: 15px auto 80px;
                 box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.2);
                 padding: 0;
 
