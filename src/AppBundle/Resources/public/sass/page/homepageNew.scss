@@ -607,14 +607,26 @@
             }
         }
 
-        h3 {
-            color: $light-blue;
+        span.h3 {
+            display: inline-block;
+            background-color: $primary-blue;
+            position: relative;
+            z-index: 10;
+            color: $white;
+            padding: 10px 50px;
             margin-top: 80px;
+            margin-bottom: 0;
+            @include border-radius(4px);
+
+            @include breakpoint(laptop) {
+                padding: 10px 100px;
+            }
         }
 
         .video-container {
             height: 0;
             overflow: hidden;
+            z-index: 9;
             position: relative;
             padding-bottom: 53.4%;
             padding-top: 30px;
@@ -628,7 +640,7 @@
 
             @include breakpoint(laptop) {
                 width: 800px; height: 450px;
-                margin: 15px auto 80px;
+                margin: -20px auto 80px;
                 box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.2);
                 padding: 0;
 
