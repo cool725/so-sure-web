@@ -542,6 +542,7 @@
             display: inline-block;
             background-color: darken($lightest-blue, 5%);
             padding: 20px 30px;
+            margin: 25px 0 40px;
             font-weight: bold;
             color: $primary-blue;
             @include border-radius(4px);
