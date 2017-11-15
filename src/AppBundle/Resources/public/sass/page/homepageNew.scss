@@ -417,13 +417,28 @@
 
     &--cover-details {
         text-align: center;
+        position: relative;
 
         &__item {
             cursor: pointer;
+
+            &:hover {
+                h4 {
+                    color: $primary-blue;
+                }
+            }
         }
 
         img {
             width: 200px;
+        }
+
+        .cover-arrow {
+            position: absolute;
+            z-index: 10;
+            left: 10px; top: 10px;
+            width: 220px; height: 81px;
+            background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_cover_arrow.svg') center no-repeat;
         }
     }
 
