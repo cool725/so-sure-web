@@ -24,7 +24,8 @@
     <section class="homepage--hero">
         <h1 class="homepage--hero-h1">Mobile Phone Insurance <br class="hidden-xs"> How it Should Be</h1>
         {% if partner is defined and partner == 'starling' %}
-            <p class="lead">in partnership with starling</p>
+            <p class="lead"><small>in partnership with</small><br><img src="{{ cdn_url }}/images/homepage/so-sure_starling_bank_logo.svg" alt="Starling Bank" width="300px"></p>
+            <p class="lead">Providing exceptional experience when you claim, <br class="hidden-xs">and rewarding you and your friends when you don't</p>
         {% else %}
             <p class="lead">Providing exceptional experience when you claim, <br class="hidden-xs">and rewarding you and your friends when you don't</p>
         {% endif %}
@@ -421,7 +422,7 @@
         <div class="container">
             <h2 class="h1">Our Customers Love Us</h2>
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
                          data-src="{{ cdn_url }}/images/feedback/so-sure_feedback_honor_b.png"
                          alt="Honor B"
@@ -433,7 +434,7 @@
                         </footer>
                     </blockquote>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
                          data-src="{{ cdn_url }}/images/feedback/so-sure_feedback_herve_n.png"
                          alt="Herve N"
@@ -442,6 +443,18 @@
                         <p>"My so-sure claim was super fast and everyone was really friendly! Based on previous phone insurance experiences, I can honestly say this truly is a revolution"</p>
                         <footer>
                             Herve N.
+                        </footer>
+                    </blockquote>
+                </div>
+                <div class="col-md-4">
+                    <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                         data-src="{{ cdn_url }}/images/feedback/so-sure_feedback_ted_e.png"
+                         alt="Ted E"
+                         width="120px">
+                    <blockquote>
+                        <p>"After the 1st year, I got 71% money back. I used it to spruce up my new apartment. Never imagined my phone insurance would pay my IKEA bill!"</p>
+                        <footer>
+                            Ted E.
                         </footer>
                     </blockquote>
                 </div>

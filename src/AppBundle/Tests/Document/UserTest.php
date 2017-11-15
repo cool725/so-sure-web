@@ -387,27 +387,62 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $premium->setIpt(1);
         $userA = new User();
         $policyA = new PhonePolicy();
+        $policyA->setStatus(Policy::STATUS_ACTIVE);
         $policyA->setPremium($premium);
         $userA->addPolicy($policyA);
         $userB = new User();
         $policyB = new PhonePolicy();
         $policyB->setPremium($premium);
+        $policyB->setStatus(Policy::STATUS_ACTIVE);
         $userB->addPolicy($policyB);
         $claimB = new Claim();
         $claimB->setStatus(Claim::STATUS_APPROVED);
         $policyB->addClaim($claimB);
 
+        $userC = new User();
+        $policyC1 = new PhonePolicy();
+        $policyC1->setId(rand(1, 9999999));
+        $policyC1->setPremium($premium);
+        $policyC1->setStatus(Policy::STATUS_ACTIVE);
+        $userC->addPolicy($policyC1);
+        $policyC2 = new PhonePolicy();
+        $policyC2->setId(rand(1, 9999999));
+        $policyC2->setPremium($premium);
+        $policyC2->setStatus(Policy::STATUS_ACTIVE);
+        $userC->addPolicy($policyC2);
+        $claimC = new Claim();
+        $claimC->setStatus(Claim::STATUS_APPROVED);
+        $policyC1->addClaim($claimC);
+
         $this->assertFalse($policyA->isCancelledAndPaymentOwed());
         $this->assertFalse($policyB->isCancelledAndPaymentOwed());
+        $this->assertFalse($policyC1->isCancelledAndPaymentOwed());
+        $this->assertFalse($policyC2->isCancelledAndPaymentOwed());
 
         $policyB->setStatus(Policy::STATUS_CANCELLED);
         $policyB->setCancelledReason(Policy::CANCELLED_UNPAID);
+        $policyC1->setStatus(Policy::STATUS_CANCELLED);
+        $policyC1->setCancelledReason(Policy::CANCELLED_UNPAID);
 
         $this->assertFalse($policyA->isCancelledAndPaymentOwed());
         $this->assertTrue($policyB->isCancelledAndPaymentOwed());
+        $this->assertTrue($policyC1->isCancelledAndPaymentOwed());
+        $this->assertFalse($policyC2->isCancelledAndPaymentOwed());
+
+        $this->assertTrue($policyC1->getUser()->hasPolicyCancelledAndPaymentOwed());
+
+        $policyC2->addLinkedClaim($claimC);
+
+        $this->assertFalse($policyC1->isCancelledAndPaymentOwed());
+        $this->assertFalse($policyC2->isCancelledAndPaymentOwed());
 
         $this->assertFalse($policyA->getUser()->hasPolicyCancelledAndPaymentOwed());
         $this->assertTrue($policyB->getUser()->hasPolicyCancelledAndPaymentOwed());
+        $this->assertFalse($policyC1->getUser()->hasPolicyCancelledAndPaymentOwed());
+
+        $policyC2->setStatus(Policy::STATUS_CANCELLED);
+        $this->assertTrue($policyC1->isCancelledAndPaymentOwed());
+        $this->assertTrue($policyC2->isCancelledAndPaymentOwed());
 
         $bacsA = new BacsPayment();
         $bacsA->setAmount($policyA->getPremium()->getMonthlyPremiumPrice() * 12);

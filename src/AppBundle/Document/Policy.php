@@ -3598,10 +3598,31 @@ abstract class Policy
 
     public function isCancelledAndPaymentOwed()
     {
-        return !$this->isFullyPaid() &&
+        if (!$this->isFullyPaid() &&
             count($this->getApprovedClaims(true, true)) > 0 &&
             $this->getStatus() == self::STATUS_CANCELLED &&
-            $this->getCancelledReason() != self::CANCELLED_UPGRADE;
+            $this->getCancelledReason() != self::CANCELLED_UPGRADE) {
+            foreach ($this->getApprovedClaims(true, true) as $claim) {
+                if ($claim->getLinkedPolicy()) {
+                    // if this is the linked policy, then its automatically a cancelled w/payment owed
+                    if ($claim->getLinkedPolicy()->getId() == $this->getId()) {
+                        // print 'same' . PHP_EOL;
+                        return true;
+                    } elseif (!$claim->getLinkedPolicy()->isActive()) {
+                        // there was a linked policy, but its not active, so again ists a cancelled w/payment owed
+                        // print 'inactive' . PHP_EOL;
+                        return true;
+                    }
+                } else {
+                    // if there isn't a linked policy for one of the claims, then the policy must be this one
+                    // e.g. automatically a cancelled w/payment owed
+                    // print 'unlinked' . PHP_EOL;
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public function getSupportWarnings()
@@ -3947,6 +3968,11 @@ abstract class Policy
         // but we want to allow repurchase, so we set the flag to igore the claim
         if ($this->getStatus() == self::STATUS_CANCELLED && count($this->getApprovedClaims()) > 0 &&
             count($this->getApprovedClaims(true, true, true)) == 0) {
+            return true;
+        }
+
+        // If user forgot to pay and doesn't have a claim we will allow re-purchase
+        if ($this->getStatus() == self::STATUS_CANCELLED && count($this->getClaims()) == 0) {
             return true;
         }
 

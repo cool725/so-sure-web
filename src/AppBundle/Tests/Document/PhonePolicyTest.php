@@ -3372,7 +3372,7 @@ class PhonePolicyTest extends WebTestCase
 
         $policy->setStatus(SalvaPhonePolicy::STATUS_CANCELLED);
         $policy->setCancelledReason(SalvaPhonePolicy::CANCELLED_UNPAID);
-        $this->assertFalse($policy->displayRepurchase());
+        $this->assertTrue($policy->displayRepurchase());
 
         $claim = new Claim();
         $claim->setStatus(Claim::STATUS_APPROVED);
