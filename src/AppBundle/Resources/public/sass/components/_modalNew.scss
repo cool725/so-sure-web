@@ -164,7 +164,7 @@
 .modal-blue {
 
 	@include breakpoint(tablet) {
-		padding-top: 100px;
+		padding-top: 80px;
 	}
 
 	.modal-content {
@@ -175,27 +175,71 @@
 		}
 	}
 
+	.modal-header {
+		position: relative;
+
+		h3 {
+			color: $dark-blue;
+
+			@include breakpoint(tablet) {
+				margin-top: 30px;
+				margin-bottom: 0;
+			}
+		}
+
+		&-img {
+			width: 120px;
+			margin: 0 auto 15px;
+
+			@include breakpoint(tablet) {
+				width: 150px;
+				position: absolute;
+				left: 50%; top: -75px;
+				margin-left: -75px;
+			}
+		}
+
+		@include breakpoint(tablet) {
+			padding-bottom: 10px;
+		}
+	}
+
 	.modal-dialog {
 		width: 100%; height: 100%;
 		margin: 0;
 
 		@include breakpoint(tablet) {
 			margin: 10px auto;
-			width: 70%; height: auto;
+			width: 65%; height: auto;
 		}
 	}
 
 	.modal-body {
-		font-size: 14px;
+		// font-size: 14px;
 
 		.highlight-text {
 			background-color: $lightest-blue;
 			padding: 10px 15px;
-			@include border-radius(4px);
+			margin-left: -30px;
+			margin-right: -30px;
+
+			@include breakpoint(tablet) {
+				padding: 15px 60px;
+				margin-left: -60px;
+				margin-right: -60px;
+			}
+		}
+
+		ul {
+			padding-left: 15px;
 		}
 
 		> * {
 			margin-bottom: 15px;
+		}
+
+		@include breakpoint(tablet) {
+			padding-bottom: 15px;
 		}
 	}
 
@@ -213,6 +257,10 @@
 
 		&:hover {
 			background-color: darken($primary-blue, 10%);
+		}
+
+		@include breakpoint(tablet) {
+			top: -10px; right: -10px;
 		}
 	}
 }
