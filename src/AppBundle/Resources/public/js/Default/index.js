@@ -17,13 +17,14 @@ $(function(){
 
         var anchor  = $(this).data('scroll-to-anchor');
         var focus   = $(this).data('scroll-to-focus');
+        var adjust2 = adjust;
 
         if ($(this).data('scroll-to-adjust') !== undefined) {
-            adjust = adjust + $(this).data('scroll-to-adjust');
+            adjust2 = adjust + $(this).data('scroll-to-adjust');
         }
 
         $('html, body').animate({
-            scrollTop: $(anchor).offset().top - adjust
+            scrollTop: $(anchor).offset().top - adjust2
         }, 1500);
 
         // Unfocus the button!
