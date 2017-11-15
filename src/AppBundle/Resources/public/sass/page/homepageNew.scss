@@ -487,38 +487,46 @@
             z-index: 2;
         }
 
-        ul {
-            margin-bottom: 30px;
+        h4 {
+            cursor: pointer;
 
-            h4 {
+            &:hover, &:focus {
                 color: $primary-blue;
-                cursor: pointer;
-                margin: 0;
-                padding: 20px 0;
-
-                &:after {
-                    display: inline-block;
-                    font-family: FontAwesome;
-                    color: $black;
-                    content: '\f106';
-                    padding-left: 10px;
-                }
             }
 
-            h4.collapsed {
-                &:after {
-                    content: '\f107';
-                }
+            &:after {
+                display: inline-block;
+                font-family: FontAwesome;
+                color: $primary-blue;
+                content: '\f106';
+                padding-left: 10px;
             }
+        }
 
-            p {
-                background-color: $lightest-blue;
-                padding: 15px;
-                @include border-radius(8px);
+        h4.collapsed {
+            &:after {
+                content: '\f107';
             }
+        }
+
+        .what-we-dont-cover--list {
+            margin-bottom: 25px;
 
             @include breakpoint(tablet) {
                 padding-left: 30px;
+            }
+
+            &__item {
+                background-color: $primary-blue;
+                color: $white;
+                padding: 15px;
+                @include border-radius(6px);
+
+                p, ul, li {
+                    &:last-of-type {
+                        margin-bottom: 0;
+                    }
+                }
             }
         }
     }
