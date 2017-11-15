@@ -31,6 +31,7 @@ class LoadUserData implements FixtureInterface, ContainerAwareInterface
         $this->newUser('julien@so-sure.com', self::DEFAULT_PASSWORD, 'Julien', 'Champagne', ['ROLE_ADMIN']);
         $this->newUser('nick@so-sure.com', self::DEFAULT_PASSWORD, 'Nick', 'Waller', ['ROLE_ADMIN']);
         $this->newUser('marta@so-sure.com', self::DEFAULT_PASSWORD, 'Marta', 'Datkiewicz', ['ROLE_ADMIN']);
+        $this->newUser('rayo@so-sure.com', self::DEFAULT_PASSWORD, 'Rayo', 'Ladipo', ['ROLE_ADMIN']);
         $this->newUser('claims@so-sure.com', self::DEFAULT_PASSWORD, 'so-sure', 'Claims', ['ROLE_CLAIMS']);
         $this->newUser('employee@so-sure.com', self::DEFAULT_PASSWORD, 'so-sure', 'Employee', ['ROLE_EMPLOYEE']);
         $manager->flush();
