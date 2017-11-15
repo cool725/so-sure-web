@@ -24,7 +24,8 @@
     <section class="homepage--hero">
         <h1 class="homepage--hero-h1">Mobile Phone Insurance <br class="hidden-xs"> How it Should Be</h1>
         {% if partner is defined and partner == 'starling' %}
-            <p class="lead">in partnership with starling</p>
+            <p class="lead"><small>in partnership with</small><br><img src="{{ cdn_url }}/images/homepage/so-sure_starling_bank_logo.svg" alt="Starling Bank" width="300px"></p>
+            <p class="lead">Providing exceptional experience when you claim, <br class="hidden-xs">and rewarding you and your friends when you don't</p>
         {% else %}
             <p class="lead">Providing exceptional experience when you claim, <br class="hidden-xs">and rewarding you and your friends when you don't</p>
         {% endif %}
@@ -312,12 +313,12 @@
             <p class="lead">When something bad happens to your phone:</p>
             <div class="row">
                 <div class="col-md-4">
-                    <span class="large-no">1</span>
+                    <span class="large-no large-no--arrow">1</span>
                     <h4 class="h3 h-light text-blue">Contact Claims Team</h4>
                     <p>These helpful people are here in the UK, available to answer your call 24-hrs a day, 7 days a week, 365 days a year when you have an issue with your phone. And if you need to start a claim, <a href="{{ path('claim') }}" class="text-nowrap">fill in the form here</a>.</p>
                 </div>
                 <div class="col-md-4">
-                    <span class="large-no">2</span>
+                    <span class="large-no large-no--arrow">2</span>
                     <h4 class="h3 h-light text-blue">Review Claim</h4>
                     <p>Our goal is for the claims to be handled almost instantly. Approving a claim takes on average less than one hour to process during normal business hours.*</p>
                 </div>
