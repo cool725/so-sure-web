@@ -2,6 +2,8 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Exception\InvalidEmailException;
+use AppBundle\Exception\InvalidFullNameException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -780,14 +782,18 @@ class PurchaseController extends BaseController
 
             // Having some validation exceptions for Lead Names - check if its going to fail
             // validation and remove name if its not working. Hopefully the name will be updated later on
+            // on invalid email format return error as we cannot open lead
             try {
                 $this->validateObject($lead);
-            } catch (ValidationException $e) {
+            } catch (InvalidFullNameException $e) {
                 $lead->setName(null);
+            } catch (InvalidEmailException $e) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, 'Invalid email format', 200);
+            } catch (ValidationException $e) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Invalid parameter', 200);
             }
-
-            $dm->persist($lead);
-            $dm->flush();
+                $dm->persist($lead);
+                $dm->flush();
         }
 
         return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'OK', 200);

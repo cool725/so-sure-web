@@ -2,6 +2,8 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Exception\InvalidEmailException;
+use AppBundle\Exception\InvalidFullNameException;
 use AppBundle\Exception\ValidationException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -316,7 +318,6 @@ class PhoneInsuranceController extends BaseController
                     return $this->redirectToRoute('launch_share', ['id' => $existingUser->getId()]);
                 }
             } elseif ($request->request->has('lead_form')) {
-
                 try {
                     $leadForm->handleRequest($request);
 
@@ -359,16 +360,21 @@ class PhoneInsuranceController extends BaseController
                             "Sorry, didn't quite catch that email.  Please try again."
                         ));
                     }
-                } catch (ValidationException $e) {
-
-                    // ValidationException sometimes fires, just catching it 
-                    \AppBundle\Classes\NoOp::ignore($e);
-
+                } catch (InvalidEmailException $ex) {
+                    $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
                     $this->addFlash('error', sprintf(
                         "Sorry, didn't quite catch that email.  Please try again."
                     ));
-
-
+                } catch (InvalidFullNameException $ex) {
+                    $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+                    $this->addFlash('error', sprintf(
+                        "Sorry, didn't quite catch your name.  Please try again."
+                    ));
+                } catch (ValidationException $ex) {
+                    $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+                    $this->addFlash('error', sprintf(
+                        "Sorry, something went wrong.  Please try again."
+                    ));
                 }
             } elseif ($request->request->has('buy_form')) {
                 $buyForm->handleRequest($request);

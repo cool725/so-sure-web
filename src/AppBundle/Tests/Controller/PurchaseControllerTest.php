@@ -754,58 +754,8 @@ class PurchaseControllerTest extends BaseControllerTest
         return $phone;
     }
 
-
-    public function testLeadValidEmail()
-    {
-
-        $crawler = self::$client->request('GET', '/login');
-        self::verifyResponse(200);
-        $form = $crawler->selectButton("_submit")->form();
-        $form['_username'] = 'sinisa@so-sure.com';
-        $form['_password'] = 'w3ares0sure!';
-        $crawler = self::$client->submit($form);
-        self::verifyResponse(302);
-        $crawler = self::$client->followRedirect();
-        file_put_contents('/home/vagrant/do',self::$client->getResponse()->getContent());
-        $crawler = self::$client->followRedirect();
-        file_put_contents('/home/vagrant/do',self::$client->getResponse()->getContent());
-        self::verifyResponse(200);
-        $crawler = self::$client->request('GET', '/phone-insurance/Apple+iPhone%207+128GB');
-        file_put_contents('/home/vagrant/do',self::$client->getResponse()->getContent());
-
-
-        $form = $crawler->selectButton("lead_form[save]")->form();
-        $email = self::generateEmail('testLeadValidEmail', $this);
-        $form['lead_form[email]'] = $email;
-        $crawler = self::$client->submit($form);
-        self::verifyResponse(200);
-        $this->assertGreaterThan(
-            0,
-            $crawler->filter('html:contains("Thanks")')->count()
-        );
-
-    }
-
-
-    private function createNewLeadMakePhone($email, $name)
-    {
-        // ignore all but email for now
-        \AppBundle\Classes\NoOp::ignore($name);
-
-        $crawler = self::$client->request('GET', '/phone-insurance/Apple+iPhone%207+128GB');
-        self::verifyResponse(200);
-
-        var_dump(self::$client->getResponse()->getContent());
-        $form = $crawler->selectButton("lead_form[save]")->form();
-        $form['lead_form[email]'] = $email;
-        $crawler = self::$client->submit($form);
-       return $crawler;
-    }
-
-
     public function testLeadInvalidEmail()
     {
-        $email = self::generateEmail('testLeadInvalidEmail', $this);
         $this->setRandomPhone();
         $crawler = self::$client->request('GET', '/purchase/?force_result=new');
         self::verifyResponse(200);
@@ -825,17 +775,33 @@ class PurchaseControllerTest extends BaseControllerTest
                 'csrf' => $csrfToken,
             ])
         );
-        file_put_contents('/home/vagrant/do',self::$client->getResponse()->getContent());
 
         self::verifyResponse(200);
-
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $leadRepo = $dm->getRepository(Lead::class);
-        $lead = $leadRepo->findOneBy(['email' => strtolower($email)]);
-        $this->assertNotNull($lead);
-        $this->assertEquals(strtolower($email), $lead->getEmail());
-        $this->assertEquals('foo bar', $lead->getName());
     }
 
+    public function testLeadInvalidName()
+    {
+        $email = self::generateEmail('testLeadInvalidName', $this);
+        $this->setRandomPhone();
+        $crawler = self::$client->request('GET', '/purchase/?force_result=new');
+        self::verifyResponse(200);
 
+        $link = $crawler->filter('#step--validate');
+        $csrfToken = $link->attr('data-csrf');
+
+        $crawler = self::$client->request(
+            'POST',
+            '/purchase/lead/buy',
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json'),
+            json_encode([
+                'email' => $email,
+                'name' => 'foo',
+                'csrf' => $csrfToken,
+            ])
+        );
+
+        self::verifyResponse(200);
+    }
 }

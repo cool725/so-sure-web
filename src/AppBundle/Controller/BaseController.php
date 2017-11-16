@@ -579,11 +579,11 @@ abstract class BaseController extends Controller
         if (count($errors) > 0) {
             foreach ($errors as $error) {
                 switch (get_class($error->getConstraint())) {
-                    case 'AppBundle\Validator\Constraints\Email':
+                    case 'Symfony\Component\Validator\Constraints\Email':
                         throw new InvalidEmailException($error->getMessage());
                         break;
                     case 'AppBundle\Validator\Constraints\FullName':
-                            throw new InvalidFullNameException($error->getMessage());
+                        throw new InvalidFullNameException($error->getMessage());
                         break;
                 }
             }
