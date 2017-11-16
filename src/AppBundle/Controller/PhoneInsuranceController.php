@@ -361,17 +361,17 @@ class PhoneInsuranceController extends BaseController
                         ));
                     }
                 } catch (InvalidEmailException $ex) {
-                    $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+                    $this->get('logger')->info('Failed validation.', ['exception' => $ex]);
                     $this->addFlash('error', sprintf(
                         "Sorry, didn't quite catch that email.  Please try again."
                     ));
                 } catch (InvalidFullNameException $ex) {
-                    $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+                    $this->get('logger')->info('Failed validation.', ['exception' => $ex]);
                     $this->addFlash('error', sprintf(
                         "Sorry, didn't quite catch your name.  Please try again."
                     ));
                 } catch (ValidationException $ex) {
-                    $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+                    $this->get('logger')->info('Failed validation.', ['exception' => $ex]);
                     $this->addFlash('error', sprintf(
                         "Sorry, something went wrong.  Please try again."
                     ));

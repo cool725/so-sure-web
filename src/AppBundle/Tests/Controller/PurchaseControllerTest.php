@@ -776,7 +776,7 @@ class PurchaseControllerTest extends BaseControllerTest
             ])
         );
 
-        self::verifyResponse(200);
+        self::verifyResponse(200, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
     }
 
     public function testLeadInvalidName()
@@ -801,7 +801,6 @@ class PurchaseControllerTest extends BaseControllerTest
                 'csrf' => $csrfToken,
             ])
         );
-
         self::verifyResponse(200);
     }
 }

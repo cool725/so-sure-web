@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\Constraints\Email;
 
 use Pagerfanta\Pagerfanta;
 use Pagerfanta\Adapter\DoctrineODMMongoDBAdapter;
@@ -27,6 +28,7 @@ use AppBundle\Exception\InvalidFullNameException;
 use AppBundle\Exception\RedirectException;
 use AppBundle\Form\Type\UserSearchType;
 use AppBundle\Form\Type\PolicySearchType;
+use AppBundle\Validator\Constraints\FullName;
 
 use MongoRegex;
 use Gedmo\Loggable\Document\LogEntry;
@@ -579,10 +581,10 @@ abstract class BaseController extends Controller
         if (count($errors) > 0) {
             foreach ($errors as $error) {
                 switch (get_class($error->getConstraint())) {
-                    case 'Symfony\Component\Validator\Constraints\Email':
+                    case Email::class:
                         throw new InvalidEmailException($error->getMessage());
                         break;
-                    case 'AppBundle\Validator\Constraints\FullName':
+                    case FullName::class:
                         throw new InvalidFullNameException($error->getMessage());
                         break;
                 }
