@@ -433,12 +433,14 @@
             width: 200px;
         }
 
-        .cover-arrow {
-            position: absolute;
-            z-index: 10;
-            left: 10px; top: 10px;
-            width: 220px; height: 81px;
-            background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_cover_arrow.svg') center no-repeat;
+        @include breakpoint(laptop) {
+            .cover-arrow {
+                position: absolute;
+                z-index: 10;
+                left: -60px; bottom: 10px;
+                width: 175px; height: 52px;
+                background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_cover_section_arrow.svg') center center no-repeat;
+            }
         }
     }
 

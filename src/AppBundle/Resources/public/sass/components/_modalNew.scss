@@ -264,3 +264,18 @@
 		}
 	}
 }
+
+// Animations
+.modal.fade .modal-dialog {
+	@include transform(scale(0.1));
+    top: 300px;
+    opacity: 0;
+    @include transition(all 0.3s);
+}
+
+.modal.fade.in .modal-dialog {
+	@include transform(scale(1));
+	@include transform(translate3d(0, -300px, 0));
+    opacity: 1;
+}
+
