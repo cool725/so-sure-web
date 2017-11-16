@@ -1,47 +1,129 @@
 // modal.scss
 
-// Standards
+// Standards overide bootstrap
 
 .modal {
-	background-color: $black-opaque;
-	overflow: hidden;
+	background-color: $white-opaque;
 
-	.modal-content {
+	&-dialog { }
+
+	&-content {
 		border: 0;
-		@include border-radius(0);
 		box-shadow: none;
+		@include border-radius(4px);
 	}
 
-	.modal-header {
+	&-header {
 		border-bottom: none;
-		padding: 30px 30px 15px;
 
-		@include breakpoint(tablet) {
-			padding: 60px 60px 30px;
-		}
-
-		h2, h3, h4, h5 {
-			margin: 0;
+		h1, h2, h3, h4, h5 {
+			margin-bottom: 0;
 		}
 
 		.close {
 			opacity: 1;
-			color: $primary-blue;
 			font-weight: bold;
+			font-size: 30px;
+			color: $primary-blue;
+		}
+	}
+
+	&-body {
+
+	}
+
+	&-footer {
+		border-top: none;
+		text-align: center;
+	}
+
+}
+
+.modal-new {
+
+	.modal-dialog {
+		width: 100%; height: 100%;
+		margin: 0;
+
+		@include breakpoint(laptop) {
+			width: 65%; height: auto;
+			margin: 5% auto 0;
+		}
+	}
+
+	.modal-content {
+		// background-color: $lightest-blue;
+		@include border-radius(0);
+	}
+
+	.modal-header {
+
+		.close {
+			width: 45px; height: 45px;
+			position: absolute;
+			top: 10px; right: 10px;
+			color: $white;
+			background-color: $primary-blue;
+			text-shadow: none;
+			@include border-radius(50%);
+
+			&:hover, &:focus {
+				background-color: $dark-blue;
+				box-shadow: none;
+			}
+
+			@include breakpoint(laptop) {
+				top: -15px; right: -15px;
+			}
 		}
 	}
 
 	.modal-body {
-		padding: 0 30px 30px;
 
 		@include breakpoint(tablet) {
-			padding: 0 60px 60px;
+			padding-left: 30px;
+			padding-right: 30px;
 		}
+
+		// Style text
+		ul {
+			padding-left: 18px;
+
+			li {
+				padding: 5px 0;
+				font-size: 14px;
+			}
+		}
+
+		p, li {
+			line-height: 1.5;
+		}
+
+		&--left {
+			@include breakpoint(tablet) {
+				border-right: 1px solid $pale-grey;
+				padding-right: 15px;
+			}
+			@include breakpoint(laptop) {
+				padding-right: 30px;
+			}
+		}
+
+		&--right {
+			@include breakpoint(tablet) {
+				padding-left: 15px;
+			}
+			@include breakpoint(laptop) {
+				// padding-left: 30px;
+			}
+		}
+
 	}
 
-	.modal-footer {}
+	&-footer { }
 }
 
+// Purchase flow and Renew modal
 .modal-purchase {
 
 	.modal-body {
@@ -161,109 +243,7 @@
 
 }
 
-.modal-blue {
 
-	@include breakpoint(tablet) {
-		padding-top: 80px;
-	}
-
-	.modal-content {
-		background-color: $light-blue;
-
-		@include breakpoint(tablet) {
-			@include border-radius(8px);
-		}
-	}
-
-	.modal-header {
-		position: relative;
-
-		h3 {
-			color: $dark-blue;
-
-			@include breakpoint(tablet) {
-				margin-top: 30px;
-				margin-bottom: 0;
-			}
-		}
-
-		&-img {
-			width: 120px;
-			margin: 0 auto 15px;
-
-			@include breakpoint(tablet) {
-				width: 150px;
-				position: absolute;
-				left: 50%; top: -75px;
-				margin-left: -75px;
-			}
-		}
-
-		@include breakpoint(tablet) {
-			padding-bottom: 10px;
-		}
-	}
-
-	.modal-dialog {
-		width: 100%; height: 100%;
-		margin: 0;
-
-		@include breakpoint(tablet) {
-			margin: 10px auto;
-			width: 65%; height: auto;
-		}
-	}
-
-	.modal-body {
-		// font-size: 14px;
-
-		.highlight-text {
-			background-color: $lightest-blue;
-			padding: 10px 15px;
-			margin-left: -30px;
-			margin-right: -30px;
-
-			@include breakpoint(tablet) {
-				padding: 15px 60px;
-				margin-left: -60px;
-				margin-right: -60px;
-			}
-		}
-
-		ul {
-			padding-left: 15px;
-		}
-
-		> * {
-			margin-bottom: 15px;
-		}
-
-		@include breakpoint(tablet) {
-			padding-bottom: 15px;
-		}
-	}
-
-	.close {
-		width: 30px; height: 30px;
-		position: absolute;
-		font-size: 14px;
-		top: 10px; right: 10px;
-
-		color: $white;
-		text-shadow: none;
-		background: $primary-blue;
-
-		@include border-radius(50%);
-
-		&:hover {
-			background-color: darken($primary-blue, 10%);
-		}
-
-		@include breakpoint(tablet) {
-			top: -10px; right: -10px;
-		}
-	}
-}
 
 // Animations
 .modal.fade .modal-dialog {
