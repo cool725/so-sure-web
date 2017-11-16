@@ -24,6 +24,7 @@ class UserCancelType extends AbstractType
                 'Insuring with another provider' => 'elsewhere',
                 'Already covered' => 'existing',
                 'Do not want phone insurance' => 'undesired',
+                'I had problems with or did not like pic-sure' => 'pic-sure',
                 'Other' => 'unknown',
             ],
                 'placeholder' => 'Select a reason',
