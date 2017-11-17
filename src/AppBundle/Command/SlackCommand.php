@@ -27,14 +27,7 @@ class SlackCommand extends ContainerAwareCommand
                 '#general'
             )
             ->addOption(
-                'unpaid-channel',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Channel to post to',
-                '#customer-contact'
-            )
-            ->addOption(
-                'renewal-channel',
+                'customer-channel',
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Channel to post to',
@@ -59,24 +52,105 @@ class SlackCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $policyChannel = $input->getOption('policy-channel');
-        $unpaidChannel = $input->getOption('unpaid-channel');
-        $renewalChannel = $input->getOption('renewal-channel');
+        $customerChannel = $input->getOption('customer-channel');
         $weeks = $input->getOption('weeks');
         $skipSlack = $input->getOption('skip-slack');
 
         $text = $this->policies($policyChannel, $weeks, $skipSlack);
+        $output->writeln('KPI');
+        $output->writeln('----');
         $output->writeln($text);
+        $output->writeln('');
 
-        $lines = $this->unpaid($unpaidChannel, $skipSlack);
+        $output->writeln('Unpaid');
+        $output->writeln('----');
+        $lines = $this->unpaid($customerChannel, $skipSlack);
         foreach ($lines as $line) {
             $output->writeln($line);
         }
+        $output->writeln('');
 
-        $lines = $this->renewals($renewalChannel, $skipSlack);
+        $output->writeln('Renewals');
+        $output->writeln('----');
+        $lines = $this->renewals($customerChannel, $skipSlack);
         foreach ($lines as $line) {
             $output->writeln($line);
         }
+        $output->writeln('');
+
+        $output->writeln('Cancelled w/Payment Owed');
+        $output->writeln('----');
+        $lines = $this->cancelledAndPaymentOwed($customerChannel, $skipSlack);
+        foreach ($lines as $line) {
+            $output->writeln($line);
+        }
+        $output->writeln('');
     }
+
+    private function cancelledAndPaymentOwed($channel, $skipSlack)
+    {
+        $router = $this->getContainer()->get('router');
+        $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
+        $repo = $dm->getRepository(PhonePolicy::class);
+        $policies = $repo->findAll();
+
+        $lines = [];
+        $now = new \DateTime();
+        foreach ($policies as $policy) {
+            if (!$policy->isPolicy() || !$policy->isCancelledAndPaymentOwed()) {
+                continue;
+            }
+            $diff = $now->diff($policy->getEnd());
+            if (!in_array($diff->days, [0])) {
+                continue;
+            }
+            // @codingStandardsIgnoreStart
+            $text = sprintf(
+                "*Policy <%s|%s> has been cancelled w/success claim. User must re-purchase policy or pay outstanding amount.*",
+                $router->generate('admin_policy', ['id' => $policy->getId()], UrlGeneratorInterface::ABSOLUTE_URL),
+                $policy->getPolicyNumber(),
+                $diff->days
+            );
+            $lines[] = $text;
+
+            // @codingStandardsIgnoreEnd
+            if (!$skipSlack) {
+                $this->send($text, $channel);
+            }
+        }
+
+        return $lines;
+    }
+
+        public function isCancelledAndPaymentOwed()
+    {
+        if (!$this->isFullyPaid() &&
+            count($this->getApprovedClaims(true, true)) > 0 &&
+            $this->getStatus() == self::STATUS_CANCELLED &&
+            $this->getCancelledReason() != self::CANCELLED_UPGRADE) {
+            foreach ($this->getApprovedClaims(true, true) as $claim) {
+                if ($claim->getLinkedPolicy()) {
+                    // if this is the linked policy, then its automatically a cancelled w/payment owed
+                    if ($claim->getLinkedPolicy()->getId() == $this->getId()) {
+                        // print 'same' . PHP_EOL;
+                        return true;
+                    } elseif (!$claim->getLinkedPolicy()->isActive()) {
+                        // there was a linked policy, but its not active, so again ists a cancelled w/payment owed
+                        // print 'inactive' . PHP_EOL;
+                        return true;
+                    }
+                } else {
+                    // if there isn't a linked policy for one of the claims, then the policy must be this one
+                    // e.g. automatically a cancelled w/payment owed
+                    // print 'unlinked' . PHP_EOL;
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
 
     private function unpaid($channel, $skipSlack)
     {
