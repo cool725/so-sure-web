@@ -6,6 +6,7 @@
 {# Set vars #}
 {% set new_stylesheet = 1 %}
 {% set distraction_free = 1 %}
+{% set new_footer = 1 %}
 
 {% set showAddress = purchase_form.addressLine1.vars.data | length > 0 or purchase_form.postcode.vars.data | length > 0 %}
 {% set showDOB = purchase_form.name.vars.data | length > 0 and purchase_form.email.vars.data | length > 0 %}
