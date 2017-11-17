@@ -1,5 +1,9 @@
 {% extends 'base.html.twig' %}
 
+{# Set vars #}
+{% set new_stylesheet = 1 %}
+{% set new_footer = 1 %}
+
 {% block title %}so-sure - Register{% endblock %}
 {% block meta %}
   <meta name="description" content="Welcome to the Social Insurance Revolution."/>
@@ -11,7 +15,7 @@
     {% stylesheets output='css/*.css'
         'components/bootstrap-daterangepicker/daterangepicker.css'
         'components/intl-tel-input/intlTelInput.css'
-        '@AppBundle/Resources/public/sass/page/checkout.scss'
+        '@AppBundle/Resources/public/sass/page/checkoutNew.scss'
     %}
         <link rel="stylesheet" href="{{ asset_url }}">
     {% endstylesheets %}
@@ -19,7 +23,38 @@
 
 
 {% block body %}
-<section class="vertical-align-wrap">
+
+<section id="register" class="checkout">
+
+    <div class="checkout--top">
+        <div class="container">
+            <h1 class="h2">
+                    <span class="title-phone">Choose an option to create your so-sure account below</span>
+            </h1>
+        </div>
+    </div>
+    <div class="checkout--step">
+        {{ form_start(form, {'attr': {'class': ''}}) }}
+        <div class="form-group {% if form_errors(form.email) %}has-error{% endif %}">
+            {{ form_label(form.email, 'Email', { 'label_attr': {'class': 'sr-only'} }) }}
+            {{ form_widget(form.email, {'attr':{'class':'form-control', 'placeholder':'e.g. jane.smith@gmail.com'}}) }}
+            <div class="help-block with-errors">{{ form_errors(form.email) }}</div>
+        </div>
+        <div class="form-group">
+            {{ form_widget(form.register, {'label': 'Create account', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
+            <div class="text-break text-grey">
+                <div class="line"></div>OR<div class="line"></div>
+            </div>
+        </div>
+        <div class="form-group text-center">
+            {% include 'AppBundle::Purchase/purchaseDownload.html.twig' %}
+        </div>
+        {{ form_end(form) }}
+    </div>
+
+</section>
+
+{# <section class="vertical-align-wrap">
     <div class="vertical-align-middle">
         <div class="container checkout">
 
@@ -59,5 +94,5 @@
 
         </div>
     </div>
-</section>
+</section> #}
 {% endblock %}
