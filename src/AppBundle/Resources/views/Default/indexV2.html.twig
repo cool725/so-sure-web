@@ -24,7 +24,8 @@
     <section class="homepage--hero">
         <h1 class="homepage--hero-h1">Mobile Phone Insurance <br class="hidden-xs"> How it Should Be</h1>
         {% if partner is defined and partner == 'starling' %}
-            <p class="lead">in partnership with starling</p>
+            <p class="lead"><small>in partnership with</small><br><img src="{{ cdn_url }}/images/homepage/so-sure_starling_bank_logo.svg" alt="Starling Bank" width="300px"></p>
+            <p class="lead">Providing exceptional experience when you claim, <br class="hidden-xs">and rewarding you and your friends when you don't</p>
         {% else %}
             <p class="lead">Providing exceptional experience when you claim, <br class="hidden-xs">and rewarding you and your friends when you don't</p>
         {% endif %}
@@ -274,22 +275,38 @@
             <div class="row">
                 <div class="col-md-5">
                     <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-                         data-src="{{ cdn_url }}/images/homepage/so-sure_piggy_bank_kerching.svg"
+                         data-src="{{ cdn_url }}/images/homepage/so-sure_reward_pot_smile_characters_small.svg"
                          alt="so-sure - reward pot"
                          class="img-responsive img-responsive--center so-sure_piggy_bank">
                 </div>
                 <div class="col-md-7">
                     <h2 class="h1">How Does the Reward Pot Work?</h2>
-                    <p class="lead">If you and your friends take good care of your phone and don’t need to claim, we’ll give you up to 80% of your premium back at the end of your policy year.</p>
+                    <p class="lead">If you and your friends take good care of your phones and don’t need to claim, we’ll give you up to <span class="text-highlight">80% of your premium back</span> at the end of your policy year.</p>
                     <ol class="ol--blue-counter">
-                        <li class="lead">Connect to your friends and family and receive up to £10 each in your individual Reward Pots</li>
-                        <li class="lead">At the end of the year, when you and your connections haven’t claimed, your Reward Pot is paid out to you.</li>
+                        <li class="lead">Invite your family and friends to join, connect with them and receive up to &pound;10 pp each in your individual Reward Pots</li>
+                        <li class="lead">Take a good care of your phone throughout of the policy period and make no claims.</li>
+                        <li class="lead">At the end of the year, when you and your connections haven’t claimed, your Reward Pot is paid out to you</li>
                     </ol>
+                </div>
+            </div>
+            <p class="lead text-center"><span class="link-text">You can save anything between £2 to £80. <a href="#" class="scroll-to" data-scroll-to-anchor=".homepage--instant-quote">Get a quote</a> to see the Reward Pot size for your device</span></p>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="speech-bubble speech-bubble--1">I used my Reward Pot money to renew my policy and my insurance bill is now cut in half!</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="speech-bubble speech-bubble--2">I was delighted to receive cash back from my phone insurance. It feels great being rewarded for my wife and I being careful! What separates so-sure from other insurers is that they actually deliver on their promises</div>
+                </div>
+                <div class="col-md-4">
+                    <div class="speech-bubble speech-bubble--3">After the 1st year, I got 71% money back. I used it to spruce up my new apartment. Never imagined my phone insurance would pay my IKEA bill!</div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-12 text-center">
-                    {% include 'AppBundle::Default/_explainerVideo.html.twig' %}
+                    <span class="h3 hidden-xs">Watch our video</span>
+                    <div class="video-container">
+                        <iframe id="exp-vid" src="https://player.vimeo.com/video/185840373??api=1&player_id=vimeoplayer&title=0&byline=0&portrait=0" width="800" height="450"  frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                    </div>
                 </div>
             </div>
         </div>
@@ -312,12 +329,12 @@
             <p class="lead">When something bad happens to your phone:</p>
             <div class="row">
                 <div class="col-md-4">
-                    <span class="large-no">1</span>
+                    <span class="large-no large-no--arrow">1</span>
                     <h4 class="h3 h-light text-blue">Contact Claims Team</h4>
-                    <p>These helpful people are here in the UK, available to answer your call 24-hrs a day, 7 days a week, 365 days a year. Just call them on <a name="Contact the claims team on - 0344 856 0852" href="tel:0344 856 0852"><span class="sr-only">Call our claims team on: </span><strong>0344 856 0852</strong></a>.</p>
+                    <p>These helpful people are here in the UK, available to answer your call 24-hrs a day, 7 days a week, 365 days a year when you have an issue with your phone. And if you need to start a claim, <a href="{{ path('claim') }}" class="text-nowrap">fill in the form here</a>.</p>
                 </div>
                 <div class="col-md-4">
-                    <span class="large-no">2</span>
+                    <span class="large-no large-no--arrow">2</span>
                     <h4 class="h3 h-light text-blue">Review Claim</h4>
                     <p>Our goal is for the claims to be handled almost instantly. Approving a claim takes on average less than one hour to process during normal business hours.*</p>
                 </div>

@@ -3057,6 +3057,13 @@ abstract class Policy
 
         $newPolicy->init($this->getUser(), $terms);
 
+        // Cancelled policies that were not fully paid should link claims to the renewal policy
+        if ($this->isCancelledAndPaymentOwed()) {
+            foreach ($this->getApprovedClaims() as $claim) {
+                $newPolicy->addLinkedClaim($claim);
+            }
+        }
+
         return $newPolicy;
     }
 
