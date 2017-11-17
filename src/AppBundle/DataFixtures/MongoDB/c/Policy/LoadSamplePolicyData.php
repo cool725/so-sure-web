@@ -33,6 +33,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
     const CONNECTIONS_RANDOM_OR_NONE = 'random-or-none';
     const CONNECTIONS_RANDOM = 'random';
+    const CONNECTIONS_ONE = 1;
 
      /**
      * @var ContainerInterface
@@ -202,7 +203,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $maxAttempts = 20;
         while ($policy->getPotValue() == 0) {
             $maxAttempts--;
-            $this->addConnections($manager, $user, $iosPreExpireUsers, self::CONNECTIONS_RANDOM);
+            $this->addConnections($manager, $user, $iosPreExpireUsers, self::CONNECTIONS_ONE);
             if ($maxAttempts < 0) {
                 throw new \Exception(sprintf('0 pot value policy %s', $user->getEmail()));
             }
@@ -216,7 +217,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $maxAttempts = 20;
         while ($policy->getPotValue() == 0) {
             $maxAttempts--;
-            $this->addConnections($manager, $user, $iosPreExpireUsers, self::CONNECTIONS_RANDOM);
+            $this->addConnections($manager, $user, $iosPreExpireUsers, self::CONNECTIONS_ONE);
             if ($maxAttempts < 0) {
                 throw new \Exception(sprintf('0 pot value policy %s', $user->getEmail()));
             }
@@ -230,7 +231,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $maxAttempts = 20;
         while ($policy->getPotValue() == 0) {
             $maxAttempts--;
-            $this->addConnections($manager, $user, $iosPreExpireUsers, self::CONNECTIONS_RANDOM);
+            $this->addConnections($manager, $user, $iosPreExpireUsers, self::CONNECTIONS_ONE);
             if ($maxAttempts < 0) {
                 throw new \Exception(sprintf('0 pot value policy %s', $user->getEmail()));
             }
@@ -266,7 +267,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $maxAttempts = 20;
         while ($policy->getPotValue() == 0) {
             $maxAttempts--;
-            $this->addConnections($manager, $user, $androidPreExpireUsers, self::CONNECTIONS_RANDOM);
+            $this->addConnections($manager, $user, $androidPreExpireUsers, self::CONNECTIONS_ONE);
             if ($maxAttempts < 0) {
                 throw new \Exception(sprintf('0 pot value policy %s', $user->getEmail()));
             }
@@ -280,7 +281,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $maxAttempts = 20;
         while ($policy->getPotValue() == 0) {
             $maxAttempts--;
-            $this->addConnections($manager, $user, $androidPreExpireUsers, self::CONNECTIONS_RANDOM);
+            $this->addConnections($manager, $user, $androidPreExpireUsers, self::CONNECTIONS_ONE);
             if ($maxAttempts < 0) {
                 throw new \Exception(sprintf('0 pot value policy %s', $user->getEmail()));
             }
@@ -294,7 +295,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $maxAttempts = 20;
         while ($policy->getPotValue() == 0) {
             $maxAttempts--;
-            $this->addConnections($manager, $user, $androidPreExpireUsers, self::CONNECTIONS_RANDOM);
+            $this->addConnections($manager, $user, $androidPreExpireUsers, self::CONNECTIONS_ONE);
             if ($maxAttempts < 0) {
                 throw new \Exception(sprintf('0 pot value policy %s', $user->getEmail()));
             }
