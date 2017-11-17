@@ -439,6 +439,9 @@ class AdminEmployeeController extends BaseController
         $claimFlags = $this->get('form.factory')
             ->createNamedBuilder('claimflags', ClaimFlagsType::class, $claim)
             ->getForm();
+        $debtForm = $this->get('form.factory')
+            ->createNamedBuilder('debt_form')->add('debt', SubmitType::class)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('cancel_form')) {
@@ -763,6 +766,30 @@ class AdminEmployeeController extends BaseController
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
+            } elseif ($request->request->has('debt_form')) {
+                $debtForm->handleRequest($request);
+                if ($debtForm->isValid()) {
+                    $policy->setDebtCollector(Policy::DEBT_COLLECTOR_WISE);
+                    $dm->flush();
+                    $mailer = $this->get('app.mailer');
+                    $mailer->sendTemplate(
+                        'Debt Collection Request',
+                        'debts@awise.demon.co.uk',
+                        'AppBundle:Email:policy/debtCollection.html.twig',
+                        ['policy' => $policy],
+                        'AppBundle:Email:policy/debtCollection.txt.twig',
+                        ['policy' => $policy],
+                        null,
+                        'bcc@so-sure.com'
+                    );
+
+                    $this->addFlash(
+                        'success',
+                        sprintf('Emailed debt collector and set flag on policy')
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
             }
         }
         $checks = $fraudService->runChecks($policy);
@@ -789,6 +816,7 @@ class AdminEmployeeController extends BaseController
             'regenerate_policy_schedule_form' => $regeneratePolicyScheduleForm->createView(),
             'makemodel_form' => $makeModelForm->createView(),
             'chargebacks_form' => $chargebacksForm->createView(),
+            'debt_form' => $debtForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),

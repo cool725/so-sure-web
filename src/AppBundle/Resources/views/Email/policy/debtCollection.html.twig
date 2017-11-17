@@ -1,0 +1,30 @@
+{% extends 'AppBundle:Email:base.html.twig' %}
+{% import "AppBundle:Email:macros.html.twig" as macros %}
+{% block body %}
+	{{ macros.start_table() }}
+		<h1>
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		</h1>
+		<div style="font-size: 14px; text-align: left;">
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		   <div style="font-size: 14px; text-align: left;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+                Please start the debt collection process for:
+                <br><br>
+				{{ policy.user.name }} 
+				<br><br>
+                for the amount of £{{ policy.getRemainderOfPolicyPrice|number_format(2, '.', ',') }} (due on {{ policy.end | date }})
+				<br><br>
+				Email: {{ policy.user.email }} 
+                <br><br>
+				Mobile: {{ policy.user.mobileNumber }} 
+                <br><br>
+				Address: {{ policy.user.billingAddress }} 
+                <br><br>
+                Link to pay: {{ url('purchase_remainder_policy', {'id': policy.Id }) }}
+                <br><br>
+                Reason: {{ policy.phone }} was insured (Policy {{ policy.policyNumber }} and replacement phone was received on {{ policy.getApprovedClaims(true, true)[0].replacementReceivedDate|date }}. As per so-sure terms & conditions, the remainder of the policy must be paid for in full.
+				<br><br>
+		   </div>
+		</div>
+	{{ macros.end_table() }}
+{% endblock %}
