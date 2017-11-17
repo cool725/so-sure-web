@@ -10,7 +10,7 @@
     {% stylesheets output='css/*.css'
         'components/bootstrap-daterangepicker/daterangepicker.css'
         'components/intl-tel-input/intlTelInput.css'
-        '@AppBundle/Resources/public/sass/page/checkoutNew.scss'
+        '@AppBundle/Resources/public/sass/page/checkout.scss'
     %}
         <link rel="stylesheet" href="{{ asset_url }}">
     {% endstylesheets %}
@@ -336,7 +336,7 @@
     'components/intl-tel-input/intlTelInput.min.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
     '@AppBundle/Resources/public/js/Default/index.js'
-    '@AppBundle/Resources/public/js/Purchase/purchaseStepNew.js'
-    '@AppBundle/Resources/public/js/Purchase/purchaseStepPhoneNew.js' %}
+    '@AppBundle/Resources/public/js/Purchase/purchaseStep.js'
+    '@AppBundle/Resources/public/js/Purchase/purchaseStepPhone.js' %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
