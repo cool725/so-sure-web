@@ -122,7 +122,7 @@ class SlackCommand extends ContainerAwareCommand
         return $lines;
     }
 
-        public function isCancelledAndPaymentOwed()
+    public function isCancelledAndPaymentOwed()
     {
         if (!$this->isFullyPaid() &&
             count($this->getApprovedClaims(true, true)) > 0 &&
