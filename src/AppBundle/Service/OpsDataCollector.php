@@ -9,6 +9,7 @@ class OpsDataCollector extends DataCollector
 {
     public function collect(Request $request, Response $response, \Exception $exception = null)
     {
+        \AppBundle\Classes\NoOp::ignore([$response, $exception]);
         $this->data = array(
             'method' => $request->getMethod(),
             'acceptable_content_types' => $request->getAcceptableContentTypes(),
