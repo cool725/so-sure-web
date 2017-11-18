@@ -382,6 +382,7 @@ services:
             imeiValidator:        "@app.imei"
             rateLimit:            "@app.ratelimit"
             intercom:             "@app.intercom"
+            sms:                  "@app.sms"
 
     app.invoice:
         class: AppBundle\Service\InvoiceService
