@@ -122,7 +122,7 @@ class PhonePolicyRepository extends PolicyRepository
         $qb = $this->createQueryBuilder()
             ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
 
-        $qb->field('start')->lte($endDate);
+        $qb->field('start')->lt($endDate);
         if ($startDate) {
             $qb->field('start')->gte($startDate);
         }
