@@ -6,6 +6,7 @@ use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Phone;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Cashback;
 use AppBundle\Document\User;
 use AppBundle\Document\Lead;
@@ -2431,6 +2432,18 @@ class PhonePolicyTest extends WebTestCase
             $yearlyPolicy->getProratedRefundCommissionAmount(new \DateTime('2016-02-10')),
             $yearlyPolicy->getRefundCommissionAmount(new \DateTime('2016-02-10'))
         );
+    }
+
+    public function testSetPicSureStatus()
+    {
+        $policy = new PhonePolicy();
+        $this->assertNull($policy->getPicSureApprovedDate());
+
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_MANUAL);
+        $this->assertNull($policy->getPicSureApprovedDate());
+
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+        $this->assertEquals(new \DateTime(), $policy->getPicSureApprovedDate());
     }
 
     public function testPolicyDispossessionRefund()

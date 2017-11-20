@@ -29,6 +29,10 @@ class Stats
     const MIXPANEL_VIEW_INVITATION_EMAIL = 'mixpanel-view-invitation-email';
     const MIXPANEL_PURCHASE_POLICY_APP_ATTRIB = 'mixpanel-purchase-policy-app-attrib';
 
+    const KPI_PICSURE_UNSTARTED_POLICIES = 'kpi-picsure-unstarted-policies';
+    const KPI_PICSURE_APPROVED_POLICIES = 'kpi-picsure-approved-policies';
+    const KPI_PICSURE_REJECTED_POLICIES = 'kpi-picsure-rejected-policies';
+
     /**
      * @MongoDB\Id
      */

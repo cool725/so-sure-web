@@ -309,11 +309,7 @@ class ReportingService
             $newToDateSCodePolicies
         );
 
-        $termsRepo = $this->dm->getRepository(PolicyTerms::class);
-        $allTerms = $termsRepo->findAll();
-        $data['picsureApproved'] = $policyRepo->countPicSurePolicies(PhonePolicy::PICSURE_STATUS_APPROVED, $allTerms);
-        $data['picsureRejected'] = $policyRepo->countPicSurePolicies(PhonePolicy::PICSURE_STATUS_REJECTED, $allTerms);
-        $data['picsureUnstarted'] = $policyRepo->countPicSurePolicies(null, $allTerms);
+        $data = array_merge($data, $this->getPicSureData());
 
         return [
             'start' => $start,
@@ -324,6 +320,20 @@ class ReportingService
             'approvedClaims' => $approvedClaimsTotals,
             'closedClaims' => $closedClaimsTotals,
         ];
+    }
+
+    public function getPicSureData()
+    {
+        $data = [];
+
+        $policyRepo = $this->dm->getRepository(PhonePolicy::class);
+        $termsRepo = $this->dm->getRepository(PolicyTerms::class);
+        $allTerms = $termsRepo->findAll();
+        $data['picsureApproved'] = $policyRepo->countPicSurePolicies(PhonePolicy::PICSURE_STATUS_APPROVED, $allTerms);
+        $data['picsureRejected'] = $policyRepo->countPicSurePolicies(PhonePolicy::PICSURE_STATUS_REJECTED, $allTerms);
+        $data['picsureUnstarted'] = $policyRepo->countPicSurePolicies(null, $allTerms);
+
+        return $data;
     }
 
     private function getTotalRunRateByDate($date)
