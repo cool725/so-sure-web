@@ -127,8 +127,7 @@
                     </div>
                 </div>
             </div>
-
-            {% if feature_enabled('quote-lead') and phone.initialPrice > 0 %}
+            {% if feature_enabled('quote-lead') and coming_soon == false and phone.initialPrice > 0 %}
             <div class="row">
                 <div class="col-md-12">
                     <div class="quote-card">
