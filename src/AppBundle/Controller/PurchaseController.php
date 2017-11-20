@@ -789,8 +789,6 @@ class PurchaseController extends BaseController
                 $lead->setName(null);
             } catch (InvalidEmailException $e) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, 'Invalid email format', 200);
-            } catch (ValidationException $e) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Invalid parameter', 200);
             }
                 $dm->persist($lead);
                 $dm->flush();

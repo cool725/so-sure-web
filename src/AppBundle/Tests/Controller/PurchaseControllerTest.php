@@ -801,6 +801,6 @@ class PurchaseControllerTest extends BaseControllerTest
                 'csrf' => $csrfToken,
             ])
         );
-        self::verifyResponse(200, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+        self::verifyResponse(200, ApiErrorCode::SUCCESS);
     }
 }
