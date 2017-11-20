@@ -288,6 +288,14 @@
 
                 .homepage--hero__tooltip {
                     bottom: 70px; left: 31px;
+
+                    &:before {
+                        background-color: $green;
+                    }
+
+                    &:after {
+                        border-top-color: $green;
+                    }
                 }
             }
 
