@@ -934,8 +934,9 @@
     padding: 10px;
 
     @include border-radius(4px);
-    box-shadow: 0 0 15px $grey;
-    @include transition(box-shadow 0.3s ease-in-out);
+    border: 1px solid $grey;
+    // box-shadow: 0 0 15px $grey;
+    // @include transition(box-shadow 0.3s ease-in-out);
 
     // search form - set width
     @include breakpoint(laptop) {
@@ -950,6 +951,7 @@
 
 // Style input on focus
 .search-phone-form--focus {
+    border-color: $light-blue;
 
     .twitter-typeahead {
 
@@ -961,8 +963,18 @@
 
 .search-phone-form--sticky {
     position: fixed;
-    top: 60px; left: 0; right: 0;
+    top: 49px; left: 0; right: 0;
     z-index: 999;
+    margin-left: 15px;
+    margin-right: 15px;
+
+    @include border-top-radius(0);
+
+    @include breakpoint(laptop) {
+        top: 15px;
+        z-index: 1001;
+        @include border-top-radius(4px);
+    }
 }
 
 
