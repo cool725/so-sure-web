@@ -15,9 +15,12 @@ use AppBundle\Document\Phone;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
+use AppBundle\Document\CurrencyTrait;
 
 class ChargebacksType extends AbstractType
 {
+    use CurrencyTrait;
+
     /**
      * @var RequestStack
      */
@@ -42,7 +45,7 @@ class ChargebacksType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
             $chargeback = $event->getData();
             $form = $event->getForm();
-            $amount = 0 - $chargeback->getPolicy()->getPremiumInstallmentPrice();
+            $amount = $this->toTwoDp(0 - $chargeback->getPolicy()->getPremiumInstallmentPrice());
 
             $form->add('chargeback', DocumentType::class, [
                     'placeholder' => 'Select a chargeback',

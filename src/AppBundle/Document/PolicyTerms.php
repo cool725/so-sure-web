@@ -15,17 +15,21 @@ class PolicyTerms extends PolicyDocument
     // Initial release version
     const VERSION_1 = 'Version 1 June 2016';
 
-    // Accidental release version that included picure - 3/8 - 16/8
+    // Accidental release version that included picure - 3/8 - 16/8 2017
     const VERSION_2 = 'Version 2 Aug 2017';
 
     // Same as version 2, but reverted excess - what should have been July release
     const VERSION_3 = 'Version 3 Aug 2017';
+
+    // Same as version 2, but released 2 Nov 2017
+    const VERSION_4 = 'Version 4 Nov 2017';
 
     public static $allVersions = [
         self::VERSION_0,
         self::VERSION_1,
         self::VERSION_2,
         self::VERSION_3,
+        self::VERSION_4,
     ];
 
     public function getVersionNumber()
@@ -41,6 +45,8 @@ class PolicyTerms extends PolicyDocument
             return '2';
         } elseif (in_array($version, [self::VERSION_3])) {
             return '3';
+        } elseif (in_array($version, [self::VERSION_4])) {
+            return '4';
         }
 
         return null;

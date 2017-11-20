@@ -49,6 +49,7 @@ use AppBundle\Exception\LostStolenImeiException;
 use AppBundle\Exception\InvalidImeiException;
 use AppBundle\Exception\ImeiBlacklistedException;
 use AppBundle\Exception\ImeiPhoneMismatchException;
+use AppBundle\Exception\InvalidEmailException;
 
 use AppBundle\Service\RateLimitService;
 use AppBundle\Service\PushService;
@@ -1030,6 +1031,14 @@ class ApiAuthController extends BaseController
             $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_MANUAL);
             $dm->flush();
 
+            $environment = $this->getParameter('kernel.environment');
+            $message = \Swift_Message::newInstance()
+                ->setSubject(sprintf('New pic-sure image to process [%s]', $environment))
+                ->setFrom('tech@so-sure.com')
+                ->setTo('tech@so-sure.com')
+                ->setBody('<a href="https://wearesosure.com/admin/picsure">Admin site</a>', 'text/html');
+            $this->get('mailer')->send($message);
+
             return new JsonResponse($policy->toApiArray());
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
@@ -1699,7 +1708,11 @@ class ApiAuthController extends BaseController
                 $userChanged = true;
             }
 
-            $this->validateObject($user);
+            try {
+                $this->validateObject($user);
+            } catch (InvalidEmailException $ex) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, 'Invalid email format', 422);
+            }
 
             if ($userChanged) {
                 $dm->flush();

@@ -2,6 +2,9 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Exception\InvalidEmailException;
+use AppBundle\Exception\InvalidFullNameException;
+use AppBundle\Exception\ValidationException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
@@ -315,42 +318,50 @@ class PhoneInsuranceController extends BaseController
                     return $this->redirectToRoute('launch_share', ['id' => $existingUser->getId()]);
                 }
             } elseif ($request->request->has('lead_form')) {
-                $leadForm->handleRequest($request);
-                if ($leadForm->isValid()) {
-                    $leadRepo = $dm->getRepository(Lead::class);
-                    $existingLead = $leadRepo->findOneBy(['email' => strtolower($lead->getEmail())]);
-                    if (!$existingLead) {
-                        $dm->persist($lead);
-                        $dm->flush();
-                    } else {
-                        $lead = $existingLead;
-                    }
-                    $sevenDays = new \DateTime();
-                    $sevenDays = $sevenDays->add(new \DateInterval('P7D'));
-                    $mailer = $this->get('app.mailer');
-                    $mailer->sendTemplate(
-                        sprintf('Your saved so-sure quote for %s', $phone),
-                        $lead->getEmail(),
-                        'AppBundle:Email:quote/priceGuarentee.html.twig',
-                        ['phone' => $phone, 'sevenDays' => $sevenDays, 'quoteUrl' => $session->get('quote_url')],
-                        'AppBundle:Email:quote/priceGuarentee.txt.twig',
-                        ['phone' => $phone, 'sevenDays' => $sevenDays, 'quoteUrl' => $session->get('quote_url')]
-                    );
-                    $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_LEAD_CAPTURE);
-                    $this->get('app.mixpanel')->queuePersonProperties([
-                        '$email' => $lead->getEmail()
-                    ], true);
-                    $this->get('app.intercom')->queueLead($lead, IntercomService::QUEUE_EVENT_SAVE_QUOTE, [
-                        'quoteUrl' => $session->get('quote_url'),
-                        'phone' => $phone->__toString(),
-                        'price' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-                        'expires' => $sevenDays,
-                    ]);
+                try {
+                    $leadForm->handleRequest($request);
 
-                    $this->addFlash('success', sprintf(
-                        "Thanks! Your quote is guaranteed now and we'll send you an email confirmation."
-                    ));
-                } else {
+                    if ($leadForm->isValid()) {
+                        $leadRepo = $dm->getRepository(Lead::class);
+                        $existingLead = $leadRepo->findOneBy(['email' => strtolower($lead->getEmail())]);
+                        if (!$existingLead) {
+                            $dm->persist($lead);
+                            $dm->flush();
+                        } else {
+                            $lead = $existingLead;
+                        }
+                        $sevenDays = new \DateTime();
+                        $sevenDays = $sevenDays->add(new \DateInterval('P7D'));
+                        $mailer = $this->get('app.mailer');
+                        $mailer->sendTemplate(
+                            sprintf('Your saved so-sure quote for %s', $phone),
+                            $lead->getEmail(),
+                            'AppBundle:Email:quote/priceGuarentee.html.twig',
+                            ['phone' => $phone, 'sevenDays' => $sevenDays, 'quoteUrl' => $session->get('quote_url')],
+                            'AppBundle:Email:quote/priceGuarentee.txt.twig',
+                            ['phone' => $phone, 'sevenDays' => $sevenDays, 'quoteUrl' => $session->get('quote_url')]
+                        );
+                        $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_LEAD_CAPTURE);
+                        $this->get('app.mixpanel')->queuePersonProperties([
+                            '$email' => $lead->getEmail()
+                        ], true);
+                        $this->get('app.intercom')->queueLead($lead, IntercomService::QUEUE_EVENT_SAVE_QUOTE, [
+                            'quoteUrl' => $session->get('quote_url'),
+                            'phone' => $phone->__toString(),
+                            'price' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+                            'expires' => $sevenDays,
+                        ]);
+
+                        $this->addFlash('success', sprintf(
+                            "Thanks! Your quote is guaranteed now and we'll send you an email confirmation."
+                        ));
+                    } else {
+                        $this->addFlash('error', sprintf(
+                            "Sorry, didn't quite catch that email.  Please try again."
+                        ));
+                    }
+                } catch (InvalidEmailException $ex) {
+                    $this->get('logger')->info('Failed validation.', ['exception' => $ex]);
                     $this->addFlash('error', sprintf(
                         "Sorry, didn't quite catch that email.  Please try again."
                     ));

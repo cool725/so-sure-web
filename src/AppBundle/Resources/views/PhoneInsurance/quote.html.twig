@@ -27,7 +27,6 @@
     'components/fuse.js/fuse.min.js'
     'components/rangeslider.js/rangeslider.min.js'
     '@AppBundle/Resources/public/js/Default/modalVideo.js'
-    '@AppBundle/Resources/public/js/Default/index.js'
     '@AppBundle/Resources/public/js/Default/slider.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
     '@AppBundle/Resources/public/js/Default/bannerSticky.js' %}
@@ -109,7 +108,9 @@
                                             <strong>£{{ phone_price.monthlyPremiumPrice }}</strong>
                                             <small>per month</small><br>
                                         </div>
-                                        <span>£50 Excess (£70 for Theft &amp; Loss)</span>
+                                        <span><i class="fa fa-question-circle" title="pic-sure is our free app-based process to prove your phone is in good working condition and your screen is not cracked"></i> pic-sure validated excess: £50 (£70 for Theft &amp; Loss)</span>
+                                        <br>
+                                        <span>pic-sure non-validated excess: £150</span>
                                     </div>
                                     <div class="col-sm-6">
                                         {{ form_widget(buy_form.buy_tablet, {'label': 'Get Started', 'attr': {'class': 'btn btn-success btn-lg  btn-block'}}) }}
@@ -125,8 +126,7 @@
                     </div>
                 </div>
             </div>
-
-            {% if feature_enabled('quote-lead') and phone.initialPrice > 0 %}
+            {% if feature_enabled('quote-lead') and coming_soon == false and phone.initialPrice > 0 %}
             <div class="row">
                 <div class="col-md-12">
                     <div class="quote-card">

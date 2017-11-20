@@ -22,14 +22,6 @@
     <link href="https://cdn-images.mailchimp.com/embedcode/classic-10_7.css" rel="stylesheet" type="text/css">
 {% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-    '@AppBundle/Resources/public/js/Default/index.js'
- %}
-    <script src="{{ asset_url }}"></script>{% endjavascripts %}
-{% endblock %}
-
 {% block body %}
 
     <!-- Primary Page Layout

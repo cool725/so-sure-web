@@ -26,6 +26,7 @@ class PhonePolicy extends Policy
     const PICSURE_STATUS_REJECTED = 'rejected';
     const PICSURE_STATUS_MANUAL = 'manual';
     const PICSURE_STATUS_INVALID = 'invalid';
+    const PICSURE_STATUS_DISABLED = 'disabled';
 
     use ArrayToApiArrayTrait;
 
@@ -113,7 +114,12 @@ class PhonePolicy extends Policy
 
         // Only set premium if not already present
         if (!$this->getPremium()) {
-            $this->setPremium($phone->getCurrentPhonePrice($date)->createPremium($date));
+            $additionalPremium = null;
+            if ($this->getUser()) {
+                $additionalPremium = $this->getUser()->getAdditionalPremium();
+            }
+            $price = $phone->getCurrentPhonePrice($date);
+            $this->setPremium($price->createPremium($additionalPremium, $date));
         }
     }
 
@@ -466,7 +472,11 @@ class PhonePolicy extends Policy
         if (!$phonePrice) {
             throw new \UnexpectedValueException(sprintf('Missing phone price'));
         }
-        $expectedPremium = $phonePrice->createPremium($date);
+        $additionalPremium = null;
+        if ($this->getUser()) {
+            $additionalPremium = $this->getUser()->getAdditionalPremium();
+        }
+        $expectedPremium = $phonePrice->createPremium($additionalPremium, $date);
 
         if ($this->getPremium()!= $expectedPremium) {
             if ($adjust) {
@@ -488,6 +498,10 @@ class PhonePolicy extends Policy
 
     public function getPicSureStatus()
     {
+        if (!$this->picSureStatus && $this->getPolicyTerms() && !$this->getPolicyTerms()->isPicSureEnabled()) {
+            return self::PICSURE_STATUS_DISABLED;
+        }
+
         return $this->picSureStatus;
     }
 

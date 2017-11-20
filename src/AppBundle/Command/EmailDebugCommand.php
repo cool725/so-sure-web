@@ -46,7 +46,7 @@ class EmailDebugCommand extends BaseCommand
             ->addArgument(
                 'template',
                 InputArgument::REQUIRED,
-                'Template (e.g. cashback/approved'
+                'Template (e.g. cashback/approved)'
             )
         ;
     }
@@ -81,8 +81,16 @@ class EmailDebugCommand extends BaseCommand
             'policyConnection' => [
                 'policy/connectionReduction',
             ],
+            'policy' => [
+                'policy/new',
+            ],
             'policyRenewal' => [
                 'policy/pendingRenewal',
+            ],
+            'picsure' => [
+                'picsure/accepted',
+                'picsure/rejected',
+                'picsure/invalid',
             ],
         ];
         $variations = [
@@ -155,6 +163,19 @@ class EmailDebugCommand extends BaseCommand
             $policyService = $this->getContainer()->get('app.policy');
 
             return $policyService->connectionReduced($connection);
+        } elseif (in_array($template, $templates['policy'])) {
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(Policy::class);
+            $policies = $repo->findBy(['status' => Policy::STATUS_ACTIVE]);
+            foreach ($policies as $policy) {
+                break;
+            }
+            if (!$policy) {
+                throw new \Exception('Unable to find matching policy');
+            }
+            $policyService = $this->getContainer()->get('app.policy');
+
+            return $policyService->resendPolicyEmail($policy);
         } elseif (in_array($template, $templates['policyRenewal'])) {
             $dm = $this->getManager();
             $repo = $dm->getRepository(Policy::class);
@@ -194,6 +215,13 @@ class EmailDebugCommand extends BaseCommand
             }
             $policyService = $this->getContainer()->get('app.policy');
             return $policyService->pendingRenewalEmail($policy);
+        } elseif (in_array($template, $templates['picsure'])) {
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(Policy::class);
+            $policy = $repo->findOneBy(['status' => Policy::STATUS_ACTIVE]);
+            $data = [
+                'policy' => $policy,
+            ];
         } else {
             throw new \Exception(sprintf('Unsupported template %s for email debug. Add data', $template));
         }

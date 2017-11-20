@@ -147,7 +147,7 @@
                         {% endif %}
 
                         {# Save Quote #}
-                        {% if feature_enabled('quote-lead') %}
+                        {% if feature_enabled('quote-lead') and coming_soon == false and phone.initialPrice > 0 %}
                             <h3>Guarantee this price for the next 7 days</h3>
                             {{ form_start(lead_form, {'attr': {'class': 'form-inline quote__save'}}) }}
                                 {{ form_label(lead_form.email, 'Your email:', { 'label_attr': {'class': 'sr-only'} }) }}
@@ -296,7 +296,6 @@
     'components/fuse.js/fuse.min.js'
     'components/rangeslider.js/rangeslider.min.js'
     '@AppBundle/Resources/public/js/Default/modalVideo.js'
-    '@AppBundle/Resources/public/js/Default/index.js'
     '@AppBundle/Resources/public/js/Default/sliderNew.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
     '@AppBundle/Resources/public/js/Default/bannerSticky.js' %}

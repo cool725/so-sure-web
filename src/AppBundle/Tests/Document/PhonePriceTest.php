@@ -22,7 +22,7 @@ class PhonePriceTest extends \PHPUnit_Framework_TestCase
         $phonePrice = new PhonePrice();
         $phonePrice->setGwp(5);
         $date = new \DateTime('2016-05-01');
-        $premium = $phonePrice->createPremium($date);
+        $premium = $phonePrice->createPremium(null, $date);
         $this->assertEquals(0.48, $premium->getIpt());
         $this->assertEquals(5, $premium->getGwp());
         $this->assertEquals(0.095, $premium->getIptRate());
@@ -33,10 +33,32 @@ class PhonePriceTest extends \PHPUnit_Framework_TestCase
         $phonePrice = new PhonePrice();
         $phonePrice->setGwp(5);
         $date = new \DateTime('2016-10-01');
-        $premium = $phonePrice->createPremium($date);
+        $premium = $phonePrice->createPremium(null, $date);
         $this->assertEquals(0.50, $premium->getIpt());
         $this->assertEquals(5, $premium->getGwp());
         $this->assertEquals(0.1, $premium->getIptRate());
+    }
+
+    public function testCreatePremiumNewNewIptRate()
+    {
+        $phonePrice = new PhonePrice();
+        $phonePrice->setGwp(5);
+        $date = new \DateTime('2017-06-01');
+        $premium = $phonePrice->createPremium(null, $date);
+        $this->assertEquals(0.60, $premium->getIpt());
+        $this->assertEquals(5, $premium->getGwp());
+        $this->assertEquals(0.12, $premium->getIptRate());
+    }
+
+    public function testCreatePremiumAdditionalPremium()
+    {
+        $phonePrice = new PhonePrice();
+        $phonePrice->setGwp(5);
+        $date = new \DateTime('2017-06-01');
+        $premium = $phonePrice->createPremium(41.67, $date);
+        $this->assertEquals(46.67, $premium->getGwp());
+        $this->assertEquals(5.60, $premium->getIpt());
+        $this->assertEquals(0.12, $premium->getIptRate());
     }
 
     public function testGetAdjustedPremiumPrices()
@@ -44,7 +66,7 @@ class PhonePriceTest extends \PHPUnit_Framework_TestCase
         $phonePrice = new PhonePrice();
         $phonePrice->setGwp(5);
         $date = new \DateTime('2016-10-01');
-        $premium = $phonePrice->createPremium($date);
+        $premium = $phonePrice->createPremium(null, $date);
 
         $this->assertEquals(5.5, $phonePrice->getAdjustedFinalMonthlyPremiumPrice(0, $date));
         $this->assertEquals(5.5, $phonePrice->getAdjustedStandardMonthlyPremiumPrice(0, $date));

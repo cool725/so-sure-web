@@ -100,21 +100,26 @@
         })(window,document,'script','dataLayer','GTM-KGBBJQ');</script>
         <!-- End Google Tag Manager -->
 
-        {% if environment != 'prod' and app.request.get('hide_env') != '1' %}
-            <div style="background-color: red; text-align: center; color: white;">
-                <strong>{{ environment }}</strong>
-                <a href="{{ path('ops_pages') }}"><i class="fa fa-wrench"></i></a>
-                &nbsp;&nbsp;&nbsp;
-                <a href="{{ path('quote_make_model_memory', {'make':'Apple','model':'iPhone 7','memory':128}) }}"><i class="fa fa-mobile" title="Quick Quote"></i></a>
-                {% if distraction_free is defined and distraction_free == 1 and app.user is not null and app.user %}
-                    &nbsp;&nbsp;&nbsp;
-                    {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
-                        <a href="{{ path('homepage', {'_impersonate': '_exit'}) }}">Exit <strong>{{ app.user.email }}</strong></a>
-                    {% else %}
-                        <a href="{{ path('fos_user_security_logout') }}">Logout <strong>{{ app.user.email }}</strong></a>
-                    {% endif %}
-                {% endif %}
-            </div>
+        {% if environment != 'prod' %}
+            <nav class="navbar navbar-fixed-bottom" style="background-color:#EFEFEF;height:40px;">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <ul class="navbar-brand list-inline">
+                            <li><strong class="text-red">{{ environment }}</strong></li>
+                            <li><a href="{{ path('ops_pages') }}"><i class="fa fa-wrench fa-lg"></i></a></li>
+                            <li><a href="{{ path('quote_make_model_memory', {'make':'Apple','model':'iPhone 7','memory':128}) }}"><i class="fa fa-mobile fa-lg" title="Quick Quote"></i></a></li>
+                            {% if distraction_free is defined and distraction_free == 1 and app.user is not null and app.user %}
+                                {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
+                                    <li><a href="{{ path('homepage', {'_impersonate': '_exit'}) }}">Exit <strong>{{ app.user.email }}</strong></a></li>
+                                {% else %}
+                                    <li><a href="{{ path('fos_user_security_logout') }}">Logout <strong>{{ app.user.email }}</strong></a></li>
+                                {% endif %}
+                            {% endif %}
+                        </ul>
+
+                    </div>
+                </div>
+            </nav>
         {% endif %}
 
         {% block nav %}

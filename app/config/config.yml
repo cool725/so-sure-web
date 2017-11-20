@@ -470,6 +470,7 @@ nelmio_security:
                 - https://www.workable.com
                 - 'data:'
                 - https://www.googleadservices.com
+                - https://*.doubleclick.net
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
@@ -716,6 +717,7 @@ nelmio_security:
                 - https://chart.googleapis.com
                 # linkedin
                 - https://secure.adnxs.com
+                - https://*.bizographics.com
                 - https://www.accountkit.com
                 - https://www.glassdoor.co.uk
                 - 'data:'

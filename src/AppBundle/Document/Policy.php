@@ -91,6 +91,8 @@ abstract class Policy
     // £5 for policies purchased feb 2016-apr 2017 when login to app
     const PROMO_APP_MARCH_2017 = 'app-download-mar-2017';
 
+    const DEBT_COLLECTOR_WISE = 'wise';
+
     public static $riskLevels = [
         self::RISK_CONNECTED_POT_ZERO => self::RISK_LEVEL_HIGH,
         self::RISK_CONNECTED_SELF_CLAIM => self::RISK_LEVEL_HIGH,
@@ -159,6 +161,13 @@ abstract class Policy
      * @Gedmo\Versioned
      */
     protected $status;
+
+    /**
+     * @Assert\Choice({"wise"}, strict=true)
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $debtCollector;
 
     /**
      * @Assert\Choice({
@@ -801,6 +810,16 @@ abstract class Policy
     public function setStart(\DateTime $start)
     {
         $this->start = $start;
+    }
+
+    public function getDebtCollector()
+    {
+        return $this->debtCollector;
+    }
+
+    public function setDebtCollector($debtCollector)
+    {
+        $this->debtCollector = $debtCollector;
     }
 
     public function getBilling()
@@ -3057,6 +3076,13 @@ abstract class Policy
 
         $newPolicy->init($this->getUser(), $terms);
 
+        // Cancelled policies that were not fully paid should link claims to the renewal policy
+        if ($this->isCancelledAndPaymentOwed()) {
+            foreach ($this->getApprovedClaims() as $claim) {
+                $newPolicy->addLinkedClaim($claim);
+            }
+        }
+
         return $newPolicy;
     }
 
@@ -3598,10 +3624,31 @@ abstract class Policy
 
     public function isCancelledAndPaymentOwed()
     {
-        return !$this->isFullyPaid() &&
+        if (!$this->isFullyPaid() &&
             count($this->getApprovedClaims(true, true)) > 0 &&
             $this->getStatus() == self::STATUS_CANCELLED &&
-            $this->getCancelledReason() != self::CANCELLED_UPGRADE;
+            $this->getCancelledReason() != self::CANCELLED_UPGRADE) {
+            foreach ($this->getApprovedClaims(true, true) as $claim) {
+                if ($claim->getLinkedPolicy()) {
+                    // if this is the linked policy, then its automatically a cancelled w/payment owed
+                    if ($claim->getLinkedPolicy()->getId() == $this->getId()) {
+                        // print 'same' . PHP_EOL;
+                        return true;
+                    } elseif (!$claim->getLinkedPolicy()->isActive()) {
+                        // there was a linked policy, but its not active, so again ists a cancelled w/payment owed
+                        // print 'inactive' . PHP_EOL;
+                        return true;
+                    }
+                } else {
+                    // if there isn't a linked policy for one of the claims, then the policy must be this one
+                    // e.g. automatically a cancelled w/payment owed
+                    // print 'unlinked' . PHP_EOL;
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public function getSupportWarnings()
@@ -3947,6 +3994,11 @@ abstract class Policy
         // but we want to allow repurchase, so we set the flag to igore the claim
         if ($this->getStatus() == self::STATUS_CANCELLED && count($this->getApprovedClaims()) > 0 &&
             count($this->getApprovedClaims(true, true, true)) == 0) {
+            return true;
+        }
+
+        // If user forgot to pay and doesn't have a claim we will allow re-purchase
+        if ($this->getStatus() == self::STATUS_CANCELLED && count($this->getClaims()) == 0) {
             return true;
         }
 

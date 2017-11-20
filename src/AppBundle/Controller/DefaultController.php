@@ -373,7 +373,7 @@ class DefaultController extends BaseController
     {
         $user = $this->getUser();
         $claimFnol = new ClaimFnol();
-        
+
         if ($policyId) {
             $repo = $this->getManager()->getRepository(Policy::class);
             $policy = $repo->find($policyId);
@@ -398,7 +398,7 @@ class DefaultController extends BaseController
                     );
                     $mailer->sendTemplate(
                         $subject,
-                        'claims@wearesosure.com',
+                        'new-claim@wearesosure.com',
                         'AppBundle:Email:claim/fnolToClaims.html.twig',
                         ['data' => $claimFnol]
                     );
@@ -424,48 +424,6 @@ class DefaultController extends BaseController
 
         return [
             'claim_form' => $claimForm->createView(),
-        ];
-    }
-
-    /**
-     * @Route("/register", name="register")
-     * @Template
-     */
-    public function registerAction(Request $request)
-    {
-        $dm = $this->getManager();
-        $registerUser = new Register();
-        $session = $request->getSession();
-        if ($session->get('email')) {
-            $registerUser->setEmail($session->get('email'));
-        }
-
-        $form = $this->get('form.factory')
-            ->createNamedBuilder('launch', RegisterUserType::class, $registerUser)
-            ->getForm();
-        $form->handleRequest($request);
-        if ($form->isValid()) {
-            $userRepo = $dm->getRepository(User::class);
-            if ($userRepo->existsUser($registerUser->getEmail(), null, null)) {
-                $this->addFlash('warning', 'Looks like you already have an account.');
-                return $this->redirectToRoute('user_home');
-            }
-
-            // TODO: add to intercom?
-            $lead = new Lead();
-            $lead->setSource(Lead::SOURCE_BUY);
-            $lead->setEmail($registerUser->getEmail());
-
-            $dm->persist($lead);
-            $dm->flush();
-            $session->set('email', $registerUser->getEmail());
-
-            return $this->redirectToRoute('purchase');
-        }
-
-        return [
-            'form' => $form->createView(),
-            'quote' => $session->get('quote'),
         ];
     }
 
@@ -1068,6 +1026,18 @@ class DefaultController extends BaseController
             'utm_medium' => 'flyer',
             'utm_source' => 'sosure',
             'utm_campaign' => 'iPhone8',
+        ]));
+    }
+
+    /**
+     * @Route("/trinitiymaxwell", name="trinitiymaxwell_redirect")
+     */
+    public function tmAction()
+    {
+        return new RedirectResponse($this->generateUrl('homepage', [
+            'utm_medium' => 'flyer',
+            'utm_source' => 'sosure',
+            'utm_campaign' => 'trinitiymaxwell',
         ]));
     }
 }

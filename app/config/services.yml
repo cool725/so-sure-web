@@ -382,6 +382,7 @@ services:
             imeiValidator:        "@app.imei"
             rateLimit:            "@app.ratelimit"
             intercom:             "@app.intercom"
+            sms:                  "@app.sms"
 
     app.invoice:
         class: AppBundle\Service\InvoiceService
@@ -995,3 +996,12 @@ services:
         arguments:
             dm:          "@doctrine_mongodb.odm.default_document_manager"
             logger:      "@logger"
+
+    app.ops.datacollector:
+        class: AppBundle\Service\OpsDataCollector
+        tags:
+            -
+                name:     data_collector
+                template: 'opsDataCollector'
+                id: "app.ops_collector"
+        public: false

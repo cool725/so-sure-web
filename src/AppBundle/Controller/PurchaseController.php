@@ -2,6 +2,8 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Exception\InvalidEmailException;
+use AppBundle\Exception\InvalidFullNameException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -237,7 +239,7 @@ class PurchaseController extends BaseController
             'postcode' => $this->sixpack($request, SixpackService::EXPERIMENT_POSTCODE, ['comma', 'split', 'type']),
         );
 
-        return $this->render('AppBundle:Purchase:purchaseStepPersonalAddressNew.html.twig', $data);
+        return $this->render('AppBundle:Purchase:purchaseStepPersonalAddress.html.twig', $data);
     }
 
     /**
@@ -274,7 +276,7 @@ class PurchaseController extends BaseController
             ) : null,
         );
 
-        return $this->render('AppBundle:Purchase:purchaseStepPhoneNoPhoneNew.html.twig', $data);
+        return $this->render('AppBundle:Purchase:purchaseStepPhoneNoPhone.html.twig', $data);
     }
 
     /**
@@ -333,10 +335,11 @@ class PurchaseController extends BaseController
             $purchase->setPhone($phone);
             // Default to monthly payment
             if ('GET' === $request->getMethod()) {
+                $price = $phone->getCurrentPhonePrice();
                 if ($user->allowedMonthlyPayments()) {
-                    $purchase->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+                    $purchase->setAmount($price->getMonthlyPremiumPrice($user->getAdditionalPremium()));
                 } elseif ($user->allowedYearlyPayments()) {
-                    $purchase->setAmount($phone->getCurrentPhonePrice()->getYearlyPremiumPrice());
+                    $purchase->setAmount($price->getYearlyPremiumPrice($user->getAdditionalPremium()));
                 }
             }
         }
@@ -538,7 +541,7 @@ class PurchaseController extends BaseController
             'billing_date' => $billingDate,
         );
 
-        return $this->render('AppBundle:Purchase:purchaseStepPhoneReviewNew.html.twig', $data);
+        return $this->render('AppBundle:Purchase:purchaseStepPhoneReview.html.twig', $data);
     }
 
     /**
@@ -779,14 +782,16 @@ class PurchaseController extends BaseController
 
             // Having some validation exceptions for Lead Names - check if its going to fail
             // validation and remove name if its not working. Hopefully the name will be updated later on
+            // on invalid email format return error as we cannot open lead
             try {
                 $this->validateObject($lead);
-            } catch (ValidationException $e) {
+            } catch (InvalidFullNameException $e) {
                 $lead->setName(null);
+            } catch (InvalidEmailException $e) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, 'Invalid email format', 200);
             }
-
-            $dm->persist($lead);
-            $dm->flush();
+                $dm->persist($lead);
+                $dm->flush();
         }
 
         return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'OK', 200);

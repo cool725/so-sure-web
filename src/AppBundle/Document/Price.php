@@ -77,17 +77,27 @@ abstract class Price
 
     public function getIpt(\DateTime $date = null)
     {
-        return $this->toTwoDp($this->getGwp() * $this->getCurrentIptRate($date));
+        return $this->calculateIpt($this->getGwp(), $date);
     }
 
-    public function getMonthlyPremiumPrice(\DateTime $date = null)
+    public function calculateIpt($gwp, \DateTime $date = null)
     {
-        return $this->toTwoDp($this->getGwp() + $this->getIpt($date));
+        return $this->toTwoDp($gwp * $this->getCurrentIptRate($date));
     }
 
-    public function getYearlyPremiumPrice(\DateTime $date = null)
+    public function getMonthlyPremiumPrice($additionalPremium = null, \DateTime $date = null)
     {
-        return $this->toTwoDp($this->getMonthlyPremiumPrice($date) * 12);
+        $gwp = $this->getGwp();
+        if ($additionalPremium) {
+            $gwp = $gwp + $additionalPremium;
+        }
+
+        return $this->toTwoDp($gwp + $this->calculateIpt($gwp, $date));
+    }
+
+    public function getYearlyPremiumPrice($additionalPremium = null, \DateTime $date = null)
+    {
+        return $this->toTwoDp($this->getMonthlyPremiumPrice($additionalPremium, $date) * 12);
     }
 
     public function getAdjustedFinalMonthlyPremiumPrice($potValue, \DateTime $date = null)
@@ -95,18 +105,18 @@ abstract class Price
         $monthlyAdjustment = floor(100 * $potValue / 12) / 100;
         $monthlyAdjustment = $potValue - ($monthlyAdjustment * 11);
 
-        return $this->toTwoDp($this->getMonthlyPremiumPrice($date) - $monthlyAdjustment);
+        return $this->toTwoDp($this->getMonthlyPremiumPrice(null, $date) - $monthlyAdjustment);
     }
 
     public function getAdjustedStandardMonthlyPremiumPrice($potValue, \DateTime $date = null)
     {
         $monthlyAdjustment = floor(100 * $potValue / 12) / 100;
-        return $this->toTwoDp($this->getMonthlyPremiumPrice($date) - $monthlyAdjustment);
+        return $this->toTwoDp($this->getMonthlyPremiumPrice(null, $date) - $monthlyAdjustment);
     }
 
     public function getAdjustedYearlyPremiumPrice($potValue, \DateTime $date = null)
     {
-        return $this->toTwoDp($this->getYearlyPremiumPrice($date) - $potValue);
+        return $this->toTwoDp($this->getYearlyPremiumPrice(null, $date) - $potValue);
     }
 
     public function getYearlyGwp()
@@ -129,12 +139,16 @@ abstract class Price
         $this->notes = $notes;
     }
 
-    abstract public function createPremium();
+    abstract public function createPremium($additionalGwp = null, \DateTime $date = null);
 
-    protected function populatePremium(Premium $premium, \DateTime $date = null)
+    protected function populatePremium(Premium $premium, $additionalGwp = null, \DateTime $date = null)
     {
-        $premium->setGwp($this->getGwp());
-        $premium->setIpt($this->getIpt($date));
+        $gwp = $this->getGwp();
+        if ($additionalGwp) {
+            $gwp = $gwp + $additionalGwp;
+        }
+        $premium->setGwp($this->toTwoDp($gwp));
+        $premium->setIpt($this->calculateIpt($gwp, $date));
         $premium->setIptRate($this->getCurrentIptRate($date));
     }
 

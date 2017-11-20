@@ -1,6 +1,8 @@
 {% extends 'base.html.twig' %}
 
-{% set white_logo = true %}
+{# Set vars #}
+{% set new_stylesheet = 1 %}
+{% set new_footer = 1 %}
 
 {% block javascripts %}
     {{ parent() }}
@@ -13,34 +15,30 @@
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-    '@AppBundle/Resources/public/sass/page/user.scss'%}
-    <link rel="stylesheet" href="{{ asset_url }}"> {% endstylesheets %}
-{% endblock %}
-
 {% block body %}
-    <section class="user-invalid">
+    <section class="section--pad">
         <div class="container">
             <div class="row">
                 <div class="col-md-12">
-                    <h1 class="text-white h2">Unpaid Policy</h1>
+                    <h1 class="text-center">Unpaid Policy</h1>
                     {% if webpay_action and webpay_reference and amount > 0 %}
-                    <p class="lead text-light-blue">Your policy is not up to date on your payments. Click below to pay the outstanding due of £{{ amount|number_format(2, '.', ',') }}.</p>
-                    <form action="{{ webpay_action }}" method="post" id="webpay-form">
-                        <div class="row">
-                            <div class="form-group col-sm-12">
-                                <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
-                                <input type="submit" class="btn btn-success " value="Proceed to payment">
+                        <p class="lead text-center">Your policy is not up to date on your payments. Click below to pay the outstanding due of £{{ amount|number_format(2, '.', ',') }}.</p>
+                        <form action="{{ webpay_action }}" method="post" id="webpay-form">
+                            <div class="row">
+                                <div class="col-sm-4 col-sm-offset-4">
+                                    <div class="form-group">
+                                        <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
+                                        <input type="submit" class="btn btn-green btn-block btn-pad " value="Proceed to payment">
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
                   {% elseif amount == 0 %}
-                    <p>Your policy is paid to date.</p>
+                        <p class="lead text-center">Your policy is paid to date.</p>
                   {% endif %}
                 </div>
             </div>
         </div>
     </section>
+    <section class="hidden-xs section--pad">&nbsp;</section>
 {% endblock %}

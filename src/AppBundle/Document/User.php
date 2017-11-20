@@ -321,7 +321,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @MongoDB\Field(type="boolean")
      * @Gedmo\Versioned
      */
-    protected $disallowRenewal;
+    protected $highRisk;
 
     /**
      * @MongoDB\Field(type="hash")
@@ -743,10 +743,6 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         }
 
         if (!$this->isEnabled()) {
-            return false;
-        }
-
-        if ($this->getDisallowRenewal()) {
             return false;
         }
 
@@ -1461,14 +1457,23 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         );
     }
 
-    public function setDisallowRenewal($disallowRenewal)
+    public function setHighRisk($highRisk)
     {
-        $this->disallowRenewal = $disallowRenewal;
+        $this->highRisk = $highRisk;
     }
 
-    public function getDisallowRenewal()
+    public function getHighRisk()
     {
-        return $this->disallowRenewal;
+        return $this->highRisk;
+    }
+
+    public function getAdditionalPremium()
+    {
+        if (!$this->getHighRisk()) {
+            return null;
+        }
+
+        return 500 / 12;
     }
 
     public function hasValidDetails()
@@ -1491,7 +1496,12 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     public function allowedMonthlyPayments()
     {
+        // Billing address is required as necessary to determine postcode
         if (!$this->hasValidDetails() || !$this->getBillingAddress()) {
+            return false;
+        }
+
+        if ($this->getHighRisk()) {
             return false;
         }
 
@@ -1508,6 +1518,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     public function allowedYearlyPayments()
     {
+        // No need to require Billing address as no postcode check
         if (!$this->hasValidDetails()) {
             return false;
         }
