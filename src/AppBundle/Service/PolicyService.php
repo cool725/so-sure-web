@@ -96,6 +96,9 @@ class PolicyService
 
     protected $intercom;
 
+    /** @var SmsService */
+    protected $sms;
+
     protected $warnMakeModelMismatch = true;
 
     public function setMailer($mailer)
@@ -150,6 +153,7 @@ class PolicyService
      * @param                  $imeiValidator
      * @param                  $rateLimit
      * @param                  $intercom
+     * @param SmsService       $sms
      */
     public function __construct(
         DocumentManager $dm,
@@ -170,7 +174,8 @@ class PolicyService
         $address,
         $imeiValidator,
         $rateLimit,
-        $intercom
+        $intercom,
+        SmsService $sms
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -191,6 +196,7 @@ class PolicyService
         $this->imeiValidator = $imeiValidator;
         $this->rateLimit = $rateLimit;
         $this->intercom = $intercom;
+        $this->sms = $sms;
     }
 
     private function validateUser($user)
@@ -895,6 +901,7 @@ class PolicyService
         $this->dm->flush();
 
         $this->cancelledPolicyEmail($policy);
+        $this->cancelledPolicySms($policy);
 
         $this->dispatchEvent(PolicyEvent::EVENT_CANCELLED, new PolicyEvent($policy));
     }
@@ -1032,7 +1039,7 @@ class PolicyService
         }
 
         $baseTemplate = sprintf('AppBundle:Email:policy-cancellation/%s', $policy->getCancelledReason());
-        if ($policy->getCancelledReason() == Policy::CANCELLED_UNPAID && $policy->hasMonetaryClaimed()) {
+        if ($policy->isCancelledAndPaymentOwed()) {
             $baseTemplate = sprintf('%sWithClaim', $baseTemplate);
         }
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
@@ -1048,6 +1055,23 @@ class PolicyService
             null,
             'bcc@so-sure.com'
         );
+    }
+
+    /**
+     * @param Policy $policy
+     */
+    public function cancelledPolicySms(Policy $policy)
+    {
+        if ($this->environment != 'prod') {
+            return;
+        }
+
+        if (!$policy->isCancelledAndPaymentOwed()) {
+            return;
+        }
+
+        $smsTemplate = 'AppBundle:Sms:cancelledWithPaymentOwed.txt.twig';
+        $this->sms->sendUser($policy, $smsTemplate, ['policy' => $policy]);
     }
 
     public function claimPendingClosedEmail(Claim $claim)

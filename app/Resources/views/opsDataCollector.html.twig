@@ -1,0 +1,25 @@
+{% extends '@WebProfiler/Profiler/layout.html.twig' %}
+
+{% block toolbar %}
+    {% set icon %}
+        {# this is the content displayed as a panel in the toolbar #}
+        <span class="icon"><img src="..." alt=""/></span>
+        <span class="sf-toolbar-status"><strong class="text-red">{{ environment }}</strong></span>
+    {% endset %}
+
+    {% set text %}
+        {# this is the content displayed when hovering the mouse over
+           the toolbar panel #}
+        <div class="sf-toolbar-info-piece">
+            <b><a href="{{ path('ops_pages') }}">Pages <i class="fa fa-wrench fa-lg"></i></a></b>
+        </div>
+
+        <div class="sf-toolbar-info-piece">
+            <b><a href="{{ path('quote_make_model_memory', {'make':'Apple','model':'iPhone 7','memory':128}) }}">Quote <i class="fa fa-mobile fa-lg" title="Quick Quote"></i></a></b>
+        </div>
+    {% endset %}
+
+    {# the 'link' value set to 'false' means that this panel doesn't
+       show a section in the web profiler #}
+    {{ include('@WebProfiler/Profiler/toolbar_item.html.twig', { link: false }) }}
+{% endblock %}
