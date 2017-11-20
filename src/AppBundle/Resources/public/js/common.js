@@ -1,14 +1,11 @@
+// Common JS functions used throughout the site
 $(function(){
 
-    $.fn.extend({
-        toggleText: function(a, b){
-            return this.text(this.text() == b ? a : b);
-        }
-    });
+    // SROLL TO
+    // Add anchor via:         data-scroll-to-anchor
+    // Add focus after anchor: data-scroll-to-focus
+    // Add adjustment to pos:  data-scroll-to-adjust
 
-    // SCROLL TO - Wahoooooo
-    // Add anchor - data-scroll-to-anchor
-    // To focus   - data-scroll-to-focus
     var adjust = 0;
 
     $('.scroll-to').click(function(e) {
@@ -36,7 +33,7 @@ $(function(){
 
     });
 
-    // FIXED NAV & STICKY NAV
+    // Sticky Navbar
     function navbarFixed() {
         var windowTop  = $(window).scrollTop();
         var offsetTop  = $('body').offset().top + 50;
@@ -70,22 +67,6 @@ $(function(){
         $(window).scroll(stickyNav);
     }
 
-    // IMAGE SRC SWAP
-    $('.image-swap').each(function() {
-        $(this).on('mouseover', function() {
-            $(this).attr('src', $(this).data('hover-src'));
-        }).on('mouseout', function() {
-            $(this).attr('src', $(this).data('orig-src'));
-        });
-    });
-
-    // ???
-    $('#phone_phone').change(function() {
-        $.get('/price/' + this.value + '/', function(data) {
-            $('#policy-price').text('£' + data.price);
-        });
-    });
-
     // Collapse Panels - FAQs
     $('.panel-heading').click(function(event) {
 
@@ -99,7 +80,6 @@ $(function(){
     $('[data-toggle="popover"]').popover();
 
     // Policy Modal
-
     // Find the headings to add class
     $('#policy-modal, .modal-policy').find('h2').addClass('section-header');
     // Find the tables to add some styling classes
@@ -115,21 +95,4 @@ $(function(){
         });
 
     });
-
-
-
-
-    // $('.section-header').nextAll().not('h1').not('h2').hide();
-    // $('.section-header').each(function(index, el) {
-    //     $(this).click(function(event) {
-    //         $(this).nextUntil().toggle();
-    //     });
-    // });
-
-    // $('.section-header').nextAll().not('h1').not('h2').hide();
-    // $('.section-header').click(function(e) {
-    //     $(this).nextUntil('section-header').toggle();
-    //     $(this).toggleClass('section-open');
-    // });
-
 });
