@@ -372,6 +372,7 @@ class ReceperioService extends BaseImeiService
                 $charge = new Charge();
                 if ($claim) {
                     $charge->setType(Charge::TYPE_CLAIMSDAMAGE);
+                    $charge->setPolicy($claim->getPolicy());
                 } else {
                     $charge->setType(Charge::TYPE_GSMA);
                 }

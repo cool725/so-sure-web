@@ -357,6 +357,21 @@
                             <td></td>
                             <td>{{ data.totalAvgHoursToConnect|number_format(1, '.', ',')  }}</td>
                         </tr>
+                        <tr>
+                            <td>pic-sure Approved</td>
+                            <td></td>
+                            <td>{{ data.picsureApproved|number_format(0, '.', ',')  }}</td>
+                        </tr>
+                        <tr>
+                            <td>pic-sure Rejected</td>
+                            <td></td>
+                            <td>{{ data.picsureRejected|number_format(0, '.', ',')  }}</td>
+                        </tr>
+                        <tr>
+                            <td>pic-sure Un-Started</td>
+                            <td></td>
+                            <td>{{ data.picsureUnstarted|number_format(0, '.', ',')  }}</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

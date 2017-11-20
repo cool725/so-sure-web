@@ -55,7 +55,7 @@
                     {% if policy.user.unprocessedReceivedInvitations|length > 0 %}
                     <h3 class="text-grey-blue">Received invitations</h3>
                     <div class="user-homepage--section">
-                        {{ form_start(invitation_form, {'attr': { 'class': 'form-inline'}}) }}
+                        {{ form_start(invitation_form, {'attr': { 'class': 'form-inline', 'autocomplete': 'off'}}) }}
                             <ul class="list-unstyled invite-list">
                                 {% for invitation in policy.user.unprocessedReceivedInvitations %}
                                 <li class="clearfix">
@@ -76,7 +76,7 @@
                     {% if policy.sentInvitations|length > 0 %}
                     <h3 class="text-grey-blue">Sent invitations</h3>
                     <div class="user-homepage--section">
-                        {{ form_start(sent_invitation_form, {'attr': { 'class': 'form-inline'}}) }}
+                        {{ form_start(sent_invitation_form, {'attr': { 'class': 'form-inline', 'autocomplete': 'off'}}) }}
                             <ul class="list-unstyled invite-list">
                                 {% for invitation in policy.sentInvitations %}
                                 <li class="clearfix">
@@ -148,7 +148,7 @@
                             {% endif %}
                         </strong></h4>
                         <p><small>Enter the unique 8-digit code below and we'll connect you.</small></p>
-                        {{ form_start(scode_form, {'attr': {'class': ''}}) }}
+                        {{ form_start(scode_form, {'attr': {'class': '', 'autocomplete': 'off'}}) }}
                             <div class="form-group">
                                 {{ form_errors(scode_form.scode) }}
                                 <div class="input-group">
@@ -262,7 +262,8 @@
                     <h4>Email an invite:</h4>
                     <p><small>Just enter their email below and we'll do the rest..</small></p>
                     <div class="row">
-                        {{ form_start(email_form, {'attr': {'class': 'col-sm-8 col-sm-offset-2'}}) }}
+                        {# Non-valid entry for autocomplete see: https://developer.mozilla.org/en-US/docs/Web/Security/Securing_your_site/Turning_off_form_autocompletion #}
+                        {{ form_start(email_form, {'attr': {'class': 'col-sm-8 col-sm-offset-2', 'autocomplete': 'nope'}}) }}
                             <div class="form-group">
                                 {{ form_errors(email_form.email) }}
                                 <div class="input-group">

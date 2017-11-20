@@ -1,163 +1,371 @@
 // checkout.scss
 
 @import "../mixins";
-@import "../common/palette";
+@import "../common/type";
+@import "../common/paletteNew";
 @import "checkoutNav";
 
+// body {
+//     overflow-x: hidden;
+// }
 
 .checkout {
-	padding: 0 0 30px;
 
-	h3 {
-		display: none;
-	}
+    h1 {
+        text-align: center;
+        line-height: 30px;
 
-	&--step {
-		max-width: 410px;
-		margin: 0 auto;
-
-		@include breakpoint(tablet) {
-			 max-width: 510px;
-
-		}
-
-	}
-
-	&--step-review {
-		line-height: 2;
-
-		@include breakpoint(mobileishup) {
-			padding: 0 20px;
-		}
-	}
-
-	.form-footer {
-		margin-top: 25px;
-	}
-
-	.radio {
-	    width: 45%;
-	    font-size: 14px;
-	    text-align: center;
-	    display: inline-block;
-	    padding: 10px 0;
-	    border: 2px solid $blue;
-	    @include border-radius(3px);
-
-	    &:first-of-type {
-	    	margin-right: 10%;
-	    }
-
-	    label {
-	    	text-align: center;
-	    }
-
-	    input {
-	    	margin-top: 2px;
-	    }
-	}
-
-	.radio.radio-selected {
-		background-color: $blue;
-		color: $white;
-	}
-
-	.address-manual-cont {
-	    margin-top: 15px;
-	}
-
-	@include breakpoint(tablet) {
-        padding: 0 0 100px;
-        margin-top: 5px;
-        border-top: 2px solid $blue;
-
-        h3 {
-	        display: block;
-	        padding: 0 0 10px;
-	        margin-bottom: 25px;
-	        color: $blue;
-	        border-bottom: 2px solid $grey-light;
+        .title-top {
+            font-size: 18px;
         }
-	}
+
+        .title-top-all {
+            font-size: 18px;
+        }
+
+        .title-phone {
+            font-size: 25px;
+            cursor: pointer;
+        }
+
+        .title-phone.title-phone_renew {
+            cursor: inherit;
+        }
+
+        .memory-dropdown-list {
+            display: inline;
+
+            a {
+                &:hover, &:focus, &:active {
+                    text-decoration: none;
+                }
+            }
+        }
+
+        .title-price {
+            font-size: 20px;
+        }
+
+        @include breakpoint(tablet) {
+            line-height: inherit;
+
+            .title-top,
+            .title-phone {
+                font-size: inherit;
+            }
+
+            .title-top-all {
+                font-size: 24px;
+            }
+
+            .title-price {
+                font-size: 28px;
+            }
+        }
+    }
+
 }
 
-.terms-checkbox {
-    margin-top: 20px;
+.memory-dropdown {
+    font-family: $avenir-book;
 
-    label {
-	    font-size: 16px !important;
-	    font-weight: bold;
+    @include breakpoint(mobileishup) {
+        right: 0 !important;
     }
 }
 
-.birthday select {
-    font-size: 14px;
-    padding: 5px 15px;
-    background-color: $white;
-    background-image: none;
-    -webkit-background-clip: padding-box;
-          background-clip: padding-box;
-    border: 2px solid $grey-light;
+
+.checkout--step {
+    padding: 20px 0 140px;
+    background-color: $off-white;
+    border-top: 1px solid $pale-grey;
+    border-bottom: 1px solid $pale-grey;
+
+    form,
+    .form {
+        max-width: 345px;
+        margin: 0 auto;
+
+        .form-group-break {
+            margin-top: 30px;
+        }
+    }
+
+    .radio {
+        position: absolute;
+        left: -10000px;
+        top: auto;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+    }
+}
+
+.checkout--step-payment {
+    // padding: 20px 0;
+    // background-color: $white;
+    border-color: transparent;
+}
+
+.step {
+
+    &--hide {
+        display: none;
+    }
+
+}
+
+.payment--step {
+    background-color: $off-white;
+    border-top: 1px solid $pale-grey;
+    border-bottom: 1px solid $pale-grey;
+    text-align: center;
+
+    &-inner {
+        max-width: 700px;
+        position: relative;
+        margin: 0 auto;
+        padding: 0;
+        border-left: 1px solid $pale-grey;
+        border-right: 1px solid $pale-grey;
+
+        h4 {
+            margin: 10px 0;
+        }
+    }
+
+    .payment--btn {
+        padding: 15px 0;
+        background-color: $off-white;
+        border-top: 1px solid $pale-grey;
+
+        cursor: pointer;
+
+        font-family: $avenir-heavy;
+        color: $dark-grey;
+
+        &:first-of-type {
+            border-right: 1px solid $pale-grey;
+        }
+
+        &:hover, &:focus {
+            background-color: $light-blue;
+            color: $white;
+        }
+
+        .billed {
+            font-size: 16px;
+        }
+
+        .amount {
+            font-size: 24px;
+        }
+
+        small {
+            font-size: 12px;
+            font-family: $avenir-book;
+        }
+
+        &-or {
+            width: 40px; height: 40px;
+            @include border-radius(50%);
+            font-weight: bold;
+            line-height: 25px;
+            padding: 8px;
+            color: $primary-blue;
+            background-color: $white;
+            border: 1px solid $primary-blue;
+            position: absolute;
+            left: 50%; bottom: 50%;
+            margin-left: -20px;
+            margin-bottom: -55px;
+        }
+    }
+
+    .payment--btn-two {
+        width: 50%;
+        float: left;
+    }
+
+    .payment--btn-inner-single {
+        margin: 0 auto;
+    }
+
+    .payment--btn-selected {
+        background-color: $primary-blue;
+
+        .payment--btn-inner {
+            background: transparent url('https://cdn.so-sure.com/images/library_benefits/so-sure_cover-tick.svg') center no-repeat;
+            color: $white;
+        }
+    }
+
+    .payment--no-btn {
+        padding: 15px 0;
+        // background-color: $white;
+        border-top: 1px solid $pale-grey;
+
+        font-family: $avenir-heavy;
+        color: $dark-grey;
+
+        .billed {
+            font-size: 16px;
+        }
+
+        .amount {
+            font-size: 24px;
+        }
+
+        .no-btn {
+            color: $primary-blue;
+        }
+
+        small {
+            font-size: 12px;
+            font-family: $avenir-book;
+        }
+    }
+}
+
+.payment--step + .payment--step {
+    border-bottom: none;
+    border-top: none;
+}
+
+// Cover / Benefits
+.owl-carousel {
+
+    .item {
+        text-align: center;
+
+        img {
+            width: 100px; height: 100px;
+            display: block;
+            margin: 0 auto 15px;
+        }
+    }
+
+    h5 {
+        line-height: 1.5;
+    }
+
+}
+
+.owl-theme .owl-nav.disabled+.owl-dots {
+    display: none;
+}
+
+.cover-list {
+    text-align: center;
+
+    li {
+        width: 130px;
+    }
+
+    img {
+        width: 100px; height: 100px;
+        display: block;
+        margin: 0 auto 15px;
+    }
+
+    h5 {
+        // text-align: center;
+    }
+}
+
+.benefits--review-mobile {
+    margin: 0 -15px;
+    padding: 0 30px 20px;
+    background: url('https://cdn.so-sure.com/images/library_benefits/so-sure_cover-globe.svg') no-repeat;
+    background-position: right -110px bottom -22px;
+
+    li {
+        margin: 15px 0;
+    }
+}
+
+#purchase-step-review {
+
+    @include breakpoint(tablet) {
+        .checkout--top {
+            background: url('https://cdn.so-sure.com/images/library_benefits/so-sure_cover-globe-large.svg') no-repeat;
+            background-position: right -180px bottom 0px;
+        }
+    }
+}
+
+.benefits--review-desktop {
+    padding-bottom: 20px;
+
+    .benefits--inner {
+        width: 700px;
+        margin: 0 auto;
+
+        h4 {
+            margin: 10px 0 5px;
+        }
+
+        img {
+            width: 100px; height: 100px;
+            float: left;
+            margin-right: 15px;
+        }
+
+        .row {
+            margin-bottom: 30px;
+        }
+
+    }
+}
+
+.modal-body__policy-doc {
+    height: 300px;
+    margin: 30px -25px 0;
+    padding: 10px;
+    overflow-y: scroll;
+
+    border: 1px solid $grey;
     @include border-radius(4px);
 }
 
-.review-terms {
-    background-color: $blue-lightest;
-    border: 2px solid $blue;
- 	@include border-radius(4px);
-    color: $grey-dark;
-    padding: 25px;
-    margin: 15px 0;
+.connections {
+    max-width: 345px;
+    margin: 30px auto;
 
-    ol {
-    	padding-left: 25px;
+    &__list {
+        max-height: 400px;
+        overflow-y: scroll;
+        border: 1px solid $grey;
+    }
 
-    	li {
-    		padding: 5px 0;
-    	}
+    &__user {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+
+        padding: 15px 10px;
+        border-bottom: 1px solid $grey;
+
+        cursor: pointer;
+
+        > * {
+            margin-left: 15px;
+        }
+
+        input[type='checkbox'] {
+            cursor: pointer;
+        }
+
+        &:last-of-type {
+            border: none;
+        }
+
+        &:hover {
+            background-color: $off-white;
+        }
+
+        &--selected {
+            background-color: $off-white;
+        }
     }
 }
-
-/* Includes */
-
-.purchase-download {
-    margin: 10px 0 40px;
-
-	&--btns {
-    	text-align: center;
-	}
-}
-
-.help-block ul {
-    list-style: none;
-    text-align: left;
-    margin: 0; padding: 0;
-
-    li {
-	    color: $red;
-	    font-size: 13px;
-    }
-}
-
-.has-error .control-label,
-.address-show-error-text {
-	color: $red;
-}
-
-.intl-tel-input {
-	display: block;
-}
-
-.iti-flag {
-	background-image: url("/components/intl-tel-input/flags.png");}
-
-	@media only screen and (-webkit-min-device-pixel-ratio: 2),
-	only screen and (min--moz-device-pixel-ratio: 2),
-	only screen and (-o-min-device-pixel-ratio: 2 / 1),
-	only screen and (min-device-pixel-ratio: 2),
-	only screen and (min-resolution: 192dpi),
-	only screen and (min-resolution: 2dppx) {
-
-    	.iti-flag{background-image:url("/components/intl-tel-input/flags@2x.png")}
-}
-

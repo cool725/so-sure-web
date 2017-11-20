@@ -72,7 +72,7 @@ class PhonePolicyRepository extends PolicyRepository
         if ($installments) {
             $qb->field('premiumInstallments')->equals($installments);
         }
-        $qb->field('start')->lte($endDate);
+        $qb->field('start')->lt($endDate);
         if ($startDate) {
             $qb->field('start')->gte($startDate);
         }
@@ -122,7 +122,7 @@ class PhonePolicyRepository extends PolicyRepository
         $qb = $this->createQueryBuilder()
             ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
 
-        $qb->field('start')->lte($endDate);
+        $qb->field('start')->lt($endDate);
         if ($startDate) {
             $qb->field('start')->gte($startDate);
         }
@@ -153,7 +153,7 @@ class PhonePolicyRepository extends PolicyRepository
             ])
             ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
 
-        $qb->field('start')->lte($endDate);
+        $qb->field('start')->lt($endDate);
         if ($startDate) {
             $qb->field('start')->gte($startDate);
         }
@@ -190,7 +190,7 @@ class PhonePolicyRepository extends PolicyRepository
             ])
             ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $prefix)));
 
-        $qb->field('start')->lte($endDate);
+        $qb->field('start')->lt($endDate);
         if ($startDate) {
             $qb->field('start')->gte($startDate);
         }
@@ -217,7 +217,7 @@ class PhonePolicyRepository extends PolicyRepository
             ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
 
         $qb->field('leadSource')->equals($leadSource);
-        $qb->field('start')->lte($endDate);
+        $qb->field('start')->lt($endDate);
         if ($startDate) {
             $qb->field('start')->gte($startDate);
         }
@@ -277,7 +277,7 @@ class PhonePolicyRepository extends PolicyRepository
         if ($emptyCancellation || $cancellationReason) {
             $qb->field('cancelledReason')->equals($cancellationReason);
         }
-        $qb->field('end')->lte($endDate);
+        $qb->field('end')->lt($endDate);
         if ($startDate) {
             $qb->field('end')->gte($startDate);
         }
@@ -385,5 +385,32 @@ class PhonePolicyRepository extends PolicyRepository
 
         return $qb->getQuery()
             ->execute();
+    }
+
+    /**
+     * All pic-sure policies that have been created (excluding so-sure test ones) with given pic-sure status
+     *
+     * @param string $picSureStatus
+     * @param array  $allTerms
+     */
+    public function countPicSurePolicies($picSureStatus, array $allTerms)
+    {
+        $policy = new PhonePolicy();
+        $picsureTermsIds = [];
+        foreach ($allTerms as $term) {
+            if ($term->isPicSureEnabled()) {
+                $picsureTermsIds[] = new \MongoId($term->getId());
+            }
+        }
+
+        $qb = $this->createQueryBuilder()
+            ->field('picSureStatus')->equals($picSureStatus)
+            ->field('policyTerms.$id')->in($picsureTermsIds)
+            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
+
+        return $qb
+            ->getQuery()
+            ->execute()
+            ->count();
     }
 }

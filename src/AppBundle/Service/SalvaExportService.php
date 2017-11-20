@@ -919,6 +919,13 @@ class SalvaExportService
         $policy->appendChild($dom->createElement('ns2:issuerUser', 'so_sure'));
         $policy->appendChild($dom->createElement('ns2:deliveryModeCode', 'undefined'));
         $policy->appendChild($dom->createElement('ns2:policyNo', $phonePolicy->getSalvaPolicyNumber()));
+        // If policy is completely paid, then no need to include the firstDueDate
+        if ($phonePolicy->getSalvaFirstDueDate()) {
+            $policy->appendChild($dom->createElement(
+                'ns2:firstDueDate',
+                $this->adjustDate($phonePolicy->getSalvaFirstDueDate(), false)
+            ));
+        }
 
         $policyCustomers = $dom->createElement('ns2:policyCustomers');
         $policy->appendChild($policyCustomers);

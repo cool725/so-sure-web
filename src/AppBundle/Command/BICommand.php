@@ -74,9 +74,16 @@ class BICommand extends ContainerAwareCommand
             '"Pen Portrait"',
             '"Gender"',
             '"Total Weekly Income"',
+            '"Latest Campaign Name"',
+            '"Latest Campaign Source"',
         ]);
         foreach ($claims as $claim) {
             $policy = $claim->getPolicy();
+            // mainly for dev use
+            if (!$policy) {
+                $this->getContainer()->get('logger')->error(sprintf('Missing policy for claim %s', $claim->getId()));
+                continue;
+            }
             $user = $policy->getUser();
             $census = $search->findNearest($user->getBillingAddress()->getPostcode());
             $income = $search->findIncome($user->getBillingAddress()->getPostcode());
@@ -105,6 +112,8 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $census ? $census->getSubgrp() : ''),
                 sprintf('"%s"', $user->getGender() ? $user->getGender() : ''),
                 $income ? sprintf('"%0.0f"', $income->getTotal()->getIncome()) : '""',
+                sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getCampaignName() : ''),
+                sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getCampaignSource() : ''),
             ]);
         }
         $this->uploadS3(implode(PHP_EOL, $lines), 'claims.csv');
@@ -134,6 +143,8 @@ class BICommand extends ContainerAwareCommand
             '"Pen Portrait"',
             '"Gender"',
             '"Total Weekly Income"',
+            '"Latest Campaign Name"',
+            '"Latest Campaign Source"',
         ]);
         foreach ($policies as $policy) {
             $user = $policy->getUser();
@@ -155,6 +166,8 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $census ? $census->getSubgrp() : ''),
                 sprintf('"%s"', $user->getGender() ? $user->getGender() : ''),
                 $income ? sprintf('"%0.0f"', $income->getTotal()->getIncome()) : '""',
+                sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getCampaignName() : ''),
+                sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getCampaignSource() : ''),
             ]);
         }
         $this->uploadS3(implode(PHP_EOL, $lines), 'policies.csv');

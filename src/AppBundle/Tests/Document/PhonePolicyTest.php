@@ -3396,6 +3396,27 @@ class PhonePolicyTest extends WebTestCase
         $this->assertNull($repurchase->getStatus());
     }
 
+    public function testCreateRepurchaseCancelledUnpaidClaims()
+    {
+        $policy = $this->getPolicy(static::generateEmail('testCreateRepurchaseCancelledUnpaidClaims', $this));
+        $policy->setStatus(SalvaPhonePolicy::STATUS_CANCELLED);
+        $policy->setCancelledReason(SalvaPhonePolicy::CANCELLED_USER_REQUESTED);
+        $policy->setId(rand(1, 999999));
+        $claim = new Claim();
+        $claim->setStatus(Claim::STATUS_APPROVED);
+        $claim->setIgnoreWarningFlags(Claim::WARNING_FLAG_IGNORE_USER_DECLINED);
+
+        $policy->addClaim($claim);
+        $this->assertTrue($policy->isCancelledAndPaymentOwed());
+
+        $repurchase = $policy->createRepurchase($policy->getPolicyTerms());
+        $repurchase->setId(rand(1, 999999));
+
+        $this->assertNull($repurchase->getStatus());
+        $this->assertNotNull($claim->getLinkedPolicy());
+        $this->assertEquals($repurchase->getId(), $claim->getLinkedPolicy()->getId());
+    }
+
     public function testRenewActivateExpire()
     {
         $policy = $this->getPolicy(static::generateEmail('testRenewActivateExpire', $this));

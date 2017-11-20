@@ -439,6 +439,9 @@ class AdminEmployeeController extends BaseController
         $claimFlags = $this->get('form.factory')
             ->createNamedBuilder('claimflags', ClaimFlagsType::class, $claim)
             ->getForm();
+        $debtForm = $this->get('form.factory')
+            ->createNamedBuilder('debt_form')->add('debt', SubmitType::class)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('cancel_form')) {
@@ -763,6 +766,30 @@ class AdminEmployeeController extends BaseController
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
+            } elseif ($request->request->has('debt_form')) {
+                $debtForm->handleRequest($request);
+                if ($debtForm->isValid()) {
+                    $policy->setDebtCollector(Policy::DEBT_COLLECTOR_WISE);
+                    $dm->flush();
+                    $mailer = $this->get('app.mailer');
+                    $mailer->sendTemplate(
+                        'Debt Collection Request',
+                        'debts@awise.demon.co.uk',
+                        'AppBundle:Email:policy/debtCollection.html.twig',
+                        ['policy' => $policy],
+                        'AppBundle:Email:policy/debtCollection.txt.twig',
+                        ['policy' => $policy],
+                        null,
+                        'bcc@so-sure.com'
+                    );
+
+                    $this->addFlash(
+                        'success',
+                        sprintf('Emailed debt collector and set flag on policy')
+                    );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
             }
         }
         $checks = $fraudService->runChecks($policy);
@@ -789,6 +816,7 @@ class AdminEmployeeController extends BaseController
             'regenerate_policy_schedule_form' => $regeneratePolicyScheduleForm->createView(),
             'makemodel_form' => $makeModelForm->createView(),
             'chargebacks_form' => $chargebacksForm->createView(),
+            'debt_form' => $debtForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),
@@ -1694,11 +1722,21 @@ class AdminEmployeeController extends BaseController
         if ($request->get('_route') == "admin_picsure_approve") {
             $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
             $dm->flush();
+            $mailer = $this->get('app.mailer');
+            $mailer->sendTemplate(
+                'pic-sure is successfully validated',
+                $policy->getUser()->getEmail(),
+                'AppBundle:Email:picsure/accepted.html.twig',
+                ['policy' => $policy],
+                'AppBundle:Email:picsure/accepted.txt.twig',
+                ['policy' => $policy]
+            );
+
             try {
                 $push = $this->get('app.push');
                 // @codingStandardsIgnoreStart
                 $push->sendToUser(PushService::PSEUDO_MESSAGE_PICSURE, $policy->getUser(), sprintf(
-                    'Your pic-sure image has been approved and your phone is now valided.'
+                    'Your pic-sure image has been approved and your phone is now validated.'
                 ), null, null, $policy);
                 // @codingStandardsIgnoreEnd
             } catch (\Exception $e) {
@@ -1709,6 +1747,15 @@ class AdminEmployeeController extends BaseController
         } elseif ($request->get('_route') == "admin_picsure_reject") {
             $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_REJECTED);
             $dm->flush();
+            $mailer = $this->get('app.mailer');
+            $mailer->sendTemplate(
+                'pic-sure failed to validate your phone',
+                $policy->getUser()->getEmail(),
+                'AppBundle:Email:picsure/rejected.html.twig',
+                ['policy' => $policy],
+                'AppBundle:Email:picsure/rejected.txt.twig',
+                ['policy' => $policy]
+            );
             try {
                 $push = $this->get('app.push');
                 // @codingStandardsIgnoreStart
@@ -1724,6 +1771,15 @@ class AdminEmployeeController extends BaseController
         } elseif ($request->get('_route') == "admin_picsure_invalid") {
             $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_INVALID);
             $dm->flush();
+            $mailer = $this->get('app.mailer');
+            $mailer->sendTemplate(
+                'Sorry, we need another pic-sure',
+                $policy->getUser()->getEmail(),
+                'AppBundle:Email:picsure/invalid.html.twig',
+                ['policy' => $policy],
+                'AppBundle:Email:picsure/invalid.txt.twig',
+                ['policy' => $policy]
+            );
             try {
                 $push = $this->get('app.push');
                 // @codingStandardsIgnoreStart
@@ -1742,5 +1798,31 @@ class AdminEmployeeController extends BaseController
         return [
             'policies' => $policies,
         ];
+    }
+
+    /**
+     * @Route("/picsure/image/{file}", name="admin_picsure_image", requirements={"file"=".*"})
+     * @Template()
+     */
+    public function picsureImageAction($file)
+    {
+        $filesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3policy_fs');
+        $environment = $this->getParameter('kernel.environment');
+        $file = str_replace(sprintf('%s/', $environment), '', $file);
+
+        if (!$filesystem->has($file)) {
+            throw $this->createNotFoundException(sprintf('URL not found %s', $file));
+        }
+
+        $mimetype = $filesystem->getMimetype($file);
+        return StreamedResponse::create(
+            function () use ($file, $filesystem) {
+                $stream = $filesystem->readStream($file);
+                echo stream_get_contents($stream);
+                flush();
+            },
+            200,
+            array('Content-Type' => $mimetype)
+        );
     }
 }

@@ -91,6 +91,8 @@ abstract class Policy
     // £5 for policies purchased feb 2016-apr 2017 when login to app
     const PROMO_APP_MARCH_2017 = 'app-download-mar-2017';
 
+    const DEBT_COLLECTOR_WISE = 'wise';
+
     public static $riskLevels = [
         self::RISK_CONNECTED_POT_ZERO => self::RISK_LEVEL_HIGH,
         self::RISK_CONNECTED_SELF_CLAIM => self::RISK_LEVEL_HIGH,
@@ -159,6 +161,13 @@ abstract class Policy
      * @Gedmo\Versioned
      */
     protected $status;
+
+    /**
+     * @Assert\Choice({"wise"}, strict=true)
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $debtCollector;
 
     /**
      * @Assert\Choice({
@@ -801,6 +810,16 @@ abstract class Policy
     public function setStart(\DateTime $start)
     {
         $this->start = $start;
+    }
+
+    public function getDebtCollector()
+    {
+        return $this->debtCollector;
+    }
+
+    public function setDebtCollector($debtCollector)
+    {
+        $this->debtCollector = $debtCollector;
     }
 
     public function getBilling()
@@ -3056,6 +3075,13 @@ abstract class Policy
         $newPolicy->setStatus(null);
 
         $newPolicy->init($this->getUser(), $terms);
+
+        // Cancelled policies that were not fully paid should link claims to the renewal policy
+        if ($this->isCancelledAndPaymentOwed()) {
+            foreach ($this->getApprovedClaims() as $claim) {
+                $newPolicy->addLinkedClaim($claim);
+            }
+        }
 
         return $newPolicy;
     }

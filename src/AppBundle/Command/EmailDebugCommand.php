@@ -87,6 +87,11 @@ class EmailDebugCommand extends BaseCommand
             'policyRenewal' => [
                 'policy/pendingRenewal',
             ],
+            'picsure' => [
+                'picsure/accepted',
+                'picsure/rejected',
+                'picsure/invalid',
+            ],
         ];
         $variations = [
             'policyRenewal' => [
@@ -210,6 +215,13 @@ class EmailDebugCommand extends BaseCommand
             }
             $policyService = $this->getContainer()->get('app.policy');
             return $policyService->pendingRenewalEmail($policy);
+        } elseif (in_array($template, $templates['picsure'])) {
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(Policy::class);
+            $policy = $repo->findOneBy(['status' => Policy::STATUS_ACTIVE]);
+            $data = [
+                'policy' => $policy,
+            ];
         } else {
             throw new \Exception(sprintf('Unsupported template %s for email debug. Add data', $template));
         }

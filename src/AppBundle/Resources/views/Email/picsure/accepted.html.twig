@@ -1,0 +1,28 @@
+{% extends 'AppBundle:Email:base.html.twig' %}
+{% import "AppBundle:Email:macros.html.twig" as macros %}
+{% block title %}pic-sure is successfully validated{% endblock %}
+{% block body %}
+	{{ macros.start_table() }}
+		<h1>
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		</h1>
+		<div style="font-size: 14px; text-align: left;">
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		   <div style="font-size: 14px; text-align: left;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+				Thanks for validating your phone via pic-sure. Your {{ policy.phone }} is now successfully validated.
+				<br><br>
+                Your excess for policy {{ policy.policyNumber }} is now:
+                <br>
+                    • Accidental Damage: £50
+                <br>
+                    • Breakdown: £50
+                <br>
+                    • Theft: £70
+                <br>
+                    • Loss: £70
+				<br><br>
+			    If you have any questions, please don't hesitate to <a href="mailto:support@wearesosure.com?subject=I%20have%20a%20question" target="_blank"><span style="color:#3399ff">contact us</span></a>.
+		   </div>
+		</div>
+	{{ macros.end_table() }}
+{% endblock %}
