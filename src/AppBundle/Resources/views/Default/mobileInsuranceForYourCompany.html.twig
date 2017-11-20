@@ -314,10 +314,3 @@
     {# Page Modals #}
 
 {% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts %}
-    <script src="{{ asset_url }}"></script>{% endjavascripts %}
-{% endblock %}
-

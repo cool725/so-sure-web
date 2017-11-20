@@ -7,12 +7,6 @@
     <meta name="keywords" content="mobile phone insurance, social insurance"/>
 {% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts %}
-    <script src="{{ asset_url }}"></script>{% endjavascripts %}
-{% endblock %}
-
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets output='css/*.css'
