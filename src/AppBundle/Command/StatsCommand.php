@@ -22,6 +22,7 @@ class StatsCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->kpiPicsure();
+        $this->cancelledAndPaymentOwed();
         $output->writeln('Finished');
     }
 
@@ -36,6 +37,17 @@ class StatsCommand extends ContainerAwareCommand
         $this->getStats()->set(Stats::KPI_PICSURE_APPROVED_POLICIES, $date, $data['picsureApproved']);
         $this->getStats()->set(Stats::KPI_PICSURE_REJECTED_POLICIES, $date, $data['picsureRejected']);
         $this->getStats()->set(Stats::KPI_PICSURE_UNSTARTED_POLICIES, $date, $data['picsureUnstarted']);
+    }
+
+    private function cancelledAndPaymentOwed($date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        $data = $this->getReporting()->getCancelledAndPaymentOwed();
+
+        $this->getStats()->set(Stats::KPI_CANCELLED_AND_PAYMENT_OWED, $date, $data['picsureApproved']);
     }
 
     private function getStats()

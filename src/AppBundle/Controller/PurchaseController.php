@@ -27,6 +27,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\User;
 use AppBundle\Document\Lead;
+use AppBundle\Document\Stats;
 use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Document\File\ImeiUploadFile;
 use AppBundle\Document\Form\Purchase;
@@ -680,6 +681,7 @@ class PurchaseController extends BaseController
 
     private function notifyRemainderRecevied(Policy $policy)
     {
+        $this->get('app.stats')->increment(Stats::KPI_CANCELLED_AND_PAYMENT_PAID);
         $body = sprintf(
             'Remainder (likely) payment was received. Policy %s (Total payments received £%0.2f of £%0.2f).',
             $policy->getPolicyNumber(),
