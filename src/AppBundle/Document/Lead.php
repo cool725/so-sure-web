@@ -43,7 +43,7 @@ class Lead
     protected $mobileNumber;
 
     /**
-     * @AppAssert\Email()
+     * @Assert\Email(strict=false)
      * @MongoDB\Field(type="string")
      */
     protected $email;
