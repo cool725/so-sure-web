@@ -100,6 +100,13 @@ class PhonePolicy extends Policy
      */
     protected $picSureStatus;
 
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
+    protected $picSureApprovedDate;
+
     public function getPhone()
     {
         return $this->phone;
@@ -170,6 +177,16 @@ class PhonePolicy extends Policy
     public function setImeiReplacementDate(\DateTime $imeiReplacementDate)
     {
         $this->imeiReplacementDate = $imeiReplacementDate;
+    }
+
+    public function getPicSureApprovedDate()
+    {
+        return $this->picSureApprovedDate;
+    }
+
+    public function setPicSureApprovedDate(\DateTime $picSureApprovedDate)
+    {
+        $this->picSureApprovedDate = $picSureApprovedDate;
     }
 
     public function getSerialNumber()
@@ -508,6 +525,9 @@ class PhonePolicy extends Policy
     public function setPicSureStatus($picSureStatus)
     {
         $this->picSureStatus = $picSureStatus;
+        if ($picSureStatus == self::PICSURE_STATUS_APPROVED && !$this->getPicSureApprovedDate()) {
+            $this->setPicSureApprovedDate(new \DateTime());
+        }
     }
 
     public function isPicSureValidated()
