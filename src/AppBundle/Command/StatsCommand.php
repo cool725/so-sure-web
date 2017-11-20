@@ -33,7 +33,6 @@ class StatsCommand extends ContainerAwareCommand
         }
 
         $data = $this->getReporting()->getPicSureData();
-
         $this->getStats()->set(Stats::KPI_PICSURE_APPROVED_POLICIES, $date, $data['picsureApproved']);
         $this->getStats()->set(Stats::KPI_PICSURE_REJECTED_POLICIES, $date, $data['picsureRejected']);
         $this->getStats()->set(Stats::KPI_PICSURE_UNSTARTED_POLICIES, $date, $data['picsureUnstarted']);
@@ -47,7 +46,7 @@ class StatsCommand extends ContainerAwareCommand
 
         $data = $this->getReporting()->getCancelledAndPaymentOwed();
 
-        $this->getStats()->set(Stats::KPI_CANCELLED_AND_PAYMENT_OWED, $date, $data['picsureApproved']);
+        $this->getStats()->set(Stats::KPI_CANCELLED_AND_PAYMENT_OWED, $date, $data['cancelledAndPaymentOwed']);
     }
 
     private function getStats()
