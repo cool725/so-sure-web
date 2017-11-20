@@ -309,6 +309,7 @@ class ReportingService
             $newToDateSCodePolicies
         );
 
+        $data = array_merge($data, $this->getCancelledAndPaymentOwed());
         $data = array_merge($data, $this->getPicSureData());
 
         return [
@@ -320,6 +321,22 @@ class ReportingService
             'approvedClaims' => $approvedClaimsTotals,
             'closedClaims' => $closedClaimsTotals,
         ];
+    }
+
+    public function getCancelledAndPaymentOwed()
+    {
+        $data = [];
+
+        $policyRepo = $this->dm->getRepository(PhonePolicy::class);
+        $data['cancelledAndPaymentOwed'] = 0;
+        $cancelledPolicies = $policyRepo->findBy(['status' => Policy::STATUS_CANCELLED]);
+        foreach ($cancelledPolicies as $cancelledPolicy) {
+            if ($cancelledPolicy->isCancelledAndPaymentOwed()) {
+                $data['cancelledAndPaymentOwed']++;
+            }
+        }
+
+        return $data;
     }
 
     public function getPicSureData()

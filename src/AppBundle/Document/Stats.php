@@ -33,6 +33,9 @@ class Stats
     const KPI_PICSURE_APPROVED_POLICIES = 'kpi-picsure-approved-policies';
     const KPI_PICSURE_REJECTED_POLICIES = 'kpi-picsure-rejected-policies';
 
+    const KPI_CANCELLED_AND_PAYMENT_OWED = 'kpi-cancelled-payment-owed';
+    const KPI_CANCELLED_AND_PAYMENT_PAID = 'kpi-cancelled-payment-paid';
+
     /**
      * @MongoDB\Id
      */

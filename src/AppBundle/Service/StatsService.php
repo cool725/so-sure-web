@@ -4,9 +4,12 @@ namespace AppBundle\Service;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\Stats;
+use AppBundle\Document\DateTrait;
 
 class StatsService
 {
+    use DateTrait;
+
     const ROOTED_FORMAT = 'stats:rooted:%s';
     const COGNITO_FORMAT = 'stats:cognito:%s';
     const DEVICE_FORMAT = 'stats:%s:%s:%s';
@@ -69,15 +72,53 @@ class StatsService
     public function set($name, $date, $value, $overwrite = true)
     {
         $repo = $this->dm->getRepository(Stats::class);
-        $stat = $repo->findOneBy(['name' => $name, 'date' => $name]);
+        $stat = $repo->findOneBy(['name' => $name, 'date' => $this->startOfDay($date)]);
         if (!$stat) {
             $stat = new Stats();
-            $stat->setDate($date);
+            $stat->setDate($this->startOfDay($date));
             $stat->setName($name);
             $stat->setValue($value);
             $this->dm->persist($stat);
         } elseif ($overwrite) {
             $stat->setValue($value);
+        }
+
+        $this->dm->flush();
+    }
+
+    public function increment($name, $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        $repo = $this->dm->getRepository(Stats::class);
+        $stat = $repo->findOneBy(['name' => $name, 'date' => $this->startOfDay($date)]);
+        if (!$stat) {
+            $stat = new Stats();
+            $stat->setDate($this->startOfDay($date));
+            $stat->setName($name);
+            $stat->setValue(1);
+            $this->dm->persist($stat);
+        } elseif ($overwrite) {
+            $stat->setValue($stat->getValue() + 1);
+        }
+
+        $this->dm->flush();
+    }
+
+    public function decrement($name, $date)
+    {
+        $repo = $this->dm->getRepository(Stats::class);
+        $stat = $repo->findOneBy(['name' => $name, 'date' => $this->startOfDay($date)]);
+        if (!$stat) {
+            $stat = new Stats();
+            $stat->setDate($date);
+            $stat->setName($this->startOfDay($date));
+            $stat->setValue(-1);
+            $this->dm->persist($stat);
+        } elseif ($overwrite) {
+            $stat->setValue($stat->getValue() - 1);
         }
 
         $this->dm->flush();
