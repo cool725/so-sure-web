@@ -753,4 +753,54 @@ class PurchaseControllerTest extends BaseControllerTest
 
         return $phone;
     }
+
+    public function testLeadInvalidEmail()
+    {
+        $this->setRandomPhone();
+        $crawler = self::$client->request('GET', '/purchase/?force_result=new');
+        self::verifyResponse(200);
+
+        $link = $crawler->filter('#step--validate');
+        $csrfToken = $link->attr('data-csrf');
+
+        $crawler = self::$client->request(
+            'POST',
+            '/purchase/lead/buy',
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json'),
+            json_encode([
+                'email' => 'foo',
+                'name' => 'foo',
+                'csrf' => $csrfToken,
+            ])
+        );
+
+        self::verifyResponse(200, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+    }
+
+    public function testLeadInvalidName()
+    {
+        $email = self::generateEmail('testLeadInvalidName', $this);
+        $this->setRandomPhone();
+        $crawler = self::$client->request('GET', '/purchase/?force_result=new');
+        self::verifyResponse(200);
+
+        $link = $crawler->filter('#step--validate');
+        $csrfToken = $link->attr('data-csrf');
+
+        $crawler = self::$client->request(
+            'POST',
+            '/purchase/lead/buy',
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json'),
+            json_encode([
+                'email' => $email,
+                'name' => 'foo',
+                'csrf' => $csrfToken,
+            ])
+        );
+        self::verifyResponse(200, ApiErrorCode::SUCCESS);
+    }
 }
