@@ -237,7 +237,7 @@ class PurchaseController extends BaseController
             'postcode' => $this->sixpack($request, SixpackService::EXPERIMENT_POSTCODE, ['comma', 'split', 'type']),
         );
 
-        return $this->render('AppBundle:Purchase:purchaseStepPersonalAddressNew.html.twig', $data);
+        return $this->render('AppBundle:Purchase:purchaseStepPersonalAddress.html.twig', $data);
     }
 
     /**
@@ -274,7 +274,7 @@ class PurchaseController extends BaseController
             ) : null,
         );
 
-        return $this->render('AppBundle:Purchase:purchaseStepPhoneNoPhoneNew.html.twig', $data);
+        return $this->render('AppBundle:Purchase:purchaseStepPhoneNoPhone.html.twig', $data);
     }
 
     /**
@@ -539,7 +539,7 @@ class PurchaseController extends BaseController
             'billing_date' => $billingDate,
         );
 
-        return $this->render('AppBundle:Purchase:purchaseStepPhoneReviewNew.html.twig', $data);
+        return $this->render('AppBundle:Purchase:purchaseStepPhoneReview.html.twig', $data);
     }
 
     /**

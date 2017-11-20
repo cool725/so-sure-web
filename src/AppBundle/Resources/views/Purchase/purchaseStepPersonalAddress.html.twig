@@ -6,6 +6,7 @@
 {# Set vars #}
 {% set new_stylesheet = 1 %}
 {% set distraction_free = 1 %}
+{% set new_footer = 1 %}
 
 {% set showAddress = purchase_form.addressLine1.vars.data | length > 0 or purchase_form.postcode.vars.data | length > 0 %}
 {% set showDOB = purchase_form.name.vars.data | length > 0 and purchase_form.email.vars.data | length > 0 %}
@@ -22,7 +23,7 @@
         'components/owl.carousel/owl.theme.default.min.css'
         'components/bootstrap-daterangepicker/daterangepicker.css'
         'components/intl-tel-input/intlTelInput.css'
-        '@AppBundle/Resources/public/sass/page/checkoutNew.scss'
+        '@AppBundle/Resources/public/sass/page/checkout.scss'
     %}
         <link rel="stylesheet" href="{{ asset_url }}">
     {% endstylesheets %}
@@ -32,7 +33,7 @@
 
 <section id="purchase-step-personal" class="checkout">
 
-    {% include 'AppBundle::Purchase/purchaseNavNew.html.twig' %}
+    {% include 'AppBundle::Purchase/purchaseNav.html.twig' %}
 
     {% if phone %}
         <div class="checkout--top">
@@ -312,7 +313,7 @@
     '@AppBundle/Resources/public/js/Default/jqueryValidatorMethods.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
     '@AppBundle/Resources/public/js/Default/index.js'
-    '@AppBundle/Resources/public/js/Purchase/purchaseStepNew.js'
-    '@AppBundle/Resources/public/js/Purchase/purchaseStepAddressNew.js' %}
+    '@AppBundle/Resources/public/js/Purchase/purchaseStep.js'
+    '@AppBundle/Resources/public/js/Purchase/purchaseStepAddress.js' %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
