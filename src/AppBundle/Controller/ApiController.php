@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Exception\InvalidEmailException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -638,8 +639,11 @@ class ApiController extends BaseController
                 }
                 $scode->addAcceptor($user);
             }
-
-            $this->validateObject($user);
+            try {
+                $this->validateObject($user);
+            } catch (InvalidEmailException $ex) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, 'Invalid email format', 422);
+            }
 
             $launchUser = $this->get('app.user.launch');
             $addedUser = $launchUser->addUser($user);
