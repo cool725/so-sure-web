@@ -45,7 +45,12 @@ class BICommand extends ContainerAwareCommand
             $output->write(json_encode($lines, JSON_PRETTY_PRINT));
         }
 
-        $lines = $this->exportClaims($debug);
+        $lines = $this->exportClaims();
+        if ($debug) {
+            $output->write(json_encode($lines, JSON_PRETTY_PRINT));
+        }
+
+        $lines = $this->exportUsers();
         if ($debug) {
             $output->write(json_encode($lines, JSON_PRETTY_PRINT));
         }
@@ -171,6 +176,46 @@ class BICommand extends ContainerAwareCommand
             ]);
         }
         $this->uploadS3(implode(PHP_EOL, $lines), 'policies.csv');
+
+        return $lines;
+    }
+
+    private function exportUsers()
+    {
+        $search = $this->getContainer()->get('census.search');
+        $repo = $this->getManager()->getRepository(User::class);
+        $users = $repo->findAll();
+        $lines = [];
+        $lines[] = implode(',', [
+            '"Age of User"',
+            '"Postcode of User"',
+            '"User Id"',
+            '"Purchased Policy"',
+            '"Pen Portrait"',
+            '"Gender"',
+            '"Total Weekly Income"',
+            '"Latest Campaign Name"',
+            '"Latest Campaign Source"',
+        ]);
+        foreach ($users as $user) {
+            if (!$user->getBillingAddress()) {
+                continue;
+            }
+            $census = $search->findNearest($user->getBillingAddress()->getPostcode());
+            $income = $search->findIncome($user->getBillingAddress()->getPostcode());
+            $lines[] = implode(',', [
+                sprintf('"%d"', $user->getAge()),
+                sprintf('"%s"', $user->getBillingAddress()->getPostcode()),
+                sprintf('"%s"', $user->getId()),
+                sprintf('"%s"', count($user->getCreatedPolicies()) > 0 ? 'yes' : 'no'),
+                sprintf('"%s"', $census ? $census->getSubgrp() : ''),
+                sprintf('"%s"', $user->getGender() ? $user->getGender() : ''),
+                $income ? sprintf('"%0.0f"', $income->getTotal()->getIncome()) : '""',
+                sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getCampaignName() : ''),
+                sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getCampaignSource() : ''),
+            ]);
+        }
+        $this->uploadS3(implode(PHP_EOL, $lines), 'users.csv');
 
         return $lines;
     }
