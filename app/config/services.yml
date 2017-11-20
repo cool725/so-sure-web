@@ -996,3 +996,12 @@ services:
         arguments:
             dm:          "@doctrine_mongodb.odm.default_document_manager"
             logger:      "@logger"
+
+    app.ops.datacollector:
+        class: AppBundle\Service\OpsDataCollector
+        tags:
+            -
+                name:     data_collector
+                template: 'opsDataCollector'
+                id: "app.ops_collector"
+        public: false
