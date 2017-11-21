@@ -33,4 +33,13 @@ class PotRewardPayment extends Payment
     {
         return false;
     }
+
+    public function getNotes()
+    {
+        if (parent::getNotes()) {
+            return parent::getNotes();
+        }
+
+        return 'Pot Reward (Salva)';
+    }
 }
