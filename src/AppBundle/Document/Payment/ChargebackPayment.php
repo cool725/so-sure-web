@@ -27,4 +27,13 @@ class ChargebackPayment extends Payment
     {
         return true;
     }
+
+    public function getNotes()
+    {
+        if (parent::getNotes()) {
+            return parent::getNotes();
+        }
+
+        return 'Chargeback';
+    }
 }

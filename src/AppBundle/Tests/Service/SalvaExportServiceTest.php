@@ -10,6 +10,8 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\Company;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\Payment\ChargebackPayment;
+use AppBundle\Document\Payment\Payment;
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Classes\Salva;
 
@@ -261,6 +263,56 @@ class SalvaExportServiceTest extends WebTestCase
         // cancellation above should set to wait cancelled
         $this->assertEquals(SalvaPhonePolicy::SALVA_STATUS_WAIT_CANCELLED, $updatedPolicy->getSalvaStatus());
         static::$salva->processPolicy($updatedPolicy, '', null);
+    }
+
+    public function testPaymentsCashback()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPaymentsCashback', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime(),
+            true
+        );
+//        static::addJudoPayPayment(self::$judopay, $policy, new \DateTime());
+
+        $policy->setStatus(Policy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime(), true);
+        static::$policyService->setEnvironment('test');
+        static::$dm->flush();
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $policyRepo->find($policy->getId());
+
+        $chargeback = new ChargebackPayment();
+        $chargeback->setDate(new \DateTime());
+        $chargeback->setSource(Payment::SOURCE_ADMIN);
+        $chargeback->setAmount(0 - $policy->getPremiumInstallmentPrice());
+        $updatedPolicy->addPayment($chargeback);
+        $dm->flush();
+
+        //\Doctrine\Common\Util\Debug::dump($updatedPolicy->getPayments());
+        $lines = $this->exportPayments($policy->getPolicyNumber());
+        //print_r($lines);
+        $this->assertEquals(2, count($lines));
+        $this->assertEquals(
+            sprintf('"%0.2f"', $policy->getPremiumInstallmentPrice()),
+            explode(',', $lines[0])[2]
+        );
+        $this->assertEquals(
+            sprintf('"%0.2f"', 0 - $policy->getPremiumInstallmentPrice()),
+            explode(',', $lines[1])[2]
+        );
     }
 
     public function testProcessPaidPolicyWait()
@@ -557,6 +609,20 @@ class SalvaExportServiceTest extends WebTestCase
     {
         $lines = [];
         foreach (static::$salva->exportPolicies(null) as $line) {
+            $data = explode(",", $line);
+            $search = sprintf('"%s', $policyNumber);
+            if (stripos($data[0], $search) === 0) {
+                $lines[] = $line;
+            }
+        }
+
+        return $lines;
+    }
+
+    private function exportPayments($policyNumber)
+    {
+        $lines = [];
+        foreach (static::$salva->exportPayments(null, true) as $line) {
             $data = explode(",", $line);
             $search = sprintf('"%s', $policyNumber);
             if (stripos($data[0], $search) === 0) {
