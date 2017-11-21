@@ -18,8 +18,8 @@ class AddressType extends AbstractType
     {
         $builder
             ->add('line1', TextType::class)
-            ->add('line2', TextType::class)
-            ->add('line3', TextType::class)
+            ->add('line2', TextType::class, ['required' => false])
+            ->add('line3', TextType::class, ['required' => false])
             ->add('city', TextType::class)
             ->add('postcode', TextType::class)
             ->add('next', SubmitType::class)

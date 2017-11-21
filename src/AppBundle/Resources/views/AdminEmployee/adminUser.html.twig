@@ -85,7 +85,10 @@
                         £{{ income.total.income|number_format(0, '.', ',') }} weekly income
                     {% endif %}
                     </td>
-                    <td></td>
+                    <td>
+                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#userAddressModal"
+                        ><i class="fa fa-edit"></i> Edit User Address</button>                        
+                    </td>
                 </tr>
                 <tr>
                     <td>User Status</td>
@@ -304,6 +307,69 @@
                 {{ form_widget(user_email_form.update, {'label': 'Change User Email Address', 'attr': {'class': 'btn btn-success'}}) }}
           </div>
           {{ form_end(user_email_form )}}
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="userAddressModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document" style="width: 60%;">
+        <div class="modal-content">
+            {{ form_start(user_address_form )}}
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Change User Address</h4>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        {{ form_label(user_address_form.line1) }}
+                        {{ form_errors(user_address_form.line1) }}
+                        {{ form_widget(user_address_form.line1) }}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        {{ form_label(user_address_form.line2) }}
+                        {{ form_errors(user_address_form.line2) }}
+                        {{ form_widget(user_address_form.line2) }}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        {{ form_label(user_address_form.line3) }}
+                        {{ form_errors(user_address_form.line3) }}
+                        {{ form_widget(user_address_form.line3) }}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        {{ form_label(user_address_form.city) }}
+                        {{ form_errors(user_address_form.city) }}
+                        {{ form_widget(user_address_form.city) }}
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        {{ form_label(user_address_form.postcode) }}
+                        {{ form_errors(user_address_form.postcode) }}
+                        {{ form_widget(user_address_form.postcode) }}
+                    </div>
+                </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+                {{ form_widget(user_address_form.next, {'label': 'Change User Email Address', 'attr': {'class': 'btn btn-success'}}) }}
+          </div>
+          {{ form_end(user_address_form )}}
         </div>
       </div>
     </div>

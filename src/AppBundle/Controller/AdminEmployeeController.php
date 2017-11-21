@@ -54,6 +54,7 @@ use AppBundle\Document\Form\Cancel;
 use AppBundle\Document\Form\Imei;
 use AppBundle\Document\Form\BillingDay;
 use AppBundle\Document\Form\Chargebacks;
+use AppBundle\Form\Type\AddressType;
 use AppBundle\Form\Type\BillingDayType;
 use AppBundle\Form\Type\CancelPolicyType;
 use AppBundle\Form\Type\BacsType;
@@ -874,6 +875,10 @@ class AdminEmployeeController extends BaseController
             ->add('serial', TextType::class)
             ->add('check', SubmitType::class)
             ->getForm();
+        $address = $user->getBillingAddress();
+        $userAddressForm = $this->get('form.factory')
+            ->createNamedBuilder('user_address_form', AddressType::class, $address)
+            ->getForm();
 
         $policyData = new SalvaPhonePolicy();
         $policyForm = $this->get('form.factory')
@@ -955,6 +960,17 @@ class AdminEmployeeController extends BaseController
 
                     return $this->redirectToRoute('admin_user', ['id' => $id]);
                 }
+            } elseif ($request->request->has('user_address_form')) {
+                $userAddressForm->handleRequest($request);
+                if ($userAddressForm->isValid()) {
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        'Updated User Address'
+                    );
+
+                    return $this->redirectToRoute('admin_user', ['id' => $id]);
+                }
             } elseif ($request->request->has('user_email_form')) {
                 $userEmailForm->handleRequest($request);
                 if ($userEmailForm->isValid()) {
@@ -1031,6 +1047,7 @@ class AdminEmployeeController extends BaseController
             'policy_form' => $policyForm->createView(),
             'user_detail_form' => $userDetailForm->createView(),
             'user_email_form' => $userEmailForm->createView(),
+            'user_address_form' => $userAddressForm->createView(),
             'user_permission_form' => $userPermissionForm->createView(),
             'user_high_risk_form' => $userHighRiskForm->createView(),
             'makemodel_form' => $makeModelForm->createView(),
