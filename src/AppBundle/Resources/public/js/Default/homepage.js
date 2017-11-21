@@ -22,4 +22,5 @@ $(function(){
             $(container).removeClass('search-phone-form--focus');
         });
     });
+
 });

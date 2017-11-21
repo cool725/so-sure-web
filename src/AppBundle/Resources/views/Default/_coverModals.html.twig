@@ -241,8 +241,8 @@
 {# End Accidental Damage #}
 
 {# Skeleton #}
-<div class="modal modal-new fade"
-     {# id="loss-modal" #}
+<div class="modal modal-new fade and carousel slide"
+     id="cover-modal"
      tabindex="-1"
      role="dialog"
      aria-labelledby="so-sure"
@@ -255,59 +255,76 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div class="row">
-                    <div class="col-sm-4">
-                        <div class="modal-body--left text-center">
-                            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-                                 data-src="{{ cdn_url }}/images/homepage/so-sure_loss.svg"
-                                 alt="so-sure cover - Loss"
-                                 width="250px">
-                            <h3>Loss</h3>
-                            <ul class="list-inline hidden-xs">
-                                <li>
-                                    <a href="#theft-modal"
-                                       data-toggle="modal"
-                                       data-dismiss="modal"
-                                       class="btn btn-blue-hollow">Theft <i class="fa fa-angle-right" aria-hidden="true"></i></a>
-                                </li>
-                                <li>
-                                    <a href="#accidental-damage-modal"
-                                       data-toggle="modal"
-                                       data-dismiss="modal"
-                                       class="btn btn-blue-hollow">Accidental Damage <i class="fa fa-angle-right" aria-hidden="true"></i></a>
-                                </li>
-                                <li>
-                                    <a href="#breakdown-modal"
-                                       data-toggle="modal"
-                                       data-dismiss="modal"
-                                       class="btn btn-blue-hollow">Out of Warranty Breakdown <i class="fa fa-angle-right" aria-hidden="true"></i></a>
-                                </li>
-                                <li>
-                                    <a href="#charges-modall"
-                                       data-toggle="modal"
-                                       data-dismiss="modal"
-                                       class="btn btn-blue-hollow">Unauthorise Network charges <i class="fa fa-angle-right" aria-hidden="true"></i></a>
-                                </li>
-                                <li>
-                                    <a href="#accessories-modal"
-                                       data-toggle="modal"
-                                       data-dismiss="modal"
-                                       class="btn btn-blue-hollow">Accessories <i class="fa fa-angle-right" aria-hidden="true"></i></a>
-                                </li>
+                <div id="modal-carousel"
+                     {# class="carousel slide" #}
+                     data-ride="carousel"
+                     data-interval="false">
+
+                    <!-- Wrapper for slides -->
+                    <div class="carousel-inner" role="listbox">
+                        <div class="item active">
+                            <div class="item--content">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <div class="modal-body--left text-center">
+                                            <ul>
+                                                <li>
+                                                    <a href="#"
+                                                       class="btn btn-blue-hollow"
+                                                       data-target="#modal-carousel"
+                                                       data-slide-to="1">
+                                                        Loss <i class="fa fa-angle-right" aria-hidden="true"></i>
+                                                    </a>
+                                                </li>
+                                                <li></li>
+                                                <li></li>
+                                                <li></li>
+                                                <li></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <div class="modal-body--right">
+                                            Right
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-sm-8">
-                        <div class="modal-body--right">
-                            Right
+                        <div class="item">
+                            <div class="item--content">
+                                Content 2
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="item--content">
+                                Content 3
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="item--content">
+                                Content 4
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="item--content">
+                                Content 5
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="item--content">
+                                Content 6
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-blue-hollow visible-xs-inline-block" data-dismiss="modal" aria-label="Close">Close
-                </button>
+                <button type="button" class="btn btn-blue-hollow visible-xs-inline-block" data-dismiss="modal" aria-label="Close">Close</button>
             </div>
         </div>
     </div>
 </div>
 {# Skeleton #}
+
+

@@ -265,3 +265,29 @@
     }
 
 }
+
+.modal {
+    .carousel {
+
+        .carousel-control.left {
+            left: -10px;
+
+            @include breakpoint(laptop) {
+                left: -150px;
+            }
+        }
+
+        .carousel-control.right {
+            right: -10px;
+
+            @include breakpoint(laptop) {
+                right: -150px;
+            }
+        }
+
+    }
+}
+
+.modal.and.carousel {
+    position: fixed; // Needed because the carousel overrides the position property
+}

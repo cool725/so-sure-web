@@ -422,13 +422,13 @@
         position: relative;
 
         &__item {
-            cursor: pointer;
+            // cursor: pointer;
 
-            &:hover {
-                h4 {
-                    color: $primary-blue;
-                }
-            }
+            // &:hover {
+            //     h4 {
+            //         color: $primary-blue;
+            //     }
+            // }
         }
 
         img {
