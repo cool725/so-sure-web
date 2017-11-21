@@ -51,6 +51,7 @@ use AppBundle\Document\File\LloydsFile;
 use AppBundle\Document\File\ImeiUploadFile;
 use AppBundle\Document\File\ScreenUploadFile;
 use AppBundle\Document\Form\Cancel;
+use AppBundle\Document\Form\Imei;
 use AppBundle\Document\Form\BillingDay;
 use AppBundle\Document\Form\Chargebacks;
 use AppBundle\Form\Type\BillingDayType;
@@ -372,8 +373,10 @@ class AdminEmployeeController extends BaseController
         $noteForm = $this->get('form.factory')
             ->createNamedBuilder('note_form', NoteType::class)
             ->getForm();
+        $imei = new Imei();
+        $imei->setPolicy($policy);
         $imeiForm = $this->get('form.factory')
-            ->createNamedBuilder('imei_form', ImeiType::class, $policy)
+            ->createNamedBuilder('imei_form', ImeiType::class, $imei)
             ->getForm();
         $facebookForm = $this->get('form.factory')
             ->createNamedBuilder('facebook_form', FacebookType::class, $policy)
@@ -488,6 +491,7 @@ class AdminEmployeeController extends BaseController
             } elseif ($request->request->has('imei_form')) {
                 $imeiForm->handleRequest($request);
                 if ($imeiForm->isValid()) {
+                    $policy->adjustImei($imei->getImei(), false);
                     $dm->flush();
                     $this->addFlash(
                         'success',

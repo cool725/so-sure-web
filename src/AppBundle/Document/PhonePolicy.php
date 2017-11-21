@@ -163,10 +163,19 @@ class PhonePolicy extends Policy
 
     public function setImei($imei)
     {
-        if ($this->imei && $imei != $this->imei) {
+        $this->imei = $imei;
+    }
+
+    public function adjustImei($imei, $setReplacementDate = true)
+    {
+        if ($setReplacementDate && $this->imei && $imei != $this->imei) {
             $this->setImeiReplacementDate(new \DateTime());
         }
-        $this->imei = $imei;
+        $this->setImei($imei);
+
+        if ($this->getNextPolicy()) {
+            $this->getNextPolicy()->adjustImei($imei, $setReplacementDate);
+        }
     }
 
     public function getImeiReplacementDate()
@@ -174,7 +183,7 @@ class PhonePolicy extends Policy
         return $this->imeiReplacementDate;
     }
 
-    public function setImeiReplacementDate(\DateTime $imeiReplacementDate)
+    public function setImeiReplacementDate(\DateTime $imeiReplacementDate = null)
     {
         $this->imeiReplacementDate = $imeiReplacementDate;
     }

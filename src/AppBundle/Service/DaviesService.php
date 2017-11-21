@@ -494,7 +494,7 @@ class DaviesService extends S3EmailService
                 // Imei has changed, but we can't change their policy premium, which is fixed
                 // If there are multiple open claims, don't update the imei!
                 if (!$skipImeiUpdate) {
-                    $policy->setImei($claim->getReplacementImei());
+                    $policy->adjustImei($claim->getReplacementImei());
                 }
                 // If phone has been updated (unlikely at the moment)
                 if ($claim->getReplacementPhone()) {
