@@ -72,6 +72,11 @@ class SalvaExportService
         $this->environment = $environment;
     }
 
+    public function setDm($dm)
+    {
+        $this->dm = $dm;
+    }
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
