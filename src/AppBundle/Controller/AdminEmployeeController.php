@@ -1604,18 +1604,13 @@ class AdminEmployeeController extends BaseController
                 if (!isset($week[$stat->getName()])) {
                     $week[$stat->getName()] = 0;
                 }
-                $week[$stat->getName()] += $stat->getValue();
+                if (!$stat->isAbsolute()) {
+                    $week[$stat->getName()] += $stat->getValue();
+                } else {
+                    $week[$stat->getName()] = $stat->getValue();
+                }
             }
-            foreach ([
-                Stats::INSTALL_GOOGLE,
-                Stats::INSTALL_APPLE,
-                Stats::MIXPANEL_TOTAL_SITE_VISITORS,
-                Stats::MIXPANEL_QUOTES_UK,
-                Stats::MIXPANEL_RECEIVE_PERSONAL_DETAILS,
-                Stats::MIXPANEL_CPC_QUOTES_UK,
-                Stats::MIXPANEL_CPC_MANUFACTURER_UK,
-                Stats::MIXPANEL_CPC_COMPETITORS_UK,
-            ] as $stat) {
+            foreach (Stats::$allStats as $stat) {
                 if (!isset($week[$stat])) {
                     $week[$stat] = '-';
                 }
