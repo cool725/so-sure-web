@@ -256,7 +256,8 @@ class SalvaExportService
         $numPayments = 0;
         $repo = $this->dm->getRepository(Payment::class);
         $lines[] = sprintf("%s", $this->formatLine($this->transformPayment(null, $includeBrokerFee)));
-        foreach ($repo->getAllPaymentsForExport($date) as $payment) {
+        $payments = $repo->getAllPaymentsForExport($date);
+        foreach ($payments as $payment) {
             // For prod, skip invalid policies
             if ($this->environment == 'prod' && !$payment->getPolicy()->isValidPolicy()) {
                 continue;
