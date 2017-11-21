@@ -15,7 +15,9 @@ class StatsRepository extends BaseDocumentRepository
             ->field('date')->lt($end)
             ->field('date')->gte($start);
 
-        return $qb->getQuery()
+        return $qb
+            ->sort('date', 'asc')
+            ->getQuery()
             ->execute();
     }
 }
