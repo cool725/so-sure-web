@@ -279,7 +279,7 @@
         }
 
         @include breakpoint(laptop) {
-            left: -150px;
+            left: -120px;
 
             span {
                 top: inherit;
@@ -295,7 +295,7 @@
         }
 
         @include breakpoint(laptop) {
-            right: -150px;
+            right: -120px;
 
             span {
                 top: inherit;
