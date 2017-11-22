@@ -16,6 +16,7 @@ use AppBundle\Document\Reward;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Connection\RenewalConnection;
 use AppBundle\Classes\Salva;
+use AppBundle\Document\PhonePolicy;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
 trait UserClassTrait
@@ -431,5 +432,135 @@ trait UserClassTrait
         $policy->link($renewalPolicy);
 
         return $renewalPolicy;
+    }
+
+    public function getPendingRenewalPolicies(
+        $emailA,
+        $emailB,
+        $connect = true,
+        $dateA = null,
+        $dateB = null,
+        $additional = null,
+        $valueA = 10,
+        $valueB = 10
+    ) {
+        if (!$dateA) {
+            $dateA = new \DateTime('2016-01-01');
+        }
+        $renewalDateA = clone $dateA;
+        $renewalDateA = $renewalDateA->add(new \DateInterval('P350D'));
+        if (!$dateB) {
+            $dateB = new \DateTime('2016-01-01');
+        }
+        $renewalDateB = clone $dateB;
+        $renewalDateB = $renewalDateB->add(new \DateInterval('P350D'));
+        $userA = static::createUser(
+            static::$userManager,
+            $emailA,
+            'bar',
+            static::$dm
+        );
+        $userB = static::createUser(
+            static::$userManager,
+            $emailB,
+            'bar',
+            static::$dm
+        );
+        $policyA = static::initPolicy(
+            $userA,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            clone $dateA,
+            true
+        );
+        $policyB = static::initPolicy(
+            $userB,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            clone $dateB,
+            true
+        );
+
+        $policyA->setStatus(PhonePolicy::STATUS_PENDING);
+        $policyB->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policyA, clone $dateA, true);
+        static::$policyService->create($policyB, clone $dateB, true);
+        static::$policyService->setEnvironment('test');
+        static::$dm->flush();
+        $this->assertEquals($this->getCurrentIptRate($dateA), $policyA->getPremium()->getIptRate());
+        $this->assertEquals($this->getCurrentIptRate($dateB), $policyB->getPremium()->getIptRate());
+
+        if ($connect) {
+            list($connectionA, $connectionB) = $this->createLinkedConnections(
+                $policyA,
+                $policyB,
+                $valueA,
+                $valueB,
+                clone $dateA,
+                clone $dateB
+            );
+        }
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policyA->getStatus());
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policyB->getStatus());
+
+        $renewalPolicyA = static::$policyService->createPendingRenewal(
+            $policyA,
+            $renewalDateA
+        );
+        $renewalPolicyB = static::$policyService->createPendingRenewal(
+            $policyB,
+            $renewalDateB
+        );
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyA->getStatus());
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicyB->getStatus());
+        $this->assertEquals($this->getCurrentIptRate($dateA), $policyA->getPremium()->getIptRate());
+        $this->assertEquals($this->getCurrentIptRate($dateB), $policyB->getPremium()->getIptRate());
+        $this->assertEquals($this->getCurrentIptRate($policyA->getEnd()), $renewalPolicyA->getPremium()->getIptRate());
+        $this->assertEquals($this->getCurrentIptRate($policyB->getEnd()), $renewalPolicyB->getPremium()->getIptRate());
+
+        if ($additional) {
+            for ($i = 0; $i < $additional; $i++) {
+                $user = static::createUser(
+                    static::$userManager,
+                    sprintf("%d%s", $i, $emailB),
+                    'bar',
+                    static::$dm
+                );
+                $policy = static::initPolicy(
+                    $user,
+                    static::$dm,
+                    $this->getRandomPhone(static::$dm),
+                    clone $dateB,
+                    true
+                );
+                $policy->setStatus(PhonePolicy::STATUS_PENDING);
+                static::$policyService->setEnvironment('prod');
+                static::$policyService->create($policy, clone $dateB, true);
+                static::$policyService->setEnvironment('test');
+                static::$dm->flush();
+
+                if ($connect) {
+                    list($connectionA, $connectionB) = $this->createLinkedConnections(
+                        $policyA,
+                        $policy,
+                        $valueA,
+                        $valueB,
+                        clone $dateA,
+                        clone $dateB
+                    );
+                }
+
+                $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+
+                $renewalPolicy = static::$policyService->createPendingRenewal(
+                    $policy,
+                    $renewalDateB
+                );
+            }
+        }
+
+        return [$policyA, $policyB];
     }
 }

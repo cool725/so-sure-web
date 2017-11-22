@@ -36,6 +36,22 @@ class Stats
     const KPI_CANCELLED_AND_PAYMENT_OWED = 'kpi-cancelled-payment-owed';
     const KPI_CANCELLED_AND_PAYMENT_PAID = 'kpi-cancelled-payment-paid';
 
+    public static $allStats = [
+        Stats::INSTALL_GOOGLE,
+        Stats::INSTALL_APPLE,
+        Stats::MIXPANEL_TOTAL_SITE_VISITORS,
+        Stats::MIXPANEL_QUOTES_UK,
+        Stats::MIXPANEL_RECEIVE_PERSONAL_DETAILS,
+        Stats::MIXPANEL_CPC_QUOTES_UK,
+        Stats::MIXPANEL_CPC_MANUFACTURER_UK,
+        Stats::MIXPANEL_CPC_COMPETITORS_UK,
+        Stats::KPI_PICSURE_UNSTARTED_POLICIES,
+        Stats::KPI_PICSURE_APPROVED_POLICIES,
+        Stats::KPI_PICSURE_REJECTED_POLICIES,
+        Stats::KPI_CANCELLED_AND_PAYMENT_OWED,
+        Stats::KPI_CANCELLED_AND_PAYMENT_PAID,
+    ];
+
     /**
      * @MongoDB\Id
      */
@@ -97,5 +113,19 @@ class Stats
     public function setValue($value)
     {
         $this->value = $value;
+    }
+
+    public function isAbsolute()
+    {
+        if (in_array($this->getName(), [
+            self::KPI_CANCELLED_AND_PAYMENT_OWED,
+            self::KPI_PICSURE_UNSTARTED_POLICIES,
+            self::KPI_PICSURE_APPROVED_POLICIES,
+            self::KPI_PICSURE_REJECTED_POLICIES,
+        ])) {
+            return true;
+        }
+
+        return false;
     }
 }
