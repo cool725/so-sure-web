@@ -272,18 +272,34 @@
 .modal.and.carousel {
 
     .carousel-control.left {
-        left: -10px;
+        left: -10px; top: 100px;
+
+        span {
+            top: 20px;
+        }
 
         @include breakpoint(laptop) {
             left: -150px;
+
+            span {
+                top: inherit;
+            }
         }
     }
 
     .carousel-control.right {
-        right: -10px;
+        right: -10px; top: 100px;
+
+        span {
+            top: 20px;
+        }
 
         @include breakpoint(laptop) {
             right: -150px;
+
+            span {
+                top: inherit;
+            }
         }
     }
 
