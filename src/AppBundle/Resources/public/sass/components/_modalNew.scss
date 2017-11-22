@@ -60,7 +60,6 @@
     }
 
     .modal-content {
-        // background-color: $lightest-blue;
         @include border-radius(0);
     }
 
@@ -109,11 +108,7 @@
 
         &--left {
             @include breakpoint(tablet) {
-
                 padding-right: 15px;
-            }
-            @include breakpoint(laptop) {
-                // padding-right: 30px;
             }
         }
 
@@ -154,7 +149,6 @@
 
         ol, ul {
             padding: 10px 10px 10px 30px;
-            // margin-bottom: 30px;
 
             li {
                 font-family: $avenir-heavy;
@@ -236,10 +230,6 @@
 
     h2.section-open:after {
         content: '\f078';
-    }
-
-    h3 {
-        // font-size: 16px;
     }
 
     p {
