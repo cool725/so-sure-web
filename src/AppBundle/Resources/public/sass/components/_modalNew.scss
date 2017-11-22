@@ -109,11 +109,11 @@
 
         &--left {
             @include breakpoint(tablet) {
-                border-right: 1px solid $pale-grey;
+
                 padding-right: 15px;
             }
             @include breakpoint(laptop) {
-                padding-right: 30px;
+                // padding-right: 30px;
             }
         }
 
@@ -122,7 +122,8 @@
                 padding-left: 15px;
             }
             @include breakpoint(laptop) {
-                // padding-left: 30px;
+                border-left: 1px solid $pale-grey;
+                padding-left: 30px;
             }
         }
 
@@ -268,26 +269,24 @@
 
 // Carousel inside modal
 
-.modal {
-    .carousel {
+.modal.and.carousel {
 
-        .carousel-control.left {
-            left: -10px;
+    .carousel-control.left {
+        left: -10px;
 
-            @include breakpoint(laptop) {
-                left: -150px;
-            }
+        @include breakpoint(laptop) {
+            left: -150px;
         }
-
-        .carousel-control.right {
-            right: -10px;
-
-            @include breakpoint(laptop) {
-                right: -150px;
-            }
-        }
-
     }
+
+    .carousel-control.right {
+        right: -10px;
+
+        @include breakpoint(laptop) {
+            right: -150px;
+        }
+    }
+
 }
 
 .modal.and.carousel {
