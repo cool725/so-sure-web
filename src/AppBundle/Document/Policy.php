@@ -3034,7 +3034,11 @@ abstract class Policy
         $this->updatePotValue();
     }
 
-    abstract public function setPolicyDetailsForPendingRenewal(Policy $policy, \DateTime $startDate);
+    abstract public function setPolicyDetailsForPendingRenewal(
+        Policy $policy,
+        \DateTime $startDate,
+        PolicyTerms $terms
+    );
     abstract public function setPolicyDetailsForRepurchase(Policy $policy, \DateTime $startDate);
 
     public function createPendingRenewal(PolicyTerms $terms, \DateTime $date = null)
@@ -3048,7 +3052,7 @@ abstract class Policy
         }
 
         $newPolicy = new static();
-        $this->setPolicyDetailsForPendingRenewal($newPolicy, $this->getEnd());
+        $this->setPolicyDetailsForPendingRenewal($newPolicy, $this->getEnd(), $terms);
         $newPolicy->setStatus(Policy::STATUS_PENDING_RENEWAL);
         // don't allow renewal after the end the current policy
         $newPolicy->setRenewalExpiration($this->getEnd());

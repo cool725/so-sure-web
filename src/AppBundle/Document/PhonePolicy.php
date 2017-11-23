@@ -22,6 +22,7 @@ class PhonePolicy extends Policy
     const NETWORK_CLAIM_VALUE = 2;
     const PROMO_LAUNCH_VALUE = 5;
 
+    const PICSURE_STATUS_PREAPPROVED = 'preapproved';
     const PICSURE_STATUS_APPROVED = 'approved';
     const PICSURE_STATUS_REJECTED = 'rejected';
     const PICSURE_STATUS_MANUAL = 'manual';
@@ -94,7 +95,7 @@ class PhonePolicy extends Policy
     protected $name;
 
     /**
-     * @Assert\Choice({"approved", "invalid", "rejected", "manual"}, strict=true)
+     * @Assert\Choice({"preapproved", "approved", "invalid", "rejected", "manual"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -468,7 +469,7 @@ class PhonePolicy extends Policy
         }
     }
 
-    public function setPolicyDetailsForPendingRenewal(Policy $policy, \DateTime $startDate)
+    public function setPolicyDetailsForPendingRenewal(Policy $policy, \DateTime $startDate, PolicyTerms $terms)
     {
         $policy->setPhone($this->getPhone());
         $policy->setImei($this->getImei());
@@ -476,6 +477,9 @@ class PhonePolicy extends Policy
 
         // make sure ipt rate is set to ipt rate at the start of the policy
         $policy->validatePremium(true, $startDate);
+        if ($terms->isPicSureEnabled()) {
+            $policy->setPicSureStatus(self::PICSURE_STATUS_PREAPPROVED);
+        }
     }
 
     public function setPolicyDetailsForRepurchase(Policy $policy, \DateTime $startDate)
@@ -531,6 +535,16 @@ class PhonePolicy extends Policy
         return $this->picSureStatus;
     }
 
+    public function getPicSureStatusForApi()
+    {
+        $status = $this->getPicSureStatus();
+        if ($status == self::PICSURE_STATUS_PREAPPROVED) {
+            return self::PICSURE_STATUS_APPROVED;
+        }
+
+        return $status;
+    }
+    
     public function setPicSureStatus($picSureStatus)
     {
         $this->picSureStatus = $picSureStatus;
@@ -561,7 +575,7 @@ class PhonePolicy extends Policy
                 'name' => $this->getName() && strlen($this->getName()) > 0 ?
                     $this->getName() :
                     $this->getDefaultName(),
-                'picsure_status' => $this->getPicSureStatus(),
+                'picsure_status' => $this->getPicSureStatusForApi(),
                 'excesses' => [
                     [
                         'type' => Claim::TYPE_LOSS,
