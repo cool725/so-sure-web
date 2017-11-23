@@ -31,9 +31,9 @@ $(function(){
         var hitPoint   = $('.homepage--instant-quote').offset().top;
 
         if (windowTop > offsetTop && windowTop < hitPoint) {
-            $(searchBox).addClass('search-phone-form--sticky');
+            $(searchBox).addClass('search-phone-form--sticky').addClass('animated bounceInDown');
         } else {
-            $(searchBox).removeClass('search-phone-form--sticky');
+            $(searchBox).removeClass('search-phone-form--sticky').removeClass('animated bounceInDown');
         }
     }
 

@@ -908,16 +908,14 @@
     }
 
     .tt-menu {
-        margin-top: 10px;
+        margin-top: 11px;
 
         @include breakpoint(tablet) {
             width: 430px;
-            // margin-top: 67px;
         }
 
         @include breakpoint(laptop) {
             width: 530px;
-            // margin-top: 10px;
         }
 
         @include breakpoint(desktop) {
@@ -935,8 +933,6 @@
 
     @include border-radius(4px);
     border: 1px solid $grey;
-    // box-shadow: 0 0 15px $grey;
-    // @include transition(box-shadow 0.3s ease-in-out);
 
     // search form - set width
     @include breakpoint(laptop) {
@@ -951,7 +947,7 @@
 
 // Style input on focus
 .search-phone-form--focus {
-    border-color: $light-blue;
+    border-color: $primary-blue;
 
     .twitter-typeahead {
 
@@ -963,17 +959,53 @@
 
 .search-phone-form--sticky {
     position: fixed;
-    top: 49px; left: 0; right: 0;
+    top: 55px; left: 0; right: 0;
     z-index: 999;
-    margin-left: 15px;
-    margin-right: 15px;
 
-    @include border-top-radius(0);
+    margin-left: 10px;
+    margin-right: 10px;
 
-    @include breakpoint(laptop) {
-        top: 15px;
+    padding: 0 10px;
+
+    .twitter-typeahead {
+
+        .tt-hint,
+        .tt-input {
+
+            @include breakpoint(laptop) {
+                height: 37px;
+                padding-left: 50px;
+            }
+        }
+
+        &:before {
+
+            @include breakpoint(laptop) {
+                font-size: 23px;
+                top: 2px;
+            }
+        }
+
+        @include breakpoint(tablet) {
+            font-size: 18px;
+        }
+
+        .tt-menu {
+            margin-top: 1px;
+        }
+    }
+
+    border-color: $light-blue;
+
+    @include breakpoint(tablet) {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    // search form - set width
+    @include breakpoint(desktop) {
+        top: 5px;
         z-index: 1001;
-        @include border-top-radius(4px);
     }
 }
 
