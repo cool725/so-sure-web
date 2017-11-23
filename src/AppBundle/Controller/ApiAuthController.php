@@ -1889,8 +1889,8 @@ class ApiAuthController extends BaseController
             $device = $this->getRequestString($request, 'device');
             $memory = (float) $this->getRequestString($request, 'memory');
             $rooted = $this->getRequestBool($request, 'rooted');
-
-            $quoteData = $this->getQuotes($make, $device, $memory, $rooted);
+            $quoteService = $this->get('app.quote');
+            $quoteData = $quoteService->getQuotes($make, $device, $memory, $rooted);
             $phones = $quoteData['phones'];
             $deviceFound = $quoteData['deviceFound'];
             if (!$phones || !$deviceFound) {

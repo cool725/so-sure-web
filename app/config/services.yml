@@ -382,6 +382,11 @@ services:
             imeiValidator:        "@app.imei"
             rateLimit:            "@app.ratelimit"
             intercom:             "@app.intercom"
+    app.quote:
+        class: AppBundle\Service\QuoteService
+        arguments:
+            mailer:               "@app.mailer"
+            dm:                   "@doctrine_mongodb.odm.default_document_manager"
 
     app.invoice:
         class: AppBundle\Service\InvoiceService
