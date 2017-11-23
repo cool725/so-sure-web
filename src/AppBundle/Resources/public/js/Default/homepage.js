@@ -8,13 +8,16 @@ $(function(){
     $('.search-phone').each(function(index, el) {
         var container = $(this).parents('.search-phone-form');
         $(this).on('focus', function(){
+
+            console.log(fixedsearch);
+
             // Add focus style
             $(container).addClass('search-phone-form--focus');
 
             // If mobile slide up to make more room
-            if (device == 'Mobile') {
-                $('html,body').animate({scrollTop: $(this).offset().top - 100}, 800);
-            }
+            // if (device == 'Mobile') {
+            //     $('html,body').animate({scrollTop: $(this).offset().top - 100}, 800);
+            // }
         });
 
         // Remove class on blur
@@ -24,7 +27,7 @@ $(function(){
     });
 
     // Sticky Search - Homepage only
-    function stickySearch() {
+    function stickySearch(fixedsearch) {
         var windowTop  = $(window).scrollTop();
         var searchBox  = $('#select-phone-data-1');
         var offsetTop  = $('.homepage--hero').height();
