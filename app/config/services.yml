@@ -384,6 +384,12 @@ services:
             intercom:             "@app.intercom"
             sms:                  "@app.sms"
 
+    app.quote:
+        class: AppBundle\Service\QuoteService
+        arguments:
+            mailer:               "@app.mailer"
+            dm:                   "@doctrine_mongodb.odm.default_document_manager"
+
     app.invoice:
         class: AppBundle\Service\InvoiceService
         arguments:
