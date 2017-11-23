@@ -50,11 +50,11 @@
 .modal-new {
 
     .modal-dialog {
-        width: 100%; height: 100%;
+        width: 100%;
         margin: 0;
 
         @include breakpoint(laptop) {
-            width: 65%; height: auto;
+            width: 65%;
             margin: 5% auto 0;
         }
     }
@@ -261,6 +261,12 @@
 
 .modal.and.carousel {
 
+    .modal-content {
+        @include breakpoint(laptop) {
+            min-height: 655px;
+        }
+    }
+
     .carousel-control.left {
         left: -10px; top: 100px;
 
@@ -293,8 +299,14 @@
         }
     }
 
+    .modal-footer {
+        // width: 100%;
+        // position: absolute;
+        // bottom: 0; left: 0; right: 0;
+    }
 }
 
 .modal.and.carousel {
     position: fixed; // Needed because the carousel overrides the position property
 }
+
