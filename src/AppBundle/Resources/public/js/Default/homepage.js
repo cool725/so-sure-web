@@ -9,8 +9,6 @@ $(function(){
         var container = $(this).parents('.search-phone-form');
         $(this).on('focus', function(){
 
-            console.log(fixedsearch);
-
             // Add focus style
             $(container).addClass('search-phone-form--focus');
 
