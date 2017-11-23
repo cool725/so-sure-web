@@ -82,7 +82,7 @@
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>New Policies [KPI: 50] (adjusted for Upgrades)</td>
+                            <td>New Policies [KPI: 50] (excludes upgrades)</td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['newPoliciesAdjUpgrade'] }}</td>
                             {% endfor %}
@@ -298,6 +298,36 @@
                                     {{ week['install-google'] }}
                                     <i class="fa fa-clock-o" title="Value is delayed"></i>
                                 </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td># of Total Policies that are Cancelled w/approved Claim (Payment owed)</td>
+                            {% for week in weeks %}
+                                <td>{{ week['kpi-cancelled-payment-owed'] }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td># of Policies Paid that were Cancelled w/approved Claim (Payment owed)</td>
+                            {% for week in weeks %}
+                                <td>{{ week['kpi-cancelled-payment-paid'] }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td>Total # pic-sure unstarted policies (pic-sure policy, but no upload)</td>
+                            {% for week in weeks %}
+                                <td>{{ week['kpi-picsure-unstarted-policies'] }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td>Total # pic-sure approved policies</td>
+                            {% for week in weeks %}
+                                <td>{{ week['kpi-picsure-approved-policies'] }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td>Total # pic-sure rejected policies</td>
+                            {% for week in weeks %}
+                                <td>{{ week['kpi-picsure-rejected-policies'] }}</td>
                             {% endfor %}
                         </tr>
                     </tbody>

@@ -12,6 +12,7 @@ use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\Payment\ChargebackPayment;
 use AppBundle\Document\Payment\Payment;
+use AppBundle\Document\Payment\SoSurePotRewardPayment;
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Classes\Salva;
 
@@ -313,6 +314,43 @@ class SalvaExportServiceTest extends WebTestCase
             sprintf('"%0.2f"', 0 - $policy->getPremiumInstallmentPrice()),
             explode(',', $lines[1])[2]
         );
+    }
+
+    public function testPaymentsPotReward()
+    {
+        list($policyA, $policyB) = $this->getPendingRenewalPolicies(
+            static::generateEmail('testPaymentsPotRewardA', $this),
+            static::generateEmail('testPaymentsPotRewardB', $this),
+            true,
+            new \DateTime('2016-01-01'),
+            new \DateTime('2016-01-15'),
+            null,
+            15,
+            15
+        );
+        $renewalPolicyA = static::$policyService->renew($policyA, 12, null, false, new \DateTime('2016-12-30'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicyA->getStatus());
+
+        static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policyA->getStatus());
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        static::$salva->setDm($dm);
+
+        $lines = $this->exportPayments($policyA->getPolicyNumber(), new \DateTime('2017-01-01'));
+        //print_r($lines);
+        $this->assertEquals(1, count($lines));
+        $this->assertEquals('"-10.00"', explode(',', $lines[0])[2]);
+
+        $updatedPolicyA = $dm->getRepository(Policy::class)->find($policyA->getId());
+        $this->assertEquals(1, count($updatedPolicyA->getPayments()));
+        $foundSoSurePotReward = false;
+        foreach ($updatedPolicyA->getAllPayments() as $payment) {
+            if ($payment instanceof SoSurePotRewardPayment) {
+                $foundSoSurePotReward = true;
+            }
+        }
+        $this->assertTrue($foundSoSurePotReward);
     }
 
     public function testProcessPaidPolicyWait()
@@ -619,10 +657,10 @@ class SalvaExportServiceTest extends WebTestCase
         return $lines;
     }
 
-    private function exportPayments($policyNumber)
+    private function exportPayments($policyNumber, $date = null)
     {
         $lines = [];
-        foreach (static::$salva->exportPayments(null, true) as $line) {
+        foreach (static::$salva->exportPayments(null, true, $date) as $line) {
             $data = explode(",", $line);
             $search = sprintf('"%s', $policyNumber);
             if (stripos($data[0], $search) === 0) {
