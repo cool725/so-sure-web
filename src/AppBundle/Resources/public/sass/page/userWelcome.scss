@@ -82,6 +82,38 @@
             margin-right: auto;
         }
 
+        table { //TODO - Move to tables scss
+            max-width: 660px;
+            margin: 0 auto 50px;
+
+            thead {
+                td {
+                    padding: 30px 15px;
+                    text-align: center;
+                    vertical-align: middle;
+                }
+            }
+
+            tr {
+                td.sosure {
+                    background-color: $white;
+                }
+
+                td.contrast {
+                    background-color: lighten($lightest-blue, 6%);
+                    opacity: 0.7;
+                }
+            }
+
+            tbody {
+                td {
+                    padding: 15px;
+                    border-color: darken($lightest-blue, 6%);
+                    vertical-align: middle;
+                }
+            }
+        }
+
         @include breakpoint(tablet) {
             // margin-bottom: 400px;
             padding-top: 350px;
