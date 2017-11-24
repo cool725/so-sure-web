@@ -72,6 +72,16 @@
         }
     }
 
+    &--pic-sure {
+        text-align: center;
+        background-color: $lightest-blue;
+
+        @include breakpoint(tablet) {
+            // margin-bottom: 400px;
+            padding-top: 350px;
+        }
+    }
+
     &--how-to-get-cashback {
         text-align: center;
 
@@ -85,11 +95,6 @@
             p {
                 opacity: 0;
             }
-        }
-
-        @include breakpoint(tablet) {
-            // margin-bottom: 400px;
-            padding-top: 350px;
         }
     }
 
