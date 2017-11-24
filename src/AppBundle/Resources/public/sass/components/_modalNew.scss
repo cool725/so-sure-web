@@ -262,9 +262,7 @@
 .modal.and.carousel {
 
     .modal-content {
-        @include breakpoint(laptop) {
-            min-height: 655px;
-        }
+
     }
 
     .carousel-control.left {
@@ -300,9 +298,11 @@
     }
 
     .modal-footer {
-        // width: 100%;
-        // position: absolute;
-        // bottom: 0; left: 0; right: 0;
+        @include breakpoint(laptop) {
+            width: 100%;
+            position: absolute;
+            top: 100%; left: 0; right: 0;
+        }
     }
 }
 
