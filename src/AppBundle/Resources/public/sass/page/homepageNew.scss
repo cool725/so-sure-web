@@ -973,8 +973,8 @@
         .tt-input {
 
             @include breakpoint(laptop) {
-                height: 37px;
-                padding-left: 50px;
+                height: 38px;
+                padding: 0 0 0 50px;
             }
         }
 
@@ -1002,7 +1002,11 @@
         margin-right: auto;
     }
 
-    // search form - set width
+    // search form - set width/height
+    @include breakpoint(laptop) {
+        height: 40px;
+    }
+
     @include breakpoint(desktop) {
         top: 5px;
         z-index: 1001;
