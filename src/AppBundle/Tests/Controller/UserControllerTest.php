@@ -653,7 +653,6 @@ class UserControllerTest extends BaseControllerTest
         $this->assertFalse($policyB->isRenewed());
         
         self::connectPolicies(self::$invitationService, $policyA, $policyB, $date);
-
         $tomorrow = new \DateTime();
         $tomorrow = $tomorrow->add(new \DateInterval('P1D'));
         $renewalPolicyA = $this->getRenewalPolicy($policyA, false, $tomorrow);
