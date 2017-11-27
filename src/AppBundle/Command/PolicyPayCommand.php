@@ -9,6 +9,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\Phone;
+use AppBundle\Document\Policy;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Payment\Payment;
@@ -89,7 +90,7 @@ class PolicyPayCommand extends ContainerAwareCommand
         if (!$policy) {
             throw new \Exception('Unable to find a partial policy');
         }
-        if (!$policy->getStatus()) {
+        if ($policy->getStatus()) {
             throw new \Exception('Policy is not partial');
         }
 
