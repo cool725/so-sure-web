@@ -84,7 +84,7 @@
 
         table { //TODO - Move to tables scss
             max-width: 600px;
-            margin: 30px auto;
+            margin: 30px auto 0;
 
             thead {
                 td {
@@ -111,6 +111,13 @@
                     border-color: darken($lightest-blue, 6%);
                     vertical-align: middle;
                 }
+            }
+        }
+
+        .app-link {
+            img {
+                max-width: 500px;
+                margin: 0 auto;
             }
         }
 

@@ -153,9 +153,25 @@
                 </tbody>
             </table>
 
-{#             <a href="#">
-                <img src="{{ cdn_url }}/images/user/app_install_apple.png" alt="" class="img-responsive img-responsive--center">
-            </a> #}
+            <div class="app-link">
+                {% set location = 'user-welcome' %} {# Do we need this ? #}
+
+                {% if policy.phone is defined and policy.phone and not policy.phone.googlePlay %}
+                    <a class="ga-outbound-click"
+                       data-clicklabel="iTunes"
+                       href="{{ apple_download(location) }}"
+                       target="_blank"><img src="{{ cdn_url }}/images/user/app_install_apple.png" alt="Available at the AppleStore" class="img-responsive">
+                    </a>
+                {% endif %}
+                {% if policy.phone is defined and policy.phone and not policy.phone.iTunes %}
+                    <a class="ga-outbound-click"
+                       data-clicklabel="PlayStore"
+                       href="{{ google_download(location) }}"
+                       target="_blank"><img src="{{ cdn_url }}/images/user/app_install_androird.png" alt="Get it on Google Play" class="img-responsive">
+                   </a>
+                {% endif %}
+            </div>
+
             <p>You can also add additional phones, invite and connect or get in touch when you need us most.</p>
         </div>
     </section>
