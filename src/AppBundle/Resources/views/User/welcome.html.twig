@@ -95,7 +95,8 @@
         <div class="container">
             <h3>Download our handy app - reduce your excess!</h3>
             <p>Validate your phone using our pic-sure technology, this not only helps us recognise your phone is in good working order and not already damaged but <span class="text-highlight text-uppercase">reduces your excess by half!</span> <br>Help us stamp out fraud, reduce claims times and reduce costs to give that saving back to you.</p>
-            <table class="table">
+
+            <table class="table hidden-xs">
                 <thead>
                     <tr>
                         <td width="50%" class="h3 contrast">Excess <u>without</u> pic-sure</td>
@@ -117,6 +118,44 @@
                     </tr>
                 </tbody>
             </table>
+
+            <table class="table visible-xs">
+                <thead>
+                    <tr>
+                        <td width="100%" class="h3 contrast">Excess <u>without</u> pic-sure</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="contrast" align="middle" valign="middle">
+                            <span class="text-blue h1">£150</span><br>
+                            FOR THEFT/LOSS/ACCIDENTAL DAMAGE/BREAKDOWN
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <table class="table visible-xs">
+                <thead>
+                    <tr>
+                        <td width="100%" class="h3 sosure">Excess <u>with</u> pic-sure</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="sosure" align="middle" valign="middle">
+                            <span class="text-blue h1">£50</span><br>
+                            FOR ACCIDENTAL DAMAGE/BREAKDOWN <br><br>
+                            <span class="text-blue h1">£70</span><br>
+                            FOR THEFT/LOSS
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+{#             <a href="#">
+                <img src="{{ cdn_url }}/images/user/app_install_apple.png" alt="" class="img-responsive img-responsive--center">
+            </a> #}
             <p>You can also add additional phones, invite and connect or get in touch when you need us most.</p>
         </div>
     </section>
@@ -153,7 +192,7 @@
 
     <section class="section--pad user-welcome--download">
         <div class="container">
-            {% include 'AppBundle::Default/_appDownload.html.twig' with { 'phone': policy.phone, 'location': 'user-welcome' } %}
+            {# {% include 'AppBundle::Default/_appDownload.html.twig' with { 'phone': policy.phone, 'location': 'user-welcome' } %} #}
         </div>
     </section>
 
