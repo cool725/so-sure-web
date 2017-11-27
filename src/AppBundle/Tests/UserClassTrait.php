@@ -409,6 +409,10 @@ trait UserClassTrait
     {
         if (!$date) {
             $date = new \DateTime("2017-01-01");
+            $pendingDate = clone $date;
+            $pendingDate = $pendingDate->sub(new \DateInterval('P21D'));
+        } else {
+            $pendingDate = clone $date;
         }
         $exp = clone $date;
         $exp = $exp->sub(new \DateInterval('PT1S'));
@@ -416,18 +420,20 @@ trait UserClassTrait
         $end = $end->add(new \DateInterval('P1Y'));
         $end = $end->sub(new \DateInterval('PT1S'));
 
+        $renewalPolicy = $policy->createPendingRenewal(static::getLatestPolicyTerms(self::$dm), $pendingDate);
+
+        /*
         $renewalPolicy = new SalvaPhonePolicy();
         $renewalPolicy->setPhone($policy->getPhone());
 
         $renewalPolicy->init($policy->getUser(), static::getLatestPolicyTerms(self::$dm));
+        */
         if ($create) {
             $renewalPolicy->create(rand(1, 999999), null, null, rand(1, 9999));
             $renewalPolicy->setStart($date);
             $renewalPolicy->setEnd($end);
-        } else {
-            $renewalPolicy->setRenewalExpiration($exp);
         }
-        $renewalPolicy->setStatus(Policy::STATUS_PENDING_RENEWAL);
+        //$renewalPolicy->setStatus(Policy::STATUS_PENDING_RENEWAL);
 
         $policy->link($renewalPolicy);
 

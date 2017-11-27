@@ -348,6 +348,10 @@ class ReportingService
         $allTerms = $termsRepo->findAll();
         $data['picsureApproved'] = $policyRepo->countPicSurePolicies(PhonePolicy::PICSURE_STATUS_APPROVED, $allTerms);
         $data['picsureRejected'] = $policyRepo->countPicSurePolicies(PhonePolicy::PICSURE_STATUS_REJECTED, $allTerms);
+        $data['picsurePreApproved'] = $policyRepo->countPicSurePolicies(
+            PhonePolicy::PICSURE_STATUS_PREAPPROVED,
+            $allTerms
+        );
         $data['picsureUnstarted'] = $policyRepo->countPicSurePolicies(null, $allTerms);
 
         return $data;
