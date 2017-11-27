@@ -25,7 +25,7 @@ $(function(){
     });
 
     // Sticky Search - Homepage only
-    function stickySearch(fixedsearch) {
+    function stickySearch() {
         var windowTop  = $(window).scrollTop();
         var searchBox  = $('#select-phone-data-1');
         var offsetTop  = $('.homepage--hero').height();
