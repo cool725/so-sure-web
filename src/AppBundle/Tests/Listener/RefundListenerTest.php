@@ -252,6 +252,7 @@ class RefundListenerTest extends WebTestCase
         static::$policyService->setEnvironment('prod');
         static::$policyService->create($policy, new \DateTime('2016-01-01'));
         static::$policyService->setEnvironment('test');
+        $policy->setStatus(Policy::STATUS_ACTIVE);
 
         $renewalPolicy = $this->getRenewalPolicy($policy);
         static::$dm->persist($renewalPolicy);
@@ -309,6 +310,7 @@ class RefundListenerTest extends WebTestCase
         static::$policyService->setEnvironment('prod');
         static::$policyService->create($policy, new \DateTime('2016-01-01'));
         static::$policyService->setEnvironment('test');
+        $policy->setStatus(Policy::STATUS_ACTIVE);
 
         $renewalPolicy = $this->getRenewalPolicy($policy);
         static::$dm->persist($renewalPolicy);
@@ -378,6 +380,7 @@ class RefundListenerTest extends WebTestCase
         static::$policyService->setEnvironment('prod');
         static::$policyService->create($policy, new \DateTime('2016-01-01'));
         static::$policyService->setEnvironment('test');
+        $policy->setStatus(Policy::STATUS_ACTIVE);
 
         $renewalPolicy = $this->getRenewalPolicy($policy);
         static::$dm->persist($renewalPolicy);

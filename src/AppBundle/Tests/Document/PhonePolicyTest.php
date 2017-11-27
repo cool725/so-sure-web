@@ -3258,7 +3258,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(Policy::STATUS_DECLINED_RENEWAL, $renewalPolicy->getStatus());
 
         // should be able to renew after declining if still within timeframe
-        $renewalPolicy->renew(0);
+        $renewalPolicy->renew(0, false, new \DateTime('2016-12-31'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicy->getStatus());
     }
 
@@ -3428,6 +3428,25 @@ class PhonePolicyTest extends WebTestCase
         $this->assertNull($repurchase->getStatus());
         $this->assertNotNull($claim->getLinkedPolicy());
         $this->assertEquals($repurchase->getId(), $claim->getLinkedPolicy()->getId());
+    }
+
+    public function testRenewPicSurePreApproved()
+    {
+        $policy = $this->getPolicy(static::generateEmail('testRenewPicSurePreApproved', $this));
+
+        $this->assertFalse($policy->isRenewed());
+        $this->assertNull($policy->getPicSureStatus());
+
+        $renewalPolicy = $this->getRenewalPolicy($policy);
+
+        $this->assertFalse($policy->isRenewed());
+        $this->assertTrue($renewalPolicy->isRenewalAllowed(false, new \DateTime('2016-12-15')));
+
+        $renewalPolicy->renew(0, false, new \DateTime('2016-12-15'));
+
+        $this->assertTrue($policy->isRenewed());
+        $this->assertTrue($policy->getPolicyTerms()->isPicSureEnabled());
+        $this->assertEquals(PhonePolicy::PICSURE_STATUS_PREAPPROVED, $renewalPolicy->getPicSureStatus());
     }
 
     public function testRenewActivateExpire()
@@ -3809,7 +3828,7 @@ class PhonePolicyTest extends WebTestCase
         $renewalPolicyA = $this->getRenewalPolicy($policyA);
 
         $this->assertFalse($policyA->isRenewed());
-        $this->assertTrue($renewalPolicyA->isRenewalAllowed(new \DateTime('2016-12-15')));
+        $this->assertTrue($renewalPolicyA->isRenewalAllowed(false, new \DateTime('2016-12-15')));
 
         $renewalPolicyA->renew(0, false, new \DateTime('2016-12-15'));
 
