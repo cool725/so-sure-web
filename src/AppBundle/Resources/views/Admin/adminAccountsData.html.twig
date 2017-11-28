@@ -269,7 +269,7 @@
     <tr>
         <td width="{{ indent_width }}"></td>
         <td width="{{ text_width }}"><strong>Net transfer to Salva</strong></td>
-        <td><strong>£{{ (paymentTotals.all.totalUnderwriter + paymentTotals.potReward.total + paymentTotals.sosurePotRewardDiscount.total)|number_format(2, '.', ',') }}</strong></td>
+        <td><strong>£{{ (paymentTotals.all.totalUnderwriter + paymentTotals.potReward.total + (0 - paymentTotals.sosurePotRewardDiscount.total))|number_format(2, '.', ',') }}</strong></td>
     </tr>
     <tr class="info">
         <td colspan="3">so-sure Transfer</td>
