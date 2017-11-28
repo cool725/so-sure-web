@@ -5,7 +5,7 @@ $(function(){
         margin: 30,
         stagePadding: 70,
         items: 2,
-        loop: true
+        loop: true,
     });
 
     $('.item').trigger('initialized.owl.carousel').show();
