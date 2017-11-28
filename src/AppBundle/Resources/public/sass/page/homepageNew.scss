@@ -431,6 +431,12 @@
             width: 200px;
         }
 
+        a {
+            &:focus {
+                outline: 0;
+            }
+        }
+
         @include breakpoint(laptop) {
             .cover-arrow {
                 position: absolute;
