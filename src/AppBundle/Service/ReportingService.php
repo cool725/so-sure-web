@@ -623,6 +623,7 @@ class ReportingService
         $policyDiscountPayments = $this->getPayments($date, 'policyDiscount');
         $totalRunRate = $this->getTotalRunRateByDate($this->endOfMonth($date));
 
+        // @codingStandardsIgnoreStart
         return [
             'all' => Payment::sumPayments($payments, $isProd),
             'judo' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
@@ -639,6 +640,7 @@ class ReportingService
             'totalRunRate' => $totalRunRate,
             'totalCashback' => Cashback::sumCashback($this->getCashback($date)),
         ];
+        // @codingStandardsIgnoreEnd
     }
 
     private function getCashback(\DateTime $date)
