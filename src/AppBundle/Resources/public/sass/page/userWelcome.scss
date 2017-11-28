@@ -121,6 +121,10 @@
             }
         }
 
+        .non-iosandroid {
+            margin-top: 20px;
+        }
+
         @include breakpoint(tablet) {
             // margin-bottom: 400px;
             padding-top: 350px;

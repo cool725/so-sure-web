@@ -155,20 +155,20 @@
                         <a class="ga-outbound-click"
                            data-clicklabel="iTunes"
                            href="{{ apple_download('user-welcome') }}"
-                           target="_blank"><img src="{{ cdn_url }}/images/user/app_homescreen_apple_download.png" alt="Available at the AppleStore" class="img-responsive">
+                           target="_blank"><img src="{{ cdn_url }}/images/user/app_download_welcome_apple.png" alt="Available at the AppleStore" class="img-responsive">
                         </a>
                     {% endif %}
                     {% if policy.phone is defined and policy.phone and not policy.phone.iTunes %}
                         <a class="ga-outbound-click"
                            data-clicklabel="PlayStore"
                            href="{{ google_download('user-welcome') }}"
-                           target="_blank"><img src="{{ cdn_url }}/images/user/app_homescreen_android_download.png" alt="Get it on Google Play" class="img-responsive">
+                           target="_blank"><img src="{{ cdn_url }}/images/user/app_download_welcome_android.png" alt="Get it on Google Play" class="img-responsive">
                        </a>
                     {% endif %}
                 </div>
                 <p>You can also add additional phones, invite and connect or get in touch when you need us most.</p>
             {% else %}
-                <p>For non-iOS or Android phones, please <a href="#" class="open-intercom">click here</a> to chat to us for further instructions on how to validate your phone.</p>
+                <p class="non-iosandroid">For non-iOS or Android phones, please <a href="#" class="open-intercom">click here</a> to chat to us for further instructions on how to validate your phone.</p>
             {% endif %}
         </div>
     </section>
