@@ -168,7 +168,10 @@
                 </div>
                 <p>You can also add additional phones, invite and connect or get in touch when you need us most.</p>
             {% else %}
-                <p class="non-iosandroid">For non-iOS or Android phones, please <a href="#" class="open-intercom">click here</a> to chat to us for further instructions on how to validate your phone.</p>
+                <div class="app-link">
+                    <img src="{{ cdn_url }}/images/user/app_download_welcome_other_os.png" alt="Other OS" class="img-responsive">
+                    <p class="non-iosandroid">For non-iOS or Android phones, please <a href="#" class="open-intercom">click here</a> to chat to us for further instructions on how to validate your phone.</p>
+                </div>
             {% endif %}
         </div>
     </section>
