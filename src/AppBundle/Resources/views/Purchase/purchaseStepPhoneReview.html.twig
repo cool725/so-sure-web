@@ -196,6 +196,21 @@
                     <div class="help-block with-errors">{{ form_errors(purchase_form.fileValid) }}</div>
                 </div>
 
+                {% if phone.googlePlay or phone.iTunes %}
+                    <div class="text-break text-grey">
+                        <div class="line"></div>OR<div class="line"></div>
+                    </div>
+                    <p><strong class="h4">SIGN UP IN MINUTES</strong> using our handy app: less forms to fill, validate your phone instantly to <u>reduce your excess by half</u>!</p>
+                    <div class="text-center">
+                        {% if phone.googlePlay %}
+                            <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('purchase-flow') }}" target="_blank"><img src="{{ cdn_url }}/images/purchase/app_download_purchase_android.png" alt="Get it on Google Play"></a>
+                        {% endif %}
+                        {% if phone.iTunes %}
+                            <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('purchase-flow') }}" target="_blank"><img src="{{ cdn_url }}/images/purchase/app_download_purchase_apple.png" alt="Available on the AppStore"></a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
                 <div class="form-group form-group-break">
                     <a href="#"
                        id="step--validate"
