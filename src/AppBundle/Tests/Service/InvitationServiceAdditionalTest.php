@@ -66,7 +66,7 @@ class InvitationServiceAdditionalTest extends WebTestCase
             \Swift_Mailer::newInstance($transport),
             $transport,
             self::$container->get('templating'),
-            self::$container->get('api.router'),
+            self::$container->get('app.router'),
             'foo@foo.com',
             'bar',
             'http://localhost'

@@ -1255,7 +1255,7 @@ class ApiAuthController extends BaseController
             $shortLink = $this->get('app.branch')->generateSCode($scode->getCode());
             // branch is preferred, but can fallback to old website version if branch is down
             if (!$shortLink) {
-                $link = $this->generateUrl('scode', ['code' => $scode->getCode()], UrlGeneratorInterface::ABSOLUTE_URL);
+                $link = $this->get('app.router')->generateUrl('scode', ['code' => $scode->getCode()]);
                 $shortLink = $this->get('app.shortlink')->addShortLink($link);
             }
             $scode->setShareLink($shortLink);

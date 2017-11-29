@@ -65,7 +65,9 @@ class PolicyService
     protected $mailer;
     protected $smtp;
     protected $templating;
-    protected $router;
+
+    /** @var RouterService */
+    protected $routerService;
     protected $snappyPdf;
     protected $dispatcher;
     protected $s3;
@@ -140,7 +142,7 @@ class PolicyService
      * @param MailerService    $mailer
      * @param                  $smtp
      * @param                  $templating
-     * @param                  $router
+     * @param RouterService    $routerService
      * @param                  $environment
      * @param                  $snappyPdf
      * @param                  $dispatcher
@@ -162,7 +164,7 @@ class PolicyService
         MailerService $mailer,
         $smtp,
         $templating,
-        $router,
+        RouterService $routerService,
         $environment,
         $snappyPdf,
         $dispatcher,
@@ -183,7 +185,7 @@ class PolicyService
         $this->mailer = $mailer;
         $this->smtp = $smtp;
         $this->templating = $templating;
-        $this->router = $router->getRouter();
+        $this->routerService = $routerService;
         $this->environment = $environment;
         $this->snappyPdf = $snappyPdf;
         $this->dispatcher = $dispatcher;
@@ -398,10 +400,9 @@ class PolicyService
                 $shortLink = $this->branch->generateSCode($scode->getCode());
                 // branch is preferred, but can fallback to old website version if branch is down
                 if (!$shortLink) {
-                    $link = $this->router->generate(
+                    $link = $this->routerService->generateUrl(
                         'scode',
-                        ['code' => $scode->getCode()],
-                        UrlGeneratorInterface::ABSOLUTE_URL
+                        ['code' => $scode->getCode()]
                     );
                     $shortLink = $this->shortLink->addShortLink($link);
                 }
@@ -1689,10 +1690,9 @@ class PolicyService
         );
         $data = [
             'policy' => $policy,
-            'renew_url' => $this->router->generate(
+            'renew_url' => $this->routerService->generateUrl(
                 'user_renew_policy',
-                ['id' => $policy->getId()],
-                UrlGeneratorInterface::ABSOLUTE_URL
+                ['id' => $policy->getId()]
             ),
             'start_date' => $this->endOfDay($policy->getEnd()),
         ];
@@ -1830,7 +1830,7 @@ class PolicyService
         // @codingStandardsIgnoreStart
         $body = sprintf(
             "Policy: <a href='%s'>%s/%s</a> has requested a billing date change to the %d. Verify policy id match in system.",
-            $this->mailer->generateUrl(
+            $this->routerService->generateUrl(
                 'admin_policy',
                 ['id' => $policy->getId()]
             ),
@@ -1914,10 +1914,9 @@ class PolicyService
 
         $data = [
             'cashback' => $cashback,
-            'withdraw_url' => $this->router->generate(
+            'withdraw_url' => $this->routerService->generateUrl(
                 'user_cashback',
-                ['id' => $cashback->getId()],
-                UrlGeneratorInterface::ABSOLUTE_URL
+                ['id' => $cashback->getId()]
             ),
         ];
         $this->mailer->sendTemplate(
