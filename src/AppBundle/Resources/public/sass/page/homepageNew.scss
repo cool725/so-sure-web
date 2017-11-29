@@ -427,9 +427,32 @@
 
     &--cover-details {
         text-align: center;
+        position: relative;
+
+        p {
+            @include breakpoint(tablet) {
+                min-height: 60px;
+            }
+        }
 
         img {
             width: 200px;
+        }
+
+        a {
+            &:focus {
+                outline: 0;
+            }
+        }
+
+        @include breakpoint(laptop) {
+            .cover-arrow {
+                position: absolute;
+                z-index: 10;
+                left: -60px; bottom: 10px;
+                width: 175px; height: 52px;
+                background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_cover_section_arrow.svg') center center no-repeat;
+            }
         }
     }
 
@@ -493,13 +516,46 @@
             z-index: 2;
         }
 
-        ol {
-            max-width: 860px;
-            margin: 0 auto;
+        h4 {
+            cursor: pointer;
 
-            li {
-                margin-bottom: 15px;
-                padding-top: 5px;
+            &:hover, &:focus {
+                color: $primary-blue;
+            }
+
+            &:after {
+                display: inline-block;
+                font-family: FontAwesome;
+                color: $primary-blue;
+                content: '\f106';
+                padding-left: 10px;
+            }
+        }
+
+        h4.collapsed {
+            &:after {
+                content: '\f107';
+            }
+        }
+
+        .what-we-dont-cover--list {
+            margin-bottom: 25px;
+
+            @include breakpoint(tablet) {
+                padding-left: 30px;
+            }
+
+            &__item {
+                background-color: $primary-blue;
+                color: $white;
+                padding: 15px;
+                @include border-radius(6px);
+
+                p, ul, li {
+                    &:last-of-type {
+                        margin-bottom: 0;
+                    }
+                }
             }
         }
     }
