@@ -87,6 +87,43 @@
     <input type="hidden" id="accountkit-csrf" name="csrf">
 </form>
 
+<script>
+window.fbAsyncInit = function() {
+  FB.init({
+    appId: '{{ fb_appid }}',
+    xfbml: true,
+    version: 'v2.5',
+    status     : true
+  });
+};
+
+(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {
+    return;
+  }
+  js = d.createElement(s);
+  js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+
+        function fb_login() {
+            FB.getLoginStatus(function(response) {
+                if (response.status === 'connected') {
+                    document.location = $('#ss-root').data('fb-redirect');
+                } else {
+                    // not_authorized
+                    FB.login(function(response) {
+                        if (response.authResponse) {
+                            document.location = $('#ss-root').data('fb-redirect');
+                        }
+                    }, {scope: 'email'});
+                }
+            });
+        }  
+</script>
+
 {% endblock fos_user_content %}
 
 {% block javascripts %}

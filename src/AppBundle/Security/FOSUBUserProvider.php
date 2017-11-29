@@ -12,6 +12,8 @@ use AppBundle\Validator\Constraints\UkMobileValidator;
 
 class FOSUBUserProvider extends BaseClass
 {
+    const SERVICE_ACCOUNTKIT = 'accountkit';
+
     /** @var RequestStack */
     protected $requestStack;
 
@@ -57,7 +59,7 @@ class FOSUBUserProvider extends BaseClass
         $service = $response->getResourceOwner()->getName();
         $username = $response->getUsername();
         $search = $this->getProperty($response);
-        if ($service == 'accountkit') {
+        if ($service == self::SERVICE_ACCOUNTKIT) {
             $search = 'mobileNumber';
             if (isset($response->getResponse()['phone'])) {
                 $username = $response->getResponse()['phone']['number'];
@@ -78,7 +80,11 @@ class FOSUBUserProvider extends BaseClass
         if (null === $user) {
             // Not guarenteed an email address
             if (!$response->getEmail()) {
-                $msg = sprintf('Unable to find an account matching your %s details.', $service);
+                if ($service != self::SERVICE_ACCOUNTKIT) {
+                    $msg = sprintf('Unable to find an account matching your %s details.', $service);
+                } else {
+                    $msg = sprintf('Unable to find an account with the mobile number provided.');
+                }
 
                 if ($request = $this->requestStack->getCurrentRequest()) {
                     if ($session = $request->getSession()) {
@@ -108,7 +114,7 @@ class FOSUBUserProvider extends BaseClass
             // create new user here
             $user = $this->userManager->createUser();
 
-            if ($service != 'accountkit') {
+            if ($service != self::SERVICE_ACCOUNTKIT) {
                 $setter = 'set'.ucfirst($service);
                 $setter_id = $setter.'Id';
                 $setter_token = $setter.'AccessToken';
@@ -142,7 +148,7 @@ class FOSUBUserProvider extends BaseClass
         //if user exists - go with the HWIOAuth way
         //$user = parent::loadUserByOAuthUserResponse($response);
 
-        if ($service != 'accountkit') {
+        if ($service != self::SERVICE_ACCOUNTKIT) {
             $setter = 'set' . ucfirst($service) . 'AccessToken';
             //update access token
             $user->$setter($this->getLongLivedAccessToken($response));

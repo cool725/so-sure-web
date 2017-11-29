@@ -615,10 +615,15 @@ class ReportingService
     {
         $payments = $this->getPayments($date);
         $potRewardPayments = $this->getPayments($date, 'potReward');
+        $potRewardPaymentsCashback = $this->getPayments($date, 'potReward', true);
+        $potRewardPaymentsDiscount = $this->getPayments($date, 'potReward', false);
         $soSurePotRewardPayments = $this->getPayments($date, 'sosurePotReward');
+        $soSurePotRewardPaymentsCashback = $this->getPayments($date, 'sosurePotReward', true);
+        $soSurePotRewardPaymentsDiscount = $this->getPayments($date, 'sosurePotReward', false);
         $policyDiscountPayments = $this->getPayments($date, 'policyDiscount');
         $totalRunRate = $this->getTotalRunRateByDate($this->endOfMonth($date));
 
+        // @codingStandardsIgnoreStart
         return [
             'all' => Payment::sumPayments($payments, $isProd),
             'judo' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
@@ -626,11 +631,16 @@ class ReportingService
             'chargebacks' => Payment::sumPayments($payments, $isProd, ChargebackPayment::class),
             'bacs' => Payment::sumPayments($payments, $isProd, BacsPayment::class),
             'potReward' => Payment::sumPayments($potRewardPayments, $isProd, PotRewardPayment::class),
+            'potRewardCashback' => Payment::sumPayments($potRewardPaymentsCashback, $isProd, PotRewardPayment::class),
+            'potRewardDiscount' => Payment::sumPayments($potRewardPaymentsDiscount, $isProd, PotRewardPayment::class),
             'sosurePotReward' => Payment::sumPayments($soSurePotRewardPayments, $isProd, SoSurePotRewardPayment::class),
+            'sosurePotRewardCashback' => Payment::sumPayments($soSurePotRewardPaymentsCashback, $isProd, SoSurePotRewardPayment::class),
+            'sosurePotRewardDiscount' => Payment::sumPayments($soSurePotRewardPaymentsDiscount, $isProd, SoSurePotRewardPayment::class),
             'policyDiscounts' => Payment::sumPayments($policyDiscountPayments, $isProd, PolicyDiscountPayment::class),
             'totalRunRate' => $totalRunRate,
             'totalCashback' => Cashback::sumCashback($this->getCashback($date)),
         ];
+        // @codingStandardsIgnoreEnd
     }
 
     private function getCashback(\DateTime $date)
@@ -641,10 +651,20 @@ class ReportingService
         return $cashback;
     }
 
-    private function getPayments(\DateTime $date, $type = null)
+    private function getPayments(\DateTime $date, $type = null, $cashback = null)
     {
         $paymentRepo = $this->dm->getRepository(Payment::class);
         $payments = $paymentRepo->getAllPayments($date, $type);
+        if ($cashback !== null) {
+            $allPayments = [];
+            foreach ($payments as $payment) {
+                if ($payment->getPolicy()->hasCashback() === $cashback) {
+                    $allPayments[] = $payment;
+                }
+            }
+
+            return $allPayments;
+        }
 
         return $payments;
     }
