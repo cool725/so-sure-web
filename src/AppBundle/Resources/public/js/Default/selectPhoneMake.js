@@ -80,8 +80,6 @@ sosure.selectPhoneMake = (function() {
 
     self.setFormAction = function (id, form) {
         $(form).attr('action', self.getFormAction(id, form));
-        var action = $(form).attr('action');
-        console.log(action);
     }
 
     self.setFormActionVal = function (form, input) {
