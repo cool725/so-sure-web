@@ -134,3 +134,50 @@
 
 }
 
+// Find your phone
+.modal-phone {
+
+    .modal-body {
+        @include breakpoint(tablet) {
+            padding-bottom: 0;
+        }
+    }
+
+    &--link-list {
+        height: 200px;
+        margin: 0;
+        overflow: hidden;
+
+        img {
+            height: 300px;
+        }
+
+        li {
+            position: relative;
+            padding-top: 15x;
+
+            &:first-of-type,
+            &:last-of-type, {
+                top: 25px;
+            }
+
+            h5 {
+                font-weight: bold;
+                color: $primary-blue;
+
+                &:hover, &:focus {
+                    text-decoration: none;
+                }
+            }
+
+            &:hover {
+                top: -10px;
+
+                &:first-of-type,
+                &:last-of-type, {
+                    top: 15px;
+                }
+            }
+        }
+    }
+}
