@@ -151,14 +151,14 @@
             </table>
             {% if policy.phone.googlePlay or policy.phone.iTunes %}
                 <div class="app-link">
-                    {% if policy.phone.googlePlay %}
+                    {% if policy.phone.iTunes %}
                         <a class="ga-outbound-click"
                            data-clicklabel="iTunes"
                            href="{{ apple_download('user-welcome') }}"
                            target="_blank"><img src="{{ cdn_url }}/images/user/app_download_welcome_apple.png" alt="Available at the AppleStore" class="img-responsive">
                         </a>
                     {% endif %}
-                    {% if policy.phone.iTunes %}
+                    {% if policy.phone.googlePlay %}
                         <a class="ga-outbound-click"
                            data-clicklabel="PlayStore"
                            href="{{ google_download('user-welcome') }}"
