@@ -119,6 +119,11 @@ $(function(){
         var input   = $(this).find('.search-phone');
         var loading = $(this).next('.so-sure-loading');
 
+        // Fallback incase not set
+        if (!base_path) {
+            base_path = '/phone-insurance/';
+        }
+
         // If the form action is already defined, then allow the form to submit
         if (!$(form).attr('action')) {
             $(form).bind('submit', sosure.selectPhoneMake.preventDefault);
