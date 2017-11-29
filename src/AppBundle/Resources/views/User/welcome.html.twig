@@ -92,6 +92,91 @@
         </div>
     </section>
 
+    <section class="section--pad user-welcome--pic-sure section--arrow section--arrow__lightest-blue">
+        <div class="container">
+            <h3>Download our handy app - reduce your excess!</h3>
+            <p>Validate your phone using our pic-sure technology, this not only helps us recognise your phone is in good working order and not already damaged but <span class="text-highlight text-uppercase">reduces your excess by half!</span> <br>Help us stamp out fraud, reduce claims times and reduce costs to give that saving back to you.</p>
+            <table class="table hidden-xs">
+                <thead>
+                    <tr>
+                        <td width="50%" class="h3 contrast">Excess <u>without</u> pic-sure</td>
+                        <td width="50%" class="h3 sosure">Excess <u>with</u> pic-sure</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="contrast" align="middle" valign="middle">
+                            <span class="text-blue h1">£150</span><br>
+                            FOR THEFT/LOSS/ACCIDENTAL DAMAGE/BREAKDOWN
+                        </td>
+                        <td class="sosure" align="middle" valign="middle">
+                            <span class="text-blue h1">£50</span><br>
+                            FOR ACCIDENTAL DAMAGE/BREAKDOWN <br><br>
+                            <span class="text-blue h1">£70</span><br>
+                            FOR THEFT/LOSS
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="table visible-xs">
+                <thead>
+                    <tr>
+                        <td width="100%" class="h3 contrast">Excess <u>without</u> pic-sure</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="contrast" align="middle" valign="middle">
+                            <span class="text-blue h1">£150</span><br>
+                            FOR THEFT/LOSS/ACCIDENTAL DAMAGE/BREAKDOWN
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <table class="table visible-xs">
+                <thead>
+                    <tr>
+                        <td width="100%" class="h3 sosure">Excess <u>with</u> pic-sure</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="sosure" align="middle" valign="middle">
+                            <span class="text-blue h1">£50</span><br>
+                            FOR ACCIDENTAL DAMAGE/BREAKDOWN <br><br>
+                            <span class="text-blue h1">£70</span><br>
+                            FOR THEFT/LOSS
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            {% if policy.phone.googlePlay or policy.phone.iTunes %}
+                <div class="app-link">
+                    {% if policy.phone.iTunes %}
+                        <a class="ga-outbound-click"
+                           data-clicklabel="iTunes"
+                           href="{{ apple_download('user-welcome') }}"
+                           target="_blank"><img src="{{ cdn_url }}/images/user/app_download_welcome_apple.png" alt="Available at the AppleStore" class="img-responsive">
+                        </a>
+                    {% endif %}
+                    {% if policy.phone.googlePlay %}
+                        <a class="ga-outbound-click"
+                           data-clicklabel="PlayStore"
+                           href="{{ google_download('user-welcome') }}"
+                           target="_blank"><img src="{{ cdn_url }}/images/user/app_download_welcome_android.png" alt="Get it on Google Play" class="img-responsive">
+                       </a>
+                    {% endif %}
+                </div>
+                <p>You can also add additional phones, invite and connect or get in touch when you need us most.</p>
+            {% else %}
+                <div class="app-link">
+                    <img src="{{ cdn_url }}/images/user/app_download_welcome_other_os_2x.png" alt="Other OS" class="img-responsive">
+                    <p class="non-iosandroid">For non-iOS or Android phones, please <a href="#" class="open-intercom">click here</a> to chat to us for further instructions on how to validate your phone.</p>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
     <section id="how-to-get-cashback" class="section--pad section--arrow user-welcome--how-to-get-cashback">
         <div class="container">
             {% include 'AppBundle::Default/_howToGetCashback.html.twig' %}
@@ -122,11 +207,7 @@
         </div>
     </section>
 
-    <section class="section--pad user-welcome--download">
-        <div class="container">
-            {% include 'AppBundle::Default/_appDownload.html.twig' with { 'phone': policy.phone, 'location': 'user-welcome' } %}
-        </div>
-    </section>
+    <section class="section--pad"></section>
 
     {# Page Modals #}
     <div class="modal modal-fullscreen fade"
