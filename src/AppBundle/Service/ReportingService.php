@@ -22,6 +22,7 @@ use AppBundle\Document\Payment\PotRewardPayment;
 use AppBundle\Document\Payment\SoSurePotRewardPayment;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
 use AppBundle\Document\Payment\ChargebackPayment;
+use AppBundle\Document\Payment\DebtCollectionPayment;
 use AppBundle\Document\PolicyTerms;
 
 class ReportingService
@@ -614,6 +615,7 @@ class ReportingService
     public function getAllPaymentTotals($isProd, \DateTime $date)
     {
         $payments = $this->getPayments($date);
+        $debtCollectionPayments = $this->getPayments($date, 'debtCollection');
         $potRewardPayments = $this->getPayments($date, 'potReward');
         $potRewardPaymentsCashback = $this->getPayments($date, 'potReward', true);
         $potRewardPaymentsDiscount = $this->getPayments($date, 'potReward', false);
@@ -629,6 +631,7 @@ class ReportingService
             'judo' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
             'sosure' => Payment::sumPayments($payments, $isProd, SoSurePayment::class),
             'chargebacks' => Payment::sumPayments($payments, $isProd, ChargebackPayment::class),
+            'debtCollections' => Payment::sumPayments($debtCollectionPayments, $isProd, DebtCollectionPayment::class),
             'bacs' => Payment::sumPayments($payments, $isProd, BacsPayment::class),
             'potReward' => Payment::sumPayments($potRewardPayments, $isProd, PotRewardPayment::class),
             'potRewardCashback' => Payment::sumPayments($potRewardPaymentsCashback, $isProd, PotRewardPayment::class),

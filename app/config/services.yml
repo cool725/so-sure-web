@@ -685,6 +685,14 @@ services:
             -  { name: kernel.event_listener, event: event.user.updated, method: onUserUpdatedEvent }
             -  { name: kernel.event_listener, event: event.user.email.changed, method: onUserEmailChangedEvent }
 
+    app.listener.debtCollection:
+        class:   AppBundle\Listener\DebtCollectionListener
+        arguments:
+            dm:                   "@doctrine_mongodb.odm.default_document_manager"
+            logger:               "@logger"
+        tags:
+            -  { name: kernel.event_listener, event: event.payment.success, method: onPaymentSuccessEvent }
+
     app.listener.intercom:
         class:   AppBundle\Listener\IntercomListener
         arguments:

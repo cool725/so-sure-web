@@ -25,7 +25,8 @@ use AppBundle\Document\ScheduledPayment;
  *      "chargeback"="ChargebackPayment",
  *      "potReward"="PotRewardPayment",
  *      "policyDiscount"="PolicyDiscountPayment",
- *      "sosurePotReward"="SoSurePotRewardPayment"
+ *      "sosurePotReward"="SoSurePotRewardPayment",
+ *      "debtCollection"="DebtCollectionPayment"
  * })
  * @Gedmo\Loggable
  */
