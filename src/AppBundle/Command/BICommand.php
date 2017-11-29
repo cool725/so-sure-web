@@ -150,6 +150,7 @@ class BICommand extends ContainerAwareCommand
             '"Total Weekly Income"',
             '"Latest Campaign Name"',
             '"Latest Campaign Source"',
+            '"Requested Cancellation Reason (Phone Damaged Prior To Policy)"',
         ]);
         foreach ($policies as $policy) {
             $user = $policy->getUser();
@@ -173,6 +174,10 @@ class BICommand extends ContainerAwareCommand
                 $income ? sprintf('"%0.0f"', $income->getTotal()->getIncome()) : '""',
                 sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getCampaignName() : ''),
                 sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getCampaignSource() : ''),
+                sprintf(
+                    '"%s"',
+                    $policy->getRequestedCancellationReason() ? $policy->getRequestedCancellationReason() : null
+                ),
             ]);
         }
         $this->uploadS3(implode(PHP_EOL, $lines), 'policies.csv');
