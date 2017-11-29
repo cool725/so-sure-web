@@ -8,7 +8,7 @@ use AppBundle\Document\Phone;
 /**
  * @group functional-nonet
  *
- * AppBundle\\Tests\\Service\\BaseImeiServiceTest
+ * AppBundle\\Tests\\Service\\QuoteServiceTest
  */
 class QuoteServiceTest extends WebTestCase
 {
