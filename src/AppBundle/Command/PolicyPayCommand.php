@@ -9,6 +9,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\Phone;
+use AppBundle\Document\Policy;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Payment\Payment;
@@ -39,6 +40,12 @@ class PolicyPayCommand extends ContainerAwareCommand
                 InputOption::VALUE_REQUIRED,
                 'Use a different customer reference'
             )
+            ->addOption(
+                'id',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Policy (partial) Id'
+            )
         ;
     }
 
@@ -47,13 +54,22 @@ class PolicyPayCommand extends ContainerAwareCommand
         $email = $input->getArgument('email');
         $payments = $input->getOption('payments');
         $customerRef = $input->getOption('customer-ref');
+        $policyId = $input->getOption('id');
         $date = new \DateTime();
 
         $policyService = $this->getContainer()->get('app.policy');
         $judopay = $this->getContainer()->get('app.judopay');
-        $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $policy = null;
+        $user = null;
 
-        $user = $this->getUser($email);
+        if ($policyId) {
+            if ($policy = $this->getPolicy($policyId)) {
+                $user = $policy->getUser();
+            }
+        } else {
+            $user = $this->getUser($email);
+        }
+
         if (!$user->getPaymentMethod()) {
             throw new \Exception('Policy payment only works if the user has a payment method');
         }
@@ -63,15 +79,19 @@ class PolicyPayCommand extends ContainerAwareCommand
             );
         }
 
-        $policy = null;
-        foreach ($user->getPolicies() as $policyItem) {
-            if (!$policyItem->getStatus()) {
-                $policy = $policyItem;
+        if (!$policy) {
+            foreach ($user->getPolicies() as $policyItem) {
+                if (!$policyItem->getStatus()) {
+                    $policy = $policyItem;
+                }
             }
         }
-        
+
         if (!$policy) {
             throw new \Exception('Unable to find a partial policy');
+        }
+        if ($policy->getStatus()) {
+            throw new \Exception('Policy is not partial');
         }
 
         $phone = $policy->getPhone();
@@ -104,5 +124,13 @@ class PolicyPayCommand extends ContainerAwareCommand
         $repo = $dm->getRepository(User::class);
 
         return $repo->findOneBy(['emailCanonical' => strtolower($email)]);
+    }
+
+    private function getPolicy($id)
+    {
+        $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+
+        return $repo->find($id);
     }
 }

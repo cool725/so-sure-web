@@ -228,8 +228,8 @@ class ApiController extends BaseController
             $device = $this->getRequestString($request, 'device');
             $memory = (float) $this->getRequestString($request, 'memory');
             $rooted = $this->getRequestBool($request, 'rooted');
-
-            $quoteData = $this->getQuotes($make, $device, $memory, $rooted);
+            $quoteService = $this->get('app.quote');
+            $quoteData = $quoteService->getQuotes($make, $device, $memory, $rooted);
             $phones = $quoteData['phones'];
             $deviceFound = $quoteData['deviceFound'];
 
@@ -284,7 +284,6 @@ class ApiController extends BaseController
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api quoteAction.', ['exception' => $e]);
-
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
     }

@@ -427,9 +427,32 @@
 
     &--cover-details {
         text-align: center;
+        position: relative;
+
+        p {
+            @include breakpoint(tablet) {
+                min-height: 60px;
+            }
+        }
 
         img {
             width: 200px;
+        }
+
+        a {
+            &:focus {
+                outline: 0;
+            }
+        }
+
+        @include breakpoint(laptop) {
+            .cover-arrow {
+                position: absolute;
+                z-index: 10;
+                left: -60px; bottom: 10px;
+                width: 175px; height: 52px;
+                background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_cover_section_arrow.svg') center center no-repeat;
+            }
         }
     }
 
@@ -493,13 +516,46 @@
             z-index: 2;
         }
 
-        ol {
-            max-width: 860px;
-            margin: 0 auto;
+        h4 {
+            cursor: pointer;
 
-            li {
-                margin-bottom: 15px;
-                padding-top: 5px;
+            &:hover, &:focus {
+                color: $primary-blue;
+            }
+
+            &:after {
+                display: inline-block;
+                font-family: FontAwesome;
+                color: $primary-blue;
+                content: '\f106';
+                padding-left: 10px;
+            }
+        }
+
+        h4.collapsed {
+            &:after {
+                content: '\f107';
+            }
+        }
+
+        .what-we-dont-cover--list {
+            margin-bottom: 25px;
+
+            @include breakpoint(tablet) {
+                padding-left: 30px;
+            }
+
+            &__item {
+                background-color: $primary-blue;
+                color: $white;
+                padding: 15px;
+                @include border-radius(6px);
+
+                p, ul, li {
+                    &:last-of-type {
+                        margin-bottom: 0;
+                    }
+                }
             }
         }
     }
@@ -908,16 +964,14 @@
     }
 
     .tt-menu {
-        margin-top: 10px;
+        margin-top: 11px;
 
         @include breakpoint(tablet) {
             width: 430px;
-            // margin-top: 67px;
         }
 
         @include breakpoint(laptop) {
             width: 530px;
-            // margin-top: 10px;
         }
 
         @include breakpoint(desktop) {
@@ -934,8 +988,7 @@
     padding: 10px;
 
     @include border-radius(4px);
-    box-shadow: 0 0 15px $grey;
-    @include transition(box-shadow 0.3s ease-in-out);
+    border: 1px solid $grey;
 
     // search form - set width
     @include breakpoint(laptop) {
@@ -950,6 +1003,7 @@
 
 // Style input on focus
 .search-phone-form--focus {
+    border-color: $primary-blue;
 
     .twitter-typeahead {
 
@@ -961,8 +1015,58 @@
 
 .search-phone-form--sticky {
     position: fixed;
-    top: 60px; left: 0; right: 0;
+    top: 55px; left: 0; right: 0;
     z-index: 999;
+
+    margin-left: 10px;
+    margin-right: 10px;
+
+    padding: 0 10px;
+
+    .twitter-typeahead {
+
+        .tt-hint,
+        .tt-input {
+
+            @include breakpoint(laptop) {
+                height: 38px;
+                padding: 0 0 0 50px;
+            }
+        }
+
+        &:before {
+
+            @include breakpoint(laptop) {
+                font-size: 23px;
+                top: 2px;
+            }
+        }
+
+        @include breakpoint(tablet) {
+            font-size: 18px;
+        }
+
+        .tt-menu {
+            margin-top: 1px;
+        }
+    }
+
+    border-color: $light-blue;
+
+    @include breakpoint(tablet) {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    // search form - set width/height
+    @include breakpoint(laptop) {
+        height: 40px;
+    }
+
+    @include breakpoint(desktop) {
+        top: 5px;
+        z-index: 1001;
+    }
 }
 
 

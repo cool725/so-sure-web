@@ -38,17 +38,30 @@
             </ul>
         </div>
         <div>
-            <p>If you have provided pictures to clearly show that your phone is in good condition with no cracked screen before claiming.</p>
-            <p>Excess to be paid at point of claim:</p>
-            <ul>
-                <li>£50 for Accidental Damage or Breakdown claim</li>
-                <li>£70 for Theft or Loss claim</li>
-            </ul>
-            <p>If you have not provided pictures to clearly show that your phone is in good condition with no cracked screen before claiming.</p>
-            <p>Excess to be paid at point of claim:</p>
-            <ul>
-                <li>£150 for any type of claim</li>
-            </ul>
+            {% if policy.picSureStatus == 'preapproved' %}
+                <p>Excess to be paid at point of claim:</p>
+                <ul>
+                    <li>£50 for Accidental Damage or Breakdown claim</li>
+                    <li>£70 for Theft or Loss claim</li>
+                </ul>
+                <p>If you upgrade or change phones, and do not provide pictures to clearly show that your phone is in good condition with no cracked screen before claiming.</p>
+                <p>Excess to be paid at point of claim:</p>
+                <ul>
+                    <li>£150 for any type of claim</li>
+                </ul>
+            {% else %}
+                <p>If you have provided pictures to clearly show that your phone is in good condition with no cracked screen before claiming.</p>
+                <p>Excess to be paid at point of claim:</p>
+                <ul>
+                    <li>£50 for Accidental Damage or Breakdown claim</li>
+                    <li>£70 for Theft or Loss claim</li>
+                </ul>
+                <p>If you have not provided pictures to clearly show that your phone is in good condition with no cracked screen before claiming.</p>
+                <p>Excess to be paid at point of claim:</p>
+                <ul>
+                    <li>£150 for any type of claim</li>
+                </ul>
+            {% endif %}
         </div>
         <div style="position: absolute; float: left; bottom: 50px; font-size: 12px; margin-right: 25mm;">
             <i>

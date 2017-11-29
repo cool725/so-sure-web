@@ -1,162 +1,312 @@
 // modal.scss
 
-// Standards
+// Standards overide bootstrap
 
 .modal {
-	background-color: $black-opaque;
-	overflow: hidden;
+    background-color: $white-opaque;
 
-	.modal-content {
-		border: 0;
-		@include border-radius(0);
-		box-shadow: none;
-	}
+    &-dialog { }
 
-	.modal-header {
-		border-bottom: none;
-		padding: 30px 30px 15px;
+    &-content {
+        border: 0;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.10)  ;
+        @include border-radius(2px);
+    }
 
-		@include breakpoint(tablet) {
-			padding: 60px 60px 30px;
-		}
+    &-header {
+        border-bottom: none;
 
-		h2, h3, h4, h5 {
-			margin: 0;
-		}
+        h1, h2, h3, h4, h5 {
+            margin-bottom: 0;
+        }
 
-		.close {
-			opacity: 1;
-			color: $primary-blue;
-			font-weight: bold;
-		}
-	}
+        .close {
+            opacity: 1;
+            font-family: $avenir-heavy;
+            font-weight: bold;
+            font-size: 30px;
+            color: $light-blue;
 
-	.modal-body {
-		padding: 0 30px 30px;
+            &:hover, &:focus {
+                color: $primary-blue;
+            }
+        }
+    }
 
-		@include breakpoint(tablet) {
-			padding: 0 60px 60px;
-		}
-	}
+    &-body {
+        @include breakpoint(tablet) {
+            padding-left: 30px;
+            padding-right: 30px;
+        }
+    }
 
-	.modal-footer {}
+    &-footer {
+        border-top: none;
+        text-align: center;
+    }
+
 }
 
-.modal-purchase {
+.modal-new {
 
-	.modal-body {
+    .modal-dialog {
+        width: 100%;
+        margin: 0;
 
-		ol, ul {
-			padding: 10px 10px 10px 30px;
-			// margin-bottom: 30px;
+        @include breakpoint(laptop) {
+            width: 65%;
+            margin: 5% auto 0;
+        }
+    }
 
-			li {
-				font-family: $avenir-heavy;
-				font-size: 16px;
-				line-height: 1.5;
-				padding: 7px 0;
-			}
+    .modal-content {
+        @include border-radius(0);
+    }
 
-		}
-	}
+    .modal-header {
+
+        .close {
+            width: 45px; height: 45px;
+            position: absolute;
+            top: 10px; right: 10px;
+            color: $white;
+            background-color: $primary-blue;
+            text-shadow: none;
+            @include border-radius(50%);
+
+            &:hover, &:focus {
+                background-color: $dark-blue;
+                box-shadow: none;
+            }
+
+            @include breakpoint(laptop) {
+                top: -15px; right: -15px;
+            }
+        }
+    }
+
+    .modal-body {
+
+        @include breakpoint(tablet) {
+            padding-left: 30px;
+            padding-right: 30px;
+        }
+
+        // Style text
+        ul {
+            padding-left: 18px;
+
+            li {
+                padding: 5px 0;
+                font-size: 14px;
+            }
+        }
+
+        p, li {
+            line-height: 1.5;
+        }
+
+        &--left {
+            @include breakpoint(tablet) {
+                padding-right: 15px;
+            }
+        }
+
+        &--right {
+            @include breakpoint(tablet) {
+                padding-left: 15px;
+            }
+            @include breakpoint(laptop) {
+                border-left: 1px solid $pale-grey;
+                padding-left: 30px;
+            }
+        }
+
+    }
+
+    &-footer { }
+}
+
+// Animations
+.modal.fade .modal-dialog {
+    @include transform(scale(0.1));
+    top: 300px;
+    opacity: 0;
+    @include transition(all 0.3s);
+}
+
+.modal.fade.in .modal-dialog {
+    @include transform(scale(1));
+    @include transform(translate3d(0, -300px, 0));
+    opacity: 1;
 }
 
 // Variations
 
+.modal-purchase {
+
+    .modal-body {
+
+        ol, ul {
+            padding: 10px 10px 10px 30px;
+
+            li {
+                font-family: $avenir-heavy;
+                font-size: 16px;
+                line-height: 1.5;
+                padding: 7px 0;
+            }
+
+        }
+    }
+}
+
 .modal-fullscreen {
 
-	.modal-dialog {
-		width: 100%;
-		margin: 0 auto;
+    .modal-dialog {
+        width: 100%;
+        margin: 0 auto;
 
-		@include breakpoint(tablet) {
-			width: 750px;
-		}
+        @include breakpoint(tablet) {
+            width: 750px;
+        }
 
-		@include breakpoint(laptop) {
-			width: 970px;
-		}
+        @include breakpoint(laptop) {
+            width: 970px;
+        }
 
-		@include breakpoint(desktop) {
-			width: 1170px;
-		}
+        @include breakpoint(desktop) {
+            width: 1170px;
+        }
 
-	}
+    }
 
-	.responsive-container {
-		height: 0;
-		overflow: hidden;
-		position: relative;
-		padding-bottom: 53.4%;
-		padding-top: 30px;
-	}
+    .responsive-container {
+        height: 0;
+        overflow: hidden;
+        position: relative;
+        padding-bottom: 53.4%;
+        padding-top: 30px;
+    }
 
-	.responsive-container, .responsive-container iframe {
-		width: 100%; height: 100%;
-		position: absolute;
-		top: 0; left: 0;
-	}
+    .responsive-container, .responsive-container iframe {
+        width: 100%; height: 100%;
+        position: absolute;
+        top: 0; left: 0;
+    }
 
 }
 
 .modal-middle {
-	padding-top: 10%;
+    @include breakpoint(tablet) {
+        padding-top: 10%;
+    }
 }
 
 .modal-policy {
 
-	h1 {
-		font-size: 24px;
-	}
+    h1 {
+        font-size: 24px;
+    }
 
-	h2 {
-		margin: 0 0 15px;
-		padding: 10px 30px 10px 15px;
-		background-color: $grey-light;
-		border: 1px solid $grey;
-		@include border-radius(4px);
-		font-family: $avenir-book;
-		font-size: 16px;
-		cursor: pointer;
-		position: relative;
+    h2 {
+        margin: 0 0 15px;
+        padding: 10px 30px 10px 15px;
+        background-color: $grey-light;
+        border: 1px solid $grey;
+        @include border-radius(4px);
+        font-family: $avenir-book;
+        font-size: 16px;
+        cursor: pointer;
+        position: relative;
 
-		&:after {
-			content: '\f054';
-			font-family: FontAwesome;
-			position: absolute;
-			right: 15px; top: 10px;
-		}
-	}
+        &:after {
+            content: '\f054';
+            font-family: FontAwesome;
+            position: absolute;
+            right: 15px; top: 10px;
+        }
+    }
 
-	h2.section-open:after {
-		content: '\f078';
-	}
+    h2.section-open:after {
+        content: '\f078';
+    }
 
-	h3 {
-		// font-size: 16px;
-	}
+    p {
+        font-size: 14px;
+        padding: 0 15px;
+    }
 
-	p {
-		font-size: 14px;
-		padding: 0 15px;
-	}
+    ul {
+        font-size: 16px;
+        padding: 5px 15px 5px 25px;
+    }
 
-	ul {
-		font-size: 16px;
-		padding: 5px 15px 5px 25px;
-	}
+    table {
+        margin: 10px auto;
+        font-size: 14px;
 
-	table {
-		margin: 10px auto;
-		font-size: 14px;
+        td, th {
+            padding: 15px;
+        }
 
-		td, th {
-			padding: 15px;
-		}
-
-		th {
-			font-weight: bold;
-		}
-	}
+        th {
+            font-weight: bold;
+        }
+    }
 
 }
+
+// Carousel inside modal
+
+.modal.and.carousel {
+
+    .modal-content {
+
+    }
+
+    .carousel-control.left {
+        left: -10px; top: 100px;
+
+        span {
+            top: 20px;
+        }
+
+        @include breakpoint(laptop) {
+            left: -120px;
+
+            span {
+                top: inherit;
+            }
+        }
+    }
+
+    .carousel-control.right {
+        right: -10px; top: 100px;
+
+        span {
+            top: 20px;
+        }
+
+        @include breakpoint(laptop) {
+            right: -120px;
+
+            span {
+                top: inherit;
+            }
+        }
+    }
+
+    .modal-footer {
+        @include breakpoint(laptop) {
+            width: 100%;
+            position: absolute;
+            top: 100%; left: 0; right: 0;
+        }
+    }
+}
+
+.modal.and.carousel {
+    position: fixed; // Needed because the carousel overrides the position property
+}
+

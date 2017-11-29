@@ -32,6 +32,7 @@ class Stats
     const KPI_PICSURE_UNSTARTED_POLICIES = 'kpi-picsure-unstarted-policies';
     const KPI_PICSURE_APPROVED_POLICIES = 'kpi-picsure-approved-policies';
     const KPI_PICSURE_REJECTED_POLICIES = 'kpi-picsure-rejected-policies';
+    const KPI_PICSURE_PREAPPROVED_POLICIES = 'kpi-picsure-preapproved-policies';
 
     const KPI_CANCELLED_AND_PAYMENT_OWED = 'kpi-cancelled-payment-owed';
     const KPI_CANCELLED_AND_PAYMENT_PAID = 'kpi-cancelled-payment-paid';
@@ -47,6 +48,7 @@ class Stats
         Stats::MIXPANEL_CPC_COMPETITORS_UK,
         Stats::KPI_PICSURE_UNSTARTED_POLICIES,
         Stats::KPI_PICSURE_APPROVED_POLICIES,
+        Stats::KPI_PICSURE_PREAPPROVED_POLICIES,
         Stats::KPI_PICSURE_REJECTED_POLICIES,
         Stats::KPI_CANCELLED_AND_PAYMENT_OWED,
         Stats::KPI_CANCELLED_AND_PAYMENT_PAID,
@@ -121,6 +123,7 @@ class Stats
             self::KPI_CANCELLED_AND_PAYMENT_OWED,
             self::KPI_PICSURE_UNSTARTED_POLICIES,
             self::KPI_PICSURE_APPROVED_POLICIES,
+            self::KPI_PICSURE_PREAPPROVED_POLICIES,
             self::KPI_PICSURE_REJECTED_POLICIES,
         ])) {
             return true;

@@ -36,7 +36,7 @@
         {% endif %}
         <div id="hero-character_1"
              class="homepage--hero__character">
-            <div class="homepage--hero__tooltip animated bounce"
+            <div class="homepage--hero__tooltip animated tada"
                  data-content="Accidental damage cover, including cracked screen and water damage"></div>
         </div>
         <div id="hero-character_2"
@@ -142,7 +142,7 @@
                 <div class="col-md-5">
                     <div class="img-container">
                         <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-                             data-src="{{ cdn_url }}/images/homepage/so-sure_balloon_better_section.svg"
+                             data-src="{{ cdn_url }}/images/homepage/so-sure_balloon_better.svg"
                              class="img-responsive img-responsive--center so-sure_homepage-balloon"alt="We lift you up when something bad happens">
                     </div>
                 </div>
@@ -177,43 +177,121 @@
             <h2 class="h1">Cover Details</h2>
             <p class="lead">We give you peace of mind and cover you for:</p>
             <div class="row">
-                <div class="col-md-10 col-md-offset-1">
+                <div class="col-md-12">
                     <div class="row">
                         <div class="col-sm-6 col-md-4">
-                            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-                                 data-src="{{ cdn_url }}/images/homepage/so-sure_theft.svg"
-                                 alt="so-sure cover - Theft">
-                            <h4>Theft <br><small class="hidden-xs">&nbsp;</small></h4>
+                            <div class="homepage--cover-details__item">
+                                <a href="#cover-modal"
+                                   class="text-nowrap"
+                                   data-toggle="modal"
+                                   data-slide-to="0">
+                                    <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                                         data-src="{{ cdn_url }}/images/homepage/so-sure_theft.svg"
+                                         alt="so-sure cover - Theft">
+                                </a>
+                                <h4>Theft</h4>
+                                <p>Theft happens when someone takes your phone from you using...
+                                    <a href="#cover-modal"
+                                       class="text-nowrap"
+                                       data-toggle="modal"
+                                       data-slide-to="0">read more</a>
+                                </p>
+                            </div>
                         </div>
                         <div class="col-sm-6 col-md-4">
-                            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-                                 data-src="{{ cdn_url }}/images/homepage/so-sure_loss.svg"
-                                 alt="so-sure cover - Loss">
-                            <h4>Loss <br><small class="hidden-xs">&nbsp;</small></h4>
+                            <div class="homepage--cover-details__item">
+                                <a href="#cover-modal"
+                                   class="text-nowrap"
+                                   data-toggle="modal"
+                                   data-slide-to="1">
+                                    <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                                         data-src="{{ cdn_url }}/images/homepage/so-sure_loss.svg"
+                                         alt="so-sure cover - Loss">
+                                </a>
+                                <h4>Loss</h4>
+                                <p>Our policy document defines loss as "The mobile phone...
+                                    <a href="#cover-modal"
+                                       class="text-nowrap"
+                                       data-toggle="modal"
+                                       data-slide-to="1">read more</a>
+                                </p>
+                            </div>
                         </div>
                         <div class="col-sm-6 col-md-4">
-                            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-                                 data-src="{{ cdn_url }}/images/homepage/so-sure_accidental_damage.svg"
-                                 alt="so-sure cover - Accidental Damage">
-                            <h4>Accidental Damage <br><small>Including cracked screen &amp; water damage </small></h4>
+                            <div class="homepage--cover-details__item">
+                                <a href="#cover-modal"
+                                   class="text-nowrap"
+                                   data-toggle="modal"
+                                   data-slide-to="2">
+                                    <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                                         data-src="{{ cdn_url }}/images/homepage/so-sure_accidental_damage.svg"
+                                         alt="so-sure cover - Accidental Damage">
+                                </a>
+                                <h4>Accidental Damage</h4>
+                                <p>Accidental damage is when something happens to your...
+                                    <a href="#cover-modal"
+                                       class="text-nowrap"
+                                       data-toggle="modal"
+                                       data-slide-to="2">read more</a>
+                                </p>
+                            </div>
                         </div>
                         <div class="col-sm-6 col-md-4">
-                            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-                                 data-src="{{ cdn_url }}/images/homepage/so-sure_out_of_warranty_breakdown.svg"
-                                 alt="so-sure cover - Out fo Warranty Breakdown">
-                            <h4>Out of Warranty Breakdown <br><small class="hidden-xs">&nbsp;</small></h4>
+                            <div class="homepage--cover-details__item">
+                                <a href="#cover-modal"
+                                   class="text-nowrap"
+                                   data-toggle="modal"
+                                   data-slide-to="3">
+                                    <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                                         data-src="{{ cdn_url }}/images/homepage/so-sure_out_of_warranty_breakdown.svg"
+                                         alt="so-sure cover - Out fo Warranty Breakdown">
+                                </a>
+                                <h4>Out of Warranty Breakdown</h4>
+                                <p>Our policy does not provide cover for problems with your mobile...
+                                    <a href="#cover-modal"
+                                       class="text-nowrap"
+                                       data-toggle="modal"
+                                       data-slide-to="3">read more</a>
+                                </p>
+                            </div>
                         </div>
                         <div class="col-sm-6 col-md-4">
-                            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-                                 data-src="{{ cdn_url }}/images/homepage/so-sure_unauthorised_network_charges.svg"
-                                 alt="so-sure cover - Unauthorised Network Charges">
-                            <h4>Unauthorised Network Charges <br><small >Up to the value of £1000 inc. VAT</small></h4>
+                            <div class="homepage--cover-details__item">
+                                <a href="#cover-modal"
+                                   class="text-nowrap"
+                                   data-toggle="modal"
+                                   data-slide-to="4">
+                                    <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                                         data-src="{{ cdn_url }}/images/homepage/so-sure_unauthorised_network_charges.svg"
+                                         alt="so-sure cover - Unauthorised Network Charges">
+                                </a>
+                                <h4>Unauthorised Network Charges</h4>
+                                <p>We cover you for up to &pound;1,000 of unauthorised network...
+                                    <a href="#cover-modal"
+                                       class="text-nowrap"
+                                       data-toggle="modal"
+                                       data-slide-to="4">read more</a>
+                                </p>
+                            </div>
                         </div>
                         <div class="col-sm-6 col-md-4">
-                            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-                                 data-src="{{ cdn_url }}/images/homepage/so-sure_accessories.svg"
-                                 alt="so-sure cover - Accessories">
-                            <h4>Accessories <br><small>Up to the value of £100 inc. VAT for theft or loss claims</small></h4>
+                            <div class="homepage--cover-details__item">
+                                <a href="#cover-modal"
+                                   class="text-nowrap"
+                                   data-toggle="modal"
+                                   data-slide-to="5">
+                                    <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                                         data-src="{{ cdn_url }}/images/homepage/so-sure_accessories.svg"
+                                         alt="so-sure cover - Accessories">
+                                </a>
+                                <h4>Accessories</h4>
+                                <p>Accessory claims are covered up to &pound;100 including VAT...
+                                    <a href="#cover-modal"
+                                       class="text-nowrap"
+                                       data-toggle="modal"
+                                       data-slide-to="5">read more</a>
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -248,14 +326,69 @@
     <section class="homepage--what-we-dont-cover">
         <div class="container">
             <h2 class="text-center h1">What We Don't Cover</h2>
-            <ol class="ol--blue-counter">
-                <li class="h4 h-light">Excess<br>
-                    • pic-sure validated <i class="fa fa-question-circle" title="pic-sure is our free app-based process to prove your phone is in good working condition and your screen is not cracked"></i>: £70 for Theft/Loss and £50 for Accidental Damage/Breakdown.<br>
-                    • otherwise: £150 for Theft/Loss/Accidental Damage/Breakdown
-                </li>
-                <li class="h4 h-light">Theft, Loss, Accidental Damage or Breakdown where you have knowingly put your phone at risk</li>
-                <li class="h4 h-light">3+ claims for Loss and/or Theft in any policy year</li>
-            </ol>
+            <div class="row">
+                <div class="col-md-10 col-md-offset-1">
+                    <p class="lead">We're upfront and honest with our customers. We tell you what you're covered for, and it is only fair to spell out, and explain, what is not:</p>
+                    <div class="what-we-dont-cover--list">
+                        <h4 class="collapsed h-light"
+                            data-toggle="collapse"
+                            data-target="#what-we-dont-cover-1"
+                            aria-expanded="false"
+                            aria-controls="what-we-dont-cover-1">Breakdown covered by the manufacturer's warranty</h4>
+                        <div id="what-we-dont-cover-1"
+                             class="what-we-dont-cover--list__item collapse">
+                            <p>This policy does not provide cover for problems with your mobile phone that are covered by the manufacturer warranty. If your mobile phone does develop a fault whilst still under warranty you should follow the warranty returns process as specified by the manufacturer.</p>
+                        </div>
+                        <h4 class="collapsed h-light"
+                                data-toggle="collapse"
+                                data-target="#what-we-dont-cover-2"
+                                aria-expanded="false"
+                                aria-controls="what-we-dont-cover-2">Excess: You need to pay a contribution every time you make a successful claim</h4>
+                        <div id="what-we-dont-cover-2"
+                             class="what-we-dont-cover--list__item collapse">
+                            <p>You need to pay a contribution every time you make a successful claim, the amount of your excess will depend on the type of claim you are making and if you have validated your phone using pic-sure.
+                                pic-sure is our process to ensure that your phone is working prior to making a claim and will help make your claim easier and faster.
+                                Your excess must be paid before your claim is settled.</p>
+                            <ul class="lead">
+                                <li>
+                                    <strong>pic-sure validated:</strong> £70 for Theft/Loss and £50 for Accidental Damage/Breakdown.
+                                </li>
+                                <li>
+                                    <strong>not pic-sure validated:</strong> £150 for Theft/Loss/Accidental Damage/Breakdown
+                                </li>
+                            </ul>
+                        </div>
+                        <h4 class="collapsed h-light"
+                            data-toggle="collapse"
+                            data-target="#what-we-dont-cover-3"
+                            aria-expanded="false"
+                            aria-controls="what-we-dont-cover-3">More than 2 Loss and/or Theft claims in a policy year for each insured item</h4>
+                        <div id="what-we-dont-cover-3"
+                             class="what-we-dont-cover--list__item collapse">
+                            <p>There is a limit of 2 successful claims for Loss and/or Theft in your policy year. There is no limitation on claims for Accidental Damage or Breakdown.</p>
+                        </div>
+                        <h4 class="collapsed h-light"
+                            data-toggle="collapse"
+                            data-target="#what-we-dont-cover-4"
+                            aria-expanded="false"
+                            aria-controls="what-we-dont-cover-4">Cosmetic Accidental Damage</h4>
+                        <div id="what-we-dont-cover-4"
+                             class="what-we-dont-cover--list__item collapse">
+                            <p>We only cover Accidental Damage if it stops the normal functioning of your mobile phone. We know scratches, dents, deterioration and scrapes to your mobile phone aren't nice but we are here to fix your mobile phone when it isn't working, so if it still functions as you would expect then we will not repair or replace it. For example, a scratched screen would not be covered but a cracked screen would be covered</p>
+                        </div>
+                        <h4 class="collapsed h-light"
+                            data-toggle="collapse"
+                            data-target="#what-we-dont-cover-5"
+                            aria-expanded="false"
+                            aria-controls="what-we-dont-cover-5">Loss, Theft, Accidental Damage or Breakdown by not taking 'Reasonable Care' of your mobile phone</h4>
+                        <div id="what-we-dont-cover-5"
+                             class="what-we-dont-cover--list__item collapse">
+                            <p>We expect you to be ‘taking reasonable care' of your mobile phone. That means not knowingly leaving your mobile phone somewhere it is likely to be lost, stolen or accidentally damaged. If you don't take care of your mobile phone then we may not pay your claim. <br>If in doubt for Loss or Theft, ask yourself "would I leave a pile of £400 in cash there and expect to find it when I return?"</p>
+                        </div>
+                    </div>
+                    <p class="lead">This means that there’s no nasty surprises when you have an issue with your device.</p>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -494,7 +627,7 @@
     </section>
 
     {# Page Modals #}
-
+    {% include 'AppBundle::Default/_coverModals.html.twig' %}
     {# End Page Modals #}
 
 {% endblock %}

@@ -98,6 +98,10 @@ hr {
 	border-top: 2px dashed $light-blue;
 }
 
+mark {
+	background-color: $lightest-blue;
+}
+
 // Helpers - for rapid prototyping
 
 	// Alignment
@@ -139,6 +143,9 @@ hr {
 		color: $light-blue !important;
 	}
 
+	.text-dark-blue {
+		color: $dark-blue !important;
+	}
 
 	.text-grey-blue {
 		color: $blue-grey !important;
