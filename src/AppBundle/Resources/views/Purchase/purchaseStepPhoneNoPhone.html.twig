@@ -45,9 +45,7 @@
 </section>
 
 {# Page Modals #}
-
-{% include 'AppBundle::Default/modalQuote.html.twig' %}
-
+{% include 'AppBundle::Default/modalQuote.html.twig' with {'selectPhoneMakeType': 'purchase-change'} %}
 {# End Page Modals #}
 
 {% endblock %}

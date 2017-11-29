@@ -80,6 +80,8 @@ sosure.selectPhoneMake = (function() {
 
     self.setFormAction = function (id, form) {
         $(form).attr('action', self.getFormAction(id, form));
+        var action = $(form).attr('action');
+        console.log(action);
     }
 
     self.setFormActionVal = function (form, input) {
@@ -114,6 +116,8 @@ $(function(){
     $.each($typeahead, function (index, typeahead){
 
         var form    = $(this);
+        var base_path = $(form).data('base-path');
+        var path_suffix = $(form).data('path-suffix');
         var input   = $(this).find('.search-phone');
         var loading = $(this).next('.so-sure-loading');
 
@@ -146,7 +150,7 @@ $(function(){
                         '<div class="tt-menu-right hidden-xs hidden-sm"><i class="fa fa-angle-down" aria-hidden="true"></i>  SELECT FOR INSTANT QUOTE <i class="fa fa-angle-down" aria-hidden="true"></i></div>',
                     '</div>'
                 ].join('\n'),
-                suggestion: doT.template('<div class="clearfix"><div class="tt-menu-left tt-menu-pad">{{=it.name}}</div><div class="tt-menu-right">{{~it.sizes :value}}<a href="/phone-insurance/{{=value.id}}" class="btn-tt">{{=value.memory}}GB</a> {{~}}</div></div>')
+                suggestion: doT.template('<div class="clearfix"><div class="tt-menu-left tt-menu-pad">{{=it.name}}</div><div class="tt-menu-right">{{~it.sizes :value}}<a href="'+base_path+'{{=value.id}}'+path_suffix+'" class="btn-tt">{{=value.memory}}GB</a> {{~}}</div></div>')
             }
         });
 
