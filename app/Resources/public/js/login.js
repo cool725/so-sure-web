@@ -62,6 +62,21 @@ function loadDigits() {
   })
 }
 
+function fb_login() {
+    FB.getLoginStatus(function(response) {
+        if (response.status === 'connected') {
+            document.location = $('#ss-root').data('fb-redirect');
+        } else {
+            // not_authorized
+            FB.login(function(response) {
+                if (response.authResponse) {
+                    document.location = $('#ss-root').data('fb-redirect');
+                }
+            }, {scope: 'email'});
+        }
+    });
+}
+
 $.fn.extend({
     toggleText: function(a, b){
         return this.text(this.text() == b ? a : b);
