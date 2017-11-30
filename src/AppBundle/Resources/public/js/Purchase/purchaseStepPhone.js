@@ -150,6 +150,7 @@ $(function(){
 
     $('#purchase_form_file').on('change', function() {
         $('#upload-file-info').html('<i class="fa fa-file"></i> <span id="upload-file-name"></span>');
+        // Use cation - .name is original client name and can have script input
         $('#upload-file-name').text(this.files[0].name);
         $('#purchase_form_imei').rules("remove");
         $('#purchase_form_imei').removeAttr("required");
