@@ -149,7 +149,8 @@ $(function(){
     });
 
     $('#purchase_form_file').on('change', function() {
-        $('#upload-file-info').html('<i class="fa fa-file"></i> ' + this.files[0].name)         
+        $('#upload-file-info').html('<i class="fa fa-file"></i> <span id="upload-file-name"></span>');
+        $('#upload-file-name').text(this.files[0].name);
         $('#purchase_form_imei').rules("remove");
         $('#purchase_form_imei').removeAttr("required");
         $('#purchase_form_serialNumber').rules("remove");
