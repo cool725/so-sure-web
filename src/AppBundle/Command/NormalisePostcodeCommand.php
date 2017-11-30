@@ -2,13 +2,9 @@
 
 namespace AppBundle\Command;
 
-use League\Flysystem\Exception;
-use Sortable\Fixture\Document\Post;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use AppBundle\Document\User;
-use VasilDakov\Postcode\Postcode;
 
 class NormalisePostcodeCommand extends BaseCommand
 {
