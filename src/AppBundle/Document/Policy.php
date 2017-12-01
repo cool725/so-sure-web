@@ -3296,7 +3296,7 @@ abstract class Policy
                 $adjustedDiscount->setDate(clone $date);
                 $adjustedDiscount->setAmount($this->toTwoDp($this->getPotValue() - $discount->getAmount()));
                 $adjustedDiscount->setNotes(sprintf(
-                    'Pot was adjusted and this adjusts previous discount. Split should be %0.2f salva / %0.2f so-sure marketing',
+                    'Adjust previous discount. Split should be %0.2f salva / %0.2f so-sure marketing',
                     $this->getStandardPotValue(),
                     $this->getPromoPotValue()
                 ));
