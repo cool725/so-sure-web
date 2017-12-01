@@ -23,7 +23,7 @@ class NormalisePostcodeCommand extends BaseCommand
         $users = $repo->findAll();
         $output->writeln(sprintf('Processing %s users', count($users)));
         $totalProcessed = 0;
-        $flushCounter = 0;
+        $flushCounter = 1;
         $hasBillingAddress = 0;
         foreach ($users as $user) {
             $totalProcessed++;
@@ -33,10 +33,8 @@ class NormalisePostcodeCommand extends BaseCommand
                 $postcode = $user->getBillingAddress()->getPostcode();
                 $user->getBillingAddress()->setPostcode($postcode);
             }
-
-            if ($flushCounter >= 1000) {
+            if ($flushCounter % 1000 == 0) {
                 $repo->getDocumentManager()->flush();
-                $flushCounter = 0;
             }
         }
         if ($flushCounter > 0) {
