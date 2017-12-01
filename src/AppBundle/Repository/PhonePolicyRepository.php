@@ -331,6 +331,29 @@ class PhonePolicyRepository extends PolicyRepository
             ->execute();
     }
 
+    public function getAllExpiredPoliciesForExport(\DateTime $date, $environment)
+    {
+        \AppBundle\Classes\NoOp::ignore([$date]);
+
+        $policy = new PhonePolicy();
+
+        $qb = $this->createQueryBuilder()
+            ->field('status')->in([
+                Policy::STATUS_EXPIRED,
+                Policy::STATUS_EXPIRED_CLAIMABLE,
+                Policy::STATUS_EXPIRED_WAIT_CLAIM,
+            ]);
+
+        if ($environment == "prod") {
+            $qb->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
+        } else {
+            $qb->field('policyNumber')->notEqual(null);
+        }
+
+        return $qb->getQuery()
+            ->execute();
+    }
+
     public function getPotValues()
     {
         $policy = new PhonePolicy();
