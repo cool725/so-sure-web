@@ -3,7 +3,6 @@ namespace AppBundle\Service;
 
 use Psr\Log\LoggerInterface;
 use GuzzleHttp\Client;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class BranchService
 {
@@ -14,7 +13,8 @@ class BranchService
     /** @var LoggerInterface */
     protected $logger;
 
-    protected $router;
+    /** @var RouterService */
+    protected $routerService;
     protected $redis;
 
     /** @var string */
@@ -22,6 +22,9 @@ class BranchService
 
     /** @var string */
     protected $branchKey;
+
+    /** @var string */
+    protected $branchSecret;
 
     /** @var string */
     protected $branchDomain;
@@ -34,29 +37,32 @@ class BranchService
 
     /**
      * @param LoggerInterface   $logger
-     * @param                   $router
+     * @param RouterService     $routerService
      * @param                   $redis
      * @param                   $environment
      * @param                   $branchKey
+     * @param                   $branchSecret
      * @param                   $branchDomain
      * @param                   $googleAppDownload
      * @param                   $appleAppDownload
      */
     public function __construct(
         LoggerInterface $logger,
-        $router,
+        RouterService $routerService,
         $redis,
         $environment,
         $branchKey,
+        $branchSecret,
         $branchDomain,
         $googleAppDownload,
         $appleAppDownload
     ) {
         $this->logger = $logger;
-        $this->router = $router;
+        $this->routerService = $routerService;
         $this->redis = $redis;
         $this->environment = $environment;
         $this->branchKey = $branchKey;
+        $this->branchSecret = $branchSecret;
         $this->branchDomain = $branchDomain;
         $this->googleAppDownload = $googleAppDownload;
         $this->appleAppDownload = $appleAppDownload;
@@ -203,7 +209,7 @@ class BranchService
     public function link($data, $source, $medium, $campaign)
     {
         $data = array_merge($data, [
-            //'$desktop_url' => $this->router->generate('', true),
+            //'$desktop_url' => $this->routerService->generate('', true),
             '$ios_url' => $this->downloadAppleLink($source, $medium, $campaign),
             '$android_url' => $this->downloadGoogleLink($source, $medium, $campaign),
         ]);
@@ -213,12 +219,12 @@ class BranchService
 
     public function linkToAppleDownload($medium)
     {
-        return $this->router->generate('download_apple', ['medium' => $medium]);
+        return $this->routerService->generate('download_apple', ['medium' => $medium]);
     }
 
     public function linkToGoogleDownload($medium)
     {
-        return $this->router->generate('download_google', ['medium' => $medium]);
+        return $this->routerService->generate('download_google', ['medium' => $medium]);
     }
 
     public function generateSCode($code)
@@ -235,12 +241,48 @@ class BranchService
         $data = [
             'scode' => $code,
             '$deeplink_path' => sprintf('invite/scode/%s', $code),
-            '$desktop_url' => $this->router->generate('scode', ['code' => $code], UrlGeneratorInterface::ABSOLUTE_URL),
+            '$desktop_url' => $this->routerService->generateUrl('scode', ['code' => $code]),
             '$ios_url' => $this->downloadAppleLink($source, $medium, $campaign),
             '$android_url' => $this->downloadGoogleLink($source, $medium, $campaign),
         ];
 
         return $this->send($data, $source, $medium, $campaign, $code);
+    }
+
+    /**
+     * Get the data from branch, merge with the updated data provided, then update branch
+     */
+    public function update($url, $data)
+    {
+        try {
+            $url = sprintf('%s?url=%s&branch_key=%s', self::BASE_URL, $url, $this->branchKey);
+            $client = new Client();
+            $res = $client->request('GET', $url);
+            $body = (string) $res->getBody();
+            $this->logger->debug(sprintf('Received %s from branch', $body));
+
+            $data = array_merge(json_decode($body, true), $data);
+
+            $body = [
+                'branch_key' => $this->branchKey,
+                'branch_secret' => $this->branchSecret,
+                'data' => json_encode($data),
+                "sdk" => "api"
+            ];
+
+            $this->logger->debug(sprintf('Sending %s to branch', json_encode($body)));
+            $res = $client->request('PUT', $url, [
+                'json' => $body,
+            ]);
+            $body = (string) $res->getBody();
+            $this->logger->debug(sprintf('Received %s from branch', $body));
+
+            $response = json_decode($body, true);
+
+            return $response;
+        } catch (\Exception $e) {
+            $this->logger->error(sprintf('Error in branch request'), ['exception' => $e]);
+        }
     }
 
     protected function send($data, $source, $medium, $campaign, $alias = null)

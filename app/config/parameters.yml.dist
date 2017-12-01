@@ -87,6 +87,7 @@ parameters:
     pca_apikey: ''
     pca_webkey: ''
     branch_key: ''
+    branch_secret: ''
     branch_domain: ''
     drift_key: ''
     zendesk_jwt_secret: 'cannotbeblank'

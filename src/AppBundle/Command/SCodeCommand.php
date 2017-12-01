@@ -11,10 +11,12 @@ use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\SCode;
-use AppBundle\Document\ScheduledPayment;
+use AppBundle\Document\DateTrait;
 
-class SCodeCommand extends ContainerAwareCommand
+class SCodeCommand extends BaseCommand
 {
+    use DateTrait;
+
     protected function configure()
     {
         $this
@@ -26,6 +28,24 @@ class SCodeCommand extends ContainerAwareCommand
                 InputOption::VALUE_REQUIRED,
                 'Update scode link in Branch'
             )
+            ->addOption(
+                'update-type',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'db to update link to scode; branch to update url in branch'
+            )
+            ->addOption(
+                'update-source',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'google, branch'
+            )
+            ->addOption(
+                'update-date',
+                null,
+                InputOption::VALUE_REQUIRED,
+                '(re-)update if not update before'
+            )
         ;
     }
 
@@ -33,8 +53,12 @@ class SCodeCommand extends ContainerAwareCommand
     {
         $lines = [];
         $policyNumber = $input->getOption('policyNumber');
+        $updateType = $input->getOption('update-type');
+        $updateSource = $input->getOption('update-source');
+        $updateDate = $input->getOption('update-date') ? new \DateTime($input->getOption('update-date')) : new \DateTime();
+        $updateDate = $this->startOfDay($updateDate);
 
-        $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
+        $dm = $this->getManager();
         $policyRepo = $dm->getRepository(Policy::class);
         $scodeRepo = $dm->getRepository(SCode::class);
 
@@ -44,23 +68,59 @@ class SCodeCommand extends ContainerAwareCommand
                 throw new \Exception(sprintf('Unable to find policy for %s', $policyNumber));
             }
             $scode = $policy->getStandardSCode();
-            if (!$scode) {
-                throw new \Exception(sprintf('Unable to find scode for policy %s', $policyNumber));
-            }
             $this->printSCode($output, $scode);
-            $shareLink = $this->getContainer()->get('app.branch')->generateSCode($scode->getCode());
-            $scode->setShareLink($shareLink);
+            $this->updateSCode($output, $scode, $updateType);
             $dm->flush();
-            $this->printSCode($output, $scode);
         } else {
-            $scodes = $scodeRepo->getLinkPrefix('https://goo.gl');
-            foreach ($scodes as $scode) {
-                $this->printSCode($output, $scode);
+            if ($updateSource == 'google') {
+                $scodes = $scodeRepo->getLinkPrefix('https://goo.gl');
+            } elseif($updateSource == 'branch') {
+                $scodes = $scodeRepo->getLinkPrefix($this->getContainer()->getParameter('branch_domain'));
+            } else {
+                $scodes = $scodeRepo->findAll();
             }
+            $count = 1;
+            foreach ($scodes as $scode) {
+                if ($scode->getUpdatedDate() && $scode->getUpdatedDate() >= $updateDate) {
+                    continue;
+                }
+                if ($updateType) {
+                    $this->updateSCode($output, $scode, $updateType);                    
+                }
+                if ($count % 100 == 0) {
+                    $dm->flush();
+                }
+            }
+            $dm->flush();
         }
 
         $output->writeln(implode(PHP_EOL, $lines));
         $output->writeln('Finished');
+    }
+
+    private function updateSCode($output, $scode, $updateType)
+    {
+        if (!$scode) {
+            throw new \Exception(sprintf('Unable to find scode for policy %s', $policyNumber));
+        }
+        $branch = $this->getContainer()->get('app.branch');
+        $routerService = $this->getContainer()->get('app.router');
+        if ($updateType == 'db') {
+            $shareLink = $branch->generateSCode($scode->getCode());
+            $scode->setShareLink($shareLink);
+        } elseif ($updateType == 'branch') {
+            if (stripos($scode->getShareLink(), $this->getContainer()->getParameter('branch_domain')) !== false) {
+                $branch->update($scode->getShareLink(), [
+                    '$desktop_url' => $routerService->generateUrl('scode', ['code' => $scode->getCode()]),
+                ]);
+                $scode->setUpdatedDate(new \DateTime());
+            } else {
+                $output->writeln(sprintf('%s is not a branch url', $scode->getShareLink()));
+            }
+        } else {
+            throw new \Exception('Unknown update-type');
+        }
+        $this->printSCode($output, $scode);
     }
 
     private function printSCode($output, $scode)
