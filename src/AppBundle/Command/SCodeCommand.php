@@ -55,7 +55,9 @@ class SCodeCommand extends BaseCommand
         $policyNumber = $input->getOption('policyNumber');
         $updateType = $input->getOption('update-type');
         $updateSource = $input->getOption('update-source');
-        $updateDate = $input->getOption('update-date') ? new \DateTime($input->getOption('update-date')) : new \DateTime();
+        $updateDate = $input->getOption('update-date') ?
+            new \DateTime($input->getOption('update-date')) :
+            new \DateTime();
         $updateDate = $this->startOfDay($updateDate);
 
         $dm = $this->getManager();
@@ -74,7 +76,7 @@ class SCodeCommand extends BaseCommand
         } else {
             if ($updateSource == 'google') {
                 $scodes = $scodeRepo->getLinkPrefix('https://goo.gl');
-            } elseif($updateSource == 'branch') {
+            } elseif ($updateSource == 'branch') {
                 $scodes = $scodeRepo->getLinkPrefix($this->getContainer()->getParameter('branch_domain'));
             } else {
                 $scodes = $scodeRepo->findAll();
@@ -85,7 +87,7 @@ class SCodeCommand extends BaseCommand
                     continue;
                 }
                 if ($updateType) {
-                    $this->updateSCode($output, $scode, $updateType);                    
+                    $this->updateSCode($output, $scode, $updateType);   
                 }
                 if ($count % 100 == 0) {
                     $dm->flush();
