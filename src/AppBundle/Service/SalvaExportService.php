@@ -487,7 +487,9 @@ class SalvaExportService
                 $policy->isRenewed() ? $policy->getNextPolicy()->getPremium()->getMonthlyPremiumPrice() : '',
                 $policy->isRenewed() ? $policy->getNextPolicy()->getPremium()->getAnnualDiscount() : '',
                 $policy->isRenewed() ? $policy->getNextPolicy()->getPremium()->getMonthlyDiscount() : '',
-                $policy->isRenewed() ? $policy->getNextPolicy()->getPremium()->getAdjustedStandardMonthlyPremiumPrice() : '',
+                $policy->isRenewed() ?
+                    $policy->getNextPolicy()->getPremium()->getAdjustedStandardMonthlyPremiumPrice() :
+                    '',
             ];
         } else {
             $data = [
