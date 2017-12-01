@@ -87,7 +87,7 @@ class SCodeCommand extends BaseCommand
                     continue;
                 }
                 if ($updateType) {
-                    $this->updateSCode($output, $scode, $updateType);   
+                    $this->updateSCode($output, $scode, $updateType);
                 }
                 if ($count % 100 == 0) {
                     $dm->flush();
