@@ -48,7 +48,7 @@ class LaunchUserService
         $this->mailchimp = $mailchimp;
         $this->mailer = $mailer;
         $this->templating = $templating;
-        $this->router = $router->getRouter();
+        $this->router = $router;
         $this->shortLink = $shortLink;
     }
 
@@ -102,7 +102,7 @@ class LaunchUserService
      */
     public function getLink($userId)
     {
-        return $this->router->generate('homepage', ['referral' => $userId], UrlGeneratorInterface::ABSOLUTE_URL);
+        return $this->router->generateUrl('homepage', ['referral' => $userId]);
     }
 
     /**

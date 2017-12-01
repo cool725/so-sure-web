@@ -12,16 +12,15 @@ class MailerService
     protected $mailer;
     protected $smtp;
     protected $templating;
-    protected $router;
+
+    /** @var RouterService */
+    protected $routerService;
 
     /** @var string */
     protected $defaultSenderAddress;
 
     /** @var string */
     protected $defaultSenderName;
-
-    /** @var string */
-    protected $baseUrl;
 
     public function setMailer($mailer)
     {
@@ -32,27 +31,24 @@ class MailerService
      * @param \Swift_Mailer $mailer
      * @param               $smtp
      * @param               $templating
-     * @param               $router
+     * @param RouterService $routerService
      * @param string        $defaultSenderAddress
      * @param string        $defaultSenderName
-     * @param string        $baseUrl
      */
     public function __construct(
         \Swift_Mailer $mailer,
         $smtp,
         $templating,
-        $router,
+        RouterService $routerService,
         $defaultSenderAddress,
-        $defaultSenderName,
-        $baseUrl
+        $defaultSenderName
     ) {
         $this->mailer = $mailer;
         $this->smtp = $smtp;
         $this->templating = $templating;
-        $this->router = $router->getRouter();
+        $this->routerService = $routerService;
         $this->defaultSenderAddress = $defaultSenderAddress;
         $this->defaultSenderName = $defaultSenderName;
-        $this->baseUrl = $baseUrl;
     }
 
     public function sendTemplate(
@@ -119,10 +115,9 @@ class MailerService
             if ($emailType) {
                 $data['cat'] = $this->emailTypeToOptOut($emailType);
             }
-            $array['unsubscribe_url'] = $this->router->generate(
+            $array['unsubscribe_url'] = $this->routerService->generateUrl(
                 'optout_hash',
-                $data,
-                UrlGeneratorInterface::ABSOLUTE_URL
+                $data
             );
         } else {
             $array['unsubscribe_url'] = "mailto:hello@wearesosure.com?Subject=I don't want these emails anymore!";
@@ -188,14 +183,5 @@ class MailerService
                 unlink($attachmentFile);
             }
         }
-    }
-
-    public function generateUrl($route, $params)
-    {
-        return sprintf(
-            "%s%s",
-            $this->baseUrl,
-            $this->router->generate($route, $params)
-        );
     }
 }

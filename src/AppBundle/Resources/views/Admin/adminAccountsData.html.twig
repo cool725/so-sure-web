@@ -57,8 +57,12 @@
         <td colspan="3">&nbsp;</td>
     </tr>
     <tr>
+        <td colspan="2" width="{{ text_width }}">Debt Collection Fees</td>
+        <td>(£{{ (0 - paymentTotals.debtCollections.total)|number_format(2, '.', ',') }})</td>
+    </tr>
+    <tr>
         <td colspan="2"><strong>Net monthly premium received</strong></td>
-        <td><strong>£{{ paymentTotals.all.total|number_format(2, '.', ',') }}</strong></td>
+        <td><strong>£{{ (paymentTotals.all.total + paymentTotals.debtCollections.total)|number_format(2, '.', ',') }}</strong></td>
     </tr>
 </table>
 <h4>Reward Pot</h4>

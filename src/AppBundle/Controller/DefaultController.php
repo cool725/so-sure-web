@@ -165,8 +165,8 @@ class DefaultController extends BaseController
 
     /**
      * @Route("/select-phone", name="select_phone_make")
-     * @Route("/select-phone/{type}", name="select_phone_make_type")
      * @Route("/select-phone/{type}/{id}", name="select_phone_make_type_id")
+     * @Route("/select-phone/{type}", name="select_phone_make_type")
      * @Template()
      */
     public function selectPhoneMakeAction(Request $request, $type = null, $id = null)
@@ -177,6 +177,8 @@ class DefaultController extends BaseController
         if ($id) {
             $phone = $phoneRepo->find($id);
         }
+
+        // throw new \Exception($id);
 
         if ($phone && in_array($type, ['purchase-select', 'purchase-change'])) {
             $session = $request->getSession();

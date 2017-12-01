@@ -98,7 +98,7 @@ services:
             mailchimp:  "@app.mailchimp.prelaunch"
             mailer:     "@app.mailer"
             templating: "@templating"
-            router:     "@api.router"
+            router:     "@app.router"
             shortLink:  "@app.shortlink"
 
     app.invitation:
@@ -107,7 +107,7 @@ services:
             dm:                   "@doctrine_mongodb.odm.default_document_manager"
             logger:               "@logger"
             mailer:               "@app.mailer"
-            router:               "@api.router"
+            router:               "@app.router"
             shortLink:            "@app.shortlink"
             sms:                  "@app.sms"
             rateLimit:            "@app.ratelimit"
@@ -369,7 +369,7 @@ services:
             mailer:               "@app.mailer"
             smtp:                 "@swiftmailer.transport.real"
             templating:           "@templating"
-            router:               "@api.router"
+            router:               "@app.router"
             environment:          "%kernel.environment%"
             snappy_pdf:           "@knp_snappy.pdf"
             dispatcher:           "@event_dispatcher"
@@ -409,9 +409,14 @@ services:
             mailer:               "@mailer"
             smtp:                 "@swiftmailer.transport.real"
             templating:           "@templating"
-            router:               "@api.router"
+            router:               "@app.router"
             defaultSenderAddress: "%default_sender_address%"
             defaultSenderName:    "%default_sender_name%"
+
+    app.router:
+        class: AppBundle\Service\RouterService
+        arguments:
+            router:               "@router"
             baseUrl:              "%web_base_url%"
 
     app.ratelimit:
@@ -679,6 +684,14 @@ services:
             -  { name: kernel.event_listener, event: event.user.created, method: onUserCreatedEvent }
             -  { name: kernel.event_listener, event: event.user.updated, method: onUserUpdatedEvent }
             -  { name: kernel.event_listener, event: event.user.email.changed, method: onUserEmailChangedEvent }
+
+    app.listener.debtCollection:
+        class:   AppBundle\Listener\DebtCollectionListener
+        arguments:
+            dm:                   "@doctrine_mongodb.odm.default_document_manager"
+            logger:               "@logger"
+        tags:
+            -  { name: kernel.event_listener, event: event.payment.success, method: onPaymentSuccessEvent }
 
     app.listener.intercom:
         class:   AppBundle\Listener\IntercomListener

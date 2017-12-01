@@ -10,14 +10,14 @@ else
     echo "Non-production server - safe to run"
 fi
 
-SKIP_POLICY=0
+SKIP_POLICY=1
 SKIP_DB=0
 COVER=0
 FUNCTIONAL_TEST="test:functional"
 while getopts ":snpdhcC" opt; do
   case $opt in
     s)
-      SKIP_POLICY=1
+      SKIP_POLICY=0
       ;;
     d)
       SKIP_DB=1
@@ -37,7 +37,7 @@ while getopts ":snpdhcC" opt; do
       FUNCTIONAL_TEST="test:functional:paid"
       ;;
     h)
-      echo "Usage: $0 [-d skip db refresh] [-s skip policy] [-n no network test | -p run paid test | -c run coverage | -C run coverage no network] [filter e.g. (::Method or namespace - use \\)"
+      echo "Usage: $0 [-d skip db refresh] [-s populate sample policy data] [-n no network test | -p run paid test | -c run coverage | -C run coverage no network] [filter e.g. (::Method or namespace - use \\)"
       ;;
   esac
 done

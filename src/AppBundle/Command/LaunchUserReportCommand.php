@@ -7,7 +7,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use AppBundle\Document\User;
 
 class LaunchUserReportCommand extends ContainerAwareCommand
@@ -32,16 +31,15 @@ class LaunchUserReportCommand extends ContainerAwareCommand
 
         $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
         $userRepo = $dm->getRepository(User::class);
-        $router = $this->getContainer()->get('router');
+        $router = $this->getContainer()->get('app.router');
         $shortLink = $this->getContainer()->get('app.shortlink');
 
         $users = $userRepo->findAll();
         foreach ($users as $user) {
             if (stripos($user->getEmailCanonical(), "@so-sure.com") === false) {
-                $url = $router->generate(
+                $url = $router->generateUrl(
                     'homepage',
-                    ['referral' => $user->getId()],
-                    UrlGeneratorInterface::ABSOLUTE_URL
+                    ['referral' => $user->getId()]
                 );
                 if ($useShortLink) {
                     $url = $shortLink->addShortLink($url);
