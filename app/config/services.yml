@@ -233,10 +233,11 @@ services:
         class: AppBundle\Service\BranchService
         arguments:
             logger:            "@logger"
-            router:            "@router"
+            routerService:     "@app.router"
             redis:             "@snc_redis.default"
             environment:       "%kernel.environment%"
             branchKey:         "%branch_key%"
+            branchSecret:      "%branch_secret%"
             branchDomain:      "%branch_domain%"
             googleAppDownload: "%google_app_download%"
             appleAppDownload": "%apple_app_download%"

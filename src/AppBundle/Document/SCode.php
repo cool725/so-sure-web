@@ -32,6 +32,13 @@ class SCode
     protected $createdDate;
 
     /**
+     * @Assert\DateTime()
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
+    protected $updatedDate;
+
+    /**
      * @Assert\Length(min="2", max="50")
      * @AppAssert\Alphanumeric()
      * @MongoDB\Field(type="string")
@@ -176,6 +183,16 @@ class SCode
     public function setCreatedDate($createdDate)
     {
         $this->createdDate = $createdDate;
+    }
+
+    public function getUpdatedDate()
+    {
+        return $this->updatedDate;
+    }
+
+    public function setUpdatedDate($updatedDate)
+    {
+        $this->updatedDate = $updatedDate;
     }
 
     public function getCode()
