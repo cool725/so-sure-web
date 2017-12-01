@@ -1295,6 +1295,14 @@ abstract class Policy
         $this->promoPotValue = $promoPotValue;
     }
 
+    /**
+     * Standard Value (e.g. Salva / the non-promo portion of the pot value)
+     */
+    public function getStandardPotValue()
+    {
+        return $this->toTwoDp($this->getPotValue() - $this->getPromoPotValue());
+    }
+
     public function getPolicyTerms()
     {
         return $this->policyTerms;
@@ -2138,7 +2146,7 @@ abstract class Policy
             count($this->getStandardConnections()) > count($this->getStandardSelfConnections())) {
             // Connected and value of their pot is zero
             if ($this->areEqualToFourDp($this->getPotValue(), 0) ||
-                $this->areEqualToFourDp($this->getPotValue() - $this->getPromoPotValue(), 0)) {
+                $this->areEqualToFourDp($this->getStandardPotValue(), 0)) {
                 // pot is empty, or pot is entirely made up of promo values
                 return self::RISK_CONNECTED_POT_ZERO;
             }
@@ -3137,7 +3145,7 @@ abstract class Policy
             // Normal pot reward
             $reward = new PotRewardPayment();
             $reward->setDate(clone $date);
-            $reward->setAmount($this->toTwoDp(0 - ($this->getPotValue() - $this->getPromoPotValue())));
+            $reward->setAmount($this->toTwoDp(0 - ($this->getStandardPotValue())));
             $this->addPayment($reward);
 
             // We can't give cashback + give a discount on the next year's policy as that would be
@@ -3163,6 +3171,11 @@ abstract class Policy
                 } else {
                     $discount->setDate(clone $date);
                 }
+                $discount->setNotes(sprintf(
+                    '%0.2f salva / %0.2f so-sure marketing',
+                    $this->getStandardPotValue(),
+                    $this->getPromoPotValue()
+                ));
                 $this->getNextPolicy()->addPayment($discount);
             } else {
                 // No cashback requested but also no renewal
@@ -3260,7 +3273,7 @@ abstract class Policy
         }
 
         // Standard pot reward
-        $standardPotValue = 0 - ($this->getPotValue() - $this->getPromoPotValue());
+        $standardPotValue = 0 - ($this->getStandardPotValue());
         if ($potReward && !$this->areEqualToTwoDp($potReward->getAmount(), $standardPotValue)) {
             // pot changed (due to claim) - issue refund if applicable
             $reward = new PotRewardPayment();
@@ -3282,6 +3295,11 @@ abstract class Policy
                 $adjustedDiscount = new PolicyDiscountPayment();
                 $adjustedDiscount->setDate(clone $date);
                 $adjustedDiscount->setAmount($this->toTwoDp($this->getPotValue() - $discount->getAmount()));
+                $adjustedDiscount->setNotes(sprintf(
+                    'Adjust previous discount. Split should be %0.2f salva / %0.2f so-sure marketing',
+                    $this->getStandardPotValue(),
+                    $this->getPromoPotValue()
+                ));
                 $this->getNextPolicy()->addPayment($adjustedDiscount);
                 $this->getNextPolicy()->getPremium()->setAnnualDiscount($this->getPotValue());
             }

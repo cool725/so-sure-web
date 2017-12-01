@@ -19,7 +19,16 @@ class PaymentRepository extends DocumentRepository
             ->field('success')->equals(true)
             ->field('date')->gte($startMonth)
             ->field('date')->lt($nextMonth)
-            ->field('type')->in(['judo', 'bacs', 'gocardless', 'sosure', 'chargeback', 'potReward'])
+            ->field('type')->in([
+                'judo',
+                'bacs',
+                'gocardless',
+                'sosure',
+                'chargeback',
+                'potReward',
+                'policyDiscount',
+                'debtCollection'
+            ])
             ->getQuery()
             ->execute();
     }
