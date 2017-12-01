@@ -63,7 +63,9 @@ class InvitationService
 
     /** @var MailerService */
     protected $mailer;
-    protected $router;
+
+    /** @var RouterService */
+    protected $routerService;
 
     /** @var ShortLink */
     protected $shortLink;
@@ -95,7 +97,7 @@ class InvitationService
      * @param DocumentManager  $dm
      * @param LoggerInterface  $logger
      * @param MailerService    $mailer
-     * @param                  $router
+     * @param RouterService    $routerService
      * @param ShortLinkService $shortLink
      * @param SmsService       $sms
      * @param RateLimitService $rateLimit
@@ -108,7 +110,7 @@ class InvitationService
         DocumentManager $dm,
         LoggerInterface $logger,
         MailerService $mailer,
-        $router,
+        RouterService $routerService,
         ShortLinkService $shortLink,
         SmsService $sms,
         RateLimitService $rateLimit,
@@ -120,7 +122,7 @@ class InvitationService
         $this->dm = $dm;
         $this->logger = $logger;
         $this->mailer = $mailer;
-        $this->router = $router->getRouter();
+        $this->routerService = $routerService;
         $this->shortLink = $shortLink;
         $this->sms = $sms;
         $this->rateLimit = $rateLimit;
@@ -152,9 +154,9 @@ class InvitationService
      */
     public function getLink(Invitation $invitation)
     {
-        return $this->router->generate('invitation', [
+        return $this->routerService->generateUrl('invitation', [
             'id' => $invitation->getId()
-        ], UrlGeneratorInterface::ABSOLUTE_URL);
+        ]);
     }
 
     /**

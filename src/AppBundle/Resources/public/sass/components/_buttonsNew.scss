@@ -87,6 +87,15 @@
 	@include btn(transparent, $white, $white);
 }
 
+// Active Buttons
+.btn.active {
+	box-shadow: none;
+}
+
+.btn-blue-hollow.active {
+	 @include btn($primary-blue, $white, $white);
+}
+
 // Others
 
 .btn-arrow-right {

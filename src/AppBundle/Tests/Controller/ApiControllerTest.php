@@ -356,7 +356,7 @@ class ApiControllerTest extends BaseControllerTest
     }
 
     // quote
-    
+
     /**
      *
      */
@@ -373,6 +373,7 @@ class ApiControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', '/api/v1/quote?device=A0001&make[$ne]=1');
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
     }
+
 
     public function testQuoteA0001()
     {

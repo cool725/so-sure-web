@@ -10,7 +10,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class SlackCommand extends ContainerAwareCommand
 {
@@ -89,7 +88,7 @@ class SlackCommand extends ContainerAwareCommand
 
     private function cancelledAndPaymentOwed($channel, $skipSlack)
     {
-        $router = $this->getContainer()->get('router');
+        $router = $this->getContainer()->get('app.router');
         $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
         $repo = $dm->getRepository(PhonePolicy::class);
         $policies = $repo->findAll();
@@ -107,7 +106,7 @@ class SlackCommand extends ContainerAwareCommand
             // @codingStandardsIgnoreStart
             $text = sprintf(
                 "*Policy <%s|%s> has been cancelled w/success claim. User must re-purchase policy or pay outstanding amount.*",
-                $router->generate('admin_policy', ['id' => $policy->getId()], UrlGeneratorInterface::ABSOLUTE_URL),
+                $router->generateUrl('admin_policy', ['id' => $policy->getId()]),
                 $policy->getPolicyNumber(),
                 $diff->days
             );
@@ -154,7 +153,7 @@ class SlackCommand extends ContainerAwareCommand
 
     private function unpaid($channel, $skipSlack)
     {
-        $router = $this->getContainer()->get('router');
+        $router = $this->getContainer()->get('app.router');
         $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
         $repo = $dm->getRepository(PhonePolicy::class);
         $policies = $repo->getUnpaidPolicies();
@@ -169,7 +168,7 @@ class SlackCommand extends ContainerAwareCommand
             // @codingStandardsIgnoreStart
             $text = sprintf(
                 "*Policy <%s|%s> is scheduled to be cancelled in %d days*",
-                $router->generate('admin_policy', ['id' => $policy->getId()], UrlGeneratorInterface::ABSOLUTE_URL),
+                $router->generateUrl('admin_policy', ['id' => $policy->getId()]),
                 $policy->getPolicyNumber(),
                 $diff->days
             );

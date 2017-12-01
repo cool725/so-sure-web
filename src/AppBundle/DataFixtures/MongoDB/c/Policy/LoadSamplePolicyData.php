@@ -479,11 +479,10 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $scode->setType(SCode::TYPE_STANDARD);
             $policy->addSCode($scode);
         }
-        $router = $this->container->get('router');
-        $shareUrl = $router->generate(
+        $router = $this->container->get('app.router');
+        $shareUrl = $router->generateUrl(
             'scode',
-            ['code' => $policy->getStandardSCode()->getCode()],
-            UrlGeneratorInterface::ABSOLUTE_URL
+            ['code' => $policy->getStandardSCode()->getCode()]
         );
         $policy->getStandardSCode()->setShareLink($shareUrl);
 

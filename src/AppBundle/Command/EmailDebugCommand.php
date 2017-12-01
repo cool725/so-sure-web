@@ -15,7 +15,6 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Cashback;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Classes\SoSure;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class EmailDebugCommand extends BaseCommand
 {
@@ -131,10 +130,9 @@ class EmailDebugCommand extends BaseCommand
             $repo = $dm->getRepository(Cashback::class);
             $data = [
                 'cashback' => $repo->findOneBy([]),
-                'withdraw_url' => $this->getContainer()->get('router')->generate(
+                'withdraw_url' => $this->getContainer()->get('app.router')->generateUrl(
                     'homepage',
-                    [],
-                    UrlGeneratorInterface::ABSOLUTE_URL
+                    []
                 ),
             ];
         } elseif (in_array($template, $templates['potReward'])) {

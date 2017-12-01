@@ -1255,7 +1255,7 @@ class ApiAuthController extends BaseController
             $shortLink = $this->get('app.branch')->generateSCode($scode->getCode());
             // branch is preferred, but can fallback to old website version if branch is down
             if (!$shortLink) {
-                $link = $this->generateUrl('scode', ['code' => $scode->getCode()], UrlGeneratorInterface::ABSOLUTE_URL);
+                $link = $this->get('app.router')->generateUrl('scode', ['code' => $scode->getCode()]);
                 $shortLink = $this->get('app.shortlink')->addShortLink($link);
             }
             $scode->setShareLink($shortLink);
@@ -1894,8 +1894,8 @@ class ApiAuthController extends BaseController
             $device = $this->getRequestString($request, 'device');
             $memory = (float) $this->getRequestString($request, 'memory');
             $rooted = $this->getRequestBool($request, 'rooted');
-
-            $quoteData = $this->getQuotes($make, $device, $memory, $rooted);
+            $quoteService = $this->get('app.quote');
+            $quoteData = $quoteService->getQuotes($make, $device, $memory, $rooted);
             $phones = $quoteData['phones'];
             $deviceFound = $quoteData['deviceFound'];
             if (!$phones || !$deviceFound) {
