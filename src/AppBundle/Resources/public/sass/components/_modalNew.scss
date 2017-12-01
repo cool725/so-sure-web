@@ -21,14 +21,22 @@
         }
 
         .close {
+            width: 45px; height: 45px;
+            position: absolute;
+            top: 10px; right: 10px;
+            color: $white;
+            background-color: $primary-blue;
+            text-shadow: none;
             opacity: 1;
-            font-family: $avenir-heavy;
-            font-weight: bold;
-            font-size: 30px;
-            color: $light-blue;
+            @include border-radius(50%);
 
             &:hover, &:focus {
-                color: $primary-blue;
+                background-color: $dark-blue;
+                box-shadow: none;
+            }
+
+            @include breakpoint(laptop) {
+                top: -15px; right: -15px;
             }
         }
     }
@@ -310,3 +318,50 @@
     position: fixed; // Needed because the carousel overrides the position property
 }
 
+// Find your phone
+.modal-phone {
+
+    .modal-body {
+        @include breakpoint(tablet) {
+            padding-bottom: 0;
+        }
+    }
+
+    &--link-list {
+        height: 200px;
+        margin: 0;
+        overflow: hidden;
+
+        img {
+            height: 300px;
+        }
+
+        li {
+            position: relative;
+            padding-top: 15x;
+
+            &:first-of-type,
+            &:last-of-type, {
+                top: 25px;
+            }
+
+            h5 {
+                font-weight: bold;
+                color: $primary-blue;
+
+                &:hover, &:focus {
+                    text-decoration: none;
+                }
+            }
+
+            &:hover {
+                top: -10px;
+
+                &:first-of-type,
+                &:last-of-type, {
+                    top: 15px;
+                }
+            }
+        }
+    }
+}
