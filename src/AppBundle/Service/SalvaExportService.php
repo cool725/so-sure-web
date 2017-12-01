@@ -8,11 +8,13 @@ use DOMXPath;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Policy;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Classes\Salva;
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\Cashback;
 use AppBundle\Document\User;
 use AppBundle\Document\Feature;
 use AppBundle\Document\File\SalvaPolicyFile;
@@ -328,6 +330,43 @@ class SalvaExportService
         return $lines;
     }
 
+    public function exportRenewals($s3, \DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+            $date->setTimezone(new \DateTimeZone(Salva::SALVA_TIMEZONE));
+        }
+
+        $lines = [];
+        $repo = $this->dm->getRepository(PhonePolicy::class);
+        $lines[] =  sprintf("%s", $this->formatLine($this->transformRenewal(null)));
+        foreach ($repo->getAllExpiredPoliciesForExport($date, $this->environment) as $policy) {
+            // For prod, skip invalid policies
+            if ($this->environment == 'prod' && !$policy->isValidPolicy()) {
+                continue;
+            }
+            // We want policies that had a pot discount, so skip those with a 0 pot value
+            if (!$this->greaterThanZero($policy->getPotValue())) {
+                continue;
+            }
+            $data = $this->transformRenewal($policy);
+            $lines[] = sprintf("%s", $this->formatLine($data));
+        }
+
+        if ($s3) {
+            $filename = sprintf(
+                'renewals-export-%d-%02d-%02d-%s.csv',
+                $date->format('Y'),
+                $date->format('m'),
+                $date->format('d'),
+                $date->format('U')
+            );
+            $this->uploadS3(implode("\n", $lines), $filename, 'renewals', $date->format('Y'));
+        }
+
+        return $lines;
+    }
+
     public function uploadS3($data, $filename, $type, $year)
     {
         $tmpFile = sprintf('%s/%s', sys_get_temp_dir(), $filename);
@@ -424,6 +463,47 @@ class SalvaExportService
                 'ReplacementMake',
                 'ReplacementModel',
                 'ReplacementImei',
+            ];
+        }
+
+        return $data;
+    }
+
+    public function transformRenewal(SalvaPhonePolicy $policy = null)
+    {
+        if ($policy) {
+            $data = [
+                $policy->getSalvaPolicyNumber(),
+                $this->toTwoDp($policy->getPotValue()),
+                $this->toTwoDp($policy->getPotValue() - $policy->getPromoPotValue()),
+                $this->adjustDate($policy->getStaticEnd(), false),
+                $policy->getCashback() ?
+                    sprintf('cashback - %s', $policy->getCashback()->getDisplayableStatus()) :
+                    'discount',
+                ($policy->getCashback() && $policy->getCashback()->getStatus() == Cashback::STATUS_PAID) ?
+                    $this->adjustDate($policy->getCashback()->getDate(), false) :
+                    '',
+                $policy->isRenewed() ? $policy->getNextPolicy()->getSalvaPolicyNumber() : '',
+                $policy->isRenewed() ? $policy->getNextPolicy()->getPremium()->getMonthlyPremiumPrice() : '',
+                $policy->isRenewed() ? $policy->getNextPolicy()->getPremium()->getAnnualDiscount() : '',
+                $policy->isRenewed() ? $policy->getNextPolicy()->getPremium()->getMonthlyDiscount() : '',
+                $policy->isRenewed() ?
+                    $policy->getNextPolicy()->getPremium()->getAdjustedStandardMonthlyPremiumPrice() :
+                    '',
+            ];
+        } else {
+            $data = [
+                'InitialPolicyNumber',
+                'RewardPot',
+                'RewardPotSalva',
+                'RewardPotIncurredDate',
+                'RewardPotType',
+                'CashbackPaidDate',
+                'RenewalPolicyNumber',
+                'RenewalPolicyMonthlyPremiumExDiscount',
+                'RenewalPolicyDiscount',
+                'RenewalPolicyDiscountPerMonth',
+                'RenewalPolicyMonthlyPremiumIncDiscount',
             ];
         }
 
