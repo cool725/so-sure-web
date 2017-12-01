@@ -32,19 +32,12 @@ class SalvaExportPaymentCommand extends ContainerAwareCommand
                 InputOption::VALUE_NONE,
                 'Upload to s3'
             )
-            ->addOption(
-                'broker-fee',
-                null,
-                InputOption::VALUE_NONE,
-                'Include broker fee'
-            )
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $s3 = true === $input->getOption('s3');
-        $includeBrokerFee = true === $input->getOption('broker-fee');
         $date = $input->getOption('date');
         if ($date) {
             $date = new \DateTime($input->getOption('date'));
@@ -53,7 +46,7 @@ class SalvaExportPaymentCommand extends ContainerAwareCommand
             $output->writeln(sprintf('Using last month %s', $date->format('Y-m')));
         }
         $salva = $this->getContainer()->get('app.salva');
-        $data = $salva->exportPayments($s3, $includeBrokerFee, $date);
+        $data = $salva->exportPayments($s3, $date);
         $output->write(implode(PHP_EOL, $data));
         $output->writeln('');
     }

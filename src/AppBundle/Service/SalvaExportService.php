@@ -251,7 +251,7 @@ class SalvaExportService
         return $lines;
     }
 
-    public function exportPayments($s3, $includeBrokerFee, \DateTime $date = null)
+    public function exportPayments($s3, \DateTime $date = null)
     {
         if (!$date) {
             $date = new \DateTime();
@@ -262,14 +262,14 @@ class SalvaExportService
         $total = 0;
         $numPayments = 0;
         $repo = $this->dm->getRepository(Payment::class);
-        $lines[] = sprintf("%s", $this->formatLine($this->transformPayment(null, $includeBrokerFee)));
+        $lines[] = sprintf("%s", $this->formatLine($this->transformPayment(null)));
         $payments = $repo->getAllPaymentsForExport($date);
         foreach ($payments as $payment) {
             // For prod, skip invalid policies
             if ($this->environment == 'prod' && !$payment->getPolicy()->isValidPolicy()) {
                 continue;
             }
-            $data = $this->transformPayment($payment, $includeBrokerFee);
+            $data = $this->transformPayment($payment);
             $total += $data[2];
             $numPayments++;
             $lines[] = sprintf("%s", $this->formatLine($data));
@@ -384,7 +384,7 @@ class SalvaExportService
         return $s3Key;
     }
 
-    public function transformPayment(Payment $payment = null, $includeBrokerFee = true)
+    public function transformPayment(Payment $payment = null)
     {
         if ($payment) {
             if (!$payment->isSuccess()) {
@@ -396,20 +396,16 @@ class SalvaExportService
                 $this->adjustDate($payment->getDate()),
                 $this->toTwoDp($payment->getAmount()),
                 $payment->getNotes() ? $payment->getNotes() : '',
+                $this->toTwoDp($payment->getTotalCommission()),
             ];
-            if ($includeBrokerFee) {
-                $data[] = $this->toTwoDp($payment->getTotalCommission());
-            }
         } else {
             $data = [
                 'PolicyNumber',
                 'PaymentDate',
                 'PaymentAmount',
                 'Notes',
+                'BrokerFee',
             ];
-            if ($includeBrokerFee) {
-                $data[] = 'BrokerFee';
-            }
         }
 
         return $data;
@@ -475,7 +471,7 @@ class SalvaExportService
             $data = [
                 $policy->getSalvaPolicyNumber(),
                 $this->toTwoDp($policy->getPotValue()),
-                $this->toTwoDp($policy->getPotValue() - $policy->getPromoPotValue()),
+                $this->toTwoDp($policy->getStandardPotValue()),
                 $this->adjustDate($policy->getStaticEnd(), false),
                 $policy->getCashback() ?
                     sprintf('cashback - %s', $policy->getCashback()->getDisplayableStatus()) :

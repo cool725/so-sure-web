@@ -660,7 +660,7 @@ class SalvaExportServiceTest extends WebTestCase
     private function exportPayments($policyNumber, $date = null)
     {
         $lines = [];
-        foreach (static::$salva->exportPayments(null, true, $date) as $line) {
+        foreach (static::$salva->exportPayments(null, $date) as $line) {
             $data = explode(",", $line);
             $search = sprintf('"%s', $policyNumber);
             if (stripos($data[0], $search) === 0) {
