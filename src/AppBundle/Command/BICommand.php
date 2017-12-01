@@ -151,6 +151,7 @@ class BICommand extends ContainerAwareCommand
             '"Latest Campaign Name"',
             '"Latest Campaign Source"',
             '"Requested Cancellation Reason (Phone Damaged Prior To Policy)"',
+            '"Policy Renewed"',
         ]);
         foreach ($policies as $policy) {
             $user = $policy->getUser();
@@ -178,6 +179,7 @@ class BICommand extends ContainerAwareCommand
                     '"%s"',
                     $policy->getRequestedCancellationReason() ? $policy->getRequestedCancellationReason() : null
                 ),
+                sprintf('"%s"', $policy->isRenewed() ? 'yes' : 'no'),
             ]);
         }
         $this->uploadS3(implode(PHP_EOL, $lines), 'policies.csv');
