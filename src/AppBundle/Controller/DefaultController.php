@@ -141,7 +141,7 @@ class DefaultController extends BaseController
             'memory' => (int) 32
         ]);
 
-        $exp = $this->sixpack($request, SixpackService::EXPERIMENT_HOMEPAGE_V1_V2, ['v2', 'v1']);
+        $exp = $this->sixpack($request, SixpackService::EXPERIMENT_HOMEPAGE_V1_V2, ['v2old', 'v2', 'v1']);
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         $data = array(
@@ -158,6 +158,8 @@ class DefaultController extends BaseController
 
         if ($exp == 'v2') {
             return $this->render('AppBundle:Default:indexV2.html.twig', $data);
+        } elseif ($exp == 'v2old') {
+            return $this->render('AppBundle:Default:indexV2old.html.twig', $data);
         } else {
             return $this->render('AppBundle:Default:index.html.twig', $data);
         }
