@@ -1826,7 +1826,7 @@ class AdminEmployeeController extends BaseController
         return [
             'policies' => $pager->getCurrentPageResults(),
             'pager' => $pager,
-            'status' => $status,
+            'status' => $data,
             'picsure_search_form' => $picSureSearchForm->createView(),
         ];
     }
