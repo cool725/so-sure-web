@@ -35,7 +35,6 @@ use AppBundle\Document\Form\PurchaseStepPersonalAddress;
 use AppBundle\Document\Form\PurchaseStepPersonal;
 use AppBundle\Document\Form\PurchaseStepAddress;
 use AppBundle\Document\Form\PurchaseStepPhone;
-use AppBundle\Document\Form\PurchaseStepPhoneNoPhone;
 
 use AppBundle\Form\Type\ImeiUploadFileType;
 use AppBundle\Form\Type\BasicUserType;
@@ -44,7 +43,6 @@ use AppBundle\Form\Type\PurchaseStepPersonalAddressType;
 use AppBundle\Form\Type\PurchaseStepPersonalType;
 use AppBundle\Form\Type\PurchaseStepAddressType;
 use AppBundle\Form\Type\PurchaseStepPhoneType;
-use AppBundle\Form\Type\PurchaseStepPhoneNoPhoneType;
 use AppBundle\Form\Type\UserCancelType;
 
 use AppBundle\Service\MixpanelService;
@@ -243,42 +241,42 @@ class PurchaseController extends BaseController
         return $this->render('AppBundle:Purchase:purchaseStepPersonalAddress.html.twig', $data);
     }
 
-    /**
-     * @Route("/step-missing-phone", name="purchase_step_phone_no_phone")
-     * @Template
-    */
-    public function purchaseStepPhoneNoPhoneAction(Request $request)
-    {
-        $dm = $this->getManager();
-        $phoneRepo = $dm->getRepository(Phone::class);
+    // /**
+    //  * @Route("/step-missing-phone", name="purchase_step_phone_no_phone")
+    //  * @Template
+    // */
+    // public function purchaseStepPhoneNoPhoneAction(Request $request)
+    // {
+    //     $dm = $this->getManager();
+    //     $phoneRepo = $dm->getRepository(Phone::class);
 
-        $user = $this->getUser();
-        if (!$user) {
-            return $this->redirectToRoute('purchase');
-        }
-        $phone = $this->getSessionQuotePhone($request);
-        if ($phone) {
-            return $this->redirectToRoute('purchase_step_policy');
-        }
-        $purchaseNoPhone = new PurchaseStepPhoneNoPhone();
-        $purchaseNoPhone->setUser($user);
-        $purchaseNoPhoneForm = $this->get('form.factory')
-            ->createNamedBuilder('purchase_no_phone_form', PurchaseStepPhoneNoPhoneType::class, $purchaseNoPhone)
-            ->getForm();
+    //     $user = $this->getUser();
+    //     if (!$user) {
+    //         return $this->redirectToRoute('purchase');
+    //     }
+    //     $phone = $this->getSessionQuotePhone($request);
+    //     if ($phone) {
+    //         return $this->redirectToRoute('purchase_step_policy');
+    //     }
+    //     $purchaseNoPhone = new PurchaseStepPhoneNoPhone();
+    //     $purchaseNoPhone->setUser($user);
+    //     $purchaseNoPhoneForm = $this->get('form.factory')
+    //         ->createNamedBuilder('purchase_no_phone_form', PurchaseStepPhoneNoPhoneType::class, $purchaseNoPhone)
+    //         ->getForm();
 
-        $data = array(
-            'phone' => $phone,
-            'purchase_no_phone_form' => $purchaseNoPhoneForm->createView(),
-            'is_postback' => 'POST' === $request->getMethod(),
-            'step' => 2,
-            'phones' => $phone ? $phoneRepo->findBy(
-                ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
-                ['memory' => 'asc']
-            ) : null,
-        );
+    //     $data = array(
+    //         'phone' => $phone,
+    //         'purchase_no_phone_form' => $purchaseNoPhoneForm->createView(),
+    //         'is_postback' => 'POST' === $request->getMethod(),
+    //         'step' => 2,
+    //         'phones' => $phone ? $phoneRepo->findBy(
+    //             ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
+    //             ['memory' => 'asc']
+    //         ) : null,
+    //     );
 
-        return $this->render('AppBundle:Purchase:purchaseStepPhoneNoPhone.html.twig', $data);
-    }
+    //     return $this->render('AppBundle:Purchase:purchaseStepPhoneNoPhone.html.twig', $data);
+    // }
 
     /**
      * Note that any changes to actual path routes need to be reflected in the Google Analytics Goals
