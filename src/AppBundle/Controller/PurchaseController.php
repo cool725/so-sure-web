@@ -241,43 +241,6 @@ class PurchaseController extends BaseController
         return $this->render('AppBundle:Purchase:purchaseStepPersonalAddress.html.twig', $data);
     }
 
-    // /**
-    //  * @Route("/step-missing-phone", name="purchase_step_phone_no_phone")
-    //  * @Template
-    // */
-    // public function purchaseStepPhoneNoPhoneAction(Request $request)
-    // {
-    //     $dm = $this->getManager();
-    //     $phoneRepo = $dm->getRepository(Phone::class);
-
-    //     $user = $this->getUser();
-    //     if (!$user) {
-    //         return $this->redirectToRoute('purchase');
-    //     }
-    //     $phone = $this->getSessionQuotePhone($request);
-    //     if ($phone) {
-    //         return $this->redirectToRoute('purchase_step_policy');
-    //     }
-    //     $purchaseNoPhone = new PurchaseStepPhoneNoPhone();
-    //     $purchaseNoPhone->setUser($user);
-    //     $purchaseNoPhoneForm = $this->get('form.factory')
-    //         ->createNamedBuilder('purchase_no_phone_form', PurchaseStepPhoneNoPhoneType::class, $purchaseNoPhone)
-    //         ->getForm();
-
-    //     $data = array(
-    //         'phone' => $phone,
-    //         'purchase_no_phone_form' => $purchaseNoPhoneForm->createView(),
-    //         'is_postback' => 'POST' === $request->getMethod(),
-    //         'step' => 2,
-    //         'phones' => $phone ? $phoneRepo->findBy(
-    //             ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
-    //             ['memory' => 'asc']
-    //         ) : null,
-    //     );
-
-    //     return $this->render('AppBundle:Purchase:purchaseStepPhoneNoPhone.html.twig', $data);
-    // }
-
     /**
      * Note that any changes to actual path routes need to be reflected in the Google Analytics Goals
      *   as these will impact Adwords
