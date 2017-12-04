@@ -38,8 +38,9 @@ $(function(){
         }
     }
 
-    if ($('#search-phone-form-homepage-1').length) {
+    if ($('#select-phone-data-1').data('sticky-search') == true) {
         $(window).scroll(stickySearch);
     }
+
 
 });
