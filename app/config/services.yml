@@ -808,6 +808,12 @@ services:
         tags:
             - { name: form.type }
 
+    app.form.type.picsuresearch:
+        class: AppBundle\Form\Type\PicSureSearchType
+        arguments: ["@request_stack"]
+        tags:
+            - { name: form.type }
+
     app.form.type.chargebacks:
         class: AppBundle\Form\Type\ChargebacksType
         arguments: ["@request_stack", "%kernel.environment%"]

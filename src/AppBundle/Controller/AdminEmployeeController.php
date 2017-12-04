@@ -70,6 +70,7 @@ use AppBundle\Form\Type\PartialPolicyType;
 use AppBundle\Form\Type\UserSearchType;
 use AppBundle\Form\Type\PhoneSearchType;
 use AppBundle\Form\Type\JudoFileType;
+use AppBundle\Form\Type\PicSureSearchType;
 use AppBundle\Form\Type\FacebookType;
 use AppBundle\Form\Type\BarclaysFileType;
 use AppBundle\Form\Type\LloydsFileType;
@@ -1735,6 +1736,11 @@ class AdminEmployeeController extends BaseController
         if ($id) {
             $policy = $repo->find($id);
         }
+        $picSureSearchForm = $this->get('form.factory')
+            ->createNamedBuilder('search_form', PicSureSearchType::class, null, ['method' => 'GET'])
+            ->getForm();
+        $picSureSearchForm->handleRequest($request);
+
         if ($request->get('_route') == "admin_picsure_approve") {
             $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
             $dm->flush();
@@ -1810,9 +1816,18 @@ class AdminEmployeeController extends BaseController
             return new RedirectResponse($this->generateUrl('admin_picsure'));
         }
 
-        $policies = $repo->findBy(['picSureStatus' => PhonePolicy::PICSURE_STATUS_MANUAL]);
+        $status = $request->get('status');
+        $data = $picSureSearchForm->get('status')->getData();
+        $qb = $repo->createQueryBuilder()
+            ->field('picSureStatus')->equals($data)
+            ->sort('picSureApprovedDate', 'desc')
+            ->sort('created', 'desc');
+        $pager = $this->pager($request, $qb);
         return [
-            'policies' => $policies,
+            'policies' => $pager->getCurrentPageResults(),
+            'pager' => $pager,
+            'status' => $status,
+            'picsure_search_form' => $picSureSearchForm->createView(),
         ];
     }
 

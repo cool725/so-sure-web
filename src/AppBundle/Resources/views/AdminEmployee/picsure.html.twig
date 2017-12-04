@@ -4,11 +4,24 @@
 <div class="container" style="margin-bottom: 50px">
 <div class="row">
     <div class="col-md-8">
-        <h2>pic-sure Manual Processing</h2>
+        <h2>pic-sure - {{ status }}</h2>
     </div>
 </div>
+    <div class="bg-info text-center" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
+        {{ form_start(picsure_search_form) }}
+        <div class="row">
+            <div class="col-md-8">
+                {{ form_widget(picsure_search_form.status) }}                
+            </div>
+            <div class="col-md-4">
+                {{ form_widget(picsure_search_form.search, {'attr':{'class':'btn btn-info'}}) }}
+            </div>
+        </div>
+        {{ form_end(picsure_search_form) }}
+    </div>
+
 {% if policies|length == 0 %}
-    <h4>Nothing in the manual approval queue</h4>
+    <h4>No policies</h4>
 {% endif %}
 {% for policy in policies %}
 <div class="row">
@@ -16,13 +29,16 @@
         <h4><a href="{{ path('admin_policy', {'id': policy.id}) }}">{{ policy.policyNumber }}</a></h4>
     </div>
     <div class="col-md-7">
+        {% if policy.picSureStatus == 'manual' %}
         <a class="btn btn-success"
                 href="{{ path('admin_picsure_approve', {'id': policy.id}) }}"><i class="fa fa-check"></i> Undamaged</a>
         <a class="btn btn-warning"
                 href="{{ path('admin_picsure_invalid', {'id': policy.id}) }}"><i class="fa fa-question"></i> Invalid Photo</a>
         <a class="btn btn-danger"
                 href="{{ path('admin_picsure_reject', {'id': policy.id}) }}"><i class="fa fa-minus"></i> Damaged</a>
-        
+        {% elseif policy.picSureStatus == 'approved' %}
+            Approved at: {{ policy.picSureApprovedDate | date}}
+        {% endif %}
     </div>
 </div>
 <div class="row" style="margin-top: 20px;">
@@ -30,8 +46,10 @@
     <div class="col-md-12 text-center">
             <a href="{{ s3DownloadLink(file.bucket, file.key) }}" target="_blank">
                 <i class="fa fa-external-link"></i> {{ file.key }}
+                {% if policy.picSureStatus == 'manual' %}
                 <br>
                 <img src="{{ path('admin_picsure_image', {'file': file.key }) }}" style="max-width: 100%">
+                {% endif %}
             </a>
     </div>
     {% endfor %}
@@ -39,4 +57,10 @@
 <hr style="border-bottom: 3px solid black">
 {% endfor %}
 </div>
+
+    {% if policies.count > 0 %}
+    <div class="pagerfanta text-center">
+        {{ pagerfanta(pager, 'twitter_bootstrap3') }}
+    </div>
+    {% endif %}
 {% endblock %}
