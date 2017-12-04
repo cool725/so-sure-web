@@ -26,6 +26,7 @@ class SixpackService
     const EXPERIMENT_CPC_MANUFACTURER_WITH_HOME = 'cpc-manufacturer-with-home';
     const EXPERIMENT_POSTCODE = 'postcode';
     const EXPERIMENT_HOMEPAGE_V1_V2 = 'homepage-v1-v2';
+    const EXPERIMENT_HOMEPAGE_V1_V2OLD_V2NEW = 'homepage-v1-v2old-v2new';
     const EXPERIMENT_APP_SHARE_METHOD = 'app-share-method';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
