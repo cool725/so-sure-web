@@ -422,7 +422,7 @@ class SalvaExportServiceTest extends WebTestCase
         $this->assertEquals(1, count($lines));
         $data = explode('","', trim($lines[0], '"'));
 
-        $this->assertEquals("foo'bar", $data[7], json_encode($data));
+        $this->assertEquals('foo\"bar', $data[7], json_encode($data));
     }
 
     public function testBasicExportCompanyPolicies()
