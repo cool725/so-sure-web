@@ -25,6 +25,7 @@ class DownloadController extends BaseController
         $url = $this->get('app.twig.branch')->apple($medium);
         $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_APP_DOWNLOAD, [
             'Store' => 'Apple',
+            'Location' => $medium,
         ]);
 
         return new RedirectResponse($url);
@@ -39,6 +40,7 @@ class DownloadController extends BaseController
         $url = $this->get('app.twig.branch')->google($medium);
         $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_APP_DOWNLOAD, [
             'Store' => 'Google',
+            'Location' => $medium,
         ]);
 
         return new RedirectResponse($url);
