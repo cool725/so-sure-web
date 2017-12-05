@@ -324,7 +324,13 @@ class OpsController extends BaseController
             ])) {
                 $logger->debug(sprintf('Content-Security-Policy called with ignore host: %s', $host));
 
-                return new Response('', 204);
+                return new JsonResponse(['details' => 'Ignore Host'], 204);
+            }
+
+            if (preg_match('/^[.0-9]+$/', $host)) {
+                $logger->debug(sprintf('Content-Security-Policy called with ignore host: %s', $host));
+
+                return new JsonResponse(['details' => 'Ignore Ip'], 204);
             }
 
             $scheme = strtolower(parse_url($violationReport['csp-report']['blocked-uri'], PHP_URL_SCHEME));
@@ -336,7 +342,7 @@ class OpsController extends BaseController
             ])) {
                 $logger->debug(sprintf('Content-Security-Policy called with ignore scheme: %s', $scheme));
 
-                return new Response('', 204);
+                return new JsonResponse(['details' => 'Ignore scheme'], 204);
             }
         }
 
@@ -347,7 +353,7 @@ class OpsController extends BaseController
             if ($scheme == "http" && $host == "wearesosure.com") {
                 $logger->debug(sprintf('Content-Security-Policy called with non-https host: %s', $host));
 
-                return new Response('', 204);
+                return new JsonResponse(['details' => 'http'], 204);
             }
         }
 
