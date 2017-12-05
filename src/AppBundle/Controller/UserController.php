@@ -1004,7 +1004,7 @@ class UserController extends BaseController
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_PYG_HOME);
         //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_SIMPLE_COMPLEX_SPLIT);
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_SIMPLE_SPLIT);
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_CPC_MANUFACTURER_WITH_HOME);
+        //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_CPC_MANUFACTURER_WITH_HOME);
         //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_V1_V2);
         $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_V1_V2OLD_V2NEW);
 
