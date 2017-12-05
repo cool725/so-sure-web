@@ -411,6 +411,20 @@ class SalvaExportServiceTest extends WebTestCase
         $this->validateStaticPolicyData($data, $updatedPolicy);
     }
 
+    public function testQuoteExportPolicies()
+    {
+        $policy = $this->createPolicy('testQuoteExportPolicies', new \DateTime('2016-01-01'), true, 'foo"bar');
+        static::$dm->flush();
+
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+
+        $lines = $this->exportPolicies($updatedPolicy->getPolicyNumber());
+        $this->assertEquals(1, count($lines));
+        $data = explode('","', trim($lines[0], '"'));
+
+        $this->assertEquals("foo'bar", $data[7], json_encode($data));
+    }
+
     public function testBasicExportCompanyPolicies()
     {
         $policy = $this->createPolicy('testBasicExportCompanyPolicies', new \DateTime('2016-01-01'), true, 'foo');
