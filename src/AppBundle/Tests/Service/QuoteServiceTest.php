@@ -18,6 +18,7 @@ class QuoteServiceTest extends WebTestCase
     protected static $dm;
     protected static $quoteService;
     protected static $rootDir;
+    protected static $redis;
 
     public static function setUpBeforeClass()
     {
@@ -28,6 +29,7 @@ class QuoteServiceTest extends WebTestCase
         //get the DI container
         self::$container = $kernel->getContainer();
         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$redis = self::$container->get('snc_redis.default');
 
         //now we can instantiate our service (if you want a fresh one for
         //each test method, do this in setUp() instead
@@ -84,7 +86,7 @@ class QuoteServiceTest extends WebTestCase
         $this->expect($mailer, 0, 'PlayDevice: One');
         self::$quoteService->setMailerMailer($mailer);
         self::$quoteService->getQuotes(null, 'A0001', 3000);
-
+        $this->assertTrue((self::$redis->get('UNKNOWN-DEVICE:A0001') == 1), 'Redis key found');
     }
 
     public function testQuoteServiceKnownDeviceKnownMemory()
