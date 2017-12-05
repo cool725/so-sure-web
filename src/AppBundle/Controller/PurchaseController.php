@@ -212,11 +212,7 @@ class PurchaseController extends BaseController
                     }
                     $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_RECEIVE_DETAILS, $data);
 
-                    if ($phone) {
-                        return $this->redirectToRoute('purchase_step_policy');
-                    } else {
-                        return $this->redirectToRoute('purchase_step_phone_no_phone');
-                    }
+                    return $this->redirectToRoute('purchase_step_policy');
                 }
             }
         }
