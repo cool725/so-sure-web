@@ -120,6 +120,7 @@
                         <th>Claims</th>
                         <th>Pot Value</th>
                         <th># Notes</th>
+                        <th>Debt collector</th>
                         {#
                         <th>Facebook</th>
                         <th>User Status</th>
@@ -157,6 +158,7 @@
                             </td>
                             <td>£{{ policy.potValue }}</td>
                             <td style="background-color: {{ policy.getLatestNoteTimestampColour }}">{{ policy.notes|length }}</td>
+                            <td>{% if policy.debtCollector %}{{ policy.debtCollector }}{% else %}-{% endif %}</td>
                             {#
                             <td>{% if policy.user.facebookId | length > 0 %}Yes{% else %}No{% endif %}</td>
                             <td>{% if policy.user.locked %}locked{% elseif policy.user.enabled %}enabled{% else %}disabled{%endif %}</td>
