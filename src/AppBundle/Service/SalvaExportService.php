@@ -201,7 +201,7 @@ class SalvaExportService
 
     protected function formatLine($data)
     {
-        return sprintf('"%s"', implode('","', $data));
+        return sprintf('"%s"', implode('","', $this->escapeQuotes($data)));
     }
 
     public function exportPolicies($s3, \DateTime $date = null)
@@ -1115,5 +1115,10 @@ class SalvaExportService
         }
 
         return $body;
+    }
+
+    private function escapeQuotes($string)
+    {
+        return str_replace('"', "'", $string);
     }
 }
