@@ -141,7 +141,12 @@ class DefaultController extends BaseController
             'memory' => (int) 32
         ]);
 
-        $exp = $this->sixpack($request, SixpackService::EXPERIMENT_HOMEPAGE_V1_V2OLD_V2NEW, ['v1', 'v2-old', 'v2-new']);
+        $exp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_HOMEPAGE_V1_V2OLD_V2NEW,
+            ['v1', 'v2-old', 'v2-new'],
+            true
+        );
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         $data = array(

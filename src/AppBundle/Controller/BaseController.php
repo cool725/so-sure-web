@@ -881,9 +881,9 @@ abstract class BaseController extends Controller
         return $this->getParameter('kernel.environment') == 'prod';
     }
 
-    protected function sixpack($request, $name, $options)
+    protected function sixpack($request, $name, $options, $logMixpanel = false)
     {
-        $exp = $this->get('app.sixpack')->participate($name, $options);
+        $exp = $this->get('app.sixpack')->participate($name, $options, $logMixpanel);
         if ($request->get('force')) {
             $exp = $request->get('force');
         }
