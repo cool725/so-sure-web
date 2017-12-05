@@ -16,6 +16,8 @@ use AppBundle\Document\JudoPaymentMethod;
 
 /**
  * @group functional-net
+ *
+ * AppBundle\\Tests\\Controller\\PurchaseControllerTest
  */
 class PurchaseControllerTest extends BaseControllerTest
 {
