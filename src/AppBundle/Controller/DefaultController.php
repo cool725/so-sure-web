@@ -586,14 +586,16 @@ class DefaultController extends BaseController
      */
     public function soSureVsCompetitor(Request $request)
     {
+        /*
         $exp = $this->get('app.sixpack')->participate(
             SixpackService::EXPERIMENT_PYG_HOME,
             ['pyg', 'home'],
             true
         );
-        if ($exp == 'home') {
-            return new RedirectResponse($this->generateUrl('homepage'));
-        }
+        */
+        //if ($exp == 'home') {
+        return new RedirectResponse($this->generateUrl('homepage'));
+        //}
 
         if ($request->get('_route') == "so_sure_vs_protect_your_bubble_phone_insurance" ||
             $request->get('_route') == "so_sure_vs_protect_your_bubble") {
