@@ -10,6 +10,9 @@ use Predis\Client;
 
 class QuoteService
 {
+    const DUPLICATE_EMAIL_CACHE_TIME = 3600;
+    const REDIS_UNKNOWN_EMAIL_KEY_FORMAT = 'UNKNOWN-DEVICE:%s';
+
 
     /** @var MailerService */
     protected $mailer;
@@ -103,11 +106,11 @@ class QuoteService
         ])) {
             return false;
         }
-        $key = sprintf('UNKNOWN-DEVICE:%s', $device);
+        $key = sprintf(self::REDIS_UNKNOWN_EMAIL_KEY_FORMAT, $device);
         if ($this->redis->get($key)) {
             return false;
         }
-        $this->redis->setex($key, '3600', 1);
+        $this->redis->setex($key, self::DUPLICATE_EMAIL_CACHE_TIME, 1);
         $playDeviceRepo = $this->dm->getRepository(PlayDevice::class);
         $playDevice = $playDeviceRepo->findOneBy(['device' => $device]);
         $marketingName = ($playDevice) ? $playDevice->getMarketingName() : 'unknown';
