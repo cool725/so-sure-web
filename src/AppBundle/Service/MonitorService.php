@@ -235,6 +235,15 @@ class MonitorService
         }
     }
 
+    public function checkPicSureStatusManual()
+    {
+        $repo = $this->dm->getRepository(PhonePolicy::class);
+        $manual = $repo->findOneBy(['picSureStatus' => PhonePolicy::PICSURE_STATUS_MANUAL]);
+        if ($manual) {
+            throw new \Exception('Policy for manual PicSure processing found');
+        }
+    }
+
     public function policyTerms()
     {
         $repo = $this->dm->getRepository(PolicyTerms::class);
