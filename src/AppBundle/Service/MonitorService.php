@@ -240,7 +240,7 @@ class MonitorService
         $repo = $this->dm->getRepository(PhonePolicy::class);
         $manual = $repo->findOneBy(['picSureStatus' => PhonePolicy::PICSURE_STATUS_MANUAL]);
         if ($manual) {
-            throw new \Exception('Policy for manual PicSure processing found');
+            throw new \Exception('There is a policy that is waiting for pic-sure approval');
         }
     }
 
