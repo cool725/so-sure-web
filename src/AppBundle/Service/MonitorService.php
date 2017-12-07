@@ -92,7 +92,7 @@ class MonitorService
             $replacementDate = $claim->getPolicy()->getImeiReplacementDate();
             if ($replacementDate &&
                 $now->getTimestamp() - $replacementDate->getTimestamp() > 3600) {
-                throw new \Exception(sprintf(
+                throw new MonitorException(sprintf(
                     'Claim %s Policy %s is missing replacement phone',
                     $claim->getNumber(),
                     $claim->getPolicy()->getPolicyNumber()
@@ -106,7 +106,7 @@ class MonitorService
         $repo = $this->dm->getRepository(Claim::class);
         $claims = $repo->findSettledUnprocessed();
         foreach ($claims as $claim) {
-            throw new \Exception(sprintf(
+            throw new MonitorException(sprintf(
                 'Claim %s is settled, but has not been processed (e.g. pot updated)',
                 $claim->getNumber()
             ));
@@ -119,13 +119,13 @@ class MonitorService
         $successFiles = $fileRepo->findBy(['success' => true], ['created' => 'desc'], 1);
         $successFile = count($successFiles) > 0 ? $successFiles[0] : null;
         if (!$successFile) {
-            throw new \Exception('Unable to find any successful imports');
+            throw new MonitorException('Unable to find any successful imports');
         }
 
         $now = $this->startOfDay(new \DateTime());
         $diff = $now->diff($successFile->getCreated());
         if ($diff->days >= 1) {
-            throw new \Exception(sprintf(
+            throw new MonitorException(sprintf(
                 'Last successful import on %s',
                 $successFile->getCreated()->format(\DateTime::ATOM)
             ));
@@ -166,7 +166,7 @@ class MonitorService
         }
 
         if ($errors) {
-            throw new \Exception(json_encode($errors));
+            throw new MonitorException(json_encode($errors));
         }
     }
 
@@ -176,7 +176,7 @@ class MonitorService
         $maxUsers = 48000;
         $total = $this->mixpanel->getUserCount();
         if ($total > $maxUsers) {
-            throw new \Exception(sprintf('User count %d too high (warning %d)', $total, $maxUsers));
+            throw new MonitorException(sprintf('User count %d too high (warning %d)', $total, $maxUsers));
         }
     }
 
@@ -206,7 +206,7 @@ class MonitorService
 
             if ($lastestClaimForPolicy = $policy->getLatestClaim(true)) {
                 if ($policy->getImei() != $lastestClaimForPolicy->getReplacementImei()) {
-                    throw new \Exception(sprintf(
+                    throw new MonitorException(sprintf(
                         'Policy %s has a claim w/replacement imei that does not match current imei',
                         $policy->getId()
                     ));
@@ -220,14 +220,14 @@ class MonitorService
         $results = $this->judopay->getTransactions(20, false);
         if (isset($results['additional-payments']) && count($results['additional-payments']) > 0) {
             // @codingStandardsIgnoreStart
-            throw new \Exception(sprintf(
+            throw new MonitorException(sprintf(
                 'Judopay is recording more than 1 payment against a policy that indicates a scheduled payment issue. %s',
                 json_encode($results['additional-payments'])
             ));
             // @codingStandardsIgnoreEnd
         } elseif (isset($results['missing']) && count($results['missing']) > 0) {
             // @codingStandardsIgnoreStart
-            throw new \Exception(sprintf(
+            throw new MonitorException(sprintf(
                 'Judopay is missing database payment records that indices a mobile payment was received, but not recorded. %s',
                 json_encode($results['missing'])
             ));
@@ -240,7 +240,7 @@ class MonitorService
         $repo = $this->dm->getRepository(PhonePolicy::class);
         $manual = $repo->findOneBy(['picSureStatus' => PhonePolicy::PICSURE_STATUS_MANUAL]);
         if ($manual) {
-            throw new \Exception('Policy for manual PicSure processing found');
+            throw new MonitorException('There is a policy that is waiting for pic-sure approval');
         }
     }
 
@@ -251,7 +251,7 @@ class MonitorService
         $termVersions = [];
         foreach ($terms as $term) {
             if (!in_array($term->getVersion(), PolicyTerms::$allVersions)) {
-                throw new \Exception(sprintf(
+                throw new MonitorException(sprintf(
                     'Policy Terms %s is in db but not present in code',
                     $term->getVersion()
                 ));
@@ -260,7 +260,7 @@ class MonitorService
         }
         foreach (PolicyTerms::$allVersions as $version) {
             if (!in_array($version, $termVersions)) {
-                throw new \Exception(sprintf(
+                throw new MonitorException(sprintf(
                     'Policy Terms %s is in code but not present in db',
                     $version
                 ));
