@@ -34,6 +34,11 @@ class DebtCollectionPayment extends Payment
         return false;
     }
 
+    public function isFee()
+    {
+        return true;
+    }
+
     public function getNotes()
     {
         if (parent::getNotes()) {

@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Service;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\Payment\PotRewardPayment;
+use AppBundle\Document\Payment\DebtCollectionPayment;
 use AppBundle\Document\Policy;
 
 /**
@@ -71,5 +72,39 @@ class ReportingServiceTest extends WebTestCase
         $this->assertEquals($new['all']['total'], $existing['all']['total']);
         // potreward should affect potReward
         $this->assertEquals($new['potReward']['total'], $existing['potReward']['total'] + 1);
+    }
+
+    public function testGetAllPaymentTotalsAdjusted()
+    {
+        $now = new \DateTime();
+        $existing = self::$reporting->getAllPaymentTotals(false, $now);
+
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testGetAllPaymentTotalsAdjusted', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-10-28'),
+            true,
+            true
+        );
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $debt = new DebtCollectionPayment();
+        $debt->setDate($now);
+        $debt->setAmount(-20);
+        $policy->addPayment($debt);
+        self::$dm->persist($debt);
+        self::$dm->flush();
+
+        $new = self::$reporting->getAllPaymentTotals(false, $now);
+
+        $this->assertEquals($new['all']['total'], $existing['all']['total'] - 20);
+        $this->assertEquals($new['all']['fees'], $existing['all']['fees'] - 20);
+        $this->assertEquals($new['all']['numFees'], $existing['all']['numFees'] + 1);
     }
 }
