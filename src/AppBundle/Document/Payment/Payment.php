@@ -323,6 +323,12 @@ abstract class Payment
 
     abstract public function isSuccess();
     abstract public function isUserPayment();
+
+    public function isFee()
+    {
+        return false;
+    }
+
     public function isStandardPayment()
     {
         return true;
@@ -461,6 +467,8 @@ abstract class Payment
             'numRefunded' => 0,
             'received' => 0,
             'refunded' => 0,
+            'numFees' => 0,
+            'fees' => 0,
             'totalCommission' => 0,
             'totalCommissionPercent' => 0,
             'coverholderCommission' => 0,
@@ -481,7 +489,10 @@ abstract class Payment
             }
 
             $data['total'] += $payment->getAmount();
-            if ($payment->getAmount() >= 0) {
+            if ($payment->isFee()) {
+                $data['fees'] += $payment->getAmount();
+                $data['numFees']++;
+            } elseif ($payment->getAmount() >= 0) {
                 $data['received'] += $payment->getAmount();
                 $data['numReceived']++;
             } else {
