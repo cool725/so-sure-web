@@ -6,6 +6,5 @@ lozad('.lozad', {
         el.onload = function() {
             el.classList.add('fade-img')
         }
-    },
-    threshold: 0.1
+    }
 }).observe()
