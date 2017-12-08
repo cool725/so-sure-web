@@ -40,4 +40,9 @@ class CurrencyTraitTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('0.1', $this->getCurrentIptRate(new \DateTime('2017-05-31 23:59')));
         $this->assertEquals('0.12', $this->getCurrentIptRate(new \DateTime('2017-06-01')));
     }
+
+    public function testStaticToTwoDp()
+    {
+        $this->assertEquals('1298.02', $this->staticToTwoDp(1298.02));
+    }
 }

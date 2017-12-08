@@ -48,17 +48,17 @@ trait CurrencyTrait
 
     public function toTwoDp($float)
     {
-        return number_format(round($float, 2), 2, ".", ",");
+        return number_format(round($float, 2), 2, ".", "");
     }
 
     public function toFourDp($float)
     {
-        return number_format(round($float, 4), 4, ".", ",");
+        return number_format(round($float, 4), 4, ".", "");
     }
 
     public static function staticToTwoDp($float)
     {
-        return number_format(round($float, 2), 2, ".", ",");
+        return number_format(round($float, 2), 2, ".", "");
     }
 
     public function areEqualToTwoDp($float1, $float2)
