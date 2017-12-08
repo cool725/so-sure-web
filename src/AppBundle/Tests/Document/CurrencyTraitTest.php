@@ -43,6 +43,6 @@ class CurrencyTraitTest extends \PHPUnit_Framework_TestCase
 
     public function testStaticToTwoDp()
     {
-        $this->assertEquals('1,298.02', $this->staticToTwoDp(1298.02));
+        $this->assertEquals('1298.02', $this->staticToTwoDp(1298.02));
     }
 }
