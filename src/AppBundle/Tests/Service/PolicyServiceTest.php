@@ -1308,11 +1308,11 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(new \DateTimeZone(Salva::SALVA_TIMEZONE), $renewalPolicy->getStart()->getTimeZone());
     }
 
-    public function testPolicyAutoRenew()
+    public function testPolicyAutoRenewUnpaid()
     {
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('testPolicyAutoRenew', $this),
+            static::generateEmail('testPolicyAutoRenewUnpaid', $this),
             'bar',
             static::$dm
         );
@@ -1338,6 +1338,51 @@ class PolicyServiceTest extends WebTestCase
             new \DateTime('2017-05-15')
         );
         $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
+
+        static::$policyService->autoRenew($policy, new \DateTime('2017-06-01'));
+        $this->assertEquals(Policy::STATUS_UNRENEWED, $renewalPolicy->getStatus());
+        $this->assertNull($policy->getCashback());
+        $this->assertNull($renewalPolicy->getStart());
+    }
+
+    public function testPolicyAutoRenewPaid()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPolicyAutoRenewPaid', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-06-01'), true);
+        static::$policyService->setEnvironment('test');
+        static::$dm->flush();
+        $this->assertEquals(new \DateTimeZone(Salva::SALVA_TIMEZONE), $policy->getStart()->getTimeZone());
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+
+        $renewalPolicy = static::$policyService->createPendingRenewal(
+            $policy,
+            new \DateTime('2017-05-15')
+        );
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
+
+        self::addPayment(
+            $policy,
+            $policy->getPremium(new \DateTime('2017-01-01'))->getMonthlyPremiumPrice() * 11,
+            Salva::MONTHLY_TOTAL_COMMISSION * 10 + Salva::FINAL_MONTHLY_TOTAL_COMMISSION,
+            null,
+            new \DateTime('2017-01-01')
+        );
 
         static::$policyService->autoRenew($policy, new \DateTime('2017-06-01'));
         $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicy->getStatus());
