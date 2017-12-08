@@ -13,6 +13,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\Company;
 use AppBundle\Document\DateTrait;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
+use GuzzleHttp\Client;
 
 class SanctionsCommand extends BaseCommand
 {
@@ -47,12 +48,20 @@ class SanctionsCommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 '(Re)Run a company check'
             )
+            ->addOption(
+                'url',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Url to get source file (default to expected location',
+                'http://hmt-sanctions.s3.amazonaws.com/sanctionsconlist.csv'
+            )
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $source = $input->getOption('source');
+        $url = $input->getOption('url');
         $file = $input->getOption('file');
         $userId = $input->getOption('userId');
         $companyId = $input->getOption('companyId');
@@ -66,6 +75,13 @@ class SanctionsCommand extends BaseCommand
             $this->checkUsers($userId);
         } elseif ($companyId) {
             $this->checkCompanies($companyId);
+        } elseif ($source == Sanctions::SOURCE_UK_TREASURY) {
+            $file = tempnam(sys_get_temp_dir(), 'sanc');
+            $client = new Client();
+            $client->request('GET', $url, ['sink' => $file]);
+            $rows = $this->ukTreasury($file);
+            $output->writeln(sprintf('%d records added/updated', $rows));
+            unlink($file);
         } else {
             $this->checkUsers();
             $this->checkCompanies();
@@ -137,8 +153,9 @@ class SanctionsCommand extends BaseCommand
             }
             fclose($handle);
         }
-
         $dm->flush();
+
+        return $row;
     }
     
     protected function addUpdateSanctions($dm, $data, $date)
