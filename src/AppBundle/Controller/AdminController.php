@@ -534,13 +534,13 @@ class AdminController extends BaseController
         $totalTransaction = 0;
         foreach ($dailyTransaction as $key => $value) {
             if (stripos($key, sprintf('%d%02d', $year, $month)) !== false) {
-                $totalTransaction += $value;
+                $totalTransaction += (float)$value;
             }
         }
         $totalBarclaysProcessing = 0;
         foreach ($dailyBarclaysProcessing as $key => $value) {
             if (stripos($key, sprintf('%d%02d', $year, $month)) !== false) {
-                $totalBarclaysProcessing += $value;
+                $totalBarclaysProcessing += (float)$value;
             }
         }
 
@@ -550,13 +550,13 @@ class AdminController extends BaseController
         $totalReceived = 0;
         foreach ($dailyReceived as $key => $value) {
             if (stripos($key, sprintf('%d%02d', $year, $month)) !== false) {
-                $totalReceived += $value;
+                $totalReceived += (float)$value;
             }
         }
         $totalLloydsProcessing = 0;
         foreach ($dailyLloydsProcessing as $key => $value) {
             if (stripos($key, sprintf('%d%02d', $year, $month)) !== false) {
-                $totalLloydsProcessing += $value;
+                $totalLloydsProcessing += (float)$value;
             }
         }
 
