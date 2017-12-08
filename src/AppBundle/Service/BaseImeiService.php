@@ -121,6 +121,7 @@ class BaseImeiService
     public function ocr($filename, $make, $extension = null)
     {
         $results = $this->ocrRaw($filename, $extension);
+        print_r($results);
 
         return $this->parseOcr($results, $make);
     }
