@@ -130,7 +130,7 @@
       "animate": [
         "bower_components/animate.css/animate.min.css"
       ],
-      "doT": [
+      "doT.min.js": [
         "bower_components/dot/doT.min.js"
       ],
       "lozad.min.js": [
