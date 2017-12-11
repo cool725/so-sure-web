@@ -24,6 +24,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @group functional-net
+ *
+ * AppBundle\\Tests\\Listener\\RefundListenerTest
  */
 class RefundListenerTest extends WebTestCase
 {
@@ -192,6 +194,49 @@ class RefundListenerTest extends WebTestCase
         // judo initial, judo refund for free month
         // so-sure payment to offset judo refund, so-sure refund for cancellation
         $this->assertEquals(5, count($policy->getPayments()));
+    }
+
+    public function testRefundListenerBacsCancelledCooloffYearly()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testRefundListenerBacsCancelledCooloffYearly', $this),
+            'bar'
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-11-01'),
+            false
+        );
+        static::addBacsPayPayment($policy, new \DateTime('2016-11-01'), false);
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-11-01'));
+        static::$policyService->setEnvironment('test');
+
+        $this->assertTrue($policy->isValidPolicy());
+
+        $policy->setCancelledReason(PhonePolicy::CANCELLED_COOLOFF);
+        $policy->setStatus(PhonePolicy::STATUS_CANCELLED);
+        static::$dm->flush();
+
+        $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger, 'test');
+        $listener->onPolicyCancelledEvent(new PolicyEvent($policy));
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $policy = $repo->find($policy->getId());
+        $totalBacs = Payment::sumPayments($policy->getPayments(), false, BacsPayment::class);
+        $this->assertTrue($this->areEqualToTwoDp(0, $totalBacs['total']));
+
+        $total = Payment::sumPayments($policy->getPayments(), false);
+        $this->assertTrue($this->areEqualToTwoDp(0, $total['total']));
+
+        // bacs initial, bacs refund for cancellation
+        $this->assertEquals(2, count($policy->getPayments()));
     }
 
     public function testRefundFreeNovPromo()

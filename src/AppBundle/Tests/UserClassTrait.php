@@ -11,6 +11,7 @@ use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\Payment\GocardlessPayment;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Payment\SoSurePayment;
+use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\ImeiTrait;
 use AppBundle\Document\Reward;
 use AppBundle\Document\Connection\StandardConnection;
@@ -215,6 +216,21 @@ trait UserClassTrait
         self::addPayment($policy, $premium, $commission, $receiptId);
     }
 
+    public static function addBacsPayPayment($policy, $date = null, $monthly = true)
+    {
+        if ($monthly) {
+            $policy->setPremiumInstallments(12);
+            $premium = $policy->getPremium()->getMonthlyPremiumPrice(null, $date);
+            $commission = Salva::MONTHLY_TOTAL_COMMISSION;
+        } else {
+            $policy->setPremiumInstallments(1);
+            $premium = $policy->getPremium()->getYearlyPremiumPrice(null, $date);
+            $commission = Salva::YEARLY_TOTAL_COMMISSION;
+        }
+
+        self::addBacsPayment($policy, $premium, $commission, $date);
+    }
+
     public static function runJudoPayPayment($judopay, User $user, Policy $policy, $amount)
     {
         return $judopay->testPayDetails(
@@ -237,6 +253,19 @@ trait UserClassTrait
         $payment->setTotalCommission($commission);
         $payment->setResult(JudoPayment::RESULT_SUCCESS);
         $payment->setReceipt($receiptId);
+        if ($date) {
+            $payment->setDate($date);
+        }
+        $policy->addPayment($payment);
+
+        return $payment;
+    }
+
+    public static function addBacsPayment($policy, $amount, $commission, $date = null)
+    {
+        $payment = new BacsPayment();
+        $payment->setAmount($amount);
+        $payment->setTotalCommission($commission);
         if ($date) {
             $payment->setDate($date);
         }
