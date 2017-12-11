@@ -87,6 +87,12 @@ class QuoteServiceTest extends WebTestCase
         self::$quoteService->setMailerMailer($mailer);
         self::$quoteService->getQuotes(null, 'A0001', 3000);
         $this->assertTrue((self::$redis->get('UNKNOWN-DEVICE:A0001') == 1), 'Redis key found');
+        $mailer = $this->getMockBuilder('Swift_Mailer')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mailer->expects($this->never())->method('send');
+        self::$quoteService->setMailerMailer($mailer);
+        self::$quoteService->getQuotes(null, 'A0001', 3000);
     }
 
     public function testQuoteServiceKnownDeviceKnownMemory()
