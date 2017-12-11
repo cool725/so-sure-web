@@ -1708,7 +1708,19 @@ class PolicyService
 
     public function autoRenew(Policy $policy, \DateTime $date = null)
     {
-        return $this->renew($policy, $policy->getPremiumInstallmentCount(), null, true, $date);
+        if ($policy->isFullyPaid()) {
+            return $this->renew($policy, $policy->getPremiumInstallmentCount(), null, true, $date);
+        } else {
+            $this->logger->warning(sprintf(
+                'Skipping renewal as policy %s/%s is not fully paid',
+                $policy->getId(),
+                $policy->getPolicyNumber()
+            ));
+            $policy->getNextPolicy()->setStatus(Policy::STATUS_UNRENEWED);
+            $this->dm->flush();
+
+            return false;
+        }
     }
 
     public function renew(

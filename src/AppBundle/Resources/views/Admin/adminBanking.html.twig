@@ -203,7 +203,7 @@
                 {% endif %}
                 <tr>
                     <td>{{ day }}</td>
-                    <td>{% if dailyReceived[ymd] is defined %}£{{ dailyReceived[ymd] }}{% else %}-{% endif %}</td>
+                    <td>{% if dailyReceived[ymd] is defined %}£{{ dailyReceived[ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
                 </tr>
             {% endfor %}
             {% for next_month_day in 1..5 %}

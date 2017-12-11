@@ -6,22 +6,29 @@ use AppBundle\Document\PlayDevice;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Document\Phone;
 use AppBundle\Service\MailerService;
+use Predis\Client;
 
 class QuoteService
 {
+    const DUPLICATE_EMAIL_CACHE_TIME = 3600;
+    const REDIS_UNKNOWN_EMAIL_KEY_FORMAT = 'UNKNOWN-DEVICE:%s';
+
 
     /** @var MailerService */
     protected $mailer;
     protected $dm;
+    protected $redis;
 
     /**
      * @param MailerService   $mailer
      * @param DocumentManager $dm
+     * @param Client          $redis
      */
-    public function __construct(MailerService $mailer, DocumentManager $dm)
+    public function __construct(MailerService $mailer, DocumentManager $dm, Client $redis)
     {
         $this->mailer = $mailer;
         $this->dm = $dm;
+        $this->redis = $redis;
     }
 
     public function getQuotes($make, $device, $memory = null, $rooted = null, $ignoreMake = false)
@@ -99,7 +106,11 @@ class QuoteService
         ])) {
             return false;
         }
-
+        $key = sprintf(self::REDIS_UNKNOWN_EMAIL_KEY_FORMAT, $device);
+        if ($this->redis->get($key)) {
+            return false;
+        }
+        $this->redis->setex($key, self::DUPLICATE_EMAIL_CACHE_TIME, 1);
         $playDeviceRepo = $this->dm->getRepository(PlayDevice::class);
         $playDevice = $playDeviceRepo->findOneBy(['device' => $device]);
         $marketingName = ($playDevice) ? $playDevice->getMarketingName() : 'unknown';

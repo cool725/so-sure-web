@@ -21,6 +21,7 @@ use AppBundle\Document\Payment\SoSurePayment;
 use AppBundle\Document\Payment\PotRewardPayment;
 use AppBundle\Document\Payment\SoSurePotRewardPayment;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
+use AppBundle\Document\Payment\PolicyDiscountRefundPayment;
 use AppBundle\Document\Payment\ChargebackPayment;
 use AppBundle\Document\Payment\DebtCollectionPayment;
 use AppBundle\Document\PolicyTerms;
@@ -615,7 +616,6 @@ class ReportingService
     public function getAllPaymentTotals($isProd, \DateTime $date)
     {
         $payments = $this->getPayments($date);
-        $debtCollectionPayments = $this->getPayments($date, 'debtCollection');
         $potRewardPayments = $this->getPayments($date, 'potReward');
         $potRewardPaymentsCashback = $this->getPayments($date, 'potReward', true);
         $potRewardPaymentsDiscount = $this->getPayments($date, 'potReward', false);
@@ -623,6 +623,7 @@ class ReportingService
         $soSurePotRewardPaymentsCashback = $this->getPayments($date, 'sosurePotReward', true);
         $soSurePotRewardPaymentsDiscount = $this->getPayments($date, 'sosurePotReward', false);
         $policyDiscountPayments = $this->getPayments($date, 'policyDiscount');
+        $policyDiscountRefundPayments = $this->getPayments($date, 'policyDiscountRefund');
         $totalRunRate = $this->getTotalRunRateByDate($this->endOfMonth($date));
 
         // @codingStandardsIgnoreStart
@@ -631,7 +632,6 @@ class ReportingService
             'judo' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
             'sosure' => Payment::sumPayments($payments, $isProd, SoSurePayment::class),
             'chargebacks' => Payment::sumPayments($payments, $isProd, ChargebackPayment::class),
-            'debtCollections' => Payment::sumPayments($debtCollectionPayments, $isProd, DebtCollectionPayment::class),
             'bacs' => Payment::sumPayments($payments, $isProd, BacsPayment::class),
             'potReward' => Payment::sumPayments($potRewardPayments, $isProd, PotRewardPayment::class),
             'potRewardCashback' => Payment::sumPayments($potRewardPaymentsCashback, $isProd, PotRewardPayment::class),
@@ -640,6 +640,7 @@ class ReportingService
             'sosurePotRewardCashback' => Payment::sumPayments($soSurePotRewardPaymentsCashback, $isProd, SoSurePotRewardPayment::class),
             'sosurePotRewardDiscount' => Payment::sumPayments($soSurePotRewardPaymentsDiscount, $isProd, SoSurePotRewardPayment::class),
             'policyDiscounts' => Payment::sumPayments($policyDiscountPayments, $isProd, PolicyDiscountPayment::class),
+            'policyDiscountRefunds' => Payment::sumPayments($policyDiscountRefundPayments, $isProd, PolicyDiscountRefundPayment::class),
             'totalRunRate' => $totalRunRate,
             'totalCashback' => Cashback::sumCashback($this->getCashback($date)),
         ];

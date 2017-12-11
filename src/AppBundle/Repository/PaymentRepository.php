@@ -51,7 +51,7 @@ class PaymentRepository extends DocumentRepository
         $startMonth = $this->startOfMonth($date);
         $nextMonth = $this->endOfMonth($date);
         if (!$type) {
-            $type = ['judo', 'bacs', 'gocardless', 'sosure', 'chargeback'];
+            $type = ['judo', 'bacs', 'gocardless', 'sosure', 'chargeback', 'debtCollection'];
         } elseif (is_string($type)) {
             $type = [$type];
         }

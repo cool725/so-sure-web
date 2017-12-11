@@ -10,8 +10,10 @@ use AppBundle\Event\PolicyEvent;
 use AppBundle\Document\Policy;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Cashback;
+use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Payment\SoSurePayment;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
+use AppBundle\Document\Payment\PolicyDiscountRefundPayment;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\CurrencyTrait;
@@ -78,7 +80,10 @@ class RefundListener
         if ($policy->isRefundAllowed() && $policy->hasPolicyDiscountPresent()) {
             $totalDiscount = Payment::sumPayments($policy->getPayments(), false, PolicyDiscountPayment::class);
             $total = $totalDiscount['total'];
-            $total = $this->toTwoDp($total - ($total * $policy->getProrataMultiplier($event->getDate())));
+            // Cooloff should retain full amount of discount
+            if ($policy->getCancelledReason() != Policy::CANCELLED_COOLOFF) {
+                $total = $this->toTwoDp($total - ($total * $policy->getProrataMultiplier($event->getDate())));
+            }
             if ($this->greaterThanZero($total)) {
                 if ($policy->hasCashback()) {
                     throw new \Exception(sprintf(
@@ -87,11 +92,11 @@ class RefundListener
                         $total
                     ));
                 }
-                // Offset the policy discount
-                $policyDiscountPayment = new PolicyDiscountPayment();
-                $policyDiscountPayment->setAmount(0 - $total);
-                $policyDiscountPayment->setDate($event->getDate());
-                $policy->addPayment($policyDiscountPayment);
+                // Offset the policy discount with a refund
+                $policyDiscountRefundPayment = new PolicyDiscountRefundPayment();
+                $policyDiscountRefundPayment->setAmount(0 - $total);
+                $policyDiscountRefundPayment->setDate($event->getDate());
+                $policy->addPayment($policyDiscountRefundPayment);
 
                 // and convert to cashback
                 $cashback = new Cashback();
@@ -116,10 +121,23 @@ class RefundListener
                 return;
             }
             try {
-                $this->judopayService->refund($payment, $refundAmount, $refundCommissionAmount, sprintf(
-                    'cancelled %s',
-                    $policy->getCancelledReason()
-                ));
+                $notes = sprintf('cancelled %s', $policy->getCancelledReason());
+                if ($payment instanceof JudoPayment) {
+                    $this->judopayService->refund($payment, $refundAmount, $refundCommissionAmount, $notes);
+                } elseif ($payment instanceof BacsPayment) {
+                    // Refund is a negative payment
+                    $refund = new BacsPayment();
+                    $refund->setAmount(0 - $refundAmount);
+                    $refund->setNotes($notes);
+                    $refund->setSource(Payment::SOURCE_SYSTEM);
+                    $refund->setRefundTotalCommission($refundCommissionAmount);
+                    $payment->getPolicy()->addPayment($refund);
+                    $this->dm->persist($refund);
+                    $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+                    $this->logger->warning(sprintf('bacs refund due - id %s', $refund->getId()));
+                } else {
+                    throw new \Exception(sprintf('Unable to refund %s payments', get_class($payment)));
+                }
             } catch (\Exception $e) {
                 $this->logger->error(
                     sprintf(

@@ -11,6 +11,7 @@ use AppBundle\Event\UserEvent;
 use AppBundle\Classes\Salva;
 use AppBundle\Document\User;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
+use AppBundle\Document\Payment\PolicyDiscountRefundPayment;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
@@ -24,6 +25,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @group functional-net
+ *
+ * AppBundle\\Tests\\Listener\\RefundListenerTest
  */
 class RefundListenerTest extends WebTestCase
 {
@@ -194,6 +197,49 @@ class RefundListenerTest extends WebTestCase
         $this->assertEquals(5, count($policy->getPayments()));
     }
 
+    public function testRefundListenerBacsCancelledCooloffYearly()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testRefundListenerBacsCancelledCooloffYearly', $this),
+            'bar'
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-11-01'),
+            false
+        );
+        static::addBacsPayPayment($policy, new \DateTime('2016-11-01'), false);
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-11-01'));
+        static::$policyService->setEnvironment('test');
+
+        $this->assertTrue($policy->isValidPolicy());
+
+        $policy->setCancelledReason(PhonePolicy::CANCELLED_COOLOFF);
+        $policy->setStatus(PhonePolicy::STATUS_CANCELLED);
+        static::$dm->flush();
+
+        $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger, 'test');
+        $listener->onPolicyCancelledEvent(new PolicyEvent($policy));
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $policy = $repo->find($policy->getId());
+        $totalBacs = Payment::sumPayments($policy->getPayments(), false, BacsPayment::class);
+        $this->assertTrue($this->areEqualToTwoDp(0, $totalBacs['total']));
+
+        $total = Payment::sumPayments($policy->getPayments(), false);
+        $this->assertTrue($this->areEqualToTwoDp(0, $total['total']));
+
+        // bacs initial, bacs refund for cancellation
+        $this->assertEquals(2, count($policy->getPayments()));
+    }
+
     public function testRefundFreeNovPromo()
     {
         $user = static::createUser(
@@ -358,6 +404,12 @@ class RefundListenerTest extends WebTestCase
         $this->assertTrue($judo['received'] > 0);
         $this->assertTrue($judo['refunded'] < 0);
 
+        $refund = Payment::sumPayments($updatedRenewalPolicy->getPayments(), false, PolicyDiscountRefundPayment::class);
+        $this->assertEquals(1, $refund['numRefunded']);
+        $this->assertTrue($this->areEqualToTwoDp(-9.45, $refund['total']), $refund['total']);
+        $this->assertTrue($refund['received'] == 0);
+        $this->assertTrue($refund['refunded'] < 0);
+
         $total = Payment::sumPayments($updatedRenewalPolicy->getPayments(), false);
         $this->assertEquals(2, $total['numReceived']);
         $this->assertEquals(2, $total['numRefunded']);
@@ -419,8 +471,7 @@ class RefundListenerTest extends WebTestCase
         $repo = $dm->getRepository(Policy::class);
         $updatedRenewalPolicy = $repo->find($renewalPolicy->getId());
         $this->assertNotNull($updatedRenewalPolicy->getCashback());
-        // 10 - (10 * 5/365) = 9.86
-        $this->assertTrue($this->areEqualToTwoDp(9.86, $updatedRenewalPolicy->getCashback()->getAmount()));
+        $this->assertTrue($this->areEqualToTwoDp(10, $updatedRenewalPolicy->getCashback()->getAmount()));
 
         $judo = Payment::sumPayments($updatedRenewalPolicy->getPayments(), false, JudoPayment::class);
         $this->assertEquals(1, $judo['numRefunded']);
@@ -432,7 +483,7 @@ class RefundListenerTest extends WebTestCase
         $total = Payment::sumPayments($updatedRenewalPolicy->getPayments(), false);
         $this->assertEquals(2, $total['numReceived']);
         $this->assertEquals(2, $total['numRefunded']);
-        $this->assertTrue($total['total'] > 0);
+        $this->assertEquals(0, $total['total']);
         $this->assertTrue($total['received'] > 0);
         $this->assertTrue($total['refunded'] < 0);
     }

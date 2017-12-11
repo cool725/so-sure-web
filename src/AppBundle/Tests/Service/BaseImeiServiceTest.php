@@ -216,6 +216,19 @@ class BaseImeiServiceTest extends WebTestCase
         $this->assertEquals('C77QMB7SGRY9', $results['serialNumber']);
     }
 
+    public function testOcrIPhoneX()
+    {
+        $image = sprintf(
+            "%s/../src/AppBundle/Tests/Resources/iPhoneXSettings.png",
+            self::$rootDir
+        );
+
+        $results = self::$imei->ocr($image, 'Apple');
+        $this->assertNotNull($results);
+        $this->assertEquals('359406087220311', $results['imei']);
+        $this->assertEquals('F17VQLU1JCLJ', $results['serialNumber']);
+    }
+
     public function testOcrIPhoneSerialOnly()
     {
         $image = sprintf(

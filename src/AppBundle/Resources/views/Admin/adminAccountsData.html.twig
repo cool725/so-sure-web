@@ -58,11 +58,11 @@
     </tr>
     <tr>
         <td colspan="2" width="{{ text_width }}">Debt Collection Fees</td>
-        <td>(£{{ (0 - paymentTotals.debtCollections.total)|number_format(2, '.', ',') }})</td>
+        <td>(£{{ (0 - paymentTotals.all.fees)|number_format(2, '.', ',') }})</td>
     </tr>
     <tr>
         <td colspan="2"><strong>Net monthly premium received</strong></td>
-        <td><strong>£{{ (paymentTotals.all.total + paymentTotals.debtCollections.total)|number_format(2, '.', ',') }}</strong></td>
+        <td><strong>£{{ (paymentTotals.all.total)|number_format(2, '.', ',') }}</strong></td>
     </tr>
 </table>
 <h4>Reward Pot</h4>
@@ -185,13 +185,21 @@
     </tr>
     <tr>
         <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">Renewal Discount Refund To Customers due to Policy Cancellation</td>
-        <td>-</td>
+        <td width="{{ text_width }}"><strong>Net Reward Pot Paid To Customers</strong></td>
+        <td><strong>£{{ paymentTotals.totalCashback|number_format(2, '.', ',') }}</strong></td>
+    </tr>
+    <tr class="info">
+        <td colspan="3">Renewal Discount Refund</td>
     </tr>
     <tr>
         <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}"><strong>Net Reward Pot Paid To Customers</strong></td>
-        <td><strong>£{{ paymentTotals.totalCashback|number_format(2, '.', ',') }}</strong></td>
+        <td width="{{ text_width }}">Renewal Discount Refund To Customers due to Policy Cancellation</td>
+        <td>£{{ (0 - paymentTotals.policyDiscountRefunds.total)|number_format(2, '.', ',') }}</td>
+    </tr>
+    <tr>
+        <td width="{{ indent_width }}"></td>
+        <td width="{{ text_width }}"><strong>Net Renewal Discount Refund</strong></td>
+        <td><strong>£{{ (0 - paymentTotals.policyDiscountRefunds.total)|number_format(2, '.', ',') }}</strong></td>
     </tr>
     {#
     <tr class="info">
@@ -267,13 +275,13 @@
     </tr>
     <tr>
         <td width="{{ indent_width }}"></td>
-        <td width="{{ text_width }}">Renewal Discount Refund To Customers due to Policy Cancellation</td>
-        <td>-</td>
+        <td width="{{ text_width }}">Net Renewal Discount Refund</td>
+        <td>(£{{ 0 - paymentTotals.policyDiscountRefunds.total|number_format(2, '.', ',') }})</td>
     </tr>
     <tr>
         <td width="{{ indent_width }}"></td>
         <td width="{{ text_width }}"><strong>Net transfer to Salva</strong></td>
-        <td><strong>£{{ (paymentTotals.all.totalUnderwriter + paymentTotals.potRewardCashback.total + (0 - paymentTotals.sosurePotRewardDiscount.total))|number_format(2, '.', ',') }}</strong></td>
+        <td><strong>£{{ (paymentTotals.all.totalUnderwriter + paymentTotals.potRewardCashback.total + (0 - paymentTotals.sosurePotRewardDiscount.total) + paymentTotals.policyDiscountRefunds.total)|number_format(2, '.', ',') }}</strong></td>
     </tr>
     <tr class="info">
         <td colspan="3">so-sure Transfer</td>

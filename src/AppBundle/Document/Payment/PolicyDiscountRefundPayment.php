@@ -8,10 +8,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 
 /**
- * @MongoDB\Document()
+ * @MongoDB\Document
  * @Gedmo\Loggable
  */
-class DebtCollectionPayment extends Payment
+class PolicyDiscountRefundPayment extends Payment
 {
     public function __construct()
     {
@@ -27,24 +27,5 @@ class DebtCollectionPayment extends Payment
     public function isUserPayment()
     {
         return false;
-    }
-
-    public function isStandardPayment()
-    {
-        return false;
-    }
-
-    public function isFee()
-    {
-        return true;
-    }
-
-    public function getNotes()
-    {
-        if (parent::getNotes()) {
-            return parent::getNotes();
-        }
-
-        return 'Debt Collection Fee';
     }
 }

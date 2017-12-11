@@ -158,7 +158,7 @@ abstract class Price
             'valid_from' => $this->getValidFrom()->format(\DateTime::ATOM),
             'valid_to' => $this->getValidTo() ? $this->getValidTo()->format(\DateTime::ATOM) : null,
             'gwp' => $this->getGwp(),
-            'premium' => $this->getMonthlyPremiumPrice($date),
+            'premium' => $this->getMonthlyPremiumPrice(null, $date),
             'notes' => $this->getNotes(),
         ];
     }
@@ -166,8 +166,8 @@ abstract class Price
     public function toPriceArray(\DateTime $date = null)
     {
         return array_merge($this->toApiArray($date), [
-            'initial_premium' => $this->getMonthlyPremiumPrice($this->getValidFrom()),
-            'final_premium' => $this->getValidTo() ? $this->getMonthlyPremiumPrice($this->getValidTo()) : null,
+            'initial_premium' => $this->getMonthlyPremiumPrice(null, $this->getValidFrom()),
+            'final_premium' => $this->getValidTo() ? $this->getMonthlyPremiumPrice(null, $this->getValidTo()) : null,
         ]);
     }
 }

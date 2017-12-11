@@ -628,6 +628,10 @@ class Phone
 
     public function getSalvaMiniumumBinderMonthlyPremium()
     {
+        if (!$this->getSalvaBinderMonthlyPremium()) {
+            return null;
+        }
+
         return $this->toTwoDp(0.67 * $this->getSalvaBinderMonthlyPremium());
     }
 
@@ -647,9 +651,9 @@ class Phone
             return 7.99 + 1.5;
         } elseif ($this->getInitialPrice() <= 1000) {
             return 8.99 + 1.5;
-        } else {
-            throw new \Exception('Unknown binder pricing');
         }
+
+        return null;
     }
 
     public function policyProfit($claimFrequency, $consumerPayout, $iptRebate)
@@ -1077,6 +1081,9 @@ class Phone
                 $to->format(\DateTime::ATOM)
             ));
         }
+        if (!$this->getSalvaMiniumumBinderMonthlyPremium()) {
+            throw new \Exception(sprintf('Unable to determine min binder'));
+        }
 
         $price = new PhonePrice();
         $price->setGwp($gwp);
@@ -1094,15 +1101,17 @@ class Phone
             ));
         }
 
-        if (!$this->getCurrentPhonePrice()->getValidTo()) {
-            if ($this->getCurrentPhonePrice()->getValidFrom() > $from) {
-                throw new \Exception(sprintf(
-                    '%s must be after current pricing start date %s',
-                    $from->format(\DateTime::ATOM),
-                    $this->getCurrentPhonePrice()->getValidFrom()->format(\DateTime::ATOM)
-                ));
+        if ($this->getCurrentPhonePrice()) {
+            if (!$this->getCurrentPhonePrice()->getValidTo()) {
+                if ($this->getCurrentPhonePrice()->getValidFrom() > $from) {
+                    throw new \Exception(sprintf(
+                        '%s must be after current pricing start date %s',
+                        $from->format(\DateTime::ATOM),
+                        $this->getCurrentPhonePrice()->getValidFrom()->format(\DateTime::ATOM)
+                    ));
+                }
+                $this->getCurrentPhonePrice()->setValidTo($from);
             }
-            $this->getCurrentPhonePrice()->setValidTo($from);
         }
 
         $this->addPhonePrice($price);
