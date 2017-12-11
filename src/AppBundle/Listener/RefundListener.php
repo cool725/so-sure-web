@@ -13,6 +13,7 @@ use AppBundle\Document\Cashback;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Payment\SoSurePayment;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
+use AppBundle\Document\Payment\PolicyDiscountRefundPayment;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\CurrencyTrait;
@@ -91,11 +92,11 @@ class RefundListener
                         $total
                     ));
                 }
-                // Offset the policy discount
-                $policyDiscountPayment = new PolicyDiscountPayment();
-                $policyDiscountPayment->setAmount(0 - $total);
-                $policyDiscountPayment->setDate($event->getDate());
-                $policy->addPayment($policyDiscountPayment);
+                // Offset the policy discount with a refund
+                $policyDiscountRefundPayment = new PolicyDiscountRefundPayment();
+                $policyDiscountRefundPayment->setAmount(0 - $total);
+                $policyDiscountRefundPayment->setDate($event->getDate());
+                $policy->addPayment($policyDiscountRefundPayment);
 
                 // and convert to cashback
                 $cashback = new Cashback();

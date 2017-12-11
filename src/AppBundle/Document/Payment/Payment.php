@@ -25,6 +25,7 @@ use AppBundle\Document\ScheduledPayment;
  *      "chargeback"="ChargebackPayment",
  *      "potReward"="PotRewardPayment",
  *      "policyDiscount"="PolicyDiscountPayment",
+ *      "policyDiscountRefund"="PolicyDiscountRefundPayment",
  *      "sosurePotReward"="SoSurePotRewardPayment",
  *      "debtCollection"="DebtCollectionPayment"
  * })

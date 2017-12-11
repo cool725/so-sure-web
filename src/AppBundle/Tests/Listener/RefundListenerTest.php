@@ -11,6 +11,7 @@ use AppBundle\Event\UserEvent;
 use AppBundle\Classes\Salva;
 use AppBundle\Document\User;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
+use AppBundle\Document\Payment\PolicyDiscountRefundPayment;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
@@ -402,6 +403,12 @@ class RefundListenerTest extends WebTestCase
         $this->assertTrue($judo['total'] > 0);
         $this->assertTrue($judo['received'] > 0);
         $this->assertTrue($judo['refunded'] < 0);
+
+        $refund = Payment::sumPayments($updatedRenewalPolicy->getPayments(), false, PolicyDiscountRefundPayment::class);
+        $this->assertEquals(1, $refund['numRefunded']);
+        $this->assertTrue($this->areEqualToTwoDp(-9.45, $refund['total']), $refund['total']);
+        $this->assertTrue($refund['received'] == 0);
+        $this->assertTrue($refund['refunded'] < 0);
 
         $total = Payment::sumPayments($updatedRenewalPolicy->getPayments(), false);
         $this->assertEquals(2, $total['numReceived']);

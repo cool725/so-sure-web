@@ -9,6 +9,8 @@ use AppBundle\Document\Policy;
 
 /**
  * @group functional-nonet
+ *
+ * AppBundle\\Tests\\Service\\ReportingServiceTest
  */
 class ReportingServiceTest extends WebTestCase
 {
