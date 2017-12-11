@@ -95,7 +95,19 @@ class PhoneTest extends \PHPUnit_Framework_TestCase
         $phone->setMake('Apple');
         $this->assertFalse($phone->isSameMake('Google'));
     }
-    
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testChangePriceNoBinder()
+    {
+        $phone = new Phone();
+        $phone->init('Apple', 'Binder', 9, 32, ['binder'], 5000);
+        $this->assertNull($phone->getSalvaBinderMonthlyPremium());
+        $this->assertNull($phone->getSalvaMiniumumBinderMonthlyPremium());
+        $phone->changePrice(9, new \DateTime());
+    }
+
     /**
      * @expectedException \Exception
      */
