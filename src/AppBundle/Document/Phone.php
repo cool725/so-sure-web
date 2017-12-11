@@ -4,6 +4,7 @@ namespace AppBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use AppBundle\Classes\Salva;
+use AppBundle\Classes\SoSure;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 
@@ -635,22 +636,46 @@ class Phone
         return $this->toTwoDp(0.67 * $this->getSalvaBinderMonthlyPremium());
     }
 
-    public function getSalvaBinderMonthlyPremium()
+    public function getSalvaBinderMonthlyPremium(\DateTime $date = null)
     {
+        // Initial binder
+        $binder2016 = new \DateTime('2016-09-01 00:00:00', new \DateTimeZone(SoSure::TIMEZONE));
+
+        // 2018 binder - prices static, but additional bands £1250 & £1500
+        $binder2018 = new \DateTime('2018-01-01 00:00:00', new \DateTimeZone(SoSure::TIMEZONE));
+        // No binder yet
+        $binder2019 = new \DateTime('2019-01-01 00:00:00', new \DateTimeZone(SoSure::TIMEZONE));
+
+        if (!$date) {
+            $date = new \DateTime('now', new \DateTimeZone(SoSure::TIMEZONE));
+        }
+
+        if ($date >= $binder2019) {
+            throw new \Exception('No binder available');
+        }
+
         if ($this->getInitialPrice() <= 150) {
-            return 3.99 + 1.5;
+            return 3.99 + 1.5; // 5.49
         } elseif ($this->getInitialPrice() <= 250) {
-            return 4.99 + 1.5;
+            return 4.99 + 1.5; // 6.49
         } elseif ($this->getInitialPrice() <= 400) {
-            return 5.49 + 1.5;
+            return 5.49 + 1.5; // 6.99
         } elseif ($this->getInitialPrice() <= 500) {
-            return 5.99 + 1.5;
+            return 5.99 + 1.5; // 7.49
         } elseif ($this->getInitialPrice() <= 600) {
-            return 6.99 + 1.5;
+            return 6.99 + 1.5; // 8.49
         } elseif ($this->getInitialPrice() <= 750) {
-            return 7.99 + 1.5;
+            return 7.99 + 1.5; // 9.49
         } elseif ($this->getInitialPrice() <= 1000) {
-            return 8.99 + 1.5;
+            return 8.99 + 1.5; // 10.49
+        }
+
+        if ($date >= $binder2018) {
+            if ($this->getInitialPrice() <= 1250) {
+                return 9.99 + 1.5; // 11.49
+            } elseif ($this->getInitialPrice() <= 1500) {
+                return 10.99 + 1.5; // 12.49
+            }
         }
 
         return null;

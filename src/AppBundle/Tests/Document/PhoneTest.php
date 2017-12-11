@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Document;
 
+use AppBundle\Classes\SoSure;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePrice;
 
@@ -106,6 +107,42 @@ class PhoneTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($phone->getSalvaBinderMonthlyPremium());
         $this->assertNull($phone->getSalvaMiniumumBinderMonthlyPremium());
         $phone->changePrice(9, new \DateTime());
+    }
+
+    public function testBinder2017()
+    {
+        $phone1000 = new Phone();
+        $phone1000->init('Apple', '1000Binder', 9, 32, ['1000-binder'], 1000);
+        $phone1250 = new Phone();
+        $phone1250->init('Apple', '1250Binder', 9, 32, ['1250-binder'], 1250);
+        $binder2017 = new \DateTime('2017-01-01 00:00:00', new \DateTimeZone(SoSure::TIMEZONE));
+        $this->assertEquals(10.49, $phone1000->getSalvaBinderMonthlyPremium($binder2017));
+        $this->assertEquals(null, $phone1250->getSalvaBinderMonthlyPremium($binder2017));
+    }
+
+    public function testBinder2018()
+    {
+        $phone1000 = new Phone();
+        $phone1000->init('Apple', '1000Binder', 9, 32, ['1000-binder'], 1000);
+        $phone1250 = new Phone();
+        $phone1250->init('Apple', '1250Binder', 9, 32, ['1250-binder'], 1250);
+        $phone1500 = new Phone();
+        $phone1500->init('Apple', '1500Binder', 9, 32, ['1500-binder'], 1500);
+        $binder2018 = new \DateTime('2018-01-01 00:00:00', new \DateTimeZone(SoSure::TIMEZONE));
+        $this->assertEquals(10.49, $phone1000->getSalvaBinderMonthlyPremium($binder2018));
+        $this->assertEquals(11.49, $phone1250->getSalvaBinderMonthlyPremium($binder2018));
+        $this->assertEquals(12.49, $phone1500->getSalvaBinderMonthlyPremium($binder2018));
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testPostBinder()
+    {
+        $phone = new Phone();
+        $phone->init('Apple', 'PostBinder', 9, 32, ['post-binder'], 1000);
+        $binder2019 = new \DateTime('2019-01-01 00:00:00', new \DateTimeZone(SoSure::TIMEZONE));
+        $phone->getSalvaBinderMonthlyPremium($binder2019);
     }
 
     /**
