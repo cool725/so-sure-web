@@ -109,6 +109,19 @@ class PhoneTest extends \PHPUnit_Framework_TestCase
         $phone->changePrice(9, new \DateTime());
     }
 
+    /**
+     * Will break when binder changes
+     */
+    public function testBinderCurrent()
+    {
+        $phone1000 = new Phone();
+        $phone1000->init('Apple', '1000Binder', 9, 32, ['1000-binder'], 1000);
+        $phone1250 = new Phone();
+        $phone1250->init('Apple', '1250Binder', 9, 32, ['1250-binder'], 1250);
+        $this->assertEquals(10.49, $phone1000->getSalvaBinderMonthlyPremium());
+        $this->assertEquals(null, $phone1250->getSalvaBinderMonthlyPremium());
+    }
+
     public function testBinder2017()
     {
         $phone1000 = new Phone();
