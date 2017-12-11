@@ -464,8 +464,7 @@ class RefundListenerTest extends WebTestCase
         $repo = $dm->getRepository(Policy::class);
         $updatedRenewalPolicy = $repo->find($renewalPolicy->getId());
         $this->assertNotNull($updatedRenewalPolicy->getCashback());
-        // 10 - (10 * 5/365) = 9.86
-        $this->assertTrue($this->areEqualToTwoDp(9.86, $updatedRenewalPolicy->getCashback()->getAmount()));
+        $this->assertTrue($this->areEqualToTwoDp(10, $updatedRenewalPolicy->getCashback()->getAmount()));
 
         $judo = Payment::sumPayments($updatedRenewalPolicy->getPayments(), false, JudoPayment::class);
         $this->assertEquals(1, $judo['numRefunded']);
@@ -477,7 +476,7 @@ class RefundListenerTest extends WebTestCase
         $total = Payment::sumPayments($updatedRenewalPolicy->getPayments(), false);
         $this->assertEquals(2, $total['numReceived']);
         $this->assertEquals(2, $total['numRefunded']);
-        $this->assertTrue($total['total'] > 0);
+        $this->assertEquals(0, $total['total']);
         $this->assertTrue($total['received'] > 0);
         $this->assertTrue($total['refunded'] < 0);
     }

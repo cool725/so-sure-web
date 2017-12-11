@@ -79,7 +79,10 @@ class RefundListener
         if ($policy->isRefundAllowed() && $policy->hasPolicyDiscountPresent()) {
             $totalDiscount = Payment::sumPayments($policy->getPayments(), false, PolicyDiscountPayment::class);
             $total = $totalDiscount['total'];
-            $total = $this->toTwoDp($total - ($total * $policy->getProrataMultiplier($event->getDate())));
+            // Cooloff should retain full amount of discount
+            if ($policy->getCancelledReason() != Policy::CANCELLED_COOLOFF) {
+                $total = $this->toTwoDp($total - ($total * $policy->getProrataMultiplier($event->getDate())));
+            }
             if ($this->greaterThanZero($total)) {
                 if ($policy->hasCashback()) {
                     throw new \Exception(sprintf(
