@@ -390,6 +390,7 @@ services:
         arguments:
             mailer:               "@app.mailer"
             dm:                   "@doctrine_mongodb.odm.default_document_manager"
+            redis:                "@snc_redis.default"
 
     app.invoice:
         class: AppBundle\Service\InvoiceService
