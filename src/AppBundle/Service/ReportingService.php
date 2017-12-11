@@ -21,6 +21,7 @@ use AppBundle\Document\Payment\SoSurePayment;
 use AppBundle\Document\Payment\PotRewardPayment;
 use AppBundle\Document\Payment\SoSurePotRewardPayment;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
+use AppBundle\Document\Payment\PolicyDiscountRefundPayment;
 use AppBundle\Document\Payment\ChargebackPayment;
 use AppBundle\Document\Payment\DebtCollectionPayment;
 use AppBundle\Document\PolicyTerms;
@@ -622,6 +623,7 @@ class ReportingService
         $soSurePotRewardPaymentsCashback = $this->getPayments($date, 'sosurePotReward', true);
         $soSurePotRewardPaymentsDiscount = $this->getPayments($date, 'sosurePotReward', false);
         $policyDiscountPayments = $this->getPayments($date, 'policyDiscount');
+        $policyDiscountRefundPayments = $this->getPayments($date, 'policyDiscountRefund');
         $totalRunRate = $this->getTotalRunRateByDate($this->endOfMonth($date));
 
         // @codingStandardsIgnoreStart
@@ -638,6 +640,7 @@ class ReportingService
             'sosurePotRewardCashback' => Payment::sumPayments($soSurePotRewardPaymentsCashback, $isProd, SoSurePotRewardPayment::class),
             'sosurePotRewardDiscount' => Payment::sumPayments($soSurePotRewardPaymentsDiscount, $isProd, SoSurePotRewardPayment::class),
             'policyDiscounts' => Payment::sumPayments($policyDiscountPayments, $isProd, PolicyDiscountPayment::class),
+            'policyDiscountRefunds' => Payment::sumPayments($policyDiscountRefundPayments, $isProd, PolicyDiscountRefundPayment::class),
             'totalRunRate' => $totalRunRate,
             'totalCashback' => Cashback::sumCashback($this->getCashback($date)),
         ];
