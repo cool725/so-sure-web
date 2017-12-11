@@ -325,6 +325,12 @@
                             {% endfor %}
                         </tr>
                         <tr>
+                            <td>Total # pic-sure pre-approved (renewals) policies</td>
+                            {% for week in weeks %}
+                                <td>{{ week['kpi-picsure-preapproved-policies'] }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
                             <td>Total # pic-sure rejected policies</td>
                             {% for week in weeks %}
                                 <td>{{ week['kpi-picsure-rejected-policies'] }}</td>
