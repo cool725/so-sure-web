@@ -142,7 +142,12 @@
                             </td>
                             {% else %}
                               <td>-</td>
-                              <td>-</td>
+                              <td>
+                                {% if phone.getSalvaBinderMonthlyPremium %}-
+                                {% else %}
+                                  <b>No possible binder!</b>
+                                {% endif %}
+                              </td>
                               <td>-</td>
                               <td>-</td>
                               <td>-</td>
