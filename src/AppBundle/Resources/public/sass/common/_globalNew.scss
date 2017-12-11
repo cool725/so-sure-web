@@ -246,3 +246,18 @@ mark {
         height: 100% !important;
     }
 }
+
+// Images
+.fade-img {
+  animation-name: fade;
+  animation-duration: 0.4s;
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

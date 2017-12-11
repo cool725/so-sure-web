@@ -19,20 +19,6 @@
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-    'components/dot/doT.js'
-    'components/vimeo-player-js/player.min.js'
-    'components/corejs-typeahead/typeahead.bundle.min.js'
-    'components/fuse.js/fuse.min.js'
-    '@AppBundle/Resources/public/js/Default/index.js'
-    '@AppBundle/Resources/public/js/Default/modalVideo.js'
-    '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
- %}
-    <script src="{{ asset_url }}"></script>{% endjavascripts %}
-{% endblock %}
-
 {% block body %}
 
     <section class="hero {% if sixpack == 'phone-image' %} hero-search-container {% endif %}" id="get-quote">
@@ -112,11 +98,22 @@
     {% include 'AppBundle::Default/partnership.html.twig' %}
 
     {# Page Modals #}
-
     {% include 'AppBundle::Default/modalVideo.html.twig' %}
-
-    {# {% include 'AppBundle::Default/modalQuote.html.twig' %}     #}
-
     {# End Page Modals #}
 
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    'components/dot/doT.min.js'
+    'components/vimeo-player-js/player.min.js'
+    'components/corejs-typeahead/typeahead.bundle.min.js'
+    'components/fuse.js/fuse.min.js'
+    '@AppBundle/Resources/public/js/Default/index.js'
+    '@AppBundle/Resources/public/js/Default/modalVideo.js'
+    '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
+ %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
