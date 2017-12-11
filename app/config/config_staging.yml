@@ -3,7 +3,7 @@ imports:
 
 framework:
     # 10.* required for the elb load balancing health check
-    trusted_hosts: ['staging.wearesosure.com', '10\.\d+\.\d+\.\d+']
+    trusted_hosts: ['api.staging.so-sure.net','staging.wearesosure.com', '10\.\d+\.\d+\.\d+']
 #    validation:
 #        cache: validator.mapping.cache.apc
 #    serializer:
