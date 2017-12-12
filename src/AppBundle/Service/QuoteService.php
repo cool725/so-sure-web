@@ -171,6 +171,10 @@ class QuoteService
      */
     private function rootedDevice($device, $memory)
     {
+        if (in_array($device, ["bullhead"])) {
+            return false;
+        }
+
         $body = sprintf(
             'Rooted device queried: %s (%s GB).',
             $device,
