@@ -119,9 +119,19 @@ class QuoteServiceTest extends WebTestCase
         $mailer = $this->getMockBuilder('Swift_Mailer')
             ->disableOriginalConstructor()
             ->getMock();
-        $mailer->expects($this->exactly(1))->method('send');
+        $mailer->expects($this->never())->method('send');
         self::$quoteService->setMailerMailer($mailer);
-        self::$quoteService->getQuotes('Nexus', 'bullhead', 2, true);
+        self::$quoteService->getQuotes('Google', 'bullhead', 2, true);
+    }
+
+    public function testQuoteServiceKnownDeviceRootedSend()
+    {
+        $mailer = $this->getMockBuilder('Swift_Mailer')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->expect($mailer, 0, 'Rooted');
+        self::$quoteService->setMailerMailer($mailer);
+        self::$quoteService->getQuotes('Google', 'bullhead', 16, true);
     }
 
     public function testQuoteServiceKnownDeviceIgnoreMake()
