@@ -2,222 +2,223 @@
 
 {% block body %}
 <div class="container">
-<h3>Pages to manually verify when updating design</h3>
-<h4>Any login status</h4>
-<ul>
-    <li>
-        <a href="{{ url('homepage') }}">Home</a>
-    </li>
-    <li>
-        <a href="{{ url('quote_make_model', {'make':'Apple','model':'iPhone+6S'}) }}">Quote</a>
-    </li>
-    <li>
-        {% if upcoming_phone %}
-        <a href="{{ url('quote_make_model', {'make': upcoming_phone.make,'model': upcoming_phone.model, 'force': 'old'}) }}">Quote - Upcoming Phone (old)</a>
-        &nbsp;&nbsp;&nbsp;&nbsp;
-        <a href="{{ url('quote_make_model', {'make': upcoming_phone.make,'model': upcoming_phone.model, 'force': 'split'}) }}">Quote - Upcoming Phone (split)</a>
-        {% else %}
-            No Upcoming Phone in DB
-        {% endif %}
-    </li>
-    <li>
-        <a href="{{ url('phone_insurance_water_damage') }}">SEO Phone Pages (several other similiar)</a>
-    </li>
-    <li>
-        <a href="{{ url('learn_more_make_model', {'make':'Apple','model':'iPhone+6S'}) }}">Learn More</a>
-    </li>
-</ul>
+    <section class="section--pad">
+        <h3>Pages to manually verify when updating design</h3>
+        <h4>Any login status</h4>
+        <ul>
+            <li>
+                <a href="{{ url('homepage') }}">Home</a>
+            </li>
+            <li>
+                <a href="{{ url('quote_make_model', {'make':'Apple','model':'iPhone+6S'}) }}">Quote</a>
+            </li>
+            <li>
+                {% if upcoming_phone %}
+                <a href="{{ url('quote_make_model', {'make': upcoming_phone.make,'model': upcoming_phone.model, 'force': 'old'}) }}">Quote - Upcoming Phone (old)</a>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <a href="{{ url('quote_make_model', {'make': upcoming_phone.make,'model': upcoming_phone.model, 'force': 'split'}) }}">Quote - Upcoming Phone (split)</a>
+                {% else %}
+                    No Upcoming Phone in DB
+                {% endif %}
+            </li>
+            <li>
+                <a href="{{ url('phone_insurance_water_damage') }}">SEO Phone Pages (several other similiar)</a>
+            </li>
+            <li>
+                <a href="{{ url('learn_more_make_model', {'make':'Apple','model':'iPhone+6S'}) }}">Learn More</a>
+            </li>
+        </ul>
 
-<h4>Logged out required</h4>
-<ul>
-    <li>
-        <a href="{{ url('scode', {'code':scode}) }}">SCode Invitiation</a>
-    </li>
-    <li>
-        <a href="{{ url('invitation', {'id':invitation.id}) }}">Email Invitiation</a>
-    </li>
-</ul>
+        <h4>Logged out required</h4>
+        <ul>
+            <li>
+                <a href="{{ url('scode', {'code':scode}) }}">SCode Invitiation</a>
+            </li>
+            <li>
+                <a href="{{ url('invitation', {'id':invitation.id}) }}">Email Invitiation</a>
+            </li>
+        </ul>
 
-<h4>Admin login required</h4>
-<ul>
-    <li>
-        <a href="{{ url('user_invalid_policy') }}?_impersonate={{ cancelled_policy.user.email }}">User Policy Invalid</a> <b>(auto impersonate {{ cancelled_policy.user.email }}</b>
-    </li>
-    <li>
-        <a href="{{ url('user_invalid_policy') }}?_impersonate={{ cancelled_fraud_policy.user.email }}">User Policy Invalid (Fraud) - no additonal purchase</a> <b>(auto impersonate {{ cancelled_fraud_policy.user.email }}</b>
-    </li>
-    <li>
-        <a href="{{ url('user_home') }}?_impersonate={{ valid_multiple_policy.user.email }}">User Home - Multiple Policy</a> <b>(auto impersonate {{ valid_multiple_policy.user.email }})</b>
-    </li>
-    <li>
-        <a href="{{ url('user_home') }}?_impersonate={{ valid_policy.user.email }}">User Home</a> <b>(auto impersonate {{ valid_policy.user.email }})</b>
-    </li>
-    <li>
-        <a href="{{ url('user_home') }}?_impersonate={{ invitation.inviter.email }}">User Home - Sent Invitation</a> <b>(auto impersonate {{ invitation.inviter.email }})</b>
-    </li>
-    <li>
-        <a href="{{ url('user_home') }}?_impersonate={{ claimed_policy.user.email }}">User Home - Unable to invite (w/Claimed Policy)</a> <b>(auto impersonate {{ claimed_policy.user.email }})</b>
-    </li>
-    <li>
-        {% if expired_policy_nocashback %}
-        <a href="{{ url('user_policy', {'policyId': expired_policy_nocashback.id }) }}?_impersonate={{ expired_policy_nocashback.user.email }}">User Home - Expired Policy No Cashback</a> <b>(auto impersonate {{ expired_policy_nocashback.user.email }})</b>
-        {% else %}
-            No expired policy (no cashback) available
-        {% endif %}
-    </li>
-    <li>
-        {% if expired_policy_cashback %}
-        <a href="{{ url('user_policy', {'policyId': expired_policy_cashback.id }) }}?_impersonate={{ expired_policy_cashback.user.email }}">User Home - Expired Policy Cashback</a> <b>(auto impersonate {{ expired_policy_cashback.user.email }})</b>
-        {% else %}
-            No expired policy (cashback) available
-        {% endif %}
-    </li>
-    <li>
-        {% if fully_expired_policy_nocashback %}
-        <a href="{{ url('user_policy', {'policyId': fully_expired_policy_nocashback.id }) }}?_impersonate={{ fully_expired_policy_nocashback.user.email }}">User Home - Fully Expired Policy No Cashback</a> <b>(auto impersonate {{ fully_expired_policy_nocashback.user.email }})</b>
-        {% else %}
-            No fully expired policy (no cashback) available
-        {% endif %}
-    </li>
-    <li>
-        {% if fully_expired_policy_cashback %}
-        <a href="{{ url('user_policy', {'policyId': fully_expired_policy_cashback.id }) }}?_impersonate={{ fully_expired_policy_cashback.user.email }}">User Home - Fully Expired Policy Cashback</a> <b>(auto impersonate {{ fully_expired_policy_cashback.user.email }})</b>
-        {% else %}
-            No fully expired policy (cashback) available
-        {% endif %}
-    </li>
-    <li>
-        <a href="{{ url('user_welcome') }}?_impersonate={{ valid_policy.user.email }}">User Welcome</a> <b>(auto impersonate {{ valid_policy.user.email }})</b>
-    </li>
-    <li>
-        <a href="{{ url('user_home') }}?_impersonate={{ unpaid_policy.user.email }}">User Unpaid Page</a> <b>(auto impersonate {{ unpaid_policy.user.email }})</b>
-    </li>
-    <li>
-        {% if policy_cancelled_payment_owed %}
-        <a href="{{ url('user_home') }}?_impersonate={{ policy_cancelled_payment_owed.user.email }}">User Home Page Redirect (Policy Cancelled & Payment Owed)</a> <b>(auto impersonate {{ policy_cancelled_payment_owed.user.email }})</b>
-        {% else %}
-            No policy cancelled w/payment owed available
-        {% endif %}
-    </li>
-    <li>
-        {% if valid_remainder_policy %}
-        <a href="{{ url('purchase_remainder_policy', {'id': valid_remainder_policy.id }) }}?_impersonate={{ valid_remainder_policy.user.email }}">User Remainder Payment Page</a> <b>(auto impersonate {{ valid_remainder_policy.user.email }})</b>
-        {% else %}
-            No remainder policy available
-        {% endif %}
-    </li>
-</ul>
+        <h4>Admin login required</h4>
+        <ul>
+            <li>
+                <a href="{{ url('user_invalid_policy') }}?_impersonate={{ cancelled_policy.user.email }}">User Policy Invalid</a> <b>(auto impersonate {{ cancelled_policy.user.email }}</b>
+            </li>
+            <li>
+                <a href="{{ url('user_invalid_policy') }}?_impersonate={{ cancelled_fraud_policy.user.email }}">User Policy Invalid (Fraud) - no additonal purchase</a> <b>(auto impersonate {{ cancelled_fraud_policy.user.email }}</b>
+            </li>
+            <li>
+                <a href="{{ url('user_home') }}?_impersonate={{ valid_multiple_policy.user.email }}">User Home - Multiple Policy</a> <b>(auto impersonate {{ valid_multiple_policy.user.email }})</b>
+            </li>
+            <li>
+                <a href="{{ url('user_home') }}?_impersonate={{ valid_policy.user.email }}">User Home</a> <b>(auto impersonate {{ valid_policy.user.email }})</b>
+            </li>
+            <li>
+                <a href="{{ url('user_home') }}?_impersonate={{ invitation.inviter.email }}">User Home - Sent Invitation</a> <b>(auto impersonate {{ invitation.inviter.email }})</b>
+            </li>
+            <li>
+                <a href="{{ url('user_home') }}?_impersonate={{ claimed_policy.user.email }}">User Home - Unable to invite (w/Claimed Policy)</a> <b>(auto impersonate {{ claimed_policy.user.email }})</b>
+            </li>
+            <li>
+                {% if expired_policy_nocashback %}
+                <a href="{{ url('user_policy', {'policyId': expired_policy_nocashback.id }) }}?_impersonate={{ expired_policy_nocashback.user.email }}">User Home - Expired Policy No Cashback</a> <b>(auto impersonate {{ expired_policy_nocashback.user.email }})</b>
+                {% else %}
+                    No expired policy (no cashback) available
+                {% endif %}
+            </li>
+            <li>
+                {% if expired_policy_cashback %}
+                <a href="{{ url('user_policy', {'policyId': expired_policy_cashback.id }) }}?_impersonate={{ expired_policy_cashback.user.email }}">User Home - Expired Policy Cashback</a> <b>(auto impersonate {{ expired_policy_cashback.user.email }})</b>
+                {% else %}
+                    No expired policy (cashback) available
+                {% endif %}
+            </li>
+            <li>
+                {% if fully_expired_policy_nocashback %}
+                <a href="{{ url('user_policy', {'policyId': fully_expired_policy_nocashback.id }) }}?_impersonate={{ fully_expired_policy_nocashback.user.email }}">User Home - Fully Expired Policy No Cashback</a> <b>(auto impersonate {{ fully_expired_policy_nocashback.user.email }})</b>
+                {% else %}
+                    No fully expired policy (no cashback) available
+                {% endif %}
+            </li>
+            <li>
+                {% if fully_expired_policy_cashback %}
+                <a href="{{ url('user_policy', {'policyId': fully_expired_policy_cashback.id }) }}?_impersonate={{ fully_expired_policy_cashback.user.email }}">User Home - Fully Expired Policy Cashback</a> <b>(auto impersonate {{ fully_expired_policy_cashback.user.email }})</b>
+                {% else %}
+                    No fully expired policy (cashback) available
+                {% endif %}
+            </li>
+            <li>
+                <a href="{{ url('user_welcome') }}?_impersonate={{ valid_policy.user.email }}">User Welcome</a> <b>(auto impersonate {{ valid_policy.user.email }})</b>
+            </li>
+            <li>
+                <a href="{{ url('user_home') }}?_impersonate={{ unpaid_policy.user.email }}">User Unpaid Page</a> <b>(auto impersonate {{ unpaid_policy.user.email }})</b>
+            </li>
+            <li>
+                {% if policy_cancelled_payment_owed %}
+                <a href="{{ url('user_home') }}?_impersonate={{ policy_cancelled_payment_owed.user.email }}">User Home Page Redirect (Policy Cancelled & Payment Owed)</a> <b>(auto impersonate {{ policy_cancelled_payment_owed.user.email }})</b>
+                {% else %}
+                    No policy cancelled w/payment owed available
+                {% endif %}
+            </li>
+            <li>
+                {% if valid_remainder_policy %}
+                <a href="{{ url('purchase_remainder_policy', {'id': valid_remainder_policy.id }) }}?_impersonate={{ valid_remainder_policy.user.email }}">User Remainder Payment Page</a> <b>(auto impersonate {{ valid_remainder_policy.user.email }})</b>
+                {% else %}
+                    No remainder policy available
+                {% endif %}
+            </li>
+        </ul>
 
-<h4>Renewals</h4>
-<ul>
-    <li>
-        {% if valid_renewal_policy_monthly_no_pot %}
-            <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_monthly_no_pot.user.email }}">User Renewal Monthly No Pot - Home Page</a> <b>(auto impersonate {{ valid_renewal_policy_monthly_no_pot.user.email }})</b>
-        {% else %}
-            No renewal policy (monthly without pot) available
-        {% endif %}
-    </li>
-    <li>
-        {% if valid_renewal_policy_yearly_no_pot %}
-            <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_yearly_no_pot.user.email }}">User Renewal Yearly No Pot - Home Page</a> <b>(auto impersonate {{ valid_renewal_policy_yearly_no_pot.user.email }})</b>
-        {% else %}
-            No renewal policy (yearly without pot) available
-        {% endif %}
-    </li>
-    <li>
-        {% if valid_renewal_policy_yearly_only_no_pot %}
-            <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_yearly_only_no_pot.user.email }}">User Renewal Yearly (Restricted) No Pot - Home Page</a> <b>(auto impersonate {{ valid_renewal_policy_yearly_only_no_pot.user.email }})</b>
-        {% else %}
-            No renewal policy (yearly restricted without pot) available
-        {% endif %}
-    </li>
-    <li>
-        {% if valid_renewal_policy_monthly_with_pot %}
-            <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_monthly_with_pot.user.email }}">User Renewal Monthly With Pot - Home Page</a> <b>(auto impersonate {{ valid_renewal_policy_monthly_with_pot.user.email }})</b>
-        {% else %}
-            No renewal policy (monthly with pot) available
-        {% endif %}
-    </li>
-    <li>
-        {% if valid_renewal_policy_yearly_with_pot %}
-            <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_yearly_with_pot.user.email }}">User Renewal Yearly With Pot - Home Page</a> <b>(auto impersonate {{ valid_renewal_policy_yearly_with_pot.user.email }})</b>
-        {% else %}
-            No renewal policy (yearly with pot) available
-        {% endif %}
-    </li>
-    <li>
-        {% if valid_renewal_policy_yearly_only_with_pot %}
-            <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_yearly_only_with_pot.user.email }}">User Renewal Yearly (Restricted) With Pot - Home Page</a> <b>(auto impersonate {{ valid_renewal_policy_yearly_only_with_pot.user.email }})</b>
-        {% else %}
-            No renewal policy (yearly restricted with pot) available
-        {% endif %}
-    </li>
-</ul>
+        <h4>Renewals</h4>
+        <ul>
+            <li>
+                {% if valid_renewal_policy_monthly_no_pot %}
+                    <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_monthly_no_pot.user.email }}">User Renewal Monthly No Pot - Home Page</a> <b>(auto impersonate {{ valid_renewal_policy_monthly_no_pot.user.email }})</b>
+                {% else %}
+                    No renewal policy (monthly without pot) available
+                {% endif %}
+            </li>
+            <li>
+                {% if valid_renewal_policy_yearly_no_pot %}
+                    <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_yearly_no_pot.user.email }}">User Renewal Yearly No Pot - Home Page</a> <b>(auto impersonate {{ valid_renewal_policy_yearly_no_pot.user.email }})</b>
+                {% else %}
+                    No renewal policy (yearly without pot) available
+                {% endif %}
+            </li>
+            <li>
+                {% if valid_renewal_policy_yearly_only_no_pot %}
+                    <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_yearly_only_no_pot.user.email }}">User Renewal Yearly (Restricted) No Pot - Home Page</a> <b>(auto impersonate {{ valid_renewal_policy_yearly_only_no_pot.user.email }})</b>
+                {% else %}
+                    No renewal policy (yearly restricted without pot) available
+                {% endif %}
+            </li>
+            <li>
+                {% if valid_renewal_policy_monthly_with_pot %}
+                    <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_monthly_with_pot.user.email }}">User Renewal Monthly With Pot - Home Page</a> <b>(auto impersonate {{ valid_renewal_policy_monthly_with_pot.user.email }})</b>
+                {% else %}
+                    No renewal policy (monthly with pot) available
+                {% endif %}
+            </li>
+            <li>
+                {% if valid_renewal_policy_yearly_with_pot %}
+                    <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_yearly_with_pot.user.email }}">User Renewal Yearly With Pot - Home Page</a> <b>(auto impersonate {{ valid_renewal_policy_yearly_with_pot.user.email }})</b>
+                {% else %}
+                    No renewal policy (yearly with pot) available
+                {% endif %}
+            </li>
+            <li>
+                {% if valid_renewal_policy_yearly_only_with_pot %}
+                    <a href="{{ url('user_home') }}?_impersonate={{ valid_renewal_policy_yearly_only_with_pot.user.email }}">User Renewal Yearly (Restricted) With Pot - Home Page</a> <b>(auto impersonate {{ valid_renewal_policy_yearly_only_with_pot.user.email }})</b>
+                {% else %}
+                    No renewal policy (yearly restricted with pot) available
+                {% endif %}
+            </li>
+        </ul>
 
-<h4>Other pages</h4>
-<ul>
-    <li>
-        <a href="{{ url('about_home') }}">About Us Page</a>
-    </li>
-    <li>
-        <a href="{{ url('about_how_to_contact_so_sure') }}">Contact Us Page</a>
-    </li>
-    <li>
-        <a href="{{ url('mobile_phone_insurance_for_your_company') }}">Company page</a>
-    </li>
-    <li>
-        <a href="{{ url('purchase_cancel', {'id': valid_policy.id}) }}">Cancel policy</a>
-    </li>
-    <li>
-        <a href="{{ url('claim') }}">Make a claim page</a>
-    </li>
-    <li>
-        <a href="{{ url('launch_usa') }}">USA Page</a>
-    </li>
-</ul>
+        <h4>Other pages</h4>
+        <ul>
+            <li>
+                <a href="{{ url('about_home') }}">About Us Page</a>
+            </li>
+            <li>
+                <a href="{{ url('about_how_to_contact_so_sure') }}">Contact Us Page</a>
+            </li>
+            <li>
+                <a href="{{ url('mobile_phone_insurance_for_your_company') }}">Company page</a>
+            </li>
+            <li>
+                <a href="{{ url('purchase_cancel', {'id': valid_policy.id}) }}">Cancel policy</a>
+            </li>
+            <li>
+                <a href="{{ url('claim') }}">Make a claim page</a>
+            </li>
+            <li>
+                <a href="{{ url('launch_usa') }}">USA Page</a>
+            </li>
+        </ul>
 
-<h4>Error pages</h4>
-<ul>
-    <li>
-        <a href="/_error/403">403</a>
-    </li>
-    <li>
-        <a href="/_error/404">404</a>
-    </li>
-    <li>
-        <a href="/_error/500">500</a>
-    </li>
-    <li>
-        <a href="/_error/503">503</a>
-    </li>
-</ul>
+        <h4>Error pages</h4>
+        <ul>
+            <li>
+                <a href="/_error/403">403</a>
+            </li>
+            <li>
+                <a href="/_error/404">404</a>
+            </li>
+            <li>
+                <a href="/_error/500">500</a>
+            </li>
+            <li>
+                <a href="/_error/503">503</a>
+            </li>
+        </ul>
 
 
-<h4>Landing pages</h4>
-<ul>
-    <li>Bank
-        <a href="{{ url('think_your_iPhone-7_is_insured_by_your_bank') }}">iPhone 7</a>
-    </li>
-    <li>Vodafone
-        <a href="{{ url('samsung_s7_insured_with_vodafone') }}">Samsung S7</a>
-        <a href="{{ url('google_pixel_insured_with_vodafone') }}">Pixel</a>
-        <a href="{{ url('iphone_SE_insured_with_vodafone') }}">iPhone SE</a>
-        <a href="{{ url('iphone_6_insured_with_vodafone') }}">iPhone 6</a>
-        <a href="{{ url('iphone_6s_insured_with_vodafone') }}">iPhone 6S</a>
-        <a href="{{ url('iphone_7_insured_with_vodafone') }}">iPhone 7</a>
-        <a href="{{ url('iphone_7_plus_insured_with_vodafone') }}">iPhone 7+</a>
-    </li>
-    <li>Network
-        <a href="{{ url('samsung_s7_insured_with_your_mobile_network') }}">Samsung S7</a>
-        <a href="{{ url('google_pixel_insured_with_your_mobile_network') }}">Pixel</a>
-        <a href="{{ url('iphone_SE_insured_with_your_mobile_network') }}">iPhone SE</a>
-        <a href="{{ url('iphone_6_insured_with_your_mobile_network') }}">iPhone 6</a>
-        <a href="{{ url('iphone_6s_insured_with_your_mobile_network') }}">iPhone 6S</a>
-        <a href="{{ url('iphone_7_insured_with_your_mobile_network') }}">iPhone 7</a>
-        <a href="{{ url('iphone_7_plus_insured_with_your_mobile_network') }}">iPhone 7+</a>
-    </li>
-</ul>
-
+        <h4>Landing pages</h4>
+        <ul>
+            <li>Bank
+                <a href="{{ url('think_your_iPhone-7_is_insured_by_your_bank') }}">iPhone 7</a>
+            </li>
+            <li>Vodafone
+                <a href="{{ url('samsung_s7_insured_with_vodafone') }}">Samsung S7</a>
+                <a href="{{ url('google_pixel_insured_with_vodafone') }}">Pixel</a>
+                <a href="{{ url('iphone_SE_insured_with_vodafone') }}">iPhone SE</a>
+                <a href="{{ url('iphone_6_insured_with_vodafone') }}">iPhone 6</a>
+                <a href="{{ url('iphone_6s_insured_with_vodafone') }}">iPhone 6S</a>
+                <a href="{{ url('iphone_7_insured_with_vodafone') }}">iPhone 7</a>
+                <a href="{{ url('iphone_7_plus_insured_with_vodafone') }}">iPhone 7+</a>
+            </li>
+            <li>Network
+                <a href="{{ url('samsung_s7_insured_with_your_mobile_network') }}">Samsung S7</a>
+                <a href="{{ url('google_pixel_insured_with_your_mobile_network') }}">Pixel</a>
+                <a href="{{ url('iphone_SE_insured_with_your_mobile_network') }}">iPhone SE</a>
+                <a href="{{ url('iphone_6_insured_with_your_mobile_network') }}">iPhone 6</a>
+                <a href="{{ url('iphone_6s_insured_with_your_mobile_network') }}">iPhone 6S</a>
+                <a href="{{ url('iphone_7_insured_with_your_mobile_network') }}">iPhone 7</a>
+                <a href="{{ url('iphone_7_plus_insured_with_your_mobile_network') }}">iPhone 7+</a>
+            </li>
+        </ul>
+    </section>
 </div>
 {% endblock %}
 
