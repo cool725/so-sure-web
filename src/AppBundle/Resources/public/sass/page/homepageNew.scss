@@ -390,16 +390,51 @@
     }
 
     &--press {
+
+        .press-img {
+            width: 200px; height: 100px;
+            background: transparent url('https://cdn.so-sure.com/images/homepage/press/in_the_press_sprite_2x.png') no-repeat;
+            background-size: 900px;
+        }
+
+        .the-guardian {
+            background-position: 10px 0;
+
+            @include breakpoint(tablet) {
+                background-position: 0 0;
+            }
+        }
+
+        .financial-times {
+            background-position: -200px 0;
+        }
+
+        .insurance-post {
+            background-position: -400px 0;
+        }
+
+        .digital-top-50 {
+            width: 160px;
+            background-position: -600px 0;
+
+            @include breakpoint(tablet) {
+                background-position: -620px 0;
+            }
+        }
+
+        .insurance-choice-awards {
+            width: 150px;
+            background-position: -749px 0;
+
+            @include breakpoint(tablet) {
+                background-position: -800px 0;
+            }
+        }
+
         text-align: center;
 
         h4 {
             margin: 0 0 0 5px;
-        }
-
-        li.fix-img {
-            &:first-of-type {
-                margin-left: -5px;
-            }
         }
 
         @include breakpoint(laptop) {
