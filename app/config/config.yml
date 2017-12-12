@@ -136,15 +136,15 @@ fos_user:
     user_class: AppBundle\Document\User
     registration:
         form:
-            type: AppBundle\Form\Type\RegistrationFormType
+            type: app_user_registration
     service:
         mailer: fos_user.mailer.twig_swift
     resetting:
         email:
             template: email/password_resetting.email.twig
-            from_email:
-                address:        hello@wearesosure.com
-                sender_name:    so-sure
+    from_email:
+        address:        hello@wearesosure.com
+        sender_name:    so-sure
 
 hwi_oauth:
     connect:
@@ -341,7 +341,7 @@ scheb_two_factor:
 
     # If your Doctrine user object is managed by a model manager, which is not the default one, you have to
     # set this option. Name of entity manager or null, which uses the default one.
-    model_manager_name: ~
+    model_manager_name: fos_user.user_manager
 
     # The security token classes, which trigger two-factor authentication.
     # By default the bundle only reacts to Symfony's username+password authentication. If you want to enable

@@ -3,6 +3,14 @@
 parameters:
 
 services:
+    _defaults:
+        autowire: false      # Automatically injects dependencies in your services.
+        autoconfigure: false # Automatically registers your services as commands, event subscribers, etc.
+
+    # hack for unused scheb_two_factor.entity_manager
+    doctrine:
+        class: AppBundle\Security\FOSUBUserProvider
+
     app.user:
         class: AppBundle\Security\FOSUBUserProvider
         arguments: ["@fos_user.user_manager",{facebook: facebookId, starling: starlingId, accountkit: id}]
@@ -12,178 +20,180 @@ services:
 
     app.user.cognitoidentity:
         class: AppBundle\Security\CognitoIdentityUserProvider
+        autowire: false
+        autoconfigure: false
         arguments:
-            user_manager:   "@fos_user.user_manager"
-            dm:             "@doctrine_mongodb.odm.default_document_manager"
-            coginto:        "@aws.cognito"
-            developerLogin: "%cognito_developer_login%"
-            identityPoolId: "%aws_cognito_identitypoolid%"
-            logger:         "@logger"
-            facebook:       "@app.facebook"
-            environment:    "%kernel.environment%"
+            - "@fos_user.user_manager"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@aws.cognito"
+            - "%cognito_developer_login%"
+            - "%aws_cognito_identitypoolid%"
+            - "@logger"
+            - "@app.facebook"
+            - "%kernel.environment%"
 
     app.user.cognitoidentity.authenticator:
         class: AppBundle\Security\CognitoIdentityAuthenticator
         arguments:
-            httpUtils: "@security.http_utils"
-            logger:    "@logger"
+            - "@security.http_utils"
+            - "@logger"
 
     app.facebook:
         class: AppBundle\Service\FacebookService
         arguments:
-            logger:             "@logger"
-            router:             "@router"
-            fb_appid:           "%fb_appid%"
-            fb_secret:          "%fb_secret%"
-            account_kit_secret: "%account_kit_secret%"
+            - "@logger"
+            - "@router"
+            - "%fb_appid%"
+            - "%fb_secret%"
+            - "%account_kit_secret%"
 
     app.mailchimp.prelaunch:
         class: AppBundle\Service\MailchimpService
         arguments:
-          logger: "@logger"
-          apikey: "%mailchimp_apikey%"
-          list: "%mailchimp_prelaunch_list%"
-          environment: "%kernel.environment%"
+            - "@logger"
+            - "%mailchimp_apikey%"
+            - "%mailchimp_prelaunch_list%"
+            - "%kernel.environment%"
 
     app.gocardless:
         class: AppBundle\Service\GocardlessService
         arguments:
-            dm:          "@doctrine_mongodb.odm.default_document_manager"
-            logger:      "@logger"
-            policy:      "@app.policy"
-            accessToken: "%gocardless_apikey%"
-            prod:        "%gocardless_prod%"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "@app.policy"
+            - "%gocardless_apikey%"
+            - "%gocardless_prod%"
 
     app.fraud:
         class: AppBundle\Service\FraudService
         arguments:
-            dm:          "@doctrine_mongodb.odm.default_document_manager"
-            logger:      "@logger"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
 
     app.judopay:
         class: AppBundle\Service\JudopayService
         arguments:
-            dm:                   "@doctrine_mongodb.odm.default_document_manager"
-            logger:               "@logger"
-            policy:               "@app.policy"
-            mailer:               "@app.mailer"
-            apiToken:             "%judopay_apitoken%"
-            apiSecret:            "%judopay_apisecret%"
-            judoId:               "%judopay_id%"
-            environment:          "%kernel.environment%"
-            statsd:               "@statsd"
-            webToken:             "%judopay_webtoken%"
-            webSecret:            "%judopay_websecret%"
-            dispatcher:           "@event_dispatcher"
-            sms:                  "@app.sms"
-            feature:              "@app.feature"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "@app.policy"
+            - "@app.mailer"
+            - "%judopay_apitoken%"
+            - "%judopay_apisecret%"
+            - "%judopay_id%"
+            - "%kernel.environment%"
+            - "@statsd"
+            - "%judopay_webtoken%"
+            - "%judopay_websecret%"
+            - "@event_dispatcher"
+            - "@app.sms"
+            - "@app.feature"
 
     app.barclays:
         class: AppBundle\Service\BarclaysService
         arguments:
-            dm:          "@doctrine_mongodb.odm.default_document_manager"
-            logger:      "@logger"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
 
     app.lloyds:
         class: AppBundle\Service\LloydsService
         arguments:
-            dm:          "@doctrine_mongodb.odm.default_document_manager"
-            logger:      "@logger"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
 
     app.user.launch:
         class: AppBundle\Service\LaunchUserService
         arguments:
-            dm:         "@doctrine_mongodb.odm.default_document_manager"
-            logger:     "@logger"
-            mailchimp:  "@app.mailchimp.prelaunch"
-            mailer:     "@app.mailer"
-            templating: "@templating"
-            router:     "@app.router"
-            shortLink:  "@app.shortlink"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "@app.mailchimp.prelaunch"
+            - "@app.mailer"
+            - "@templating"
+            - "@app.router"
+            - "@app.shortlink"
 
     app.invitation:
         class: AppBundle\Service\InvitationService
         arguments:
-            dm:                   "@doctrine_mongodb.odm.default_document_manager"
-            logger:               "@logger"
-            mailer:               "@app.mailer"
-            router:               "@app.router"
-            shortLink:            "@app.shortlink"
-            sms:                  "@app.sms"
-            rateLimit:            "@app.ratelimit"
-            push:                 "@app.push"
-            environment:          "%kernel.environment%"
-            dispatcher:           "@event_dispatcher"
-            mixpanel:             "@app.mixpanel"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "@app.mailer"
+            - "@app.router"
+            - "@app.shortlink"
+            - "@app.sms"
+            - "@app.ratelimit"
+            - "@app.push"
+            - "%kernel.environment%"
+            - "@event_dispatcher"
+            - "@app.mixpanel"
 
     app.digits:
         class: AppBundle\Service\DigitsService
         arguments:
-            dm:                   "@doctrine_mongodb.odm.default_document_manager"
-            logger:               "@logger"
-            digitsConsumerKey:    "%digits_consumer_key%"
-            allowedKeys:          "%allowed_digits_consumer_keys%"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "%digits_consumer_key%"
+            - "%allowed_digits_consumer_keys%"
 
     app.push:
         class: AppBundle\Service\PushService
         arguments:
-            logger:     "@logger"
-            sns:        "@aws.sns"
+            - "@logger"
+            - "@aws.sns"
 
     app.claims:
         class: AppBundle\Service\ClaimsService
         arguments:
-            dm:                   "@doctrine_mongodb.odm.default_document_manager"
-            logger:               "@logger"
-            mailer:               "@app.mailer"
-            environment:          "%kernel.environment%"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "@app.mailer"
+            - "%kernel.environment%"
 
     app.shortlink:
         class: AppBundle\Service\ShortLinkService
         arguments:
-            logger:        "@logger"
-            googleAppName: "%google_appname%"
-            googleApiKey:  "%google_apikey%"
-            statsd:        "@statsd"
+            - "@logger"
+            - "%google_appname%"
+            - "%google_apikey%"
+            - "@statsd"
 
     app.intercom:
         class: AppBundle\Service\IntercomService
         arguments:
-            dm:             "@doctrine_mongodb.odm.default_document_manager"
-            logger:         "@logger"
-            intercom_token: "%intercom_token%"
-            redis:          "@snc_redis.default"
-            secure:         "%intercom_secure%"
-            android:        "%intercom_secure_android%"
-            ios:            "%intercom_secure_ios%"
-            mailer:         "@mailer"
-            router:         "@router"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "%intercom_token%"
+            - "@snc_redis.default"
+            - "%intercom_secure%"
+            - "%intercom_secure_android%"
+            - "%intercom_secure_ios%"
+            - "@mailer"
+            - "@router"
 
     app.address:
         class: AppBundle\Service\PCAService
         arguments:
-            dm:          "@doctrine_mongodb.odm.default_document_manager"
-            logger:      "@logger"
-            apiKey:      "%pca_apikey%"
-            environment: "%kernel.environment%"
-            redis:       "@snc_redis.default"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "%pca_apikey%"
+            - "%kernel.environment%"
+            - "@snc_redis.default"
 
     app.geoip:
         class: AppBundle\Service\MaxMindIpService
         arguments:
-            logger:     "@logger"
-            cityDb:     "%geoip_city_db%"
-            countryDb:  "%geoip_country_db%"
+            - "@logger"
+            - "%geoip_city_db%"
+            - "%geoip_country_db%"
 
     app.cognito.identity:
         class: AppBundle\Service\CognitoIdentityService
         arguments:
-            logger:         "@logger"
-            dm:             "@doctrine_mongodb.odm.default_document_manager"
-            coginto:        "@aws.cognito"
-            developerLogin: "%cognito_developer_login%"
-            identityPoolId: "%aws_cognito_identitypoolid%"
-            environment:    "%kernel.environment%"
+            - "@logger"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@aws.cognito"
+            - "%cognito_developer_login%"
+            - "%aws_cognito_identitypoolid%"
+            - "%kernel.environment%"
 
     base.imei:
         abstract: true
@@ -195,6 +205,8 @@ services:
 
     app.imei:
         parent: base.imei
+        autowire: false
+        autoconfigure: false
         class: AppBundle\Service\ReceperioService
         calls:
             - [setSecretKey, ['%receperio_secretkey%']]
@@ -207,55 +219,55 @@ services:
     app.deviceatlas:
         class: AppBundle\Service\DeviceAtlasService
         arguments:
-            logger:        "@logger"
-            dm:            "@doctrine_mongodb.odm.default_document_manager"
-            redis:         "@snc_redis.default"
-            mailerService: "@app.mailer"
+            - "@logger"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@snc_redis.default"
+            - "@app.mailer"
 
     app.sanctions:
         class: AppBundle\Service\SanctionsService
         arguments:
-            dm:            "@doctrine_mongodb.odm.default_document_manager"
-            logger:        "@logger"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
 
     app.sms:
         class: AppBundle\Service\SmsService
         arguments:
-            dm:             "@doctrine_mongodb.odm.default_document_manager"
-            logger:         "@logger"
-            router:         "@router"
-            auth_id:        "%plivo_authid%"
-            auth_token:     "%plivo_authtoken%"
-            sending_number: "%plivo_sendingnumber%"
-            templating:     "@templating"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "@router"
+            - "%plivo_authid%"
+            - "%plivo_authtoken%"
+            - "%plivo_sendingnumber%"
+            - "@templating"
 
     app.branch:
         class: AppBundle\Service\BranchService
         arguments:
-            logger:            "@logger"
-            routerService:     "@app.router"
-            redis:             "@snc_redis.default"
-            environment:       "%kernel.environment%"
-            branchKey:         "%branch_key%"
-            branchSecret:      "%branch_secret%"
-            branchDomain:      "%branch_domain%"
-            googleAppDownload: "%google_app_download%"
-            appleAppDownload": "%apple_app_download%"
+            - "@logger"
+            - "@app.router"
+            - "@snc_redis.default"
+            - "%kernel.environment%"
+            - "%branch_key%"
+            - "%branch_secret%"
+            - "%branch_domain%"
+            - "%google_app_download%"
+            - "%apple_app_download%"
 
     app.request:
         class: AppBundle\Service\RequestService
         arguments:
-            requestStack:     "@request_stack"
-            logger:           "@logger"
-            tokenStorage:     "@security.token_storage"
-            adminCookieValue: "%sosure_employee_cookie_value%"
+            - "@request_stack"
+            - "@logger"
+            - "@security.token_storage"
+            - "%sosure_employee_cookie_value%"
 
     app.twig.branch:
         class: AppBundle\Service\BranchTwigExtension
         arguments:
-            branch:         "@app.branch"
-            logger:         "@logger"
-            requestService: "@app.request"
+            - "@app.branch"
+            - "@logger"
+            - "@app.request"
         public: true
         tags:
             - { name: twig.extension }
@@ -263,8 +275,8 @@ services:
     app.twig.accountkit:
         class: AppBundle\Service\AccountkitTwigExtension
         arguments:
-            oauth:          "@hwi_oauth.resource_owner.accountkit"
-            logger:         "@logger"
+            - "@hwi_oauth.resource_owner.accountkit"
+            - "@logger"
         public: true
         tags:
             - { name: twig.extension }
@@ -272,7 +284,7 @@ services:
     app.twig.s3:
         class: AppBundle\Service\S3TwigExtension
         arguments:
-            s3: "@aws.s3"
+            - "@aws.s3"
         public: false
         tags:
             - { name: twig.extension }
@@ -280,8 +292,8 @@ services:
     app.twig.intercom:
         class: AppBundle\Service\IntercomTwigExtension
         arguments:
-            intercom:     "@app.intercom"
-            logger:       "@logger"
+            - "@app.intercom"
+            - "@logger"
         public: false
         tags:
             - { name: twig.extension }
@@ -289,8 +301,8 @@ services:
     app.twig.misc:
         class: AppBundle\Service\MiscTwigExtension
         arguments:
-            requestStack: "@request_stack"
-            logger:       "@logger"
+            - "@request_stack"
+            - "@logger"
         public: false
         tags:
             - { name: twig.extension }
@@ -298,21 +310,21 @@ services:
     app.excel:
         class: AppBundle\Service\ExcelService
         arguments:
-            logger:         "@logger"
+            - "@logger"
 
     app.salva:
         class: AppBundle\Service\SalvaExportService
         arguments:
-            dm:             "@doctrine_mongodb.odm.default_document_manager"
-            logger:         "@logger"
-            baseUrl:        "%salva_url%"
-            username:       "%salva_username%"
-            password:       "%salva_password%"
-            rootDir:        "%kernel.root_dir%"
-            redis:          "@snc_redis.default"
-            s3:             "@aws.s3"
-            environment:    "%kernel.environment%"
-            featureService: "@app.feature"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "%salva_url%"
+            - "%salva_username%"
+            - "%salva_password%"
+            - "%kernel.root_dir%"
+            - "@snc_redis.default"
+            - "@aws.s3"
+            - "%kernel.environment%"
+            - "@app.feature"
         tags:
             - { name: monolog.logger, channel: salva }
 
@@ -328,6 +340,8 @@ services:
 
     app.davies:
         parent: base.s3email
+        autowire: false
+        autoconfigure: false
         class: AppBundle\Service\DaviesService
         calls:
             - [setClaims, ['@app.claims']]
@@ -341,6 +355,8 @@ services:
 
     app.brightstar:
         parent: base.s3email
+        autowire: false
+        autoconfigure: false
         class: AppBundle\Service\BrightstarService
         calls:
             - [setBucket, ['ops.so-sure.com']]
@@ -352,100 +368,100 @@ services:
     app.jwt:
         class: AppBundle\Service\JWTService
         arguments:
-            logger:         "@logger"
-            secret:         "%api_secret%"
+            - "@logger"
+            - "%api_secret%"
 
     app.sequence:
         class: AppBundle\Service\SequenceService
         arguments:
-            dm:             "@doctrine_mongodb.odm.default_document_manager"
-            logger:         "@logger"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
 
     app.policy:
         class: AppBundle\Service\PolicyService
         arguments:
-            dm:                   "@doctrine_mongodb.odm.default_document_manager"
-            logger:               "@logger"
-            sequence:             "@app.sequence"
-            mailer:               "@app.mailer"
-            smtp:                 "@swiftmailer.transport.real"
-            templating:           "@templating"
-            router:               "@app.router"
-            environment:          "%kernel.environment%"
-            snappy_pdf:           "@knp_snappy.pdf"
-            dispatcher:           "@event_dispatcher"
-            s3:                   "@aws.s3"
-            shortLink:            "@app.shortlink"
-            statsd:               "@statsd"
-            redis:                "@snc_redis.default"
-            branch:               "@app.branch"
-            address:              "@app.address"
-            imeiValidator:        "@app.imei"
-            rateLimit:            "@app.ratelimit"
-            intercom:             "@app.intercom"
-            sms:                  "@app.sms"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "@app.sequence"
+            - "@app.mailer"
+            - "@swiftmailer.transport.real"
+            - "@templating"
+            - "@app.router"
+            - "%kernel.environment%"
+            - "@knp_snappy.pdf"
+            - "@event_dispatcher"
+            - "@aws.s3"
+            - "@app.shortlink"
+            - "@statsd"
+            - "@snc_redis.default"
+            - "@app.branch"
+            - "@app.address"
+            - "@app.imei"
+            - "@app.ratelimit"
+            - "@app.intercom"
+            - "@app.sms"
 
     app.quote:
         class: AppBundle\Service\QuoteService
         arguments:
-            mailer:               "@app.mailer"
-            dm:                   "@doctrine_mongodb.odm.default_document_manager"
-            redis:                "@snc_redis.default"
+            - "@app.mailer"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@snc_redis.default"
 
     app.invoice:
         class: AppBundle\Service\InvoiceService
         arguments:
-            dm:                   "@doctrine_mongodb.odm.default_document_manager"
-            logger:               "@logger"
-            sequence:             "@app.sequence"
-            mailer:               "@app.mailer"
-            smtp:                 "@swiftmailer.transport.real"
-            templating:           "@templating"
-            environment:          "%kernel.environment%"
-            snappy_pdf:           "@knp_snappy.pdf"
-            s3:                   "@aws.s3"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "@app.sequence"
+            - "@app.mailer"
+            - "@swiftmailer.transport.real"
+            - "@templating"
+            - "%kernel.environment%"
+            - "@knp_snappy.pdf"
+            - "@aws.s3"
 
     app.mailer:
         class: AppBundle\Service\MailerService
         arguments:
-            mailer:               "@mailer"
-            smtp:                 "@swiftmailer.transport.real"
-            templating:           "@templating"
-            router:               "@app.router"
-            defaultSenderAddress: "%default_sender_address%"
-            defaultSenderName:    "%default_sender_name%"
+            - "@mailer"
+            - "@swiftmailer.transport.real"
+            - "@templating"
+            - "@app.router"
+            - "%default_sender_address%"
+            - "%default_sender_name%"
 
     app.router:
         class: AppBundle\Service\RouterService
         arguments:
-            router:               "@router"
-            baseUrl:              "%web_base_url%"
+            - "@router"
+            - "%web_base_url%"
 
     app.ratelimit:
         class: AppBundle\Service\RateLimitService
         arguments:
-            redis:          "@snc_redis.default"
-            logger:         "@logger"
-            environment:    "%kernel.environment%"
+            - "@snc_redis.default"
+            - "@logger"
+            - "%kernel.environment%"
 
     statsd_client:
         class: Domnikl\Statsd\Connection\UdpSocket
         arguments:
-            host:         "localhost"
-            port:         "8125"
+            - "localhost"
+            - "8125"
 
     statsd:
         class: Domnikl\Statsd\Client
         arguments:
-            connection:         "@statsd_client"
-            namespace:          "sosure"
+            - "@statsd_client"
+            - "sosure"
 
     app.stats:
         class: AppBundle\Service\StatsService
         arguments:
-            dm:             "@doctrine_mongodb.odm.default_document_manager"
-            redis:          "@snc_redis.default"
-            logger:         "@logger"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@snc_redis.default"
+            - "@logger"
 
     app.logger.rollbar:
         class: AppBundle\Classes\Rollbar
@@ -465,8 +481,8 @@ services:
     aws.credentials:
         class: Aws\Credentials\Credentials
         arguments:
-            key: "%aws_key%"
-            secret: "%aws_secret%"
+            - "%aws_key%"
+            - "%aws_secret%"
 
     aws.cognito:
         class: Aws\CognitoIdentity\CognitoIdentityClient
@@ -495,69 +511,69 @@ services:
     api.router:
         class: AppBundle\Service\ApiRouterService
         arguments:
-            router: "@router"
-            listenPort: 8080
-            httpPort: 80
-            httpsPort: 443
+            - "@router"
+            - 8080
+            - 80
+            - 443
 
     app.monitor:
         class: AppBundle\Service\MonitorService
         arguments:
-            dm:       "@doctrine_mongodb.odm.default_document_manager"
-            logger:   "@logger"
-            redis:    "@snc_redis.default"
-            intercom: "@app.intercom"
-            mixpanel: "@app.mixpanel"
-            judopay:  "@app.judopay"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "@snc_redis.default"
+            - "@app.intercom"
+            - "@app.mixpanel"
+            - "@app.judopay"
 
     app.annie:
         class: AppBundle\Service\AppAnnieService
         arguments:
-            dm:      "@doctrine_mongodb.odm.default_document_manager"
-            logger:  "@logger"
-            apiKey:  "%appannie_apikey%"
-            stats:   "@app.stats"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "%appannie_apikey%"
+            - "@app.stats"
 
     app.reporting:
         class: AppBundle\Service\ReportingService
         arguments:
-            dm:                "@doctrine_mongodb.odm.default_document_manager"
-            logger:            "@logger"
-            excludedPolicyIds: "%report_excluded_policy_ids%"
-            environment:       "%kernel.environment%"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "%report_excluded_policy_ids%"
+            - "%kernel.environment%"
 
     app.mixpanel:
         class: AppBundle\Service\MixpanelService
         arguments:
-            dm:             "@doctrine_mongodb.odm.default_document_manager"
-            logger:         "@logger"
-            redis:          "@snc_redis.default"
-            mixpanel:       "@mixpanel"
-            requestService: "@app.request"
-            environment:    "%kernel.environment%"
-            apiSecret:      "%mixpanel_apisecret%"
-            stats:          "@app.stats"
-            censusService:  "@census.search"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "@snc_redis.default"
+            - "@mixpanel"
+            - "@app.request"
+            - "%kernel.environment%"
+            - "%mixpanel_apisecret%"
+            - "@app.stats"
+            - "@census.search"
 
     app.sixpack:
         class: AppBundle\Service\SixpackService
         arguments:
-            dm:             "@doctrine_mongodb.odm.default_document_manager"
-            logger:         "@logger"
-            url:            "%sixpack_url%"
-            requestService: "@app.request"
-            mixpanel:       "@app.mixpanel"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "%sixpack_url%"
+            - "@app.request"
+            - "@app.mixpanel"
 
     app.feature:
         class: AppBundle\Service\FeatureService
         arguments:
-            dm:             "@doctrine_mongodb.odm.default_document_manager"
-            logger:         "@logger"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
 
     app.twig.feature:
         class: AppBundle\Service\FeatureTwigExtension
         arguments:
-            featureService: "@app.feature"
+            - "@app.feature"
         public: false
         tags:
             - { name: twig.extension }
@@ -590,7 +606,7 @@ services:
     doctrine.listener.invitation:
         class:   AppBundle\Listener\DoctrineInvitationListener
         arguments:
-            dispatcher: "@event_dispatcher"
+            - "@event_dispatcher"
         tags:
             -  { name: doctrine_mongodb.odm.event_listener, event: postPersist }
             -  { name: doctrine_mongodb.odm.event_listener, event: postUpdate  }
@@ -598,7 +614,7 @@ services:
     doctrine.listener.lead:
         class:   AppBundle\Listener\DoctrineLeadListener
         arguments:
-            dispatcher: "@event_dispatcher"
+            - "@event_dispatcher"
         tags:
             -  { name: doctrine_mongodb.odm.event_listener, event: postPersist }
             -  { name: doctrine_mongodb.odm.event_listener, event: postUpdate  }
@@ -606,7 +622,7 @@ services:
     doctrine.listener.user:
         class:   AppBundle\Listener\DoctrineUserListener
         arguments:
-            dispatcher: "@event_dispatcher"
+            - "@event_dispatcher"
         tags:
             -  { name: doctrine_mongodb.odm.event_listener, event: postPersist }
             -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
@@ -615,14 +631,14 @@ services:
     doctrine.listener.company:
         class:   AppBundle\Listener\DoctrineCompanyListener
         arguments:
-            dispatcher: "@event_dispatcher"
+            - "@event_dispatcher"
         tags:
             -  { name: doctrine_mongodb.odm.event_listener, event: postPersist }
 
     doctrine.listener.claim:
         class:   AppBundle\Listener\DoctrineClaimListener
         arguments:
-            dispatcher: "@event_dispatcher"
+            - "@event_dispatcher"
         tags:
             -  { name: doctrine_mongodb.odm.event_listener, event: postPersist }
             -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
@@ -630,31 +646,31 @@ services:
     doctrine.listener.connection:
         class:   AppBundle\Listener\DoctrineConnectionListener
         arguments:
-            dispatcher: "@event_dispatcher"
+            - "@event_dispatcher"
         tags:
             -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
 
     doctrine.listener.salva:
         class:   AppBundle\Listener\DoctrineSalvaListener
         arguments:
-            dispatcher:  "@event_dispatcher"
-            environment: "%kernel.environment%"
-            logger:      "@logger"
+            - "@event_dispatcher"
+            - "%kernel.environment%"
+            - "@logger"
         tags:
             -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
 
     doctrine.listener.policy:
         class:   AppBundle\Listener\DoctrinePolicyListener
         arguments:
-            dispatcher:  "@event_dispatcher"
-            environment: "%kernel.environment%"
+            - "@event_dispatcher"
+            - "%kernel.environment%"
         tags:
             -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
 
     doctrine.listener.validation:
         class:   AppBundle\Listener\DoctrineValidationListener
         arguments:
-            dispatcher:  "@event_dispatcher"
+            - "@event_dispatcher"
         tags:
             -  { name: doctrine_mongodb.odm.event_listener, event: prePersist }
             -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
@@ -662,26 +678,26 @@ services:
     app.listener.validation:
         class:   AppBundle\Listener\ValidationListener
         arguments:
-            validator: "@validator"
-            logger:    "@logger"
+            - "@validator"
+            - "@logger"
         tags:
             -  { name: kernel.event_listener, event: event.validate, method: onValidateEvent }
 
     app.listener.policy:
         class:   AppBundle\Listener\PolicyListener
         arguments:
-            policyService:        "@app.policy"
-            logger:               "@logger"
+            - "@app.policy"
+            - "@logger"
         tags:
             -  { name: kernel.event_listener, event: event.connection.reduced, method: onConnectionReducedEvent }
 
     app.listener.user:
         class:   AppBundle\Listener\UserListener
         arguments:
-            dm:                   "@doctrine_mongodb.odm.default_document_manager"
-            logger:               "@logger"
-            mailer:               "@app.mailer"
-            redis:                "@snc_redis.default"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "@app.mailer"
+            - "@snc_redis.default"
         tags:
             -  { name: kernel.event_listener, event: event.user.created, method: onUserCreatedEvent }
             -  { name: kernel.event_listener, event: event.user.updated, method: onUserUpdatedEvent }
@@ -690,15 +706,15 @@ services:
     app.listener.debtCollection:
         class:   AppBundle\Listener\DebtCollectionListener
         arguments:
-            dm:                   "@doctrine_mongodb.odm.default_document_manager"
-            logger:               "@logger"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
         tags:
             -  { name: kernel.event_listener, event: event.payment.success, method: onPaymentSuccessEvent }
 
     app.listener.intercom:
         class:   AppBundle\Listener\IntercomListener
         arguments:
-            intercom: "@app.intercom"
+            - "@app.intercom"
         tags:
             -  { name: kernel.event_listener, event: event.lead.updated, method: onLeadUpdatedEvent }
             -  { name: kernel.event_listener, event: event.user.created, method: onUserCreatedEvent }
@@ -722,10 +738,10 @@ services:
     app.listener.sanctions:
         class:   AppBundle\Listener\SanctionsListener
         arguments:
-            dm:                   "@doctrine_mongodb.odm.default_document_manager"
-            logger:               "@logger"
-            mailer:               "@app.mailer"
-            sanctions:            "@app.sanctions"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "@app.mailer"
+            - "@app.sanctions"
         tags:
             -  { name: kernel.event_listener, event: event.user.created, method: onUserCreatedEvent }
             -  { name: kernel.event_listener, event: event.company.created, method: onCompanyCreatedEvent }
@@ -733,7 +749,7 @@ services:
     app.listener.mixpanel:
         class:   AppBundle\Listener\MixpanelListener
         arguments:
-            mixpanel: "@app.mixpanel"
+            - "@app.mixpanel"
         tags:
             -  { name: kernel.event_listener, event: event.payment.success, method: onPaymentSuccessEvent }
             -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
@@ -745,14 +761,14 @@ services:
     app.listener.push:
         class:   AppBundle\Listener\PushListener
         arguments:
-            push: "@app.push"
+            - "@app.push"
         tags:
             -  { name: kernel.event_listener, event: event.policy.pending-renewal, method: onPolicyPendingRenewalEvent }
 
     app.listener.salva:
         class:   AppBundle\Listener\SalvaListener
         arguments:
-            salva: "@app.salva"
+            - "@app.salva"
         tags:
             -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
             -  { name: kernel.event_listener, event: event.policy.salva_increment, method: onPolicySalvaIncrementEvent }
@@ -761,10 +777,10 @@ services:
     app.listener.refund:
         class:   AppBundle\Listener\RefundListener
         arguments:
-            dm:      "@doctrine_mongodb.odm.default_document_manager"
-            judopay: "@app.judopay"
-            logger:  "@logger"
-            environment: "%kernel.environment%"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@app.judopay"
+            - "@logger"
+            - "%kernel.environment%"
         tags:
             -  { name: kernel.event_listener, event: event.policy.cancelled, method: onPolicyCancelledEvent }
             -  { name: kernel.event_listener, event: event.policy.created, method: refundFreeMonthPromo }
@@ -772,12 +788,12 @@ services:
     app.listener.response:
         class:   AppBundle\Listener\KernelListener
         arguments:
-            tokenStorage:     "@security.token_storage"
-            authChecker:      "@security.authorization_checker"
-            adminCookieValue: "%sosure_employee_cookie_value%"
-            logger:           "@logger"
-            environment:      "%kernel.environment%"
-            domain:           "%sosure_employee_cookie_domain%"
+            - "@security.token_storage"
+            - "@security.authorization_checker"
+            - "%sosure_employee_cookie_value%"
+            - "@logger"
+            - "%kernel.environment%"
+            - "%sosure_employee_cookie_domain%"
         tags:
             -  { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
             -  { name: kernel.event_listener, event: kernel.response, method: onKernelResponse }
@@ -785,10 +801,10 @@ services:
     app.listener.security:
         class:   AppBundle\Listener\SecurityListener
         arguments:
-            logger:        "@logger"
-            requestStack:  "@request_stack"
-            dispatcher:    "@event_dispatcher"
-            mixpanel:      "@app.mixpanel"
+            - "@logger"
+            - "@request_stack"
+            - "@event_dispatcher"
+            - "@app.mixpanel"
         tags:
             -  { name: kernel.event_listener, event: security.interactive_login, method: onSecurityInteractiveLogin }
             -  { name: kernel.event_listener, event: security.interactive_login.actual, method: onActualSecurityInteractiveLogin }
@@ -797,11 +813,17 @@ services:
         class:  AppBundle\Listener\MailerListener
         # for now, comment out to avoid circular ref - add back once swift log emailer not in use
         arguments:
-            logger:   "@logger"
-            spoolDir: "%kernel.root_dir%/../app/spool/requeue"
+            - "@logger"
+            - "%kernel.root_dir%/../app/spool/requeue"
         tags:
           - { name: monolog.logger, channel: mailer }
           - { name: "swiftmailer.default.plugin" }
+
+    app.form.type.registration:
+        class: AppBundle\Form\Type\RegistrationFormType
+        arguments: ["@request_stack", "%kernel.environment%"]
+        tags:
+            - { name: form.type, alias: app_user_registration }
 
     app.form.type.usersearch:
         class: AppBundle\Form\Type\UserSearchType
@@ -989,24 +1011,24 @@ services:
     rollbar.voter.accessdenied:
         class: AppBundle\Security\AccessDeniedHttpExceptionVoter
         arguments:
-            requestStack: "@request_stack"
-            ips:          "%sosure_ips%"
+            - "@request_stack"
+            - "%sosure_ips%"
         tags:
             - { name: staffim_rollbar.report_voter }
 
     sitemap.phone:
         class: AppBundle\Service\PhoneSitemapGenerator
         arguments:
-            dm:          "@doctrine_mongodb.odm.default_document_manager"
-            logger:      "@logger"
-            router:      "@router"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "@router"
         tags:
             - { name: dpn_xml_sitemap.generator }
     
     two_factor.persister:
         class: AppBundle\Service\DoctrinePersister
         arguments:
-            dm:          "@doctrine_mongodb.odm.default_document_manager"
+            - "@doctrine_mongodb.odm.default_document_manager"
 
     twig.extension.intl:
         class: Twig_Extensions_Extension_Intl
@@ -1016,13 +1038,13 @@ services:
     census.search:
         class: CensusBundle\Service\SearchService
         arguments:
-            dm:          "@doctrine_mongodb.odm.census_document_manager"
+            - "@doctrine_mongodb.odm.census_document_manager"
 
     app.gender:
         class: AppBundle\Service\GenderizeService
         arguments:
-            dm:          "@doctrine_mongodb.odm.default_document_manager"
-            logger:      "@logger"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
 
     app.ops.datacollector:
         class: AppBundle\Service\OpsDataCollector
