@@ -470,14 +470,34 @@
             }
         }
 
-        img {
-            width: 200px;
-        }
+        // img {
+        //     width: 200px;
+        // }
 
         a {
             &:focus {
                 outline: 0;
             }
+        }
+
+        .cover-img {
+            width: 200px; height: 200px;
+            background: transparent url('https://cdn.so-sure.com/images/homepage/whats_covered_sprite_2x.png') no-repeat;
+            background-size: 1200px;
+
+            margin: 0 auto;
+        }
+
+        .theft {
+            background-position: 0 -20px;
+        }
+
+        .loss {
+            background-position: -200px -20px;
+        }
+
+        .accidental-damage {
+            background-position: -400px -20px;
         }
 
         @include breakpoint(laptop) {
