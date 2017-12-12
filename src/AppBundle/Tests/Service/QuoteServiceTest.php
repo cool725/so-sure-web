@@ -114,6 +114,16 @@ class QuoteServiceTest extends WebTestCase
         self::$quoteService->getQuotes('OnePlus', 'A0001', 15.5, true);
     }
 
+    public function testQuoteServiceKnownDeviceRootedIgnore()
+    {
+        $mailer = $this->getMockBuilder('Swift_Mailer')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mailer->expects($this->exactly(1))->method('send');
+        self::$quoteService->setMailerMailer($mailer);
+        self::$quoteService->getQuotes('Nexus', 'bullhead', 2, true);
+    }
+
     public function testQuoteServiceKnownDeviceIgnoreMake()
     {
         $mailer = $this->getMockBuilder('Swift_Mailer')
