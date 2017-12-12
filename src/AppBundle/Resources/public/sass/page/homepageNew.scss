@@ -484,8 +484,8 @@
             width: 200px; height: 200px;
             background: transparent url('https://cdn.so-sure.com/images/homepage/whats_covered_sprite_2x.png') no-repeat;
             background-size: 1200px;
-
             margin: 0 auto;
+            cursor: pointer;
         }
 
         .theft {
@@ -499,6 +499,19 @@
         .accidental-damage {
             background-position: -400px -20px;
         }
+
+        .breakdown {
+            background-position: -600px -20px;
+        }
+
+        .charges {
+            background-position: -800px -20px;
+        }
+
+        .accessories {
+            background-position: -1000px -20px;
+        }
+
 
         @include breakpoint(laptop) {
             .cover-arrow {
