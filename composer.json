@@ -47,7 +47,7 @@
         "knplabs/knp-snappy-bundle": "^1.4",
         "dpn/xml-sitemap-bundle": "2.1.0.1",
         "domnikl/statsd": "~2.0",
-        "scheb/two-factor-bundle": "^2.6",
+        "scheb/two-factor-bundle": "dev-RemoveDoctrineHack",
         "nexylan/slack-bundle": "^1.0",
         "rollerworks/password-strength-bundle": "^1.5",
         "nelmio/security-bundle": "^2.0",
@@ -84,6 +84,10 @@
         {
             "type": "vcs",
             "url":  "https://github.com/so-sure/HWIOAuthBundle.git"
+        },
+        {
+            "type": "vcs",
+            "url":  "https://github.com/so-sure/two-factor-bundle.git"
         }
     ],
     "scripts": {

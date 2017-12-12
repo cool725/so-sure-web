@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "2b86181062c5fc95be5243cfabaf26bb",
-    "content-hash": "d5fad2969df41dd1091f72564e4c6c78",
+    "hash": "b35877101b74c3986f063690db98c3ff",
+    "content-hash": "e5cf18a8f85e59341e1444f3c61b90f6",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
@@ -5333,16 +5333,16 @@
         },
         {
             "name": "scheb/two-factor-bundle",
-            "version": "v2.14.0",
+            "version": "dev-RemoveDoctrineHack",
             "source": {
                 "type": "git",
-                "url": "https://github.com/scheb/two-factor-bundle.git",
-                "reference": "6ba7afc0e79fd3321e7c4f9974ff9b6d2f751222"
+                "url": "https://github.com/so-sure/two-factor-bundle.git",
+                "reference": "6b4a30131b0d9a557543e52008eaf51da11ee701"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/scheb/two-factor-bundle/zipball/6ba7afc0e79fd3321e7c4f9974ff9b6d2f751222",
-                "reference": "6ba7afc0e79fd3321e7c4f9974ff9b6d2f751222",
+                "url": "https://api.github.com/repos/so-sure/two-factor-bundle/zipball/6b4a30131b0d9a557543e52008eaf51da11ee701",
+                "reference": "6b4a30131b0d9a557543e52008eaf51da11ee701",
                 "shasum": ""
             },
             "require": {
@@ -5376,7 +5376,6 @@
                     "Scheb\\TwoFactorBundle\\": ""
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -5389,13 +5388,16 @@
             "description": "Provides two-factor authentication for Symfony applications",
             "homepage": "https://github.com/scheb/two-factor-bundle",
             "keywords": [
-                "Authentication",
+                "authentication",
                 "security",
                 "symfony",
                 "two-factor",
                 "two-step"
             ],
-            "time": "2017-11-18 10:48:13"
+            "support": {
+                "source": "https://github.com/so-sure/two-factor-bundle/tree/RemoveDoctrineHack"
+            },
+            "time": "2017-12-12 17:02:09"
         },
         {
             "name": "sensio/distribution-bundle",
@@ -8503,7 +8505,8 @@
         "friendsofsymfony/user-bundle": 10,
         "drewm/mailchimp-api": 20,
         "google/apiclient": 5,
-        "snc/redis-bundle": 20
+        "snc/redis-bundle": 20,
+        "scheb/two-factor-bundle": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

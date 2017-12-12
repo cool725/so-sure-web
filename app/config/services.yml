@@ -7,10 +7,6 @@ services:
         autowire: false      # Automatically injects dependencies in your services.
         autoconfigure: false # Automatically registers your services as commands, event subscribers, etc.
 
-    # hack for unused scheb_two_factor.entity_manager
-    doctrine:
-        class: AppBundle\Security\FOSUBUserProvider
-
     app.user:
         class: AppBundle\Security\FOSUBUserProvider
         arguments: ["@fos_user.user_manager",{facebook: facebookId, starling: starlingId, accountkit: id}]
