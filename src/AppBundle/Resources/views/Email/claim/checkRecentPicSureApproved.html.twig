@@ -1,7 +1,7 @@
 {% set logo_image = 'unhappy' %}
 {% extends 'AppBundle:Email:base.html.twig' %}
 {% import "AppBundle:Email:macros.html.twig" as macros %}
-{% block title %}Policy {{ policy.policyNumber }} should be cancelled{% endblock %}
+{% block title %}Review of pic-sure image for policy {{ policy.policyNumber }} needed {% endblock %}
 {% block body %}
     {{ macros.start_table() }}
     <h1>
