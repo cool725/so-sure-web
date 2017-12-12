@@ -51,6 +51,18 @@ class ClaimsServiceTest extends WebTestCase
     {
     }
 
+    private function expect($mailer, $at, $needle)
+    {
+        $mailer->expects($this->at($at))
+            ->method('send')
+            ->with($this->callback(
+                function ($mail) use ($needle) {
+                    return stripos($mail->getBody(), $needle) !== false;
+                }
+            ));
+    }
+
+
     public function testRecordLostPhone()
     {
         $user = static::createUser(
@@ -167,5 +179,106 @@ class ClaimsServiceTest extends WebTestCase
         $reward2 = $this->createReward(static::generateEmail('testProcessClaimRewards2', $this));
         $connection = static::$invitationService->addReward($policy, $reward2, 10);
         $this->assertEquals(10, $connection->getPromoValue());
+    }
+
+    public function testPicSureNotificationWithin30Day()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPicSureNotificationWithin30Day', $this),
+            'bar'
+        );
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, true, true);
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+        $policy->setPicSureApprovedDate(new \DateTime('-29 days'));
+        $claim = new Claim();
+        $claim->setPolicy($policy);
+        $claim->setProcessed(false);
+        $claim->setStatus(Claim::STATUS_SETTLED);
+        $claim->setType(Claim::TYPE_THEFT);
+        $mailer = $this->getMockBuilder('Swift_Mailer')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->expect($mailer, 0, 'recent claim');
+
+        self::$claimsService->setMailerMailer($mailer);
+        self::$claimsService->sendPicSureNotification($claim);
+    }
+
+    public function testPicSureNotificationOutside30Day()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPicSureNotificationOutside30Day', $this),
+            'bar'
+        );
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, true, true);
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+        $policy->setPicSureApprovedDate(new \DateTime('-35 days'));
+        $claim = new Claim();
+        $claim->setPolicy($policy);
+        $claim->setProcessed(false);
+        $claim->setStatus(Claim::STATUS_SETTLED);
+        $claim->setType(Claim::TYPE_THEFT);
+        $mailer = $this->getMockBuilder('Swift_Mailer')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mailer->expects($this->never())->method('send');
+        self::$claimsService->setMailerMailer($mailer);
+        self::$claimsService->sendPicSureNotification($claim);
+    }
+
+    public function testProcessClaimWithin30days()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testProcessClaimWithin30Day', $this),
+            'bar'
+        );
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, true, true);
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+        $policy->setPicSureApprovedDate(new \DateTime('-29 days'));
+        $claim = new Claim();
+        $claim->setPolicy($policy);
+        $claim->setProcessed(false);
+        $claim->setStatus(Claim::STATUS_SETTLED);
+        $claim->setType(Claim::TYPE_THEFT);
+        $mailer = $this->getMockBuilder('Swift_Mailer')
+            ->disableOriginalConstructor()
+            ->setMethods(['send'])
+            ->getMock();
+        $mailer->expects($this->exactly(2))->method('send');
+        self::$claimsService->setMailerMailer($mailer);
+        self::$claimsService->processClaim($claim);
+
+    }
+
+    public function testProcessClaimOutside30days()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testProcessClaimOutside30Day', $this),
+            'bar'
+        );
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, true, true);
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+        $policy->setPicSureApprovedDate(new \DateTime('-35 days'));
+        $claim = new Claim();
+        $claim->setPolicy($policy);
+        $claim->setProcessed(false);
+        $claim->setStatus(Claim::STATUS_SETTLED);
+        $claim->setType(Claim::TYPE_THEFT);
+        $mailer = $this->getMockBuilder('Swift_Mailer')
+            ->disableOriginalConstructor()
+            ->setMethods(['send'])
+            ->getMock();
+        $mailer->expects($this->exactly(1))->method('send');
+        self::$claimsService->setMailerMailer($mailer);
+        self::$claimsService->processClaim($claim);
+
     }
 }

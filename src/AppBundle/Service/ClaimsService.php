@@ -98,7 +98,34 @@ class ClaimsService
         $this->recordLostPhone($claim->getPolicy(), $claim);
         $this->dm->flush();
 
+        $this->sendPicSureNotification($claim);
         return true;
+    }
+
+    public function sendPicSureNotification(Claim $claim)
+    {
+        if ($claim->getPolicy()->getPicSureStatus() == PhonePolicy::PICSURE_STATUS_APPROVED
+            && $claim->getPolicy()->getPicSureApprovedDate()) {
+            $picSureApprovedDate = $claim->getPolicy()->getPicSureApprovedDate();
+            $diff = $picSureApprovedDate->diff(new \DateTime());
+            if ($diff->m < 1) {
+                try {
+                    $subject = 'Pic-sure validated claim needs review';
+                    $templateHtml = "AppBundle:Email:claim/checkRecentPicSureApproved.html.twig";
+                    $this->mailer->sendTemplate(
+                        $subject,
+                        'tech@wearesosure.com',
+                        $templateHtml,
+                        ['policy' => $claim->getPolicy()]
+                    );
+                } catch (\Exception $ex) {
+                    $this->logger->error(sprintf(
+                        'Error sending pic-sure validated claim review email. Ex: %s',
+                        $ex->getMessage()
+                    ));
+                }
+            }
+        }
     }
 
     public function recordLostPhone(Policy $policy, Claim $claim)
@@ -176,5 +203,9 @@ class ClaimsService
         } catch (\Exception $e) {
             $this->logger->error(sprintf("Error in notifyPolicyShouldBeCancelled.", ['exception' => $e]));
         }
+    }
+    public function setMailerMailer($mailer)
+    {
+        $this->mailer->setMailer($mailer);
     }
 }
