@@ -102,7 +102,7 @@ class QuoteService
         if (in_array($device, [
             "", "generic_x86", "generic_x86_64", "Simulator",
             "iPad4,4", "iPad5,2", "iPad5,3", "iPad5,4", "iPad6,7", "iPad6,8", "iPad Air", "iPad Air 2",
-            "iPad2,7", "iPad3,4", "iPad2,5", "iPad7,3", "iPad6,3", "iPad2,4", "iPat5,1",
+            "iPad2,7", "iPad3,4", "iPad2,5", "iPad7,3", "iPad6,3", "iPad2,4", "iPad5,1", "iPad4,8",
         ])) {
             return false;
         }
@@ -171,6 +171,11 @@ class QuoteService
      */
     private function rootedDevice($device, $memory)
     {
+        // add device-memory combinations to disable mail notifications
+        if (in_array($device.'-'.$memory, ["bullhead-2"])) {
+            return false;
+        }
+
         $body = sprintf(
             'Rooted device queried: %s (%s GB).',
             $device,
