@@ -1,8 +1,8 @@
 AccountKit_OnInteractive = function(){
     AccountKit.init(
         {
-            appId: document.getElementById('login-account-kit').data('key'),
-            state: document.getElementById('login-account-kit').data('csrf'),
+            appId: document.getElementById('login-account-kit').getAttribute('data-key'),
+            state: document.getElementById('login-account-kit').getAttribute('data-csrf'),
             version:"v1.0",
             fbAppEventsEnabled:true
         }
@@ -11,7 +11,7 @@ AccountKit_OnInteractive = function(){
 
 window.fbAsyncInit = function() {
   FB.init({
-    appId: document.getElementById('ss-root').data('fb-id'),
+    appId: document.getElementById('ss-root').getAttribute('data-fb-id'),
     xfbml: true,
     version: 'v2.5',
     status     : true

@@ -1,9 +1,5 @@
 {% extends "FOSUserBundle::layout.html.twig" %}
 {% block fos_user_content %}
-{% set default_login_method = 'accountkit' %}
-{% if use_cdn == false %}
-    {% set default_login_method = 'email' %}
-{% endif %}
 <h1>Welcome back!</h1>
 {# Account Kit Login #}
 <div id="login-account-kit" class="login-account-kit login-box" style="{% if default_login_method == 'email' %}display: none;{% endif %}" data-key="{{ fb_appid }}" data-csrf="{{ csrf_token('account-kit') }}" data-toggle="{% if app.request.clientIp == davies_ip %}1{% else %}0{% endif %}">
