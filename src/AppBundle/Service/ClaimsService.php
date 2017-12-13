@@ -108,7 +108,7 @@ class ClaimsService
             && $claim->getPolicy()->getPicSureApprovedDate()) {
             $picSureApprovedDate = $claim->getPolicy()->getPicSureApprovedDate();
             $diff = $picSureApprovedDate->diff(new \DateTime());
-            if ($diff->m < 1) {
+            if ($diff->d < 2) {
                 try {
                     $subject = 'Pic-sure validated claim needs review';
                     $templateHtml = "AppBundle:Email:claim/checkRecentPicSureApproved.html.twig";

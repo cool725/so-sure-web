@@ -181,17 +181,17 @@ class ClaimsServiceTest extends WebTestCase
         $this->assertEquals(10, $connection->getPromoValue());
     }
 
-    public function testPicSureNotificationWithin30Day()
+    public function testPicSureNotificationWithin1Day()
     {
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('testPicSureNotificationWithin30Day', $this),
+            static::generateEmail('testPicSureNotificationWithin1Day', $this),
             'bar'
         );
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone, null, true, true);
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
-        $policy->setPicSureApprovedDate(new \DateTime('-29 days'));
+        $policy->setPicSureApprovedDate(new \DateTime('-1 days'));
         $claim = new Claim();
         $claim->setPolicy($policy);
         $claim->setProcessed(false);
@@ -206,17 +206,17 @@ class ClaimsServiceTest extends WebTestCase
         self::$claimsService->sendPicSureNotification($claim);
     }
 
-    public function testPicSureNotificationOutside30Day()
+    public function testPicSureNotificationOutside1Day()
     {
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('testPicSureNotificationOutside30Day', $this),
+            static::generateEmail('testPicSureNotificationOutside1Day', $this),
             'bar'
         );
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone, null, true, true);
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
-        $policy->setPicSureApprovedDate(new \DateTime('-35 days'));
+        $policy->setPicSureApprovedDate(new \DateTime('-2 days'));
         $claim = new Claim();
         $claim->setPolicy($policy);
         $claim->setProcessed(false);
@@ -234,13 +234,13 @@ class ClaimsServiceTest extends WebTestCase
     {
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('testProcessClaimWithin30Day', $this),
+            static::generateEmail('testProcessClaimWithin1Day', $this),
             'bar'
         );
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone, null, true, true);
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
-        $policy->setPicSureApprovedDate(new \DateTime('-29 days'));
+        $policy->setPicSureApprovedDate(new \DateTime('-1 days'));
         $claim = new Claim();
         $claim->setPolicy($policy);
         $claim->setProcessed(false);
@@ -260,13 +260,13 @@ class ClaimsServiceTest extends WebTestCase
     {
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('testProcessClaimOutside30Day', $this),
+            static::generateEmail('testProcessClaimOutside1Day', $this),
             'bar'
         );
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone, null, true, true);
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
-        $policy->setPicSureApprovedDate(new \DateTime('-35 days'));
+        $policy->setPicSureApprovedDate(new \DateTime('-2 days'));
         $claim = new Claim();
         $claim->setPolicy($policy);
         $claim->setProcessed(false);
