@@ -77,7 +77,9 @@ $(function(){
     });
 
     // Enable Popovers
-    $('[data-toggle="popover"]').popover();
+    if (jQuery.fn.popover) {
+        $('[data-toggle="popover"]').popover();
+    }
 
     // Policy Modal
     // Find the headings to add class
