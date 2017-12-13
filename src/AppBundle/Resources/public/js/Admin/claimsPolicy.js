@@ -40,8 +40,6 @@ $('.confirm-regenerate-schedule').on("click",function() {
 });
 
 $(document).ready(function(){
-    $('[data-toggle="popover"]').popover();
-
     $('.datetimepicker').datetimepicker({
         format: "DD-MM-YYYY HH:mm",
         allowInputToggle: true,

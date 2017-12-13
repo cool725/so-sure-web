@@ -1,7 +1,5 @@
 
 $(function () {
-    $('[data-toggle="popover"]').popover();
-
     $('#kpi').datetimepicker({
         format: "DD-MM-YYYY",
         allowInputToggle: true,
