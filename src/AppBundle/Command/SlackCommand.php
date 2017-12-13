@@ -197,7 +197,7 @@ class SlackCommand extends ContainerAwareCommand
 
     private function renewals($channel, $skipSlack)
     {
-        $router = $this->getContainer()->get('router');
+        $router = $this->getContainer()->get('app.router');
         $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
         $repo = $dm->getRepository(PhonePolicy::class);
         $policies = $repo->findBy(['status' => Policy::STATUS_DECLINED_RENEWAL]);
@@ -216,7 +216,7 @@ class SlackCommand extends ContainerAwareCommand
             // @codingStandardsIgnoreStart
             $text = sprintf(
                 "Policy <%s|%s> will be expired in %d days and customer has declined to renew. Please call customer.",
-                $router->generate('admin_policy', ['id' => $policy->getPreviousPolicy()->getId()], UrlGeneratorInterface::ABSOLUTE_URL),
+                $router->generateUrl('admin_policy', ['id' => $policy->getPreviousPolicy()->getId()]),
                 $policy->getPreviousPolicy()->getPolicyNumber(),
                 $diff->days
             );
