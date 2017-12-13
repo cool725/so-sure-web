@@ -40,8 +40,7 @@
     "animate.css": "^3.5.2",
     "corejs-typeahead": "^1.2.1",
     "dot": "doT#^1.1.2",
-    "lozad": "^1.0.9",
-    "tether": "^1.4.3"
+    "lozad": "^1.0.9"
   },
   "install": {
     "path": "web/components",
@@ -136,9 +135,6 @@
       ],
       "lozad": [
         "bower_components/lozad/dist/lozad.min.js"
-      ],
-      "tether": [
-        "bower_components/tether/dist/js/tether.min.js"
       ]
     }
   }
