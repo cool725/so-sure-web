@@ -105,6 +105,7 @@ Vagrant.configure("2") do |config|
 	#   auto eth1
     #   iface eth1 inet manual
     dev1604_config.vm.box = "geerlingguy/ubuntu1604"
+    dev1604_config.vm.box_check_update = false
     dev1604_config.vm.network "forwarded_port", guest: 80, host: 40080 # apache sosure website
     dev1604_config.vm.network "forwarded_port", guest: 27017, host: 47017 # mongodb
     dev1604_config.vm.network "forwarded_port", guest: 5000, host: 5000 # sixpack
