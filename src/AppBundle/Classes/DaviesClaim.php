@@ -73,6 +73,7 @@ class DaviesClaim extends DaviesExcel
         'Sarah.Aston@davies-group.com',
         'patrick@so-sure.com',
         'dylan@so-sure.com',
+        'rayo@so-sure.com',
     ];
 
     public static $sheetNames = [
