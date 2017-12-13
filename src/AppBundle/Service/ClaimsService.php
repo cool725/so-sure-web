@@ -114,14 +114,14 @@ class ClaimsService
                     $templateHtml = "AppBundle:Email:claim/checkRecentPicSureApproved.html.twig";
                     $this->mailer->sendTemplate(
                         $subject,
-                        'tech@wearesosure.com',
+                        'tech@so-sure.com',
                         $templateHtml,
                         ['policy' => $claim->getPolicy()]
                     );
                 } catch (\Exception $ex) {
                     $this->logger->error(sprintf(
-                        'Error sending pic-sure validated claim review email. Ex: %s',
-                        $ex->getMessage()
+                        "Error sending pic-sure validated claim review email.",
+                        ['exception' => $ex]
                     ));
                 }
             }
