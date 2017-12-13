@@ -96,7 +96,7 @@ services:
     staging.apierror:
         class:   AppBundle\Listener\ApiResponseSubscriber
         arguments:
-            redis: "@snc_redis.default"
+            - "@snc_redis.default"
         tags:
             - {name:kernel.event_subscriber}
 
