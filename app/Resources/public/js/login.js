@@ -1,12 +1,21 @@
 AccountKit_OnInteractive = function(){
     AccountKit.init(
         {
-            appId: $('.login-account-kit').data('key'),
-            state:$('.login-account-kit').data('csrf'),
+            appId: document.getElementById('login-account-kit').data('key'),
+            state: document.getElementById('login-account-kit').data('csrf'),
             version:"v1.0",
             fbAppEventsEnabled:true
         }
     );
+};
+
+window.fbAsyncInit = function() {
+  FB.init({
+    appId: document.getElementById('ss-root').data('fb-id'),
+    xfbml: true,
+    version: 'v2.5',
+    status     : true
+  });
 };
 
 // login callback
@@ -23,6 +32,17 @@ function loginCallback(response) {
         // handle bad parameters
     }
 }
+
+(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {
+    return;
+  }
+  js = d.createElement(s);
+  js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
 
 // phone form submission handler
 function smsLogin() {
@@ -106,6 +126,11 @@ $(function() {
         $('.login-email, .login-account-kit').toggle();
         $('#swap-login span').toggleText('mobile', 'email');
     }
+
+    $('.btn-facebook-login').on('click', function(e) {
+        e.preventDefault();
+        fb_login();
+    });
 
     // When clicking the sms login check window opens if not provide temp message
     $('#sms-login__btn').on('click', function(e) {
