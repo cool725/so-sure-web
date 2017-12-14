@@ -122,7 +122,10 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $user->getGender() ? $user->getGender() : ''),
                 $income ? sprintf('"%0.0f"', $income->getTotal()->getIncome()) : '""',
                 sprintf('"%s"', $user->getLatestAttribution() ? $user->getLatestAttribution()->getCampaignName() : ''),
-                sprintf('"%s"', $user->getLatestAttribution() ? $user->getLatestAttribution()->getCampaignSource() : ''),
+                sprintf(
+                    '"%s"',
+                    $user->getLatestAttribution() ? $user->getLatestAttribution()->getCampaignSource() : ''
+                ),
                 sprintf('"%s"', $user->getLatestAttribution() ? $user->getLatestAttribution()->getReferer() : ''),
                 sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getCampaignName() : ''),
                 sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getCampaignSource() : ''),
@@ -186,7 +189,10 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $user->getGender() ? $user->getGender() : ''),
                 $income ? sprintf('"%0.0f"', $income->getTotal()->getIncome()) : '""',
                 sprintf('"%s"', $user->getLatestAttribution() ? $user->getLatestAttribution()->getCampaignName() : ''),
-                sprintf('"%s"', $user->getLatestAttribution() ? $user->getLatestAttribution()->getCampaignSource() : ''),
+                sprintf(
+                    '"%s"',
+                    $user->getLatestAttribution() ? $user->getLatestAttribution()->getCampaignSource() : ''
+                ),
                 sprintf(
                     '"%s"',
                     $policy->getRequestedCancellationReason() ? $policy->getRequestedCancellationReason() : null
