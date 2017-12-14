@@ -42,6 +42,7 @@ security:
             logout:       true
             anonymous:    true
             security: true
+            logout_on_user_change: true
             oauth:
                 resource_owners:
                     facebook:           "/login/check-facebook"
