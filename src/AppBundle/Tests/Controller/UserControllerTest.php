@@ -198,6 +198,48 @@ class UserControllerTest extends BaseControllerTest
         $this->validateRewardPot($crawler, 10);
     }
 
+    public function testUserInviteOptOut()
+    {
+        $email = self::generateEmail('testUserInviteOptOut', $this);
+        $inviteeEmail = 'foo@so-sure.com';
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        self::$dm->flush();
+
+        $invitee = self::createUser(
+            self::$userManager,
+            $inviteeEmail,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $inviteePolicy = self::initPolicy($invitee, self::$dm, $phone, null, true, true);
+        $inviteePolicy->setStatus(Policy::STATUS_ACTIVE);
+        self::$dm->flush();
+
+        $this->assertTrue($policy->getUser()->hasActivePolicy());
+        $this->assertTrue($inviteePolicy->getUser()->hasActivePolicy());
+
+        $this->login($email, $password, 'user/');
+
+        $crawler = self::$client->request('GET', '/user/');
+        self::verifyResponse(200);
+        $form = $crawler->selectButton('email[submit]')->form();
+        $form['email[email]'] = $inviteeEmail;
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(200);
+    }
+
     public function testUserSCode()
     {
         $email = self::generateEmail('testUserSCode-inviter', $this);

@@ -211,11 +211,9 @@ class InvitationService
      */
     public function validateSoSurePolicyEmail(Policy $policy, $email)
     {
-        // For Prod, Invitations to @so-sure.com emails can only come from INVALID prod policies
-        if ($this->environment == 'prod') {
-            if (SoSure::hasSoSureEmail($email) && !$policy->hasPolicyPrefix(Policy::PREFIX_INVALID)) {
-                throw new OptOutException(sprintf('Email %s has opted out', $email));
-            }
+        // Invitations to @so-sure.com emails can only come from INVALID policies
+        if (SoSure::hasSoSureEmail($email) && !$policy->hasPolicyPrefix(Policy::PREFIX_INVALID)) {
+            throw new OptOutException(sprintf('Email %s has opted out', $email));
         }
 
         // INVALID prod policies can only invite @so-sure.com emails
