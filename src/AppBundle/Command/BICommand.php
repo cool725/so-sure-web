@@ -81,6 +81,10 @@ class BICommand extends ContainerAwareCommand
             '"Total Weekly Income"',
             '"Latest Campaign Name"',
             '"Latest Campaign Source"',
+            '"Latest Referer"',
+            '"First Campaign Name"',
+            '"First Campaign Source"',
+            '"First Referer"',
         ]);
         foreach ($claims as $claim) {
             $policy = $claim->getPolicy();
@@ -117,8 +121,12 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $census ? $census->getSubgrp() : ''),
                 sprintf('"%s"', $user->getGender() ? $user->getGender() : ''),
                 $income ? sprintf('"%0.0f"', $income->getTotal()->getIncome()) : '""',
+                sprintf('"%s"', $user->getLatestAttribution() ? $user->getLatestAttribution()->getCampaignName() : ''),
+                sprintf('"%s"', $user->getLatestAttribution() ? $user->getLatestAttribution()->getCampaignSource() : ''),
+                sprintf('"%s"', $user->getLatestAttribution() ? $user->getLatestAttribution()->getReferer() : ''),
                 sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getCampaignName() : ''),
                 sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getCampaignSource() : ''),
+                sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getReferer() : ''),
             ]);
         }
         $this->uploadS3(implode(PHP_EOL, $lines), 'claims.csv');
@@ -152,6 +160,10 @@ class BICommand extends ContainerAwareCommand
             '"Latest Campaign Source"',
             '"Requested Cancellation Reason (Phone Damaged Prior To Policy)"',
             '"Policy Renewed"',
+            '"Latest Referer"',
+            '"First Campaign Name"',
+            '"First Campaign Source"',
+            '"First Referer"',
         ]);
         foreach ($policies as $policy) {
             $user = $policy->getUser();
@@ -173,13 +185,17 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $census ? $census->getSubgrp() : ''),
                 sprintf('"%s"', $user->getGender() ? $user->getGender() : ''),
                 $income ? sprintf('"%0.0f"', $income->getTotal()->getIncome()) : '""',
-                sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getCampaignName() : ''),
-                sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getCampaignSource() : ''),
+                sprintf('"%s"', $user->getLatestAttribution() ? $user->getLatestAttribution()->getCampaignName() : ''),
+                sprintf('"%s"', $user->getLatestAttribution() ? $user->getLatestAttribution()->getCampaignSource() : ''),
                 sprintf(
                     '"%s"',
                     $policy->getRequestedCancellationReason() ? $policy->getRequestedCancellationReason() : null
                 ),
                 sprintf('"%s"', $policy->isRenewed() ? 'yes' : 'no'),
+                sprintf('"%s"', $user->getLatestAttribution() ? $user->getLatestAttribution()->getReferer() : ''),
+                sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getCampaignName() : ''),
+                sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getCampaignSource() : ''),
+                sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getReferer() : ''),
             ]);
         }
         $this->uploadS3(implode(PHP_EOL, $lines), 'policies.csv');
