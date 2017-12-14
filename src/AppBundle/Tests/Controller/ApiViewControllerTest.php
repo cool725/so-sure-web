@@ -114,6 +114,7 @@ class ApiViewControllerTest extends BaseControllerTest
             );
 
             $this->verifyTerms($data, $pdf);
+            //$this->verifyTerms($data, $pdf, true);
         }
     }
 
@@ -128,6 +129,8 @@ class ApiViewControllerTest extends BaseControllerTest
         $pdf = str_replace('p {display: block;}', '', $pdf);
         $pdf = str_replace('•', '', $pdf);
         $pdf = str_replace('&nbsp;', '', $pdf);
+
+        $data = str_replace('£60.00', '£60', $data);
 
         // top and bottom of api is slightly different - best to add to pdf version to avoid replacing unindented areas
         $pdf = sprintf('so-sure Policy Document%s', $pdf);
