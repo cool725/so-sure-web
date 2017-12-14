@@ -18,7 +18,7 @@
         {% block remotestylesheets %}{% endblock %}
         {% block metaend %}{% endblock %}
     </head>
-    <body {% if distraction_free is defined and distraction_free == 1 %}class="distraction-free"{% endif %}>
+    <body>
 
         {# Dev Bar #}
         {% if environment != 'prod' %}
