@@ -21,19 +21,7 @@
     <body>
 
         {# Dev Bar #}
-        {% if environment != 'prod' %}
-            <nav class="navbar navbar-fixed-bottom" style="background-color:#EFEFEF;height:40px;">
-                <div class="container-fluid">
-                    <div class="navbar-header">
-                        <ul class="navbar-brand list-inline">
-                            <li><strong class="text-red">{{ environment }}</strong></li>
-                            <li><a href="{{ path('ops_pages') }}"><i class="fa fa-wrench fa-lg"></i></a></li>
-                            <li><a href="{{ path('quote_make_model_memory', {'make':'Apple','model':'iPhone 7','memory':128}) }}"><i class="fa fa-mobile fa-lg" title="Quick Quote"></i></a></li>
-                        </ul>
-                    </div>
-                </div>
-            </nav>
-        {% endif %}
+        {% include '::dev_bar.html.twig' %}
 
         {# Navigation #}
         {% block nav %}

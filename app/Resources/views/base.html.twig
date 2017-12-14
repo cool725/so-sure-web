@@ -32,27 +32,7 @@
         {% include '::tag_manager.html.twig' %}
 
         {# Dev Bar #}
-        {% if environment != 'prod' %}
-            <nav class="navbar navbar-fixed-bottom" style="background-color:#EFEFEF;height:40px;">
-                <div class="container-fluid">
-                    <div class="navbar-header">
-                        <ul class="navbar-brand list-inline">
-                            <li><strong class="text-red">{{ environment }}</strong></li>
-                            <li><a href="{{ path('ops_pages') }}"><i class="fa fa-wrench fa-lg"></i></a></li>
-                            <li><a href="{{ path('quote_make_model_memory', {'make':'Apple','model':'iPhone 7','memory':128}) }}"><i class="fa fa-mobile fa-lg" title="Quick Quote"></i></a></li>
-                            {% if distraction_free is defined and distraction_free == 1 and app.user is not null and app.user %}
-                                {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
-                                    <li><a href="{{ path('homepage', {'_impersonate': '_exit'}) }}">Exit <strong>{{ app.user.email }}</strong></a></li>
-                                {% else %}
-                                    <li><a href="{{ path('fos_user_security_logout') }}">Logout <strong>{{ app.user.email }}</strong></a></li>
-                                {% endif %}
-                            {% endif %}
-                        </ul>
-
-                    </div>
-                </div>
-            </nav>
-        {% endif %}
+        {% include '::dev_bar.html.twig' %}
 
         {# Navigation #}
         {# NOTE: Whilst we are transitioning use two different main stylesheets #}
