@@ -3,6 +3,7 @@
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 
 /**
  * @var Composer\Autoload\ClassLoader
@@ -42,6 +43,13 @@ try {
     } else {
         throw $e;
     }
+} catch (SuspiciousOperationException $e) {
+    if (stripos($e->getMessage(), "Untrusted Host") !== false) {
+        $response = new RedirectResponse('https://wearesosure.com');
+    } else {
+        throw $e;
+    }
 }
+
 $response->send();
 $kernel->terminate($request, $response);
