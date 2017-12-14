@@ -2,6 +2,7 @@
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * @var Composer\Autoload\ClassLoader
@@ -35,7 +36,7 @@ Request::setTrustedProxies(array('127.0.0.1', $request->server->get('REMOTE_ADDR
 // so just redirect on the untrusted host exception.
 try {
     $response = $kernel->handle($request);
-} catch (\UnexpectedValueException $e) {
+} catch (BadRequestHttpException $e) {
     if (stripos($e->getMessage(), "Untrusted Host") !== false) {
         $response = new RedirectResponse('https://wearesosure.com');
     } else {
