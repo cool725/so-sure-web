@@ -237,7 +237,7 @@ class UserControllerTest extends BaseControllerTest
         $form = $crawler->selectButton('email[submit]')->form();
         $form['email[email]'] = $inviteeEmail;
         $crawler = self::$client->submit($form);
-        self::verifyResponse(200);
+        self::verifyResponse(302);
     }
 
     public function testUserSCode()
