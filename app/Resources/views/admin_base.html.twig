@@ -8,28 +8,17 @@
         {% include '::header.html.twig' %}
 
         {# Stylesheets #}
-        {# NOTE: Whilst we are transitioning use two different main stylesheets #}
         {% block stylesheets %}
-            {% if new_stylesheet is defined and new_stylesheet == 1 %}
-                {% stylesheets output='css/*.css'
-                    '@AppBundle/Resources/public/sass/mainNew.scss'
-                %}<link rel="stylesheet" href="{{ asset_url }}">
-                {% endstylesheets %}
-            {% else %}
-                {% stylesheets output='css/*.css'
-                    '@AppBundle/Resources/public/sass/main.scss'
-                %}<link rel="stylesheet" href="{{ asset_url }}">
-                {% endstylesheets %}
-            {% endif %}
+            {% stylesheets output='css/*.css'
+                '@AppBundle/Resources/public/sass/adminNew.scss'
+            %}<link rel="stylesheet" href="{{ asset_url }}">
+            {% endstylesheets %}
         {% endblock %}
 
         {% block remotestylesheets %}{% endblock %}
         {% block metaend %}{% endblock %}
     </head>
     <body {% if distraction_free is defined and distraction_free == 1 %}class="distraction-free"{% endif %}>
-
-        {# Google Tag Manager Data Layer #}
-        {% include '::tag_manager.html.twig' %}
 
         {# Dev Bar #}
         {% if environment != 'prod' %}
@@ -55,13 +44,8 @@
         {% endif %}
 
         {# Navigation #}
-        {# NOTE: Whilst we are transitioning use two different main stylesheets #}
         {% block nav %}
-            {% if new_stylesheet is defined and new_stylesheet == 1 %}
-                {% include '::nav_new.html.twig' %}
-            {% else %}
-                {% include '::nav.html.twig' %}
-            {% endif %}
+            {% include '::nav.html.twig' %}
         {% endblock %}
 
         {# Flash Messages #}
@@ -72,14 +56,7 @@
         {# End Page Content #}
 
         {# Footer #}
-        {# NOTE: Whilst we are transitioning use two different main stylesheets #}
-        {% block footer %}
-            {% if new_footer is defined and new_footer == 1 %}
-                {% include '::footer_new.html.twig' %}
-            {% else %}
-                {% include '::footer.html.twig' %}
-            {% endif %}
-        {% endblock %}
+        {% block footer %}{% endblock %}
 
         {# If using CDN else load locally #}
         {% if use_cdn %}
@@ -92,18 +69,10 @@
 
         {# Javascript #}
         {% block javascripts %}
-            {% if hide_cookie_warning is defined and hide_cookie_warning %}
-                {% javascripts
-                '@AppBundle/Resources/public/js/*' %}
-                <script src="{{ asset_url }}"></script>
-                {% endjavascripts %}
-            {% else %}
-                {% javascripts
-                'components/cookieconsent/cookieconsent.min.js'
-                '@AppBundle/Resources/public/js/*' %}
-                <script src="{{ asset_url }}"></script>
-                {% endjavascripts %}
-            {% endif %}
+            {% javascripts
+            '@AppBundle/Resources/public/js/*' %}
+            <script src="{{ asset_url }}"></script>
+            {% endjavascripts %}
         {% endblock %}
     </body>
 </html>

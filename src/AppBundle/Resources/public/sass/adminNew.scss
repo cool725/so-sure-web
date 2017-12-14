@@ -1,0 +1,42 @@
+// adminNew.scss
+// author: N Waller
+
+// Import Bootstrap
+@import "bootstrap-sass/bootstrapAdmin.scss";
+
+// Import font-awesome
+@import "font-awesome/font-awesome.scss";
+
+// Mixins
+@import "mixins";
+
+// Common
+@import "common/variables";
+@import "common/palette";
+@import "common/paletteNew";
+
+@import "common/type";
+@import "common/global";
+
+// Components
+@import "components/buttons";
+@import "components/modal";
+@import "components/banners";
+@import "components/visual";
+@import "components/forms";
+@import "components/hero";
+@import "components/quotes";
+@import "components/tables";
+@import "components/panels";
+@import "components/alerts";
+@import "components/carousel";
+@import "components/typeahead";
+
+// Layouts
+@import "layout/footer";
+@import "layout/header";
+@import "layout/includes";
+@import "layout/nav";
+@import "layout/base";
+
+@import "cookie-consent/cookieconsent"

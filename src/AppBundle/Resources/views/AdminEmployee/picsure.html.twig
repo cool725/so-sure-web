@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin_base.html.twig' %}
 
 {% block body %}
 <div class="container" style="margin-bottom: 50px">
@@ -11,7 +11,7 @@
         {{ form_start(picsure_search_form) }}
         <div class="row">
             <div class="col-md-8">
-                {{ form_widget(picsure_search_form.status) }}                
+                {{ form_widget(picsure_search_form.status) }}
             </div>
             <div class="col-md-4">
                 {{ form_widget(picsure_search_form.search, {'attr':{'class':'btn btn-info'}}) }}

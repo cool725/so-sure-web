@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin_base.html.twig' %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -76,7 +76,7 @@
                         </tr>
                         <tr>
                             <td>Active Policies [KPI: 20]</td>
-                            {% for week in weeks %} 
+                            {% for week in weeks %}
                                 {# as upgrades will be included in new and taken off ending is the same as if using adjUpgrade on both #}
                                 <td>{{ (week.total.data['newPolicies'] - week.total.data['endingEndingPolicies']) }}</td>
                             {% endfor %}
