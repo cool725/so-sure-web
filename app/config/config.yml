@@ -472,7 +472,7 @@ nelmio_security:
                 - 'data:'
                 - https://www.googleadservices.com
                 - https://*.doubleclick.net
-                - https://*.bing.com
+                - https://bat.bing.com
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
@@ -717,6 +717,7 @@ nelmio_security:
                 - https://*.googlesyndication.com
                 - https://www.gstatic.com
                 - https://chart.googleapis.com
+                - https://bat.bing.com
                 # linkedin
                 - https://secure.adnxs.com
                 - https://*.bizographics.com
