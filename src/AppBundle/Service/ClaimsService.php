@@ -74,6 +74,7 @@ class ClaimsService
 
     public function processClaim(Claim $claim)
     {
+        $this->sendPicSureNotification($claim);
         if ($claim->getProcessed() || !$claim->isMonetaryClaim()) {
             return false;
         }
@@ -97,8 +98,6 @@ class ClaimsService
         $claim->setProcessed(true);
         $this->recordLostPhone($claim->getPolicy(), $claim);
         $this->dm->flush();
-
-        $this->sendPicSureNotification($claim);
         return true;
     }
 
