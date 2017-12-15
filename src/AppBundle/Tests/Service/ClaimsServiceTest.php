@@ -191,11 +191,12 @@ class ClaimsServiceTest extends WebTestCase
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone, null, true, true);
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
-        $policy->setPicSureApprovedDate(new \DateTime('-1 days'));
+        $policy->setPicSureApprovedDate(new \DateTime('-10 days'));
         $claim = new Claim();
         $claim->setPolicy($policy);
         $claim->setProcessed(false);
-        $claim->setStatus(Claim::STATUS_SETTLED);
+        $claim->setStatus(Claim::STATUS_APPROVED);
+        $claim->setApprovedDate(new \DateTime('-1 day'));
         $claim->setType(Claim::TYPE_THEFT);
         $mailer = $this->getMockBuilder('Swift_Mailer')
             ->disableOriginalConstructor()
@@ -216,11 +217,12 @@ class ClaimsServiceTest extends WebTestCase
         $phone = static::getRandomPhone(static::$dm);
         $policy = static::initPolicy($user, static::$dm, $phone, null, true, true);
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
-        $policy->setPicSureApprovedDate(new \DateTime('-2 days'));
+        $policy->setPicSureApprovedDate(new \DateTime('-10 days'));
         $claim = new Claim();
         $claim->setPolicy($policy);
         $claim->setProcessed(false);
-        $claim->setStatus(Claim::STATUS_SETTLED);
+        $claim->setStatus(Claim::STATUS_APPROVED);
+        $claim->setApprovedDate(new \DateTime('-3 day'));
         $claim->setType(Claim::TYPE_THEFT);
         $mailer = $this->getMockBuilder('Swift_Mailer')
             ->disableOriginalConstructor()
@@ -229,6 +231,58 @@ class ClaimsServiceTest extends WebTestCase
         self::$claimsService->setMailerMailer($mailer);
         self::$claimsService->sendPicSureNotification($claim);
     }
+
+    public function testPicSureNotificationWithin1DayPicsureApprovedOlder()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPicSureNotificationWithin1Day2', $this),
+            'bar'
+        );
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, true, true);
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+        $policy->setPicSureApprovedDate(new \DateTime('-35 days'));
+        $claim = new Claim();
+        $claim->setPolicy($policy);
+        $claim->setProcessed(false);
+        $claim->setStatus(Claim::STATUS_APPROVED);
+        $claim->setApprovedDate(new \DateTime('-1 day'));
+        $claim->setType(Claim::TYPE_THEFT);
+        $mailer = $this->getMockBuilder('Swift_Mailer')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mailer->expects($this->never())->method('send');
+        self::$claimsService->setMailerMailer($mailer);
+        self::$claimsService->sendPicSureNotification($claim);
+    }
+
+    public function testPicSureNotificationOutside1DayPicsureApprovedOlder()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPicSureNotificationOutside1Day2', $this),
+            'bar'
+        );
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, true, true);
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+        $policy->setPicSureApprovedDate(new \DateTime('-35 days'));
+        $claim = new Claim();
+        $claim->setPolicy($policy);
+        $claim->setProcessed(false);
+        $claim->setStatus(Claim::STATUS_APPROVED);
+        $claim->setApprovedDate(new \DateTime('-2 day'));
+        $claim->setType(Claim::TYPE_THEFT);
+        $mailer = $this->getMockBuilder('Swift_Mailer')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mailer->expects($this->never())->method('send');
+        self::$claimsService->setMailerMailer($mailer);
+        self::$claimsService->sendPicSureNotification($claim);
+    }
+
+
 
     public function testProcessClaimWithin30days()
     {

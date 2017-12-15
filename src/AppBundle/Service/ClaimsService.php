@@ -104,25 +104,29 @@ class ClaimsService
 
     public function sendPicSureNotification(Claim $claim)
     {
-        if ($claim->getPolicy()->getPicSureStatus() == PhonePolicy::PICSURE_STATUS_APPROVED
-            && $claim->getPolicy()->getPicSureApprovedDate()) {
-            $picSureApprovedDate = $claim->getPolicy()->getPicSureApprovedDate();
-            $diff = $picSureApprovedDate->diff(new \DateTime());
-            if ($diff->d < 2) {
-                try {
-                    $subject = 'Pic-sure validated claim needs review';
-                    $templateHtml = "AppBundle:Email:claim/checkRecentPicSureApproved.html.twig";
-                    $this->mailer->sendTemplate(
-                        $subject,
-                        'tech@so-sure.com',
-                        $templateHtml,
-                        ['policy' => $claim->getPolicy()]
-                    );
-                } catch (\Exception $ex) {
-                    $this->logger->error(sprintf(
-                        "Error sending pic-sure validated claim review email.",
-                        ['exception' => $ex]
-                    ));
+        if ($claim->getStatus() == Claim::STATUS_APPROVED &&
+            $claim->getApprovedDate() &&
+            $claim->getApprovedDate()->diff(new \DateTime())->d < 2) {
+            if ($claim->getPolicy()->getPicSureStatus() == PhonePolicy::PICSURE_STATUS_APPROVED
+                && $claim->getPolicy()->getPicSureApprovedDate()) {
+                $picSureApprovedDate = $claim->getPolicy()->getPicSureApprovedDate();
+                $diff = $picSureApprovedDate->diff(new \DateTime());
+                if ($diff->m < 1) {
+                    try {
+                        $subject = 'Pic-sure validated claim needs review';
+                        $templateHtml = "AppBundle:Email:claim/checkRecentPicSureApproved.html.twig";
+                        $this->mailer->sendTemplate(
+                            $subject,
+                            'tech@so-sure.com',
+                            $templateHtml,
+                            ['policy' => $claim->getPolicy()]
+                        );
+                    } catch (\Exception $ex) {
+                        $this->logger->error(sprintf(
+                            "Error sending pic-sure validated claim review email.",
+                            ['exception' => $ex]
+                        ));
+                    }
                 }
             }
         }
