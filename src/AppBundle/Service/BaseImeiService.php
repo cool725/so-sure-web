@@ -200,7 +200,11 @@ class BaseImeiService
         $file = sprintf('%s/gray-%s-%s', sys_get_temp_dir(), time(), $path['basename']);
         if ($extension) {
             $file = sprintf('%s.%s', $file, $extension);
+        } elseif (pathinfo($file, PATHINFO_EXTENSION) == "") {
+            // if no extension is present, default to png
+            $file = sprintf('%s.png', $file);
         }
+
         $image->save($file);
 
         $ocr = new \TesseractOCR($file);
