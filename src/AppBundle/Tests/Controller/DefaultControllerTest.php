@@ -25,6 +25,18 @@ class DefaultControllerTest extends BaseControllerTest
         self::verifyResponse(200);
     }
 
+    public function testTagManager()
+    {
+        $crawler = self::$client->request('GET', '/');
+        self::verifyResponse(200);
+        $tag = self::$client->getContainer()->getParameter('ga_tag_manager_env');
+        $body = self::$client->getResponse()->getContent();
+        
+        // Not a perfect test, but unable to test js code via symfony client
+        // This should at least detect if the custom tag manager code environment was accidental removed
+        $this->assertTrue(stripos($body, $tag) !== false);
+    }
+
     public function testIndexRedirect()
     {
         $crawler = self::$client->request('GET', '/', [], [], ['REMOTE_ADDR' => '70.248.28.23']);
