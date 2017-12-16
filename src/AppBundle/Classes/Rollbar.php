@@ -11,7 +11,9 @@ class Rollbar extends \RollbarNotifier
         });
     }
 
-    public function shouldIgnore($isUncaught, $exception, $payload) {
+    public function shouldIgnore($isUncaught, $exception, $payload)
+    {
+        \AppBundle\Classes\NoOp::ignore([$isUncaught, $payload]);
         if ($exception instanceof \RollbarException) {
             $source = $exception->getException();
             // Don't sent 404's
