@@ -34,7 +34,6 @@ framework:
         #assets_version: SomeVersionScheme
     default_locale:  "%locale%"
     trusted_hosts:   ~
-    trusted_proxies: ~
     session:
         handler_id: snc_redis.session.handler
         cookie_httponly: true
