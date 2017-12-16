@@ -177,11 +177,17 @@ class UserController extends BaseController
         if ($request->request->has('email')) {
             $emailInvitationForm->handleRequest($request);
             if ($emailInvitationForm->isSubmitted() && $emailInvitationForm->isValid()) {
-                $invitationService->inviteByEmail($policy, $emailInvitiation->getEmail());
-                $this->addFlash(
-                    'success',
-                    sprintf('%s was invited', $emailInvitiation->getEmail())
-                );
+                try {
+                    $invitationService->inviteByEmail($policy, $emailInvitiation->getEmail());
+                    $this->addFlash(
+                        'success',
+                        sprintf('%s was invited', $emailInvitiation->getEmail())
+                    );
+                } catch (\Exception $e) {
+                    $msg = sprintf('Sorry, there was an error inviting %s', $emailInvitiation->getEmail());
+                    $this->get('logger')->error($msg, ['exception' => $e]);
+                    $this->addFlash('error', $msg);
+                }
 
                 return new RedirectResponse($this->generateUrl('user_policy', ['policyId' => $policy->getId()]));
             }
