@@ -7,7 +7,6 @@ parameters:
 
 framework:
     trusted_hosts: ['127.0.0.1', 'localhost', 'dev.so-sure.net', '10\.\d+\.\d+\.\d+']
-    trusted_proxies: ['127.0.0.1']
     test: ~
     session:
         storage_id: session.storage.mock_file

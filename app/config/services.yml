@@ -6,6 +6,7 @@ services:
     _defaults:
         autowire: false      # Automatically injects dependencies in your services.
         autoconfigure: false # Automatically registers your services as commands, event subscribers, etc.
+        public: true
 
     app.user:
         class: AppBundle\Security\FOSUBUserProvider
@@ -203,6 +204,7 @@ services:
         parent: base.imei
         autowire: false
         autoconfigure: false
+        public: true
         class: AppBundle\Service\ReceperioService
         calls:
             - [setSecretKey, ['%receperio_secretkey%']]
@@ -338,6 +340,7 @@ services:
         parent: base.s3email
         autowire: false
         autoconfigure: false
+        public: true
         class: AppBundle\Service\DaviesService
         calls:
             - [setClaims, ['@app.claims']]
@@ -353,6 +356,7 @@ services:
         parent: base.s3email
         autowire: false
         autoconfigure: false
+        public: true
         class: AppBundle\Service\BrightstarService
         calls:
             - [setBucket, ['ops.so-sure.com']]
