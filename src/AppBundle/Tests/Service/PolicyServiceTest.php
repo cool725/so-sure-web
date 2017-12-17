@@ -3183,9 +3183,15 @@ class PolicyServiceTest extends WebTestCase
         // 1 adjustment to rebate
         $this->assertEquals(24, count($renewalPolicyA->getScheduledPayments()));
         // 10/12 = 0.83
+        // first payment should be (annual policy - 50) / 12
         $this->assertEquals(
-            $policyA->getNextPolicy()->getPremium()->getAdjustedStandardMonthlyPremiumPrice() + 0.83,
-            $paymentA->getAmount() + $policyA->getNextPolicy()->getNextScheduledPayment()->getAmount()
+            $this->toTopTwoDp(($policyA->getNextPolicy()->getPremium()->getYearlyPremiumPrice() - 50) / 12),
+            $paymentA->getAmount()
+        );
+        // 2nd payment should be (50-10)/12=3.33
+        $this->assertEquals(
+            3.33,
+            $policyA->getNextPolicy()->getNextScheduledPayment()->getAmount()
         );
     }
 
