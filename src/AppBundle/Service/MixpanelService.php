@@ -313,7 +313,7 @@ class MixpanelService
         }
 
         foreach (self::$segments as $event => $segmentData) {
-            foreach($segmentData as $segment => $mapping) {
+            foreach ($segmentData as $segment => $mapping) {
                 $query = [
                     'event' => $event,
                     'on' => sprintf('properties["%s"]', $segment),
