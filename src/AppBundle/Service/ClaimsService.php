@@ -105,12 +105,12 @@ class ClaimsService
     {
         if ($claim->getStatus() == Claim::STATUS_APPROVED &&
             $claim->getApprovedDate() &&
-            $claim->getApprovedDate()->diff(new \DateTime())->d < 2) {
+            $claim->getApprovedDate()->diff(new \DateTime())->days < 2) {
             if ($claim->getPolicy()->getPicSureStatus() == PhonePolicy::PICSURE_STATUS_APPROVED
                 && $claim->getPolicy()->getPicSureApprovedDate()) {
                 $picSureApprovedDate = $claim->getPolicy()->getPicSureApprovedDate();
                 $diff = $picSureApprovedDate->diff(new \DateTime());
-                if ($diff->m < 1) {
+                if ($diff->days < 30) {
                     try {
                         $subject = 'Pic-sure validated claim needs review';
                         $templateHtml = "AppBundle:Email:claim/checkRecentPicSureApproved.html.twig";
