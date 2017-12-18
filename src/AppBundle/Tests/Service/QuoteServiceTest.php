@@ -95,6 +95,18 @@ class QuoteServiceTest extends WebTestCase
         self::$quoteService->getQuotes(null, 'A0001', 3000);
     }
 
+    public function testQuoteServiceUnknownDeviceiPadEmail()
+    {
+        $mailer = $this->getMockBuilder('Swift_Mailer')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mailer->expects($this->never())->method('send');
+        self::$quoteService->setMailerMailer($mailer);
+        self::$quoteService->getQuotes(null, 'iPad6,11', 3000);
+    }
+
+
     public function testQuoteServiceKnownDeviceKnownMemory()
     {
         $quote = self::$quoteService->getQuotes('OnePlus', 'A0001', 15.5);
