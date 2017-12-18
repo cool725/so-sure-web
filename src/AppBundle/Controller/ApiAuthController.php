@@ -117,6 +117,42 @@ class ApiAuthController extends BaseController
     }
 
     /**
+     * @Route("/detected-imei", name="api_auth_detected_imei")
+     * @Method({"POST"})
+     */
+    public function detectedImeiAction(Request $request, $id)
+    {
+        try {
+            $data = json_decode($request->getContent(), true)['body'];
+            if (!$this->validateFields($data, ['detected_imei', 'bucket', 'key'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+            $detectedImei = $this->getDataString($data, 'detected_imei');
+            $suggestedImei = $this->getDataString($data, 'suggested_imei');
+
+            $dm = $this->getManager();
+            $policyRepo = $dm->getRepository(Policy::class);
+            $policy = $policyRepo->findOneBy(['imei' => $suggestedImei]);
+            $user = $this->getUser();
+            if ($policy && $policy->getUser()->getId() == $user->getId()) {
+                return new JsonResponse($policy->toApiArray());
+            } else {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_DETECTED_IMEI_MANUAL_PROCESSING, 'Access denied', 422);
+            }
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api detectedImeiAction.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
      * @Route("/invitation/{id}", name="api_auth_process_invitation")
      * @Method({"POST"})
      */
