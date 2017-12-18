@@ -224,7 +224,12 @@
                                 pic-sure Status
                             </td>
                             <td>
-                                {{ policy.picSureStatus }}
+                                {% if policy.policyTerms.isPicSureEnabled %}
+                                    {% if policy.picSureStatus %}{{ policy.picSureStatus }}{% else %}Not started{% endif %}
+                                    {% if policy.getPicSureApprovedDate %}<br />Approved: {{ policy.getPicSureApprovedDate|date }}{% endif %}
+                                {% else %}
+                                    Non pic-sure policy
+                                {% endif %}
                             </td>
                         </tr>
                     </table>
@@ -832,6 +837,22 @@
                             {{ form_end(debt_form)}}
                         {% else %}
                             N/A
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                <tr>
+                    <td><i class="fa fa-lock" title="Admin only"></i> pic-sure</td>
+                    <td>
+                        {% if policy.policyTerms.isPicSureEnabled %}
+                            Status: {% if policy.picSureStatus %}{{ policy.picSureStatus }}{% else %}Not started{% endif %}
+                            {% if policy.picSureStatus != "approved" and policy.picSureStatus != "preapproved" %}
+                                {{ form_start(picsure_form)}}
+                                {{ form_widget(picsure_form.approve, {'attr': {'class': 'btn btn-danger confirm-picsure'}})}}
+                                {{ form_end(picsure_form)}}
+                            {% endif %}
+                        {% else %}
+                            Non pic-sure policy
                         {% endif %}
                     </td>
                 </tr>
