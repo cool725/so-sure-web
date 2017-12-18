@@ -27,6 +27,7 @@ class Stats
     const MIXPANEL_INVITE_SOMEONE = 'mixpanel-invite-someone';
     const MIXPANEL_VIEW_INVITATION_SCODE = 'mixpanel-view-invitation-scode';
     const MIXPANEL_VIEW_INVITATION_EMAIL = 'mixpanel-view-invitation-email';
+    const MIXPANEL_VIEW_INVITATION_SMS = 'mixpanel-view-invitation-sms';
     const MIXPANEL_PURCHASE_POLICY_APP_ATTRIB = 'mixpanel-purchase-policy-app-attrib';
 
     const KPI_PICSURE_UNSTARTED_POLICIES = 'kpi-picsure-unstarted-policies';
