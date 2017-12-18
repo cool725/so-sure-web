@@ -115,11 +115,10 @@ class QuoteService
         $playDevice = $playDeviceRepo->findOneBy(['device' => $device]);
         $marketingName = ($playDevice) ? $playDevice->getMarketingName() : 'unknown';
         $body = sprintf(
-            'Unknown device queried: %s (%s GB). If device exists, memory may be higher than expected.
-            PlayDevice: %s',
+            'Unknown device queried: "%s" %s (%s GB). If device exists, memory may be higher than expected.',
+            $marketingName,
             $device,
-            $memory,
-            $marketingName
+            $memory
         );
 
         $this->mailer->send(

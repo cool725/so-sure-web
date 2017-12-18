@@ -83,7 +83,7 @@ class QuoteServiceTest extends WebTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->expect($mailer, 0, 'PlayDevice: One');
+        $this->expect($mailer, 0, 'Unknown device queried: "One"');
         self::$quoteService->setMailerMailer($mailer);
         self::$quoteService->getQuotes(null, 'A0001', 3000);
         $this->assertTrue((self::$redis->get('UNKNOWN-DEVICE:A0001') == 1), 'Redis key found');
