@@ -127,7 +127,14 @@ class OpsController extends BaseController
             }
         }
 
-        $unpaidPolicy = $policyRepo->findOneBy(['status' => Policy::STATUS_UNPAID]);
+        $unpaidPolicy = $policyRepo->findOneBy([
+            'status' => Policy::STATUS_UNPAID,
+            'policyDiscountPresent' => ['$ne' => true],
+        ]);
+        $unpaidPolicyDiscountPolicy = $policyRepo->findOneBy([
+            'status' => Policy::STATUS_UNPAID,
+            'policyDiscountPresent' => true,
+        ]);
         $validPolicies = $policyRepo->findBy(['status' => Policy::STATUS_ACTIVE]);
         $cancelledPolicies = $policyRepo->findBy(['status' => Policy::STATUS_CANCELLED]);
         $position = rand(1, count($validPolicies));
@@ -220,6 +227,7 @@ class OpsController extends BaseController
             'scode' => $scode->getCode(),
             'invitation' => $invitation,
             'unpaid_policy' => $unpaidPolicy,
+            'unpaid_policydiscount_policy' => $unpaidPolicyDiscountPolicy,
             'valid_policy' => $validPolicy,
             'cancelled_fraud_policy' => $cancelledFraudPolicy,
             'cancelled_policy' => $cancelledPolicy,
