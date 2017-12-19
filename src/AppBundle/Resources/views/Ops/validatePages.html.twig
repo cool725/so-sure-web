@@ -1,14 +1,23 @@
 {% extends 'base.html.twig' %}
 
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    'components/js-cookie/js.cookie.js'
+    '@AppBundle/Resources/public/js/Ops/ops.js'
+    %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}
+
 {% block body %}
 <div class="container">
     <section class="section--pad">
         <h3>Pages to manually verify when updating design</h3>
+        <h4>Cookie warning</h4>
         <ul class="list-inline">
             <li>
-                <a href="#" class="btn btn-success">Clear Cookies</a>
+                <a id="clearcookies" href="#" class="btn btn-success">Clear Cookies</a>
             </li>
-            <li></li>
         </ul>
         <h4>Any login status</h4>
         <ul>
