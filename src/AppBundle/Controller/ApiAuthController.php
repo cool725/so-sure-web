@@ -150,12 +150,12 @@ class ApiAuthController extends BaseController
                 return new JsonResponse($policy->toApiArray());
             } else {
                 $redis = $this->get('snc_redis.default');
-                $redis->lpush('DETECTED-IMEI', [
+                $redis->lpush('DETECTED-IMEI', json_encode([
                     'detected_imei' => $detectedImei,
                     'suggested_imei' => $suggestedImei,
                     'bucket' => $bucket,
                     'key' => $key
-                ]);
+                ]));
 
                 $this->get('app.mailer')->send(
                     'Unknown App IMEI - Process on admin site',

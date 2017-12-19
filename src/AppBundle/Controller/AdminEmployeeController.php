@@ -1278,6 +1278,31 @@ class AdminEmployeeController extends BaseController
         ];
     }
 
+    /**
+     * @Route("/detected-imei", name="admin_detected_imei")
+     * @Template
+     */
+    public function detectedImeiAction(Request $request)
+    {
+        $redis = $this->get('snc_redis.default');
+        /*
+                $redis->lpush('DETECTED-IMEI', json_encode([
+                    'detected_imei' => 'a123',
+                    'suggested_imei' => 'a456',
+                    'bucket' => 'a',
+                    'key' => 'key', 
+                ]));
+        */
+        $imeis = [];
+        if ($imei = $redis->lpop('DETECTED-IMEI')) {
+            $imeis[] = json_decode($imei, true);
+            $redis->lpush('DETECTED-IMEI', $imei);
+        }
+        return [
+            'imeis' => $imeis,
+        ];
+    }
+
     private function getConnectionData()
     {
         $dm = $this->getManager();
