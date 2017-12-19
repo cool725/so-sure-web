@@ -717,7 +717,7 @@ class ApiController extends BaseController
                 $this->getManager()->flush();
             }
 
-            if ($redis->exists('ERROR_NOT_YET_REGULATED')) {
+            if ($redis->exists('ERROR_NOT_YET_REGULATED') == 1) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_NOT_YET_REGULATED,
                     "Coming soon",
