@@ -1282,7 +1282,7 @@ class AdminEmployeeController extends BaseController
      * @Route("/detected-imei", name="admin_detected_imei")
      * @Template
      */
-    public function detectedImeiAction(Request $request)
+    public function detectedImeiAction()
     {
         $redis = $this->get('snc_redis.default');
         /*
