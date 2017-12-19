@@ -330,7 +330,7 @@
                     <h3>So-Sure Policy Terms</h3>
                 </div>
                 <div class="modal-body modal-policy">
-                    {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  max_pot })) }}
+                    {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  max_pot, 'include': true })) }}
                 </div>
             </div>
         </div>
