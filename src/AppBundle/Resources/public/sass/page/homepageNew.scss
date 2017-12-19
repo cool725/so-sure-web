@@ -691,7 +691,7 @@
             font-size: 14px;
 
             padding: 20px 20px 20px 80px;
-            margin: 0 auto 30px;
+            margin: 0 auto 20px;
 
             &:after {
                 position: absolute;
@@ -718,6 +718,10 @@
                 &:after {
                     left: 15px;
                 }
+            }
+
+            &--name {
+                margin-bottom: 20px;
             }
 
             @include breakpoint(laptop) {
