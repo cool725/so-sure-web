@@ -120,7 +120,7 @@ class ApiAuthController extends BaseController
      * @Route("/detected-imei", name="api_auth_detected_imei")
      * @Method({"POST"})
      */
-    public function detectedImeiAction(Request $request, $id)
+    public function detectedImeiAction(Request $request)
     {
         try {
             $data = json_decode($request->getContent(), true)['body'];
@@ -129,15 +129,45 @@ class ApiAuthController extends BaseController
             }
             $detectedImei = $this->getDataString($data, 'detected_imei');
             $suggestedImei = $this->getDataString($data, 'suggested_imei');
+            $bucket = $this->getDataString($data, 'bucket');
+            $key = $this->getDataString($data, 'key');
 
             $dm = $this->getManager();
             $policyRepo = $dm->getRepository(Policy::class);
             $policy = $policyRepo->findOneBy(['imei' => $suggestedImei]);
             $user = $this->getUser();
             if ($policy && $policy->getUser()->getId() == $user->getId()) {
+                if (!$policy->getDetectedImei()) {
+                    $policy->setDetectedImei($detectedImei);
+                    $dm->flush();
+                }
+                $this->get('logger')->warning(sprintf(
+                    'Policy %s/%s has detected imei set',
+                    $policy->getId(),
+                    $policy->getPolicyNumber()
+                ));
+
                 return new JsonResponse($policy->toApiArray());
             } else {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_DETECTED_IMEI_MANUAL_PROCESSING, 'Access denied', 422);
+                $redis = $this->get('snc_redis.default');
+                $redis->lpush('DETECTED-IMEI', [
+                    'detected_imei' => $detectedImei,
+                    'suggested_imei' => $suggestedImei,
+                    'bucket' => $bucket,
+                    'key' => $key
+                ]);
+
+                $this->get('app.mailer')->send(
+                    'Unknown App IMEI - Process on admin site',
+                    'tech@so-sure.com',
+                    'Unknown App IMEI - Process on admin site'
+                );
+
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_DETECTED_IMEI_MANUAL_PROCESSING,
+                    'Wait on manual processing',
+                    422
+                );
             }
         } catch (AccessDeniedException $ade) {
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);

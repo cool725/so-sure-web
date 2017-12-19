@@ -170,6 +170,90 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(400);
     }
 
+    // POST /detected-imei
+
+    /**
+     *
+     */
+    public function testDetectedImeiMissing()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testDetectedImeiMissing', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+
+        $url = "/api/v1/auth/detected-imei";
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+        ]);
+        $this->verifyResponse(400);
+
+        $url = "/api/v1/auth/detected-imei";
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            //'detected_imei' => 'foo',
+            'bucket' => 'foo',
+            'key' => 'foo',
+        ]);
+        $this->verifyResponse(400);
+
+        $url = "/api/v1/auth/detected-imei";
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'detected_imei' => 'foo',
+            //'bucket' => 'foo',
+            'key' => 'foo',
+        ]);
+        $this->verifyResponse(400);
+
+        $url = "/api/v1/auth/detected-imei";
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'detected_imei' => 'foo',
+            'bucket' => 'foo',
+            //'key' => 'foo',
+        ]);
+        $this->verifyResponse(400);
+    }
+
+    public function testDetectedImeiWait()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testDetectedImeiWait', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+
+        $url = "/api/v1/auth/detected-imei";
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'detected_imei' => 'foo',
+            'bucket' => 'foo',
+            'key' => 'foo',
+        ]);
+        $this->verifyResponse(422, ApiErrorCode::ERROR_DETECTED_IMEI_MANUAL_PROCESSING);
+    }
+
+    public function testDetectedImeiSuggested()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testDetectedImeiSuggested', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $url = "/api/v1/auth/detected-imei";
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'detected_imei' => 'foo',
+            'suggested_imei' => $policyData['phone_policy']['imei'],
+            'bucket' => 'foo',
+            'key' => 'foo',
+        ]);
+        $policy = $this->verifyResponse(200);
+        $this->assertEquals('foo', $policy['phone_policy']['detected_imei']);
+    }
+
     // invitation/{id}
 
     /**
