@@ -411,7 +411,7 @@ class ApiAuthController extends BaseController
             }
 
             $redis = $this->get('snc_redis.default');
-            if ($redis->exists('ERROR_NOT_YET_REGULATED')) {
+            if ($redis->exists('ERROR_NOT_YET_REGULATED') == 1) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_NOT_YET_REGULATED,
                     "Coming soon",
@@ -941,7 +941,7 @@ class ApiAuthController extends BaseController
             }
 
             $redis = $this->get('snc_redis.default');
-            if ($redis->exists('ERROR_NOT_YET_REGULATED')) {
+            if ($redis->exists('ERROR_NOT_YET_REGULATED') == 1) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_NOT_YET_REGULATED,
                     "Coming soon",

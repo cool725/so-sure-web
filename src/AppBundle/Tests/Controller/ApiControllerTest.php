@@ -558,7 +558,8 @@ class ApiControllerTest extends BaseControllerTest
         $date = new \DateTime();
         $deviceKey = sprintf('stats:%s:query:%s', $date->format('Y-m-d'), 'A0001');
         $this->assertGreaterThan(0, self::$redis->get($deviceKey));
-        $this->assertTrue(self::$redis->exists('stats:rooted:A0001'));
+        $this->assertGreaterThan(0, self::$redis->get('stats:rooted:A0001'));
+        $this->assertTrue(self::$redis->exists('stats:rooted:A0001') == 1);
     }
 
     // referral

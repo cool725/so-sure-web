@@ -41,7 +41,7 @@ class StatsServiceTest extends WebTestCase
         $this->assertEquals(1, self::$redis->get('stats:cognito:1'), 'Record cog id');
         $this->assertEquals(1, self::$redis->get('stats:2016-01-01:query:device'), 'Inc device');
         $this->assertEquals(1, self::$redis->get('stats:2016-01-01:query:device:32'), 'Inc device mem');
-        $this->assertFalse(self::$redis->exists('stats:rooted:device'), 'No rooted');
+        $this->assertFalse(self::$redis->exists('stats:rooted:device') == 1, 'No rooted');
 
         self::$stats->quote(1, new \DateTime('2016-01-01'), 'device', 32, true, false);
         $this->assertEquals(2, self::$redis->get('stats:cognito:1'), 'Inc cog id');

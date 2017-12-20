@@ -146,7 +146,7 @@ class PCAService
             return false;
         }
 
-        if ($this->redis->hexists(self::REDIS_POSTCODE_KEY, $postcode)) {
+        if ($this->redis->hexists(self::REDIS_POSTCODE_KEY, $postcode) == 1) {
             return true;
         }
 

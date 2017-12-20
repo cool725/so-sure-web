@@ -62,7 +62,7 @@ class UserListener
     public function sendUserEmailChangedEmail(User $user, $email)
     {
         $key = sprintf('user:change-email:%s', $email);
-        if ($this->redis->exists($key)) {
+        if ($this->redis->exists($key) == 1) {
             return;
         }
 
