@@ -38,10 +38,10 @@ class PCAServiceTest extends WebTestCase
     public function testGetAddressCaching()
     {
         self::$redis->flushdb();
-        $this->assertFalse(self::$redis->hexists(PCAService::REDIS_POSTCODE_KEY, 'BX11LT'));
+        $this->assertFalse(self::$redis->hexists(PCAService::REDIS_POSTCODE_KEY, 'BX11LT') == 1);
         $address = self::$pca->getAddress('BX11LT', null);
         $this->assertEquals('BX1 1LT', $address->getPostCode());
-        $this->assertTrue(self::$redis->hexists(PCAService::REDIS_POSTCODE_KEY, 'BX11LT'));
+        $this->assertTrue(self::$redis->hexists(PCAService::REDIS_POSTCODE_KEY, 'BX11LT') == 1);
     }
 
     public function testNormalize()
