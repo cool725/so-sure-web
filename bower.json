@@ -135,6 +135,10 @@
       ],
       "lozad": [
         "bower_components/lozad/dist/lozad.min.js"
+      ],
+      "Jcrop": [
+        "bower_components/Jcrop/css/Jcrop.min.css",
+        "bower_components/Jcrop/js/Jcrop.min.js"
       ]
     }
   }
