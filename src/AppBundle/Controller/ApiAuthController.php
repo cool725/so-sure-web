@@ -134,9 +134,23 @@ class ApiAuthController extends BaseController
 
             $dm = $this->getManager();
             $policyRepo = $dm->getRepository(Policy::class);
-            $policy = $policyRepo->findOneBy(['imei' => $suggestedImei]);
+            $policies = $policyRepo->findBy(['imei' => $suggestedImei]);
             $user = $this->getUser();
-            if ($policy && $policy->getUser()->getId() == $user->getId()) {
+
+            // prefer an active policy
+            $policy = null;
+            foreach ($policies as $checkPolicy) {
+                if ($checkPolicy->isActive()) {
+                    $policy = $checkPolicy;
+                    break;
+                }
+            }
+            if (!$policy && count($policies) > 0) {
+                $policy = $policies[0];
+            }
+
+            if ($policy) {
+                $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
                 if (!$policy->getDetectedImei()) {
                     $policy->setDetectedImei($detectedImei);
                     $dm->flush();

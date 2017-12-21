@@ -254,6 +254,67 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals('foo', $policy['phone_policy']['detected_imei']);
     }
 
+    public function testDetectedImeiNonUser()
+    {
+        $userA = self::createUser(
+            self::$userManager,
+            self::generateEmail('testDetectedImeiNonUserA', $this),
+            'foo'
+        );
+        $userB = self::createUser(
+            self::$userManager,
+            self::generateEmail('testDetectedImeiNonUserB', $this),
+            'foo'
+        );
+        $cognitoIdentityIdA = $this->getAuthUser($userA);
+        $crawler = $this->generatePolicy($cognitoIdentityIdA, $userA);
+        $policyData = $this->verifyResponse(200);
+
+        $cognitoIdentityIdB = $this->getAuthUser($userB);
+        $url = "/api/v1/auth/detected-imei";
+        $crawler = static::postRequest(self::$client, $cognitoIdentityIdB, $url, [
+            'detected_imei' => 'foo',
+            'suggested_imei' => $policyData['phone_policy']['imei'],
+            'bucket' => 'foo',
+            'key' => 'foo',
+        ]);
+        $policy = $this->verifyResponse(403);
+    }
+
+    public function testDetectedImeiExpired()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testDetectedImeiExpired', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyDataA = $this->verifyResponse(200);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyDataB = $this->verifyResponse(200);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $policyA = $repo->find($policyDataA['id']);
+        $policyA->setImei($policyDataB['phone_policy']['imei']);
+        $policyA->setStatus(Policy::STATUS_EXPIRED);
+        $policyB = $repo->find($policyDataB['id']);
+        $policyB->setStatus(Policy::STATUS_UNPAID);
+        $dm->flush();
+
+        $url = "/api/v1/auth/detected-imei";
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'detected_imei' => 'foo',
+            'suggested_imei' => $policyDataB['phone_policy']['imei'],
+            'bucket' => 'foo',
+            'key' => 'foo',
+        ]);
+        $policy = $this->verifyResponse(200);
+        $this->assertEquals('foo', $policy['phone_policy']['detected_imei']);
+        $this->assertEquals($policyDataB['id'], $policy['id']);
+    }
+
     // invitation/{id}
 
     /**
