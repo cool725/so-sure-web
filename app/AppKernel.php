@@ -34,6 +34,7 @@ class AppKernel extends Kernel
             new WhiteOctober\PagerfantaBundle\WhiteOctoberPagerfantaBundle(),
             new AppBundle\AppBundle(),
             new CensusBundle\CensusBundle(),
+            new PicsureMLBundle\PicsureMLBundle(),
             new Staffim\RollbarBundle\StaffimRollbarBundle(),
             new Snc\RedisBundle\SncRedisBundle(),
             new Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),

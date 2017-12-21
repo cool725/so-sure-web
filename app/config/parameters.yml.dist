@@ -71,6 +71,7 @@ parameters:
     mongodb_db: so-sure
     mongodb_url: mongodb://root:root@localhost
     census_mongodb_url: mongodb://root:root@localhost
+    picsure_mongodb_url: mongodb://root:root@localhost
 
     redis_default_dsn: redis://localhost/0
     redis_session_dsn: redis://localhost/1

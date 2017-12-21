@@ -83,6 +83,9 @@ doctrine_mongodb:
         census:
             server: "%census_mongodb_url%"
             options: {}
+        picsureml:
+            server: "%picsure_mongodb_url%"
+            options: {}
     default_database: "%mongodb_db%"
     document_managers:
         default:
@@ -100,6 +103,12 @@ doctrine_mongodb:
             database: census
             mappings:
                 CensusBundle: ~
+            retry_connect: 5
+            retry_query: 1
+        picsureml:
+            database: picsure
+            mappings:
+                PicsureMLBundle: ~
             retry_connect: 5
             retry_query: 1
     default_commit_options:
@@ -122,7 +131,7 @@ monolog:
     channels: ['receperio']
 
 assetic:
-    bundles:        [ AppBundle, FOSUserBundle, TwigBundle ]
+    bundles:        [ AppBundle, PicsureMLBundle, FOSUserBundle, TwigBundle ]
     debug:          '%kernel.debug%'
     use_controller: '%kernel.debug%'
     filters:
@@ -264,6 +273,10 @@ oneup_flysystem:
                 client: aws.s3
                 bucket: policy.so-sure.com
                 prefix: "%kernel.environment%"
+        s3picsure:
+            awss3v3:
+                client: aws.s3
+                bucket: picsure.so-sure.com
     filesystems:
         s3admin_fs:
             adapter: s3admin
@@ -277,6 +290,9 @@ oneup_flysystem:
         s3policy_fs:
             adapter: s3policy
             mount: s3policy_fs
+        s3picsure_fs:
+            adapter: s3picsure
+            mount: s3picsure_fs
 
 vich_uploader:
     db_driver: mongodb
