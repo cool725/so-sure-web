@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin_claims_base.html.twig' %}
 
 {% block javascripts %}
     {{ parent() }}
@@ -43,7 +43,7 @@
             <tr>
                 <td></td>
                 <td>
-                    Sanctions: 
+                    Sanctions:
                         {% if company.sanctionsChecks|length == 0%}
                             No checks run
                         {% endif %}
