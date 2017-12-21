@@ -9,7 +9,6 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
  */
 class Image
 {
-	
     /**
      * @MongoDB\Id(strategy="auto")
      */
@@ -108,4 +107,8 @@ class Image
         return '['.$this->x.','.$this->y.','.$this->width.','.$this->height.']';
     }
 
+    public function hasAnnotation()
+    {
+        return $this->x != null && $this->y != null && $this->width != null && $this->height != null;
+    }
 }

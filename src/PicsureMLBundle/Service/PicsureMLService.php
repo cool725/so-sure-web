@@ -6,62 +6,80 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use PicsureMLBundle\Document\Image;
+use Psr\Log\LoggerInterface;
 
 class PicsureMLService
 {
-
+    /** @var DocumentManager */
     protected $dm;
+
+    /** @var LoggerInterface */
+    protected $logger;
 
     /**
      * @param DocumentManager $dm
+     * @param LoggerInterface $logger
      */
-    public function __construct(DocumentManager $dm)
+    public function __construct(DocumentManager $dm, LoggerInterface $logger)
     {
         $this->dm = $dm;
+        $this->logger = $logger;
     }
 
-    public function sync($filesystem) {
+    public function sync($filesystem)
+    {
         $repo = $this->dm->getRepository(Image::class);
 
-		$contents = $filesystem->listContents('ml', true);
-		foreach ($contents as $object) {
-			if ( $object['type'] == "file" && !$repo->imageExists($object['path']) ) {
-		    	$image = new Image();
-		    	$image->setPath($object['path']);
-		        $this->dm->persist($image);
-			}
-		}
-		
-		$this->dm->flush();
+        $contents = $filesystem->listContents('ml', true);
+        foreach ($contents as $object) {
+            if ($object['type'] == "file" && !$repo->imageExists($object['path'])) {
+                $image = new Image();
+                $image->setPath($object['path']);
+                $this->dm->persist($image);
+            }
+        }
+
+        $this->dm->flush();
     }
 
-    public function annotate($filesystem) {
-    	$repo = $this->dm->getRepository(Image::class);
+    public function annotate($filesystem)
+    {
+        $repo = $this->dm->getRepository(Image::class);
 
-        $annotations = "";
+        $annotations = [];
 
         $qb = $repo->createQueryBuilder();
         $qb->sort('id', 'desc');
         $results = $qb->getQuery()->execute();
 
         foreach ($results as $result) {
-            if ($result->getX() != null && $result->getY() != null && $result->getWidth() != null && $result->getHeight() != null) {
-                $annotations .= $result->getPath().' 1 '.$result->getX().' '.$result->getY().' '.$result->getWidth().' '.$result->getHeight().PHP_EOL;
+            if ($result->hasAnnotation()) {
+                $annotations[] = sprintf(
+                    "%s 1 %d %d %d %d",
+                    $result->getPath(),
+                    $result->getX(),
+                    $result->getY(),
+                    $result->getWidth(),
+                    $result->getHeight()
+                );
             }
         }
 
         $fs = new Filesystem();
         try {
-            $fs->dumpFile(sys_get_temp_dir().'/annotations.txt', $annotations);
+            $file = sprintf("%s/annotations.txt", sys_get_temp_dir());
+            $fs->dumpFile($file, implode(PHP_EOL, $annotations));
 
-            $stream = fopen(sys_get_temp_dir().'/annotations.txt', 'r+');
-            if ($stream != FALSE) {
+            $stream = fopen($file, 'r+');
+            if ($stream != false) {
                 $filesystem->putStream('annotations.txt', $stream);
                 fclose($stream);
             }
         } catch (IOExceptionInterface $e) {
-            echo "An error occurred while writting the annotations to ".$e->getPath();
+            $this->logger->warning(
+                sprintf("An error occurred while writting the annotations to %s", $e->getPath()),
+                ['exception' => $e]
+            );
         }
     }
-
 }

@@ -40,7 +40,7 @@ class PicsureMLController extends BaseController
             'images' => $pager->getCurrentPageResults(),
             'pager' => $pager
         ];
-	}
+    }
 
     /**
      * @Route("/picsure-ml/edit/{id}", name="admin_picsure_ml_edit")
@@ -51,7 +51,7 @@ class PicsureMLController extends BaseController
         $dm = $this->getPicsureMLManager();
         $repo = $dm->getRepository(Image::class);
         $image = $repo->find($id);
-        if ( $image === null ) {
+        if ($image === null) {
             throw $this->createNotFoundException(sprintf('Image not found %s', $id));
         }
 
@@ -68,18 +68,15 @@ class PicsureMLController extends BaseController
                         $prevId = $repo->getPreviousImage($id);
                         if ($prevId) {
                             return $this->redirectToRoute('admin_picsure_ml_edit', ['id' => $prevId]);
+                        } else {
+                            return $this->redirectToRoute('admin_picsure_ml');
                         }
-                        else {
-                            return $this->redirectToRoute('admin_picsure_ml');                        
-                        }
-                    }
-                    else {
+                    } else {
                         $nextId = $repo->getNextImage($id);
                         if ($nextId) {
                             return $this->redirectToRoute('admin_picsure_ml_edit', ['id' => $nextId]);
-                        }
-                        else {
-                            return $this->redirectToRoute('admin_picsure_ml');                        
+                        } else {
+                            return $this->redirectToRoute('admin_picsure_ml');
                         }
                     }
                 }
@@ -89,7 +86,7 @@ class PicsureMLController extends BaseController
         return [
             'image' => $image,
             'picsure_annotation_form' => $imagesForm->createView(),
-        ];        
+        ];
     }
 
     /**
@@ -131,9 +128,9 @@ class PicsureMLController extends BaseController
         $service->sync($filesystem);
 
         return new RedirectResponse($this->generateUrl('admin_picsure_ml'));
-	}
+    }
 
-	 /**
+    /**
      * @Route("/picsure-ml/annotate", name="admin_picsure_ml_annotate")
      * @Method({"POST"})
      */
@@ -148,6 +145,5 @@ class PicsureMLController extends BaseController
         $service->annotate($filesystem);
 
         return new RedirectResponse($this->generateUrl('admin_picsure_ml'));
-	}
-
+    }
 }

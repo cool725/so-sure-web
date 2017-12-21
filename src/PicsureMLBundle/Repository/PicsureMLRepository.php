@@ -18,7 +18,8 @@ class PicsureMLRepository extends DocumentRepository
             ->count() > 0;
     }
 
-    public function getPreviousImage($id) {
+    public function getPreviousImage($id)
+    {
         $qb = $this->createQueryBuilder();
         $qb->sort('id', 'desc');
 
@@ -27,19 +28,19 @@ class PicsureMLRepository extends DocumentRepository
         $prevId = null;
         $previousId = '0';
         foreach ($results as $result) {
-        	if ($result->getId() == $id) {
-				$prevId = $previousId;
-				break;
-	    	}
-	    	else {
-	    		$previousId = $result->getId();
-	    	}
+            if ($result->getId() == $id) {
+                $prevId = $previousId;
+                break;
+            } else {
+                $previousId = $result->getId();
+            }
         }
 
         return $prevId;
     }
 
-    public function getNextImage($id) {
+    public function getNextImage($id)
+    {
         $qb = $this->createQueryBuilder();
         $qb->sort('id', 'desc');
 
@@ -48,18 +49,16 @@ class PicsureMLRepository extends DocumentRepository
         $nextId = null;
         $getNext = false;
         foreach ($results as $result) {
-        	if (!$getNext) {
-	        	if ($result->getId() == $id) {
-					$getNext = true;
-    	    	}
-    	    }
-    	    else {
-    	    	$nextId = $result->getId();
-    	    	break;
-    	    }
+            if (!$getNext) {
+                if ($result->getId() == $id) {
+                    $getNext = true;
+                }
+            } else {
+                $nextId = $result->getId();
+                break;
+            }
         }
 
         return $nextId;
     }
-
 }

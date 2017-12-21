@@ -1059,6 +1059,8 @@ services:
         class: PicsureMLBundle\Service\PicsureMLService
         arguments:
             - "@doctrine_mongodb.odm.picsureml_document_manager"
+            - "@logger"
+
     picsureml.form.type.annotate:
         class: PicsureMLBundle\Form\Type\AnnotateType
         arguments: ["@request_stack", "%form_required%"]
