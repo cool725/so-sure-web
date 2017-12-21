@@ -460,17 +460,19 @@ class PhoneInsuranceController extends BaseController
         );
         */
         $exp = $this->get('app.sixpack')->participate(
-            SixpackService::EXPERIMENT_QUOTE_SIMPLE_SPLIT,
-            ['simple', 'split'],
-            false
+            SixpackService::EXPERIMENT_FUNNEL_V1_V2,
+            ['v1', 'v2'],
+            true
         );
         if ($request->get('force')) {
             $exp = $request->get('force');
         }
         $template = 'AppBundle:PhoneInsurance:quote.html.twig';
+        /*
         if ($exp == 'complex') {
             $template = 'AppBundle:PhoneInsurance:quoteNewSlider.html.twig';
-        } elseif ($exp == 'split') {
+        } */
+        if ($exp == 'v2') {
             $template = 'AppBundle:PhoneInsurance:quoteNew.html.twig';
         }
 
