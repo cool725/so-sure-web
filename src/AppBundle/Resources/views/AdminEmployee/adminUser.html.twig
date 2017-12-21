@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin_claims_base.html.twig' %}
 
 {% block body %}
 <div class="container">
@@ -87,7 +87,7 @@
                     </td>
                     <td>
                         <button type="button" class="btn btn-info" data-toggle="modal" data-target="#userAddressModal"
-                        ><i class="fa fa-edit"></i> Edit User Address</button>                        
+                        ><i class="fa fa-edit"></i> Edit User Address</button>
                     </td>
                 </tr>
                 <tr>
@@ -170,7 +170,7 @@
                             {% else %}
                                 Possible match: <b>{{ match.sanctions.name }}</b>
                             {% endif %}
-                            / Dob: 
+                            / Dob:
                             {% if match.sanctions.birthday %}
                                 {% if match.sanctions.birthday|date('d M Y') == user.birthday|date('d M Y') %}
                                     <b style="color: red">{{ match.sanctions.birthday|date('d M Y') }}</b>

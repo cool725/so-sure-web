@@ -1,32 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <title>
-            {% block title %}so-sure{% endblock %}
-        </title>
-        {% block meta %}{% endblock %}
+        <title>{% block title %}so-sure{% endblock %}</title>
 
+        {# Meta #}
+        {% block meta %}{% endblock %}
         {% include '::header.html.twig' %}
 
+        {# Stylesheets #}
+        {# NOTE: Whilst we are transitioning use two different main stylesheets #}
         {% block stylesheets %}
-            {# Whilst we are transitioning use two different main stylesheets #}
             {% if new_stylesheet is defined and new_stylesheet == 1 %}
                 {% stylesheets output='css/*.css'
                     '@AppBundle/Resources/public/sass/mainNew.scss'
-                %}
-                <link rel="stylesheet" href="{{ asset_url }}">
+                %}<link rel="stylesheet" href="{{ asset_url }}">
                 {% endstylesheets %}
             {% else %}
                 {% stylesheets output='css/*.css'
                     '@AppBundle/Resources/public/sass/main.scss'
-                %}
-                <link rel="stylesheet" href="{{ asset_url }}">
+                %}<link rel="stylesheet" href="{{ asset_url }}">
                 {% endstylesheets %}
             {% endif %}
         {% endblock %}
 
-        {% block remotestylesheets %}
-        {% endblock %}
+        {% block remotestylesheets %}{% endblock %}
         {% block metaend %}{% endblock %}
     </head>
     <body {% if distraction_free is defined and distraction_free == 1 %}class="distraction-free"{% endif %}>
@@ -108,28 +105,11 @@
 
         {% endif %}
 
-        {% if environment != 'prod' %}
-            <nav class="navbar navbar-fixed-bottom" style="background-color:#EFEFEF;height:40px;">
-                <div class="container-fluid">
-                    <div class="navbar-header">
-                        <ul class="navbar-brand list-inline">
-                            <li><strong class="text-red">{{ environment }}</strong></li>
-                            <li><a href="{{ path('ops_pages') }}"><i class="fa fa-wrench fa-lg"></i></a></li>
-                            <li><a href="{{ path('quote_make_model_memory', {'make':'Apple','model':'iPhone 7','memory':128}) }}"><i class="fa fa-mobile fa-lg" title="Quick Quote"></i></a></li>
-                            {% if distraction_free is defined and distraction_free == 1 and app.user is not null and app.user %}
-                                {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
-                                    <li><a href="{{ path('homepage', {'_impersonate': '_exit'}) }}">Exit <strong>{{ app.user.email }}</strong></a></li>
-                                {% else %}
-                                    <li><a href="{{ path('fos_user_security_logout') }}">Logout <strong>{{ app.user.email }}</strong></a></li>
-                                {% endif %}
-                            {% endif %}
-                        </ul>
+        {# Dev Bar #}
+        {% include '::dev_bar.html.twig' %}
 
-                    </div>
-                </div>
-            </nav>
-        {% endif %}
-
+        {# Navigation #}
+        {# NOTE: Whilst we are transitioning use two different main stylesheets #}
         {% block nav %}
             {% if new_stylesheet is defined and new_stylesheet == 1 %}
                 {% include '::nav_new.html.twig' %}
@@ -138,30 +118,15 @@
             {% endif %}
         {% endblock %}
 
-        {% if app.session.isStarted %}
-            {% if app.session.flashBag.peekAll | length > 0 %}
-                <div class="container text-center flash-container">
-                    {% for flash_message in app.session.flashBag.get('success') %}
-                        <div class="bg-success flash-success flash">
-                            <h4>{{ flash_message|raw }}</h4>
-                        </div>
-                    {% endfor %}
-                    {% for flash_message in app.session.flashBag.get('warning') %}
-                        <div class="bg-warning flash-warning flash">
-                            <h4>{{ flash_message|raw }}</h4>
-                        </div>
-                    {% endfor %}
-                    {% for flash_message in app.session.flashBag.get('error') %}
-                        <div class="bg-danger flash-danger flash">
-                            <h4>{{ flash_message|raw }}</h4>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        {% endif %}
+        {# Flash Messages #}
+        {% include '::flash_messages.html.twig' %}
 
+        {# Page Content #}
         {% block body %}{% endblock %}
+        {# End Page Content #}
 
+        {# Footer #}
+        {# NOTE: Whilst we are transitioning use two different main stylesheets #}
         {% block footer %}
             {% if new_footer is defined and new_footer == 1 %}
                 {% include '::footer_new.html.twig' %}
@@ -170,6 +135,7 @@
             {% endif %}
         {% endblock %}
 
+        {# If using CDN else load locally #}
         {% if use_cdn %}
             <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
             <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
@@ -178,6 +144,7 @@
             <script src="/components/bootstrap-sass/bootstrap.js"></script>
         {% endif %}
 
+        {# Javascript #}
         {% block javascripts %}
             {% if hide_cookie_warning is defined and hide_cookie_warning %}
                 {% javascripts

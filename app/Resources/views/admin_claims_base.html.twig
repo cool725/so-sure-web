@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{% block title %}so-sure{% endblock %}</title>
+
+        {# Meta #}
+        {% block meta %}{% endblock %}
+        {% include '::header.html.twig' %}
+
+        {# Stylesheets #}
+        {% block stylesheets %}
+            {% stylesheets output='css/*.css'
+                '@AppBundle/Resources/public/sass/adminNew.scss'
+            %}<link rel="stylesheet" href="{{ asset_url }}">
+            {% endstylesheets %}
+        {% endblock %}
+
+        {% block remotestylesheets %}{% endblock %}
+        {% block metaend %}{% endblock %}
+    </head>
+    <body>
+
+        {# Dev Bar #}
+        {% include '::dev_bar.html.twig' %}
+
+        {# Navigation #}
+        {% block nav %}
+            {% include '::nav.html.twig' %}
+        {% endblock %}
+
+        {# Flash Messages #}
+        {% include '::flash_messages.html.twig' %}
+
+        {# Page Content #}
+        {% block body %}{% endblock %}
+        {# End Page Content #}
+
+        {# Footer #}
+        {% block footer %}{% endblock %}
+
+        {# If using CDN else load locally #}
+        {% if use_cdn %}
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+        {% else %}
+            <script src="/components/jquery/jquery.min.js"></script>
+            <script src="/components/bootstrap/bootstrap.js"></script>
+        {% endif %}
+
+        {# Javascript #}
+        {% block javascripts %}
+            {% javascripts
+            '@AppBundle/Resources/public/js/*' %}
+            <script src="{{ asset_url }}"></script>
+            {% endjavascripts %}
+        {% endblock %}
+    </body>
+</html>

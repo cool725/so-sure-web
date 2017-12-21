@@ -26,6 +26,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Pagerfanta\Pagerfanta;
 use Pagerfanta\Adapter\DoctrineODMMongoDBAdapter;
 use MongoRegex;
+use CensusBundle\Document\Postcode;
 
 /**
  * @Route("/claims")
@@ -218,6 +219,14 @@ class ClaimsController extends BaseController
         }
         $checks = $fraudService->runChecks($policy);
 
+        $censusDM = $this->getCensusManager();
+        $postcodeRepo = $censusDM->getRepository(PostCode::class);
+        $oa = null;
+        if ($policy->getUser()->getBillingAddress()) {
+            $search = $this->get('census.search');
+            $oa = $search->findOutputArea($policy->getUser()->getBillingAddress()->getPostcode());
+        }
+
         return [
             'policy' => $policy,
             'formClaim' => $formClaim->createView(),
@@ -229,6 +238,7 @@ class ClaimsController extends BaseController
             'policy_route' => 'claims_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),
             'user_history' => $this->getUserHistory($policy->getUser()->getId()),
+            'oa' => $oa,
         ];
     }
 
