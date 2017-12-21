@@ -281,7 +281,7 @@ class RateLimitService
 
         $shaContents = sha1($contents);
         $this->logger->debug(sprintf('Replay Check %s -> sha1(%s)', $replayKey, $contents));
-        if ($this->redis->hexists($replayKey, $shaContents)) {
+        if ($this->redis->hexists($replayKey, $shaContents) == 1) {
             return false;
         }
 

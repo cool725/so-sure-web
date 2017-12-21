@@ -2,6 +2,8 @@
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 
 /**
  * @var Composer\Autoload\ClassLoader
@@ -22,25 +24,37 @@ $apcLoader->register(true);
 //require_once __DIR__.'/../app/AppCache.php';
 
 $kernel = new AppKernel('prod', false);
-$kernel->loadClassCache();
+//$kernel->loadClassCache();
 //$kernel = new AppCache($kernel);
 
 // When using the HttpCache, you need to call the method in your front controller instead of relying on the configuration parameter
 //Request::enableHttpMethodParameterOverride();
 $request = Request::createFromGlobals();
 // http://symfony.com/doc/current/cookbook/request/load_balancer_reverse_proxy.html
-Request::setTrustedProxies(array('127.0.0.1', $request->server->get('REMOTE_ADDR')));
+Request::setTrustedProxies(
+    // trust *all* requests
+    array('127.0.0.1', $request->server->get('REMOTE_ADDR')),
+    // if you're using ELB, otherwise use a constant from above
+    Request::HEADER_X_FORWARDED_AWS_ELB
+);
 
 // If we're getting untrusted host, user is hitting elb ip.  Difficult to find correct rewrite rules that don't also catch the elb ip probes
 // so just redirect on the untrusted host exception.
 try {
     $response = $kernel->handle($request);
-} catch (\UnexpectedValueException $e) {
+} catch (BadRequestHttpException $e) {
+    if (stripos($e->getMessage(), "Untrusted Host") !== false) {
+        $response = new RedirectResponse('https://wearesosure.com');
+    } else {
+        throw $e;
+    }
+} catch (SuspiciousOperationException $e) {
     if (stripos($e->getMessage(), "Untrusted Host") !== false) {
         $response = new RedirectResponse('https://wearesosure.com');
     } else {
         throw $e;
     }
 }
+
 $response->send();
 $kernel->terminate($request, $response);

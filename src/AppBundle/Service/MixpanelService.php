@@ -66,9 +66,33 @@ class MixpanelService
 
     const CUSTOM_CPC_MANUFACTURER_PAGE_UK = '$custom_event:534868';
     const CUSTOM_CPC_COMPETITOR_PAGE_UK = '$custom_event:599266';
-    const CUSTOM_INVITATION_PAGE_SCODE = '$custom_event:591840';
-    const CUSTOM_INVITATION_PAGE_EMAIL = '$custom_event:591838';
+    //const CUSTOM_INVITATION_PAGE_SCODE = '$custom_event:591840';
+    //const CUSTOM_INVITATION_PAGE_EMAIL = '$custom_event:591838';
+    const CUSTOM_INVITATION_PAGE_SMS = '$custom_event:591838';
     const CUSTOM_PURCHASE_POLICY_APP_ATTRIB = '$custom_event:674827';
+
+    public static $events = [
+            self::CUSTOM_TOTAL_SITE_VISITORS => Stats::MIXPANEL_TOTAL_SITE_VISITORS,
+            self::CUSTOM_QUOTE_PAGE_UK => Stats::MIXPANEL_QUOTES_UK,
+            self::CUSTOM_LANDING_PAGE_UK => Stats::MIXPANEL_LANDING_UK,
+            self::EVENT_BUY_BUTTON_CLICKED => Stats::MIXPANEL_CLICK_BUY_NOW,
+            self::EVENT_RECEIVE_DETAILS => Stats::MIXPANEL_RECEIVE_PERSONAL_DETAILS,
+            self::EVENT_INVITE => Stats::MIXPANEL_INVITE_SOMEONE,
+            self::CUSTOM_CPC_QUOTE_PAGE_UK => Stats::MIXPANEL_CPC_QUOTES_UK,
+            self::CUSTOM_CPC_MANUFACTURER_PAGE_UK => Stats::MIXPANEL_CPC_MANUFACTURER_UK,
+            self::CUSTOM_CPC_COMPETITOR_PAGE_UK => Stats::MIXPANEL_CPC_COMPETITORS_UK,
+            self::CUSTOM_PURCHASE_POLICY_APP_ATTRIB => Stats::MIXPANEL_PURCHASE_POLICY_APP_ATTRIB,
+    ];
+
+    public static $segments = [
+        self::EVENT_INVITATION_PAGE => [
+            'Invitation Method' => [
+                'scode' => Stats::MIXPANEL_VIEW_INVITATION_SCODE,
+                'sms' => Stats::MIXPANEL_VIEW_INVITATION_SMS,
+                'email' => Stats::MIXPANEL_VIEW_INVITATION_EMAIL,
+            ]
+        ],
+    ];
 
     /** @var DocumentManager */
     protected $dm;
@@ -275,22 +299,8 @@ class MixpanelService
     public function stats($start, $end)
     {
         $stats = [];
-        $events = [
-            self::CUSTOM_TOTAL_SITE_VISITORS,
-            self::CUSTOM_QUOTE_PAGE_UK,
-            self::CUSTOM_LANDING_PAGE_UK,
-            self::EVENT_BUY_BUTTON_CLICKED,
-            self::EVENT_RECEIVE_DETAILS,
-            self::EVENT_INVITE,
-            self::CUSTOM_CPC_QUOTE_PAGE_UK,
-            self::CUSTOM_CPC_MANUFACTURER_PAGE_UK,
-            self::CUSTOM_CPC_COMPETITOR_PAGE_UK,
-            self::CUSTOM_INVITATION_PAGE_SCODE,
-            self::CUSTOM_INVITATION_PAGE_EMAIL,
-            self::CUSTOM_PURCHASE_POLICY_APP_ATTRIB,
-        ];
         $data = $this->mixpanelData->data('events', [
-            'event' => $events,
+            'event' => array_keys(self::$events),
             'type' => 'unique',
             'unit' => 'week',
             'from_date' => $start->format('Y-m-d'),
@@ -298,42 +308,31 @@ class MixpanelService
         ]);
         $key = $data['data']['series'][0];
         foreach ($data['data']['values'] as $event => $results) {
-            if ($event == self::CUSTOM_TOTAL_SITE_VISITORS) {
-                $stats['Total Visitors'] = $results[$key];
-                $this->stats->set(Stats::MIXPANEL_TOTAL_SITE_VISITORS, $start, $results[$key]);
-            } elseif ($event == self::CUSTOM_QUOTE_PAGE_UK) {
-                $stats['Quote Page UK'] = $results[$key];
-                $this->stats->set(Stats::MIXPANEL_QUOTES_UK, $start, $results[$key]);
-            } elseif ($event == self::CUSTOM_LANDING_PAGE_UK) {
-                $stats['Landing Page UK'] = $results[$key];
-                $this->stats->set(Stats::MIXPANEL_LANDING_UK, $start, $results[$key]);
-            } elseif ($event == self::CUSTOM_CPC_QUOTE_PAGE_UK) {
-                $stats['CPC Quote Page UK'] = $results[$key];
-                $this->stats->set(Stats::MIXPANEL_CPC_QUOTES_UK, $start, $results[$key]);
-            } elseif ($event == self::CUSTOM_CPC_MANUFACTURER_PAGE_UK) {
-                $stats['CPC Manufacturer Page UK'] = $results[$key];
-                $this->stats->set(Stats::MIXPANEL_CPC_MANUFACTURER_UK, $start, $results[$key]);
-            } elseif ($event == self::CUSTOM_CPC_COMPETITOR_PAGE_UK) {
-                $stats['CPC Competitor Page UK'] = $results[$key];
-                $this->stats->set(Stats::MIXPANEL_CPC_COMPETITORS_UK, $start, $results[$key]);
-            } elseif ($event == self::EVENT_BUY_BUTTON_CLICKED) {
-                $stats['Click Buy Now Button'] = $results[$key];
-                $this->stats->set(Stats::MIXPANEL_CLICK_BUY_NOW, $start, $results[$key]);
-            } elseif ($event == self::EVENT_RECEIVE_DETAILS) {
-                $stats['Receive Personal Details'] = $results[$key];
-                $this->stats->set(Stats::MIXPANEL_RECEIVE_PERSONAL_DETAILS, $start, $results[$key]);
-            } elseif ($event == self::EVENT_INVITE) {
-                $stats['Invite someone'] = $results[$key];
-                $this->stats->set(Stats::MIXPANEL_INVITE_SOMEONE, $start, $results[$key]);
-            } elseif ($event == self::CUSTOM_INVITATION_PAGE_SCODE) {
-                $stats['View Invitation SCode'] = $results[$key];
-                $this->stats->set(Stats::MIXPANEL_VIEW_INVITATION_SCODE, $start, $results[$key]);
-            } elseif ($event == self::CUSTOM_INVITATION_PAGE_EMAIL) {
-                $stats['View Invitation Email'] = $results[$key];
-                $this->stats->set(Stats::MIXPANEL_VIEW_INVITATION_EMAIL, $start, $results[$key]);
-            } elseif ($event == self::CUSTOM_PURCHASE_POLICY_APP_ATTRIB) {
-                $stats['Purchase Policy App Attrib'] = $results[$key];
-                $this->stats->set(Stats::MIXPANEL_PURCHASE_POLICY_APP_ATTRIB, $start, $results[$key]);
+            $stats[self::$events[$event]] = $results[$key];
+            $this->stats->set(self::$events[$event], $start, $results[$key]);
+        }
+
+        foreach (self::$segments as $event => $segmentData) {
+            foreach ($segmentData as $segment => $mapping) {
+                $query = [
+                    'event' => $event,
+                    'on' => sprintf('properties["%s"]', $segment),
+                    'type' => 'unique',
+                    'unit' => 'week',
+                    'from_date' => $start->format('Y-m-d'),
+                    'to_date' => $end->format('Y-m-d'),
+                ];
+                $data = $this->mixpanelData->data('segmentation', $query);
+                //print_r($data);
+                $key = $data['data']['series'][0];
+                foreach ($data['data']['values'] as $on => $results) {
+                    foreach ($mapping as $type => $statsKey) {
+                        if ($on == $type) {
+                            $stats[sprintf('%s-%s', $statsKey, $type)] = $results[$key];
+                            $this->stats->set($statsKey, $start, $results[$key]);
+                        }
+                    }
+                }
             }
         }
 

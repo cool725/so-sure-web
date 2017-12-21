@@ -34,7 +34,6 @@ framework:
         #assets_version: SomeVersionScheme
     default_locale:  "%locale%"
     trusted_hosts:   ~
-    trusted_proxies: ~
     session:
         handler_id: snc_redis.session.handler
         cookie_httponly: true
@@ -58,6 +57,8 @@ twig:
         branch_key: "%branch_key%"
         drift_key: "%drift_key%"
         use_cdn: true
+        default_login_method: "accountkit"
+        #default_login_method: "email"
         branch_pot_url: "%branch_pot_url%"
         branch_share_url: "%branch_share_url%"
         branch_policy_url: "%branch_policy_url%"
@@ -413,6 +414,7 @@ nelmio_security:
                 - https://www.youtube.com
                 - https://*.digits.com
                 - https://*.facebook.com
+                - https://connect.facebook.net
                 - http://*.facebook.com
                 - https://*.vimeo.com
                 - https://*.hotjar.com
@@ -472,6 +474,7 @@ nelmio_security:
                 - 'data:'
                 - https://www.googleadservices.com
                 - https://*.doubleclick.net
+                - https://bat.bing.com
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com
                 - https://www.google.ac
@@ -716,6 +719,7 @@ nelmio_security:
                 - https://*.googlesyndication.com
                 - https://www.gstatic.com
                 - https://chart.googleapis.com
+                - https://bat.bing.com
                 # linkedin
                 - https://secure.adnxs.com
                 - https://*.bizographics.com

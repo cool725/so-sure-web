@@ -99,10 +99,9 @@ class QuoteService
      */
     private function unknownDevice($device, $memory)
     {
-        if (in_array($device, [
-            "", "generic_x86", "generic_x86_64", "Simulator",
-            "iPad4,4", "iPad5,2", "iPad5,3", "iPad5,4", "iPad6,7", "iPad6,8", "iPad Air", "iPad Air 2",
-            "iPad2,7", "iPad3,4", "iPad2,5", "iPad7,3", "iPad6,3", "iPad2,4", "iPad5,1", "iPad4,8",
+        $searchDevice = (substr($device, 0, 4) == 'iPad') ? 'iPad' : $device;
+        if (in_array($searchDevice, [
+            "", "generic_x86", "generic_x86_64", "Simulator", "iPad",
         ])) {
             return false;
         }
@@ -115,11 +114,10 @@ class QuoteService
         $playDevice = $playDeviceRepo->findOneBy(['device' => $device]);
         $marketingName = ($playDevice) ? $playDevice->getMarketingName() : 'unknown';
         $body = sprintf(
-            'Unknown device queried: %s (%s GB). If device exists, memory may be higher than expected.
-            PlayDevice: %s',
+            'Unknown device queried: "%s" %s (%s GB). If device exists, memory may be higher than expected.',
+            $marketingName,
             $device,
-            $memory,
-            $marketingName
+            $memory
         );
 
         $this->mailer->send(

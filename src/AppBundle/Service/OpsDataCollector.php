@@ -16,6 +16,11 @@ class OpsDataCollector extends DataCollector
         );
     }
 
+    public function reset()
+    {
+        $this->data = [];
+    }
+
     public function getMethod()
     {
         return $this->data['method'];

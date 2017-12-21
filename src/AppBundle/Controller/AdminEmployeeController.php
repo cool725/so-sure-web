@@ -447,6 +447,9 @@ class AdminEmployeeController extends BaseController
         $debtForm = $this->get('form.factory')
             ->createNamedBuilder('debt_form')->add('debt', SubmitType::class)
             ->getForm();
+        $picsureForm = $this->get('form.factory')
+            ->createNamedBuilder('picsure_form')->add('approve', SubmitType::class)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('cancel_form')) {
@@ -796,6 +799,26 @@ class AdminEmployeeController extends BaseController
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
+            } elseif ($request->request->has('picsure_form')) {
+                $picsureForm->handleRequest($request);
+                if ($picsureForm->isValid()) {
+                    if ($policy->getPolicyTerms()->isPicSureEnabled() && !$policy->isPicSureValidated()) {
+                        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+                        $policy->setPicSureApprovedDate(new \DateTime());
+                        $dm->flush();
+                        $this->addFlash(
+                            'success',
+                            'Set pic-sure to approved'
+                        );
+                    } else {
+                        $this->addFlash(
+                            'error',
+                            'Policy is not a pic-sure policy or policy is already pic-sure approved'
+                        );
+                    }
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
             }
         }
         $checks = $fraudService->runChecks($policy);
@@ -823,6 +846,7 @@ class AdminEmployeeController extends BaseController
             'makemodel_form' => $makeModelForm->createView(),
             'chargebacks_form' => $chargebacksForm->createView(),
             'debt_form' => $debtForm->createView(),
+            'picsure_form' => $picsureForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),
@@ -1251,6 +1275,31 @@ class AdminEmployeeController extends BaseController
             'history' => $history,
             'charges' => $charges,
             'form' => $form->createView(),
+        ];
+    }
+
+    /**
+     * @Route("/detected-imei", name="admin_detected_imei")
+     * @Template
+     */
+    public function detectedImeiAction()
+    {
+        $redis = $this->get('snc_redis.default');
+        /*
+                $redis->lpush('DETECTED-IMEI', json_encode([
+                    'detected_imei' => 'a123',
+                    'suggested_imei' => 'a456',
+                    'bucket' => 'a',
+                    'key' => 'key', 
+                ]));
+        */
+        $imeis = [];
+        if ($imei = $redis->lpop('DETECTED-IMEI')) {
+            $imeis[] = json_decode($imei, true);
+            $redis->lpush('DETECTED-IMEI', $imei);
+        }
+        return [
+            'imeis' => $imeis,
         ];
     }
 

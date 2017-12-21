@@ -24,6 +24,7 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
+            provider: fos_userbundle
 
         api:
             pattern: ^/api
@@ -41,7 +42,9 @@ security:
                 csrf_token_generator: security.csrf.token_manager
             logout:       true
             anonymous:    true
+            provider: fos_userbundle
             security: true
+            logout_on_user_change: true
             oauth:
                 resource_owners:
                     facebook:           "/login/check-facebook"

@@ -23,14 +23,19 @@ $apcLoader->register(true);
 //require_once __DIR__.'/../app/AppCache.php';
 
 $kernel = new AppKernel('vagrant', true);
-$kernel->loadClassCache();
+//$kernel->loadClassCache();
 //$kernel = new AppCache($kernel);
 
 // When using the HttpCache, you need to call the method in your front controller instead of relying on the configuration parameter
 //Request::enableHttpMethodParameterOverride();
 $request = Request::createFromGlobals();
 // http://symfony.com/doc/current/cookbook/request/load_balancer_reverse_proxy.html
-Request::setTrustedProxies(array('127.0.0.1', $request->server->get('REMOTE_ADDR')));
+Request::setTrustedProxies(
+    // trust *all* requests
+    array('127.0.0.1', $request->server->get('REMOTE_ADDR')),
+    // trust *all* "X-Forwarded-*" headers
+    Request::HEADER_X_FORWARDED_ALL
+);
 
 $response = $kernel->handle($request);
 $response->send();

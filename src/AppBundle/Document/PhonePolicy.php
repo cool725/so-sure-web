@@ -66,6 +66,14 @@ class PhonePolicy extends Policy
     protected $imei;
 
     /**
+     * @AppAssert\Alphanumeric()
+     * @Assert\Length(min="0", max="50")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $detectedImei;
+
+    /**
      * @Assert\DateTime()
      * @MongoDB\Date()
      * @Gedmo\Versioned
@@ -177,6 +185,16 @@ class PhonePolicy extends Policy
         if ($this->getNextPolicy()) {
             $this->getNextPolicy()->adjustImei($imei, $setReplacementDate);
         }
+    }
+
+    public function getDetectedImei()
+    {
+        return $this->detectedImei;
+    }
+
+    public function setDetectedImei($detectedImei)
+    {
+        $this->detectedImei = $detectedImei;
     }
 
     public function getImeiReplacementDate()
@@ -602,7 +620,8 @@ class PhonePolicy extends Policy
                         )
                     ],
                 ],
-            ]
+                'detected_imei' => $this->getDetectedImei(),
+            ],
         ]);
     }
 }

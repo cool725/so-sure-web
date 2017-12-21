@@ -50,7 +50,7 @@ parameters:
     google_appname:
     google_apikey:
     google_analytics:
-    ga_tag_manager_env:
+    ga_tag_manager_env: '&gtm_auth=&gtm_preview=env-4&gtm_cookies_win=x'
 
     gocardless_apikey:
     gocardless_prod: false
