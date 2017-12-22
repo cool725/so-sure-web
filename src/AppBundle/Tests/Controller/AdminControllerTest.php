@@ -24,6 +24,12 @@ class AdminControllerTest extends BaseControllerTest
     {
     }
 
+    public function setUp()
+    {
+        parent::setUp();
+        $this->clearRateLimit();
+    }
+
     public function testAdminLoginOk()
     {
         $this->login('patrick@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'admin/');
