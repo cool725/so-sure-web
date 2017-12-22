@@ -4530,6 +4530,7 @@ class PhonePolicyTest extends WebTestCase
         $policyB->init($user, self::getLatestPolicyTerms(static::$dm));
         $policyB->setPhone(self::$phone);
         $policyB->create(rand(1, 999999), null, null, rand(1, 9999));
+        $this->assertFalse($policyB->isSameInsurable($policyA));
         $policyB->setImei($policyA->getImei());
         $policyB->setStatus(null);
         $policyB->setId(rand(1, 999999));
