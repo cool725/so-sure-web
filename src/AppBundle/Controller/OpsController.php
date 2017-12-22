@@ -339,6 +339,7 @@ class OpsController extends BaseController
                 'none',
                 'about',
                 'asset',
+                'blob',
             ])) {
                 $logger->debug(sprintf('Content-Security-Policy called with ignore scheme: %s', $scheme));
 
