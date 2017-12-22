@@ -46,6 +46,7 @@ class AppKernel extends Kernel
             new Nexy\SlackBundle\NexySlackBundle(),
             new Rollerworks\Bundle\PasswordStrengthBundle\RollerworksPasswordStrengthBundle(),
             new Nelmio\SecurityBundle\NelmioSecurityBundle(),
+            new Peerj\UserSecurityBundle\PeerjUserSecurityBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test', 'vagrant'), true)) {

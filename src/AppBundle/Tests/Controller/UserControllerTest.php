@@ -725,4 +725,34 @@ class UserControllerTest extends BaseControllerTest
         $this->assertEquals(Policy::STATUS_DECLINED_RENEWAL, $updatedRenewalPolicyA->getStatus());
         $this->assertNotNull($updatedRenewalPolicyA->getPreviousPolicy()->getCashback());
     }
+
+    public function testUserFormRateLimit()
+    {
+        $this->clearRateLimit();
+
+        $email = self::generateEmail('testUserRateLimit', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        self::$dm->flush();
+        //print_r($policy->getClaimsWarnings());
+        $this->assertTrue($policy->getUser()->hasActivePolicy());
+
+        for ($i = 1; $i < 25; $i++) {
+            $this->login($email, 'bar', 'login');
+        }
+
+        $this->login($email, 'bar', 'login', null, null);
+
+        // expect a locked account
+        $this->login($email, 'bar', 'login', null, 503);
+    }
 }
