@@ -581,6 +581,15 @@ class PhonePolicy extends Policy
         return $this->getPolicyFilesByType(PicSureFile::class);
     }
 
+    public function isSameInsurable(Policy $policy)
+    {
+        if ($policy instanceof PhonePolicy) {
+            return $this->getImei() == $policy->getImei();
+        } else {
+            return false;
+        }
+    }
+
     public function toApiArray()
     {
         $picSureEnabled = $this->getPolicyTerms() && $this->getPolicyTerms()->isPicSureEnabled();

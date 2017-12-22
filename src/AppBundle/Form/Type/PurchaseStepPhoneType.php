@@ -60,6 +60,11 @@ class PurchaseStepPhoneType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
             $purchase = $event->getData();
             $form = $event->getForm();
+
+            if ($purchase->getPolicy() && $purchase->getPolicy()->isRepurchase()) {
+                $form->remove('imei');
+                $form->add('imei', TelType::class, ['attr' => ['readonly' => true], 'required' => $this->required]);
+            }
  
             if ($purchase->getPhone()) {
                 $price = $purchase->getPhone()->getCurrentPhonePrice();

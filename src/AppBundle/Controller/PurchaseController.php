@@ -287,6 +287,7 @@ class PurchaseController extends BaseController
             }
             $purchase->setImei($policy->getImei());
             $purchase->setSerialNumber($policy->getSerialNumber());
+            $purchase->setPolicy($policy);
         }
 
         if ($phone) {
