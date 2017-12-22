@@ -4059,6 +4059,24 @@ abstract class Policy
         return true;
     }
 
+    public function isRepurchase()
+    {
+        if ($this->getStatus()) {
+            return false;
+        }
+
+        foreach ($this->getUser()->getPolicies() as $policy) {
+            // Find any policies that match imei
+            if ($policy->getId() != $this->getId() && $this->isSameInsurable($policy) && $policy->getStatus()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    abstract public function isSameInsurable(Policy $policy);
+
     protected function toApiArray()
     {
         if ($this->isPolicy() && !$this->getPolicyTerms() && in_array($this->getStatus(), [
