@@ -4075,7 +4075,7 @@ abstract class Policy
         return false;
     }
 
-    public abstract function isSameInsurable(Policy $policy);
+    abstract public function isSameInsurable(Policy $policy);
 
     protected function toApiArray()
     {
