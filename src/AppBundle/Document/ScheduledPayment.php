@@ -211,7 +211,18 @@ class ScheduledPayment
             return null;
         }
 
-        return $this->getScheduledDay() == $this->policy->getBillingDay();
+        if ($this->getScheduledDay() == $this->policy->getBillingDay()) {
+            return true;
+        }
+
+        // Hack for a off by one hour timezone issue between billing & scheduled
+        // TODO: Fix scheduled times
+        $diff = $this->getScheduled()->diff($this->policy->getBilling());
+        if ($diff->d == 0 && $diff->h <= 1) {
+            return true;
+        }
+
+        return false;
     }
 
     public function toApiArray()
