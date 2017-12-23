@@ -3584,6 +3584,17 @@ abstract class Policy
         // All Scheduled day must match the billing day
         foreach ($scheduledPayments as $scheduledPayment) {
             if ($scheduledPayment->hasCorrectBillingDay() === false) {
+                /*
+                $diff = $scheduledPayment->getScheduled()->diff($this->getBilling());
+                print sprintf(
+                    "%s %s %s%s",
+                    $scheduledPayment->getScheduled()->format(\DateTime::ATOM),
+                    $this->getBilling()->format(\DateTime::ATOM),
+                    json_encode($diff),
+                    PHP_EOL
+                );
+                */
+
                 return false;
             }
         }
