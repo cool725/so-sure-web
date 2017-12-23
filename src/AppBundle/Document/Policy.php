@@ -3442,7 +3442,7 @@ abstract class Policy
 
         $expectedPaid = 0;
         if ($this->getPremiumPlan() == self::PLAN_YEARLY) {
-            $expectedPaid = $this->getPremiumInstallmentPrice();
+            $expectedPaid = $this->getPremium()->getAdjustedYearlyPremiumPrice();
         } elseif ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
             $months = $this->dateDiffMonths($date, $this->getBilling());
             if ($months > 12) {
@@ -3454,7 +3454,7 @@ abstract class Policy
             print $this->getBilling()->format(\DateTime::ATOM) . PHP_EOL;
             print $months . PHP_EOL;
             */
-            $expectedPaid = $this->getPremiumInstallmentPrice() * $months;
+            $expectedPaid = $this->getPremium()->getAdjustedStandardMonthlyPremiumPrice() * $months;
         } else {
             throw new \Exception('Unknown premium plan');
         }
