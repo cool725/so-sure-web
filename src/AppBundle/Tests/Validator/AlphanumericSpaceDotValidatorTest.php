@@ -29,7 +29,7 @@ class AlphanumericSpaceDotValidatorTest extends \PHPUnit_Framework_TestCase
         $validator = $this->configureValidator();
 
         // standard alphanumeric
-        $validator->validate(' aA1-.,;:+():_£&@*!^#"%/’[]', self::$constraint);
+        $validator->validate(' aA1-.,;:+():_£&@*!^#"%/’[]|', self::$constraint);
         $validator->validate("'", self::$constraint);
     }
 
