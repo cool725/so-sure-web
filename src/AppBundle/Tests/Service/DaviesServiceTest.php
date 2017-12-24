@@ -205,11 +205,11 @@ class DaviesServiceTest extends WebTestCase
     public function testSaveClaimsClosed()
     {
         $davies = new DaviesClaim();
-        $davies->policyNumber = '1';
+        $davies->policyNumber = $this->getRandomPolicyNumber();
         $davies->status = 'Closed';
 
         $daviesOpen = new DaviesClaim();
-        $daviesOpen->policyNumber = '1';
+        $daviesOpen->policyNumber = $davies->policyNumber;
         $daviesOpen->status = 'Open';
 
         self::$daviesService->saveClaims(1, [$davies, $davies]);
@@ -219,7 +219,7 @@ class DaviesServiceTest extends WebTestCase
     public function testSaveClaimsOpen()
     {
         $daviesOpen = new DaviesClaim();
-        $daviesOpen->policyNumber = '1';
+        $daviesOpen->policyNumber = $this->getRandomPolicyNumber();
         $daviesOpen->status = 'Open';
 
         self::$daviesService->clearErrors();

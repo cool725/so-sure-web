@@ -2138,30 +2138,6 @@ class InvitationServiceTest extends WebTestCase
         $this->assertEquals(2, count($policy->getConnections()));
     }
 
-    public function testResolveSCode()
-    {
-        $this->assertEquals('a', static::$invitationService->resolveSCode('a'));
-        $this->assertEquals('abcdefgh', static::$invitationService->resolveSCode('abcdefgh'));
-
-        $this->assertEquals(
-            'abcdefgh',
-            static::$invitationService->resolveSCode('https://goo.gl/wSZGbc'),
-            'If error, try running webvagrant, as requires server running on localhost.'
-        );
-        $this->assertEquals(
-            'abcdefgh',
-            static::$invitationService->resolveSCode('goo.gl/wSZGbc'),
-            'If error, try clearing cache.'
-        );
-
-        $this->assertEquals('abcdefgh', static::$invitationService->resolveSCode(
-            'https://sosure.test-app.link/GQnmCNBSwB'
-        ));
-        $this->assertEquals('abcdefgh', static::$invitationService->resolveSCode(
-            'sosure.test-app.link/GQnmCNBSwB'
-        ));
-    }
-
     private function createAndLink($email, $date, $inviteeEmail = null, $policy = null, $phone = null)
     {
         if ($phone == null) {

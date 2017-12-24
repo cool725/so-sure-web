@@ -303,7 +303,7 @@ class SalvaExportServiceTest extends WebTestCase
         $dm->flush();
 
         //\Doctrine\Common\Util\Debug::dump($updatedPolicy->getPayments());
-        $lines = $this->exportPayments($policy->getPolicyNumber());
+        $lines = $this->exportPayments($updatedPolicy->getPolicyNumber());
         //print_r($lines);
         $this->assertEquals(2, count($lines));
         $this->assertEquals(

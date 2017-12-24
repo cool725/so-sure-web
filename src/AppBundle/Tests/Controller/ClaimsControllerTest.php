@@ -26,7 +26,7 @@ class ClaimsControllerTest extends BaseControllerTest
 
     public function testClaimsLoginViewPolicyOk()
     {
-        $email = self::generateEmail('testUserOk', $this);
+        $email = self::generateEmail('testClaimsLoginViewPolicyOk', $this);
         $password = 'foo';
         $phone = self::getRandomPhone(self::$dm);
         $user = self::createUser(
