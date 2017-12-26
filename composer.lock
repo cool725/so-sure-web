@@ -4512,17 +4512,17 @@
         },
         {
             "name": "peerj/peerj-user-security-bundle",
-            "version": "v0.2",
+            "version": "v0.2.1",
             "target-dir": "Peerj/UserSecurityBundle",
             "source": {
                 "type": "git",
                 "url": "https://github.com/so-sure/PeerjUserSecurityBundle.git",
-                "reference": "570cdcf304c706579ee0e034942b3c691bee0127"
+                "reference": "b9648ea0bb43ad37cc20fb390b4f57291c8a8848"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/so-sure/PeerjUserSecurityBundle/zipball/570cdcf304c706579ee0e034942b3c691bee0127",
-                "reference": "570cdcf304c706579ee0e034942b3c691bee0127",
+                "url": "https://api.github.com/repos/so-sure/PeerjUserSecurityBundle/zipball/b9648ea0bb43ad37cc20fb390b4f57291c8a8848",
+                "reference": "b9648ea0bb43ad37cc20fb390b4f57291c8a8848",
                 "shasum": ""
             },
             "require": {
@@ -4557,9 +4557,9 @@
                 "user"
             ],
             "support": {
-                "source": "https://github.com/so-sure/PeerjUserSecurityBundle/tree/v0.2"
+                "source": "https://github.com/so-sure/PeerjUserSecurityBundle/tree/v0.2.1"
             },
-            "time": "2017-12-22 12:07:36"
+            "time": "2017-12-26 09:20:49"
         },
         {
             "name": "phpoffice/phpexcel",
