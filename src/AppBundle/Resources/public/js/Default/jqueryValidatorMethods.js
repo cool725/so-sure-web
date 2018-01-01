@@ -59,7 +59,6 @@ $(function(){
 
         var birthdate = new Date();
         birthdate.setFullYear(year, month - 1, day);
-        console.log(birthdate);
 
         var minAge = new Date();
         minAge.setYear(minAge.getFullYear() - 18);
