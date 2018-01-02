@@ -719,6 +719,13 @@ class JudopayService
             */
         }
 
+        if (!$payment) {
+            $payment = new JudoPayment();
+            $payment->setAmount(0);
+            $payment->setResult(JudoPayment::RESULT_SKIPPED);
+            $scheduledPayment->setPayment($payment);
+            $policy->addPayment($payment);
+        }
         $this->processScheduledPaymentResult($scheduledPayment, $payment);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
