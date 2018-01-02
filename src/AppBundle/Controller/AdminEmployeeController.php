@@ -447,6 +447,9 @@ class AdminEmployeeController extends BaseController
         $debtForm = $this->get('form.factory')
             ->createNamedBuilder('debt_form')->add('debt', SubmitType::class)
             ->getForm();
+        $picsureForm = $this->get('form.factory')
+            ->createNamedBuilder('picsure_form')->add('approve', SubmitType::class)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('cancel_form')) {
@@ -796,6 +799,26 @@ class AdminEmployeeController extends BaseController
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
+            } elseif ($request->request->has('picsure_form')) {
+                $picsureForm->handleRequest($request);
+                if ($picsureForm->isValid()) {
+                    if ($policy->getPolicyTerms()->isPicSureEnabled() && !$policy->isPicSureValidated()) {
+                        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+                        $policy->setPicSureApprovedDate(new \DateTime());
+                        $dm->flush();
+                        $this->addFlash(
+                            'success',
+                            'Set pic-sure to approved'
+                        );
+                    } else {
+                        $this->addFlash(
+                            'error',
+                            'Policy is not a pic-sure policy or policy is already pic-sure approved'
+                        );
+                    }
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
             }
         }
         $checks = $fraudService->runChecks($policy);
@@ -823,6 +846,7 @@ class AdminEmployeeController extends BaseController
             'makemodel_form' => $makeModelForm->createView(),
             'chargebacks_form' => $chargebacksForm->createView(),
             'debt_form' => $debtForm->createView(),
+            'picsure_form' => $picsureForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),
@@ -1254,6 +1278,31 @@ class AdminEmployeeController extends BaseController
         ];
     }
 
+    /**
+     * @Route("/detected-imei", name="admin_detected_imei")
+     * @Template
+     */
+    public function detectedImeiAction()
+    {
+        $redis = $this->get('snc_redis.default');
+        /*
+                $redis->lpush('DETECTED-IMEI', json_encode([
+                    'detected_imei' => 'a123',
+                    'suggested_imei' => 'a456',
+                    'bucket' => 'a',
+                    'key' => 'key', 
+                ]));
+        */
+        $imeis = [];
+        if ($imei = $redis->lpop('DETECTED-IMEI')) {
+            $imeis[] = json_decode($imei, true);
+            $redis->lpush('DETECTED-IMEI', $imei);
+        }
+        return [
+            'imeis' => $imeis,
+        ];
+    }
+
     private function getConnectionData()
     {
         $dm = $this->getManager();
@@ -1622,13 +1671,16 @@ class AdminEmployeeController extends BaseController
 
         $adjustedWeeks = array_slice($weeks, 0 - $numWeeks);
         $reversedAdjustedWeeks = array_reverse($adjustedWeeks);
+        $prevPageDate = $reversedAdjustedWeeks[0]['end_date'];
+        $prevPageDate->add(new \DateInterval('P'.($numWeeks).'W'));
+
         return [
             'weeks' => $reversedAdjustedWeeks,
             'next_page' => $this->generateUrl('admin_kpi_date', [
                 'now' => $adjustedWeeks[0]['start_date']->format('y-m-d')
             ]),
             'previous_page' => $this->generateUrl('admin_kpi_date', [
-                'now' => $reversedAdjustedWeeks[0]['end_date']->format('y-m-d')
+                'now' => $prevPageDate->format('y-m-d')
             ]),
             'now' => $now,
         ];

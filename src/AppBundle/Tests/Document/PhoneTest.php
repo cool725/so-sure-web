@@ -119,7 +119,7 @@ class PhoneTest extends \PHPUnit_Framework_TestCase
         $phone1250 = new Phone();
         $phone1250->init('Apple', '1250Binder', 9, 32, ['1250-binder'], 1250);
         $this->assertEquals(10.49, $phone1000->getSalvaBinderMonthlyPremium());
-        $this->assertEquals(null, $phone1250->getSalvaBinderMonthlyPremium());
+        $this->assertEquals(11.49, $phone1250->getSalvaBinderMonthlyPremium());
     }
 
     public function testBinder2017()

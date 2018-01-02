@@ -1054,3 +1054,15 @@ services:
                 template: 'opsDataCollector'
                 id: "app.ops_collector"
         public: false
+
+    picsureml.picsureml:
+        class: PicsureMLBundle\Service\PicsureMLService
+        arguments:
+            - "@doctrine_mongodb.odm.picsureml_document_manager"
+            - "@logger"
+
+    picsureml.form.type.annotate:
+        class: PicsureMLBundle\Form\Type\AnnotateType
+        arguments: ["@request_stack", "%form_required%"]
+        tags:
+            - { name: form.type }

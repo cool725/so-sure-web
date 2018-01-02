@@ -1,0 +1,42 @@
+// picsureML.scss
+
+.container {
+	margin-bottom: 20px;
+
+	.container-action {
+		margin-top: 20px;
+		margin-bottom: 20px;
+		
+		button {
+			margin-right: 10px;
+		}
+	}
+
+	.picsure-image {
+		margin-bottom: 20px;
+		padding-top: 10px;
+		padding-bottom: 10px;
+		border-radius: 5px;
+		border: solid 1px;
+
+		img {
+			max-width: 100%;
+			height: auto;
+		}
+	}
+
+	.row {
+		.content-left {
+			float: left;
+			margin-top: 10px;
+		}
+		.content-right {
+			float: right;
+			margin-top: 10px;
+		}
+		button {
+			margin-left: 10px;
+		}
+	}
+
+}

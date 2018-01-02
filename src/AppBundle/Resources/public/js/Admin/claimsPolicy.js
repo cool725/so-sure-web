@@ -39,6 +39,10 @@ $('.confirm-regenerate-schedule').on("click",function() {
     return confirm('Are you sure you want to re-generate the Policy Schedule?');
 });
 
+$('.confirm-picsure').on("click",function() {
+    return confirm('Are you sure you want to approve pic-sure?');
+});
+
 $(document).ready(function(){
     $('.datetimepicker').datetimepicker({
         format: "DD-MM-YYYY HH:mm",

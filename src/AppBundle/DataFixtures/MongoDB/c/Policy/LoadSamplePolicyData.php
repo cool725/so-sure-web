@@ -11,6 +11,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\Address;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Payment\JudoPayment;
+use AppBundle\Document\Payment\PolicyDiscountPayment;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\SCode;
@@ -54,6 +55,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $this->faker = Faker\Factory::create('en_GB');
 
         $users = $this->newUsers($manager, 150);
+        $unpaidDiscount = $this->newUsers($manager, 10);
         $iosPreExpireUsers = $this->newUsers($manager, 40);
         $androidPreExpireUsers = $this->newUsers($manager, 40);
         $preExpireUsers = $this->newUsers($manager, 40);
@@ -77,6 +79,11 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         foreach ($users as $user) {
             $this->addConnections($manager, $user, $users);
+        }
+
+        foreach ($unpaidDiscount as $user) {
+            $this->newPolicy($manager, $user, $count, self::CLAIM_NONE, null, null, null, false, true, null, rand(2, 50));
+            $count++;
         }
 
         foreach ($iosPreExpireUsers as $user) {
@@ -451,7 +458,8 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $phone = null,
         $paid = null,
         $sendInvitation = true,
-        $days = null
+        $days = null,
+        $policyDiscount = null
     ) {
         if (!$phone) {
             $phone = $this->getRandomPhone($manager);
@@ -505,7 +513,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
 
         $paymentDate = clone $startDate;
-        if ($paid === true || rand(0, 1) == 0) {
+        if ($paid === true || ($paid === null && rand(0, 1) == 0)) {
             $payment = new JudoPayment();
             $payment->setDate($paymentDate);
             $payment->setAmount($phone->getCurrentPhonePrice()->getYearlyPremiumPrice(null, clone $startDate));
@@ -554,6 +562,15 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         $policyService = $this->container->get('app.policy');
         $policyService->generateScheduledPayments($policy, $startDate);
+
+        if ($policyDiscount) {
+            $policy->setPolicyDiscountPresent(true);
+            $payment = new PolicyDiscountPayment();
+            $payment->setDate(clone $startDate);
+            $payment->setAmount(0 - $policyDiscount);
+            $payment->setNotes('LoadSamplePolicyData');
+            $policy->addPayment($payment);
+        }
 
         if ($sendInvitation) {
             $invitation = new EmailInvitation();

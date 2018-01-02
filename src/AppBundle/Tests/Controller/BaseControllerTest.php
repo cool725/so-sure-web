@@ -128,7 +128,8 @@ class BaseControllerTest extends WebTestCase
         $username,
         $password,
         $expectedLocation = null,
-        $loginLocation = null
+        $loginLocation = null,
+        $expectedHttpCode = 200
     ) {
         if ($loginLocation) {
             self::$client->followRedirects();
@@ -140,7 +141,12 @@ class BaseControllerTest extends WebTestCase
         self::$client->followRedirects();
         $crawler = self::$client->request('GET', $loginLocation);
         self::$client->followRedirects(false);
-        self::verifyResponse(200);
+        if ($expectedHttpCode) {
+            self::verifyResponse($expectedHttpCode);
+            if ($expectedHttpCode > 200) {
+                return;
+            }
+        }
         $this->assertEquals(
             sprintf('http://localhost/login'),
             self::$client->getHistory()->current()->getUri()
@@ -151,7 +157,9 @@ class BaseControllerTest extends WebTestCase
         $form['_password'] = $password;
         self::$client->followRedirects();
         $crawler = self::$client->submit($form);
-        self::verifyResponse(200);
+        if ($expectedHttpCode) {
+            self::verifyResponse($expectedHttpCode);
+        }
         self::$client->followRedirects(false);
         if ($expectedLocation) {
             $this->assertEquals(

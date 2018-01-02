@@ -20,14 +20,15 @@ class SixpackService
     //const EXPERIMENT_HOMEPAGE_PHONE_IMAGE = 'homepage-phone-image';
     // const EXPERIMENT_QUOTE_SLIDER = 'quote-slider';
     //const EXPERIMENT_PYG_HOME= 'pyg-or-home';
-    const EXPERIMENT_QUOTE_SIMPLE_COMPLEX_SPLIT = 'quote-simple-complex-split';
-    const EXPERIMENT_QUOTE_SIMPLE_SPLIT = 'quote-simple-split';
+    //const EXPERIMENT_QUOTE_SIMPLE_COMPLEX_SPLIT = 'quote-simple-complex-split';
+    //const EXPERIMENT_QUOTE_SIMPLE_SPLIT = 'quote-simple-split';
     //const EXPERIMENT_CPC_MANUFACTURER_HOME = 'cpc-manufacturer-or-home';
     //const EXPERIMENT_CPC_MANUFACTURER_WITH_HOME = 'cpc-manufacturer-with-home';
     const EXPERIMENT_POSTCODE = 'postcode';
     //const EXPERIMENT_HOMEPAGE_V1_V2 = 'homepage-v1-v2';
-    const EXPERIMENT_HOMEPAGE_V1_V2OLD_V2NEW = 'homepage-v1-v2old-v2new';
+    //const EXPERIMENT_HOMEPAGE_V1_V2OLD_V2NEW = 'homepage-v1-v2old-v2new';
     const EXPERIMENT_APP_SHARE_METHOD = 'app-share-method';
+    const EXPERIMENT_FUNNEL_V1_V2 = 'funnel-v1-v2';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_SHARE_MESSAGE_ORIGINAL = 'original';

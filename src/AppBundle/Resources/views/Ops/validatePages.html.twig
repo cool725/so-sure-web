@@ -1,9 +1,24 @@
 {% extends 'base.html.twig' %}
 
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    'components/js-cookie/js.cookie.js'
+    '@AppBundle/Resources/public/js/Ops/ops.js'
+    %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}
+
 {% block body %}
 <div class="container">
     <section class="section--pad">
         <h3>Pages to manually verify when updating design</h3>
+        <h4>Cookie warning</h4>
+        <ul class="list-inline">
+            <li>
+                <a id="clearcookies" href="#" class="btn btn-success">Clear Cookies</a>
+            </li>
+        </ul>
         <h4>Any login status</h4>
         <ul>
             <li>
@@ -92,6 +107,13 @@
             </li>
             <li>
                 <a href="{{ url('user_home') }}?_impersonate={{ unpaid_policy.user.email }}">User Unpaid Page</a> <b>(auto impersonate {{ unpaid_policy.user.email }})</b>
+            </li>
+            <li>
+                {% if unpaid_policydiscount_policy %}
+                    <a href="{{ url('user_home') }}?_impersonate={{ unpaid_policydiscount_policy.user.email }}">User Unpaid w/Policy Discount Page</a> <b>(auto impersonate {{ unpaid_policydiscount_policy.user.email }})</b>
+                {% else %}
+                    No policy unpaid w/policy discount available
+                {% endif %}
             </li>
             <li>
                 {% if policy_cancelled_payment_owed %}

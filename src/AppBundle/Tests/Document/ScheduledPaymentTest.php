@@ -93,4 +93,17 @@ class ScheduledPaymentTest extends \PHPUnit_Framework_TestCase
         $scheduledPayment->getScheduled()->setTimezone(new \DateTimeZone('UTC'));
         $this->assertTrue($scheduledPayment->hasCorrectBillingDay());
     }
+
+    public function testHasCorrectBillingDayHackOneHour()
+    {
+        $policy2 = new SalvaPhonePolicy();
+        $policy2->setBilling(new \DateTime('2017-06-15 23:00', new \DateTimeZone('Europe/London')));
+
+        $scheduledPayment2 = new ScheduledPayment();
+        $scheduledPayment2->setType(ScheduledPayment::TYPE_SCHEDULED);
+        $scheduledPayment2->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+        $scheduledPayment2->setScheduled(new \DateTime('2017-06-16 00:00', new \DateTimeZone('Europe/London')));
+        $policy2->addScheduledPayment($scheduledPayment2);
+        $this->assertTrue($scheduledPayment2->hasCorrectBillingDay());
+    }
 }

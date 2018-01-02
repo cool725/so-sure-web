@@ -5,6 +5,8 @@ namespace AppBundle\Tests\Controller;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
+use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\Policy;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Payment\JudoPayment;
@@ -222,6 +224,46 @@ class PurchaseControllerTest extends BaseControllerTest
 
         self::verifyResponse(200);
         $this->verifyPurchaseReady($crawler);
+    }
+
+    public function testRePurchase()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testRePurchase', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-01-01'), true);
+        static::$policyService->setEnvironment('test');
+        static::$dm->flush();
+        $this->assertEquals(new \DateTimeZone(Salva::SALVA_TIMEZONE), $policy->getStart()->getTimeZone());
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+
+        static::$policyService->expire($policy, new \DateTime('2017-01-01'));
+
+        $this->login($user->getEmail(), 'bar', 'user/invalid');
+
+        $crawler = self::$client->request(
+            'GET',
+            self::$router->generate('user_repurchase_policy', ['id' => $policy->getId()])
+        );
+        $crawler = self::$client->followRedirect();
+        //print_r($crawler->html());
+        self::verifyResponse(200);
+        $this->assertEquals('readonly', $crawler->filter('#purchase_form_imei')->attr('readonly'));
+        $this->assertNotEquals('readonly', $crawler->filter('#purchase_form__token')->attr('readonly'));
     }
 
     public function testPurchasePhoneImeiDashNew()

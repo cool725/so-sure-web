@@ -143,8 +143,8 @@ class DefaultController extends BaseController
 
         $exp = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_HOMEPAGE_V1_V2OLD_V2NEW,
-            ['v1', 'v2-old', 'v2-new'],
+            SixpackService::EXPERIMENT_FUNNEL_V1_V2,
+            ['v1', 'v2'],
             true
         );
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
@@ -161,9 +161,9 @@ class DefaultController extends BaseController
             'device_category' => $this->get('app.request')->getDeviceCategory()
         );
 
-        if ($exp == 'v2-new') {
-            return $this->render('AppBundle:Default:indexV2.html.twig', $data);
-        } elseif ($exp == 'v2-old') {
+        //if ($exp == 'v2-new') {
+        //    return $this->render('AppBundle:Default:indexV2.html.twig', $data);
+        if ($exp == 'v2') {
             return $this->render('AppBundle:Default:indexV2old.html.twig', $data);
         } else {
             return $this->render('AppBundle:Default:index.html.twig', $data);

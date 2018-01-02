@@ -40,7 +40,9 @@
     "animate.css": "^3.5.2",
     "corejs-typeahead": "^1.2.1",
     "dot": "doT#^1.1.2",
-    "lozad": "^1.0.9"
+    "lozad": "^1.0.9",
+    "js-cookie": "^2.2.0",
+    "Jcrop": "^2.0.4"
   },
   "install": {
     "path": "web/components",
@@ -135,6 +137,13 @@
       ],
       "lozad": [
         "bower_components/lozad/dist/lozad.min.js"
+      ],
+      "Jcrop": [
+        "bower_components/Jcrop/css/Jcrop.min.css",
+        "bower_components/Jcrop/js/Jcrop.min.js"
+      ],
+      "js-cookie": [
+        "bower_components/js-cookie/src/js.cookie.js"
       ]
     }
   }

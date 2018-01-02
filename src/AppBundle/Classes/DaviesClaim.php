@@ -52,7 +52,6 @@ class DaviesClaim extends DaviesExcel
 
     public static $breakdownEmailAddresses = [
         'laura.harvey@davies-group.com',
-        'Louisa.Luxton@davies-group.com',
         'patrick@so-sure.com',
         'dylan@so-sure.com',
     ];
@@ -60,17 +59,14 @@ class DaviesClaim extends DaviesExcel
     public static $invoiceEmailAddresses = [
         'accounts.payable@davies-group.com',
         'laura.harvey@davies-group.com',
-        'Louisa.Luxton@davies-group.com',
         'patrick@so-sure.com',
         'dylan@so-sure.com',
     ];
 
     public static $errorEmailAddresses = [
         'laura.harvey@davies-group.com',
-        'Louisa.Luxton@davies-group.com',
-        'Owen.Pugh@davies-group.com',
+        'Samantha.adams@davies-group.com',
         'Simon.Harvey@davies-group.com',
-        'Sarah.Aston@davies-group.com',
         'patrick@so-sure.com',
         'dylan@so-sure.com',
         'rayo@so-sure.com',

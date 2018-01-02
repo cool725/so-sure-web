@@ -34,6 +34,7 @@ class AppKernel extends Kernel
             new WhiteOctober\PagerfantaBundle\WhiteOctoberPagerfantaBundle(),
             new AppBundle\AppBundle(),
             new CensusBundle\CensusBundle(),
+            new PicsureMLBundle\PicsureMLBundle(),
             new Staffim\RollbarBundle\StaffimRollbarBundle(),
             new Snc\RedisBundle\SncRedisBundle(),
             new Stof\DoctrineExtensionsBundle\StofDoctrineExtensionsBundle(),
@@ -45,6 +46,7 @@ class AppKernel extends Kernel
             new Nexy\SlackBundle\NexySlackBundle(),
             new Rollerworks\Bundle\PasswordStrengthBundle\RollerworksPasswordStrengthBundle(),
             new Nelmio\SecurityBundle\NelmioSecurityBundle(),
+            new Peerj\UserSecurityBundle\PeerjUserSecurityBundle(),
         );
 
         if (in_array($this->getEnvironment(), array('dev', 'test', 'vagrant'), true)) {

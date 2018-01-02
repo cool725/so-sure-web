@@ -117,6 +117,86 @@ class ApiAuthController extends BaseController
     }
 
     /**
+     * @Route("/detected-imei", name="api_auth_detected_imei")
+     * @Method({"POST"})
+     */
+    public function detectedImeiAction(Request $request)
+    {
+        try {
+            $data = json_decode($request->getContent(), true)['body'];
+            if (!$this->validateFields($data, ['detected_imei', 'bucket', 'key'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+            $detectedImei = $this->getDataString($data, 'detected_imei');
+            $suggestedImei = $this->getDataString($data, 'suggested_imei');
+            $bucket = $this->getDataString($data, 'bucket');
+            $key = $this->getDataString($data, 'key');
+
+            $dm = $this->getManager();
+            $policyRepo = $dm->getRepository(Policy::class);
+            $policies = $policyRepo->findBy(['imei' => $suggestedImei]);
+            $user = $this->getUser();
+
+            // prefer an active policy
+            $policy = null;
+            foreach ($policies as $checkPolicy) {
+                if ($checkPolicy->isActive()) {
+                    $policy = $checkPolicy;
+                    break;
+                }
+            }
+            if (!$policy && count($policies) > 0) {
+                $policy = $policies[0];
+            }
+
+            if ($policy) {
+                $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+                if (!$policy->getDetectedImei()) {
+                    $policy->setDetectedImei($detectedImei);
+                    $dm->flush();
+                }
+                $this->get('logger')->warning(sprintf(
+                    'Policy %s/%s has detected imei set',
+                    $policy->getId(),
+                    $policy->getPolicyNumber()
+                ));
+
+                return new JsonResponse($policy->toApiArray());
+            } else {
+                $redis = $this->get('snc_redis.default');
+                $redis->lpush('DETECTED-IMEI', json_encode([
+                    'detected_imei' => $detectedImei,
+                    'suggested_imei' => $suggestedImei,
+                    'bucket' => $bucket,
+                    'key' => $key
+                ]));
+
+                $this->get('app.mailer')->send(
+                    'Unknown App IMEI - Process on admin site',
+                    'tech@so-sure.com',
+                    'Unknown App IMEI - Process on admin site'
+                );
+
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_DETECTED_IMEI_MANUAL_PROCESSING,
+                    'Wait on manual processing',
+                    422
+                );
+            }
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api detectedImeiAction.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
      * @Route("/invitation/{id}", name="api_auth_process_invitation")
      * @Method({"POST"})
      */
@@ -345,7 +425,7 @@ class ApiAuthController extends BaseController
             }
 
             $redis = $this->get('snc_redis.default');
-            if ($redis->exists('ERROR_NOT_YET_REGULATED')) {
+            if ($redis->exists('ERROR_NOT_YET_REGULATED') == 1) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_NOT_YET_REGULATED,
                     "Coming soon",
@@ -875,7 +955,7 @@ class ApiAuthController extends BaseController
             }
 
             $redis = $this->get('snc_redis.default');
-            if ($redis->exists('ERROR_NOT_YET_REGULATED')) {
+            if ($redis->exists('ERROR_NOT_YET_REGULATED') == 1) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_NOT_YET_REGULATED,
                     "Coming soon",

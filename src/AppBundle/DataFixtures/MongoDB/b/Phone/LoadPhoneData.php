@@ -148,8 +148,8 @@ abstract class LoadPhoneData implements ContainerAwareInterface
                 $premium, // $premium
                 $data[3], // $memory
                 $devices, // $devices
-                str_replace('£', '', $data[7]), // $initialPrice
-                str_replace('£', '', $data[6]), // $replacementPrice
+                str_replace('£', '', trim($data[7])), // $initialPrice
+                str_replace('£', '', trim($data[6])), // $replacementPrice
                 $data[8], // $initialPriceUrl
                 $date
             );

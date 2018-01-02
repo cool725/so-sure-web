@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<div class="container" style="margin-bottom: 50px">
+<div class="row">
+    <div class="col-md-8">
+        <h2>Detected Imei</h2>
+    </div>
+</div>
+
+{% if imeis|length == 0 %}
+    <h4>No detected imeis</h4>
+{% endif %}
+{% for imei in imeis %}
+<div class="row">
+    <div class="col-md-3">
+        <h4>{{ imei['detected_imei'] }} (Suggested {{ imei['suggested_imei'] }}) </h4>
+    </div>
+    <div class="col-md-7">
+    </div>
+</div>
+<div class="row" style="margin-top: 20px;">
+    <div class="col-md-12 text-center">
+            <a href="{{ s3DownloadLink(imei['bucket'], imei['key']) }}" target="_blank">
+                <i class="fa fa-external-link"></i> {{ imei.key }}
+            </a>
+    </div>
+</div>
+<hr style="border-bottom: 3px solid black">
+{% endfor %}
+</div>
+
+{% endblock %}

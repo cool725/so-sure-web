@@ -10,6 +10,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 use VasilDakov\Postcode\Postcode;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
+use AppBundle\Validator\Constraints\AlphanumericSpaceDotPipeValidator;
 
 /**
  * @MongoDB\EmbeddedDocument
@@ -18,7 +19,7 @@ use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 class Attribution
 {
     /**
-     * @AppAssert\AlphanumericSpaceDot()
+     * @AppAssert\AlphanumericSpaceDotPipe()
      * @Assert\Length(min="1", max="250")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned

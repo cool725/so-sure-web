@@ -3442,7 +3442,7 @@ abstract class Policy
 
         $expectedPaid = 0;
         if ($this->getPremiumPlan() == self::PLAN_YEARLY) {
-            $expectedPaid = $this->getPremiumInstallmentPrice();
+            $expectedPaid = $this->getPremium()->getAdjustedYearlyPremiumPrice();
         } elseif ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
             $months = $this->dateDiffMonths($date, $this->getBilling());
             if ($months > 12) {
@@ -3454,7 +3454,7 @@ abstract class Policy
             print $this->getBilling()->format(\DateTime::ATOM) . PHP_EOL;
             print $months . PHP_EOL;
             */
-            $expectedPaid = $this->getPremiumInstallmentPrice() * $months;
+            $expectedPaid = $this->getPremium()->getAdjustedStandardMonthlyPremiumPrice() * $months;
         } else {
             throw new \Exception('Unknown premium plan');
         }
@@ -3584,6 +3584,17 @@ abstract class Policy
         // All Scheduled day must match the billing day
         foreach ($scheduledPayments as $scheduledPayment) {
             if ($scheduledPayment->hasCorrectBillingDay() === false) {
+                /*
+                $diff = $scheduledPayment->getScheduled()->diff($this->getBilling());
+                print sprintf(
+                    "%s %s %s%s",
+                    $scheduledPayment->getScheduled()->format(\DateTime::ATOM),
+                    $this->getBilling()->format(\DateTime::ATOM),
+                    json_encode($diff),
+                    PHP_EOL
+                );
+                */
+
                 return false;
             }
         }
@@ -4058,6 +4069,24 @@ abstract class Policy
 
         return true;
     }
+
+    public function isRepurchase()
+    {
+        if ($this->getStatus()) {
+            return false;
+        }
+
+        foreach ($this->getUser()->getPolicies() as $policy) {
+            // Find any policies that match imei
+            if ($policy->getId() != $this->getId() && $this->isSameInsurable($policy) && $policy->getStatus()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    abstract public function isSameInsurable(Policy $policy);
 
     protected function toApiArray()
     {

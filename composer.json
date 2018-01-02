@@ -13,7 +13,7 @@
         "doctrine/orm": "^2.4.8",
         "doctrine/doctrine-bundle": "^1.4",
         "symfony/swiftmailer-bundle": "^2.3",
-        "symfony/monolog-bundle": "^2.4",
+        "symfony/monolog-bundle": "^3.1",
         "sensio/distribution-bundle": "^5.0",
         "sensio/framework-extra-bundle": "^3.0",
         "incenteev/composer-parameter-handler": "^2.0",
@@ -33,8 +33,8 @@
         "plivo/plivo-php": "^1.1",
         "phpoffice/phpexcel": "^1.8",
         "lcobucci/jwt": "^3.1",
-        "snc/redis-bundle": "dev-master",
-        "predis/predis": "1.0.4",
+        "snc/redis-bundle": "^2.0",
+        "predis/predis": "^1.1.1",
         "egulias/email-validator": "~1.2",
         "fzaninotto/faker": "^1.6",
         "stof/doctrine-extensions-bundle": "^1.2",
@@ -62,7 +62,8 @@
         "mobiledetect/mobiledetectlib": "^2.8",
         "NoodlesNZ/double-metaphone": "^1.0",
         "thiagoalessio/tesseract_ocr": "^1.1",
-        "imagine/imagine": "^0.7.1"
+        "imagine/imagine": "^0.7.1",
+        "peerj/peerj-user-security-bundle": "^0.2"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",
@@ -88,6 +89,10 @@
         {
             "type": "vcs",
             "url":  "https://github.com/so-sure/two-factor-bundle.git"
+        },
+        {
+            "type": "vcs",
+            "url":  "https://github.com/so-sure/PeerjUserSecurityBundle.git"
         }
     ],
     "scripts": {

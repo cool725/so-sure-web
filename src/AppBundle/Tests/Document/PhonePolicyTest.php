@@ -4510,4 +4510,31 @@ class PhonePolicyTest extends WebTestCase
 
         return $policy;
     }
+
+    public function testIsRepurchase()
+    {
+        $user = new User();
+        $user->setEmail(static::generateEmail('testIsRepurchase', $this));
+        self::$dm->persist($user);
+        self::addAddress($user);
+        $policyA = new SalvaPhonePolicy();
+        $policyA->init($user, self::getLatestPolicyTerms(static::$dm));
+        $policyA->setPhone(self::$phone);
+        $policyA->create(rand(1, 999999), null, null, rand(1, 9999));
+        $policyA->setImei(rand(1, 999999));
+        $policyA->setStatus(Policy::STATUS_ACTIVE);
+        $policyA->setId(rand(1, 999999));
+        $this->assertFalse($policyA->isRepurchase());
+
+        $policyB = new SalvaPhonePolicy();
+        $policyB->init($user, self::getLatestPolicyTerms(static::$dm));
+        $policyB->setPhone(self::$phone);
+        $policyB->create(rand(1, 999999), null, null, rand(1, 9999));
+        $this->assertFalse($policyB->isSameInsurable($policyA));
+        $policyB->setImei($policyA->getImei());
+        $policyB->setStatus(null);
+        $policyB->setId(rand(1, 999999));
+        $this->assertTrue($policyB->isSameInsurable($policyA));
+        $this->assertTrue($policyB->isRepurchase());
+    }
 }

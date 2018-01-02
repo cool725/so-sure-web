@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "8c9bf98777a836ab7c8ffe8bf2b47152",
-    "content-hash": "da26d81bbaf70e2434d9cf8b6d813676",
+    "hash": "34fbbf4d5b1eb508557c5fc6b8574827",
+    "content-hash": "7d05f9b59a6bcd84ab5ddd008bc1de7e",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
@@ -4511,6 +4511,57 @@
             "time": "2017-09-27 21:40:39"
         },
         {
+            "name": "peerj/peerj-user-security-bundle",
+            "version": "v0.2.1",
+            "target-dir": "Peerj/UserSecurityBundle",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/so-sure/PeerjUserSecurityBundle.git",
+                "reference": "b9648ea0bb43ad37cc20fb390b4f57291c8a8848"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/so-sure/PeerjUserSecurityBundle/zipball/b9648ea0bb43ad37cc20fb390b4f57291c8a8848",
+                "reference": "b9648ea0bb43ad37cc20fb390b4f57291c8a8848",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.2",
+                "snc/redis-bundle": "*",
+                "symfony/symfony": "^3.0"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-0": {
+                    "Peerj\\UserSecurityBundle": ""
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "patrick",
+                    "email": "patrick@peerj.com"
+                }
+            ],
+            "description": "Peerj User Security Bundle",
+            "homepage": "http://github.com/PeerJ/PeerjUserSecurityBundle",
+            "keywords": [
+                "CCDNUserSecurityBundle",
+                "brute force",
+                "dictionary attack",
+                "login",
+                "peerj",
+                "security",
+                "user"
+            ],
+            "support": {
+                "source": "https://github.com/so-sure/PeerjUserSecurityBundle/tree/v0.2.1"
+            },
+            "time": "2017-12-26 09:20:49"
+        },
+        {
             "name": "phpoffice/phpexcel",
             "version": "1.8.1",
             "source": {
@@ -4805,20 +4856,20 @@
         },
         {
             "name": "predis/predis",
-            "version": "v1.0.4",
+            "version": "v1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nrk/predis.git",
-                "reference": "9ead747663bb1b1ae017dfa0d152aca87792b42f"
+                "reference": "f0210e38881631afeafb56ab43405a92cafd9fd1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nrk/predis/zipball/9ead747663bb1b1ae017dfa0d152aca87792b42f",
-                "reference": "9ead747663bb1b1ae017dfa0d152aca87792b42f",
+                "url": "https://api.github.com/repos/nrk/predis/zipball/f0210e38881631afeafb56ab43405a92cafd9fd1",
+                "reference": "f0210e38881631afeafb56ab43405a92cafd9fd1",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.2"
+                "php": ">=5.3.9"
             },
             "require-dev": {
                 "phpunit/phpunit": "~4.8"
@@ -4851,7 +4902,7 @@
                 "predis",
                 "redis"
             ],
-            "time": "2016-05-30 15:25:52"
+            "time": "2016-06-16 16:22:20"
         },
         {
             "name": "psr/cache",
@@ -5575,29 +5626,29 @@
         },
         {
             "name": "snc/redis-bundle",
-            "version": "dev-master",
+            "version": "2.0.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/snc/SncRedisBundle.git",
-                "reference": "101b7f80c859d932c200f5d75f8805e782a76b55"
+                "reference": "73c87c435f87e08c2d564c3d9ad35f38cd8d3a0e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/snc/SncRedisBundle/zipball/101b7f80c859d932c200f5d75f8805e782a76b55",
-                "reference": "101b7f80c859d932c200f5d75f8805e782a76b55",
+                "url": "https://api.github.com/repos/snc/SncRedisBundle/zipball/73c87c435f87e08c2d564c3d9ad35f38cd8d3a0e",
+                "reference": "73c87c435f87e08c2d564c3d9ad35f38cd8d3a0e",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3",
-                "symfony/framework-bundle": "^2.7 || ^3.0",
-                "symfony/yaml": "^2.7 || ^3.0"
+                "symfony/framework-bundle": "^2.7 || ^3.0 || ^4.0",
+                "symfony/yaml": "^2.7 || ^3.0 || ^4.0"
             },
             "require-dev": {
                 "doctrine/cache": "1.*",
-                "phpunit/phpunit": "4.8.*",
+                "phpunit/phpunit": "^4.8 || ^5.4",
                 "predis/predis": "^1.0",
-                "symfony/console": "^2.7 || ^3.0",
-                "symfony/phpunit-bridge": "^2.7 || ^3.0"
+                "symfony/console": "^2.7 || ^3.0 || ^4.0",
+                "symfony/phpunit-bridge": "^2.7 || ^3.0 || ^4.0"
             },
             "suggest": {
                 "monolog/monolog": "If you want to use the monolog redis handler.",
@@ -5636,7 +5687,7 @@
                 "redis",
                 "symfony"
             ],
-            "time": "2016-12-11 08:54:19"
+            "time": "2017-12-01 10:40:06"
         },
         {
             "name": "sonata-project/google-authenticator",
@@ -5932,41 +5983,44 @@
         },
         {
             "name": "symfony/monolog-bundle",
-            "version": "v2.12.1",
+            "version": "v3.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/monolog-bundle.git",
-                "reference": "b0146bdca7ba2a65f3bbe7010423c7393b29ec3f"
+                "reference": "2b41b8b6d2c6edb1a5494f02f8e4129be2a44784"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/monolog-bundle/zipball/b0146bdca7ba2a65f3bbe7010423c7393b29ec3f",
-                "reference": "b0146bdca7ba2a65f3bbe7010423c7393b29ec3f",
+                "url": "https://api.github.com/repos/symfony/monolog-bundle/zipball/2b41b8b6d2c6edb1a5494f02f8e4129be2a44784",
+                "reference": "2b41b8b6d2c6edb1a5494f02f8e4129be2a44784",
                 "shasum": ""
             },
             "require": {
-                "monolog/monolog": "~1.18",
+                "monolog/monolog": "~1.22",
                 "php": ">=5.3.2",
-                "symfony/config": "~2.3|~3.0",
-                "symfony/dependency-injection": "~2.3|~3.0",
-                "symfony/http-kernel": "~2.3|~3.0",
-                "symfony/monolog-bridge": "~2.3|~3.0"
+                "symfony/config": "~2.7|~3.0|~4.0",
+                "symfony/dependency-injection": "~2.7|~3.0|~4.0",
+                "symfony/http-kernel": "~2.7|~3.0|~4.0",
+                "symfony/monolog-bridge": "~2.7|~3.0|~4.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^4.8",
-                "symfony/console": "~2.3|~3.0",
-                "symfony/yaml": "~2.3|~3.0"
+                "symfony/console": "~2.3|~3.0|~4.0",
+                "symfony/phpunit-bridge": "^3.3|^4.0",
+                "symfony/yaml": "~2.3|~3.0|~4.0"
             },
             "type": "symfony-bundle",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.x-dev"
+                    "dev-master": "3.x-dev"
                 }
             },
             "autoload": {
                 "psr-4": {
                     "Symfony\\Bundle\\MonologBundle\\": ""
-                }
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -5988,7 +6042,7 @@
                 "log",
                 "logging"
             ],
-            "time": "2017-01-02 19:04:26"
+            "time": "2017-11-06 16:02:17"
         },
         {
             "name": "symfony/polyfill-apcu",
@@ -8515,7 +8569,6 @@
         "friendsofsymfony/user-bundle": 10,
         "drewm/mailchimp-api": 20,
         "google/apiclient": 5,
-        "snc/redis-bundle": 20,
         "scheb/two-factor-bundle": 20
     },
     "prefer-stable": false,

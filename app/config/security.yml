@@ -40,6 +40,7 @@ security:
                 default_target_path: /login-redirect
                 always_use_default_target_path: false
                 csrf_token_generator: security.csrf.token_manager
+                failure_handler: peerj_user_security.component.authentication.handler.login_failure_handler
             logout:       true
             anonymous:    true
             provider: fos_userbundle

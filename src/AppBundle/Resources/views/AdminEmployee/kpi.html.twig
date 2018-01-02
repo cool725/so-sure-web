@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin_claims_base.html.twig' %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -76,7 +76,7 @@
                         </tr>
                         <tr>
                             <td>Active Policies [KPI: 20]</td>
-                            {% for week in weeks %} 
+                            {% for week in weeks %}
                                 {# as upgrades will be included in new and taken off ending is the same as if using adjUpgrade on both #}
                                 <td>{{ (week.total.data['newPolicies'] - week.total.data['endingEndingPolicies']) }}</td>
                             {% endfor %}
@@ -183,7 +183,7 @@
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td># Invitations - Email [KPI: 93]</td>
+                            <td># Invitations - Email & SMS [KPI: 93]</td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['newInvitationPolicies'] }}</td>
                             {% endfor %}
@@ -192,6 +192,12 @@
                             <td># Viewed Invitations - Email [KPI: 94]</td>
                             {% for week in weeks %}
                                 <td>{% if week['mixpanel-view-invitation-email'] is defined %}{{ week['mixpanel-view-invitation-email'] }}{% else %}unknown - see mixpanel{% endif %}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td># Viewed Invitations - SMS [KPI: ??]</td>
+                            {% for week in weeks %}
+                                <td>{% if week['mixpanel-invite-someone'] is defined %}{{ week['mixpanel-invite-someone'] }}{% else %}unknown - see mixpanel{% endif %}</td>
                             {% endfor %}
                         </tr>
                         <tr>

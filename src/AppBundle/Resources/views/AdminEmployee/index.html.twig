@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+{% extends 'admin_claims_base.html.twig' %}
 
 {% block body %}
     {% set style = "text-align: center; height: 100px; margin-bottom: 20px; padding-top: 30px; font-size: 24px; vertical-align: middle; border-radius: 5px; border: solid 1px;" %}
@@ -34,7 +34,10 @@
             <a href="{{ path('admin_picsure') }}"><i class="fa fa-photo fa-large"></i> pic-sure</a>
         </div>
         <div class="col-md-3 col-md-offset-1" style="{{ style }};">
-            <a href="{{ path('admin_imei') }}"><i class="fa fa-sort-numeric-asc fa-large"></i> IMEI</a>
+            <a href="{{ path('admin_imei') }}"><i class="fa fa-search fa-large"></i> IMEI Lookup</a>
+        </div>
+        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
+            <a href="{{ path('admin_detected_imei') }}"><i class="fa fa-bullseye fa-large"></i> Detected IMEI</a>
         </div>
     </div>
     <div class="row">
@@ -105,6 +108,9 @@
         </div>
         <div class="col-md-3 col-md-offset-1" style="{{ style }};">
             <a href="{{ path('admin_feature_flags') }}"><i class="fa fa-flag fa-large"></i> Feature Flags</a>
+        </div>
+        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
+            <a href="{{ path('admin_picsure_ml') }}"><i class="fa fa-photo fa-large"></i> Picsure ML</a>
         </div>
     </div>
   {% endif %}
