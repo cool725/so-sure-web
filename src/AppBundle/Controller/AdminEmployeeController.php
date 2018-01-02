@@ -1671,13 +1671,16 @@ class AdminEmployeeController extends BaseController
 
         $adjustedWeeks = array_slice($weeks, 0 - $numWeeks);
         $reversedAdjustedWeeks = array_reverse($adjustedWeeks);
+        $prevPageDate = $reversedAdjustedWeeks[0]['end_date'];
+        $prevPageDate->add(new \DateInterval('P'.($numWeeks).'W'));
+
         return [
             'weeks' => $reversedAdjustedWeeks,
             'next_page' => $this->generateUrl('admin_kpi_date', [
                 'now' => $adjustedWeeks[0]['start_date']->format('y-m-d')
             ]),
             'previous_page' => $this->generateUrl('admin_kpi_date', [
-                'now' => $reversedAdjustedWeeks[0]['end_date']->format('y-m-d')
+                'now' => $prevPageDate->format('y-m-d')
             ]),
             'now' => $now,
         ];
