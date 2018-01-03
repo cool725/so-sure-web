@@ -62,7 +62,8 @@ class DefaultController extends BaseController
         // make sure to exclude us based bots that import content - eg. facebook/twitter
         // https://developers.facebook.com/docs/sharing/webmasters/crawler
         // https://dev.twitter.com/cards/getting-started#crawling
-        if ($geoip->findCountry($ip) == "US" && $site != 'uk' &&
+        // also, for use with casper monitor, if force is present, then ignore
+        if (!$request->get('force') && $geoip->findCountry($ip) == "US" && $site != 'uk' &&
             !preg_match("/Twitterbot|facebookexternalhit|Facebot/i", $userAgent)) {
             return $this->redirectToRoute('launch_usa');
         }
