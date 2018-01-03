@@ -260,6 +260,9 @@ class DaviesService extends S3EmailService
 
         $claim->setShippingAddress($daviesClaim->shippingAddress);
 
+        $claim->setInitialSuspicion($daviesClaim->initialSuspicion);
+        $claim->setFinalSuspicion($daviesClaim->finalSuspicion);
+
         $this->updatePolicy($claim, $daviesClaim, $skipImeiUpdate);
 
         $errors = $this->validator->validate($claim);

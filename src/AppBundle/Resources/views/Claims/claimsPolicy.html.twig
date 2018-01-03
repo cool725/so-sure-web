@@ -82,9 +82,17 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <i class="col-sm-1 fa fa-question-circle" title="If the claim is suspected of being fraudulent, regardless of status"></i>
-                                    {{ form_label(formClaim.suspected_fraud, '', {'label_attr': {'class': 'col-sm-8'}}) }}
-                                    {{ form_errors(formClaim.suspected_fraud) }}
-                                    {{ form_widget(formClaim.suspected_fraud, {'attr': {'class': 'col-sm-2'}}) }}
+                                    {{ form_label(formClaim.initial_suspicion, '', {'label_attr': {'class': 'col-sm-8'}}) }}
+                                    {{ form_errors(formClaim.initial_suspicion) }}
+                                    {{ form_widget(formClaim.initial_suspicion, {'attr': {'class': 'col-sm-2'}}) }}
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <i class="col-sm-1 fa fa-question-circle" title="If claim was fraudulent"></i>
+                                    {{ form_label(formClaim.final_suspicion, '', {'label_attr': {'class': 'col-sm-8'}}) }}
+                                    {{ form_errors(formClaim.final_suspicion) }}
+                                    {{ form_widget(formClaim.final_suspicion, {'attr': {'class': 'col-sm-2'}}) }}
                                 </div>
                             </div>
                             <div class="col-md-12">

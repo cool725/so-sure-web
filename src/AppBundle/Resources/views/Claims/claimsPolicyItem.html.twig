@@ -401,8 +401,9 @@
                         <td  style="width: 10%;" class="{% if claim.crimeRef|length > 0 %}{% if claim.validCrimeRef %}success{% elseif not claim.validCrimeRef %}danger{% endif %}{% endif %}">
                           {{ claim.crimeRef }}
                         </td>
-                        <td style="width: 10%;" class="{% if claim.suspectedFraud or claim.shouldCancelPolicy %}danger{% endif %}">
-                          {% if claim.suspectedFraud %}Suspected Fraud;{% endif %}
+                        <td style="width: 10%;" class="{% if claim.initialSuspicion or claim.finalSuspicion or claim.shouldCancelPolicy %}danger{% endif %}">
+                            {% if claim.initialSuspicion %}Initial suspicion;{% endif %}
+                            {% if claim.finalSuspicion %}Final suspicion;{% endif %}
                           {% if claim.shouldCancelPolicy %}Policy should be cancelled;{% endif %}
                         </td>
                         <td style="width: 20%;">{{ claim.notes }}
@@ -460,8 +461,9 @@
                         <td  style="width: 10%;" class="{% if claim.crimeRef|length > 0 %}{% if claim.validCrimeRef %}success{% elseif not claim.validCrimeRef %}danger{% endif %}{% endif %}">
                           {{ claim.crimeRef }}
                         </td>
-                        <td style="width: 10%;" class="{% if claim.suspectedFraud or claim.shouldCancelPolicy %}danger{% endif %}">
-                          {% if claim.suspectedFraud %}Suspected Fraud;{% endif %}
+                        <td style="width: 10%;" class="{% if claim.initialSuspection or claim.finalSuspection or claim.shouldCancelPolicy %}danger{% endif %}">
+                            {% if claim.initialSuspection %}Initial Suspection;{% endif %}
+                          {% if claim.finalSuspection %}Final Suspection;{% endif %}
                           {% if claim.shouldCancelPolicy %}Policy should be cancelled;{% endif %}
                         </td>
                         <td style="width: 20%;">{{ claim.notes }}
@@ -498,9 +500,10 @@
                         <td  style="width: 10%;" class="{% if claim.crimeRef|length > 0 %}{% if claim.validCrimeRef %}success{% elseif not claim.validCrimeRef %}danger{% endif %}{% endif %}">
                           {{ claim.crimeRef }}
                         </td>
-                        <td style="width: 10%;" class="{% if claim.suspectedFraud or claim.shouldCancelPolicy %}danger{% endif %}">
-                          {% if claim.suspectedFraud %}Suspected Fraud;{% endif %}
-                          {% if claim.shouldCancelPolicy %}Policy should be cancelled;{% endif %}
+                        <td style="width: 10%;" class="{% if claim.initialSuspection or claim.finalSuspection or claim.shouldCancelPolicy %}danger{% endif %}">
+                            {% if claim.initialSuspection %}Initial Suspection;{% endif %}
+                            {% if claim.finalSuspection %}Final Suspection;{% endif %}
+                            {% if claim.shouldCancelPolicy %}Policy should be cancelled;{% endif %}
                         </td>
                         <td style="width: 30%;">{{ claim.notes }}</td>
                     </tr>

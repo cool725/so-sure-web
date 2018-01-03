@@ -73,7 +73,8 @@ class BICommand extends ContainerAwareCommand
             '"Policy Cancellation Date"',
             '"Policy Cancellation Type"',
             '"Policy Connections"',
-            '"Claim Suspected Fraud"',
+            '"Claim Initial Suspicion"',
+            '"Claim Final Suspicion"',
             '"Policy upgraded"',
             '"Age of Policy Holder"',
             '"Pen Portrait"',
@@ -110,7 +111,8 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $policy->getCancelledReason() ? $policy->getEnd()->format('Y-m-d H:i:s') : ""),
                 sprintf('"%s"', $policy->getCancelledReason() ? $policy->getCancelledReason() : ""),
                 sprintf('"%s"', count($policy->getStandardConnections())),
-                sprintf('"%s"', $claim->getSuspectedFraud() ? 'yes' : 'no'),
+                sprintf('"%s"', $claim->getInitialSuspicion() ? 'yes' : 'no'),
+                sprintf('"%s"', $claim->getFinalSuspicion() ? 'yes' : 'no'),
                 sprintf(
                     '"%s"',
                     $policy->getCancelledReason() && $policy->getCancelledReason() == Policy::CANCELLED_UPGRADE ?

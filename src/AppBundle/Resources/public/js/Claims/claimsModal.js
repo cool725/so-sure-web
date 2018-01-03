@@ -8,6 +8,8 @@ $('#claimsModal').on('show.bs.modal', function (event) {
     modal.find('#claims-detail-policy').text(claim.policyNumber);
     modal.find('#claims-detail-type').text(claim.type);
     modal.find('#claims-detail-status').text(claim.status);
+    modal.find('#claims-detail-initial-suspicion').text(claim.initialSuspicion);
+    modal.find('#claims-detail-final-suspicion').text(claim.finalSuspicion);
     modal.find('#claims-detail-davies-status').text(claim.daviesStatus);
     modal.find('#claims-detail-notes').text(claim.notes);
     modal.find('#claims-detail-description').text(claim.description);
@@ -34,6 +36,8 @@ $('#claimsModal').on('show.bs.modal', function (event) {
     modal.find('#claims-detail-policy').text('');
     modal.find('#claims-detail-type').text('');
     modal.find('#claims-detail-status').text('');
+    modal.find('#claims-detail-initial-suspicion').text('');
+    modal.find('#claims-detail-final-suspicion').text('');
     modal.find('#claims-detail-davies-status').text('');
     modal.find('#claims-detail-notes').text('');
     modal.find('#claims-detail-description').text('');

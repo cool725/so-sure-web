@@ -199,7 +199,14 @@ class Claim
      * @MongoDB\Field(type="boolean")
      * @Gedmo\Versioned
      */
-    protected $suspectedFraud;
+    protected $initialSuspicion;
+
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
+    protected $finalSuspicion;
 
     /**
      * @Assert\Type("bool")
@@ -525,12 +532,33 @@ class Claim
 
     public function getSuspectedFraud()
     {
-        return $this->suspectedFraud;
+        // TODO: confirm logic: if claim.status = in_review return value of initialSuspicion
+        // TODO: in any other case return finalSuspicion
+
+        if ($this->status == Claim::STATUS_INREVIEW) {
+            return $this->initialSuspicion;
+        }
+        return $this->finalSuspicion;
     }
 
-    public function setSuspectedFraud($suspectedFraud)
+    public function getInitialSuspicion()
     {
-        $this->suspectedFraud = $suspectedFraud;
+        return $this->initialSuspicion;
+    }
+
+    public function setInitialSuspicion($initialSuspicion)
+    {
+        $this->initialSuspicion = $initialSuspicion;
+    }
+
+    public function getFinalSuspicion()
+    {
+        return $this->finalSuspicion;
+    }
+
+    public function setFinalSuspicion($finalSuspicion)
+    {
+        $this->finalSuspicion = $finalSuspicion;
     }
 
     public function getShouldCancelPolicy()
@@ -965,7 +993,8 @@ class Claim
             'status' => $this->getStatus(),
             'daviesStatus' => $this->getDaviesStatus(),
             'notes' => $this->getNotes(),
-            'suspectedFraud' => $this->getSuspectedFraud(),
+            'initialSuspicion' => $this->getInitialSuspicion() ? 'yes' : 'no',
+            'finalSuspicion' => $this->getFinalSuspicion() ? 'yes' : 'no',
             'shouldCancelPolicy' => $this->getShouldCancelPolicy(),
             'processed' => $this->getProcessed(),
             'excess' => $this->toTwoDp($this->getExcess()),
