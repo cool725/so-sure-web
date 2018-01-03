@@ -226,6 +226,31 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->verifyPurchaseReady($crawler);
     }
 
+    public function testPurchaseChangePhone()
+    {
+        $phone = $this->setRandomPhone();
+
+        $crawler = $this->createPurchaseNew(
+            self::generateEmail('testPurchaseChangePhone', $this),
+            'foo bar',
+            new \DateTime('1980-01-01')
+        );
+
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-policy'));
+
+        $crawler = $this->setPhoneNew($phone);
+        self::verifyResponse(200);
+        $this->assertContains($phone->getModel(), $crawler->html());
+        $this->verifyPurchaseReady($crawler);
+
+        $phone2 = $this->getRandomPhone(static::$dm);
+        $crawler = $this->changePhone($phone2);
+        self::verifyResponse(200);
+        $this->assertContains($phone2->getModel(), $crawler->html());
+        $this->assertNotEquals($phone2->getId(), $phone->getId());
+    }
+
     public function testRePurchase()
     {
         $user = static::createUser(
@@ -716,9 +741,12 @@ class PurchaseControllerTest extends BaseControllerTest
         return $crawler;
     }
 
-    private function setPhoneNew($phone, $imei = null, $agreed = 1, $nextButton = true)
+    private function setPhoneNew($phone, $imei = null, $agreed = 1, $nextButton = true, $crawler = null)
     {
-        $crawler = self::$client->request('GET', '/purchase/step-policy?force_result=new');
+        if (!$crawler) {
+            $crawler = self::$client->request('GET', '/purchase/step-policy?force_result=new');
+        }
+        //print $crawler->html();
         if ($nextButton) {
             $form = $crawler->selectButton('purchase_form[next]')->form();
         } else {
@@ -741,6 +769,14 @@ class PurchaseControllerTest extends BaseControllerTest
             $form['purchase_form[serialNumber]'] = self::generateRandomImei();
         }
         $crawler = self::$client->submit($form);
+
+        return $crawler;
+    }
+
+    private function changePhone($phone)
+    {
+        $crawler = self::$client->request('GET', sprintf('/select-phone-v2/purchase-change/%s', $phone->getId()));
+        $crawler = self::$client->followRedirect();
 
         return $crawler;
     }
