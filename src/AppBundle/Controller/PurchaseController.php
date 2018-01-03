@@ -334,12 +334,10 @@ class PurchaseController extends BaseController
                 if ($purchaseFormValid) {
                     if ($policy) {
                         // TODO: How can we preserve imei & make/model check results across policies
-                        // If any policy data has changed, delete/re-create
+                        // If any policy data has changed, create new one
                         if ($policy->getImei() != $purchase->getImei() ||
                             $policy->getSerialNumber() != $purchase->getSerialNumber() ||
                             $policy->getPhone()->getId() != $purchase->getPhone()->getId()) {
-                            $dm->remove($policy);
-                            $dm->flush();
                             $policy = null;
                         }
                     }
