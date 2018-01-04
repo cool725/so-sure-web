@@ -802,11 +802,16 @@ class JudopayService
             $paymentMethod = $policy->getUser()->getPaymentMethod();
             $withinFirstProblemTimeframe = false;
             if ($paymentMethod && $firstProblem = $paymentMethod->getFirstProblem()) {
+                //print_r($date);
+                //print_r($firstProblem);
                 $diff = $date->diff($firstProblem);
+                //print_r($diff);
                 $days = $diff->days;
-                // 30 - 7 = 23 days - firstProblem is recorded 7 days into problem (failedPayments >= 2)
+                // 28 (feb) - 7 = 21 days - firstProblem is recorded 7 days into problem (failedPayments >= 2)
                 // must be less than or will catch first next month
-                $withinFirstProblemTimeframe = $days < 23;
+                $withinFirstProblemTimeframe = $days < 21;
+                //print $days . PHP_EOL;
+                //print $failedPayments . PHP_EOL;
             }
             if ($paymentMethod && $this->featureService->isEnabled(Feature::FEATURE_PAYMENT_PROBLEM_INTERCOM)) {
                 // We need the user to only enter the campaign on the 2nd failure as otherwise
