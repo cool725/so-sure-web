@@ -820,7 +820,6 @@ class JudopayServiceTest extends WebTestCase
 
     public function testPaymentFirstProblem()
     {
-        $debug = false;
         $this->clearEmail(static::$container);
         $user = $this->createValidUser(static::generateEmail('testPaymentFirstProblem', $this));
         $phone = static::getRandomPhone(static::$dm);
@@ -858,13 +857,9 @@ class JudopayServiceTest extends WebTestCase
         $mock = $this->mockMailerSend(1);
 
         // 1st failure (expected email; total = 1)
-        if ($debug) {
-            print '1/1st failure' . PHP_EOL;
-        }
+        // print '1/1st failure' . PHP_EOL;
         $scheduledPayment = $policy->getNextScheduledPayment();
-        if ($debug) {
-            print_r($scheduledPayment->getScheduled());
-        }
+        // print_r($scheduledPayment->getScheduled());
         $payment = new JudoPayment();
         $payment->setResult(JudoPayment::RESULT_DECLINED);
         $payment->setPolicy($policy);
@@ -880,9 +875,7 @@ class JudopayServiceTest extends WebTestCase
         $mock->__phpunit_verify();
 
         // 2nd failure - should trigger problem  (expected no email; total = 1)
-        if ($debug) {
-            print '1/2nd failure' . PHP_EOL;
-        }
+        // print '1/2nd failure' . PHP_EOL;
         $scheduledPayment = $policy->getNextScheduledPayment();
         // print_r($scheduledPayment->getScheduled());
         $payment = new JudoPayment();
@@ -902,9 +895,7 @@ class JudopayServiceTest extends WebTestCase
         );
 
         // 3rd failure - nothing (expected no email; total = 1)
-        if ($debug) {
-            print '1/3rd failure' . PHP_EOL;
-        }
+        // print '1/3rd failure' . PHP_EOL;
         $scheduledPayment = $policy->getNextScheduledPayment();
         // print_r($scheduledPayment->getScheduled());
         $payment = new JudoPayment();
@@ -924,9 +915,7 @@ class JudopayServiceTest extends WebTestCase
         );
 
         // 4th - success (expected no email; total = 1)
-        if ($debug) {
-            print '1/4th success' . PHP_EOL;
-        }
+        // print '1/4th success' . PHP_EOL;
         $scheduledPayment = $policy->getNextScheduledPayment();
         // print_r($scheduledPayment->getScheduled());
         $payment = new JudoPayment();
@@ -939,13 +928,9 @@ class JudopayServiceTest extends WebTestCase
         $mock->__phpunit_verify();
         $mock = $this->mockMailerSend(1);
         // 1st failure (expected email; total = 2)
-        if ($debug) {
-            print '2/1st failure' . PHP_EOL;
-        }
+        // print '2/1st failure' . PHP_EOL;
         $scheduledPayment = $policy->getNextScheduledPayment();
-        if ($debug) {
-            print_r($scheduledPayment->getScheduled());
-        }
+        // print_r($scheduledPayment->getScheduled());
         $payment = new JudoPayment();
         $payment->setResult(JudoPayment::RESULT_DECLINED);
         $payment->setPolicy($policy);
@@ -962,9 +947,7 @@ class JudopayServiceTest extends WebTestCase
 
         $mock = $this->mockMailerSend(1);
         // 2nd failure -  (expected email; total = 3)
-        if ($debug) {
-            print '2/2nd failure' . PHP_EOL;
-        }
+        // print '2/2nd failure' . PHP_EOL;
         $scheduledPayment = $policy->getNextScheduledPayment();
         // print_r($scheduledPayment->getScheduled());
         $payment = new JudoPayment();
