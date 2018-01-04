@@ -216,6 +216,7 @@ class ApiAuthControllerTest extends BaseControllerTest
 
     public function testDetectedImeiWait()
     {
+        $this->clearRateLimit();
         $user = self::createUser(
             self::$userManager,
             self::generateEmail('testDetectedImeiWait', $this),
@@ -2997,16 +2998,16 @@ class ApiAuthControllerTest extends BaseControllerTest
     /**
      *
      */
-    public function testApiReconnect()
+    public function testApiReconnectOk()
     {
         $userA = self::createUser(
             self::$userManager,
-            self::generateEmail('testApiReconnectA', $this),
+            self::generateEmail('testApiReconnectOkA', $this),
             'foo'
         );
         $userB = self::createUser(
             self::$userManager,
-            self::generateEmail('testApiReconnectB', $this),
+            self::generateEmail('testApiReconnectOkB', $this),
             'foo'
         );
         $cognitoIdentityIdA = $this->getAuthUser($userA);
@@ -3142,7 +3143,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         for ($i = 1; $i < 15; $i++) {
             $userB = self::createUser(
                 self::$userManager,
-                self::generateEmail(sprintf('testApiReconnectB%d', $i), $this),
+                self::generateEmail(sprintf('testApiReconnectTooManyB%d', $i), $this),
                 'foo'
             );
             $cognitoIdentityIdB = $this->getAuthUser($userB);
