@@ -2,12 +2,14 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Document\PhonePolicy;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
 use GeoJson\Geometry\Point;
 use AppBundle\Document\Claim;
 use AppBundle\Service\ReceperioService;
+use AppBundle\Exception\ReciperoManualProcessException;
 
 /**
  * @group functional-nonet
@@ -27,15 +29,33 @@ class ReceperioServiceTest extends WebTestCase
     protected static $phoneB;
     protected static $phoneC;
     protected static $phoneD;
+    protected static $phoneE;
+
+    // @codingStandardsIgnoreStart
+    const TEST_MSG_APP_IMEI = 'a:1:{s:5:"makes";a:1:{i:0;a:4:{s:4:"make";s:5:"Apple";s:8:"category";i:1;s:7:"serials";a:1:{i:0;s:15:"391674386275365";}s:6:"models";a:17:{i:0;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:9:"JET BLACK";s:7:"storage";s:5:"128GB";}i:1;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:9:"JET BLACK";s:7:"storage";s:5:"256GB";}i:2;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:5:"BLACK";s:7:"storage";s:4:"32GB";}i:3;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:5:"BLACK";s:7:"storage";s:5:"128GB";}i:4;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:5:"BLACK";s:7:"storage";s:4:"16GB";}i:5;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:4:"GOLD";s:7:"storage";s:4:"32GB";}i:6;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:4:"GOLD";s:7:"storage";s:5:"128GB";}i:7;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:4:"GOLD";s:7:"storage";s:5:"256GB";}i:8;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:6:"SILVER";s:7:"storage";s:4:"32GB";}i:9;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:6:"SILVER";s:7:"storage";s:5:"128GB";}i:10;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:6:"SILVER";s:7:"storage";s:5:"256GB";}i:11;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:9:"ROSE GOLD";s:7:"storage";s:4:"32GB";}i:12;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:9:"ROSE GOLD";s:7:"storage";s:5:"128GB";}i:13;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:9:"ROSE GOLD";s:7:"storage";s:5:"256GB";}i:14;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:3:"RED";s:7:"storage";s:5:"128GB";}i:15;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:3:"RED";s:7:"storage";s:5:"256GB";}i:16;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:9:"JET BLACK";s:7:"storage";s:4:"32GB";}}}}}';
+    const TEST_MSG_APP_SERIAL = 'a:1:{s:5:"makes";a:1:{i:0;a:4:{s:4:"make";s:5:"APPLE";s:8:"category";i:1;s:7:"serials";a:1:{i:0;s:12:"C39NMUXQG5QY";}s:6:"models";a:1:{i:0;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:4:"GOLD";s:7:"storage";s:5:"128GB";}}}}}';
+    const TEST_MSG_ANDROID_SERIAL = 'a:1:{s:5:"makes";a:1:{i:0;a:4:{s:4:"make";s:3:"One";s:8:"category";i:1;s:7:"serials";a:1:{i:0;s:12:"C39NMUXQG5QZ";}s:6:"models";a:1:{i:0;a:4:{s:4:"name";s:1:"3";s:14:"modelreference";s:8:"ONEPLUS3";s:6:"colour";s:4:"GOLD";s:7:"storage";s:4:"64GB";}}}}}';
+    const TEST_MSG_SERIAL_MODEL_FAIL = 'a:1:{s:5:"makes";a:1:{i:0;a:4:{s:4:"make";s:5:"Apple";s:8:"category";i:1;s:7:"serials";a:1:{i:0;s:12:"C39NMUXQG5QY";}s:6:"models";a:17:{i:0;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:9:"JET BLACK";s:7:"storage";s:5:"128GB";}i:1;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:9:"JET BLACK";s:7:"storage";s:5:"256GB";}i:2;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:5:"BLACK";s:7:"storage";s:4:"32GB";}i:3;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:5:"BLACK";s:7:"storage";s:5:"128GB";}i:4;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:5:"BLACK";s:7:"storage";s:4:"16GB";}i:5;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:4:"GOLD";s:7:"storage";s:4:"32GB";}i:6;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:4:"GOLD";s:7:"storage";s:5:"128GB";}i:7;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:4:"GOLD";s:7:"storage";s:5:"256GB";}i:8;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:6:"SILVER";s:7:"storage";s:4:"32GB";}i:9;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:6:"SILVER";s:7:"storage";s:5:"128GB";}i:10;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:6:"SILVER";s:7:"storage";s:5:"256GB";}i:11;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:9:"ROSE GOLD";s:7:"storage";s:4:"32GB";}i:12;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:9:"ROSE GOLD";s:7:"storage";s:5:"128GB";}i:13;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:9:"ROSE GOLD";s:7:"storage";s:5:"256GB";}i:14;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:3:"RED";s:7:"storage";s:5:"128GB";}i:15;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:3:"RED";s:7:"storage";s:5:"256GB";}i:16;a:3:{s:4:"name";s:8:"IPHONE 7";s:6:"colour";s:9:"JET BLACK";s:7:"storage";s:4:"32GB";}}}}}';
+    // @codingStandardsIgnoreEnd
+
+    //test case constants
+    const TEST_IPHONE_SERIAL_VALID = 'C39NMUXQG5QY';
+    const TEST_IPHONE_IMEI_VALID = '305796250981516';
+    const TEST_ANDROID_SERIAL_VALID = 'C39NMUXQG5QZ';
+    const TEST_ANDROID_SERIAL_INVALID = '9876543211';
+    const TEST_IPHONE_SERIAL_INVALID = '123456789013';
+    const TEST_IPHONE_SERIAL_INVALID2 = '123456789012';
+    const TEST_INVALID_SERIAL = "111111";
+    const TEST_MANUAL_PROCESS_SERIAL = "111112";
 
     public static function setUpBeforeClass()
     {
-         //start the symfony kernel
-         $kernel = static::createKernel();
-         $kernel->boot();
+        //start the symfony kernel
+        $kernel = static::createKernel();
+        $kernel->boot();
 
-         //get the DI container
-         self::$container = $kernel->getContainer();
+        //get the DI container
+        self::$container = $kernel->getContainer();
 
         //now we can instantiate our service (if you want a fresh one for
         //each test method, do this in setUp() instead
@@ -47,10 +67,20 @@ class ReceperioServiceTest extends WebTestCase
         self::$phoneB = self::$phoneRepo->findOneBy(['devices' => 'A0001', 'memory' => 64]);
         self::$phoneC = self::$phoneRepo->findOneBy(['devices' => 'hero2lte']);
         self::$phoneD = self::$phoneRepo->findOneBy(['devices' => 'OnePlus3']);
+        self::$phoneE = self::$phoneRepo->findOneBy(['devices' => 'iPhone 7', 'memory' => 128]);
     }
 
     public function tearDown()
     {
+    }
+
+    public function callValidateSamePhone($phone, $device, $data = array())
+    {
+        try {
+            self::$imei->validateSamePhone($phone, $device, $data);
+        } catch (ReciperoManualProcessException $e) {
+            return $e->getCode();
+        }
     }
 
     public function testAreSameModelMemory()
@@ -89,7 +119,7 @@ class ReceperioServiceTest extends WebTestCase
      */
     public function testValidateSamePhoneNoData()
     {
-        $this->assertTrue(self::$imei->validateSamePhone(static::$phoneA, '123', ['makes' => []]));
+        $this->assertEquals(self::$imei->validateSamePhone(static::$phoneA, '123', ['makes' => []]));
     }
 
     /**
@@ -105,35 +135,50 @@ class ReceperioServiceTest extends WebTestCase
     {
         $models[] = ['name' => 'iPhone 5', 'storage' => '64GB'];
         $data['makes'][] = ['make' => 'Apple', 'models' => $models];
-        $this->assertTrue(self::$imei->validateSamePhone(static::$phoneA, '123', $data));
+        $this->assertEquals(
+            ReciperoManualProcessException::VALID_SERIAL,
+            $this->callValidateSamePhone(static::$phoneA, '123', $data)
+        );
     }
 
     public function testValidateSamePhoneAndroid()
     {
         $models[] = ['name' => 'A', 'storage' => '64GB', 'modelreference' => 'A0001'];
         $data['makes'][] = ['make' => 'A', 'models' => $models];
-        $this->assertTrue(self::$imei->validateSamePhone(static::$phoneB, '123', $data));
+        $this->assertEquals(
+            ReciperoManualProcessException::VALID_SERIAL,
+            $this->callValidateSamePhone(static::$phoneB, '123', $data)
+        );
     }
 
     public function testValidateSamePhoneAndroidCase()
     {
         $models[] = ['name' => 'GALAXY S7 EDGE', 'storage' => '', 'modelreference' => 'HERO2LTE'];
         $data['makes'][] = ['make' => 'A', 'models' => $models];
-        $this->assertTrue(self::$imei->validateSamePhone(static::$phoneC, '123', $data));
+        $this->assertEquals(
+            ReciperoManualProcessException::VALID_SERIAL,
+            $this->callValidateSamePhone(static::$phoneC, '123', $data)
+        );
     }
 
     public function testValidateSamePhoneAndroidMixedCase()
     {
         $models[] = ['name' => '3', 'storage' => '', 'modelreference' => 'ONEPLUS3'];
         $data['makes'][] = ['make' => 'ONEPLUS', 'models' => $models];
-        $this->assertTrue(self::$imei->validateSamePhone(static::$phoneD, '123', $data));
+        $this->assertEquals(
+            ReciperoManualProcessException::VALID_SERIAL,
+            $this->callValidateSamePhone(static::$phoneD, '123', $data)
+        );
     }
 
     public function testValidateSamePhoneAndroidDifferentModel()
     {
         $models[] = ['name' => 'GALAXY S7 EDGE', 'storage' => '', 'modelreference' => 'HERO2LTE'];
         $data['makes'][] = ['make' => 'A', 'models' => $models];
-        $this->assertFalse(self::$imei->validateSamePhone(static::$phoneB, '123', $data));
+        $this->assertEquals(
+            ReciperoManualProcessException::DEVICE_NOT_FOUND,
+            $this->callValidateSamePhone(static::$phoneB, '123', $data)
+        );
     }
 
     /**
@@ -151,7 +196,10 @@ class ReceperioServiceTest extends WebTestCase
         $models[] = ['name' => 'A', 'storage' => '64GB', 'modelreference' => 'A0001'];
         $models[] = ['name' => 'A', 'storage' => '16GB', 'modelreference' => 'A0001'];
         $data['makes'][] = ['make' => 'A', 'models' => $models];
-        $this->assertTrue(self::$imei->validateSamePhone(static::$phoneB, $this->generateRandomImei(), $data));
+        $this->assertEquals(
+            ReciperoManualProcessException::VALID_SERIAL,
+            $this->callValidateSamePhone(static::$phoneB, $this->generateRandomImei(), $data)
+        );
     }
 
     /**
@@ -165,15 +213,15 @@ class ReceperioServiceTest extends WebTestCase
         self::$imei->validateSamePhone(static::$phoneB, '123', $data);
     }
 
-    /**
-     * @expectedException AppBundle\Exception\ReciperoManualProcessException
-     */
     public function testValidateSamePhoneAppleMultipleMemory()
     {
         $models[] = ['name' => 'A', 'storage' => '64GB'];
         $models[] = ['name' => 'A', 'storage' => '16GB'];
         $data['makes'][] = ['make' => 'Apple', 'models' => $models];
-        $this->assertTrue(self::$imei->validateSamePhone(static::$phoneA, '123', $data));
+        $this->assertEquals(
+            ReciperoManualProcessException::MODEL_MISMATCH,
+            $this->callValidateSamePhone(static::$phoneA, '123', $data)
+        );
     }
 
     /**
@@ -192,38 +240,50 @@ class ReceperioServiceTest extends WebTestCase
         $models[] = ['name' => 'iPhone 5', 'storage' => '64GB', 'color' => 'white'];
         $models[] = ['name' => 'iPhone 5', 'storage' => '64GB', 'color' => 'black'];
         $data['makes'][] = ['make' => 'Apple', 'models' => $models];
-        $this->assertTrue(self::$imei->validateSamePhone(static::$phoneA, '123', $data));
+        $this->assertEquals(
+            ReciperoManualProcessException::VALID_SERIAL,
+            $this->callValidateSamePhone(static::$phoneA, '123', $data)
+        );
     }
 
     public function testValidateSamePhoneAppleIncorrectModel()
     {
         $models[] = ['name' => 'foo', 'storage' => '16GB', 'color' => 'white'];
         $data['makes'][] = ['make' => 'Apple', 'models' => $models];
-        $this->assertFalse(self::$imei->validateSamePhone(static::$phoneA, '123', $data));
+        $this->assertEquals(
+            ReciperoManualProcessException::MODEL_MISMATCH,
+            $this->callValidateSamePhone(static::$phoneA, '123', $data)
+        );
     }
 
     public function testValidateSamePhoneAppleIncorrectMemory()
     {
         $models[] = ['name' => 'iPhone 5', 'storage' => '16GB', 'color' => 'white'];
         $data['makes'][] = ['make' => 'Apple', 'models' => $models];
-        $this->assertFalse(self::$imei->validateSamePhone(static::$phoneA, '123', $data));
+        $this->assertEquals(
+            ReciperoManualProcessException::MEMORY_MISMATCH,
+            $this->callValidateSamePhone(static::$phoneA, '123', $data)
+        );
     }
 
     public function testValidateSamePhoneAppleImeiSkipsMemory()
     {
         $models[] = ['name' => 'iPhone 5', 'storage' => '16GB', 'color' => 'white'];
         $data['makes'][] = ['make' => 'Apple', 'models' => $models];
-        $this->assertTrue(self::$imei->validateSamePhone(static::$phoneA, $this->generateRandomImei(), $data));
+        $this->assertEquals(
+            ReciperoManualProcessException::VALID_IMEI,
+            $this->callValidateSamePhone(static::$phoneA, $this->generateRandomImei(), $data)
+        );
     }
 
-    /**
-     * @expectedException AppBundle\Exception\ReciperoManualProcessException
-     */
     public function testValidateSamePhoneAppleMissingStorage()
     {
         $models[] = ['name' => 'iPhone 5', 'color' => 'white'];
         $data['makes'][] = ['make' => 'Apple', 'models' => $models];
-        $this->assertFalse(self::$imei->validateSamePhone(static::$phoneA, '123', $data));
+        $this->assertEquals(
+            ReciperoManualProcessException::NO_MEMORY,
+            $this->callValidateSamePhone(static::$phoneA, '123', $data)
+        );
     }
 
     /**
@@ -246,10 +306,10 @@ class ReceperioServiceTest extends WebTestCase
 
     public function testAppleManulProcessSerialRetry()
     {
-        $this->assertFalse(self::$imei->runMakeModelCheck(ReceperioService::TEST_INVALID_SERIAL));
+        $this->assertFalse(self::$imei->runMakeModelCheck(self::TEST_INVALID_SERIAL));
         self::$imei->checkSerial(
             static::$phoneA,
-            ReceperioService::TEST_MANUAL_PROCESS_SERIAL,
+            self::TEST_MANUAL_PROCESS_SERIAL,
             $this->generateRandomImei()
         );
         $this->assertEquals('serial', self::$imei->getResponseData());
@@ -257,12 +317,97 @@ class ReceperioServiceTest extends WebTestCase
 
     public function testAppleInvalidSerialNoRetry()
     {
-        $this->assertFalse(self::$imei->runMakeModelCheck(ReceperioService::TEST_INVALID_SERIAL));
+        $this->assertFalse(self::$imei->runMakeModelCheck(self::TEST_INVALID_SERIAL));
         self::$imei->checkSerial(
             static::$phoneA,
-            ReceperioService::TEST_INVALID_SERIAL,
+            self::TEST_INVALID_SERIAL,
             null
         );
         $this->assertNotEquals('serial', self::$imei->getResponseData());
+    }
+
+    public function testAppleValidSerial()
+    {
+        $this->testCheckSerial(
+            static::$phoneE,
+            self::TEST_IPHONE_SERIAL_VALID,
+            null
+        );
+        $this->assertContains(PhonePolicy::MAKEMODEL_VALID_SERIAL, self::$imei->getMakeModelValidatedStatus());
+    }
+
+    public function testAppleInvalidModel()
+    {
+        $this->testCheckSerial(
+            static::$phoneA,
+            self::TEST_IPHONE_SERIAL_INVALID,
+            self::TEST_IPHONE_IMEI_VALID
+        );
+        $this->assertContains(PhonePolicy::MAKEMODEL_MODEL_MISMATCH, self::$imei->getMakeModelValidatedStatus());
+    }
+
+    public function testAppleValidIMEI()
+    {
+        $this->testCheckSerial(
+            static::$phoneE,
+            self::TEST_IPHONE_SERIAL_INVALID2,
+            self::TEST_IPHONE_IMEI_VALID
+        );
+        $this->assertContains(PhonePolicy::MAKEMODEL_VALID_IMEI, self::$imei->getMakeModelValidatedStatus());
+    }
+
+    public function testAndroidSerialInvalid()
+    {
+        //message from recipero will be valid but serials check is ignored
+        $this->testCheckSerial(
+            static::$phoneD,
+            self::TEST_ANDROID_SERIAL_INVALID,
+            null
+        );
+        $this->assertContains(PhonePolicy::MAKEMODEL_VALID_SERIAL, self::$imei->getMakeModelValidatedStatus());
+    }
+
+    public function testAndroidSerialValid()
+    {
+        $this->testCheckSerial(
+            static::$phoneD,
+            self::TEST_ANDROID_SERIAL_VALID,
+            null
+        );
+        $this->assertContains(PhonePolicy::MAKEMODEL_VALID_SERIAL, self::$imei->getMakeModelValidatedStatus());
+    }
+
+    public function testCheckSerial(
+        Phone $phone,
+        $serialNumber,
+        $imei = null
+    ) {
+        switch ($serialNumber) {
+            case self::TEST_IPHONE_IMEI_VALID:
+                self::$imei->setResponseData(unserialize(self::TEST_MSG_APP_IMEI));
+                break;
+            case self::TEST_IPHONE_SERIAL_VALID:
+                self::$imei->setResponseData(unserialize(self::TEST_MSG_APP_SERIAL));
+                break;
+            case self::TEST_IPHONE_SERIAL_INVALID:
+                self::$imei->setResponseData(unserialize(self::TEST_MSG_APP_SERIAL));
+                break;
+            case self::TEST_IPHONE_SERIAL_INVALID2:
+                self::$imei->setResponseData(unserialize(self::TEST_MSG_APP_IMEI));
+                break;
+            case self::TEST_ANDROID_SERIAL_INVALID:
+                self::$imei->setResponseData(unserialize(self::TEST_MSG_ANDROID_SERIAL));
+                break;
+            case self::TEST_ANDROID_SERIAL_VALID:
+                self::$imei->setResponseData(unserialize(self::TEST_MSG_ANDROID_SERIAL));
+                break;
+        }
+        self::$imei->checkSerial(
+            $phone,
+            $serialNumber,
+            $imei
+        );
+
+        self::$imei->setResponseData(null);
     }
 }

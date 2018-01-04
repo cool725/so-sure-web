@@ -287,7 +287,8 @@ class PolicyService
 
             $policy->addCheckmendCertData($checkmend['imeiCertId'], $checkmend['imeiResponse']);
             $policy->addCheckmendSerialData($checkmend['serialResponse']);
-
+            // saving final finaly checkmendcert based status
+            $policy->setMakemodelValidatedStatus($this->imeiValidator->getMakemodelValidatedStatus());
             return $policy;
         } catch (InvalidPremiumException $e) {
             $this->dispatchEvent(
@@ -717,7 +718,7 @@ class PolicyService
         $scheduledPayments = [];
         // Try cancellating scheduled payments until amount matches
         while (!$policy->arePolicyScheduledPaymentsCorrect() &&
-                ($scheduledPayment = $policy->getNextScheduledPayment()) !== null) {
+            ($scheduledPayment = $policy->getNextScheduledPayment()) !== null) {
             $scheduledPayments[] = $scheduledPayment;
             $scheduledPayment->cancel();
             $log[] = sprintf(
@@ -1489,10 +1490,10 @@ class PolicyService
         }
 
         if ($policy->hasCashback() && !in_array($policy->getCashback()->getStatus(), [
-            Cashback::STATUS_MISSING,
-            Cashback::STATUS_FAILED,
-            Cashback::STATUS_PAID,
-        ])) {
+                Cashback::STATUS_MISSING,
+                Cashback::STATUS_FAILED,
+                Cashback::STATUS_PAID,
+            ])) {
             if ($policy->getStatus() == Policy::STATUS_EXPIRED_WAIT_CLAIM) {
                 $this->updateCashback($policy->getCashback(), Cashback::STATUS_PENDING_WAIT_CLAIM);
             } elseif ($this->areEqualToTwoDp(0, $policy->getCashback()->getAmount())) {
@@ -1519,7 +1520,7 @@ class PolicyService
             $this->adjustPotRewardEmail($policy->getNextPolicy(), $outstanding);
         }
     }
-    
+
     public function adjustPotRewardEmail(Policy $policy, $additionalAmount)
     {
         if (!$this->mailer) {
