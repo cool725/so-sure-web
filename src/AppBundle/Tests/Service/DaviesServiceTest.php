@@ -426,35 +426,6 @@ class DaviesServiceTest extends WebTestCase
         );
     }
 
-    public function testValidateClaimDetailsReplacementDateMissingImei()
-    {
-        $address = new Address();
-        $address->setType(Address::TYPE_BILLING);
-        $address->setPostCode('BX11LT');
-        $user = new User();
-        $user->setBillingAddress($address);
-        $user->setFirstName('foo');
-        $user->setLastName('bar');
-        $policy = new PhonePolicy();
-        $user->addPolicy($policy);
-        $claim = new Claim();
-        $policy->addClaim($claim);
-        $policy->setPolicyNumber('TEST/2017/123456');
-
-        $daviesClaim = new DaviesClaim();
-        $daviesClaim->policyNumber = 'TEST/2017/123456';
-        $daviesClaim->status = 'Open';
-        $daviesClaim->miStatus = '';
-        $daviesClaim->insuredName = 'Mr Foo Bar';
-        $daviesClaim->lossDate = new \DateTime('2017-07-01');
-        $daviesClaim->replacementReceivedDate = new \DateTime('2017-07-02');
-        $daviesClaim->replacementMake = 'Apple';
-        $daviesClaim->replacementModel = 'iPhone 8';
-
-        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $this->insureErrorExists('/replacement received date without a replacement imei/');
-    }
-
     public function testValidateClaimDetailsName()
     {
         $user = new User();
@@ -882,34 +853,38 @@ class DaviesServiceTest extends WebTestCase
         //$daviesClaim->replacementReceivedDate = new \DateTime('2016-01-01');
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $this->insureErrorExists('/the received date is not recorded/');
-        $this->insureErrorExists('/the replacement imei is not recorded/');
-        $this->insureErrorExists('/the replacement phone is not recorded/');
+        $this->insureErrorExists('/the replacement data not recorded/');
+        $this->insureErrorExists('/received date/');
+        $this->insureErrorExists('/imei/');
+        $this->insureErrorExists('/phone/');
 
         self::$daviesService->clearErrors();
 
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 8';
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $this->insureErrorExists('/the received date is not recorded/');
-        $this->insureErrorExists('/the replacement imei is not recorded/');
-        $this->insureErrorDoesNotExist('/the replacement phone is not recorded/');
+        $this->insureErrorExists('/the replacement data not recorded/');
+        $this->insureErrorExists('/received date/');
+        $this->insureErrorExists('/imei/');
+        $this->insureErrorDoesNotExist('/phone/');
 
         self::$daviesService->clearErrors();
 
         $daviesClaim->replacementReceivedDate = new \DateTime();
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $this->insureErrorDoesNotExist('/the received date is not recorded/');
-        $this->insureErrorExists('/the replacement imei is not recorded/');
-        $this->insureErrorDoesNotExist('/the replacement phone is not recorded/');
+        $this->insureErrorExists('/the replacement data not recorded/');
+        $this->insureErrorDoesNotExist('/received date/');
+        $this->insureErrorExists('/imei/');
+        $this->insureErrorDoesNotExist('/phone/');
 
         self::$daviesService->clearErrors();
 
         $daviesClaim->replacementImei = '123';
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $this->insureErrorDoesNotExist('/the received date is not recorded/');
-        $this->insureErrorDoesNotExist('/the replacement imei is not recorded/');
-        $this->insureErrorDoesNotExist('/the replacement phone is not recorded/');
+        $this->insureErrorDoesNotExist('/the replacement data not recorded/');
+        $this->insureErrorDoesNotExist('/received date/');
+        $this->insureErrorDoesNotExist('/imei/');
+        $this->insureErrorDoesNotExist('/phone/');
     }
 
     public function testPostValidateClaimDetailsReceivedDate()
@@ -1108,9 +1083,15 @@ class DaviesServiceTest extends WebTestCase
             }
         }
         if ($exists) {
-            $this->assertTrue($foundMatch);
+            $this->assertTrue(
+                $foundMatch,
+                sprintf('did not find %s in %s', $errorRegEx, json_encode(self::$daviesService->getErrors()))
+            );
         } else {
-            $this->assertFalse($foundMatch);
+            $this->assertFalse(
+                $foundMatch,
+                sprintf('found %s in %s', $errorRegEx, json_encode(self::$daviesService->getErrors()))
+            );
         }
     }
 
