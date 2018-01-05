@@ -450,27 +450,22 @@ class DaviesService extends S3EmailService
         $twoWeekAgo = new \DateTime();
         $twoWeekAgo = $twoWeekAgo->sub(new \DateInterval('P2W'));
         if ($claim->getApprovedDate() && $claim->getApprovedDate() <= $twoWeekAgo) {
+            $items = [];
             if (!$daviesClaim->replacementReceivedDate) {
-                $msg = sprintf(
-                    'Claim %s was approved over 2 weeks ago (%s), however, the received date is not recorded.',
-                    $daviesClaim->claimNumber,
-                    $claim->getApprovedDate()->format(\DateTime::ATOM)
-                );
-                $this->errors[$daviesClaim->claimNumber][] = $msg;
+                $items[] = 'received date';
             }
             if (!$daviesClaim->replacementImei) {
-                $msg = sprintf(
-                    'Claim %s was approved over 2 weeks ago (%s), however, the replacement imei is not recorded.',
-                    $daviesClaim->claimNumber,
-                    $claim->getApprovedDate()->format(\DateTime::ATOM)
-                );
-                $this->errors[$daviesClaim->claimNumber][] = $msg;
+                $items[] = 'imei';
             }
             if (!$daviesClaim->replacementMake || !$daviesClaim->replacementModel) {
+                $items[] = 'phone';
+            }
+            if (count($items) > 0) {
                 $msg = sprintf(
-                    'Claim %s was approved over 2 weeks ago (%s), however, the replacement phone is not recorded.',
+                    'Claim %s was approved over 2 weeks ago (%s), however, the replacement data not recorded (%s).',
                     $daviesClaim->claimNumber,
-                    $claim->getApprovedDate()->format(\DateTime::ATOM)
+                    $claim->getApprovedDate()->format(\DateTime::ATOM),
+                    implode($items)
                 );
                 $this->errors[$daviesClaim->claimNumber][] = $msg;
             }

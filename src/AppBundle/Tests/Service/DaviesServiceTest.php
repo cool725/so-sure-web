@@ -882,34 +882,38 @@ class DaviesServiceTest extends WebTestCase
         //$daviesClaim->replacementReceivedDate = new \DateTime('2016-01-01');
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $this->insureErrorExists('/the received date is not recorded/');
-        $this->insureErrorExists('/the replacement imei is not recorded/');
-        $this->insureErrorExists('/the replacement phone is not recorded/');
+        $this->insureErrorExists('/the replacement data not recorded/');
+        $this->insureErrorExists('/received date/');
+        $this->insureErrorExists('/imei/');
+        $this->insureErrorExists('/phone/');
 
         self::$daviesService->clearErrors();
 
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 8';
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $this->insureErrorExists('/the received date is not recorded/');
-        $this->insureErrorExists('/the replacement imei is not recorded/');
-        $this->insureErrorDoesNotExist('/the replacement phone is not recorded/');
+        $this->insureErrorExists('/the replacement data not recorded/');
+        $this->insureErrorExists('/received date/');
+        $this->insureErrorExists('/imei/');
+        $this->insureErrorDoesNotExist('/phone/');
 
         self::$daviesService->clearErrors();
 
         $daviesClaim->replacementReceivedDate = new \DateTime();
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $this->insureErrorDoesNotExist('/the received date is not recorded/');
-        $this->insureErrorExists('/the replacement imei is not recorded/');
-        $this->insureErrorDoesNotExist('/the replacement phone is not recorded/');
+        $this->insureErrorExists('/the replacement data not recorded/');
+        $this->insureErrorDoesNotExist('/received date/');
+        $this->insureErrorExists('/imei/');
+        $this->insureErrorDoesNotExist('/phone/');
 
         self::$daviesService->clearErrors();
 
         $daviesClaim->replacementImei = '123';
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $this->insureErrorDoesNotExist('/the received date is not recorded/');
-        $this->insureErrorDoesNotExist('/the replacement imei is not recorded/');
-        $this->insureErrorDoesNotExist('/the replacement phone is not recorded/');
+        $this->insureErrorExists('/the replacement data not recorded/');
+        $this->insureErrorDoesNotExist('/received date/');
+        $this->insureErrorDoesNotExist('/imei/');
+        $this->insureErrorDoesNotExist('/phone/');
     }
 
     public function testPostValidateClaimDetailsReceivedDate()
