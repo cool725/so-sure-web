@@ -29,6 +29,8 @@ class DaviesService extends S3EmailService
     protected $mailer;
     protected $validator;
 
+    protected $fees = [];
+
     public function setClaims($claimsService)
     {
         $this->claimsService = $claimsService;
@@ -47,6 +49,16 @@ class DaviesService extends S3EmailService
     public function setValidator($validator)
     {
         $this->validator = $validator;
+    }
+
+    public function getFees()
+    {
+        return $this->fees;
+    }
+
+    public function clearFees()
+    {
+        $this->fees = [];
     }
 
     public function processExcelData($key, $data)
@@ -407,7 +419,7 @@ class DaviesService extends S3EmailService
                 $claim->totalChargesWithVat(),
                 $daviesClaim->reciperoFee
             );
-            $this->errors[$daviesClaim->claimNumber][] = $msg;
+            $this->fees[$daviesClaim->claimNumber][] = $msg;
         }
 
         if ($daviesClaim->isClosed(true) && $daviesClaim->reserved > 0) {
@@ -550,6 +562,7 @@ class DaviesService extends S3EmailService
                 'successFile' => $successFile,
                 'warnings' => $this->warnings,
                 'errors' => $this->errors,
+                'fees' => $this->fees,
                 'title' => 'Daily Claims Report',
                 'highDemandPhones' => $highDemandPhones,
             ]
@@ -586,6 +599,7 @@ class DaviesService extends S3EmailService
                     'errors' => $this->errors,
                     'warnings' => null,
                     'claims' => null,
+                    'fees' => $this->fees,
                     'title' => 'Errors in So-Sure Mobile - Daily Claims Report',
                 ]
             );
