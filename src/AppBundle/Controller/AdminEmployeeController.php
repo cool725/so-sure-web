@@ -1763,6 +1763,10 @@ class AdminEmployeeController extends BaseController
         try {
             $response['calculatedPremium'] = $phone->getSalvaBinderMonthlyPremium();
         } catch (\Exception $e) {
+            $this->get('logger')->error(
+                sprintf("Error in call to getSalvaBinderMonthlyPremium."),
+                ['exception' => $e]
+            );
             $response['calculatedPremium'] = 'no data';
         }
         return new Response(json_encode($response));
