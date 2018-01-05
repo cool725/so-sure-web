@@ -782,7 +782,7 @@ class ReceperioService extends BaseImeiService
             $this->mailer->send(
                 sprintf('Empty Data Response for %s', $serialNumber),
                 'tech@so-sure.com',
-                sprintf("A recent make/model query for %s returned a successful response but without any data in the makes field. If apple, verify at https://checkcoverage.apple.com/gb/en/?sn=%s Email support@recipero.com\n\n--------------\n\nDear Recipero Support,\nA recent make/model query for %s returned a successful response but without any data present for the makes field. Can you please investigate and add to your db if its a valid serial number.  If it is a valid serial number, can you also confirm the make/model/colour & memory?", $serialNumber, $serialNumber, $serialNumber)
+                sprintf("A recent make/model query for %s returned a successful response but without any data in the makes field. If apple, verify at https://sndeep.info/en?sn=%s Email support@recipero.com\n\n--------------\n\nDear Recipero Support,\nA recent make/model query for %s returned a successful response but without any data present for the makes field. Can you please investigate and add to your db if its a valid serial number.  If it is a valid serial number, can you also confirm the make/model/colour & memory?", $serialNumber, $serialNumber, $serialNumber)
             );
             // @codingStandardsIgnoreEnd
             $this->statsd->increment('recipero.makeModelEmptyMakes');
