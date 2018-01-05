@@ -532,13 +532,8 @@ class Claim
 
     public function getSuspectedFraud()
     {
-        // TODO: confirm logic: if claim.status = in_review return value of initialSuspicion
-        // TODO: in any other case return finalSuspicion
-
-        if ($this->status == Claim::STATUS_INREVIEW) {
-            return $this->initialSuspicion;
-        }
-        return $this->finalSuspicion;
+        // if finalSuspicion is null return initialSuspicion
+        return ($this->finalSuspicion == null) ? $this->initialSuspicion : $this->finalSuspicion;
     }
 
     public function getInitialSuspicion()

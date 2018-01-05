@@ -44,8 +44,6 @@ class ClaimType extends AbstractType
             ],
                 'preferred_choices' => [Claim::STATUS_INREVIEW]
             ])
-            ->add('initial_suspicion', CheckboxType::class, ['required' => false])
-            ->add('final_suspicion', CheckboxType::class, ['required' => false])
             ->add('shouldCancelPolicy', CheckboxType::class, ['required' => false])
             ->add('notes', TextareaType::class, ['required' => false])
             ->add('record', SubmitType::class)

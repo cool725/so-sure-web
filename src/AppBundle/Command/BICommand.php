@@ -73,8 +73,7 @@ class BICommand extends ContainerAwareCommand
             '"Policy Cancellation Date"',
             '"Policy Cancellation Type"',
             '"Policy Connections"',
-            '"Claim Initial Suspicion"',
-            '"Claim Final Suspicion"',
+            '"Claim Suspected Fraud"',
             '"Policy upgraded"',
             '"Age of Policy Holder"',
             '"Pen Portrait"',
@@ -86,6 +85,8 @@ class BICommand extends ContainerAwareCommand
             '"First Campaign Name"',
             '"First Campaign Source"',
             '"First Referer"',
+            '"Claim Initial Suspicion"',
+            '"Claim Final Suspicion"',
         ]);
         foreach ($claims as $claim) {
             $policy = $claim->getPolicy();
@@ -111,8 +112,7 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $policy->getCancelledReason() ? $policy->getEnd()->format('Y-m-d H:i:s') : ""),
                 sprintf('"%s"', $policy->getCancelledReason() ? $policy->getCancelledReason() : ""),
                 sprintf('"%s"', count($policy->getStandardConnections())),
-                sprintf('"%s"', $claim->getInitialSuspicion() ? 'yes' : 'no'),
-                sprintf('"%s"', $claim->getFinalSuspicion() ? 'yes' : 'no'),
+                'N/A',
                 sprintf(
                     '"%s"',
                     $policy->getCancelledReason() && $policy->getCancelledReason() == Policy::CANCELLED_UPGRADE ?
@@ -132,6 +132,8 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getCampaignName() : ''),
                 sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getCampaignSource() : ''),
                 sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getReferer() : ''),
+                sprintf('"%s"', $claim->getInitialSuspicion() ? 'yes' : 'no'),
+                sprintf('"%s"', $claim->getFinalSuspicion() ? 'yes' : 'no'),
             ]);
         }
         $this->uploadS3(implode(PHP_EOL, $lines), 'claims.csv');
