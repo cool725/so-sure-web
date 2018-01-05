@@ -372,7 +372,6 @@ class DaviesService extends S3EmailService
             $this->areEqualToTwoDp($daviesClaim->getIncurred(), 0) &&
             $this->areEqualToTwoDp($daviesClaim->getReserved(), 0)) {
             $msg = sprintf('Claim %s does not have a reserved value', $daviesClaim->claimNumber);
-            $this->logger->warning($msg);
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
@@ -386,7 +385,6 @@ class DaviesService extends S3EmailService
                 $daviesClaim->getClaimType(),
                 $daviesClaim->getClaimStatus()
             );
-            $this->logger->warning($msg);
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
@@ -397,7 +395,6 @@ class DaviesService extends S3EmailService
                 $daviesClaim->getExpectedIncurred(),
                 $daviesClaim->incurred
             );
-            $this->logger->warning($msg);
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
@@ -410,7 +407,6 @@ class DaviesService extends S3EmailService
                 $claim->totalChargesWithVat(),
                 $daviesClaim->reciperoFee
             );
-            $this->logger->warning($msg);
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
@@ -419,7 +415,6 @@ class DaviesService extends S3EmailService
                 'Claim %s is closed, yet still has a reserve fee.',
                 $daviesClaim->claimNumber
             );
-            $this->logger->warning($msg);
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
@@ -463,7 +458,6 @@ class DaviesService extends S3EmailService
                 $claim->getApprovedDate()->format(\DateTime::ATOM),
                 $claim->getReplacementReceivedDate()->format(\DateTime::ATOM)
             );
-            $this->logger->warning($msg);
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
     }
@@ -526,7 +520,6 @@ class DaviesService extends S3EmailService
                     'Claim %s is missing a replacement recevied date (expected 2 days after imei replacement)',
                     $daviesClaim->claimNumber
                 );
-                $this->logger->warning($msg);
                 $this->errors[$daviesClaim->claimNumber][] = $msg;
             }
         }
