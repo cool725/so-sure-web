@@ -853,6 +853,65 @@ class DaviesServiceTest extends WebTestCase
         $this->insureErrorDoesNotExist('/should be closed. Replacement was delivered more than 1 month ago/');
     }
 
+    public function testValidateClaimDetailsMissingReceivedInfo()
+    {
+        $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        // 2 weeks
+        $twoWeekAgo = new \DateTime();
+        $twoWeekAgo = $twoWeekAgo->sub(new \DateInterval('P14D'));
+        $claim->setApprovedDate($twoWeekAgo);
+        $policy->addClaim($claim);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = 1;
+        $daviesClaim->status = 'open';
+        $daviesClaim->incurred = 1;
+        $daviesClaim->unauthorizedCalls = 1.01;
+        $daviesClaim->accessories = 1.03;
+        $daviesClaim->phoneReplacementCost = 1.07;
+        $daviesClaim->transactionFees = 1.11;
+        $daviesClaim->handlingFees = 1.19;
+        $daviesClaim->reciperoFee = 1.27;
+        $daviesClaim->excess = 6;
+        $daviesClaim->reserved = 0;
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+        //$daviesClaim->replacementMake = 'Apple';
+        //$daviesClaim->replacementModel = 'iPhone 8';
+        //$daviesClaim->replacementReceivedDate = new \DateTime('2016-01-01');
+
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->insureErrorExists('/the received date is not recorded/');
+        $this->insureErrorExists('/the replacement imei is not recorded/');
+        $this->insureErrorExists('/the replacement phone is not recorded/');
+
+        self::$daviesService->clearErrors();
+
+        $daviesClaim->replacementMake = 'Apple';
+        $daviesClaim->replacementModel = 'iPhone 8';
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->insureErrorExists('/the received date is not recorded/');
+        $this->insureErrorExists('/the replacement imei is not recorded/');
+        $this->insureErrorDoesNotExist('/the replacement phone is not recorded/');
+
+        self::$daviesService->clearErrors();
+
+        $daviesClaim->replacementReceivedDate = new \DateTime();
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->insureErrorDoesNotExist('/the received date is not recorded/');
+        $this->insureErrorExists('/the replacement imei is not recorded/');
+        $this->insureErrorDoesNotExist('/the replacement phone is not recorded/');
+
+        self::$daviesService->clearErrors();
+
+        $daviesClaim->replacementImei = '123';
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->insureErrorDoesNotExist('/the received date is not recorded/');
+        $this->insureErrorDoesNotExist('/the replacement imei is not recorded/');
+        $this->insureErrorDoesNotExist('/the replacement phone is not recorded/');
+    }
+
     public function testPostValidateClaimDetailsReceivedDate()
     {
         $policy = static::createUserPolicy(true);
@@ -865,7 +924,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->claimNumber = 1;
 
         self::$daviesService->postValidateClaimDetails($claim, $daviesClaim);
-        $this->insureErrorExists('/has an approved date/');
+        $this->insureWarningExists('/has an approved date/');
     }
 
     public function testSaveClaimsReplacementDate()
