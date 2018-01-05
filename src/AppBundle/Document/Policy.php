@@ -2515,11 +2515,18 @@ abstract class Policy
         if ($this->getPremiumPlan() == self::PLAN_YEARLY) {
             if ($this->areEqualToTwoDp(0, $this->getOutstandingPremiumToDate($date))) {
                 return $this->endOfDay($this->getEnd());
-            } else {
+            } elseif ($this->areEqualToTwoDp(0, $this->getPremiumPaid())) {
                 $thirthDays = clone $this->getStart();
                 $thirthDays = $thirthDays->add(new \DateInterval('P30D'));
 
                 return $thirthDays;
+            } else {
+                throw new \Exception(sprintf(
+                    'Failed to find a yearly date with a 0 outstanding premium (%f). Policy %s/%s',
+                    $this->getOutstandingPremiumToDate($date),
+                    $this->getPolicyNumber(),
+                    $this->getId()
+                ));
             }
         }
 
