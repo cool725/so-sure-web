@@ -454,6 +454,23 @@ class DaviesService extends S3EmailService
             );
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
+
+        if ($daviesClaim->initialSuspicion == null) {
+            $msg = sprintf(
+                'Claim %s does not have initialSuspicion flag set.',
+                $daviesClaim->claimNumber
+            );
+            $this->warnings[$daviesClaim->claimNumber][] = $msg;
+        }
+
+        if ($daviesClaim->status == Claim::STATUS_SETTLED && $daviesClaim->finalSuspicion == null) {
+            $msg = sprintf(
+                'Claim %s should have finalSuspicion flag set.',
+                $daviesClaim->claimNumber
+            );
+            $this->warnings[$daviesClaim->claimNumber][] = $msg;
+        }
+
     }
 
     public function postValidateClaimDetails(Claim $claim, DaviesClaim $daviesClaim)
