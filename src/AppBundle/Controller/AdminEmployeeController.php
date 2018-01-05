@@ -1749,6 +1749,30 @@ class AdminEmployeeController extends BaseController
     }
 
     /**
+     * @Route("/phone/checkpremium/{price}", name="admin_phone_check_premium_price")
+     * @Method({"POST"})
+     */
+    public function phoneCheckPremium(Request $request, $price)
+    {
+        if (!$this->isCsrfTokenValid('default', $request->get('access_token'))) {
+            throw new \InvalidArgumentException('Invalid csrf token');
+        }
+
+        $phone = new Phone();
+        $phone->setInitialPrice($price);
+        try {
+            $response['calculatedPremium'] = $phone->getSalvaBinderMonthlyPremium();
+        } catch (\Exception $e) {
+            $this->get('logger')->error(
+                sprintf("Error in call to getSalvaBinderMonthlyPremium."),
+                ['exception' => $e]
+            );
+            $response['calculatedPremium'] = 'no data';
+        }
+        return new Response(json_encode($response));
+    }
+
+    /**
      * @Route("/payments", name="admin_payments")
      * @Route("/payments/{year}/{month}", name="admin_payments_date")
      * @Template

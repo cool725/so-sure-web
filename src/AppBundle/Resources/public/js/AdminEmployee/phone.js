@@ -113,3 +113,23 @@ $('.phone-newhighdemand').click(function() {
         });
     }
 });
+
+
+$("#checkPremiumButton").click(function(e) {
+    $("#check-calculated-premium").val('checking...');
+    $.ajax({
+            type: "POST",
+            url: "/admin/phone/checkpremium/" + $("#check-initial-price").val(),
+            data: {
+                price: $("#check-initial-price").val(),
+                access_token: $(this).data('token')
+            },
+            success: function(result) {
+                var data = $.parseJSON(result);
+                $("#check-calculated-premium").val(data.calculatedPremium);
+            },
+            error: function(result) {
+                $("#check-calculated-premium").val('Error...');
+            }
+        });
+});

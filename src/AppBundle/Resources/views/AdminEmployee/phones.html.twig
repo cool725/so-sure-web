@@ -54,7 +54,7 @@
 <div class="container">
     <div class="bg-info" style="border-radius: 10px; padding: 10px;">
     <div class="row">
-      <div class="col-sm-10 col-offset-sm-1">
+      <div class="col-sm-8 col-offset-sm-1">
         <h4 class="text-center"><strong>Phones</strong></h4>
       </div>
       <div class="col-sm-1">
@@ -62,6 +62,11 @@
           <i class="fa fa-plus"></i> Add upcoming phone
         </button>
       </div>
+        <div class="col-sm-2">
+            <button class="btn btn-success pull-right"  data-toggle="modal" data-target="#checkPriceModal">
+                Calculate Premium
+            </button>
+        </div>
     </div>
     <div class="row">
     {{ form_start(form) }}
@@ -401,6 +406,46 @@
         </div>
       </div>
     </div>
+
+    <div class="modal fade" id="checkPriceModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document" style="width: 60%;">
+            <div class="modal-content">
+                <form id="check-price-form" class="form-horizontal" method="post">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="exampleModalLabel">Calculate monthly premium based on original phone price</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-sm-8 col-offset-2">
+                                <div class="form-group">
+                                    <label for="details-description" class="control-label col-sm-6">Enter original phone price</label>
+                                    <div class="col-sm-6">
+                                        <input type="number" class="control-label" id="check-initial-price" name="initial-price" style="width:100%;text-align: left;"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-8 col-offset-2">
+                                <div class="form-group">
+                                    <label for="details-fun-facts" class="control-label col-sm-6">Calculated monthly premium</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" readonly class="control-label" id="check-calculated-premium" name="calculated" style="width:100%;text-align: left;"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" data-token="{{ csrf_token('default') }}" id="checkPremiumButton">Calculate Premium</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 
     <div class="modal fade" id="newPhoneModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document" style="width: 60%;">
