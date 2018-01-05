@@ -327,15 +327,6 @@ class DaviesService extends S3EmailService
                 $daviesClaim->claimNumber
             ));
         }
-        // TODO: Investigating timing on this one - it might be that imei is always present prior to replacement
-        // received date coming in
-        if ($daviesClaim->replacementReceivedDate && !$daviesClaim->replacementImei) {
-            $msg = sprintf(
-                'Claim %s has a replacement received date without a replacement imei',
-                $daviesClaim->claimNumber
-            );
-            $this->errors[$daviesClaim->claimNumber][] = $msg;
-        }
 
         $now = new \DateTime();
         if ($daviesClaim->isOpen() || ($daviesClaim->dateClosed && $daviesClaim->dateClosed->diff($now)->days < 5)) {
