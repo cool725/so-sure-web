@@ -2499,7 +2499,9 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPremiumInstallments($installments);
         $policy->setStatus(Policy::STATUS_ACTIVE);
 
-        self::addPayment($policy, $amount, $commission, null, $date);
+        if ($amount > 0) {
+            self::addPayment($policy, $amount, $commission, null, $date);
+        }
 
         self::$dm->persist($user);
         self::$dm->persist($policy);
@@ -2885,6 +2887,20 @@ class PhonePolicyTest extends WebTestCase
             $date
         );
         $this->assertEquals(new \DateTime('2017-01-01'), $policy->getPolicyExpirationDate(new \DateTime('2016-01-01')));
+    }
+
+    public function testPolicyRenewalUnpaidExpirationDateYearly()
+    {
+        $date = new \DateTime('2016-01-01');
+        $policy = $this->createPolicyForCancellation(
+            0,
+            0,
+            1,
+            $date
+        );
+        $this->assertEquals(new \DateTime('2016-01-31'), $policy->getPolicyExpirationDate(new \DateTime('2016-01-01')));
+        $this->assertEquals(new \DateTime('2016-01-31'), $policy->getPolicyExpirationDate(new \DateTime('2016-01-31')));
+        $this->assertEquals(new \DateTime('2016-01-31'), $policy->getPolicyExpirationDate(new \DateTime('2016-02-01')));
     }
 
     public function testPolicyIsPaidToDateStandard()
