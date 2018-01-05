@@ -54,6 +54,8 @@ class DaviesServiceTest extends WebTestCase
     public function setUp()
     {
         self::$daviesService->clearErrors();
+        self::$daviesService->clearWarnings();
+        self::$daviesService->clearFees();
         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $phoneRepo = self::$dm->getRepository(Phone::class);
         self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 6', 'memory' => 64]);
@@ -779,11 +781,11 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->insuredName = 'Mr foo bar';
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $this->insureErrorDoesNotExist('/does not have the correct recipero fee/');
+        $this->insureFeesDoesNotExist('/does not have the correct recipero fee/');
 
         $daviesClaim->reciperoFee = 1.26;
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $this->insureErrorExists('/does not have the correct recipero fee/');
+        $this->insureFeesExists('/does not have the correct recipero fee/');
     }
 
     public function testValidateClaimDetailsReceivedDate()
@@ -1042,6 +1044,32 @@ class DaviesServiceTest extends WebTestCase
         $foundMatch = false;
         foreach (self::$daviesService->getErrors() as $error) {
             $matches = preg_grep($errorRegEx, $error);
+            if (count($matches) > 0) {
+                $foundMatch = true;
+            }
+        }
+        if ($exists) {
+            $this->assertTrue($foundMatch);
+        } else {
+            $this->assertFalse($foundMatch);
+        }
+    }
+
+    private function insureFeesExists($feesRegEx)
+    {
+        $this->insureFeesExistsOrNot($feesRegEx, true);
+    }
+
+    private function insureFeesDoesNotExist($feesRegEx)
+    {
+        $this->insureFeesExistsOrNot($feesRegEx, false);
+    }
+
+    private function insureFeesExistsOrNot($feesRegEx, $exists)
+    {
+        $foundMatch = false;
+        foreach (self::$daviesService->getFees() as $fee) {
+            $matches = preg_grep($feesRegEx, $fee);
             if (count($matches) > 0) {
                 $foundMatch = true;
             }
