@@ -706,8 +706,8 @@ class ReceperioService extends BaseImeiService
         User $user = null,
         $warnMismatch = true
     ) {
-        //if response data is set - we are in test mode
-        if (!$this->responseData) {
+        //dont run recipero if testrun
+        if (!$this->isTestRun) {
             if (!$this->runMakeModelCheck($serialNumber, $user)) {
                 return false;
             }
@@ -1026,9 +1026,10 @@ class ReceperioService extends BaseImeiService
         }
         if ($isApple && $isIMEI && $result) {
             throw new ReciperoManualProcessException("Success Apple", ReciperoManualProcessException::VALID_IMEI);
-        }
-        if ($result) {
-            throw new ReciperoManualProcessException("Success", ReciperoManualProcessException::VALID_SERIAL);
+        } elseif ($isApple && !$isIMEI && $result) {
+            throw new ReciperoManualProcessException("Success Apple", ReciperoManualProcessException::VALID_SERIAL);
+        } elseif (!$isApple && $result) {
+            throw new ReciperoManualProcessException("Success", ReciperoManualProcessException::VALID_IMEI);
         }
 
         throw new ReciperoManualProcessException("Fail", ReciperoManualProcessException::NOT_VALID);

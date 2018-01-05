@@ -106,29 +106,29 @@ class ReceperioServiceTest extends WebTestCase
         ], false));
     }
 
-    /**
-     * @expectedException AppBundle\Exception\ReciperoManualProcessException
-     */
     public function testValidateSamePhoneMissingData()
     {
-        self::$imei->validateSamePhone(static::$phoneA, '123', []);
+        $this->assertEquals(
+            ReciperoManualProcessException::NO_MAKES_OR_MULTIPLE_MAKES,
+            $this->callValidateSamePhone(static::$phoneA, '123', [])
+        );
     }
 
-    /**
-     * @expectedException AppBundle\Exception\ReciperoManualProcessException
-     */
     public function testValidateSamePhoneNoData()
     {
-        $this->assertEquals(self::$imei->validateSamePhone(static::$phoneA, '123', ['makes' => []]));
+        $this->assertEquals(
+            ReciperoManualProcessException::EMPTY_MAKES,
+            $this->callValidateSamePhone(static::$phoneA, '123', ['makes' => []])
+        );
     }
 
-    /**
-     * @expectedException AppBundle\Exception\ReciperoManualProcessException
-     */
     public function testValidateSamePhoneMissingModel()
     {
         $data['makes'][] = ['make' => 'Apple'];
-        self::$imei->validateSamePhone(static::$phoneA, '123', $data);
+        $this->assertEquals(
+            ReciperoManualProcessException::NO_MODELS,
+            $this->callValidateSamePhone(static::$phoneA, '123', $data)
+        );
     }
 
     public function testValidateSamePhoneApple()
@@ -146,7 +146,7 @@ class ReceperioServiceTest extends WebTestCase
         $models[] = ['name' => 'A', 'storage' => '64GB', 'modelreference' => 'A0001'];
         $data['makes'][] = ['make' => 'A', 'models' => $models];
         $this->assertEquals(
-            ReciperoManualProcessException::VALID_SERIAL,
+            ReciperoManualProcessException::VALID_IMEI,
             $this->callValidateSamePhone(static::$phoneB, '123', $data)
         );
     }
@@ -156,7 +156,7 @@ class ReceperioServiceTest extends WebTestCase
         $models[] = ['name' => 'GALAXY S7 EDGE', 'storage' => '', 'modelreference' => 'HERO2LTE'];
         $data['makes'][] = ['make' => 'A', 'models' => $models];
         $this->assertEquals(
-            ReciperoManualProcessException::VALID_SERIAL,
+            ReciperoManualProcessException::VALID_IMEI,
             $this->callValidateSamePhone(static::$phoneC, '123', $data)
         );
     }
@@ -166,7 +166,7 @@ class ReceperioServiceTest extends WebTestCase
         $models[] = ['name' => '3', 'storage' => '', 'modelreference' => 'ONEPLUS3'];
         $data['makes'][] = ['make' => 'ONEPLUS', 'models' => $models];
         $this->assertEquals(
-            ReciperoManualProcessException::VALID_SERIAL,
+            ReciperoManualProcessException::VALID_IMEI,
             $this->callValidateSamePhone(static::$phoneD, '123', $data)
         );
     }
@@ -181,14 +181,14 @@ class ReceperioServiceTest extends WebTestCase
         );
     }
 
-    /**
-     * @expectedException AppBundle\Exception\ReciperoManualProcessException
-     */
     public function testValidateSamePhoneAndroidMissingModelRef()
     {
         $models[] = ['name' => 'A', 'storage' => '64GB'];
         $data['makes'][] = ['make' => 'A', 'models' => $models];
-        self::$imei->validateSamePhone(static::$phoneB, '123', $data);
+        $this->assertEquals(
+            ReciperoManualProcessException::NO_MODELREFERENCE,
+            $this->callValidateSamePhone(static::$phoneB, '123', $data)
+        );
     }
 
     public function testValidateSamePhoneAndroidMultipleMemory()
@@ -197,20 +197,20 @@ class ReceperioServiceTest extends WebTestCase
         $models[] = ['name' => 'A', 'storage' => '16GB', 'modelreference' => 'A0001'];
         $data['makes'][] = ['make' => 'A', 'models' => $models];
         $this->assertEquals(
-            ReciperoManualProcessException::VALID_SERIAL,
+            ReciperoManualProcessException::VALID_IMEI,
             $this->callValidateSamePhone(static::$phoneB, $this->generateRandomImei(), $data)
         );
     }
 
-    /**
-     * @expectedException AppBundle\Exception\ReciperoManualProcessException
-     */
     public function testValidateSamePhoneAndroidDifferentModelMem()
     {
         $models[] = ['name' => 'A', 'storage' => '64GB', 'modelreference' => 'A0001'];
         $models[] = ['name' => 'B', 'storage' => '64GB', 'modelreference' => 'A0001'];
         $data['makes'][] = ['make' => 'A', 'models' => $models];
-        self::$imei->validateSamePhone(static::$phoneB, '123', $data);
+        $this->assertEquals(
+            ReciperoManualProcessException::MODEL_MISMATCH,
+            $this->callValidateSamePhone(static::$phoneB, '123', $data)
+        );
     }
 
     public function testValidateSamePhoneAppleMultipleMemory()
@@ -224,15 +224,15 @@ class ReceperioServiceTest extends WebTestCase
         );
     }
 
-    /**
-     * @expectedException AppBundle\Exception\ReciperoManualProcessException
-     */
     public function testValidateSamePhoneAppleDifferentModel()
     {
         $models[] = ['name' => 'A', 'storage' => '64GB'];
         $models[] = ['name' => 'A', 'storage' => '16GB'];
         $data['makes'][] = ['make' => 'Apple', 'models' => $models];
-        self::$imei->validateSamePhone(static::$phoneA, '123', $data);
+        $this->assertEquals(
+            ReciperoManualProcessException::MODEL_MISMATCH,
+            $this->callValidateSamePhone(static::$phoneA, '123', $data)
+        );
     }
 
     public function testValidateSamePhoneAppleDifferentColours()
