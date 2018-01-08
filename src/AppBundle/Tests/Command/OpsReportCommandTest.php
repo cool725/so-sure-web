@@ -77,6 +77,20 @@ class OpsReportCommandTest extends KernelTestCase
         $this->callCommand('found validation');
     }
 
+    public function testOpsReportCommandEmptyName()
+    {
+        $data = [
+            'url' => '/testurl2',
+            'errors' => [
+                ['value' => '', 'message' => 'This field is required.'],
+            ],
+            'browser' => 'Internal'
+        ];
+        $now = new \DateTime();
+        self::$redis->hset('client-validation', json_encode($data), $now->format('U'));
+        $this->callCommand('no validation');
+    }
+
     public function testOpsReportCommandNoData()
     {
         $data = [
