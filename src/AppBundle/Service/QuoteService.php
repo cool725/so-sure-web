@@ -12,6 +12,7 @@ class QuoteService
 {
     const DUPLICATE_EMAIL_CACHE_TIME = 3600;
     const REDIS_UNKNOWN_EMAIL_KEY_FORMAT = 'UNKNOWN-DEVICE:%s';
+    const REDIS_DIFFERENT_MAKE_EMAIL_KEY_FORMAT = 'DIFFERENT-MAKE:%s-%s';
 
 
     /** @var MailerService */
@@ -141,6 +142,12 @@ class QuoteService
      */
     private function differentMake(Phone $phone, $phoneMake)
     {
+        $key = sprintf(self::REDIS_DIFFERENT_MAKE_EMAIL_KEY_FORMAT, $phone->getMake(), $phoneMake);
+        if ($this->redis->get($key)) {
+            return false;
+        }
+        $this->redis->setex($key, self::DUPLICATE_EMAIL_CACHE_TIME, 1);
+
         $body = sprintf(
             'Make in db is different than phone make. Db: %s Phone: %s. DB details are enclosed: ObjectId("%s") %s',
             $phone->getMake(),
