@@ -51,7 +51,11 @@ class OpsReportCommand extends ContainerAwareCommand
         $emptyValues = 0;
 
         foreach ($errors as $error) {
-            if (isset($error['value']) && $error['value'] == '') {
+            if (!isset($error['name']) || !isset($error['value'])) {
+                $emptyValues++;
+            } elseif (isset($error['name']) && $error['name'] == '') {
+                $emptyValues++;
+            } elseif (isset($error['value']) && $error['value'] == '') {
                 $emptyValues++;
             }
             if (isset($error['name']) && isset($error['message'])) {
@@ -62,10 +66,9 @@ class OpsReportCommand extends ContainerAwareCommand
                     $error['message']
                 );
             } else {
-                $items[] = sprintf('Unknown format: %s', $item);
+                $items[] = sprintf('Unknown format: %s', json_encode($error));
             }
         }
-
         // exception: if all values are empty, do not include in the email
         return (count($items) == $emptyValues) ? false : $items;
     }
