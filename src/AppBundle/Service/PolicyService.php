@@ -1406,7 +1406,10 @@ class PolicyService
             $fullyExpired[$policy->getId()] = $policy->getPolicyNumber();
             if (!$dryRun) {
                 try {
-                    $this->fullyExpire($policy);
+                    $result = $this->fullyExpire($policy);
+                    if ($result === null) {
+                        $fullyExpired[$policy->getId()] = sprintf('%s - waiting on claim', $policy->getPolicyNumber());
+                    }
                 } catch (\Exception $e) {
                     $msg = sprintf(
                         'Error Fully Expiring Policy %s / %s',
@@ -1485,7 +1488,7 @@ class PolicyService
         // If no change in wait claim, then don't proceed as may resend emails for cashback
         if ($policy->getStatus() == Policy::STATUS_EXPIRED_WAIT_CLAIM &&
             $initialStatus == Policy::STATUS_EXPIRED_WAIT_CLAIM) {
-            return;
+            return null;
         }
 
         if ($policy->hasCashback() && !in_array($policy->getCashback()->getStatus(), [
@@ -1518,6 +1521,8 @@ class PolicyService
 
             $this->adjustPotRewardEmail($policy->getNextPolicy(), $outstanding);
         }
+
+        return true;
     }
     
     public function adjustPotRewardEmail(Policy $policy, $additionalAmount)
