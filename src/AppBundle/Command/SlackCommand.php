@@ -269,15 +269,17 @@ class SlackCommand extends ContainerAwareCommand
         $weekStart = $repo->countAllActivePolicies($start);
 
         $weekTarget = ($growthTarget - $weekStart) / $weeksRemaining;
+        $weekTargetIncCancellations = 1.2 * $weekTarget;
 
         // @codingStandardsIgnoreStart
         $text = sprintf(
-            "*%s*\n\nLast 24 hours: *%d*\n\nWeekly Target: %d\nWeekly Actual: %d\nWeekly Remaining: %d\n\nOverall Target (%s): %d\nOverall Actual: %d\nOverall Remaining: %d\n\n_policy compounding_",
+            "*%s*\n\nLast 24 hours: *%d*\n\nWeekly Base Target: %d\nWeekly Target inc Cancellation: %d\nWeekly Actual: %d\nWeekly Remaining: %d\n\nOverall Target (%s): %d\nOverall Actual: %d\nOverall Remaining: %d",
             $weekText,
             $daily,
             $weekTarget,
+            $weekTargetIncCancellations,
             $total - $weekStart,
-            $weekTarget + $weekStart - $total,
+            $weekTargetIncCancellations + $weekStart - $total,
             $targetEnd->format('d/m/Y'),
             $growthTarget,
             $total,
