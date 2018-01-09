@@ -13,6 +13,8 @@ class BaseImeiService
 {
     use \AppBundle\Document\ImeiTrait;
 
+    const S3_FAILED_OCR_FOLDER = 'FailedOCR';
+
     /** @var LoggerInterface */
     protected $logger;
 
@@ -20,6 +22,17 @@ class BaseImeiService
     protected $dm;
 
     protected $redis;
+
+    /** @var MountManager */
+    protected $filesystem;
+
+    /**
+     * @param MountManager $oneUpFlySystemMountManager
+     */
+    public function setMountManager($oneUpFlySystemMountManager)
+    {
+        $this->filesystem = $oneUpFlySystemMountManager;
+    }
 
     /**
      * @param LoggerInterface $logger
@@ -122,7 +135,12 @@ class BaseImeiService
     {
         $results = $this->ocrRaw($filename, $extension);
 
-        return $this->parseOcr($results, $make);
+        $parseResult = $this->parseOcr($results, $make);
+        // save unsucessfull images to FailedOCR
+        if (!$parseResult) {
+            $this->uploadS3($filename, $make);
+        }
+        return $parseResult;
     }
 
     private function findSerialNumberByLinePosition($results, $imei)
@@ -213,9 +231,20 @@ class BaseImeiService
             ->lang('eng')
             ->config('tessedit_ocr_engine_mode', '2') // tesseractCubeCombined
             ->run();
-    
+
         unlink($file);
 
         return $results;
+    }
+
+    public function uploadS3($filename, $make = '', $folder = BaseImeiService::S3_FAILED_OCR_FOLDER)
+    {
+        $fs = $this->filesystem->getFilesystem('s3policy_fs');
+        $path = pathinfo($filename);
+        $s3Key = sprintf('%s/%s_%s', $folder, $make, $path['basename']);
+        $stream = fopen($filename, 'r+');
+        $fs->writeStream($s3Key, $stream);
+        fclose($stream);
+        return $s3Key;
     }
 }
