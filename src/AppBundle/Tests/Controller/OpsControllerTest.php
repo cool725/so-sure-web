@@ -73,4 +73,17 @@ class OpsControllerTest extends BaseControllerTest
         );
         $data = self::verifyResponse(204);
     }
+
+    public function testCspBlob()
+    {
+        $crawler = self::$client->request(
+            'POST',
+            '/ops/csp',
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json'),
+            json_encode(['csp-report' => ['blocked-uri' => 'blob']])
+        );
+        $data = self::verifyResponse(204);
+    }
 }

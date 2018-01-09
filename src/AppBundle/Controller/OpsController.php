@@ -341,13 +341,23 @@ class OpsController extends BaseController
                 return new JsonResponse(['details' => 'Ignore Ip'], 204);
             }
 
+            if (in_array(strtolower($violationReport['csp-report']['blocked-uri']), [
+                'blob'
+            ])) {
+                $logger->debug(sprintf(
+                    'Content-Security-Policy called with ignore url: %s',
+                    $violationReport['csp-report']['blocked-uri']
+                ));
+
+                return new JsonResponse(['details' => 'Ignore url'], 204);
+            }
+
             $scheme = strtolower(parse_url($violationReport['csp-report']['blocked-uri'], PHP_URL_SCHEME));
             if (in_array($scheme, [
                 'ms-appx-web',
                 'none',
                 'about',
                 'asset',
-                'blob',
             ])) {
                 $logger->debug(sprintf('Content-Security-Policy called with ignore scheme: %s', $scheme));
 
