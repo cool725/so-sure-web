@@ -152,11 +152,17 @@
                         {% if policy.isPolicy %}
                         <tr>
                             <td>Card</td>
-                            {% if policy.user.paymentMethod %}
-                            <td class="{% if policy.user.paymentMethod.isCardExpired %}danger{% endif %}">{{ policy.user.paymentMethod }}</td>
+                            {% if policy.payerOrUser.paymentMethod %}
+                            <td class="{% if policy.payerOrUser.paymentMethod.isCardExpired %}danger{% endif %}">{{ policy.payerOrUser.paymentMethod }}</td>
                             {% else %}
                             <td class="danger">Missing payment card</td>
                             {% endif %}
+                        </tr>
+                        {% endif %}
+                        {% if policy.payerOrUser.id != policy.user.id %}
+                        <tr>
+                            <td>Payer</td>
+                            <td><a href="{{ path('admin_user', {'id': policy.payerOrUser.id }) }}">{{ policy.payerOrUser.name }}</a></td>
                         </tr>
                         {% endif %}
                         {% if is_granted('ROLE_EMPLOYEE')  %}

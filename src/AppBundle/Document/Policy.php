@@ -775,6 +775,11 @@ abstract class Policy
         $this->payer = $user;
     }
 
+    public function getPayerOrUser()
+    {
+        return $this->getPayer() ? $this->getPayer() : $this->getUser();
+    }
+
     public function getIssueDate()
     {
         if (!$this->issueDate) {
