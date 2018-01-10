@@ -116,13 +116,18 @@ class PurchaseStepPhoneType extends AbstractType
                     $purchase->getPhone()->getMake(),
                     $filename->guessExtension()
                 );
-                if ($ocr === null) {
+                if (isset($ocr['raw'])) {
                     $purchase->setFileValid(false);
-                    $raw = $this->imeiService->ocrRaw($filename);
                     $this->logger->warning(sprintf(
                         'Failed to find imei for user %s ocr: %s',
                         $purchase->getUser()->getEmail(),
-                        $raw
+                        $ocr['raw']
+                    ));
+                    $this->imeiService->saveFailedOcr($filename, $purchase->getUser()->getId());
+                    $this->logger->warning(sprintf(
+                        'Saving failed image to s3 for user %s userid: %s',
+                        $purchase->getUser()->getEmail(),
+                        $purchase->getUser()->getId()
                     ));
                 } else {
                     $purchase->setFileValid(true);

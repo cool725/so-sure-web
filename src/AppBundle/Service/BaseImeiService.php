@@ -13,7 +13,7 @@ class BaseImeiService
 {
     use \AppBundle\Document\ImeiTrait;
 
-    const S3_FAILED_OCR_FOLDER = 'FailedOCR';
+    const S3_FAILED_OCR_FOLDER = 'imei-failure';
 
     /** @var LoggerInterface */
     protected $logger;
@@ -135,12 +135,8 @@ class BaseImeiService
     {
         $results = $this->ocrRaw($filename, $extension);
 
-        $parseResult = $this->parseOcr($results, $make);
-        // save unsucessfull images to FailedOCR
-        if (!$parseResult) {
-            $this->uploadS3($filename, $make);
-        }
-        return $parseResult;
+         return $this->parseOcr($results, $make);
+
     }
 
     private function findSerialNumberByLinePosition($results, $imei)
@@ -205,7 +201,7 @@ class BaseImeiService
             }
         }
 
-        return null;
+        return ['raw' => $results];
     }
 
     public function ocrRaw($filename, $extension = null)
@@ -237,11 +233,11 @@ class BaseImeiService
         return $results;
     }
 
-    public function uploadS3($filename, $make = '', $folder = BaseImeiService::S3_FAILED_OCR_FOLDER)
+    public function saveFailedOcr($filename, $policyid = '', $folder = BaseImeiService::S3_FAILED_OCR_FOLDER)
     {
         $fs = $this->filesystem->getFilesystem('s3policy_fs');
         $path = pathinfo($filename);
-        $s3Key = sprintf('%s/%s_%s', $folder, $make, $path['basename']);
+        $s3Key = sprintf('%s/%s/%s', $folder, $policyid, $path['basename']);
         $stream = fopen($filename, 'r+');
         $fs->writeStream($s3Key, $stream);
         fclose($stream);

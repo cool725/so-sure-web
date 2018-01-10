@@ -254,7 +254,8 @@ class BaseImeiServiceTest extends WebTestCase
         );
 
         $results = self::$imei->ocr($image, 'Apple');
-        $this->assertNull($results);
+        $this->assertNotNull($results);
+        $this->assertTrue(isset($results['raw']));
     }
 
     public function testOcrError()
@@ -280,11 +281,11 @@ SEID";
     public function testOcrFailed()
     {
         $time = time();
+        $policyId = 111;
         $image = sprintf(
             "%s/../src/AppBundle/Tests/Resources/iPhoneXSettings.png",
             self::$rootDir
         );
-
         // create temporary image
         $testImage = sprintf(
             "%s/../src/AppBundle/Tests/Resources/%s_OcrFail.png",
@@ -292,17 +293,17 @@ SEID";
             $time
         );
         copy($image, $testImage);
-
         // expecting failure
         $results = self::$imei->ocr($testImage, 'Samsung');
-        $this->assertNull($results);
-
+        $this->assertNotNull($results);
+        $this->assertTrue(isset($results['raw']));
+        self::$imei->saveFailedOcr($testImage, $policyId);
         //check if file is on S3, remove local and remote copy
         $path = pathinfo($testImage);
         $s3Key = sprintf(
-            '%s/%s_%s',
+            '%s/%s/%s',
             BaseImeiService::S3_FAILED_OCR_FOLDER,
-            'Samsung',
+            $policyId,
             $path['basename']
         );
         $fs = self::$filesystem->getFilesystem('s3policy_fs');
