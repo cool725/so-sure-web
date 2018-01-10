@@ -462,8 +462,7 @@ class DaviesService extends S3EmailService
             );
             $this->warnings[$daviesClaim->claimNumber][] = $msg;
         }
-
-        if (in_array($daviesClaim->status, array(Claim::STATUS_SETTLED, Claim::STATUS_APPROVED))
+        if (in_array($claim->getStatus(), array(Claim::STATUS_SETTLED, Claim::STATUS_APPROVED))
             && $daviesClaim->finalSuspicion == null) {
             $msg = sprintf(
                 'Claim %s should have finalSuspicion flag set.',
