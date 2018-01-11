@@ -116,7 +116,7 @@ class PurchaseStepPhoneType extends AbstractType
                     $purchase->getPhone()->getMake(),
                     $filename->guessExtension()
                 );
-                if (isset($ocr['raw'])) {
+                if ($ocr['success'] === false) {
                     $purchase->setFileValid(false);
                     $this->logger->warning(sprintf(
                         'Failed to find imei for user %s ocr: %s',
