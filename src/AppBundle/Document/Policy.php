@@ -2064,6 +2064,44 @@ abstract class Policy
         return $this->toTwoDp($totalCommission);
     }
 
+    public function getCoverholderCommissionPaid($payments = null)
+    {
+        $coverholderCommission = 0;
+        if (!$this->isPolicy()) {
+            return 0;
+        }
+        if ($payments === null) {
+            $payments = $this->getPayments();
+        }
+
+        foreach ($payments as $payment) {
+            if ($payment->isSuccess()) {
+                $coverholderCommission += $payment->getTotalCommission();
+            }
+        }
+
+        return $this->toTwoDp($coverholderCommission);
+    }
+
+    public function getBrokerCommissionPaid($payments = null)
+    {
+        $brokerCommission = 0;
+        if (!$this->isPolicy()) {
+            return 0;
+        }
+        if ($payments === null) {
+            $payments = $this->getPayments();
+        }
+
+        foreach ($payments as $payment) {
+            if ($payment->isSuccess()) {
+                $brokerCommission += $payment->getBrokerCommission();
+            }
+        }
+
+        return $this->toTwoDp($brokerCommission);
+    }
+
     public function getOutstandingPremium()
     {
         return $this->toTwoDp($this->getPremium()->getYearlyPremiumPrice() - $this->getPremiumPaid());

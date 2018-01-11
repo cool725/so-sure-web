@@ -1200,6 +1200,66 @@ class AdminEmployeeController extends BaseController
     }
 
     /**
+     * @Route("/pl", name="admin_quarterly_pl")
+     * @Route("/pl/{year}/{month}", name="admin_quarterly_pl_date")
+     * @Template
+     */
+    public function adminQuarterlyPLAction(Request $request, $year = null, $month = null)
+    {
+        if ($request->get('_route') == "admin_quarterly_pl") {
+            $now = new \DateTime();
+            $now = $now->sub(new \DateInterval('P1Y'));
+            return new RedirectResponse($this->generateUrl('admin_quarterly_pl_date', [
+                'year' => $now->format('Y'),
+                'month' => $now->format('m'),
+            ]));
+        }
+        $date = \DateTime::createFromFormat(
+            "Y-m-d",
+            sprintf('%d-%d-01', $year, $month),
+            new \DateTimeZone(SoSure::TIMEZONE)
+        );
+
+        $data = [];
+
+        $reporting = $this->get('app.reporting');
+        $report = $reporting->getQuarterlyPL($date);
+
+        return ['data' => $report];
+    }
+
+    /**
+     * @Route("/pl/print/{year}/{month}", name="admin_quarterly_pl_print")
+     */
+    public function adminAccountsPrintAction($year, $month)
+    {
+        $date = \DateTime::createFromFormat(
+            "Y-m-d",
+            sprintf('%d-%d-01', $year, $month),
+            new \DateTimeZone(SoSure::TIMEZONE)
+        );
+
+        $templating = $this->get('templating');
+        $snappyPdf = $this->get('knp_snappy.pdf');
+        $snappyPdf->setOption('orientation', 'Portrait');
+        $snappyPdf->setOption('page-size', 'A4');
+        $reporting = $this->get('app.reporting');
+        $report = $reporting->getQuarterlyPL($date);
+        $html = $templating->render('AppBundle:Pdf:adminQuarterlyPL.html.twig', [
+            'data' => $report,
+        ]);
+
+        return new Response(
+            $snappyPdf->getOutputFromHtml($html),
+            200,
+            array(
+                'Content-Type'          => 'application/pdf',
+                'Content-Disposition'   => sprintf('attachment; filename="so-sure-pl-%d-%d.pdf"', $year, $month)
+            )
+        );
+    }
+
+    /**
      * @Route("/connections", name="admin_connections")
      * @Template
      */
