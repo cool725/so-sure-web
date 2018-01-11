@@ -1090,4 +1090,88 @@ class PurchaseControllerTest extends BaseControllerTest
             $this->assertSame('/phone-insurance//learn-more', $val);
         }
     }
+
+    public function testPhoneSearchPhoneInsuranceSamsung()
+    {
+        $crawler = self::$client->request('GET', '/phone-insurance/Samsung');
+        $data = self::$client->getResponse();
+        $this->assertEquals(200, $data->getStatusCode());
+        $forms = $this->checkSearchForms($crawler->filter('form'));
+        $this->assertTrue(isset($forms));
+        foreach ($forms as $key => $val) {
+            $this->assertSame('/phone-insurance/', $val);
+        }
+    }
+
+    public function testPhoneSearchInsureSamsung()
+    {
+        $crawler = self::$client->request('GET', '/insure/Samsung');
+        $data = self::$client->getResponse();
+        $this->assertEquals(200, $data->getStatusCode());
+        $forms = $this->checkSearchForms($crawler->filter('form'));
+        $this->assertTrue(isset($forms));
+        foreach ($forms as $key => $val) {
+            $this->assertSame('/phone-insurance/', $val);
+        }
+    }
+
+    public function testPhoneSearchInsuranceCrackedScreen()
+    {
+        $crawler = self::$client->request('GET', '/phone-insurance/cracked-screen');
+        $data = self::$client->getResponse();
+        $this->assertEquals(200, $data->getStatusCode());
+        $forms = $this->checkSearchForms($crawler->filter('form'));
+        $this->assertTrue(isset($forms));
+        foreach ($forms as $key => $val) {
+            $this->assertSame('/phone-insurance/', $val);
+        }
+    }
+
+    public function testPhoneSearchInsuranceTheft()
+    {
+        $crawler = self::$client->request('GET', '/phone-insurance/theft');
+        $data = self::$client->getResponse();
+        $this->assertEquals(200, $data->getStatusCode());
+        $forms = $this->checkSearchForms($crawler->filter('form'));
+        $this->assertTrue(isset($forms));
+        foreach ($forms as $key => $val) {
+            $this->assertSame('/phone-insurance/', $val);
+        }
+    }
+
+    public function testPhoneSearchInsuranceWaterDamage()
+    {
+        $crawler = self::$client->request('GET', '/phone-insurance/water-damage');
+        $data = self::$client->getResponse();
+        $this->assertEquals(200, $data->getStatusCode());
+        $forms = $this->checkSearchForms($crawler->filter('form'));
+        $this->assertTrue(isset($forms));
+        foreach ($forms as $key => $val) {
+            $this->assertSame('/phone-insurance/', $val);
+        }
+    }
+
+    public function testPhoneSearchInsuranceBrokenPhone()
+    {
+        $crawler = self::$client->request('GET', '/phone-insurance/broken-phone');
+        $data = self::$client->getResponse();
+        $this->assertEquals(200, $data->getStatusCode());
+        $forms = $this->checkSearchForms($crawler->filter('form'));
+        $this->assertTrue(isset($forms));
+        foreach ($forms as $key => $val) {
+            $this->assertSame('/phone-insurance/', $val);
+        }
+    }
+
+    public function testPhoneSearchInsuranceLost()
+    {
+        $crawler = self::$client->request('GET', '/phone-insurance/loss');
+        $data = self::$client->getResponse();
+        $this->assertEquals(200, $data->getStatusCode());
+        $forms = $this->checkSearchForms($crawler->filter('form'));
+        $this->assertTrue(isset($forms));
+        foreach ($forms as $key => $val) {
+            $this->assertSame('/phone-insurance/', $val);
+        }
+    }
 }
