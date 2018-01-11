@@ -990,13 +990,26 @@ class PurchaseControllerTest extends BaseControllerTest
         return (isset($res)) ? $res : null;
     }
 
-    public function testPhoneSearchHomepage()
+    public function testPhoneSearchHomepageV1()
     {
-        $crawler = self::$client->request('GET', '/');
+        $crawler = self::$client->request('GET', '/?force=v1');
         $data = self::$client->getResponse();
         $this->assertEquals(200, $data->getStatusCode());
         $forms = $this->checkSearchForms($crawler->filter('form'));
-        $this->assertTrue(isset($forms));
+        $this->assertEquals(1, count($forms));
+        foreach ($forms as $key => $val) {
+            $this->assertSame('/phone-insurance/', $val);
+        }
+        return;
+    }
+
+    public function testPhoneSearchHomepageV2()
+    {
+        $crawler = self::$client->request('GET', '/?force=v2');
+        $data = self::$client->getResponse();
+        $this->assertEquals(200, $data->getStatusCode());
+        $forms = $this->checkSearchForms($crawler->filter('form'));
+        $this->assertEquals(2, count($forms));
         foreach ($forms as $key => $val) {
             $this->assertSame('/phone-insurance/', $val);
         }
