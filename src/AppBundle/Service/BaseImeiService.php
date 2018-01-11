@@ -260,7 +260,7 @@ class BaseImeiService
         return $results;
     }
 
-    public function saveFailedOcr($filename, $userId = '', $folder = BaseImeiService::S3_FAILED_OCR_FOLDER)
+    public function saveFailedOcr($filename, $userId, $folder = BaseImeiService::S3_FAILED_OCR_FOLDER)
     {
         $fs = $this->filesystem->getFilesystem('s3policy_fs');
         $path = pathinfo($filename);
