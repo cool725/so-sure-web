@@ -895,12 +895,19 @@ class PurchaseControllerTest extends BaseControllerTest
         $data = self::$client->getResponse();
         $this->assertEquals(200, $data->getStatusCode());
         $phones = json_decode($data->getContent(), true);
-        $rand = rand(0, count($phones)-1);
-        //use a random phone to check proper generation of links for /phone-insurance
-        $onephone = array($phones[$rand]);
+
+        //find iphone 7 for the test
+        $onephone = array_filter($phones, function ($item) {
+            return ($item['name'] === 'Apple iPhone 7') ? true : false;
+        });
+
+        // number of expected additional variants in memory dropdown menu.
+        $numLinks = 2;
+
         foreach ($onephone as $phone) {
-            //basic phone name for url generation
-            $name = urlencode(str_replace('+', '-Plus', $phone['name']));
+            $testPhone = new Phone();
+            $testPhone->setModel($phone['name']);
+            $name = $testPhone->getEncodedModel();
 
             //fetch page for each phone and save internal linking to alternative memory models
             $alternate = [];
@@ -936,8 +943,6 @@ class PurchaseControllerTest extends BaseControllerTest
                 }
             }
 
-            //check that each page links to all memory models
-            $numLinks = count($alternate)-1;
             foreach (array_keys($alternate) as $key) {
                 $this->assertEquals($numLinks, count($alternate[$key]));
                 $this->areLinksValid($name, $key, array_keys($alternate), $alternate[$key]);
@@ -1000,7 +1005,6 @@ class PurchaseControllerTest extends BaseControllerTest
         foreach ($forms as $key => $val) {
             $this->assertSame('/phone-insurance/', $val);
         }
-        return;
     }
 
     public function testPhoneSearchHomepageV2()
@@ -1013,7 +1017,6 @@ class PurchaseControllerTest extends BaseControllerTest
         foreach ($forms as $key => $val) {
             $this->assertSame('/phone-insurance/', $val);
         }
-        return;
     }
 
     public function testPhoneSearchPurchasePage()
@@ -1026,7 +1029,44 @@ class PurchaseControllerTest extends BaseControllerTest
         foreach ($forms as $key => $val) {
             $this->assertSame('/select-phone/purchase-change/', $val);
         }
-        return;
+    }
+
+    public function testPhoneSearchPhoneInsuranceByPhoneName()
+    {
+        $crawler = self::$client->request('GET', '/phone-insurance/Apple+iPhone+7');
+        $data = self::$client->getResponse();
+        $this->assertEquals(200, $data->getStatusCode());
+        $forms = $this->checkSearchForms($crawler->filter('form'));
+        $this->assertTrue(isset($forms));
+        foreach ($forms as $key => $val) {
+            $this->assertSame('/phone-insurance/', $val);
+        }
+    }
+
+    public function testPhoneSearchPhoneInsuranceByPhoneId()
+    {
+        $phoneRepo = self::$dm->getRepository(Phone::class);
+        $phone =  $phoneRepo->findOneBy(['make' => 'Apple', 'model' => 'iPhone 7']);
+        $url = sprintf('/phone-insurance/%s', $phone->getId());
+        $redirectUrl = sprintf(
+            '/phone-insurance/%s+%s+%sGB',
+            $phone->getMake(),
+            $phone->getEncodedModel(),
+            $phone->getMemory()
+        );
+        $crawler = self::$client->request('GET', $url);
+        $data = self::$client->getResponse();
+
+        // should be redirected to redirect url
+        $this->assertEquals(301, $data->getStatusCode());
+        $this->assertEquals($redirectUrl, $data->getTargetUrl());
+        $crawler = self::$client->followRedirect();
+
+        $forms = $this->checkSearchForms($crawler->filter('form'));
+        $this->assertTrue(isset($forms));
+        foreach ($forms as $key => $val) {
+            $this->assertSame('/phone-insurance/', $val);
+        }
     }
 
     public function testPhoneSearchLearnMore()
