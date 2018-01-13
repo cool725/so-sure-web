@@ -39,7 +39,7 @@
         "fzaninotto/faker": "^1.6",
         "stof/doctrine-extensions-bundle": "^1.2",
         "vich/uploader-bundle": "^1.1.0",
-        "oneup/flysystem-bundle": "^1.4.1",
+        "oneup/flysystem-bundle": "^3.0",
         "league/flysystem-aws-s3-v3": "^1.0.13",
         "alcaeus/mongo-php-adapter": "^1.0",
         "doctrine/mongodb-odm": "^1.1",
