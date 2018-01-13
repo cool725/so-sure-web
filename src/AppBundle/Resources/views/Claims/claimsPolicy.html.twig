@@ -81,14 +81,6 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <i class="col-sm-1 fa fa-question-circle" title="If the claim is suspected of being fraudulent, regardless of status"></i>
-                                    {{ form_label(formClaim.suspected_fraud, '', {'label_attr': {'class': 'col-sm-8'}}) }}
-                                    {{ form_errors(formClaim.suspected_fraud) }}
-                                    {{ form_widget(formClaim.suspected_fraud, {'attr': {'class': 'col-sm-2'}}) }}
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="form-group">
                                     <i class="col-sm-1 fa fa-question-circle" title="If the claim is declined/withdrawn and the phone is lost/stolen/or unusable"></i>
                                     {{ form_label(formClaim.shouldCancelPolicy, '', {'label_attr': {'class': 'col-sm-8'}}) }}
                                     {{ form_errors(formClaim.shouldCancelPolicy) }}

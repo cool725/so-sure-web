@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Document\Policy;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Document\Claim;
@@ -232,6 +233,119 @@ class DaviesServiceTest extends WebTestCase
 
         $this->insureWarningExists('/multiple open claims against policy/');
     }
+
+    public function testUpdateClaimNoFinalFlag()
+    {
+
+        $policy = new PhonePolicy();
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setId('1');
+
+        $claim = new Claim();
+        $claim->setPolicy($policy);
+        $claim->setNumber(time());
+        $claim->setStatus(Claim::STATUS_SETTLED);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = $claim->getNumber();
+        $daviesClaim->status = DaviesClaim::STATUS_CLOSED;
+        $daviesClaim->finalSuspicion = null;
+        $daviesClaim->initialSuspicion = null;
+        $daviesClaim->finalSuspicion = null;
+        self::$daviesService->clearWarnings();
+        $this->assertEquals(0, count(self::$daviesService->getWarnings()));
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->assertEquals(1, count(self::$daviesService->getWarnings()));
+        $this->insureWarningExists('/finalSuspicion/');
+    }
+
+    public function testUpdateClaimNoInitialFlag()
+    {
+
+        $user = new User();
+        $user->setFirstName('Marko');
+        $user->setLastName('Marulic');
+        $policy = new PhonePolicy();
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setId('1');
+        $policy->setUser($user);
+
+        $claim = new Claim();
+        $claim->setPolicy($policy);
+        $claim->setNumber(time());
+        $claim->setStatus(Claim::STATUS_INREVIEW);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = $claim->getNumber();
+        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->insuredName = 'Marko Marulic';
+        $daviesClaim->initialSuspicion = null;
+        $daviesClaim->finalSuspicion = null;
+
+        self::$daviesService->clearWarnings();
+        $this->assertEquals(0, count(self::$daviesService->getWarnings()));
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->assertEquals(1, count(self::$daviesService->getWarnings()));
+        $this->insureWarningExists('/initialSuspicion/');
+    }
+
+    public function testUpdateClaimValidDaviesInitialFlag()
+    {
+        $user = new User();
+        $user->setFirstName('Marko');
+        $user->setLastName('Marulic');
+        $policy = new PhonePolicy();
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setId('1');
+        $policy->setUser($user);
+
+        $claim = new Claim();
+        $claim->setPolicy($policy);
+        $claim->setNumber(time());
+        $claim->setStatus(Claim::STATUS_INREVIEW);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = $claim->getNumber();
+        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->insuredName = 'Marko Marulic';
+        $daviesClaim->initialSuspicion = 'no';
+        $daviesClaim->finalSuspicion = null;
+
+        self::$daviesService->clearWarnings();
+        $this->assertEquals(0, count(self::$daviesService->getWarnings()));
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->assertEquals(0, count(self::$daviesService->getWarnings()));
+    }
+
+    public function testUpdateClaimValidDaviesFinalFlag()
+    {
+        $user = new User();
+        $user->setFirstName('Marko');
+        $user->setLastName('Marulic');
+        $policy = new PhonePolicy();
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setId('1');
+        $policy->setUser($user);
+
+        $claim = new Claim();
+        $claim->setPolicy($policy);
+        $claim->setNumber(time());
+        $claim->setStatus(Claim::STATUS_APPROVED);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = $claim->getNumber();
+        $daviesClaim->status = DaviesClaim::STATUS_CLOSED;
+        $daviesClaim->insuredName = 'Marko Marulic';
+        $daviesClaim->initialSuspicion = 'no';
+        $daviesClaim->finalSuspicion = 'no';
+
+        self::$daviesService->clearWarnings();
+        $this->assertEquals(0, count(self::$daviesService->getWarnings()));
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->assertEquals(0, count(self::$daviesService->getWarnings()));
+    }
+
+
 
     private function getRandomPolicyNumber()
     {
