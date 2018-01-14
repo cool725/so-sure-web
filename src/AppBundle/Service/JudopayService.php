@@ -296,13 +296,30 @@ class JudopayService
             $policy->setStatus(PhonePolicy::STATUS_PENDING);
             $this->dm->flush();
 
-            $this->createPayment($policy, $receiptId, $consumerToken, $cardToken, $source, $deviceDna, $date);
+            $payment = $this->createPayment(
+                $policy,
+                $receiptId,
+                $consumerToken,
+                $cardToken,
+                $source,
+                $deviceDna,
+                $date
+            );
 
             $this->policyService->create($policy, $date, true);
             $this->dm->flush();
+            $this->triggerPaymentEvent($payment);
         } else {
             // Existing policy - add payment + prevent duplicate billing
-            $this->createPayment($policy, $receiptId, $consumerToken, $cardToken, $source, $deviceDna, $date);
+            $payment = $this->createPayment(
+                $policy,
+                $receiptId,
+                $consumerToken,
+                $cardToken,
+                $source,
+                $deviceDna,
+                $date
+            );
             if (!$this->policyService->adjustScheduledPayments($policy, true)) {
                 // Reload object from db
                 $policy = $this->dm->merge($policy);
@@ -310,6 +327,7 @@ class JudopayService
 
             $this->validatePolicyStatus($policy, $date);
             $this->dm->flush();
+            $this->triggerPaymentEvent($payment);
         }
 
         $this->statsd->endTiming("judopay.add");
@@ -339,6 +357,14 @@ class JudopayService
         $user->setPaymentMethod($judo);
 
         $payment = $this->validateReceipt($policy, $receiptId, $cardToken, $source, $date);
+
+        $this->validateUser($user);
+
+        return $payment;
+    }
+
+    private function triggerPaymentEvent($payment)
+    {
         // Primarily used to allow tests to avoid triggering policy events
         if ($this->dispatcher) {
             if ($payment->isSuccess()) {
@@ -351,8 +377,6 @@ class JudopayService
         } else {
             $this->logger->warning('Dispatcher is disabled for Judo Service');
         }
-
-        $this->validateUser($user);
     }
 
     public function testPay(User $user, $ref, $amount, $cardNumber, $expiryDate, $cv2, $policyId = null)
@@ -704,6 +728,8 @@ class JudopayService
             );
         } catch (SameDayPaymentException $e) {
             $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+            $this->triggerPaymentEvent($payment);
+
             throw $e;
         } catch (\Exception $e) {
             // TODO: Nicer handling if Judo has an issue
@@ -727,6 +753,8 @@ class JudopayService
         }
         $this->processScheduledPaymentResult($scheduledPayment, $payment);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+        $this->triggerPaymentEvent($payment);
 
         return $scheduledPayment;
     }
@@ -1049,19 +1077,6 @@ class JudopayService
         // make consistent
         $this->setCommission($policy, $payment);
 
-        // Primarily used to allow tests to avoid triggering policy events
-        if ($this->dispatcher) {
-            if ($payment->isSuccess()) {
-                $this->logger->debug('Event Payment Success');
-                $this->dispatcher->dispatch(PaymentEvent::EVENT_SUCCESS, new PaymentEvent($payment));
-            } else {
-                $this->logger->debug('Event Payment Failed');
-                $this->dispatcher->dispatch(PaymentEvent::EVENT_FAILED, new PaymentEvent($payment));
-            }
-        } else {
-            $this->logger->warning('Dispatcher is disabled for Judo Service');
-        }
-
         return $payment;
     }
 
@@ -1358,11 +1373,15 @@ class JudopayService
 
         $payment = $this->tokenPay($policy, $amount, null, false);
         if (!$payment->isSuccess()) {
+            $this->triggerPaymentEvent($payment);
+
             return false;
         }
 
         $this->policyService->create($policy, $date, true);
         $this->dm->flush();
+
+        $this->triggerPaymentEvent($payment);
 
         $this->statsd->endTiming("judopay.multipay");
 
@@ -1398,11 +1417,15 @@ class JudopayService
 
         $payment = $this->tokenPay($policy, $amount, null, false);
         if (!$payment->isSuccess()) {
+            $this->triggerPaymentEvent($payment);
+
             return false;
         }
 
         $this->policyService->create($policy, $date, true);
         $this->dm->flush();
+
+        $this->triggerPaymentEvent($payment);
 
         $this->statsd->endTiming("judopay.existing");
 
