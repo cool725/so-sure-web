@@ -1308,6 +1308,50 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(new \DateTimeZone(Salva::SALVA_TIMEZONE), $renewalPolicy->getStart()->getTimeZone());
     }
 
+    public function testPolicyRenewMultiPay()
+    {
+        $payer = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPolicyRenewMultiPay-payer', $this),
+            'bar',
+            static::$dm
+        );
+        $payee = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPolicyRenewMultiPay-payee', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $payee,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+        $payer->addPayerPolicy($policy);
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-06-01'), true);
+        static::$policyService->setEnvironment('test');
+        static::$dm->flush();
+        $this->assertEquals(new \DateTimeZone(Salva::SALVA_TIMEZONE), $policy->getStart()->getTimeZone());
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+
+        $renewalPolicy = static::$policyService->createPendingRenewal(
+            $policy,
+            new \DateTime('2017-05-15')
+        );
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
+
+        static::$policyService->renew($policy, 12, null, false, new \DateTime('2017-05-30'));
+        $this->assertEquals(Policy::STATUS_RENEWAL, $renewalPolicy->getStatus());
+        $this->assertNull($policy->getCashback());
+        $this->assertEquals($payer->getId(), $renewalPolicy->getPayer()->getId());
+    }
+
     public function testPolicyAutoRenewUnpaid()
     {
         $user = static::createUser(

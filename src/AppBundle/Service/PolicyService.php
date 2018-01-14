@@ -1774,6 +1774,9 @@ class PolicyService
             $discount = $policy->getPotValue();
         }
 
+        if ($payer = $policy->getPayer()) {
+            $payer->addPayerPolicy($newPolicy);
+        }
         $this->create($newPolicy, $startDate, false, $numPayments);
         $newPolicy->renew($discount, $autoRenew, $date);
         $this->generateScheduledPayments($newPolicy, $startDate, $numPayments);
