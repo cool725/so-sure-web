@@ -2503,6 +2503,17 @@ abstract class Policy
         return $date >= $this->getPolicyExpirationDate($date);
     }
 
+    public function hasPolicyExpirationDate(\DateTime $date = null)
+    {
+        try {
+            $this->getPolicyExpirationDate($date);
+
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
     /**
      * Note that expiration date is for cancellations only and may be after policy end date
      */

@@ -4844,7 +4844,7 @@ class ApiAuthControllerTest extends BaseControllerTest
             ]]);
             $this->verifyResponse(200);
         } else {
-            $this->payPolicyMonthly($user, $policy, $date);
+            $payment = $this->payPolicyMonthly($user, $policy, $date);
             $dm->persist($payment);
             $dm->flush();
             $this->assertNotNull($payment->getId());
@@ -4877,6 +4877,8 @@ class ApiAuthControllerTest extends BaseControllerTest
         $user->addPolicy($policy);
 
         static::$policyService->create($policy, $date, true);
+
+        return $payment;
     }
 
     private function createMultiPayRequest($payerEmail, $payeeEmail, $real = false)

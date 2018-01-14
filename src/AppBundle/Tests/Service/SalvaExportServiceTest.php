@@ -296,11 +296,15 @@ class SalvaExportServiceTest extends WebTestCase
 
         $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
 
+        
+        $now = new \DateTime();
+        $now = $now->sub(new \DateInterval('PT1S'));
         $chargeback = new ChargebackPayment();
-        $chargeback->setDate(new \DateTime());
+        $chargeback->setDate($now);
         $chargeback->setSource(Payment::SOURCE_ADMIN);
         $chargeback->setAmount(0 - $policy->getPremiumInstallmentPrice());
         $policy->addPayment($chargeback);
+        static::$dm->persist($chargeback);
         static::$dm->flush();
         
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');

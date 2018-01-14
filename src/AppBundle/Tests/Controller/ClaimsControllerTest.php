@@ -14,6 +14,7 @@ use AppBundle\DataFixtures\MongoDB\b\User\LoadUserData;
 
 /**
  * @group functional-net
+ * AppBundle\\Tests\\Controller\\ClaimsControllerTest
  */
 class ClaimsControllerTest extends BaseControllerTest
 {
@@ -24,9 +25,9 @@ class ClaimsControllerTest extends BaseControllerTest
     {
     }
 
-    public function testClaimsLoginViewPolicyOk()
+    public function testClaimsLoginViewPartialPolicy()
     {
-        $email = self::generateEmail('testClaimsLoginViewPolicyOk', $this);
+        $email = self::generateEmail('testClaimsLoginViewPolicyPending', $this);
         $password = 'foo';
         $phone = self::getRandomPhone(self::$dm);
         $user = self::createUser(
@@ -36,6 +37,31 @@ class ClaimsControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
+        self::addAddress($user);
+        self::$dm->flush();
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        self::$dm->flush();
+
+        $this->login('claims@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'claims/policies');
+
+        $crawler = self::$client->request('GET', sprintf('/claims/policy/%s', $policy->getId()));
+        $this->verifyResponse(200);
+    }
+
+    public function testClaimsLoginViewPolicyActive()
+    {
+        $email = self::generateEmail('testClaimsLoginViewPolicyActive', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        self::addAddress($user);
+        self::$dm->flush();
         $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         self::$dm->flush();

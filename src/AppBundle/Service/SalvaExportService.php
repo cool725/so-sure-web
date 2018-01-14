@@ -391,6 +391,9 @@ class SalvaExportService
                 throw new \Exception('Invalid payment');
             }
             $policy = $payment->getPolicy();
+            if (!$policy) {
+                throw new \Exception('Invalid policy');
+            }
             $data = [
                 $policy->getSalvaPolicyNumberByDate($payment->getDate()),
                 $this->adjustDate($payment->getDate()),
