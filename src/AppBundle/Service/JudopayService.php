@@ -365,6 +365,10 @@ class JudopayService
 
     private function triggerPaymentEvent($payment)
     {
+        if (!$payment) {
+            return;
+        }
+
         // Primarily used to allow tests to avoid triggering policy events
         if ($this->dispatcher) {
             if ($payment->isSuccess()) {
