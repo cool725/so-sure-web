@@ -22,6 +22,7 @@ use AppBundle\Document\MultiPay;
 use AppBundle\Document\CurrencyTrait;
 
 use AppBundle\Event\PaymentEvent;
+use AppBundle\Event\PolicyEvent;
 
 use AppBundle\Exception\InvalidPremiumException;
 use AppBundle\Exception\PaymentDeclinedException;
@@ -296,13 +297,29 @@ class JudopayService
             $policy->setStatus(PhonePolicy::STATUS_PENDING);
             $this->dm->flush();
 
-            $this->createPayment($policy, $receiptId, $consumerToken, $cardToken, $source, $deviceDna, $date);
+            $payment = $this->createPayment(
+                $policy,
+                $receiptId,
+                $consumerToken,
+                $cardToken,
+                $source,
+                $deviceDna,
+                $date
+            );
 
             $this->policyService->create($policy, $date, true);
             $this->dm->flush();
         } else {
             // Existing policy - add payment + prevent duplicate billing
-            $this->createPayment($policy, $receiptId, $consumerToken, $cardToken, $source, $deviceDna, $date);
+            $payment = $this->createPayment(
+                $policy,
+                $receiptId,
+                $consumerToken,
+                $cardToken,
+                $source,
+                $deviceDna,
+                $date
+            );
             if (!$this->policyService->adjustScheduledPayments($policy, true)) {
                 // Reload object from db
                 $policy = $this->dm->merge($policy);
@@ -339,6 +356,20 @@ class JudopayService
         $user->setPaymentMethod($judo);
 
         $payment = $this->validateReceipt($policy, $receiptId, $cardToken, $source, $date);
+
+        $this->triggerPaymentEvent($payment);
+
+        $this->validateUser($user);
+
+        return $payment;
+    }
+
+    private function triggerPaymentEvent($payment)
+    {
+        if (!$payment) {
+            return;
+        }
+
         // Primarily used to allow tests to avoid triggering policy events
         if ($this->dispatcher) {
             if ($payment->isSuccess()) {
@@ -351,8 +382,21 @@ class JudopayService
         } else {
             $this->logger->warning('Dispatcher is disabled for Judo Service');
         }
+    }
 
-        $this->validateUser($user);
+    private function triggerPolicyEvent($policy, $event)
+    {
+        if (!$policy) {
+            return;
+        }
+
+        // Primarily used to allow tests to avoid triggering policy events
+        if ($this->dispatcher) {
+            $this->logger->debug(sprintf('Event %s', $event));
+            $this->dispatcher->dispatch($event, new PolicyEvent($policy));
+        } else {
+            $this->logger->warning('Dispatcher is disabled for Judo Service');
+        }
     }
 
     public function testPay(User $user, $ref, $amount, $cardNumber, $expiryDate, $cv2, $policyId = null)
@@ -704,6 +748,7 @@ class JudopayService
             );
         } catch (SameDayPaymentException $e) {
             $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
             throw $e;
         } catch (\Exception $e) {
             // TODO: Nicer handling if Judo has an issue
@@ -742,6 +787,8 @@ class JudopayService
             in_array($policy->getStatus(), [PhonePolicy::STATUS_UNPAID, PhonePolicy::STATUS_PENDING])
         ) {
             $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+            $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+            $this->triggerPolicyEvent($policy, PolicyEvent::EVENT_REACTIVATED);
             // print 'status -> active' . PHP_EOL;
             // \Doctrine\Common\Util\Debug::dump($policy);
         } elseif (!$isPaidToDate) {
@@ -749,6 +796,8 @@ class JudopayService
 
             if (in_array($policy->getStatus(), [PhonePolicy::STATUS_ACTIVE, PhonePolicy::STATUS_PENDING])) {
                 $policy->setStatus(PhonePolicy::STATUS_UNPAID);
+                $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+                $this->triggerPolicyEvent($policy, PolicyEvent::EVENT_UNPAID);
             }
         }
     }
@@ -781,6 +830,7 @@ class JudopayService
             // and used by expire process to cancel policy if unpaid after 30 days
             $policy->setStatus(PhonePolicy::STATUS_UNPAID);
             $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+            $this->triggerPolicyEvent($policy, PolicyEvent::EVENT_UNPAID);
 
             $repo = $this->dm->getRepository(ScheduledPayment::class);
 
@@ -1049,18 +1099,7 @@ class JudopayService
         // make consistent
         $this->setCommission($policy, $payment);
 
-        // Primarily used to allow tests to avoid triggering policy events
-        if ($this->dispatcher) {
-            if ($payment->isSuccess()) {
-                $this->logger->debug('Event Payment Success');
-                $this->dispatcher->dispatch(PaymentEvent::EVENT_SUCCESS, new PaymentEvent($payment));
-            } else {
-                $this->logger->debug('Event Payment Failed');
-                $this->dispatcher->dispatch(PaymentEvent::EVENT_FAILED, new PaymentEvent($payment));
-            }
-        } else {
-            $this->logger->warning('Dispatcher is disabled for Judo Service');
-        }
+        $this->triggerPaymentEvent($payment);
 
         return $payment;
     }
