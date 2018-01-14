@@ -4876,7 +4876,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $policy->addPayment($payment);
         $user->addPolicy($policy);
 
-        static::$policyService->create($policy, $date, true);        
+        static::$policyService->create($policy, $date, true);
     }
 
     private function createMultiPayRequest($payerEmail, $payeeEmail, $real = false)
