@@ -207,23 +207,44 @@ class DaviesServiceTest extends WebTestCase
 
     public function testSaveClaimsClosed()
     {
-        $davies = new DaviesClaim();
-        $davies->policyNumber = $this->getRandomPolicyNumber();
-        $davies->status = 'Closed';
-
+        $policyOpen = static::createUserPolicy(true);
+        $policyOpen->getUser()->setEmail(static::generateEmail('testSaveClaimsClosed-Open', $this));
+        $claimOpen = new Claim();
+        $claimOpen->setNumber($this->getRandomPolicyNumber());
+        $policyOpen->addClaim($claimOpen);
         $daviesOpen = new DaviesClaim();
-        $daviesOpen->policyNumber = $davies->policyNumber;
+        $daviesOpen->policyNumber = $policyOpen->getPolicyNumber();
+        $daviesOpen->claimNumber = $claimOpen->getNumber();
         $daviesOpen->status = 'Open';
+        $daviesOpen->lossDate = new \DateTime('2017-02-01');
 
-        self::$daviesService->saveClaims(1, [$davies, $davies]);
-        self::$daviesService->saveClaims(1, [$davies, $daviesOpen]);
+        $policyClosed = static::createUserPolicy(true);
+        $policyClosed->getUser()->setEmail(static::generateEmail('testSaveClaimsClosed-Closed', $this));
+        $claimClosed = new Claim();
+        $claimClosed->setNumber($this->getRandomPolicyNumber());
+        $policyClosed->addClaim($claimClosed);
+        $daviesClosed = new DaviesClaim();
+        $daviesClosed->policyNumber = $policyClosed->getPolicyNumber();
+        $daviesClosed->claimNumber = $claimClosed->getNumber();
+        $daviesClosed->status = 'Closed';
+        $daviesClosed->lossDate = new \DateTime('2017-01-01');
+
+        self::$daviesService->saveClaims(1, [$daviesClosed, $daviesClosed]);
+        self::$daviesService->saveClaims(1, [$daviesClosed, $daviesOpen]);
     }
 
     public function testSaveClaimsOpen()
     {
+        $policyOpen = static::createUserPolicy(true);
+        $policyOpen->getUser()->setEmail(static::generateEmail('testSaveClaimsOpen-Open', $this));
+        $claimOpen = new Claim();
+        $claimOpen->setNumber($this->getRandomPolicyNumber());
+        $policyOpen->addClaim($claimOpen);
         $daviesOpen = new DaviesClaim();
-        $daviesOpen->policyNumber = $this->getRandomPolicyNumber();
+        $daviesOpen->policyNumber = $policyOpen->getPolicyNumber();
+        $daviesOpen->claimNumber = $claimOpen->getNumber();
         $daviesOpen->status = 'Open';
+        $daviesOpen->lossDate = new \DateTime('2017-02-01');
 
         self::$daviesService->clearErrors();
 

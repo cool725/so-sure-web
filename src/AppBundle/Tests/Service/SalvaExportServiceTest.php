@@ -63,6 +63,11 @@ class SalvaExportServiceTest extends WebTestCase
         self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
     }
 
+    public function setUp()
+    {
+        static::$salva->setEnvironment('test');
+    }
+
     public function tearDown()
     {
     }
@@ -291,16 +296,25 @@ class SalvaExportServiceTest extends WebTestCase
 
         $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
 
+        $chargeback = new ChargebackPayment();
+        $chargeback->setDate(new \DateTime());
+        $chargeback->setSource(Payment::SOURCE_ADMIN);
+        $chargeback->setAmount(0 - $policy->getPremiumInstallmentPrice());
+        $policy->addPayment($chargeback);
+        static::$dm->flush();
+        
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $policyRepo = $dm->getRepository(Policy::class);
         $updatedPolicy = $policyRepo->find($policy->getId());
 
+        /*
         $chargeback = new ChargebackPayment();
         $chargeback->setDate(new \DateTime());
         $chargeback->setSource(Payment::SOURCE_ADMIN);
         $chargeback->setAmount(0 - $policy->getPremiumInstallmentPrice());
         $updatedPolicy->addPayment($chargeback);
         $dm->flush();
+        */
 
         //\Doctrine\Common\Util\Debug::dump($updatedPolicy->getPayments());
         $lines = $this->exportPayments($updatedPolicy->getPolicyNumber());

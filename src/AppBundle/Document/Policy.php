@@ -2536,6 +2536,13 @@ abstract class Policy
         }
 
         $billingDate = $this->getNextBillingDate($date);
+        if (!$billingDate || !$this->getBilling()) {
+            throw new \Exception(sprintf(
+                'Failed to find a next billing date. Policy %s/%s',
+                $this->getPolicyNumber(),
+                $this->getId()
+            ));
+        }
         $maxCount = $this->dateDiffMonths($billingDate, $this->getBilling());
 
         // print $billingDate->format(\DateTime::ATOM) . PHP_EOL;
