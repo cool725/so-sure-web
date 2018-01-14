@@ -90,6 +90,16 @@ class IntercomListener
         $this->intercom->queuePolicy($event->getPolicy(), IntercomService::QUEUE_EVENT_POLICY_CREATED);
     }
 
+    public function onPolicyUnpaidEvent(PolicyEvent $event)
+    {
+        $this->intercom->queue($event->getPolicy()->getUser());
+    }
+
+    public function onPolicyReactivatedEvent(PolicyEvent $event)
+    {
+        $this->intercom->queue($event->getPolicy()->getUser());
+    }
+
     public function onInvitationAcceptedEvent(InvitationEvent $event)
     {
         // Invitation accepted is a connection, so update both inviter & invitee
