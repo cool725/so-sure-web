@@ -787,6 +787,7 @@ class JudopayService
             in_array($policy->getStatus(), [PhonePolicy::STATUS_UNPAID, PhonePolicy::STATUS_PENDING])
         ) {
             $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+            $this->dm->flush(null, array('w' => 'majority', 'j' => true));
             $this->triggerPolicyEvent($policy, PolicyEvent::EVENT_REACTIVATED);
             // print 'status -> active' . PHP_EOL;
             // \Doctrine\Common\Util\Debug::dump($policy);
@@ -795,6 +796,7 @@ class JudopayService
 
             if (in_array($policy->getStatus(), [PhonePolicy::STATUS_ACTIVE, PhonePolicy::STATUS_PENDING])) {
                 $policy->setStatus(PhonePolicy::STATUS_UNPAID);
+                $this->dm->flush(null, array('w' => 'majority', 'j' => true));
                 $this->triggerPolicyEvent($policy, PolicyEvent::EVENT_UNPAID);
             }
         }
