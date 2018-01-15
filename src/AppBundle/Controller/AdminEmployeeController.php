@@ -792,6 +792,17 @@ class AdminEmployeeController extends BaseController
                         'bcc@so-sure.com'
                     );
 
+                    $mailer->sendTemplate(
+                        'Debt Collection Request',
+                        $policy->getUser()->getEmail(),
+                        'AppBundle:Email:policy/debtCollectionCustomer.html.twig',
+                        ['policy' => $policy],
+                        'AppBundle:Email:policy/debtCollectionCustomer.txt.twig',
+                        ['policy' => $policy],
+                        null,
+                        'bcc@so-sure.com'
+                    );
+
                     $this->addFlash(
                         'success',
                         sprintf('Emailed debt collector and set flag on policy')
