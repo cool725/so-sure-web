@@ -40,33 +40,30 @@ class AdminEmployeeControllerTest extends BaseControllerTest
         $date->sub(new \DateInterval('P91D'));
         $dateClaim = new \DateTime();
         $dateClaim->sub(new \DateInterval('P90D'));
-        $email = 'testDebtCollectionUser@so-sure.net';
+        $email = $this->generateEmail('testDebtCollectorEmails', $this);
 
         $userRepo = self::$dm->getRepository(User::class);
         $phoneRepo = self::$dm->getRepository(Phone::class);
-        $policyTermsRepo = self::$dm->getRepository(PolicyTerms::class);
-        $policyTerm = $policyTermsRepo->findOneBy([]);
+        $phone = $phoneRepo->findOneBy(['make' => 'Apple', 'model' => 'iPhone 7']);
 
         $user = $userRepo->findOneBy(['email' => $email]);
         if (!$user) {
-            $user = new User();
-            $email = 'testDebtCollectionUser@so-sure.net';
-            $user->setEmail($email);
-            self::$dm->persist($user);
+            $user = self::createUser(self::$userManager, $email, 'foo');
         }
 
-        // generate phone
-        $policy = new SalvaPhonePolicy();
+        $policy = static::initPolicy(
+            $user,
+            self::$dm,
+            $phone,
+            $date,
+            false,
+            true,
+            true
+        );
 
-        $phone = $phoneRepo->findOneBy(['model' => 'iPhone 7']);
-        $policy->setUser($user);
-        $policy->setPhone($phone);
-        $policy->setStart($date);
-        $policy->setPolicyTerms($policyTerm);
         $policy->setPremiumInstallments(12);
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
 
-        self::$dm->persist($policy);
 
         $claim = new Claim();
         $claim->setCreatedDate($dateClaim);
@@ -76,11 +73,13 @@ class AdminEmployeeControllerTest extends BaseControllerTest
         $claim->setReplacementImei(self::generateRandomImei());
         $claim->setReplacementPhone($phone);
         $claim->setPolicy($policy);
-        self::$dm->persist($claim);
+
         $policy->addClaim($claim);
         $policy->setStatus(Policy::STATUS_CANCELLED);
         $policy->setCancelledReason(Policy::CANCELLED_UNPAID);
         self::$dm->flush();
+
+
         $url = sprintf('/admin/policy/%s', $policy->getId());
         $this->login('patrick@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'admin/');
         $crawler = self::$client->request('GET', $url);
