@@ -70,7 +70,6 @@ class SCodeServiceTest extends WebTestCase
         self::$userManager = self::$container->get('fos_user.user_manager');
         self::$scodeService = self::$container->get('app.scode');
         self::$invitationService = self::$container->get('app.invitation');
-        self::$invitationService->setMailer($mailer);
         self::$invitationService->setDebug(true);
 
         self::$policyService = self::$container->get('app.policy');
@@ -106,22 +105,26 @@ class SCodeServiceTest extends WebTestCase
         );
         $user->setFirstName('Aaa');
         $user->setLastName('Bbb');
-        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, true);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy);
+        static::$policyService->setEnvironment('test');
         $policy->setStatus(Policy::STATUS_ACTIVE);
         static::$dm->flush();
 
-        $scode = static::$invitationService->generateUniqueSCode($user, SCode::TYPE_MULTIPAY);
+        $scode = static::$scodeService->generateUniqueSCode($user, SCode::TYPE_MULTIPAY);
         $this->assertEquals(SCode::TYPE_MULTIPAY, $scode->getType());
-        $this->assertNotEquals('abbb0001', $scode->getCode());
+        // policy create should generate 0001 entry
+        $this->assertNotEquals('abbb0002', $scode->getCode());
 
-        $scode = static::$invitationService->generateUniqueSCode($user, SCode::TYPE_STANDARD);
+        $scode = static::$scodeService->generateUniqueSCode($user, SCode::TYPE_STANDARD);
         $this->assertEquals(SCode::TYPE_STANDARD, $scode->getType());
-        $this->assertEquals('abbb0001', $scode->getCode());
+        $this->assertEquals('abbb0002', $scode->getCode());
         $policy->addSCode($scode);
         static::$dm->flush();
         
-        $scode = static::$invitationService->generateUniqueSCode($user, SCode::TYPE_STANDARD);
+        $scode = static::$scodeService->generateUniqueSCode($user, SCode::TYPE_STANDARD);
         $this->assertEquals(SCode::TYPE_STANDARD, $scode->getType());
-        $this->assertEquals('abbb0002', $scode->getCode());
+        $this->assertEquals('abbb0003', $scode->getCode());
     }
 }

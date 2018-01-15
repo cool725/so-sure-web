@@ -2,6 +2,7 @@
 namespace AppBundle\Service;
 
 use Psr\Log\LoggerInterface;
+use Doctrine\ODM\MongoDB\DocumentManager;
 
 use AppBundle\Document\Policy;
 use AppBundle\Document\SCode;
