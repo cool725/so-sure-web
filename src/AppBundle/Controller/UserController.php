@@ -1011,21 +1011,18 @@ class UserController extends BaseController
             $policy = $user->getLatestPolicy();
         } else {
             $policyRepo = $dm->getRepository(Policy::class);
-            $policy = $policyRepo->findOneBy(['id' => $id, 'user' => $user]);
+            $policy = $policyRepo->find($id);
+            $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
         }
         // if policy id was given and user does not match
         if (!$policy) {
-            return new RedirectResponse($this->generateUrl('user_invalid_policy'));
+            throw $this->createNotFoundException('Policy not found');
         }
 
         if ($policy->getVisitedWelcomePage() == null) {
             $date = new \DateTime();
             $policy->setVisitedWelcomePage($date);
             $dm->flush($policy);
-            $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_PURCHASE_POLICY, [
-                'Redirected Page' => $request->get('_route'),
-                'Policy Id' => $policy->getId()
-            ]);
         }
         //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_LANDING_HOME);
         //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_CPC_QUOTE_MANUFACTURER);
