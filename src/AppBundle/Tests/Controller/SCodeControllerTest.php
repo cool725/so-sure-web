@@ -31,6 +31,13 @@ class SCodeControllerTest extends BaseControllerTest
         $url = sprintf('/scode/%s', $scode->getCode());
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(200);
+        // check if phone forms are pointing to the right location
+        $forms = $this->checkSearchForms($crawler->filter('form'));
+        $this->assertTrue(isset($forms));
+        foreach ($forms as $key => $val) {
+            $this->assertSame('/phone-insurance/', $val);
+        }
+
     }
 
     public function testSCodeUser()
@@ -61,6 +68,36 @@ class SCodeControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(302);
         $this->assertTrue(self::$client->getResponse()->isRedirect('/user/'));
+    }
+
+    public function isInKeys($item)
+    {
+        $keys = array(
+            'search-phone-form',
+            'search-phone-form-homepage',
+            'search-phone-form-footer',
+            'search-phone-form-header'
+        );
+        foreach ($keys as $key) {
+            if (strpos($item, $key) !== false) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function checkSearchForms($forms)
+    {
+        foreach ($forms as $form) {
+            if ($this->isInKeys($form->getAttribute('id'))) {
+                $res[$form->getAttribute('id')] = sprintf(
+                    '%s%s',
+                    $form->getAttribute('data-base-path'),
+                    $form->getAttribute('data-path-suffix')
+                );
+            }
+        }
+        return (isset($res)) ? $res : null;
     }
 
     private function createSCode($emailBase)

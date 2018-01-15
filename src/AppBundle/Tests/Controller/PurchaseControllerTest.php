@@ -1095,6 +1095,7 @@ class PurchaseControllerTest extends BaseControllerTest
     {
         $crawler = self::$client->request('GET', '/phone-insurance/Samsung');
         $data = self::$client->getResponse();
+        var_dump($data);
         $this->assertEquals(200, $data->getStatusCode());
         $forms = $this->checkSearchForms($crawler->filter('form'));
         $this->assertTrue(isset($forms));
@@ -1166,6 +1167,42 @@ class PurchaseControllerTest extends BaseControllerTest
     public function testPhoneSearchInsuranceLost()
     {
         $crawler = self::$client->request('GET', '/phone-insurance/loss');
+        $data = self::$client->getResponse();
+        $this->assertEquals(200, $data->getStatusCode());
+        $forms = $this->checkSearchForms($crawler->filter('form'));
+        $this->assertTrue(isset($forms));
+        foreach ($forms as $key => $val) {
+            $this->assertSame('/phone-insurance/', $val);
+        }
+    }
+
+    public function testPhoneSearchVSGadget()
+    {
+        $crawler = self::$client->request('GET', '/so-sure-vs-gadget-cover-phone-insurance');
+        $data = self::$client->getResponse();
+        $this->assertEquals(200, $data->getStatusCode());
+        $forms = $this->checkSearchForms($crawler->filter('form'));
+        $this->assertTrue(isset($forms));
+        foreach ($forms as $key => $val) {
+            $this->assertSame('/phone-insurance/', $val);
+        }
+    }
+
+    public function testPhoneSearchVSHalifax()
+    {
+        $crawler = self::$client->request('GET', '/so-sure-vs-halifax-phone-insurance');
+        $data = self::$client->getResponse();
+        $this->assertEquals(200, $data->getStatusCode());
+        $forms = $this->checkSearchForms($crawler->filter('form'));
+        $this->assertTrue(isset($forms));
+        foreach ($forms as $key => $val) {
+            $this->assertSame('/phone-insurance/', $val);
+        }
+    }
+
+    public function testPhoneSearchVSThree()
+    {
+        $crawler = self::$client->request('GET', '/so-sure-vs-three-phone-insurance');
         $data = self::$client->getResponse();
         $this->assertEquals(200, $data->getStatusCode());
         $forms = $this->checkSearchForms($crawler->filter('form'));
