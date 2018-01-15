@@ -70,6 +70,31 @@ class ApiPartialControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(200);
     }
 
+    public function testABNoScode()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testABNoScode', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $phone = self::getRandomPhone(self::$dm);
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        foreach ($policy->getScodes() as $scode) {
+            self::$dm->remove($scode);
+        }
+        self::$dm->flush();
+
+        $url = sprintf('/api/v1/partial/ab/%s?_method=GET', SixpackService::EXPERIMENT_SHARE_MESSAGE);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, array());
+        $data = $this->verifyResponse(404);
+
+        $url = sprintf('/api/v1/partial/ab/%s?_method=GET', SixpackService::EXPERIMENT_APP_SHARE_METHOD);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, array());
+        $data = $this->verifyResponse(404);
+    }
+
     // feature flags
 
     /**
