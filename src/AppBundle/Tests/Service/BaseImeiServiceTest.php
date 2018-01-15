@@ -289,7 +289,7 @@ SEID";
         $time = time();
         $userId = 111;
         $image = sprintf(
-            "%s/../src/AppBundle/Tests/Resources/iPhoneXSettings.png",
+            "%s/../src/AppBundle/Tests/Resources/iPhoneSettingsSerialOnly.png",
             self::$rootDir
         );
         // create temporary image
