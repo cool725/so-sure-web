@@ -380,6 +380,7 @@ class OpsController extends BaseController
         if (isset($violationReport['csp-report']['original-policy'])) {
             unset($violationReport['csp-report']['original-policy']);
         }
+        $violationReport['csp-report']['user-agent']= $request->headers->get('User-Agent');
         $this->get('snc_redis.default')->rpush('csp', json_encode($violationReport));
         $logger->debug(
             'Content-Security-Policy Violation Reported',
