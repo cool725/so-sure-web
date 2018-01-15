@@ -94,7 +94,7 @@ trait DateTrait
         return $businessDays;
     }
 
-    public function dateDiffMonths($date1, $date2, $ceil = true)
+    public function dateDiffMonths(\DateTime $date1, \DateTime $date2, $ceil = true)
     {
         if ($date1 < $date2) {
             return 0;

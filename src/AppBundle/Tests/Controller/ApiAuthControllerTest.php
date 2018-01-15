@@ -3029,8 +3029,8 @@ class ApiAuthControllerTest extends BaseControllerTest
             $lastYear,
             true
         );
-        $this->payPolicy($userA, $policyA->getId(), null, $lastYear);
-        $this->payPolicy($userB, $policyB->getId(), null, $lastYear);
+        $this->payPolicyMonthly($userA, $policyA, $lastYear);
+        $this->payPolicyMonthly($userB, $policyB, $lastYear);
         $this->assertEquals(Policy::STATUS_ACTIVE, $policyA->getStatus());
         $this->assertEquals(Policy::STATUS_ACTIVE, $policyB->getStatus());
 
@@ -3137,7 +3137,7 @@ class ApiAuthControllerTest extends BaseControllerTest
             $lastYear,
             true
         );
-        $this->payPolicy($userA, $policyA->getId(), null, $lastYear);
+        $this->payPolicyMonthly($userA, $policyA, $lastYear);
         $this->assertEquals(Policy::STATUS_ACTIVE, $policyA->getStatus());
 
         for ($i = 1; $i < 15; $i++) {
@@ -3156,7 +3156,7 @@ class ApiAuthControllerTest extends BaseControllerTest
                 $lastYear,
                 true
             );
-            $this->payPolicy($userB, $policyB->getId(), null, $lastYear);
+            $this->payPolicyMonthly($userB, $policyB, $lastYear);
             //$this->assertEquals(Policy::STATUS_ACTIVE, $policyB->getStatus());
 
             $url = sprintf("/api/v1/auth/policy/%s/invitation?debug=true", $policyA->getId());
@@ -4844,15 +4844,8 @@ class ApiAuthControllerTest extends BaseControllerTest
             ]]);
             $this->verifyResponse(200);
         } else {
-            $payment = new JudoPayment();
+            $payment = $this->payPolicyMonthly($user, $policy, $date);
             $dm->persist($payment);
-            $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
-            $payment->setResult(JudoPayment::RESULT_SUCCESS);
-            $payment->setReceipt(rand(1, 999999));
-            $policy->addPayment($payment);
-            $user->addPolicy($policy);
-
-            static::$policyService->create($policy, $date, true);
             $dm->flush();
             $this->assertNotNull($payment->getId());
         }
@@ -4872,6 +4865,20 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals(SalvaPhonePolicy::STATUS_PENDING, $policyData['status']);
         $this->assertEquals($policyId, $policyData['id']);
         */
+    }
+
+    protected function payPolicyMonthly($user, $policy, $date = null)
+    {
+        $payment = new JudoPayment();
+        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
+        $payment->setResult(JudoPayment::RESULT_SUCCESS);
+        $payment->setReceipt(rand(1, 999999));
+        $policy->addPayment($payment);
+        $user->addPolicy($policy);
+
+        static::$policyService->create($policy, $date, true);
+
+        return $payment;
     }
 
     private function createMultiPayRequest($payerEmail, $payeeEmail, $real = false)

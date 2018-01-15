@@ -2503,6 +2503,17 @@ abstract class Policy
         return $date >= $this->getPolicyExpirationDate($date);
     }
 
+    public function hasPolicyExpirationDate(\DateTime $date = null)
+    {
+        try {
+            $this->getPolicyExpirationDate($date);
+
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
     /**
      * Note that expiration date is for cancellations only and may be after policy end date
      */
@@ -2536,6 +2547,13 @@ abstract class Policy
         }
 
         $billingDate = $this->getNextBillingDate($date);
+        if (!$billingDate || !$this->getBilling()) {
+            throw new \Exception(sprintf(
+                'Failed to find a next billing date. Policy %s/%s',
+                $this->getPolicyNumber(),
+                $this->getId()
+            ));
+        }
         $maxCount = $this->dateDiffMonths($billingDate, $this->getBilling());
 
         // print $billingDate->format(\DateTime::ATOM) . PHP_EOL;
