@@ -107,30 +107,14 @@ class OpsReportCommandTest extends KernelTestCase
 
     public function testOpsReportCsp()
     {
-        self::$client->request(
-            'POST',
-            '/ops/csp',
-            array(),
-            array(),
-            array('CONTENT_TYPE' => 'application/json'),
-            json_encode(['csp-report' => ['blocked-uri' => 'http://www.mytesturi.com']])
-        );
-        self::$client->request(
-            'POST',
-            '/ops/csp',
-            array(),
-            array(),
-            array('CONTENT_TYPE' => 'application/json'),
-            json_encode(['csp-report' => ['blocked-uri' => 'http://www.mytesturi.com']])
-        );
-        self::$client->request(
-            'POST',
-            '/ops/csp',
-            array(),
-            array(),
-            array('CONTENT_TYPE' => 'application/json'),
-            json_encode(['csp-report' => ['blocked-uri' => 'http://www.mytesturi.com']])
-        );
+        $data = [
+            'csp-report' => [
+                'blocked-uri' => 'http://www.mytesturi.com',
+                'user-data' => 'Symfony Browser'
+            ]];
+        self::$redis->rpush('csp', json_encode($data));
+        self::$redis->rpush('csp', json_encode($data));
+        self::$redis->rpush('csp', json_encode($data));
         $this->callCommand('3 CSP');
     }
 }

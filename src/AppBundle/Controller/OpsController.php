@@ -387,7 +387,7 @@ class OpsController extends BaseController
             $violationReport
         );
 
-        return new Response(json_encode($violationReport), 204);
+        return new Response('', 204);
     }
 
     /**
