@@ -101,6 +101,9 @@ class PolicyService
     /** @var SmsService */
     protected $sms;
 
+    /** @var SCodeService */
+    protected $scodeService;
+
     protected $warnMakeModelMismatch = true;
 
     public function setMailer($mailer)
@@ -156,6 +159,7 @@ class PolicyService
      * @param                  $rateLimit
      * @param                  $intercom
      * @param SmsService       $sms
+     * @param SCodeService     $scodeService
      */
     public function __construct(
         DocumentManager $dm,
@@ -177,7 +181,8 @@ class PolicyService
         $imeiValidator,
         $rateLimit,
         $intercom,
-        SmsService $sms
+        SmsService $sms,
+        SCodeService $scodeService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -199,6 +204,7 @@ class PolicyService
         $this->rateLimit = $rateLimit;
         $this->intercom = $intercom;
         $this->sms = $sms;
+        $this->scodeService = $scodeService;
     }
 
     private function validateUser($user)
@@ -396,17 +402,8 @@ class PolicyService
             }
 
             if (!$scode) {
-                $scode = $this->uniqueSCode($policy);
-                $shortLink = $this->branch->generateSCode($scode->getCode());
-                // branch is preferred, but can fallback to old website version if branch is down
-                if (!$shortLink) {
-                    $link = $this->routerService->generateUrl(
-                        'scode',
-                        ['code' => $scode->getCode()]
-                    );
-                    $shortLink = $this->shortLink->addShortLink($link);
-                }
-                $scode->setShareLink($shortLink);
+                $scode = $this->scodeService->generateSCode($policy->getUser(), SCode::TYPE_STANDARD);
+                $policy->addSCode($scode);
             }
 
             if ($prefix) {
@@ -548,36 +545,6 @@ class PolicyService
         if ($email) {
             $this->newPolicyEmail($policy, [$policySchedule, $policyTerms], $bcc);
         }
-    }
-
-    public function uniqueSCode($policy, $count = 0)
-    {
-        if ($count > 10) {
-            throw new \Exception('Too many unique scode attempts');
-        }
-
-        $repo = $this->dm->getRepository(SCode::class);
-        $scode = $policy->getStandardSCode();
-        if (!$scode) {
-            $existingCount = $repo->getCountForName(SCode::getNameForCode($policy->getUser(), SCode::TYPE_STANDARD));
-            $policy->createAddSCode($existingCount + 1 + $count);
-
-            return $this->uniqueSCode($policy, $count + 1);
-        }
-
-        // scode created during the policy generation should not yet be persisted to the db
-        // so if it does exist, its a duplicate code
-        $exists = $repo->findOneBy(['code' => $scode->getCode()]);
-        if ($exists) {
-            // removing scode from policy seems to be problematic, so change code and make inactive
-            $scode->deactivate();
-            $existingCount = $repo->getCountForName(SCode::getNameForCode($policy->getUser(), SCode::TYPE_STANDARD));
-            $policy->createAddSCode($existingCount + 1 + $count);
-
-            return $this->uniqueSCode($policy, $count + 1);
-        }
-
-        return $scode;
     }
 
     public function generatePolicyTerms(Policy $policy)

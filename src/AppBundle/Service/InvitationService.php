@@ -459,10 +459,17 @@ class InvitationService
             throw new NotFoundHttpException();
         }
 
+        // If someone accidently enters a multipay code, transform request to the standard scode
+        if ($scode->isMultiPay()) {
+            $scode = $scode->getPolicy()->getStandardSCode();
+        }
+
         if ($scode->isStandard()) {
             $user = $scode->getPolicy()->getUser();
         } elseif ($scode->isReward()) {
             $user = $scode->getReward()->getUser();
+        } else {
+            throw new \Exception(sprintf('Unimplemented scode (%s) invitation (type: %s)', $code, $scode->getType()));
         }
 
         $this->validatePolicy($policy);
