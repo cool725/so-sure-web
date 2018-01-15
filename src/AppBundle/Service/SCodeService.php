@@ -70,7 +70,7 @@ class SCodeService
         $scode = new SCode();
         $scode->setType($type);
         $scodeRepo = $this->dm->getRepository(SCode::class);
-        print SCode::getNameForCode($user, $type) . PHP_EOL;
+        //print SCode::getNameForCode($user, $type) . PHP_EOL;
         $existingCount = $scodeRepo->getCountForName(
             SCode::getNameForCode($user, $type)
         );
@@ -93,7 +93,7 @@ class SCodeService
             }
             $count++;
         }
-        print $scode->getCode() . PHP_EOL;
+        //print $scode->getCode() . PHP_EOL;
 
         return $scode;
     }
