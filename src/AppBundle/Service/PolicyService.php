@@ -402,6 +402,16 @@ class PolicyService
             }
 
             if (!$scode) {
+                if ($scode = $policy->getStandardSCode()) {
+                    // scode created during the policy generation should not yet be persisted to the db
+                    // so if it does exist, its a duplicate code
+                    $scodeRepo = $this->dm->getRepository(SCode::class);
+                    $exists = $scodeRepo->findOneBy(['code' => $scode->getCode()]);
+                    if ($exists) {
+                        // removing scode from policy seems to be problematic, so change code and make inactive
+                        $scode->deactivate();
+                    }
+                }
                 $scode = $this->scodeService->generateSCode($policy->getUser(), SCode::TYPE_STANDARD);
                 $policy->addSCode($scode);
             }
