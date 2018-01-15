@@ -13,6 +13,8 @@ use AppBundle\Service\SixpackService;
 
 /**
  * @group functional-net
+ *
+ * AppBundle\\Tests\\Controller\\ApiPartialControllerTest
  */
 class ApiPartialControllerTest extends BaseControllerTest
 {
