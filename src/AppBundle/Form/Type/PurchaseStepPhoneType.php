@@ -119,14 +119,13 @@ class PurchaseStepPhoneType extends AbstractType
                 );
                 if ($ocr['success'] === false) {
                     $purchase->setFileValid(false);
+                    $s3key = $this->imeiService->saveFailedOcr($filename, $purchase->getUser()->getId());
                     $this->logger->warning(sprintf(
-                        'Failed to find imei for user: %s; picture saved in %s/%s ; ocr: %s',
+                        'Failed to find imei for user: %s; picture saved in %s ; ocr: %s',
                         $purchase->getUser()->getEmail(),
-                        BaseImeiService::S3_FAILED_OCR_FOLDER,
-                        $purchase->getUser()->getId(),
+                        $s3key,
                         $ocr['raw']
                     ));
-                    $this->imeiService->saveFailedOcr($filename, $purchase->getUser()->getId());
                 } else {
                     $purchase->setFileValid(true);
                     $purchase->setImei($ocr['imei']);
