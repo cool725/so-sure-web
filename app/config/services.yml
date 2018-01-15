@@ -198,6 +198,7 @@ services:
         calls:
             - [setLogger, ['@monolog.logger.receperio']]
             - [setDm, ['@doctrine_mongodb.odm.default_document_manager']]
+            - [setMountManager, ['@oneup_flysystem.mount_manager']]
             - [setRedis, ['@snc_redis.default']]
 
     app.imei:

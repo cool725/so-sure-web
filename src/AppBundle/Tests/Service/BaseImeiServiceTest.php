@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Service\BaseImeiService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\LostPhone;
 use AppBundle\Document\Phone;
@@ -22,6 +23,7 @@ class BaseImeiServiceTest extends WebTestCase
     protected static $dm;
     protected static $imei;
     protected static $rootDir;
+    protected static $filesystem;
 
     public static function setUpBeforeClass()
     {
@@ -39,6 +41,8 @@ class BaseImeiServiceTest extends WebTestCase
         self::$imei = self::$container->get('app.imei');
 
         self::$rootDir = self::$container->getParameter('kernel.root_dir');
+        self::$filesystem = self::$container->get('oneup_flysystem.mount_manager');
+
     }
 
     public function tearDown()
@@ -174,6 +178,7 @@ class BaseImeiServiceTest extends WebTestCase
 
         $results = self::$imei->ocr($image, 'Samsung');
         $this->assertNotNull($results);
+        $this->assertTrue($results['success']);
         $this->assertEquals('353498080807133', $results['imei']);
     }
 
@@ -186,6 +191,7 @@ class BaseImeiServiceTest extends WebTestCase
 
         $results = self::$imei->ocr($image, 'Apple');
         $this->assertNotNull($results);
+        $this->assertTrue($results['success']);
         $this->assertEquals('355424073417084', $results['imei']);
         $this->assertNull($results['serialNumber']);
     }
@@ -199,6 +205,7 @@ class BaseImeiServiceTest extends WebTestCase
 
         $results = self::$imei->ocr($image, 'Apple');
         $this->assertNotNull($results);
+        $this->assertTrue($results['success']);
         $this->assertEquals('355424073417084', $results['imei']);
         $this->assertEquals('C77QMB7SGRY9', $results['serialNumber']);
     }
@@ -212,6 +219,7 @@ class BaseImeiServiceTest extends WebTestCase
 
         $results = self::$imei->ocr($image, 'Apple');
         $this->assertNotNull($results);
+        $this->assertTrue($results['success']);
         $this->assertEquals('355424073417084', $results['imei']);
         $this->assertEquals('C77QMB7SGRY9', $results['serialNumber']);
     }
@@ -225,6 +233,7 @@ class BaseImeiServiceTest extends WebTestCase
 
         $results = self::$imei->ocr($image, 'Apple');
         $this->assertNotNull($results);
+        $this->assertTrue($results['success']);
         $this->assertEquals('355424073417084', $results['imei']);
         $this->assertEquals('C77QMB7SGRY9', $results['serialNumber']);
     }
@@ -238,6 +247,7 @@ class BaseImeiServiceTest extends WebTestCase
 
         $results = self::$imei->ocr($image, 'Apple');
         $this->assertNotNull($results);
+        $this->assertTrue($results['success']);
         $this->assertEquals('359406087220311', $results['imei']);
         $this->assertEquals('F17VQLU1JCLJ', $results['serialNumber']);
     }
@@ -250,7 +260,8 @@ class BaseImeiServiceTest extends WebTestCase
         );
 
         $results = self::$imei->ocr($image, 'Apple');
-        $this->assertNull($results);
+        $this->assertNotNull($results);
+        $this->assertFalse($results['success']);
     }
 
     public function testOcrError()
@@ -271,5 +282,39 @@ SEID";
         $results = self::$imei->parseOcr($data, 'Apple');
         $this->assertEquals('355424073417084', $results['imei']);
         $this->assertEquals('C77QMB7SGRY9', $results['serialNumber']);
+    }
+
+    public function testOcrFailed()
+    {
+        $time = time();
+        $userId = 111;
+        $image = sprintf(
+            "%s/../src/AppBundle/Tests/Resources/iPhoneXSettings.png",
+            self::$rootDir
+        );
+        // create temporary image
+        $testImage = sprintf(
+            "%s/%s_OcrFail.png",
+            sys_get_temp_dir(),
+            $time
+        );
+        copy($image, $testImage);
+        // expecting failure
+        $results = self::$imei->ocr($testImage, 'Samsung');
+        $this->assertNotNull($results);
+        $this->assertFalse($results['success']);
+        self::$imei->saveFailedOcr($testImage, $userId);
+        //check if file is on S3, remove local and remote copy
+        $path = pathinfo($testImage);
+        $s3Key = sprintf(
+            '%s/%s/%s',
+            BaseImeiService::S3_FAILED_OCR_FOLDER,
+            $userId,
+            $path['basename']
+        );
+        $fs = self::$filesystem->getFilesystem('s3policy_fs');
+        $this->assertTrue($fs->has($s3Key));
+        $fs->delete($s3Key);
+        unlink($testImage);
     }
 }

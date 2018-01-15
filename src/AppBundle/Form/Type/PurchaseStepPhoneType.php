@@ -2,6 +2,7 @@
 
 namespace AppBundle\Form\Type;
 
+use AppBundle\Service\BaseImeiService;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -116,13 +117,14 @@ class PurchaseStepPhoneType extends AbstractType
                     $purchase->getPhone()->getMake(),
                     $filename->guessExtension()
                 );
-                if ($ocr === null) {
+                if ($ocr['success'] === false) {
                     $purchase->setFileValid(false);
-                    $raw = $this->imeiService->ocrRaw($filename);
+                    $s3key = $this->imeiService->saveFailedOcr($filename, $purchase->getUser()->getId());
                     $this->logger->warning(sprintf(
-                        'Failed to find imei for user %s ocr: %s',
+                        'Failed to find imei for user: %s; picture saved in %s ; ocr: %s',
                         $purchase->getUser()->getEmail(),
-                        $raw
+                        $s3key,
+                        $ocr['raw']
                     ));
                 } else {
                     $purchase->setFileValid(true);
