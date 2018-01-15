@@ -123,6 +123,15 @@ services:
             - "@event_dispatcher"
             - "@app.mixpanel"
 
+    app.scode:
+        class: AppBundle\Service\SCodeService
+        arguments:
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "@app.router"
+            - "@app.shortlink"
+            - "@app.branch"
+
     app.digits:
         class: AppBundle\Service\DigitsService
         arguments:
@@ -401,6 +410,7 @@ services:
             - "@app.ratelimit"
             - "@app.intercom"
             - "@app.sms"
+            - "@app.scode"
 
     app.quote:
         class: AppBundle\Service\QuoteService
