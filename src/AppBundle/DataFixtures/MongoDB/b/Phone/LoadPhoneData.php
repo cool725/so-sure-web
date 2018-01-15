@@ -27,7 +27,7 @@ abstract class LoadPhoneData implements ContainerAwareInterface
             $date = new \DateTime('2016-01-01');
         }
         $file = sprintf(
-            "%s/../src/AppBundle/DataFixtures/%s",
+            "%s/../src/AppBundle/DataFixtures/PhoneData/%s",
             $this->container->getParameter('kernel.root_dir'),
             $filename
         );
