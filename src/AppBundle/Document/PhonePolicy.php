@@ -116,9 +116,28 @@ class PhonePolicy extends Policy
      */
     protected $picSureApprovedDate;
 
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
+    protected $visitedWelcomePage;
+
     public function getPhone()
     {
         return $this->phone;
+    }
+
+    public function setVisitedWelcomePage(\DateTime $date)
+    {
+        if ($this->visitedWelcomePage == null) {
+            $this->visitedWelcomePage = $date;
+        }
+    }
+
+    public function getVisitedWelcomePage()
+    {
+        return $this->visitedWelcomePage;
     }
 
     public function setPhone(Phone $phone, \DateTime $date = null)

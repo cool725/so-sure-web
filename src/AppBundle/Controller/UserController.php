@@ -994,15 +994,39 @@ class UserController extends BaseController
      *   as these will impact Adwords
      *
      * @Route("/welcome", name="user_welcome")
+     * @Route("/welcome/{id}", name="user_welcome_policy_id")
      * @Template
      */
-    public function welcomeAction()
+    public function welcomeAction(Request $request, $id = null)
     {
+        $dm = $this->getManager();
         $user = $this->getUser();
+
         if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
             return new RedirectResponse($this->generateUrl('user_invalid_policy'));
         }
 
+        // fetch latest policy if none provided
+        if ($id === null) {
+            $policy = $user->getLatestPolicy();
+        } else {
+            $policyRepo = $dm->getRepository(Policy::class);
+            $policy = $policyRepo->findOneBy(['id' => $id, 'user' => $user]);
+        }
+        // if policy id was given and user does not match
+        if (!$policy) {
+            return new RedirectResponse($this->generateUrl('user_invalid_policy'));
+        }
+
+        if ($policy->getVisitedWelcomePage() == null) {
+            $date = new \DateTime();
+            $policy->setVisitedWelcomePage($date);
+            $dm->flush($policy);
+            $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_PURCHASE_POLICY, [
+                'Redirected Page' => $request->get('_route'),
+                'Policy Id' => $policy->getId()
+            ]);
+        }
         //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_LANDING_HOME);
         //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_CPC_QUOTE_MANUFACTURER);
         //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_PHONE_IMAGE);
