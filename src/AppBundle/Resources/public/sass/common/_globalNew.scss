@@ -174,12 +174,6 @@ mark {
 		text-decoration: underline !important;
 	}
 
-	.text-highlight {
-		padding: 3px 5px;
-        background-color: $off-white;
-		@include border-radius(3px);
-	}
-
 	// Backgrounds
 	.background-white {
 		background-color: $white;
