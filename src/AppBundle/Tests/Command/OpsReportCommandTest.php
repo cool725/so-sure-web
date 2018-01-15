@@ -16,12 +16,15 @@ class OpsReportCommandTest extends KernelTestCase
     protected static $container;
     protected static $redis;
     protected static $kernel;
+    protected static $client;
 
     public static function setUpBeforeClass()
     {
         //start the symfony kernel
         self::$kernel = static::createKernel();
         self::$kernel->boot();
+
+        self::$client = self::$kernel->getContainer()->get('test.client');
 
         //get the DI container
         self::$container = self::$kernel->getContainer();
@@ -100,5 +103,34 @@ class OpsReportCommandTest extends KernelTestCase
         $now = new \DateTime();
         self::$redis->hset('client-validation', json_encode($data), $now->format('U'));
         $this->callCommand('no validation');
+    }
+
+    public function testOpsReportCsp()
+    {
+        self::$client->request(
+            'POST',
+            '/ops/csp',
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json'),
+            json_encode(['csp-report' => ['blocked-uri' => 'http://www.mytesturi.com']])
+        );
+        self::$client->request(
+            'POST',
+            '/ops/csp',
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json'),
+            json_encode(['csp-report' => ['blocked-uri' => 'http://www.mytesturi.com']])
+        );
+        self::$client->request(
+            'POST',
+            '/ops/csp',
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json'),
+            json_encode(['csp-report' => ['blocked-uri' => 'http://www.mytesturi.com']])
+        );
+        $this->callCommand('3 CSP');
     }
 }
