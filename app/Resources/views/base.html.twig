@@ -58,6 +58,7 @@
                     'user': {
                         'id': undefined,
                     },
+                    'page_visited': {% if page_visited is not defined %}false{% else %}true{% endif %},
                     'intercom': {
                         'user_id': null,
                         'user_hash': null,
@@ -73,6 +74,7 @@
                         'referral': '{{ session_referral }}',
                         'scode': '{{ session_scode }}'
                     },
+                    'page_visited': {% if page_visited is not defined %}false{% else %}true{% endif %}
                     'user': {
                         'id': '{{ app.user.id }}'
                     },
