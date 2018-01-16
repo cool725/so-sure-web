@@ -9,17 +9,15 @@
     display: block;
 }
 
-
-
 .navbar-default .navbar-collapse {
-	background-color: $white;
-	border-top: 2px solid $grey-light;
-	border-bottom: 2px solid $grey-light;
+	background-color: $blue;
+    border-top: 1px solid $grey-light;
+    border-bottom: 1px solid $grey-light;
 }
 
 .navbar-default .navbar-nav > li > a {
     font-size: 14px;
-    color: $blue;
+    color: $white;
 
     &:hover {
     	color: darken($blue, 20%);
@@ -31,6 +29,10 @@
     	border-color: $black;
     	outline: none;
     	transition: all 0.3s ease;
+    }
+
+    @include breakpoint(laptop) {
+        color: $blue;
     }
 }
 
@@ -58,6 +60,10 @@
 			background-color: darken($blue, 20%);
 		}
 	}
+
+    @include breakpoint(laptop) {
+        display: none;
+    }
 }
 
 @include breakpoint(laptop) {
@@ -79,8 +85,7 @@
 }
 
 .navbar-sticky {
-    // border-bottom: 2px solid $blue;
-    box-shadow: 0 2px 15px 0px $grey;
+    box-shadow: 0 3px 5px rgba(57, 63, 72, 0.3);
 }
 
 // Secondary Nav

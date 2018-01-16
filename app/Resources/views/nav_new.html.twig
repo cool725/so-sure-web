@@ -6,13 +6,7 @@
             {% if distraction_free is defined and distraction_free == 1 %}
                 {# Show nothing #}
             {% else %}
-{#                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button> #}
-                <button class="navbar-toggle hamburger hamburger--spring-r hamburger--collapse"
+                <button class="hamburger hamburger--spring-r hamburger--collapse navbar-toggle"
                         type="button"
                         data-toggle="collapse"
                         data-target="#navbar"
@@ -50,16 +44,16 @@
                         {% endif %}
                         {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
                             <li>
-                                <span><a href="{{ path('homepage', {'_impersonate': '_exit'}) }}" class="btn btn-blue-hollow navbar-btn">Exit <strong>{{ app.user.email }}</strong></a></span>
+                                <span><a href="{{ path('homepage', {'_impersonate': '_exit'}) }}" class="btn navbar-btn">Exit <strong>{{ app.user.email }}</strong></a></span>
                             </li>
                         {% else %}
                             <li>
-                                <span><a href="{{ path('fos_user_security_logout') }}" class="btn btn-blue-hollow navbar-btn">Logout</a></span>
+                                <span><a href="{{ path('fos_user_security_logout') }}" class="btn navbar-btn">Logout</a></span>
                             </li>
                         {% endif %}
                     {% else %}
                         <li>
-                            <span><a href="{{ path('fos_user_security_login') }}" class="btn btn-blue-hollow navbar-btn"> Login</a></span>
+                            <span><a href="{{ path('fos_user_security_login') }}" class="btn navbar-btn"> Login</a></span>
                         </li>
                     {% endif %}
                 </ul>
