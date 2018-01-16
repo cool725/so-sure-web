@@ -364,7 +364,7 @@ class ReceperioServiceTest extends WebTestCase
             self::TEST_ANDROID_SERIAL_INVALID,
             null
         );
-        $this->assertContains(PhonePolicy::MAKEMODEL_VALID_SERIAL, self::$imei->getMakeModelValidatedStatus());
+        $this->assertContains(PhonePolicy::MAKEMODEL_VALID_IMEI, self::$imei->getMakeModelValidatedStatus());
     }
 
     public function testAndroidSerialValid()
@@ -374,7 +374,7 @@ class ReceperioServiceTest extends WebTestCase
             self::TEST_ANDROID_SERIAL_VALID,
             null
         );
-        $this->assertContains(PhonePolicy::MAKEMODEL_VALID_SERIAL, self::$imei->getMakeModelValidatedStatus());
+        $this->assertContains(PhonePolicy::MAKEMODEL_VALID_IMEI, self::$imei->getMakeModelValidatedStatus());
     }
 
     public function testCheckSerial(
@@ -384,22 +384,22 @@ class ReceperioServiceTest extends WebTestCase
     ) {
         switch ($serialNumber) {
             case self::TEST_IPHONE_IMEI_VALID:
-                self::$imei->setResponseData(unserialize(self::TEST_MSG_APP_IMEI));
+                self::$imei->setResponseData(unserialize(self::TEST_MSG_APP_IMEI), true);
                 break;
             case self::TEST_IPHONE_SERIAL_VALID:
-                self::$imei->setResponseData(unserialize(self::TEST_MSG_APP_SERIAL));
+                self::$imei->setResponseData(unserialize(self::TEST_MSG_APP_SERIAL), true);
                 break;
             case self::TEST_IPHONE_SERIAL_INVALID:
-                self::$imei->setResponseData(unserialize(self::TEST_MSG_APP_SERIAL));
+                self::$imei->setResponseData(unserialize(self::TEST_MSG_APP_SERIAL), true);
                 break;
             case self::TEST_IPHONE_SERIAL_INVALID2:
-                self::$imei->setResponseData(unserialize(self::TEST_MSG_APP_IMEI));
+                self::$imei->setResponseData(unserialize(self::TEST_MSG_APP_IMEI), true);
                 break;
             case self::TEST_ANDROID_SERIAL_INVALID:
-                self::$imei->setResponseData(unserialize(self::TEST_MSG_ANDROID_SERIAL));
+                self::$imei->setResponseData(unserialize(self::TEST_MSG_ANDROID_SERIAL), true);
                 break;
             case self::TEST_ANDROID_SERIAL_VALID:
-                self::$imei->setResponseData(unserialize(self::TEST_MSG_ANDROID_SERIAL));
+                self::$imei->setResponseData(unserialize(self::TEST_MSG_ANDROID_SERIAL), true);
                 break;
         }
         self::$imei->checkSerial(
@@ -408,6 +408,6 @@ class ReceperioServiceTest extends WebTestCase
             $imei
         );
 
-        self::$imei->setResponseData(null);
+        self::$imei->setResponseData(null, true);
     }
 }

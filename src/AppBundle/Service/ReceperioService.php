@@ -664,10 +664,6 @@ class ReceperioService extends BaseImeiService
             // If apple serial number doesn't work, try imei to get a non-memory match
             if ($phone->getMake() == 'Apple' && $imei) {
                 try {
-                    // clear response data in case it is not a test run
-                    if (!$this->isTestRun) {
-                        $this->responseData = null;
-                    }
                     return $this->runCheckSerial($phone, $imei, $user, $warnMismatch);
                 } catch (ReciperoManualProcessException $e) {
                     if (!in_array($e->getCode(), [ReciperoManualProcessException::EMPTY_MAKES,
@@ -708,11 +704,12 @@ class ReceperioService extends BaseImeiService
     ) {
         //dont run recipero if testrun
         if (!$this->isTestRun) {
+            //clear response data from previous request
+            $this->responseData = null;
             if (!$this->runMakeModelCheck($serialNumber, $user)) {
                 return false;
             }
         }
-        $isIMEI = $this->isImei($serialNumber);
         try {
             $this->validateSamePhone($phone, $serialNumber, $this->responseData, $warnMismatch);
         } catch (ReciperoManualProcessException $ex) {
@@ -744,15 +741,16 @@ class ReceperioService extends BaseImeiService
 
     /**
      *
-     * @param $data
+     * @param $data      string
+     * @param $isTestRun bool
      *
      * Sets response data for test cases to mimic recipero service response
      *
      */
-    public function setResponseData($data)
+    public function setResponseData($data, $isTestRun)
     {
         $this->responseData = $data;
-        $this->isTestRun = true;
+        $this->isTestRun = $isTestRun;
     }
 
     public function runMakeModelCheck(

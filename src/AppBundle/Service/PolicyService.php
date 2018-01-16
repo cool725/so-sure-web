@@ -245,6 +245,7 @@ class PolicyService
             throw new ImeiPhoneMismatchException();
         }
         $checkmend['serialResponse'] = $this->imeiValidator->getResponseData();
+        $checkmend['makeModelValidatedStatus'] = $this->imeiValidator->getMakeModelValidatedStatus();
 
         return $checkmend;
     }
@@ -288,7 +289,7 @@ class PolicyService
             $policy->addCheckmendCertData($checkmend['imeiCertId'], $checkmend['imeiResponse']);
             $policy->addCheckmendSerialData($checkmend['serialResponse']);
             // saving final finaly checkmendcert based status
-            $policy->setMakemodelValidatedStatus($this->imeiValidator->getMakemodelValidatedStatus());
+            $policy->setMakemodelValidatedStatus($checkmend['makemodelValidatedStatus']);
             return $policy;
         } catch (InvalidPremiumException $e) {
             $this->dispatchEvent(
