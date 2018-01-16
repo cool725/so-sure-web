@@ -281,6 +281,11 @@ class PurchaseController extends BaseController
             $policy = $user->getUnInitPolicy();
         }
 
+        $this->get('app.sixpack')->convert(
+            SixpackService::EXPERIMENT_FUNNEL_V1_V2,
+            SixpackService::KPI_RECEIVE_DETAILS
+        );
+
         if ($policy) {
             if (!$phone && $policy->getPhone()) {
                 $phone = $policy->getPhone();
