@@ -231,7 +231,8 @@ class PurchaseController extends BaseController
                 ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
                 ['memory' => 'asc']
             ) : null,
-            'postcode' => $this->sixpack($request, SixpackService::EXPERIMENT_POSTCODE, ['comma', 'split', 'type']),
+            // 'postcode' => $this->sixpack($request, SixpackService::EXPERIMENT_POSTCODE, ['comma', 'split', 'type']),
+            'postcode' => 'comma',
         );
 
         return $this->render('AppBundle:Purchase:purchaseStepPersonalAddress.html.twig', $data);
@@ -317,7 +318,7 @@ class PurchaseController extends BaseController
         $webpay = null;
         $allowPayment = true;
 
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_POSTCODE);
+        //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_POSTCODE);
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('purchase_form')) {
                 $purchaseForm->handleRequest($request);
