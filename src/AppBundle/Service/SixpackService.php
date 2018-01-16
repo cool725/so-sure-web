@@ -36,6 +36,9 @@ class SixpackService
     const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';
     const ALTERNATIVES_APP_SHARE_METHOD_API = 'api';
 
+    const KPI_STANDARD = 'standard';
+    const KPI_RECEIVE_DETAILS = 'receive-details';
+
     // Completed test - SW-45
     // const EXPERIMENT_QUOTE_CALC_LOWER = 'quote-calc-lower';
 
@@ -121,12 +124,12 @@ class SixpackService
         return $result;
     }
 
-    public function convert($experiment, $expectParticipating = false)
+    public function convert($experiment, $kpi = null, $expectParticipating = false)
     {
-        $unauth = $this->convertByClientId($this->requestService->getTrackingId(), $experiment);
+        $unauth = $this->convertByClientId($this->requestService->getTrackingId(), $experiment, $kpi);
         $auth = null;
         if ($user = $this->requestService->getUser()) {
-            $auth = $this->convertByClientId($user->getId(), $experiment);
+            $auth = $this->convertByClientId($user->getId(), $experiment, $kpi);
         }
 
         if (!$unauth && !$auth && $expectParticipating) {
@@ -145,13 +148,16 @@ class SixpackService
         }
     }
 
-    public function convertByClientId($clientId, $experiment)
+    public function convertByClientId($clientId, $experiment, $kpi = null)
     {
         try {
             $data = [
                 'experiment' => $experiment,
                 'client_id' => $clientId
             ];
+            if ($kpi !== null) {
+                $data['kpi'] = $kpi;
+            }
             $query = http_build_query($data);
             $url = sprintf('%s/convert?%s', $this->url, $query);
             $client = new Client();
