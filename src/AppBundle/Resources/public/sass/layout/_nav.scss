@@ -19,6 +19,11 @@
     background-color: $blue;
     max-height: none;
     height: 100vh;
+
+    @include breakpoint(laptop) {
+        background-color: $white;
+        height: inherit;
+    }
 }
 
 .navbar-default .navbar-nav > li > a {
