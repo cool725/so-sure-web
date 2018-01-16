@@ -711,19 +711,14 @@ class ReceperioService extends BaseImeiService
             }
         }
         try {
-            $this->validateSamePhone($phone, $serialNumber, $this->responseData, $warnMismatch);
+            $this->setMakemodelValidatedStatus(
+                $this->validateSamePhone($phone, $serialNumber, $this->responseData, $warnMismatch)
+            );
+            return true;
         } catch (ReciperoManualProcessException $ex) {
             $this->setMakemodelValidatedStatus($this->generateMakemodelValidationStatusCode($ex->getCode()));
-            if (in_array(
-                $ex->getCode(),
-                array(
-                    ReciperoManualProcessException::VALID_SERIAL,
-                    ReciperoManualProcessException::VALID_IMEI
-                )
-            )
-            ) {
-                return true;
-            } elseif ($ex->getCode() == ReciperoManualProcessException::NOT_VALID) {
+
+            if ($ex->getCode() == ReciperoManualProcessException::NOT_VALID) {
                 return false;
             }
             throw $ex;
@@ -1023,11 +1018,11 @@ class ReceperioService extends BaseImeiService
             );
         }
         if ($isApple && $isIMEI && $result) {
-            throw new ReciperoManualProcessException("Success Apple", ReciperoManualProcessException::VALID_IMEI);
+            return PhonePolicy::MAKEMODEL_VALID_IMEI;
         } elseif ($isApple && !$isIMEI && $result) {
-            throw new ReciperoManualProcessException("Success Apple", ReciperoManualProcessException::VALID_SERIAL);
+            return PhonePolicy::MAKEMODEL_VALID_SERIAL;
         } elseif (!$isApple && $result) {
-            throw new ReciperoManualProcessException("Success", ReciperoManualProcessException::VALID_IMEI);
+            return PhonePolicy::MAKEMODEL_VALID_IMEI;
         }
 
         throw new ReciperoManualProcessException("Fail", ReciperoManualProcessException::NOT_VALID);
@@ -1165,10 +1160,6 @@ class ReceperioService extends BaseImeiService
                 return PhonePolicy::MAKEMODEL_MAKE_MISMATCH;
             case ReciperoManualProcessException::NO_MODELS:
                 return PhonePolicy::MAKEMODEL_NO_MODELS;
-            case ReciperoManualProcessException::VALID_SERIAL:
-                return PhonePolicy::MAKEMODEL_VALID_SERIAL;
-            case ReciperoManualProcessException::VALID_IMEI:
-                return PhonePolicy::MAKEMODEL_VALID_IMEI;
             case ReciperoManualProcessException::NOT_VALID:
                 return PhonePolicy::MAKEMODEL_NOT_VALID;
             case ReciperoManualProcessException::NO_MEMORY:

@@ -19,10 +19,8 @@ class ReciperoManualProcessException extends \Exception
     const NO_MODELREFERENCE = 17;
     const EMPTY_MAKES = 18;
     const UNKNOWN_STATUS = 19;
-    const VALID_IMEI = 20;
     const SERIAL_MISMATCH = 21;
     const MODEL_MISMATCH = 22;
-    const VALID_SERIAL = 23;
     const DEVICE_NOT_FOUND = 24;
     const NOT_VALID = 25;
 }

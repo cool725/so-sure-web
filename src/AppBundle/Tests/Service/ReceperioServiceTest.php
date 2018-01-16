@@ -77,7 +77,7 @@ class ReceperioServiceTest extends WebTestCase
     public function callValidateSamePhone($phone, $device, $data = array())
     {
         try {
-            self::$imei->validateSamePhone($phone, $device, $data);
+            return self::$imei->validateSamePhone($phone, $device, $data);
         } catch (ReciperoManualProcessException $e) {
             return $e->getCode();
         }
@@ -136,7 +136,7 @@ class ReceperioServiceTest extends WebTestCase
         $models[] = ['name' => 'iPhone 5', 'storage' => '64GB'];
         $data['makes'][] = ['make' => 'Apple', 'models' => $models];
         $this->assertEquals(
-            ReciperoManualProcessException::VALID_SERIAL,
+            PhonePolicy::MAKEMODEL_VALID_SERIAL,
             $this->callValidateSamePhone(static::$phoneA, '123', $data)
         );
     }
@@ -146,7 +146,7 @@ class ReceperioServiceTest extends WebTestCase
         $models[] = ['name' => 'A', 'storage' => '64GB', 'modelreference' => 'A0001'];
         $data['makes'][] = ['make' => 'A', 'models' => $models];
         $this->assertEquals(
-            ReciperoManualProcessException::VALID_IMEI,
+            PhonePolicy::MAKEMODEL_VALID_IMEI,
             $this->callValidateSamePhone(static::$phoneB, '123', $data)
         );
     }
@@ -156,7 +156,7 @@ class ReceperioServiceTest extends WebTestCase
         $models[] = ['name' => 'GALAXY S7 EDGE', 'storage' => '', 'modelreference' => 'HERO2LTE'];
         $data['makes'][] = ['make' => 'A', 'models' => $models];
         $this->assertEquals(
-            ReciperoManualProcessException::VALID_IMEI,
+            PhonePolicy::MAKEMODEL_VALID_IMEI,
             $this->callValidateSamePhone(static::$phoneC, '123', $data)
         );
     }
@@ -166,7 +166,7 @@ class ReceperioServiceTest extends WebTestCase
         $models[] = ['name' => '3', 'storage' => '', 'modelreference' => 'ONEPLUS3'];
         $data['makes'][] = ['make' => 'ONEPLUS', 'models' => $models];
         $this->assertEquals(
-            ReciperoManualProcessException::VALID_IMEI,
+            PhonePolicy::MAKEMODEL_VALID_IMEI,
             $this->callValidateSamePhone(static::$phoneD, '123', $data)
         );
     }
@@ -197,7 +197,7 @@ class ReceperioServiceTest extends WebTestCase
         $models[] = ['name' => 'A', 'storage' => '16GB', 'modelreference' => 'A0001'];
         $data['makes'][] = ['make' => 'A', 'models' => $models];
         $this->assertEquals(
-            ReciperoManualProcessException::VALID_IMEI,
+            PhonePolicy::MAKEMODEL_VALID_IMEI,
             $this->callValidateSamePhone(static::$phoneB, $this->generateRandomImei(), $data)
         );
     }
@@ -241,7 +241,7 @@ class ReceperioServiceTest extends WebTestCase
         $models[] = ['name' => 'iPhone 5', 'storage' => '64GB', 'color' => 'black'];
         $data['makes'][] = ['make' => 'Apple', 'models' => $models];
         $this->assertEquals(
-            ReciperoManualProcessException::VALID_SERIAL,
+            PhonePolicy::MAKEMODEL_VALID_SERIAL,
             $this->callValidateSamePhone(static::$phoneA, '123', $data)
         );
     }
@@ -271,7 +271,7 @@ class ReceperioServiceTest extends WebTestCase
         $models[] = ['name' => 'iPhone 5', 'storage' => '16GB', 'color' => 'white'];
         $data['makes'][] = ['make' => 'Apple', 'models' => $models];
         $this->assertEquals(
-            ReciperoManualProcessException::VALID_IMEI,
+            PhonePolicy::MAKEMODEL_VALID_IMEI,
             $this->callValidateSamePhone(static::$phoneA, $this->generateRandomImei(), $data)
         );
     }
