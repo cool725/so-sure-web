@@ -15,6 +15,7 @@ use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use AppBundle\Classes\Salva;
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\Invitation\EmailInvitation;
 
 /**
  * @group functional-net
@@ -1038,18 +1039,28 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function testPhoneSearchPhoneInsuranceSamsung()
     {
+        //make sure phone is highlighted
+        $phoneRepo = self::$dm->getRepository(Phone::class);
+        $phone = $phoneRepo->findOneBy(['make' => 'Samsung', 'active' => true]);
+        $phone->setHighlight(true);
+        self::$dm->flush();
         $crawler = self::$client->request('GET', '/phone-insurance/Samsung');
         $data = self::$client->getResponse();
         $this->assertEquals(200, $data->getStatusCode());
-        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
+        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 2);
     }
 
     public function testPhoneSearchInsureSamsung()
     {
+        //make sure phone is highlighted
+        $phoneRepo = self::$dm->getRepository(Phone::class);
+        $phone = $phoneRepo->findOneBy(['make' => 'Samsung', 'active' => true]);
+        $phone->setHighlight(true);
+        self::$dm->flush();
         $crawler = self::$client->request('GET', '/insure/Samsung');
         $data = self::$client->getResponse();
         $this->assertEquals(200, $data->getStatusCode());
-        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
+        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 2);
     }
 
     public function testPhoneSearchInsuranceCrackedScreen()
@@ -1111,6 +1122,69 @@ class PurchaseControllerTest extends BaseControllerTest
     public function testPhoneSearchVSThree()
     {
         $crawler = self::$client->request('GET', '/so-sure-vs-three-phone-insurance');
+        $data = self::$client->getResponse();
+        $this->assertEquals(200, $data->getStatusCode());
+        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
+    }
+
+    public function testPhoneSearchUserInvalidPolicy()
+    {
+        $email = self::generateEmail('testPhoneSearchUserInvalid', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        self::$dm->flush();
+        $crawler = $this->login($email, $password, 'user/invalid');
+        $data = self::$client->getResponse();
+        $this->assertEquals(200, $data->getStatusCode());
+        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
+    }
+    public function testPhoneSearchInvitation()
+    {
+        //generate user, policy and invitation
+        $email = self::generateEmail('testPhoneSearchInvitation', $this);
+        $emailInvitee = self::generateEmail('testPhoneSearchInvitationInvitee', $this);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            'foo',
+            null,
+            self::$dm
+        );
+        $phone = self::getRandomPhone(self::$dm);
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+
+        $invitation = new EmailInvitation();
+        $invitation->setPolicy($policy);
+        $invitation->setStatus(EmailInvitation::STATUS_SENT);
+        $invitation->setEmail($emailInvitee);
+        self::$dm->persist($invitation);
+
+        $url = sprintf('/invitation/%s', $invitation->getId());
+        $crawler = self::$client->request('GET', $url);
+        $data = self::$client->getResponse();
+        $this->assertEquals(200, $data->getStatusCode());
+        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
+    }
+
+    public function testPhoneSearchAppleUpcomingSplit()
+    {
+        $crawler = self::$client->request('GET', '/phone-insurance/Apple+Upcoming?force=split');
+        $data = self::$client->getResponse();
+        $this->assertEquals(200, $data->getStatusCode());
+        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
+    }
+
+    public function testPhoneSearchAppleUpcomingOld()
+    {
+        $crawler = self::$client->request('GET', '/phone-insurance/Apple+Upcoming?force=old');
         $data = self::$client->getResponse();
         $this->assertEquals(200, $data->getStatusCode());
         self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
