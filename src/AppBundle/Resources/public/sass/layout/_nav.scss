@@ -17,12 +17,9 @@
 
 .navbar-default.nav-new .navbar-collapse {
     background-color: $blue;
-    max-height: none;
-    height: 100vh;
 
     @include breakpoint(laptop) {
         background-color: $white;
-        height: inherit;
     }
 }
 
