@@ -10,9 +10,15 @@
 }
 
 .navbar-default .navbar-collapse {
-	background-color: $blue;
+	background-color: $white;
     border-top: 1px solid $grey-light;
     border-bottom: 1px solid $grey-light;
+}
+
+.navbar-default.nav-new .navbar-collapse {
+    background-color: $blue;
+    max-height: none;
+    height: 100vh;
 }
 
 .navbar-default .navbar-nav > li > a {
