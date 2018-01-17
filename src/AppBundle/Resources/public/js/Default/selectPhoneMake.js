@@ -50,7 +50,7 @@ sosure.selectPhoneMake = (function() {
         self.sendSearch(page);
         if (typeof self.fuse !== 'undefined') {
             results = self.fuse.search(q);
-            //results.sort(function(a, b){return b.score - a.score}); 
+            //results.sort(function(a, b){return b.score - a.score});
             //console.log(results);
             sync(results);
         } else {
@@ -155,7 +155,6 @@ $(function(){
                         '<div class="tt-menu-right hidden-xs hidden-sm"><i class="fa fa-angle-down" aria-hidden="true"></i>  SELECT FOR INSTANT QUOTE <i class="fa fa-angle-down" aria-hidden="true"></i></div>',
                     '</div>'
                 ].join('\n'),
-                //suggestion: doT.template('<div class="clearfix"><div class="tt-menu-left tt-menu-pad">{{=it.item.name}} - {{=it.score}}</span></div><div class="tt-menu-right">{{~it.item.sizes :value}}<a href="'+base_path+'{{=value.id}}'+path_suffix+'" class="btn-tt">{{=value.memory}}GB</a> {{~}}</div></div>')
                 suggestion: doT.template('<div class="clearfix"><div class="tt-menu-left tt-menu-pad" data-score="{{=it.score}}">{{=it.item.name}}</div><div class="tt-menu-right">{{~it.item.sizes :value}}<a href="'+base_path+'{{=value.id}}'+path_suffix+'" class="btn-tt">{{=value.memory}}GB</a> {{~}}</div></div>')
             }
         });
@@ -170,11 +169,24 @@ $(function(){
 
         // On select add class to row
         $(input).bind('typeahead:select', function(ev, suggestion) {
-            sosure.selectPhoneMake.setFormAction(suggestion.id, form);
 
-            var path_suggestion = sosure.selectPhoneMake.getFormAction(suggestion.id, form);
+            // var form = $(ev.target).closest('form');
 
-            $('.tt-suggestion').find('a[href="'+path_suggestion+'"]').parent().parent().addClass('tt-selected').siblings().removeClass('tt-selected');
+            sosure.selectPhoneMake.setFormAction(suggestion.item.id, form);
+
+            var path_suggestion = sosure.selectPhoneMake.getFormAction(suggestion.item.id, form);
+
+            // Check memory options
+            var link_count = suggestion.item.sizes.length;
+
+            // If less than 1 forward to option when selected anywhere on the suggestion
+            if (link_count == 1) {
+                var link_to_go = $('.tt-suggestion').find('a[href="'+path_suggestion+'"]').attr('href');
+                window.location.href = link_to_go;
+            } else {
+                // If more than 1 option highlight the buttons to alert the user there are options
+                $('.tt-suggestion').find('a[href="'+path_suggestion+'"]').parent().parent().addClass('tt-selected').siblings().removeClass('tt-selected');
+            }
 
             menuHold();
         });
