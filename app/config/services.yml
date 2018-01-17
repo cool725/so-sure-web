@@ -755,6 +755,7 @@ services:
             - "@logger"
             - "@app.mailer"
             - "@app.sanctions"
+            - "@snc_redis.default"
         tags:
             -  { name: kernel.event_listener, event: event.user.created, method: onUserCreatedEvent }
             -  { name: kernel.event_listener, event: event.company.created, method: onCompanyCreatedEvent }

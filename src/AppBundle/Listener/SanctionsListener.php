@@ -8,6 +8,7 @@ use AppBundle\Event\CompanyEvent;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\SanctionsService;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Snc\RedisBundle;
 use Psr\Log\LoggerInterface;
 
 class SanctionsListener
@@ -23,22 +24,28 @@ class SanctionsListener
 
     protected $sanctions;
 
+    protected $redis;
+
+    const SANCTIONS_LISTENER_REDIS_KEY = 'sanctions_email_queue';
     /**
      * @param DocumentManager  $dm
      * @param LoggerInterface  $logger
      * @param MailerService    $mailer
      * @param SanctionsService $sanctions
+     * @param                  $redis
      */
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
         MailerService $mailer,
-        SanctionsService $sanctions
+        SanctionsService $sanctions,
+        $redis
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->mailer = $mailer;
         $this->sanctions = $sanctions;
+        $this->redis = $redis;
     }
 
     /**
@@ -49,11 +56,9 @@ class SanctionsListener
         $user = $event->getUser();
         $matches = $this->sanctions->checkUser($user);
         if (count($matches) > 0) {
-            $this->mailer->sendTemplate(
-                sprintf('Sanctions Verification Required for %s', $user->getName()),
-                'tech@so-sure.com',
-                'AppBundle:Email:user/admin_sanctions.html.twig',
-                ['user' => $user, 'matches' => json_encode($matches)]
+            $this->redis->rpush(
+                self::SANCTIONS_LISTENER_REDIS_KEY,
+                serialize(['user' => $user, 'matches' => $matches])
             );
         }
     }
@@ -66,12 +71,11 @@ class SanctionsListener
         $company = $event->getCompany();
         $matches = $this->sanctions->checkCompany($company);
         if (count($matches) > 0) {
-            $this->mailer->sendTemplate(
-                sprintf('Sanctions Verification Required for %s', $company->getName()),
-                'tech@so-sure.com',
-                'AppBundle:Email:company/admin_sanctions.html.twig',
-                ['company' => $company, 'matches' => json_encode($matches)]
+            $this->redis->rpush(
+                self::SANCTIONS_LISTENER_REDIS_KEY,
+                serialize(['company' => $company, 'matches' => $matches])
             );
         }
     }
 }
+
