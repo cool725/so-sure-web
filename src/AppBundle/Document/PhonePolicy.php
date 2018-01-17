@@ -128,11 +128,12 @@ class PhonePolicy extends Policy
         return $this->phone;
     }
 
-    public function setVisitedWelcomePage(\DateTime $date)
+    public function setVisitedWelcomePage(\DateTime $date, $forceUpdate = false)
     {
-        if ($this->visitedWelcomePage == null) {
-            $this->visitedWelcomePage = $date;
+        if ($this->visitedWelcomePage !== null && !$forceUpdate) {
+            return;
         }
+            $this->visitedWelcomePage = $date;
     }
 
     public function getVisitedWelcomePage()

@@ -1023,7 +1023,11 @@ class UserController extends BaseController
             $date = new \DateTime();
             $policy->setVisitedWelcomePage($date);
             $dm->flush($policy);
+            $pageVisited = 'false';
+        } else {
+            $pageVisited = 'true';
         }
+
         //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_LANDING_HOME);
         //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_CPC_QUOTE_MANUFACTURER);
         //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_PHONE_IMAGE);
@@ -1052,10 +1056,10 @@ class UserController extends BaseController
 
         return array(
             'policy_key' => $this->getParameter('policy_key'),
-            'policy' => $user->getLatestPolicy()
+            'policy' => $user->getLatestPolicy(),
+            'page_visited' => $pageVisited
         );
     }
-
     /**
      * @Route("/payment-details", name="user_card_details")
      * @Route("/payment-details/{policyId}", name="user_card_details_policy",
