@@ -155,6 +155,7 @@ $(function(){
                         '<div class="tt-menu-right hidden-xs hidden-sm"><i class="fa fa-angle-down" aria-hidden="true"></i>  SELECT FOR INSTANT QUOTE <i class="fa fa-angle-down" aria-hidden="true"></i></div>',
                     '</div>'
                 ].join('\n'),
+                //suggestion: doT.template('<div class="clearfix"><div class="tt-menu-left tt-menu-pad">{{=it.item.name}} - {{=it.score}}</span></div><div class="tt-menu-right">{{~it.item.sizes :value}}<a href="'+base_path+'{{=value.id}}'+path_suffix+'" class="btn-tt">{{=value.memory}}GB</a> {{~}}</div></div>')
                 suggestion: doT.template('<div class="clearfix"><div class="tt-menu-left tt-menu-pad" data-score="{{=it.score}}">{{=it.item.name}}</div><div class="tt-menu-right">{{~it.item.sizes :value}}<a href="'+base_path+'{{=value.id}}'+path_suffix+'" class="btn-tt">{{=value.memory}}GB</a> {{~}}</div></div>')
             }
         });
