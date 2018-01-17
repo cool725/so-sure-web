@@ -745,10 +745,12 @@ class PolicyService
             $policy->setPremiumInstallments(1);
             $this->dm->flush();
             $this->regenerateScheduledPayments($policy);
+            $this->dm->flush();
         } elseif ($policy->getPremiumPlan() == Policy::PLAN_YEARLY) {
             $policy->setPremiumInstallments(12);
             $this->dm->flush();
             $this->regenerateScheduledPayments($policy);
+            $this->dm->flush();
         }
     }
 
