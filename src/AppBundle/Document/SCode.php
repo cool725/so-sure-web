@@ -111,7 +111,7 @@ class SCode
         $lastName = str_pad($user->getLastName(), $length, "0");
         $name = sprintf("%s%s%s", $prefix, substr($firstName, 0, 1), substr($lastName, 0, $length - 1));
 
-        return trim($name);
+        return trim(strtolower($name));
     }
 
     public static function getPrefix($type)
@@ -290,6 +290,11 @@ class SCode
     public function isReward()
     {
         return $this->getType() == self::TYPE_REWARD;
+    }
+
+    public function isMultiPay()
+    {
+        return $this->getType() == self::TYPE_MULTIPAY;
     }
 
     public function toApiArray()

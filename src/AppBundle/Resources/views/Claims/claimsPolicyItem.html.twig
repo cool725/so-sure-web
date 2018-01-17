@@ -467,9 +467,9 @@
                         <td  style="width: 10%;" class="{% if claim.crimeRef|length > 0 %}{% if claim.validCrimeRef %}success{% elseif not claim.validCrimeRef %}danger{% endif %}{% endif %}">
                           {{ claim.crimeRef }}
                         </td>
-                        <td style="width: 10%;" class="{% if claim.initialSuspection or claim.finalSuspection or claim.shouldCancelPolicy %}danger{% endif %}">
-                            {% if claim.initialSuspection %}Initial Suspection;{% endif %}
-                          {% if claim.finalSuspection %}Final Suspection;{% endif %}
+                        <td style="width: 10%;" class="{% if claim.initialSuspicion or claim.finalSuspicion or claim.shouldCancelPolicy %}danger{% endif %}">
+                            {% if claim.initialSuspicion %}Initial Suspicion;{% endif %}
+                          {% if claim.finalSuspicion %}Final Suspicion;{% endif %}
                           {% if claim.shouldCancelPolicy %}Policy should be cancelled;{% endif %}
                         </td>
                         <td style="width: 20%;">{{ claim.notes }}
@@ -506,9 +506,9 @@
                         <td  style="width: 10%;" class="{% if claim.crimeRef|length > 0 %}{% if claim.validCrimeRef %}success{% elseif not claim.validCrimeRef %}danger{% endif %}{% endif %}">
                           {{ claim.crimeRef }}
                         </td>
-                        <td style="width: 10%;" class="{% if claim.initialSuspection or claim.finalSuspection or claim.shouldCancelPolicy %}danger{% endif %}">
-                            {% if claim.initialSuspection %}Initial Suspection;{% endif %}
-                            {% if claim.finalSuspection %}Final Suspection;{% endif %}
+                        <td style="width: 10%;" class="{% if claim.initialSuspicion or claim.finalSuspicion or claim.shouldCancelPolicy %}danger{% endif %}">
+                            {% if claim.initialSuspicion %}Initial Suspicion;{% endif %}
+                            {% if claim.finalSuspicion %}Final Suspicion;{% endif %}
                             {% if claim.shouldCancelPolicy %}Policy should be cancelled;{% endif %}
                         </td>
                         <td style="width: 30%;">{{ claim.notes }}</td>
@@ -648,7 +648,42 @@
         </div>
       {% if is_granted('ROLE_EMPLOYEE') %}
         <div role="tabpanel" class="tab-pane" id="admin">
-            <h3>Admin</h3>
+            <h3>Common Actions</h3>
+            <table class="table table-striped">
+                {% if policy.premiumPlan == 'monthly' %}
+                <tr>
+                    <td>Billing day of month</td>
+                    <td>
+                        {{ form_start(billing_form, {'attr': {'class': 'form-inline'}}) }}
+                        {{ form_widget(billing_form.day) }}
+                        {{ form_widget(billing_form.update, {'label': 'Change billing date', 'attr': {'class': 'btn btn-danger confirm-usertoken-clear'}}) }}
+                        {{ form_end(billing_form) }}
+                        {% if not policy.isPolicyPaidToDate %}<strong>Policy must be paid to date before update is allowed</strong>{% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td>
+                        Regenerate Policy Terms & Schedule<br />(Name change, etc)
+                    </td>
+                    <td>
+                        {{ form_start(regenerate_policy_schedule_form, {'attr': {'class': 'form-inline'}}) }}
+                        {{ form_widget(regenerate_policy_schedule_form.regenerate, {'label': 'Regenerate', 'attr': {'class': 'btn btn-danger confirm-regenerate-schedule'}}) }}
+                        {{ form_end(regenerate_policy_schedule_form) }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Resend Policy Welcome Email
+                    </td>
+                    <td>
+                        {{ form_start(resend_email_form, {'attr': {'class': 'form-inline'}}) }}
+                        {{ form_widget(resend_email_form.resend, {'label': 'Resend Email', 'attr': {'class': 'btn btn-danger confirm-resend-email'}}) }}
+                        {{ form_end(resend_email_form) }}
+                      </td>
+                </tr>
+            </table>
+            <h3>Photos</h3>
             <table class="table table-striped">
                 <tr>
                     <td>Imei Screenshot Upload</td>
@@ -682,6 +717,26 @@
                         {{ form_end(screen_upload_form)}}
                     </td>
                 </tr>
+                {% if is_granted('ROLE_ADMIN') %}
+                <tr>
+                    <td><i class="fa fa-lock" title="Admin only"></i> pic-sure</td>
+                    <td>
+                        {% if policy.policyTerms.isPicSureEnabled %}
+                            Status: {% if policy.picSureStatus %}{{ policy.picSureStatus }}{% else %}Not started{% endif %}
+                            {% if policy.picSureStatus != "approved" and policy.picSureStatus != "preapproved" %}
+                                {{ form_start(picsure_form)}}
+                                {{ form_widget(picsure_form.approve, {'attr': {'class': 'btn btn-danger confirm-picsure'}})}}
+                                {{ form_end(picsure_form)}}
+                            {% endif %}
+                        {% else %}
+                            Non pic-sure policy
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+            </table>
+            <h3>Tokens</h3>
+            <table class="table table-striped">
                 <tr>
                     <td>Mobile User Token</td>
                     <td>
@@ -706,38 +761,6 @@
                         {% endif %}
                     </td>
                 </tr>
-                {% if policy.premiumPlan == 'monthly' %}
-                <tr>
-                    <td>Billing day of month</td>
-                    <td>
-                        {{ form_start(billing_form, {'attr': {'class': 'form-inline'}}) }}
-                        {{ form_widget(billing_form.day) }}
-                        {{ form_widget(billing_form.update, {'label': 'Change billing date', 'attr': {'class': 'btn btn-danger confirm-usertoken-clear'}}) }}
-                        {{ form_end(billing_form) }}
-                        {% if not policy.isPolicyPaidToDate %}<strong>Policy must be paid to date before update is allowed</strong>{% endif %}
-                    </td>
-                </tr>
-                {% endif %}
-                <tr>
-                    <td>
-                        Regenerate Policy Terms & Schedule<br />(Name change, etc)
-                    </td>
-                    <td>
-                        {{ form_start(regenerate_policy_schedule_form, {'attr': {'class': 'form-inline'}}) }}
-                        {{ form_widget(regenerate_policy_schedule_form.regenerate, {'label': 'Regenerate', 'attr': {'class': 'btn btn-danger confirm-regenerate-schedule'}}) }}
-                        {{ form_end(regenerate_policy_schedule_form) }}
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        Resend Policy Welcome Email
-                    </td>
-                    <td>
-                        {{ form_start(resend_email_form, {'attr': {'class': 'form-inline'}}) }}
-                        {{ form_widget(resend_email_form.resend, {'label': 'Resend Email', 'attr': {'class': 'btn btn-danger confirm-resend-email'}}) }}
-                        {{ form_end(resend_email_form) }}
-                      </td>
-                </tr>
                 <tr>
                     <td>Facebook</td>
                     <td>
@@ -752,15 +775,83 @@
                       {{ form_end(facebook_form) }}
                     </td>
                 </tr>
+            </table>
+            <h3>Financial</h3>
+            <table class="table table-striped">
                 <tr>
                     <td>
                         Pay remainder of policy link
                     </td>
                     <td>
-                        {{ url('purchase_remainder_policy', {'id': policy.id })}}
+                        <div class="input-group">
+                        <input name="remainder-link" id="remainder-link" readonly="readonly" type="text" class="form-control" value="{{ url('purchase_remainder_policy', {'id': policy.id })}}">
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary btn-copy"
+                                    data-clipboard-target="#remainder-link"
+                                    data-toggle="tooltip"
+                                    data-placement="bottom"
+                                    >Copy</button>
+                        </span>
+                        </div>
                     </td>
                 </tr>
-              {% if is_granted('ROLE_ADMIN') %}
+                {% if is_granted('ROLE_ADMIN') %}
+                <tr>
+                    <td><i class="fa fa-lock" title="Admin only"></i> Debt Collection</td>
+                    <td>
+                        {% if policy.debtCollector %}
+                            Debt Collector: {{ policy.debtCollector }}
+                            <br>
+                            Paid £{{ policy.premiumPaid | number_format(2, '.', ',') }} of £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }}
+                        {% elseif policy.isCancelledAndPaymentOwed %}
+                            {{ form_start(debt_form)}}
+                            {{ form_widget(debt_form.debt, {'attr': {'class': 'btn btn-danger'}})}}
+                            {{ form_end(debt_form)}}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td><i class="fa fa-lock" title="Admin only"></i> Chargebacks</td>
+                    <td>
+                        {{ form_start(chargebacks_form, {'attr': {'class': 'form-inline'}}) }}
+                        <div class="form-group">
+                            {{ form_errors(chargebacks_form.chargeback) }}
+                            {{ form_widget(chargebacks_form.chargeback) }}
+                        </div>
+                        {{ form_widget(chargebacks_form.add, {'Add': 'Update', 'attr': {'class': 'btn btn-danger confirm-chargeback'}}) }}
+                        {{ form_end(chargebacks_form)}}
+                    </td>
+                </tr>
+                <tr>
+                    <td><i class="fa fa-lock" title="Admin only"></i> Swap payment plan</td>
+                    <td>
+                        Currently: {{ policy.premiumPlan }}<br />
+                        {% if policy.getPremiumPaid == 0 %}
+                        {{ form_start(swap_payment_plan_form, {'attr': {'class': 'form-inline'}}) }}
+                        {{ form_widget(swap_payment_plan_form.swap, {'Swap': 'Swap Payment Plan', 'attr': {'class': 'btn btn-danger confirm-swap-payment-plan'}}) }}
+                        {{ form_end(swap_payment_plan_form)}}
+                        {% else %}
+                            Policy has already received payment - unable to swap.
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endif %}
+            </table>
+            {% if is_granted('ROLE_ADMIN') %}
+            <h3>Update Policy</h3>
+            <table class="table table-striped">
+                <tr>
+                    <td><i class="fa fa-lock" title="Admin only"></i> Recipero Make/Model Check</td>
+                    <td>{{ form_start(makemodel_form)}}
+                        {{ form_widget(makemodel_form.serial, {'attr': {'placeholder':'IMEI or Serial Number'}})}}
+                        {{ form_widget(makemodel_form.check, {'attr': {'class': 'btn btn-info'}})}}
+                        {{ form_end(makemodel_form)}}
+                        <br>
+                        £0.05 to run check
+                    </td>
+                </tr>
                 <tr>
                     <td><i class="fa fa-lock" title="Admin only"></i> Imei</td>
                     <td>
@@ -785,21 +876,14 @@
                       {{ form_end(phone_form) }}
                     </td>
                 </tr>
+            </table>
+            <h3>Company</h3>
+            <table class="table table-striped">
                 <tr>
                     <td><i class="fa fa-lock" title="Admin only"></i> Record BACS Payment</td>
                     <td>
                         <button type="button" class="btn btn-info" data-toggle="modal" data-target="#bacsModal"
                             >Record BACS Payment</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td><i class="fa fa-lock" title="Admin only"></i> Recipero Make/Model Check</td>
-                    <td>{{ form_start(makemodel_form)}}
-                        {{ form_widget(makemodel_form.serial, {'attr': {'placeholder':'IMEI or Serial Number'}})}}
-                        {{ form_widget(makemodel_form.check, {'attr': {'class': 'btn btn-info'}})}}
-                        {{ form_end(makemodel_form)}}
-                        <br>
-                        £0.05 to run check
                     </td>
                 </tr>
                 <tr>
@@ -821,52 +905,8 @@
                         {{ form_end(connect_form)}}
                     </td>
                 </tr>
-                <tr>
-                    <td><i class="fa fa-lock" title="Admin only"></i> Chargebacks</td>
-                    <td>
-                        {{ form_start(chargebacks_form, {'attr': {'class': 'form-inline'}}) }}
-                        <div class="form-group">
-                            {{ form_errors(chargebacks_form.chargeback) }}
-                            {{ form_widget(chargebacks_form.chargeback) }}
-                        </div>
-                        {{ form_widget(chargebacks_form.add, {'Add': 'Update', 'attr': {'class': 'btn btn-danger confirm-chargeback'}}) }}
-                        {{ form_end(chargebacks_form)}}
-                    </td>
-                </tr>                
-                <tr>
-                    <td><i class="fa fa-lock" title="Admin only"></i> Debt Collection</td>
-                    <td>
-                        {% if policy.debtCollector %}
-                            Debt Collector: {{ policy.debtCollector }}
-                            <br>
-                            Paid £{{ policy.premiumPaid | number_format(2, '.', ',') }} of £{{ policy.premium.yearlyPremiumPrice| number_format(2, '.', ',') }}
-                        {% elseif policy.isCancelledAndPaymentOwed %}
-                            {{ form_start(debt_form)}}
-                            {{ form_widget(debt_form.debt, {'attr': {'class': 'btn btn-danger'}})}}
-                            {{ form_end(debt_form)}}
-                        {% else %}
-                            N/A
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                <tr>
-                    <td><i class="fa fa-lock" title="Admin only"></i> pic-sure</td>
-                    <td>
-                        {% if policy.policyTerms.isPicSureEnabled %}
-                            Status: {% if policy.picSureStatus %}{{ policy.picSureStatus }}{% else %}Not started{% endif %}
-                            {% if policy.picSureStatus != "approved" and policy.picSureStatus != "preapproved" %}
-                                {{ form_start(picsure_form)}}
-                                {{ form_widget(picsure_form.approve, {'attr': {'class': 'btn btn-danger confirm-picsure'}})}}
-                                {{ form_end(picsure_form)}}
-                            {% endif %}
-                        {% else %}
-                            Non pic-sure policy
-                        {% endif %}
-                    </td>
-                </tr>
-              {% endif %}
             </table>
+            {% endif %}
         </div>
       {% endif %}
     </div>
