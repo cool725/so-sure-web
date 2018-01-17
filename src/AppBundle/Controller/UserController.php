@@ -960,9 +960,6 @@ class UserController extends BaseController
         $policy = $user->getUnpaidPolicy();
         if ($policy) {
             $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
-            if ($policy->getPremiumPlan() != Policy::PLAN_MONTHLY) {
-                throw new \Exception('Unpaid policy should only be triggered for monthly plans');
-            }
             if (!$policy->isPolicyPaidToDate()) {
                 $amount = $policy->getOutstandingPremiumToDate();
 

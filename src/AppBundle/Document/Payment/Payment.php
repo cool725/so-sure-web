@@ -169,7 +169,7 @@ abstract class Payment
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
-     * @Assert\Length(min="1", max="100")
+     * @Assert\Length(min="1", max="200")
      * @MongoDB\Field(type="string")
      * @MongoDB\Index(sparse=true)
      * @Gedmo\Versioned
