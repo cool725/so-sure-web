@@ -11,15 +11,19 @@
 		{% for item in users %}
 	   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
 			   {{ item.user.name }} triggered a sanctions warning. Please manually verify.
-			   <br><br>
+               <br><br>
 			   {{ item.matches | json_encode }}
-	   </div>
+               <br><br>
+               {{ macros.email_button_table(url('admin_user', {'id': item.user.id }), "View User", "View User")}}
+       </div>
 		{% endfor %}
         {% for item in companies %}
 			<div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
 					{{ item.company.name }} triggered a sanctions warning. Please manually verify.
 					<br><br>
 					{{ item.matches | json_encode }}
+                    <br><br>
+                    {{ macros.email_button_table(url('admin_user', {'id': item.company.id }), "View Company User", "View Company User")}}
 			</div>
         {% endfor %}
 		{%  if users|length < 1 and companies|length <1 %}
@@ -27,8 +31,6 @@
 					Happy days, no sanctions to report!
 			</div>
 		{% endif %}
-
 	</div>
 	{{ macros.end_table() }}
-	{{ macros.email_button_table(url('admin_user', {'id': user.id}), "View User", "View User")}}
 {% endblock %}

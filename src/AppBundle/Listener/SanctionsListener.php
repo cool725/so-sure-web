@@ -28,22 +28,13 @@ class SanctionsListener
 
     const SANCTIONS_LISTENER_REDIS_KEY = 'sanctions_email_queue';
     /**
-     * @param DocumentManager  $dm
-     * @param LoggerInterface  $logger
-     * @param MailerService    $mailer
      * @param SanctionsService $sanctions
      * @param                  $redis
      */
     public function __construct(
-        DocumentManager $dm,
-        LoggerInterface $logger,
-        MailerService $mailer,
         SanctionsService $sanctions,
         $redis
     ) {
-        $this->dm = $dm;
-        $this->logger = $logger;
-        $this->mailer = $mailer;
         $this->sanctions = $sanctions;
         $this->redis = $redis;
     }
@@ -58,7 +49,7 @@ class SanctionsListener
         if (count($matches) > 0) {
             $this->redis->rpush(
                 self::SANCTIONS_LISTENER_REDIS_KEY,
-                serialize(['user' => $user, 'matches' => $matches])
+                serialize(['user' => ['id' => $user->getId(), 'name' => $user->getName()], 'matches' => $matches])
             );
         }
     }
@@ -73,9 +64,11 @@ class SanctionsListener
         if (count($matches) > 0) {
             $this->redis->rpush(
                 self::SANCTIONS_LISTENER_REDIS_KEY,
-                serialize(['company' => $company, 'matches' => $matches])
+                serialize([
+                    'company' => ['id' => $company->getId(), 'name' => $company->getName()],
+                    'matches' => $matches
+                ])
             );
         }
     }
 }
-

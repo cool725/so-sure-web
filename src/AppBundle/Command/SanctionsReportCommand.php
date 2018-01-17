@@ -16,7 +16,7 @@ use AppBundle\Document\DateTrait;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 use GuzzleHttp\Client;
 
-class SanctionsCommand extends BaseCommand
+class SanctionsReportCommand extends ContainerAwareCommand
 {
     use DateTrait;
 
@@ -25,17 +25,25 @@ class SanctionsCommand extends BaseCommand
         $this
             ->setName('sosure:sanctions:report')
             ->setDescription('Sanctions - send email report')
+            ->addOption(
+                'debug',
+                null,
+                InputOption::VALUE_NONE,
+                'generates debug email output for testing'
+            )
         ;
     }
+
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $redis = $this->getContainer('snc_redis.default');
-        $mailer = $this->getContainer('app.mailer');
+        $redis = $this->getContainer()->get('snc_redis.default');
+        $mailer = $this->getContainer()->get('app.mailer');
+        $debug = $input->getOption('debug');
         $users = [];
         $companies = [];
 
         //fetch all items from redis
-        while ($sanction = unserialize($redis->hpop(SanctionsListener::SANCTIONS_LISTENER_REDIS_KEY))) {
+        while ($sanction = unserialize($redis->lpop(SanctionsListener::SANCTIONS_LISTENER_REDIS_KEY))) {
             if (isset($sanction['user'])) {
                 $users[] = $sanction;
                 continue;
@@ -43,18 +51,26 @@ class SanctionsCommand extends BaseCommand
             $companies[] = $sanction;
         }
 
-        $numSanctions = (count($users)+count($companies);
-
+        $numSanctions = (count($users)+count($companies));
         $mailer->sendTemplate(
             sprintf(
                 'Daily sanctions report for %s. Sanctions to verify %s',
-                date(),
-                $numSanctions)
+                date('m-d-Y'),
+                $numSanctions
             ),
             'tech@so-sure.com',
             'AppBundle:Email:user/admin_sanctions.html.twig',
             ['users' => $users, 'companies' => $companies]
         );
-    }
 
+        if ($debug) {
+            $templating = $this->getContainer()->get('templating');
+            $email = $templating->render(
+                'AppBundle:Email:user/admin_sanctions.html.twig',
+                ['users' => $users, 'companies' => $companies]
+            );
+            $output->writeln($email);
+        }
+        $output->writeln(sprintf('Found %s records. Mail sent.', $numSanctions));
+    }
 }
