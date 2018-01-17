@@ -467,9 +467,9 @@
                         <td  style="width: 10%;" class="{% if claim.crimeRef|length > 0 %}{% if claim.validCrimeRef %}success{% elseif not claim.validCrimeRef %}danger{% endif %}{% endif %}">
                           {{ claim.crimeRef }}
                         </td>
-                        <td style="width: 10%;" class="{% if claim.initialSuspection or claim.finalSuspection or claim.shouldCancelPolicy %}danger{% endif %}">
-                            {% if claim.initialSuspection %}Initial Suspection;{% endif %}
-                          {% if claim.finalSuspection %}Final Suspection;{% endif %}
+                        <td style="width: 10%;" class="{% if claim.initialSuspicion or claim.finalSuspicion or claim.shouldCancelPolicy %}danger{% endif %}">
+                            {% if claim.initialSuspicion %}Initial Suspicion;{% endif %}
+                          {% if claim.finalSuspicion %}Final Suspicion;{% endif %}
                           {% if claim.shouldCancelPolicy %}Policy should be cancelled;{% endif %}
                         </td>
                         <td style="width: 20%;">{{ claim.notes }}
@@ -506,9 +506,9 @@
                         <td  style="width: 10%;" class="{% if claim.crimeRef|length > 0 %}{% if claim.validCrimeRef %}success{% elseif not claim.validCrimeRef %}danger{% endif %}{% endif %}">
                           {{ claim.crimeRef }}
                         </td>
-                        <td style="width: 10%;" class="{% if claim.initialSuspection or claim.finalSuspection or claim.shouldCancelPolicy %}danger{% endif %}">
-                            {% if claim.initialSuspection %}Initial Suspection;{% endif %}
-                            {% if claim.finalSuspection %}Final Suspection;{% endif %}
+                        <td style="width: 10%;" class="{% if claim.initialSuspicion or claim.finalSuspicion or claim.shouldCancelPolicy %}danger{% endif %}">
+                            {% if claim.initialSuspicion %}Initial Suspicion;{% endif %}
+                            {% if claim.finalSuspicion %}Final Suspicion;{% endif %}
                             {% if claim.shouldCancelPolicy %}Policy should be cancelled;{% endif %}
                         </td>
                         <td style="width: 30%;">{{ claim.notes }}</td>
@@ -823,7 +823,20 @@
                         {{ form_widget(chargebacks_form.add, {'Add': 'Update', 'attr': {'class': 'btn btn-danger confirm-chargeback'}}) }}
                         {{ form_end(chargebacks_form)}}
                     </td>
-                </tr>                
+                </tr>
+                <tr>
+                    <td><i class="fa fa-lock" title="Admin only"></i> Swap payment plan</td>
+                    <td>
+                        Currently: {{ policy.premiumPlan }}<br />
+                        {% if policy.getPremiumPaid == 0 %}
+                        {{ form_start(swap_payment_plan_form, {'attr': {'class': 'form-inline'}}) }}
+                        {{ form_widget(swap_payment_plan_form.swap, {'Swap': 'Swap Payment Plan', 'attr': {'class': 'btn btn-danger confirm-swap-payment-plan'}}) }}
+                        {{ form_end(swap_payment_plan_form)}}
+                        {% else %}
+                            Policy has already received payment - unable to swap.
+                        {% endif %}
+                    </td>
+                </tr>
                 {% endif %}
             </table>
             {% if is_granted('ROLE_ADMIN') %}
