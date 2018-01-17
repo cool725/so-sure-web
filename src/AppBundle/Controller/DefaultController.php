@@ -247,13 +247,13 @@ class DefaultController extends BaseController
      */
     public function searchPhoneAction(Request $request)
     {
-        $simple = true;
+        $type = 'simple';
         if ($request->get('_route') == 'search_phone_combined_data') {
-            $simple = false;
+            $type = 'highlight';
         }
 
         return new JsonResponse(
-            $this->getPhonesSearchArray($simple)
+            $this->getPhonesSearchArray($type)
         );
     }
 
