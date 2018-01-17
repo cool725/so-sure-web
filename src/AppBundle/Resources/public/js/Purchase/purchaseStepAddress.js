@@ -85,7 +85,7 @@ sosure.purchaseStepAddress = (function() {
                             return true;
                         }
                     },
-                    postcodeUK: true                    
+                    postcodeUK: true
                 }
             },
             messages: {
@@ -309,7 +309,7 @@ sosure.purchaseStepAddress = (function() {
             sosure.purchaseStepAddress.setAddress(addr);
         });
     }
-    
+
     return self;
 })();
 
@@ -337,7 +337,7 @@ $(function(){
             sosure.purchaseStepAddress.focusBirthday();
         }
     });
-    
+
     $('#search_address_button').click(function(e) {
         e.preventDefault();
         var search_number = $('#search_address_number').val();
@@ -396,7 +396,7 @@ $(function(){
 
         return true;
     });
-    
+
     $('#search-address-manual').click(function(e) {
         e.preventDefault();
         $('#search_address_number').removeAttr("required");
