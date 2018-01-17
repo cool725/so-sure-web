@@ -695,8 +695,12 @@ class JudopayService
         }
     }
 
-    public function scheduledPayment(ScheduledPayment $scheduledPayment, $prefix = null, \DateTime $date = null)
-    {
+    public function scheduledPayment(
+        ScheduledPayment $scheduledPayment,
+        $prefix = null,
+        \DateTime $date = null,
+        $abortOnMultipleSameDayPayment = true
+    ) {
         if (!$scheduledPayment->getPolicy()->isValidPolicy($prefix)) {
             throw new \Exception(sprintf(
                 'Scheduled payment %s policy is not valid. Invalid Prefix?',
@@ -743,7 +747,7 @@ class JudopayService
                 $policy,
                 $scheduledPayment->getAmount(),
                 $scheduledPayment->getType(),
-                true,
+                $abortOnMultipleSameDayPayment,
                 $date
             );
         } catch (SameDayPaymentException $e) {
