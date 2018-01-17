@@ -22,4 +22,15 @@ class CashbackRepository extends DocumentRepository
             ->getQuery()
             ->execute();
     }
+    public function getLateCashback(int $daysLate = 14)
+    {
+        $dateOlder = new \DateTime();
+        $dateOlder->sub(new \DateInterval(sprintf('P%sD', $daysLate)));
+
+        return $this->createQueryBuilder()
+            ->field('status')->equals(Cashback::STATUS_PENDING_PAYMENT)
+            ->field('createdDate')->lte($dateOlder)
+            ->getQuery()
+            ->execute();
+    }
 }
