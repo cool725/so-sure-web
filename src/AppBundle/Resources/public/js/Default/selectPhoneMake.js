@@ -171,7 +171,7 @@ $(function(){
         // On select add class to row
         $(input).bind('typeahead:select', function(ev, suggestion) {
 
-            // var form = $(ev.target).closest('form');
+            var form = $(ev.target).closest('form');
 
             sosure.selectPhoneMake.setFormAction(suggestion.item.id, form);
 
