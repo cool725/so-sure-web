@@ -50,7 +50,7 @@ sosure.selectPhoneMake = (function() {
         self.sendSearch(page);
         if (typeof self.fuse !== 'undefined') {
             results = self.fuse.search(q);
-            //results.sort(function(a, b){return b.score - a.score}); 
+            //results.sort(function(a, b){return b.score - a.score});
             //console.log(results);
             sync(results);
         } else {
@@ -170,11 +170,24 @@ $(function(){
 
         // On select add class to row
         $(input).bind('typeahead:select', function(ev, suggestion) {
-            sosure.selectPhoneMake.setFormAction(suggestion.id, form);
 
-            var path_suggestion = sosure.selectPhoneMake.getFormAction(suggestion.id, form);
+            var form = $(ev.target).closest('form');
 
-            $('.tt-suggestion').find('a[href="'+path_suggestion+'"]').parent().parent().addClass('tt-selected').siblings().removeClass('tt-selected');
+            sosure.selectPhoneMake.setFormAction(suggestion.item.id, form);
+
+            var path_suggestion = sosure.selectPhoneMake.getFormAction(suggestion.item.id, form);
+
+            // Check memory options
+            var link_count = suggestion.item.sizes.length;
+
+            // If less than 1 forward to option when selected anywhere on the suggestion
+            if (link_count == 1) {
+                var link_to_go = $('.tt-suggestion').find('a[href="'+path_suggestion+'"]').attr('href');
+                window.location.href = link_to_go;
+            } else {
+                // If more than 1 option highlight the buttons to alert the user there are options
+                $('.tt-suggestion').find('a[href="'+path_suggestion+'"]').parent().parent().addClass('tt-selected').siblings().removeClass('tt-selected');
+            }
 
             menuHold();
         });
