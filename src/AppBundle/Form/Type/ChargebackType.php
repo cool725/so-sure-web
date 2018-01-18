@@ -25,6 +25,7 @@ class ChargebackType extends AbstractType
             ->add('reference', TextType::class, ['required' => true])
             ->add('amount', TextType::class, ['required' => true])
             ->add('date', DateType::class, ['required' => true, 'years' => $years])
+            ->add('totalCommission', TextType::class, ['required' => true])
             ->add('add', SubmitType::class)
         ;
     }
