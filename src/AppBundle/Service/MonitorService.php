@@ -118,7 +118,7 @@ class MonitorService
         }
     }
 
-    public function claimsCashbackLate()
+    public function cashbackPastDue()
     {
         $repo = $this->dm->getRepository(Cashback::class);
         $cashbacks = $repo->getLateCashback();
