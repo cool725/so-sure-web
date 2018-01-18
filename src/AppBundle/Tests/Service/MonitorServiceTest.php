@@ -53,6 +53,22 @@ class MonitorServiceIpTest extends WebTestCase
     /**
      * @expectedException \Exception
      */
+    public function testMissingName()
+    {
+        $this->assertFalse(self::$monitor->run('foo'));
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testMissingPartialName()
+    {
+        $this->assertFalse(self::$monitor->run('claimsSettledUnprocessedFoo'));
+    }
+
+    /**
+     * @expectedException \Exception
+     */
     public function testClaimsSettledUnprocessedFalse()
     {
         $claim = new Claim();

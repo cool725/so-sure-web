@@ -61,7 +61,11 @@ class MonitorService
 
     public function run($name)
     {
-        return call_user_func([$this, $name]);
+        if (method_exists($this, $name)) {
+            return call_user_func([$this, $name]);
+        } else {
+            throw new \Exception(sprintf('Unknown monitor %s', $name));
+        }
     }
 
     public function multipay()
