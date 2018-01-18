@@ -375,6 +375,14 @@ abstract class Payment
         $this->brokerCommission = 0 - $this->brokerCommission;
     }
 
+    /**
+     * quick hack in order for chargeback form to work with setRefundTotalCommission
+     */
+    public function getRefundTotalCommission()
+    {
+        return $this->totalCommission;
+    }
+
     public function getTotalCommission()
     {
         return $this->totalCommission;

@@ -111,12 +111,13 @@
             </div>
             <div class="row">
                 <div class="form-group col-sm-2">
-                    {{ form_label(chargeback_form.totalCommission, 'Total Commission') }}<br>
-                    £10.72 for annual or £0.89 / month
+                    {{ form_label(chargeback_form.refundTotalCommission, 'Total Commission') }}<br>
+                    £10.72 for annual or £0.89 / month 
                 </div>
                 <div class="form-group col-sm-6">
-                    {{ form_errors(chargeback_form.totalCommission) }}
-                    {{ form_widget(chargeback_form.totalCommission) }}
+                    {{ form_errors(chargeback_form.refundTotalCommission) }}
+                    {{ form_widget(chargeback_form.refundTotalCommission) }}<br>
+                    (use positive number - system will adjust to refund)
                 </div>
             </div>
             <div class="row">
