@@ -139,13 +139,6 @@ class DaviesService extends S3EmailService
             } catch (\Exception $e) {
                 //$success = false;
                 $this->errors[$daviesClaim->claimNumber][] = $e->getMessage();
-                $this->logger->error(
-                    sprintf(
-                        'Skipped import. Fatal error processing file (%s)',
-                        $key
-                    ),
-                    ['exception' => $e]
-                );
                 // In case any of the db data failed validation, clear the changeset
                 if ($claim = $this->getClaim($daviesClaim)) {
                     $this->dm->refresh($claim);
@@ -459,7 +452,7 @@ class DaviesService extends S3EmailService
                     'Claim %s was approved over 2 weeks ago (%s), however, the replacement data not recorded (%s).',
                     $daviesClaim->claimNumber,
                     $claim->getApprovedDate()->format(\DateTime::ATOM),
-                    implode($items)
+                    implode('; ', $items)
                 );
                 $this->errors[$daviesClaim->claimNumber][] = $msg;
             }
