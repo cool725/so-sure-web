@@ -450,6 +450,9 @@ class AdminEmployeeController extends BaseController
         $picsureForm = $this->get('form.factory')
             ->createNamedBuilder('picsure_form')->add('approve', SubmitType::class)
             ->getForm();
+        $swapPaymentPlanForm = $this->get('form.factory')
+            ->createNamedBuilder('swap_payment_plan_form')->add('swap', SubmitType::class)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('cancel_form')) {
@@ -819,6 +822,17 @@ class AdminEmployeeController extends BaseController
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
+            } elseif ($request->request->has('swap_payment_plan_form')) {
+                $swapPaymentPlanForm->handleRequest($request);
+                if ($swapPaymentPlanForm->isValid()) {
+                    $policyService->swapPaymentPlan($policy);
+                    // @codingStandardsIgnoreStart
+                    $this->addFlash(
+                        'success',
+                        'Payment Plan has been swapped. For now, please manually adjust final scheduled payment to current date.'
+                    );
+                    // @codingStandardsIgnoreEnd
+                }
             }
         }
         $checks = $fraudService->runChecks($policy);
@@ -847,6 +861,7 @@ class AdminEmployeeController extends BaseController
             'chargebacks_form' => $chargebacksForm->createView(),
             'debt_form' => $debtForm->createView(),
             'picsure_form' => $picsureForm->createView(),
+            'swap_payment_plan_form' => $swapPaymentPlanForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),

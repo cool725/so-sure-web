@@ -71,4 +71,11 @@ class ApiKeyControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', '/api/v1/key/monitor/multipay');
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_UNKNOWN);
     }
+
+    public function testMonitorUnknown()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $crawler = self::$client->request('GET', '/api/v1/key/monitor/policyImeiUpdatedFromClaimFoo');
+        $data = $this->verifyResponse(500, ApiErrorCode::ERROR_UNKNOWN);
+    }
 }

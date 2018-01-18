@@ -735,6 +735,25 @@ class PolicyService
         }
     }
 
+    public function swapPaymentPlan(Policy $policy)
+    {
+        if ($policy->getPremiumPaid() > 0) {
+            throw new \Exception('Only able to swap payment plan when policy is unpaid');
+        }
+
+        if ($policy->getPremiumPlan() == Policy::PLAN_MONTHLY) {
+            $policy->setPremiumInstallments(1);
+            $this->dm->flush();
+            $this->regenerateScheduledPayments($policy);
+            $this->dm->flush();
+        } elseif ($policy->getPremiumPlan() == Policy::PLAN_YEARLY) {
+            $policy->setPremiumInstallments(12);
+            $this->dm->flush();
+            $this->regenerateScheduledPayments($policy);
+            $this->dm->flush();
+        }
+    }
+
     public function regenerateScheduledPayments(
         Policy $policy,
         \DateTime $date = null,

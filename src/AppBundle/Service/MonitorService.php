@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Document\Cashback;
 use Psr\Log\LoggerInterface;
 use GuzzleHttp\Client;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -60,7 +61,11 @@ class MonitorService
 
     public function run($name)
     {
-        return call_user_func([$this, $name]);
+        if (method_exists($this, $name)) {
+            return call_user_func([$this, $name]);
+        } else {
+            throw new \Exception(sprintf('Unknown monitor %s', $name));
+        }
     }
 
     public function multipay()
@@ -109,6 +114,20 @@ class MonitorService
             throw new MonitorException(sprintf(
                 'Claim %s is settled, but has not been processed (e.g. pot updated)',
                 $claim->getNumber()
+            ));
+        }
+    }
+
+    public function cashbackPastDue()
+    {
+        $repo = $this->dm->getRepository(Cashback::class);
+        $cashbacks = $repo->getLateCashback();
+        foreach ($cashbacks as $cashback) {
+            throw new MonitorException(sprintf(
+                'Cashback for policy id:%s (%s) is late (%s)',
+                $cashback->getPolicy()->getId(),
+                $cashback->getPolicy()->getSalvaPolicyNumber(),
+                $cashback->getCreatedDate()->format('d-m-Y')
             ));
         }
     }
