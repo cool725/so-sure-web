@@ -89,6 +89,8 @@ class DaviesService extends S3EmailService
 
     public function saveClaims($key, array $daviesClaims)
     {
+        // was using key for logging purposes - can be removed in the future
+        \AppBundle\Classes\NoOp::ignore([$key]);
         $success = true;
         $claims = [];
         $openClaims = [];
