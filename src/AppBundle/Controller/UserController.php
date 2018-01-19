@@ -1057,7 +1057,7 @@ class UserController extends BaseController
         return array(
             'policy_key' => $this->getParameter('policy_key'),
             'policy' => $user->getLatestPolicy(),
-            'page_visited' => $pageVisited
+            'has_visited_welcome_page' => $pageVisited
         );
     }
     /**
