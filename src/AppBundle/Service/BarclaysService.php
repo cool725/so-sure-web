@@ -225,4 +225,91 @@ class BarclaysService
         $barclaysStatementFile->setDate($date);
         $barclaysStatementFile->setChargebacks($chargebacks);
     }
+
+    public function processStatementNewCsv($barclaysStatementFile)
+    {
+        $repo = $this->dm->getRepository(ChargebackPayment::class);
+
+        $filename = $barclaysStatementFile->getFile();
+
+        $header = null;
+        $lines = array();
+        $chargebacks = array();
+
+        $invoiceTotal = 0;
+        $transactionTotal = 0;
+        $merchantId = null;
+        $date = null;
+
+        if (($handle = fopen($filename, 'r')) !== false) {
+            while (($row = fgetcsv($handle, 5000)) !== false) {
+                if (!$header) {
+                    $header = [];
+                    $count = 0;
+                    foreach ($row as $item) {
+                        if (!in_array(trim($item), $header)) {
+                            $header[] = trim($item);
+                        } else {
+                            $header[] = sprintf('%s_%d', trim($item), $count);
+                        }
+                        $count++;
+                    }
+                } else {
+                    $line = array_combine($header, $row);
+                    $lines[] = $line;
+                    if ($line['MERCHANT ID'] != '') {
+                        $merchantId = $line['MERCHANT ID'];
+                    }
+                    if (in_array($line['CHARGE BREAKDOWN'], ['Transaction charges', 'Activity based charges'])) {
+                        $invoiceTotal += $line['CHARGE BREAKDOWN TOTAL'];
+                    }
+                    if ($line['AMOUNT IN SETTLEMENT CURRENCY'] != '') {
+                        // throw new \Exception(print_r($line, true));
+                        $transactionTotal += $line['AMOUNT IN SETTLEMENT CURRENCY'];
+                    }
+                    if ($line['DATE PROCESSED'] != '') {
+                        $processedDate = \DateTime::createFromFormat('dmY', trim($line['DATE PROCESSED']));
+                        $processedDate = $this->startOfDay($processedDate);
+                        if (!$date || $processedDate < $date) {
+                            $date = $processedDate;
+                        }
+                    }
+                    if (trim($line['CHARGE GROUP']) == 'Chargebacks') {
+                        //throw new \Exception(print_r($line, true));
+                        $ref = trim(str_replace($merchantId, '', $line['CHARGE TYPE']));
+                        $amount = $this->toTwoDp(0 - $line['CHARGE GROUP TOTAL']);
+                        $id = null;
+                        $chargeback = $repo->findOneBy(['reference' => $ref]);
+                        if (!$chargeback) {
+                            $chargeback = new ChargebackPayment();
+                            $chargeback->setSource(Payment::SOURCE_ADMIN);
+                            $chargeback->setReference($ref);
+                            $chargeback->setAmount($amount);
+                            $chargeback->setDate($date);
+                            $this->dm->persist($chargeback);
+                            $this->dm->flush();
+                            // @codingStandardsIgnoreStart
+                            $this->logger->warning(sprintf(
+                                'Barclays Statement Upload for %s has an unprocessed chargeback ref %s for %0.2f. Make sure to manually add commission to the chargeback payment.',
+                                $date->format(\DateTime::ATOM),
+                                $ref,
+                                $amount
+                            ));
+                            // @codingStandardsIgnoreEnd
+                        }
+                        $data['id'] = $chargeback->getId();
+                        $chargebacks[$ref] = $data;
+                    }
+                }
+            }
+            fclose($handle);
+        }
+        if (!$date) {
+            throw new \Exception('Unable to parse file');
+        }
+        $barclaysStatementFile->addMetadata('invoiceTotal', $invoiceTotal);
+        $barclaysStatementFile->addMetadata('transactionTotal', $transactionTotal);
+        $barclaysStatementFile->setDate($date);
+        $barclaysStatementFile->setChargebacks($chargebacks);
+    }
 }

@@ -515,7 +515,7 @@ class AdminController extends BaseController
                     $barclaysStatementFile->setKeyFormat($this->getParameter('kernel.environment') . '/upload/%s');
 
                     $barclaysService = $this->get('app.barclays');
-                    $data = $barclaysService->processStatementCsv($barclaysStatementFile);
+                    $data = $barclaysService->processStatementNewCsv($barclaysStatementFile);
 
                     $dm->persist($barclaysStatementFile);
                     $dm->flush();
