@@ -26,7 +26,7 @@ class SanctionsListener
 
     protected $redis;
 
-    const SANCTIONS_LISTENER_REDIS_KEY = 'sanctions_email_queue';
+    const SANCTIONS_LISTENER_REDIS_KEY = 'queue:sanctions';
     /**
      * @param SanctionsService $sanctions
      * @param                  $redis
