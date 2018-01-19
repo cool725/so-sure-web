@@ -78,9 +78,11 @@ class UserController extends BaseController
             if ($this->getSessionQuotePhone($request) && $user->canPurchasePolicy()) {
                 // TODO: If possible to detect if the user came via the purchase page or via the login page
                 // login page would be nice to add a flash message saying their policy has not yet been purchased
-                if ($user->hasParitalPolicy()) {
+                if ($user->hasPartialPolicy()) {
                     return new RedirectResponse(
-                        $this->generateUrl('purchase_step_policy_id', ['id' => $user->getPartialPolicies()[0]])
+                        $this->generateUrl('purchase_step_policy_id', [
+                            'id' => $user->getPartialPolicies()[0]->getId()
+                        ])
                     );
                 } else {
                     return new RedirectResponse($this->generateUrl('purchase_step_policy'));

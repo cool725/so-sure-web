@@ -214,7 +214,9 @@ class PurchaseController extends BaseController
 
                     if ($user->hasPartialPolicy()) {
                         return new RedirectResponse(
-                            $this->generateUrl('purchase_step_policy_id', ['id' => $user->getPartialPolicies()[0]])
+                            $this->generateUrl('purchase_step_policy_id', [
+                                'id' => $user->getPartialPolicies()[0]->getId()
+                            ])
                         );
                     } else {
                         return $this->redirectToRoute('purchase_step_policy');
