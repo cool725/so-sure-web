@@ -288,12 +288,14 @@ class BarclaysService
                             $chargeback->setDate($date);
                             $this->dm->persist($chargeback);
                             $this->dm->flush();
+                            // @codingStandardsIgnoreStart
                             $this->logger->warning(sprintf(
                                 'Barclays Statement Upload for %s has an unprocessed chargeback ref %s for %0.2f. Make sure to manually add commission to the chargeback payment.',
                                 $date->format(\DateTime::ATOM),
                                 $ref,
                                 $amount
                             ));
+                            // @codingStandardsIgnoreEnd
                         }
                         $data['id'] = $chargeback->getId();
                         $chargebacks[$ref] = $data;
