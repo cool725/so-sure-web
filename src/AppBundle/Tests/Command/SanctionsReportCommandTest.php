@@ -50,7 +50,6 @@ class SanctionsReportCommandTest extends BaseControllerTest
 
     public function testSanctionsReportFoundData()
     {
-
         $sanctions = new Sanctions();
         $sanctions->setSource(Sanctions::SOURCE_UK_TREASURY);
         $sanctions->setType(Sanctions::TYPE_USER);
@@ -62,7 +61,7 @@ class SanctionsReportCommandTest extends BaseControllerTest
         $sanctionsCompany->setSource(Sanctions::SOURCE_UK_TREASURY);
         $sanctionsCompany->setType(Sanctions::TYPE_COMPANY);
         $sanctionsCompany->setCompany('Aboo oka');
-        self::$dm->persist($sanctions);
+        self::$dm->persist($sanctionsCompany);
 
         self::$dm->flush();
 

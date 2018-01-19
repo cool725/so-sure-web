@@ -21,7 +21,7 @@ use AppBundle\Listener\SanctionsListener;
 /**
  * @group functional-nonet
  */
-class SanctionsListenerListenerTest extends WebTestCase
+class SanctionsListenerTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
