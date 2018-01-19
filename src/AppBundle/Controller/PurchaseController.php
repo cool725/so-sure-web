@@ -9,6 +9,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -212,7 +213,15 @@ class PurchaseController extends BaseController
                     }
                     $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_RECEIVE_DETAILS, $data);
 
-                    return $this->redirectToRoute('purchase_step_policy');
+                    if ($user->hasPartialPolicy()) {
+                        return new RedirectResponse(
+                            $this->generateUrl('purchase_step_policy_id', [
+                                'id' => $user->getPartialPolicies()[0]->getId()
+                            ])
+                        );
+                    } else {
+                        return $this->redirectToRoute('purchase_step_policy');
+                    }
                 }
             }
         }
