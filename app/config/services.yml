@@ -751,10 +751,8 @@ services:
     app.listener.sanctions:
         class:   AppBundle\Listener\SanctionsListener
         arguments:
-            - "@doctrine_mongodb.odm.default_document_manager"
-            - "@logger"
-            - "@app.mailer"
             - "@app.sanctions"
+            - "@snc_redis.default"
         tags:
             -  { name: kernel.event_listener, event: event.user.created, method: onUserCreatedEvent }
             -  { name: kernel.event_listener, event: event.company.created, method: onCompanyCreatedEvent }

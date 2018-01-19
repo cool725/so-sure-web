@@ -143,6 +143,11 @@ class Sanctions
         return $this->company;
     }
 
+    public function setCompany($company)
+    {
+        $this->company = $company;
+    }
+
     public function getName()
     {
         if ($this->firstName) {
