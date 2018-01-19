@@ -508,18 +508,6 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $this->namedPolicies;
     }
 
-    public function getUnInitPolicies()
-    {
-        $policies = [];
-        foreach ($this->policies as $policy) {
-            if (!$policy->getStatus()) {
-                $policies[] = $policy;
-            }
-        }
-
-        return $policies;
-    }
-
     public function getCreatedPolicies()
     {
         $policies = [];
@@ -854,6 +842,28 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                 $policies[] = $policy;
             }
         }
+
+        return $policies;
+    }
+
+    public function hasPartialPolicy()
+    {
+        return count($this->getPartialPolicies()) > 0;
+    }
+
+    public function getPartialPolicies()
+    {
+        $policies = [];
+        foreach ($this->getPolicies() as $policy) {
+            if ($policy->getStatus() === null) {
+                $policies[] = $policy;
+            }
+        }
+
+        // sort more recent to older
+        usort($payments, function ($a, $b) {
+            return $a->getCreated() < $b->getCreated();
+        });
 
         return $policies;
     }

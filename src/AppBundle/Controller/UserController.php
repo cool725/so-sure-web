@@ -78,7 +78,13 @@ class UserController extends BaseController
             if ($this->getSessionQuotePhone($request) && $user->canPurchasePolicy()) {
                 // TODO: If possible to detect if the user came via the purchase page or via the login page
                 // login page would be nice to add a flash message saying their policy has not yet been purchased
-                return new RedirectResponse($this->generateUrl('purchase_step_policy'));
+                if ($user->hasParitalPolicy()) {
+                    return new RedirectResponse(
+                        $this->generateUrl('purchase_step_policy_id', ['id' => $user->getPartialPolicies()[0]])
+                    );
+                } else {
+                    return new RedirectResponse($this->generateUrl('purchase_step_policy'));
+                }
             } else {
                 return new RedirectResponse($this->generateUrl('user_invalid_policy'));
             }
@@ -904,8 +910,8 @@ class UserController extends BaseController
     {
         $user = $this->getUser();
         $excludePolicyImei = [];
-        foreach ($user->getUnInitPolicies() as $unInitPolicy) {
-            $excludePolicyImei[] = $unInitPolicy->getImei();
+        foreach ($user->getPartialPolicies() as $partialPolicy) {
+            $excludePolicyImei[] = $partialPolicy->getImei();
         }
         foreach ($user->getPolicies() as $policy) {
             if ($policy->isPolicyExpiredWithin30Days() && !in_array($policy->getImei(), $excludePolicyImei)) {
@@ -922,11 +928,11 @@ class UserController extends BaseController
     private function addUnInitPolicyInsureFlash()
     {
         $user = $this->getUser();
-        foreach ($user->getUnInitPolicies() as $unInitPolicy) {
+        foreach ($user->getPartialPolicies() as $partialPolicy) {
             $message = sprintf(
                 'Insure your <a href="%s">%s phone</a>',
-                $this->generateUrl('purchase_step_policy_id', ['id' => $unInitPolicy->getId()]),
-                $unInitPolicy->getPhone()->__toString()
+                $this->generateUrl('purchase_step_policy_id', ['id' => $partialPolicy->getId()]),
+                $partialPolicy->getPhone()->__toString()
             );
             $this->addFlash('success', $message);
         }

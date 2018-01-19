@@ -192,6 +192,7 @@ class DefaultController extends BaseController
             $session = $request->getSession();
             $session->set('quote', $phone->getId());
 
+            // don't check for partial partial as selected phone may be different from partial policy phone
             return $this->redirectToRoute('purchase_step_policy');
         } elseif ($phone && in_array($type, ['learn-more'])) {
             $session = $request->getSession();
@@ -226,6 +227,7 @@ class DefaultController extends BaseController
             $session = $request->getSession();
             $session->set('quote', $phone->getId());
 
+            // don't check for partial partial as selected phone may be different from partial policy phone
             return $this->redirectToRoute('purchase_step_policy');
         } elseif ($phone && in_array($type, ['learn-more'])) {
             $session = $request->getSession();
