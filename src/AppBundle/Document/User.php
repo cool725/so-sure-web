@@ -861,7 +861,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         }
 
         // sort more recent to older
-        usort($payments, function ($a, $b) {
+        usort($policies, function ($a, $b) {
             return $a->getCreated() < $b->getCreated();
         });
 
