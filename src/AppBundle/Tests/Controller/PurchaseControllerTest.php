@@ -15,6 +15,7 @@ use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use AppBundle\Classes\Salva;
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\Invitation\EmailInvitation;
 
 /**
  * @group functional-net
@@ -25,6 +26,10 @@ class PurchaseControllerTest extends BaseControllerTest
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     use CurrencyTrait;
+
+    const SEARCH_URL1_TEMPLATE = '/phone-insurance/%s';
+    const SEARCH_URL2_TEMPLATE = '/phone-insurance/%s+%sGB';
+
 
     public function tearDown()
     {
@@ -912,5 +917,32 @@ class PurchaseControllerTest extends BaseControllerTest
             ])
         );
         self::verifyResponse(200, ApiErrorCode::SUCCESS);
+    }
+
+    public function testPhoneSearchPurchasePage()
+    {
+        $crawler = self::$client->request('GET', '/purchase/');
+        $data = self::$client->getResponse();
+        $this->assertEquals(200, $data->getStatusCode());
+        self::verifySearchFormData($crawler->filter('form'), '/select-phone/purchase-change/', 1);
+    }
+
+    public function testPhoneSearchUserInvalidPolicy()
+    {
+        $email = self::generateEmail('testPhoneSearchUserInvalid', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        self::$dm->flush();
+        $crawler = $this->login($email, $password, 'user/invalid');
+        $data = self::$client->getResponse();
+        $this->assertEquals(200, $data->getStatusCode());
+        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
     }
 }
