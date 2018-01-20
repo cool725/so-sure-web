@@ -145,6 +145,36 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->assertTrue(self::$client->getResponse()->isRedirect('/login'));
     }
 
+    public function testPurchaseExistingUserSameDetailsWithMultiplePartialPolicyNew()
+    {
+        $phone = self::getRandomPhone(self::$dm);
+        // set phone in session
+        $crawler = self::$client->request(
+            'GET',
+            self::$router->generate('quote_phone', ['id' => $phone->getId()])
+        );
+        $crawler = self::$client->followRedirect();
+
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testPurchaseExistingUserSameDetailsWithMultiplePartialPolicyNew', $this),
+            'foo',
+            $phone
+        );
+        $policy1 = self::initPolicy($user, self::$dm, $phone);
+        sleep(1);
+        $policy2 = self::initPolicy($user, self::$dm, $phone);
+
+        $this->login($user->getEmail(), 'foo', sprintf('purchase/step-policy/%s', $policy2->getId()));
+
+        $crawler = $this->setPhoneNew($phone, $policy1->getImei());
+
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect(
+            sprintf('/purchase/step-policy/%s', $policy1->getId())
+        ));
+    }
+
     public function testPurchaseAddressNew()
     {
         $phone = $this->setRandomPhone();

@@ -395,8 +395,9 @@ class PurchaseController extends BaseController
                             );
                             throw $this->createNotFoundException('Unable to see policy');
                         } catch (DuplicateImeiException $e) {
-                            $partialPolicy = $policyRepo->find(['imei' => $purchase->getImei()]);
-                            if (!$partialPolicy->getStatus() && $partialPolicy->getUser()->getId() == $user->getId()) {
+                            $partialPolicy = $policyRepo->findOneBy(['imei' => $purchase->getImei()]);
+                            if ($partialPolicy && !$partialPolicy->getStatus() &&
+                                $partialPolicy->getUser()->getId() == $user->getId()) {
                                 $this->addFlash(
                                     'error',
                                     "Sorry, you weren't in quite the right place. Please try again here."
