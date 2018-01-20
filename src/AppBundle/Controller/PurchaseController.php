@@ -276,6 +276,7 @@ class PurchaseController extends BaseController
 
         $dm = $this->getManager();
         $phoneRepo = $dm->getRepository(Phone::class);
+        $policyRepo = $dm->getRepository(Policy::class);
 
         $phone = $this->getSessionQuotePhone($request);
 
@@ -283,12 +284,11 @@ class PurchaseController extends BaseController
         $purchase->setUser($user);
         $policy = null;
         if ($id) {
-            $policyRepo = $dm->getRepository(Policy::class);
             $policy = $policyRepo->find($id);
         }
 
-        if (!$policy) {
-            $policy = $user->getUnInitPolicy();
+        if (!$policy && $user->hasPartialPolicy()) {
+            $policy = $user->getPartialPolicies()[0];
         }
 
         $this->get('app.sixpack')->convert(
@@ -395,10 +395,23 @@ class PurchaseController extends BaseController
                             );
                             throw $this->createNotFoundException('Unable to see policy');
                         } catch (DuplicateImeiException $e) {
-                            $this->addFlash(
-                                'error',
-                                "Sorry, it looks this phone is already insured"
-                            );
+                            $partialPolicy = $policyRepo->find(['imei' => $purchase->getImei()]);
+                            if (!$partialPolicy->getStatus() && $partialPolicy->getUser()->getId() == $user->getId()) {
+                                $this->addFlash(
+                                    'error',
+                                    "Sorry, you weren't in quite the right place. Please try again here."
+                                );
+                                return new RedirectResponse(
+                                    $this->generateUrl('purchase_step_policy_id', [
+                                        'id' => $partialPolicy->getId()
+                                    ])
+                                );
+                            } else {
+                                $this->addFlash(
+                                    'error',
+                                    "Sorry, your phone is already in our system. Perhaps it's already insured?"
+                                );
+                            }
                             $allowPayment = false;
                         } catch (LostStolenImeiException $e) {
                             $this->addFlash(
