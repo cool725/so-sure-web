@@ -1013,11 +1013,13 @@ class UserController extends BaseController
             $policyRepo = $dm->getRepository(Policy::class);
             $policy = $policyRepo->find($id);
         }
-        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+
         // if policy id was given and user does not match
         if (!$policy) {
             throw $this->createNotFoundException('Policy not found');
         }
+
+        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
 
         if ($policy->getVisitedWelcomePage() == null) {
             $date = new \DateTime();
