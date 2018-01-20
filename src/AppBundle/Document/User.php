@@ -562,17 +562,6 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $cashback;
     }
 
-    public function getUnInitPolicy()
-    {
-        foreach ($this->getAllPolicies() as $policy) {
-            if (!$policy->getStatus()) {
-                return $policy;
-            }
-        }
-
-        return null;
-    }
-
     public function getAllPolicies()
     {
         return $this->policies;
