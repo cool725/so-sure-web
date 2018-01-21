@@ -1,0 +1,56 @@
+{% extends 'admin_claims_base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets
+    'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.css'
+ %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+        'components/moment/moment.min.js'
+        'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.js'
+        '@AppBundle/Resources/public/js/Admin/month.js'
+    %}
+    <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock %}
+
+    {% block body %}
+    <div class="container">
+<div class="row">
+    <div class="col-md-8">
+        <h1>so-sure Quarterly PL [{{ data.start|date('M Y', 'Europe/London') }} - {{ data.end|date('M Y', 'Europe/London') }}]</h1>
+    </div>
+    <form class="month-form form-inline" method="POST" autocomplete="off">
+    <div class="col-md-4">
+        <div class="form-group" style="padding-top: 15px;">
+            <div class="input-group date month" data-url="{{ path('admin_quarterly_pl_date') }}">
+                <input name="pl" type='text' class="form-control" value="{{data.month}}-{{data.year}}" />
+                <span class="input-group-addon">
+                    <span class="fa fa-calendar"></span>
+                </span>
+            </div>
+            <div class="input-group">
+                <div class="input-group-btn">
+                    <button class="btn btn-success"><i class="fa fa-arrow-right"></i></button>
+                </div>
+            </div>
+            <div class="input-group" style="margin-left: 10px;">
+                <div class="input-group-btn">
+                    <a class="btn btn-info" target="_blank" href="{{ path('admin_quarterly_pl_print', {'year': data.year, 'month': data.month}) }}">
+                        &nbsp;<i class="fa fa-print"></i>&nbsp;
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    </form>
+</div>
+
+<div class="container">
+    {% include 'AppBundle:AdminEmployee:adminQuarterlyPLData.html.twig' %}
+</div>
+{% endblock %}
