@@ -4,9 +4,9 @@
 {% set combined_width = "35%" %}
 <h4>so-sure Scheme P&L for {{ data.start|date('M Y', 'Europe/London') }} - {{ data.end|date('M Y', 'Europe/London') }}</h4>
 {% if not data.allowed %}
-    <h2>Quarterly period must be over 1 year ago</h2>
-{% else %}
-<table class="table table-striped">
+<h2 style="color: red">PRELIMINARY RESULTS - Quarterly period must be over 1 year ago</h2>
+{% endif %}
+<table class="table table-striped" style="{% if not data.allowed %}background-color: red{% endif %}">
     <tr class="info">
         <td colspan="4">Income</td>
     </tr>
@@ -153,4 +153,3 @@
         <td></td>
     </tr>
 </table>
-{% endif %}
