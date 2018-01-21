@@ -228,6 +228,7 @@ class DaviesService extends S3EmailService
         $claim->setIncurred($daviesClaim->incurred);
         $claim->setClaimHandlingFees($daviesClaim->handlingFees);
         $claim->setReservedValue($daviesClaim->reserved);
+        $claim->setTotalIncurred($daviesClaim->totalIncurred);
 
         $claim->setAccessories($daviesClaim->accessories);
         $claim->setUnauthorizedCalls($daviesClaim->unauthorizedCalls);
