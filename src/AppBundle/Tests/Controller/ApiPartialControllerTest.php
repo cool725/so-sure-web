@@ -82,7 +82,7 @@ class ApiPartialControllerTest extends BaseControllerTest
         $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         foreach ($policy->getScodes() as $scode) {
-            self::$dm->remove($scode);
+            $scode->setActive(false);
         }
         self::$dm->flush();
 
