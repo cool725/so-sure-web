@@ -710,7 +710,7 @@ class ReportingService
             );
             $data['underwriterPreferredReturn'] += $underwritersPreferredReturn;
             $underwriterReturn = $this->toTwoDp(
-                $newWrittenPremium - $underwritersPreferredReturn - $policy->getBrokerCommissionPaid()
+                $underwritersPreferredReturn - $policy->getBrokerCommissionPaid()
             );
             $data['underwriterReturn'] += $underwriterReturn;
             $data['profit'] += $this->toTwoDp(
