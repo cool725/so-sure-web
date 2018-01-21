@@ -695,7 +695,7 @@ class ReportingService
                 $policy->getAdjustedRewardPotPaymentAmount() * (1 + $policy->getPremium()->getIptRate())
             );
             $data['netWrittenPremium'] += $this->toTwoDp(
-              $data['gwp'] - $data['coverholderCommission'] - $data['rewardPotInclIptRebate']
+                $data['gwp'] - $data['coverholderCommission'] - $data['rewardPotInclIptRebate']
             );
             $data['underwriterPreferredReturn'] += $this->toTwoDp(
                 $data['netWrittenPremium'] * 0.08
