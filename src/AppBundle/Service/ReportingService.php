@@ -682,30 +682,39 @@ class ReportingService
         foreach ($policies as $policy) {
             $data['gwp'] += $policy->getGwpPaid();
             $data['coverholderCommission'] += $policy->getCoverholderCommissionPaid();
-            $data['brokerCommission'] += $policy->getCoverholderCommissionPaid();
-            $data['net'] += ($policy->getGwpPaid() -
-                $policy->getCoverholderCommissionPaid() - $policy->getCoverholderCommissionPaid());
+            $data['brokerCommission'] += $policy->getBrokerCommissionPaid();
+            $net = $policy->getGwpPaid() - $policy->getCoverholderCommissionPaid() -
+                $policy->getBrokerCommissionPaid();
+            $data['net'] += $net;
+            $claimsCost = 0;
+            $claimsReserves = 0;
             foreach ($policy->getClaims() as $claim) {
                 // TODO: add daviesIncurred
-                $data['claimsCost'] += $claim->getClaimHandlingFees() + 15;
-                $data['claimsReserves'] += $claim->getReservedValue();
+                $claimsCost += $claim->getClaimHandlingFees() + 15;
+                $claimsReserves += $claim->getReservedValue();
             }
-            $data['rewardPot'] += $policy->getAdjustedRewardPotPaymentAmount();
-            $data['rewardPotInclIptRebate'] += $this->toTwoDp(
-                $policy->getAdjustedRewardPotPaymentAmount() * (1 + $policy->getPremium()->getIptRate())
+            $data['claimsCost'] += $claimsCost;
+            $data['claimsReserves'] += $claimsReserves;
+            $rewardPot = (0 - $policy->getAdjustedRewardPotPaymentAmount());
+            $data['rewardPot'] += $rewardPot;
+            $rewardPotInclIptRebate = $this->toTwoDp(
+                $rewardPot * (1 + $policy->getPremium()->getIptRate())
             );
-            $data['netWrittenPremium'] += $this->toTwoDp(
-                $data['gwp'] - $data['coverholderCommission'] - $data['rewardPotInclIptRebate']
+            $data['rewardPotInclIptRebate'] += $rewardPotInclIptRebate;
+            $newWrittenPremium = $this->toTwoDp(
+                $policy->getGwpPaid() - $policy->getCoverholderCommissionPaid() - $rewardPotInclIptRebate
             );
-            $data['underwriterPreferredReturn'] += $this->toTwoDp(
-                $data['netWrittenPremium'] * 0.08
+            $data['netWrittenPremium'] += $newWrittenPremium;
+            $underwritersPreferredReturn = $this->toTwoDp(
+                $newWrittenPremium * 0.08
             );
-            $data['underwriterReturn'] += $this->toTwoDp(
-                $data['netWrittenPremium'] - $data['underwriterPreferredReturn'] - $data['brokerCommission']
+            $data['underwriterPreferredReturn'] += $underwritersPreferredReturn;
+            $underwriterReturn = $this->toTwoDp(
+                $newWrittenPremium - $underwritersPreferredReturn - $policy->getBrokerCommissionPaid()
             );
+            $data['underwriterReturn'] += $underwriterReturn;
             $data['profit'] += $this->toTwoDp(
-                $data['net'] - $data['rewardPot'] - $data['claimsCost'] - $data['claimsReserves'] -
-                $data['underwriterReturn']
+                $net - $rewardPot - $claimsCost - $claimsReserves - $underwriterReturn
             );
         }
 
