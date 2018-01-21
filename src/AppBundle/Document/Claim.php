@@ -271,6 +271,12 @@ class Claim
     protected $incurred;
 
     /**
+     * @MongoDB\Field(type="float")
+     * @Gedmo\Versioned
+     */
+    protected $totalIncurred;
+
+    /**
      * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
@@ -697,6 +703,16 @@ class Claim
     public function setIncurred($incurred)
     {
         $this->incurred = $incurred;
+    }
+
+    public function getTotalIncurred()
+    {
+        return $this->totalIncurred;
+    }
+
+    public function setTotalIncurred($totalIncurred)
+    {
+        $this->totalIncurred = $totalIncurred;
     }
 
     public function getUnauthorizedCalls()
