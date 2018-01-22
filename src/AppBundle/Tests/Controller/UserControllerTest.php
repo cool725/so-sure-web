@@ -755,4 +755,40 @@ class UserControllerTest extends BaseControllerTest
         // expect a locked account
         $this->login($email, 'bar', 'login', null, 503);
     }
+    public function testUserWelcomePage()
+    {
+        $email = self::generateEmail('testUserWelcomePage', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        self::$dm->flush();
+        $welcomePage = sprintf('/user/welcome/%s', $policy->getId());
+        // initial flag is false
+        $this->login($email, $password);
+        self::$client->request('GET', $welcomePage);
+        $this->assertContains(
+            "'has_visited_welcome_page': false",
+            self::$client->getResponse()->getContent()
+        );
+        // set after first show to true
+        self::$client->request('GET', $welcomePage);
+        $this->assertContains(
+            "'has_visited_welcome_page': true",
+            self::$client->getResponse()->getContent()
+        );
+        // consistent after repeated show
+        self::$client->request('GET', $welcomePage);
+        $this->assertContains(
+            "'has_visited_welcome_page': true",
+            self::$client->getResponse()->getContent()
+        );
+    }
 }
