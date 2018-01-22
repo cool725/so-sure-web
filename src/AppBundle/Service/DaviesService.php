@@ -31,6 +31,9 @@ class DaviesService extends S3EmailService
 
     protected $fees = [];
 
+    protected $dbClaims = [];
+    protected $processedClaims = [];
+
     public function setClaims($claimsService)
     {
         $this->claimsService = $claimsService;
@@ -40,7 +43,6 @@ class DaviesService extends S3EmailService
     {
         $this->mailer = $mailer;
     }
-
     public function setFeature($featureService)
     {
         $this->featureService = $featureService;
@@ -61,6 +63,35 @@ class DaviesService extends S3EmailService
         $this->fees = [];
     }
 
+    public function loadAllClaims()
+    {
+        $repoClaims = $this->dm->getRepository(Claim::class);
+        $findAllClaims = $repoClaims->findAll();
+        foreach ($findAllClaims as $claim) {
+            $this->dbClaims[] = $claim->getNumber();
+        }
+    }
+
+    public function logImportedClaim($number)
+    {
+        $this->importedClaims[] = $number;
+    }
+
+    public function reportMissingClaims()
+    {
+        $foundClaims = array_intersect($this->processedClaims, $this->dbClaims);
+        $missingClaims = array_diff($this->dbClaims, $foundClaims);
+
+        foreach ($missingClaims as $missingClaim) {
+            if (isset($missingClaim)) {
+                $msg = sprintf(
+                    'Unable to locate claim %s in db',
+                    $missingClaim
+                );
+                $this->warnings[$missingClaim][] = $msg;
+            }
+        }
+    }
     public function processExcelData($key, $data)
     {
         return $this->saveClaims($key, $data);
@@ -95,6 +126,13 @@ class DaviesService extends S3EmailService
         $claims = [];
         $openClaims = [];
         $multiple = [];
+
+        $this->loadAllClaims();
+        foreach ($daviesClaims as $daviesClaim) {
+            $this->logImportedClaim($daviesClaim->claimNumber);
+        }
+        $this->reportMissingClaims();
+
         foreach ($daviesClaims as $daviesClaim) {
             // get the most recent claim that's open
             if ($daviesClaim->isOpen()) {
@@ -147,7 +185,6 @@ class DaviesService extends S3EmailService
                 }
             }
         }
-
         return $success;
     }
 
