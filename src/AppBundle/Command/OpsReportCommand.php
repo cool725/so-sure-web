@@ -39,7 +39,7 @@ class OpsReportCommand extends ContainerAwareCommand
             $items[] = $item;
         }
 
-        $html = implode("<br>\n", $items);
+        $html = implode("\n<br/><br/>\n", $items);
         if (!$html) {
             $html = 'No csp violations';
         }
