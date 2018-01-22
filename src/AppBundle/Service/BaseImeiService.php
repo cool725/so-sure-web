@@ -264,10 +264,11 @@ class BaseImeiService
     {
         $fs = $this->filesystem->getFilesystem('s3policy_fs');
         $bucket = $fs->getAdapter()->getBucket();
-
+        $pathPrefix = $fs->getAdapter()->getPathPrefix();
         $path = pathinfo($filename);
         $s3Key = sprintf(
-            '%s/%s/%s.%s',
+            '%s%s/%s/%s.%s',
+            $pathPrefix,
             BaseImeiService::S3_FAILED_OCR_FOLDER,
             $userId,
             $path['basename'],

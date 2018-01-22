@@ -305,15 +305,16 @@ SEID";
         $this->assertFalse($results['success']);
         self::$imei->saveFailedOcr($testImage, $userId, 'png');
         $path = pathinfo($testImage);
+        $fs = self::$filesystem->getFilesystem('s3policy_fs');
+        $pathPrefix = $fs->getAdapter()->getPathPrefix();
         $s3Key = sprintf(
-            '%s/%s/%s.%s',
+            '%s%s/%s/%s.%s',
+            $pathPrefix,
             BaseImeiService::S3_FAILED_OCR_FOLDER,
             $userId,
             $path['basename'],
             'png'
         );
-        $fs = self::$filesystem->getFilesystem('s3policy_fs');
-
         $this->assertTrue($fs->has($s3Key));
         $fs->delete($s3Key);
         unlink($testImage);
