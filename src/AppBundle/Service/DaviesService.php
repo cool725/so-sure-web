@@ -31,9 +31,6 @@ class DaviesService extends S3EmailService
 
     protected $fees = [];
 
-    protected $dbClaims = [];
-    protected $processedClaims = [];
-
     public function setClaims($claimsService)
     {
         $this->claimsService = $claimsService;
@@ -63,29 +60,25 @@ class DaviesService extends S3EmailService
         $this->fees = [];
     }
 
-    public function loadAllClaims()
+    public function reportMissingClaims($daviesClaims)
     {
         $repoClaims = $this->dm->getRepository(Claim::class);
         $findAllClaims = $repoClaims->findAll();
         foreach ($findAllClaims as $claim) {
-            $this->dbClaims[] = $claim->getNumber();
+            $dbClaims[] = $claim->getNumber();
         }
-    }
 
-    public function logImportedClaim($number)
-    {
-        $this->importedClaims[] = $number;
-    }
+        foreach ($daviesClaims as $daviesClaim) {
+            $processedClaims[] = $daviesClaim->claimNumber;
+        }
 
-    public function reportMissingClaims()
-    {
-        $foundClaims = array_intersect($this->processedClaims, $this->dbClaims);
-        $missingClaims = array_diff($this->dbClaims, $foundClaims);
+        $foundClaims = array_intersect($processedClaims, $dbClaims);
+        $missingClaims = array_diff($dbClaims, $foundClaims);
 
         foreach ($missingClaims as $missingClaim) {
             if (isset($missingClaim)) {
                 $msg = sprintf(
-                    'Unable to locate claim %s in db',
+                    'Unable to locate db claim %s in the import file',
                     $missingClaim
                 );
                 $this->warnings[$missingClaim][] = $msg;
@@ -127,11 +120,7 @@ class DaviesService extends S3EmailService
         $openClaims = [];
         $multiple = [];
 
-        $this->loadAllClaims();
-        foreach ($daviesClaims as $daviesClaim) {
-            $this->logImportedClaim($daviesClaim->claimNumber);
-        }
-        $this->reportMissingClaims();
+        $this->reportMissingClaims($daviesClaims);
 
         foreach ($daviesClaims as $daviesClaim) {
             // get the most recent claim that's open

@@ -1315,4 +1315,49 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->replacementReceivedDate = new \DateTime();
         $this->assertFalse(static::$daviesService->saveClaim($daviesClaim, false));
     }
+
+    public function testSaveClaimsNoClaimsFound()
+    {
+        $policy = static::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('testSaveClaimsNoClaimsFound', $this));
+        $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
+        $claim->setStatus(Claim::STATUS_APPROVED);
+        $claim->setNumber(1234567890);
+        $policy->addClaim($claim);
+
+        static::$dm->persist($policy->getUser());
+        static::$dm->persist($policy);
+        static::$dm->persist($claim);
+        static::$dm->flush();
+
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->policyNumber = $claim->getPolicy()->getPolicyNumber();
+        $daviesClaim->claimNumber = '1234567890';
+        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
+        $daviesClaim->replacementMake = 'Apple';
+        $daviesClaim->replacementModel = 'iPhone 4';
+        $daviesClaim->replacementImei = '123 Bx11lt';
+        $daviesClaim->replacementReceivedDate = new \DateTime();
+        $daviesClaims = array($daviesClaim);
+
+        static::$daviesService->saveClaims('', $daviesClaims);
+        $this->insureWarningDoesNotExist('/1234567890/');
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->policyNumber = $claim->getPolicy()->getPolicyNumber();
+        $daviesClaim->claimNumber = '1234567891';
+        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
+        $daviesClaim->replacementMake = 'Apple';
+        $daviesClaim->replacementModel = 'iPhone 4';
+        $daviesClaim->replacementImei = '123 Bx11lt';
+        $daviesClaim->replacementReceivedDate = new \DateTime();
+        $daviesClaims = array($daviesClaim);
+
+        static::$daviesService->saveClaims('', $daviesClaims);
+        $this->insureWarningExists('/1234567890/');
+    }
 }
