@@ -23,10 +23,9 @@
     "typeahead.js": "^0.11.1",
     "clipboard": "^1.7.1",
     "jssocials": "^1.5.0",
-    "rangeslider.js": "^2.3.0",
+    "rangeslider.js": "^2.3.2",
     "cookieconsent": "^3.0.4",
-    "vimeo-player-js": "^2.0.1",
-    "intl-tel-input": "^11.0.4",
+    "vimeo-player-js": "^2.2.1",
     "jquery-circle-progress": "^1.2.1",
     "jquery-validation": "jquery.validate#^1.13.0",
     "bootstrap-sass": "^3.3.7",
@@ -75,6 +74,16 @@
         "bower_components/jssocials/dist/jssocials-theme-plain.css",
         "bower_components/jssocials/dist/jssocials-theme-classic.css"
       ],
+      "rangeslider.js": [
+        "bower_components/rangeslider.js/dist/rangeslider.min.js"
+      ],
+      "cookieconsent": [
+        "bower_components/cookieconsent/build/cookieconsent.min.js",
+        "bower_components/cookieconsent/build/cookieconsent.min.css"
+      ],
+      "vimeo-player-js": [
+        "bower_components/vimeo-player-js/dist/player.min.js"
+      ],
       "jquery-mask-plugin": [
         "bower_components/jquery-mask-plugin/dist/jquery.mask.min.js"
       ],
@@ -91,23 +100,6 @@
       ],
       "corejs-typeahead": [
         "bower_components/corejs-typeahead/dist/typeahead.bundle.min.js"
-      ],
-      "rangeslider.js": [
-        "bower_components/rangeslider.js/dist/rangeslider.min.js"
-      ],
-      "cookieconsent": [
-        "bower_components/cookieconsent/build/cookieconsent.min.js",
-        "bower_components/cookieconsent/build/cookieconsent.min.css"
-      ],
-      "vimeo-player-js": [
-        "bower_components/vimeo-player-js/dist/player.min.js"
-      ],
-      "intl-tel-input": [
-        "bower_components/intl-tel-input/build/js/intlTelInput.min.js",
-        "bower_components/intl-tel-input/build/js/utils.js",
-        "bower_components/intl-tel-input/build/css/intlTelInput.css",
-        "bower_components/intl-tel-input/build/img/flags.png",
-        "bower_components/intl-tel-input/build/img/flags@2x.png"
       ],
       "jquery-circle-progress": [
         "bower_components/jquery-circle-progress/dist/circle-progress.min.js"
