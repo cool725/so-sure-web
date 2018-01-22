@@ -16,7 +16,6 @@
   ],
   "dependencies": {
     "jquery": "~2.2.4",
-    "seiyria-bootstrap-slider": "^9.1",
     "Chart.js": "^1.1.0",
     "eonasdan-bootstrap-datetimepicker": "^4.17.42",
     "ouibounce": "^0.0.12",
@@ -60,10 +59,6 @@
         "bower_components/owl.carousel/dist/owl.carousel.min.js",
         "bower_components/owl.carousel/dist/assets/owl.carousel.min.css",
         "bower_components/owl.carousel/dist/assets/owl.theme.default.min.css"
-      ],
-      "seiyria-bootstrap-slider": [
-        "bower_components/seiyria-bootstrap-slider/dist/bootstrap-slider.min.js",
-        "bower_components/seiyria-bootstrap-slider/dist/css/bootstrap-slider.min.css"
       ],
       "Chart.js": [
         "bower_components/Chart.js/Chart.js"
