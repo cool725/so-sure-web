@@ -16,7 +16,7 @@
   ],
   "dependencies": {
     "jquery": "~2.2.4",
-    "eonasdan-bootstrap-datetimepicker": "^4.17.42",
+    "eonasdan-bootstrap-datetimepicker": "^4.17.47",
     "ouibounce": "^0.0.12",
     "datatables.net": "^1.10.12",
     "datatables.net-bs": "^1.10.12",
@@ -48,6 +48,10 @@
       "jquery": [
         "bower_components/jquery/dist/jquery.min.js"
       ],
+      "eonasdan-bootstrap-datetimepicker": [
+        "bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js",
+        "bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css"
+      ],
       "jquery-mask-plugin": [
         "bower_components/jquery-mask-plugin/dist/jquery.mask.min.js"
       ],
@@ -61,10 +65,6 @@
       ],
       "moment": [
         "bower_components/moment/min/moment.min.js"
-      ],
-      "eonasdan-bootstrap-datetimepicker": [
-        "bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js",
-        "bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css"
       ],
       "ouibounce": [
         "bower_components/ouibounce/build/ouibounce.min.js"
