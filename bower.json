@@ -20,13 +20,12 @@
     "ouibounce": "^0.0.12",
     "datatables.net": "^1.10.16",
     "datatables.net-bs": "^1.10.16",
-    "typeahead.js": "^0.11.1",
     "clipboard": "^1.7.1",
     "jssocials": "^1.5.0",
     "rangeslider.js": "^2.3.2",
     "cookieconsent": "^3.0.4",
     "vimeo-player-js": "^2.2.1",
-    "jquery-circle-progress": "^1.2.1",
+    "jquery-circle-progress": "^1.2.2",
     "jquery-validation": "jquery.validate#^1.13.0",
     "bootstrap-sass": "^3.3.7",
     "owl.carousel": "^2.2.1",
@@ -60,9 +59,6 @@
         "bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js",
         "bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css"
       ],
-      "typeahead.js": [
-        "bower_components/typeahead.js/dist/typeahead.bundle.min.js"
-      ],
       "clipboard": [
         "bower_components/clipboard/dist/clipboard.min.js"
       ],
@@ -84,6 +80,9 @@
       "vimeo-player-js": [
         "bower_components/vimeo-player-js/dist/player.min.js"
       ],
+      "jquery-circle-progress": [
+        "bower_components/jquery-circle-progress/dist/circle-progress.min.js"
+      ],
       "jquery-mask-plugin": [
         "bower_components/jquery-mask-plugin/dist/jquery.mask.min.js"
       ],
@@ -100,9 +99,6 @@
       ],
       "corejs-typeahead": [
         "bower_components/corejs-typeahead/dist/typeahead.bundle.min.js"
-      ],
-      "jquery-circle-progress": [
-        "bower_components/jquery-circle-progress/dist/circle-progress.min.js"
       ],
       "fuse.js": [
         "bower_components/fuse.js/dist/fuse.min.js"
