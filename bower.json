@@ -30,14 +30,15 @@
     "bootstrap-sass": "^3.3.7",
     "owl.carousel": "^2.2.1",
     "fuse.js": "^3.2.0",
-    "jquery-mask-plugin": "^1.14.11",
-    "parsleyjs": "^2.7.2",
+    "jquery-mask-plugin": "^1.14.13",
+    "parsleyjs": "^2.8.0",
     "animate.css": "^3.5.2",
     "corejs-typeahead": "^1.2.1",
     "dot": "doT#^1.1.2",
     "lozad": "^1.0.9",
     "js-cookie": "^2.2.0",
-    "Jcrop": "^2.0.4"
+    "Jcrop": "^2.0.4",
+    "moment": "^2.20.1"
   },
   "install": {
     "path": "web/components",
@@ -86,28 +87,25 @@
       "jquery-validation": [
         "bower_components/jquery-validation/dist/jquery.validate.min.js"
       ],
+      "owl.carousel": [
+        "bower_components/owl.carousel/dist/owl.carousel.min.js",
+        "bower_components/owl.carousel/dist/assets/owl.carousel.min.css",
+        "bower_components/owl.carousel/dist/assets/owl.theme.default.min.css"
+      ],
+      "fuse.js": [
+        "bower_components/fuse.js/dist/fuse.min.js"
+      ],
       "jquery-mask-plugin": [
         "bower_components/jquery-mask-plugin/dist/jquery.mask.min.js"
       ],
       "parsleyjs": [
         "bower_components/parsleyjs/dist/parsley.min.js"
       ],
-      "owl.carousel": [
-        "bower_components/owl.carousel/dist/owl.carousel.min.js",
-        "bower_components/owl.carousel/dist/assets/owl.carousel.min.css",
-        "bower_components/owl.carousel/dist/assets/owl.theme.default.min.css"
-      ],
-      "moment": [
-        "bower_components/moment/min/moment.min.js"
+      "animate": [
+        "bower_components/animate.css/animate.min.css"
       ],
       "corejs-typeahead": [
         "bower_components/corejs-typeahead/dist/typeahead.bundle.min.js"
-      ],
-      "fuse.js": [
-        "bower_components/fuse.js/dist/fuse.min.js"
-      ],
-      "animate": [
-        "bower_components/animate.css/animate.min.css"
       ],
       "dot": [
         "bower_components/dot/doT.min.js"
@@ -115,12 +113,15 @@
       "lozad": [
         "bower_components/lozad/dist/lozad.min.js"
       ],
+      "js-cookie": [
+        "bower_components/js-cookie/src/js.cookie.js"
+      ],
       "Jcrop": [
         "bower_components/Jcrop/css/Jcrop.min.css",
         "bower_components/Jcrop/js/Jcrop.min.js"
       ],
-      "js-cookie": [
-        "bower_components/js-cookie/src/js.cookie.js"
+      "moment": [
+        "bower_components/moment/min/moment.min.js"
       ]
     }
   }
