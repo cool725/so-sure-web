@@ -303,16 +303,17 @@ SEID";
         $results = self::$imei->ocr($testImage, 'Samsung');
         $this->assertNotNull($results);
         $this->assertFalse($results['success']);
-        self::$imei->saveFailedOcr($testImage, $userId);
-        //check if file is on S3, remove local and remote copy
+        self::$imei->saveFailedOcr($testImage, $userId, 'png');
         $path = pathinfo($testImage);
         $s3Key = sprintf(
-            '%s/%s/%s',
+            '%s/%s/%s.%s',
             BaseImeiService::S3_FAILED_OCR_FOLDER,
             $userId,
-            $path['basename']
+            $path['basename'],
+            'png'
         );
         $fs = self::$filesystem->getFilesystem('s3policy_fs');
+
         $this->assertTrue($fs->has($s3Key));
         $fs->delete($s3Key);
         unlink($testImage);

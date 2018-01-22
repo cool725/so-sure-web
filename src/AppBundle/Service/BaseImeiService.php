@@ -260,14 +260,27 @@ class BaseImeiService
         return $results;
     }
 
-    public function saveFailedOcr($filename, $userId, $folder = BaseImeiService::S3_FAILED_OCR_FOLDER)
+    public function saveFailedOcr($filename, $userId, $extension = 'png')
     {
         $fs = $this->filesystem->getFilesystem('s3policy_fs');
+        $bucket = $fs->getAdapter()->getBucket();
+
         $path = pathinfo($filename);
-        $s3Key = sprintf('%s/%s/%s', $folder, $userId, $path['basename']);
+        $s3Key = sprintf(
+            '%s/%s/%s.%s',
+            BaseImeiService::S3_FAILED_OCR_FOLDER,
+            $userId,
+            $path['basename'],
+            $extension
+        );
         $stream = fopen($filename, 'r+');
         $fs->writeStream($s3Key, $stream);
         fclose($stream);
-        return $s3Key;
+
+        return sprintf(
+            's3://%s/%s',
+            $bucket,
+            $s3Key
+        );
     }
 }
