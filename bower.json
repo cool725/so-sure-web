@@ -18,12 +18,11 @@
     "jquery": "~2.2.4",
     "eonasdan-bootstrap-datetimepicker": "^4.17.47",
     "ouibounce": "^0.0.12",
-    "datatables.net": "^1.10.12",
-    "datatables.net-bs": "^1.10.12",
+    "datatables.net": "^1.10.16",
+    "datatables.net-bs": "^1.10.16",
     "typeahead.js": "^0.11.1",
-    "clipboard": "^1.6.1",
-    "jssocials": "^1.4.0",
-    "bootstrap-daterangepicker": "https://github.com/dangrossman/bootstrap-daterangepicker.git#2.1.24",
+    "clipboard": "^1.7.1",
+    "jssocials": "^1.5.0",
     "rangeslider.js": "^2.3.0",
     "cookieconsent": "^3.0.4",
     "vimeo-player-js": "^2.0.1",
@@ -52,6 +51,30 @@
         "bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js",
         "bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css"
       ],
+      "ouibounce": [
+        "bower_components/ouibounce/build/ouibounce.min.js"
+      ],
+      "datatables.net": [
+        "bower_components/datatables.net/js/jquery.dataTables.min.js"
+      ],
+      "datatables.net-bs": [
+        "bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js",
+        "bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css"
+      ],
+      "typeahead.js": [
+        "bower_components/typeahead.js/dist/typeahead.bundle.min.js"
+      ],
+      "clipboard": [
+        "bower_components/clipboard/dist/clipboard.min.js"
+      ],
+      "jssocials": [
+        "bower_components/jssocials/dist/jssocials.min.js",
+        "bower_components/jssocials/dist/jssocials.css",
+        "bower_components/jssocials/dist/jssocials-theme-flat.css",
+        "bower_components/jssocials/dist/jssocials-theme-minima.css",
+        "bower_components/jssocials/dist/jssocials-theme-plain.css",
+        "bower_components/jssocials/dist/jssocials-theme-classic.css"
+      ],
       "jquery-mask-plugin": [
         "bower_components/jquery-mask-plugin/dist/jquery.mask.min.js"
       ],
@@ -66,36 +89,8 @@
       "moment": [
         "bower_components/moment/min/moment.min.js"
       ],
-      "ouibounce": [
-        "bower_components/ouibounce/build/ouibounce.min.js"
-      ],
-      "datatables.net": [
-        "bower_components/datatables.net/js/jquery.dataTables.min.js"
-      ],
-      "datatables.net-bs": [
-        "bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js",
-        "bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css"
-      ],
-      "typeahead.js": [
-        "bower_components/typeahead.js/dist/typeahead.bundle.min.js"
-      ],
       "corejs-typeahead": [
         "bower_components/corejs-typeahead/dist/typeahead.bundle.min.js"
-      ],
-      "clipboard": [
-        "bower_components/clipboard/dist/clipboard.min.js"
-      ],
-      "jssocials": [
-        "bower_components/jssocials/dist/jssocials.min.js",
-        "bower_components/jssocials/dist/jssocials.css",
-        "bower_components/jssocials/dist/jssocials-theme-flat.css",
-        "bower_components/jssocials/dist/jssocials-theme-minima.css",
-        "bower_components/jssocials/dist/jssocials-theme-plain.css",
-        "bower_components/jssocials/dist/jssocials-theme-classic.css"
-      ],
-      "bootstrap-daterangepicker": [
-        "bower_components/bootstrap-daterangepicker/daterangepicker.js",
-        "bower_components/bootstrap-daterangepicker/daterangepicker.css"
       ],
       "rangeslider.js": [
         "bower_components/rangeslider.js/dist/rangeslider.min.js"
