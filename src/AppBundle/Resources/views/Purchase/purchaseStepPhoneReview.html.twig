@@ -9,8 +9,6 @@
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets output='css/*.css'
-        'components/bootstrap-daterangepicker/daterangepicker.css'
-        'components/intl-tel-input/intlTelInput.css'
         '@AppBundle/Resources/public/sass/page/checkout.scss'
     %}
         <link rel="stylesheet" href="{{ asset_url }}">
@@ -346,7 +344,7 @@
     'components/corejs-typeahead/typeahead.bundle.min.js'
     'components/owl.carousel/owl.carousel.min.js'
     'components/fuse.js/fuse.min.js'
-    'components/jquery-validation/jquery.validate.js'
+    'components/jquery-validation/jquery.validate.min.js'
     '@AppBundle/Resources/public/js/Default/jqueryValidatorMethods.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
     '@AppBundle/Resources/public/js/Purchase/purchaseStep.js'
