@@ -33,6 +33,17 @@
     }
 }
 
+label {
+    font-size: 15px;
+    font-family: $avenir-book;
+    font-weight: normal;
+    margin-bottom: 5px;
+
+    .req {
+        color: $blue;
+    }
+}
+
 .error {
     color: $red;
 }
@@ -47,19 +58,14 @@
     }
 }
 
-.has-success {
-    border-color: $green;
+label.error {
+    display: block;
+    color: $red;
+    margin: 5px 0;
 }
 
-label {
-    font-size: 15px;
-    font-family: $avenir-book;
-    font-weight: normal;
-    margin-bottom: 5px;
-
-    .req {
-        color: $blue;
-    }
+.has-success {
+    border-color: $green;
 }
 
 // TT - Modify form inline for typeahead - ugly (refactor)
