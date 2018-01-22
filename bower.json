@@ -16,7 +16,6 @@
   ],
   "dependencies": {
     "jquery": "~2.2.4",
-    "Chart.js": "^1.1.0",
     "eonasdan-bootstrap-datetimepicker": "^4.17.42",
     "ouibounce": "^0.0.12",
     "datatables.net": "^1.10.12",
@@ -59,9 +58,6 @@
         "bower_components/owl.carousel/dist/owl.carousel.min.js",
         "bower_components/owl.carousel/dist/assets/owl.carousel.min.css",
         "bower_components/owl.carousel/dist/assets/owl.theme.default.min.css"
-      ],
-      "Chart.js": [
-        "bower_components/Chart.js/Chart.js"
       ],
       "moment": [
         "bower_components/moment/min/moment.min.js"
