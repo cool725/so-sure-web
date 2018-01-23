@@ -577,7 +577,12 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->login($email, $password, 'user/');
         $this->setPhoneNew($phone2, null, 1, false);
         self::verifyResponse(302);
-        $latestPolicy = $user->getLatestPolicy();
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $userRepo = $dm->getRepository(User::class);
+        $updatedUser = $userRepo->find($user->getId());
+
+        $latestPolicy = $updatedUser->getLatestPolicy();
         $redirectUrl = self::$router->generate('user_welcome_policy_id', ['id' => $latestPolicy->getId()]);
         $this->assertTrue(self::$client->getResponse()->isRedirect($redirectUrl));
         self::$client->followRedirect();

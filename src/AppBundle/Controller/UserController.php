@@ -1021,13 +1021,10 @@ class UserController extends BaseController
 
         $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
 
-        if ($policy->getVisitedWelcomePage() == null) {
-            $date = new \DateTime();
-            $policy->setVisitedWelcomePage($date);
+        $pageVisited = $policy->getVisitedWelcomePage() ? true : false;
+        if ($pageVisited === null) {
+            $policy->setVisitedWelcomePage(new \DateTime());
             $dm->flush($policy);
-            $pageVisited = 'false';
-        } else {
-            $pageVisited = 'true';
         }
 
         //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_LANDING_HOME);
@@ -1059,7 +1056,7 @@ class UserController extends BaseController
         return array(
             'policy_key' => $this->getParameter('policy_key'),
             'policy' => $user->getLatestPolicy(),
-            'has_visited_welcome_page' => $pageVisited
+            'has_visited_welcome_page' => $pageVisited,
         );
     }
     /**

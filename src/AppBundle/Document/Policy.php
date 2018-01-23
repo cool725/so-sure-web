@@ -441,6 +441,13 @@ abstract class Policy
      */
     protected $requestedCancellationReason;
 
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
+    protected $visitedWelcomePage;
+
     public function __construct()
     {
         $this->created = new \DateTime();
@@ -1750,6 +1757,16 @@ abstract class Policy
     public function getRequestedCancellationReason()
     {
         return $this->requestedCancellationReason;
+    }
+
+    public function setVisitedWelcomePage(\DateTime $date)
+    {
+        $this->visitedWelcomePage = $date;
+    }
+
+    public function getVisitedWelcomePage()
+    {
+        return $this->visitedWelcomePage;
     }
 
     abstract public function validatePremium($adjust, \DateTime $date);
