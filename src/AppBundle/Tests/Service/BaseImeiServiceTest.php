@@ -306,10 +306,8 @@ SEID";
         self::$imei->saveFailedOcr($testImage, $userId, 'png');
         $path = pathinfo($testImage);
         $fs = self::$filesystem->getFilesystem('s3policy_fs');
-        $pathPrefix = $fs->getAdapter()->getPathPrefix();
         $s3Key = sprintf(
-            '%s%s/%s/%s.%s',
-            $pathPrefix,
+            '%s/%s/%s.%s',
             BaseImeiService::S3_FAILED_OCR_FOLDER,
             $userId,
             $path['basename'],

@@ -267,8 +267,7 @@ class BaseImeiService
         $pathPrefix = $fs->getAdapter()->getPathPrefix();
         $path = pathinfo($filename);
         $s3Key = sprintf(
-            '%s%s/%s/%s.%s',
-            $pathPrefix,
+            '%s/%s/%s.%s',
             BaseImeiService::S3_FAILED_OCR_FOLDER,
             $userId,
             $path['basename'],
@@ -278,10 +277,6 @@ class BaseImeiService
         $fs->writeStream($s3Key, $stream);
         fclose($stream);
 
-        return sprintf(
-            's3://%s/%s',
-            $bucket,
-            $s3Key
-        );
+        return array('s3Key' => $s3Key, 'bucket' => $bucket, 'prefix' => $pathPrefix);
     }
 }
