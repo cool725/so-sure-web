@@ -62,6 +62,8 @@ class DaviesService extends S3EmailService
 
     public function reportMissingClaims($daviesClaims)
     {
+        $dbClaims = [];
+        $processedClaims = [];
         $repoClaims = $this->dm->getRepository(Claim::class);
         $findAllClaims = $repoClaims->findAll();
         foreach ($findAllClaims as $claim) {
