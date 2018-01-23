@@ -470,7 +470,7 @@ class PurchaseControllerTest extends BaseControllerTest
         ]);
 
         self::verifyResponse(302);
-        $redirectUrl = self::$router->generate('user_welcome');
+        $redirectUrl = self::$router->generate('user_welcome_policy_id', ['id' => $policy->getId()]);
         $this->assertTrue(self::$client->getResponse()->isRedirect($redirectUrl));
         $crawler = self::$client->followRedirect();
         self::verifyResponse(200);
@@ -513,9 +513,8 @@ class PurchaseControllerTest extends BaseControllerTest
             'ReceiptId' => $response['receiptId'],
             'CardToken' => $response['consumer']['consumerToken']
         ]);
-
         self::verifyResponse(302);
-        $redirectUrl = self::$router->generate('user_welcome');
+        $redirectUrl = self::$router->generate('user_welcome_policy_id', ['id' => $policy->getId()]);
         $this->assertTrue(self::$client->getResponse()->isRedirect($redirectUrl));
         $crawler = self::$client->followRedirect();
         self::verifyResponse(200);
@@ -529,7 +528,7 @@ class PurchaseControllerTest extends BaseControllerTest
         self::verifyResponse(302);
         // TODO: Current user welcome will only be displayed if one payment has been made,
         // but should check the actual paid amount on policy as well in the future
-        $redirectUrl = self::$router->generate('user_welcome');
+        $redirectUrl = self::$router->generate('user_welcome_policy_id', ['id' => $policy->getId()]);
         $this->assertTrue(self::$client->getResponse()->isRedirect($redirectUrl));
         $crawler = self::$client->followRedirect();
         self::verifyResponse(200);
@@ -537,19 +536,18 @@ class PurchaseControllerTest extends BaseControllerTest
 
     public function test2ndPolicyPayCC()
     {
-        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $email = self::generateEmail('test2ndPolicyPayCC', $this);
         $password = 'foo';
-        $phone1 = self::getRandomPhone($dm);
+        $phone1 = self::getRandomPhone(self::$dm);
         $user = self::createUser(
             self::$userManager,
             $email,
             $password,
             $phone1,
-            $dm
+            self::$dm
         );
 
-        $policy1 = self::initPolicy($user, $dm, $phone1, null, false, false);
+        $policy1 = self::initPolicy($user, self::$dm, $phone1, null, false, false);
 
         $judopay = self::$container->get('app.judopay');
         $policyService = self::$container->get('app.policy');
@@ -577,12 +575,12 @@ class PurchaseControllerTest extends BaseControllerTest
 
         $phone2 = $this->setRandomPhone();
         $this->login($email, $password, 'user/');
-
-        $crawler = $this->setPhoneNew($phone2, null, 1, false);
+        $this->setPhoneNew($phone2, null, 1, false);
         self::verifyResponse(302);
-        $redirectUrl = self::$router->generate('user_welcome');
+        $latestPolicy = $user->getLatestPolicy();
+        $redirectUrl = self::$router->generate('user_welcome_policy_id', ['id' => $latestPolicy->getId()]);
         $this->assertTrue(self::$client->getResponse()->isRedirect($redirectUrl));
-        $crawler = self::$client->followRedirect();
+        self::$client->followRedirect();
         self::verifyResponse(200);
     }
 

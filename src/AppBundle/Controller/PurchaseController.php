@@ -451,7 +451,7 @@ class PurchaseController extends BaseController
                                     $purchase->setAgreed(true);
                                     return $this->redirectToRoute(
                                         'user_welcome_policy_id',
-                                        ['id', $policy->getId()]
+                                        ['id' => $policy->getId()]
                                     );
                                 } else {
                                     // @codingStandardsIgnoreStart
