@@ -774,18 +774,21 @@ class UserControllerTest extends BaseControllerTest
         // initial flag is false
         $this->login($email, $password);
         self::$client->request('GET', $welcomePage);
+        self::verifyResponse(200);
         $this->assertContains(
             "'has_visited_welcome_page': false",
             self::$client->getResponse()->getContent()
         );
         // set after first show to true
         self::$client->request('GET', $welcomePage);
+        self::verifyResponse(200);
         $this->assertContains(
             "'has_visited_welcome_page': true",
             self::$client->getResponse()->getContent()
         );
         // consistent after repeated show
         self::$client->request('GET', $welcomePage);
+        self::verifyResponse(200);
         $this->assertContains(
             "'has_visited_welcome_page': true",
             self::$client->getResponse()->getContent()

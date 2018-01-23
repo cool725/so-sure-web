@@ -1022,7 +1022,7 @@ class UserController extends BaseController
         $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
 
         $pageVisited = $policy->getVisitedWelcomePage() ? true : false;
-        if ($pageVisited === null) {
+        if ($policy->getVisitedWelcomePage() === null) {
             $policy->setVisitedWelcomePage(new \DateTime());
             $dm->flush($policy);
         }
