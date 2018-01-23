@@ -1331,11 +1331,13 @@ class DaviesServiceTest extends WebTestCase
         static::$dm->persist($claim);
         static::$dm->flush();
 
-
         $daviesClaim = new DaviesClaim();
         $daviesClaim->policyNumber = $claim->getPolicy()->getPolicyNumber();
         $daviesClaim->claimNumber = '1234567890';
-        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->insuredName = 'foo bar';
+        $daviesClaim->initialSuspicion = 'no';
+        $daviesClaim->finalSuspicion = 'no';
+        $daviesClaim->status = DaviesClaim::STATUS_CLOSED;
         $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 4';
@@ -1344,13 +1346,16 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaims = array($daviesClaim);
 
         static::$daviesService->saveClaims('', $daviesClaims);
-        $this->insureWarningDoesNotExist('/1234567890/');
+        $this->insureErrorDoesNotExist('/1234567890/');
 
         $daviesClaim = new DaviesClaim();
         $daviesClaim->policyNumber = $claim->getPolicy()->getPolicyNumber();
         $daviesClaim->claimNumber = '1234567891';
-        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->status = DaviesClaim::STATUS_CLOSED;
         $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
+        $daviesClaim->insuredName = 'foo bar';
+        $daviesClaim->initialSuspicion = 'no';
+        $daviesClaim->finalSuspicion = 'no';
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 4';
         $daviesClaim->replacementImei = '123 Bx11lt';
@@ -1358,6 +1363,6 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaims = array($daviesClaim);
 
         static::$daviesService->saveClaims('', $daviesClaims);
-        $this->insureWarningExists('/1234567890/');
+        $this->insureErrorExists('/1234567890/');
     }
 }

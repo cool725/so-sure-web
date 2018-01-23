@@ -81,7 +81,7 @@ class DaviesService extends S3EmailService
                     'Unable to locate db claim %s in the import file',
                     $missingClaim
                 );
-                $this->warnings[$missingClaim][] = $msg;
+                $this->errors[$missingClaim][] = $msg;
             }
         }
     }
