@@ -22,6 +22,7 @@ use AppBundle\Listener\UserListener;
 use AppBundle\Service\RateLimitService;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Classes\SoSure;
+use AppBundle\Document\Payment\PolicyDiscountPayment;
 
 /**
  * @group functional-net
@@ -850,6 +851,8 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertTrue(in_array('A0001', $data['phone_policy']['phone']['devices']));
         $this->assertGreaterThan(0, $data['monthly_premium']);
         $this->assertGreaterThan(0, $data['yearly_premium']);
+        $this->assertEquals($data['monthly_premium'], $data['adjusted_monthly_premium']);
+        $this->assertEquals($data['yearly_premium'], $data['adjusted_yearly_premium']);
         $this->assertEquals("Kelvin’s iPhone5", $data['phone_policy']['name']);
         $this->assertNull($data['phone_policy']['picsure_status']);
         $this->assertTrue(count($data['phone_policy']['excesses']) > 0);
@@ -872,6 +875,52 @@ class ApiAuthControllerTest extends BaseControllerTest
             }
         }
         $this->assertTrue($foundPolicy);
+    }
+
+    public function testApiNewPolicyWithPolicyDiscount()
+    {
+        $this->clearRateLimit();
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testApiNewPolicyWithPolicyDiscount', $this),
+            'foo',
+            true
+        );
+        self::addAddress($user);
+        self::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $imei = self::generateRandomImei();
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
+            'imei' => $imei,
+            'make' => 'HTC',
+            'device' => 'A0001',
+            'memory' => 64,
+            'rooted' => false,
+            'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
+            'name' => "Kelvin’|s iPhone5",
+        ]]);
+
+        $data = $this->verifyResponse(200);
+        $repo = self::$dm->getRepository(Policy::class);
+        $policy = $repo->find($data['id']);
+
+        $discount = new PolicyDiscountPayment();
+        $discount->setAmount(10);
+        $discount->setDate(new \DateTime());
+        $policy->addPayment($discount);
+        $policy->getPremium()->setAnnualDiscount($discount->getAmount());
+        static::$dm->flush();
+        
+        // Now make sure that the policy shows up against the user
+        $url = sprintf('/api/v1/auth/policy/%s?_method=GET', $policy->getId());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+        $this->assertGreaterThan(0, $data['monthly_premium']);
+        $this->assertGreaterThan(0, $data['yearly_premium']);
+        $this->assertTrue($data['monthly_premium'] > $data['adjusted_monthly_premium']);
+        $this->assertTrue($data['yearly_premium'] > $data['adjusted_yearly_premium']);
+        $this->assertEquals(1, count($data['premium_payments']['paid']));
+        $this->assertEquals('policyDiscount', $data['premium_payments']['paid'][0]['type']);
     }
 
     public function testNewPolicy17DigitImei()
@@ -1797,6 +1846,8 @@ class ApiAuthControllerTest extends BaseControllerTest
             $this->assertEquals(10, $highConnectionValue);
         }
         $this->assertEquals(2, $lowConnectionValue);
+        $this->assertEquals(1, count($policyData['premium_payments']['paid']));
+        $this->assertEquals('judo', $policyData['premium_payments']['paid'][0]['type']);
     }
 
     public function testNewPolicyJudopayExceptionPartialPolicy()

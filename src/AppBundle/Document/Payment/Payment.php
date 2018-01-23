@@ -71,6 +71,8 @@ abstract class Payment
             return 'potReward';
         } elseif ($this instanceof SoSurePotRewardPayment) {
             return 'sosurePotReward';
+        } elseif ($this instanceof PolicyDiscountPayment) {
+            return 'policyDiscount';
         } else {
             return null;
         }
@@ -464,6 +466,7 @@ abstract class Payment
         return [
             'date' => $this->getDate() ? $this->getDate()->format(\DateTime::ATOM) : null,
             'amount' => $this->getAmount() ? $this->toTwoDp($this->getAmount()) : null,
+            'type' => $this->getType() ? $this->getType() : null,
         ];
     }
 
