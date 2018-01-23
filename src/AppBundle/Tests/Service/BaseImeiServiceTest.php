@@ -303,18 +303,17 @@ SEID";
         $results = self::$imei->ocr($testImage, 'Samsung');
         $this->assertNotNull($results);
         $this->assertFalse($results['success']);
-        self::$imei->saveFailedOcr($testImage, $userId, 'png');
-        $path = pathinfo($testImage);
+
+        $url = self::$imei->saveFailedOcr($testImage, $userId, 'png');
+
         $fs = self::$filesystem->getFilesystem('s3policy_fs');
-        $s3Key = sprintf(
-            '%s/%s/%s.%s',
-            BaseImeiService::S3_FAILED_OCR_FOLDER,
-            $userId,
-            $path['basename'],
-            'png'
-        );
-        $this->assertTrue($fs->has($s3Key));
-        $fs->delete($s3Key);
+        $bucket = $fs->getAdapter()->getBucket();
+        $pathPrefix = $fs->getAdapter()->getPathPrefix();
+
+        $key = str_replace(sprintf('s3://%s/%s', $bucket, $pathPrefix), '', $url);
+        $this->assertTrue($fs->has($key));
+
+        $fs->delete($key);
         unlink($testImage);
     }
 }

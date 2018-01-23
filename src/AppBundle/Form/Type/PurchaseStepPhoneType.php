@@ -119,16 +119,10 @@ class PurchaseStepPhoneType extends AbstractType
                 );
                 if ($ocr['success'] === false) {
                     $purchase->setFileValid(false);
-                    $response = $this->imeiService->saveFailedOcr(
+                    $url = $this->imeiService->saveFailedOcr(
                         $filename,
                         $purchase->getUser()->getId(),
                         $filename->guessExtension()
-                    );
-                    $url = sprintf(
-                        's3://%s/%s%s',
-                        $response['bucket'],
-                        $response['prefix'],
-                        $response['s3Key']
                     );
                     $this->logger->warning(sprintf(
                         'Failed to find imei for user: %s; picture saved in %s ; ocr: %s',
