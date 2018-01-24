@@ -274,8 +274,6 @@
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
-    'components/jquery-validation/jquery.validate.js'
-    '@AppBundle/Resources/public/js/Default/jqueryValidatorMethods.js'
     '@AppBundle/Resources/public/js/About/index.js' %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
