@@ -40,7 +40,6 @@ class DaviesService extends S3EmailService
     {
         $this->mailer = $mailer;
     }
-
     public function setFeature($featureService)
     {
         $this->featureService = $featureService;
@@ -61,6 +60,33 @@ class DaviesService extends S3EmailService
         $this->fees = [];
     }
 
+    public function reportMissingClaims($daviesClaims)
+    {
+        $dbClaims = [];
+        $processedClaims = [];
+        $repoClaims = $this->dm->getRepository(Claim::class);
+        $findAllClaims = $repoClaims->findAll();
+        foreach ($findAllClaims as $claim) {
+            $dbClaims[] = $claim->getNumber();
+        }
+
+        foreach ($daviesClaims as $daviesClaim) {
+            $processedClaims[] = $daviesClaim->claimNumber;
+        }
+
+        $foundClaims = array_intersect($processedClaims, $dbClaims);
+        $missingClaims = array_diff($dbClaims, $foundClaims);
+
+        foreach ($missingClaims as $missingClaim) {
+            if (isset($missingClaim)) {
+                $msg = sprintf(
+                    'Unable to locate db claim %s in the import file',
+                    $missingClaim
+                );
+                $this->errors[$missingClaim][] = $msg;
+            }
+        }
+    }
     public function processExcelData($key, $data)
     {
         return $this->saveClaims($key, $data);
@@ -95,6 +121,9 @@ class DaviesService extends S3EmailService
         $claims = [];
         $openClaims = [];
         $multiple = [];
+
+        $this->reportMissingClaims($daviesClaims);
+
         foreach ($daviesClaims as $daviesClaim) {
             // get the most recent claim that's open
             if ($daviesClaim->isOpen()) {
@@ -147,7 +176,6 @@ class DaviesService extends S3EmailService
                 }
             }
         }
-
         return $success;
     }
 

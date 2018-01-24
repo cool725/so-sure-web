@@ -999,13 +999,37 @@ class UserController extends BaseController
      *   as these will impact Adwords
      *
      * @Route("/welcome", name="user_welcome")
+     * @Route("/welcome/{id}", name="user_welcome_policy_id")
      * @Template
      */
-    public function welcomeAction()
+    public function welcomeAction($id = null)
     {
+        $dm = $this->getManager();
         $user = $this->getUser();
+
         if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
             return new RedirectResponse($this->generateUrl('user_invalid_policy'));
+        }
+
+        // fetch latest policy if none provided
+        if ($id === null) {
+            $policy = $user->getLatestPolicy();
+        } else {
+            $policyRepo = $dm->getRepository(Policy::class);
+            $policy = $policyRepo->find($id);
+        }
+
+        // if policy id was given and user does not match
+        if (!$policy) {
+            throw $this->createNotFoundException('Policy not found');
+        }
+
+        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+
+        $pageVisited = $policy->getVisitedWelcomePage() ? true : false;
+        if ($policy->getVisitedWelcomePage() === null) {
+            $policy->setVisitedWelcomePage(new \DateTime());
+            $dm->flush($policy);
         }
 
         //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_LANDING_HOME);
@@ -1036,10 +1060,10 @@ class UserController extends BaseController
 
         return array(
             'policy_key' => $this->getParameter('policy_key'),
-            'policy' => $user->getLatestPolicy()
+            'policy' => $user->getLatestPolicy(),
+            'has_visited_welcome_page' => $pageVisited,
         );
     }
-
     /**
      * @Route("/payment-details", name="user_card_details")
      * @Route("/payment-details/{policyId}", name="user_card_details_policy",

@@ -250,16 +250,17 @@
                                     </ol>
                                     <p>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</p>
                                     <p class="text-center" style="display: none">{{ form_widget(purchase_form.agreed, {'label': ' I confirm the above is correct', 'value': 'checked'}) }}</p>
-                                    {% if app.user.hasValidPaymentMethod %}
-                                        <div class="form-group">
+                                    <div class="form-group">
+                                        {% if app.user.hasValidPaymentMethod %}
                                             {{ form_widget(purchase_form.existing, {'label': 'Pay with card on file', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
                                             {{ form_widget(purchase_form.next, {'label': 'Pay with a new card', 'attr': {'class': 'btn btn-default btn-block btn-pad'}}) }}
-                                        </div>
-                                    {% else %}
-                                        <div class="form-group">
+                                        {% else %}
                                             {{ form_widget(purchase_form.next, {'label': 'Continue to payment', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
-                                        </div>
-                                    {% endif %}
+                                        {% endif %}
+                                    </div>
+                                    <div class="form-group">
+                                        <p class="help-block text-center"><small>You will be taken to our payment service provider Judo Pay</small></p>
+                                    </div>
                                 </div>
                                 <div id="policy-doc" class="modal-body__policy-doc" style="display:none;">
                                     <button type="button" class="close policy-doc-toggle" aria-label="Close"><span aria-hidden="true">&times;</span></button>
