@@ -292,7 +292,7 @@ class PurchaseController extends BaseController
         }
 
         $this->get('app.sixpack')->convert(
-            SixpackService::EXPERIMENT_FUNNEL_V1_V2,
+            // SixpackService::EXPERIMENT_FUNNEL_V1_V2,
             SixpackService::KPI_RECEIVE_DETAILS
         );
 
