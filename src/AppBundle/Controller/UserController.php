@@ -15,6 +15,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\SCode;
 use AppBundle\Document\Cashback;
 use AppBundle\Document\Feature;
+use AppBundle\Document\User;
 use AppBundle\Document\Form\Renew;
 use AppBundle\Document\Form\RenewCashback;
 use AppBundle\Form\Type\PhoneType;
@@ -1158,6 +1159,19 @@ class UserController extends BaseController
             if ($request->request->has('user_email_form')) {
                 $userEmailForm->handleRequest($request);
                 if ($userEmailForm->isValid()) {
+                    $userRepo = $this->getManager()->getRepository(User::class);
+                    $existingUser = $userRepo->findOneBy(['emailCanonical' => strtolower($user->getEmail())]);
+                    if ($existingUser) {
+                        // @codingStandardsIgnoreStart
+                        $this->addFlash(
+                            'error',
+                            'Sorry, but that email already exists in our system. Please contact us to resolve this issue.'
+                        );
+                        // @codingStandardsIgnoreEnd
+
+                        return $this->redirectToRoute('user_contact_details_policy', ['policyId' => $policy->getId()]);
+                    }
+
                     $this->getManager()->flush();
                     $this->addFlash(
                         'success',
