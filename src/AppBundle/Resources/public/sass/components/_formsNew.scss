@@ -44,6 +44,7 @@ label {
     }
 }
 
+// Validation
 .error {
     color: $red;
 }
@@ -59,9 +60,9 @@ label {
 }
 
 label.error {
-    display: block;
-    color: $red;
-    margin: 5px 0;
+    display: block !important;
+    color: $red !important;
+    margin: 5px 0 !important;
 }
 
 .has-success {
