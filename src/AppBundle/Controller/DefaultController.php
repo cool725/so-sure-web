@@ -86,7 +86,7 @@ class DefaultController extends BaseController
             ]);
         }
 
-        $userTop = new User();
+        // $userTop = new User();
         $referral = $request->get('referral');
         if ($referral) {
             $userTop->setReferralId($referral);
@@ -94,53 +94,6 @@ class DefaultController extends BaseController
             $session->set('referral', $referral);
             $logger->debug(sprintf('Referral %s', $referral));
         }
-        $userBottom = clone $userTop;
-        $formTop = $this->get('form.factory')
-            ->createNamedBuilder('launch_top', LaunchType::class, $userTop)
-            ->getForm();
-        $formBottom = $this->get('form.factory')
-            ->createNamedBuilder('launch_bottom', LaunchType::class, $userBottom)
-            ->getForm();
-
-        if ('POST' === $request->getMethod()) {
-            $existingUser = null;
-            if ($request->request->has('launch_top')) {
-                $formTop->handleRequest($request);
-                if ($formTop->isValid()) {
-                    $existingUser = $launchUser->addUser($userTop)['user'];
-                }
-            } elseif ($request->request->has('launch_bottom')) {
-                $formBottom->handleRequest($request);
-                if ($formBottom->isValid()) {
-                    $existingUser = $launchUser->addUser($userBottom)['user'];
-                }
-            }
-
-            if ($existingUser) {
-                return $this->redirectToRoute('launch_share', ['id' => $existingUser->getId()]);
-            }
-        }
-
-        $i6s = $phoneRepo->findOneBy([
-                'active' => true,
-                'make' => 'Apple',
-                'model' => 'iPhone 6S',
-                'memory' => (int) 32
-        ]);
-
-        $i7 = $phoneRepo->findOneBy([
-            'active' => true,
-            'make' => 'Apple',
-            'model' => 'iPhone 7',
-            'memory' => (int) 32
-        ]);
-
-        $s7 = $phoneRepo->findOneBy([
-            'active' => true,
-            'make' => 'Samsung',
-            'model' => 'Galaxy S7',
-            'memory' => (int) 32
-        ]);
 
         // $exp = $this->sixpack(
         //     $request,
@@ -152,14 +105,8 @@ class DefaultController extends BaseController
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         $data = array(
-            'form_top' => $formTop->createView(),
-            'form_bottom' => $formBottom->createView(),
             'referral' => $referral,
-            'i6s' => $i6s,
-            'i7' => $i7,
             'phone' => $phone,
-            's7' => $s7,
-            'sixpack' => 'phone-image',
             'device_category' => $this->get('app.request')->getDeviceCategory()
         );
 
