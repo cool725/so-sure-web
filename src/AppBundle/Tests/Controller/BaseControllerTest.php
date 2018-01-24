@@ -216,4 +216,28 @@ class BaseControllerTest extends WebTestCase
         }
         $this->assertEquals($numOfForms, $processed);
     }
+
+    protected function expectFlashSuccess($crawler, $message)
+    {
+        $this->assertContains(
+            $message,
+            $crawler->filterXPath('//div[contains(@class, "flash-success")]')->html()
+        );
+    }
+
+    protected function expectFlashWarning($crawler, $message)
+    {
+        $this->assertContains(
+            $message,
+            $crawler->filterXPath('//div[contains(@class, "flash-warning")]')->html()
+        );
+    }
+
+    protected function expectFlashError($crawler, $message)
+    {
+        $this->assertContains(
+            $message,
+            $crawler->filterXPath('//div[contains(@class, "flash-danger")]')->html()
+        );
+    }
 }

@@ -1014,6 +1014,19 @@ class AdminEmployeeController extends BaseController
             } elseif ($request->request->has('user_email_form')) {
                 $userEmailForm->handleRequest($request);
                 if ($userEmailForm->isValid()) {
+                    $userRepo = $this->getManager()->getRepository(User::class);
+                    $existingUser = $userRepo->findOneBy(['emailCanonical' => strtolower($user->getEmail())]);
+                    if ($existingUser) {
+                        // @codingStandardsIgnoreStart
+                        $this->addFlash(
+                            'error',
+                            'Sorry, but that email already exists in our system. Please contact us to resolve this issue.'
+                        );
+                        // @codingStandardsIgnoreEnd
+
+                        return $this->redirectToRoute('admin_user', ['id' => $id]);
+                    }
+
                     $dm->flush();
                     $this->addFlash(
                         'success',
