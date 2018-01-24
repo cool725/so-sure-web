@@ -31,7 +31,6 @@
     "owl.carousel": "^2.2.1",
     "fuse.js": "^3.2.0",
     "jquery-mask-plugin": "^1.14.13",
-    "parsleyjs": "^2.8.0",
     "animate.css": "^3.5.2",
     "corejs-typeahead": "^1.2.1",
     "dot": "doT#^1.1.2",
@@ -97,9 +96,6 @@
       ],
       "jquery-mask-plugin": [
         "bower_components/jquery-mask-plugin/dist/jquery.mask.min.js"
-      ],
-      "parsleyjs": [
-        "bower_components/parsleyjs/dist/parsley.min.js"
       ],
       "animate": [
         "bower_components/animate.css/animate.min.css"
