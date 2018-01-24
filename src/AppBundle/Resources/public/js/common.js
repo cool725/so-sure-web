@@ -62,6 +62,12 @@ $(function(){
         }
     }
 
+    var hamburger = $('.hamburger');
+
+    $(hamburger).click(function(event) {
+        $(this).toggleClass('is-active');
+    });
+
     if ($('.secondary-nav').length) {
         adjust = 50;
         $(window).scroll(stickyNav);
