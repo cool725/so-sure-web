@@ -144,12 +144,21 @@ class QuoteServiceTest extends WebTestCase
         self::$quoteService->getQuotes('Google', 'bullhead', 2, true);
     }
 
-    public function testQuoteServiceKnownDeviceRootedSend()
+    public function testQuoteServiceKnownRootedDeviceEmail()
     {
         $mailer = $this->getMockBuilder('Swift_Mailer')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->expect($mailer, 0, 'Rooted');
+
+        $this->expect($mailer, 0, 'Rooted device queried: bullhead (16 GB)');
+        self::$quoteService->setMailerMailer($mailer);
+        self::$quoteService->getQuotes('Google', 'bullhead', 16, true);
+        $key = sprintf(QuoteService::REDIS_ROOTED_DEVICE_EMAIL_KEY_FORMAT, 'bullhead', 16);
+        $this->assertTrue((self::$redis->get($key) == 1), 'Redis key found');
+        $mailer = $this->getMockBuilder('Swift_Mailer')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mailer->expects($this->never())->method('send');
         self::$quoteService->setMailerMailer($mailer);
         self::$quoteService->getQuotes('Google', 'bullhead', 16, true);
     }
