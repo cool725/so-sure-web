@@ -118,6 +118,35 @@ class DefaultController extends BaseController
         return $this->render('AppBundle:Default:index.html.twig', $data);
     }
 
+
+    /**
+     * @Route("/opt1", name="opt1")
+     * @Route("/opt2", name="opt2")
+     * @Template
+     */
+    public function homepageLanding(Request $request)
+    {
+
+        if ($request->get('_route') == "opt1") {
+            $data = array(
+                'main'      => 'Mobile Insurance',
+                'main_cont' => 'Reinvented',
+                'sub'       => 'Easier. Quicker. Jargon Free.',
+                // 'sub_cont'  => '',
+            );
+        } elseif ($request->get('_route') == "opt2") {
+            $data = array(
+                'main'      => 'Hassle Free',
+                'main_cont' => 'Mobile Insurance',
+                'sub'       => 'We dont give you the run around when you claim.',
+                // 'sub_cont'  => '',
+            );
+        }
+
+        return $this->render('AppBundle:Default:index.html.twig', $data);
+    }
+
+
     /**
      * @Route("/select-phone", name="select_phone_make")
      * @Route("/select-phone/{type}/{id}", name="select_phone_make_type_id")
