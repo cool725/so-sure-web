@@ -120,21 +120,21 @@ class DefaultController extends BaseController
 
 
     /**
-     * @Route("/opt1", name="opt1")
-     * @Route("/opt2", name="opt2")
+     * @Route("/reimagined", name="reimagined")
+     * @Route("/hasslefree", name="hasslefree")
      * @Template
      */
     public function homepageLanding(Request $request)
     {
 
-        if ($request->get('_route') == "opt1") {
+        if ($request->get('_route') == "reimagined") {
             $data = array(
                 'main'      => 'Mobile Insurance',
-                'main_cont' => 'Reinvented',
+                'main_cont' => 'Re-Imagined',
                 'sub'       => 'Easier. Quicker. Jargon Free.',
                 // 'sub_cont'  => '',
             );
-        } elseif ($request->get('_route') == "opt2") {
+        } elseif ($request->get('_route') == "hasslefree") {
             $data = array(
                 'main'      => 'Hassle Free',
                 'main_cont' => 'Mobile Insurance',
