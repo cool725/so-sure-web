@@ -43,7 +43,7 @@ use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\PolicyTerms;
 
 use AppBundle\Service\MixpanelService;
-// use AppBundle\Service\SixpackService;
+use AppBundle\Service\SixpackService;
 
 class DefaultController extends BaseController
 {
