@@ -142,12 +142,13 @@ class DefaultController extends BaseController
             'memory' => (int) 32
         ]);
 
-        $exp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_FUNNEL_V1_V2,
-            ['v1', 'v2'],
-            true
-        );
+        // $exp = $this->sixpack(
+        //     $request,
+        //     SixpackService::EXPERIMENT_FUNNEL_V1_V2,
+        //     ['v1', 'v2'],
+        //     true
+        // );
+
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         $data = array(
@@ -162,13 +163,12 @@ class DefaultController extends BaseController
             'device_category' => $this->get('app.request')->getDeviceCategory()
         );
 
-        //if ($exp == 'v2-new') {
-        //    return $this->render('AppBundle:Default:indexV2.html.twig', $data);
-        if ($exp == 'v2') {
-            return $this->render('AppBundle:Default:indexV2old.html.twig', $data);
-        } else {
-            return $this->render('AppBundle:Default:index.html.twig', $data);
-        }
+        // if ($exp == 'v2') {
+        //     return $this->render('AppBundle:Default:indexV2old.html.twig', $data);
+        // } else {
+        //     return $this->render('AppBundle:Default:index.html.twig', $data);
+        // }
+        return $this->render('AppBundle:Default:index.html.twig', $data);
     }
 
     /**

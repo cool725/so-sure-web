@@ -461,25 +461,22 @@ class PhoneInsuranceController extends BaseController
             false
         );
         */
-        $exp = $this->get('app.sixpack')->participate(
-            SixpackService::EXPERIMENT_FUNNEL_V1_V2,
-            ['v1', 'v2'],
-            true
-        );
+        // $exp = $this->get('app.sixpack')->participate(
+        //     SixpackService::EXPERIMENT_FUNNEL_V1_V2,
+        //     ['v1', 'v2'],
+        //     true
+        // );
+
         if ($request->get('force')) {
             $exp = $request->get('force');
         }
         $template = 'AppBundle:PhoneInsurance:quote.html.twig';
-        /*
-        if ($exp == 'complex') {
-            $template = 'AppBundle:PhoneInsurance:quoteNewSlider.html.twig';
-        } */
-        if ($exp == 'v2') {
-            $template = 'AppBundle:PhoneInsurance:quoteNew.html.twig';
-        }
+
+        // if ($exp == 'v2') {
+        //     $template = 'AppBundle:PhoneInsurance:quoteNew.html.twig';
+        // }
 
         if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
-            // return $this->render('AppBundle:PhoneInsurance:insuranceLanding.html.twig', $data);
             return $this->render($template, $data);
         } else {
             return $this->render($template, $data);
