@@ -13,6 +13,11 @@ class BaseImeiService
 {
     use \AppBundle\Document\ImeiTrait;
 
+    const OEM_TESSERACT_ONLY = 1;
+    const OEM_CUBE_ONLY = 2;
+    const OEM_TESSERACT_CUBE_COMBINED = 3;
+    const OEM_DEFAULT = 4;
+
     const S3_FAILED_OCR_FOLDER = 'imei-failure';
 
     /** @var LoggerInterface */
@@ -106,37 +111,57 @@ class BaseImeiService
         return false;
     }
 
-    /**
-     * @param string $imei
-     *
-     * @return boolean
-     */
-    public function isImei($imei)
-    {
-        return $this->isLuhn($imei) && strlen($imei) == 15;
-    }
-
-    /**
-     * @see http://stackoverflow.com/questions/4741580/imei-validation-function
-     * @param string $n
-     *
-     * @return boolean
-     */
-    protected function isLuhn($n)
-    {
-        $str = '';
-        foreach (str_split(strrev((string) $n)) as $i => $d) {
-            $str .= $i %2 !== 0 ? $d * 2 : $d;
-        }
-        return array_sum(str_split($str)) % 10 === 0;
-    }
-
     public function ocr($filename, $make, $extension = null)
     {
-        $results = $this->ocrRaw($filename, $extension);
+        $resultsCubeCombined = $this->parseOcr(
+            $this->ocrRaw($filename, $extension, self::OEM_TESSERACT_CUBE_COMBINED),
+            $make
+        );
+        if ($resultsCubeCombined['full_success']) {
+            return $resultsCubeCombined;
+        }
 
-         return $this->parseOcr($results, $make);
+        $resultsCube = $this->parseOcr(
+            $this->ocrRaw($filename, $extension, self::OEM_CUBE_ONLY),
+            $make
+        );
+        $resultsTesseract = $this->parseOcr(
+            $this->ocrRaw($filename, $extension, self::OEM_TESSERACT_ONLY),
+            $make
+        );
+        $results = [
+            'success' => false,
+            'full_success' => false,
+            'raw' => $resultsCubeCombined['raw'],
+            'imei' => null,
+            'serialNumber' => null,
+        ];
+        if ($this->isImei($resultsCubeCombined['imei'])) {
+            $results['imei'] = $resultsCubeCombined['imei'];
+            $results['success'] = true;
+        } elseif ($this->isImei($resultsCube['imei'])) {
+            $results['imei'] = $resultsCube['imei'];
+            $results['success'] = true;
+        } elseif ($this->isImei($resultsTesseract['imei'])) {
+            $results['imei'] = $resultsTesseract['imei'];
+            $results['success'] = true;
+        }
+        if ($make == 'Apple') {
+            if ($this->isAppleSerialNumber($resultsCubeCombined['serialNumber'])) {
+                $results['serialNumber'] = $resultsCubeCombined['serialNumber'];
+                $results['full_success'] = $results['success'];
+            } elseif ($this->isAppleSerialNumber($resultsCube['serialNumber'])) {
+                $results['serialNumber'] = $resultsCube['serialNumber'];
+                $results['full_success'] = $results['success'];
+            } elseif ($this->isAppleSerialNumber($resultsTesseract['serialNumber'])) {
+                $results['serialNumber'] = $resultsTesseract['serialNumber'];
+                $results['full_success'] = $results['success'];
+            }
+        } else {
+            $results['full_success'] = $results['success'];
+        }
 
+        return $results;
     }
 
     private function findSerialNumberByLinePosition($results, $imei)
@@ -175,44 +200,49 @@ class BaseImeiService
                 // Expected case
                 return [
                     'success' => true,
+                    'full_success' => $this->isAppleSerialNumber($matches[1]) && $this->isImei($matches[1]),
                     'raw' => $results,
                     'imei' => $matches[3],
-                    'serialNumber' => $matches[1]
+                    'serialNumber' => $matches[1],
                 ];
             } elseif (preg_match('/([Il]ME[Il])(\d{15})/', $noSpace, $matches)) {
                 // Expected case if non-english language (serial number copy is different)
                 $serialNumber = $this->findSerialNumberByLinePosition($results, $matches[2]);
                 return [
                     'success' => true,
+                    'full_success' => $this->isAppleSerialNumber($serialNumber) && $this->isImei($matches[2]),
                     'raw' => $results,
                     'imei' => $matches[2],
-                    'serialNumber' => $serialNumber
+                    'serialNumber' => $serialNumber,
                 ];
             } elseif (preg_match('/SerialNumber([A-Z0-9]+).*([Il]ME[Il])(\d{14})A/s', $noSpace, $matches)) {
                 // 14 digit IMEI followed by A
                 return [
                     'success' => true,
+                    'full_success' => $this->isAppleSerialNumber($matches[1]), // forcing a valid imei
                     'raw' => $results,
                     'imei' => $this->luhnGenerate($matches[3]),
-                    'serialNumber' => $matches[1]
+                    'serialNumber' => $matches[1],
                 ];
             } elseif (preg_match('/([Il]ME[Il])(\d{14})A/', $noSpace, $matches)) {
                 // 14 digit IMEI followed by A with non-english language (serial number copy is different)
                 $serialNumber = $this->findSerialNumberByLinePosition($results, $matches[2]);
                 return [
                     'success' => true,
+                    'full_success' => $this->isAppleSerialNumber($serialNumber), // forcing a valid imei
                     'raw' => $results,
                     'imei' => $this->luhnGenerate($matches[2]),
-                    'serialNumber' => $serialNumber
+                    'serialNumber' => $serialNumber,
                 ];
             } elseif (preg_match('/(\d{15})/', $noSpace, $matches)) {
                 // might be a screenshot of *#06# rather than settings
                 if ($this->isImei($matches[1])) {
                     return [
                         'success' => true,
+                        'full_success' => false,
                         'raw' => $results,
                         'imei' => $matches[1],
-                        'serialNumber' => null
+                        'serialNumber' => null,
                     ];
                 }
             }
@@ -221,17 +251,25 @@ class BaseImeiService
                 if ($this->isImei($matches[1])) {
                     return [
                         'success' => true,
+                        'full_success' => true,
                         'raw' => $results,
-                        'imei' => $matches[1]
+                        'imei' => $matches[1],
+                        'serialNumber' => null,
                     ];
                 }
             }
         }
 
-        return ['raw' => $results, 'success' => false];
+        return [
+            'raw' => $results,
+            'success' => false,
+            'full_success' => false,
+            'imei' => null,
+            'serialNumber' => null
+        ];
     }
 
-    public function ocrRaw($filename, $extension = null)
+    public function ocrRaw($filename, $extension = null, $engine = OEM_TESSERACT_CUBE_COMBINED)
     {
         $imagine = new \Imagine\Gd\Imagine();
         $image = $imagine->open($filename);
@@ -252,7 +290,7 @@ class BaseImeiService
         $results = $ocr
             ->psm(6) // singleBlock
             ->lang('eng')
-            ->config('tessedit_ocr_engine_mode', '2') // tesseractCubeCombined
+            ->config('tessedit_ocr_engine_mode', $engine)
             ->run();
 
         unlink($file);
