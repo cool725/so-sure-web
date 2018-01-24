@@ -676,7 +676,7 @@ class ReceperioService extends BaseImeiService
                 }
             } else {
                 if (!in_array($e->getCode(), [ReciperoManualProcessException::EMPTY_MAKES,
-                    $e->getCode() != ReciperoManualProcessException::NO_MODELREFERENCE])) {
+                    ReciperoManualProcessException::NO_MODELREFERENCE])) {
                     $this->logger->error(
                         sprintf("Unable to check serial number '%s'", $serialNumber),
                         ['exception' => $e]
@@ -702,13 +702,8 @@ class ReceperioService extends BaseImeiService
         User $user = null,
         $warnMismatch = true
     ) {
-        //dont run recipero if testrun
-        if (!$this->isTestRun) {
-            //clear response data from previous request
-            $this->responseData = null;
-            if (!$this->runMakeModelCheck($serialNumber, $user)) {
-                return false;
-            }
+        if (!$this->isTestRun && !$this->runMakeModelCheck($serialNumber, $user)) {
+            return false;
         }
         try {
             $this->setMakemodelValidatedStatus(
