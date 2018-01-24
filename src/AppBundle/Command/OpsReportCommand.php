@@ -26,7 +26,8 @@ class OpsReportCommand extends ContainerAwareCommand
         $redis = $this->getContainer()->get('snc_redis.default');
         $mailer = $this->getContainer()->get('app.mailer');
 
-        $this->sendCsp($redis, $mailer);
+        $response = $this->sendCsp($redis, $mailer);
+        $output->writeln(sprintf('Sent %s CSP violations', $response));
         $response = $this->sendClientValidation($redis, $mailer);
         $output->writeln(sprintf('Sent %s', $response));
     }
@@ -38,11 +39,13 @@ class OpsReportCommand extends ContainerAwareCommand
             $items[] = $item;
         }
 
-        $html = implode('<br>', $items);
+        $html = implode("\n<br/><br/>\n", $items);
         if (!$html) {
             $html = 'No csp violations';
         }
         $mailer->send('CSP Report', 'tech@so-sure.com', $html);
+        return count($items);
+
     }
 
     private function parseErrors($errors)

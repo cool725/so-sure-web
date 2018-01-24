@@ -123,6 +123,15 @@ services:
             - "@event_dispatcher"
             - "@app.mixpanel"
 
+    app.scode:
+        class: AppBundle\Service\SCodeService
+        arguments:
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "@app.router"
+            - "@app.shortlink"
+            - "@app.branch"
+
     app.digits:
         class: AppBundle\Service\DigitsService
         arguments:
@@ -401,6 +410,7 @@ services:
             - "@app.ratelimit"
             - "@app.intercom"
             - "@app.sms"
+            - "@app.scode"
 
     app.quote:
         class: AppBundle\Service\QuoteService
@@ -741,10 +751,8 @@ services:
     app.listener.sanctions:
         class:   AppBundle\Listener\SanctionsListener
         arguments:
-            - "@doctrine_mongodb.odm.default_document_manager"
-            - "@logger"
-            - "@app.mailer"
             - "@app.sanctions"
+            - "@snc_redis.default"
         tags:
             -  { name: kernel.event_listener, event: event.user.created, method: onUserCreatedEvent }
             -  { name: kernel.event_listener, event: event.company.created, method: onCompanyCreatedEvent }

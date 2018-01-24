@@ -58,7 +58,6 @@
                     'user': {
                         'id': undefined,
                     },
-                    'page_visited': {% if page_visited is not defined %}false{% else %}{{ page_visited }}{% endif %},
                     'intercom': {
                         'user_id': null,
                         'user_hash': null,
@@ -74,7 +73,6 @@
                         'referral': '{{ session_referral }}',
                         'scode': '{{ session_scode }}'
                     },
-                    'page_visited': {% if page_visited is not defined %}false{% else %}{{ page_visited }}{% endif %},
                     'user': {
                         'id': '{{ app.user.id }}'
                     },
@@ -88,6 +86,7 @@
                         'enabled': {% if intercom_enabled %}true{% else %}false{% endif %}
                     }
                 {% endif %}
+                ,'has_visited_welcome_page': {% if has_visited_welcome_page is not defined or not has_visited_welcome_page %}false{% else %}true{% endif %}
                 {% block gtm_data %}{% endblock %}
             }];
         </script>

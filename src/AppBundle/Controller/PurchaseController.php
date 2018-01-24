@@ -9,6 +9,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -212,7 +213,15 @@ class PurchaseController extends BaseController
                     }
                     $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_RECEIVE_DETAILS, $data);
 
-                    return $this->redirectToRoute('purchase_step_policy');
+                    if ($user->hasPartialPolicy()) {
+                        return new RedirectResponse(
+                            $this->generateUrl('purchase_step_policy_id', [
+                                'id' => $user->getPartialPolicies()[0]->getId()
+                            ])
+                        );
+                    } else {
+                        return $this->redirectToRoute('purchase_step_policy');
+                    }
                 }
             }
         }
@@ -231,7 +240,8 @@ class PurchaseController extends BaseController
                 ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
                 ['memory' => 'asc']
             ) : null,
-            'postcode' => $this->sixpack($request, SixpackService::EXPERIMENT_POSTCODE, ['comma', 'split', 'type']),
+            // 'postcode' => $this->sixpack($request, SixpackService::EXPERIMENT_POSTCODE, ['comma', 'split', 'type']),
+            'postcode' => 'comma',
         );
 
         return $this->render('AppBundle:Purchase:purchaseStepPersonalAddress.html.twig', $data);
@@ -266,6 +276,7 @@ class PurchaseController extends BaseController
 
         $dm = $this->getManager();
         $phoneRepo = $dm->getRepository(Phone::class);
+        $policyRepo = $dm->getRepository(Policy::class);
 
         $phone = $this->getSessionQuotePhone($request);
 
@@ -273,13 +284,17 @@ class PurchaseController extends BaseController
         $purchase->setUser($user);
         $policy = null;
         if ($id) {
-            $policyRepo = $dm->getRepository(Policy::class);
             $policy = $policyRepo->find($id);
         }
 
-        if (!$policy) {
-            $policy = $user->getUnInitPolicy();
+        if (!$policy && $user->hasPartialPolicy()) {
+            $policy = $user->getPartialPolicies()[0];
         }
+
+        $this->get('app.sixpack')->convert(
+            SixpackService::EXPERIMENT_FUNNEL_V1_V2,
+            SixpackService::KPI_RECEIVE_DETAILS
+        );
 
         if ($policy) {
             if (!$phone && $policy->getPhone()) {
@@ -312,7 +327,7 @@ class PurchaseController extends BaseController
         $webpay = null;
         $allowPayment = true;
 
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_POSTCODE);
+        //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_POSTCODE);
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('purchase_form')) {
                 $purchaseForm->handleRequest($request);
@@ -380,10 +395,24 @@ class PurchaseController extends BaseController
                             );
                             throw $this->createNotFoundException('Unable to see policy');
                         } catch (DuplicateImeiException $e) {
-                            $this->addFlash(
-                                'error',
-                                "Sorry, it looks this phone is already insured"
-                            );
+                            $partialPolicy = $policyRepo->findOneBy(['imei' => $purchase->getImei()]);
+                            if ($partialPolicy && !$partialPolicy->getStatus() &&
+                                $partialPolicy->getUser()->getId() == $user->getId()) {
+                                $this->addFlash(
+                                    'error',
+                                    "Sorry, you weren't in quite the right place. Please try again here."
+                                );
+                                return new RedirectResponse(
+                                    $this->generateUrl('purchase_step_policy_id', [
+                                        'id' => $partialPolicy->getId()
+                                    ])
+                                );
+                            } else {
+                                $this->addFlash(
+                                    'error',
+                                    "Sorry, your phone is already in our system. Perhaps it's already insured?"
+                                );
+                            }
                             $allowPayment = false;
                         } catch (LostStolenImeiException $e) {
                             $this->addFlash(
@@ -451,7 +480,7 @@ class PurchaseController extends BaseController
                                     $purchase->setAgreed(true);
                                     return $this->redirectToRoute(
                                         'user_welcome_policy_id',
-                                        ['id', $policy->getId()]
+                                        ['id' => $policy->getId()]
                                     );
                                 } else {
                                     // @codingStandardsIgnoreStart

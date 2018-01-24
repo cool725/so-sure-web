@@ -78,7 +78,15 @@ class UserController extends BaseController
             if ($this->getSessionQuotePhone($request) && $user->canPurchasePolicy()) {
                 // TODO: If possible to detect if the user came via the purchase page or via the login page
                 // login page would be nice to add a flash message saying their policy has not yet been purchased
-                return new RedirectResponse($this->generateUrl('purchase_step_policy'));
+                if ($user->hasPartialPolicy()) {
+                    return new RedirectResponse(
+                        $this->generateUrl('purchase_step_policy_id', [
+                            'id' => $user->getPartialPolicies()[0]->getId()
+                        ])
+                    );
+                } else {
+                    return new RedirectResponse($this->generateUrl('purchase_step_policy'));
+                }
             } else {
                 return new RedirectResponse($this->generateUrl('user_invalid_policy'));
             }
@@ -904,8 +912,8 @@ class UserController extends BaseController
     {
         $user = $this->getUser();
         $excludePolicyImei = [];
-        foreach ($user->getUnInitPolicies() as $unInitPolicy) {
-            $excludePolicyImei[] = $unInitPolicy->getImei();
+        foreach ($user->getPartialPolicies() as $partialPolicy) {
+            $excludePolicyImei[] = $partialPolicy->getImei();
         }
         foreach ($user->getPolicies() as $policy) {
             if ($policy->isPolicyExpiredWithin30Days() && !in_array($policy->getImei(), $excludePolicyImei)) {
@@ -922,11 +930,11 @@ class UserController extends BaseController
     private function addUnInitPolicyInsureFlash()
     {
         $user = $this->getUser();
-        foreach ($user->getUnInitPolicies() as $unInitPolicy) {
+        foreach ($user->getPartialPolicies() as $partialPolicy) {
             $message = sprintf(
                 'Insure your <a href="%s">%s phone</a>',
-                $this->generateUrl('purchase_step_policy_id', ['id' => $unInitPolicy->getId()]),
-                $unInitPolicy->getPhone()->__toString()
+                $this->generateUrl('purchase_step_policy_id', ['id' => $partialPolicy->getId()]),
+                $partialPolicy->getPhone()->__toString()
             );
             $this->addFlash('success', $message);
         }
@@ -960,9 +968,6 @@ class UserController extends BaseController
         $policy = $user->getUnpaidPolicy();
         if ($policy) {
             $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
-            if ($policy->getPremiumPlan() != Policy::PLAN_MONTHLY) {
-                throw new \Exception('Unpaid policy should only be triggered for monthly plans');
-            }
             if (!$policy->isPolicyPaidToDate()) {
                 $amount = $policy->getOutstandingPremiumToDate();
 
@@ -1013,19 +1018,18 @@ class UserController extends BaseController
             $policyRepo = $dm->getRepository(Policy::class);
             $policy = $policyRepo->find($id);
         }
-        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+
         // if policy id was given and user does not match
         if (!$policy) {
             throw $this->createNotFoundException('Policy not found');
         }
 
-        if ($policy->getVisitedWelcomePage() == null) {
-            $date = new \DateTime();
-            $policy->setVisitedWelcomePage($date);
+        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+
+        $pageVisited = $policy->getVisitedWelcomePage() ? true : false;
+        if ($policy->getVisitedWelcomePage() === null) {
+            $policy->setVisitedWelcomePage(new \DateTime());
             $dm->flush($policy);
-            $pageVisited = 'false';
-        } else {
-            $pageVisited = 'true';
         }
 
         //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_LANDING_HOME);
@@ -1057,7 +1061,7 @@ class UserController extends BaseController
         return array(
             'policy_key' => $this->getParameter('policy_key'),
             'policy' => $user->getLatestPolicy(),
-            'has_visited_welcome_page' => $pageVisited
+            'has_visited_welcome_page' => $pageVisited,
         );
     }
     /**

@@ -3,6 +3,7 @@ namespace AppBundle\Service;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Psr\Log\LoggerInterface;
+use AppBundle\Classes\SoSure;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\SalvaPhonePolicy;
@@ -645,6 +646,143 @@ class ReportingService
             'totalCashback' => Cashback::sumCashback($this->getCashback($date)),
         ];
         // @codingStandardsIgnoreEnd
+    }
+
+    /**
+     * @param $date Current date - will run report for previous year quarter
+     */
+    public function getQuarterlyPL(\DateTime $date, \DateTime $now = null)
+    {
+        if (!$now) {
+            $now = new \DateTime();
+        }
+        list($start, $end) = $this->getQuarterlyPLDates($date);
+        $policies = $this->getQuarterlyPolicies($start, $end);
+        $data = [
+            'start' => $start,
+            'end' => $end,
+            'month' => $date->format('n'),
+            'year' => $date->format('Y'),
+            'allowed' => $now->diff($end)->y > 0,
+            'gwp' => 0,
+            'coverholderCommission' => 0,
+            'brokerCommission' => 0,
+            'net' => 0,
+            'claimsCost' => 0,
+            'claimsReserves' => 0,
+            'rewardPot' => 0,
+            'rewardPotInclIptRebate' => 0,
+            'netWrittenPremium' => 0,
+            'underwriterPreferredReturn' => 0,
+            'underwriterReturn' => 0,
+            'profit' => 0,
+            'profitSalva' => 0,
+            'profitSoSure' => 0,
+        ];
+        foreach ($policies as $policy) {
+            $data['gwp'] += $policy->getGwpPaid();
+            $data['coverholderCommission'] += $policy->getCoverholderCommissionPaid();
+            $data['brokerCommission'] += $policy->getBrokerCommissionPaid();
+            $net = $policy->getGwpPaid() - $policy->getCoverholderCommissionPaid() -
+                $policy->getBrokerCommissionPaid();
+            $data['net'] += $net;
+            $claimsCost = 0;
+            $claimsReserves = 0;
+            foreach ($policy->getClaims() as $claim) {
+                $claimsCost += $claim->getTotalIncurred() + $claim->getClaimHandlingFees();
+                $claimsReserves += $claim->getReservedValue();
+            }
+            $data['claimsCost'] += $claimsCost;
+            $data['claimsReserves'] += $claimsReserves;
+            $rewardPot = (0 - $policy->getAdjustedRewardPotPaymentAmount());
+            $data['rewardPot'] += $rewardPot;
+            $rewardPotInclIptRebate = $this->toTwoDp(
+                $rewardPot * (1 + $policy->getPremium()->getIptRate())
+            );
+            $data['rewardPotInclIptRebate'] += $rewardPotInclIptRebate;
+            $newWrittenPremium = $this->toTwoDp(
+                $policy->getGwpPaid() - $policy->getCoverholderCommissionPaid() - $rewardPotInclIptRebate
+            );
+            $data['netWrittenPremium'] += $newWrittenPremium;
+            $underwritersPreferredReturn = $this->toTwoDp(
+                $newWrittenPremium * 0.08
+            );
+            $data['underwriterPreferredReturn'] += $underwritersPreferredReturn;
+            $underwriterReturn = $this->toTwoDp(
+                $underwritersPreferredReturn - $policy->getBrokerCommissionPaid()
+            );
+            $data['underwriterReturn'] += $underwriterReturn;
+            $data['profit'] += $this->toTwoDp(
+                $net - $rewardPot - $claimsCost - $claimsReserves - $underwriterReturn
+            );
+        }
+
+        if ($data['profit'] > 0) {
+            $data['profitSalva'] += $this->toTwoDp($data['profit'] * 0.4);
+            $data['profitSoSure'] += $this->toTwoDp($data['profit'] * 0.6);
+        }
+
+        return $data;
+    }
+    
+    private function getQuarterlyPLDates(\DateTime $date)
+    {
+        // Quarters are defined Sept-Nov, Dec-Feb, Mar-May, Jun-Aug
+        $date = clone $date;
+        $month = $date->format('n');
+        if (in_array($month, [9, 10, 11])) {
+            $start = new \DateTime(
+                sprintf('%d-09-01 00:00:00', $date->format('Y')),
+                new \DateTimeZone(SoSure::TIMEZONE)
+            );
+            $end = new \DateTime(
+                sprintf('%d-12-01 00:00:00', $date->format('Y')),
+                new \DateTimeZone(SoSure::TIMEZONE)
+            );
+        } elseif (in_array($month, [12, 1, 2])) {
+            $year = $date->format('Y');
+            $month = $date->format('M');
+            if ($month != 12) {
+                $year = $year - 1;
+            }
+            $start = new \DateTime(
+                sprintf('%d-12-01 00:00:00', $year),
+                new \DateTimeZone(SoSure::TIMEZONE)
+            );
+            $end = new \DateTime(
+                sprintf('%d-03-01 00:00:00', $date->format('Y')),
+                new \DateTimeZone(SoSure::TIMEZONE)
+            );
+        } elseif (in_array($month, [3, 4, 5])) {
+            $start = new \DateTime(
+                sprintf('%d-03-01 00:00:00', $date->format('Y')),
+                new \DateTimeZone(SoSure::TIMEZONE)
+            );
+            $end = new \DateTime(
+                sprintf('%d-06-01 00:00:00', $date->format('Y')),
+                new \DateTimeZone(SoSure::TIMEZONE)
+            );
+        } elseif (in_array($month, [6, 7, 8])) {
+            $start = new \DateTime(
+                sprintf('%d-06-01 00:00:00', $date->format('Y')),
+                new \DateTimeZone(SoSure::TIMEZONE)
+            );
+            $end = new \DateTime(
+                sprintf('%d-09-01 00:00:00', $date->format('Y')),
+                new \DateTimeZone(SoSure::TIMEZONE)
+            );
+        }
+        $end = $end->sub(new \DateInterval('PT1S'));
+
+        return [$start, $end];
+    }
+
+    private function getQuarterlyPolicies(\DateTime $startDate, \DateTime $endDate)
+    {
+        $policyRepo = $this->dm->getRepository(PhonePolicy::class);
+        $policies = $policyRepo->findAllStartedPolicies(null, $startDate, $endDate);
+
+        return $policies;
     }
 
     private function getCashback(\DateTime $date)

@@ -158,7 +158,10 @@ abstract class BaseController extends Controller
         return $phones;
     }
 
-    protected function getPhonesSearchArray($simple = true)
+    /**
+     * @param string $type simple, all, highlight
+     */
+    protected function getPhonesSearchArray($type = 'all')
     {
         $makes = [];
         $phones = [];
@@ -166,18 +169,38 @@ abstract class BaseController extends Controller
         $repo = $dm->getRepository(Phone::class);
         $items = $repo->findActive()->getQuery()->execute();
         foreach ($items as $phone) {
-            if ($simple) {
-                $phones[] = ['id' => $phone->getId(), 'name' => $phone->__toString()];
+            if ($type == 'simple') {
+                $phones[] = [
+                    'id' => $phone->getId(),
+                    'name' => $phone->__toString(),
+                ];
             } else {
-                $phones[sprintf('%s %s', $phone->getMake(), $phone->getModel())
-                ][] = ['id' => $phone->getId(), 'memory' => $phone->getMemory()];
+                $phones[sprintf('%s %s', $phone->getMake(), $phone->getModel())][] = [
+                    'id' => $phone->getId(),
+                    'memory' => $phone->getMemory(),
+                    'highlight' => $phone->isHighlight(),
+                ];
             }
         }
 
-        if (!$simple) {
+        if ($type != 'simple') {
             $transformedPhones = [];
             foreach ($phones as $name => $data) {
-                $transformedPhones[] = ['id' => $data[0]['id'], 'name' => $name, 'sizes' => $data];
+                $highlight = false;
+                foreach ($data as $item) {
+                    if ($item['highlight']) {
+                        $highlight = true;
+                    }
+                }
+                $results = [
+                    'id' => $data[0]['id'],
+                    'name' => $name,
+                    'sizes' => $data,
+                ];
+                if ($highlight) {
+                    $results['highlight'] = $name;
+                }
+                $transformedPhones[] = $results;
             }
 
             $phones = $transformedPhones;

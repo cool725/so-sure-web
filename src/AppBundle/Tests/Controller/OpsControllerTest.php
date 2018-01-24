@@ -17,6 +17,7 @@ class OpsControllerTest extends BaseControllerTest
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
 
+
     public function tearDown()
     {
     }
@@ -58,7 +59,7 @@ class OpsControllerTest extends BaseControllerTest
             json_encode(['csp-report' => ['blocked-uri' => 'http://www.bizographics.com']])
         );
 
-        $data = self::verifyResponse(204);
+        self::verifyResponse(204);
     }
 
     public function testCspIp()
@@ -71,7 +72,7 @@ class OpsControllerTest extends BaseControllerTest
             array('CONTENT_TYPE' => 'application/json'),
             json_encode(['csp-report' => ['blocked-uri' => 'http://10.0.1.0']])
         );
-        $data = self::verifyResponse(204);
+        self::verifyResponse(204);
     }
 
     public function testCspBlob()
@@ -84,6 +85,44 @@ class OpsControllerTest extends BaseControllerTest
             array('CONTENT_TYPE' => 'application/json'),
             json_encode(['csp-report' => ['blocked-uri' => 'blob']])
         );
-        $data = self::verifyResponse(204);
+        self::verifyResponse(204);
+    }
+
+    public function testCspLog()
+    {
+        self::$client->request(
+            'POST',
+            '/ops/csp',
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json'),
+            json_encode(['csp-report' => ['blocked-uri' => 'http://www.mytesturi.com']])
+        );
+        self::$client->request(
+            'POST',
+            '/ops/csp',
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json'),
+            json_encode(['csp-report' => ['blocked-uri' => 'http://www.mytesturi.com']])
+        );
+        self::$client->request(
+            'POST',
+            '/ops/csp',
+            array(),
+            array(),
+            array('CONTENT_TYPE' => 'application/json'),
+            json_encode(['csp-report' => ['blocked-uri' => 'http://www.mytesturi.com']])
+        );
+
+
+        $items = [];
+        while (($item = self::$redis->lpop('csp')) != null) {
+            $data = json_decode($item, true);
+            $this->assertTrue(isset($data['csp-report']['user-agent']));
+            $this->assertContains('Symfony', $data['csp-report']['user-agent']);
+            $items[] = $item;
+        }
+        self::verifyResponse(204);
     }
 }

@@ -3,7 +3,12 @@ $(function(){
 
     // Full name
     jQuery.validator.addMethod('fullName', function(value, element) {
+
+        // Strip accent marks
+        value = value.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
         return this.optional(element) || value.match(/\w+\s+\w+/);
+
     }, 'Please enter your full name');
 
     jQuery.validator.addMethod('emaildomain', function(value, element) {

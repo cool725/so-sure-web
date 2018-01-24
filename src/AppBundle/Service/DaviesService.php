@@ -40,7 +40,6 @@ class DaviesService extends S3EmailService
     {
         $this->mailer = $mailer;
     }
-
     public function setFeature($featureService)
     {
         $this->featureService = $featureService;
@@ -61,6 +60,33 @@ class DaviesService extends S3EmailService
         $this->fees = [];
     }
 
+    public function reportMissingClaims($daviesClaims)
+    {
+        $dbClaims = [];
+        $processedClaims = [];
+        $repoClaims = $this->dm->getRepository(Claim::class);
+        $findAllClaims = $repoClaims->findAll();
+        foreach ($findAllClaims as $claim) {
+            $dbClaims[] = $claim->getNumber();
+        }
+
+        foreach ($daviesClaims as $daviesClaim) {
+            $processedClaims[] = $daviesClaim->claimNumber;
+        }
+
+        $foundClaims = array_intersect($processedClaims, $dbClaims);
+        $missingClaims = array_diff($dbClaims, $foundClaims);
+
+        foreach ($missingClaims as $missingClaim) {
+            if (isset($missingClaim)) {
+                $msg = sprintf(
+                    'Unable to locate db claim %s in the import file',
+                    $missingClaim
+                );
+                $this->errors[$missingClaim][] = $msg;
+            }
+        }
+    }
     public function processExcelData($key, $data)
     {
         return $this->saveClaims($key, $data);
@@ -89,10 +115,15 @@ class DaviesService extends S3EmailService
 
     public function saveClaims($key, array $daviesClaims)
     {
+        // was using key for logging purposes - can be removed in the future
+        \AppBundle\Classes\NoOp::ignore([$key]);
         $success = true;
         $claims = [];
         $openClaims = [];
         $multiple = [];
+
+        $this->reportMissingClaims($daviesClaims);
+
         foreach ($daviesClaims as $daviesClaim) {
             // get the most recent claim that's open
             if ($daviesClaim->isOpen()) {
@@ -139,20 +170,12 @@ class DaviesService extends S3EmailService
             } catch (\Exception $e) {
                 //$success = false;
                 $this->errors[$daviesClaim->claimNumber][] = $e->getMessage();
-                $this->logger->error(
-                    sprintf(
-                        'Skipped import. Fatal error processing file (%s)',
-                        $key
-                    ),
-                    ['exception' => $e]
-                );
                 // In case any of the db data failed validation, clear the changeset
                 if ($claim = $this->getClaim($daviesClaim)) {
                     $this->dm->refresh($claim);
                 }
             }
         }
-
         return $success;
     }
 
@@ -233,6 +256,7 @@ class DaviesService extends S3EmailService
         $claim->setIncurred($daviesClaim->incurred);
         $claim->setClaimHandlingFees($daviesClaim->handlingFees);
         $claim->setReservedValue($daviesClaim->reserved);
+        $claim->setTotalIncurred($daviesClaim->totalIncurred);
 
         $claim->setAccessories($daviesClaim->accessories);
         $claim->setUnauthorizedCalls($daviesClaim->unauthorizedCalls);
@@ -459,7 +483,7 @@ class DaviesService extends S3EmailService
                     'Claim %s was approved over 2 weeks ago (%s), however, the replacement data not recorded (%s).',
                     $daviesClaim->claimNumber,
                     $claim->getApprovedDate()->format(\DateTime::ATOM),
-                    implode($items)
+                    implode('; ', $items)
                 );
                 $this->errors[$daviesClaim->claimNumber][] = $msg;
             }

@@ -37,6 +37,12 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
                 'Only display payments that should be run'
             )
             ->addOption(
+                'allow-multiple-same-day-payment',
+                null,
+                InputOption::VALUE_NONE,
+                'Typically we only allow one payment per day. If id is set, allow force multiple payments on same day'
+            )
+            ->addOption(
                 'date',
                 null,
                 InputOption::VALUE_REQUIRED,
@@ -57,6 +63,7 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
         $date = $input->getOption('date');
         $show = true === $input->getOption('show');
         $prefix = $input->getArgument('prefix');
+        $allowMultipleSameDayPayment = true === $input->getOption('allow-multiple-same-day-payment');
         $scheduledDate = null;
         if ($date) {
             $scheduledDate = new \DateTime($date);
@@ -68,7 +75,12 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
         $repo = $dm->getRepository(ScheduledPayment::class);
         if ($id) {
             $scheduledPayment = $repo->find($id);
-            $scheduledPayment = $judoPay->scheduledPayment($scheduledPayment, $prefix, $scheduledDate);
+            $scheduledPayment = $judoPay->scheduledPayment(
+                $scheduledPayment,
+                $prefix,
+                $scheduledDate,
+                !$allowMultipleSameDayPayment
+            );
             $this->displayScheduledPayment($scheduledPayment, $output);
             //\Doctrine\Common\Util\Debug::dump($scheduledPayment);
         } elseif ($policyNumber) {

@@ -441,6 +441,13 @@ abstract class Policy
      */
     protected $requestedCancellationReason;
 
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
+    protected $visitedWelcomePage;
+
     public function __construct()
     {
         $this->created = new \DateTime();
@@ -1752,6 +1759,16 @@ abstract class Policy
         return $this->requestedCancellationReason;
     }
 
+    public function setVisitedWelcomePage(\DateTime $date)
+    {
+        $this->visitedWelcomePage = $date;
+    }
+
+    public function getVisitedWelcomePage()
+    {
+        return $this->visitedWelcomePage;
+    }
+
     abstract public function validatePremium($adjust, \DateTime $date);
 
     public function getPremiumInstallmentCount()
@@ -2062,6 +2079,44 @@ abstract class Policy
         }
 
         return $this->toTwoDp($totalCommission);
+    }
+
+    public function getCoverholderCommissionPaid($payments = null)
+    {
+        $coverholderCommission = 0;
+        if (!$this->isPolicy()) {
+            return 0;
+        }
+        if ($payments === null) {
+            $payments = $this->getPayments();
+        }
+
+        foreach ($payments as $payment) {
+            if ($payment->isSuccess()) {
+                $coverholderCommission += $payment->getTotalCommission();
+            }
+        }
+
+        return $this->toTwoDp($coverholderCommission);
+    }
+
+    public function getBrokerCommissionPaid($payments = null)
+    {
+        $brokerCommission = 0;
+        if (!$this->isPolicy()) {
+            return 0;
+        }
+        if ($payments === null) {
+            $payments = $this->getPayments();
+        }
+
+        foreach ($payments as $payment) {
+            if ($payment->isSuccess()) {
+                $brokerCommission += $payment->getBrokerCommission();
+            }
+        }
+
+        return $this->toTwoDp($brokerCommission);
     }
 
     public function getOutstandingPremium()
@@ -3167,6 +3222,14 @@ abstract class Policy
                 $reward = new SoSurePotRewardPayment();
                 $reward->setDate(clone $date);
                 $reward->setAmount($this->toTwoDp(0 - $this->getPromoPotValue()));
+                if ($this->isRenewalPending() || $this->isRenewed()) {
+                    $reward->setNotes(sprintf(
+                        'Pot Reward (so-sure marketing) applied to renewed policy %s',
+                        $this->getNextPolicy()->getPolicyNumber()
+                    ));
+                } else {
+                    $reward->setNotes('Pot Reward (so-sure marketing)');
+                }
                 $this->addPayment($reward);
             }
 
@@ -3174,6 +3237,14 @@ abstract class Policy
             $reward = new PotRewardPayment();
             $reward->setDate(clone $date);
             $reward->setAmount($this->toTwoDp(0 - ($this->getStandardPotValue())));
+            if ($this->isRenewalPending() || $this->isRenewed()) {
+                $reward->setNotes(sprintf(
+                    'Pot Reward (Salva) applied to renewed policy %s',
+                    $this->getNextPolicy()->getPolicyNumber()
+                ));
+            } else {
+                $reward->setNotes(sprintf('Pot Reward (Salva)'));
+            }
             $this->addPayment($reward);
 
             // We can't give cashback + give a discount on the next year's policy as that would be
@@ -3200,9 +3271,10 @@ abstract class Policy
                     $discount->setDate(clone $date);
                 }
                 $discount->setNotes(sprintf(
-                    '%0.2f salva / %0.2f so-sure marketing',
+                    '%0.2f salva / %0.2f so-sure marketing from pot reward (%s)',
                     $this->getStandardPotValue(),
-                    $this->getPromoPotValue()
+                    $this->getPromoPotValue(),
+                    $this->getPolicyNumber()
                 ));
                 $this->getNextPolicy()->addPayment($discount);
             } else {
@@ -3323,11 +3395,14 @@ abstract class Policy
                 $adjustedDiscount = new PolicyDiscountPayment();
                 $adjustedDiscount->setDate(clone $date);
                 $adjustedDiscount->setAmount($this->toTwoDp($this->getPotValue() - $discount->getAmount()));
+                // @codingStandardsIgnoreStart
                 $adjustedDiscount->setNotes(sprintf(
-                    'Adjust previous discount. Split should be %0.2f salva / %0.2f so-sure marketing',
+                    'Adjust previous discount. Split should be %0.2f salva / %0.2f so-sure marketing from pot reward (%s)',
                     $this->getStandardPotValue(),
-                    $this->getPromoPotValue()
+                    $this->getPromoPotValue(),
+                    $this->getPolicyNumber()
                 ));
+                // @codingStandardsIgnoreEnd
                 $this->getNextPolicy()->addPayment($adjustedDiscount);
                 $this->getNextPolicy()->getPremium()->setAnnualDiscount($this->getPotValue());
             }

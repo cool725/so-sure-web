@@ -54,7 +54,16 @@ class ApiPartialController extends BaseController
                     throw new NotFoundHttpException();
                 }
                 // all policies should have the same scode
-                $scode = $user->getPolicies()[0]->getStandardSCode();
+                $scode = null;
+                foreach ($user->getPolicies() as $policy) {
+                    if ($scode = $policy->getStandardSCode()) {
+                        break;
+                    }
+                }
+                if (!$scode) {
+                    $this->get('logger')->warning(sprintf('Unable to find scode for user %s', $user->getId()));
+                    throw new NotFoundHttpException();
+                }
 
                 $experiment = $sixpack->participate(
                     SixpackService::EXPERIMENT_SHARE_MESSAGE,
@@ -82,7 +91,16 @@ class ApiPartialController extends BaseController
                     throw new NotFoundHttpException();
                 }
                 // all policies should have the same scode
-                $scode = $user->getPolicies()[0]->getStandardSCode();
+                $scode = null;
+                foreach ($user->getPolicies() as $policy) {
+                    if ($scode = $policy->getStandardSCode()) {
+                        break;
+                    }
+                }
+                if (!$scode) {
+                    $this->get('logger')->warning(sprintf('Unable to find scode for user %s', $user->getId()));
+                    throw new NotFoundHttpException();
+                }
 
                 $experiment = $sixpack->participate(
                     SixpackService::EXPERIMENT_APP_SHARE_METHOD,

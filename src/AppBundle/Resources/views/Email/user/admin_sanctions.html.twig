@@ -1,6 +1,6 @@
 {% extends 'AppBundle:Email:base.html.twig' %}
 {% import "AppBundle:Email:macros.html.twig" as macros %}
-{% block title %}Sanctions check required{% endblock %}
+{% block title %}Sanction check report{% endblock %}
 {% block body %}
 	{{ macros.start_table() }}
 	<h1>
@@ -8,11 +8,29 @@
 	</h1>
 	<div style="font-size: 14px; text-align: left;">
 	   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		{% for item in users %}
 	   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
-        {{ user.name }} triggered a sanctions warning. Please manually verify.<br><br>
-        {{ matches }}
-	   </div>
+			   {{ item.user.name }} triggered a sanctions warning. Please manually verify.
+               <br><br>
+			   {{ item.matches | json_encode }}
+               <br><br>
+               {{ macros.email_button_table(url('admin_user', {'id': item.user.id }), "View User", "View User")}}
+       </div>
+		{% endfor %}
+        {% for item in companies %}
+			<div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+					{{ item.company.name }} triggered a sanctions warning. Please manually verify.
+					<br><br>
+					{{ item.matches | json_encode }}
+                    <br><br>
+                    {{ macros.email_button_table(url('admin_user', {'id': item.company.id }), "View Company User", "View Company User")}}
+			</div>
+        {% endfor %}
+		{%  if users|length < 1 and companies|length <1 %}
+			<div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+					Happy days, no sanctions to report!
+			</div>
+		{% endif %}
 	</div>
 	{{ macros.end_table() }}
-	{{ macros.email_button_table(url('admin_user', {'id': user.id}), "View User", "View User")}}
 {% endblock %}

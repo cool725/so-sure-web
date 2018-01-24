@@ -16,12 +16,15 @@ class OpsReportCommandTest extends KernelTestCase
     protected static $container;
     protected static $redis;
     protected static $kernel;
+    protected static $client;
 
     public static function setUpBeforeClass()
     {
         //start the symfony kernel
         self::$kernel = static::createKernel();
         self::$kernel->boot();
+
+        self::$client = self::$kernel->getContainer()->get('test.client');
 
         //get the DI container
         self::$container = self::$kernel->getContainer();
@@ -100,5 +103,18 @@ class OpsReportCommandTest extends KernelTestCase
         $now = new \DateTime();
         self::$redis->hset('client-validation', json_encode($data), $now->format('U'));
         $this->callCommand('no validation');
+    }
+
+    public function testOpsReportCsp()
+    {
+        $data = [
+            'csp-report' => [
+                'blocked-uri' => 'http://www.mytesturi.com',
+                'user-data' => 'Symfony Browser'
+            ]];
+        self::$redis->rpush('csp', json_encode($data));
+        self::$redis->rpush('csp', json_encode($data));
+        self::$redis->rpush('csp', json_encode($data));
+        $this->callCommand('3 CSP');
     }
 }

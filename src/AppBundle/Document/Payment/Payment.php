@@ -169,7 +169,7 @@ abstract class Payment
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
-     * @Assert\Length(min="1", max="100")
+     * @Assert\Length(min="1", max="200")
      * @MongoDB\Field(type="string")
      * @MongoDB\Index(sparse=true)
      * @Gedmo\Versioned
@@ -373,6 +373,14 @@ abstract class Payment
         $this->totalCommission = 0 - $this->totalCommission;
         $this->coverholderCommission = 0 - $this->coverholderCommission;
         $this->brokerCommission = 0 - $this->brokerCommission;
+    }
+
+    /**
+     * quick hack in order for chargeback form to work with setRefundTotalCommission
+     */
+    public function getRefundTotalCommission()
+    {
+        return $this->totalCommission;
     }
 
     public function getTotalCommission()

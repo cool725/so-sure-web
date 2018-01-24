@@ -100,6 +100,8 @@ hr {
 
 mark {
 	background-color: $lightest-blue;
+	padding: 4px;
+	@include border-radius(2px);
 }
 
 // Helpers - for rapid prototyping
@@ -170,13 +172,6 @@ mark {
 
 	.text-underline {
 		text-decoration: underline !important;
-	}
-
-	.text-highlight {
-		display: inline-block;
-		padding: 3px 10px;
-        background-color: $off-white;
-		@include border-radius(3px);
 	}
 
 	// Backgrounds
