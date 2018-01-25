@@ -1406,7 +1406,6 @@ class PolicyService
             if (!$dryRun) {
                 try {
                     $result = $this->fullyExpire($policy, $date);
-                    print_r($result);
                     if ($result === null) {
                         $skipLogging = true;
                         foreach ($policy->getClaims() as $claim) {
@@ -1424,6 +1423,7 @@ class PolicyService
                                 $policy->getPolicyNumber()
                             );
                         } else {
+                            print 'unset' . PHP_EOL;
                             unset($fullyExpired[$policy->getId()]);
                         }
                     }

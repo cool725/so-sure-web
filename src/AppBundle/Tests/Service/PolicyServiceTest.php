@@ -1661,6 +1661,7 @@ class PolicyServiceTest extends WebTestCase
             false,
             new \DateTime('2017-02-02')
         );
+        print_r($policies);
         $this->assertGreaterThan(0, count($policies));
 
         // 2nd run (and later) should still return policies as no flag set
@@ -1669,6 +1670,7 @@ class PolicyServiceTest extends WebTestCase
             false,
             new \DateTime('2017-02-02')
         );
+        print_r($policies);
         $this->assertGreaterThan(0, count($policies));
     }
 
