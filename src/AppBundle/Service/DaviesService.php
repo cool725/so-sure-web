@@ -472,7 +472,7 @@ class DaviesService extends S3EmailService
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
-        if ($daviesClaim->initialSuspicion == null) {
+        if (!isset($daviesClaim->initialSuspicion)) {
             $msg = sprintf(
                 'Claim %s does not have initialSuspicion flag set.',
                 $daviesClaim->claimNumber
@@ -480,7 +480,7 @@ class DaviesService extends S3EmailService
             $this->warnings[$daviesClaim->claimNumber][] = $msg;
         }
         if (in_array($claim->getStatus(), array(Claim::STATUS_SETTLED, Claim::STATUS_APPROVED))
-            && $daviesClaim->finalSuspicion == null) {
+            && !isset($daviesClaim->finalSuspicion)) {
             $msg = sprintf(
                 'Claim %s should have finalSuspicion flag set.',
                 $daviesClaim->claimNumber
