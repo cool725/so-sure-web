@@ -123,6 +123,15 @@ services:
             - "@event_dispatcher"
             - "@app.mixpanel"
 
+    app.scode:
+        class: AppBundle\Service\SCodeService
+        arguments:
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "@app.router"
+            - "@app.shortlink"
+            - "@app.branch"
+
     app.digits:
         class: AppBundle\Service\DigitsService
         arguments:
@@ -198,6 +207,7 @@ services:
         calls:
             - [setLogger, ['@monolog.logger.receperio']]
             - [setDm, ['@doctrine_mongodb.odm.default_document_manager']]
+            - [setMountManager, ['@oneup_flysystem.mount_manager']]
             - [setRedis, ['@snc_redis.default']]
 
     app.imei:
@@ -400,6 +410,7 @@ services:
             - "@app.ratelimit"
             - "@app.intercom"
             - "@app.sms"
+            - "@app.scode"
 
     app.quote:
         class: AppBundle\Service\QuoteService
@@ -725,6 +736,8 @@ services:
             -  { name: kernel.event_listener, event: event.policy.pending-renewal, method: onPolicyPendingRenewedEvent }
             -  { name: kernel.event_listener, event: event.policy.renewed, method: onPolicyRenewedEvent }
             -  { name: kernel.event_listener, event: event.policy.start, method: onPolicyStartEvent }
+            -  { name: kernel.event_listener, event: event.policy.unpaid, method: onPolicyUnpaidEvent }
+            -  { name: kernel.event_listener, event: event.policy.reactivated, method: onPolicyReactivatedEvent }
             -  { name: kernel.event_listener, event: event.invitation.accepted, method: onInvitationAcceptedEvent }
             -  { name: kernel.event_listener, event: event.connection.connected, method: onConnectionConnectedEvent }
             -  { name: kernel.event_listener, event: event.payment.success, method: onPaymentSuccessEvent }
@@ -738,10 +751,8 @@ services:
     app.listener.sanctions:
         class:   AppBundle\Listener\SanctionsListener
         arguments:
-            - "@doctrine_mongodb.odm.default_document_manager"
-            - "@logger"
-            - "@app.mailer"
             - "@app.sanctions"
+            - "@snc_redis.default"
         tags:
             -  { name: kernel.event_listener, event: event.user.created, method: onUserCreatedEvent }
             -  { name: kernel.event_listener, event: event.company.created, method: onCompanyCreatedEvent }

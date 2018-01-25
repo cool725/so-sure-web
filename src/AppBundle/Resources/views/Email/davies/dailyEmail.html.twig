@@ -43,6 +43,21 @@
 		   </div>
 		   {% endif %}
 
+		   {% if fees|length > 0 %}
+		   <div style="font-size: 14px; text-align: left; margin-top: 30px;"><font face="arial, helvetica neue, helvetica, sans-serif">
+			   <h3>Fee Errors in last import</h3>
+	 		   <hr>
+			{% for claimNumber,msgs in fees %}
+				 <p>Claim: {{ claimNumber }}</p>
+					 <ul>
+						 {% for msg in msgs %}
+							 <li>{{ msg }}</li>
+						 {% endfor %}
+					 </ul>
+			 {% endfor %}
+		   </div>
+		   {% endif %}
+
 		   {% if warnings|length > 0 %}
 		   <div style="font-size: 14px; text-align: left; margin-top: 30px;"><font face="arial, helvetica neue, helvetica, sans-serif">
 			   <h3>Warnings in last import</h3>

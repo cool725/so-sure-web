@@ -134,7 +134,11 @@ class ApiAuthController extends BaseController
 
             $dm = $this->getManager();
             $policyRepo = $dm->getRepository(Policy::class);
-            $policies = $policyRepo->findBy(['imei' => $suggestedImei]);
+            if ($suggestedImei && strlen($suggestedImei) > 0) {
+                $policies = $policyRepo->findBy(['imei' => $suggestedImei]);
+            } else {
+                $policies = [];
+            }
             $user = $this->getUser();
 
             // prefer an active policy
@@ -1304,41 +1308,8 @@ class ApiAuthController extends BaseController
                 );
             }
 
-            $scode = new SCode();
-            $scode->setType($this->getDataString($data, 'type'));
-
-            $scodeRepo = $dm->getRepository(SCode::class);
-            if ($scode->getType() == SCode::TYPE_STANDARD) {
-                $existingCount = $scodeRepo->getCountForName(
-                    SCode::getNameForCode($this->getUser(), $scode->getType())
-                );
-                $scode->generateNamedCode($this->getUser(), $existingCount + 1);
-                $count = 1;
-                while ($scodeRepo->findOneBy(['code' => $scode->getCode()]) !== null) {
-                    $scode->generateNamedCode($this->getUser(), $existingCount + 1 + $count);
-                    $count++;
-                    if ($count > 10) {
-                        throw new \Exception('Unable to generate unique scode');
-                    }
-                }
-            } elseif ($scode->getType() == SCode::TYPE_MULTIPAY) {
-                $scode->generateNamedCode($this->getUser(), rand(1, 9999));
-                $count = 0;
-                while ($scodeRepo->findOneBy(['code' => $scode->getCode()]) !== null) {
-                    $scode->generateNamedCode($this->getUser(), rand(1, 9999));
-                    $count++;
-                    if ($count > 10) {
-                        throw new \Exception('Unable to generate unique scode');
-                    }
-                }
-            }
-            $shortLink = $this->get('app.branch')->generateSCode($scode->getCode());
-            // branch is preferred, but can fallback to old website version if branch is down
-            if (!$shortLink) {
-                $link = $this->get('app.router')->generateUrl('scode', ['code' => $scode->getCode()]);
-                $shortLink = $this->get('app.shortlink')->addShortLink($link);
-            }
-            $scode->setShareLink($shortLink);
+            $scodeService = $this->get('app.scode');
+            $scode = $scodeService->generateSCode($this->getUser(), $this->getDataString($data, 'type'));
             $policy->addSCode($scode);
             $this->validateObject($scode);
 

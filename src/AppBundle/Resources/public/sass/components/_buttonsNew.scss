@@ -64,6 +64,10 @@
 	@include btn($green, $white, $white);
 }
 
+.btn-white {
+	@include btn($white, $white, $white);
+}
+
 .btn-facebook {
 	@include btn($facebook, $white, $white);
 }
@@ -107,6 +111,41 @@
 		padding-left: 10px;
 		font-size: 90%;
 	}
+}
+
+// Nav Btn
+.navbar-btn {
+	background-color: transparent;
+	border-color: $white;
+	color: $white;
+
+	&:hover, &:focus {
+		background-color: $white;
+		color: $blue;
+	}
+
+	&:active {
+		background-color: darken($white, 25%);
+		border-color: darken($white, 25%);
+		color: $blue;
+	}
+
+    @include breakpoint(laptop) {
+		background-color: transparent;
+		border-color: $blue;
+		color: $blue;
+
+		&:hover, &:focus {
+			background-color: $blue;
+			color: $white;
+		}
+
+		&:active {
+			background-color: darken($blue, 25%);
+			border-color: darken($blue, 25%);
+			color: $white;
+		}
+    }
 }
 
 //TODO - Construct a better way to do this, count btns next to one another and alter respectively if possible?

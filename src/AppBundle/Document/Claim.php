@@ -199,7 +199,14 @@ class Claim
      * @MongoDB\Field(type="boolean")
      * @Gedmo\Versioned
      */
-    protected $suspectedFraud;
+    protected $initialSuspicion;
+
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
+    protected $finalSuspicion;
 
     /**
      * @Assert\Type("bool")
@@ -262,6 +269,12 @@ class Claim
      * @Gedmo\Versioned
      */
     protected $incurred;
+
+    /**
+     * @MongoDB\Field(type="float")
+     * @Gedmo\Versioned
+     */
+    protected $totalIncurred;
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
@@ -525,12 +538,28 @@ class Claim
 
     public function getSuspectedFraud()
     {
-        return $this->suspectedFraud;
+        // if finalSuspicion is null return initialSuspicion
+        return ($this->finalSuspicion == null) ? $this->initialSuspicion : $this->finalSuspicion;
     }
 
-    public function setSuspectedFraud($suspectedFraud)
+    public function getInitialSuspicion()
     {
-        $this->suspectedFraud = $suspectedFraud;
+        return $this->initialSuspicion;
+    }
+
+    public function setInitialSuspicion($initialSuspicion)
+    {
+        $this->initialSuspicion = $initialSuspicion;
+    }
+
+    public function getFinalSuspicion()
+    {
+        return $this->finalSuspicion;
+    }
+
+    public function setFinalSuspicion($finalSuspicion)
+    {
+        $this->finalSuspicion = $finalSuspicion;
     }
 
     public function getShouldCancelPolicy()
@@ -674,6 +703,16 @@ class Claim
     public function setIncurred($incurred)
     {
         $this->incurred = $incurred;
+    }
+
+    public function getTotalIncurred()
+    {
+        return $this->totalIncurred;
+    }
+
+    public function setTotalIncurred($totalIncurred)
+    {
+        $this->totalIncurred = $totalIncurred;
     }
 
     public function getUnauthorizedCalls()
@@ -965,7 +1004,8 @@ class Claim
             'status' => $this->getStatus(),
             'daviesStatus' => $this->getDaviesStatus(),
             'notes' => $this->getNotes(),
-            'suspectedFraud' => $this->getSuspectedFraud(),
+            'initialSuspicion' => $this->getInitialSuspicion(),
+            'finalSuspicion' => $this->getFinalSuspicion(),
             'shouldCancelPolicy' => $this->getShouldCancelPolicy(),
             'processed' => $this->getProcessed(),
             'excess' => $this->toTwoDp($this->getExcess()),

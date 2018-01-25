@@ -807,6 +807,17 @@ class JudopayServiceTest extends WebTestCase
         self::$judopay->scheduledPayment($initialScheduledPayment, 'TEST');
     }
 
+    private function mockMailerSend($times)
+    {
+        $mailer = $this->getMockBuilder('Swift_Mailer')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mailer->expects($this->exactly($times))->method('send');
+        self::$judopay->getMailer()->setMailer($mailer);
+
+        return $mailer;
+    }
+
     public function testPaymentFirstProblem()
     {
         $this->clearEmail(static::$container);
@@ -843,11 +854,7 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals(11, count($policy->getScheduledPayments()));
         $this->assertEquals(self::$JUDO_TEST_CARD_LAST_FOUR, $policy->getPayments()[0]->getCardLastFour());
 
-        $mailer = $this->getMockBuilder('Swift_Mailer')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $mailer->expects($this->exactly(3))->method('send');
-        self::$judopay->getMailer()->setMailer($mailer);
+        $mock = $this->mockMailerSend(1);
 
         // 1st failure (expected email; total = 1)
         // print '1/1st failure' . PHP_EOL;
@@ -865,6 +872,7 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals(ScheduledPayment::STATUS_FAILED, $scheduledPayment->getStatus());
         $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
         $this->assertNull($policy->getUser()->getPaymentMethod()->getFirstProblem());
+        $mock->__phpunit_verify();
 
         // 2nd failure - should trigger problem  (expected no email; total = 1)
         // print '1/2nd failure' . PHP_EOL;
@@ -881,11 +889,10 @@ class JudopayServiceTest extends WebTestCase
         );
         $this->assertEquals(ScheduledPayment::STATUS_FAILED, $scheduledPayment->getStatus());
         $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
-        /*
         $this->assertEquals(
             $scheduledPayment->getScheduled(),
             $policy->getUser()->getPaymentMethod()->getFirstProblem()
-        );*/
+        );
 
         // 3rd failure - nothing (expected no email; total = 1)
         // print '1/3rd failure' . PHP_EOL;
@@ -918,6 +925,8 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals(ScheduledPayment::STATUS_SUCCESS, $scheduledPayment->getStatus());
         $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
 
+        $mock->__phpunit_verify();
+        $mock = $this->mockMailerSend(1);
         // 1st failure (expected email; total = 2)
         // print '2/1st failure' . PHP_EOL;
         $scheduledPayment = $policy->getNextScheduledPayment();
@@ -934,7 +943,9 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals(ScheduledPayment::STATUS_FAILED, $scheduledPayment->getStatus());
         $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
         $this->assertNotNull($policy->getUser()->getPaymentMethod()->getFirstProblem());
+        $mock->__phpunit_verify();
 
+        $mock = $this->mockMailerSend(1);
         // 2nd failure -  (expected email; total = 3)
         // print '2/2nd failure' . PHP_EOL;
         $scheduledPayment = $policy->getNextScheduledPayment();
@@ -951,6 +962,7 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals(ScheduledPayment::STATUS_FAILED, $scheduledPayment->getStatus());
         $this->assertEquals(Policy::STATUS_UNPAID, $policy->getStatus());
         $this->assertNotNull($policy->getUser()->getPaymentMethod()->getFirstProblem());
+        $mock->__phpunit_verify();
     }
 
     public function testRemainderPaymentCancelledPolicy()

@@ -29,6 +29,8 @@ class DaviesService extends S3EmailService
     protected $mailer;
     protected $validator;
 
+    protected $fees = [];
+
     public function setClaims($claimsService)
     {
         $this->claimsService = $claimsService;
@@ -38,7 +40,6 @@ class DaviesService extends S3EmailService
     {
         $this->mailer = $mailer;
     }
-
     public function setFeature($featureService)
     {
         $this->featureService = $featureService;
@@ -49,6 +50,43 @@ class DaviesService extends S3EmailService
         $this->validator = $validator;
     }
 
+    public function getFees()
+    {
+        return $this->fees;
+    }
+
+    public function clearFees()
+    {
+        $this->fees = [];
+    }
+
+    public function reportMissingClaims($daviesClaims)
+    {
+        $dbClaims = [];
+        $processedClaims = [];
+        $repoClaims = $this->dm->getRepository(Claim::class);
+        $findAllClaims = $repoClaims->findAll();
+        foreach ($findAllClaims as $claim) {
+            $dbClaims[] = $claim->getNumber();
+        }
+
+        foreach ($daviesClaims as $daviesClaim) {
+            $processedClaims[] = $daviesClaim->claimNumber;
+        }
+
+        $foundClaims = array_intersect($processedClaims, $dbClaims);
+        $missingClaims = array_diff($dbClaims, $foundClaims);
+
+        foreach ($missingClaims as $missingClaim) {
+            if (isset($missingClaim)) {
+                $msg = sprintf(
+                    'Unable to locate db claim %s in the import file',
+                    $missingClaim
+                );
+                $this->errors[$missingClaim][] = $msg;
+            }
+        }
+    }
     public function processExcelData($key, $data)
     {
         return $this->saveClaims($key, $data);
@@ -77,10 +115,15 @@ class DaviesService extends S3EmailService
 
     public function saveClaims($key, array $daviesClaims)
     {
+        // was using key for logging purposes - can be removed in the future
+        \AppBundle\Classes\NoOp::ignore([$key]);
         $success = true;
         $claims = [];
         $openClaims = [];
         $multiple = [];
+
+        $this->reportMissingClaims($daviesClaims);
+
         foreach ($daviesClaims as $daviesClaim) {
             // get the most recent claim that's open
             if ($daviesClaim->isOpen()) {
@@ -127,20 +170,12 @@ class DaviesService extends S3EmailService
             } catch (\Exception $e) {
                 //$success = false;
                 $this->errors[$daviesClaim->claimNumber][] = $e->getMessage();
-                $this->logger->error(
-                    sprintf(
-                        'Skipped import. Fatal error processing file (%s)',
-                        $key
-                    ),
-                    ['exception' => $e]
-                );
                 // In case any of the db data failed validation, clear the changeset
                 if ($claim = $this->getClaim($daviesClaim)) {
                     $this->dm->refresh($claim);
                 }
             }
         }
-
         return $success;
     }
 
@@ -221,6 +256,7 @@ class DaviesService extends S3EmailService
         $claim->setIncurred($daviesClaim->incurred);
         $claim->setClaimHandlingFees($daviesClaim->handlingFees);
         $claim->setReservedValue($daviesClaim->reserved);
+        $claim->setTotalIncurred($daviesClaim->totalIncurred);
 
         $claim->setAccessories($daviesClaim->accessories);
         $claim->setUnauthorizedCalls($daviesClaim->unauthorizedCalls);
@@ -259,6 +295,9 @@ class DaviesService extends S3EmailService
         $claim->setLossDate($daviesClaim->lossDate);
 
         $claim->setShippingAddress($daviesClaim->shippingAddress);
+
+        $claim->setInitialSuspicion($daviesClaim->initialSuspicion);
+        $claim->setFinalSuspicion($daviesClaim->finalSuspicion);
 
         $this->updatePolicy($claim, $daviesClaim, $skipImeiUpdate);
 
@@ -315,15 +354,6 @@ class DaviesService extends S3EmailService
                 $daviesClaim->claimNumber
             ));
         }
-        // TODO: Investigating timing on this one - it might be that imei is always present prior to replacement
-        // received date coming in
-        if ($daviesClaim->replacementReceivedDate && !$daviesClaim->replacementImei) {
-            $msg = sprintf(
-                'Claim %s has a replacement received date without a replacement imei',
-                $daviesClaim->claimNumber
-            );
-            $this->errors[$daviesClaim->claimNumber][] = $msg;
-        }
 
         $now = new \DateTime();
         if ($daviesClaim->isOpen() || ($daviesClaim->dateClosed && $daviesClaim->dateClosed->diff($now)->days < 5)) {
@@ -372,7 +402,6 @@ class DaviesService extends S3EmailService
             $this->areEqualToTwoDp($daviesClaim->getIncurred(), 0) &&
             $this->areEqualToTwoDp($daviesClaim->getReserved(), 0)) {
             $msg = sprintf('Claim %s does not have a reserved value', $daviesClaim->claimNumber);
-            $this->logger->warning($msg);
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
@@ -386,7 +415,6 @@ class DaviesService extends S3EmailService
                 $daviesClaim->getClaimType(),
                 $daviesClaim->getClaimStatus()
             );
-            $this->logger->warning($msg);
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
@@ -397,7 +425,6 @@ class DaviesService extends S3EmailService
                 $daviesClaim->getExpectedIncurred(),
                 $daviesClaim->incurred
             );
-            $this->logger->warning($msg);
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
@@ -410,8 +437,7 @@ class DaviesService extends S3EmailService
                 $claim->totalChargesWithVat(),
                 $daviesClaim->reciperoFee
             );
-            $this->logger->warning($msg);
-            $this->errors[$daviesClaim->claimNumber][] = $msg;
+            $this->fees[$daviesClaim->claimNumber][] = $msg;
         }
 
         if ($daviesClaim->isClosed(true) && $daviesClaim->reserved > 0) {
@@ -419,7 +445,6 @@ class DaviesService extends S3EmailService
                 'Claim %s is closed, yet still has a reserve fee.',
                 $daviesClaim->claimNumber
             );
-            $this->logger->warning($msg);
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
@@ -440,6 +465,30 @@ class DaviesService extends S3EmailService
             }
         }
 
+        $twoWeekAgo = new \DateTime();
+        $twoWeekAgo = $twoWeekAgo->sub(new \DateInterval('P2W'));
+        if ($claim->getApprovedDate() && $claim->getApprovedDate() <= $twoWeekAgo) {
+            $items = [];
+            if (!$daviesClaim->replacementReceivedDate) {
+                $items[] = 'received date';
+            }
+            if (!$daviesClaim->replacementImei) {
+                $items[] = 'imei';
+            }
+            if (!$daviesClaim->replacementMake || !$daviesClaim->replacementModel) {
+                $items[] = 'phone';
+            }
+            if (count($items) > 0) {
+                $msg = sprintf(
+                    'Claim %s was approved over 2 weeks ago (%s), however, the replacement data not recorded (%s).',
+                    $daviesClaim->claimNumber,
+                    $claim->getApprovedDate()->format(\DateTime::ATOM),
+                    implode('; ', $items)
+                );
+                $this->errors[$daviesClaim->claimNumber][] = $msg;
+            }
+        }
+
         $threeMonthsAgo = new \DateTime();
         $threeMonthsAgo = $threeMonthsAgo->sub(new \DateInterval('P3M'));
         if ($daviesClaim->isOpen() && $daviesClaim->replacementReceivedDate &&
@@ -451,6 +500,23 @@ class DaviesService extends S3EmailService
             );
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
+
+        if ($daviesClaim->initialSuspicion == null) {
+            $msg = sprintf(
+                'Claim %s does not have initialSuspicion flag set.',
+                $daviesClaim->claimNumber
+            );
+            $this->warnings[$daviesClaim->claimNumber][] = $msg;
+        }
+        if (in_array($claim->getStatus(), array(Claim::STATUS_SETTLED, Claim::STATUS_APPROVED))
+            && $daviesClaim->finalSuspicion == null) {
+            $msg = sprintf(
+                'Claim %s should have finalSuspicion flag set.',
+                $daviesClaim->claimNumber
+            );
+            $this->warnings[$daviesClaim->claimNumber][] = $msg;
+        }
+
     }
 
     public function postValidateClaimDetails(Claim $claim, DaviesClaim $daviesClaim)
@@ -463,8 +529,7 @@ class DaviesService extends S3EmailService
                 $claim->getApprovedDate()->format(\DateTime::ATOM),
                 $claim->getReplacementReceivedDate()->format(\DateTime::ATOM)
             );
-            $this->logger->warning($msg);
-            $this->errors[$daviesClaim->claimNumber][] = $msg;
+            $this->warnings[$daviesClaim->claimNumber][] = $msg;
         }
     }
 
@@ -526,7 +591,6 @@ class DaviesService extends S3EmailService
                     'Claim %s is missing a replacement recevied date (expected 2 days after imei replacement)',
                     $daviesClaim->claimNumber
                 );
-                $this->logger->warning($msg);
                 $this->errors[$daviesClaim->claimNumber][] = $msg;
             }
         }
@@ -557,6 +621,7 @@ class DaviesService extends S3EmailService
                 'successFile' => $successFile,
                 'warnings' => $this->warnings,
                 'errors' => $this->errors,
+                'fees' => $this->fees,
                 'title' => 'Daily Claims Report',
                 'highDemandPhones' => $highDemandPhones,
             ]
@@ -593,6 +658,7 @@ class DaviesService extends S3EmailService
                     'errors' => $this->errors,
                     'warnings' => null,
                     'claims' => null,
+                    'fees' => $this->fees,
                     'title' => 'Errors in So-Sure Mobile - Daily Claims Report',
                 ]
             );

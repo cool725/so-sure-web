@@ -135,8 +135,7 @@ class DaviesClaim extends DaviesExcel
     public $dateCreated;
     public $dateClosed;
 
-    // davies use only
-    public $daviesIncurred;
+    public $totalIncurred;
 
     public $risk;
 
@@ -407,7 +406,7 @@ class DaviesClaim extends DaviesExcel
             $this->shippingAddress = $this->nullIfBlank($data[++$i]);
 
             if (in_array($columns, [self::COLUMN_COUNT_V6, self::COLUMN_COUNT_V7, self::COLUMN_COUNT_V8])) {
-                $this->daviesIncurred = $this->nullIfBlank($data[++$i]);
+                $this->totalIncurred = $this->nullIfBlank($data[++$i]);
             }
             if (in_array($columns, [self::COLUMN_COUNT_V7, self::COLUMN_COUNT_V8])) {
                 $this->risk = $this->nullIfBlank($data[++$i]);

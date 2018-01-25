@@ -62,7 +62,8 @@ class DefaultController extends BaseController
         // make sure to exclude us based bots that import content - eg. facebook/twitter
         // https://developers.facebook.com/docs/sharing/webmasters/crawler
         // https://dev.twitter.com/cards/getting-started#crawling
-        if ($geoip->findCountry($ip) == "US" && $site != 'uk' &&
+        // also, for use with casper monitor, if force is present, then ignore
+        if (!$request->get('force') && $geoip->findCountry($ip) == "US" && $site != 'uk' &&
             !preg_match("/Twitterbot|facebookexternalhit|Facebot/i", $userAgent)) {
             return $this->redirectToRoute('launch_usa');
         }
@@ -141,12 +142,13 @@ class DefaultController extends BaseController
             'memory' => (int) 32
         ]);
 
-        $exp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_FUNNEL_V1_V2,
-            ['v1', 'v2'],
-            true
-        );
+        // $exp = $this->sixpack(
+        //     $request,
+        //     SixpackService::EXPERIMENT_FUNNEL_V1_V2,
+        //     ['v1', 'v2'],
+        //     true
+        // );
+
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         $data = array(
@@ -161,13 +163,12 @@ class DefaultController extends BaseController
             'device_category' => $this->get('app.request')->getDeviceCategory()
         );
 
-        //if ($exp == 'v2-new') {
-        //    return $this->render('AppBundle:Default:indexV2.html.twig', $data);
-        if ($exp == 'v2') {
-            return $this->render('AppBundle:Default:indexV2old.html.twig', $data);
-        } else {
-            return $this->render('AppBundle:Default:index.html.twig', $data);
-        }
+        // if ($exp == 'v2') {
+        //     return $this->render('AppBundle:Default:indexV2old.html.twig', $data);
+        // } else {
+        //     return $this->render('AppBundle:Default:index.html.twig', $data);
+        // }
+        return $this->render('AppBundle:Default:index.html.twig', $data);
     }
 
     /**
@@ -191,6 +192,7 @@ class DefaultController extends BaseController
             $session = $request->getSession();
             $session->set('quote', $phone->getId());
 
+            // don't check for partial partial as selected phone may be different from partial policy phone
             return $this->redirectToRoute('purchase_step_policy');
         } elseif ($phone && in_array($type, ['learn-more'])) {
             $session = $request->getSession();
@@ -225,6 +227,7 @@ class DefaultController extends BaseController
             $session = $request->getSession();
             $session->set('quote', $phone->getId());
 
+            // don't check for partial partial as selected phone may be different from partial policy phone
             return $this->redirectToRoute('purchase_step_policy');
         } elseif ($phone && in_array($type, ['learn-more'])) {
             $session = $request->getSession();
@@ -246,13 +249,13 @@ class DefaultController extends BaseController
      */
     public function searchPhoneAction(Request $request)
     {
-        $simple = true;
+        $type = 'simple';
         if ($request->get('_route') == 'search_phone_combined_data') {
-            $simple = false;
+            $type = 'highlight';
         }
 
         return new JsonResponse(
-            $this->getPhonesSearchArray($simple)
+            $this->getPhonesSearchArray($type)
         );
     }
 

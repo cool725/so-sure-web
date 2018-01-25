@@ -29,7 +29,11 @@
     'affilinet': {
         'rate': {% if policy.getPremiumPlan == 'monthly'%}1{% elseif policy.getPremiumPlan == 'yearly' %}2{% else %}-1{% endif %},
         'gwp': {% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.gwp }}{% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyGwp }}{% else %}0{% endif %}
-    }
+    },
+    {% if has_visited_welcome_page is defined and has_visited_welcome_page == false %}
+        'transactionId': '{{ policy.policyNumber }}',
+        'transactionTotal': {% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.gwp }}{% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyGwp }}{% endif %}
+    {% endif %}
 {% endblock %}
 
 {% block body %}
@@ -95,7 +99,7 @@
     <section class="section--pad user-welcome--pic-sure section--arrow section--arrow__lightest-blue">
         <div class="container">
             <h3>Download our handy app - reduce your excess!</h3>
-            <p>Validate your phone using our pic-sure technology, this not only helps us recognise your phone is in good working order and not already damaged but <span class="text-highlight text-uppercase">reduces your excess by half!</span> <br>Help us stamp out fraud, reduce claims times and reduce costs to give that saving back to you.</p>
+            <p>Validate your phone using our pic-sure technology, this not only helps us recognise your phone is in good working order and not already damaged but <mark class="background-white text-uppercase">reduces your excess by half!</mark> <br>Help us stamp out fraud, reduce claims times and reduce costs to give that saving back to you.</p>
             <table class="table hidden-xs">
                 <thead>
                     <tr>
@@ -232,9 +236,11 @@
     </div>
     {# End Page Modals #}
 
+    {% if has_visited_welcome_page is not defined or not has_visited_welcome_page %}
     <!-- Offer Conversion: So Sure [UK] -->
     <img src="https://t.wowtrk.com/SL9e7" width="1" height="1" />
     <!-- // End Offer Conversion -->
+    {% endif %}
 
 {% endblock %}
 

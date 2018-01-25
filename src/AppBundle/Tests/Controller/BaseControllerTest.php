@@ -170,4 +170,74 @@ class BaseControllerTest extends WebTestCase
 
         return $crawler;
     }
+
+    /**
+     *
+     * @param $item string
+     *
+     * check if id is one of the search form ID's
+     */
+    protected function isASearchFormId($item)
+    {
+        $keys = array(
+            'search-phone-form',
+            'search-phone-form-homepage',
+            'search-phone-form-footer',
+            'search-phone-form-header'
+        );
+        foreach ($keys as $key) {
+            if (strpos($item, $key) !== false) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param $forms array
+     *
+     * Returns list of all phone search forms, extracts data-base-path and data-path suffix
+     */
+    protected function verifySearchFormData($forms, $expectedPath, $numOfForms = 1)
+    {
+        $processed = 0;
+        foreach ($forms as $form) {
+            if (self::isASearchFormId($form->getAttribute('id'))) {
+                $this->assertSame(
+                    $expectedPath,
+                    sprintf(
+                        '%s%s',
+                        $form->getAttribute('data-base-path'),
+                        $form->getAttribute('data-path-suffix')
+                    )
+                );
+                $processed++;
+            }
+        }
+        $this->assertEquals($numOfForms, $processed);
+    }
+
+    protected function expectFlashSuccess($crawler, $message)
+    {
+        $this->assertContains(
+            $message,
+            $crawler->filterXPath('//div[contains(@class, "flash-success")]')->html()
+        );
+    }
+
+    protected function expectFlashWarning($crawler, $message)
+    {
+        $this->assertContains(
+            $message,
+            $crawler->filterXPath('//div[contains(@class, "flash-warning")]')->html()
+        );
+    }
+
+    protected function expectFlashError($crawler, $message)
+    {
+        $this->assertContains(
+            $message,
+            $crawler->filterXPath('//div[contains(@class, "flash-danger")]')->html()
+        );
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Document\Policy;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Document\Claim;
@@ -54,6 +55,8 @@ class DaviesServiceTest extends WebTestCase
     public function setUp()
     {
         self::$daviesService->clearErrors();
+        self::$daviesService->clearWarnings();
+        self::$daviesService->clearFees();
         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $phoneRepo = self::$dm->getRepository(Phone::class);
         self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 6', 'memory' => 64]);
@@ -204,23 +207,44 @@ class DaviesServiceTest extends WebTestCase
 
     public function testSaveClaimsClosed()
     {
-        $davies = new DaviesClaim();
-        $davies->policyNumber = '1';
-        $davies->status = 'Closed';
-
+        $policyOpen = static::createUserPolicy(true);
+        $policyOpen->getUser()->setEmail(static::generateEmail('testSaveClaimsClosed-Open', $this));
+        $claimOpen = new Claim();
+        $claimOpen->setNumber($this->getRandomPolicyNumber());
+        $policyOpen->addClaim($claimOpen);
         $daviesOpen = new DaviesClaim();
-        $daviesOpen->policyNumber = '1';
+        $daviesOpen->policyNumber = $policyOpen->getPolicyNumber();
+        $daviesOpen->claimNumber = $claimOpen->getNumber();
         $daviesOpen->status = 'Open';
+        $daviesOpen->lossDate = new \DateTime('2017-02-01');
 
-        self::$daviesService->saveClaims(1, [$davies, $davies]);
-        self::$daviesService->saveClaims(1, [$davies, $daviesOpen]);
+        $policyClosed = static::createUserPolicy(true);
+        $policyClosed->getUser()->setEmail(static::generateEmail('testSaveClaimsClosed-Closed', $this));
+        $claimClosed = new Claim();
+        $claimClosed->setNumber($this->getRandomPolicyNumber());
+        $policyClosed->addClaim($claimClosed);
+        $daviesClosed = new DaviesClaim();
+        $daviesClosed->policyNumber = $policyClosed->getPolicyNumber();
+        $daviesClosed->claimNumber = $claimClosed->getNumber();
+        $daviesClosed->status = 'Closed';
+        $daviesClosed->lossDate = new \DateTime('2017-01-01');
+
+        self::$daviesService->saveClaims(1, [$daviesClosed, $daviesClosed]);
+        self::$daviesService->saveClaims(1, [$daviesClosed, $daviesOpen]);
     }
 
     public function testSaveClaimsOpen()
     {
+        $policyOpen = static::createUserPolicy(true);
+        $policyOpen->getUser()->setEmail(static::generateEmail('testSaveClaimsOpen-Open', $this));
+        $claimOpen = new Claim();
+        $claimOpen->setNumber($this->getRandomPolicyNumber());
+        $policyOpen->addClaim($claimOpen);
         $daviesOpen = new DaviesClaim();
-        $daviesOpen->policyNumber = '1';
+        $daviesOpen->policyNumber = $policyOpen->getPolicyNumber();
+        $daviesOpen->claimNumber = $claimOpen->getNumber();
         $daviesOpen->status = 'Open';
+        $daviesOpen->lossDate = new \DateTime('2017-02-01');
 
         self::$daviesService->clearErrors();
 
@@ -230,6 +254,119 @@ class DaviesServiceTest extends WebTestCase
 
         $this->insureWarningExists('/multiple open claims against policy/');
     }
+
+    public function testUpdateClaimNoFinalFlag()
+    {
+
+        $policy = new PhonePolicy();
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setId('1');
+
+        $claim = new Claim();
+        $claim->setPolicy($policy);
+        $claim->setNumber(time());
+        $claim->setStatus(Claim::STATUS_SETTLED);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = $claim->getNumber();
+        $daviesClaim->status = DaviesClaim::STATUS_CLOSED;
+        $daviesClaim->finalSuspicion = null;
+        $daviesClaim->initialSuspicion = null;
+        $daviesClaim->finalSuspicion = null;
+        self::$daviesService->clearWarnings();
+        $this->assertEquals(0, count(self::$daviesService->getWarnings()));
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->assertEquals(1, count(self::$daviesService->getWarnings()));
+        $this->insureWarningExists('/finalSuspicion/');
+    }
+
+    public function testUpdateClaimNoInitialFlag()
+    {
+
+        $user = new User();
+        $user->setFirstName('Marko');
+        $user->setLastName('Marulic');
+        $policy = new PhonePolicy();
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setId('1');
+        $policy->setUser($user);
+
+        $claim = new Claim();
+        $claim->setPolicy($policy);
+        $claim->setNumber(time());
+        $claim->setStatus(Claim::STATUS_INREVIEW);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = $claim->getNumber();
+        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->insuredName = 'Marko Marulic';
+        $daviesClaim->initialSuspicion = null;
+        $daviesClaim->finalSuspicion = null;
+
+        self::$daviesService->clearWarnings();
+        $this->assertEquals(0, count(self::$daviesService->getWarnings()));
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->assertEquals(1, count(self::$daviesService->getWarnings()));
+        $this->insureWarningExists('/initialSuspicion/');
+    }
+
+    public function testUpdateClaimValidDaviesInitialFlag()
+    {
+        $user = new User();
+        $user->setFirstName('Marko');
+        $user->setLastName('Marulic');
+        $policy = new PhonePolicy();
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setId('1');
+        $policy->setUser($user);
+
+        $claim = new Claim();
+        $claim->setPolicy($policy);
+        $claim->setNumber(time());
+        $claim->setStatus(Claim::STATUS_INREVIEW);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = $claim->getNumber();
+        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->insuredName = 'Marko Marulic';
+        $daviesClaim->initialSuspicion = 'no';
+        $daviesClaim->finalSuspicion = null;
+
+        self::$daviesService->clearWarnings();
+        $this->assertEquals(0, count(self::$daviesService->getWarnings()));
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->assertEquals(0, count(self::$daviesService->getWarnings()));
+    }
+
+    public function testUpdateClaimValidDaviesFinalFlag()
+    {
+        $user = new User();
+        $user->setFirstName('Marko');
+        $user->setLastName('Marulic');
+        $policy = new PhonePolicy();
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setId('1');
+        $policy->setUser($user);
+
+        $claim = new Claim();
+        $claim->setPolicy($policy);
+        $claim->setNumber(time());
+        $claim->setStatus(Claim::STATUS_APPROVED);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = $claim->getNumber();
+        $daviesClaim->status = DaviesClaim::STATUS_CLOSED;
+        $daviesClaim->insuredName = 'Marko Marulic';
+        $daviesClaim->initialSuspicion = 'no';
+        $daviesClaim->finalSuspicion = 'no';
+
+        self::$daviesService->clearWarnings();
+        $this->assertEquals(0, count(self::$daviesService->getWarnings()));
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->assertEquals(0, count(self::$daviesService->getWarnings()));
+    }
+
+
 
     private function getRandomPolicyNumber()
     {
@@ -422,35 +559,6 @@ class DaviesServiceTest extends WebTestCase
             $daviesClaim,
             'replacement received date without a replacement make/model'
         );
-    }
-
-    public function testValidateClaimDetailsReplacementDateMissingImei()
-    {
-        $address = new Address();
-        $address->setType(Address::TYPE_BILLING);
-        $address->setPostCode('BX11LT');
-        $user = new User();
-        $user->setBillingAddress($address);
-        $user->setFirstName('foo');
-        $user->setLastName('bar');
-        $policy = new PhonePolicy();
-        $user->addPolicy($policy);
-        $claim = new Claim();
-        $policy->addClaim($claim);
-        $policy->setPolicyNumber('TEST/2017/123456');
-
-        $daviesClaim = new DaviesClaim();
-        $daviesClaim->policyNumber = 'TEST/2017/123456';
-        $daviesClaim->status = 'Open';
-        $daviesClaim->miStatus = '';
-        $daviesClaim->insuredName = 'Mr Foo Bar';
-        $daviesClaim->lossDate = new \DateTime('2017-07-01');
-        $daviesClaim->replacementReceivedDate = new \DateTime('2017-07-02');
-        $daviesClaim->replacementMake = 'Apple';
-        $daviesClaim->replacementModel = 'iPhone 8';
-
-        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $this->insureErrorExists('/replacement received date without a replacement imei/');
     }
 
     public function testValidateClaimDetailsName()
@@ -779,11 +887,11 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->insuredName = 'Mr foo bar';
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $this->insureErrorDoesNotExist('/does not have the correct recipero fee/');
+        $this->insureFeesDoesNotExist('/does not have the correct recipero fee/');
 
         $daviesClaim->reciperoFee = 1.26;
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $this->insureErrorExists('/does not have the correct recipero fee/');
+        $this->insureFeesExists('/does not have the correct recipero fee/');
     }
 
     public function testValidateClaimDetailsReceivedDate()
@@ -851,6 +959,69 @@ class DaviesServiceTest extends WebTestCase
         $this->insureErrorDoesNotExist('/should be closed. Replacement was delivered more than 1 month ago/');
     }
 
+    public function testValidateClaimDetailsMissingReceivedInfo()
+    {
+        $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        // 2 weeks
+        $twoWeekAgo = new \DateTime();
+        $twoWeekAgo = $twoWeekAgo->sub(new \DateInterval('P14D'));
+        $claim->setApprovedDate($twoWeekAgo);
+        $policy->addClaim($claim);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = 1;
+        $daviesClaim->status = 'open';
+        $daviesClaim->incurred = 1;
+        $daviesClaim->unauthorizedCalls = 1.01;
+        $daviesClaim->accessories = 1.03;
+        $daviesClaim->phoneReplacementCost = 1.07;
+        $daviesClaim->transactionFees = 1.11;
+        $daviesClaim->handlingFees = 1.19;
+        $daviesClaim->reciperoFee = 1.27;
+        $daviesClaim->excess = 6;
+        $daviesClaim->reserved = 0;
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+        //$daviesClaim->replacementMake = 'Apple';
+        //$daviesClaim->replacementModel = 'iPhone 8';
+        //$daviesClaim->replacementReceivedDate = new \DateTime('2016-01-01');
+
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->insureErrorExists('/the replacement data not recorded/');
+        $this->insureErrorExists('/received date/');
+        $this->insureErrorExists('/imei/');
+        $this->insureErrorExists('/phone/');
+
+        self::$daviesService->clearErrors();
+
+        $daviesClaim->replacementMake = 'Apple';
+        $daviesClaim->replacementModel = 'iPhone 8';
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->insureErrorExists('/the replacement data not recorded/');
+        $this->insureErrorExists('/received date/');
+        $this->insureErrorExists('/imei/');
+        $this->insureErrorDoesNotExist('/phone/');
+
+        self::$daviesService->clearErrors();
+
+        $daviesClaim->replacementReceivedDate = new \DateTime();
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->insureErrorExists('/the replacement data not recorded/');
+        $this->insureErrorDoesNotExist('/received date/');
+        $this->insureErrorExists('/imei/');
+        $this->insureErrorDoesNotExist('/phone/');
+
+        self::$daviesService->clearErrors();
+
+        $daviesClaim->replacementImei = '123';
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->insureErrorDoesNotExist('/the replacement data not recorded/');
+        $this->insureErrorDoesNotExist('/received date/');
+        $this->insureErrorDoesNotExist('/imei/');
+        $this->insureErrorDoesNotExist('/phone/');
+    }
+
     public function testPostValidateClaimDetailsReceivedDate()
     {
         $policy = static::createUserPolicy(true);
@@ -863,7 +1034,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->claimNumber = 1;
 
         self::$daviesService->postValidateClaimDetails($claim, $daviesClaim);
-        $this->insureErrorExists('/has an approved date/');
+        $this->insureWarningExists('/has an approved date/');
     }
 
     public function testSaveClaimsReplacementDate()
@@ -1047,6 +1218,38 @@ class DaviesServiceTest extends WebTestCase
             }
         }
         if ($exists) {
+            $this->assertTrue(
+                $foundMatch,
+                sprintf('did not find %s in %s', $errorRegEx, json_encode(self::$daviesService->getErrors()))
+            );
+        } else {
+            $this->assertFalse(
+                $foundMatch,
+                sprintf('found %s in %s', $errorRegEx, json_encode(self::$daviesService->getErrors()))
+            );
+        }
+    }
+
+    private function insureFeesExists($feesRegEx)
+    {
+        $this->insureFeesExistsOrNot($feesRegEx, true);
+    }
+
+    private function insureFeesDoesNotExist($feesRegEx)
+    {
+        $this->insureFeesExistsOrNot($feesRegEx, false);
+    }
+
+    private function insureFeesExistsOrNot($feesRegEx, $exists)
+    {
+        $foundMatch = false;
+        foreach (self::$daviesService->getFees() as $fee) {
+            $matches = preg_grep($feesRegEx, $fee);
+            if (count($matches) > 0) {
+                $foundMatch = true;
+            }
+        }
+        if ($exists) {
             $this->assertTrue($foundMatch);
         } else {
             $this->assertFalse($foundMatch);
@@ -1111,5 +1314,55 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->replacementImei = '123 Bx11lt';
         $daviesClaim->replacementReceivedDate = new \DateTime();
         $this->assertFalse(static::$daviesService->saveClaim($daviesClaim, false));
+    }
+
+    public function testSaveClaimsNoClaimsFound()
+    {
+        $policy = static::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('testSaveClaimsNoClaimsFound', $this));
+        $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
+        $claim->setStatus(Claim::STATUS_APPROVED);
+        $claim->setNumber(1234567890);
+        $policy->addClaim($claim);
+
+        static::$dm->persist($policy->getUser());
+        static::$dm->persist($policy);
+        static::$dm->persist($claim);
+        static::$dm->flush();
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->policyNumber = $claim->getPolicy()->getPolicyNumber();
+        $daviesClaim->claimNumber = '1234567890';
+        $daviesClaim->insuredName = 'foo bar';
+        $daviesClaim->initialSuspicion = 'no';
+        $daviesClaim->finalSuspicion = 'no';
+        $daviesClaim->status = DaviesClaim::STATUS_CLOSED;
+        $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
+        $daviesClaim->replacementMake = 'Apple';
+        $daviesClaim->replacementModel = 'iPhone 4';
+        $daviesClaim->replacementImei = '123 Bx11lt';
+        $daviesClaim->replacementReceivedDate = new \DateTime();
+        $daviesClaims = array($daviesClaim);
+
+        static::$daviesService->saveClaims('', $daviesClaims);
+        $this->insureErrorDoesNotExist('/1234567890/');
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->policyNumber = $claim->getPolicy()->getPolicyNumber();
+        $daviesClaim->claimNumber = '1234567891';
+        $daviesClaim->status = DaviesClaim::STATUS_CLOSED;
+        $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
+        $daviesClaim->insuredName = 'foo bar';
+        $daviesClaim->initialSuspicion = 'no';
+        $daviesClaim->finalSuspicion = 'no';
+        $daviesClaim->replacementMake = 'Apple';
+        $daviesClaim->replacementModel = 'iPhone 4';
+        $daviesClaim->replacementImei = '123 Bx11lt';
+        $daviesClaim->replacementReceivedDate = new \DateTime();
+        $daviesClaims = array($daviesClaim);
+
+        static::$daviesService->saveClaims('', $daviesClaims);
+        $this->insureErrorExists('/1234567890/');
     }
 }

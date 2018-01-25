@@ -615,7 +615,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         if ($accepted) {
             $invitation->setAccepted($policyB->getStart());
         }
-        $manager->persist($invitation);        
+        $manager->persist($invitation);
     }
 
     private function addConnections($manager, $userA, $users, $connections = self::CONNECTIONS_RANDOM_OR_NONE)
@@ -668,15 +668,15 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             if ($policyA->getPromoCode() == SalvaPhonePolicy::PROMO_LAUNCH) {
                 $connectionB->setPromoValue($policyA->getAllowedPromoConnectionValue());
             }
-    
+
             $policyA->addConnection($connectionB);
             $policyA->updatePotValue();
-    
+
             $policyB->addConnection($connectionA);
             $policyB->updatePotValue();
 
             $manager->persist($connectionA);
-            $manager->persist($connectionB);            
+            $manager->persist($connectionB);
         }
     }
 

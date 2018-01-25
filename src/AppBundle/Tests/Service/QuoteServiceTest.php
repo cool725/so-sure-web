@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Service\QuoteService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\Phone;
 
@@ -73,9 +74,15 @@ class QuoteServiceTest extends WebTestCase
         $this->expect($mailer, 0, 'OnePlus');
         self::$quoteService->setMailerMailer($mailer);
         self::$quoteService->getQuotes('Apple', 'A0001');
-
+        $key = sprintf(QuoteService::REDIS_DIFFERENT_MAKE_EMAIL_KEY_FORMAT, 'OnePlus', 'Apple');
+        $this->assertTrue((self::$redis->get($key) == 1), 'Redis key found');
+        $mailer = $this->getMockBuilder('Swift_Mailer')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mailer->expects($this->never())->method('send');
+        self::$quoteService->setMailerMailer($mailer);
+        self::$quoteService->getQuotes('Apple', 'A0001');
     }
-
 
     public function testQuoteServiceUnknownDeviceEmail()
     {
@@ -86,7 +93,8 @@ class QuoteServiceTest extends WebTestCase
         $this->expect($mailer, 0, 'Unknown device queried: "One"');
         self::$quoteService->setMailerMailer($mailer);
         self::$quoteService->getQuotes(null, 'A0001', 3000);
-        $this->assertTrue((self::$redis->get('UNKNOWN-DEVICE:A0001') == 1), 'Redis key found');
+        $key = sprintf(QuoteService::REDIS_UNKNOWN_EMAIL_KEY_FORMAT, 'A0001');
+        $this->assertTrue((self::$redis->get($key) == 1), 'Redis key found');
         $mailer = $this->getMockBuilder('Swift_Mailer')
             ->disableOriginalConstructor()
             ->getMock();
@@ -136,12 +144,21 @@ class QuoteServiceTest extends WebTestCase
         self::$quoteService->getQuotes('Google', 'bullhead', 2, true);
     }
 
-    public function testQuoteServiceKnownDeviceRootedSend()
+    public function testQuoteServiceKnownRootedDeviceEmail()
     {
         $mailer = $this->getMockBuilder('Swift_Mailer')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->expect($mailer, 0, 'Rooted');
+
+        $this->expect($mailer, 0, 'Rooted device queried: bullhead (16 GB)');
+        self::$quoteService->setMailerMailer($mailer);
+        self::$quoteService->getQuotes('Google', 'bullhead', 16, true);
+        $key = sprintf(QuoteService::REDIS_ROOTED_DEVICE_EMAIL_KEY_FORMAT, 'bullhead', 16);
+        $this->assertTrue((self::$redis->get($key) == 1), 'Redis key found');
+        $mailer = $this->getMockBuilder('Swift_Mailer')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mailer->expects($this->never())->method('send');
         self::$quoteService->setMailerMailer($mailer);
         self::$quoteService->getQuotes('Google', 'bullhead', 16, true);
     }

@@ -8,6 +8,7 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Document\User;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Address;
+use AppBundle\Document\SCode;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Phone;
@@ -51,6 +52,7 @@ class InvitationServiceTest extends WebTestCase
     protected static $phone;
     protected static $phone2;
     protected static $policyService;
+    protected static $scodeService;
 
     public static function setUpBeforeClass()
     {
@@ -81,6 +83,7 @@ class InvitationServiceTest extends WebTestCase
         self::$invitationService->setDebug(true);
 
         self::$policyService = self::$container->get('app.policy');
+        self::$scodeService = self::$container->get('app.scode');
 
         $phoneRepo = self::$dm->getRepository(Phone::class);
         self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
@@ -888,6 +891,44 @@ class InvitationServiceTest extends WebTestCase
         $this->assertEquals($userInvitee->getId(), $invitation->getInvitee()->getId());
         $this->assertEquals($policyInvitee->getStandardSCode()->getId(), $invitation->getSCode()->getId());
         
+        $updatedInvitee = static::$userRepo->find($userInvitee->getId());
+        //\Doctrine\Common\Util\Debug::dump($updatedInvitee);
+        $foundInvite = false;
+        foreach ($updatedInvitee->getUnprocessedReceivedInvitations() as $receviedInvitation) {
+            if ($invitation->getId() == $receviedInvitation->getId()) {
+                $foundInvite = true;
+            }
+        }
+        $this->assertTrue($foundInvite);
+    }
+
+    public function testSCodeMultiPay()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testSCodeMultiPay-inviter', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+
+        $userInvitee = static::createUser(
+            static::$userManager,
+            static::generateEmail('testSCodeMultiPay-invitee', $this),
+            'bar'
+        );
+        $policyInvitee = static::initPolicy($userInvitee, static::$dm, static::$phone, null, false, true);
+
+        $multiPaySCode = self::$scodeService->generateSCode($userInvitee, SCode::TYPE_MULTIPAY);
+        $policyInvitee->addSCode($multiPaySCode);
+        self::$dm->flush();
+
+        $invitation = self::$invitationService->inviteBySCode($policy, $multiPaySCode->getCode());
+        $this->assertTrue($invitation instanceof SCodeInvitation);
+        $this->assertNotNull($invitation->getInvitee());
+        $this->assertEquals($userInvitee->getId(), $invitation->getInvitee()->getId());
+        $this->assertEquals($policyInvitee->getStandardSCode()->getId(), $invitation->getSCode()->getId());
+
         $updatedInvitee = static::$userRepo->find($userInvitee->getId());
         //\Doctrine\Common\Util\Debug::dump($updatedInvitee);
         $foundInvite = false;
@@ -2136,30 +2177,6 @@ class InvitationServiceTest extends WebTestCase
         $connection = static::$invitationService->addReward($policy, $reward, 10);
         $this->assertEquals(20, $policy->getPotValue());
         $this->assertEquals(2, count($policy->getConnections()));
-    }
-
-    public function testResolveSCode()
-    {
-        $this->assertEquals('a', static::$invitationService->resolveSCode('a'));
-        $this->assertEquals('abcdefgh', static::$invitationService->resolveSCode('abcdefgh'));
-
-        $this->assertEquals(
-            'abcdefgh',
-            static::$invitationService->resolveSCode('https://goo.gl/wSZGbc'),
-            'If error, try running webvagrant, as requires server running on localhost.'
-        );
-        $this->assertEquals(
-            'abcdefgh',
-            static::$invitationService->resolveSCode('goo.gl/wSZGbc'),
-            'If error, try clearing cache.'
-        );
-
-        $this->assertEquals('abcdefgh', static::$invitationService->resolveSCode(
-            'https://sosure.test-app.link/GQnmCNBSwB'
-        ));
-        $this->assertEquals('abcdefgh', static::$invitationService->resolveSCode(
-            'sosure.test-app.link/GQnmCNBSwB'
-        ));
     }
 
     private function createAndLink($email, $date, $inviteeEmail = null, $policy = null, $phone = null)

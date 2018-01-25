@@ -101,6 +101,9 @@ class PolicyService
     /** @var SmsService */
     protected $sms;
 
+    /** @var SCodeService */
+    protected $scodeService;
+
     protected $warnMakeModelMismatch = true;
 
     public function setMailer($mailer)
@@ -156,6 +159,7 @@ class PolicyService
      * @param                  $rateLimit
      * @param                  $intercom
      * @param SmsService       $sms
+     * @param SCodeService     $scodeService
      */
     public function __construct(
         DocumentManager $dm,
@@ -177,7 +181,8 @@ class PolicyService
         $imeiValidator,
         $rateLimit,
         $intercom,
-        SmsService $sms
+        SmsService $sms,
+        SCodeService $scodeService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -199,6 +204,7 @@ class PolicyService
         $this->rateLimit = $rateLimit;
         $this->intercom = $intercom;
         $this->sms = $sms;
+        $this->scodeService = $scodeService;
     }
 
     private function validateUser($user)
@@ -398,17 +404,18 @@ class PolicyService
             }
 
             if (!$scode) {
-                $scode = $this->uniqueSCode($policy);
-                $shortLink = $this->branch->generateSCode($scode->getCode());
-                // branch is preferred, but can fallback to old website version if branch is down
-                if (!$shortLink) {
-                    $link = $this->routerService->generateUrl(
-                        'scode',
-                        ['code' => $scode->getCode()]
-                    );
-                    $shortLink = $this->shortLink->addShortLink($link);
+                if ($scode = $policy->getStandardSCode()) {
+                    // scode created during the policy generation should not yet be persisted to the db
+                    // so if it does exist, its a duplicate code
+                    $scodeRepo = $this->dm->getRepository(SCode::class);
+                    $exists = $scodeRepo->findOneBy(['code' => $scode->getCode()]);
+                    if ($exists) {
+                        // removing scode from policy seems to be problematic, so change code and make inactive
+                        $scode->deactivate();
+                    }
                 }
-                $scode->setShareLink($shortLink);
+                $scode = $this->scodeService->generateSCode($policy->getUser(), SCode::TYPE_STANDARD);
+                $policy->addSCode($scode);
             }
 
             if ($prefix) {
@@ -550,36 +557,6 @@ class PolicyService
         if ($email) {
             $this->newPolicyEmail($policy, [$policySchedule, $policyTerms], $bcc);
         }
-    }
-
-    public function uniqueSCode($policy, $count = 0)
-    {
-        if ($count > 10) {
-            throw new \Exception('Too many unique scode attempts');
-        }
-
-        $repo = $this->dm->getRepository(SCode::class);
-        $scode = $policy->getStandardSCode();
-        if (!$scode) {
-            $existingCount = $repo->getCountForName(SCode::getNameForCode($policy->getUser(), SCode::TYPE_STANDARD));
-            $policy->createAddSCode($existingCount + 1 + $count);
-
-            return $this->uniqueSCode($policy, $count + 1);
-        }
-
-        // scode created during the policy generation should not yet be persisted to the db
-        // so if it does exist, its a duplicate code
-        $exists = $repo->findOneBy(['code' => $scode->getCode()]);
-        if ($exists) {
-            // removing scode from policy seems to be problematic, so change code and make inactive
-            $scode->deactivate();
-            $existingCount = $repo->getCountForName(SCode::getNameForCode($policy->getUser(), SCode::TYPE_STANDARD));
-            $policy->createAddSCode($existingCount + 1 + $count);
-
-            return $this->uniqueSCode($policy, $count + 1);
-        }
-
-        return $scode;
     }
 
     public function generatePolicyTerms(Policy $policy)
@@ -757,6 +734,25 @@ class PolicyService
             ));
 
             return false;
+        }
+    }
+
+    public function swapPaymentPlan(Policy $policy)
+    {
+        if ($policy->getPremiumPaid() > 0) {
+            throw new \Exception('Only able to swap payment plan when policy is unpaid');
+        }
+
+        if ($policy->getPremiumPlan() == Policy::PLAN_MONTHLY) {
+            $policy->setPremiumInstallments(1);
+            $this->dm->flush();
+            $this->regenerateScheduledPayments($policy);
+            $this->dm->flush();
+        } elseif ($policy->getPremiumPlan() == Policy::PLAN_YEARLY) {
+            $policy->setPremiumInstallments(12);
+            $this->dm->flush();
+            $this->regenerateScheduledPayments($policy);
+            $this->dm->flush();
         }
     }
 
@@ -1408,7 +1404,10 @@ class PolicyService
             $fullyExpired[$policy->getId()] = $policy->getPolicyNumber();
             if (!$dryRun) {
                 try {
-                    $this->fullyExpire($policy);
+                    $result = $this->fullyExpire($policy);
+                    if ($result === null) {
+                        $fullyExpired[$policy->getId()] = sprintf('%s - waiting on claim', $policy->getPolicyNumber());
+                    }
                 } catch (\Exception $e) {
                     $msg = sprintf(
                         'Error Fully Expiring Policy %s / %s',
@@ -1487,7 +1486,7 @@ class PolicyService
         // If no change in wait claim, then don't proceed as may resend emails for cashback
         if ($policy->getStatus() == Policy::STATUS_EXPIRED_WAIT_CLAIM &&
             $initialStatus == Policy::STATUS_EXPIRED_WAIT_CLAIM) {
-            return;
+            return null;
         }
 
         if ($policy->hasCashback() && !in_array($policy->getCashback()->getStatus(), [
@@ -1520,6 +1519,8 @@ class PolicyService
 
             $this->adjustPotRewardEmail($policy->getNextPolicy(), $outstanding);
         }
+
+        return true;
     }
 
     public function adjustPotRewardEmail(Policy $policy, $additionalAmount)
@@ -1771,6 +1772,9 @@ class PolicyService
             $discount = $policy->getPotValue();
         }
 
+        if ($payer = $policy->getPayer()) {
+            $payer->addPayerPolicy($newPolicy);
+        }
         $this->create($newPolicy, $startDate, false, $numPayments);
         $newPolicy->renew($discount, $autoRenew, $date);
         $this->generateScheduledPayments($newPolicy, $startDate, $numPayments);

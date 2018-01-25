@@ -67,6 +67,9 @@
         <div class="col-md-3 col-md-offset-1" style="{{ style }};">
             <a href="{{ path('admin_payments') }}"><i class="fa fa-gbp fa-large"></i> Payments</a>
         </div>
+        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
+            <a href="{{ path('admin_quarterly_pl') }}"><i class="fa fa-bar-chart fa-large"></i> Quarterly P&L</a>
+        </div>
     </div>
   {% if is_granted('ROLE_ADMIN') %}
     <div class="row">

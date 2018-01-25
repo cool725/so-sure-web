@@ -341,13 +341,23 @@ class OpsController extends BaseController
                 return new JsonResponse(['details' => 'Ignore Ip'], 204);
             }
 
+            if (in_array(strtolower($violationReport['csp-report']['blocked-uri']), [
+                'blob'
+            ])) {
+                $logger->debug(sprintf(
+                    'Content-Security-Policy called with ignore url: %s',
+                    $violationReport['csp-report']['blocked-uri']
+                ));
+
+                return new JsonResponse(['details' => 'Ignore url'], 204);
+            }
+
             $scheme = strtolower(parse_url($violationReport['csp-report']['blocked-uri'], PHP_URL_SCHEME));
             if (in_array($scheme, [
                 'ms-appx-web',
                 'none',
                 'about',
                 'asset',
-                'blob',
             ])) {
                 $logger->debug(sprintf('Content-Security-Policy called with ignore scheme: %s', $scheme));
 
@@ -370,6 +380,7 @@ class OpsController extends BaseController
         if (isset($violationReport['csp-report']['original-policy'])) {
             unset($violationReport['csp-report']['original-policy']);
         }
+        $violationReport['csp-report']['user-agent']= $request->headers->get('User-Agent');
         $this->get('snc_redis.default')->rpush('csp', json_encode($violationReport));
         $logger->debug(
             'Content-Security-Policy Violation Reported',

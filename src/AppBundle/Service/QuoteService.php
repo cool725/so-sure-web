@@ -12,6 +12,8 @@ class QuoteService
 {
     const DUPLICATE_EMAIL_CACHE_TIME = 3600;
     const REDIS_UNKNOWN_EMAIL_KEY_FORMAT = 'UNKNOWN-DEVICE:%s';
+    const REDIS_DIFFERENT_MAKE_EMAIL_KEY_FORMAT = 'DIFFERENT-MAKE:%s-%s';
+    const REDIS_ROOTED_DEVICE_EMAIL_KEY_FORMAT = 'ROOTED-DEVICE:%s-%s';
 
 
     /** @var MailerService */
@@ -141,6 +143,12 @@ class QuoteService
      */
     private function differentMake(Phone $phone, $phoneMake)
     {
+        $key = sprintf(self::REDIS_DIFFERENT_MAKE_EMAIL_KEY_FORMAT, $phone->getMake(), $phoneMake);
+        if ($this->redis->get($key)) {
+            return false;
+        }
+        $this->redis->setex($key, self::DUPLICATE_EMAIL_CACHE_TIME, 1);
+
         $body = sprintf(
             'Make in db is different than phone make. Db: %s Phone: %s. DB details are enclosed: ObjectId("%s") %s',
             $phone->getMake(),
@@ -173,6 +181,13 @@ class QuoteService
         if (in_array($device.'-'.$memory, ["bullhead-2"])) {
             return false;
         }
+
+        $key = sprintf(self::REDIS_ROOTED_DEVICE_EMAIL_KEY_FORMAT, $device, $memory);
+        if ($this->redis->get($key)) {
+            return false;
+        }
+
+        $this->redis->setex($key, self::DUPLICATE_EMAIL_CACHE_TIME, 1);
 
         $body = sprintf(
             'Rooted device queried: %s (%s GB).',

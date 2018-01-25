@@ -31,6 +31,9 @@ class SCodeControllerTest extends BaseControllerTest
         $url = sprintf('/scode/%s', $scode->getCode());
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(200);
+        // check if phone forms are pointing to the right location
+        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
+
     }
 
     public function testSCodeUser()

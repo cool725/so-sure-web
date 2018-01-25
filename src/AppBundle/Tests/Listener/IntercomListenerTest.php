@@ -166,6 +166,50 @@ class IntercomListenerTest extends WebTestCase
         $this->assertEquals($user->getId(), $data['userId']);
     }
 
+    public function testIntercomQueuePolicyUnpaid()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testIntercomQueuePolicyUnpaid', $this),
+            'bar'
+        );
+        $policy = new PhonePolicy();
+        $policy->setUser($user);
+        $policy->setId(rand(1, 99999));
+
+        static::$redis->del(IntercomService::KEY_INTERCOM_QUEUE);
+        $this->assertEquals(0, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+
+        $listener = new IntercomListener(static::$intercomService);
+        $listener->onPolicyUnpaidEvent(new PolicyEvent($policy));
+
+        $this->assertEquals(1, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+        $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
+        $this->assertEquals($user->getId(), $data['userId']);
+    }
+
+    public function testIntercomQueuePolicyReactivated()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testIntercomQueuePolicyReactivated', $this),
+            'bar'
+        );
+        $policy = new PhonePolicy();
+        $policy->setUser($user);
+        $policy->setId(rand(1, 99999));
+
+        static::$redis->del(IntercomService::KEY_INTERCOM_QUEUE);
+        $this->assertEquals(0, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+
+        $listener = new IntercomListener(static::$intercomService);
+        $listener->onPolicyReactivatedEvent(new PolicyEvent($policy));
+
+        $this->assertEquals(1, static::$redis->llen(IntercomService::KEY_INTERCOM_QUEUE));
+        $data = unserialize(static::$redis->lpop(IntercomService::KEY_INTERCOM_QUEUE));
+        $this->assertEquals($user->getId(), $data['userId']);
+    }
+
     public function testIntercomQueueCreated()
     {
         $user = static::createUser(

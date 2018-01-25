@@ -293,6 +293,109 @@ class UserControllerTest extends BaseControllerTest
         $this->validateRewardPot($crawler, 10);
     }
 
+    public function testUserChangeEmailDuplicate()
+    {
+        $email = self::generateEmail('testUserChangeEmailDuplicate', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $dupUser = self::createUser(
+            self::$userManager,
+            self::generateEmail('testUserChangeEmailDuplicate-dup', $this),
+            $password,
+            $phone,
+            self::$dm
+        );
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        self::$dm->flush();
+
+        $this->assertTrue($policy->getUser()->hasActivePolicy());
+
+        $this->login($email, $password, 'user/');
+
+        self::$client->followRedirects();
+        $crawler = self::$client->request('GET', '/user/contact-details');
+        self::verifyResponse(200);
+
+        $form = $crawler->selectButton('user_email_form[update]')->form();
+        $form['user_email_form[email]'] = $dupUser->getEmail();
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(200);
+        $this->expectFlashError($crawler, 'email already exists in our system');
+    }
+
+    public function testUserChangeEmailActual()
+    {
+        $email = self::generateEmail('testUserChangeEmailActual', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        self::$dm->flush();
+
+        $this->assertTrue($policy->getUser()->hasActivePolicy());
+
+        $this->login($email, $password, 'user/');
+
+        self::$client->followRedirects();
+        $crawler = self::$client->request('GET', '/user/contact-details');
+        self::verifyResponse(200);
+
+        $form = $crawler->selectButton('user_email_form[update]')->form();
+        $form['user_email_form[email]'] = self::generateEmail('testUserChangeEmailActual-new', $this);
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(200);
+        $this->expectFlashSuccess($crawler, 'email address is updated');
+    }
+
+    public function testUserChangeEmailInvalidEmail()
+    {
+        $email = self::generateEmail('testUserChangeEmailInvalidEmail', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        self::$dm->flush();
+
+        $this->assertTrue($policy->getUser()->hasActivePolicy());
+
+        $this->login($email, $password, 'user/');
+
+        self::$client->followRedirects();
+        $crawler = self::$client->request('GET', '/user/contact-details');
+        self::verifyResponse(200);
+
+        $form = $crawler->selectButton('user_email_form[update]')->form();
+        $form['user_email_form[email]'] = 'testUserChangeEmailInvalidEmail-dup@foo';
+        $crawler = self::$client->submit($form);
+        self::verifyResponse(200);
+        //print_r($crawler->html());
+    }
+
     private function validateInviteAllowed($crawler, $allowed)
     {
         $count = 0;
@@ -754,5 +857,44 @@ class UserControllerTest extends BaseControllerTest
 
         // expect a locked account
         $this->login($email, 'bar', 'login', null, 503);
+    }
+    public function testUserWelcomePage()
+    {
+        $email = self::generateEmail('testUserWelcomePage', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        self::$dm->flush();
+        $welcomePage = sprintf('/user/welcome/%s', $policy->getId());
+        // initial flag is false
+        $this->login($email, $password);
+        self::$client->request('GET', $welcomePage);
+        self::verifyResponse(200);
+        $this->assertContains(
+            "'has_visited_welcome_page': false",
+            self::$client->getResponse()->getContent()
+        );
+        // set after first show to true
+        self::$client->request('GET', $welcomePage);
+        self::verifyResponse(200);
+        $this->assertContains(
+            "'has_visited_welcome_page': true",
+            self::$client->getResponse()->getContent()
+        );
+        // consistent after repeated show
+        self::$client->request('GET', $welcomePage);
+        self::verifyResponse(200);
+        $this->assertContains(
+            "'has_visited_welcome_page': true",
+            self::$client->getResponse()->getContent()
+        );
     }
 }

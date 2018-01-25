@@ -508,6 +508,11 @@ class Phone
         return $this->toTwoDp($this->initialPrice);
     }
 
+    public function setInitialPrice($price)
+    {
+        $this->initialPrice = $price;
+    }
+
     public function getReplacementPrice()
     {
         return $this->toTwoDp($this->replacementPrice);
