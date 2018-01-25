@@ -462,6 +462,49 @@
 
     }
 
+    &--pic-sure {
+        background-color: $lightest-blue;
+
+        p {
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        table { //TODO - Move to tables scss
+            max-width: 600px;
+            margin: 30px auto 0;
+
+            thead {
+                td {
+                    padding: 30px 15px;
+                    text-align: center;
+                    vertical-align: middle;
+                }
+            }
+
+            tr {
+                td.sosure {
+                    background-color: $white;
+                }
+
+                td.contrast {
+                    background-color: lighten($lightest-blue, 6%);
+                    opacity: 0.7;
+                }
+            }
+
+            tbody {
+                td {
+                    padding: 15px;
+                    border-color: darken($lightest-blue, 6%);
+                    vertical-align: middle;
+                }
+            }
+        }
+    }
+
+
     &--cover-details {
         text-align: center;
         position: relative;
@@ -942,6 +985,30 @@
         }
     }
 
+}
+
+// pic-sure animation
+.pic-sure {
+    width: 300px; height: 300px;
+    margin: 0 auto;
+    position: relative;
+
+    &--mirror {
+        display: inline-block;
+        margin: 0 auto;
+    }
+
+    &--phone-back {
+        position: absolute;
+        z-index: 100;
+        bottom: 30px; right: 70px;
+    }
+
+    &--phone-front {
+        position: absolute;
+        z-index: 99;
+        bottom: 80px; right: 118px;
+    }
 }
 
 .footer-new {
