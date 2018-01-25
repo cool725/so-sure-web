@@ -49,9 +49,9 @@
         {% endif %}
 
         {% if phone is defined and phone %}
-            {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'homepage', 'id': phone.id, 'sticky_search': sticky_search })) }}
+            {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type': select_phone_type, 'id': phone.id })) }}
         {% else %}
-            {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'homepage', 'sticky_search': sticky_search })) }}
+            {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type': select_phone_type })) }}
         {% endif %}
         <div id="hero-character_1"
              class="homepage--hero__character">

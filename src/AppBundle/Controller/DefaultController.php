@@ -65,20 +65,20 @@ class DefaultController extends BaseController
             $this->get('logger')->debug(sprintf('Referral %s', $referral));
         }
 
-        // $exp = $this->sixpack(
-        //     $request,
-        //     SixpackService::EXPERIMENT_FUNNEL_V1_V2,
-        //     ['v1', 'v2'],
-        //     true
-        // );
+        $exp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_HOMEPAGE_STICKYSEARCH_PICSURE,
+            ['v2', 'sticky-search', 'picsure'],
+            true
+        );
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         $data = array(
-            'sticky_search'   => false,
-            'pic_sure'        => false,
+            'select_phone_type'   => $exp == 'sticky-search' ? 'homepage-sticky' : 'homepage',
+            'pic_sure'        => $exp == 'picsure',
             'referral'        => $referral,
-            'phone'           => $this->getQuerystringPhone($request),,
+            'phone'           => $this->getQuerystringPhone($request),
             'device_category' => $this->get('app.request')->getDeviceCategory()
         );
 
