@@ -10,8 +10,9 @@
 {% set phonePath    = 'quote_phone' %}
 {% set pathSuffix   = '' %}
 {% set formID       = '' %}
+{% set stickySearch = false %}
 {% set formClass    = 'form-inline--homepage select-phone-form' %}
-{% set stickySearch = true %}
+
 {% if phone %}
   {% set formAction   = path('quote_phone', {'id': phone.id }) %}
 {% endif %}
@@ -19,13 +20,13 @@
 {% if type is defined and type == 'homepage' %}
     {% set formID = 'search-phone-form-homepage' %}
     {% set uid    = '-1' %}
-{% elseif type == 'homepageOld' %}
-    {% set formID = 'search-phone-form-homepage' %}
-    {% set uid    = '-1' %}
-    {% set stickySearch = false %}
 {% elseif type == 'footer' %}
     {% set formID    = 'search-phone-form-footer' %}
     {% set uid    = '-2' %}
+{% endif %}
+
+{% if sticky_search is defined and sticky_search == true %}
+  {% set stickySearch = true %}
 {% endif %}
 
 <div id="select-phone-data{{ uid }}"

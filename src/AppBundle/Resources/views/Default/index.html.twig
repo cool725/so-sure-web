@@ -48,11 +48,10 @@
             <p class="lead">Providing exceptional experience when you claim, <br class="hidden-xs">and rewarding you and your friends when you don't</p>
         {% endif %}
 
-
         {% if phone is defined and phone %}
-            {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'homepageOld', 'id': phone.id })) }}
+            {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'homepage', 'id': phone.id, 'sticky_search': sticky_search })) }}
         {% else %}
-            {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'homepageOld'})) }}
+            {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'homepage', 'sticky_search': sticky_search })) }}
         {% endif %}
         <div id="hero-character_1"
              class="homepage--hero__character">

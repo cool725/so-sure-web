@@ -75,7 +75,7 @@ class DefaultController extends BaseController
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         $data = array(
-            'sticky'          => false,
+            'sticky_search'   => false,
             'pic_sure'        => false,
             'referral'        => $referral,
             'phone'           => $this->getQuerystringPhone($request),,
