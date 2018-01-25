@@ -194,17 +194,10 @@ class DefaultControllerTest extends BaseControllerTest
         $this->assertEquals(200, $data->getStatusCode());
         self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
     }
-    public function testPhoneSearchHomepageV1()
-    {
-        $crawler = self::$client->request('GET', '/?force=v1');
-        $data = self::$client->getResponse();
-        $this->assertEquals(200, $data->getStatusCode());
-        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
-    }
 
-    public function testPhoneSearchHomepageV2()
+    public function testPhoneSearchHomepage()
     {
-        $crawler = self::$client->request('GET', '/?force=v2');
+        $crawler = self::$client->request('GET', '/');
         $data = self::$client->getResponse();
         $this->assertEquals(200, $data->getStatusCode());
         self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 2);

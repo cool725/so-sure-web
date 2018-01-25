@@ -17,21 +17,6 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
     {
     }
 
-    public function testPhoneSearchAppleUpcomingSplit()
-    {
-        $crawler = self::$client->request('GET', '/phone-insurance/Apple+Upcoming?force=split');
-        $data = self::$client->getResponse();
-        $this->assertEquals(200, $data->getStatusCode());
-        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
-    }
-
-    public function testPhoneSearchAppleUpcomingOld()
-    {
-        $crawler = self::$client->request('GET', '/phone-insurance/Apple+Upcoming?force=old');
-        $data = self::$client->getResponse();
-        $this->assertEquals(200, $data->getStatusCode());
-        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
-    }
     public function testPhoneSearchPhoneInsuranceByPhoneName()
     {
         $crawler = self::$client->request('GET', '/phone-insurance/Apple+iPhone+7');
