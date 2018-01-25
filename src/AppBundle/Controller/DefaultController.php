@@ -54,45 +54,15 @@ class DefaultController extends BaseController
      */
     public function indexAction(Request $request)
     {
-        $geoip = $this->get('app.geoip');
-        //$ip = "72.229.28.185";
-        $ip = $request->getClientIp();
-        $site = $request->get('site');
-        $userAgent = $request->headers->get('User-Agent');
-        // make sure to exclude us based bots that import content - eg. facebook/twitter
-        // https://developers.facebook.com/docs/sharing/webmasters/crawler
-        // https://dev.twitter.com/cards/getting-started#crawling
-        // also, for use with casper monitor, if force is present, then ignore
-        if (!$request->get('force') && $geoip->findCountry($ip) == "US" && $site != 'uk' &&
-            !preg_match("/Twitterbot|facebookexternalhit|Facebot/i", $userAgent)) {
+        if ($this->isRealUSAIp($request) && $request->get('site') != 'uk') {
             return $this->redirectToRoute('launch_usa');
         }
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(User::class);
-        $phoneRepo = $dm->getRepository(Phone::class);
-        $logger = $this->get('logger');
-        $launchUser = $this->get('app.user.launch');
 
-        $phone = null;
-        $phoneName = (string) $request->get('phone');
-        $matches = null;
-        if (preg_match('/([^ ]+) (.*) ([0-9]+)GB/', $phoneName, $matches) !== false && count($matches) >= 3) {
-            $decodedModel = Phone::decodeModel($matches[2]);
-            $phone = $phoneRepo->findOneBy([
-                'active' => true,
-                'make' => $matches[1],
-                'model' => $decodedModel,
-                'memory' => (int) $matches[3]
-            ]);
-        }
-
-        // $userTop = new User();
         $referral = $request->get('referral');
         if ($referral) {
-            $userTop->setReferralId($referral);
             $session = $this->get('session');
             $session->set('referral', $referral);
-            $logger->debug(sprintf('Referral %s', $referral));
+            $this->get('logger')->debug(sprintf('Referral %s', $referral));
         }
 
         // $exp = $this->sixpack(
@@ -106,7 +76,7 @@ class DefaultController extends BaseController
 
         $data = array(
             'referral' => $referral,
-            'phone' => $phone,
+            'phone' => $this->getQuerystringPhone($request),
             'device_category' => $this->get('app.request')->getDeviceCategory()
         );
 
@@ -142,6 +112,10 @@ class DefaultController extends BaseController
                 // 'sub_cont'  => '',
             );
         }
+
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
+            'Page' => $request->get('_route'),
+        ]);
 
         return $this->render('AppBundle:Default:index.html.twig', $data);
     }

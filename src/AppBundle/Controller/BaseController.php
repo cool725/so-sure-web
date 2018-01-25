@@ -918,4 +918,39 @@ abstract class BaseController extends Controller
 
         return $exp;
     }
+
+    protected function isRealUSAIp(Request $request)
+    {
+        $geoip = $this->get('app.geoip');
+        $ip = $request->getClientIp();
+        //$ip = "72.229.28.185";
+        $userAgent = $request->headers->get('User-Agent');
+
+        // make sure to exclude us based bots that import content - eg. facebook/twitter
+        // https://developers.facebook.com/docs/sharing/webmasters/crawler
+        // https://dev.twitter.com/cards/getting-started#crawling
+        return !preg_match("/Twitterbot|facebookexternalhit|Facebot/i", $userAgent) &&
+            $geoip->findCountry($ip) == "US";        
+    }
+
+    protected function getQuerystringPhone(Request $request)
+    {
+        $dm = $this->getManager();
+        $phoneRepo = $dm->getRepository(Phone::class);
+
+        $phone = null;
+        $phoneName = (string) $request->get('phone');
+        $matches = null;
+        if (preg_match('/([^ ]+) (.*) ([0-9]+)GB/', $phoneName, $matches) !== false && count($matches) >= 3) {
+            $decodedModel = Phone::decodeModel($matches[2]);
+            $phone = $phoneRepo->findOneBy([
+                'active' => true,
+                'make' => $matches[1],
+                'model' => $decodedModel,
+                'memory' => (int) $matches[3]
+            ]);
+        }
+
+        return $phone;        
+    }
 }
