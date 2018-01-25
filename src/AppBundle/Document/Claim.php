@@ -37,13 +37,15 @@ class Claim
     // technically not a warning flag, but fits nicely under that for UI with little change required
     // and very little usage envisioned
     const WARNING_FLAG_IGNORE_USER_DECLINED = 'ignore-user-declined';
+    const WARNING_FLAG_IGNORE_POLICY_EXPIRE_CLAIM_WAIT = 'ignore-policy-expire-claim-wait';
 
     public static $warningFlags = [
         self::WARNING_FLAG_DAVIES_NAME_MATCH => self::WARNING_FLAG_DAVIES_NAME_MATCH,
         self::WARNING_FLAG_DAVIES_POSTCODE => self::WARNING_FLAG_DAVIES_POSTCODE,
         self::WARNING_FLAG_BRIGHTSTAR_NAME_MATCH => self::WARNING_FLAG_BRIGHTSTAR_NAME_MATCH,
         self::WARNING_FLAG_BRIGHTSTAR_POSTCODE => self::WARNING_FLAG_BRIGHTSTAR_POSTCODE,
-        self::WARNING_FLAG_IGNORE_USER_DECLINED => self::WARNING_FLAG_IGNORE_USER_DECLINED
+        self::WARNING_FLAG_IGNORE_USER_DECLINED => self::WARNING_FLAG_IGNORE_USER_DECLINED,
+        self::WARNING_FLAG_IGNORE_POLICY_EXPIRE_CLAIM_WAIT => self::WARNING_FLAG_IGNORE_POLICY_EXPIRE_CLAIM_WAIT,
     ];
 
     /**
