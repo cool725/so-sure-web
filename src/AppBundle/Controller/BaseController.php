@@ -930,7 +930,7 @@ abstract class BaseController extends Controller
         // https://developers.facebook.com/docs/sharing/webmasters/crawler
         // https://dev.twitter.com/cards/getting-started#crawling
         return !preg_match("/Twitterbot|facebookexternalhit|Facebot/i", $userAgent) &&
-            $geoip->findCountry($ip) == "US";        
+            $geoip->findCountry($ip) == "US";
     }
 
     protected function getQuerystringPhone(Request $request)
@@ -951,6 +951,6 @@ abstract class BaseController extends Controller
             ]);
         }
 
-        return $phone;        
+        return $phone;
     }
 }
