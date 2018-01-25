@@ -1661,7 +1661,7 @@ class PolicyServiceTest extends WebTestCase
             false,
             new \DateTime('2017-02-02')
         );
-        print_r($policies);
+        //print_r($policies);
         $this->assertGreaterThan(0, count($policies));
 
         // 2nd run (and later) should still return policies as no flag set
@@ -1670,7 +1670,7 @@ class PolicyServiceTest extends WebTestCase
             false,
             new \DateTime('2017-02-02')
         );
-        print_r($policies);
+        //print_r($policies);
         $this->assertGreaterThan(0, count($policies));
     }
 
@@ -1681,6 +1681,12 @@ class PolicyServiceTest extends WebTestCase
             false,
             new \DateTime('2017-02-02')
         );
+        $init = count(static::$policyService->fullyExpireExpiredClaimablePolicies(
+            'TEST',
+            false,
+            new \DateTime('2017-02-02')
+        ));
+
 
         $user = static::createUser(
             static::$userManager,
@@ -1721,7 +1727,7 @@ class PolicyServiceTest extends WebTestCase
             false,
             new \DateTime('2017-02-02')
         );
-        $this->assertGreaterThan(0, count($policies));
+        $this->assertGreaterThan($init, count($policies));
 
         // 2nd run (and later) should return 0 policies
         $policies = static::$policyService->fullyExpireExpiredClaimablePolicies(
@@ -1729,15 +1735,15 @@ class PolicyServiceTest extends WebTestCase
             false,
             new \DateTime('2017-02-02')
         );
-        $this->assertEquals(0, count($policies));
+        $this->assertEquals($init, count($policies));
 
-        // 9am should alwasy return policies
+        // 9am should always return policies
         $policies = static::$policyService->fullyExpireExpiredClaimablePolicies(
             'TEST',
             false,
             new \DateTime('2017-02-02 09:05')
         );
-        $this->assertGreaterThan(0, count($policies));
+        $this->assertGreaterThan($init, count($policies));
     }
 
     public function testUnRenewPolicies()

@@ -1415,7 +1415,7 @@ class PolicyService
                                 $skipLogging = false;
                             }
                         }
-                        $skipLogging = true;
+
                         // avoid sending constantly for the same claims, but at least send once a day
                         if (!$skipLogging || $date->format('H') == 9) {
                             $fullyExpired[$policy->getId()] = sprintf(
@@ -1423,7 +1423,7 @@ class PolicyService
                                 $policy->getPolicyNumber()
                             );
                         } else {
-                            print 'unset' . PHP_EOL;
+                            //print 'unset' . PHP_EOL;
                             unset($fullyExpired[$policy->getId()]);
                         }
                     }
