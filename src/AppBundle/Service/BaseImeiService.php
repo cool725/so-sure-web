@@ -118,6 +118,7 @@ class BaseImeiService
             $this->ocrRaw($filename, $extension, self::OEM_TESSERACT_CUBE_COMBINED),
             $make
         );
+        //print_r($resultsCubeCombined);
         if ($resultsCubeCombined['full_success']) {
             return $resultsCubeCombined;
         }
@@ -126,10 +127,12 @@ class BaseImeiService
             $this->ocrRaw($filename, $extension, self::OEM_CUBE_ONLY),
             $make
         );
+        //print_r($resultsCube);
         $resultsTesseract = $this->parseOcr(
             $this->ocrRaw($filename, $extension, self::OEM_TESSERACT_ONLY),
             $make
         );
+        //print_r($resultsTesseract);
         $results = [
             'success' => false,
             'full_success' => false,
@@ -182,6 +185,7 @@ class BaseImeiService
         $serialLine = $lines[$imeiLine - 3];
         $serialLineData = explode(' ', $serialLine);
         foreach ($serialLineData as $serialNumber) {
+            $serialNumber = str_replace('@', '0', $serialNumber);
             if (preg_match('/[A-Z0-9]{12}/', $serialNumber)) {
                 break;
             } else {
@@ -197,7 +201,7 @@ class BaseImeiService
         $noSpace = str_replace(' ', '', $results);
         // print_r($noSpace);
         if ($make == "Apple") {
-            if (preg_match('/SerialNumber([A-Z0-9]+).*([Il]ME[Il])(\d{15})/s', $noSpace, $matches)) {
+            if (preg_match('/SerialNumber([A-Z0-9]{12}).*([Il]ME[Il])(\d{15})/s', $noSpace, $matches)) {
                 // Expected case
                 return [
                     'success' => true,
@@ -216,7 +220,7 @@ class BaseImeiService
                     'imei' => $matches[2],
                     'serialNumber' => $serialNumber,
                 ];
-            } elseif (preg_match('/SerialNumber([A-Z0-9]+).*([Il]ME[Il])(\d{14})A/s', $noSpace, $matches)) {
+            } elseif (preg_match('/SerialNumber([A-Z0-9]{12}).*([Il]ME[Il])(\d{14})[A@]/s', $noSpace, $matches)) {
                 // 14 digit IMEI followed by A
                 return [
                     'success' => true,
@@ -225,16 +229,7 @@ class BaseImeiService
                     'imei' => $this->luhnGenerate($matches[3]),
                     'serialNumber' => $matches[1],
                 ];
-            } elseif (preg_match('/SerialNumber([A-Z0-9]+).*([Il]ME[Il])(\d{14})@/s', $noSpace, $matches)) {
-                // 14 digit IMEI followed by @
-                return [
-                    'success' => true,
-                    'full_success' => $this->isAppleSerialNumber($matches[1]), // forcing a valid imei
-                    'raw' => $results,
-                    'imei' => $this->luhnGenerate($matches[3]),
-                    'serialNumber' => $matches[1],
-                ];
-            } elseif (preg_match('/([Il]ME[Il])(\d{14})A/', $noSpace, $matches)) {
+            } elseif (preg_match('/([Il]ME[Il])(\d{14})[A@]/', $noSpace, $matches)) {
                 // 14 digit IMEI followed by A with non-english language (serial number copy is different)
                 $serialNumber = $this->findSerialNumberByLinePosition($results, $matches[2]);
                 return [

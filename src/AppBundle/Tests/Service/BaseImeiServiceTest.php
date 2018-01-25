@@ -490,7 +490,7 @@ SEID";
         $this->assertTrue($results['success']);
         //print_r($results);
         $this->assertEquals('355354080202940', $results['imei']);
-        $this->assertEquals('GONVRO7ZNJCL', $results['serialNumber']);
+        $this->assertEquals('F2NSYYVNHG04', $results['serialNumber']);
 
         $resultsCubeCombined = self::$imei->parseOcr(
             self::$imei->ocrRaw($image, 'png', BaseImeiService::OEM_TESSERACT_CUBE_COMBINED),
@@ -513,6 +513,6 @@ SEID";
         $this->assertNotNull($resultsCubeCombined);
         $this->assertTrue($resultsCubeCombined['success']);
         $this->assertEquals('355354080202940', $resultsCubeCombined['imei']);
-        $this->assertEquals('F2NSYYVNHG', $resultsCubeCombined['serialNumber']);
+        $this->assertEquals('F2NSYYVNHG04', $resultsCubeCombined['serialNumber']);
     }
 }
