@@ -1404,7 +1404,22 @@ class PolicyService
                 try {
                     $result = $this->fullyExpire($policy);
                     if ($result === null) {
-                        $fullyExpired[$policy->getId()] = sprintf('%s - waiting on claim', $policy->getPolicyNumber());
+                        $skipLogging = true;
+                        foreach ($policy->getClaims() as $claim) {
+                            if (!$claim->isIgnoreWarningFlagSet(
+                                Claim::WARNING_FLAG_IGNORE_POLICY_EXPIRE_CLAIM_WAIT
+                            )) {
+                                $skipLogging = false;
+                            }
+                        }
+                        $now = new \DateTime();
+                        // avoid sending constantly for the same claims, but at least send once a day
+                        if (!$skipLogging || $now->format('H') == 9) {
+                            $fullyExpired[$policy->getId()] = sprintf(
+                                '%s - waiting on claim',
+                                $policy->getPolicyNumber()
+                            );
+                        }
                     }
                 } catch (\Exception $e) {
                     $msg = sprintf(
