@@ -6,6 +6,8 @@ use GuzzleHttp\Client;
 
 class GsmaService
 {
+    use \AppBundle\Document\ImeiTrait;
+
     const BASE_URL = "https://devicecheck.gsma.com/imeirtl";
 
     /** @var LoggerInterface */
@@ -58,30 +60,5 @@ class GsmaService
 
         // for now, always ok the imei until we purchase db
         return true;
-    }
-
-    /**
-     * @param string $imei
-     *
-     * @return boolean
-     */
-    public function isImei($imei)
-    {
-        return $this->isLuhn($imei) && strlen($imei) == 15;
-    }
-
-    /**
-     * @see http://stackoverflow.com/questions/4741580/imei-validation-function
-     * @param string $n
-     *
-     * @return boolean
-     */
-    protected function isLuhn($n)
-    {
-        $str = '';
-        foreach (str_split(strrev((string) $n)) as $i => $d) {
-            $str .= $i %2 !== 0 ? $d * 2 : $d;
-        }
-        return array_sum(str_split($str)) % 10 === 0;
     }
 }
