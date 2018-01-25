@@ -998,6 +998,12 @@
         margin: 0 auto;
     }
 
+    &--mirror-reflection {
+        position: absolute;
+        z-index: 99;
+        left: 0; top: 0;
+    }
+
     &--phone-back {
         position: absolute;
         z-index: 100;
@@ -1006,7 +1012,7 @@
 
     &--phone-front {
         position: absolute;
-        z-index: 99;
+        z-index: 98;
         bottom: 80px; right: 118px;
     }
 }

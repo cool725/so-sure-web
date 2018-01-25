@@ -179,119 +179,125 @@
     </section>
 
     {# pic-sure #}
-    <section class="section--pad homepage--pic-sure">
-        <div class="container">
-            <h2 class="h1 text-center">Let's talk about excess</h2>
-            <p class="lead">Our excess is &pound;150. That's high, we know, but we're making sure that dishonest policyholders and fraudsters don't take advantage of us and our genuine customers.</p>
-            <p class="lead">And that's why, by validating your phone with <strong>pic-sure technology</strong>, which takes less than 30 seconds, you can easily take your excess down to:</p>
-            <table class="table hidden-xs">
-                <thead>
-                    <tr>
-                        <td width="50%" class="h3 contrast">Excess <u>without</u> pic-sure</td>
-                        <td width="50%" class="h3 sosure">Excess <u>with</u> pic-sure</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="contrast" align="middle" valign="middle">
-                            <span class="text-blue h1">£150</span><br>
-                            FOR THEFT/LOSS/ACCIDENTAL DAMAGE/BREAKDOWN
-                        </td>
-                        <td class="sosure" align="middle" valign="middle">
-                            <span class="text-blue h1">£50</span><br>
-                            FOR ACCIDENTAL DAMAGE/BREAKDOWN <br><br>
-                            <span class="text-blue h1">£70</span><br>
-                            FOR THEFT/LOSS
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <table class="table visible-xs">
-                <thead>
-                    <tr>
-                        <td width="100%" class="h3 contrast">Excess <u>without</u> pic-sure</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="contrast" align="middle" valign="middle">
-                            <span class="text-blue h1">£150</span><br>
-                            FOR THEFT/LOSS/ACCIDENTAL DAMAGE/BREAKDOWN
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <table class="table visible-xs">
-                <thead>
-                    <tr>
-                        <td width="100%" class="h3 sosure">Excess <u>with</u> pic-sure</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="sosure" align="middle" valign="middle">
-                            <span class="text-blue h1">£50</span><br>
-                            FOR ACCIDENTAL DAMAGE/BREAKDOWN <br><br>
-                            <span class="text-blue h1">£70</span><br>
-                            FOR THEFT/LOSS
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </section>
-    <section class="section--pad homepage--pic-sure-steps">
-        <div class="container">
-            <div class="row text-center">
-                <div class="col-md-4">
-                    <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/pic-sure_step_1.svg"
-                             class="lozad" alt="">
-                    <h3>1. Download</h3>
-                </div>
-                <div class="col-md-4">
-                    <div class="pic-sure">
-                        <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-                             data-src="{{ cdn_url }}/images/homepage/pic-sure_step_2_mirror.svg"
-                             class="lozad pic-sure--mirror"
-                             alt="Mirror">
-                        <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-                             data-src="{{ cdn_url }}/images/homepage/pic-sure_step_2_phone_back.svg"
-                             class="lozad pic-sure--phone-back animated infinite pulse"
-                             alt="Phone Back">
-                        <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-                             data-src="{{ cdn_url }}/images/homepage/pic-sure_step_2_phone_front_qr.svg"
-                             class="lozad pic-sure--phone-front animated infinite pulse"
-                             alt="Phone Front">
+    {% if pic_sure is defined and pic_sure == true %}
+        <section class="section--pad homepage--pic-sure section--arrow section--arrow__lightest-blue">
+            <div class="container">
+                <h2 class="h1 text-center">Let's talk about excess</h2>
+                <p class="lead">Our excess is &pound;150. That's high, we know, but we're making sure that dishonest policyholders and fraudsters don't take advantage of us and our genuine customers.</p>
+                <p class="lead">And that's why, by validating your phone with <strong>pic-sure technology</strong>, which takes less than 30 seconds, you can easily take your excess down to:</p>
+                <table class="table hidden-xs">
+                    <thead>
+                        <tr>
+                            <td width="50%" class="h3 contrast">Excess <u>without</u> pic-sure</td>
+                            <td width="50%" class="h3 sosure">Excess <u>with</u> pic-sure</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="contrast" align="middle" valign="middle">
+                                <span class="text-blue h1">£150</span><br>
+                                FOR THEFT/LOSS/ACCIDENTAL DAMAGE/BREAKDOWN
+                            </td>
+                            <td class="sosure" align="middle" valign="middle">
+                                <span class="text-blue h1">£50</span><br>
+                                FOR ACCIDENTAL DAMAGE/BREAKDOWN <br><br>
+                                <span class="text-blue h1">£70</span><br>
+                                FOR THEFT/LOSS
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="table visible-xs">
+                    <thead>
+                        <tr>
+                            <td width="100%" class="h3 contrast">Excess <u>without</u> pic-sure</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="contrast" align="middle" valign="middle">
+                                <span class="text-blue h1">£150</span><br>
+                                FOR THEFT/LOSS/ACCIDENTAL DAMAGE/BREAKDOWN
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="table visible-xs">
+                    <thead>
+                        <tr>
+                            <td width="100%" class="h3 sosure">Excess <u>with</u> pic-sure</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="sosure" align="middle" valign="middle">
+                                <span class="text-blue h1">£50</span><br>
+                                FOR ACCIDENTAL DAMAGE/BREAKDOWN <br><br>
+                                <span class="text-blue h1">£70</span><br>
+                                FOR THEFT/LOSS
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <section class="section--pad homepage--pic-sure-steps section--arrow">
+            <div class="container">
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/pic-sure_step_1.svg"
+                                 class="lozad" alt="">
+                        <h3>1. Download</h3>
                     </div>
-                    <h3>2. Validate with pic-sure</h3>
-                </div>
-                <div class="col-md-4">
-                    <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/pic-sure_step_3.svg"
-                             class="lozad" alt="">
-                    <h3>3. Reduce your excess</h3>
+                    <div class="col-md-4">
+                        <div class="pic-sure">
+                            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                                 data-src="{{ cdn_url }}/images/homepage/pic-sure_step_2_mirror_frame.svg"
+                                 class="lozad pic-sure--mirror"
+                                 alt="Mirror frame">
+                            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                                 data-src="{{ cdn_url }}/images/homepage/pic-sure_step_2_phone_back.svg"
+                                 class="lozad pic-sure--phone-back animated infinite pulse"
+                                 alt="Phone Back">
+                            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                                 data-src="{{ cdn_url }}/images/homepage/pic-sure_step_2_mirror_reflection.svg"
+                                 class="lozad pic-sure--mirror-reflection"
+                                 alt="Mirror reflection">
+                            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                                 data-src="{{ cdn_url }}/images/homepage/pic-sure_step_2_phone_front_qr.svg"
+                                 class="lozad pic-sure--phone-front animated infinite pulse"
+                                 alt="Phone Front">
+                        </div>
+                        <h3>2. Validate with pic-sure</h3>
+                    </div>
+                    <div class="col-md-4">
+                        <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/pic-sure_step_3.svg"
+                                 class="lozad" alt="">
+                        <h3>3. Reduce your excess</h3>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
-    <section class="section--pad homepage--pic-sure text-center">
-        <div class="container">
-            <h3>Download our handy app - reduce your excess</h3>
-            <div class="app-link">
-                <a class="ga-outbound-click"
-                   data-clicklabel="iTunes"
-                   href="{{ apple_download('homepage-pic-sure') }}"
-                   target="_blank">
-                    <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download so-sure on the App Store" /><span class="sr-only">so-sure app - Apple App Store</span>
-                </a>
-                <a class="ga-outbound-click"
-                   data-clicklabel="PlayStore"
-                   href="{{ google_download('homepage-pic-sure') }}"
-                   target="_blank">
-                    <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get so-sure on Google Play" /><span class="sr-only">so-sure app - Google Play</span>
-               </a>
+        </section>
+        <section class="section--pad homepage--pic-sure text-center">
+            <div class="container">
+                <h3>Download our handy app - reduce your excess</h3>
+                <div class="app-link">
+                    <a class="ga-outbound-click"
+                       data-clicklabel="iTunes"
+                       href="{{ apple_download('homepage-pic-sure') }}"
+                       target="_blank">
+                        <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download so-sure on the App Store" /><span class="sr-only">so-sure app - Apple App Store</span>
+                    </a>
+                    <a class="ga-outbound-click"
+                       data-clicklabel="PlayStore"
+                       href="{{ google_download('homepage-pic-sure') }}"
+                       target="_blank">
+                        <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get so-sure on Google Play" /><span class="sr-only">so-sure app - Google Play</span>
+                   </a>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
+    {% endif %}
 
     {# Cover Details #}
     <section class="section--pad homepage--cover-details">

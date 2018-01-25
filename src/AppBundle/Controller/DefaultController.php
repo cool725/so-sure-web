@@ -75,16 +75,13 @@ class DefaultController extends BaseController
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         $data = array(
-            'referral' => $referral,
-            'phone' => $this->getQuerystringPhone($request),
+            'sticky'          => false,
+            'pic_sure'        => false,
+            'referral'        => $referral,
+            'phone'           => $this->getQuerystringPhone($request),,
             'device_category' => $this->get('app.request')->getDeviceCategory()
         );
 
-        // if ($exp == 'v2') {
-        //     return $this->render('AppBundle:Default:indexV2old.html.twig', $data);
-        // } else {
-        //     return $this->render('AppBundle:Default:index.html.twig', $data);
-        // }
         return $this->render('AppBundle:Default:index.html.twig', $data);
     }
 
