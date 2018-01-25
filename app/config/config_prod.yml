@@ -3,7 +3,7 @@ imports:
 
 framework:
     # 10.* required for the elb load balancing health check
-    trusted_hosts: ['wearesosure.com', '10\.\d+\.\d+\.\d+', 'api.so-sure.net']
+    trusted_hosts: ['wearesosure.com', '10\.\d+\.\d+\.\d+', 'api.so-sure.net', 'api.prod.so-sure.net']
     session:
         cookie_secure: true
 #    validation:
