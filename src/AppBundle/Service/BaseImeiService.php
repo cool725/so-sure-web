@@ -123,6 +123,11 @@ class BaseImeiService
             return $resultsCubeCombined;
         }
 
+        // fallbacks below do not appear to be any different from cube combined on web
+        // little point in having fallback mechanism unless there is a difference, but keeping
+        // logic for further investigation in the future
+        return $resultsCubeCombined;
+        /*
         $resultsCube = $this->parseOcr(
             $this->ocrRaw($filename, $extension, self::OEM_CUBE_ONLY),
             $make
@@ -166,6 +171,7 @@ class BaseImeiService
         }
 
         return $results;
+        */
     }
 
     private function findSerialNumberByLinePosition($results, $imei)
