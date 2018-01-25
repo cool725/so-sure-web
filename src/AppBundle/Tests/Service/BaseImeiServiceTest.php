@@ -316,4 +316,203 @@ SEID";
         $fs->delete($key);
         unlink($testImage);
     }
+
+    public function testOcr27()
+    {
+        $image = sprintf(
+            "%s/../src/AppBundle/Tests/Resources/imei/IMG_0027.png",
+            self::$rootDir
+        );
+
+        $results = self::$imei->ocr($image, 'Apple');
+        $this->assertNotNull($results);
+        $this->assertTrue($results['success']);
+        $this->assertEquals('352987091447138', $results['imei']);
+        $this->assertEquals('DNPVPBZQHG7J', $results['serialNumber']);
+
+        $resultsCubeCombined = self::$imei->parseOcr(
+            self::$imei->ocrRaw($image, 'png', BaseImeiService::OEM_TESSERACT_CUBE_COMBINED),
+            'Apple'
+        );
+        $this->assertNotNull($resultsCubeCombined);
+        $this->assertTrue($resultsCubeCombined['success']);
+        $this->assertEquals('352987091447138', $resultsCubeCombined['imei']);
+        $this->assertEquals('DNPVPBZQHG7J', $resultsCubeCombined['serialNumber']);
+    }
+
+    public function testOcr28()
+    {
+        $image = sprintf(
+            "%s/../src/AppBundle/Tests/Resources/imei/IMG_0028.png",
+            self::$rootDir
+        );
+
+        $results = self::$imei->ocr($image, 'Apple');
+        $this->assertNotNull($results);
+        $this->assertTrue($results['success']);
+        $this->assertEquals('352987091447138', $results['imei']);
+        $this->assertEquals('DNPVPBZQHG7J', $results['serialNumber']);
+
+        $resultsCubeCombined = self::$imei->parseOcr(
+            self::$imei->ocrRaw($image, 'png', BaseImeiService::OEM_TESSERACT_CUBE_COMBINED),
+            'Apple'
+        );
+        $this->assertNotNull($resultsCubeCombined);
+        $this->assertTrue($resultsCubeCombined['success']);
+        $this->assertEquals('352987091447138', $resultsCubeCombined['imei']);
+        $this->assertEquals('DNPVPBZQHG7J', $resultsCubeCombined['serialNumber']);
+    }
+
+    public function testOcr29()
+    {
+        $image = sprintf(
+            "%s/../src/AppBundle/Tests/Resources/imei/IMG_0029.png",
+            self::$rootDir
+        );
+
+        $results = self::$imei->ocr($image, 'Apple');
+        $this->assertNotNull($results);
+        $this->assertTrue($results['success']);
+        $this->assertEquals('352987091447138', $results['imei']);
+        $this->assertEquals('DNPVPBZQHG7J', $results['serialNumber']);
+
+        $resultsCubeCombined = self::$imei->parseOcr(
+            self::$imei->ocrRaw($image, 'png', BaseImeiService::OEM_TESSERACT_CUBE_COMBINED),
+            'Apple'
+        );
+        $this->assertNotNull($resultsCubeCombined);
+        $this->assertTrue($resultsCubeCombined['success']);
+        $this->assertEquals('352987091447138', $resultsCubeCombined['imei']);
+        $this->assertEquals('DNPVPBZQHG7J', $resultsCubeCombined['serialNumber']);
+    }
+
+    public function testOcr30()
+    {
+        $image = sprintf(
+            "%s/../src/AppBundle/Tests/Resources/imei/IMG_0030.png",
+            self::$rootDir
+        );
+
+        $results = self::$imei->ocr($image, 'Apple');
+        $this->assertNotNull($results);
+        $this->assertTrue($results['success']);
+        $this->assertEquals('356648088006230', $results['imei']);
+        $this->assertEquals('FRDVD437GRY9', $results['serialNumber']);
+
+        $resultsCubeCombined = self::$imei->parseOcr(
+            self::$imei->ocrRaw($image, 'png', BaseImeiService::OEM_TESSERACT_CUBE_COMBINED),
+            'Apple'
+        );
+        $this->assertNotNull($resultsCubeCombined);
+        $this->assertTrue($resultsCubeCombined['success']);
+        $this->assertEquals('356648088006230', $resultsCubeCombined['imei']);
+        $this->assertEquals('FRDVD437GRY9', $resultsCubeCombined['serialNumber']);
+    }
+
+    public function testOcr331()
+    {
+        $image = sprintf(
+            "%s/../src/AppBundle/Tests/Resources/imei/IMG_0331.png",
+            self::$rootDir
+        );
+
+        $results = self::$imei->ocr($image, 'Apple');
+        $this->assertNotNull($results);
+        $this->assertTrue($results['success']);
+        $this->assertEquals('359210070611613', $results['imei']);
+        $this->assertEquals('DNPSCA3EHG7F', $results['serialNumber']);
+
+        $resultsCubeCombined = self::$imei->parseOcr(
+            self::$imei->ocrRaw($image, 'png', BaseImeiService::OEM_TESSERACT_CUBE_COMBINED),
+            'Apple'
+        );
+        $this->assertNotNull($resultsCubeCombined);
+        $this->assertTrue($resultsCubeCombined['success']);
+        $this->assertEquals('359210070611613', $resultsCubeCombined['imei']);
+        $this->assertEquals('DNPSCA3EHG7F', $resultsCubeCombined['serialNumber']);
+    }
+
+    public function testOcr332()
+    {
+        $image = sprintf(
+            "%s/../src/AppBundle/Tests/Resources/imei/IMG_0332.png",
+            self::$rootDir
+        );
+
+        $results = self::$imei->ocr($image, 'Apple');
+        $this->assertNotNull($results);
+        $this->assertTrue($results['success']);
+        $this->assertEquals('359406087220311', $results['imei']);
+        $this->assertEquals('F17VQLU1JCLJ', $results['serialNumber']);
+
+        $resultsCubeCombined = self::$imei->parseOcr(
+            self::$imei->ocrRaw($image, 'png', BaseImeiService::OEM_TESSERACT_CUBE_COMBINED),
+            'Apple'
+        );
+        $this->assertNotNull($resultsCubeCombined);
+        $this->assertTrue($resultsCubeCombined['success']);
+        $this->assertEquals('359406087220311', $resultsCubeCombined['imei']);
+        $this->assertEquals('F17VQLU1JCLJ', $resultsCubeCombined['serialNumber']);
+    }
+
+    public function testOcr6087()
+    {
+        $image = sprintf(
+            "%s/../src/AppBundle/Tests/Resources/imei/IMG_6087.png",
+            self::$rootDir
+        );
+
+        $results = self::$imei->ocr($image, 'Apple');
+        $this->assertNotNull($results);
+        $this->assertTrue($results['success']);
+        $this->assertEquals('356648088006230', $results['imei']);
+        $this->assertEquals('FRDVD437GRY9', $results['serialNumber']);
+
+        $resultsCubeCombined = self::$imei->parseOcr(
+            self::$imei->ocrRaw($image, 'png', BaseImeiService::OEM_TESSERACT_CUBE_COMBINED),
+            'Apple'
+        );
+        $this->assertNotNull($resultsCubeCombined);
+        $this->assertTrue($resultsCubeCombined['success']);
+        $this->assertEquals('356648088006230', $resultsCubeCombined['imei']);
+        $this->assertEquals('FRDVD437GRY9', $resultsCubeCombined['serialNumber']);
+    }
+
+    public function testOcrAt()
+    {
+        $image = sprintf(
+            "%s/../src/AppBundle/Tests/Resources/imei/at.png",
+            self::$rootDir
+        );
+
+        $results = self::$imei->ocr($image, 'Apple');
+        $this->assertNotNull($results);
+        $this->assertTrue($results['success']);
+        //print_r($results);
+        $this->assertEquals('355354080202940', $results['imei']);
+        $this->assertEquals('GONVRO7ZNJCL', $results['serialNumber']);
+
+        $resultsCubeCombined = self::$imei->parseOcr(
+            self::$imei->ocrRaw($image, 'png', BaseImeiService::OEM_TESSERACT_CUBE_COMBINED),
+            'Apple'
+        );
+        //print_r($resultsCubeCombined);
+        $resultsCube = self::$imei->parseOcr(
+            self::$imei->ocrRaw($image, 'png', BaseImeiService::OEM_CUBE_ONLY),
+            'Apple'
+        );
+        $this->assertEquals($resultsCubeCombined['raw'], $resultsCube['raw']);
+        //print_r($resultsCube);
+        $resultsTesseract = self::$imei->parseOcr(
+            self::$imei->ocrRaw($image, 'png', BaseImeiService::OEM_TESSERACT_ONLY),
+            'Apple'
+        );
+        //print_r($resultsTesseract);
+        $this->assertEquals($resultsCubeCombined['raw'], $resultsTesseract['raw']);
+        $this->assertEquals($resultsCube['raw'], $resultsTesseract['raw']);
+        $this->assertNotNull($resultsCubeCombined);
+        $this->assertTrue($resultsCubeCombined['success']);
+        $this->assertEquals('355354080202940', $resultsCubeCombined['imei']);
+        $this->assertEquals('F2NSYYVNHG', $resultsCubeCombined['serialNumber']);
+    }
 }

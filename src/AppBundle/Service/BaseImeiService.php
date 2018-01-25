@@ -13,10 +13,11 @@ class BaseImeiService
 {
     use \AppBundle\Document\ImeiTrait;
 
-    const OEM_TESSERACT_ONLY = 1;
-    const OEM_CUBE_ONLY = 2;
-    const OEM_TESSERACT_CUBE_COMBINED = 3;
-    const OEM_DEFAULT = 4;
+    // see tesseract --help
+    const OEM_TESSERACT_ONLY = 0;
+    const OEM_CUBE_ONLY = 1;
+    const OEM_TESSERACT_CUBE_COMBINED = 2;
+    const OEM_DEFAULT = 3;
 
     const S3_FAILED_OCR_FOLDER = 'imei-failure';
 
@@ -217,6 +218,15 @@ class BaseImeiService
                 ];
             } elseif (preg_match('/SerialNumber([A-Z0-9]+).*([Il]ME[Il])(\d{14})A/s', $noSpace, $matches)) {
                 // 14 digit IMEI followed by A
+                return [
+                    'success' => true,
+                    'full_success' => $this->isAppleSerialNumber($matches[1]), // forcing a valid imei
+                    'raw' => $results,
+                    'imei' => $this->luhnGenerate($matches[3]),
+                    'serialNumber' => $matches[1],
+                ];
+            } elseif (preg_match('/SerialNumber([A-Z0-9]+).*([Il]ME[Il])(\d{14})@/s', $noSpace, $matches)) {
+                // 14 digit IMEI followed by @
                 return [
                     'success' => true,
                     'full_success' => $this->isAppleSerialNumber($matches[1]), // forcing a valid imei
