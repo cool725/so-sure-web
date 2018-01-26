@@ -431,8 +431,7 @@ class PhoneInsuranceController extends BaseController
             }
 
             $this->get('app.sixpack')->convert(
-                SixpackService::EXPERIMENT_HOMEPAGE_STICKYSEARCH_PICSURE,
-                SixpackService::KPI_DEFAULT
+                SixpackService::EXPERIMENT_HOMEPAGE_STICKYSEARCH_PICSURE
             );
         }
 

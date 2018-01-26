@@ -37,7 +37,6 @@ class SixpackService
     const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';
     const ALTERNATIVES_APP_SHARE_METHOD_API = 'api';
 
-    const KPI_DEFAULT = 'default';
     const KPI_RECEIVE_DETAILS = 'receive-details';
     const KPI_QUOTE = 'quote';
     const KPI_POLICY_PURCHASE = 'policy-purchase';
