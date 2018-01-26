@@ -41,7 +41,7 @@ class RetirePhoneReportCommandTest extends KernelTestCase
 
         $application = new Application(self::$kernel);
         $application->add(new OpsReportCommand());
-        $command = $application->find('sosure:phone:retire');
+        $command = $application->find('sosure:phone:report');
         $commandTester = new CommandTester($command);
         $commandTester->execute(array(
             'command'  => $command->getName(),
@@ -52,7 +52,7 @@ class RetirePhoneReportCommandTest extends KernelTestCase
 
     }
 
-    public function testRetirePhoneCommandTest()
+    public function testPhoneShouldBeRetiredReportCommand()
     {
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $phone = new Phone();
@@ -87,58 +87,5 @@ class RetirePhoneReportCommandTest extends KernelTestCase
         $dm->flush();
         $search = sprintf('%s %s', $phone->getMake(), $phone->getModel());
         $this->callCommand($search);
-    }
-
-    public function testOpsReportCommandFoundErrors()
-    {
-        $data = [
-            'url' => '/testurl2',
-            'errors' => [
-                ['name' => 'firstName', 'value' => '2', 'message' => 'Missing First Name'],
-                ['name' => 'lastName', 'value' => '', 'message' => 'Missing LastName']
-            ],
-            'browser' => 'Internal'
-        ];
-        $now = new \DateTime();
-        self::$redis->hset('client-validation', json_encode($data), $now->format('U'));
-        $this->callCommand('found validation');
-    }
-
-    public function testOpsReportCommandEmptyName()
-    {
-        $data = [
-            'url' => '/testurl2',
-            'errors' => [
-                ['value' => '', 'message' => 'This field is required.'],
-            ],
-            'browser' => 'Internal'
-        ];
-        $now = new \DateTime();
-        self::$redis->hset('client-validation', json_encode($data), $now->format('U'));
-        $this->callCommand('no validation');
-    }
-
-    public function testOpsReportCommandNoData()
-    {
-        $data = [
-            'url' => '/testurl3',
-            'browser' => 'Internal'
-        ];
-        $now = new \DateTime();
-        self::$redis->hset('client-validation', json_encode($data), $now->format('U'));
-        $this->callCommand('no validation');
-    }
-
-    public function testOpsReportCsp()
-    {
-        $data = [
-            'csp-report' => [
-                'blocked-uri' => 'http://www.mytesturi.com',
-                'user-data' => 'Symfony Browser'
-            ]];
-        self::$redis->rpush('csp', json_encode($data));
-        self::$redis->rpush('csp', json_encode($data));
-        self::$redis->rpush('csp', json_encode($data));
-        $this->callCommand('3 CSP');
     }
 }

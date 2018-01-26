@@ -17,7 +17,7 @@ class RetirePhoneReportCommand extends ContainerAwareCommand
     protected function configure()
     {
         $this
-            ->setName('sosure:phone:retire')
+            ->setName('sosure:phone:report')
             ->setDescription('Send a mail with list of phones that should be retired.')
             ->addOption(
                 'debug',
@@ -46,12 +46,12 @@ class RetirePhoneReportCommand extends ContainerAwareCommand
                 );
             }
         }
-        $join = (count($retire) > 0) ? join("<br/>\n", $retire) : 'No phones to retire <br/>';
-        $message = sprintf("Phones that should retire:<br/><br/>\n\n%s", $join);
-        $mailer->send('Phones that should retire report', 'tech@so-sure.com', $message);
+        $join = (count($retire) > 0) ? join("<br/>\n", $retire) : 'No phones should be retired.<br/>';
+        $message = sprintf("Phones that should be retired:<br/><br/>\n\n%s", $join);
+        $mailer->send('Phones that should be retired report', 'tech@so-sure.com', $message);
         if ($debug) {
             $output->writeln($message);
         }
-        $output->writeln(sprintf('Found %s phones ready to retire.', count($retire)));
+        $output->writeln(sprintf('Found %s phones that should be retired.', count($retire)));
     }
 }
