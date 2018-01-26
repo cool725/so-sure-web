@@ -317,6 +317,34 @@ class AdminController extends BaseController
     }
 
     /**
+     * @Route("/claims/delete-claim", name="admin_claims_delete_claim")
+     * @Method({"POST"})
+     */
+    public function adminClaimsDeleteClaim(Request $request)
+    {
+        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
+            throw new \InvalidArgumentException('Invalid csrf token');
+        }
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Claim::class);
+        $claim = $repo->find($request->get('id'));
+        if ($claim) {
+            $subject = sprintf("Claim %s has been manually deleted.", $claim->getNumber());
+            $mailer = $this->get('app.mailer');
+            $mailer->sendTemplate(
+                $subject,
+                'tech@so-sure.com',
+                'AppBundle:Email:claim/manuallyDeleted.html.twig',
+                ['claim' => $claim, 'policy' => $claim->getPolicy()]
+            );
+            $dm->remove($claim);
+            $dm->flush();
+            $dm->clear();
+        }
+        return $this->redirectToRoute('admin_claims');
+    }
+
+    /**
      * @Route("/claims/replacement-phone", name="admin_claims_replacement_phone")
      * @Method({"POST"})
      */
@@ -335,6 +363,40 @@ class AdminController extends BaseController
             $claim->setReplacementPhone($phone);
             $dm->flush();
         }
+        return $this->redirectToRoute('admin_claims');
+    }
+
+    /**
+     * @Route("/claims/update-claim", name="admin_claims_update_claim")
+     * @Method({"POST"})
+     */
+    public function adminClaimsUpdateClaimAction(Request $request)
+    {
+        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
+            throw new \InvalidArgumentException('Invalid csrf token');
+        }
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Claim::class);
+        $claim = $repo->find($request->get('id'));
+        if (!$claim) {
+            return $this->redirectToRoute('admin_claims');
+        }
+
+        if ($request->get('change-claim-type') && $request->get('claim-type')) {
+            $claim->setType($request->get('claim-type'), true);
+        }
+        if ($request->get('change-approved-date') && $request->get('new-approved-date')) {
+            $date = new \DateTime($request->get('approved-date'));
+            $claim->setApprovedDate($date);
+        }
+        if ($request->get('update-replacement-phone') && $request->get('replacement-phone')) {
+            $phoneRepo = $dm->getRepository(Phone::class);
+            $phone = $phoneRepo->find($request->get('replacement-phone'));
+            if ($phone) {
+                $claim->setReplacementPhone($phone);
+            }
+        }
+            $dm->flush();
 
         return $this->redirectToRoute('admin_claims');
     }

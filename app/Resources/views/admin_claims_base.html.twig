@@ -10,6 +10,7 @@
         {# Stylesheets #}
         {% block stylesheets %}
             {% stylesheets output='css/*.css'
+                'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.css'
                 '@AppBundle/Resources/public/sass/adminNew.scss'
             %}<link rel="stylesheet" href="{{ asset_url }}">
             {% endstylesheets %}
@@ -50,6 +51,8 @@
         {# Javascript #}
         {% block javascripts %}
             {% javascripts
+            'components/moment/moment.min.js'
+            'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.js'
             '@AppBundle/Resources/public/js/*' %}
             <script src="{{ asset_url }}"></script>
             {% endjavascripts %}

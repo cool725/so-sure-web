@@ -1,0 +1,25 @@
+{% set logo_image = 'unhappy' %}
+{% extends 'AppBundle:Email:base.html.twig' %}
+{% import "AppBundle:Email:macros.html.twig" as macros %}
+{% block title %}Policy {{ policy.policyNumber }} should be cancelled{% endblock %}
+{% block body %}
+	{{ macros.start_table() }}
+		<h1>
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		</h1>
+		<div style="font-size: 14px; text-align: left;">
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		   <div style="font-size: 14px; text-align: center;"><font face="arial, helvetica neue, helvetica, sans-serif">
+            Claim {{ claim.number }} has been manually deleted. Attached are claim details:<br/>
+
+					   Claim number: {{ claim.number }}<br/>
+					   Type: {{ claim.type }}<br/>
+					   Status: {{ claim.status }}<br/>
+					   PolicyId: {{ policy.id }}<br/>
+					   PolicyNumber: {{ policy.policyNumber }}<br/><br/>
+
+				   Link to the policy <a href="{{ url('admin_policy',{id: policy.id}) }}">{{ policy.id }}</a><br/>
+		   </div>
+		</div>
+	{{ macros.end_table() }}
+{% endblock %}

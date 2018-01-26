@@ -1136,11 +1136,11 @@ class AdminEmployeeController extends BaseController
         $pager = $this->pager($request, $qb);
         $phoneRepo = $dm->getRepository(Phone::class);
         $phones = $phoneRepo->findActive()->getQuery()->execute();
-
         return [
             'claims' => $pager->getCurrentPageResults(),
             'pager' => $pager,
             'phones' => $phones,
+            'claim_types' => Claim::$claimTypes,
             'form' => $form->createView(),
         ];
     }
