@@ -291,10 +291,10 @@ class PurchaseController extends BaseController
             $policy = $user->getPartialPolicies()[0];
         }
 
-        $this->get('app.sixpack')->convert(
-            SixpackService::EXPERIMENT_FUNNEL_V1_V2,
-            SixpackService::KPI_RECEIVE_DETAILS
-        );
+        // $this->get('app.sixpack')->convert(
+        //     // SixpackService::EXPERIMENT_FUNNEL_V1_V2,
+        //     SixpackService::KPI_RECEIVE_DETAILS
+        // );
 
         if ($policy) {
             if (!$phone && $policy->getPhone()) {
@@ -478,7 +478,10 @@ class PurchaseController extends BaseController
                                     $purchase->getAmount()
                                 )) {
                                     $purchase->setAgreed(true);
-                                    return $this->redirectToRoute('user_welcome');
+                                    return $this->redirectToRoute(
+                                        'user_welcome_policy_id',
+                                        ['id' => $policy->getId()]
+                                    );
                                 } else {
                                     // @codingStandardsIgnoreStart
                                     $this->addFlash(
@@ -655,7 +658,7 @@ class PurchaseController extends BaseController
             JudopayService::WEB_TYPE_UNPAID,
         ])) {
             if ($policy->isInitialPayment()) {
-                return $this->redirectToRoute('user_welcome');
+                return $this->redirectToRoute('user_welcome_policy_id', ['id' => $policy->getId()]);
             } else {
                 return $this->redirectToRoute('user_home');
             }

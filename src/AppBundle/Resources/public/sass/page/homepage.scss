@@ -1,142 +1,1141 @@
-// homepage.scss
+// homepageNew.scss
 
 @import "../mixins";
 @import "../common/palette";
+@import "../common/paletteNew";
+@import "../common/type";
 
-body {
-    background-color: $blue;
+.navbar {
+    background-color: $white;
 }
 
-// Adjust Navbar
-
-.navbar-default .navbar-nav > li > a {
-    font-size: 14px;
-    padding-top: 20px;
-    color: $blue;
-
-    &:hover {
-    	color: darken($blue, 20%);
-    	transition: all 0.3s ease;
-    }
-
-    &:focus {
-    	color: $black;
-    	border-color: $black;
-    	outline: none;
-    }
-    transition: all 0.3s ease;
-
-	@include breakpoint(laptop) {
-
-		color: $white;
-
-	}
-
-}
-
-.navbar-default .navbar-toggle {
-    background-color: transparent;
-    border: none;
-
-	.icon-bar {
-		background-color: $white;
-	}
-
-	&:hover, &:focus {
-		background-color: transparent;
-		border: none;
-		outline: none;
-		transition: all 0.3s ease;
-
-		.icon-bar {
-			background-color: darken($blue, 20%);
-		}
-	}
-}
-
-// Hero Search
-.twitter-typeahead,
-.tt-input,
-.tt-menu,
-.tt-hint {
-    width: 100%;
-
-    @include breakpoint(tablet) {
-        width: 320px;
-    }
-}
-
-.tt-menu-left, .tt-menu-right {
-    width: 100%;
-
-    @include breakpoint(laptop) {
-        float: none;
-        text-align: left;
-    }
-}
-
-.tt-menu-header  .tt-menu-right {
-    display: none;
-}
-
-.homepage-hero-text {
-    text-align: center;
-
-    @include breakpoint(tablet) {
-        text-align: left;
-    }
-}
-
-.homepage-hero-search {
-    max-width: 420px;
+// TODO: Move!
+.img-responsive--center {
     margin: 0 auto;
-    text-align: center;
-
-    @include breakpoint(tablet) {
-        max-width: none;
-        text-align: left;
-    }
 }
 
-.hero.hero-search-container {
-    padding: 10px 0 25px;
-}
-
-@include breakpoint(laptop) {
-
-    .hero.hero-search-container {
-        padding: 20px 0;
-    }
-}
-
-.hero-search {
-    margin: 0 auto 40px;
+.curved-background {
+    height: 200px;
     position: relative;
-    z-index: 10;
+    overflow: hidden;
+    z-index: 1;
 
-    &--left,
-    &--right {
-        width: 50%;
-        float: left;
+    background-color: $white;
+
+    svg {
+        width: 100%;
+        position: absolute;
+        top: 0; left: 0;
+    }
+
+    &__bg-blue {
+        background-color: $lightest-blue;
+    }
+}
+
+// TODO: Move!
+.ol--blue-counter {
+    list-style: none;
+    padding-bottom: 30px;
+    padding-left: 60px;
+
+    li {
+        counter-increment: item;
+        position: relative;
+
+        &:before {
+            width: 40px; height: 40px;
+            display: inline-block;
+            content: counter(item);
+            position: absolute;
+            top: 0; left: -55px;
+            text-align: center;
+            color: $white;
+            font-family: $avenir-heavy;
+            font-size: 24px;
+            line-height: 1.8;
+
+
+            background-color: $primary-blue;
+            @include border-radius(100%);
+        }
+    }
+}
+
+.homepage {
+
+    &--hero {
+        position: relative;
+        text-align: center;
+        padding-left: 15px;
+        padding-right: 15px;
+
+        // Heading
+        &-h1 {
+            color: $primary-blue;
+
+            font-size: 28px;
+            line-height: 36px;
+            margin: 0 0 15px;
+
+            @include breakpoint(mobileishup) {
+                font-size: 30px;
+                line-height: 38px;
+            }
+
+            @include breakpoint(tablet) {
+                font-size: 42px;
+                line-height: 50px;
+            }
+
+            @include breakpoint(desktop) {
+                font-size: 72px;
+                line-height: 80px;
+            }
+        }
+
+        // Strapline
+        p {
+            margin-bottom: 0 0 30px;
+
+            @include breakpoint(tablet) {
+                font-size: 20px;
+            }
+        }
+
+
+        // Background
+
+            // Mobile
+            padding: 20px 15px 100px;
+            background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_homepage_hero_mobile_background.svg') no-repeat center bottom;
+            background-size: 85%;
+
+            // Tooltips
+            &__tooltip {
+                width: 40px; height: 47px;
+                position: absolute;
+                z-index: 2;
+                background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_hero_pin_alt.svg') no-repeat center;
+
+                &:before, &:after {
+                    display: block;
+                    opacity: 0;
+                    pointer-events: none;
+                    position: absolute;
+                }
+
+                &:before {
+                    bottom: 8px; left: -50px;
+                    min-width: 150px;
+                    padding: 15px 10px;
+                    font-size: 15px;
+                    font-family: $avenir-heavy;
+                    content: attr(data-content);
+                    background-color: $darkest-blue;
+                    color: $white;
+                    @include border-radius(3px);
+
+                    @include transform(scale3d(.2,.2,1));
+                    @include transition(all .1s ease-in-out);
+                }
+
+                &:after {
+                    bottom: 0; left: 15px;
+                    content: '';
+                    border-left: 8px solid transparent;
+                    border-right: 8px solid transparent;
+                    border-top: 8px solid $darkest-blue;
+
+                    @include transform(translate3d(0,-6px,0));
+                    @include transition(all .1s ease-in-out);
+                }
+
+                &__reward {
+                    background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_hero_pin_reward.svg') no-repeat center;
+                }
+
+                &:hover {
+                    cursor: pointer;
+                    background: transparent;
+                    z-index: 100;
+
+                    &:before, &:after {
+                        pointer-events: auto;
+                        opacity: 1;
+                        z-index: 100;
+                        @include transform(scale3d(1,1,1));
+                    }
+
+                    &:after {
+                        @include transition(all .2s .1s ease-in-out);
+                    }
+                }
+            }
+
+            // Characters
+            &__character {
+                // Hide
+                display: none;
+
+                // Shared
+                position: absolute;
+
+                // Sprite
+                background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_characters_sprites.svg') no-repeat;
+            }
+
+            #hero-character_1 {
+                width: 50px; height: 90px;
+                background-position: 0 0;
+                bottom: 5px; left: 5%;
+
+                @include breakpoint(desktop) {
+                    left: 10%;
+                }
+
+                .homepage--hero__tooltip {
+                    bottom: 92px; left: 20px;
+                    animation-duration: 1s;
+                    animation-iteration-count: 3;
+                }
+            }
+
+            #hero-character_2 {
+                width: 50px; height: 90px;
+                background-position: -50px 0;
+                bottom: -5px; left: 25%;
+
+                .homepage--hero__tooltip {
+                    bottom: 95px; right: 11px;
+                }
+            }
+
+            #hero-character_3_and_4 {
+                width: 113px; height: 90px;
+                bottom: 10px; left: 38%;
+
+                // Reset to split!
+                background: transparent;
+
+                .left, .right {
+                    width: 50%; height: 90px;
+                    float: left;
+                    position: relative;
+                    background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_characters_sprite.svg') no-repeat;
+                }
+
+                .left {
+                    background-position: -255px 0;
+
+                    .homepage--hero__tooltip {
+                        bottom: 80px; right: 20px;
+                    }
+                }
+
+                .right {
+                    background-position: -312px 0;
+
+                    .homepage--hero__tooltip {
+                        bottom: 82px; left: 20px;
+                    }
+                }
+            }
+
+            #hero-character_5_and_6 {
+                width: 100px; height: 90px;
+                bottom: -8px; right: 35%;
+
+                @include breakpoint(desktop) {
+                    right: 40%;
+                }
+
+                // Reset to split!
+                background: transparent;
+
+                .left, .right {
+                    width: 50%; height: 90px;
+                    float: left;
+                    position: relative;
+                    background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_characters_sprite.svg') no-repeat;
+                }
+
+                .left {
+                    background-position: -100px 0;
+
+                    .homepage--hero__tooltip {
+                        bottom: 85px; right: 23px;
+                    }
+                }
+
+                .right {
+                    background-position: -150px 0;
+
+                    .homepage--hero__tooltip {
+                        bottom: 94px; right: 0;
+                    }
+                }
+            }
+
+            #hero-character_7 {
+                width: 109px; height: 90px;
+                background-position: -368px 0;
+                bottom: 15px; right: 20%;
+
+                @include breakpoint(desktop) {
+                    right: 30%;
+                }
+
+                .homepage--hero__tooltip {
+                    bottom: 70px; left: 31px;
+
+                    &:before {
+                        background-color: $green;
+                    }
+
+                    &:after {
+                        border-top-color: $green;
+                    }
+                }
+            }
+
+            #hero-character_8 {
+                width: 55px; height: 90px;
+                background-position: -200px 0;
+                bottom: 0px; right: 5%;
+
+                @include breakpoint(desktop) {
+                    right: 10%;
+                }
+
+                .homepage--hero__tooltip {
+                    bottom: 90px; right: 20px;
+                }
+            }
+
+
+
+
+
+            // Background Adjustments
+
+                // Large Mobile
+                @include breakpoint(mobileishup) {
+                    padding: 20px 15px 140px;
+                }
+
+                // Tablet
+                @include breakpoint(tablet) {
+                    padding: 20px 15px 200px;
+                    background-size: 70%;
+                }
+
+                // Laptop
+                @include breakpoint(laptop) {
+                    padding: 100px 15px 200px;
+                    // Reset background
+                    background: transparent;
+
+                    &:after, &:before {
+                        width: 100%; height: 100%;
+                        content: '';
+                        position: absolute;
+                        z-index: 0;
+                        left: 50%;
+                        margin-left: -50%;
+                    }
+
+                    // Add the Buildings
+                    &:before {
+                        bottom: 0;
+                        background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_hero_background_empty_space_for_bench.svg') no-repeat center bottom;
+
+                        background-size: 1900px;
+                    }
+
+                    // Add the Clouds
+                    &:after {
+                        top: 0; left: 50%;
+                        background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_homepage-hero-clouds-combined.svg') repeat-x center top;
+                        background-size: 100%;
+                    }
+
+                    // Show Characters
+                    &__character {
+                        display: block;
+                    }
+                }
+
+                // Desktop
+                @include breakpoint(desktop) {
+                    padding: 120px 15px 200px;
+                }
+
+                @include breakpoint(hd) {
+                    padding: 200px 15px;
+                }
+
+    }
+
+    &--what-is-so-sure {
+
+        @include breakpoint(tablet) {
+            .so-sure_homepage-what-is-so-sure {
+                max-width: 400px;
+            }
+        }
+
+        @include breakpoint(laptop) {
+            padding-top: 80px;
+        }
+
+    }
+
+    &--press {
+
+        .press-img {
+            width: 200px; height: 100px;
+            background: transparent url('https://cdn.so-sure.com/images/homepage/press/in_the_press_sprite_2x.png') no-repeat;
+            background-size: 900px;
+        }
+
+        .the-guardian {
+            background-position: 10px 0;
+
+            @include breakpoint(tablet) {
+                background-position: 0 0;
+            }
+        }
+
+        .financial-times {
+            background-position: -200px 0;
+        }
+
+        .insurance-post {
+            background-position: -400px 0;
+        }
+
+        .digital-top-50 {
+            width: 160px;
+            background-position: -600px 0;
+
+            @include breakpoint(tablet) {
+                background-position: -620px 0;
+            }
+        }
+
+        .insurance-choice-awards {
+            width: 150px;
+            background-position: -749px 0;
+
+            @include breakpoint(tablet) {
+                background-position: -800px 0;
+            }
+        }
+
+        text-align: center;
+
+        h4 {
+            margin: 0 0 0 5px;
+        }
+
+        @include breakpoint(laptop) {
+            text-align: left;
+        }
+    }
+
+    &--why-we-are-better {
+        padding-bottom: 60px;
+        background-color: $lightest-blue;
+
+        h2 {
+            margin-bottom: 40px;
+        }
+
+        .so-sure_homepage-balloon {
+            margin: 25px auto;
+        }
+
+        .btn {
+            white-space: normal;
+        }
+
+    }
+
+    &--cover-details {
+        text-align: center;
+        position: relative;
+
+        p {
+            @include breakpoint(tablet) {
+                min-height: 60px;
+            }
+        }
+
+        a {
+            &:focus {
+                outline: 0;
+            }
+        }
+
+        .cover-img {
+            width: 200px; height: 200px;
+            background: transparent url('https://cdn.so-sure.com/images/homepage/whats_covered_sprite_2x.png') no-repeat;
+            background-size: 1200px;
+            margin: 0 auto;
+            cursor: pointer;
+        }
+
+        .theft {
+            background-position: 0 -20px;
+        }
+
+        .loss {
+            background-position: -200px -20px;
+        }
+
+        .accidental-damage {
+            background-position: -400px -20px;
+        }
+
+        .breakdown {
+            background-position: -600px -20px;
+        }
+
+        .charges {
+            background-position: -800px -20px;
+        }
+
+        .accessories {
+            background-position: -1000px -20px;
+        }
+
+
+        @include breakpoint(laptop) {
+            .cover-arrow {
+                position: absolute;
+                z-index: 10;
+                left: -60px; bottom: 10px;
+                width: 175px; height: 52px;
+                background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_cover_section_arrow.svg') center center no-repeat;
+            }
+        }
+    }
+
+    &--when-you-travel {
+        padding: 100px 0 200px;
+        position: relative;
+        background-color: $lightest-blue;
+        text-align: center;
+        overflow-x: hidden;
+
+        h2 {
+            margin-bottom: 0;
+        }
+
+        .so-sure_airways {
+            margin-bottom: 25px;
+
+            @include breakpoint(tablet) {
+                max-width: 500px;
+            }
+        }
+
+        .cloud {
+            position: absolute;
+            left: 50%;
+            margin-left: -500px;
+
+            &--top {
+                top: 0;
+            }
+
+            &--bottom {
+                bottom: 0;
+            }
+
+            img {
+                width: 1000px;
+                display: block;
+            }
+
+            @include breakpoint(tablet) {
+                margin-left: -1000px;
+
+                img {
+                    width: 2000px;
+                }
+
+            }
+        }
+
+        @include breakpoint(tablet) {
+            padding: 200px 0 300px;
+        }
+    }
+
+    &--what-we-dont-cover {
+        position: relative;
+
+        .container {
+            position: relative;
+            z-index: 2;
+        }
+
+        h4 {
+            cursor: pointer;
+
+            &:hover, &:focus {
+                color: $primary-blue;
+            }
+
+            &:after {
+                display: inline-block;
+                font-family: FontAwesome;
+                color: $primary-blue;
+                content: '\f106';
+                padding-left: 10px;
+            }
+        }
+
+        h4.collapsed {
+            &:after {
+                content: '\f107';
+            }
+        }
+
+        .what-we-dont-cover--list {
+            margin-bottom: 25px;
+
+            @include breakpoint(tablet) {
+                padding-left: 30px;
+            }
+
+            &__item {
+                background-color: $primary-blue;
+                color: $white;
+                padding: 15px;
+                @include border-radius(6px);
+
+                p, ul, li {
+                    &:last-of-type {
+                        margin-bottom: 0;
+                    }
+                }
+            }
+        }
+    }
+
+    &--how-does-the-reward-pot-work {
+        background-color: $lightest-blue;
+        position: relative;
+
+        h2 {
+            margin: 0 0 30px;
+        }
+
+        ol {
+            padding-left: 75px;
+
+            li {
+                margin-bottom: 35px;
+
+                &:before {
+                    width: 60px; height: 60px;
+                    display: inline-block;
+                    position: absolute;
+                    top: 0; left: -75px;
+                    text-align: center;
+                    color: $grey;
+                    font-family: 'arial black';
+                    font-size: 32px;
+                    line-height: 1.3;
+
+                    border: 8px solid $gold;
+                    text-shadow: 1px 1px 0 $off-white;
+                    // box-shadow: 0 2px 0 $gold-dark, $gold-dark 0px 2px 0 inset;
+                    background-color: $silver;
+                }
+            }
+        }
+
+        .so-sure_piggy_bank {
+            max-width: 200px;
+            margin-bottom: 25px;
+
+            @include breakpoint(tablet) {
+                max-width: 300px;
+            }
+        }
+
+        .link-text {
+            display: inline-block;
+            background-color: darken($lightest-blue, 5%);
+            padding: 20px 30px;
+            margin: 25px 0 40px;
+            font-weight: bold;
+            color: $primary-blue;
+            @include border-radius(4px);
+
+            a {
+                text-decoration: underline;
+                font-family: $avenir-heavy;
+            }
+        }
+
+        .speech-bubble {
+            max-width: 400px;
+            background: $white url('https://cdn.so-sure.com/images/homepage/so-sure_logo_speech_bubble.png') no-repeat 15px 20px;
+            position: relative;
+            @include border-radius(6px);
+            font-size: 14px;
+
+            padding: 20px 20px 20px 80px;
+            margin: 0 auto 20px;
+
+            &:after {
+                position: absolute;
+                top: 100%;
+                content: '';
+                border-left: 8px solid transparent;
+                border-right: 8px solid transparent;
+                border-top: 8px solid $white;
+            }
+
+            &--1 {
+                &:after {
+                    left: 15px;
+                }
+            }
+
+            &--2 {
+                &:after {
+                    right: 15px;
+                }
+            }
+
+            &--3 {
+                &:after {
+                    left: 15px;
+                }
+            }
+
+            &--name {
+                margin-bottom: 20px;
+            }
+
+            @include breakpoint(laptop) {
+                max-width: 320px;
+                margin: 0 auto 30px;
+
+                &--1 {
+
+                }
+
+                &--2 {
+                    margin-top: 20px;
+                }
+
+                &--3 {
+
+                }
+            }
+        }
+
+        span.h3 {
+            display: inline-block;
+            background-color: $primary-blue;
+            position: relative;
+            z-index: 10;
+            color: $white;
+            padding: 10px 50px;
+            margin-top: 80px;
+            margin-bottom: 0;
+            @include border-radius(4px);
+
+            @include breakpoint(laptop) {
+                padding: 10px 100px;
+            }
+        }
+
+        .video-container {
+            height: 0;
+            overflow: hidden;
+            z-index: 9;
+            position: relative;
+            padding-bottom: 53.4%;
+            padding-top: 30px;
+            margin-bottom: 30px;
+
+            iframe {
+                width: 100%; height: 100%;
+                position: absolute;
+                top: 0; left: 0;
+            }
+
+            @include breakpoint(laptop) {
+                width: 800px; height: 450px;
+                margin: -20px auto 80px;
+                box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.2);
+                padding: 0;
+
+                iframe {
+                    width: inherit; height: inherit;
+                    position: static;
+                }
+            }
+
+        }
+
+        padding-top: 40px;
+
+        @include breakpoint(tablet) {
+            padding-top: 0;
+        }
+    }
+
+    &--claims-process {
+        text-align: center;
+
+        .large-no {
+            position: relative;
+            display: inline-block;
+            font-size: 128px;
+            font-family: $avenir-heavy;
+            line-height: 1;
+            color: $primary-blue;
+            margin-top: 20px;
+
+            &--arrow {
+
+                @include breakpoint(laptop) {
+                    &:after {
+                        width: 163px; height: 26px;
+                        content: '';
+                        position: absolute;
+                        right: -203px; top: 40px;
+                        background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_arrow_right.svg') no-repeat center;
+                    }
+                }
+
+                @include breakpoint(desktop) {
+                    &:after {
+                        right: -233px;
+                    }
+                }
+            }
+        }
+
+        h4 {
+            margin: 0;
+        }
+
+        p {
+            max-width: 800px;
+            margin: 15px auto;
+        }
+
+        @include breakpoint(tablet) {
+            padding-top: 0;
+        }
+    }
+
+    &--we-compare-well {
+        background-color: $lightest-blue;
+
+        table {
+            max-width: 960px;
+            margin: 0 auto 50px;
+
+            thead {
+                td {
+                    padding: 30px 15px;
+                    text-align: center;
+                    vertical-align: middle;
+                }
+            }
+
+            tr {
+                td.sosure {
+                    background-color: $white;
+                }
+
+                td.contrast {
+                    background-color: lighten($lightest-blue, 6%);
+                    opacity: 0.7;
+                }
+            }
+
+            tbody {
+
+                tr {
+                    td {
+                        padding: 25px 20px 25px 90px;
+                        border-color: darken($lightest-blue, 6%);
+                        vertical-align: middle;
+                    }
+
+
+                    td.sosure  {
+                        background-image: url('https://cdn.so-sure.com/images/logo/so-sure-blue-smile.svg');
+                        background-size: 40px 40px;
+                        background-repeat: no-repeat;
+                        background-position: 30px center;
+                    }
+
+                    td.contrast {
+                        background-image: url('https://cdn.so-sure.com/images/logo/so-sure_blue-frown.svg');
+                        background-size: 40px 40px;
+                        background-repeat: no-repeat;
+                        background-position: 30px center;
+                    }
+                }
+            }
+        }
+    }
+
+    &--feedback {
+        text-align: center;
+
+        h2 {
+            margin-bottom: 30px;
+        }
+
+        p {
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
 
         img {
-            width: 100%;
-            height: auto;
+            border-radius: 50%;
+            border: 15px solid $off-white;
+
+            &:hover {
+                border-color: $lightest-blue;
+            }
         }
     }
 
-    @include breakpoint(mobileishup) {
-        width: 388px; height: 331px;
+    &--instant-quote {
+        position: relative;
+        padding-bottom: 40px;
 
-        &--left,
-        &--right {
-            width: 194px;
+        .form-rocket {
+            display: none;
+            width: 200px;
+            position: absolute;
+            top: 20px; right: 10%;
+            z-index: 1;
+
+            @include breakpoint(tablet) {
+                display: inline;
+            }
+
+            @include breakpoint(desktop) {
+                right: 25%;
+            }
+        }
+
+        @include breakpoint(tablet) {
+            padding-bottom: 0;
         }
     }
 
+}
+
+.footer-new {
+    @include breakpoint(tablet) {
+        padding-top: 100px;
+        margin-top: -40px;
+    }
+}
+
+
+// TODO: Move!
+.search-phone-form--homepage {
+    max-width: 450px;
+    background-color: $white;
+    padding: 0;
+    position: relative;
+    margin: 0 auto;
+    z-index: 5;
+
+    // Hide the form on load
+    .select-phone-form {
+        display: none;
+    }
+
+    .search-phone-text {
+        border-color: transparent;
+    }
+
+    .form-inline--homepage {
+
+        .form-group {
+            margin-bottom: 0;
+        }
+
+        @include breakpoint(desktop) {
+
+            .form-group {
+                display: inline-block;
+                vertical-align: middle;
+            }
+
+        }
+
+        .form-control {
+            vertical-align: initial;
+            border-color: transparent;
+            padding-left: 35px;
+        }
+
+        .btn {
+            font-size: 18px;
+        }
+
+    }
+
+    .twitter-typeahead {
+        z-index: 99;
+
+        .tt-hint,
+        .tt-input {
+            height: 40px;
+            padding-left: 40px;
+            margin-bottom: 10px;
+
+            @include breakpoint(laptop) {
+                height: 57px;
+                padding-left: 60px;
+                margin-bottom: 0;
+            }
+        }
+
+        &:before {
+            content: '\f002';
+            color: $light-blue;
+            font-family: FontAwesome;
+            font-size: 24px;
+            position: absolute;
+            z-index: 10;
+            left: 10px; top: 0;
+
+            @include breakpoint(laptop) {
+                font-size: 34px;
+                top: 2px;
+            }
+        }
+
+        @include breakpoint(tablet) {
+            font-size: 20px;
+        }
+    }
+
+    .tt-menu {
+        margin-top: 11px;
+
+        @include breakpoint(tablet) {
+            width: 430px;
+        }
+
+        @include breakpoint(laptop) {
+            width: 530px;
+        }
+
+        @include breakpoint(desktop) {
+            width: 630px;
+        }
+    }
+
+    .tt-suggestion {
+        font-size: 16px;
+    }
+
+    // Add style to search form - set width
+    max-width: 450px;
+    padding: 10px;
+
+    @include border-radius(4px);
+    border: 1px solid $grey;
+
+    // search form - set width
     @include breakpoint(laptop) {
-        margin: 0 auto;
-        top: 30px;
+        max-width: 550px;
+    }
+
+    // search form - set width
+    @include breakpoint(desktop) {
+        max-width: 650px;
+    }
+}
+
+// Style input on focus
+.search-phone-form--focus {
+    border-color: $primary-blue;
+
+    .twitter-typeahead {
+
+        &:before {
+            color: $primary-blue;
+        }
+    }
+}
+
+.search-phone-form--sticky {
+    position: fixed;
+    top: 55px; left: 0; right: 0;
+    z-index: 999;
+
+    margin-left: 10px;
+    margin-right: 10px;
+
+    padding: 0 10px;
+
+    .twitter-typeahead {
+
+        .tt-hint,
+        .tt-input {
+
+            @include breakpoint(laptop) {
+                height: 38px;
+                padding: 0 0 0 50px;
+            }
+        }
+
+        &:before {
+
+            @include breakpoint(laptop) {
+                font-size: 23px;
+                top: 2px;
+            }
+        }
+
+        @include breakpoint(tablet) {
+            font-size: 18px;
+        }
+
+        .tt-menu {
+            margin-top: 1px;
+        }
+    }
+
+    border-color: $light-blue;
+
+    @include breakpoint(tablet) {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    // search form - set width/height
+    @include breakpoint(laptop) {
+        height: 40px;
+    }
+
+    @include breakpoint(desktop) {
+        top: 5px;
+        z-index: 1001;
     }
 }
 

@@ -1369,11 +1369,11 @@ class PolicyService
         return $renewals;
     }
 
-    public function expireEndingPolicies($prefix, $dryRun = false)
+    public function expireEndingPolicies($prefix, $dryRun = false, \DateTime $date = null)
     {
         $expired = [];
         $policyRepo = $this->dm->getRepository(Policy::class);
-        $policies = $policyRepo->findPoliciesForExpiration($prefix);
+        $policies = $policyRepo->findPoliciesForExpiration($prefix, $date);
         foreach ($policies as $policy) {
             $expired[$policy->getId()] = $policy->getPolicyNumber();
             if (!$dryRun) {
@@ -1393,8 +1393,11 @@ class PolicyService
         return $expired;
     }
 
-    public function fullyExpireExpiredClaimablePolicies($prefix, $dryRun = false)
+    public function fullyExpireExpiredClaimablePolicies($prefix, $dryRun = false, \DateTime $date = null)
     {
+        if (!$date) {
+            $date = new \DateTime();
+        }
         $fullyExpired = [];
         $policyRepo = $this->dm->getRepository(Policy::class);
         $policies = $policyRepo->findPoliciesForFullExpiration($prefix);
@@ -1402,9 +1405,27 @@ class PolicyService
             $fullyExpired[$policy->getId()] = $policy->getPolicyNumber();
             if (!$dryRun) {
                 try {
-                    $result = $this->fullyExpire($policy);
+                    $result = $this->fullyExpire($policy, $date);
                     if ($result === null) {
-                        $fullyExpired[$policy->getId()] = sprintf('%s - waiting on claim', $policy->getPolicyNumber());
+                        $skipLogging = true;
+                        foreach ($policy->getClaims() as $claim) {
+                            if (!$claim->isIgnoreWarningFlagSet(
+                                Claim::WARNING_FLAG_IGNORE_POLICY_EXPIRE_CLAIM_WAIT
+                            )) {
+                                $skipLogging = false;
+                            }
+                        }
+
+                        // avoid sending constantly for the same claims, but at least send once a day
+                        if (!$skipLogging || $date->format('H') == 9) {
+                            $fullyExpired[$policy->getId()] = sprintf(
+                                '%s - waiting on claim',
+                                $policy->getPolicyNumber()
+                            );
+                        } else {
+                            //print 'unset' . PHP_EOL;
+                            unset($fullyExpired[$policy->getId()]);
+                        }
                     }
                 } catch (\Exception $e) {
                     $msg = sprintf(

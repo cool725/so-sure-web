@@ -54,122 +54,72 @@ class DefaultController extends BaseController
      */
     public function indexAction(Request $request)
     {
-        $geoip = $this->get('app.geoip');
-        //$ip = "72.229.28.185";
-        $ip = $request->getClientIp();
-        $site = $request->get('site');
-        $userAgent = $request->headers->get('User-Agent');
-        // make sure to exclude us based bots that import content - eg. facebook/twitter
-        // https://developers.facebook.com/docs/sharing/webmasters/crawler
-        // https://dev.twitter.com/cards/getting-started#crawling
-        // also, for use with casper monitor, if force is present, then ignore
-        if (!$request->get('force') && $geoip->findCountry($ip) == "US" && $site != 'uk' &&
-            !preg_match("/Twitterbot|facebookexternalhit|Facebot/i", $userAgent)) {
+        if ($this->isRealUSAIp($request) && $request->get('site') != 'uk') {
             return $this->redirectToRoute('launch_usa');
         }
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(User::class);
-        $phoneRepo = $dm->getRepository(Phone::class);
-        $logger = $this->get('logger');
-        $launchUser = $this->get('app.user.launch');
 
-        $phone = null;
-        $phoneName = (string) $request->get('phone');
-        $matches = null;
-        if (preg_match('/([^ ]+) (.*) ([0-9]+)GB/', $phoneName, $matches) !== false && count($matches) >= 3) {
-            $decodedModel = Phone::decodeModel($matches[2]);
-            $phone = $phoneRepo->findOneBy([
-                'active' => true,
-                'make' => $matches[1],
-                'model' => $decodedModel,
-                'memory' => (int) $matches[3]
-            ]);
-        }
-
-        $userTop = new User();
         $referral = $request->get('referral');
         if ($referral) {
-            $userTop->setReferralId($referral);
             $session = $this->get('session');
             $session->set('referral', $referral);
-            $logger->debug(sprintf('Referral %s', $referral));
-        }
-        $userBottom = clone $userTop;
-        $formTop = $this->get('form.factory')
-            ->createNamedBuilder('launch_top', LaunchType::class, $userTop)
-            ->getForm();
-        $formBottom = $this->get('form.factory')
-            ->createNamedBuilder('launch_bottom', LaunchType::class, $userBottom)
-            ->getForm();
-
-        if ('POST' === $request->getMethod()) {
-            $existingUser = null;
-            if ($request->request->has('launch_top')) {
-                $formTop->handleRequest($request);
-                if ($formTop->isValid()) {
-                    $existingUser = $launchUser->addUser($userTop)['user'];
-                }
-            } elseif ($request->request->has('launch_bottom')) {
-                $formBottom->handleRequest($request);
-                if ($formBottom->isValid()) {
-                    $existingUser = $launchUser->addUser($userBottom)['user'];
-                }
-            }
-
-            if ($existingUser) {
-                return $this->redirectToRoute('launch_share', ['id' => $existingUser->getId()]);
-            }
+            $this->get('logger')->debug(sprintf('Referral %s', $referral));
         }
 
-        $i6s = $phoneRepo->findOneBy([
-                'active' => true,
-                'make' => 'Apple',
-                'model' => 'iPhone 6S',
-                'memory' => (int) 32
-        ]);
+        // $exp = $this->sixpack(
+        //     $request,
+        //     SixpackService::EXPERIMENT_FUNNEL_V1_V2,
+        //     ['v1', 'v2'],
+        //     true
+        // );
 
-        $i7 = $phoneRepo->findOneBy([
-            'active' => true,
-            'make' => 'Apple',
-            'model' => 'iPhone 7',
-            'memory' => (int) 32
-        ]);
-
-        $s7 = $phoneRepo->findOneBy([
-            'active' => true,
-            'make' => 'Samsung',
-            'model' => 'Galaxy S7',
-            'memory' => (int) 32
-        ]);
-
-        $exp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_FUNNEL_V1_V2,
-            ['v1', 'v2'],
-            true
-        );
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         $data = array(
-            'form_top' => $formTop->createView(),
-            'form_bottom' => $formBottom->createView(),
             'referral' => $referral,
-            'i6s' => $i6s,
-            'i7' => $i7,
-            'phone' => $phone,
-            's7' => $s7,
-            'sixpack' => 'phone-image',
+            'phone' => $this->getQuerystringPhone($request),
             'device_category' => $this->get('app.request')->getDeviceCategory()
         );
 
-        //if ($exp == 'v2-new') {
-        //    return $this->render('AppBundle:Default:indexV2.html.twig', $data);
-        if ($exp == 'v2') {
-            return $this->render('AppBundle:Default:indexV2old.html.twig', $data);
-        } else {
-            return $this->render('AppBundle:Default:index.html.twig', $data);
-        }
+        // if ($exp == 'v2') {
+        //     return $this->render('AppBundle:Default:indexV2old.html.twig', $data);
+        // } else {
+        //     return $this->render('AppBundle:Default:index.html.twig', $data);
+        // }
+        return $this->render('AppBundle:Default:index.html.twig', $data);
     }
+
+
+    /**
+     * @Route("/reimagined", name="reimagined")
+     * @Route("/hasslefree", name="hasslefree")
+     * @Template
+     */
+    public function homepageLanding(Request $request)
+    {
+
+        if ($request->get('_route') == "reimagined") {
+            $data = array(
+                'main'      => 'Mobile Insurance',
+                'main_cont' => 'Re-Imagined',
+                'sub'       => 'Easier. Quicker. Jargon Free.',
+                // 'sub_cont'  => '',
+            );
+        } elseif ($request->get('_route') == "hasslefree") {
+            $data = array(
+                'main'      => 'Hassle Free',
+                'main_cont' => 'Mobile Insurance',
+                'sub'       => 'We dont give you the run around when you claim.',
+                // 'sub_cont'  => '',
+            );
+        }
+
+        $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
+            'Page' => $request->get('_route'),
+        ]);
+
+        return $this->render('AppBundle:Default:index.html.twig', $data);
+    }
+
 
     /**
      * @Route("/select-phone", name="select_phone_make")

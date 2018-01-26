@@ -1564,6 +1564,188 @@ class PolicyServiceTest extends WebTestCase
         $this->assertGreaterThan(0, count($policies));
     }
 
+    public function testFullyExpireExpiredClaimablePolicies()
+    {
+        $policies = static::$policyService->fullyExpireExpiredClaimablePolicies(
+            'TEST',
+            false,
+            new \DateTime('2017-02-02')
+        );
+
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testFullyExpireExpiredClaimablePolicies', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->create($policy, new \DateTime('2016-01-01'), true);
+        static::$dm->flush();
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+        static::$dm->flush();
+
+        $policies = static::$policyService->expireEndingPolicies(
+            'TEST',
+            false,
+            new \DateTime('2017-01-02')
+        );
+        $this->assertGreaterThan(0, count($policies));
+
+        $policies = static::$policyService->fullyExpireExpiredClaimablePolicies(
+            'TEST',
+            false,
+            new \DateTime('2017-02-02')
+        );
+        $this->assertGreaterThan(0, count($policies));
+
+        $policies = static::$policyService->fullyExpireExpiredClaimablePolicies(
+            'TEST',
+            false,
+            new \DateTime('2017-02-02')
+        );
+        $this->assertEquals(0, count($policies));
+    }
+
+    public function testFullyExpireExpiredClaimablePoliciesWithClaim()
+    {
+        $policies = static::$policyService->fullyExpireExpiredClaimablePolicies(
+            'TEST',
+            false,
+            new \DateTime('2017-02-02')
+        );
+
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testFullyExpireExpiredClaimablePoliciesWithClaim', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->create($policy, new \DateTime('2016-01-01'), true);
+        static::$dm->flush();
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+        $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
+        $claim->setStatus(Claim::STATUS_INREVIEW);
+        $policy->addClaim($claim);
+        static::$dm->flush();
+
+        $policies = static::$policyService->expireEndingPolicies(
+            'TEST',
+            false,
+            new \DateTime('2017-01-02')
+        );
+        $this->assertGreaterThan(0, count($policies));
+
+        // 1st run to set to wait-claim and should always have policy
+        $policies = static::$policyService->fullyExpireExpiredClaimablePolicies(
+            'TEST',
+            false,
+            new \DateTime('2017-02-02')
+        );
+        //print_r($policies);
+        $this->assertGreaterThan(0, count($policies));
+
+        // 2nd run (and later) should still return policies as no flag set
+        $policies = static::$policyService->fullyExpireExpiredClaimablePolicies(
+            'TEST',
+            false,
+            new \DateTime('2017-02-02')
+        );
+        //print_r($policies);
+        $this->assertGreaterThan(0, count($policies));
+    }
+
+    public function testFullyExpireExpiredClaimablePoliciesWithClaimAndIgnoreFlag()
+    {
+        $policies = static::$policyService->fullyExpireExpiredClaimablePolicies(
+            'TEST',
+            false,
+            new \DateTime('2017-02-02')
+        );
+        $init = count(static::$policyService->fullyExpireExpiredClaimablePolicies(
+            'TEST',
+            false,
+            new \DateTime('2017-02-02')
+        ));
+
+
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testFullyExpireExpiredClaimablePoliciesWithClaimAndIgnoreFlag', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->create($policy, new \DateTime('2016-01-01'), true);
+        static::$dm->flush();
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+        $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
+        $claim->setStatus(Claim::STATUS_INREVIEW);
+        $claim->setIgnoreWarningFlags(Claim::WARNING_FLAG_IGNORE_POLICY_EXPIRE_CLAIM_WAIT);
+        $policy->addClaim($claim);
+        static::$dm->flush();
+
+        $policies = static::$policyService->expireEndingPolicies(
+            'TEST',
+            false,
+            new \DateTime('2017-01-02')
+        );
+        $this->assertGreaterThan(0, count($policies));
+
+        // 1st run to set to wait-claim and should always have policy
+        $policies = static::$policyService->fullyExpireExpiredClaimablePolicies(
+            'TEST',
+            false,
+            new \DateTime('2017-02-02')
+        );
+        $this->assertGreaterThan($init, count($policies));
+
+        // 2nd run (and later) should return 0 policies
+        $policies = static::$policyService->fullyExpireExpiredClaimablePolicies(
+            'TEST',
+            false,
+            new \DateTime('2017-02-02')
+        );
+        $this->assertEquals($init, count($policies));
+
+        // 9am should always return policies
+        $policies = static::$policyService->fullyExpireExpiredClaimablePolicies(
+            'TEST',
+            false,
+            new \DateTime('2017-02-02 09:05')
+        );
+        $this->assertGreaterThan($init, count($policies));
+    }
+
     public function testUnRenewPolicies()
     {
         $policies = static::$policyService->unrenewPolicies(

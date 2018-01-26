@@ -15,6 +15,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\SCode;
 use AppBundle\Document\Cashback;
 use AppBundle\Document\Feature;
+use AppBundle\Document\User;
 use AppBundle\Document\Form\Renew;
 use AppBundle\Document\Form\RenewCashback;
 use AppBundle\Form\Type\PhoneType;
@@ -999,13 +1000,37 @@ class UserController extends BaseController
      *   as these will impact Adwords
      *
      * @Route("/welcome", name="user_welcome")
+     * @Route("/welcome/{id}", name="user_welcome_policy_id")
      * @Template
      */
-    public function welcomeAction()
+    public function welcomeAction($id = null)
     {
+        $dm = $this->getManager();
         $user = $this->getUser();
+
         if (!$user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
             return new RedirectResponse($this->generateUrl('user_invalid_policy'));
+        }
+
+        // fetch latest policy if none provided
+        if ($id === null) {
+            $policy = $user->getLatestPolicy();
+        } else {
+            $policyRepo = $dm->getRepository(Policy::class);
+            $policy = $policyRepo->find($id);
+        }
+
+        // if policy id was given and user does not match
+        if (!$policy) {
+            throw $this->createNotFoundException('Policy not found');
+        }
+
+        $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+
+        $pageVisited = $policy->getVisitedWelcomePage() ? true : false;
+        if ($policy->getVisitedWelcomePage() === null) {
+            $policy->setVisitedWelcomePage(new \DateTime());
+            $dm->flush($policy);
         }
 
         //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_LANDING_HOME);
@@ -1018,7 +1043,7 @@ class UserController extends BaseController
         //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_CPC_MANUFACTURER_WITH_HOME);
         //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_V1_V2);
         //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_V1_V2OLD_V2NEW);
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_FUNNEL_V1_V2);
+        // $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_FUNNEL_V1_V2);
 
         $countUnprocessedInvitations = count($user->getUnprocessedReceivedInvitations());
         if ($countUnprocessedInvitations > 0) {
@@ -1036,10 +1061,10 @@ class UserController extends BaseController
 
         return array(
             'policy_key' => $this->getParameter('policy_key'),
-            'policy' => $user->getLatestPolicy()
+            'policy' => $user->getLatestPolicy(),
+            'has_visited_welcome_page' => $pageVisited,
         );
     }
-
     /**
      * @Route("/payment-details", name="user_card_details")
      * @Route("/payment-details/{policyId}", name="user_card_details_policy",
@@ -1134,6 +1159,19 @@ class UserController extends BaseController
             if ($request->request->has('user_email_form')) {
                 $userEmailForm->handleRequest($request);
                 if ($userEmailForm->isValid()) {
+                    $userRepo = $this->getManager()->getRepository(User::class);
+                    $existingUser = $userRepo->findOneBy(['emailCanonical' => strtolower($user->getEmail())]);
+                    if ($existingUser) {
+                        // @codingStandardsIgnoreStart
+                        $this->addFlash(
+                            'error',
+                            'Sorry, but that email already exists in our system. Please contact us to resolve this issue.'
+                        );
+                        // @codingStandardsIgnoreEnd
+
+                        return $this->redirectToRoute('user_contact_details_policy', ['policyId' => $policy->getId()]);
+                    }
+
                     $this->getManager()->flush();
                     $this->addFlash(
                         'success',

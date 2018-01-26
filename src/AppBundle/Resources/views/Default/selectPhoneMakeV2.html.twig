@@ -47,7 +47,7 @@
              id="search-phone{{ uid }}"
              class="required search-phone-text search-phone"
              placeholder="Find your phone e.g. iPhone 8 Plus..."
-             value="{% if phone %}{{ phone }}{% endif %}" />
+             value="{% if phone %}{{ phone.make }} {{ phone.model }}{% endif %}" />
     </form>
 
     {% if type is not defined or not type  %}

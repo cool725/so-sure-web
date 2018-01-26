@@ -441,6 +441,13 @@ abstract class Policy
      */
     protected $requestedCancellationReason;
 
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
+    protected $visitedWelcomePage;
+
     public function __construct()
     {
         $this->created = new \DateTime();
@@ -1750,6 +1757,16 @@ abstract class Policy
     public function getRequestedCancellationReason()
     {
         return $this->requestedCancellationReason;
+    }
+
+    public function setVisitedWelcomePage(\DateTime $date)
+    {
+        $this->visitedWelcomePage = $date;
+    }
+
+    public function getVisitedWelcomePage()
+    {
+        return $this->visitedWelcomePage;
     }
 
     abstract public function validatePremium($adjust, \DateTime $date);
@@ -4221,6 +4238,8 @@ abstract class Policy
             'next_policy_id' => $this->hasNextPolicy() ? $this->getNextPolicy()->getId() : null,
             'billing_day' => $this->getBillingDay(),
             'cashback_status' => $this->getCashback() ? $this->getCashback()->getStatus() : null,
+            'adjusted_monthly_premium' => $this->getPremium()->getAdjustedStandardMonthlyPremiumPrice(),
+            'adjusted_yearly_premium' => $this->getPremium()->getAdjustedYearlyPremiumPrice(),
         ];
 
         if ($this->getStatus() == self::STATUS_RENEWAL) {

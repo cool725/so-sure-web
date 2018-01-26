@@ -26,6 +26,10 @@ class ClaimFlagsType extends AbstractType
                 'multiple' => true,
                 'expanded' => true,
                 'choices' => [Claim::$warningFlags],
+                'label_attr' => ['style' => 'display: block'],
+                'choice_attr' => function ($val, $key, $index) {
+                    return ['style' => 'margin-left: 15px; margin-right: 3px;'];
+                }
             ])
             ->add('update', SubmitType::class)
         ;

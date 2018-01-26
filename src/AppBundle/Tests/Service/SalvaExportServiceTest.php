@@ -303,25 +303,14 @@ class SalvaExportServiceTest extends WebTestCase
         $chargeback->setDate($now);
         $chargeback->setSource(Payment::SOURCE_ADMIN);
         $chargeback->setAmount(0 - $policy->getPremiumInstallmentPrice());
-        $policy->addPayment($chargeback);
         static::$dm->persist($chargeback);
         static::$dm->flush();
-        
-        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
-        $policyRepo = $dm->getRepository(Policy::class);
-        $updatedPolicy = $policyRepo->find($policy->getId());
 
-        /*
-        $chargeback = new ChargebackPayment();
-        $chargeback->setDate(new \DateTime());
-        $chargeback->setSource(Payment::SOURCE_ADMIN);
-        $chargeback->setAmount(0 - $policy->getPremiumInstallmentPrice());
-        $updatedPolicy->addPayment($chargeback);
-        $dm->flush();
-        */
+        $policy->addPayment($chargeback);
+        static::$dm->flush();
 
         //\Doctrine\Common\Util\Debug::dump($updatedPolicy->getPayments());
-        $lines = $this->exportPayments($updatedPolicy->getPolicyNumber());
+        $lines = $this->exportPayments($policy->getPolicyNumber());
         //print_r($lines);
         $this->assertEquals(2, count($lines));
         $this->assertEquals(

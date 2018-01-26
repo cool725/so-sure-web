@@ -28,7 +28,7 @@ class SixpackService
     //const EXPERIMENT_HOMEPAGE_V1_V2 = 'homepage-v1-v2';
     //const EXPERIMENT_HOMEPAGE_V1_V2OLD_V2NEW = 'homepage-v1-v2old-v2new';
     const EXPERIMENT_APP_SHARE_METHOD = 'app-share-method';
-    const EXPERIMENT_FUNNEL_V1_V2 = 'funnel-v1-v2';
+    // const EXPERIMENT_FUNNEL_V1_V2 = 'funnel-v1-v2';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_SHARE_MESSAGE_ORIGINAL = 'original';
@@ -104,10 +104,10 @@ class SixpackService
             $url = sprintf('%s/participate?%s', $this->url, $query);
             $client = new Client();
             $res = $client->request('GET', $url, ['connect_timeout' => self::TIMEOUT, 'timeout' => self::TIMEOUT]);
-    
+
             $body = (string) $res->getBody();
             $this->logger->info(sprintf('Sixpack participate response: %s', $body));
-    
+
             // @codingStandardsIgnoreStart
             // {"status": "ok", "alternative": {"name": "red"}, "experiment": {"name": "button_color"}, "client_id": "12345678-1234-5678-1234-567812345678"}
             // @codingStandardsIgnoreEnd
@@ -165,7 +165,7 @@ class SixpackService
 
             $body = (string) $res->getBody();
             $this->logger->info(sprintf('Sixpack convert response: %s', $body));
-    
+
             // @codingStandardsIgnoreStart
             // {"status": "ok", "alternative": {"name": "red"}, "experiment": {"name": "button_color"}, "conversion": {"kpi": null, "value": null}, "client_id": "12345678-1234-5678-1234-567812345678"}
             // @codingStandardsIgnoreEnd
