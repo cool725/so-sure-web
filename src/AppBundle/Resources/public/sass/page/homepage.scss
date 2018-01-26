@@ -471,9 +471,27 @@
             margin-right: auto;
         }
 
+        .p-arrow {
+            position: relative;
+
+            @include breakpoint(laptop) {
+                &:after {
+                    width: 100px; height: 120px;
+                    content: '';
+                    background: transparent url('https://cdn.so-sure.com/images/homepage/pic-sure_p_arrow.svg') no-repeat;
+                    position: absolute;
+                    top: 100%; right: -20px;
+                }
+            }
+        }
+
         table { //TODO - Move to tables scss
             max-width: 600px;
             margin: 30px auto 0;
+
+            @include breakpoint(laptop) {
+                margin-bottom: 30px;
+            }
 
             thead {
                 td {
