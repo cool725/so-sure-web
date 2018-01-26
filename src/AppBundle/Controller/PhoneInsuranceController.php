@@ -429,6 +429,11 @@ class PhoneInsuranceController extends BaseController
                     'Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
                 ]);
             }
+
+            $this->get('app.sixpack')->convert(
+                SixpackService::EXPERIMENT_HOMEPAGE_STICKYSEARCH_PICSURE,
+                SixpackService::KPI_STANDARD
+            );
         }
 
         $data = array(
