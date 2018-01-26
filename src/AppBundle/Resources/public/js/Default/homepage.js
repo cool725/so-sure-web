@@ -1,9 +1,6 @@
 // homepage.js
 $(function(){
 
-    // Get the current device
-    var device = $('#ss-root').data('device-category');
-
     // Enhance the focus on the search box when input focused
     $('.search-phone').each(function(index, el) {
         var container = $(this).parents('.search-phone-form');
