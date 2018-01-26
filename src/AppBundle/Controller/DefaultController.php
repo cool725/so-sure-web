@@ -98,7 +98,7 @@ class DefaultController extends BaseController
             $data = array(
                 'main'      => 'Mobile Insurance',
                 'main_cont' => 'Re-Imagined',
-                'sub'       => 'Easier. Quicker. Jargon Free.',
+                'sub'       => 'Quicker. Easier. Jargon Free.',
                 // 'sub_cont'  => '',
             );
         } elseif ($request->get('_route') == "hasslefree") {
