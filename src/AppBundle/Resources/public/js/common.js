@@ -1,6 +1,9 @@
 // Common JS functions used throughout the site
 $(function(){
 
+    // Get the current device
+    var device = $('#ss-root').data('device-category');
+
     // SROLL TO
     // Add anchor via:         data-scroll-to-anchor
     // Add focus after anchor: data-scroll-to-focus
