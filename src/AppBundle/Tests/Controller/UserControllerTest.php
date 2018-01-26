@@ -983,13 +983,15 @@ class UserControllerTest extends BaseControllerTest
         $policy->setStart(new \DateTime('2017-10-11'));
         self::$dm->flush();
 
-        $welcomePage = self::$router->generate('user_welcome_policy_id', ['policyId' => $policy->getId()]);
+        $policy2 = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy2->setStatus(Policy::STATUS_ACTIVE);
+        $policy2->setStart(new \DateTime('2017-10-11'));
+        self::$dm->flush();
+
+        $welcomePage = self::$router->generate('user_welcome_policy_id', ['id' => $policy->getId()]);
         $this->login($email, $password);
         $crawler = self::$client->request('GET', $welcomePage);
-        self::verifyResponse(302);
-        $this->assertContains(self::$router->generate('user_home'), self::$client->getResponse()->getTargetUrl());
-        self::$client->followRedirect();
-
+        self::verifyResponse(403);
     }
 
     public function testUserWelcomePageInvalidPolicy()
@@ -1004,11 +1006,14 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
-        $welcomePage = self::$router->generate('user_welcome_policy_id', ['policyId' => rand(0, 10000000)]);
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setStart(new \DateTime('2017-10-11'));
+        self::$dm->flush();
+
+        $welcomePage = self::$router->generate('user_welcome_policy_id', ['id' => rand(0, 10000000)]);
         $this->login($email, $password);
         $crawler = self::$client->request('GET', $welcomePage);
-        self::verifyResponse(302);
-        $this->assertContains(self::$router->generate('user_home'), self::$client->getResponse()->getTargetUrl());
-        self::$client->followRedirect();
+        self::verifyResponse(404);
     }
 }
