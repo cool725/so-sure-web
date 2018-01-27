@@ -1,4 +1,14 @@
-FOS\UserBundle\Form\Model\ChangePassword:
+namespaces:
+  Rollerworks: Rollerworks\Component\PasswordStrength\Validator\Constraints\
+  AppBundle: AppBundle\Validator\Constraints\
+
+FOS\UserBundle\Model\User:
   properties:
-    new:
-      - Rollerworks\Bundle\PasswordStrengthBundle\Validator\Constraints\PasswordStrength: { minStrength: 3, minLength: 8, groups: [ ChangePassword, ResetPassword ], message: "Your password must be at least 8 characters and have a mixture of digits, special characters and uppercase and lower letters." }
+    plainPassword:
+      - Rollerworks:PasswordStrength: { minStrength: 4, minLength: 8, groups: [ ChangePassword, ResetPassword ], message: "Your password must be at least 8 characters and have a mixture of digits, special characters and uppercase and lower letters." }
+#      - Expression: { expression: "!this.hasPreviouslyUsedPassword(4)", groups: [ ChangePassword, ResetPassword ], message: "Previous Password" }
+#      - AppBundle:PreviousPassword: { versions: 4, groups: [ ChangePassword, ResetPassword ], message: "Your password can not be a previously used password." }
+
+AppBundle\Document\User:
+    previousPassswordOk:
+      - IsTrue: { message: "Password must not be previously used", groups: [ ChangePassword, ResetPassword ] }

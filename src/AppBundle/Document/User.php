@@ -15,12 +15,12 @@ use AppBundle\Validator\Constraints as AppAssert;
 use Scheb\TwoFactorBundle\Model\TrustedComputerInterface;
 use AppBundle\Validator\Constraints\AgeValidator;
 use VasilDakov\Postcode\Postcode;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * @MongoDB\Document(repositoryClass="AppBundle\Repository\UserRepository")
  * @MongoDB\Index(keys={"identity_log.loc"="2dsphere"}, sparse="true")
  * @Gedmo\Loggable
- *
  */
 class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterface
 {
@@ -335,7 +335,16 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * )
      */
     protected $sanctionsMatches = array();
-    
+
+    /**
+     * @MongoDB\Field(type="hash")
+     */
+    protected $previousPasswords = array();
+
+    /**
+     */
+    protected $previousPasswordCheck;
+
     public function __construct()
     {
         parent::__construct();
@@ -606,6 +615,27 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
         $multipay->setPayer($this);
         $this->multipays[] = $multipay;
+    }
+
+    public function passwordChange($oldPassword, $oldSalt)
+    {
+        $now = new \DateTime();
+        $this->previousPasswords[$now->format('U')] = ['password' => $oldPassword, 'salt' => $oldSalt];
+    }
+
+    public function getPreviousPasswords()
+    {
+        return $this->previousPasswords;
+    }
+
+    public function setPreviousPasswordCheck($previousPasswordCheck)
+    {
+        $this->previousPasswordCheck = $previousPasswordCheck;
+    }
+
+    public function getPreviousPasswordCheck()
+    {
+        return $this->previousPasswordCheck;
     }
 
     public function hasCancelledPolicy()

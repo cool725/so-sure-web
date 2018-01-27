@@ -5,6 +5,7 @@ use HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface;
 use HWI\Bundle\OAuthBundle\Security\Core\User\FOSUBUserProvider as BaseClass;
 use Symfony\Component\Security\Core\User\UserInterface;
 use AppBundle\Service\FacebookService;
+use AppBundle\Document\User;
 use HWI\Bundle\OAuthBundle\Security\Core\Exception\AccountNotLinkedException;
 use AppBundle\Validator\Constraints\AlphanumericValidator;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -17,9 +18,23 @@ class FOSUBUserProvider extends BaseClass
     /** @var RequestStack */
     protected $requestStack;
 
+    protected $encoderFactory;
+
+    protected $authService;
+
     public function setRequestStack(RequestStack $requestStack)
     {
         $this->requestStack = $requestStack;
+    }
+
+    public function setEncoderFactory($encoderFactory)
+    {
+        $this->encoderFactory = $encoderFactory;
+    }
+
+    public function setAuthService($authService)
+    {
+        $this->authService = $authService;
     }
 
     /**
@@ -183,5 +198,80 @@ class FOSUBUserProvider extends BaseClass
         $fb->setExtendedAccessToken(); //long-live access_token 60 days
 
         return $fb->getAccessToken();
+    }
+
+    public function isHistoricalPassword($user, $plainPassword, $oldPassword, $oldSalt)
+    {
+        $password = $this->getPassword($user, $plainPassword, $oldSalt);
+
+        $same = $oldPassword === $password;
+        // @codingStandardsIgnoreStart
+        // print sprintf('Checking %s %d (Salt: %s) %s ?= %s%s', $plainPassword, $same, $oldSalt, $oldPassword, $password, PHP_EOL);
+        // @codingStandardsIgnoreEnd
+
+        return $same;
+    }
+
+    public function getPassword(User $user, $plainPassword, $salt)
+    {
+        $encoder = $this->encoderFactory->getEncoder($user);
+
+        return $encoder->encodePassword($plainPassword, $salt);
+    }
+
+    public function previousPasswordCheck(User $user)
+    {
+        $employee = true;
+        try {
+            // non url requests will not have firewall setup
+            $employee = $this->authService->isGranted('ROLE_EMPLOYEE', $user);
+        } catch (\Exception $e) {
+            // fallback to check for known roles
+            $employee = $user->hasRole('ROLE_EMPLOYEE') || $user->hasRole('ROLE_ADMIN');
+        }
+
+        if ($employee) {
+            // PCI Requirement - 4 passwords
+            $user->setPreviousPasswordCheck(!$this->hasPreviouslyUsedPassword($user, 4));
+        } else {
+            // For users make it simple
+            $user->setPreviousPasswordCheck(!$this->hasPreviouslyUsedPassword($user, 2));
+        }
+
+        return $user->getPreviousPasswordCheck();
+    }
+
+    public function hasPreviouslyUsedPassword(User $user, $attempts = null)
+    {
+        $oldPasswords = $user->getPreviousPasswords();
+
+        if (!is_array($oldPasswords)) {
+            $oldPasswords = $user->getPreviousPasswords->getValues();
+        }
+        if (count($oldPasswords) == 0) {
+            return false;
+        }
+        $plainPassword = $user->getPlainPassword();
+
+        // current password not allowed
+        if ($this->isHistoricalPassword($user, $plainPassword, $user->getPassword(), $user->getSalt())) {
+            return true;
+        }
+
+        krsort($oldPasswords);
+        $count = 1;
+        foreach ($oldPasswords as $timestamp => $passwordData) {
+            if ($attempts && $count >= $attempts) {
+                break;
+            }
+
+            if ($this->isHistoricalPassword($user, $plainPassword, $passwordData['password'], $passwordData['salt'])) {
+                return true;
+            }
+
+            $count++;
+        }
+
+        return false;
     }
 }
