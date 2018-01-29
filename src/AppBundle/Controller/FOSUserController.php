@@ -87,6 +87,11 @@ class FOSUserController extends ResettingController
             );
 
             return $response;
+        } elseif ($user->getPreviousPasswordCheck() === false) {
+            $this->addFlash(
+                'error',
+                'Sorry, but you can not re-use a previously used password.'
+            );
         }
 
         return $this->render('FOSUserBundle:Resetting:reset.html.twig', array(
