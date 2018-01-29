@@ -910,6 +910,8 @@ class UserControllerTest extends BaseControllerTest
             $phone,
             self::$dm
         );
+
+        // setting up 3 policies, middle onw being setuo is the latest by start date
         $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setStart(new \DateTime('2017-10-11'));
@@ -918,39 +920,69 @@ class UserControllerTest extends BaseControllerTest
         $policy2->setStatus(Policy::STATUS_ACTIVE);
         $policy2->setStart(new \DateTime('2018-1-11'));
         self::$dm->flush();
+        $policy3 = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy3->setStatus(Policy::STATUS_ACTIVE);
+        $policy3->setStart(new \DateTime('2016-1-11'));
+        self::$dm->flush();
+
+        // latest policy should be policy number 2
+        $this->assertEquals($user->getLatestPolicy(), $policy2);
 
 
+        //testing user welcome page without policy id
         $welcomePage = self::$router->generate('user_welcome');
-        // initial flag is false
+
         $this->login($email, $password);
         self::$client->request('GET', $welcomePage);
         self::verifyResponse(200);
+
+        //always expecting latest policy to be policy number2
         $this->assertContains(
-            $policy2->getId(),
+            $user->getLatestPolicy()->getId(),
             self::$client->getResponse()->getContent()
         );
+        // initial flag is false
         $this->assertContains(
             "'has_visited_welcome_page': false",
             self::$client->getResponse()->getContent()
         );
+
         // set after first show to true
         self::$client->request('GET', $welcomePage);
         self::verifyResponse(200);
         $this->assertContains(
-            "'has_visited_welcome_page': true",
+            $user->getLatestPolicy()->getId(),
             self::$client->getResponse()->getContent()
         );
         $this->assertContains(
-            $policy2->getId(),
+            "'has_visited_welcome_page': true",
             self::$client->getResponse()->getContent()
         );
+
         // consistent after repeated show
         self::$client->request('GET', $welcomePage);
         self::verifyResponse(200);
         $this->assertContains(
+            $user->getLatestPolicy()->getId(),
+            self::$client->getResponse()->getContent()
+        );
+        $this->assertContains(
             "'has_visited_welcome_page': true",
             self::$client->getResponse()->getContent()
         );
+
+        // consistent after repeated show
+        self::$client->request('GET', $welcomePage);
+        self::verifyResponse(200);
+        $this->assertNotContains(
+            $user->getFirstPolicy()->getId(),
+            self::$client->getResponse()->getContent()
+        );
+        $this->assertContains(
+            "'has_visited_welcome_page': true",
+            self::$client->getResponse()->getContent()
+        );
+
     }
 
     public function testUserWelcomePageNotOwnedPolicy()
