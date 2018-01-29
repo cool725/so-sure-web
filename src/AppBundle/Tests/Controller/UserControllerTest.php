@@ -897,4 +897,155 @@ class UserControllerTest extends BaseControllerTest
             self::$client->getResponse()->getContent()
         );
     }
+
+    public function testUserWelcomePageMultiPolicyShowLatest()
+    {
+        $email = self::generateEmail('testUserWelcomePageMultiPolicyShowLatest', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+
+        // setting up 3 policies, middle onw being setuo is the latest by start date
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setStart(new \DateTime('2017-10-11'));
+        self::$dm->flush();
+        $policy2 = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy2->setStatus(Policy::STATUS_ACTIVE);
+        $policy2->setStart(new \DateTime('2018-1-11'));
+        self::$dm->flush();
+        $policy3 = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy3->setStatus(Policy::STATUS_ACTIVE);
+        $policy3->setStart(new \DateTime('2016-1-11'));
+        self::$dm->flush();
+
+        // latest policy should be policy number 2
+        $this->assertEquals($user->getLatestPolicy(), $policy2);
+
+
+        //testing user welcome page without policy id
+        $welcomePage = self::$router->generate('user_welcome');
+
+        $this->login($email, $password);
+        self::$client->request('GET', $welcomePage);
+        self::verifyResponse(200);
+
+        //always expecting latest policy to be policy number2
+        $this->assertContains(
+            $user->getLatestPolicy()->getId(),
+            self::$client->getResponse()->getContent()
+        );
+        // initial flag is false
+        $this->assertContains(
+            "'has_visited_welcome_page': false",
+            self::$client->getResponse()->getContent()
+        );
+
+        // set after first show to true
+        self::$client->request('GET', $welcomePage);
+        self::verifyResponse(200);
+        $this->assertContains(
+            $user->getLatestPolicy()->getId(),
+            self::$client->getResponse()->getContent()
+        );
+        $this->assertContains(
+            "'has_visited_welcome_page': true",
+            self::$client->getResponse()->getContent()
+        );
+
+        // consistent after repeated show
+        self::$client->request('GET', $welcomePage);
+        self::verifyResponse(200);
+        $this->assertContains(
+            $user->getLatestPolicy()->getId(),
+            self::$client->getResponse()->getContent()
+        );
+        $this->assertContains(
+            "'has_visited_welcome_page': true",
+            self::$client->getResponse()->getContent()
+        );
+
+        // consistent after repeated show
+        self::$client->request('GET', $welcomePage);
+        self::verifyResponse(200);
+        $this->assertNotContains(
+            $user->getFirstPolicy()->getId(),
+            self::$client->getResponse()->getContent()
+        );
+        $this->assertContains(
+            "'has_visited_welcome_page': true",
+            self::$client->getResponse()->getContent()
+        );
+
+    }
+
+    public function testUserWelcomePageNotOwnedPolicy()
+    {
+        $email = self::generateEmail('testUserWelcomePageNotOwnedPolicy1', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+
+        $email2 = self::generateEmail('testUserWelcomePageNotOwnedPolicy2', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user2 = self::createUser(
+            self::$userManager,
+            $email2,
+            $password,
+            $phone,
+            self::$dm
+        );
+
+        //visiting
+        $policy = self::initPolicy($user2, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setStart(new \DateTime('2017-10-11'));
+        self::$dm->flush();
+
+        $policy2 = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy2->setStatus(Policy::STATUS_ACTIVE);
+        $policy2->setStart(new \DateTime('2017-10-11'));
+        self::$dm->flush();
+
+        $welcomePage = self::$router->generate('user_welcome_policy_id', ['id' => $policy->getId()]);
+        $this->login($email, $password);
+        $crawler = self::$client->request('GET', $welcomePage);
+        self::verifyResponse(403);
+    }
+
+    public function testUserWelcomePageInvalidPolicy()
+    {
+        $email = self::generateEmail('testUserWelcomePageInvalidPolicy', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setStart(new \DateTime('2017-10-11'));
+        self::$dm->flush();
+
+        $welcomePage = self::$router->generate('user_welcome_policy_id', ['id' => rand(0, 10000000)]);
+        $this->login($email, $password);
+        $crawler = self::$client->request('GET', $welcomePage);
+        self::verifyResponse(404);
+    }
 }
