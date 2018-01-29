@@ -39,8 +39,8 @@
                     <p class="lead">Select your phone below and follow the steps to get your phone covered with us.</p>
                   {% endif %}
                 </div>
-                <div class="col-md-6">
-                    {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':'old-inline'})) }}
+                <div class="col-md-6 section--pad">
+                    {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'homepage'})) }}
                 </div>
               {% else %}
                 <div class="col-md-12">
