@@ -79,7 +79,6 @@ class DefaultController extends BaseController
             'pic_sure'        => $exp == 'picsure',
             'referral'        => $referral,
             'phone'           => $this->getQuerystringPhone($request),
-            'device_category' => $this->get('app.request')->getDeviceCategory()
         );
 
         return $this->render('AppBundle:Default:index.html.twig', $data);
