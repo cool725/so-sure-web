@@ -329,7 +329,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->claimNumber = $claim->getNumber();
         $daviesClaim->status = DaviesClaim::STATUS_OPEN;
         $daviesClaim->insuredName = 'Marko Marulic';
-        $daviesClaim->initialSuspicion = 'no';
+        $daviesClaim->initialSuspicion = false;
         $daviesClaim->finalSuspicion = null;
 
         self::$daviesService->clearWarnings();
@@ -357,13 +357,71 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->claimNumber = $claim->getNumber();
         $daviesClaim->status = DaviesClaim::STATUS_CLOSED;
         $daviesClaim->insuredName = 'Marko Marulic';
-        $daviesClaim->initialSuspicion = 'no';
-        $daviesClaim->finalSuspicion = 'no';
+        $daviesClaim->initialSuspicion = false;
+        $daviesClaim->finalSuspicion = false;
 
         self::$daviesService->clearWarnings();
         $this->assertEquals(0, count(self::$daviesService->getWarnings()));
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
         $this->assertEquals(0, count(self::$daviesService->getWarnings()));
+    }
+
+    public function testUpdateClaimValidDaviesInitialFlagMissing()
+    {
+        $user = new User();
+        $user->setFirstName('Marko');
+        $user->setLastName('Marulic');
+        $policy = new PhonePolicy();
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setId('1');
+        $policy->setUser($user);
+
+        $claim = new Claim();
+        $claim->setPolicy($policy);
+        $claim->setNumber(time());
+        $claim->setStatus(Claim::STATUS_INREVIEW);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = $claim->getNumber();
+        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->insuredName = 'Marko Marulic';
+        $daviesClaim->initialSuspicion = null;
+        $daviesClaim->finalSuspicion = null;
+
+        self::$daviesService->clearWarnings();
+        $this->assertEquals(0, count(self::$daviesService->getWarnings()));
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->assertEquals(1, count(self::$daviesService->getWarnings()));
+        $this->insureWarningExists('/initialSuspicion/');
+    }
+
+    public function testUpdateClaimValidDaviesFinalFlagMissing()
+    {
+        $user = new User();
+        $user->setFirstName('Marko');
+        $user->setLastName('Marulic');
+        $policy = new PhonePolicy();
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setId('1');
+        $policy->setUser($user);
+
+        $claim = new Claim();
+        $claim->setPolicy($policy);
+        $claim->setNumber(time());
+        $claim->setStatus(Claim::STATUS_APPROVED);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = $claim->getNumber();
+        $daviesClaim->status = DaviesClaim::STATUS_CLOSED;
+        $daviesClaim->insuredName = 'Marko Marulic';
+        $daviesClaim->initialSuspicion = false;
+        $daviesClaim->finalSuspicion = null;
+
+        self::$daviesService->clearWarnings();
+        $this->assertEquals(0, count(self::$daviesService->getWarnings()));
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->assertEquals(1, count(self::$daviesService->getWarnings()));
+        $this->insureWarningExists('/finalSuspicion/');
     }
 
 
