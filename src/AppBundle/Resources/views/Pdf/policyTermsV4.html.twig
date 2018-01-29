@@ -689,7 +689,7 @@
     <p>
         If one of your Group's mobile phone is no longer insured by so-sure part way through your annual policy, we will allow you to replace that connection at the same value within the 30 days following your connection leaving the service.
     </p>
-    {% if policy.promoCode == 'launch' or policy.promoCode == 'launch-free-nov' %}
+    {% if policy is defined  and policy and (policy.promoCode == 'launch' or policy.promoCode == 'launch-free-nov') %}
         <p>
             As your policy has a promotion code "{{ policy.promoCode|upper }}", so-sure is offering you in the first year of you being insured by so-sure:
         </p>
@@ -702,7 +702,7 @@
             </li>
         </ol>
     {% endif %}
-    {% if policy.promoCode == 'free-nov' or policy.promoCode == 'launch-free-nov' or policy.promoCode == 'free-dec-2016' %}
+    {% if policy is defined policy and (policy.promoCode == 'free-nov' or policy.promoCode == 'launch-free-nov' or policy.promoCode == 'free-dec-2016') %}
         <p>
             As your policy has a promotion code "{{ policy.promoCode|upper }}", so-sure is offering you a free month of coverage:
         </p>
