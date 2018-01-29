@@ -353,6 +353,23 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             }
         }
         $manager->flush();
+
+        // unpaid policy with discount
+        $user = $this->newUser('ios-testing+unpaid+discount@so-sure.net');
+        $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $user->setEnabled(true);
+        $manager->persist($user);
+        $policy = $this->newPolicy($manager, $user, $count++, self::CLAIM_NONE, null, null, $iphoneUI, false, true, null, null, 3);
+        $policy->setStatus(Policy::STATUS_UNPAID);
+
+        $user = $this->newUser('android-testing+unpaid+discount@so-sure.net');
+        $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $user->setEnabled(true);
+        $manager->persist($user);
+        $policy = $this->newPolicy($manager, $user, $count++, self::CLAIM_NONE, null, null, $iphoneUI, false, true, null, null, 3);
+        $policy->setStatus(Policy::STATUS_UNPAID);
+
+        $manager->flush();
     }
 
     private function newUsers($manager, $number, $yearlyOnlyPostcode = false)
@@ -459,7 +476,8 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $paid = null,
         $sendInvitation = true,
         $days = null,
-        $policyDiscount = null
+        $policyDiscount = null,
+        $paidMonths = null
     ) {
         if (!$phone) {
             $phone = $this->getRandomPhone($manager);
@@ -528,7 +546,10 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $payment->setNotes('LoadSamplePolicyData');
             $policy->addPayment($payment);
         } else {
-            $months = rand(1, 11);
+            $months = $paidMonths;
+            if ($paidMonths === null) {
+                $months = rand(1, 11);
+            }
             for ($i = 1; $i <= $months; $i++) {
                 $payment = new JudoPayment();
                 $payment->setDate(clone $paymentDate);
