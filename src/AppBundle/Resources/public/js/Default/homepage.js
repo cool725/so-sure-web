@@ -10,7 +10,7 @@ $(function(){
             $(container).addClass('search-phone-form--focus');
 
             // If mobile slide up to make more room
-            // if (device == 'Mobile') {
+            // if (device_category == 'Mobile') {
             //     $('html,body').animate({scrollTop: $(this).offset().top - 100}, 800);
             // }
         });

@@ -2,7 +2,7 @@
 $(function(){
 
     // Get the current device
-    var device = $('#ss-root').data('device-category');
+    var device_category = $('#ss-root').data('device-category');
 
     // SROLL TO
     // Add anchor via:         data-scroll-to-anchor
