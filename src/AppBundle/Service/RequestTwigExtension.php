@@ -12,7 +12,7 @@ class RequestTwigExtension extends \Twig_Extension
     protected $logger;
 
     /**
-     * @param RequestService    $requestService
+     * @param RequestService  $requestService
      * @param LoggerInterface $logger
      */
     public function __construct(
