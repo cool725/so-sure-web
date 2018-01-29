@@ -1049,6 +1049,11 @@ class UserController extends BaseController
             SixpackService::KPI_POLICY_PURCHASE
         );
 
+        $this->get('app.sixpack')->convert(
+            SixpackService::EXPERIMENT_QUOTE_SECTIONS,
+            SixpackService::KPI_POLICY_PURCHASE
+        );
+
         $countUnprocessedInvitations = count($user->getUnprocessedReceivedInvitations());
         if ($countUnprocessedInvitations > 0) {
             $message = sprintf(

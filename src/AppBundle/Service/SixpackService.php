@@ -41,6 +41,8 @@ class SixpackService
     const KPI_QUOTE = 'quote';
     const KPI_POLICY_PURCHASE = 'policy-purchase';
 
+    const EXPERIMENT_QUOTE_SECTIONS = 'quote-sections';
+
     // Completed test - SW-45
     // const EXPERIMENT_QUOTE_CALC_LOWER = 'quote-calc-lower';
 
