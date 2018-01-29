@@ -221,6 +221,24 @@
 
     {% include 'AppBundle::Default/_sectionFeedback.html.twig' %}
 
+    <section class="phone-details background-blue">
+        <div class="container">
+            <h3>About the {{ phone.make }} {{ phone.model }}</h3>
+            <ul class="list-inline">
+                <li>Camera: {{ phone.camera }} MP</li>
+                <li>Size: {{ phone.getScreenPhysicalInch }}"</li>
+                <li>Screen Resolution: {{ phone.getScreenResolution }}</li>
+                <li>RAM: {{ phone.getRamDisplay }}</li>
+            </ul>
+            {% if phone.funFacts|length > 0 %}
+                <p>{{ phone.funFacts|raw }}</p>
+            {% endif %}
+            {% if phone.description|length > 0 %}
+                <p>{{ phone.description|raw }}</p>
+            {% endif %}
+        </div>
+    </section>
+
     {% include 'AppBundle::Default/faqs.html.twig' %}
 
     <div class="modal modal-fullscreen fade"
