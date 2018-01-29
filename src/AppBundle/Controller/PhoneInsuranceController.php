@@ -474,7 +474,8 @@ class PhoneInsuranceController extends BaseController
         if ($request->get('force')) {
             $exp = $request->get('force');
         }
-        $template = 'AppBundle:PhoneInsurance:quote.html.twig';
+
+        $template = 'AppBundle:PhoneInsurance:quoteB.html.twig';
 
         // if ($exp == 'v2') {
         //     $template = 'AppBundle:PhoneInsurance:quoteNew.html.twig';
