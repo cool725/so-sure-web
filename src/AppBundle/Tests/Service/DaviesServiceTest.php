@@ -392,6 +392,7 @@ class DaviesServiceTest extends WebTestCase
         $this->assertEquals(0, count(self::$daviesService->getWarnings()));
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
         $this->assertEquals(1, count(self::$daviesService->getWarnings()));
+        $this->insureWarningExists('/initialSuspicion/');
     }
 
     public function testUpdateClaimValidDaviesFinalFlagMissing()
@@ -420,6 +421,7 @@ class DaviesServiceTest extends WebTestCase
         $this->assertEquals(0, count(self::$daviesService->getWarnings()));
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
         $this->assertEquals(1, count(self::$daviesService->getWarnings()));
+        $this->insureWarningExists('/finalSuspicion/');
     }
 
 
