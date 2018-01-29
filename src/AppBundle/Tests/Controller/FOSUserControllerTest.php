@@ -101,6 +101,64 @@ class FOSUserControllerTest extends BaseControllerTest
         $this->setPassword($reset['url'], 'foooBarr1!', true);
     }
 
+    public function testClaimsResetWithPasswordLogging()
+    {
+        $email = self::generateEmail('testClaimsResetWithPasswordLogging', $this);
+        $user = static::createUser(
+            self::$userManager,
+            $email,
+            'foo'
+        );
+        $user->addRole('ROLE_CLAIMS');
+        static::$dm->flush();
+        $password1 = $user->getPassword();
+
+        $reset = $this->resetPassword($email);
+        $password2 = $reset['password'];
+
+        // try a simple password - should fail with 200 (error displayed on page)
+        $this->setPassword($reset['url'], 'foo', false);
+
+        // allowed complex password - should succeed and redirect
+        $this->setPassword($reset['url'], 'foooBarr1!', true);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $userRepo = $dm->getRepository(User::class);
+        $updatedUser2 = $userRepo->findOneBy(['emailCanonical' => strtolower($email)]);
+        $this->assertNotEquals($updatedUser2->getPassword(), $password1);
+        $this->assertNotEquals($updatedUser2->getPassword(), $password2);
+        $this->assertTrue(count($updatedUser2->getPreviousPasswords()) > 0);
+
+        // 2nd complex password - should succeed and redirect
+        sleep(1);
+        $reset = $this->resetPassword($email);
+        $this->setPassword($reset['url'], 'foooBarr2!', true);
+
+        // try first password should fail
+        $reset = $this->resetPassword($email);
+        $this->setPassword($reset['url'], 'foooBarr1!', false);
+
+        // 3rd complex password - should succeed and redirect
+        sleep(1);
+        $reset = $this->resetPassword($email);
+        $this->setPassword($reset['url'], 'foooBarr3!', true);
+
+        // 4th complex password - should succeed and redirect
+        sleep(1);
+        $reset = $this->resetPassword($email);
+        $this->setPassword($reset['url'], 'foooBarr4!', true);
+
+        // 5th complex password - should succeed and redirect
+        sleep(1);
+        $reset = $this->resetPassword($email);
+        $this->setPassword($reset['url'], 'foooBarr5!', true);
+
+        // now 1st complex password - should be re-allowed and succeed and redirect
+        sleep(1);
+        $reset = $this->resetPassword($email);
+        $this->setPassword($reset['url'], 'foooBarr1!', true);
+    }
+
     public function testUserResetWithPasswordLogging()
     {
         $email = self::generateEmail('testUserResetWithPasswordLogging', $this);

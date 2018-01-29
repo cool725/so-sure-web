@@ -222,6 +222,7 @@ class FOSUBUserProvider extends BaseClass
     public function previousPasswordCheck(User $user)
     {
         $employee = true;
+        $claims = true;
         try {
             // non url requests will not have firewall setup
             $employee = $this->authService->isGranted('ROLE_EMPLOYEE', $user);
@@ -229,8 +230,15 @@ class FOSUBUserProvider extends BaseClass
             // fallback to check for known roles
             $employee = $user->hasRole('ROLE_EMPLOYEE') || $user->hasRole('ROLE_ADMIN');
         }
+        try {
+            // non url requests will not have firewall setup
+            $claims = $this->authService->isGranted('ROLE_CLAIMS', $user);
+        } catch (\Exception $e) {
+            // fallback to check for known roles
+            $employee = $user->hasRole('ROLE_CLAIMS');
+        }
 
-        if ($employee) {
+        if ($employee || $claims) {
             // PCI Requirement - 4 passwords
             $user->setPreviousPasswordCheck(!$this->hasPreviouslyUsedPassword($user, 4));
         } else {
