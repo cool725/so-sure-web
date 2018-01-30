@@ -512,7 +512,8 @@ class PurchaseController extends BaseController
             }
         }
 
-        $exp = $this->get('app.sixpack')->participate(
+        $exp = $this->sixpack(
+            $request,
             SixpackService::EXPERIMENT_POLICY_PDF_DOWNLOAD,
             ['no-pdf-download', 'pdf-download'],
             false
