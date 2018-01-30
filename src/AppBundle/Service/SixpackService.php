@@ -43,7 +43,7 @@ class SixpackService
 
     const EXPERIMENT_QUOTE_SECTIONS = 'quote-sections';
 
-    const EXPERIMENT_POLICY_PDF_DOWNLOAD = 'policy-pdf-download'
+    const EXPERIMENT_POLICY_PDF_DOWNLOAD = 'policy-pdf-download';
 
     // Completed test - SW-45
     // const EXPERIMENT_QUOTE_CALC_LOWER = 'quote-calc-lower';
