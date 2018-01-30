@@ -23,6 +23,9 @@ $(function(){
     // Add focus after anchor: data-scroll-to-focus
     // Add adjustment to pos:  data-scroll-to-adjust
 
+    // var device_category = $('#ss-root').data('device-category');
+    // console.log(device_category);
+
     var adjust = 0;
 
     $('.scroll-to').click(function(e) {
