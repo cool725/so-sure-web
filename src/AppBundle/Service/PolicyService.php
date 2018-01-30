@@ -564,21 +564,6 @@ class PolicyService
             "policy",
             str_replace('/', '-', $policy->getPolicyNumber())
         );
-
-        $tmpFile = $this->generatePolicyTermsFile($policy->getPolicyTerms()->getVersionNumber());
-
-        $this->uploadS3($tmpFile, $filename, $policy);
-
-        $policyTermsFile = new PolicyTermsFile();
-        $policyTermsFile->setBucket(self::S3_BUCKET);
-        $policyTermsFile->setKey($this->getS3Key($policy, $filename));
-        $policy->addPolicyFile($policyTermsFile);
-
-        return $tmpFile;
-    }
-
-    public function generatePolicyTermsFile($version, Policy $policy = null)
-    {
         $tmpFile = sprintf(
             "%s/%s",
             sys_get_temp_dir(),
@@ -590,7 +575,7 @@ class PolicyService
 
         $template = sprintf(
             'AppBundle:Pdf:policyTermsV%d.html.twig',
-            $version
+            $policy->getPolicyTerms()->getVersionNumber()
         );
 
         $this->snappyPdf->setOption('orientation', 'Landscape');
@@ -605,6 +590,15 @@ class PolicyService
             $this->templating->render($template, ['policy' => $policy]),
             $tmpFile
         );
+
+        $this->uploadS3($tmpFile, $filename, $policy);
+
+        $policyTermsFile = new PolicyTermsFile();
+        $policyTermsFile->setBucket(self::S3_BUCKET);
+        $policyTermsFile->setKey($this->getS3Key($policy, $filename));
+        $policy->addPolicyFile($policyTermsFile);
+
+        return $tmpFile;
     }
 
     public function generatePolicySchedule(Policy $policy)

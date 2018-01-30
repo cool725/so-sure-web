@@ -469,6 +469,9 @@ class PurchaseController extends BaseController
                                 'Final Monthly Cost' => $price->getMonthlyPremiumPrice(),
                                 'Policy Id' => $policy->getId(),
                             ]);
+
+                            $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_POLICY_PDF_DOWNLOAD);
+
                             // There was an odd case of next not being detected as clicked
                             // perhaps a brower issue with multiple buttons
                             // just in case, assume judo pay if we don't detect existing
@@ -556,7 +559,10 @@ class PurchaseController extends BaseController
             throw $this->createNotFoundException(sprintf('URL not found %s', $file));
         }
 
-        $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_POLICY_PDF_DOWNLOAD);
+        $this->get('app.mixpanel')->queueTrack(
+            MixpanelService::EVENT_TEST,
+            ['Test Name' => 'pdf-terms-download']
+        );
 
         $mimetype = $filesystem->getMimetype($file);
         return StreamedResponse::create(
