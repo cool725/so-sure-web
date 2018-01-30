@@ -1,6 +1,7 @@
 {% extends 'base.html.twig' %}
 
-{% set white_logo = true %}
+{# Set vars #}
+{% set new_stylesheet = 1 %}
 {% set new_footer = 1 %}
 
 {% block javascripts %}
@@ -38,8 +39,8 @@
                     <p class="lead">Select your phone below and follow the steps to get your phone covered with us.</p>
                   {% endif %}
                 </div>
-                <div class="col-md-12">
-                    {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':'old-inline'})) }}
+                <div class="col-md-6 section--pad">
+                    {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'homepage'})) }}
                 </div>
               {% else %}
                 <div class="col-md-12">

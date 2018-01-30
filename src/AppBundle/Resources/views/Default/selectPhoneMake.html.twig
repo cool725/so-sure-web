@@ -20,7 +20,7 @@
     {% set formClass    = 'form-inline' %}
 {% elseif type == 'old-inline' %}
     {% set buttonCSS    = 'btn btn-success btn-search' %}
-    {% set formClass    = 'form-inline text-center' %}
+    {% set formClass    = 'text-center' %}
 {% elseif type == 'old-block' %}
     {% set buttonCSS    = 'btn btn-success btn-search' %}
 {% elseif type == 'new-inline' %}
@@ -67,7 +67,7 @@
         <p><a href="mailto:hello@wearesosure.com" class="btn btn-link text-black open-intercom"><i class="fa fa-comments"></i> Don't see your device? Let us know.</a></p>
     {% endif %}
 
-    <div id="loading-search-phone" class="text-center so-sure-loading">
+    <div class="text-center so-sure-loading">
         <p><small>loading...</small></p>
     </div>
 

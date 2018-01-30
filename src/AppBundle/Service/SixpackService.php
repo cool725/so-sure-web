@@ -29,6 +29,7 @@ class SixpackService
     //const EXPERIMENT_HOMEPAGE_V1_V2OLD_V2NEW = 'homepage-v1-v2old-v2new';
     const EXPERIMENT_APP_SHARE_METHOD = 'app-share-method';
     // const EXPERIMENT_FUNNEL_V1_V2 = 'funnel-v1-v2';
+    const EXPERIMENT_HOMEPAGE_STICKYSEARCH_PICSURE = 'homepage-v2-sticksearch-picsure';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_SHARE_MESSAGE_ORIGINAL = 'original';
@@ -36,8 +37,13 @@ class SixpackService
     const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';
     const ALTERNATIVES_APP_SHARE_METHOD_API = 'api';
 
-    const KPI_STANDARD = 'standard';
     const KPI_RECEIVE_DETAILS = 'receive-details';
+    const KPI_QUOTE = 'quote';
+    const KPI_POLICY_PURCHASE = 'policy-purchase';
+
+    const EXPERIMENT_QUOTE_SECTIONS = 'quote-sections';
+
+    const EXPERIMENT_POLICY_PDF_DOWNLOAD = 'policy-pdf-download';
 
     // Completed test - SW-45
     // const EXPERIMENT_QUOTE_CALC_LOWER = 'quote-calc-lower';

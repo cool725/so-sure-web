@@ -462,6 +462,71 @@
 
     }
 
+    &--pic-sure {
+        background-color: $lightest-blue;
+
+        p {
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .p-arrow {
+            position: relative;
+
+            @include breakpoint(laptop) {
+                &:after {
+                    width: 100px; height: 120px;
+                    content: '';
+                    background: transparent url('https://cdn.so-sure.com/images/homepage/pic-sure_p_arrow.svg') no-repeat;
+                    position: absolute;
+                    top: 100%; right: -20px;
+                }
+            }
+        }
+
+        table { //TODO - Move to tables scss
+            max-width: 600px;
+            margin: 30px auto 0;
+
+            @include breakpoint(laptop) {
+                margin-bottom: 30px;
+            }
+
+            thead {
+                td {
+                    padding: 30px 15px;
+                    text-align: center;
+                    vertical-align: middle;
+                }
+            }
+
+            tr {
+                td.sosure {
+                    background-color: $white;
+                }
+
+                td.contrast {
+                    background-color: lighten($lightest-blue, 6%);
+                    opacity: 0.7;
+                }
+            }
+
+            tbody {
+                td {
+                    padding: 15px;
+                    border-color: darken($lightest-blue, 6%);
+                    vertical-align: middle;
+                }
+            }
+        }
+
+        .app-link {
+            margin-top: 40px;
+        }
+    }
+
+
     &--cover-details {
         text-align: center;
         position: relative;
@@ -942,6 +1007,36 @@
         }
     }
 
+}
+
+// pic-sure animation
+.pic-sure {
+    width: 300px; height: 300px;
+    margin: 0 auto;
+    position: relative;
+
+    &--mirror {
+        display: inline-block;
+        margin: 0 auto;
+    }
+
+    &--mirror-reflection {
+        position: absolute;
+        z-index: 99;
+        left: 0; top: 0;
+    }
+
+    &--phone-back {
+        position: absolute;
+        z-index: 100;
+        bottom: 30px; right: 70px;
+    }
+
+    &--phone-front {
+        position: absolute;
+        z-index: 98;
+        bottom: 80px; right: 118px;
+    }
 }
 
 .footer-new {

@@ -315,6 +315,15 @@ services:
         tags:
             - { name: twig.extension }
 
+    app.twig.request:
+        class: AppBundle\Service\RequestTwigExtension
+        arguments:
+            - "@app.request"
+            - "@logger"
+        public: false
+        tags:
+            - { name: twig.extension }
+
     app.excel:
         class: AppBundle\Service\ExcelService
         arguments:

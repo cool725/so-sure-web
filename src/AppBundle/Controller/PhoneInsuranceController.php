@@ -368,6 +368,8 @@ class PhoneInsuranceController extends BaseController
                     }
                     $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
 
+                    $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_SECTIONS);
+
                     // Multipolicy should skip user details
                     if ($this->getUser() && $this->getUser()->hasPolicy()) {
                         // don't check for partial partial as quote phone may be different from partial policy phone
@@ -388,6 +390,8 @@ class PhoneInsuranceController extends BaseController
                         $properties['Played with Claims'] = true;
                     }
                     $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
+
+                    $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_SECTIONS);
 
                     // Multipolicy should skip user details
                     if ($this->getUser() && $this->getUser()->hasPolicy()) {
@@ -429,6 +433,10 @@ class PhoneInsuranceController extends BaseController
                     'Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
                 ]);
             }
+
+            $this->get('app.sixpack')->convert(
+                SixpackService::EXPERIMENT_HOMEPAGE_STICKYSEARCH_PICSURE
+            );
         }
 
         $data = array(
@@ -454,27 +462,21 @@ class PhoneInsuranceController extends BaseController
             'slider_test' => 'slide-me',
         );
 
-        /*
         $exp = $this->get('app.sixpack')->participate(
-            SixpackService::EXPERIMENT_QUOTE_SIMPLE_COMPLEX_SPLIT,
-            ['simple', 'complex', 'split'],
+            SixpackService::EXPERIMENT_QUOTE_SECTIONS,
+            ['old-sections', 'new-sections'],
             false
         );
-        */
-        // $exp = $this->get('app.sixpack')->participate(
-        //     SixpackService::EXPERIMENT_FUNNEL_V1_V2,
-        //     ['v1', 'v2'],
-        //     true
-        // );
 
         if ($request->get('force')) {
             $exp = $request->get('force');
         }
+
         $template = 'AppBundle:PhoneInsurance:quote.html.twig';
 
-        // if ($exp == 'v2') {
-        //     $template = 'AppBundle:PhoneInsurance:quoteNew.html.twig';
-        // }
+        if ($exp == 'new-sections') {
+            $template = 'AppBundle:PhoneInsurance:quoteNewSections.html.twig';
+        }
 
         if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
             return $this->render($template, $data);

@@ -65,26 +65,22 @@ class DefaultController extends BaseController
             $this->get('logger')->debug(sprintf('Referral %s', $referral));
         }
 
-        // $exp = $this->sixpack(
-        //     $request,
-        //     SixpackService::EXPERIMENT_FUNNEL_V1_V2,
-        //     ['v1', 'v2'],
-        //     true
-        // );
+        $exp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_HOMEPAGE_STICKYSEARCH_PICSURE,
+            ['v2', 'sticky-search', 'picsure'],
+            true
+        );
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         $data = array(
-            'referral' => $referral,
-            'phone' => $this->getQuerystringPhone($request),
-            'device_category' => $this->get('app.request')->getDeviceCategory()
+            'select_phone_type'   => $exp == 'sticky-search' ? 'homepage-sticky' : 'homepage',
+            'pic_sure'        => $exp == 'picsure',
+            'referral'        => $referral,
+            'phone'           => $this->getQuerystringPhone($request),
         );
 
-        // if ($exp == 'v2') {
-        //     return $this->render('AppBundle:Default:indexV2old.html.twig', $data);
-        // } else {
-        //     return $this->render('AppBundle:Default:index.html.twig', $data);
-        // }
         return $this->render('AppBundle:Default:index.html.twig', $data);
     }
 
@@ -101,7 +97,7 @@ class DefaultController extends BaseController
             $data = array(
                 'main'      => 'Mobile Insurance',
                 'main_cont' => 'Re-Imagined',
-                'sub'       => 'Easier. Quicker. Jargon Free.',
+                'sub'       => 'Quicker. Easier. Jargon Free.',
                 // 'sub_cont'  => '',
             );
         } elseif ($request->get('_route') == "hasslefree") {
