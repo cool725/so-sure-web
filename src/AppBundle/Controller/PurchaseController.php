@@ -542,7 +542,7 @@ class PurchaseController extends BaseController
     }
 
     /**
-     * @Route("/sample-policy-terms", name="sample-policy-terms")
+     * @Route("/sample-policy-terms", name="sample_policy_terms")
      * @Template()
      */
     public function samplePolicyTermsAction()
