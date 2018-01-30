@@ -11,6 +11,8 @@ use AppBundle\Event\UserEmailEvent;
 use AppBundle\Service\MailerService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Psr\Log\LoggerInterface;
+use FOS\UserBundle\Event\FilterUserResponseEvent;
+use FOS\UserBundle\FOSUserEvents;
 
 class UserListener
 {
@@ -27,6 +29,8 @@ class UserListener
 
     protected $redis;
 
+    protected $userService;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
@@ -37,12 +41,14 @@ class UserListener
         DocumentManager $dm,
         LoggerInterface $logger,
         MailerService $mailer,
-        $redis
+        $redis,
+        $userService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->mailer = $mailer;
         $this->redis = $redis;
+        $this->userService = $userService;
     }
 
     /**
@@ -92,7 +98,20 @@ class UserListener
     {
         $this->onUserCreatedUpdated($event);
     }
-    
+
+    /**
+     * @param UserEvent $event
+     */
+    public function onUserPasswordChangedEvent(UserEvent $event)
+    {
+        if (!$this->userService->previousPasswordCheck($event->getUser())) {
+            throw new \Exception(sprintf(
+                'User %s has attempted to re-use a previous password',
+                $event->getUser()->getId()
+            ));
+        }
+    }
+
     private function onUserCreatedUpdated(UserEvent $event)
     {
         $user = $event->getUser();

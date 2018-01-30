@@ -66,7 +66,11 @@ class FOSUserController extends ResettingController
 
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        // must be run after handle request such that the new password is present in plainPassword on the user
+        $userService = $this->get('app.user');
+        $userService->previousPasswordCheck($user);
+
+        if ($form->isSubmitted() && $form->isValid() && $user->getPreviousPasswordCheck()) {
             $event = new FormEvent($form, $request);
             $dispatcher->dispatch(FOSUserEvents::RESETTING_RESET_SUCCESS, $event);
 
@@ -83,6 +87,11 @@ class FOSUserController extends ResettingController
             );
 
             return $response;
+        } elseif ($user->getPreviousPasswordCheck() === false) {
+            $this->addFlash(
+                'error',
+                'Sorry, but you can not re-use a previously used password.'
+            );
         }
 
         return $this->render('FOSUserBundle:Resetting:reset.html.twig', array(

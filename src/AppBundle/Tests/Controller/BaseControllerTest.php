@@ -73,10 +73,14 @@ class BaseControllerTest extends WebTestCase
         return self::$client->getResponse()->getContent();
     }
 
-    protected function verifyResponse($statusCode, $errorCode = null)
+    protected function verifyResponse($statusCode, $errorCode = null, $crawler = null)
     {
         $data = json_decode(self::$client->getResponse()->getContent(), true);
-        $this->assertEquals($statusCode, self::$client->getResponse()->getStatusCode(), json_encode($data));
+        $msg = json_encode($data);
+        if (!$data && $crawler) {
+            $msg = $crawler->html();
+        }
+        $this->assertEquals($statusCode, self::$client->getResponse()->getStatusCode(), $msg);
         if ($errorCode) {
             $this->assertEquals($errorCode, $data['code']);
         }
