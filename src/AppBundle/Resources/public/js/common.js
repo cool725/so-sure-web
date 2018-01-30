@@ -1,8 +1,17 @@
 // Common JS functions used throughout the site
+var sosure = sosure || {};
+sosure.globals = (function() {
+    var self = {};
+    self.device_category = null;
+
+    self.init = function() {
+        self.device_category = $('#ss-root').data('device-category');
+    }
+})();
+
 $(function(){
 
-    // Get the current device
-    var device_category = $('#ss-root').data('device-category');
+    sosure.globals.init();
 
     // SROLL TO
     // Add anchor via:         data-scroll-to-anchor
