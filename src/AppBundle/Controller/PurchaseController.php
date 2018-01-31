@@ -723,7 +723,7 @@ class PurchaseController extends BaseController
             ->setSubject('Remainder Payment received')
             ->setFrom('tech@so-sure.com')
             ->setTo('dylan@so-sure.com')
-            ->setCc('patrick@so-sure.com')
+            ->setCc('tech+ops@so-sure.com')
             ->setBody($body, 'text/html');
         $this->get('mailer')->send($message);
     }

@@ -208,7 +208,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
 
         if (!$skipEmail) {
             $mailer = $this->getContainer()->get('app.mailer');
-            $mailer->send('Policy Validation & Pending Cancellations', 'tech@so-sure.com', implode('<br />', $lines));
+            $mailer->send('Policy Validation & Pending Cancellations', 'tech+ops@so-sure.com', implode('<br />', $lines));
         }
 
         $output->writeln(implode(PHP_EOL, $lines));

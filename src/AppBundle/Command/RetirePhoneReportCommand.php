@@ -49,7 +49,7 @@ class RetirePhoneReportCommand extends ContainerAwareCommand
         }
         $join = (count($retire) > 0) ? join("<br/>\n", $retire) : 'No phones should be retired.<br/>';
         $message = sprintf("Phones that should be retired:<br/><br/>\n\n%s", $join);
-        $mailer->send('Phones that should be retired report', 'tech@so-sure.com', $message);
+        $mailer->send('Phones that should be retired report', 'tech+ops@so-sure.com', $message);
         if ($debug) {
             $output->writeln($message);
         }

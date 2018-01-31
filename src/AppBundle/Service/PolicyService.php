@@ -1457,7 +1457,7 @@ class PolicyService
                     } else {
                         $this->mailer->sendTemplate(
                             sprintf('Unclaimed cashback %s', $cashbackItem->getPolicy()->getPolicyNumber()),
-                            'tech@so-sure.com',
+                            'tech+ops@so-sure.com',
                             'AppBundle:Email:cashback/admin_missing.html.twig',
                             ['cashback' => $cashbackItem]
                         );
