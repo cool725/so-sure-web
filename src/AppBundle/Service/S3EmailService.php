@@ -303,7 +303,7 @@ abstract class S3EmailService
                     $data[] = $lineObject;
                 }
             } catch (\Exception $e) {
-                $msg = sprintf("Error parsing line %s. Ex: %s", json_encode($line), $e->getMessage());
+                $msg = sprintf("Error parsing line. Ex: %s, Line: %s", $e->getMessage(), json_encode($line));
                 $this->logger->error($msg);
                 $this->errors['Unknown'][] = $msg;
                 $parseErrors++;
