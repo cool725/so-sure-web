@@ -57,11 +57,11 @@ class RetirePhoneReportCommandTest extends KernelTestCase
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $phone = new Phone();
         $phone->init(
-            'TestMake',
-            'TestModel',
+            'ShouldBeRetiredMakeMake',
+            'ShouldBeRetiredTestModel',
             5,
             64,
-            ['testdevice'],
+            ['shoudberetireddevice'],
             300,
             200,
             '',

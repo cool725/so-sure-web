@@ -38,11 +38,12 @@ class RetirePhoneReportCommand extends ContainerAwareCommand
         foreach ($phones as $phone) {
             if ($phone->shouldBeRetired()) {
                 $retire[] = sprintf(
-                    '%s %s (%s MB) Released: %s',
+                    '%s %s (%s MB) Released: %s (%s months ago)',
                     $phone->getMake(),
                     $phone->getModel(),
                     $phone->getMemory(),
-                    $phone->getReleaseDate()->format('d.m.Y.')
+                    $phone->getReleaseDate()->format('m/Y'),
+                    $phone->getMonthAge()
                 );
             }
         }
