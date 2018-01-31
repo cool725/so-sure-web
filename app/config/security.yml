@@ -5,8 +5,7 @@ security:
     encoders:
         FOS\UserBundle\Model\UserInterface: sha512
 
-    # WARNING! see AppBundle\Listener\KernelResponseListener - each role using ROLE_EMPLOYEE needs to be directly assigned until fixed
-    # WARNING! see AppBundle\Security\FOSUserProvider - each role using ROLE_EMPLOYEE should be added to fallback check
+    # WARNING! see AppBundle\Document\User::has*Role() and maintain parity
     role_hierarchy:
         ROLE_EMPLOYEE:    ROLE_USER,ROLE_CLAIMS
         ROLE_ADMIN:       ROLE_USER,ROLE_CLAIMS,ROLE_EMPLOYEE

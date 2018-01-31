@@ -638,6 +638,51 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $this->previousPasswordCheck;
     }
 
+    public function getLastPasswordChange()
+    {
+        $oldPasswords = $user->getPreviousPasswords();
+
+        if (!is_array($oldPasswords)) {
+            $oldPasswords = $user->getPreviousPasswords->getValues();
+        }
+        if (count($oldPasswords) == 0) {
+            return $this->created;
+        }
+
+        krsort($oldPasswords);
+        foreach ($oldPasswords as $timestamp => $passwordData) {
+            return \DateTime::createFromFormat('U', $timestamp);
+        }
+
+        return $this->created;
+    }
+
+    public function isPasswordChangeRequired(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        if (!$this->hasEmployeeRole() && !$this->hasClaimsRole()) {
+            return false;
+        }
+
+        $lastPasswordChange = $this->getLastPasswordChange();
+        $diff = $date->diff($this->getLastPasswordChange());
+
+        return $diff->days >= 90;
+    }
+
+    public function hasEmployeeRole()
+    {
+        return $this->hasRole('ROLE_EMPLOYEE') || $this->hasRole('ROLE_ADMIN');
+    }
+
+    public function hasClaimsRole()
+    {
+        return $this->hasRole('ROLE_CLAIMS');
+    }
+
     public function hasCancelledPolicy()
     {
         foreach ($this->getPolicies() as $policy) {
