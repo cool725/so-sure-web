@@ -95,16 +95,18 @@ class DefaultController extends BaseController
 
         if ($request->get('_route') == "reimagined") {
             $data = array(
-                'main'      => 'Mobile Insurance',
-                'main_cont' => 'Re-Imagined',
-                'sub'       => 'Quicker. Easier. Jargon Free.',
+                'select_phone_type' => 'homepage',
+                'main'              => 'Mobile Insurance',
+                'main_cont'         => 'Re-Imagined',
+                'sub'               => 'Quicker. Easier. Jargon Free.',
                 // 'sub_cont'  => '',
             );
         } elseif ($request->get('_route') == "hasslefree") {
             $data = array(
-                'main'      => 'Hassle Free',
-                'main_cont' => 'Mobile Insurance',
-                'sub'       => 'We dont give you the run around when you claim.',
+                'select_phone_type' => 'homepage',
+                'main'              => 'Hassle Free',
+                'main_cont'         => 'Mobile Insurance',
+                'sub'               => 'We dont give you the run around when you claim.',
                 // 'sub_cont'  => '',
             );
         }
