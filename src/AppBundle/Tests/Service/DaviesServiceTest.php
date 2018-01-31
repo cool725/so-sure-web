@@ -982,7 +982,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 8';
         $daviesClaim->replacementReceivedDate = new \DateTime('2016-01-01');
-        self::$daviesService->enableReplacementCostWarning(false);
+        $claim->setIgnoreWarningFlags(Claim::WARNING_FLAG_DAVIES_REPLACEMENT_COST_HIGHER);
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
         $this->insureWarningDoesNotExist('/Device replacement cost/');
     }
@@ -1017,7 +1017,6 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 8';
         $daviesClaim->replacementReceivedDate = new \DateTime('2016-01-01');
-        self::$daviesService->enableReplacementCostWarning(true);
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
         $this->insureWarningExists('/Device replacement cost/');
     }
@@ -1052,7 +1051,6 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 8';
         $daviesClaim->replacementReceivedDate = new \DateTime('2016-01-01');
-        self::$daviesService->enableReplacementCostWarning(true);
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
         $this->insureWarningDoesNotExist('/Device replacement cost/');
     }

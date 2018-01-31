@@ -31,13 +31,6 @@ class DaviesService extends S3EmailService
 
     protected $fees = [];
 
-    protected $enableReplacementCostWarning = false;
-
-    public function enableReplacementCostWarning(bool $isEnabled = true)
-    {
-        $this->enableReplacementCostWarning = $isEnabled;
-    }
-
     public function setClaims($claimsService)
     {
         $this->claimsService = $claimsService;
@@ -236,7 +229,7 @@ class DaviesService extends S3EmailService
             throw new \Exception(sprintf('Unable to locate claim %s in db', $daviesClaim->claimNumber));
         }
 
-        $this->validateClaimDetails($claim, $daviesClaim) ;
+        $this->validateClaimDetails($claim, $daviesClaim);
 
         if ($claim->getType() != $daviesClaim->getClaimType()) {
             throw new \Exception(sprintf('Claims type does not match for claim %s', $daviesClaim->claimNumber));
@@ -404,7 +397,7 @@ class DaviesService extends S3EmailService
             }
         }
 
-        if ($this->enableReplacementCostWarning &&
+        if (!$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_DAVIES_REPLACEMENT_COST_HIGHER) &&
             $daviesClaim->phoneReplacementCost > $claim->getPolicy()->getPhone()->getInitialPrice()) {
             $msg = sprintf(
                 'Device replacement cost for claim %s is greater than initial price of the device',

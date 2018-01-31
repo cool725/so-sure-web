@@ -24,12 +24,6 @@ class DaviesCommand extends ContainerAwareCommand
                 'Run a daily check on outstanding claims'
             )
             ->addOption(
-                'cost-warning',
-                null,
-                InputOption::VALUE_NONE,
-                'Warn if phone/device replacement cost are higher than initial price of the device'
-            )
-            ->addOption(
                 'file',
                 null,
                 InputOption::VALUE_REQUIRED,
@@ -74,10 +68,6 @@ class DaviesCommand extends ContainerAwareCommand
             ));
         }
         $davies = $this->getContainer()->get('app.davies');
-        // add flag with price warning
-        if ($enableReplacementCostWarning) {
-            $davies->enableReplacementCostWarning();
-        }
         if ($isDaily) {
             $count = $davies->claimsDailyEmail();
             $output->writeln(sprintf('%d outstanding claims. Email report sent.', $count));
