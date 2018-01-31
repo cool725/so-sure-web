@@ -954,7 +954,6 @@ class DaviesServiceTest extends WebTestCase
 
     /**
      *  cost warning is off should not trigger
-     * @throws \Exception
      */
     public function testValidateClaimDetailsReplacementCostNoWarning()
     {
@@ -969,7 +968,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->incurred = 1;
         $daviesClaim->unauthorizedCalls = 1.01;
         $daviesClaim->accessories = 1.03;
-
+        // replacement cost is bigger than initial price, should create warning
         $replacementCost = $policy->getPhone()->getInitialPrice() + 10;
         $daviesClaim->phoneReplacementCost = $replacementCost;
         $daviesClaim->transactionFees = 1.11;
@@ -982,6 +981,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 8';
         $daviesClaim->replacementReceivedDate = new \DateTime('2016-01-01');
+        // set ignore warning flag
         $claim->setIgnoreWarningFlags(Claim::WARNING_FLAG_DAVIES_REPLACEMENT_COST_HIGHER);
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
         $this->insureWarningDoesNotExist('/Device replacement cost/');
@@ -989,7 +989,6 @@ class DaviesServiceTest extends WebTestCase
 
     /**
      * cost warning is on and should trigger
-     * @throws \Exception
      */
     public function testValidateClaimDetailsReplacementCostWarning()
     {
@@ -1005,6 +1004,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->unauthorizedCalls = 1.01;
         $daviesClaim->accessories = 1.03;
 
+        // replacement cost is bigger than initial price
         $replacementCost = $policy->getPhone()->getInitialPrice() + 10;
         $daviesClaim->phoneReplacementCost = $replacementCost;
         $daviesClaim->transactionFees = 1.11;
@@ -1018,12 +1018,16 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->replacementModel = 'iPhone 8';
         $daviesClaim->replacementReceivedDate = new \DateTime('2016-01-01');
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+
+        // all ignore warning flags are off
+        $claim->clearIgnoreWarningFlags();
+
+        // there should be a warning
         $this->insureWarningExists('/Device replacement cost/');
     }
 
     /**
      * warning flag on but price is the same
-     * @throws \Exception
      */
     public function testValidateClaimDetailsReplacementCostWarningOn()
     {
@@ -1039,6 +1043,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->unauthorizedCalls = 1.01;
         $daviesClaim->accessories = 1.03;
 
+        // price is the same as initial price
         $replacementCost = $policy->getPhone()->getInitialPrice();
         $daviesClaim->phoneReplacementCost = $replacementCost;
         $daviesClaim->transactionFees = 1.11;
@@ -1051,7 +1056,10 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 8';
         $daviesClaim->replacementReceivedDate = new \DateTime('2016-01-01');
+        // all ignore warning flags are off
+        $claim->clearIgnoreWarningFlags();
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        // we are not expecting warning
         $this->insureWarningDoesNotExist('/Device replacement cost/');
     }
 
