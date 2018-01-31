@@ -128,9 +128,7 @@ class QuoteService
             $body,
             null,
             null,
-            null,
-            'tech@so-sure.com',
-            null
+            'tech+ops@so-sure.com'
         );
 
 
@@ -159,13 +157,8 @@ class QuoteService
 
         $this->mailer->send(
             'Make different in db',
-            'tech@so-sure.com',
-            $body,
-            null,
-            null,
-            null,
-            'tech@so-sure.com',
-            null
+            'tech+ops@so-sure.com',
+            $body
         );
 
 
@@ -197,13 +190,8 @@ class QuoteService
 
         $this->mailer->send(
             'Rooted Device/Memory',
-            'tech@so-sure.com',
-            $body,
-            null,
-            null,
-            null,
-            'tech@so-sure.com',
-            null
+            'tech+ops@so-sure.com',
+            $body
         );
 
     }

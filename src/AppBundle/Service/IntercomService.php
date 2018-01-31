@@ -948,7 +948,7 @@ class IntercomService
         $message = \Swift_Message::newInstance()
             ->setSubject('Intercom Mainteanance and Duplicate Entries')
             ->setFrom('tech@so-sure.com')
-            ->setTo('tech@so-sure.com')
+            ->setTo('tech+ops@so-sure.com')
             ->setBody(implode(PHP_EOL, $lines), 'text/text');
         $this->mailer->send($message);
 
