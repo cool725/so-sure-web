@@ -5,26 +5,24 @@ sosure.globals = (function() {
     var self = {};
     self.device_category = null;
 
-    self.init = function() {
-        self.device_category = $('#ss-root').data('device-category');
+    self.setDevice = function(device_category) {
+        self.device_category = device_category;
     }
 
     return self;
 })();
 
 $(function(){
-    sosure.globals.init();
+    sosure.globals.setDevice($('#ss-root').data('device-category'));
 });
 
 $(function(){
+
 
     // SROLL TO
     // Add anchor via:         data-scroll-to-anchor
     // Add focus after anchor: data-scroll-to-focus
     // Add adjustment to pos:  data-scroll-to-adjust
-
-    // var device_category = $('#ss-root').data('device-category');
-    // console.log(device_category);
 
     var adjust = 0;
 
