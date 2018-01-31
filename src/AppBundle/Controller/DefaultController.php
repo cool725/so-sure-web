@@ -75,6 +75,7 @@ class DefaultController extends BaseController
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         $data = array(
+            // Make sure to check homepage landing below too
             'select_phone_type'   => $exp == 'sticky-search' ? 'homepage-sticky' : 'homepage',
             'pic_sure'        => $exp == 'picsure',
             'referral'        => $referral,
