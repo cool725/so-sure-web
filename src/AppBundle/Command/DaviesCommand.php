@@ -53,7 +53,6 @@ class DaviesCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $isDaily = true === $input->getOption('daily');
-        $enableReplacementCostWarning = true === $input->getOption('cost-warning');
         $useMime = true !== $input->getOption('use-extension');
         $file = $input->getOption('file');
         $maxParseErrors = $input->getOption('max-parse-errors');
