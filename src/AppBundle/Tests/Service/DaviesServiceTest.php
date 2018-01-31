@@ -952,6 +952,111 @@ class DaviesServiceTest extends WebTestCase
         $this->insureFeesExists('/does not have the correct recipero fee/');
     }
 
+    /**
+     *  cost warning is off should not trigger
+     * @throws \Exception
+     */
+    public function testValidateClaimDetailsReplacementCostNoWarning()
+    {
+        $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        $claim->setApprovedDate(new \DateTime('2016-01-02'));
+        $policy->addClaim($claim);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = 1;
+        $daviesClaim->status = 'open';
+        $daviesClaim->incurred = 1;
+        $daviesClaim->unauthorizedCalls = 1.01;
+        $daviesClaim->accessories = 1.03;
+
+        $replacementCost = $policy->getPhone()->getInitialPrice() + 10;
+        $daviesClaim->phoneReplacementCost = $replacementCost;
+        $daviesClaim->transactionFees = 1.11;
+        $daviesClaim->handlingFees = 1.19;
+        $daviesClaim->reciperoFee = 1.27;
+        $daviesClaim->excess = 6;
+        $daviesClaim->reserved = 0;
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+        $daviesClaim->replacementMake = 'Apple';
+        $daviesClaim->replacementModel = 'iPhone 8';
+        $daviesClaim->replacementReceivedDate = new \DateTime('2016-01-01');
+        self::$daviesService->enableReplacementCostWarning(false);
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->insureWarningDoesNotExist('/Device replacement cost/');
+    }
+
+    /**
+     * cost warning is on and should trigger
+     * @throws \Exception
+     */
+    public function testValidateClaimDetailsReplacementCostWarning()
+    {
+        $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        $claim->setApprovedDate(new \DateTime('2016-01-02'));
+        $policy->addClaim($claim);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = 1;
+        $daviesClaim->status = 'open';
+        $daviesClaim->incurred = 1;
+        $daviesClaim->unauthorizedCalls = 1.01;
+        $daviesClaim->accessories = 1.03;
+
+        $replacementCost = $policy->getPhone()->getInitialPrice() + 10;
+        $daviesClaim->phoneReplacementCost = $replacementCost;
+        $daviesClaim->transactionFees = 1.11;
+        $daviesClaim->handlingFees = 1.19;
+        $daviesClaim->reciperoFee = 1.27;
+        $daviesClaim->excess = 6;
+        $daviesClaim->reserved = 0;
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+        $daviesClaim->replacementMake = 'Apple';
+        $daviesClaim->replacementModel = 'iPhone 8';
+        $daviesClaim->replacementReceivedDate = new \DateTime('2016-01-01');
+        self::$daviesService->enableReplacementCostWarning(true);
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->insureWarningExists('/Device replacement cost/');
+    }
+
+    /**
+     * warning flag on but price is the same
+     * @throws \Exception
+     */
+    public function testValidateClaimDetailsReplacementCostWarningOn()
+    {
+        $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        $claim->setApprovedDate(new \DateTime('2016-01-02'));
+        $policy->addClaim($claim);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = 1;
+        $daviesClaim->status = 'open';
+        $daviesClaim->incurred = 1;
+        $daviesClaim->unauthorizedCalls = 1.01;
+        $daviesClaim->accessories = 1.03;
+
+        $replacementCost = $policy->getPhone()->getInitialPrice();
+        $daviesClaim->phoneReplacementCost = $replacementCost;
+        $daviesClaim->transactionFees = 1.11;
+        $daviesClaim->handlingFees = 1.19;
+        $daviesClaim->reciperoFee = 1.27;
+        $daviesClaim->excess = 6;
+        $daviesClaim->reserved = 0;
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+        $daviesClaim->replacementMake = 'Apple';
+        $daviesClaim->replacementModel = 'iPhone 8';
+        $daviesClaim->replacementReceivedDate = new \DateTime('2016-01-01');
+        self::$daviesService->enableReplacementCostWarning(true);
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->insureWarningDoesNotExist('/Device replacement cost/');
+    }
+
     public function testValidateClaimDetailsReceivedDate()
     {
         $policy = static::createUserPolicy(true);
