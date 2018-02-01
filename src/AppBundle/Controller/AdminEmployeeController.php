@@ -627,11 +627,32 @@ class AdminEmployeeController extends BaseController
             } elseif ($request->request->has('create_form')) {
                 $createForm->handleRequest($request);
                 if ($createForm->isValid()) {
+                    $missingSerialNumber = false;
+                    if ($policy->getPhone()->isApple() && !$policy->isValidAppleSerialNumber()) {
+                        $missingSerialNumber = true;
+                        # Admin's can create without serial number if necessary
+                        if (!$this->getUser()->hasRole('ROLE_ADMIN')) {
+                            $this->addFlash(
+                                'error',
+                                'Missing Serial Number - unable to create policy'
+                            );
+
+                            return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                        }
+                    }
+
                     $policyService->create($policy, null, true);
-                    $this->addFlash(
-                        'success',
-                        'Created Policy'
-                    );
+                    if ($missingSerialNumber) {
+                        $this->addFlash(
+                            'warning',
+                            'Created Policy - Missing Expected Serial Number'
+                        );
+                    } else {
+                        $this->addFlash(
+                            'success',
+                            'Created Policy'
+                        );
+                    }
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }

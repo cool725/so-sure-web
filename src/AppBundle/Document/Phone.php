@@ -796,6 +796,11 @@ class Phone
         return in_array($this->getOs(), [self::OS_ANDROID, self::OS_CYANOGEN, self::OS_IOS]);
     }
 
+    public function isApple()
+    {
+        return $this->getMake() == 'Apple';
+    }
+
     public function isITunes()
     {
         return $this->getOs() == self::OS_IOS;
