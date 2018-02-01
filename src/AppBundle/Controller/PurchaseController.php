@@ -16,6 +16,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 use AppBundle\Classes\ApiErrorCode;
 
@@ -468,6 +469,9 @@ class PurchaseController extends BaseController
                                 'Final Monthly Cost' => $price->getMonthlyPremiumPrice(),
                                 'Policy Id' => $policy->getId(),
                             ]);
+
+                            $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_POLICY_PDF_DOWNLOAD);
+
                             // There was an odd case of next not being detected as clicked
                             // perhaps a brower issue with multiple buttons
                             // just in case, assume judo pay if we don't detect existing
@@ -511,6 +515,13 @@ class PurchaseController extends BaseController
             }
         }
 
+        $exp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_POLICY_PDF_DOWNLOAD,
+            ['no-pdf-download', 'pdf-download'],
+            false
+        );
+
         $now = new \DateTime();
         $billingDate = $this->adjustDayForBilling($now);
 
@@ -523,6 +534,7 @@ class PurchaseController extends BaseController
             'webpay_action' => $webpay ? $webpay['post_url'] : null,
             'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
             'policy_key' => $this->getParameter('policy_key'),
+            'pdf_download' => $exp == 'pdf-download',
             'phones' => $phone ? $phoneRepo->findBy(
                 ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
                 ['memory' => 'asc']
@@ -531,6 +543,37 @@ class PurchaseController extends BaseController
         );
 
         return $this->render('AppBundle:Purchase:purchaseStepPhoneReview.html.twig', $data);
+    }
+
+    /**
+     * @Route("/sample-policy-terms", name="sample_policy_terms")
+     * @Template()
+     */
+    public function samplePolicyTermsAction()
+    {
+        $filesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3policy_fs');
+        $environment = $this->getParameter('kernel.environment');
+        $file = 'sample-policy-terms.pdf';
+
+        if (!$filesystem->has($file)) {
+            throw $this->createNotFoundException(sprintf('URL not found %s', $file));
+        }
+
+        $this->get('app.mixpanel')->queueTrack(
+            MixpanelService::EVENT_TEST,
+            ['Test Name' => 'pdf-terms-download']
+        );
+
+        $mimetype = $filesystem->getMimetype($file);
+        return StreamedResponse::create(
+            function () use ($file, $filesystem) {
+                $stream = $filesystem->readStream($file);
+                echo stream_get_contents($stream);
+                flush();
+            },
+            200,
+            array('Content-Type' => $mimetype)
+        );
     }
 
     /**
@@ -680,7 +723,7 @@ class PurchaseController extends BaseController
             ->setSubject('Remainder Payment received')
             ->setFrom('tech@so-sure.com')
             ->setTo('dylan@so-sure.com')
-            ->setCc('patrick@so-sure.com')
+            ->setCc('tech+ops@so-sure.com')
             ->setBody($body, 'text/html');
         $this->get('mailer')->send($message);
     }

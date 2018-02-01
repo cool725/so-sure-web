@@ -240,7 +240,7 @@ snc_redis:
 
     session:
         client: session
-        ttl: 1200 # 20 minutes - refreshed on page access
+        ttl: 900 # 15 minutes - refreshed on page access; PCI Requirement for 15 
 
     swiftmailer:
         client: mailer

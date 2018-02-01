@@ -214,10 +214,10 @@ class UpdatePolicyStatusCommand extends BaseCommand
             $mailer = $this->getContainer()->get('app.mailer');
             $mailer->send(
                 'Updated Policy Status',
-                'tech@so-sure.com',
+                'tech+ops@so-sure.com',
                 implode('<br />', $lines)
             );
-            $output->writeln('Emailed results to tech@so-sure.com');
+            $output->writeln('Emailed results to tech+ops@so-sure.com');
         }
         $output->writeln('Finished');
     }

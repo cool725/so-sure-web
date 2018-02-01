@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Listener;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use AppBundle\Listener\UserListener;
 use AppBundle\Listener\DoctrineUserListener;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
@@ -72,12 +73,7 @@ class UserListenerTest extends WebTestCase
 
         $event = new UserEvent($user);
 
-        $listener = new UserListener(
-            self::$dm,
-            self::$container->get('logger'),
-            self::$container->get('app.mailer'),
-            self::$container->get('snc_redis.default')
-        );
+        $listener = $this->getUserListener();
         $listener->onUserUpdatedEvent($event);
 
         $user = self::$userRepo->find($user->getId());
@@ -130,12 +126,7 @@ class UserListenerTest extends WebTestCase
 
         $event = new UserEvent($user);
 
-        $listener = new UserListener(
-            self::$dm,
-            self::$container->get('logger'),
-            self::$container->get('app.mailer'),
-            self::$container->get('snc_redis.default')
-        );
+        $listener = $this->getUserListener();
         $listener->onUserUpdatedEvent($event);
 
         $user = self::$userRepo->find($user->getId());
@@ -146,5 +137,53 @@ class UserListenerTest extends WebTestCase
         }
         $user = self::$userRepo->find($user->getId());
         $this->assertTrue($user->hasReceivedInvitations());
+    }
+
+    public function testUserChangePassword()
+    {
+        $user = static::createUser(
+            self::$userManager,
+            self::generateEmail('testUserChangePassword', $this),
+            'foo'
+        );
+        static::$dm->flush();
+
+        $user->setPlainPassword('foooBarr1!');
+        static::$userManager->updatePassword($user);
+        static::$dm->flush();
+
+        $user->setPlainPassword('foooBarr2!');
+        static::$userManager->updatePassword($user);
+        static::$dm->flush();
+
+        $user->setPlainPassword('foooBarr1!');
+        $event = new UserEvent($user);
+
+        $listener = $this->getUserListener();
+        $exception = false;
+        try {
+            $listener->onUserPasswordChangedEvent($event);
+        } catch (\Exception $e) {
+            $exception = true;
+        }
+        $this->assertTrue($exception);
+
+        $user->setPlainPassword('foooBarr3!');
+        static::$userManager->updatePassword($user);
+        static::$dm->flush();
+        $listener->onUserPasswordChangedEvent($event);
+    }
+
+    private function getUserListener()
+    {
+        $listener = new UserListener(
+            self::$dm,
+            self::$container->get('logger'),
+            self::$container->get('app.mailer'),
+            self::$container->get('snc_redis.default'),
+            self::$container->get('app.user')
+        );
+
+        return $listener;
     }
 }

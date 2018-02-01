@@ -19,6 +19,7 @@ class FOSUBUserProviderTest extends WebTestCase
     protected static $userProvider;
     protected static $userManager;
     protected static $userService;
+    protected static $dm;
 
     public static function setUpBeforeClass()
     {
@@ -35,6 +36,7 @@ class FOSUBUserProviderTest extends WebTestCase
         self::$cognito = self::$container->get('app.cognito.identity');
         self::$userManager = self::$container->get('fos_user.user_manager');
         self::$userService = self::$container->get('app.user');
+        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
     }
 
     public function tearDown()
@@ -189,6 +191,49 @@ class FOSUBUserProviderTest extends WebTestCase
             ->will($this->returnValue($email));
 
         $existingUser = self::$userService->loadUserByOAuthUserResponse($mock);
+    }
+    
+    public function testHasPreviouslyUsedPassword()
+    {
+        $email = static::generateEmail('testHasPreviouslyUsedPassword', $this);
+        $user = static::createUser(
+            static::$userManager,
+            $email,
+            'bar'
+        );
+        static::$dm->flush();
+        $passwords = [];
+        for ($i = 0; $i <= 3; $i++) {
+            $t = $user->getPassword();
+            $password = rand(11111111, 99999999) . 'aA!';
+            $user->setPlainPassword($password);
+            $passwords[$i] = $password;
+
+            static::$userManager->updatePassword($user);
+            static::$dm->flush();
+            $this->assertNotEquals($t, $user->getPassword());
+            sleep(1);
+        }
+        
+        // 4 passwords in history, 1st from create user + 3 from above
+        // current password not in history
+        $user->setPlainPassword($passwords[0]);
+        $this->assertTrue(static::$userService->hasPreviouslyUsedPassword($user, 4));
+        //print PHP_EOL;
+        $this->assertFalse(static::$userService->hasPreviouslyUsedPassword($user, 3));
+
+        // current password not allowed either
+        $user->setPlainPassword($passwords[3]);
+        $this->assertTrue(static::$userService->hasPreviouslyUsedPassword($user, 0));
+
+        $t = $user->getPassword();
+        $password = rand(11111111, 99999999) . 'aA!';
+        $user->setPlainPassword($password);
+
+        static::$userManager->updatePassword($user);
+        static::$dm->flush();
+        $this->assertNotEquals($t, $user->getPassword());
+        sleep(1);
     }
 
     protected function createResourceOwnerMock($resourceOwnerName = null)

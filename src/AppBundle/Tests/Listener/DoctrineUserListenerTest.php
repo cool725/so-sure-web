@@ -57,6 +57,20 @@ class DoctrineUserListenerTest extends WebTestCase
         $this->assertTrue($events->getDocument()->getEmailVerified());
     }
 
+    public function testPreUpdatePassword()
+    {
+        $user = new User();
+        $user->setEmail(static::generateEmail('testPreUpdatePassword', $this));
+        static::$dm->persist($user);
+        $listener = $this->createUserEventListener($user, $this->once(), UserEvent::EVENT_PASSWORD_CHANGED);
+
+        $changeSet = ['password' => ['a', 'b']];
+        $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
+        $listener->preUpdate($events);
+
+        $this->assertTrue(count($events->getDocument()->getPreviousPasswords()) > 0);
+    }
+
     public function testPostUpdate()
     {
         $user = new User();

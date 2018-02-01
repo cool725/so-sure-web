@@ -14,6 +14,8 @@ services:
         calls:
             - [setFacebook, ['@app.facebook']]
             - [setRequestStack, ['@request_stack']]
+            - [setEncoderFactory, ["@security.encoder_factory"]]
+            - [setAuthService, ["@security.authorization_checker"]]
 
     app.user.cognitoidentity:
         class: AppBundle\Security\CognitoIdentityUserProvider
@@ -718,10 +720,12 @@ services:
             - "@logger"
             - "@app.mailer"
             - "@snc_redis.default"
+            - "@app.user"
         tags:
             -  { name: kernel.event_listener, event: event.user.created, method: onUserCreatedEvent }
             -  { name: kernel.event_listener, event: event.user.updated, method: onUserUpdatedEvent }
             -  { name: kernel.event_listener, event: event.user.email.changed, method: onUserEmailChangedEvent }
+            -  { name: kernel.event_listener, event: event.user.password.changed, method: onUserPasswordChangedEvent }
 
     app.listener.debtCollection:
         class:   AppBundle\Listener\DebtCollectionListener

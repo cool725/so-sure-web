@@ -201,7 +201,7 @@ class DaviesService extends S3EmailService
                 }
                 $this->mailer->sendTemplate(
                     sprintf('Claim Number Update'),
-                    'tech@so-sure.com',
+                    'tech+ops@so-sure.com',
                     'AppBundle:Email:davies/incorrectClaimNumber.html.twig',
                     [
                         'claim' => $claim,
@@ -567,7 +567,7 @@ class DaviesService extends S3EmailService
                 }
                 $this->mailer->sendTemplate(
                     sprintf('Verify Policy %s IMEI Update', $policy->getPolicyNumber()),
-                    'tech@so-sure.com',
+                    'tech+ops@so-sure.com',
                     'AppBundle:Email:davies/checkPhone.html.twig',
                     ['policy' => $policy, 'daviesClaim' => $daviesClaim]
                 );
@@ -613,7 +613,7 @@ class DaviesService extends S3EmailService
 
         $this->mailer->sendTemplate(
             sprintf('Daily Claims Report'),
-            'tech@so-sure.com',
+            'tech+ops@so-sure.com',
             'AppBundle:Email:davies/dailyEmail.html.twig',
             [
                 'claims' => $claims,
@@ -643,7 +643,7 @@ class DaviesService extends S3EmailService
         $claims = $claimsRepo->findOutstanding();
 
         if (count($this->errors) > 0) {
-            $emails = 'tech@so-sure.com';
+            $emails = 'tech+ops@so-sure.com';
             if ($this->featureService->isEnabled(Feature::FEATURE_DAVIES_IMPORT_ERROR_EMAIL)) {
                 $emails = DaviesClaim::$errorEmailAddresses;
             }

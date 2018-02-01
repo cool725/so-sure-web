@@ -9,6 +9,7 @@ class UserEvent extends Event
 {
     const EVENT_CREATED = 'event.user.created';
     const EVENT_UPDATED = 'event.user.updated';
+    const EVENT_PASSWORD_CHANGED = 'event.user.password.changed';
 
     /** @var User */
     protected $user;

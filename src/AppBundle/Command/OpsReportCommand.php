@@ -43,7 +43,7 @@ class OpsReportCommand extends ContainerAwareCommand
         if (!$html) {
             $html = 'No csp violations';
         }
-        $mailer->send('CSP Report', 'tech@so-sure.com', $html);
+        $mailer->send('CSP Report', 'tech+ops@so-sure.com', $html);
         return count($items);
 
     }
@@ -116,7 +116,7 @@ class OpsReportCommand extends ContainerAwareCommand
         if (!$html) {
             $html = 'No client validation failures';
         }
-        $mailer->send('Client Validation Failures', 'tech@so-sure.com', $html);
+        $mailer->send('Client Validation Failures', 'tech+ops@so-sure.com', $html);
         return count($items) > 0 ? 'found validation failures' : 'no validation failures';
     }
 }

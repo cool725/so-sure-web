@@ -54,6 +54,25 @@ class DoctrineUserListener
                 $meta = $dm->getClassMetadata(get_class($document));
                 $uow->recomputeSingleDocumentChangeSet($meta, $document);
             }
+
+            if ($eventArgs->hasChangedField('password') &&
+                strlen(trim($eventArgs->getOldValue('password'))) > 0 &&
+                $eventArgs->getOldValue('password') != $eventArgs->getNewValue('password')) {
+                if ($eventArgs->hasChangedField('salt')) {
+                    $document->passwordChange($eventArgs->getOldValue('password'), $eventArgs->getOldValue('salt'));
+                } else {
+                    $document->passwordChange($eventArgs->getOldValue('password'), $document->getSalt());
+                }
+
+                // previousPasswords probably isn't in the original changeset, so recalculate
+                $dm = $eventArgs->getDocumentManager();
+                $uow = $dm->getUnitOfWork();
+                $meta = $dm->getClassMetadata(get_class($document));
+                $uow->recomputeSingleDocumentChangeSet($meta, $document);
+
+                $event = new UserEvent($document);
+                $this->dispatcher->dispatch(UserEvent::EVENT_PASSWORD_CHANGED, $event);
+            }
         }
     }
 
