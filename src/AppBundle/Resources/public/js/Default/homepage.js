@@ -10,9 +10,9 @@ $(function(){
             $(container).addClass('search-phone-form--focus');
 
             // If mobile slide up to make more room
-            if (sosure.globals.device_category == 'Mobile') {
-                $('html,body').animate({scrollTop: $(this).offset().top - 100}, 800);
-            }
+            // if (sosure.globals.device_category == 'Mobile') {
+            //     $('html,body').animate({scrollTop: $(this).offset().top - 100}, 800);
+            // }
         });
 
         // Remove class on blur
