@@ -1,5 +1,6 @@
 // checkout.scss
 
+@import "../common/variables";
 @import "../mixins";
 @import "../common/type";
 @import "../common/paletteNew";
@@ -195,7 +196,7 @@
         background-color: $primary-blue;
 
         .payment--btn-inner {
-            background: transparent url('https://cdn.so-sure.com/images/library_benefits/so-sure_cover-tick.svg') center no-repeat;
+            background: transparent url('#{$cdn_url}/images/library_benefits/so-sure_cover-tick.svg') center no-repeat;
             color: $white;
         }
     }
@@ -272,7 +273,7 @@
 .benefits--review-mobile {
     margin: 0 -15px;
     padding: 0 30px 20px;
-    background: url('https://cdn.so-sure.com/images/library_benefits/so-sure_cover-globe.svg') no-repeat;
+    background: url('#{$cdn_url}/images/library_benefits/so-sure_cover-globe.svg') no-repeat;
     background-position: right -110px bottom -22px;
 
     li {
@@ -284,7 +285,7 @@
 
     @include breakpoint(tablet) {
         .checkout--top {
-            background: url('https://cdn.so-sure.com/images/library_benefits/so-sure_cover-globe-large.svg') no-repeat;
+            background: url('#{$cdn_url}/images/library_benefits/so-sure_cover-globe-large.svg') no-repeat;
             background-position: right -180px bottom 0px;
         }
     }

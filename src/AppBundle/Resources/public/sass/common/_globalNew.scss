@@ -188,7 +188,7 @@ mark {
 	}
 
 	.background-smiley {
-		background: $white url('https://cdn.so-sure.com/images/background-smile-logo-pattern.png');
+		background: $white url('#{$cdn_url}/images/background-smile-logo-pattern.png');
 	}
 
 	// Borders
