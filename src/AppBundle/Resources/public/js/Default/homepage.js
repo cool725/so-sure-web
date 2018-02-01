@@ -1,9 +1,6 @@
 // homepage.js
 $(function(){
 
-    // Get the current device
-    var device = $('#ss-root').data('device-category');
-
     // Enhance the focus on the search box when input focused
     $('.search-phone').each(function(index, el) {
         var container = $(this).parents('.search-phone-form');
@@ -13,7 +10,7 @@ $(function(){
             $(container).addClass('search-phone-form--focus');
 
             // If mobile slide up to make more room
-            // if (device == 'Mobile') {
+            // if (sosure.globals.device_category == 'Mobile') {
             //     $('html,body').animate({scrollTop: $(this).offset().top - 100}, 800);
             // }
         });
