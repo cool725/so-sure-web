@@ -32,7 +32,13 @@
     },
     {% if has_visited_welcome_page is defined and has_visited_welcome_page == false %}
         'transactionId': '{{ policy.policyNumber }}',
-        'transactionTotal': {% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.gwp }}{% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyGwp }}{% endif %}
+        'transactionTotal': {% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.gwp }}{% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyGwp }}{% endif %},
+        'transactionProducts': [{
+            'sku':  '{{ policy.phone.make }}{{ policy.phone.model }}{{ policy.phone.memory }}',
+            'name': '{{ policy.phone.model }},
+            'category': '{{ policy.phone.make }}',
+            'price': {% if policy.getPremiumPlan == 'monthly'%}{{ policy.premium.gwp }}{% elseif policy.getPremiumPlan == 'yearly' %}{{ policy.premium.yearlyGwp }}{% endif %}
+        }]
     {% endif %}
 {% endblock %}
 
