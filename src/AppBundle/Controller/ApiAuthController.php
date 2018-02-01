@@ -177,7 +177,7 @@ class ApiAuthController extends BaseController
 
                 $this->get('app.mailer')->send(
                     'Unknown App IMEI - Process on admin site',
-                    'tech@so-sure.com',
+                    'tech+ops@so-sure.com',
                     'Unknown App IMEI - Process on admin site'
                 );
 
@@ -1119,7 +1119,7 @@ class ApiAuthController extends BaseController
             $message = \Swift_Message::newInstance()
                 ->setSubject(sprintf('New pic-sure image to process [%s]', $environment))
                 ->setFrom('tech@so-sure.com')
-                ->setTo('tech@so-sure.com')
+                ->setTo('tech+ops@so-sure.com')
                 ->setBody('<a href="https://wearesosure.com/admin/picsure">Admin site</a>', 'text/html');
             $this->get('mailer')->send($message);
 

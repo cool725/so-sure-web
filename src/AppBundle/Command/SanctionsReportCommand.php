@@ -58,7 +58,7 @@ class SanctionsReportCommand extends ContainerAwareCommand
                 date('m-d-Y'),
                 $numSanctions
             ),
-            'tech@so-sure.com',
+            'tech+ops@so-sure.com',
             'AppBundle:Email:user/admin_sanctions.html.twig',
             ['users' => $users, 'companies' => $companies]
         );
