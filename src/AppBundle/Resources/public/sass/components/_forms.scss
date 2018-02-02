@@ -64,6 +64,7 @@ label {
 .reset-error {
     ul {
         list-style: none;
+        padding: 0;
 
         li {
             color: $red;
