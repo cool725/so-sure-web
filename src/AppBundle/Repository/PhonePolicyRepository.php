@@ -229,6 +229,28 @@ class PhonePolicyRepository extends PolicyRepository
             ->execute();
     }
 
+    public function findAllStatusUpdatedPolicies(\DateTime $startDate = null, \DateTime $endDate = null)
+    {
+        if (!$endDate) {
+            $endDate = new \DateTime();
+        }
+
+        $policy = new PhonePolicy();
+
+        $qb = $this->createQueryBuilder()
+            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
+        $qb->field('statusUpdated')->lt($endDate);
+        if ($startDate) {
+            $qb->field('statusUpdated')->gte($startDate);
+        }
+        if ($this->excludedPolicyIds) {
+            $this->addExcludedPolicyQuery($qb, 'id');
+        }
+
+        return $qb->getQuery()
+            ->execute();
+    }
+
     /**
      * All policies that are 'ending' (e.g. cancelled) during time period (excluding so-sure test ones)
      */

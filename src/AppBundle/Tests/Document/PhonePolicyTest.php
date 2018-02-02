@@ -75,6 +75,20 @@ class PhonePolicyTest extends WebTestCase
         self::$dm->clear();
     }
 
+    public function testStatusUpdated()
+    {
+        $policy = new SalvaPhonePolicy();
+        $this->assertNull($policy->getStatusUpdated());
+        $now = new \DateTime();
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $this->assertEquals($now, $policy->getStatusUpdated());
+        sleep(1);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $this->assertEquals($now, $policy->getStatusUpdated());
+        $policy->setStatus(Policy::STATUS_UNPAID);
+        $this->assertNotEquals($now, $policy->getStatusUpdated());
+    }
+
     public function testEmptyPolicyReturnsCorrectApiData()
     {
         $policy = new SalvaPhonePolicy();
