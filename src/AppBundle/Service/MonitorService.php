@@ -171,13 +171,19 @@ class MonitorService
         $updatedPolicies = $repo->findAllStatusUpdatedPolicies($twoDays, $tenMinutes);
         $errors = [];
         foreach ($updatedPolicies as $policy) {
-            // only active/unpaid policies and definitely not cancelled
-            if ($policy->isActive(true)) {
-                $intercomUser = $this->intercom->getIntercomUser($policy->getUser());
-                if (is_object($intercomUser) && $intercomUser->custom_attributes->Premium <= 0) {
+            $intercomUser = $this->intercom->getIntercomUser($policy->getUser());
+            if (is_object($intercomUser)) {
+                // only active/unpaid policies and definitely not cancelled
+                if ($policy->isActive(true) && $intercomUser->custom_attributes->Premium <= 0) {
                     $this->intercom->queue($policy->getUser());
                     $errors[] = sprintf(
                         'Intercom out of sync: %s has a 0 premium in intercom, yet has a policy. Requeued.',
+                        $policy->getUser()->getEmail()
+                    );
+                } elseif (!$policy->isActive(true) && $intercomUser->custom_attributes->Premium > 0) {
+                    $this->intercom->queue($policy->getUser());
+                    $errors[] = sprintf(
+                        'Intercom out of sync: %s has a premium in intercom, but policy is not active. Requeued.',
                         $policy->getUser()->getEmail()
                     );
                 }
