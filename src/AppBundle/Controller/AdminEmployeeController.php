@@ -978,7 +978,7 @@ class AdminEmployeeController extends BaseController
                     $serialNumber = $policyData->getSerialNumber();
 
                     $missingSerialNumber = false;
-                    if ($policy->getPhone()->isApple() && !$policy->isValidAppleSerialNumber()) {
+                    if ($policyData->getPhone()->isApple() && !$this->isAppleSerialNumber($serialNumber)) {
                         $missingSerialNumber = true;
 
                         # Admin's can create without serial number if necessary
