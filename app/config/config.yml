@@ -485,6 +485,8 @@ nelmio_security:
                 - https://*.doubleclick.net
                 - https://www.google.com
                 - https://angel.co
+                # unbounce conversion
+                - https://d3pkntwtp2ukl5.cloudfront.net
                 # linked in
                 - https://secure.adnxs.com
                 - https://www.workable.com
