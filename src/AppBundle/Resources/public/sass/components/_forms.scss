@@ -61,6 +61,16 @@ label {
 
 // }
 
+.reset-error {
+    ul {
+        list-style: none;
+
+        li {
+            color: $red;
+        }
+    }
+}
+
 // Select Phone Make Overide
 .tt-menu {
     margin-top: -2px;
