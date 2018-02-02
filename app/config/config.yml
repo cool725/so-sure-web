@@ -487,6 +487,7 @@ nelmio_security:
                 - https://angel.co
                 # unbounce conversion
                 - https://d3pkntwtp2ukl5.cloudfront.net
+                - https://t.unbounce.com
                 # linked in
                 - https://secure.adnxs.com
                 - https://www.workable.com
