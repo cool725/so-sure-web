@@ -223,6 +223,8 @@ class ReportingService
 
         $data['newPolicies'] = $policyRepo->countAllNewPolicies($end, $start);
         $data['newPoliciesAdjUpgrade'] = $data['newPolicies'] - $data['endingUpgradePolicies'];
+        $data['newPoliciesAdjUpgradeRenewals'] = $data['newPolicies'] - $data['endingUpgradePolicies'] -
+            $data['endingPoliciesRenewed'];
         $data['newPoliciesPremium'] = $data['newDirectPoliciesPremium'] + $data['newInvitationPoliciesPremium'] +
             $data['newSCodePoliciesPremium'];
         if ($data['newPolicies'] != 0) {
