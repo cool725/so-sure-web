@@ -19,9 +19,16 @@
                     Verify that the new phone <strong>{{ daviesClaim.replacementMake }} {{ daviesClaim.replacementModel }}</strong> matches policy <strong>{{ policy.phone }}</strong>.
                     If not, the policy can be updated via the <a href="{{ url('admin_policy', {'id': policy.id})}}">admin policy page</a>.
                 </li>
-                <li>
-                    Set reminder to trigger any post claim followup that we might want to do.
-                </li>
+                {% if skipImeiUpdate is defined and skipImeiUpdate %}
+                    <li>
+                        <a href="{{ url('admin_policy', {'id': policy.id})}}">Update IMEI</a> for the policy as the system was unable to determine the appropiate imei to update.
+                    </li>
+                {% endif %}
+                {# No one is doing any followups at the moment - one day perhaps
+                    <li>
+                        Set reminder to trigger any post claim followup that we might want to do.
+                    </li>
+                 #}
            </ol>
 		   </div>
 		</div>
