@@ -66,18 +66,17 @@
                                 <br>
 
                                 {% if coming_soon %}
-                                    {% if phone.make == 'Apple' and phone.model =='iPhone X' %}
+                                    {# if phone.isApple and phone.model =='iPhone X'
                                         <span class="text-nowrap h2">is coming soon!</span>
                                         <p><a href="mailto:hello@wearesosure.com?subject=Let me know about the iPhone X 256GB Model" class="open-intercom">Tell me when</a> it's available.</p>
                                         <h4 class="text-blue" style="margin-top: 10px">IMPORTANT! <small>If you have the 256GB model, </small>DO NOT<small> purchase insurance for the iPhone X 64GB. We will not be able to cover you.</small></h4>
-                                    {% else %}
+                                    #}
                                         <span class="text-nowrap h2">is coming soon!</span>
                                         <p><a href="mailto:hello@wearesosure.com" class="open-intercom">Tell me when</a> it's available.</p>
                                         <p class="h2">
                                             <strong>£4.99 - £9.99 per month</strong><br>
                                             <small>(typical policy pricing)</small>
                                         <p>
-                                    {% endif %}
                                 {% else %}
                                     <span class="text-nowrap h2">only £{{ phone_price.monthlyPremiumPrice }} per month</span>
                                 {% endif %}

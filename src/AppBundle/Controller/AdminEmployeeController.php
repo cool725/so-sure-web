@@ -965,13 +965,38 @@ class AdminEmployeeController extends BaseController
                         return $this->redirectToRoute('admin_user', ['id' => $id]);
                     }
 
-                    // TODO: Ensure address is present
+                    if (!$user->hasValidDetails() || !$user->hasValidBillingDetails()) {
+                            $this->addFlash(
+                                'error',
+                                'User is missing details (mobile/address/etc)'
+                            );
+
+                            return $this->redirectToRoute('admin_user', ['id' => $id]);
+                    }
+
                     $policyService = $this->get('app.policy');
                     $serialNumber = $policyData->getSerialNumber();
+
+                    $missingSerialNumber = false;
+                    if ($policyData->getPhone()->isApple() && !$this->isAppleSerialNumber($serialNumber)) {
+                        $missingSerialNumber = true;
+
+                        # Admin's can create without serial number if necessary
+                        if (!$this->getUser()->hasRole('ROLE_ADMIN')) {
+                            $this->addFlash(
+                                'error',
+                                'Missing Serial Number - unable to create policy'
+                            );
+
+                            return $this->redirectToRoute('admin_user', ['id' => $id]);
+                        }
+                    }
+
                     // For phones without a serial number, run check on imei
                     if (!$serialNumber) {
                         $serialNumber = $policyData->getImei();
                     }
+
                     $newPolicy = $policyService->init(
                         $user,
                         $policyData->getPhone(),
@@ -982,10 +1007,17 @@ class AdminEmployeeController extends BaseController
                     $dm->persist($newPolicy);
                     $dm->flush();
 
-                    $this->addFlash(
-                        'success',
-                        'Partial policy was added'
-                    );
+                    if ($missingSerialNumber) {
+                        $this->addFlash(
+                            'warning',
+                            'Created Partial Policy - Missing Expected Serial Number'
+                        );
+                    } else {
+                        $this->addFlash(
+                            'success',
+                            'Created Partial Policy'
+                        );
+                    }
 
                     return $this->redirectToRoute('admin_user', ['id' => $id]);
                 }
