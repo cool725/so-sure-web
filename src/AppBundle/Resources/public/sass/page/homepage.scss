@@ -1,5 +1,6 @@
 // homepageNew.scss
 
+@import "../common/variables";
 @import "../mixins";
 @import "../common/palette";
 @import "../common/paletteNew";
@@ -108,7 +109,7 @@
 
             // Mobile
             padding: 20px 15px 100px;
-            background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_homepage_hero_mobile_background.svg') no-repeat center bottom;
+            background: transparent url('#{$cdn_url}/images/homepage/so-sure_homepage_hero_mobile_background.svg') no-repeat center bottom;
             background-size: 85%;
 
             // Tooltips
@@ -116,7 +117,7 @@
                 width: 40px; height: 47px;
                 position: absolute;
                 z-index: 2;
-                background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_hero_pin_alt.svg') no-repeat center;
+                background: transparent url('#{$cdn_url}/images/homepage/so-sure_hero_pin_alt.svg') no-repeat center;
 
                 &:before, &:after {
                     display: block;
@@ -152,7 +153,7 @@
                 }
 
                 &__reward {
-                    background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_hero_pin_reward.svg') no-repeat center;
+                    background: transparent url('#{$cdn_url}/images/homepage/so-sure_hero_pin_reward.svg') no-repeat center;
                 }
 
                 &:hover {
@@ -182,7 +183,7 @@
                 position: absolute;
 
                 // Sprite
-                background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_characters_sprites.svg') no-repeat;
+                background: transparent url('#{$cdn_url}/images/homepage/so-sure_characters_sprites.svg') no-repeat;
             }
 
             #hero-character_1 {
@@ -222,7 +223,7 @@
                     width: 50%; height: 90px;
                     float: left;
                     position: relative;
-                    background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_characters_sprite.svg') no-repeat;
+                    background: transparent url('#{$cdn_url}/images/homepage/so-sure_characters_sprite.svg') no-repeat;
                 }
 
                 .left {
@@ -257,7 +258,7 @@
                     width: 50%; height: 90px;
                     float: left;
                     position: relative;
-                    background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_characters_sprite.svg') no-repeat;
+                    background: transparent url('#{$cdn_url}/images/homepage/so-sure_characters_sprite.svg') no-repeat;
                 }
 
                 .left {
@@ -348,7 +349,7 @@
                     // Add the Buildings
                     &:before {
                         bottom: 0;
-                        background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_hero_background_empty_space_for_bench.svg') no-repeat center bottom;
+                        background: transparent url('#{$cdn_url}/images/homepage/so-sure_hero_background_empty_space_for_bench.svg') no-repeat center bottom;
 
                         background-size: 1900px;
                     }
@@ -356,7 +357,7 @@
                     // Add the Clouds
                     &:after {
                         top: 0; left: 50%;
-                        background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_homepage-hero-clouds-combined.svg') repeat-x center top;
+                        background: transparent url('#{$cdn_url}/images/homepage/so-sure_homepage-hero-clouds-combined.svg') repeat-x center top;
                         background-size: 100%;
                     }
 
@@ -395,7 +396,7 @@
 
         .press-img {
             width: 200px; height: 100px;
-            background: transparent url('https://cdn.so-sure.com/images/homepage/press/in_the_press_sprite_2x.png') no-repeat;
+            background: transparent url('#{$cdn_url}/images/homepage/press/in_the_press_sprite_2x.png') no-repeat;
             background-size: 900px;
         }
 
@@ -478,7 +479,7 @@
                 &:after {
                     width: 100px; height: 120px;
                     content: '';
-                    background: transparent url('https://cdn.so-sure.com/images/homepage/pic-sure_p_arrow.svg') no-repeat;
+                    background: transparent url('#{$cdn_url}/images/homepage/pic-sure_p_arrow.svg') no-repeat;
                     position: absolute;
                     top: 100%; right: -20px;
                 }
@@ -545,7 +546,7 @@
 
         .cover-img {
             width: 200px; height: 200px;
-            background: transparent url('https://cdn.so-sure.com/images/homepage/whats_covered_sprite_2x.png') no-repeat;
+            background: transparent url('#{$cdn_url}/images/homepage/whats_covered_sprite_2x.png') no-repeat;
             background-size: 1200px;
             margin: 0 auto;
             cursor: pointer;
@@ -582,7 +583,7 @@
                 z-index: 10;
                 left: -60px; bottom: 10px;
                 width: 175px; height: 52px;
-                background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_cover_section_arrow.svg') center center no-repeat;
+                background: transparent url('#{$cdn_url}/images/homepage/so-sure_cover_section_arrow.svg') center center no-repeat;
             }
         }
     }
@@ -750,7 +751,7 @@
 
         .speech-bubble {
             max-width: 400px;
-            background: $white url('https://cdn.so-sure.com/images/homepage/so-sure_logo_speech_bubble.png') no-repeat 15px 20px;
+            background: $white url('#{$cdn_url}/images/homepage/so-sure_logo_speech_bubble.png') no-repeat 15px 20px;
             position: relative;
             @include border-radius(6px);
             font-size: 14px;
@@ -879,7 +880,7 @@
                         content: '';
                         position: absolute;
                         right: -203px; top: 40px;
-                        background: transparent url('https://cdn.so-sure.com/images/homepage/so-sure_arrow_right.svg') no-repeat center;
+                        background: transparent url('#{$cdn_url}/images/homepage/so-sure_arrow_right.svg') no-repeat center;
                     }
                 }
 
@@ -942,14 +943,14 @@
 
 
                     td.sosure  {
-                        background-image: url('https://cdn.so-sure.com/images/logo/so-sure-blue-smile.svg');
+                        background-image: url('#{$cdn_url}/images/logo/so-sure-blue-smile.svg');
                         background-size: 40px 40px;
                         background-repeat: no-repeat;
                         background-position: 30px center;
                     }
 
                     td.contrast {
-                        background-image: url('https://cdn.so-sure.com/images/logo/so-sure_blue-frown.svg');
+                        background-image: url('#{$cdn_url}/images/logo/so-sure_blue-frown.svg');
                         background-size: 40px 40px;
                         background-repeat: no-repeat;
                         background-position: 30px center;

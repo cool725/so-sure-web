@@ -1,5 +1,6 @@
 //Competitors
 
+@import "../common/variables";
 @import "../mixins";
 @import "../common/paletteNew";
 
@@ -129,9 +130,9 @@ section {
 }
 
 .tick-background {
-    background: $white url('https://cdn.so-sure.com/images/library_benefits/so-sure_cover-tick-smaller.svg') center no-repeat;
+    background: $white url('#{$cdn_url}/images/library_benefits/so-sure_cover-tick-smaller.svg') center no-repeat;
 }
 
 .cross-background {
-    background: $white url('https://cdn.so-sure.com/images/library_benefits/so-sure_cover-cross-smaller.svg') center no-repeat;
+    background: $white url('#{$cdn_url}/images/library_benefits/so-sure_cover-cross-smaller.svg') center no-repeat;
 }
