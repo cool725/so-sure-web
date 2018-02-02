@@ -112,10 +112,14 @@ trait UserClassTrait
         return $mobile;
     }
     
-    public static function getRandomPhone(\Doctrine\ODM\MongoDB\DocumentManager $dm)
+    public static function getRandomPhone(\Doctrine\ODM\MongoDB\DocumentManager $dm, $make = null)
     {
         $phoneRepo = $dm->getRepository(Phone::class);
-        $phones = $phoneRepo->findBy(['active' => true]);
+        if ($make) {
+            $phones = $phoneRepo->findBy(['active' => true, 'make' => $make]);
+        } else {
+            $phones = $phoneRepo->findBy(['active' => true]);
+        }
         $phone = null;
         while ($phone == null) {
             $phone = $phones[rand(0, count($phones) - 1)];

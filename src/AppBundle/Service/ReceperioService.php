@@ -21,7 +21,7 @@ class ReceperioService extends BaseImeiService
     const CLAIMSCHECK_CACHE_TIME = 84600;
     const FORCES_CACHE_TIME = 84600;
     const TEST_INVALID_IMEI = "352000067704506";
-    const TEST_INVALID_SERIAL = "111111";
+    const TEST_INVALID_SERIAL = "111111111111";
     const TEST_MANUAL_PROCESS_SERIAL = "111112";
     const PARTNER_ID = 415;
     const BASE_URL = "http://gapi.checkmend.com";
