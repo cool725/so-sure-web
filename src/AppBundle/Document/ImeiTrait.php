@@ -10,6 +10,7 @@ trait ImeiTrait
         for ($i = 0; $i < 12; $i++) {
             $serialNumber[$i] = rand(0, 9);
         }
+        $serialNumber = implode('', $serialNumber);
 
         // strange bug - only sometimes will return 11 digits
         // TODO - fix this
