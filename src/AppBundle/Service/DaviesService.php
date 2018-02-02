@@ -397,6 +397,14 @@ class DaviesService extends S3EmailService
             }
         }
 
+        if (!$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_DAVIES_REPLACEMENT_COST_HIGHER) &&
+            $daviesClaim->phoneReplacementCost > $claim->getPolicy()->getPhone()->getInitialPrice()) {
+            $msg = sprintf(
+                'Device replacement cost for claim %s is greater than initial price of the device',
+                $daviesClaim->claimNumber
+            );
+            $this->warnings[$daviesClaim->claimNumber][] = $msg;
+        }
         // Open Non-Warranty Claims are expected to either have a total incurred value or a reserved value
         if ($daviesClaim->isOpen() && !$daviesClaim->isClaimWarranty() &&
             $this->areEqualToTwoDp($daviesClaim->getIncurred(), 0) &&

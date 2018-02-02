@@ -66,7 +66,6 @@ class DaviesCommand extends ContainerAwareCommand
                 json_encode(DaviesClaim::$sheetNames)
             ));
         }
-
         $davies = $this->getContainer()->get('app.davies');
         if ($isDaily) {
             $count = $davies->claimsDailyEmail();
