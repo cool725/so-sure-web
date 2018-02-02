@@ -164,6 +164,13 @@ abstract class Policy
     protected $status;
 
     /**
+     * @Assert\DateTime()
+     * @MongoDB\Date()
+     * @Gedmo\Versioned
+     */
+    protected $statusUpdated;
+
+    /**
      * @Assert\Choice({"wise"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
@@ -929,7 +936,20 @@ abstract class Policy
 
     public function setStatus($status)
     {
+        if ($status != $this->status) {
+            $this->setStatusUpdated(new \DateTime());
+        }
         $this->status = $status;
+    }
+
+    public function setStatusUpdated(\DateTime $statusUpdated = null)
+    {
+        $this->statusUpdated = $statusUpdated;
+    }
+
+    public function getStatusUpdated()
+    {
+        return $this->statusUpdated;
     }
 
     public function getCancelledReason()

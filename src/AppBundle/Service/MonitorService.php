@@ -168,17 +168,23 @@ class MonitorService
         // delay 10 minutes to allow time to sync
         $tenMinutes = new \DateTime();
         $tenMinutes = $tenMinutes->sub(new \DateInterval('PT10M'));
-        $newPolicies = $repo->findAllNewPolicies(null, $twoDays, $tenMinutes);
+        $updatedPolicies = $repo->findAllStatusUpdatedPolicies($twoDays, $tenMinutes);
         $errors = [];
-        foreach ($newPolicies as $newPolicy) {
-            // only active policies and definitely not cancelled
-            if (in_array($newPolicy->getStatus(), [Policy::STATUS_ACTIVE])) {
-                $intercomUser = $this->intercom->getIntercomUser($newPolicy->getUser());
-                if (is_object($intercomUser) && $intercomUser->custom_attributes->Premium <= 0) {
-                    $this->intercom->queue($newPolicy->getUser());
+        foreach ($updatedPolicies as $policy) {
+            $intercomUser = $this->intercom->getIntercomUser($policy->getUser());
+            if (is_object($intercomUser)) {
+                // only active/unpaid policies and definitely not cancelled
+                if ($policy->isActive(true) && $intercomUser->custom_attributes->Premium <= 0) {
+                    $this->intercom->queue($policy->getUser());
                     $errors[] = sprintf(
                         'Intercom out of sync: %s has a 0 premium in intercom, yet has a policy. Requeued.',
-                        $newPolicy->getUser()->getEmail()
+                        $policy->getUser()->getEmail()
+                    );
+                } elseif (!$policy->isActive(true) && $intercomUser->custom_attributes->Premium > 0) {
+                    $this->intercom->queue($policy->getUser());
+                    $errors[] = sprintf(
+                        'Intercom out of sync: %s has a premium in intercom, but policy is not active. Requeued.',
+                        $policy->getUser()->getEmail()
                     );
                 }
             }
