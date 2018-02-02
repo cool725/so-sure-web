@@ -261,6 +261,7 @@ class DaviesServiceTest extends WebTestCase
         $policy = new PhonePolicy();
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setId('1');
+        $policy->setPhone(self::getRandomPhone(self::$dm));
 
         $claim = new Claim();
         $claim->setPolicy($policy);
@@ -290,6 +291,7 @@ class DaviesServiceTest extends WebTestCase
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setId('1');
         $policy->setUser($user);
+        $policy->setPhone(self::getRandomPhone(self::$dm));
 
         $claim = new Claim();
         $claim->setPolicy($policy);
@@ -319,6 +321,7 @@ class DaviesServiceTest extends WebTestCase
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setId('1');
         $policy->setUser($user);
+        $policy->setPhone(self::getRandomPhone(self::$dm));
 
         $claim = new Claim();
         $claim->setPolicy($policy);
@@ -347,6 +350,7 @@ class DaviesServiceTest extends WebTestCase
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setId('1');
         $policy->setUser($user);
+        $policy->setPhone(self::getRandomPhone(self::$dm));
 
         $claim = new Claim();
         $claim->setPolicy($policy);
@@ -375,6 +379,7 @@ class DaviesServiceTest extends WebTestCase
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setId('1');
         $policy->setUser($user);
+        $policy->setPhone(self::getRandomPhone(self::$dm));
 
         $claim = new Claim();
         $claim->setPolicy($policy);
@@ -404,6 +409,7 @@ class DaviesServiceTest extends WebTestCase
         $policy->setStatus(Policy::STATUS_ACTIVE);
         $policy->setId('1');
         $policy->setUser($user);
+        $policy->setPhone(self::getRandomPhone(self::$dm));
 
         $claim = new Claim();
         $claim->setPolicy($policy);
@@ -653,6 +659,8 @@ class DaviesServiceTest extends WebTestCase
         $user->setLastName('bar');
         $policy = new PhonePolicy();
         $policy->setUser($user);
+        $policy->setPhone(self::getRandomPhone(self::$dm));
+
         $claim = new Claim();
         $policy->addClaim($claim);
         $policy->setPolicyNumber('TEST/2017/123456');
