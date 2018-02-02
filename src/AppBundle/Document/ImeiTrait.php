@@ -4,6 +4,23 @@ namespace AppBundle\Document;
 
 trait ImeiTrait
 {
+    public static function generateRandomAppleSerialNumber()
+    {
+        $serialNumber = [];
+        for ($i = 0; $i < 12; $i++) {
+            $serialNumber[$i] = rand(0, 9);
+        }
+        $serialNumber = implode('', $serialNumber);
+
+        // strange bug - only sometimes will return 11 digits
+        // TODO - fix this
+        if (strlen($serialNumber) != 12) {
+            return self::generateRandomAppleSerialNumber();
+        }
+
+        return $serialNumber;
+    }
+
     public static function generateRandomImei()
     {
         $imei = [];

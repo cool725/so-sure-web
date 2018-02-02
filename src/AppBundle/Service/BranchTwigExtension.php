@@ -60,7 +60,7 @@ class BranchTwigExtension extends \Twig_Extension
             if ($user->getMobileNumber()) {
                 $data['mobile'] = $user->getMobileNumber();
                 if (!isset($data['$deeplink_path'])) {
-                    $data['$deeplink_path'] = 'open/login/mobile';
+                    $data['$deeplink_path'] = 'open/login/sms';
                 }
             }
         }

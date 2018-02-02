@@ -16,6 +16,7 @@ use AppBundle\Document\File\PicSureFile;
 class PhonePolicy extends Policy
 {
     use CurrencyTrait;
+    use ImeiTrait;
 
     const STANDARD_VALUE = 10;
     const AGED_VALUE = 2;
@@ -225,6 +226,11 @@ class PhonePolicy extends Policy
     public function setSerialNumber($serialNumber)
     {
         $this->serialNumber = $serialNumber;
+    }
+
+    public function isValidAppleSerialNumber()
+    {
+        return $this->isAppleSerialNumber($this->getSerialNumber);
     }
 
     public function getPhoneData()

@@ -16,6 +16,7 @@ use AppBundle\Classes\Salva;
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Document\Invitation\EmailInvitation;
+use AppBundle\Service\ReceperioService;
 
 /**
  * @group functional-net
@@ -466,6 +467,32 @@ class PurchaseControllerTest extends BaseControllerTest
         $this->verifyPurchaseReady($crawler);
     }
 
+    public function testPurchaseReviewWithInvalidSerial()
+    {
+        $phone = self::getRandomPhone(static::$dm, 'Apple');
+
+        // set phone in session
+        $crawler = self::$client->request(
+            'GET',
+            self::$router->generate('quote_phone', ['id' => $phone->getId()])
+        );
+        $crawler = self::$client->followRedirect();
+
+        $crawler = $this->createPurchaseNew(
+            self::generateEmail('testPurchaseReviewWithInvalidSerial', $this),
+            'foo bar',
+            new \DateTime('1980-01-01')
+        );
+
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-policy'));
+
+        $crawler = $this->setPhoneNew($phone, null, 1, true, null, ReceperioService::TEST_INVALID_SERIAL);
+
+        self::verifyResponse(200);
+        $this->expectFlashError($crawler, 'phone model');
+    }
+
     public function testPayCC()
     {
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
@@ -779,8 +806,14 @@ class PurchaseControllerTest extends BaseControllerTest
         return $crawler;
     }
 
-    private function setPhoneNew($phone, $imei = null, $agreed = 1, $nextButton = true, $crawler = null)
-    {
+    private function setPhoneNew(
+        $phone,
+        $imei = null,
+        $agreed = 1,
+        $nextButton = true,
+        $crawler = null,
+        $serialNumber = null
+    ) {
         if (!$crawler) {
             $crawler = self::$client->request('GET', '/purchase/step-policy?force_result=new');
         }
@@ -802,9 +835,12 @@ class PurchaseControllerTest extends BaseControllerTest
                 $form['purchase_form[agreed]'] = 'checked';
             }
         }
-        if ($phone->getMake() == "Apple") {
+        if ($phone->isApple()) {
             // use a different number in case we're testing /, -, etc
-            $form['purchase_form[serialNumber]'] = self::generateRandomImei();
+            if (!$serialNumber) {
+                $serialNumber = self::generateRandomAppleSerialNumber();
+            }
+            $form['purchase_form[serialNumber]'] = $serialNumber;
         }
         $crawler = self::$client->submit($form);
 

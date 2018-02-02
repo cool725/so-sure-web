@@ -90,7 +90,7 @@ class PurchaseStepPhoneType extends AbstractType
                     ]);
                 }
 
-                if ($purchase->getPhone()->getMake() == "Apple") {
+                if ($purchase->getPhone()->isApple()) {
                     $form->add('serialNumber', TextType::class, ['required' => $this->required]);
                 }
             } else {
