@@ -328,19 +328,22 @@ class AdminController extends BaseController
         $dm = $this->getManager();
         $repo = $dm->getRepository(Claim::class);
         $claim = $repo->find($request->get('id'));
-        if ($claim) {
-            $subject = sprintf("Claim %s has been manually deleted.", $claim->getNumber());
-            $mailer = $this->get('app.mailer');
-            $mailer->sendTemplate(
-                $subject,
-                'tech@so-sure.com',
-                'AppBundle:Email:claim/manuallyDeleted.html.twig',
-                ['claim' => $claim, 'policy' => $claim->getPolicy()]
-            );
-            $dm->remove($claim);
-            $dm->flush();
-            $dm->clear();
+        if (!$claim) {
+            throw $this->createNotFoundException('Claim not found');
         }
+
+        $subject = sprintf("Claim %s has been manually deleted.", $claim->getNumber());
+        $mailer = $this->get('app.mailer');
+        $mailer->sendTemplate(
+            $subject,
+            'tech@so-sure.com',
+            'AppBundle:Email:claim/manuallyDeleted.html.twig',
+            ['claim' => $claim, 'policy' => $claim->getPolicy()]
+        );
+        $dm->remove($claim);
+        $dm->flush();
+        $dm->clear();
+
         return $this->redirectToRoute('admin_claims');
     }
 
@@ -358,6 +361,10 @@ class AdminController extends BaseController
         $repo = $dm->getRepository(Claim::class);
         $phoneRepo = $dm->getRepository(Phone::class);
         $claim = $repo->find($request->get('id'));
+        if (!$claim) {
+            throw $this->createNotFoundException('Claim not found');
+        }
+
         $phone = $phoneRepo->find($request->get('phone'));
         if ($claim && $phone) {
             $claim->setReplacementPhone($phone);
@@ -379,13 +386,13 @@ class AdminController extends BaseController
         $repo = $dm->getRepository(Claim::class);
         $claim = $repo->find($request->get('id'));
         if (!$claim) {
-            return $this->redirectToRoute('admin_claims');
+            throw $this->createNotFoundException('Claim not found');
         }
 
         if ($request->get('change-claim-type') && $request->get('claim-type')) {
             $claim->setType($request->get('claim-type'), true);
         }
-        if ($request->get('change-approved-date') && $request->get('new-approved-date')) {
+        if ($request->get('change-approved-date') && $request->get('approved-date')) {
             $date = new \DateTime($request->get('approved-date'));
             $claim->setApprovedDate($date);
         }

@@ -75,15 +75,12 @@ $('#claimsModal').on('show.bs.modal', function (event) {
             $('#claims-detail-type').attr('disabled', 'disabled');
     });
 
-    $('#claims-detail-approved').change(function () {
-        console.log('look mommy '+ moment($(this).text()).format('YYYY-MM-DD'));
-        $('#new-approved-date').val(moment($(this).text()).format('YYYY-MM-DD'));
-    });
-
     $("#change-approved-date").change(function(){
-      if(this.checked)
+      if (this.checked) {
         $('#claims-detail-approved').attr('readonly', false).datetimepicker({
-            format: 'DD-MM-YYYY'});
+            format: 'DD-MM-YYYY'
+        });
+      }
     });
 
     $("#delete-button").click(function(){

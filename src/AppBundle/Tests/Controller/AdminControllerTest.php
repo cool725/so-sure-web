@@ -56,7 +56,6 @@ class AdminControllerTest extends BaseControllerTest
 
     public function testAdminClaimUpdateForm()
     {
-        $repoClaim = self::$dm->getRepository(Claim::class);
         // make one claim just in case no claim was created and page is empty
         $user = static::createUser(
             static::$userManager,
@@ -79,19 +78,12 @@ class AdminControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', '/admin/claims');
         self::verifyResponse(200);
 
+        // print_r($crawler->html());
         // get one phone from the page
         $button = $crawler->filter('button[data-target="#claimsModal"]')->first()->attr('data-claim');
         $this->assertTrue(isset($button));
 
         $claimData = json_decode($button, true);
-        $claimPhoneId = $claimData['replacementPhone'];
-        $newPhoneId = null;
-
-        // select a different phone
-        while ($newPhoneId === null || $claimPhoneId == $newPhoneId) {
-            $phone = self::getRandomPhone(self::$dm);
-            $newPhoneId = $phone->getId();
-        }
 
         $form = $crawler->filter('form[id="phone-alternative-form"]')->form();
         $form['id'] = $claimData['id'];
@@ -99,6 +91,9 @@ class AdminControllerTest extends BaseControllerTest
         $form['change-approved-date'] = 'on';
         $crawler = self::$client->submit($form);
         self::verifyResponse(302);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repoClaim = $dm->getRepository(Claim::class);
         $newClaim = $repoClaim->find($claimData['id']);
         $this->assertEquals('2022-01-01', $newClaim->getApprovedDate()->format('Y-m-d'));
     }
