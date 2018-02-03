@@ -78,7 +78,7 @@ class AdminControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', '/admin/claims');
         self::verifyResponse(200);
 
-        print_r($crawler->html());
+        // print_r($crawler->html());
         // get one phone from the page
         $button = $crawler->filter('button[data-target="#claimsModal"]')->first()->attr('data-claim');
         $this->assertTrue(isset($button));
