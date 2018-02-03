@@ -95,6 +95,9 @@
                                         <i class="fa fa-warning" title="IMEI has been updated, but no replacement phone details"></i>
                                     {% endif %}
                                 {% endif %}
+                                {% if claim.replacementPhone and claim.replacementPhone.id != claim.policy.phone.id %}
+                                    <i class="fa fa-warning text-danger" title="Replacement phone does not match insured phone!"></i>
+                                {% endif %}
                             </td>
                         </tr>
                     {% endfor %}
