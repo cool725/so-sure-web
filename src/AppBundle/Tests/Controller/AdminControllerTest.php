@@ -78,19 +78,12 @@ class AdminControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', '/admin/claims');
         self::verifyResponse(200);
 
+        print_r($crawler->html());
         // get one phone from the page
         $button = $crawler->filter('button[data-target="#claimsModal"]')->first()->attr('data-claim');
         $this->assertTrue(isset($button));
 
         $claimData = json_decode($button, true);
-        $claimPhoneId = $claimData['replacementPhone'];
-        $newPhoneId = null;
-
-        // select a different phone
-        while ($newPhoneId === null || $claimPhoneId == $newPhoneId) {
-            $phone = self::getRandomPhone(self::$dm);
-            $newPhoneId = $phone->getId();
-        }
 
         $form = $crawler->filter('form[id="phone-alternative-form"]')->form();
         $form['id'] = $claimData['id'];

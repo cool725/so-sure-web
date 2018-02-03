@@ -392,7 +392,7 @@ class AdminController extends BaseController
         if ($request->get('change-claim-type') && $request->get('claim-type')) {
             $claim->setType($request->get('claim-type'), true);
         }
-        if ($request->get('change-approved-date') && $request->get('new-approved-date')) {
+        if ($request->get('change-approved-date') && $request->get('approved-date')) {
             $date = new \DateTime($request->get('approved-date'));
             $claim->setApprovedDate($date);
         }
