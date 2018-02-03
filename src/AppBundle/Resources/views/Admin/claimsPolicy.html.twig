@@ -3,7 +3,6 @@
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets output='css/*.css'
-    'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.css'
     '@AppBundle/Resources/public/sass/page/admin.scss'
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
@@ -11,9 +10,7 @@
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
-        'components/moment/moment.min.js'
         'components/clipboard/clipboard.min.js'
-        'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.js'
         '@AppBundle/Resources/public/js/tabs.js'
         '@AppBundle/Resources/public/js/Admin/claimsPolicy.js'
         '@AppBundle/Resources/public/js/Claims/phoneAlternativesModal.js'

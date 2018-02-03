@@ -1,8 +1,10 @@
     <div class="modal fade" id="claimsModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document" style="width: 50%">
         <div class="modal-content">
-        <form id="phone-alternative-form" method="post" action="{{ path('admin_claims_replacement_phone') }}">
-          <div class="modal-header">
+        <form id="phone-alternative-form" method="post" action="{{ path('admin_claims_update_claim') }}">
+            <input type="hidden" name="id" id="claims-detail-id"></input>
+            <input type="hidden" name="token" value="{{  csrf_token('default') }}"></input>
+            <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             <h4 class="modal-title">Claim: Unknown</h4>
           </div>
@@ -14,9 +16,21 @@
                     <td id='claims-detail-policy'></td>
                 </tr>
                 <tr>
-                    <td>Type</td>
-                    <td id='claims-detail-type'></td>
-                </tr>
+                    <td>Type
+                    {% if claim_types is defined %}
+                      <td>
+                          <select disabled="disabled" name="claim-type" id="claims-detail-type">
+                              {% for type in claim_types %}
+                                  <option value="{{ type }}">{{ type }}</option>
+                              {% endfor %}
+                          </select>
+                          <label>(change)</label>
+                          <input type="checkbox" id="change-claim-type" name="change-claim-type"></td>
+                      </td>
+                    {% else %}
+                      <td id="claims-detail-type"></td>
+                    {% endif %}
+
                 <tr>
                     <td>Status</td>
                     <td id='claims-detail-status'></td>
@@ -49,25 +63,31 @@
                     <td id='claims-detail-replacement-imei'></td>
                 </tr>
                 <tr>
-                    <td>Replacement Phone Details</td>
-                    <td id='claims-detail-replacement-phone-details'></td>
+                    <td>Replacement Phone Details
+                    </td>
+                    <td id='claims-detail-replacement-phone-details'>
                 </tr>
-                {% if phones is defined %}
                 <tr>
-                    <td>Replacement Phone</td>
                     <td>
-                            <input type="hidden" name="token" value="{{  csrf_token('default') }}"></input>
-                            <input type="hidden" name="id" id="claims-detail-id"></input>
-                            <select name="phone" id="claims-detail-replacement-phone">
+                        Replacement phone
+                    </td>
+                    <td>
+                        {% if is_granted('ROLE_ADMIN') and phones is defined%}
+                            <select disabled="disabled" name="replacement-phone" id="claims-detail-replacement-phone">
                                     <option value="">-- Select a phone --</option>
                                 {% for phone in phones %}
                                     <option value="{{ phone.id }}">{{ phone }}</option>
                                 {% endfor %}
                             </select>
-                            <button type="submit" class="btn btn-success">Update Replacement Phone</button>
+                            <label>(change)</label>
+                            <input type="checkbox" name='update-replacement-phone' id="update-replacement-phone"/>
+                        {% endif %}
                     </td>
                 </tr>
-                {% endif %}
+                <tr>
+                    <td>Insured phone</td>
+                    <td id='claims-detail-policy-phone'></td>
+                </tr>
             </table>
             <h3>Dates</h3>
             <table class="table table-striped">
@@ -84,8 +104,19 @@
                     <td id='claims-detail-recorded'></td>
                 </tr>
                 <tr>
-                    <td>Approved</td>
-                    <td id='claims-detail-approved'></td>
+                    <td>Approved
+                    </td>
+                        {% if is_granted('ROLE_ADMIN') %}
+                        <td>
+                            <input type="hidden" name="new-approved-date" id="new-approved-date"/>
+                            <input type="text" name="approved-date" readonly="readonly" id="claims-detail-approved"/>
+                            <label>(change)</label>
+                            <input type="checkbox" id="change-approved-date" name="change-approved-date">
+                        </td>
+                        {% else %}
+                            <td id="claims-detail-approved-show"></td>
+                        {% endif %}
+
                 </tr>
                 <tr>
                     <td>Replacement Received</td>
@@ -130,12 +161,29 @@
                     <td>Incurred</td>
                     <td id='claims-detail-incurred'></td>
                 </tr>
+                {% if is_granted('ROLE_ADMIN') %}
+                <tr id="update-button-row">
+                    <td>
+                        <button id="delete-button" id="delete-claim"  type="button" class="btn btn-danger">Delete Claim</button>
+                    </td>
+                    <td>
+                        <button id="update-button" class="btn btn-success">Save Updates</button>
+                    </td>
+                </tr>
+                {% endif %}
             </table>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          </div>
+              <button type="button" class="btn-xs btn-black-hollow" data-dismiss="modal">Close</button>
         </form>
+            {% if is_granted('ROLE_ADMIN') %}
+            <form id="delete-claim-form" method="POST" action="{{ path('admin_claims_delete_claim') }}">
+                <input type="hidden" name="id" id="claims-detail-delete-id"></input>
+                <input type="hidden" name="token" value="{{  csrf_token('default') }}"></input>
+            </form>
+            {% endif %}
+        </div>
+
         </div>
       </div>
     </div>

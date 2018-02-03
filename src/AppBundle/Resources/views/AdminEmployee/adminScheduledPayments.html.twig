@@ -9,8 +9,6 @@
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
-        'components/moment/moment.min.js'
-        'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.js'
         '@AppBundle/Resources/public/js/Admin/month.js'
     %}
     <script src="{{ asset_url }}"></script>

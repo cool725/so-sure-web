@@ -1,22 +1,5 @@
 {% extends 'admin_claims_base.html.twig' %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets
-    'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.css'
- %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-        'components/moment/moment.min.js'
-        'components/eonasdan-bootstrap-datetimepicker/bootstrap-datetimepicker.min.js'
-    %}
-    <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}
-{% endblock %}
-
 {% block body %}
 <div class="container" style="margin-bottom: 50px">
 

@@ -51,6 +51,14 @@ class Claim
         self::WARNING_FLAG_DAVIES_REPLACEMENT_COST_HIGHER => self::WARNING_FLAG_DAVIES_REPLACEMENT_COST_HIGHER
     ];
 
+    public static $claimTypes = [
+        self::TYPE_DAMAGE,
+        self::TYPE_THEFT,
+        self::TYPE_EXTENDED_WARRANTY,
+        self::TYPE_WARRANTY,
+        self::TYPE_LOSS
+    ];
+
     /**
      * @MongoDB\Id(strategy="auto")
      */
@@ -407,9 +415,9 @@ class Claim
         return $this->type;
     }
 
-    public function setType($type)
+    public function setType($type, $forceChange = false)
     {
-        if ($this->type && $this->type != $type) {
+        if ($this->type && $this->type != $type && !$forceChange) {
             throw new \Exception('Unable to change claim type');
         } elseif (!$type) {
             throw new \Exception('Type must be defined');
@@ -986,6 +994,7 @@ class Claim
             'number' => $this->getNumber(),
             'notes' => $this->getNotes(),
             'id' => $this->getId(),
+            'policyPhone' => $this->getPolicy()->getPhone()->__toString(),
             'policyId' => $this->getPolicy()->getId(),
             'policyNumber' => $this->getPolicy()->getPolicyNumber(),
             'handler' => $this->getHandler() ? $this->getHandler()->getName() : 'unknown',
