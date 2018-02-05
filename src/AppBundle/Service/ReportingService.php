@@ -74,6 +74,34 @@ class ReportingService
         $approvedClaimsTotals = Claim::sumClaims($approvedClaims);
         $closedClaims = $claimsRepo->findClosedClaims($start, $end);
         $closedClaimsTotals = Claim::sumClaims($closedClaims);
+        $allClaims = $claimsRepo->findAll();
+
+        // fnol 30 day approved %
+        $fnol30Claims = 0;
+        $totalClaims = 0;
+        foreach ($allClaims as $claim) {
+            if ($claim->getRecordedDate() > $end) {
+                continue;
+            }
+
+            $totalClaims++;
+            if ($claim->isWithin30DaysOfPolicyInception()) {
+                $fnol30Claims++;
+            }
+        }
+        $data['fnol30Claims'] = 100 * $fnol30Claims / $totalClaims;
+
+        $data['claimAttribution'] = [];
+        foreach($approvedClaims as $claim) {
+            if ($attribution = $claim->getPolicy()->getUser()->getAttribution()) {
+                if (isset($claimAttribution[$attribution->getSource()])) {
+                    $claimAttribution[$attribution->getSource()]++;
+                } else {
+                    $claimAttribution[$attribution->getSource()] = 1;
+                }
+            }
+        }
+        $data['claimAttributionJson'] = json_encode($data['claimAttribution']);
 
         $invalidPolicies = $policyRepo->getActiveInvalidPolicies();
         $invalidPoliciesIds = [];
@@ -353,6 +381,7 @@ class ReportingService
         $allTerms = $termsRepo->findAll();
         $data['picsureApproved'] = $policyRepo->countPicSurePolicies(PhonePolicy::PICSURE_STATUS_APPROVED, $allTerms);
         $data['picsureRejected'] = $policyRepo->countPicSurePolicies(PhonePolicy::PICSURE_STATUS_REJECTED, $allTerms);
+        $data['picsureInvalid'] = $policyRepo->countPicSurePolicies(PhonePolicy::PICSURE_STATUS_INVALID, $allTerms);
         $data['picsurePreApproved'] = $policyRepo->countPicSurePolicies(
             PhonePolicy::PICSURE_STATUS_PREAPPROVED,
             $allTerms

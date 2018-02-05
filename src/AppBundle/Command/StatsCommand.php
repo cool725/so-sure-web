@@ -37,6 +37,7 @@ class StatsCommand extends ContainerAwareCommand
         $this->getStats()->set(Stats::KPI_PICSURE_REJECTED_POLICIES, $date, $data['picsureRejected']);
         $this->getStats()->set(Stats::KPI_PICSURE_UNSTARTED_POLICIES, $date, $data['picsureUnstarted']);
         $this->getStats()->set(Stats::KPI_PICSURE_PREAPPROVED_POLICIES, $date, $data['picsurePreApproved']);
+        $this->getStats()->set(Stats::KPI_PICSURE_INVALID_POLICIES, $date, $data['picsureInvalid']);
     }
 
     private function cancelledAndPaymentOwed($date = null)
