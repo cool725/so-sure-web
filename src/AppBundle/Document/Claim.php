@@ -687,6 +687,16 @@ class Claim
         $this->claimHandlingFees = $claimHandlingFees;
     }
 
+    public function isWithin30DaysOfPolicyInception()
+    {
+        if (!$this->getRecordedDate() || !$this->getPolicy() || !$this->getPolicy()->getStart()) {
+            return false;
+        }
+
+        $diff = $this->getRecordedDate()->diff($this->getPolicy()->getStart());
+        return $diff->days < 30;
+    }
+
     public function isPhoneReturnExpected()
     {
         if (in_array($this->getType(), [Claim::TYPE_DAMAGE, Claim::TYPE_WARRANTY, Claim::TYPE_EXTENDED_WARRANTY])) {
