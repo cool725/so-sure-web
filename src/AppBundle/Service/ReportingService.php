@@ -94,10 +94,10 @@ class ReportingService
         $data['claimAttribution'] = [];
         foreach ($approvedClaims as $claim) {
             if ($attribution = $claim->getPolicy()->getUser()->getAttribution()) {
-                if (isset($claimAttribution[$attribution->getSource()])) {
-                    $claimAttribution[$attribution->getSource()]++;
+                if (isset($claimAttribution[$attribution->getCampaignSource()])) {
+                    $claimAttribution[$attribution->getCampaignSource()]++;
                 } else {
-                    $claimAttribution[$attribution->getSource()] = 1;
+                    $claimAttribution[$attribution->getCampaignSource()] = 1;
                 }
             }
         }
