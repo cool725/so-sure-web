@@ -92,7 +92,7 @@ class ReportingService
         $data['fnol30Claims'] = 100 * $fnol30Claims / $totalClaims;
 
         $data['claimAttribution'] = [];
-        foreach($approvedClaims as $claim) {
+        foreach ($approvedClaims as $claim) {
             if ($attribution = $claim->getPolicy()->getUser()->getAttribution()) {
                 if (isset($claimAttribution[$attribution->getSource()])) {
                     $claimAttribution[$attribution->getSource()]++;
