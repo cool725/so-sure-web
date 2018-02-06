@@ -41,8 +41,8 @@ class PrivledgedUserPasswordResetEmailCommand extends BaseCommand
         }
         $locked = [];
         foreach ($users as $user) {
-            if ($user->isPasswordChangeRequired() && !$user->isLocked()) {
-                $user->setLocked(true);
+            if ($user->isPasswordChangeRequired() && $user->isEnabled()) {
+                $user->setEnabled(false);
                 $this->sendLockedEmail($user);
                 $locked[] = $user->getEmail();
             }
