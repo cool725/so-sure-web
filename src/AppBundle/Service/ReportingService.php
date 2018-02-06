@@ -26,6 +26,7 @@ use AppBundle\Document\Payment\PolicyDiscountRefundPayment;
 use AppBundle\Document\Payment\ChargebackPayment;
 use AppBundle\Document\Payment\DebtCollectionPayment;
 use AppBundle\Document\PolicyTerms;
+use AppBundle\Document\User;
 
 class ReportingService
 {
@@ -62,7 +63,12 @@ class ReportingService
         if ($isKpi) {
             $totalEnd = $end;
         }
+        $rolling12Months = clone $end;
+        $rolling12Months = $rolling12Months->sub(new \DateInterval('P1Y'));
+        $rolling3Months = clone $start;
+        $rolling3Months = $rolling3Months->sub(new \DateInterval('P3M'));
 
+        $userRepo = $this->dm->getRepository(User::class);
         $policyRepo = $this->dm->getRepository(PhonePolicy::class);
         $connectionRepo = $this->dm->getRepository(StandardConnection::class);
         $invitationRepo = $this->dm->getRepository(Invitation::class);
@@ -94,14 +100,16 @@ class ReportingService
         $data['claimAttribution'] = [];
         foreach ($approvedClaims as $claim) {
             if ($attribution = $claim->getPolicy()->getUser()->getAttribution()) {
-                if (!isset($claimAttribution[$attribution->getCampaignSource()])) {
-                    $claimAttribution[$attribution->getCampaignSource()]++;
+                $source = $attribution->getCampaignSource();
+                if (isset($data['claimAttribution'][$source])) {
+                    $data['claimAttribution'][$source]++;
                 } else {
-                    $claimAttribution[$attribution->getCampaignSource()] = 1;
+                    $data['claimAttribution'][$source] = 1;
                 }
             }
         }
         $data['claimAttributionJson'] = json_encode($data['claimAttribution']);
+        $data['newUsers'] = $userRepo->findNewUsers($start, $end)->count();
 
         $invalidPolicies = $policyRepo->getActiveInvalidPolicies();
         $invalidPoliciesIds = [];
@@ -344,6 +352,12 @@ class ReportingService
 
         $data = array_merge($data, $this->getCancelledAndPaymentOwed());
         $data = array_merge($data, $this->getPicSureData());
+
+        $rolling12MonthClaims = $claimsRepo->findFNOLClaims($rolling12Months, $end);
+        $rolling12MonthClaimsTotals = Claim::sumClaims($rolling12MonthClaims);
+        $data['approvedClaimRate'] = $data['totalActivePolicies'] != 0 ?
+            100 * $rolling12MonthClaimsTotals['approved-settled'] / $data['totalActivePolicies'] :
+            'n/a';
 
         return [
             'start' => $start,
