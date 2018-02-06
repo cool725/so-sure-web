@@ -127,7 +127,7 @@ class KernelListener
             // authChecker doesn't seem to be working :(
             // WARNING - this means that we needs to directly check the assigned role instead of using role inheritance
             // TODO: Fixme
-            $employee = $user->hasEmployeeRole();
+            $employee = $token->getUser()->hasEmployeeRole();
             if (!$employee) {
                 return;
             }
