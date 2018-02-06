@@ -783,22 +783,41 @@ class AdminEmployeeController extends BaseController
                 if ($debtForm->isValid()) {
                     $policy->setDebtCollector(Policy::DEBT_COLLECTOR_WISE);
                     $dm->flush();
-                    $mailer = $this->get('app.mailer');
-                    $mailer->sendTemplate(
-                        'Debt Collection Request',
-                        'debts@awise.demon.co.uk',
-                        'AppBundle:Email:policy/debtCollection.html.twig',
-                        ['policy' => $policy],
-                        'AppBundle:Email:policy/debtCollection.txt.twig',
-                        ['policy' => $policy],
-                        null,
-                        'bcc@so-sure.com'
-                    );
 
-                    $this->addFlash(
-                        'success',
-                        sprintf('Emailed debt collector and set flag on policy')
-                    );
+                    if ($policy->getDebtCollector() == Policy::DEBT_COLLECTOR_WISE) {
+                        $email = 'debts@awise.demon.co.uk';
+                        $customerSubject = 'Wise has now been authorised to chase your debt to so-sure';
+                    }
+
+                    if ($email) {
+                        $mailer = $this->get('app.mailer');
+                        $mailer->sendTemplate(
+                            'Debt Collection Request',
+                            $email,
+                            'AppBundle:Email:policy/debtCollection.html.twig',
+                            ['policy' => $policy],
+                            'AppBundle:Email:policy/debtCollection.txt.twig',
+                            ['policy' => $policy],
+                            null,
+                            'bcc@so-sure.com'
+                        );
+
+                        $mailer->sendTemplate(
+                            $customerSubject,
+                            $policy->getUser()->getEmail(),
+                            'AppBundle:Email:policy/debtCollectionCustomer.html.twig',
+                            ['policy' => $policy],
+                            'AppBundle:Email:policy/debtCollectionCustomer.txt.twig',
+                            ['policy' => $policy],
+                            null,
+                            'bcc@so-sure.com'
+                        );
+
+                        $this->addFlash(
+                            'success',
+                            sprintf('Emailed debt collector and set flag on policy')
+                        );
+                    }
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
