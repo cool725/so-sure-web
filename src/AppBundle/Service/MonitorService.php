@@ -183,7 +183,7 @@ class MonitorService
                 } elseif (!$policy->isActive(true) && $intercomUser->custom_attributes->Premium > 0) {
                     // check what the expected premium for the user should be
                     // to ensure we're not checking an older expired policy where the is a renewal in place
-                    if ($user->getAnalytics()['annualPremium'] > 0) {
+                    if ($policy->getUser()->getAnalytics()['annualPremium'] > 0) {
                         continue;
                     }
 
