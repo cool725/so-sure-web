@@ -103,7 +103,7 @@ class ReportingService
 
         $data['claimAttribution'] = Claim::attributeClaims($approvedClaims);
         $data['claimAttributionText'] = http_build_query($data['claimAttribution'], '', '; ');
-        $data['rolling12MonthClaims'] = Claim::attributeClaims($rolling12MonthClaims, true);
+        $data['rolling12MonthClaims'] = Claim::attributeClaims($rolling12MonthClaims, true, true);
         $data['rolling12MonthClaimAttributionText'] = http_build_query($data['rolling12MonthClaims'], '', '; ');
 
         $data['newUsers'] = $userRepo->findNewUsers($start, $end)->count();

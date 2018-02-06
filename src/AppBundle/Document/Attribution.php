@@ -19,6 +19,54 @@ use AppBundle\Validator\Constraints\AlphanumericSpaceDotPipeValidator;
 class Attribution
 {
     const SOURCE_UNTRACKED = 'untracked';
+    const SOURCE_ACCOUNT_KIT = 'www.accountkit.com';
+    const SOURCE_JUDOPAY = 'pay.judopay.com';
+
+    const SOURCE_GOOGLE_SEARCH = 'www.google.co.uk';
+
+    const SOURCE_GOOGLE = 'goggle';
+    const SOURCE_GOOGLE_ADWORDS = 'google+adwords';
+    const SOURCE_BING = 'bing';
+
+    const SOURCE_EMAIL = 'email';
+    const SOURCE_INTERCOM = 'intercom';
+    const SOURCE_APP = 'app';
+
+    // comparision
+    const SOURCE_MONEY_CO_UK = 'money.co.uk';
+    const SOURCE_QUOTEZONE = 'quotezone';
+    const SOURCE_BOUGHTBYMANY = 'boughtbymany';
+
+    public static $sourceGroupUntracked = [
+        self::SOURCE_UNTRACKED,
+        self::SOURCE_ACCOUNT_KIT,
+        self::SOURCE_JUDOPAY,
+    ];
+
+    public static $sourceGroupBing = [
+        self::SOURCE_BING,
+    ];
+
+    public static $sourceGroupGoogle = [
+        self::SOURCE_GOOGLE,
+        self::SOURCE_GOOGLE_ADWORDS,
+    ];
+
+    public static $sourceGroupComparison = [
+        self::SOURCE_MONEY_CO_UK,
+        self::SOURCE_QUOTEZONE,
+        self::SOURCE_BOUGHTBYMANY,
+    ];
+
+    public static $sourceGroupAffiliate = [
+    ];
+
+    public static $sourceGroupOther = [
+        self::SOURCE_APP,
+        self::SOURCE_EMAIL,
+        self::SOURCE_INTERCOM,
+        self::SOURCE_GOOGLE_SEARCH,
+    ];
 
     /**
      * @AppAssert\AlphanumericSpaceDotPipe()
@@ -179,6 +227,26 @@ class Attribution
         // historical data seems to have issues with urls as source
         if (filter_var($source, FILTER_VALIDATE_URL)) {
             $source = parse_url($source, PHP_URL_HOST);
+        }
+
+        return $source;
+    }
+
+    public function getCampaignSourceGroup()
+    {
+        $source = $this->getNormalizedCampaignSource();
+        if (in_array($source, self::$sourceGroupUntracked)) {
+            return self::SOURCE_UNTRACKED;
+        } elseif (in_array($source, self::$sourceGroupAffiliate)) {
+            return 'Affiliate';
+        } elseif (in_array($source, self::$sourceGroupBing)) {
+            return 'Bing';
+        } elseif (in_array($source, self::$sourceGroupGoogle)) {
+            return 'Adwords';
+        } elseif (in_array($source, self::$sourceGroupComparison)) {
+            return 'Comparison';
+        } elseif (in_array($source, self::$sourceGroupOther)) {
+            return 'Other';
         }
 
         return $source;
