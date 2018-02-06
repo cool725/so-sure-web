@@ -16,7 +16,7 @@ use AppBundle\Document\Cashback;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Classes\SoSure;
 
-class EmailDebugCommand extends BaseCommand
+class PrivledgedUserPasswordResetEmailCommand extends BaseCommand
 {
     protected function configure()
     {
