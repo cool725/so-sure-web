@@ -266,8 +266,15 @@ class ReportingService
             $data['newPoliciesAvgPremium'] = null;
         }
 
-        $data['totalActivePolicyHolders'] = $policyRepo->groupAllActivePolicies();
-        $data['totalActivePolicies'] = $policyRepo->countAllActivePolicies();
+        $activePolicyHolders = [];
+        $activePolicies = $policyRepo->findAllActivePoliciesByInstallments(null, $end);
+        foreach ($activePolicies as $activePolicy) {
+            if (!in_array($activePolicy->getUser()->getId(), $activePolicyHolders)) {
+                $activePolicyHolders[] = $activePolicy->getUser()->getId();
+            }
+        }
+        $data['totalActivePolicyHolders'] = count($activePolicyHolders);
+        $data['totalActivePolicies'] = $policyRepo->countAllActivePolicies(null, $end);
         $data['totalPolicies'] = $policyRepo->countAllNewPolicies();
         $data['totalPoliciesAdjUpgrade'] = $data['totalPolicies'] - $data['totalUpgradePolicies'];
         $data['totalPoliciesPremium'] = $data['totalDirectPoliciesPremium'] + $data['totalInvitationPoliciesPremium'] +
