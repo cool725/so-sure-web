@@ -102,9 +102,9 @@ class ReportingService
         $data['fnol30Claims'] = 100 * $fnol30Claims / $totalClaims;
 
         $data['claimAttribution'] = Claim::attributeClaims($approvedClaims);
-        $data['claimAttributionText'] = http_build_query($data['claimAttribution'], '', '; ');
+        $data['claimAttributionText'] = $this->arrayToString($data['claimAttribution']);
         $data['rolling12MonthClaims'] = Claim::attributeClaims($rolling12MonthClaims, true, true);
-        $data['rolling12MonthClaimAttributionText'] = http_build_query($data['rolling12MonthClaims'], '', '; ');
+        $data['rolling12MonthClaimAttributionText'] = $this->arrayToString($data['rolling12MonthClaims']);
 
         $data['newUsers'] = $userRepo->findNewUsers($start, $end)->count();
 
@@ -266,6 +266,7 @@ class ReportingService
             $data['newPoliciesAvgPremium'] = null;
         }
 
+        $data['totalActivePolicyHolders'] = $policyRepo->groupAllActivePolicies();
         $data['totalActivePolicies'] = $policyRepo->countAllActivePolicies();
         $data['totalPolicies'] = $policyRepo->countAllNewPolicies();
         $data['totalPoliciesAdjUpgrade'] = $data['totalPolicies'] - $data['totalUpgradePolicies'];
@@ -851,5 +852,15 @@ class ReportingService
         }
 
         return $payments;
+    }
+
+    private function arrayToString($array, $keyValueSeperator = '=', $lineSeperator = '; ')
+    {
+        $data = [];
+        foreach ($array as $key => $value) {
+            $data[] = sprintf("%s%s%s", $key, $keyValueSeperator, $value);
+        }
+
+        return implode($lineSeperator, $data);
     }
 }

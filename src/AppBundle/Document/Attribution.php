@@ -55,10 +55,10 @@ class Attribution
     public static $sourceGroupComparison = [
         self::SOURCE_MONEY_CO_UK,
         self::SOURCE_QUOTEZONE,
-        self::SOURCE_BOUGHTBYMANY,
     ];
 
     public static $sourceGroupAffiliate = [
+        self::SOURCE_BOUGHTBYMANY,
     ];
 
     public static $sourceGroupOther = [
@@ -219,7 +219,7 @@ class Attribution
 
     public function getNormalizedCampaignSource()
     {
-        $source = strtolower($this->getCampaignSource());
+        $source = strtolower(trim($this->getCampaignSource()));
         if (strlen(trim($source)) == 0) {
             $source = self::SOURCE_UNTRACKED;
         }

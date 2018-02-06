@@ -88,6 +88,53 @@ class PhonePolicyRepository extends PolicyRepository
             ->count();
     }
 
+    /**
+     * All policies that are active with number of installment payments (excluding so-sure test ones)
+     */
+    public function groupAllActivePolicies(
+        \DateTime $startDate = null,
+        \DateTime $endDate = null,
+        $policyDiscountPresent = null
+    ) {
+        if (!$endDate) {
+            $endDate = new \DateTime();
+        }
+
+        $policy = new PhonePolicy();
+
+        $collection = $this->getDocumentManager()->getDocumentCollection($this->getClassName());
+
+        $match = [
+            'status' => [ '$in' => [ Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID ]],
+            'start' => [ '$lt' => $endDate ],
+            'policyNumber' => new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())),
+        ];
+        if ($startDate) {
+            $match['start'] = [ '$gte' => $startDate ];
+        }
+        if ($policyDiscountPresent !== null) {
+            $match['policyDiscountPresent'] = $policyDiscountPresent;
+        }
+        if ($this->excludedPolicyIds) {
+            $match['sourcePolicy.$id'] = [ '$nin' => $this->excludedPolicyIds];
+            $match['linkedPolicy.$id'] = [ '$nin' => $this->excludedPolicyIds];
+        }
+        $ops = [
+            [
+                '$match' => $match
+            ],
+            [
+                '$group' => [
+                   '_id' => ['user' => '$user'],
+                   'count' => ['$sum' => 1]
+                ]
+            ],
+        ];
+
+        $data = $collection->aggregate($ops);
+        return count($data['result']);
+    }
+
     public function findPoliciesForRewardPotLiability(\DateTime $date = null)
     {
         if (!$date) {
