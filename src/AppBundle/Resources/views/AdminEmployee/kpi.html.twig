@@ -210,18 +210,6 @@
                         </tr>
                         {#}
                         <tr>
-                            <td># Invitations - Email & SMS [KPI: 93]</td>
-                            {% for week in weeks %}
-                                <td>{{ week.period.data['newInvitationPolicies'] }}</td>
-                            {% endfor %}
-                        </tr>
-                        <tr>
-                            <td># Invitations - SCode [KPI: 95]</td>
-                            {% for week in weeks %}
-                                <td>{% if week['mixpanel-invite-someone'] is defined %}{{ week['mixpanel-invite-someone'] }}{% else %}unknown - see mixpanel{% endif %}</td>
-                            {% endfor %}
-                        </tr>
-                        <tr>
                             <td># New Connections [KPI: 97]</td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['newActiveConnections'] - week.period.data['newEndedConnections'] }} ( Active: {{ week.period.data['newActiveConnections'] }} - Ending: {{ week.period.data['newEndedConnections'] }} )</td>
@@ -328,6 +316,18 @@
                             <td>Receive Personal Details [KPI: 396]</td>
                             {% for week in weeks %}
                                 <td>{{ week['mixpanel-receive-personal-details'] }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td># Sent Invitations - Email & SMS [KPI: 436]</td>
+                            {% for week in weeks %}
+                                <td>{{ week.period.data['newInvitationPolicies'] }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td># Sent Invitations - SCode [KPI: 437]</td>
+                            {% for week in weeks %}
+                                <td>{% if week['mixpanel-invite-someone'] is defined %}{{ week['mixpanel-invite-someone'] }}{% else %}unknown - see mixpanel{% endif %}</td>
                             {% endfor %}
                         </tr>
                         <tr>
