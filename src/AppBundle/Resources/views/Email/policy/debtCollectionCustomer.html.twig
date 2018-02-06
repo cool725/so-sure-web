@@ -1,5 +1,6 @@
 {% extends 'AppBundle:Email:base.html.twig' %}
 {% import "AppBundle:Email:macros.html.twig" as macros %}
+{% block title %}{{ policy.debtCollector|capitalize }} has now been authorised to chase your debt to so-sure{% endblock %}
 {% block body %}
     {{ macros.start_table() }}
     <h1>
@@ -8,10 +9,10 @@
     <div style="font-size: 14px; text-align: left;">
         <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
         <div style="font-size: 14px; text-align: left;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
-                Debt collection process started
+                Dear {{ policy.user.name }},
                 <br><br>
-                This is to inform you that we have started a debt collection process
-                for policy {{ policy.policyNumber }}.
+                We requested that a 3rd party company ({{ policy.debtCollector|capitalize }}) start proceedings
+                to collect the outstanding funds that you owe so-sure for policy {{ policy.policyNumber }}.
                 <br><br>
                 Your phone {{ policy.phone }} was insured and you received
                 a replacement phone on {{ policy.getApprovedClaims(true, true)[0].replacementReceivedDate|date }}.
