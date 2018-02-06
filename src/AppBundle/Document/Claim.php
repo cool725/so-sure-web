@@ -983,6 +983,7 @@ class Claim
     {
         $data = [
             'total' => 0,
+            'approved-settled' => 0,
             self::STATUS_INREVIEW => 0,
             self::STATUS_APPROVED => 0,
             self::STATUS_SETTLED => 0,
@@ -993,6 +994,9 @@ class Claim
         foreach ($claims as $claim) {
             $data[$claim->getStatus()]++;
             $data['total']++;
+            if (in_array($claim->getStatus(), [self::STATUS_APPROVED, self::STATUS_SETTLED])) {
+                $data['approved-settled']++;
+            }
         }
 
         return $data;

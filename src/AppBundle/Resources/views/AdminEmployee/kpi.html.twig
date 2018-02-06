@@ -72,13 +72,25 @@
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Overall Approved Claim Rate- rolling 12mo [KPI: 65]</td>
+                            <td>Overall Approved Claim Rate- rolling 12mo [KPI: 65] <i class="fa fa-info" title="12 month FNOL that were approved / current active policies"></i></td>
+                            {% for week in weeks %}
+                                <td>{{ week.period.data['approvedClaimRate']|number_format(1, '.', ',') }}%</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td>Average cost of claims in month [KPI: 64]</td>
                             {% for week in weeks %}
                                 <td></td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Average cost of claims in month [KPI: 64]</td>
+                            <td># of User aquired [KPI: 71]</td>
+                            {% for week in weeks %}
+                                <td>{{ week.period.data['newUsers'] }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td># of New Policyholders [KPI: 73]</td>
                             {% for week in weeks %}
                                 <td></td>
                             {% endfor %}

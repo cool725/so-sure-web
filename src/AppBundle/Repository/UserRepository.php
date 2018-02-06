@@ -123,4 +123,15 @@ class UserRepository extends DocumentRepository
             ->getQuery()
             ->execute();
     }
+
+    public function findNewUsers(\DateTime $startDate, \DateTime $endDate)
+    {
+        $qb = $this->createQueryBuilder()
+            ->field('created')->lt($endDate)
+            ->field('created')->gte($startDate);
+
+        return $qb
+            ->getQuery()
+            ->execute();
+    }
 }
