@@ -3,7 +3,7 @@
 
 
 {# default to #}
-{% set uid          = '' %}
+{% set uid          = 'search-phone-form' %}
 {% set buttonText   = 'Instant Quote' %}
 {% set buttonCSS    = 'btn btn-blue btn-pad btn-block' %}
 {% set basePath     = '/phone-insurance/' %}
@@ -50,10 +50,6 @@
              placeholder="Find your phone e.g. iPhone 8 Plus..."
              value="{% if phone %}{{ phone.make }} {{ phone.model }}{% endif %}" />
     </form>
-
-    {% if type is not defined or not type  %}
-        <p><a href="mailto:hello@wearesosure.com" class="btn btn-link text-black open-intercom"><i class="fa fa-comments"></i> Don't see your device? Let us know.</a></p>
-    {% endif %}
 
     {# TODO: Move to footer #}
     {% include 'AppBundle::Default/loadingWidget.html.twig' with { 'class': 'loading-overlay-widget--show'} %}
