@@ -90,6 +90,6 @@ class AdminEmployeeControllerTest extends BaseControllerTest
         $mailCollector = self::$client->getProfile()->getCollector('swiftmailer');
         $collectedMessages = $mailCollector->getMessages();
         $this->assertContains('Please start the debt collection', $collectedMessages[0]->getBody());
-        $this->assertContains('Debt collection process started', $collectedMessages[1]->getBody());
+        $this->assertContains('authorised to chase your debt to so-sure', $collectedMessages[1]->getBody());
     }
 }
