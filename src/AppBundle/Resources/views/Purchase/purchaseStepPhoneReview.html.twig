@@ -156,7 +156,7 @@
                 <div class="form-group {% if form_errors(purchase_form.imei) %}has-error{% endif %}">
                     {{ form_label(purchase_form.imei, 'IMEI Number:', { 'label_attr': {'class': 'sr-only'} }) }}
                     {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control imei', 'placeholder':'IMEI Number'}}) }}
-                    <label class="samsung-imei">Numbers only please no / required</label>
+                    <label class="samsung-imei">Numbers only please (no / required)</label>
                     <div class="help-block with-errors">{{ form_errors(purchase_form.imei) }}</div>
                     <div class="help-block text-center">
                         <a href="#"
