@@ -141,8 +141,16 @@ $(function(){
     // Trim as you type
     $('.imei').on('keyup paste', function(event) {
         var simei  = $(this).val();
-        var newtxt = simei.replace('/', '');;
-        $(this).val(newtxt);
+
+        if (simei.indexOf('/') > 1) {
+            var newtxt = simei.replace('/', '');;
+            $(this).val(newtxt);
+            $('.samsung-imei').show();
+        }
+
+        if ($(this).valid()) {
+            $('.samsung-imei').hide();
+        }
     });
 
     // Hide/Show policy doc
