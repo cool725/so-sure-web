@@ -34,11 +34,11 @@ sosure.purchaseStepPhone = (function() {
         return (nCheck % 10) == 0;
     }
 
-    self.addValidation = function() {
+    self.addValidation = function(value) {
         $.validator.addMethod(
             "imei",
             function(value, element) {
-                var imei = value; //$('#purchase_form_imei').val();
+                var imei = value;
                 imei = imei.replace('/', '');
                 imei = imei.replace('-', '');
                 imei = imei.replace(' ', '');
@@ -136,6 +136,21 @@ $(function(){
         sosure.track.byName('Clicked Upload Imei');
         Intercom('trackEvent', 'clicked upload imei');
         Intercom('showNewMessage', $(this).data('intercom-msg'));
+    });
+
+    // Trim as you type
+    $('.imei').on('keyup paste', function(event) {
+        var simei  = $(this).val();
+
+        if (simei.indexOf('/') > 1) {
+            var newtxt = simei.replace('/', '');;
+            $(this).val(newtxt);
+            $('.samsung-imei').show();
+        }
+
+        if ($(this).valid()) {
+            $('.samsung-imei').hide();
+        }
     });
 
     // Hide/Show policy doc
