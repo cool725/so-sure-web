@@ -850,12 +850,24 @@ class PurchaseController extends BaseController
         $cancelForm = $this->get('form.factory')
             ->createNamedBuilder('cancel_form', UserCancelType::class)
             ->getForm();
+        $exp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_CANCELLATION,
+            ['damage', 'cancel'],
+            true,
+            1,
+            $policy->getUser()->getId()
+        );
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('cancel_form')) {
                 $cancelForm->handleRequest($request);
                 if ($cancelForm->isValid()) {
                     $reason = $cancelForm->getData()['reason'];
+                    $this->get('app.sixpack')->convertByClientId(
+                        $policy->getUser()->getId(),
+                        SixpackService::EXPERIMENT_CANCELLATION
+                    );
 
                     // @codingStandardsIgnoreStart
                     $body = sprintf(
@@ -907,10 +919,16 @@ class PurchaseController extends BaseController
             );
         }
 
-        return [
+        $template = 'AppBundle:Purchase:cancelDamage.html.twig';
+        if ($exp == 'cancel') {
+            $template = 'AppBundle:Purchase:cancel.html.twig';
+        }
+        $data = [
             'policy' => $policy,
             'cancel_form' => $cancelForm->createView(),
         ];
+
+        return $this->render($template, $data);
     }
 
     /**

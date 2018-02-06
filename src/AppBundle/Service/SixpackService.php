@@ -32,6 +32,7 @@ class SixpackService
     const EXPERIMENT_HOMEPAGE_STICKYSEARCH_PICSURE = 'homepage-v2-sticksearch-picsure';
     const EXPERIMENT_QUOTE_SECTIONS = 'quote-sections';
     const EXPERIMENT_POLICY_PDF_DOWNLOAD = 'policy-pdf-download';
+    const EXPERIMENT_CANCELLATION = 'cancellation';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_SHARE_MESSAGE_ORIGINAL = 'original';

@@ -104,6 +104,9 @@ class PolicyService
     /** @var SCodeService */
     protected $scodeService;
 
+    /** @var SixpackService */
+    protected $sixpackService;
+
     protected $warnMakeModelMismatch = true;
 
     public function setMailer($mailer)
@@ -160,6 +163,7 @@ class PolicyService
      * @param                  $intercom
      * @param SmsService       $sms
      * @param SCodeService     $scodeService
+     * @param SixpackService   $sixpackService
      */
     public function __construct(
         DocumentManager $dm,
@@ -182,7 +186,8 @@ class PolicyService
         $rateLimit,
         $intercom,
         SmsService $sms,
-        SCodeService $scodeService
+        SCodeService $scodeService,
+        SixpackService $sixpackService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -205,6 +210,7 @@ class PolicyService
         $this->intercom = $intercom;
         $this->sms = $sms;
         $this->scodeService = $scodeService;
+        $this->sixpackService = $sixpackService;
     }
 
     private function validateUser($user)
@@ -964,14 +970,22 @@ class PolicyService
         if ($policy->getPreviousPolicy()) {
             $baseTemplate = 'AppBundle:Email:policy/renew';
         }
+        $exp = $this->sixpackService->participate(
+            SixpackService::EXPERIMENT_CANCELLATION,
+            ['damage', 'cancel'],
+            true,
+            1,
+            $policy->getUser()->getId()
+        );
+
         try {
             $this->mailer->sendTemplate(
                 sprintf('Your so-sure policy %s', $policy->getPolicyNumber()),
                 $policy->getUser()->getEmail(),
                 sprintf('%s.html.twig', $baseTemplate),
-                ['policy' => $policy],
+                ['policy' => $policy, 'cancellation_experiment' => $exp],
                 sprintf('%s.txt.twig', $baseTemplate),
-                ['policy' => $policy],
+                ['policy' => $policy, 'cancellation_experiment' => $exp],
                 $attachmentFiles,
                 $bcc
             );
