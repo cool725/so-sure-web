@@ -181,6 +181,12 @@ class MonitorService
                         $policy->getUser()->getEmail()
                     );
                 } elseif (!$policy->isActive(true) && $intercomUser->custom_attributes->Premium > 0) {
+                    // check what the expected premium for the user should be
+                    // to ensure we're not checking an older expired policy where the is a renewal in place
+                    if ($user->getAnalytics()['annualPremium'] > 0) {
+                        continue;
+                    }
+
                     $this->intercom->queue($policy->getUser());
                     $errors[] = sprintf(
                         'Intercom out of sync: %s has a premium in intercom, but policy is not active. Requeued.',
