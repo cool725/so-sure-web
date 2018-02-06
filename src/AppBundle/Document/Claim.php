@@ -1002,13 +1002,19 @@ class Claim
         return $data;
     }
 
-    public static function attributeClaims($claims, $percent = false)
+    public static function attributeClaims($claims, $percent = false, $group = false)
     {
         $total = 0;
         $data = [];
         foreach ($claims as $claim) {
-            if ($attribution = $claim->getPolicy()->getUser()->getAttribution()) {
-                $source = $attribution->getNormalizedCampaignSource();
+            if ($claim->getPolicy()->getCompany()) {
+                $source = 'Company';
+            } elseif ($attribution = $claim->getPolicy()->getUser()->getAttribution()) {
+                if ($group) {
+                    $source = $attribution->getCampaignSourceGroup();
+                } else {
+                    $source = $attribution->getNormalizedCampaignSource();
+                }
             } else {
                 $source = Attribution::SOURCE_UNTRACKED;
             }
@@ -1028,7 +1034,7 @@ class Claim
 
             $percent = [];
             foreach ($data as $key => $value) {
-                $percent[$key] = sprintf('%0.1f%%', 100 * $value / $total);
+                $percent[$key] = sprintf("%0.1f%%", (100 * $value / $total));
             }
 
             return $percent;
