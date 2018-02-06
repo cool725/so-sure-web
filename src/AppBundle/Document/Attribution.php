@@ -24,8 +24,8 @@ class Attribution
 
     const SOURCE_GOOGLE_SEARCH = 'www.google.co.uk';
 
-    const SOURCE_GOOGLE = 'goggle';
-    const SOURCE_GOOGLE_ADWORDS = 'google+adwords';
+    const SOURCE_GOOGLE = 'google';
+    const SOURCE_GOOGLE_ADWORDS = 'google adwords';
     const SOURCE_BING = 'bing';
 
     const SOURCE_EMAIL = 'email';
