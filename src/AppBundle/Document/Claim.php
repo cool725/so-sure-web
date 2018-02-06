@@ -1002,7 +1002,7 @@ class Claim
         return $data;
     }
 
-    public static function attributeClaims($claims, $percent = false, $group = false)
+    public static function attributeClaims($claims, $group = true, $percent = false)
     {
         $total = 0;
         $data = [];

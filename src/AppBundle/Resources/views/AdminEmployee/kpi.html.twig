@@ -185,7 +185,7 @@
                         <tr>
                             <td>Number of active Policyholders [KPI: 110]</td>
                             {% for week in weeks %}
-                                <td></td>
+                                <td>{{ week.period.data['totalActivePolicyHolders'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
