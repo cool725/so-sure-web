@@ -640,7 +640,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     public function getLastPasswordChange()
     {
-        $oldPasswords = $user->getPreviousPasswords();
+        $oldPasswords = $this->getPreviousPasswords();
 
         if (!is_array($oldPasswords)) {
             $oldPasswords = $user->getPreviousPasswords->getValues();
