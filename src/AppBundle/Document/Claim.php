@@ -1008,12 +1008,9 @@ class Claim
         $data = [];
         foreach ($claims as $claim) {
             if ($attribution = $claim->getPolicy()->getUser()->getAttribution()) {
-                $source = strtolower($attribution->getCampaignSource());
-                if (strlen(trim($source)) == 0) {
-                    $source = 'Untracked';
-                }
+                $source = $attribution->getNormalizedCampaignSource();
             } else {
-                $source = 'Untracked';
+                $source = Attribution::SOURCE_UNTRACKED;
             }
 
             if (isset($data[$source])) {
@@ -1031,7 +1028,7 @@ class Claim
 
             $percent = [];
             foreach ($data as $key => $value) {
-                $percent[$key] = $value / $total;
+                $percent[$key] = sprintf('%0.1f%%', 100 * $value / $total);
             }
 
             return $percent;

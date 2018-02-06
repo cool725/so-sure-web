@@ -18,6 +18,8 @@ use AppBundle\Validator\Constraints\AlphanumericSpaceDotPipeValidator;
  */
 class Attribution
 {
+    const SOURCE_UNTRACKED = 'untracked';
+
     /**
      * @AppAssert\AlphanumericSpaceDotPipe()
      * @Assert\Length(min="1", max="250")
@@ -165,5 +167,20 @@ class Attribution
         }
 
         return implode($glue, $lines);
+    }
+
+    public function getNormalizedCampaignSource()
+    {
+        $source = strtolower($this->getCampaignSource());
+        if (strlen(trim($source)) == 0) {
+            $source = self::SOURCE_UNTRACKED;
+        }
+
+        // historical data seems to have issues with urls as source
+        if (filter_var($source, FILTER_VALIDATE_URL)) {
+            $source = parse_url($source, PHP_URL_HOST);
+        }
+
+        return $source;
     }
 }
