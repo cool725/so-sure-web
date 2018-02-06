@@ -1002,6 +1002,43 @@ class Claim
         return $data;
     }
 
+    public static function attributeClaims($claims, $percent = false)
+    {
+        $total = 0;
+        foreach ($claims as $claim) {
+            if ($attribution = $this->getPolicy()->getUser()->getAttribution()) {
+                $source = strtolower($attribution->getCampaignSource());
+                if (strlen(trim($source)) == 0) {
+                    $source = 'Untracked';
+                }
+            } else {
+                $source = 'Untracked';
+            }
+
+            if (isset($data[$source])) {
+                $data[$source]++;
+            } else {
+                $data[$source] = 1;
+            }
+            $total++;
+        }
+
+        if ($percent) {
+            if ($total == 0) {
+                return [];
+            }
+
+            $percent = [];
+            foreach ($data as $key => $value) {
+                $percent[$key] = $value / $total;
+            }
+
+            return $percent;
+        }
+
+        return $data;
+    }
+
     public function toModalArray()
     {
         return [
