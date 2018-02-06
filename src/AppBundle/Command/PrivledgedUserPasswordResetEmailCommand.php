@@ -59,7 +59,7 @@ class PrivledgedUserPasswordResetEmailCommand extends BaseCommand
     private function sendLockedEmail(User $user)
     {
         $router = $this->getContainer()->get('app.router');
-        $resetUrl = $router->generate('fos_user_resetting_request', ['email' => $user->getEmail()]);
+        $resetUrl = $router->generateUrl('fos_user_resetting_request', ['email' => $user->getEmail()]);
         $mailer = $this->getContainer()->get('app.mailer');
         $mailer->sendTemplate(
             'Your so-sure password needs changing (Account is now locked)',
