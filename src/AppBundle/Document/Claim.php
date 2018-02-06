@@ -1005,8 +1005,9 @@ class Claim
     public static function attributeClaims($claims, $percent = false)
     {
         $total = 0;
+        $data = [];
         foreach ($claims as $claim) {
-            if ($attribution = $this->getPolicy()->getUser()->getAttribution()) {
+            if ($attribution = $claim->getPolicy()->getUser()->getAttribution()) {
                 $source = strtolower($attribution->getCampaignSource());
                 if (strlen(trim($source)) == 0) {
                     $source = 'Untracked';
