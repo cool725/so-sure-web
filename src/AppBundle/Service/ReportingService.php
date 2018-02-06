@@ -85,6 +85,7 @@ class ReportingService
         // fnol 30 day approved %
         $fnol30Claims = 0;
         $totalClaims = 0;
+        $rolling12MonthClaims = [];
         foreach ($allClaims as $claim) {
             if ($claim->getRecordedDate() > $end) {
                 continue;
@@ -94,21 +95,17 @@ class ReportingService
             if ($claim->isWithin30DaysOfPolicyInception()) {
                 $fnol30Claims++;
             }
+            if ($claim->getRecordedDate() >= $rolling12Months) {
+                $rolling12MonthClaims[] = $claim;
+            }
         }
         $data['fnol30Claims'] = 100 * $fnol30Claims / $totalClaims;
 
-        $data['claimAttribution'] = [];
-        foreach ($approvedClaims as $claim) {
-            if ($attribution = $claim->getPolicy()->getUser()->getAttribution()) {
-                $source = $attribution->getCampaignSource();
-                if (isset($data['claimAttribution'][$source])) {
-                    $data['claimAttribution'][$source]++;
-                } else {
-                    $data['claimAttribution'][$source] = 1;
-                }
-            }
-        }
-        $data['claimAttributionJson'] = json_encode($data['claimAttribution']);
+        $data['claimAttribution'] = Claim::attributeClaims($approvedClaims);
+        $data['claimAttributionText'] = http_build_query($data['claimAttribution'], '', '; ');
+        $data['rolling12MonthClaims'] = Claim::attributeClaims($rolling12MonthClaims, true);
+        $data['rolling12MonthClaimAttributionText'] = http_build_query($data['rolling12MonthClaims'], '', '; ');
+
         $data['newUsers'] = $userRepo->findNewUsers($start, $end)->count();
 
         $invalidPolicies = $policyRepo->getActiveInvalidPolicies();

@@ -271,9 +271,15 @@
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Claim Attribution [KPI: 190-197]</td>
+                            <td>Claim Attribution [KPI: 178-185]</td>
                             {% for week in weeks %}
-                                <td>{{ week.period.data['claimAttributionJson'] }}</td>
+                                <td>{{ week.period.data['claimAttributionText'] }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td>Rolling 12 month Claim Attribution [KPI: 188-195]</td>
+                            {% for week in weeks %}
+                                <td>{{ week.period.data['rolling12MonthClaimAttributionText'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
