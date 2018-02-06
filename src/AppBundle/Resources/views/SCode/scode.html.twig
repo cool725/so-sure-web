@@ -1,8 +1,8 @@
 {% extends 'base.html.twig' %}
 
 {# Set vars #}
-{% set include_emoji = 1 %}
-{% set white_logo = true %}
+{% set new_stylesheet = 1 %}
+{% set new_footer = 1 %}
 
 {% block title %}so-sure - Join today and we'll reward you!{% endblock %}
 
@@ -11,19 +11,6 @@
     {% stylesheets output='css/*.css'
     '@AppBundle/Resources/public/sass/page/homepage.scss'
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-    'components/dot/doT.min.js'
-    'components/vimeo-player-js/player.min.js'
-    'components/corejs-typeahead/typeahead.bundle.min.js'
-    'components/fuse.js/fuse.min.js'
-    '@AppBundle/Resources/public/js/Default/modalVideo.js'
-    '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
- %}
-    <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
 
 {% block meta %}
@@ -40,7 +27,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-10 col-md-offset-1 text-center">
-                    <h1 class="text-white">
+                    <h1 class="">
                         {% if scode is defined and scode and scode.policy %}
                             Insure your phone with {{scode.policy.user.name}}.
                         {% elseif scode is defined and scode and scode.reward %}
@@ -51,44 +38,49 @@
                             Insure your phone.
                         {% endif %}
                         <br>
-                        <span class="h2 text-white">Get up to 80% of your money back.</span>
+                        <span class="h2">Get up to 80% of your money back.</span>
                     </h1>
-                    <p class="lead text-white" id="hero-description">Introducing so-sure, a better kind of phone insurance that allows you to get up to 80% of your money back when you connect with those you trust &amp; none of you claim.</p>
+                    <p class="lead" id="hero-description">Introducing so-sure, a better kind of phone insurance that allows you to get up to 80% of your money back when you connect with those you trust &amp; none of you claim.</p>
 
-                    {{ render(controller('AppBundle:Default:selectPhoneMake', {'type':'old-inline'})) }}
+                    {{ render(controller('AppBundle:Default:selectPhoneMakeV2')) }}
 
                 </div>
             </div>
         </div>
     </section>
 
-    {% include 'AppBundle::Default/press.html.twig' %}
+    {% include 'AppBundle::Default/_sectionComparison.html.twig' %}
 
-    {% include 'AppBundle::Default/benefits.html.twig' %}
+    {% include 'AppBundle::Default/_sectionRewardPot.html.twig' %}
 
-    {% include 'AppBundle::Default/howItWorksVideo.html.twig' %}
+    <div class="curved-background hidden-xs">
+        <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 2000 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g id="Artboard" fill="#d6ebff">
+                    <path d="M0,0 L2000,0 L2000,139.921588 C1890.08746,181.703317 1753.08746,201.692115 1589,199.887983 C1424.91254,198.083852 1258.91254,174.763587 1091,129.927189 C918.666667,89.9495926 740,69.9607942 555,69.9607942 C370,69.9607942 185,113.269857 0,199.887983 L0,0 Z" id="Rectangle" transform="translate(1000.000000, 100.000000) scale(-1, 1) translate(-1000.000000, -100.000000) "></path>
+                </g>
+            </g>
+        </svg>
+    </div>
 
-    {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}
-
-
-    <section class="press">
-        <div class="container">
-            <div class="col-sm-3 col-md-2 col-md-offset-3">
-                <h4 class="footer-press--heading">
-                    <strong><small>IN PARTNERSHIP WITH</small></strong>
-                </h4>
-            </div>
-            <div class="col-sm-3 col-md-2">
-                <img src="{{ cdn_url }}/images/munichre-logo.png" alt="Munich RE">
-            </div>
-            <div class="col-sm-3 col-md-2">
-                <img src="{{ cdn_url }}/images/salva-logo.png" alt="Salva">
-            </div>
-        </div>
-    </section>
+    {% include 'AppBundle::Default/_sectionFeedback.html.twig' %}
 
     {# Page Modals #}
 
     {% include 'AppBundle::Default/modalVideo.html.twig' %}
 
-    {% endblock %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    'components/lozad/lozad.min.js'
+    'components/dot/doT.min.js'
+    '@AppBundle/Resources/public/js/Default/images.js'
+    'components/vimeo-player-js/player.min.js'
+    'components/corejs-typeahead/typeahead.bundle.min.js'
+    'components/fuse.js/fuse.min.js'
+    '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
+ %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}
