@@ -17,7 +17,7 @@
 
 		   </div>
 		</div>
-		{% if policy.policyTerms.isPicSureEnabled %}
+		{% if policy.policyTerms.isPicSureEnabled and policy.picSureStatus != 'preapproved' %}
 		<div style="font-size: 14px; text-align: left;">
 		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
 		   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
