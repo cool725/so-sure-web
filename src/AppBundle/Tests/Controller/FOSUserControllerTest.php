@@ -7,6 +7,7 @@ use AppBundle\Document\User;
 
 /**
  * @group functional-net
+ * AppBundle\\Tests\\Controller\\FOSUserControllerTest
  */
 class FOSUserControllerTest extends BaseControllerTest
 {
@@ -206,29 +207,124 @@ class FOSUserControllerTest extends BaseControllerTest
         $this->setPassword($reset['url'], 'foooBarr1!', true);
     }
 
-    private function resetPassword($email)
+    public function testPasswordResetLockedUser()
+    {
+        $email = self::generateEmail('testPasswordResetLockedUser', $this);
+        $user = static::createUser(
+            self::$userManager,
+            $email,
+            'foo'
+        );
+        $user->setLocked(true);
+        static::$dm->flush();
+
+        // can't login
+        $this->login($email, 'foo', 'login');
+
+        $this->resetPassword($email, false);
+
+        // can't login
+        $this->login($email, 'foooBarr1!', 'login');
+    }
+
+    public function testPasswordResetDisabledUser()
+    {
+        $email = self::generateEmail('testPasswordResetDisabledUser', $this);
+        $user = static::createUser(
+            self::$userManager,
+            $email,
+            'foo'
+        );
+        $user->setEnabled(false);
+        static::$dm->flush();
+
+        // can't login
+        $this->login($email, 'foo', 'login');
+
+        $reset = $this->resetPassword($email);
+
+        // cannot change password
+        $this->setPassword($reset['url'], 'foooBarr1!', false, 403);
+
+        // can't login
+        $this->login($email, 'foo', 'login');
+    }
+
+    public function testPasswordResetCredentialsExpired()
+    {
+        $email = self::generateEmail('testPasswordResetCredentialsExpired', $this);
+        $user = static::createUser(
+            self::$userManager,
+            $email,
+            'foo'
+        );
+        $ninetyDaysAgo = new \DateTime();
+        $ninetyDaysAgo = $ninetyDaysAgo->sub(new \DateInterval('P90D'));
+        $user->passwordChange('foo', 'bar', $ninetyDaysAgo);
+        $user->addRole('ROLE_ADMIN');
+        static::$dm->flush();
+
+        // can't login
+        $this->login($email, 'foo', 'login');
+
+        $reset = $this->resetPassword($email);
+        $this->setPassword($reset['url'], 'foooBarr1!', true);
+
+        // now can login
+        $this->login($email, 'foooBarr1!', 'admin/');
+    }
+
+    private function resetPassword($email, $expectSuccess = true)
     {
         $crawler = self::$client->request('GET', '/resetting/request');
         self::verifyResponse(200);
         $form = $crawler->filter('.fos_user_resetting_request')->form();
         $form['username'] = $email;
+        self::$client->followRedirects();
         $crawler = self::$client->submit($form);
-        self::verifyResponse(302);
+        self::$client->followRedirects(false);
+        if ($expectSuccess) {
+            $this->assertEquals(
+                sprintf('http://localhost/resetting/check-email?username=%s', urlencode($email)),
+                self::$client->getHistory()->current()->getUri()
+            );
+        } else {
+            $this->assertEquals(
+                sprintf('http://localhost/resetting/request', urlencode($email)),
+                self::$client->getHistory()->current()->getUri()
+            );
+        }
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $userRepo = $dm->getRepository(User::class);
         $updatedUser = $userRepo->findOneBy(['emailCanonical' => strtolower($email)]);
+        if ($expectSuccess) {
+            $this->assertTrue(
+                strlen($updatedUser->getConfirmationToken()) > 10,
+                sprintf('Unable to find reset token: %s', $crawler->html())
+            );
+        } else {
+            $this->assertTrue(
+                strlen($updatedUser->getConfirmationToken()) == 0,
+                sprintf('Found unexpected reset token: %s', $crawler->html())
+            );
+        }
 
         return [
             'password' => $updatedUser->getPassword(),
-            'url' => sprintf('/resetting/reset/%s', $updatedUser->getConfirmationToken()),
+            'url' => $expectSuccess ? sprintf('/resetting/reset/%s', $updatedUser->getConfirmationToken()) : null,
             'updatedUser' => $updatedUser,
         ];
     }
 
-    private function setPassword($url, $password, $expectedSuccess = true)
+    private function setPassword($url, $password, $expectedSuccess = true, $initialRequestCode = 200)
     {
         $crawler = self::$client->request('GET', $url);
+        self::verifyResponse($initialRequestCode, null, $crawler);
+        if ($initialRequestCode > 200) {
+            return;
+        }
+
         $form = $crawler->filter('.fos_user_resetting_reset')->form();
         $form['fos_user_resetting_form[plainPassword][first]'] = $password;
         $form['fos_user_resetting_form[plainPassword][second]'] = $password;

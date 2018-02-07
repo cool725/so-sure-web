@@ -383,6 +383,22 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $this->locked = $locked;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function isAccountNonLocked()
+    {
+        return !$this->isLocked();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isCredentialsNonExpired()
+    {
+        return !$this->isPasswordChangeRequired();
+    }
+
     public function getCreated()
     {
         return $this->created;
@@ -617,10 +633,13 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $this->multipays[] = $multipay;
     }
 
-    public function passwordChange($oldPassword, $oldSalt)
+    public function passwordChange($oldPassword, $oldSalt, \DateTime $date = null)
     {
-        $now = new \DateTime();
-        $this->previousPasswords[$now->format('U')] = ['password' => $oldPassword, 'salt' => $oldSalt];
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        $this->previousPasswords[$date->format('U')] = ['password' => $oldPassword, 'salt' => $oldSalt];
     }
 
     public function getPreviousPasswords()
