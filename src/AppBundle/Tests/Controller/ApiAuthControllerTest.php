@@ -20,6 +20,7 @@ use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Event\UserEmailEvent;
 use AppBundle\Listener\UserListener;
 use AppBundle\Service\RateLimitService;
+use AppBundle\Service\ReceperioService;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
@@ -33,7 +34,6 @@ class ApiAuthControllerTest extends BaseControllerTest
     const INVALID_IMEI = '356938035643808';
     const BLACKLISTED_IMEI = '352000067704506';
     const LOSTSTOLEN_IMEI = '351451208401216';
-    const MISMATCH_SERIALNUMBER = '111111';
 
     protected static $testUser;
     protected static $testUser2;
@@ -1384,7 +1384,7 @@ class ApiAuthControllerTest extends BaseControllerTest
             'memory' => 63,
             'rooted' => false,
             'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
-            'serial_number' => self::MISMATCH_SERIALNUMBER,
+            'serial_number' => ReceperioService::TEST_INVALID_SERIAL,
         ]]);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_IMEI_PHONE_MISMATCH);
     }
