@@ -20,10 +20,12 @@
 {% block body %}
 <div class="container">
     <h3>Picsure Machine Learning</h3>
+    {# 
     <div class="container-action">
         <button title="Sync images" type="button" class="btn btn-success picsure-ml-sync" data-token="{{ csrf_token('default') }}" data-active="{{ path('admin_picsure_ml_sync') }}">Sync images</button>
         <button title="Generate annotations" type="button" class="btn btn-success picsure-ml-annotate" data-token="{{ csrf_token('default') }}" data-active="{{ path('admin_picsure_ml_annotate') }}">Generate annotations</button>
     </div>
+     #}
 
 {% if images|length == 0 %}
     <h4>No images</h4>
@@ -32,7 +34,7 @@
     {% for image in images %}
         <div class="picsure-image col-md-3 col-md-offset-1">
             <a href="{{ path('admin_picsure_ml_edit', {'id': image.id }) }}">
-                <img src="{{ path('admin_picsure_ml_image', {'file': image.path }) }}">
+                <img src="{{ path('admin_picsure_ml_image', {'file': image.key }) }}">
             </a>
         </div>
     {% endfor %}

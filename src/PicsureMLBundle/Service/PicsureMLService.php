@@ -26,6 +26,7 @@ class PicsureMLService
         $this->logger = $logger;
     }
 
+/*
     public function sync($filesystem)
     {
         $repo = $this->dm->getRepository(Image::class);
@@ -64,22 +65,7 @@ class PicsureMLService
                 );
             }
         }
-
-        $fs = new Filesystem();
-        try {
-            $file = sprintf("%s/annotations.txt", sys_get_temp_dir());
-            $fs->dumpFile($file, implode(PHP_EOL, $annotations));
-
-            $stream = fopen($file, 'r+');
-            if ($stream != false) {
-                $filesystem->putStream('annotations.txt', $stream);
-                fclose($stream);
-            }
-        } catch (IOExceptionInterface $e) {
-            $this->logger->warning(
-                sprintf("An error occurred while writting the annotations to %s", $e->getPath()),
-                ['exception' => $e]
-            );
-        }
     }
+    */
+    
 }

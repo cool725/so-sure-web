@@ -22,22 +22,27 @@ class Image
     /**
      * @MongoDB\Field(type="integer", name="x")
      */
-    protected $x;
+    //protected $x;
 
     /**
      * @MongoDB\Field(type="integer", name="y")
      */
-    protected $y;
+    //protected $y;
 
     /**
      * @MongoDB\Field(type="integer", name="width")
      */
-    protected $width;
+    //protected $width;
 
     /**
      * @MongoDB\Field(type="integer", name="height")
      */
-    protected $height;
+    //protected $height;
+
+    /**
+     * @MongoDB\Field(type="string", name="label")
+     */
+    protected $label;
 
     public function getId()
     {
@@ -53,6 +58,24 @@ class Image
     {
         return $this->path;
     }
+
+    public function setLabel($label)
+    {
+        $this->label = $label;
+    }
+
+    public function getLabel()
+    {
+        return $this->label;
+    }
+
+    public function hasLabel()
+    {
+        return $this->label != null;
+    }
+
+
+    /*
 
     public function setX($x)
     {
@@ -111,4 +134,6 @@ class Image
     {
         return $this->x != null && $this->y != null && $this->width != null && $this->height != null;
     }
+
+    */
 }

@@ -592,6 +592,13 @@ services:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
 
+    app.picsure:
+        class: AppBundle\Service\PicsureService
+        arguments:
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "@event_dispatcher"
+
     app.twig.feature:
         class: AppBundle\Service\FeatureTwigExtension
         arguments:
@@ -842,6 +849,15 @@ services:
         tags:
           - { name: monolog.logger, channel: mailer }
           - { name: "swiftmailer.default.plugin" }
+
+    app.listener.picsure:
+        class:   AppBundle\Listener\PicsureListener
+        arguments:
+            - "@doctrine_mongodb.odm.default_document_manager"
+        tags:
+            -  { name: kernel.event_listener, event: event.picsure.undamaged, method: onUndamagedEvent }
+            -  { name: kernel.event_listener, event: event.picsure.invalid, method: onInvalidEvent }
+            -  { name: kernel.event_listener, event: event.picsure.damaged, method: onDamagedEvent }
 
     app.form.type.registration:
         class: AppBundle\Form\Type\RegistrationFormType
