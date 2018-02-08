@@ -106,49 +106,49 @@ class Claim
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      */
     protected $recordedDate;
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      */
     protected $lossDate;
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      */
     protected $notificationDate;
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      */
     protected $replacementReceivedDate;
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      */
     protected $createdDate;
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      */
     protected $approvedDate;
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      */
     protected $closedDate;

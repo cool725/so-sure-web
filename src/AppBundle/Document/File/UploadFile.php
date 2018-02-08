@@ -25,7 +25,7 @@ abstract class UploadFile extends S3File
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      * @var \DateTime
      */
     private $updatedAt;

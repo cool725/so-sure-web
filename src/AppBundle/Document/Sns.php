@@ -18,7 +18,7 @@ class Sns
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      */
     protected $created;
 

@@ -165,7 +165,7 @@ abstract class Policy
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      */
     protected $statusUpdated;
@@ -279,56 +279,56 @@ abstract class Policy
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      */
     protected $created;
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      */
     protected $issueDate;
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      */
     protected $start;
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      */
     protected $billing;
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      */
     protected $end;
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      */
     protected $staticEnd;
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      */
     protected $pendingCancellation;
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      */
     protected $renewalExpiration;
@@ -388,7 +388,7 @@ abstract class Policy
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      */
     protected $lastEmailed;
 
@@ -422,7 +422,7 @@ abstract class Policy
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      */
     protected $viewedCancellationPage;
@@ -435,7 +435,7 @@ abstract class Policy
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      */
     protected $requestedCancellation;
@@ -450,7 +450,7 @@ abstract class Policy
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      */
     protected $visitedWelcomePage;

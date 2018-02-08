@@ -38,7 +38,7 @@ class Charge
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      */
     protected $createdDate;

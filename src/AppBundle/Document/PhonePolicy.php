@@ -76,7 +76,7 @@ class PhonePolicy extends Policy
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      */
     protected $imeiReplacementDate;
@@ -112,7 +112,7 @@ class PhonePolicy extends Policy
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      */
     protected $picSureApprovedDate;

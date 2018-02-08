@@ -174,7 +174,7 @@ class Phone
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      */
     protected $releaseDate;
 

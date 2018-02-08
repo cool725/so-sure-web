@@ -59,7 +59,7 @@ class Connection
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      */
     protected $initialInvitationDate;
@@ -78,7 +78,7 @@ class Connection
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      */
     protected $date;

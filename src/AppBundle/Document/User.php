@@ -94,7 +94,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      */
     protected $created;
 
@@ -284,7 +284,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      */
     protected $birthday;
