@@ -1024,6 +1024,16 @@ class JudopayService
 
         try {
             $tokenPaymentDetails = $tokenPayment->create();
+        } catch (\Judopay\Exception\ApiException $e) {
+            $this->logger->warning(sprintf('Error running token payment (retrying) %s. Ex: %s', $paymentRef, $e));
+            sleep(1);
+            try {
+                $tokenPaymentDetails = $tokenPayment->create();
+            } catch (\Exception $e) {
+                $this->logger->error(sprintf('Error running retried token payment %s. Ex: %s', $paymentRef, $e));
+
+                throw $e;
+            }
         } catch (\Exception $e) {
             $this->logger->error(sprintf('Error running token payment %s. Ex: %s', $paymentRef, $e));
 
