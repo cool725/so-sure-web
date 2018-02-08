@@ -205,7 +205,21 @@ class MonitorService
     {
         // acutal 50,000 for plan
         $maxUsers = 48000;
-        $total = $this->mixpanel->getUserCount();
+        $total = 0;
+        $count = 0;
+        while ($total == 0) {
+            try {
+                $total = $this->mixpanel->getUserCount();
+            } catch (\Exception $e) {
+                if ($count > 5) {
+                    throw $e;
+                }
+                sleep(1);
+            }
+
+            $count++;
+        }
+
         if ($total > $maxUsers) {
             throw new MonitorException(sprintf('User count %d too high (warning %d)', $total, $maxUsers));
         }
