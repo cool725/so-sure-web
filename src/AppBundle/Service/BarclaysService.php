@@ -277,7 +277,8 @@ class BarclaysService
                     if (trim($line['CHARGE GROUP']) == 'Chargebacks') {
                         //throw new \Exception(print_r($line, true));
                         $ref = trim(str_replace($merchantId, '', $line['CHARGE TYPE']));
-                        $amount = $this->toTwoDp(0 - $line['CHARGE GROUP TOTAL']);
+                        $ref = str_replace('/', '', $ref);
+                        $amount = $this->toTwoDp(0 - $line['CHARGE TOTAL']);
                         $id = null;
                         $chargeback = $repo->findOneBy(['reference' => $ref]);
                         if (!$chargeback) {
