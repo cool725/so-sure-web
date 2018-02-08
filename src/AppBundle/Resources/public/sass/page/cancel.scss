@@ -1,7 +1,7 @@
 // cancel.scss
 
 @import "../mixins";
-@import "../common/palette";
+@import "../common/paletteNew";
 
 .navbar {
     background-color: $white;
@@ -22,7 +22,7 @@
 
 	@include breakpoint(laptop) {
 		text-align: center;
-		min-height: 300px;
+		min-height: 500px;
 	}
 }
 
@@ -34,13 +34,58 @@
 	margin-left: auto;
 	margin-right: auto;
 
-	p {
+	p, ul, ol {
 		text-align: left;
+	}
+
+	ul, ol {
+		padding-left: 20px;
+
+		li {
+			padding: 8px 0;
+		}
 	}
 
 	&--controls {
 		margin-top: 30px;
 	}
+
+    table {
+        text-align: left;
+        margin: 0 auto 50px;
+        border: 1px solid $pale-grey;
+
+        thead {
+            td {
+                padding: 20px;
+                text-align: center;
+                vertical-align: middle;
+                border-bottom: 1px solid $pale-grey;;
+            }
+        }
+
+        tr {
+            td.sosure {
+                background-color: $white;
+            }
+
+            td.contrast {
+                background-color: lighten($lightest-blue, 6%);
+                opacity: 0.7;
+            }
+        }
+
+        tbody {
+
+            tr {
+                td {
+                    padding: 15px 20px;
+                    border-bottom: 1px solid $pale-grey;;
+                    vertical-align: middle;
+                }
+            }
+        }
+    }
 
 
 	// p {
