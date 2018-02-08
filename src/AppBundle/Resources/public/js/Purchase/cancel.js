@@ -22,8 +22,6 @@ $(function(){
 
         var data = $(this).data();
 
-        // console.log(data.info);
-
         $('.reasons').fadeOut('fast', function() {
             $(data.info).fadeIn();
         });
@@ -49,6 +47,12 @@ $(function(){
             $('#cancel_form_reason').val(reason);
             $('#cancel_form').submit();
         }
+    });
+
+    // Other
+    $('#other-reason').on('keyup', function() {
+        var newreason = $(this).val();
+        $('#btn-cancel-other').data('reason', newreason);
     });
 
 });

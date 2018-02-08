@@ -84,7 +84,7 @@
                                 <a href="#"
                                    id="reason-8"
                                    class="btn btn-blue-hollow btn-block btn-pad btn-cancel"
-                                   data-reason="Other..."
+                                   data-reason="other"
                                    data-target="#reason-8-info">Other...</a>
                             </div>
                         </div>
@@ -246,7 +246,7 @@
                        class="btn btn-blue-hollow btn-pad btn-back "><i class="fa fa-angle-left" aria-hidden="true"></i> Back to options</a>
                     <a href="#"
                        class="btn btn-red btn-pad  btn-cancel-policy"
-                       data-reason="I found another provider">
+                       data-reason="Technical Difficulties">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         Cancel My Policy
                     </a>
@@ -266,7 +266,7 @@
                        class="btn btn-blue-hollow btn-pad btn-back "><i class="fa fa-angle-left" aria-hidden="true"></i> Back to options</a>
                     <a href="#"
                        class="btn btn-red btn-pad  btn-cancel-policy"
-                       data-reason="I found another provider">
+                       data-reason="pic-sure is annoying">
                         <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
                         Cancel My Policy
                     </a>
@@ -276,21 +276,18 @@
             <div id="reason-8-info" class="information">
                 <h1>Other...</h1>
                 <p class="lead">Some text...</p>
-                <textarea class="form-control">Enter details here...</textarea>
+                <input id="other-reason" type="text" class="form-control" placeholder="Enter reason here..." />
                 <div class="information--controls clearfix">
                     <a href="#"
                        class="btn btn-blue-hollow btn-pad btn-back "><i class="fa fa-angle-left" aria-hidden="true"></i> Back to options</a>
                     <a href="#"
-                       class="btn btn-red btn-pad  btn-cancel-policy"
-                       data-reason="I found another provider">
-                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                       id="btn-cancel-other"
+                       data-reason="other"
+                       class="btn btn-red btn-pad btn-cancel-policy disabled">
                         Cancel My Policy
                     </a>
                 </div>
             </div>
-
-
-
 
         </div>
     </section>
