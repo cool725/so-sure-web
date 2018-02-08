@@ -1,14 +1,107 @@
 {% extends 'base.html.twig' %}
 
+{# Set vars #}
+{% set new_stylesheet = 1 %}
+{% set new_footer = 1 %}
+
 {% block title %}so-sure - Better Phone Insurance{% endblock %}
 {% block meta %}
     <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends don't claim. Download our app now to see how much you could save."/>
     <meta name="keywords" content="mobile phone insurance, social insurance"/>
 {% endblock %}
 
-{% block body %}
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets output='css/*.css'
+    '@AppBundle//Resources/public/sass/page/cancel.scss'
+    %}
+    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
 
-    <section class="hero background-blue">
+{% block body %}
+    <section class="section--pad">
+        <div class="container">
+
+
+            <div class="reasons">
+                <h1>Before you go...</h1>
+                <p class="lead">We appreciate that sometimes people have a change of heart. <br class="visible-md-inline"> To help us improve, we'd love to know why you'd like to cancel.</p>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-sm-6 col-md-3">
+                                <a href="#"
+                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel"
+                                   data-reason="Already broken or damaged">Already broken or damaged</a>
+                            </div>
+                            <div class="col-sm-6 col-md-3">
+                                <a href="#"
+                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel"
+                                   data-reason="Too expensive">Too expensive</a>
+                            </div>
+                            <div class="col-sm-6 col-md-3">
+                                <a href="#"
+                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel"
+                                   data-reason="I found another provider">I found another provider</a>
+                            </div>
+                            <div class="col-sm-6 col-md-3">
+                                <a href="#"
+                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel"
+                                   data-reason="Already covered">Already covered</a>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6 col-md-3">
+                                <a href="#"
+                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel"
+                                   data-reason="I don't want insurance">I don't want insurance</a>
+                            </div>
+                            <div class="col-sm-6 col-md-3">
+                                <a href="#"
+                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel"
+                                   data-reason="Technical difficulties">Technical difficulties</a>
+                            </div>
+                            <div class="col-sm-6 col-md-3">
+                                <a href="#"
+                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel"
+                                   data-reason="pic-sure is annoying">pic-sure is annoying</a>
+                            </div>
+                            <div class="col-sm-6 col-md-3">
+                                <a href="#"
+                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel"
+                                   data-reason="Other...">Other...</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <p>Please select your reason for cancelling above and then click next</p>
+                        <a href="#"
+                           id="btn-next-step"
+                           class="btn btn-green btn-pad" disabled>Next step</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="information">
+                <h2>Reason Title</h2>
+                <p>Reason message</p>
+                <ul class="list-inline">
+                    <li>
+                        <a href="#"
+                           class="btn btn-blue-hollow btn-pad">Back</a>
+                    </li>
+                    <li>
+                        <a href="#"
+                           class="btn btn-red btn-pad">Cancel My Policy</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+{#     <section class="hero background-blue">
         <div class="container">
 
             <div class="row">
@@ -40,12 +133,11 @@
             {{ form_start(cancel_form, {'attr': {'id': 'cancel_form'}}) }}
             {{ form_widget(cancel_form.reason) }}
             {{ form_widget(cancel_form.cancel) }}
-            {{ form_end(cancel_form) }}   
+            {{ form_end(cancel_form) }}
         </div>
 
-    </section>
+    </section> #}
 
-</div>
 
 {% endblock %}
 

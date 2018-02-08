@@ -1,0 +1,22 @@
+// cancel.scss
+
+@import "../mixins";
+@import "../common/palette";
+
+.btn-cancel {
+	margin-bottom: 30px;
+}
+
+.reasons {
+
+	@include breakpoint(laptop) {
+		text-align: center;
+	}
+}
+
+.information {
+
+	@include breakpoint(laptop) {
+		text-align: center;
+	}
+}
