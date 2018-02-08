@@ -20,8 +20,10 @@ $(function(){
     $('#btn-next-step').on('click', function(e) {
         e.preventDefault();
 
+        // Get the data from the button
         var data = $(this).data();
 
+        // Fade out choices fadeIn choices information
         $('.reasons').fadeOut('fast', function() {
             $(data.info).fadeIn();
         });
@@ -31,6 +33,7 @@ $(function(){
     $('.btn-back').on('click', function(e) {
         e.preventDefault();
 
+        // Hide info and reset stuff
         $('.information').fadeOut('fast', function() {
             $('.reasons').fadeIn()
             $('.btn-cancel').removeClass('active user-choice');
@@ -40,19 +43,27 @@ $(function(){
 
     // Cancel button
     $('.btn-cancel-policy').on('click', function() {
-        var reason = $(this).data('reason');
-        $(this).attr('disabled');
-        $('.btn-back').attr('disabled');
-        if (confirm('Are you sure you want to cancel your policy? Cancellation can not be undone and once cancelled, your phone will no longer be covered for Theft, Loss, & Accidental Damage.')) {
-            $('#cancel_form_reason').val(reason);
-            $('#cancel_form').submit();
+
+        if ($(this).is('#btn-cancel-other')) {
+            var reason = 'Other: ' + $('#other-reason').val();
+        } else {
+            var reason = $(this).data('reason');
         }
+
+        console.log(reason);
+
+        // $(this).attr('disabled');
+        // $('.btn-back').addClass('disabled');
+        // if (confirm('Are you sure you want to cancel your policy? Cancellation can not be undone and once cancelled, your phone will no longer be covered for Theft, Loss, & Accidental Damage.')) {
+        //     $('#cancel_form_reason').val(reason);
+        //     $('#cancel_form').submit();
+        // }
     });
 
     // Other
-    $('#other-reason').on('keyup', function() {
-        var newreason = $(this).val();
-        $('#btn-cancel-other').data('reason', newreason);
-    });
+    // $('#other-reason').on('keyup', function() {
+    //     var newreason = $(this).val();
+    //      $('#btn-cancel-other').data('reason', newreason);
+    // });
 
 });
