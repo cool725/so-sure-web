@@ -63,7 +63,7 @@ class Stats
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      */
     protected $date;
 

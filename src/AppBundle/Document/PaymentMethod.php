@@ -20,7 +20,7 @@ abstract class PaymentMethod
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
      */
     protected $firstProblem;

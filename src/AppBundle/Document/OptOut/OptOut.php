@@ -27,7 +27,7 @@ abstract class OptOut
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      */
     protected $created;
 

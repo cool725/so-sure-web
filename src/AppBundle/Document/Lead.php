@@ -32,7 +32,7 @@ class Lead
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      */
     protected $created;
 

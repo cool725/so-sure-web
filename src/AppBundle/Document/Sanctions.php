@@ -38,7 +38,7 @@ class Sanctions
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      */
     protected $date;
 
@@ -65,7 +65,7 @@ class Sanctions
 
     /**
      * @Assert\DateTime()
-     * @MongoDB\Date()
+     * @MongoDB\Field(type="date")
      */
     protected $birthday;
 
