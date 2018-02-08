@@ -31,75 +31,101 @@
                         <div class="row">
                             <div class="col-sm-6 col-md-3">
                                 <a href="#"
+                                   id="reason-1"
                                    class="btn btn-blue-hollow btn-block btn-pad btn-cancel"
-                                   data-reason="Already broken or damaged">Already broken or damaged</a>
+                                   data-reason="Already broken or damaged"
+                                   data-target="#reason-1-info">Already broken or damaged</a>
                             </div>
                             <div class="col-sm-6 col-md-3">
                                 <a href="#"
+                                   id="reason-2"
                                    class="btn btn-blue-hollow btn-block btn-pad btn-cancel"
-                                   data-reason="Too expensive">Too expensive</a>
+                                   data-reason="Too expensive"
+                                   data-target="#reason-2-info">Too expensive</a>
                             </div>
                             <div class="col-sm-6 col-md-3">
                                 <a href="#"
+                                   id="reason-3"
                                    class="btn btn-blue-hollow btn-block btn-pad btn-cancel"
-                                   data-reason="I found another provider">I found another provider</a>
+                                   data-reason="I found another provider"
+                                   data-target="#reason-3-info">I found another provider</a>
                             </div>
                             <div class="col-sm-6 col-md-3">
                                 <a href="#"
+                                   id="reason-4"
                                    class="btn btn-blue-hollow btn-block btn-pad btn-cancel"
-                                   data-reason="Already covered">Already covered</a>
+                                   data-reason="Already covered"
+                                   data-target="#reason-4-info">Already covered</a>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-sm-6 col-md-3">
                                 <a href="#"
+                                   id="reason-5"
                                    class="btn btn-blue-hollow btn-block btn-pad btn-cancel"
-                                   data-reason="I don't want insurance">I don't want insurance</a>
+                                   data-reason="I don't want insurance"
+                                   data-target="#reason-5-info">I don't want insurance</a>
                             </div>
                             <div class="col-sm-6 col-md-3">
                                 <a href="#"
+                                   id="reason-6"
                                    class="btn btn-blue-hollow btn-block btn-pad btn-cancel"
-                                   data-reason="Technical difficulties">Technical difficulties</a>
+                                   data-reason="Technical difficulties"
+                                   data-target="#reason-6-info">Technical difficulties</a>
                             </div>
                             <div class="col-sm-6 col-md-3">
                                 <a href="#"
+                                   id="reason-7"
                                    class="btn btn-blue-hollow btn-block btn-pad btn-cancel"
-                                   data-reason="pic-sure is annoying">pic-sure is annoying</a>
+                                   data-reason="pic-sure is annoying"
+                                   data-target="#reason-7-info">pic-sure is annoying</a>
                             </div>
                             <div class="col-sm-6 col-md-3">
                                 <a href="#"
+                                   id="reason-8"
                                    class="btn btn-blue-hollow btn-block btn-pad btn-cancel"
-                                   data-reason="Other...">Other...</a>
+                                   data-reason="Other..."
+                                   data-target="#reason-8-info">Other...</a>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <p>Please select your reason for cancelling above and then click next</p>
-                        <a href="#"
-                           id="btn-next-step"
-                           class="btn btn-green btn-pad" disabled>Next step</a>
-                    </div>
+                <div class="controls">
+                    <p>Please select your reason for cancelling above</p>
+                    <a href="#"
+                       id="btn-next-step"
+                       data-info=""
+                       class="btn btn-green btn-block btn-pad" disabled>Next step</a>
                 </div>
             </div>
 
-            <div class="information">
-                <h2>Reason Title</h2>
-                <p>Reason message</p>
-                <ul class="list-inline">
-                    <li>
-                        <a href="#"
-                           class="btn btn-blue-hollow btn-pad">Back</a>
-                    </li>
-                    <li>
-                        <a href="#"
-                           class="btn btn-red btn-pad">Cancel My Policy</a>
-                    </li>
-                </ul>
+            <div id="reason-1-info"
+                 class="information clearfix">
+                <h2>Already Broken/ Damaged</h2>
+                <p><strong>We understand that mistakes happen. If your phone was damaged prior to purchasing your policy, you can easily rectify this mistake by clicking the cancel button now.</strong></p>
+                <p>Keep in mind that we take fraud very seriously and do prosecute. When you purchased your policy, you confirmed that your phone was in full working condition and without a cracked screen. If you failed to disclose the state of your phone accurately, we may exercise our right to cancel the policy and will report any instance of fraud to the police.</p>
+                <div class="information--controls">
+                    <a href="#"
+                       class="btn btn-blue-hollow btn-pad btn-back pull-left"><i class="fa fa-angle-left" aria-hidden="true"></i> Back to options</a>
+                    <a href="#"
+                       class="btn btn-red btn-pad pull-right btn-cancel-policy"
+                       data-reason="Already broken or damaged">
+                        <i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+                        Cancel My Policy
+                    </a>
+                </div>
             </div>
+
+
         </div>
     </section>
+
+    <div class="hidden">
+        {{ form_start(cancel_form, {'attr': {'id': 'cancel_form'}}) }}
+        {{ form_widget(cancel_form.reason) }}
+        {{ form_widget(cancel_form.cancel) }}
+        {{ form_end(cancel_form) }}
+    </div>
 
 {#     <section class="hero background-blue">
         <div class="container">
@@ -129,12 +155,7 @@
             </div>
 
         </div>
-        <div class="hidden">
-            {{ form_start(cancel_form, {'attr': {'id': 'cancel_form'}}) }}
-            {{ form_widget(cancel_form.reason) }}
-            {{ form_widget(cancel_form.cancel) }}
-            {{ form_end(cancel_form) }}
-        </div>
+
 
     </section> #}
 

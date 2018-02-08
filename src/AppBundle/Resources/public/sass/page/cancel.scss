@@ -3,20 +3,49 @@
 @import "../mixins";
 @import "../common/palette";
 
+.navbar {
+    background-color: $white;
+}
+
 .btn-cancel {
 	margin-bottom: 30px;
 }
 
-.reasons {
-
-	@include breakpoint(laptop) {
-		text-align: center;
-	}
+.controls {
+	max-width: 350px;
+	text-align: center;
+	margin: 0 auto;
 }
 
+.reasons,
 .information {
 
 	@include breakpoint(laptop) {
 		text-align: center;
+		min-height: 300px;
 	}
+}
+
+// Hide initially
+.information {
+	display: none;
+
+	max-width: 800px;
+	margin-left: auto;
+	margin-right: auto;
+
+	p {
+		text-align: left;
+	}
+
+	&--controls {
+		margin-top: 30px;
+	}
+
+
+	// p {
+	// 	text-align: left;
+	// 	max-width: 800px;
+
+	// }
 }
