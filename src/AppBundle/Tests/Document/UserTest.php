@@ -167,6 +167,54 @@ class UserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, count($user->getAllPolicies()));
     }
 
+    public function testLastPasswordChange()
+    {
+        $user = new User();
+        $user->setCreated(new \DateTime('2010-01-01'));
+        $this->assertEquals(new \DateTime('2010-01-01'), $user->getLastPasswordChange());
+
+        $user->passwordChange('a', 'b', new \DateTime('2011-01-01'));
+        $this->assertEquals(new \DateTime('2011-01-01'), $user->getLastPasswordChange());
+
+        $user->passwordChange('a', 'b', new \DateTime('2010-07-01'));
+        $this->assertEquals(new \DateTime('2011-01-01'), $user->getLastPasswordChange());
+    }
+
+    public function testPasswordChangeRequired()
+    {
+        $user = new User();
+        $this->assertFalse($user->isPasswordChangeRequired());
+        $user->setCreated(new \DateTime('2010-01-01'));
+        $this->assertFalse($user->isPasswordChangeRequired());
+        $this->assertTrue($user->isCredentialsNonExpired());
+
+        $user->passwordChange('a', 'b', new \DateTime('2011-01-01'));
+        $this->assertFalse($user->isPasswordChangeRequired());
+        $this->assertTrue($user->isCredentialsNonExpired());
+
+        $user->addRole('ROLE_ADMIN');
+        $this->assertTrue($user->isPasswordChangeRequired());
+        $this->assertFalse($user->isCredentialsNonExpired());
+
+        $eightyNineDaysAgo = new \DateTime();
+        $eightyNineDaysAgo = $eightyNineDaysAgo->sub(new \DateInterval('P89D'));
+        $user->passwordChange('a', 'b', $eightyNineDaysAgo);
+        $this->assertFalse($user->isPasswordChangeRequired());
+        $this->assertTrue($user->isCredentialsNonExpired());
+
+        $user = new User();
+        $user->addRole('ROLE_EMPLOYEE');
+        $user->passwordChange('a', 'b', new \DateTime('2011-01-01'));
+        $this->assertTrue($user->isPasswordChangeRequired());
+        $this->assertFalse($user->isCredentialsNonExpired());
+
+        $user = new User();
+        $user->addRole('ROLE_CLAIMS');
+        $user->passwordChange('a', 'b', new \DateTime('2011-01-01'));
+        $this->assertTrue($user->isPasswordChangeRequired());
+        $this->assertFalse($user->isCredentialsNonExpired());
+    }
+
     public function testHasUnpaidPolicy()
     {
         $user = new User();

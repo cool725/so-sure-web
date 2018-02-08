@@ -383,6 +383,22 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $this->locked = $locked;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function isAccountNonLocked()
+    {
+        return !$this->isLocked();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isCredentialsNonExpired()
+    {
+        return !$this->isPasswordChangeRequired();
+    }
+
     public function getCreated()
     {
         return $this->created;
@@ -617,10 +633,13 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $this->multipays[] = $multipay;
     }
 
-    public function passwordChange($oldPassword, $oldSalt)
+    public function passwordChange($oldPassword, $oldSalt, \DateTime $date = null)
     {
-        $now = new \DateTime();
-        $this->previousPasswords[$now->format('U')] = ['password' => $oldPassword, 'salt' => $oldSalt];
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        $this->previousPasswords[$date->format('U')] = ['password' => $oldPassword, 'salt' => $oldSalt];
     }
 
     public function getPreviousPasswords()
@@ -636,6 +655,51 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function getPreviousPasswordCheck()
     {
         return $this->previousPasswordCheck;
+    }
+
+    public function getLastPasswordChange()
+    {
+        $oldPasswords = $this->getPreviousPasswords();
+
+        if (!is_array($oldPasswords)) {
+            $oldPasswords = $user->getPreviousPasswords->getValues();
+        }
+        if (count($oldPasswords) == 0) {
+            return $this->created;
+        }
+
+        krsort($oldPasswords);
+        foreach ($oldPasswords as $timestamp => $passwordData) {
+            return \DateTime::createFromFormat('U', $timestamp);
+        }
+
+        return $this->created;
+    }
+
+    public function isPasswordChangeRequired(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        if (!$this->hasEmployeeRole() && !$this->hasClaimsRole()) {
+            return false;
+        }
+
+        $lastPasswordChange = $this->getLastPasswordChange();
+        $diff = $date->diff($this->getLastPasswordChange());
+
+        return $diff->days >= 90;
+    }
+
+    public function hasEmployeeRole()
+    {
+        return $this->hasRole('ROLE_EMPLOYEE') || $this->hasRole('ROLE_ADMIN');
+    }
+
+    public function hasClaimsRole()
+    {
+        return $this->hasRole('ROLE_CLAIMS');
     }
 
     public function hasCancelledPolicy()

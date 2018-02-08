@@ -228,14 +228,14 @@ class FOSUBUserProvider extends BaseClass
             $employee = $this->authService->isGranted('ROLE_EMPLOYEE', $user);
         } catch (\Exception $e) {
             // fallback to check for known roles
-            $employee = $user->hasRole('ROLE_EMPLOYEE') || $user->hasRole('ROLE_ADMIN');
+            $employee = $user->hasEmployeeRole();
         }
         try {
             // non url requests will not have firewall setup
             $claims = $this->authService->isGranted('ROLE_CLAIMS', $user);
         } catch (\Exception $e) {
             // fallback to check for known roles
-            $employee = $user->hasRole('ROLE_CLAIMS');
+            $employee = $user->hasClaimsRole();
         }
 
         if ($employee || $claims) {
