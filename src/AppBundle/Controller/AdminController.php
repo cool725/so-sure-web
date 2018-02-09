@@ -340,6 +340,16 @@ class AdminController extends BaseController
             'AppBundle:Email:claim/manuallyDeleted.html.twig',
             ['claim' => $claim, 'policy' => $claim->getPolicy()]
         );
+        foreach ($claim->getCharges() as $charge) {
+            $charge->setClaim(null);
+            $this->get('logger')->warning(sprintf(
+                'Charge %s for £%0.2f has been disassocated for deleted claim %s/%s',
+                $charge->getId(),
+                $charge->getAmount(),
+                $claim->getNumber(),
+                $claim->getId()
+            ));
+        }
         $dm->remove($claim);
         $dm->flush();
         $dm->clear();

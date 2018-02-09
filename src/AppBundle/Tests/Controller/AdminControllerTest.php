@@ -109,6 +109,8 @@ class AdminControllerTest extends BaseControllerTest
         );
         $phone = static::getRandomPhone(self::$dm);
         $policy = static::initPolicy($user, self::$dm, $phone, null, true, true);
+        $charge = new Charge();
+        $charge->setAmount(0.02);
         $claim = new Claim();
         $claim->setPolicy($policy);
         $claim->setNumber('TEST/123');
@@ -116,6 +118,7 @@ class AdminControllerTest extends BaseControllerTest
         $claim->setStatus(Claim::STATUS_APPROVED);
         $claim->setApprovedDate(new \DateTime('-2 days'));
         $claim->setType(Claim::TYPE_THEFT);
+        $claim->addCharge($charge);
         self::$dm->persist($claim);
         self::$dm->flush();
         $claimId = $claim->getId();
