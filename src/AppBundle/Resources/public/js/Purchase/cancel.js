@@ -50,18 +50,15 @@ $(function(){
 
     // Cancel button
     $('.btn-cancel-policy').on('click', function() {
-
-        var reason = $(this).data('reason');
-
-        if ($(this).is('#btn-cancel-other')) {
-            var other = $('#other-reason').val();
-            $('#cancel_form_othertxt').val(other);
-        }
-
         $(this).attr('disabled');
         $('.btn-back').addClass('disabled');
         if (confirm('Are you sure you want to cancel your policy? Cancellation can not be undone and once cancelled, your phone will no longer be covered for Theft, Loss, & Accidental Damage.')) {
+            var reason = $(this).data('reason');
             $('#cancel_form_reason').val(reason);
+
+            var other = $('#other-reason').val();
+            $('#cancel_form_othertxt').val(other);
+
             $('#cancel_form').submit();
         }
     });
