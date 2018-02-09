@@ -745,11 +745,12 @@ class ReportingService
             $data['claimsCost'] += $claimsCost;
             $data['claimsReserves'] += $claimsReserves;
             $rewardPot = (0 - $policy->getAdjustedRewardPotPaymentAmount());
-            $data['rewardPot'] += $rewardPot;
-            $rewardPotInclIptRebate = $this->toTwoDp(
-                $rewardPot * (1 + $policy->getPremium()->getIptRate())
+            $rewardPotIptRebate = $this->toTwoDp(
+                $rewardPot * $policy->getPremium()->getIptRate() / (1 + $policy->getPremium()->getIptRate())
             );
-            $data['rewardPotInclIptRebate'] += $rewardPotInclIptRebate;
+            $rewardPotExcludingIptRebate = $this->toTwoDp($rewardPot - $rewardPotIptRebate);
+            $data['rewardPot'] += $rewardPot;
+            $data['rewardPotExcludingIptRebate'] += $rewardPotExcludingIptRebate;
             $newWrittenPremium = $this->toTwoDp(
                 $policy->getGwpPaid() - $policy->getCoverholderCommissionPaid() - $rewardPotInclIptRebate
             );
