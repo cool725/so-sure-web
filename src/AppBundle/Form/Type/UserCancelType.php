@@ -21,9 +21,11 @@ class UserCancelType extends AbstractType
         $builder
             ->add('reason', ChoiceType::class, ['choices' => [
                 'Already broken/damaged' => 'damaged',
+                'Too Expensive' => 'cost',
                 'Insuring with another provider' => 'elsewhere',
                 'Already covered' => 'existing',
                 'Do not want phone insurance' => 'undesired',
+                'Technical difficulties' => 'technical',
                 'pic-sure phone validation is annoying' => 'pic-sure',
                 'Other' => 'unknown',
             ],
