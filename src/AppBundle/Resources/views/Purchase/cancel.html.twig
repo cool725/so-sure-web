@@ -279,10 +279,13 @@
             <div id="reason-8-info" class="information">
                 <h1>Other...</h1>
                 <p class="lead">Some text...</p>
-                <input id="other-reason" type="text" class="form-control" placeholder="Enter reason here..." required />
-                <a href="#"class="btn-back "><i class="fa fa-angle-left" aria-hidden="true"></i> Back to options</a>
+                <div class="form-group">
+                    <input id="other-reason" type="text" class="form-control" placeholder="Enter reason here..." required />
+                </div>
+                <a href="#"class="btn-back btn-pad"><i class="fa fa-angle-left" aria-hidden="true"></i> Back to options</a>
                 <div class="information--controls clearfix">
                     <a href="#"
+                       id="btn-cancel-policy-other"
                        class="btn btn-red btn-pad btn-cancel-policy"
                        data-reason="Other">Cancel my policy
                     </a>
@@ -295,6 +298,7 @@
     <div class="hidden">
         {{ form_start(cancel_form, {'attr': {'id': 'cancel_form'}}) }}
         {{ form_widget(cancel_form.reason) }}
+        {{ form_widget(cancel_form.othertxt) }}
         {{ form_widget(cancel_form.cancel) }}
         {{ form_end(cancel_form) }}
     </div>

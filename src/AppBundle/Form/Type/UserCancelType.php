@@ -31,6 +31,7 @@ class UserCancelType extends AbstractType
             ],
                 'placeholder' => 'Select a reason',
             ])
+            ->add('othertxt', TextType::class)
             ->add('cancel', SubmitType::class)
         ;
     }

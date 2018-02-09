@@ -27,6 +27,10 @@ $(function(){
         $('.reasons').fadeOut('fast', function() {
             $(data.info).fadeIn();
             $(window).scrollTop(0);
+
+            if (data.info == '#reason-8-info') {
+                $('#btn-cancel-policy-other').addClass('disabled');
+            }
         });
     });
 
@@ -39,6 +43,7 @@ $(function(){
             $('.reasons').fadeIn()
             $('.btn-cancel').removeClass('active user-choice');
             $('#btn-next-step').removeClass('btn-green').addClass('disabled btn-green-hollow');
+            $('#btn-cancel-policy-other').removeClass('disabled');
             $(window).scrollTop(0);
         });
     });
@@ -46,10 +51,11 @@ $(function(){
     // Cancel button
     $('.btn-cancel-policy').on('click', function() {
 
+        var reason = $(this).data('reason');
+
         if ($(this).is('#btn-cancel-other')) {
-            var reason = 'Other: ' + $('#other-reason').val();
-        } else {
-            var reason = $(this).data('reason');
+            var other = $('#other-reason').val();
+            $('#cancel_form_othertxt').val(other);
         }
 
         $(this).attr('disabled');
@@ -57,6 +63,15 @@ $(function(){
         if (confirm('Are you sure you want to cancel your policy? Cancellation can not be undone and once cancelled, your phone will no longer be covered for Theft, Loss, & Accidental Damage.')) {
             $('#cancel_form_reason').val(reason);
             $('#cancel_form').submit();
+        }
+    });
+
+    // Other form
+    $('#other-reason').on('keyup', function(e) {
+        if ($(this).val() != '') {
+            $('#btn-cancel-policy-other').removeClass('disabled');
+        } else {
+            $('#btn-cancel-policy-other').addClass('disabled');
         }
     });
 
