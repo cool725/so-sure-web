@@ -11,6 +11,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @MongoDB\EmbeddedDocument
  * @MongoDB\InheritanceType("SINGLE_COLLECTION")
  * @MongoDB\DiscriminatorField("type")
+ * make sure to update getType() if adding
  * @MongoDB\DiscriminatorMap({"judo"="JudoPaymentMethod","gocardless"="GocardlessPaymentMethod"})
  * @Gedmo\Loggable
  */
@@ -33,5 +34,16 @@ abstract class PaymentMethod
     public function setFirstProblem($firstProblem)
     {
         $this->firstProblem = $firstProblem;
+    }
+
+    public function getType()
+    {
+        if ($this instanceof JudoPaymentMethod) {
+            return 'judo';
+        } elseif ($this instanceof GocardlessPaymentMethod) {
+            return 'gocardless';
+        } else {
+            return null;
+        }
     }
 }
