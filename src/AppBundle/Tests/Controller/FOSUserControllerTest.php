@@ -325,7 +325,10 @@ class FOSUserControllerTest extends BaseControllerTest
             $email,
             'foo'
         );
-        $this->login($email, 'foo', 'user/unauth');
+        $user->addRole('ROLE_ADMIN');
+        static::$dm->flush();
+
+        $this->login($email, 'foo', 'admin/');
 
         // can't login
         $this->login($email, 'bar', 'login');
@@ -334,7 +337,7 @@ class FOSUserControllerTest extends BaseControllerTest
         $this->login($email, 'bar', 'login');
         $this->login($email, 'bar', 'login');
 
-        $this->login($email, 'foo', 'user/unauth');
+        $this->login($email, 'foo', 'admin/');
 
         // can't login
         $this->login($email, 'bar', 'login');
