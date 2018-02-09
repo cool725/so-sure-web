@@ -12,7 +12,7 @@ $(function(){
         var data = $(this).data();
         // console.log(data.reason);
 
-        $('#btn-next-step').removeClass('disabled');
+        $('#btn-next-step').removeClass('disabled btn-green-hollow').addClass('btn-green');
         $('#btn-next-step').data('info', data.target);
     });
 
@@ -26,6 +26,7 @@ $(function(){
         // Fade out choices fadeIn choices information
         $('.reasons').fadeOut('fast', function() {
             $(data.info).fadeIn();
+            $(window).scrollTop(0);
         });
     });
 
@@ -37,7 +38,8 @@ $(function(){
         $('.information').fadeOut('fast', function() {
             $('.reasons').fadeIn()
             $('.btn-cancel').removeClass('active user-choice');
-            $('#btn-next-step').addClass('disabled');
+            $('#btn-next-step').removeClass('btn-green').addClass('disabled btn-green-hollow');
+            $(window).scrollTop(0);
         });
     });
 
@@ -50,20 +52,12 @@ $(function(){
             var reason = $(this).data('reason');
         }
 
-        console.log(reason);
-
-        // $(this).attr('disabled');
-        // $('.btn-back').addClass('disabled');
-        // if (confirm('Are you sure you want to cancel your policy? Cancellation can not be undone and once cancelled, your phone will no longer be covered for Theft, Loss, & Accidental Damage.')) {
-        //     $('#cancel_form_reason').val(reason);
-        //     $('#cancel_form').submit();
-        // }
+        $(this).attr('disabled');
+        $('.btn-back').addClass('disabled');
+        if (confirm('Are you sure you want to cancel your policy? Cancellation can not be undone and once cancelled, your phone will no longer be covered for Theft, Loss, & Accidental Damage.')) {
+            $('#cancel_form_reason').val(reason);
+            $('#cancel_form').submit();
+        }
     });
-
-    // Other
-    // $('#other-reason').on('keyup', function() {
-    //     var newreason = $(this).val();
-    //      $('#btn-cancel-other').data('reason', newreason);
-    // });
 
 });
