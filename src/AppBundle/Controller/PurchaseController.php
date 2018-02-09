@@ -864,6 +864,7 @@ class PurchaseController extends BaseController
                 $cancelForm->handleRequest($request);
                 if ($cancelForm->isValid()) {
                     $reason = $cancelForm->getData()['reason'];
+                    $other = $cancelForm->getData()['othertxt'];
                     $this->get('app.sixpack')->convertByClientId(
                         $policy->getUser()->getId(),
                         SixpackService::EXPERIMENT_CANCELLATION
@@ -879,7 +880,8 @@ class PurchaseController extends BaseController
                         ),
                         $policy->getPolicyNumber(),
                         $policy->getId(),
-                        $reason
+                        $reason,
+                        $other
                     );
                     // @codingStandardsIgnoreEnd
 
