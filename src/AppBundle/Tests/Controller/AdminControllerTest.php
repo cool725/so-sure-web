@@ -8,6 +8,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Claim;
+use AppBundle\Document\Charge;
 use AppBundle\Document\CurrencyTrait;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use AppBundle\DataFixtures\MongoDB\b\User\LoadUserData;
@@ -100,7 +101,6 @@ class AdminControllerTest extends BaseControllerTest
 
     public function testAdminClaimDelete()
     {
-        $repoClaim = self::$dm->getRepository(Claim::class);
         // make one claim just in case no claim was created and page is empty
         $user = static::createUser(
             static::$userManager,
@@ -109,6 +109,8 @@ class AdminControllerTest extends BaseControllerTest
         );
         $phone = static::getRandomPhone(self::$dm);
         $policy = static::initPolicy($user, self::$dm, $phone, null, true, true);
+        $charge = new Charge();
+        $charge->setAmount(0.02);
         $claim = new Claim();
         $claim->setPolicy($policy);
         $claim->setNumber('TEST/123');
@@ -116,9 +118,12 @@ class AdminControllerTest extends BaseControllerTest
         $claim->setStatus(Claim::STATUS_APPROVED);
         $claim->setApprovedDate(new \DateTime('-2 days'));
         $claim->setType(Claim::TYPE_THEFT);
+        $claim->addCharge($charge);
         self::$dm->persist($claim);
         self::$dm->flush();
         $claimId = $claim->getId();
+        $this->assertNotNull($charge->getClaim());
+
         $this->login('patrick@so-sure.com', LoadUserData::DEFAULT_PASSWORD, 'admin/');
         $crawler = self::$client->request('GET', '/admin/claims');
         self::verifyResponse(200);
@@ -128,11 +133,14 @@ class AdminControllerTest extends BaseControllerTest
         self::verifyResponse(302);
         $this->assertEquals(self::$router->generate('admin_claims'), self::$client->getResponse()->getTargetUrl());
 
-        // need to clear local dm cache as it still sees the deleted claim from cache
-        self::$dm->clear();
-        // no claim should exist
-        $findClaim = $repoClaim->find($claimId);
-        $this->assertNull($findClaim);
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $claimRepo = $dm->getRepository(Claim::class);
+        $this->assertNull($claimRepo->find($claimId));
+        $this->assertNull($claimRepo->find($claim->getId()));
+
+        $chargeRepo = $dm->getRepository(Charge::class);
+        $updatedCharge = $chargeRepo->find($charge->getId());
+        $this->assertNull($updatedCharge->getClaim());
     }
 
     public function testClaimsClaimDelete()
