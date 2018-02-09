@@ -422,6 +422,7 @@ services:
             - "@app.intercom"
             - "@app.sms"
             - "@app.scode"
+            - "@app.sixpack"
 
     app.quote:
         class: AppBundle\Service\QuoteService
