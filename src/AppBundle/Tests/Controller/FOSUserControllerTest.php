@@ -317,6 +317,37 @@ class FOSUserControllerTest extends BaseControllerTest
         ];
     }
 
+    public function testPCILoginLock()
+    {
+        $email = self::generateEmail('testPCILoginLock', $this);
+        $user = static::createUser(
+            self::$userManager,
+            $email,
+            'foo'
+        );
+        $this->login($email, 'foo', 'user/unauth');
+
+        // can't login
+        $this->login($email, 'bar', 'login');
+        $this->login($email, 'bar', 'login');
+        $this->login($email, 'bar', 'login');
+        $this->login($email, 'bar', 'login');
+        $this->login($email, 'bar', 'login');
+
+        $this->login($email, 'foo', 'user/unauth');
+
+        // can't login
+        $this->login($email, 'bar', 'login');
+        $this->login($email, 'bar', 'login');
+        $this->login($email, 'bar', 'login');
+        $this->login($email, 'bar', 'login');
+        $this->login($email, 'bar', 'login');
+        $this->login($email, 'bar', 'login');
+
+        // locked
+        $this->login($email, 'foo', 'login');
+    }
+
     private function setPassword($url, $password, $expectedSuccess = true, $initialRequestCode = 200)
     {
         $crawler = self::$client->request('GET', $url);
