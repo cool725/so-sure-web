@@ -17,6 +17,13 @@
 	margin: 0 auto;
 }
 
+.sad-phone {
+    @include breakpoint(mobileonly) {
+        display: block;
+        margin: 0 auto;
+    }
+}
+
 .reasons,
 .information {
 
@@ -92,10 +99,4 @@
         }
     }
 
-
-	// p {
-	// 	text-align: left;
-	// 	max-width: 800px;
-
-	// }
 }
