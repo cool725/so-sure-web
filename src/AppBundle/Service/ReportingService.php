@@ -728,8 +728,11 @@ class ReportingService
             'profit' => 0,
             'profitSalva' => 0,
             'profitSoSure' => 0,
+            'rewardPotExcludingIptRebate' => 0,
+            'policies' => 0,
         ];
         foreach ($policies as $policy) {
+            $data['policies']++;
             $data['gwp'] += $policy->getGwpPaid();
             $data['coverholderCommission'] += $policy->getCoverholderCommissionPaid();
             $data['brokerCommission'] += $policy->getBrokerCommissionPaid();
