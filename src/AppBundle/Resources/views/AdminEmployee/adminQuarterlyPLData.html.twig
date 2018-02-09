@@ -43,7 +43,8 @@
     <tr>
         <td width="{{ indent_width }}"></td>
         <td width="{{ text_width }}">Reward Pot</td>
-        <td width="{{ amount_width }}">(£{{ data.rewardPot|number_format(2, '.', ',') }})</td>
+        {# Value is reward pot paid to customer - the ipt rebate #}
+        <td width="{{ amount_width }}">(£{{ data.rewardPotExcludingIptRebate|number_format(2, '.', ',') }})</td>
         <td>No claims bonus premium rebate net of IPT rebate</td>
     </tr>
     <tr>
@@ -118,7 +119,8 @@
     <tr>
         <td width="{{ indent_width }}"></td>
         <td width="{{ text_width }}">Reward Pot incl IPT rebate</td>
-        <td width="{{ amount_width }}">(£{{ data.rewardPotInclIptRebate|number_format(2, '.', ',') }})</td>
+        {# Value is reward pot paid to customer #}
+        <td width="{{ amount_width }}">(£{{ data.rewardPot|number_format(2, '.', ',') }})</td>
         <td>No claims bonus premium rebate (incl IPT rebate)</td>
     </tr>
     <tr>
