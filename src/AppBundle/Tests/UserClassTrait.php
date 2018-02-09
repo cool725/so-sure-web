@@ -28,6 +28,7 @@ trait UserClassTrait
     public static $JUDO_TEST_CARD_LAST_FOUR = '5462';
     public static $JUDO_TEST_CARD_EXP = '12/20';
     public static $JUDO_TEST_CARD_PIN = '441';
+    public static $JUDO_TEST_CARD_NAME = 'Visa Debit **** 5462 (Exp: 1220)';
 
     public static $JUDO_TEST_CARD2_NUM = '4976 0000 0000 3436';
     public static $JUDO_TEST_CARD2_LAST_FOUR = '3436';
