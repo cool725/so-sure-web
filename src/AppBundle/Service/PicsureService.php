@@ -19,7 +19,7 @@ class PicsureService
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
-     * @param Dispatcher $dispatcher
+     * @param Dispatcher      $dispatcher
      */
     public function __construct(DocumentManager $dm, LoggerInterface $logger, $dispatcher)
     {
@@ -28,15 +28,18 @@ class PicsureService
         $this->dispatcher = $dispatcher;
     }
 
-    public function setFileUndamaged($file) {
+    public function setFileUndamaged($file)
+    {
         $this->dispatchEvent(PicsureEvent::EVENT_UNDAMAGED, new PicsureEvent($file));
     }
 
-    public function setFileInvalid($file) {
+    public function setFileInvalid($file)
+    {
         $this->dispatchEvent(PicsureEvent::EVENT_INVALID, new PicsureEvent($file));
     }
 
-    public function setFileDamaged($file) {
+    public function setFileDamaged($file)
+    {
         $this->dispatchEvent(PicsureEvent::EVENT_DAMAGED, new PicsureEvent($file));
     }
 
@@ -48,5 +51,4 @@ class PicsureService
             $this->logger->warning('Dispatcher is disabled for Picsure Service');
         }
     }
-
 }

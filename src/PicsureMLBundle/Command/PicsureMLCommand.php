@@ -42,8 +42,7 @@ class PicsureMLCommand extends ContainerAwareCommand
             $picsureMLService = $this->getContainer()->get('picsureml.picsureml');
             $picsureMLService->sync();
             $output->writeln(sprintf('Done'));
-        }
-        elseif ($csv) {
+        } elseif ($csv) {
             $output->writeln(sprintf('Output...'));
             $picsureMLService = $this->getContainer()->get('picsureml.picsureml');
             $picsureMLService->output($output);
@@ -51,5 +50,4 @@ class PicsureMLCommand extends ContainerAwareCommand
         }
 
     }
-
 }

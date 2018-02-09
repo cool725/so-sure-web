@@ -31,18 +31,24 @@ class PicsureMLService
 
     /**
      * @param DocumentManager $appDm
-     * @param DocumentManager $dm
+     * @param DocumentManager $picsureMLDm
+     * @param Filesystem      $mountManager
      * @param LoggerInterface $logger
      */
-    public function __construct(DocumentManager $appDm, DocumentManager $picsureMLDm, $mountManager, LoggerInterface $logger)
-    {
+    public function __construct(
+        DocumentManager $appDm,
+        DocumentManager $picsureMLDm,
+        $mountManager,
+        LoggerInterface $logger
+    ) {
         $this->appDm = $appDm;
         $this->picsureMLDm = $picsureMLDm;
         $this->mountManager = $mountManager;
         $this->logger = $logger;
     }
 
-    public function addFileForTraining($file, $status) {
+    public function addFileForTraining($file, $status)
+    {
         $repo = $this->picsureMLDm->getRepository(Image::class);
         if ($file->getFileType() == 'PicSureFile' && !$repo->imageExists($file->getKey())) {
             $image = new Image();
@@ -50,11 +56,9 @@ class PicsureMLService
             if ($status != null && !empty($status)) {
                 if ($status == PhonePolicy::PICSURE_STATUS_APPROVED) {
                     $image->setLabel(self::PICSURE_LABEL_UNDAMAGED);
-                }
-                elseif ($status == PhonePolicy::PICSURE_STATUS_INVALID) {
+                } elseif ($status == PhonePolicy::PICSURE_STATUS_INVALID) {
                     $image->setLabel(self::PICSURE_LABEL_INVALID);
-                }
-                elseif ($status == PhonePolicy::PICSURE_STATUS_REJECTED) {
+                } elseif ($status == PhonePolicy::PICSURE_STATUS_REJECTED) {
                     $image->setLabel(self::PICSURE_LABEL_DAMAGED);
                 }
             }
@@ -63,7 +67,8 @@ class PicsureMLService
         $this->picsureMLDm->flush();
     }
 
-    public function sync() {
+    public function sync()
+    {
         $s3Repo = $this->appDm->getRepository(S3File::class);
         $picsureFiles = $s3Repo->findBy(['fileType' => 'picsure']);
 
@@ -78,11 +83,9 @@ class PicsureMLService
                 if (!empty($status)) {
                     if ($status == PhonePolicy::PICSURE_STATUS_APPROVED) {
                         $image->setLabel(self::PICSURE_LABEL_UNDAMAGED);
-                    }
-                    elseif ($status == PhonePolicy::PICSURE_STATUS_INVALID) {
+                    } elseif ($status == PhonePolicy::PICSURE_STATUS_INVALID) {
                         $image->setLabel(self::PICSURE_LABEL_INVALID);
-                    }
-                    elseif ($status == PhonePolicy::PICSURE_STATUS_REJECTED) {
+                    } elseif ($status == PhonePolicy::PICSURE_STATUS_REJECTED) {
                         $image->setLabel(self::PICSURE_LABEL_DAMAGED);
                     }
                 }
@@ -93,7 +96,8 @@ class PicsureMLService
         $this->picsureMLDm->flush();
     }
 
-    public function output(OutputInterface $output) {
+    public function output(OutputInterface $output)
+    {
         $filesystem = $this->mountManager->getFilesystem('s3picsure_fs');
 
         $repo = $this->picsureMLDm->getRepository(Image::class);
@@ -183,5 +187,4 @@ class PicsureMLService
         }
     }
     */
-    
 }

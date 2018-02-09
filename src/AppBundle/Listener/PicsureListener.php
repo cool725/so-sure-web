@@ -17,7 +17,7 @@ class PicsureListener
     protected $picsureMLService;
 
     /**
-     * @param DocumentManager $dm
+     * @param DocumentManager  $dm
      * @param PicsureMLService $picsureMLService
      */
     public function __construct(
@@ -52,7 +52,7 @@ class PicsureListener
     public function onDamagedEvent(PicsureEvent $event)
     {
         $file = $event->getS3File();
-        $this->updateS3File($file, PhonePolicy::PICSURE_STATUS_INVALID);     
+        $this->updateS3File($file, PhonePolicy::PICSURE_STATUS_INVALID);
     }
 
     private function updateS3File(S3File $file, $status)

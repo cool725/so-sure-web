@@ -104,8 +104,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
 
         if ($resyncPicsure) {
             $this->resyncPicsureStatus();
-        }
-        else {            
+        } else {
             $policyService = $this->getContainer()->get('app.policy');
             $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
             $policyRepo = $dm->getRepository(Policy::class);
@@ -409,11 +408,16 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         // @codingStandardsIgnoreEnd
     }
 
-    private function resyncPicsureStatus() {
+    private function resyncPicsureStatus()
+    {
         $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
         $policyRepo = $dm->getRepository(PhonePolicy::class);
 
-        $picsurePolicies = $policyRepo->findBy(['picSureStatus' => ['$in' => [PhonePolicy::PICSURE_STATUS_APPROVED, PhonePolicy::PICSURE_STATUS_INVALID, PhonePolicy::PICSURE_STATUS_REJECTED]]]);
+        $picsurePolicies = $policyRepo->findBy(
+            ['picSureStatus' => ['$in' => [PhonePolicy::PICSURE_STATUS_APPROVED,
+                                        PhonePolicy::PICSURE_STATUS_INVALID,
+                                        PhonePolicy::PICSURE_STATUS_REJECTED]]]
+        );
 
         foreach ($picsurePolicies as $policy) {
             $files = $policy->getPolicyPicSureFiles();
