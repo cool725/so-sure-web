@@ -28,7 +28,7 @@
                         <p class="lead"><img src="{{ cdn_url }}/images/emails/sad_phone_so-sure.png " alt="sad phone so-sure" width="140px" class="sad-phone"></p>
                     </div>
                     <div class="col-sm-8 col-md-8 text-left">
-                        <h1>Before you go...</h1>
+                        <h1>We’d be sad to see you go...</h1>
                         <p class="lead">We appreciate that sometimes people have a change of heart. To help us improve, we'd love to know why you'd like to cancel.</p>
                     </div>
                 </div>
@@ -106,45 +106,43 @@
             </div>
 
             <div id="reason-1-info" class="information">
-                <h1>Already Broken/ Damaged</h1>
+                <h1>Already Broken or Damaged</h1>
                 <p class="lead">We understand that mistakes happen. If your phone was damaged prior to purchasing your policy, you can easily rectify this mistake by clicking the cancel button now.</p>
                 <p>Keep in mind that we take fraud very seriously and do prosecute. When you purchased your policy, you confirmed that your phone was in full working condition and without a cracked screen. If you failed to disclose the state of your phone accurately, we may exercise our right to cancel the policy and will report any instance of fraud to the police.</p>
                 <a href="#"class="btn-back "><i class="fa fa-angle-left" aria-hidden="true"></i> Back to options</a>
                 <div class="information--controls clearfix">
                     <a href="#"
-                       class="btn btn-red btn-pad btn-cancel-policy"
+                       class="btn btn-red-hollow btn-pad btn-cancel-policy"
                        data-reason="Already broken/damaged">Cancel my policy
                     </a>
                 </div>
             </div>
 
             <div id="reason-2-info" class="information">
-                <h1>Too Expensive</h1>
-                <p class="lead">You might have found a company offering ever so slightly cheaper cover than us. It's ok, we understand. However, we do offer a premium service at a not so premium price:</p>
+                <p class="h4">You might have found a company offering ever so slightly cheaper cover than us. It's ok, we understand. However, we do offer a premium service at a not so premium price:</p>
                 <ul>
-                    <li>You have no wait period on cover, so if something should happen today, we get you a next working day replacement or repair with an accredited provider</li>
-                    <li>Low excess from only &pound;50 when validated with pic-sure</li>
-                    <li>We put our customers first, that's why they love us. 4.5* Trust Pilot + Net Promoter Score of 73</li>
-                    <li>Cover for refurbished and second hand phones up to 3 years old.</li>
-                    <li>When you invite your friends we give you money back at the end of the year when you and your friends don't claim. We believe in rewarding. Find out more about our reward pot <a href="{{ path('homepage')}}#reward-pot" target="_blank">here</a>.</li>
+                    <li>You're immediately covered - if something should happen today, we get you a next working day replacement or repair with an accredited provider</li>
+                    <li>It'll only cost you &pound;50 excess to claim when validated with pic-sure</li>
+                    <li>We put you first. Its the reason our customers love us. Don’t take our word for it - Check out our <a href="https://uk.trustpilot.com/review/wearesosure.com" target="_blank">Trust Pilot reviews</a></li>
+                    <li>When you connect with your friends we give you money back at the end of the year when you and your friends don't claim. We believe in rewarding. Find out more about our reward pot <a href="{{ path('homepage')}}#reward-pot" target="_blank">here</a>.</li>
                 </ul>
                 <a href="#"class="btn-back "><i class="fa fa-angle-left" aria-hidden="true"></i> Back to options</a>
                 <div class="information--controls clearfix">
                     <h4>Still want to cancel your policy?</h4>
-                    <a href="#"
-                       class="btn btn-red btn-pad btn-cancel-policy"
-                       data-reason="Too Expensive">Yes, cancel
+                    <a href="{{ path('homepage')}}#reward-pot"
+                       class="btn btn-green btn-pad">Ok, I'll stay
                     </a>
-                    <a href="{{ path('user_home')}}"
-                       class="btn btn-green btn-pad">No, I'm keeping it
+                    {# TODO: Link this to feedback form??? #}
+                    <a href="#"
+                       class="btn btn-red-hollow btn-pad btn-cancel-policy"
+                       data-reason="Too Expensive">I'll, cancel
                     </a>
                 </div>
             </div>
 
             <div id="reason-3-info" class="information">
-                <h1>I found another provider and they are cheaper</h1>
-                <p>There are lots of insurance providers out there all promising the world, all at a very cheap price.  We do charge a little extra, but that's because we give our customers the best service, an exceptional level of cover, and we give our customers up to 80% of their money back when they don't make a claim (see our reward pot for more details - <a href="{{ path('homepage')}}#reward-pot" target="_blank">here</a>).</p>
-                <p>We recommend taking a good look at the terms and conditions before you switch and make sure the provider covers you instantly for:</p>
+                <p>There are lots of insurance providers out there all promising the world, some may even be cheaper than us. We do charge a little extra, but that's because we give our customers the best service, an exceptional level of cover, and we give our customers up to 80% of their money back when they don't make a claim (see our reward pot for more details - <a href="{{ path('homepage')}}#reward-pot" target="_blank">here</a>).</p>
+                <p>We recommend taking a good look at the terms and conditions before you switch and make sure the provider can offer next working day replacement and covers you instantly for:</p>
                 <ul>
                     <li>Loss</li>
                     <li>Theft</li>
@@ -157,19 +155,19 @@
                 <a href="#"class="btn-back "><i class="fa fa-angle-left" aria-hidden="true"></i> Back to options</a>
                 <div class="information--controls clearfix">
                     <h4>Still want to cancel your policy?</h4>
-                    <a href="#"
-                       class="btn btn-red btn-pad btn-cancel-policy"
-                       data-reason="Insuring with another provider">Yes, cancel
+                    <a href="{{ path('homepage')}}"
+                       class="btn btn-green btn-pad">Ok, I'll stay
                     </a>
-                    <a href="{{ path('user_home')}}"
-                       class="btn btn-green btn-pad">No, I'm keeping it
+                    <a href="#"
+                       class="btn btn-red-hollow btn-pad btn-cancel-policy"
+                       data-reason="Insuring with another provider">I'll, cancel
                     </a>
                 </div>
             </div>
 
             <div id="reason-4-info" class="information">
                 <h1>Already covered</h1>
-                <p class="lead">If you've discovered you're already covered by your bank, credit card or contents insurance make sure you've checked the details of the policy.  We know that there can be fine-print that you may not be aware of.</p>
+                <p class="lead">If you've discovered you're already covered by your bank, credit card or contents insurance make sure you've checked the details of the policy.  We know that there's often fine-print that you may not be aware of.</p>
                 <p>Here’s a handy comparison checklist:</p>
                 <div class="table-responsive">
                     <table width="100%">
@@ -183,7 +181,7 @@
                         <tbody>
                             <tr>
                                 <td class="contrast h4">Excess</td>
-                                <td>Low excess of just &pound;50 with pic sure, our anti-fraud technology</td>
+                                <td>Low excess of just &pound;50 with pic-sure, our anti-fraud technology</td>
                                 <td class="contrast">Excess ranges from &pound;150-&pound;500</td>
                             </tr>
                             <tr>
@@ -198,13 +196,13 @@
                             </tr>
                             <tr>
                                 <td class="contrast h4">Claims Process</td>
-                                <td>Simple and hassle free. Our NPS for handling claims is a whopping 73! Unheard of in insurance</td>
+                                <td>Simple and hassle free. Our Net Promoter Score for handling claims is a whopping 73! No idea what that means? Trust us, it's unheard of in insurance</td>
                                 <td class="contrast">*cough*</td>
                             </tr>
                             <tr>
                                 <td class="contrast h4">Terms</td>
                                 <td>Plain english, we cover you for every eventuality</td>
-                                <td class="contrast">Got a law degree? Make sure you’ve got the fact.</td>
+                                <td class="contrast">Got a law degree? Make sure you’ve got the facts.</td>
                             </tr>
                             <tr>
                                 <td class="contrast h4">Phone age</td>
@@ -217,29 +215,29 @@
                 <a href="#"class="btn-back "><i class="fa fa-angle-left" aria-hidden="true"></i> Back to options</a>
                 <div class="information--controls clearfix">
                     <h4>Still want to cancel your policy?</h4>
-                    <a href="#"
-                       class="btn btn-red btn-pad btn-cancel-policy"
-                       data-reason="Already covered">Yes, cancel
+                    <a href="{{ path('homepage')}}"
+                       class="btn btn-green btn-pad">Ok, I'll stay
                     </a>
-                    <a href="{{ path('user_home')}}"
-                       class="btn btn-green btn-pad">No, I'm keeping it
+                    <a href="#"
+                       class="btn btn-red-hollow btn-pad btn-cancel-policy"
+                       data-reason="Already covered">I'll, cancel
                     </a>
                 </div>
             </div>
 
             <div id="reason-5-info" class="information">
                 <h1>I changed my mind, I don't want insurance</h1>
-                <p class="lead">No problem, if in the future you decide to re-cover your phone, we will be happy to have you back! </p>
-                <p>Just a friendly reminder that should something happen to your phone (especially if you have a new iPhone or Samsung), the cost to replace your phone is &pound;700-&pound;1000.  A years piece of mind will cost you just over &pound;100...</p>
+                <p class="lead">No problem, if in the future you decide to re-cover your phone, we will be happy to have you back!</p>
+                <p>Just a friendly reminder that should something happen to your phone (especially if you have a new iPhone or Samsung), the cost to replace your phone is &pound;700-&pound;1000.  A years piece of mind will cost you less than 25p a day.</p>
                 <a href="#"class="btn-back "><i class="fa fa-angle-left" aria-hidden="true"></i> Back to options</a>
                 <div class="information--controls clearfix">
                     <h4>Still want to cancel your policy?</h4>
-                    <a href="#"
-                       class="btn btn-red btn-pad btn-cancel-policy"
-                       data-reason="Do not want phone insurance">Yes, cancel
+                    <a href="{{ path('homepage')}}"
+                       class="btn btn-green btn-pad">Ok, I'll stay
                     </a>
-                    <a href="{{ path('user_home')}}"
-                       class="btn btn-green btn-pad">No, I'm keeping it
+                    <a href="#"
+                       class="btn btn-red-hollow btn-pad btn-cancel-policy"
+                       data-reason="Do not want phone insurance">I'll, cancel
                     </a>
                 </div>
             </div>
@@ -250,12 +248,12 @@
                 <a href="#"class="btn-back "><i class="fa fa-angle-left" aria-hidden="true"></i> Back to options</a>
                 <div class="information--controls clearfix">
                     <h4>Still want to cancel your policy?</h4>
-                    <a href="#"
-                       class="btn btn-red btn-pad btn-cancel-policy"
-                       data-reason="Technical difficulties">Yes, cancel
+                    <a href="{{ path('homepage')}}"
+                       class="btn btn-green btn-pad">Ok, I'll stay
                     </a>
-                    <a href="{{ path('user_home')}}"
-                       class="btn btn-green btn-pad">No, I'm keeping it
+                    <a href="#"
+                       class="btn btn-red-hollow btn-pad btn-cancel-policy"
+                       data-reason="Technical difficulties">I'll, cancel
                     </a>
                 </div>
             </div>
@@ -272,12 +270,12 @@
                 <a href="#"class="btn-back "><i class="fa fa-angle-left" aria-hidden="true"></i> Back to options</a>
                 <div class="information--controls clearfix">
                     <h4>Still want to cancel your policy?</h4>
-                    <a href="#"
-                       class="btn btn-red btn-pad btn-cancel-policy"
-                       data-reason="pic-sure phone validation is annoying">Yes, cancel
+                    <a href="{{ path('homepage')}}"
+                       class="btn btn-green btn-pad">Ok, I'll stay
                     </a>
-                    <a href="{{ path('user_home')}}"
-                       class="btn btn-green btn-pad">No, I'm keeping it
+                    <a href="#"
+                       class="btn btn-red-hollow btn-pad btn-cancel-policy"
+                       data-reason="pic-sure phone validation is annoying">I'll, cancel
                     </a>
                 </div>
             </div>

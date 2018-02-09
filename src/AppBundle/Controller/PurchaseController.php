@@ -912,6 +912,7 @@ class PurchaseController extends BaseController
                         'We have passed your request to our policy team. You should receive a cancellation email once that is processed.'
                     );
                     // @codingStandardsIgnoreEnd
+                    return $this->redirectToRoute('homepage');
                 }
             }
         } else {
