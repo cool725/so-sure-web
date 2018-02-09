@@ -750,7 +750,7 @@ class ReportingService
             );
             $rewardPotExcludingIptRebate = $this->toTwoDp($rewardPot - $rewardPotIptRebate);
             $data['rewardPot'] += $rewardPot;
-            $data['rewardPotExcludingIptRebate'] += $this->toTwoDp($rewardPot - $rewardPotIptRebate);
+            $data['rewardPotExcludingIptRebate'] += $rewardPotExcludingIptRebate;
             $newWrittenPremium = $this->toTwoDp(
                 $policy->getGwpPaid() - $policy->getCoverholderCommissionPaid() - $rewardPotInclIptRebate
             );
