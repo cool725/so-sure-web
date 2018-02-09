@@ -105,14 +105,9 @@ class SecurityListener
         // Get the attempted username.
         if ($token instanceof UsernamePasswordToken) {
             $username = $token->getUsername();
-        } else {
-            $username = null;
-        }
-
-        if ($username) {
             $repo = $this->dm->getRepository(User::class);
             $user = $repo->findOneBy(['usernameCanonical' => strtolower($username)]);
-            if ($user->hasEmployeeRole() || $user->hasClaimsRole()) {
+            if ($user && ($user->hasEmployeeRole() || $user->hasClaimsRole())) {
                 $key = sprintf(self::LOGIN_FAILURE_KEY, strtolower($username));
                 $count = $this->redis->incr($key);
                 // PCI doesn't state how long a failed login persists. 1 hour should be enough for brute force
