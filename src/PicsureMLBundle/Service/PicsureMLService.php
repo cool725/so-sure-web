@@ -5,27 +5,127 @@ namespace PicsureMLBundle\Service;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\File\S3File;
 use PicsureMLBundle\Document\Image;
 use Psr\Log\LoggerInterface;
 
 class PicsureMLService
 {
+    const PICSURE_LABEL_UNDAMAGED = 'undamaged';
+    const PICSURE_LABEL_INVALID = 'invalid';
+    const PICSURE_LABEL_DAMAGED = 'damaged';
+
     /** @var DocumentManager */
-    protected $dm;
+    protected $appDm;
+
+    /** @var DocumentManager */
+    protected $picsureMLDm;
+
+    /** @var Filesystem */
+    protected $mountManager;
 
     /** @var LoggerInterface */
     protected $logger;
 
     /**
+     * @param DocumentManager $appDm
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
      */
-    public function __construct(DocumentManager $dm, LoggerInterface $logger)
+    public function __construct(DocumentManager $appDm, DocumentManager $picsureMLDm, $mountManager, LoggerInterface $logger)
     {
-        $this->dm = $dm;
+        $this->appDm = $appDm;
+        $this->picsureMLDm = $picsureMLDm;
+        $this->mountManager = $mountManager;
         $this->logger = $logger;
     }
 
+    public function addFileForTraining($file, $status) {
+        $repo = $this->picsureMLDm->getRepository(Image::class);
+        if ($file->getFileType() == 'PicSureFile' && !$repo->imageExists($file->getKey())) {
+            $image = new Image();
+            $image->setPath($file->getKey());
+            if ($status != null && !empty($status)) {
+                if ($status == PhonePolicy::PICSURE_STATUS_APPROVED) {
+                    $image->setLabel(self::PICSURE_LABEL_UNDAMAGED);
+                }
+                elseif ($status == PhonePolicy::PICSURE_STATUS_INVALID) {
+                    $image->setLabel(self::PICSURE_LABEL_INVALID);
+                }
+                elseif ($status == PhonePolicy::PICSURE_STATUS_REJECTED) {
+                    $image->setLabel(self::PICSURE_LABEL_DAMAGED);
+                }
+            }
+            $this->picsureMLDm->persist($image);
+        }
+        $this->picsureMLDm->flush();
+    }
+
+    public function sync() {
+        $s3Repo = $this->appDm->getRepository(S3File::class);
+        $picsureFiles = $s3Repo->findBy(['fileType' => 'picsure']);
+
+        $imageRepo = $this->picsureMLDm->getRepository(Image::class);
+
+        foreach ($picsureFiles as $file) {
+            if (!$imageRepo->imageExists($file->getKey())) {
+                $image = new Image();
+                $image->setPath($file->getKey());
+                $metadata = $file->getMetadata();
+                $status = $metadata['status'];
+                if (!empty($status)) {
+                    if ($status == PhonePolicy::PICSURE_STATUS_APPROVED) {
+                        $image->setLabel(self::PICSURE_LABEL_UNDAMAGED);
+                    }
+                    elseif ($status == PhonePolicy::PICSURE_STATUS_INVALID) {
+                        $image->setLabel(self::PICSURE_LABEL_INVALID);
+                    }
+                    elseif ($status == PhonePolicy::PICSURE_STATUS_REJECTED) {
+                        $image->setLabel(self::PICSURE_LABEL_DAMAGED);
+                    }
+                }
+                $this->picsureMLDm->persist($image);
+            }
+        }
+
+        $this->picsureMLDm->flush();
+    }
+
+    public function output(OutputInterface $output) {
+        $filesystem = $this->mountManager->getFilesystem('s3picsure_fs');
+
+        $repo = $this->picsureMLDm->getRepository(Image::class);
+        $qb = $repo->createQueryBuilder();
+        $qb->sort('id', 'desc');
+        $results = $qb->getQuery()->execute();
+
+        $csv = [];
+
+        foreach ($results as $result) {
+            if ($result->hasLabel()) {
+                $csv[] = sprintf(
+                    "%s, %s",
+                    $result->getPath(),
+                    $result->getLabel()
+                );
+            }
+        }
+
+        $fs = new Filesystem();
+        try {
+            $file = sprintf("%s/training-data.csv", sys_get_temp_dir());
+            $fs->dumpFile($file, implode(PHP_EOL, $csv));
+            $stream = fopen($file, 'r+');
+            if ($stream != false) {
+                $filesystem->putStream('training-data.csv', $stream);
+                fclose($stream);
+            }
+        } catch (IOExceptionInterface $e) {
+            $output->writeln(sprintf('Error writing csv: %s', $e->getPath()));
+        }
+    }
 /*
     public function sync($filesystem)
     {
@@ -64,6 +164,22 @@ class PicsureMLService
                     $result->getHeight()
                 );
             }
+        }
+
+        $fs = new Filesystem();
+        try {
+            $file = sprintf("%s/annotations.txt", sys_get_temp_dir());
+            $fs->dumpFile($file, implode(PHP_EOL, $annotations));
+            $stream = fopen($file, 'r+');
+            if ($stream != false) {
+                $filesystem->putStream('annotations.txt', $stream);
+                fclose($stream);
+            }
+        } catch (IOExceptionInterface $e) {
+            $this->logger->warning(
+                sprintf("An error occurred while writting the annotations to %s", $e->getPath()),
+                ['exception' => $e]
+            );
         }
     }
     */

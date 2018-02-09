@@ -3,25 +3,29 @@
 namespace AppBundle\Listener;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\File\S3File;
 use AppBundle\Event\PicsureEvent;
+use PicsureMLBundle\Service\PicsureMLService;
 
 class PicsureListener
 {
-    const PICSURE_UNDAMAGED = 'undamaged';
-    const PICSURE_INVALID = 'invalid';
-    const PICSURE_DAMAGED = 'damaged';
-
     /** @var DocumentManager */
     protected $dm;
 
+    /** @var PicsureMLService */
+    protected $picsureMLService;
+
     /**
      * @param DocumentManager $dm
+     * @param PicsureMLService $picsureMLService
      */
     public function __construct(
-        DocumentManager $dm
+        DocumentManager $dm,
+        PicsureMLService $picsureMLService
     ) {
         $this->dm = $dm;
+        $this->picsureMLService = $picsureMLService;
     }
 
     /**
@@ -30,7 +34,7 @@ class PicsureListener
     public function onUndamagedEvent(PicsureEvent $event)
     {
         $file = $event->getS3File();
-        $this->updateS3File($file, self::PICSURE_UNDAMAGED);
+        $this->updateS3File($file, PhonePolicy::PICSURE_STATUS_APPROVED);
     }
 
     /**
@@ -39,7 +43,7 @@ class PicsureListener
     public function onInvalidEvent(PicsureEvent $event)
     {
         $file = $event->getS3File();
-        $this->updateS3File($file, self::PICSURE_INVALID);
+        $this->updateS3File($file, PhonePolicy::PICSURE_STATUS_INVALID);
     }
 
     /**
@@ -48,12 +52,14 @@ class PicsureListener
     public function onDamagedEvent(PicsureEvent $event)
     {
         $file = $event->getS3File();
-        $this->updateS3File($file, self::PICSURE_DAMAGED);     
+        $this->updateS3File($file, PhonePolicy::PICSURE_STATUS_INVALID);     
     }
 
     private function updateS3File(S3File $file, $status)
     {
         $file->addMetadata('status', $status);
         $this->dm->flush();
+
+        $this->picsureMLService->addFileForTraining($file, $status);
     }
 }

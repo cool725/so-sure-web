@@ -16,7 +16,7 @@ use AppBundle\Controller\BaseController;
 use AppBundle\Document\File\S3File;
 use PicsureMLBundle\Service\PicsureMLService;
 use PicsureMLBundle\Document\Image;
-use PicsureMLBundle\Form\Type\AnnotateType;
+use PicsureMLBundle\Form\Type\LabelType;
 
 /**
  * @Route("/admin")
@@ -31,23 +31,9 @@ class PicsureMLController extends BaseController
      */
     public function indexAction(Request $request)
     {
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(S3File::class);
-
-        $qb = $repo->createQueryBuilder();
-        $qb->field('fileType')->equals('picsure');
-        $qb->sort('id', 'desc');
-        $pager = $this->pager($request, $qb, 12);
-
-        return [
-            'images' => $pager->getCurrentPageResults(),
-            'pager' => $pager
-        ];
-
-        /*
         $dm = $this->getPicsureMLManager();
         $repo = $dm->getRepository(Image::class);
-        
+
         $qb = $repo->createQueryBuilder();
         $qb->sort('id', 'desc');
         $pager = $this->pager($request, $qb, 12);
@@ -56,7 +42,6 @@ class PicsureMLController extends BaseController
             'images' => $pager->getCurrentPageResults(),
             'pager' => $pager
         ];
-        */
     }
 
     /**
@@ -73,15 +58,15 @@ class PicsureMLController extends BaseController
         }
 
         $imagesForm = $this->get('form.factory')
-            ->createNamedBuilder('picsure_annotation_form', AnnotateType::class, $image)
+            ->createNamedBuilder('picsure_label_form', LabelType::class, $image)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
-            if ($request->request->has('picsure_annotation_form')) {
+            if ($request->request->has('picsure_label_form')) {
                 $imagesForm->handleRequest($request);
                 if ($imagesForm->isValid()) {
                     $dm->flush();
-                    if (array_key_exists('previous', $request->request->get('picsure_annotation_form'))) {
+                    if (array_key_exists('previous', $request->request->get('picsure_label_form'))) {
                         $prevId = $repo->getPreviousImage($id);
                         if ($prevId) {
                             return $this->redirectToRoute('admin_picsure_ml_edit', ['id' => $prevId]);
@@ -102,7 +87,7 @@ class PicsureMLController extends BaseController
 
         return [
             'image' => $image,
-            'picsure_annotation_form' => $imagesForm->createView(),
+            'picsure_label_form' => $imagesForm->createView(),
         ];
     }
 

@@ -19,6 +19,7 @@ class PicsureService
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
+     * @param Dispatcher $dispatcher
      */
     public function __construct(DocumentManager $dm, LoggerInterface $logger, $dispatcher)
     {
@@ -44,7 +45,7 @@ class PicsureService
         if ($this->dispatcher) {
             $this->dispatcher->dispatch($eventType, $event);
         } else {
-            $this->logger->warning('Dispatcher is disabled for Policy Service');
+            $this->logger->warning('Dispatcher is disabled for Picsure Service');
         }
     }
 

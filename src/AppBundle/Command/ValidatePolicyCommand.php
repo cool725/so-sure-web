@@ -10,6 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Policy;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\ScheduledPayment;
 
 class ValidatePolicyCommand extends ContainerAwareCommand
@@ -73,6 +74,12 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                 InputOption::VALUE_NONE,
                 'Show all unpaid, rather than those close to expiry'
             )
+            ->addOption(
+                'resync-picsure-s3file-status',
+                null,
+                InputOption::VALUE_NONE,
+                'Set the picsure status from the policy on the s3file metadata'
+            )
         ;
     }
 
@@ -89,134 +96,140 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         $adjustScheduledPayments = $input->getOption('adjust-scheduled-payments');
         $skipEmail = true === $input->getOption('skip-email');
         $all = true === $input->getOption('all');
+        $resyncPicsure = true === $input->getOption('resync-picsure-s3file-status');
         $validateDate = null;
         if ($date) {
             $validateDate = new \DateTime($date);
         }
 
-        $policyService = $this->getContainer()->get('app.policy');
-        $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
-        $policyRepo = $dm->getRepository(Policy::class);
+        if ($resyncPicsure) {
+            $this->resyncPicsureStatus();
+        }
+        else {            
+            $policyService = $this->getContainer()->get('app.policy');
+            $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
+            $policyRepo = $dm->getRepository(Policy::class);
 
-        if ($policyNumber || $policyId) {
-            $policy = null;
-            if ($policyNumber) {
-                $policy = $policyRepo->findOneBy(['policyNumber' => $policyNumber]);
-            } elseif ($policyId) {
-                $policy = $policyRepo->find($policyId);
-            }
-            if (!$policy) {
-                throw new \Exception(sprintf('Unable to find policy for %s', $policyNumber));
-            }
-            if ($create) {
-                $policyService->create($policy, null, true);
-                $output->writeln(sprintf('Policy %s created', $policy->getPolicyNumber()));
-                return;
-            }
-
-            $blank = [];
-            $this->header($policy, $blank, $lines);
-
-            if ($policy->isCancelled()) {
-                $lines[] = sprintf(
-                    'Policy is cancelled. Refund %f / Commission %f',
-                    $policy->getRefundAmount($validateDate),
-                    $policy->getRefundCommissionAmount($validateDate)
-                );
-            }
-            $data = [
-                'warnClaim' => true,
-                'prefix' => $prefix,
-                'validateDate' => $validateDate,
-                'adjustScheduledPayments' => $adjustScheduledPayments,
-                'updatePotValue' => $updatePotValue,
-                'all' => true,
-            ];
-            $this->validatePolicy($policy, $policies, $lines, $data);
-            if ($updatePotValue || $adjustScheduledPayments) {
-                $dm->flush();
-            }
-        } else {
-            $policies = $policyRepo->findAll();
-            $lines[] = 'Policy Validation';
-            $lines[] = '-------------';
-            $lines[] = '';
-            foreach ($policies as $policy) {
-                if ($prefix && !$policy->hasPolicyPrefix($prefix)) {
-                    continue;
+            if ($policyNumber || $policyId) {
+                $policy = null;
+                if ($policyNumber) {
+                    $policy = $policyRepo->findOneBy(['policyNumber' => $policyNumber]);
+                } elseif ($policyId) {
+                    $policy = $policyRepo->find($policyId);
                 }
-                // TODO: Run financials for cancelled policies as well
+                if (!$policy) {
+                    throw new \Exception(sprintf('Unable to find policy for %s', $policyNumber));
+                }
+                if ($create) {
+                    $policyService->create($policy, null, true);
+                    $output->writeln(sprintf('Policy %s created', $policy->getPolicyNumber()));
+                    return;
+                }
+
+                $blank = [];
+                $this->header($policy, $blank, $lines);
+
                 if ($policy->isCancelled()) {
-                    continue;
+                    $lines[] = sprintf(
+                        'Policy is cancelled. Refund %f / Commission %f',
+                        $policy->getRefundAmount($validateDate),
+                        $policy->getRefundCommissionAmount($validateDate)
+                    );
                 }
                 $data = [
-                    'warnClaim' => false,
+                    'warnClaim' => true,
                     'prefix' => $prefix,
                     'validateDate' => $validateDate,
-                    'adjustScheduledPayments' => false,
-                    'updatePotValue' => false,
-                    'all' => $all,
+                    'adjustScheduledPayments' => $adjustScheduledPayments,
+                    'updatePotValue' => $updatePotValue,
+                    'all' => true,
                 ];
                 $this->validatePolicy($policy, $policies, $lines, $data);
-            }
+                if ($updatePotValue || $adjustScheduledPayments) {
+                    $dm->flush();
+                }
+            } else {
+                $policies = $policyRepo->findAll();
+                $lines[] = 'Policy Validation';
+                $lines[] = '-------------';
+                $lines[] = '';
+                foreach ($policies as $policy) {
+                    if ($prefix && !$policy->hasPolicyPrefix($prefix)) {
+                        continue;
+                    }
+                    // TODO: Run financials for cancelled policies as well
+                    if ($policy->isCancelled()) {
+                        continue;
+                    }
+                    $data = [
+                        'warnClaim' => false,
+                        'prefix' => $prefix,
+                        'validateDate' => $validateDate,
+                        'adjustScheduledPayments' => false,
+                        'updatePotValue' => false,
+                        'all' => $all,
+                    ];
+                    $this->validatePolicy($policy, $policies, $lines, $data);
+                }
 
-            $lines[] = '';
-            $lines[] = '';
-            $lines[] = '';
-            $lines[] = 'Pending Cancellations';
-            $lines[] = '-------------';
-            $lines[] = '';
-            $policyService = $this->getContainer()->get('app.policy');
-            $pending = $policyService->getPoliciesPendingCancellation(true, $prefix);
-            foreach ($pending as $policy) {
-                $lines[] = sprintf(
-                    'Policy %s is pending cancellation on %s',
-                    $policy->getPolicyNumber(),
-                    $policy->getPendingCancellation()->format(\DateTime::ATOM)
-                );
-                if ($policy->hasOpenClaim()) {
+                $lines[] = '';
+                $lines[] = '';
+                $lines[] = '';
+                $lines[] = 'Pending Cancellations';
+                $lines[] = '-------------';
+                $lines[] = '';
+                $policyService = $this->getContainer()->get('app.policy');
+                $pending = $policyService->getPoliciesPendingCancellation(true, $prefix);
+                foreach ($pending as $policy) {
                     $lines[] = sprintf(
-                        'WARNING!! - Policy %s has an open claim that should be resolved prior to cancellation',
+                        'Policy %s is pending cancellation on %s',
+                        $policy->getPolicyNumber(),
+                        $policy->getPendingCancellation()->format(\DateTime::ATOM)
+                    );
+                    if ($policy->hasOpenClaim()) {
+                        $lines[] = sprintf(
+                            'WARNING!! - Policy %s has an open claim that should be resolved prior to cancellation',
+                            $policy->getPolicyNumber()
+                        );
+                    }
+                }
+                if (count($pending) == 0) {
+                    $lines[] = 'No pending cancellations';
+                }
+
+                $lines[] = '';
+                $lines[] = '';
+                $lines[] = '';
+                $lines[] = 'Wait Claims';
+                $lines[] = '-------------';
+                $lines[] = '';
+                $repo = $dm->getRepository(Policy::class);
+                $waitClaimPolicies = $repo->findBy(['status' => Policy::STATUS_EXPIRED_WAIT_CLAIM]);
+                foreach ($waitClaimPolicies as $policy) {
+                    $lines[] = sprintf(
+                        'Policy %s is expired with an active claim that needs resolving ASAP',
                         $policy->getPolicyNumber()
                     );
                 }
-            }
-            if (count($pending) == 0) {
-                $lines[] = 'No pending cancellations';
+                if (count($waitClaimPolicies) == 0) {
+                    $lines[] = 'No wait claimable policies';
+                }
+                $lines[] = '';
+                $lines[] = '';
             }
 
-            $lines[] = '';
-            $lines[] = '';
-            $lines[] = '';
-            $lines[] = 'Wait Claims';
-            $lines[] = '-------------';
-            $lines[] = '';
-            $repo = $dm->getRepository(Policy::class);
-            $waitClaimPolicies = $repo->findBy(['status' => Policy::STATUS_EXPIRED_WAIT_CLAIM]);
-            foreach ($waitClaimPolicies as $policy) {
-                $lines[] = sprintf(
-                    'Policy %s is expired with an active claim that needs resolving ASAP',
-                    $policy->getPolicyNumber()
+            if (!$skipEmail) {
+                $mailer = $this->getContainer()->get('app.mailer');
+                $mailer->send(
+                    'Policy Validation & Pending Cancellations',
+                    'tech+ops@so-sure.com',
+                    implode('<br />', $lines)
                 );
             }
-            if (count($waitClaimPolicies) == 0) {
-                $lines[] = 'No wait claimable policies';
-            }
-            $lines[] = '';
-            $lines[] = '';
-        }
 
-        if (!$skipEmail) {
-            $mailer = $this->getContainer()->get('app.mailer');
-            $mailer->send(
-                'Policy Validation & Pending Cancellations',
-                'tech+ops@so-sure.com',
-                implode('<br />', $lines)
-            );
+            $output->writeln(implode(PHP_EOL, $lines));
+            $output->writeln('Finished');
         }
-
-        $output->writeln(implode(PHP_EOL, $lines));
-        $output->writeln('Finished');
     }
 
     private function validatePolicy(Policy $policy, &$policies, &$lines, $data)
@@ -394,5 +407,23 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             $policy->getOutstandingPremium()
         );
         // @codingStandardsIgnoreEnd
+    }
+
+    private function resyncPicsureStatus() {
+        $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
+        $policyRepo = $dm->getRepository(PhonePolicy::class);
+
+        $picsurePolicies = $policyRepo->findBy(['picSureStatus' => ['$in' => [PhonePolicy::PICSURE_STATUS_APPROVED, PhonePolicy::PICSURE_STATUS_INVALID, PhonePolicy::PICSURE_STATUS_REJECTED]]]);
+
+        foreach ($picsurePolicies as $policy) {
+            $files = $policy->getPolicyPicSureFiles();
+            if (count($files) > 0) {
+                $metadata = $files[0]->getMetadata();
+                if (empty($metadata['status'])) {
+                    $files[0]->addMetadata('status', $policy->getPicSureStatus());
+                }
+            }
+        }
+        $dm->flush();
     }
 }
