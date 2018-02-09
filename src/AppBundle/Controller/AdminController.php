@@ -343,7 +343,7 @@ class AdminController extends BaseController
         foreach ($claim->getCharges() as $charge) {
             $charge->setClaim(null);
             $this->get('logger')->warning(sprintf(
-                'Charge %s for £%0.2f has been disassocated for deleted claim %s/%s',
+                'Charge %s for £%0.2f has been disassocated for deleted claim %s (%s)',
                 $charge->getId(),
                 $charge->getAmount(),
                 $claim->getNumber(),
