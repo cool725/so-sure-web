@@ -22,7 +22,7 @@ class BillingDayType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $policy = $builder->getData()->getPolicy();
-        $enabled = $policy->isPolicyPaidToDate();
+        $enabled = $policy->isPolicyPaidToDate() && !$policy->isWithinCooloffPeriod();
 
         $days = [];
         for ($i = 1; $i <= 28; $i++) {
@@ -33,7 +33,10 @@ class BillingDayType extends AbstractType
                     'choices' => $days,
                     'required' => true
             ])
-            ->add('update', SubmitType::class, ['disabled' => !$enabled])
+            ->add('update', SubmitType::class, [
+                'disabled' => !$enabled,
+                'attr' => ['title' => $enabled ? null : 'Policy must be paid to date & not within cooloff period']
+            ])
         ;
     }
 
