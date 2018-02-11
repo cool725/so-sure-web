@@ -886,6 +886,32 @@ class DaviesServiceTest extends WebTestCase
         $this->insureErrorDoesNotExist('/does not have a reserved value/');
     }
 
+    public function testValidateClaimPhoneReplacementCostsCorrect()
+    {
+        $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        $policy->addClaim($claim);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = 1;
+        $daviesClaim->status = 'open';
+        $daviesClaim->incurred = 6.68;
+        $daviesClaim->unauthorizedCalls = 1.01;
+        $daviesClaim->accessories = 1.03;
+        $daviesClaim->phoneReplacementCost = -50;
+        $daviesClaim->transactionFees = 1.11;
+        $daviesClaim->handlingFees = 1.19;
+        $daviesClaim->reciperoFee = 1.27;
+        $daviesClaim->excess = 6;
+        $daviesClaim->reserved = 0;
+        $daviesClaim->replacementMake = 'Apple';
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->insureErrorExists('/does not have the correct phone replacement cost/');
+    }
+
     public function testValidateClaimDetailsIncurredCorrect()
     {
         $policy = static::createUserPolicy(true);
@@ -1520,6 +1546,8 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->replacementModel = 'iPhone 4';
         $daviesClaim->replacementImei = '123 Bx11lt';
         $daviesClaim->replacementReceivedDate = new \DateTime();
+        $daviesClaim->phoneReplacementCost = 100;
+        $daviesClaim->incurred = 100;
         $daviesClaims = array($daviesClaim);
 
         static::$daviesService->saveClaims('', $daviesClaims);
