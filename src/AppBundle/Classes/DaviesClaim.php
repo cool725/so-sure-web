@@ -202,6 +202,18 @@ class DaviesClaim extends DaviesExcel
         return $this->areEqualToTwoDp($this->incurred, $this->getExpectedIncurred());
     }
 
+    public function isPhoneReplacementCostCorrect()
+    {
+        if ($this->replacementMake || $this->replacementModel || $this->replacementImei ||
+            $this->replacementReceivedDate) {
+            if ($this->phoneReplacementCost <= 0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public function getExpectedIncurred()
     {
         // Incurred fee only appears to be populated at the point where the phone replacement cost is known,
