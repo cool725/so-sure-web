@@ -40,7 +40,6 @@ class PolicyServiceTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     use \AppBundle\Document\DateTrait;
-    use \AppBundle\Document\CurrencyTrait;
 
     protected static $container;
     protected static $policyService;

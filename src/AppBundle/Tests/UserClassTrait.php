@@ -12,6 +12,7 @@ use AppBundle\Document\Payment\GocardlessPayment;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Payment\SoSurePayment;
 use AppBundle\Document\Payment\BacsPayment;
+use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\ImeiTrait;
 use AppBundle\Document\Reward;
 use AppBundle\Document\Connection\StandardConnection;
@@ -22,6 +23,7 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 
 trait UserClassTrait
 {
+    use CurrencyTrait;
     use ImeiTrait;
 
     public static $JUDO_TEST_CARD_NUM = '4921 8100 0000 5462';
@@ -204,7 +206,7 @@ trait UserClassTrait
         return $policy;
     }
 
-    public static function addJudoPayPayment($judopay, $policy, $date = null, $monthly = true)
+    public static function addJudoPayPayment($judopay, $policy, $date = null, $monthly = true, $adjustment = 0)
     {
         if ($monthly) {
             $policy->setPremiumInstallments(12);
@@ -214,6 +216,12 @@ trait UserClassTrait
             $policy->setPremiumInstallments(1);
             $premium = $policy->getPremium()->getYearlyPremiumPrice(null, $date);
             $commission = Salva::YEARLY_TOTAL_COMMISSION;
+        }
+        if ($adjustment) {
+            $premium = $premium - $adjustment;
+            // toTwoDp
+            $premium = number_format(round($premium, 2), 2, ".", "");
+
         }
 
         $details = self::runJudoPayPayment($judopay, $policy->getUser(), $policy, $premium);

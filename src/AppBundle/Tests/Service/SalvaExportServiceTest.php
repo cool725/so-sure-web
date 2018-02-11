@@ -25,7 +25,6 @@ class SalvaExportServiceTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
-    use CurrencyTrait;
     protected static $container;
     protected static $salva;
     protected static $dm;

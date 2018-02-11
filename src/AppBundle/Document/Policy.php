@@ -2541,7 +2541,7 @@ abstract class Policy
                 'Failed to validate [policy %s] refund amount (%f) does not match premium price (%f)',
                 $this->getPolicyNumber(),
                 $payment->getAmount(),
-                $this->getPremiumInstallmentPrice() ? $this->getPremiumInstallmentPrice() : -1
+                $this->getPremiumInstallmentPrice(true) ? $this->getPremiumInstallmentPrice(true) : -1
             ));
         }
 

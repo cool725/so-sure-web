@@ -34,7 +34,6 @@ class PhonePolicyTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     use UserClassTrait;
-    use CurrencyTrait;
 
     protected static $container;
     protected static $dm;
@@ -1413,7 +1412,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPhone(static::$phone);
 
         $user = new User();
-        $user->setEmail(self::generateEmail('testValidateRefundAmountIsInstallmentPrice', $this));
+        $user->setEmail(self::generateEmail('testValidateRefundAmountIsInstallmentPriceWithDiscount', $this));
         self::addAddress($user);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999), null, null, rand(1, 9999));
