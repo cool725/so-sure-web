@@ -221,7 +221,6 @@ trait UserClassTrait
             $premium = $premium - $adjustment;
             // toTwoDp
             $premium = number_format(round($premium, 2), 2, ".", "");
-
         }
 
         $details = self::runJudoPayPayment($judopay, $policy->getUser(), $policy, $premium);
