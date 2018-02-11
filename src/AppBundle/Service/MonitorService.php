@@ -132,6 +132,34 @@ class MonitorService
         }
     }
 
+    public function cashbackIncorrectStatus()
+    {
+        $repo = $this->dm->getRepository(Cashback::class);
+        $cashbacks = $repo->findBy(['status' => Cashback::STATUS_PENDING_CLAIMABLE]);
+        foreach ($cashbacks as $cashback) {
+            if ($cashback->getPolicy()->getStatus() != Policy::STATUS_EXPIRED_CLAIMABLE) {
+                throw new MonitorException(sprintf(
+                    'Cashback status (claimable) for policy id:%s (%s) is incorrect. Policy status %s',
+                    $cashback->getPolicy()->getId(),
+                    $cashback->getPolicy()->getSalvaPolicyNumber(),
+                    $cashback->getPolicy()->getStatus()
+                ));
+            }
+        }
+
+        $cashbacks = $repo->findBy(['status' => Cashback::STATUS_PENDING_WAIT_CLAIM]);
+        foreach ($cashbacks as $cashback) {
+            if ($cashback->getPolicy()->getStatus() != Policy::STATUS_EXPIRED_WAIT_CLAIM) {
+                throw new MonitorException(sprintf(
+                    'Cashback status (wait claim) for policy id:%s (%s) is incorrect. Policy status %s',
+                    $cashback->getPolicy()->getId(),
+                    $cashback->getPolicy()->getSalvaPolicyNumber(),
+                    $cashback->getPolicy()->getStatus()
+                ));
+            }
+        }
+    }
+
     public function daviesImport()
     {
         $fileRepo = $this->dm->getRepository(DaviesFile::class);
