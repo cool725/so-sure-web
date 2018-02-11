@@ -35,7 +35,8 @@ class DaviesExcel
     {
         // possible values that Davies might use as placeholders
         // when a field is required by their system, but not yet known
-        return in_array(trim($value), ['', 'Unknown', 'TBC', 'Tbc', 'tbc', '-', '0', 'N/A', 'n/a', 'NA', 'na', '#N/A']);
+        return in_array(trim($value), ['', 'Unknown', 'TBC', 'Tbc', 'tbc', '-', '0',
+            'N/A', 'n/a', 'NA', 'na', '#N/A', 'Not Applicable']);
     }
 
     /**
