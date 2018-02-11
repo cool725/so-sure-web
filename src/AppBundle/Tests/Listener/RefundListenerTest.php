@@ -30,7 +30,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class RefundListenerTest extends WebTestCase
 {
-    use CurrencyTrait;
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
@@ -454,7 +453,7 @@ class RefundListenerTest extends WebTestCase
             Payment::sumPayments($renewalPolicy->getPayments(), false, PolicyDiscountPayment::class)['total']
         );
 
-        static::addJudoPayPayment(self::$judopayService, $renewalPolicy, new \DateTime('2017-01-01'));
+        static::addJudoPayPayment(self::$judopayService, $renewalPolicy, new \DateTime('2017-01-01'), true, 10/12);
 
         $renewalPolicy->setCancelledReason(PhonePolicy::CANCELLED_COOLOFF);
         $renewalPolicy->setStatus(PhonePolicy::STATUS_CANCELLED);

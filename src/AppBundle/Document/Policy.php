@@ -1800,7 +1800,7 @@ abstract class Policy
         return $this->getPremiumInstallments();
     }
 
-    public function getPremiumInstallmentPrice()
+    public function getPremiumInstallmentPrice($useAdjustedPrice = false)
     {
         if (!$this->isPolicy()) {
             return null;
@@ -1808,10 +1808,19 @@ abstract class Policy
 
         if (!$this->getPremiumInstallmentCount()) {
             return null;
-        } elseif ($this->getPremiumInstallmentCount() == 1) {
-            return $this->getPremium()->getYearlyPremiumPrice();
-        } elseif ($this->getPremiumInstallmentCount() == 12) {
-            return $this->getPremium()->getMonthlyPremiumPrice();
+        } elseif ($this->getPremiumPlan() == self::PLAN_YEARLY) {
+            if ($useAdjustedPrice) {
+                return $this->getPremium()->getAdjustedYearlyPremiumPrice();
+            } else {
+                return $this->getPremium()->getYearlyPremiumPrice();
+            }
+        } elseif ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
+            if ($useAdjustedPrice) {
+                // TODO: What about final month??
+                return $this->getPremium()->getAdjustedStandardMonthlyPremiumPrice();
+            } else {
+                return $this->getPremium()->getMonthlyPremiumPrice();
+            }
         } else {
             throw new \Exception(sprintf('Policy %s does not have correct installment amount', $this->getId()));
         }
@@ -1825,18 +1834,22 @@ abstract class Policy
 
         if (!$this->getPremiumInstallmentCount()) {
             return null;
-        } elseif ($this->getPremiumInstallmentCount() == 1) {
+        } elseif ($this->getPremiumPlan() == self::PLAN_YEARLY) {
             return $this->getPremium()->getYearlyGwp();
-        } elseif ($this->getPremiumInstallmentCount() == 12) {
+        } elseif ($this->getPremiumPlan() == self::PLAN_MONTHLY) {
             return $this->getPremium()->getGwp();
         } else {
             throw new \Exception(sprintf('Policy %s does not have correct installment amount', $this->getId()));
         }
     }
 
+    /**
+     * TODO: Should remove this
+     */
     public function getYearlyPremiumPrice()
     {
-        return $this->getPremiumInstallmentCount() * $this->getPremiumInstallmentPrice();
+        return $this->getPremium()->getYearlyPremiumPrice();
+        //return $this->getPremiumInstallmentCount() * $this->getPremiumInstallmentPrice();
     }
 
     public function getPremiumPlan()
@@ -2523,12 +2536,12 @@ abstract class Policy
         if ($payment) {
             $amount = $payment->getAmount();
         }
-        if (!$this->areEqualToTwoDp($amount, $this->getPremiumInstallmentPrice())) {
+        if (!$this->areEqualToTwoDp($amount, $this->getPremiumInstallmentPrice(true))) {
             throw new \InvalidArgumentException(sprintf(
                 'Failed to validate [policy %s] refund amount (%f) does not match premium price (%f)',
                 $this->getPolicyNumber(),
                 $payment->getAmount(),
-                $this->getPremiumInstallmentPrice() ? $this->getPremiumInstallmentPrice() : -1
+                $this->getPremiumInstallmentPrice(true) ? $this->getPremiumInstallmentPrice(true) : -1
             ));
         }
 

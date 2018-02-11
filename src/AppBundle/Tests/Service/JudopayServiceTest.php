@@ -24,7 +24,6 @@ use AppBundle\Document\Payment\PolicyDiscountPayment;
  */
 class JudopayServiceTest extends WebTestCase
 {
-    use \AppBundle\Document\CurrencyTrait;
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;

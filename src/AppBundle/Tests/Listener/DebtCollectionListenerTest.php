@@ -28,7 +28,6 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  */
 class DebtCollectionListenerTest extends WebTestCase
 {
-    use CurrencyTrait;
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
