@@ -67,7 +67,9 @@ sosure.claim = (function() {
                     required: 'Please enter a valid email address.'
                 },
                 "claim_form[when]" : {
-                    required: 'Please enter a valid date in the format DD/MM/YYYY'
+                    required: 'Please enter a valid date in the format DD/MM/YYYY',
+                    validDate: 'Please enter a valid date',
+                    checkDateIsValid: 'Please enter a valid date',
                 },
                 "claim_form[phone]" : 'Valid Phone Number'
             },
@@ -93,7 +95,7 @@ sosure.claim = (function() {
             }
         });
     }
-    
+
     return self;
 })();
 
