@@ -68,6 +68,7 @@ class DoctrineSalvaListenerTest extends WebTestCase
         $this->runPreUpdate($policy, $this->once(), ['phone' => ['Apple', 'Samsung']]);
         $this->runPreUpdate($policy, $this->once(), ['imei' => ['11', '12']]);
         $this->runPreUpdate($policy, $this->never(), ['potValue' => [1, 2]]);
+        $this->runPreUpdate($policy, $this->once(), ['premiumInstallments' => [1, 12]]);
 
         $premiumA = new PhonePremium();
         $premiumA->setGwp(5.89);

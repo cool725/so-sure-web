@@ -49,6 +49,7 @@ class DoctrineSalvaListener
                     'phone',
                     'imei',
                     'premium',
+                    'premiumInstallments',
                 ];
                 foreach ($fields as $field) {
                     $changed = false;
