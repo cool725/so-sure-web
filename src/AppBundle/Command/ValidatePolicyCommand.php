@@ -273,6 +273,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             $this->header($policy, $policies, $lines);
             $data['warnClaim'] = true;
             if ($data['adjustScheduledPayments']) {
+                $policyService = $this->getContainer()->get('app.policy');
                 if ($policyService->adjustScheduledPayments($policy)) {
                     $lines[] = sprintf(
                         'Adjusted Incorrect scheduled payments',
