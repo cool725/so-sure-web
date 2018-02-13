@@ -10,7 +10,7 @@ class PicsureMLRepository extends DocumentRepository
     public function imageExists($path)
     {
         $qb = $this->createQueryBuilder();
-        $qb->field('path')->equals($path);
+        $qb->field('imagePath')->equals($path);
 
         return $qb
             ->getQuery()

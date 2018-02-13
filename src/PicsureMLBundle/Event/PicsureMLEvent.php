@@ -1,15 +1,15 @@
 <?php
 
-namespace AppBundle\Event;
+namespace PicsureMLBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 use AppBundle\Document\File\S3File;
 
-class PicsureEvent extends Event
+class PicsureMLEvent extends Event
 {
-    const EVENT_UNDAMAGED = 'event.picsure.undamaged';
-    const EVENT_INVALID = 'event.picsure.invalid';
-    const EVENT_DAMAGED = 'event.picsure.damaged';
+    const EVENT_UNDAMAGED = 'event.picsureml.undamaged';
+    const EVENT_INVALID = 'event.picsureml.invalid';
+    const EVENT_DAMAGED = 'event.picsureml.damaged';
 
     /** @var S3File */
     protected $s3File;

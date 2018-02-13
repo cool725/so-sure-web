@@ -575,6 +575,11 @@ class PhonePolicy extends Policy
         if ($picSureStatus == self::PICSURE_STATUS_APPROVED && !$this->getPicSureApprovedDate()) {
             $this->setPicSureApprovedDate(new \DateTime());
         }
+
+        $picsureFiles = $this->getPolicyFilesByType(PicSureFile::class);
+        if (count($picsureFiles) > 0) {
+            $picsureFiles[0]->addMetadata('picsure-status', $picSureStatus);
+        }
     }
 
     public function isPicSureValidated()

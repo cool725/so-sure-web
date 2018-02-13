@@ -31,14 +31,14 @@
 {% block body %}
 <div class="container">
     <a href="{{ path('admin_picsure_ml') }}">Back to Picsure ML</a>
-    <h3>Label: {{ image.path }}</h3>
+    <h3>Label: {{ image.imagePath }}</h3>
 
     {{ form_start(picsure_label_form)}}
 
     <div class="row">
         <div class="col-md-6">
             <div class="content-right">
-                <img src="{{ path('admin_picsure_ml_image', {'file': image.path }) }}">
+                <img src="{{ path('admin_picsure_ml_image', {'file': image.imagePath }) }}">
             </div>
         </div>
         <div class="col-md-6">

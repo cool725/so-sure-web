@@ -15,7 +15,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use AppBundle\Controller\BaseController;
 use AppBundle\Document\File\S3File;
 use PicsureMLBundle\Service\PicsureMLService;
-use PicsureMLBundle\Document\Image;
+use PicsureMLBundle\Document\TrainingData;
 use PicsureMLBundle\Form\Type\LabelType;
 
 /**
@@ -32,7 +32,7 @@ class PicsureMLController extends BaseController
     public function indexAction(Request $request)
     {
         $dm = $this->getPicsureMLManager();
-        $repo = $dm->getRepository(Image::class);
+        $repo = $dm->getRepository(TrainingData::class);
 
         $qb = $repo->createQueryBuilder();
         $qb->sort('id', 'desc');
@@ -51,7 +51,7 @@ class PicsureMLController extends BaseController
     public function editAction(Request $request, $id)
     {
         $dm = $this->getPicsureMLManager();
-        $repo = $dm->getRepository(Image::class);
+        $repo = $dm->getRepository(TrainingData::class);
         $image = $repo->find($id);
         if ($image === null) {
             throw $this->createNotFoundException(sprintf('Image not found %s', $id));

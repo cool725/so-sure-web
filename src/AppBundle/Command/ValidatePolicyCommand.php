@@ -423,8 +423,8 @@ class ValidatePolicyCommand extends ContainerAwareCommand
             $files = $policy->getPolicyPicSureFiles();
             if (count($files) > 0) {
                 $metadata = $files[0]->getMetadata();
-                if (empty($metadata['status'])) {
-                    $files[0]->addMetadata('status', $policy->getPicSureStatus());
+                if (empty($metadata['picsure-status'])) {
+                    $files[0]->addMetadata('picsure-status', $policy->getPicSureStatus());
                 }
             }
         }

@@ -8,15 +8,10 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\File\S3File;
-use PicsureMLBundle\Document\Image;
-use Psr\Log\LoggerInterface;
+use PicsureMLBundle\Document\TrainingData;
 
 class PicsureMLService
 {
-    const PICSURE_LABEL_UNDAMAGED = 'undamaged';
-    const PICSURE_LABEL_INVALID = 'invalid';
-    const PICSURE_LABEL_DAMAGED = 'damaged';
-
     /** @var DocumentManager */
     protected $appDm;
 
@@ -26,42 +21,28 @@ class PicsureMLService
     /** @var Filesystem */
     protected $mountManager;
 
-    /** @var LoggerInterface */
-    protected $logger;
-
     /**
      * @param DocumentManager $appDm
      * @param DocumentManager $picsureMLDm
      * @param Filesystem      $mountManager
-     * @param LoggerInterface $logger
      */
     public function __construct(
         DocumentManager $appDm,
         DocumentManager $picsureMLDm,
-        $mountManager,
-        LoggerInterface $logger
+        $mountManager
     ) {
         $this->appDm = $appDm;
         $this->picsureMLDm = $picsureMLDm;
         $this->mountManager = $mountManager;
-        $this->logger = $logger;
     }
 
     public function addFileForTraining($file, $status)
     {
-        $repo = $this->picsureMLDm->getRepository(Image::class);
+        $repo = $this->picsureMLDm->getRepository(TrainingData::class);
         if ($file->getFileType() == 'PicSureFile' && !$repo->imageExists($file->getKey())) {
-            $image = new Image();
-            $image->setPath($file->getKey());
-            if ($status != null && !empty($status)) {
-                if ($status == PhonePolicy::PICSURE_STATUS_APPROVED) {
-                    $image->setLabel(self::PICSURE_LABEL_UNDAMAGED);
-                } elseif ($status == PhonePolicy::PICSURE_STATUS_INVALID) {
-                    $image->setLabel(self::PICSURE_LABEL_INVALID);
-                } elseif ($status == PhonePolicy::PICSURE_STATUS_REJECTED) {
-                    $image->setLabel(self::PICSURE_LABEL_DAMAGED);
-                }
-            }
+            $image = new TrainingData();
+            $image->setImagePath($file->getKey());
+            $image->setLabel($status);
             $this->picsureMLDm->persist($image);
         }
         $this->picsureMLDm->flush();
@@ -72,21 +53,28 @@ class PicsureMLService
         $s3Repo = $this->appDm->getRepository(S3File::class);
         $picsureFiles = $s3Repo->findBy(['fileType' => 'picsure']);
 
-        $imageRepo = $this->picsureMLDm->getRepository(Image::class);
+        $imageRepo = $this->picsureMLDm->getRepository(TrainingData::class);
+        $images = $imageRepo->createQueryBuilder()
+                        ->select('imagePath')
+                        ->getQuery()->execute();
+        $paths = [];
+        foreach ($images as $image) {
+            $paths[] = $image->getImagePath();
+        }
 
         foreach ($picsureFiles as $file) {
-            if (!$imageRepo->imageExists($file->getKey())) {
-                $image = new Image();
-                $image->setPath($file->getKey());
+            if (!in_array($file->getKey(), $paths)) {
+                $image = new TrainingData();
+                $image->setImagePath($file->getKey());
                 $metadata = $file->getMetadata();
-                $status = $metadata['status'];
+                $status = $metadata['picsure-status'];
                 if (!empty($status)) {
                     if ($status == PhonePolicy::PICSURE_STATUS_APPROVED) {
-                        $image->setLabel(self::PICSURE_LABEL_UNDAMAGED);
+                        $image->setLabel(TrainingData::LABEL_UNDAMAGED);
                     } elseif ($status == PhonePolicy::PICSURE_STATUS_INVALID) {
-                        $image->setLabel(self::PICSURE_LABEL_INVALID);
+                        $image->setLabel(TrainingData::LABEL_INVALID);
                     } elseif ($status == PhonePolicy::PICSURE_STATUS_REJECTED) {
-                        $image->setLabel(self::PICSURE_LABEL_DAMAGED);
+                        $image->setLabel(TrainingData::LABEL_DAMAGED);
                     }
                 }
                 $this->picsureMLDm->persist($image);
@@ -100,7 +88,7 @@ class PicsureMLService
     {
         $filesystem = $this->mountManager->getFilesystem('s3picsure_fs');
 
-        $repo = $this->picsureMLDm->getRepository(Image::class);
+        $repo = $this->picsureMLDm->getRepository(TrainingData::class);
         $qb = $repo->createQueryBuilder();
         $qb->sort('id', 'desc');
         $results = $qb->getQuery()->execute();
@@ -111,7 +99,7 @@ class PicsureMLService
             if ($result->hasLabel()) {
                 $csv[] = sprintf(
                     "%s, %s",
-                    $result->getPath(),
+                    $result->getImagePath(),
                     $result->getLabel()
                 );
             }

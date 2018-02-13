@@ -26,7 +26,7 @@ class AnnotateType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'PicsureMLBundle\Document\Image',
+            'data_class' => 'PicsureMLBundle\Document\TrainingData',
         ));
     }
 }

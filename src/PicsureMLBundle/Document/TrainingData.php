@@ -3,21 +3,26 @@
 namespace PicsureMLBundle\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @MongoDB\Document(repositoryClass="PicsureMLBundle\Repository\PicsureMLRepository")
  */
-class Image
+class TrainingData
 {
+    const LABEL_UNDAMAGED = 'undamaged';
+    const LABEL_INVALID = 'invalid';
+    const LABEL_DAMAGED = 'damaged';
+
     /**
      * @MongoDB\Id(strategy="auto")
      */
     protected $id;
 
     /**
-     * @MongoDB\Field(type="string", name="path")
+     * @MongoDB\Field(type="string", name="imagePath")
      */
-    protected $path;
+    protected $imagePath;
 
     /**
      * @MongoDB\Field(type="integer", name="x")
@@ -40,6 +45,7 @@ class Image
     //protected $height;
 
     /**
+     * @Assert\Choice({"undamaged", "invalid", "damaged"}, strict=true)
      * @MongoDB\Field(type="string", name="label")
      */
     protected $label;
@@ -49,14 +55,14 @@ class Image
         return $this->id;
     }
 
-    public function setPath($path)
+    public function setImagePath($imagePath)
     {
-        $this->path = $path;
+        $this->imagePath = $imagePath;
     }
 
-    public function getPath()
+    public function getImagePath()
     {
-        return $this->path;
+        return $this->imagePath;
     }
 
     public function setLabel($label)
@@ -73,7 +79,6 @@ class Image
     {
         return $this->label != null;
     }
-
 
     /*
 

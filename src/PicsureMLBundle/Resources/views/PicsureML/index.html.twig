@@ -37,7 +37,7 @@
     {% for image in images %}
         <div class="picsure-image col-md-3 col-md-offset-1">
             <a href="{{ path('admin_picsure_ml_edit', {'id': image.id }) }}">
-                <img src="{{ path('admin_picsure_ml_image', {'file': image.path }) }}">
+                <img src="{{ path('admin_picsure_ml_image', {'file': image.imagePath }) }}">
                 {% if image.label == "undamaged" %}
                     <span class="label label-success">Undamaged</span>
                 {% elseif image.label == "invalid" %}

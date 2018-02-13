@@ -592,13 +592,6 @@ services:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
 
-    app.picsure:
-        class: AppBundle\Service\PicsureService
-        arguments:
-            - "@doctrine_mongodb.odm.default_document_manager"
-            - "@logger"
-            - "@event_dispatcher"
-
     app.twig.feature:
         class: AppBundle\Service\FeatureTwigExtension
         arguments:
@@ -850,16 +843,6 @@ services:
           - { name: monolog.logger, channel: mailer }
           - { name: "swiftmailer.default.plugin" }
 
-    app.listener.picsure:
-        class:   AppBundle\Listener\PicsureListener
-        arguments:
-            - "@doctrine_mongodb.odm.default_document_manager"
-            - "@picsureml.picsureml"
-        tags:
-            -  { name: kernel.event_listener, event: event.picsure.undamaged, method: onUndamagedEvent }
-            -  { name: kernel.event_listener, event: event.picsure.invalid, method: onInvalidEvent }
-            -  { name: kernel.event_listener, event: event.picsure.damaged, method: onDamagedEvent }
-
     app.form.type.registration:
         class: AppBundle\Form\Type\RegistrationFormType
         arguments: ["@request_stack", "%kernel.environment%"]
@@ -1102,7 +1085,15 @@ services:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@doctrine_mongodb.odm.picsureml_document_manager"
             - "@oneup_flysystem.mount_manager"
-            - "@logger"
+
+    picsureml.listener.picsureml:
+        class:   PicsureMLBundle\Listener\PicsureMLListener
+        arguments:
+            - "@picsureml.picsureml"
+        tags:
+            -  { name: kernel.event_listener, event: event.picsureml.undamaged, method: onUndamagedEvent }
+            -  { name: kernel.event_listener, event: event.picsureml.invalid, method: onInvalidEvent }
+            -  { name: kernel.event_listener, event: event.picsureml.damaged, method: onDamagedEvent }
 
     picsureml.form.type.annotate:
         class: PicsureMLBundle\Form\Type\AnnotateType
