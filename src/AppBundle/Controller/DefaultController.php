@@ -266,6 +266,7 @@ class DefaultController extends BaseController
                 'required' => true,
                 'placeholder' => 'No. of phones to insure...',
                 'choices' => [
+                    'less than 5' => 'less than 5',
                     '5-10' => '5-10',
                     '10-50' => '10-50',
                     'more than 50' => 'more than 50',
