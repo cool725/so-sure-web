@@ -12,7 +12,7 @@ use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\ScheduledPayment;
 
-class ValidatePolicyCommand extends ContainerAwareCommand
+class ValidatePolicyCommand extends BaseCommand
 {
     protected function configure()
     {
@@ -95,7 +95,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
         }
 
         $policyService = $this->getContainer()->get('app.policy');
-        $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
+        $dm = $this->getManager();
         $policyRepo = $dm->getRepository(Policy::class);
 
         if ($policyNumber || $policyId) {
@@ -280,7 +280,7 @@ class ValidatePolicyCommand extends ContainerAwareCommand
                         $policy->getPolicyNumber()
                     );
                 } else {
-                    $policy = $this->dm->merge($policy);
+                    $policy = $this->getManager()->merge($policy);
                     $lines[] = sprintf(
                         'WARNING!! Failed to adjusted Incorrect scheduled payments',
                         $policy->getPolicyNumber()
