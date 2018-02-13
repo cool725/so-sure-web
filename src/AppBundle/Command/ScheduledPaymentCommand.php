@@ -71,11 +71,11 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
 
         $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
         $logger = $this->getContainer()->get('logger');
-        $judoPay = $this->getContainer()->get('app.judopay');
+        $scheduledPaymentService = $this->getContainer()->get('app.scheduledpayment');
         $repo = $dm->getRepository(ScheduledPayment::class);
         if ($id) {
             $scheduledPayment = $repo->find($id);
-            $scheduledPayment = $judoPay->scheduledPayment(
+            $scheduledPayment = $scheduledPaymentService->scheduledPayment(
                 $scheduledPayment,
                 $prefix,
                 $scheduledDate,
@@ -116,7 +116,7 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
 
                 try {
                     if (!$show) {
-                        $scheduledPayment = $judoPay->scheduledPayment($scheduledPayment, $prefix);
+                        $scheduledPayment = $scheduledPaymentService->scheduledPayment($scheduledPayment, $prefix);
                     }
                     $this->displayScheduledPayment($scheduledPayment, $output);
                 } catch (\Exception $e) {

@@ -34,7 +34,6 @@ class PhonePolicyTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     use UserClassTrait;
-    use CurrencyTrait;
 
     protected static $container;
     protected static $dm;
@@ -1404,6 +1403,39 @@ class PhonePolicyTest extends WebTestCase
 
         $this->assertTrue($policy->validateRefundAmountIsInstallmentPrice($payment));
         $payment->setAmount($payment->getAmount() + 0.0001);
+        $this->assertTrue($policy->validateRefundAmountIsInstallmentPrice($payment));
+    }
+
+    public function testValidateRefundAmountIsInstallmentPriceWithDiscount()
+    {
+        $policy = new SalvaPhonePolicy();
+        $policy->setPhone(static::$phone);
+
+        $user = new User();
+        $user->setEmail(self::generateEmail('testValidateRefundAmountIsInstallmentPriceWithDiscount', $this));
+        self::addAddress($user);
+        $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
+        $policy->setStart(new \DateTime("2016-01-01"));
+        // not using policy service here, so simulate what's done there
+        $policy->setPremiumInstallments(12);
+        $policy->getPremium()->setAnnualDiscount(12);
+        $payment = new PolicyDiscountPayment();
+        $payment->setAmount(12);
+        $policy->addPayment($payment);
+
+        static::$dm->persist($policy);
+        static::$dm->persist($user);
+        static::$dm->flush();
+
+        $payment = self::addPayment(
+            $policy,
+            static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice() - 1,
+            Salva::MONTHLY_TOTAL_COMMISSION
+        );
+
+        static::$dm->flush();
+
         $this->assertTrue($policy->validateRefundAmountIsInstallmentPrice($payment));
     }
 

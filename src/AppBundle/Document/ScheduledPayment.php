@@ -205,6 +205,39 @@ class ScheduledPayment
         return $this->getScheduled() <= $date;
     }
 
+    public function validateRunable($prefix = null, \DateTime $date = null)
+    {
+        if (!$this->getPolicy()->isValidPolicy($prefix)) {
+            throw new \Exception(sprintf(
+                'Scheduled payment %s policy is not valid. Invalid Prefix?',
+                $this->getId()
+            ));
+        }
+
+        if (!$this->isBillable($prefix)) {
+            throw new \Exception(sprintf(
+                'Scheduled payment %s is not billable (status: %s)',
+                $this->getId(),
+                $this->getStatus()
+            ));
+        }
+
+        if (!$this->canBeRun($date)) {
+            throw new \Exception(sprintf(
+                'Scheduled payment %s can not yet be run (scheduled: %s)',
+                $this->getId(),
+                $this->getScheduled()->format('Y-m-d H:i:s')
+            ));
+        }
+
+        if ($this->getPayment() && $this->getPayment()->isSuccess()) {
+            throw new \Exception(sprintf(
+                'Payment already received for scheduled payment %s',
+                $this->getId()
+            ));
+        }
+    }
+
     public function hasCorrectBillingDay()
     {
         if ($this->getType() == self::TYPE_RESCHEDULED) {

@@ -317,6 +317,73 @@ class FOSUserControllerTest extends BaseControllerTest
         ];
     }
 
+    public function testPCILoginLock()
+    {
+        $email = self::generateEmail('testPCILoginLock', $this);
+        $user = static::createUser(
+            self::$userManager,
+            $email,
+            'foo'
+        );
+        $user->addRole('ROLE_ADMIN');
+        static::$dm->flush();
+
+        $this->login($email, 'foo', 'admin/');
+
+        // can't login
+        $this->login($email, 'bar', 'login');
+        $this->login($email, 'bar', 'login');
+        $this->login($email, 'bar', 'login');
+        $this->login($email, 'bar', 'login');
+        $this->login($email, 'bar', 'login');
+
+        $this->login($email, 'foo', 'admin/');
+
+        // can't login
+        $this->login($email, 'bar', 'login');
+        $this->login($email, 'bar', 'login');
+        $this->login($email, 'bar', 'login');
+        $this->login($email, 'bar', 'login');
+        $this->login($email, 'bar', 'login');
+        $this->login($email, 'bar', 'login');
+
+        // locked
+        $this->login($email, 'foo', 'login');
+    }
+
+    public function testPCILoginUserNoLock()
+    {
+        $email = self::generateEmail('testPCILoginUserNoLock', $this);
+        $user = static::createUser(
+            self::$userManager,
+            $email,
+            'foo'
+        );
+        static::$dm->flush();
+
+        $this->login($email, 'foo', 'user/invalid');
+
+        // can't login
+        $this->login($email, 'bar', 'login');
+        $this->login($email, 'bar', 'login');
+        $this->login($email, 'bar', 'login');
+        $this->login($email, 'bar', 'login');
+        $this->login($email, 'bar', 'login');
+
+        $this->login($email, 'foo', 'user/invalid');
+
+        // can't login
+        $this->login($email, 'bar', 'login');
+        $this->login($email, 'bar', 'login');
+        $this->login($email, 'bar', 'login');
+        $this->login($email, 'bar', 'login');
+        $this->login($email, 'bar', 'login');
+        $this->login($email, 'bar', 'login');
+
+        // not locked
+        $this->login($email, 'foo', 'user/invalid');
+    }
+
     private function setPassword($url, $password, $expectedSuccess = true, $initialRequestCode = 200)
     {
         $crawler = self::$client->request('GET', $url);

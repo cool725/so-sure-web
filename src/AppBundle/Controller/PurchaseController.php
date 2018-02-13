@@ -850,16 +850,29 @@ class PurchaseController extends BaseController
         $cancelForm = $this->get('form.factory')
             ->createNamedBuilder('cancel_form', UserCancelType::class)
             ->getForm();
+        $exp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_CANCELLATION,
+            ['damage', 'cancel'],
+            true,
+            1,
+            $policy->getUser()->getId()
+        );
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('cancel_form')) {
                 $cancelForm->handleRequest($request);
                 if ($cancelForm->isValid()) {
                     $reason = $cancelForm->getData()['reason'];
+                    $other = $cancelForm->getData()['othertxt'];
+                    $this->get('app.sixpack')->convertByClientId(
+                        $policy->getUser()->getId(),
+                        SixpackService::EXPERIMENT_CANCELLATION
+                    );
 
                     // @codingStandardsIgnoreStart
                     $body = sprintf(
-                        "This is a so-sure generated message. Policy: <a href='%s'>%s/%s</a> requested a cancellation via the site as phone was damaged (%s) prior to purchase. so-sure support team: Please verify policy id match in system and directly cancel policy immediately without DPA validation.",
+                        "This is a so-sure generated message. Policy: <a href='%s'>%s/%s</a> requested a cancellation via the site as phone was damaged (%s) prior to purchase. so-sure support team: Please verify policy id match in system and directly cancel policy immediately without DPA validation. Additional comments: %s",
                         $this->generateUrl(
                             'admin_policy',
                             ['id' => $policy->getId()],
@@ -867,7 +880,8 @@ class PurchaseController extends BaseController
                         ),
                         $policy->getPolicyNumber(),
                         $policy->getId(),
-                        $reason
+                        $reason,
+                        $other
                     );
                     // @codingStandardsIgnoreEnd
 
@@ -898,6 +912,7 @@ class PurchaseController extends BaseController
                         'We have passed your request to our policy team. You should receive a cancellation email once that is processed.'
                     );
                     // @codingStandardsIgnoreEnd
+                    return $this->redirectToRoute('homepage');
                 }
             }
         } else {
@@ -907,10 +922,16 @@ class PurchaseController extends BaseController
             );
         }
 
-        return [
+        $template = 'AppBundle:Purchase:cancelDamage.html.twig';
+        if ($exp == 'cancel') {
+            $template = 'AppBundle:Purchase:cancel.html.twig';
+        }
+        $data = [
             'policy' => $policy,
             'cancel_form' => $cancelForm->createView(),
         ];
+
+        return $this->render($template, $data);
     }
 
     /**

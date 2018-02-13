@@ -56,6 +56,10 @@
 	@include btn($primary-blue, $white, $white);
 }
 
+.btn-red {
+	@include btn($red, $white, $white);
+}
+
 .btn-grey {
 	@include btn($pale-grey, $dark-grey, $white);
 }

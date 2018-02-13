@@ -217,46 +217,65 @@ class MixpanelService
             $data = $result['$properties'];
             if (strtolower($data['$email']) == $user->getEmailCanonical()) {
                 $attribution = new Attribution();
+                $dataPresent = false;
                 if (isset($data['Campaign Name'])) {
                     $attribution->setCampaignName(urldecode($data['Campaign Name']));
+                    $dataPresent = true;
                 }
                 if (isset($data['Campaign Source'])) {
                     $attribution->setCampaignSource(urldecode($data['Campaign Source']));
+                    $dataPresent = true;
                 }
                 if (isset($data['Campaign Medium'])) {
                     $attribution->setCampaignMedium(urldecode($data['Campaign Medium']));
+                    $dataPresent = true;
                 }
                 if (isset($data['Campaign Term'])) {
                     $attribution->setCampaignTerm(urldecode($data['Campaign Term']));
+                    $dataPresent = true;
                 }
                 if (isset($data['Campaign Content'])) {
                     $attribution->setCampaignContent(urldecode($data['Campaign Content']));
+                    $dataPresent = true;
                 }
                 if (isset($data['Referer'])) {
                     $attribution->setReferer($data['Referer']);
+                    $dataPresent = true;
                 }
-                $user->setAttribution($attribution);
+
+                if ($dataPresent) {
+                    $user->setAttribution($attribution);
+                }
 
                 $latestAttribution = new Attribution();
+                $dataPresent = false;
                 if (isset($data['Latest Campaign Name'])) {
                     $latestAttribution->setCampaignName(urldecode($data['Latest Campaign Name']));
+                    $dataPresent = true;
                 }
                 if (isset($data['Latest Campaign Source'])) {
                     $latestAttribution->setCampaignSource(urldecode($data['Latest Campaign Source']));
+                    $dataPresent = true;
                 }
                 if (isset($data['Latest Campaign Medium'])) {
                     $latestAttribution->setCampaignMedium(urldecode($data['Latest Campaign Medium']));
+                    $dataPresent = true;
                 }
                 if (isset($data['Latest Campaign Term'])) {
                     $latestAttribution->setCampaignTerm(urldecode($data['Latest Campaign Term']));
+                    $dataPresent = true;
                 }
                 if (isset($data['Latest Campaign Content'])) {
                     $latestAttribution->setCampaignContent(urldecode($data['Latest Campaign Content']));
+                    $dataPresent = true;
                 }
                 if (isset($data['Latest Referer'])) {
                     $latestAttribution->setReferer($data['Latest Referer']);
+                    $dataPresent = true;
                 }
-                $user->setLatestAttribution($latestAttribution);
+                if ($dataPresent) {
+                    $user->setLatestAttribution($latestAttribution);
+                }
                 $this->dm->flush();
             }
         }

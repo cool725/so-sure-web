@@ -84,6 +84,40 @@ class SalvaListenerTest extends WebTestCase
         $this->assertEquals(SalvaExportService::QUEUE_UPDATED, $data['action']);
     }
 
+    public function testSalvaQueueUpdatedActual()
+    {
+        static::$redis->del(SalvaExportService::KEY_POLICY_ACTION);
+        $this->assertEquals(0, static::$redis->llen(SalvaExportService::KEY_POLICY_ACTION));
+
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testSalvaQueueUpdatedActual', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy);
+        static::$policyService->setEnvironment('test');
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+        static::$dm->flush();
+
+        $data = unserialize(static::$redis->lpop(SalvaExportService::KEY_POLICY_ACTION));
+        $this->assertEquals($policy->getId(), $data['policyId']);
+        $this->assertEquals(SalvaExportService::QUEUE_CREATED, $data['action']);
+        $this->assertTrue($policy->isValidPolicy());
+        $this->assertTrue($policy->isBillablePolicy());
+
+        $policy->setPremiumInstallments(1);
+        static::$dm->flush();
+
+        // one updated
+        $this->assertEquals(1, static::$redis->llen(SalvaExportService::KEY_POLICY_ACTION));
+        $data = unserialize(static::$redis->lpop(SalvaExportService::KEY_POLICY_ACTION));
+        $this->assertEquals($policy->getId(), $data['policyId']);
+        $this->assertEquals(SalvaExportService::QUEUE_UPDATED, $data['action']);
+    }
+
     public function testSalvaQueueCreated()
     {
         static::$redis->del(SalvaExportService::KEY_POLICY_ACTION);
