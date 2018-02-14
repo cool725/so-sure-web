@@ -695,42 +695,16 @@ class JudopayService
         }
     }
 
+    /**
+     * Run via scheduledPaymentService
+     */
     public function scheduledPayment(
         ScheduledPayment $scheduledPayment,
         $prefix = null,
         \DateTime $date = null,
         $abortOnMultipleSameDayPayment = true
     ) {
-        if (!$scheduledPayment->getPolicy()->isValidPolicy($prefix)) {
-            throw new \Exception(sprintf(
-                'Scheduled payment %s policy is not valid. Invalid Prefix?',
-                $scheduledPayment->getId()
-            ));
-        }
-
-        if (!$scheduledPayment->isBillable($prefix)) {
-            throw new \Exception(sprintf(
-                'Scheduled payment %s is not billable (status: %s)',
-                $scheduledPayment->getId(),
-                $scheduledPayment->getStatus()
-            ));
-        }
-
-        if (!$scheduledPayment->canBeRun($date)) {
-            throw new \Exception(sprintf(
-                'Scheduled payment %s can not yet be run (scheduled: %s)',
-                $scheduledPayment->getId(),
-                $scheduledPayment->getScheduled()->format('Y-m-d H:i:s')
-            ));
-        }
-
-        if ($scheduledPayment->getPayment() &&
-            $scheduledPayment->getPayment()->getResult() == JudoPayment::RESULT_SUCCESS) {
-            throw new \Exception(sprintf(
-                'Payment already received for scheduled payment %s',
-                $scheduledPayment->getId()
-            ));
-        }
+        $scheduledPayment->validateRunable($prefix, $date);
 
         $payment = null;
         $policy = $scheduledPayment->getPolicy();
@@ -761,11 +735,6 @@ class JudopayService
                 $scheduledPayment->getId(),
                 $e->getMessage()
             ));
-
-            /* processScheduledPaymentResult will set result to failed as payment will not exist or be failed
-            $scheduledPayment->setStatus(ScheduledPayment::STATUS_FAILED);
-            $this->dm->flush(null, array('w' => 'majority', 'j' => true));
-            */
         }
 
         if (!$payment) {
@@ -1024,6 +993,16 @@ class JudopayService
 
         try {
             $tokenPaymentDetails = $tokenPayment->create();
+        } catch (\Judopay\Exception\ApiException $e) {
+            $this->logger->warning(sprintf('Error running token payment (retrying) %s. Ex: %s', $paymentRef, $e));
+            sleep(1);
+            try {
+                $tokenPaymentDetails = $tokenPayment->create();
+            } catch (\Exception $e) {
+                $this->logger->error(sprintf('Error running retried token payment %s. Ex: %s', $paymentRef, $e));
+
+                throw $e;
+            }
         } catch (\Exception $e) {
             $this->logger->error(sprintf('Error running token payment %s. Ex: %s', $paymentRef, $e));
 

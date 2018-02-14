@@ -6,6 +6,8 @@ use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Document\User;
+use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\Payment\JudoPayment;
 
 /**
  * @group unit
@@ -105,5 +107,120 @@ class ScheduledPaymentTest extends \PHPUnit_Framework_TestCase
         $scheduledPayment2->setScheduled(new \DateTime('2017-06-16 00:00', new \DateTimeZone('Europe/London')));
         $policy2->addScheduledPayment($scheduledPayment2);
         $this->assertTrue($scheduledPayment2->hasCorrectBillingDay());
+    }
+
+    public function testValidateRunable()
+    {
+        $user = new User();
+        $user->setPaymentMethod(new JudoPaymentMethod());
+        $premium = new PhonePremium();
+        $policy = new SalvaPhonePolicy();
+        $policy->setPolicyNumber(sprintf('TESTING/%s', rand(1, 999999)));
+        $policy->setBilling(new \DateTime('2017-01-15 15:00'));
+        $policy->setStatus(SalvaPhonePolicy::STATUS_ACTIVE);
+        $policy->setPremium($premium);
+        $user->addPolicy($policy);
+        $scheduledPayment = new ScheduledPayment();
+        $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+        $scheduledPayment->setScheduled(new \DateTime('2016-01-01 01:00'));
+        $policy->addScheduledPayment($scheduledPayment);
+
+        $scheduledPayment->validateRunable('TESTING', new \DateTime('2016-01-01 02:00'));
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testValidateRunablePaymentReceived()
+    {
+        $user = new User();
+        $premium = new PhonePremium();
+        $policy = new SalvaPhonePolicy();
+        $policy->setPolicyNumber(sprintf('TESTING/%s', rand(1, 999999)));
+        $policy->setBilling(new \DateTime('2017-01-15 15:00'));
+        $policy->setStatus(SalvaPhonePolicy::STATUS_ACTIVE);
+        $policy->setPremium($premium);
+        $user->addPolicy($policy);
+        $scheduledPayment = new ScheduledPayment();
+        $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+        $scheduledPayment->setScheduled(new \DateTime('2016-01-01 01:00'));
+        $payment = new JudoPayment();
+        $payment->setSuccess(true);
+        $scheduledPayment->setPayment($payment);
+        $policy->addScheduledPayment($scheduledPayment);
+
+        $scheduledPayment->validateRunable('TESTING', new \DateTime('2016-01-01 02:00'));
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testValidateRunableCanBeRun()
+    {
+        $user = new User();
+        $premium = new PhonePremium();
+        $policy = new SalvaPhonePolicy();
+        $policy->setPolicyNumber(sprintf('TESTING/%s', rand(1, 999999)));
+        $policy->setBilling(new \DateTime('2017-01-15 15:00'));
+        $policy->setStatus(SalvaPhonePolicy::STATUS_ACTIVE);
+        $policy->setPremium($premium);
+        $user->addPolicy($policy);
+        $scheduledPayment = new ScheduledPayment();
+        $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+        $scheduledPayment->setScheduled(new \DateTime('2016-01-01 01:00'));
+        $payment = new JudoPayment();
+        $payment->setSuccess(true);
+        $scheduledPayment->setPayment($payment);
+        $policy->addScheduledPayment($scheduledPayment);
+
+        $scheduledPayment->validateRunable('TESTING', new \DateTime('2016-01-01 00:00'));
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testValidateRunableCancelled()
+    {
+        $user = new User();
+        $premium = new PhonePremium();
+        $policy = new SalvaPhonePolicy();
+        $policy->setPolicyNumber(sprintf('TESTING/%s', rand(1, 999999)));
+        $policy->setBilling(new \DateTime('2017-01-15 15:00'));
+        $policy->setStatus(SalvaPhonePolicy::STATUS_CANCELLED);
+        $policy->setPremium($premium);
+        $user->addPolicy($policy);
+        $scheduledPayment = new ScheduledPayment();
+        $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+        $scheduledPayment->setScheduled(new \DateTime('2016-01-01 01:00'));
+        $payment = new JudoPayment();
+        $payment->setSuccess(true);
+        $scheduledPayment->setPayment($payment);
+        $policy->addScheduledPayment($scheduledPayment);
+
+        $scheduledPayment->validateRunable('TESTING', new \DateTime('2016-01-01 00:00'));
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testValidateRunableValidPolicy()
+    {
+        $user = new User();
+        $premium = new PhonePremium();
+        $policy = new SalvaPhonePolicy();
+        $policy->setPolicyNumber(sprintf('TEST/%s', rand(1, 999999)));
+        $policy->setBilling(new \DateTime('2017-01-15 15:00'));
+        $policy->setStatus(SalvaPhonePolicy::STATUS_ACTIVE);
+        $policy->setPremium($premium);
+        $user->addPolicy($policy);
+        $scheduledPayment = new ScheduledPayment();
+        $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
+        $scheduledPayment->setScheduled(new \DateTime('2016-01-01 01:00'));
+        $payment = new JudoPayment();
+        $payment->setSuccess(true);
+        $scheduledPayment->setPayment($payment);
+        $policy->addScheduledPayment($scheduledPayment);
+
+        $scheduledPayment->validateRunable('TESTING', new \DateTime('2016-01-01 00:00'));
     }
 }

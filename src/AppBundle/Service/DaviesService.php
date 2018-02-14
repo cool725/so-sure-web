@@ -436,6 +436,15 @@ class DaviesService extends S3EmailService
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
+        if ($daviesClaim->isPhoneReplacementCostCorrect() === false) {
+            $msg = sprintf(
+                'Claim %s does not have the correct phone replacement cost. Expected > 0 Actual %0.2f',
+                $daviesClaim->claimNumber,
+                $daviesClaim->phoneReplacementCost
+            );
+            $this->errors[$daviesClaim->claimNumber][] = $msg;
+        }
+
         // We should always validate Recipero Fee if the fee is present or if the claim is closed
         if (($daviesClaim->isClosed(true) || $daviesClaim->reciperoFee > 0) &&
             !$this->areEqualToTwoDp($claim->totalChargesWithVat(), $daviesClaim->reciperoFee)) {

@@ -56,7 +56,6 @@ class ClaimFnol
     protected $type;
 
     /**
-     * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="50", max="1000")
      */
     protected $message;
@@ -79,7 +78,6 @@ class ClaimFnol
     protected $time;
 
     /**
-     * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="10", max="200")
      */
     protected $where;

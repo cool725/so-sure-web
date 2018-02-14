@@ -3,6 +3,7 @@
 namespace AppBundle\Listener;
 
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
+use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -11,9 +12,12 @@ use AppBundle\Document\User;
 use AppBundle\Service\MixpanelService;
 use AppBundle\Event\ActualInteractiveLoginEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 
 class SecurityListener
 {
+    const LOGIN_FAILURE_KEY = 'privledged:login:failure:%s';
+
     /** @var EventDispatcher */
     protected $dispatcher;
 
@@ -25,12 +29,23 @@ class SecurityListener
     /** @var MixpanelService */
     protected $mixpanel;
 
-    public function __construct($logger, RequestStack $requestStack, $dispatcher, MixpanelService $mixpanel)
-    {
+    protected $redis;
+    protected $dm;
+
+    public function __construct(
+        $logger,
+        RequestStack $requestStack,
+        $dispatcher,
+        MixpanelService $mixpanel,
+        $redis,
+        $dm
+    ) {
         $this->logger = $logger;
         $this->requestStack = $requestStack;
         $this->dispatcher = $dispatcher;
         $this->mixpanel = $mixpanel;
+        $this->redis = $redis;
+        $this->dm = $dm;
     }
 
     /**
@@ -79,5 +94,30 @@ class SecurityListener
             return;
         }
         $this->mixpanel->queueTrackWithUser($user, MixpanelService::EVENT_LOGIN);
+
+        $key = sprintf(self::LOGIN_FAILURE_KEY, strtolower($user->getUsername()));
+        $this->redis->del($key);
+    }
+
+    public function onAuthenticationFailure(AuthenticationFailureEvent $event)
+    {
+        $token = $event->getAuthenticationToken();
+        // Get the attempted username.
+        if ($token instanceof UsernamePasswordToken) {
+            $username = $token->getUsername();
+            $repo = $this->dm->getRepository(User::class);
+            $user = $repo->findOneBy(['usernameCanonical' => strtolower($username)]);
+            if ($user && ($user->hasEmployeeRole() || $user->hasClaimsRole())) {
+                $key = sprintf(self::LOGIN_FAILURE_KEY, strtolower($username));
+                $count = $this->redis->incr($key);
+                // PCI doesn't state how long a failed login persists. 1 hour should be enough for brute force
+                $this->redis->expire($key, 3600);
+                // PCI requirements - 6 failed logins
+                if ($count >= 6) {
+                    $user->setLocked(true);
+                    $this->dm->flush();
+                }
+            }
+        }
     }
 }

@@ -12,15 +12,19 @@ fi
 
 SKIP_POLICY=1
 SKIP_DB=0
+SKIP_PHING=0
 COVER=0
 FUNCTIONAL_TEST="test:functional"
-while getopts ":snpdhcC" opt; do
+while getopts ":snpdhcCl" opt; do
   case $opt in
     s)
       SKIP_POLICY=0
       ;;
     d)
       SKIP_DB=1
+      ;;
+    l)
+      SKIP_PHING=1
       ;;
     c)
       FUNCTIONAL_TEST="test:functional:cover"
@@ -37,7 +41,7 @@ while getopts ":snpdhcC" opt; do
       FUNCTIONAL_TEST="test:functional:paid"
       ;;
     h)
-      echo "Usage: $0 [-d skip db refresh] [-s populate sample policy data] [-n no network test | -p run paid test | -c run coverage | -C run coverage no network] [filter e.g. (::Method or namespace - use \\)"
+      echo "Usage: $0 [-d skip db refresh] [-s populate sample policy data] [-n no network test | -p run paid test | -c run coverage | -C run coverage no network] [-l keep logs (skip force:cs check)] [filter e.g. (::Method or namespace - use \\)"
       ;;
   esac
 done
@@ -94,5 +98,7 @@ else
   echo ./build/phpunit.sh --filter "$RUN_FILTER" --bootstrap vendor/autoload.php src/AppBundle/    
   ./build/phpunit.sh --filter "$RUN_FILTER" --log-json /tmp/phpunit.json --bootstrap vendor/autoload.php src/AppBundle/
 fi
-./vendor/phing/phing/bin/phing force:cs
-casperjs test /var/ops/scripts/monitor/casper/sosure.js --url="http://localhost"
+if [ "$SKIP_PHING" == "0" ]; then
+  ./vendor/phing/phing/bin/phing force:cs
+  casperjs test /var/ops/scripts/monitor/casper/sosure.js --url="http://localhost"
+fi

@@ -3972,6 +3972,8 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertFalse($data['has_cancelled_policy']);
         $this->assertTrue($data['has_valid_policy']);
         $this->assertTrue($data['can_purchase_policy']);
+        $this->assertEquals('Please update your card', $data['card_details']);
+        $this->assertNull($data['payment_method']);
 
         $policyService = static::$container->get('app.policy');
         $repo = static::$dm->getRepository(SalvaPhonePolicy::class);
@@ -4549,6 +4551,12 @@ class ApiAuthControllerTest extends BaseControllerTest
             'receipt_id' => $details['receiptId'],
         ]]);
         $data = $this->verifyResponse(200);
+
+        $url = sprintf('/api/v1/auth/user/%s?_method=GET', $user->getId());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+        $this->assertEquals(self::$JUDO_TEST_CARD_NAME, $data['card_details']);
+        $this->assertEquals('judo', $data['payment_method']);
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(User::class);

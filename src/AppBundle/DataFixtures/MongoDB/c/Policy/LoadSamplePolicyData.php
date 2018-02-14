@@ -16,6 +16,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\SCode;
 use AppBundle\Document\Invitation\EmailInvitation;
+use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Classes\Salva;
 use AppBundle\Classes\SoSure;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -430,6 +431,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
 
         $user->setBillingAddress($address);
+        $user->setPaymentMethod(new JudoPaymentMethod());
 
         return $user;
     }
