@@ -246,7 +246,7 @@
 
                         <h2 class="text-blue text-center">Contact us to get a quote or find out more</h2>
 
-                        {{ form_start(lead_form) }}
+                        {{ form_start(lead_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'id':'corporate-form', 'data-client-validation': form_client_validation, 'autocomplete': 'off', 'novalidate': 'novalidate'}}) }}
                             <div class="row">
                                 <div class="col-sm-6">
                                     <div class="form-group">
@@ -313,4 +313,15 @@
 
     {# Page Modals #}
 
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    'components/moment/moment.min.js'
+    'components/jquery-mask-plugin/jquery.mask.min.js'
+    'components/jquery-validation/jquery.validate.min.js'
+    '@AppBundle/Resources/public/js/Default/jqueryValidatorMethods.js'
+    '@AppBundle/Resources/public/js/Default/corporate.js' %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
