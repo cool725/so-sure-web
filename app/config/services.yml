@@ -87,6 +87,12 @@ services:
             - "@app.sms"
             - "@app.feature"
 
+    app.scheduledpayment:
+        class: AppBundle\Service\ScheduledPaymentService
+        arguments:
+            - "@app.judopay"
+            - "@logger"
+
     app.barclays:
         class: AppBundle\Service\BarclaysService
         arguments:
