@@ -98,7 +98,7 @@ class PicsureMLService
         foreach ($results as $result) {
             if ($result->hasLabel()) {
                 $csv[] = sprintf(
-                    "%s, %s",
+                    "%s,%s",
                     $result->getImagePath(),
                     $result->getLabel()
                 );
