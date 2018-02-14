@@ -76,6 +76,24 @@ sosure.corporate = (function() {
                 "lead_form[message]": {
                     required: 'Please explain....'
                 }
+            },
+            submitHandler: function(form) {
+                form.submit();
+            },
+            showErrors: function(errorMap, errorList) {
+                this.defaultShowErrors();
+                var vals = [];
+                for (var err in errorMap) {
+                    var val = $('body').find('input[name="' + err + '"]').val()
+                    vals.push({'name': err, 'value': val, 'message': errorMap[err]});
+                }
+                $.ajax({
+                  method: "POST",
+                  url: "/ops/validation",
+                  contentType:"application/json; charset=utf-8",
+                  dataType:"json",
+                  data: JSON.stringify({ 'errors': vals, 'url': self.url })
+                });
             }
         });
     }
