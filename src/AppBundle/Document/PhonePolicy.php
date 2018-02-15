@@ -30,6 +30,20 @@ class PhonePolicy extends Policy
     const PICSURE_STATUS_INVALID = 'invalid';
     const PICSURE_STATUS_DISABLED = 'disabled';
 
+    const MAKEMODEL_VALID_SERIAL = 'valid-serial';
+    const MAKEMODEL_VALID_IMEI = 'valid-imei';
+    const MAKEMODEL_NO_MODELS = 'no-models';
+    const MAKEMODEL_NO_MEMORY = 'no-memory';
+    const MAKEMODEL_NO_MAKES = 'no-makes';
+    const MAKEMODEL_MULTIPLE_MAKES = 'multiple-makes';
+    const MAKEMODEL_EMPTY_MAKES = 'empty-makes';
+    const MAKEMODEL_MEMORY_MISMATCH = 'memory-mismatch';
+    const MAKEMODEL_MISSING_RESPONSE = 'missing-response';
+    const MAKEMODEL_NO_MODEL_REFERENCE = 'no-model-reference';
+    const MAKEMODEL_MAKE_MODEL_MEMORY_MISMATCH = 'make-model-memory-mismatch';
+    const MAKEMODEL_MODEL_MISMATCH = 'model-mismatch';
+    const MAKEMODEL_DEVICE_NOT_FOUND = 'device-not-found';
+
     use ArrayToApiArrayTrait;
 
     /**
@@ -111,6 +125,15 @@ class PhonePolicy extends Policy
     protected $picSureStatus;
 
     /**
+     * @Assert\Choice({"valid-serial", "valid-imei", "no-models", "no-memory", "no-makes",
+     *     "multiple-makes", "empty-makes", "memory-mismatch", "missing-response", "no-model-reference",
+     *     "make-model-memory-mismatch", "model-mismatch", "device-not-found"}, strict=false)
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $makeModelValidatedStatus;
+
+    /**
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
@@ -120,6 +143,16 @@ class PhonePolicy extends Policy
     public function getPhone()
     {
         return $this->phone;
+    }
+
+    public function setMakeModelValidatedStatus($makeModelValidatedStatus)
+    {
+        $this->makeModelValidatedStatus = $makeModelValidatedStatus;
+    }
+
+    public function getMakeModelValidatedStatus()
+    {
+        return $this->makeModelValidatedStatus;
     }
 
     public function setPhone(Phone $phone, \DateTime $date = null)
