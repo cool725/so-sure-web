@@ -360,14 +360,39 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $manager->persist($user);
-        $policy = $this->newPolicy($manager, $user, $count++, self::CLAIM_NONE, null, null, $iphoneUI, false, true, null, null, 3);
-        $policy->setStatus(Policy::STATUS_UNPAID);
+        $policy = $this->newPolicy(
+            $manager,
+            $user,
+            $count++,
+            self::CLAIM_NONE,
+            null,
+            null,
+            $iphoneUI,
+            false,
+            true,
+            null,
+            true,
+            3
+        );
 
         $user = $this->newUser('android-testing+unpaid+discount@so-sure.net');
         $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $manager->persist($user);
-        $policy = $this->newPolicy($manager, $user, $count++, self::CLAIM_NONE, null, null, $iphoneUI, false, true, null, null, 3);
+        $policy = $this->newPolicy(
+            $manager,
+            $user,
+            $count++,
+            self::CLAIM_NONE,
+            null,
+            null,
+            $androidUI,
+            false,
+            true,
+            null,
+            true,
+            3
+        );
         $policy->setStatus(Policy::STATUS_UNPAID);
 
         $manager->flush();
@@ -588,6 +613,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 
         if ($policyDiscount) {
             $policy->setPolicyDiscountPresent(true);
+            $policy->getPremium()->setAnnualDiscount($policyDiscount);
             $payment = new PolicyDiscountPayment();
             $payment->setDate(clone $startDate);
             $payment->setAmount(0 - $policyDiscount);
