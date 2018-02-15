@@ -67,7 +67,10 @@ class PicsureMLService
                 $image = new TrainingData();
                 $image->setImagePath($file->getKey());
                 $metadata = $file->getMetadata();
-                $status = $metadata['picsure-status'];
+                $status = null
+                if (isset($metadata['picsure-status']) {
+                    $status = $metadata['picsure-status'];
+                }
                 if (!empty($status)) {
                     if ($status == PhonePolicy::PICSURE_STATUS_APPROVED) {
                         $image->setLabel(TrainingData::LABEL_UNDAMAGED);
