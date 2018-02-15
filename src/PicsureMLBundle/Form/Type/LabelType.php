@@ -16,11 +16,12 @@ class LabelType extends AbstractType
         $builder
             ->add('label', ChoiceType::class, [
                 'choices'  => array(
-                    'None' => '',
+                    'None' => null,
                     'Undamaged' => 'undamaged',
                     'Invalid' => 'invalid',
                     'Damaged' => 'damaged',
                 ),
+                'placeholder' => false,
                 'expanded' => true,
                 'multiple' => false,
                 'required' => false
