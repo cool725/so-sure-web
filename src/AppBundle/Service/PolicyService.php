@@ -1048,15 +1048,17 @@ class PolicyService
     /**
      * @param Policy $policy
      */
-    public function cancelledPolicyEmail(Policy $policy)
+    public function cancelledPolicyEmail(Policy $policy, $baseTemplate = null)
     {
         if (!$this->mailer) {
             return;
         }
 
-        $baseTemplate = sprintf('AppBundle:Email:policy-cancellation/%s', $policy->getCancelledReason());
-        if ($policy->isCancelledAndPaymentOwed()) {
-            $baseTemplate = sprintf('%sWithClaim', $baseTemplate);
+        if (!$baseTemplate) {
+            $baseTemplate = sprintf('AppBundle:Email:policy-cancellation/%s', $policy->getCancelledReason());
+            if ($policy->isCancelledAndPaymentOwed()) {
+                $baseTemplate = sprintf('%sWithClaim', $baseTemplate);
+            }
         }
         $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
         $textTemplate = sprintf("%s.txt.twig", $baseTemplate);

@@ -83,6 +83,19 @@ class EmailDebugCommand extends BaseCommand
             'policy' => [
                 'policy/new',
             ],
+            'policyCancellation' => [
+                'policy-cancellation/actual-fraud',
+                'policy-cancellation/badrisk',
+                'policy-cancellation/cooloff',
+                'policy-cancellation/dispossesion',
+                'policy-cancellation/suspected-fraud',
+                'policy-cancellation/unpaid',
+                'policy-cancellation/unpaidWithClaim',
+                'policy-cancellation/upgrade',
+                'policy-cancellation/user-requested',
+                'policy-cancellation/user-requestedWithClaim',
+                'policy-cancellation/wreckage',
+            ],
             'policyRenewal' => [
                 'policy/pendingRenewal',
             ],
@@ -174,6 +187,20 @@ class EmailDebugCommand extends BaseCommand
             $policyService = $this->getContainer()->get('app.policy');
 
             return $policyService->resendPolicyEmail($policy);
+        } elseif (in_array($template, $templates['policyCancellation'])) {
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(Policy::class);
+            $policies = $repo->findBy(['status' => Policy::STATUS_ACTIVE]);
+            foreach ($policies as $policy) {
+                break;
+            }
+            if (!$policy) {
+                throw new \Exception('Unable to find matching policy');
+            }
+            $policyService = $this->getContainer()->get('app.policy');
+            $baseTemplate = sprintf('AppBundle:Email:%s', $template);
+
+            return $policyService->cancelledPolicyEmail($policy, $baseTemplate);
         } elseif (in_array($template, $templates['policyRenewal'])) {
             $dm = $this->getManager();
             $repo = $dm->getRepository(Policy::class);

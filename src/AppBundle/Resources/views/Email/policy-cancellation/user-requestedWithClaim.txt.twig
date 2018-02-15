@@ -1,0 +1,16 @@
+{% extends 'AppBundle:Email:base.txt.twig' %}
+{% block body %}
+{{ policy.user.name }}, you still owe so-sure £{{ policy.getRemainderOfPolicyPrice|number_format(2, '.', ',') }}.
+
+**
+------------------------------------------------------------
+Sorry that you're leaving us.  This email serves as official notice that your policy {{ policy.policyNumber }} is now cancelled and no longer in effect.
+
+However, as per the terms and conditions of your policy, as you've had a successful claim, you are liable for the remainder of the premium for your policy which is currently £{{ policy.getRemainderOfPolicyPrice|number_format(2, '.', ',') }}.
+
+Please visit the following page to pay the remainder of your outstanding balance.
+{{ url('purchase_remainder_policy', {'id': policy.id}) }}
+
+If you have any questions, please don't hesitate to contact us (support@wearesosure.com).
+
+{% endblock body %}
