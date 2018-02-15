@@ -14,7 +14,7 @@ sosure.corporate = (function() {
     self.addValidation = function() {
         self.form.validate({
             debug: false,
-            focusCleanup: true,
+            onkeyup: true,
             validClass: 'has-success',
             rules: {
                 "lead_form[name]": {
@@ -45,6 +45,7 @@ sosure.corporate = (function() {
                 },
                 "lead_form[phones]": {
                     required: true,
+                    isOverFive: true
                 },
                 "lead_form[timeframe]": {
                     required: true,
@@ -74,7 +75,7 @@ sosure.corporate = (function() {
                     required: 'Please enter when you wish to purchase'
                 },
                 "lead_form[message]": {
-                    required: 'Please explain....'
+                    required: 'Please enter your message'
                 }
             },
             submitHandler: function(form) {

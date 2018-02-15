@@ -100,4 +100,14 @@ $(function(){
         return true;
     }, 'Please enter a valid date of birth');
 
+    jQuery.validator.addMethod("isOverFive", function (value, element) {
+        if (value == 'less than 5') {
+            $('.other-inputs').prop('disabled', true);
+            return false;
+        } else {
+             $('.other-inputs').prop('disabled', false);
+            return true;
+        }
+    }, 'We only insure a min. of 5 company phones');
+
 });
