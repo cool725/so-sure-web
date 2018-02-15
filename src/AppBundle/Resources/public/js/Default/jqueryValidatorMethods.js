@@ -108,6 +108,6 @@ $(function(){
              $('.other-inputs').prop('disabled', false);
             return true;
         }
-    }, 'We only insure a min. of 5 company phones');
+    }, 'Sorry, we required at least 5 company phones to generate a quote. You can purchase policies for less than 5 phones directly via our site.');
 
 });
