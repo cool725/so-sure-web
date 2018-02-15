@@ -1092,11 +1092,27 @@ services:
     picsureml.picsureml:
         class: PicsureMLBundle\Service\PicsureMLService
         arguments:
+            - "@doctrine_mongodb.odm.default_document_manager"
             - "@doctrine_mongodb.odm.picsureml_document_manager"
-            - "@logger"
+            - "@oneup_flysystem.mount_manager"
+
+    picsureml.listener.picsureml:
+        class:   PicsureMLBundle\Listener\PicsureMLListener
+        arguments:
+            - "@picsureml.picsureml"
+        tags:
+            -  { name: kernel.event_listener, event: event.picsure.approved, method: onUndamagedEvent }
+            -  { name: kernel.event_listener, event: event.picsure.invalid, method: onInvalidEvent }
+            -  { name: kernel.event_listener, event: event.picsure.rejected, method: onDamagedEvent }
 
     picsureml.form.type.annotate:
         class: PicsureMLBundle\Form\Type\AnnotateType
+        arguments: ["@request_stack", "%form_required%"]
+        tags:
+            - { name: form.type }
+
+    picsureml.form.type.label:
+        class: PicsureMLBundle\Form\Type\LabelType
         arguments: ["@request_stack", "%form_required%"]
         tags:
             - { name: form.type }

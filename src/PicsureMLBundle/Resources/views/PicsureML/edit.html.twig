@@ -1,3 +1,4 @@
+{% form_theme picsure_label_form 'AppBundle:Form:fields.html.twig' %}
 {% extends 'base.html.twig' %}
 
 {% block stylesheets %}
@@ -5,18 +6,24 @@
     {% stylesheets output='css/*.css'
         '@AppBundle/Resources/public/sass/page/picsureML.scss'
     %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+    {#
     {% stylesheets
         'components/Jcrop/Jcrop.min.css'
     %}
- <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+    #}
+    {% stylesheets %}
+    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
+    {#
     {% javascripts
         'components/Jcrop/Jcrop.min.js'
         '@PicsureMLBundle/Resources/public/js/picsureml/picsure-ml-annotate.js'
     %}
+    #}
+    {% javascripts %}
     <script src="{{ asset_url }}"></script>
     {% endjavascripts %}
 {% endblock %}
@@ -24,6 +31,35 @@
 {% block body %}
 <div class="container">
     <a href="{{ path('admin_picsure_ml') }}">Back to Picsure ML</a>
+    <h3>Label: {{ image.imagePath }}</h3>
+
+    {{ form_start(picsure_label_form)}}
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="content-right">
+                <img src="{{ path('admin_picsure_ml_image', {'file': image.imagePath }) }}">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="content-left">
+                <div class="text-right">
+                    <div class="form-group">
+                        {{ form_label(picsure_label_form.label, 'Label:') }}
+                        {{ form_widget(picsure_label_form.label) }}
+                        {{ form_errors(picsure_label_form.label) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_widget(picsure_label_form.previous, {'label': 'Previous', 'attr': {'class': 'btn btn-success'}}) }}
+                        {{ form_widget(picsure_label_form.next, {'label': 'Next', 'attr': {'class': 'btn btn-success'}}) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{ form_end(picsure_label_form)}}
+    {#
     <h3>Annotate: {{ image.path }}</h3>
 
     {{ form_start(picsure_annotation_form)}}
@@ -32,7 +68,7 @@
         <div class="col-md-6">
             <div class="content-right">
                 <div id="crop-interface">
-                    <img id="annotate" src="{{ path('admin_picsure_ml_image', {'file': image.path }) }}">
+                    <img id="annotate" src="{{ path('admin_picsure_ml_image', {'file': image.key }) }}">
                 </div>
             </div>
         </div>
@@ -69,7 +105,7 @@
     </div>
     
     {{ form_end(picsure_annotation_form)}}
-
+    #}
 </div>
 
 {% endblock %}

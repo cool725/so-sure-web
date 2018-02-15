@@ -84,6 +84,7 @@ use AppBundle\Form\Type\UserHighRiskType;
 use AppBundle\Form\Type\ClaimFlagsType;
 use AppBundle\Exception\RedirectException;
 use AppBundle\Service\PushService;
+use AppBundle\Event\PicsureEvent;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -1980,6 +1981,12 @@ class AdminEmployeeController extends BaseController
                 $this->get('logger')->error(sprintf("Error in pic-sure push."), ['exception' => $e]);
             }
 
+            $picsureFiles = $policy->getPolicyPicSureFiles();
+            $this->get('event_dispatcher')->dispatch(
+                PicsureEvent::EVENT_APPROVED,
+                new PicsureEvent($picsureFiles[0])
+            );
+
             return new RedirectResponse($this->generateUrl('admin_picsure'));
         } elseif ($request->get('_route') == "admin_picsure_reject") {
             $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_REJECTED);
@@ -2004,6 +2011,12 @@ class AdminEmployeeController extends BaseController
                 $this->get('logger')->error(sprintf("Error in pic-sure push."), ['exception' => $e]);
             }
 
+            $picsureFiles = $policy->getPolicyPicSureFiles();
+            $this->get('event_dispatcher')->dispatch(
+                PicsureEvent::EVENT_REJECTED,
+                new PicsureEvent($picsureFiles[0])
+            );
+
             return new RedirectResponse($this->generateUrl('admin_picsure'));
         } elseif ($request->get('_route') == "admin_picsure_invalid") {
             $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_INVALID);
@@ -2027,6 +2040,12 @@ class AdminEmployeeController extends BaseController
             } catch (\Exception $e) {
                 $this->get('logger')->error(sprintf("Error in pic-sure push."), ['exception' => $e]);
             }
+
+            $picsureFiles = $policy->getPolicyPicSureFiles();
+            $this->get('event_dispatcher')->dispatch(
+                PicsureEvent::EVENT_INVALID,
+                new PicsureEvent($picsureFiles[0])
+            );
 
             return new RedirectResponse($this->generateUrl('admin_picsure'));
         }

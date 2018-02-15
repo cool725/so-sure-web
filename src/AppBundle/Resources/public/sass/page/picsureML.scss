@@ -23,6 +23,10 @@
 			max-width: 100%;
 			height: auto;
 		}
+		
+		span.label {
+			padding: .5em .6em .3em;
+		}
 	}
 
 	.row {
@@ -38,5 +42,4 @@
 			margin-left: 10px;
 		}
 	}
-
 }

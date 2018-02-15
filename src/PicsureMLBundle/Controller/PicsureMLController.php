@@ -13,9 +13,10 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
 use AppBundle\Controller\BaseController;
+use AppBundle\Document\File\S3File;
 use PicsureMLBundle\Service\PicsureMLService;
-use PicsureMLBundle\Document\Image;
-use PicsureMLBundle\Form\Type\AnnotateType;
+use PicsureMLBundle\Document\TrainingData;
+use PicsureMLBundle\Form\Type\LabelType;
 
 /**
  * @Route("/admin")
@@ -31,7 +32,8 @@ class PicsureMLController extends BaseController
     public function indexAction(Request $request)
     {
         $dm = $this->getPicsureMLManager();
-        $repo = $dm->getRepository(Image::class);
+        $repo = $dm->getRepository(TrainingData::class);
+
         $qb = $repo->createQueryBuilder();
         $qb->sort('id', 'desc');
         $pager = $this->pager($request, $qb, 12);
@@ -49,22 +51,22 @@ class PicsureMLController extends BaseController
     public function editAction(Request $request, $id)
     {
         $dm = $this->getPicsureMLManager();
-        $repo = $dm->getRepository(Image::class);
+        $repo = $dm->getRepository(TrainingData::class);
         $image = $repo->find($id);
         if ($image === null) {
             throw $this->createNotFoundException(sprintf('Image not found %s', $id));
         }
 
         $imagesForm = $this->get('form.factory')
-            ->createNamedBuilder('picsure_annotation_form', AnnotateType::class, $image)
+            ->createNamedBuilder('picsure_label_form', LabelType::class, $image)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
-            if ($request->request->has('picsure_annotation_form')) {
+            if ($request->request->has('picsure_label_form')) {
                 $imagesForm->handleRequest($request);
                 if ($imagesForm->isValid()) {
                     $dm->flush();
-                    if (array_key_exists('previous', $request->request->get('picsure_annotation_form'))) {
+                    if (array_key_exists('previous', $request->request->get('picsure_label_form'))) {
                         $prevId = $repo->getPreviousImage($id);
                         if ($prevId) {
                             return $this->redirectToRoute('admin_picsure_ml_edit', ['id' => $prevId]);
@@ -85,7 +87,7 @@ class PicsureMLController extends BaseController
 
         return [
             'image' => $image,
-            'picsure_annotation_form' => $imagesForm->createView(),
+            'picsure_label_form' => $imagesForm->createView(),
         ];
     }
 
@@ -95,6 +97,25 @@ class PicsureMLController extends BaseController
      */
     public function picsureImageAction($file)
     {
+        $filesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3policy_fs');
+        $environment = $this->getParameter('kernel.environment');
+        $file = str_replace(sprintf('%s/', $environment), '', $file);
+
+        if (!$filesystem->has($file)) {
+            throw $this->createNotFoundException(sprintf('URL not found %s', $file));
+        }
+
+        $mimetype = $filesystem->getMimetype($file);
+        return StreamedResponse::create(
+            function () use ($file, $filesystem) {
+                $stream = $filesystem->readStream($file);
+                echo stream_get_contents($stream);
+                flush();
+            },
+            200,
+            array('Content-Type' => $mimetype)
+        );
+        /*
         $filesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3picsure_fs');
 
         if (!$filesystem->has($file)) {
@@ -111,12 +132,14 @@ class PicsureMLController extends BaseController
             200,
             array('Content-Type' => $mimetype)
         );
+        */
     }
 
     /**
      * @Route("/picsure-ml/sync", name="admin_picsure_ml_sync")
      * @Method({"POST"})
      */
+    /*
     public function syncAction(Request $request)
     {
         if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
@@ -129,11 +152,13 @@ class PicsureMLController extends BaseController
 
         return new RedirectResponse($this->generateUrl('admin_picsure_ml'));
     }
+    */
 
     /**
      * @Route("/picsure-ml/annotate", name="admin_picsure_ml_annotate")
      * @Method({"POST"})
      */
+    /*
     public function annotateAction(Request $request)
     {
         if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
@@ -146,4 +171,5 @@ class PicsureMLController extends BaseController
 
         return new RedirectResponse($this->generateUrl('admin_picsure_ml'));
     }
+    */
 }
