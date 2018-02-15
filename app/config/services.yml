@@ -1101,9 +1101,9 @@ services:
         arguments:
             - "@picsureml.picsureml"
         tags:
-            -  { name: kernel.event_listener, event: event.picsureml.undamaged, method: onUndamagedEvent }
-            -  { name: kernel.event_listener, event: event.picsureml.invalid, method: onInvalidEvent }
-            -  { name: kernel.event_listener, event: event.picsureml.damaged, method: onDamagedEvent }
+            -  { name: kernel.event_listener, event: event.picsure.approved, method: onUndamagedEvent }
+            -  { name: kernel.event_listener, event: event.picsure.invalid, method: onInvalidEvent }
+            -  { name: kernel.event_listener, event: event.picsure.rejected, method: onDamagedEvent }
 
     picsureml.form.type.annotate:
         class: PicsureMLBundle\Form\Type\AnnotateType

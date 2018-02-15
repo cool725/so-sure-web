@@ -84,7 +84,7 @@ use AppBundle\Form\Type\UserHighRiskType;
 use AppBundle\Form\Type\ClaimFlagsType;
 use AppBundle\Exception\RedirectException;
 use AppBundle\Service\PushService;
-use PicsureMLBundle\Event\PicsureMLEvent;
+use AppBundle\Event\PicsureEvent;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -1983,8 +1983,8 @@ class AdminEmployeeController extends BaseController
 
             $picsureFiles = $policy->getPolicyPicSureFiles();
             $this->get('event_dispatcher')->dispatch(
-                PicsureMLEvent::EVENT_UNDAMAGED,
-                new PicsureMLEvent($picsureFiles[0])
+                PicsureEvent::EVENT_APPROVED,
+                new PicsureEvent($picsureFiles[0])
             );
 
             return new RedirectResponse($this->generateUrl('admin_picsure'));
@@ -2013,8 +2013,8 @@ class AdminEmployeeController extends BaseController
 
             $picsureFiles = $policy->getPolicyPicSureFiles();
             $this->get('event_dispatcher')->dispatch(
-                PicsureMLEvent::EVENT_DAMAGED,
-                new PicsureMLEvent($picsureFiles[0])
+                PicsureEvent::EVENT_REJECTED,
+                new PicsureEvent($picsureFiles[0])
             );
 
             return new RedirectResponse($this->generateUrl('admin_picsure'));
@@ -2043,8 +2043,8 @@ class AdminEmployeeController extends BaseController
 
             $picsureFiles = $policy->getPolicyPicSureFiles();
             $this->get('event_dispatcher')->dispatch(
-                PicsureMLEvent::EVENT_INVALID,
-                new PicsureMLEvent($picsureFiles[0])
+                PicsureEvent::EVENT_INVALID,
+                new PicsureEvent($picsureFiles[0])
             );
 
             return new RedirectResponse($this->generateUrl('admin_picsure'));

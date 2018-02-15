@@ -3,7 +3,7 @@
 namespace PicsureMLBundle\Listener;
 
 use AppBundle\Document\File\S3File;
-use PicsureMLBundle\Event\PicsureMLEvent;
+use AppBundle\Event\PicsureEvent;
 use PicsureMLBundle\Service\PicsureMLService;
 use PicsureMLBundle\Document\TrainingData;
 
@@ -21,25 +21,25 @@ class PicsureMLListener
     }
 
     /**
-     * @param PicsureMLEvent $event
+     * @param PicsureEvent $event
      */
-    public function onUndamagedEvent(PicsureMLEvent $event)
+    public function onUndamagedEvent(PicsureEvent $event)
     {
         $this->picsureMLService->addFileForTraining($event->getS3File(), TrainingData::LABEL_UNDAMAGED);
     }
 
     /**
-     * @param PicsureMLEvent $event
+     * @param PicsureEvent $event
      */
-    public function onInvalidEvent(PicsureMLEvent $event)
+    public function onInvalidEvent(PicsureEvent $event)
     {
         $this->picsureMLService->addFileForTraining($event->getS3File(), TrainingData::LABEL_INVALID);
     }
 
     /**
-     * @param PicsureMLEvent $event
+     * @param PicsureEvent $event
      */
-    public function onDamagedEvent(PicsureMLEvent $event)
+    public function onDamagedEvent(PicsureEvent $event)
     {
         $this->picsureMLService->addFileForTraining($event->getS3File(), TrainingData::LABEL_DAMAGED);
     }

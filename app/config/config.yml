@@ -84,7 +84,7 @@ doctrine_mongodb:
             server: "%census_mongodb_url%"
             options: {}
         picsureml:
-            server: "%picsureml_mongodb_url%"
+            server: "%picsure_mongodb_url%"
             options: {}
     default_database: "%mongodb_db%"
     document_managers:
@@ -106,7 +106,7 @@ doctrine_mongodb:
             retry_connect: 5
             retry_query: 1
         picsureml:
-            database: picsureml
+            database: picsure
             mappings:
                 PicsureMLBundle: ~
             retry_connect: 5
