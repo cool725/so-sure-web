@@ -62,14 +62,14 @@ class ReceperioService extends BaseImeiService
 
     protected $makemodelValidatedStatus;
 
-    public function setMakemodelValidatedStatus($makemodelValidatedStatus)
+    public function setMakeModelValidatedStatus($makeModelValidatedStatus)
     {
-        $this->makemodelValidatedStatus = $makemodelValidatedStatus;
+        $this->makeModelValidatedStatus = $makeModelValidatedStatus;
     }
 
-    public function getMakemodelValidatedStatus()
+    public function getMakeModelValidatedStatus()
     {
-        return $this->makemodelValidatedStatus;
+        return $this->makeModelValidatedStatus;
     }
 
     /**
@@ -667,7 +667,7 @@ class ReceperioService extends BaseImeiService
                     return $this->runCheckSerial($phone, $imei, $user, $warnMismatch);
                 } catch (ReciperoManualProcessException $e) {
                     if (!in_array($e->getCode(), [ReciperoManualProcessException::EMPTY_MAKES,
-                        ReciperoManualProcessException::NO_MODELREFERENCE])) {
+                        ReciperoManualProcessException::NO_MODEL_REFERENCE])) {
                         $this->logger->error(
                             sprintf("Unable to recheck iPhone using imei as serial number '%s'", $imei),
                             ['exception' => $e]
@@ -676,7 +676,7 @@ class ReceperioService extends BaseImeiService
                 }
             } else {
                 if (!in_array($e->getCode(), [ReciperoManualProcessException::EMPTY_MAKES,
-                    ReciperoManualProcessException::NO_MODELREFERENCE])) {
+                    ReciperoManualProcessException::NO_MODEL_REFERENCE])) {
                     $this->logger->error(
                         sprintf("Unable to check serial number '%s'", $serialNumber),
                         ['exception' => $e]
@@ -711,9 +711,9 @@ class ReceperioService extends BaseImeiService
             );
             return true;
         } catch (ReciperoManualProcessException $ex) {
-            $this->setMakemodelValidatedStatus($this->generateMakemodelValidationStatusCode($ex->getCode()));
+            $this->setMakeModelValidatedStatus($this->getMakeModelValidationStatusFromProcessCode($ex->getCode()));
 
-            if ($ex->getCode() == ReciperoManualProcessException::NOT_VALID) {
+            if ($ex->getCode() == ReciperoManualProcessException::MAKE_MODEL_MEMORY_MISMATCH) {
                 return false;
             }
             throw $ex;
@@ -842,12 +842,20 @@ class ReceperioService extends BaseImeiService
             );
         }
 
-        if (!isset($data['makes']) || count($data['makes']) != 1) {
+        if (!isset($data['makes'])) {
             throw new ReciperoManualProcessException(sprintf(
-                "Unable to check serial number (no/multiple makes) %s. Data: %s",
+                "Unable to check serial number (no makes) %s. Data: %s",
                 $serialNumber,
                 json_encode($data)
-            ), ReciperoManualProcessException::NO_MAKES_OR_MULTIPLE_MAKES);
+            ), ReciperoManualProcessException::NO_MAKES);
+        }
+
+        if (count($data['makes']) != 1) {
+            throw new ReciperoManualProcessException(sprintf(
+                "Unable to check serial number (multiple makes) %s. Data: %s",
+                $serialNumber,
+                json_encode($data)
+            ), ReciperoManualProcessException::MULTIPLE_MAKES);
         }
     }
 
@@ -897,7 +905,7 @@ class ReceperioService extends BaseImeiService
                 // Sending email to process, so no need to log exception
                 throw new ReciperoManualProcessException(
                     sprintf('Missing modelreference data %s', json_encode($data)),
-                    ReciperoManualProcessException::NO_MODELREFERENCE
+                    ReciperoManualProcessException::NO_MODEL_REFERENCE
                 );
             }
         }
@@ -1000,6 +1008,13 @@ class ReceperioService extends BaseImeiService
                 $data,
                 $warnMismatch
             );
+            if ($result) {
+                if ($isIMEI) {
+                    return PhonePolicy::MAKEMODEL_VALID_IMEI;
+                } elseif (!$isIMEI) {
+                    return PhonePolicy::MAKEMODEL_VALID_SERIAL;
+                }
+            }
         } else {
             $result =  $this->isSameNonApplePhone(
                 $phone,
@@ -1008,17 +1023,15 @@ class ReceperioService extends BaseImeiService
                 $data,
                 $warnMismatch
             );
-        }
-        if ($isApple && $isIMEI && $result) {
-            return PhonePolicy::MAKEMODEL_VALID_IMEI;
-        } elseif ($isApple && !$isIMEI && $result) {
-            return PhonePolicy::MAKEMODEL_VALID_SERIAL;
-        } elseif (!$isApple && $result) {
-            return PhonePolicy::MAKEMODEL_VALID_IMEI;
+            if ($result) {
+                return PhonePolicy::MAKEMODEL_VALID_IMEI;
+            }
         }
 
-        throw new ReciperoManualProcessException("Fail", ReciperoManualProcessException::NOT_VALID);
-
+        throw new ReciperoManualProcessException(sprintf(
+            "Make/Model/Memory mismatch for serial %s",
+            $serialNumber
+        ), ReciperoManualProcessException::MAKE_MODEL_MEMORY_MISMATCH);
     }
 
     public function areSameModel($models, $checkMemory)
@@ -1145,29 +1158,25 @@ class ReceperioService extends BaseImeiService
         return sha1(sprintf("%s%s", $this->secretKey, $body));
     }
 
-    public function generateMakemodelValidationStatusCode($code)
+    public function getMakeModelValidationStatusFromProcessCode($code)
     {
         switch ((int) $code) {
-            case ReciperoManualProcessException::MAKE_MISMATCH:
-                return PhonePolicy::MAKEMODEL_MAKE_MISMATCH;
             case ReciperoManualProcessException::NO_MODELS:
                 return PhonePolicy::MAKEMODEL_NO_MODELS;
-            case ReciperoManualProcessException::NOT_VALID:
-                return PhonePolicy::MAKEMODEL_NOT_VALID;
+            case ReciperoManualProcessException::MAKE_MODEL_MEMORY_MISMATCH:
+                return PhonePolicy::MAKEMODEL_MAKE_MODEL_MEMORY_MISMATCH;
             case ReciperoManualProcessException::NO_MEMORY:
                 return PhonePolicy::MAKEMODEL_NO_MEMORY;
-            case ReciperoManualProcessException::NO_MAKES_OR_MULTIPLE_MAKES:
-                return PhonePolicy::MAKEMODEL_NO_MAKES_OR_MULTIPLE_MAKES;
+            case ReciperoManualProcessException::NO_MAKES:
+                return PhonePolicy::MAKEMODEL_NO_MAKES;
+            case ReciperoManualProcessException::MULTIPLE_MAKES:
+                return PhonePolicy::MAKEMODEL_MULTIPLE_MAKES;
             case ReciperoManualProcessException::MEMORY_MISMATCH:
                 return PhonePolicy::MAKEMODEL_MEMORY_MISMATCH;
-            case ReciperoManualProcessException::NO_MODELREFERENCE:
-                return PhonePolicy::MAKEMODEL_NO_MODELREFERENCE;
+            case ReciperoManualProcessException::NO_MODEL_REFERENCE:
+                return PhonePolicy::MAKEMODEL_NO_MODEL_REFERENCE;
             case ReciperoManualProcessException::EMPTY_MAKES:
                 return PhonePolicy::MAKEMODEL_EMPTY_MAKES;
-            case ReciperoManualProcessException::SERIAL_MISSING:
-                return PhonePolicy::MAKEMODEL_SERIAL_MISSING;
-            case ReciperoManualProcessException::SERIAL_MISMATCH:
-                return PhonePolicy::MAKEMODEL_SERIAL_MISMATCH;
             case ReciperoManualProcessException::MODEL_MISMATCH:
                 return PhonePolicy::MAKEMODEL_MODEL_MISMATCH;
             case ReciperoManualProcessException::DEVICE_NOT_FOUND:
@@ -1175,7 +1184,7 @@ class ReceperioService extends BaseImeiService
         }
         throw new ReciperoManualProcessException(
             sprintf('Unhandled MakemodelValidationStatusCode %s', $code),
-            ReciperoManualProcessException::UNKNOWN_STATUS
+            ReciperoManualProcessException::CODE_UNKNOWN
         );
     }
 }

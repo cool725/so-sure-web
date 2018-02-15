@@ -109,7 +109,7 @@ class ReceperioServiceTest extends WebTestCase
     public function testValidateSamePhoneMissingData()
     {
         $this->assertEquals(
-            ReciperoManualProcessException::NO_MAKES_OR_MULTIPLE_MAKES,
+            ReciperoManualProcessException::NO_MAKES,
             $this->callValidateSamePhone(static::$phoneA, '123', [])
         );
     }
@@ -186,7 +186,7 @@ class ReceperioServiceTest extends WebTestCase
         $models[] = ['name' => 'A', 'storage' => '64GB'];
         $data['makes'][] = ['make' => 'A', 'models' => $models];
         $this->assertEquals(
-            ReciperoManualProcessException::NO_MODELREFERENCE,
+            ReciperoManualProcessException::NO_MODEL_REFERENCE,
             $this->callValidateSamePhone(static::$phoneB, '123', $data)
         );
     }
@@ -304,7 +304,7 @@ class ReceperioServiceTest extends WebTestCase
         self::$imei->policyClaim($policy, Claim::TYPE_DAMAGE, $claim);
     }
 
-    public function testAppleManulProcessSerialRetry()
+    public function testAppleManualProcessSerialRetry()
     {
         $this->assertFalse(self::$imei->runMakeModelCheck(self::TEST_INVALID_SERIAL));
         self::$imei->checkSerial(
@@ -328,7 +328,7 @@ class ReceperioServiceTest extends WebTestCase
 
     public function testAppleValidSerial()
     {
-        $this->testCheckSerial(
+        $this->runCheckSerial(
             static::$phoneE,
             self::TEST_IPHONE_SERIAL_VALID,
             null
@@ -338,7 +338,7 @@ class ReceperioServiceTest extends WebTestCase
 
     public function testAppleInvalidModel()
     {
-        $this->testCheckSerial(
+        $this->runCheckSerial(
             static::$phoneA,
             self::TEST_IPHONE_SERIAL_INVALID,
             self::TEST_IPHONE_IMEI_VALID
@@ -348,7 +348,7 @@ class ReceperioServiceTest extends WebTestCase
 
     public function testAppleValidIMEI()
     {
-        $this->testCheckSerial(
+        $this->runCheckSerial(
             static::$phoneE,
             self::TEST_IPHONE_SERIAL_INVALID2,
             self::TEST_IPHONE_IMEI_VALID
@@ -358,8 +358,8 @@ class ReceperioServiceTest extends WebTestCase
 
     public function testAndroidSerialInvalid()
     {
-        //message from recipero will be valid but serials check is ignored
-        $this->testCheckSerial(
+        // message from recipero will be valid but serials check is ignored
+        $this->runCheckSerial(
             static::$phoneD,
             self::TEST_ANDROID_SERIAL_INVALID,
             null
@@ -369,7 +369,7 @@ class ReceperioServiceTest extends WebTestCase
 
     public function testAndroidSerialValid()
     {
-        $this->testCheckSerial(
+        $this->runCheckSerial(
             static::$phoneD,
             self::TEST_ANDROID_SERIAL_VALID,
             null
@@ -377,7 +377,7 @@ class ReceperioServiceTest extends WebTestCase
         $this->assertContains(PhonePolicy::MAKEMODEL_VALID_IMEI, self::$imei->getMakeModelValidatedStatus());
     }
 
-    public function testCheckSerial(
+    public function runCheckSerial(
         Phone $phone,
         $serialNumber,
         $imei = null

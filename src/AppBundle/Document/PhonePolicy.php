@@ -31,18 +31,15 @@ class PhonePolicy extends Policy
 
     const MAKEMODEL_VALID_SERIAL = 'valid-serial';
     const MAKEMODEL_VALID_IMEI = 'valid-imei';
-    const MAKEMODEL_SERIAL_MISSING = 'serial-missing';
-    const MAKEMODEL_SERIAL_MISMATCH = 'serial-mismatch';
-    const MAKEMODEL_MAKE_MISMATCH = 'make-mismatch';
     const MAKEMODEL_NO_MODELS = 'no-models';
     const MAKEMODEL_NO_MEMORY = 'no-memory';
-    const MAKEMODEL_NO_MAKES_OR_MULTIPLE_MAKES = 'no-makes-or-multiple-makes';
+    const MAKEMODEL_NO_MAKES = 'no-makes';
+    const MAKEMODEL_MULTIPLE_MAKES = 'multiple-makes';
     const MAKEMODEL_EMPTY_MAKES = 'empty-makes';
     const MAKEMODEL_MEMORY_MISMATCH = 'memory-mismatch';
     const MAKEMODEL_MISSING_RESPONSE = 'missing-response';
-    const MAKEMODEL_NO_MODELREFERENCE = 'no-modelreference';
-    const MAKEMODEL_NOT_VALID = 'not-valid';
-    const MAKEMODEL_VALID_NO_SERIAL_CHECK = 'valid-no-serial-check';
+    const MAKEMODEL_NO_MODEL_REFERENCE = 'no-model-reference';
+    const MAKEMODEL_MAKE_MODEL_MEMORY_MISMATCH = 'make-model-memory-mismatch';
     const MAKEMODEL_MODEL_MISMATCH = 'model-mismatch';
     const MAKEMODEL_DEVICE_NOT_FOUND = 'device-not-found';
 
@@ -127,13 +124,13 @@ class PhonePolicy extends Policy
     protected $picSureStatus;
 
     /**
-     * @Assert\Choice({"valid-serial", "valid-imei", "serial-missing", "make-mismatch", "no-models", "no-memory",
-     *     "no-makes-or-multiple-makes", "memory-mismatch", "missing-response", "not-valid", "no-modelreference",
-     *     "empty-makes","serial-mismatch","model-mismatch"}, strict=false)
+     * @Assert\Choice({"valid-serial", "valid-imei", "no-models", "no-memory",
+     *     "no-makes", "multiple-makes", "memory-mismatch", "missing-response", "no-model-reference",
+     *     "make-model-memory-mismatch", "model-mismatch"}, strict=false)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
-    protected $makemodelValidatedStatus;
+    protected $makeModelValidatedStatus;
 
     /**
      * @Assert\DateTime()
@@ -147,14 +144,14 @@ class PhonePolicy extends Policy
         return $this->phone;
     }
 
-    public function setMakemodelValidatedStatus($makemodelValidatedStatus)
+    public function setMakemodelValidatedStatus($makeModelValidatedStatus)
     {
-        $this->makemodelValidatedStatus = $makemodelValidatedStatus;
+        $this->makeModelValidatedStatus = $makeModelValidatedStatus;
     }
 
-    public function getMakemodelValidatedStatus()
+    public function getMakeModelValidatedStatus()
     {
-        return $this->makemodelValidatedStatus;
+        return $this->makeModelValidatedStatus;
     }
 
     public function setPhone(Phone $phone, \DateTime $date = null)
