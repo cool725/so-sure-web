@@ -108,6 +108,6 @@ $(function(){
              $('.other-inputs').prop('disabled', false);
             return true;
         }
-    }, 'Sorry, we required at least 5 company phones to generate a quote. You can purchase policies for less than 5 phones directly via our site.');
+    }, 'Sorry, we require at least 5 company phones to generate a custom quote. You can purchase policies directly via our site in other cases.');
 
 });
