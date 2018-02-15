@@ -124,9 +124,9 @@ class PhonePolicy extends Policy
     protected $picSureStatus;
 
     /**
-     * @Assert\Choice({"valid-serial", "valid-imei", "no-models", "no-memory",
-     *     "no-makes", "multiple-makes", "memory-mismatch", "missing-response", "no-model-reference",
-     *     "make-model-memory-mismatch", "model-mismatch"}, strict=false)
+     * @Assert\Choice({"valid-serial", "valid-imei", "no-models", "no-memory", "no-makes",
+     *     "multiple-makes", "empty-makes", "memory-mismatch", "missing-response", "no-model-reference",
+     *     "make-model-memory-mismatch", "model-mismatch", "device-not-found"}, strict=false)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
