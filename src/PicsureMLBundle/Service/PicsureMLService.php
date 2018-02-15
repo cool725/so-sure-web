@@ -67,8 +67,8 @@ class PicsureMLService
                 $image = new TrainingData();
                 $image->setImagePath($file->getKey());
                 $metadata = $file->getMetadata();
-                $status = null
-                if (isset($metadata['picsure-status']) {
+                $status = null;
+                if (isset($metadata['picsure-status'])) {
                     $status = $metadata['picsure-status'];
                 }
                 if (!empty($status)) {
