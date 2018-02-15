@@ -60,7 +60,7 @@ class ReceperioService extends BaseImeiService
 
     protected $statsd;
 
-    protected $makemodelValidatedStatus;
+    protected $makeModelValidatedStatus;
 
     public function setMakeModelValidatedStatus($makeModelValidatedStatus)
     {
@@ -706,7 +706,7 @@ class ReceperioService extends BaseImeiService
             return false;
         }
         try {
-            $this->setMakemodelValidatedStatus(
+            $this->setMakeModelValidatedStatus(
                 $this->validateSamePhone($phone, $serialNumber, $this->responseData, $warnMismatch)
             );
             return true;
@@ -1183,7 +1183,7 @@ class ReceperioService extends BaseImeiService
                 return PhonePolicy::MAKEMODEL_DEVICE_NOT_FOUND;
         }
         throw new ReciperoManualProcessException(
-            sprintf('Unhandled MakemodelValidationStatusCode %s', $code),
+            sprintf('Unhandled MakeModelValidationStatusCode %s', $code),
             ReciperoManualProcessException::CODE_UNKNOWN
         );
     }

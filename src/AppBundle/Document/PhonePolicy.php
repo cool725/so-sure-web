@@ -144,7 +144,7 @@ class PhonePolicy extends Policy
         return $this->phone;
     }
 
-    public function setMakemodelValidatedStatus($makeModelValidatedStatus)
+    public function setMakeModelValidatedStatus($makeModelValidatedStatus)
     {
         $this->makeModelValidatedStatus = $makeModelValidatedStatus;
     }

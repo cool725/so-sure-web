@@ -295,7 +295,7 @@ class PolicyService
             $policy->addCheckmendCertData($checkmend['imeiCertId'], $checkmend['imeiResponse']);
             $policy->addCheckmendSerialData($checkmend['serialResponse']);
             // saving final finaly checkmendcert based status
-            $policy->setMakemodelValidatedStatus($checkmend['makeModelValidatedStatus']);
+            $policy->setMakeModelValidatedStatus($checkmend['makeModelValidatedStatus']);
             return $policy;
         } catch (InvalidPremiumException $e) {
             $this->dispatchEvent(
