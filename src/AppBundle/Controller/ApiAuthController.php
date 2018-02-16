@@ -51,6 +51,8 @@ use AppBundle\Exception\ImeiBlacklistedException;
 use AppBundle\Exception\ImeiPhoneMismatchException;
 use AppBundle\Exception\InvalidEmailException;
 
+use AppBundle\Event\PicsureEvent;
+
 use AppBundle\Service\RateLimitService;
 use AppBundle\Service\PushService;
 use AppBundle\Service\JudopayService;
@@ -1114,6 +1116,11 @@ class ApiAuthController extends BaseController
             $policy->addPolicyFile($picsure);
             $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_MANUAL);
             $dm->flush();
+
+            $this->get('event_dispatcher')->dispatch(
+                PicsureEvent::EVENT_RECEIVED,
+                new PicsureEvent($picsure)
+            );
 
             $environment = $this->getParameter('kernel.environment');
             $message = \Swift_Message::newInstance()

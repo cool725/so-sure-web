@@ -7,6 +7,7 @@ use AppBundle\Document\File\S3File;
 
 class PicsureEvent extends Event
 {
+    const EVENT_RECEIVED = 'event.picsure.received';
     const EVENT_APPROVED = 'event.picsure.approved';
     const EVENT_INVALID = 'event.picsure.invalid';
     const EVENT_REJECTED = 'event.picsure.rejected';
