@@ -51,6 +51,9 @@
                 <img src="{{ path('admin_picsure_image', {'file': file.key }) }}" style="max-width: 100%">
                 {% endif %}
             </a>
+            {% if 'picsure-ml-score' in file.getMetadata()|keys %}
+            <p>ML Scores: {{ file.getMetadata()['picsure-ml-score'] }}
+            {% endif %}
     </div>
     {% endfor %}
 </div>
