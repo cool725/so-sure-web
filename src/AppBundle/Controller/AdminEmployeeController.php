@@ -887,6 +887,8 @@ class AdminEmployeeController extends BaseController
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),
             'user_history' => $this->getUserHistory($policy->getUser()->getId()),
             'suggested_cancellation_date' => $now->add(new \DateInterval('P30D')),
+            'claim_types' => Claim::$claimTypes,
+            'phones' => $dm->getRepository(Phone::class)->findActive()->getQuery()->execute(),
         ];
     }
 
@@ -1186,12 +1188,10 @@ class AdminEmployeeController extends BaseController
                 ->sort('lossDate', 'desc')
                 ->sort('notificationDate', 'desc');
         $pager = $this->pager($request, $qb);
-        $phoneRepo = $dm->getRepository(Phone::class);
-        $phones = $phoneRepo->findActive()->getQuery()->execute();
         return [
             'claims' => $pager->getCurrentPageResults(),
             'pager' => $pager,
-            'phones' => $phones,
+            'phones' => $dm->getRepository(Phone::class)->findActive()->getQuery()->execute(),
             'claim_types' => Claim::$claimTypes,
             'form' => $form->createView(),
         ];

@@ -239,6 +239,8 @@ class ClaimsController extends BaseController
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),
             'user_history' => $this->getUserHistory($policy->getUser()->getId()),
             'oa' => $oa,
+            'claim_types' => Claim::$claimTypes,
+            'phones' => $dm->getRepository(Phone::class)->findActive()->getQuery()->execute(),
         ];
     }
 
