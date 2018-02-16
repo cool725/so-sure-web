@@ -17,18 +17,18 @@
                 </tr>
                 <tr>
                     <td>Type
-                    {% if claim_types is defined %}
+                    {% if claim_types is defined%}
                       <td>
                           <select disabled="disabled" name="claim-type" id="claims-detail-type">
                               {% for type in claim_types %}
                                   <option value="{{ type }}">{{ type }}</option>
                               {% endfor %}
                           </select>
+                          {% if is_granted('ROLE_ADMIN') %}
                           <label>(change)</label>
                           <input type="checkbox" id="change-claim-type" name="change-claim-type"></td>
+                          {% endif %}
                       </td>
-                    {% else %}
-                      <td id="claims-detail-type"></td>
                     {% endif %}
 
                 <tr>
@@ -72,15 +72,17 @@
                         Replacement phone
                     </td>
                     <td>
-                        {% if is_granted('ROLE_ADMIN') and phones is defined%}
+                        {% if phones is defined%}
                             <select disabled="disabled" name="replacement-phone" id="claims-detail-replacement-phone">
                                     <option value="">-- Select a phone --</option>
                                 {% for phone in phones %}
                                     <option value="{{ phone.id }}">{{ phone }}</option>
                                 {% endfor %}
                             </select>
+                            {% if is_granted('ROLE_ADMIN') %}
                             <label>(change)</label>
                             <input type="checkbox" name='update-replacement-phone' id="update-replacement-phone"/>
+                            {% endif %}
                         {% endif %}
                     </td>
                 </tr>
@@ -106,16 +108,13 @@
                 <tr>
                     <td>Approved
                     </td>
-                        {% if is_granted('ROLE_ADMIN') %}
                         <td>
                             <input type="text" name="approved-date" readonly="readonly" id="claims-detail-approved"/>
+                            {% if is_granted('ROLE_ADMIN') %}
                             <label>(change)</label>
                             <input type="checkbox" id="change-approved-date" name="change-approved-date">
+                            {% endif %}
                         </td>
-                        {% else %}
-                            <td id="claims-detail-approved-show"></td>
-                        {% endif %}
-
                 </tr>
                 <tr>
                     <td>Replacement Received</td>
