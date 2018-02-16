@@ -58,7 +58,7 @@ class PicsureMLService
         $this->picsureMLDm->flush();
     }
 
-    public function predict($file)
+    public function predict(S3File $file)
     {
         try {
             $result = $this->s3->getObject(array(
