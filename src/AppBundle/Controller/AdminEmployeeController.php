@@ -759,7 +759,7 @@ class AdminEmployeeController extends BaseController
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 } else {
                     $this->addFlash('error', 'Unable to run make/model check');
-                }                
+                }
             } elseif ($request->request->has('chargebacks_form')) {
                 $chargebacksForm->handleRequest($request);
                 if ($chargebacksForm->isValid()) {
