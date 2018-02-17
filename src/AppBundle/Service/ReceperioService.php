@@ -62,6 +62,9 @@ class ReceperioService extends BaseImeiService
 
     protected $makeModelValidatedStatus;
 
+    /** @var IdentityLog */
+    private $identityLog;
+
     public function setMakeModelValidatedStatus($makeModelValidatedStatus)
     {
         $this->makeModelValidatedStatus = $makeModelValidatedStatus;
@@ -341,6 +344,8 @@ class ReceperioService extends BaseImeiService
         if ($imei == self::TEST_INVALID_IMEI) {
             return false;
         }
+
+        $this->identityLog = $identityLog;
 
         if ($identityLog && $identityLog->isSessionDataPresent()) {
             if (!$this->rateLimit->allowedByDevice(
@@ -658,6 +663,8 @@ class ReceperioService extends BaseImeiService
             }
         }
 
+        $this->identityLog = $identityLog;
+
         try {
             return $this->runCheckSerial($phone, $serialNumber, $user, $warnMismatch);
         } catch (ReciperoManualProcessException $e) {
@@ -741,6 +748,11 @@ class ReceperioService extends BaseImeiService
     {
         $this->responseData = $data;
         $this->isTestRun = $isTestRun;
+    }
+
+    private function viaText()
+    {
+        return $this->identityLog ? $this->identityLog->viaText() : 'unknown';
     }
 
     public function runMakeModelCheck(
@@ -830,7 +842,13 @@ class ReceperioService extends BaseImeiService
             $this->mailer->send(
                 sprintf('Empty Data Response for %s', $serialNumber),
                 'tech+ops@so-sure.com',
-                sprintf("A recent make/model query for %s returned a successful response but without any data in the makes field. If apple, verify at https://sndeep.info/en?sn=%s Email support@recipero.com\n\n--------------\n\nDear Recipero Support,\nA recent make/model query for %s returned a successful response but without any data present for the makes field. Can you please investigate and add to your db if its a valid serial number.  If it is a valid serial number, can you also confirm the make/model/colour & memory?", $serialNumber, $serialNumber, $serialNumber)
+                sprintf(
+                    "A recent make/model query via %s for %s returned a successful response but without any data in the makes field. If apple, verify at https://sndeep.info/en?sn=%s Email support@recipero.com\n\n--------------\n\nDear Recipero Support,\nA recent make/model query for %s returned a successful response but without any data present for the makes field. Can you please investigate and add to your db if its a valid serial number.  If it is a valid serial number, can you also confirm the make/model/colour & memory?",
+                    $this->viaText(),
+                    $serialNumber,
+                    $serialNumber,
+                    $serialNumber
+                )
             );
             // @codingStandardsIgnoreEnd
             $this->statsd->increment('recipero.makeModelEmptyMakes');
