@@ -204,8 +204,7 @@ class DaviesClaim extends DaviesExcel
 
     public function isPhoneReplacementCostCorrect()
     {
-        if ($this->replacementMake || $this->replacementModel || $this->replacementImei ||
-            $this->replacementReceivedDate) {
+        if ($this->replacementImei || $this->replacementReceivedDate) {
             if ($this->phoneReplacementCost <= 0) {
                 return false;
             }
