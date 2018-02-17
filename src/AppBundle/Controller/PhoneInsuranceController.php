@@ -270,10 +270,6 @@ class PhoneInsuranceController extends BaseController
 
         $user = new User();
 
-        $form = $this->get('form.factory')
-            ->createNamedBuilder('launch', LaunchType::class, $user)
-            ->getForm();
-
         $lead = new Lead();
         $lead->setSource(Lead::SOURCE_SAVE_QUOTE);
         $leadForm = $this->get('form.factory')
@@ -293,17 +289,7 @@ class PhoneInsuranceController extends BaseController
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
-            if ($request->request->has('launch')) {
-                $form->handleRequest($request);
-                if ($form->isValid()) {
-                    $launchUser = $this->get('app.user.launch');
-                    $existingUser = $launchUser->addUser($user)['user'];
-                }
-
-                if ($existingUser) {
-                    return $this->redirectToRoute('launch_share', ['id' => $existingUser->getId()]);
-                }
-            } elseif ($request->request->has('lead_form')) {
+            if ($request->request->has('lead_form')) {
                 try {
                     $leadForm->handleRequest($request);
 
@@ -447,7 +433,6 @@ class PhoneInsuranceController extends BaseController
             'annual_premium' => $annualPremium,
             'max_connections' => $maxConnections,
             'max_pot' => $maxPot,
-            'form' => $form->createView(),
             'lead_form' => $leadForm->createView(),
             'buy_form' => $buyForm->createView(),
             'buy_form_banner' => $buyBannerForm->createView(),
@@ -547,10 +532,6 @@ class PhoneInsuranceController extends BaseController
 
         $user = new User();
 
-        $form = $this->get('form.factory')
-            ->createNamedBuilder('launch', LaunchType::class, $user)
-            ->getForm();
-
         $buyForm = $this->get('form.factory')
             ->createNamedBuilder('buy_form')
             ->add('buy_tablet', SubmitType::class)
@@ -570,31 +551,6 @@ class PhoneInsuranceController extends BaseController
         $annualPremium = $phone->getCurrentPhonePrice() ? $phone->getCurrentPhonePrice()->getYearlyPremiumPrice() : 100;
         $maxComparision = $phone->getMaxComparision() ? $phone->getMaxComparision() : 80;
 
-        // // only need to run this once - if its a post, then ignore
-        // if ('GET' === $request->getMethod() && $phone->getCurrentPhonePrice()) {
-        //     $event = MixpanelService::EVENT_QUOTE_PAGE;
-        //     if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
-        //         $event = MixpanelService::EVENT_CPC_QUOTE_PAGE;
-        //     }
-        //     $this->get('app.mixpanel')->queueTrackWithUtm($event, [
-        //         'Device Selected' => $phone->__toString(),
-        //         'Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-        //     ]);
-        //     $this->get('app.mixpanel')->queuePersonProperties([
-        //         'First Device Selected' => $phone->__toString(),
-        //         'First Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-        //     ], true);
-
-        //     // Deprecated - Landing Page event - Keep for awhile for a transition period
-        //     // TODO: Remove
-        //     if ($event == MixpanelService::EVENT_CPC_QUOTE_PAGE) {
-        //         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_LANDING_PAGE, [
-        //             'Device Selected' => $phone->__toString(),
-        //             'Monthly Cost' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-        //         ]);
-        //     }
-        // }
-
         $data = array(
             'phone' => $phone,
             'phone_price' => $phone->getCurrentPhonePrice(),
@@ -603,7 +559,6 @@ class PhoneInsuranceController extends BaseController
             'annual_premium' => $annualPremium,
             'max_connections' => $maxConnections,
             'max_pot' => $maxPot,
-            'form' => $form->createView(),
             'buy_form' => $buyForm->createView(),
             'buy_form_banner' => $buyBannerForm->createView(),
             'phones' => $repo->findBy(
