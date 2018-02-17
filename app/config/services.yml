@@ -1009,6 +1009,12 @@ services:
         tags:
             - { name: validator.constraint_validator }
 
+    app.validator.serialnumber:
+        class: AppBundle\Validator\Constraints\SerialNumberValidator
+        arguments: ["@app.imei"]
+        tags:
+            - { name: validator.constraint_validator }
+
     app.validator.postcode:
         class: AppBundle\Validator\Constraints\PostcodeValidator
         arguments: ["@app.address"]
