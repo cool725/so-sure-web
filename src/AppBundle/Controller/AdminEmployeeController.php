@@ -450,7 +450,9 @@ class AdminEmployeeController extends BaseController
             ->createNamedBuilder('debt_form')->add('debt', SubmitType::class)
             ->getForm();
         $picsureForm = $this->get('form.factory')
-            ->createNamedBuilder('picsure_form')->add('approve', SubmitType::class)
+            ->createNamedBuilder('picsure_form')
+            ->add('approve', SubmitType::class)
+            ->add('preapprove', SubmitType::class)
             ->getForm();
         $swapPaymentPlanForm = $this->get('form.factory')
             ->createNamedBuilder('swap_payment_plan_form')->add('swap', SubmitType::class)
@@ -829,17 +831,23 @@ class AdminEmployeeController extends BaseController
                 $picsureForm->handleRequest($request);
                 if ($picsureForm->isValid()) {
                     if ($policy->getPolicyTerms()->isPicSureEnabled() && !$policy->isPicSureValidated()) {
-                        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+                        if ($picsureForm->get('approve')->isClicked()) {
+                            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+                        } elseif ($picsureForm->get('preapprove')->isClicked()) {
+                            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_PREAPPROVED);
+                        } else {
+                            throw new \Exception('Unknown button click');
+                        }
                         $policy->setPicSureApprovedDate(new \DateTime());
                         $dm->flush();
                         $this->addFlash(
                             'success',
-                            'Set pic-sure to approved'
+                            sprintf('Set pic-sure to %s', $policy->getPicSureStatus())
                         );
                     } else {
                         $this->addFlash(
                             'error',
-                            'Policy is not a pic-sure policy or policy is already pic-sure approved'
+                            'Policy is not a pic-sure policy or policy is already pic-sure (pre)approved'
                         );
                     }
 
