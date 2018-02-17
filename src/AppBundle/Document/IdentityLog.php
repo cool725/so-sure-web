@@ -182,6 +182,16 @@ class IdentityLog
         return $this->getCognitoId() !== null || $this->getIp() !== null;
     }
 
+    public function isApi()
+    {
+        return $this->getCognitoId() !== null;
+    }
+
+    public function viaText()
+    {
+        return $this->isApi() ? 'api' : 'web';
+    }
+
     public function isSamePhone(Phone $phone = null)
     {
         if ($this->getPhone() && $phone) {
