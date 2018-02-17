@@ -21,6 +21,12 @@ class ClaimsControllerTest extends BaseControllerTest
     use \AppBundle\Tests\PhingKernelClassTrait;
     use CurrencyTrait;
 
+    public function setUp()
+    {
+        parent::setUp();
+        self::$redis->flushdb();
+    }
+
     public function tearDown()
     {
     }
