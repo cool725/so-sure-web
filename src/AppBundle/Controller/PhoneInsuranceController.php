@@ -270,10 +270,6 @@ class PhoneInsuranceController extends BaseController
 
         $user = new User();
 
-        $form = $this->get('form.factory')
-            ->createNamedBuilder('launch', LaunchType::class, $user)
-            ->getForm();
-
         $lead = new Lead();
         $lead->setSource(Lead::SOURCE_SAVE_QUOTE);
         $leadForm = $this->get('form.factory')
@@ -293,17 +289,7 @@ class PhoneInsuranceController extends BaseController
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
-            if ($request->request->has('launch')) {
-                $form->handleRequest($request);
-                if ($form->isValid()) {
-                    $launchUser = $this->get('app.user.launch');
-                    $existingUser = $launchUser->addUser($user)['user'];
-                }
-
-                if ($existingUser) {
-                    return $this->redirectToRoute('launch_share', ['id' => $existingUser->getId()]);
-                }
-            } elseif ($request->request->has('lead_form')) {
+            if ($request->request->has('lead_form')) {
                 try {
                     $leadForm->handleRequest($request);
 
@@ -447,7 +433,6 @@ class PhoneInsuranceController extends BaseController
             'annual_premium' => $annualPremium,
             'max_connections' => $maxConnections,
             'max_pot' => $maxPot,
-            'form' => $form->createView(),
             'lead_form' => $leadForm->createView(),
             'buy_form' => $buyForm->createView(),
             'buy_form_banner' => $buyBannerForm->createView(),
@@ -546,10 +531,6 @@ class PhoneInsuranceController extends BaseController
         }
 
         $user = new User();
-
-        $form = $this->get('form.factory')
-            ->createNamedBuilder('launch', LaunchType::class, $user)
-            ->getForm();
 
         $buyForm = $this->get('form.factory')
             ->createNamedBuilder('buy_form')
