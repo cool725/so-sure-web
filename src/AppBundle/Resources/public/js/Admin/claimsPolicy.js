@@ -43,6 +43,10 @@ $('.confirm-picsure').on("click",function() {
     return confirm('Are you sure you want to approve pic-sure?');
 });
 
+$('.confirm-pay-policy').on("click",function() {
+    return confirm('Are you sure you want to pay for this partial policy?');
+});
+
 $(document).ready(function(){
     $('.datetimepicker').datetimepicker({
         format: "DD-MM-YYYY HH:mm",
