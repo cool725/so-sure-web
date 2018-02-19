@@ -145,7 +145,15 @@
                 <tr>
                     <td>Recipero Make/Model Check</td>
                     <td>{{ form_start(makemodel_form)}}
-                        {{ form_widget(makemodel_form.serial, {'attr': {'placeholder':'IMEI or Serial Number'}})}}
+                        <span class="text-danger">
+                        {{ form_errors(makemodel_form) }}
+                        {{ form_errors(makemodel_form.imei) }}
+                        {{ form_errors(makemodel_form.serialNumber) }}
+                        </span>
+                        {{ form_widget(makemodel_form.imei, {'attr': {'placeholder':'IMEI'}})}}
+                        <br>-- or --<br>
+                        {{ form_widget(makemodel_form.serialNumber, {'attr': {'placeholder':'Serial Number'}})}}
+                        <br>
                         {{ form_widget(makemodel_form.check, {'attr': {'class': 'btn btn-info'}})}}
                         {{ form_end(makemodel_form)}}
                         <br>

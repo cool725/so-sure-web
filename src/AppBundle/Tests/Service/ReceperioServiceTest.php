@@ -45,8 +45,6 @@ class ReceperioServiceTest extends WebTestCase
     const TEST_ANDROID_SERIAL_INVALID = '9876543211';
     const TEST_IPHONE_SERIAL_INVALID = '123456789013';
     const TEST_IPHONE_SERIAL_INVALID2 = '123456789012';
-    const TEST_INVALID_SERIAL = "111111";
-    const TEST_MANUAL_PROCESS_SERIAL = "111112";
 
     public static function setUpBeforeClass()
     {
@@ -306,10 +304,10 @@ class ReceperioServiceTest extends WebTestCase
 
     public function testAppleManualProcessSerialRetry()
     {
-        $this->assertFalse(self::$imei->runMakeModelCheck(self::TEST_INVALID_SERIAL));
+        $this->assertFalse(self::$imei->runMakeModelCheck(ReceperioService::TEST_INVALID_SERIAL));
         self::$imei->checkSerial(
             static::$phoneA,
-            self::TEST_MANUAL_PROCESS_SERIAL,
+            ReceperioService::TEST_MANUAL_PROCESS_SERIAL,
             $this->generateRandomImei()
         );
         $this->assertEquals('serial', self::$imei->getResponseData());
@@ -317,10 +315,10 @@ class ReceperioServiceTest extends WebTestCase
 
     public function testAppleInvalidSerialNoRetry()
     {
-        $this->assertFalse(self::$imei->runMakeModelCheck(self::TEST_INVALID_SERIAL));
+        $this->assertFalse(self::$imei->runMakeModelCheck(ReceperioService::TEST_INVALID_SERIAL));
         self::$imei->checkSerial(
             static::$phoneA,
-            self::TEST_INVALID_SERIAL,
+            ReceperioService::TEST_INVALID_SERIAL,
             null
         );
         $this->assertNotEquals('serial', self::$imei->getResponseData());

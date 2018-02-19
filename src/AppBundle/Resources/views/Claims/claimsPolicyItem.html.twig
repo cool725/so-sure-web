@@ -723,9 +723,10 @@
                     <td>
                         {% if policy.policyTerms.isPicSureEnabled %}
                             Status: {% if policy.picSureStatus %}{{ policy.picSureStatus }}{% else %}Not started{% endif %}
-                            {% if policy.picSureStatus != "approved" and policy.picSureStatus != "preapproved" %}
+                            {% if not policy.isPicSureValidated %}
                                 {{ form_start(picsure_form)}}
                                 {{ form_widget(picsure_form.approve, {'attr': {'class': 'btn btn-danger confirm-picsure'}})}}
+                                {{ form_widget(picsure_form.preapprove, {'attr': {'class': 'btn btn-danger confirm-picsure'}})}}
                                 {{ form_end(picsure_form)}}
                             {% endif %}
                         {% else %}
@@ -845,7 +846,15 @@
                 <tr>
                     <td><i class="fa fa-lock" title="Admin only"></i> Recipero Make/Model Check</td>
                     <td>{{ form_start(makemodel_form)}}
-                        {{ form_widget(makemodel_form.serial, {'attr': {'placeholder':'IMEI or Serial Number'}})}}
+                        <span class="text-danger">
+                        {{ form_errors(makemodel_form) }}
+                        {{ form_errors(makemodel_form.imei) }}
+                        {{ form_errors(makemodel_form.serialNumber) }}
+                        </span>
+                        {{ form_widget(makemodel_form.imei, {'attr': {'placeholder':'IMEI'}})}}
+                        <br>-- or --<br>
+                        {{ form_widget(makemodel_form.serialNumber, {'attr': {'placeholder':'Serial Number'}})}}
+                        <br>
                         {{ form_widget(makemodel_form.check, {'attr': {'class': 'btn btn-info'}})}}
                         {{ form_end(makemodel_form)}}
                         <br>

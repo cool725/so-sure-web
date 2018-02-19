@@ -40,6 +40,7 @@ use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\Stats;
 use AppBundle\Document\ImeiTrait;
+use AppBundle\Document\Form\AdminMakeModel;
 use AppBundle\Document\OptOut\OptOut;
 use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\OptOut\SmsOptOut;
@@ -82,6 +83,7 @@ use AppBundle\Form\Type\UserEmailType;
 use AppBundle\Form\Type\UserPermissionType;
 use AppBundle\Form\Type\UserHighRiskType;
 use AppBundle\Form\Type\ClaimFlagsType;
+use AppBundle\Form\Type\AdminMakeModelType;
 use AppBundle\Exception\RedirectException;
 use AppBundle\Service\PushService;
 use AppBundle\Event\PicsureEvent;
@@ -435,10 +437,9 @@ class AdminEmployeeController extends BaseController
         $regeneratePolicyScheduleForm = $this->get('form.factory')
             ->createNamedBuilder('regenerate_policy_schedule_form')->add('regenerate', SubmitType::class)
             ->getForm();
+        $makeModel = new AdminMakeModel();
         $makeModelForm = $this->get('form.factory')
-            ->createNamedBuilder('makemodel_form')
-            ->add('serial', TextType::class)
-            ->add('check', SubmitType::class)
+            ->createNamedBuilder('makemodel_form', AdminMakeModelType::class, $makeModel)
             ->getForm();
         $claim = new Claim();
         $claim->setPolicy($policy);
@@ -449,7 +450,9 @@ class AdminEmployeeController extends BaseController
             ->createNamedBuilder('debt_form')->add('debt', SubmitType::class)
             ->getForm();
         $picsureForm = $this->get('form.factory')
-            ->createNamedBuilder('picsure_form')->add('approve', SubmitType::class)
+            ->createNamedBuilder('picsure_form')
+            ->add('approve', SubmitType::class)
+            ->add('preapprove', SubmitType::class)
             ->getForm();
         $swapPaymentPlanForm = $this->get('form.factory')
             ->createNamedBuilder('swap_payment_plan_form')->add('swap', SubmitType::class)
@@ -744,7 +747,7 @@ class AdminEmployeeController extends BaseController
                     $phone = new Phone();
                     $imeiValidator->checkSerial(
                         $phone,
-                        $makeModelForm->getData()['serial'],
+                        $makeModel->getSerialNumberOrImei(),
                         null,
                         $policy->getUser(),
                         null,
@@ -756,6 +759,8 @@ class AdminEmployeeController extends BaseController
                     );
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                } else {
+                    $this->addFlash('error', 'Unable to run make/model check');
                 }
             } elseif ($request->request->has('chargebacks_form')) {
                 $chargebacksForm->handleRequest($request);
@@ -826,17 +831,23 @@ class AdminEmployeeController extends BaseController
                 $picsureForm->handleRequest($request);
                 if ($picsureForm->isValid()) {
                     if ($policy->getPolicyTerms()->isPicSureEnabled() && !$policy->isPicSureValidated()) {
-                        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+                        if ($picsureForm->get('approve')->isClicked()) {
+                            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+                        } elseif ($picsureForm->get('preapprove')->isClicked()) {
+                            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_PREAPPROVED);
+                        } else {
+                            throw new \Exception('Unknown button click');
+                        }
                         $policy->setPicSureApprovedDate(new \DateTime());
                         $dm->flush();
                         $this->addFlash(
                             'success',
-                            'Set pic-sure to approved'
+                            sprintf('Set pic-sure to %s', $policy->getPicSureStatus())
                         );
                     } else {
                         $this->addFlash(
                             'error',
-                            'Policy is not a pic-sure policy or policy is already pic-sure approved'
+                            'Policy is not a pic-sure policy or policy is already pic-sure (pre)approved'
                         );
                     }
 
@@ -932,10 +943,9 @@ class AdminEmployeeController extends BaseController
         $userHighRiskForm = $this->get('form.factory')
             ->createNamedBuilder('user_high_risk_form', UserHighRiskType::class, $user)
             ->getForm();
+        $makeModel = new AdminMakeModel();
         $makeModelForm = $this->get('form.factory')
-            ->createNamedBuilder('makemodel_form')
-            ->add('serial', TextType::class)
-            ->add('check', SubmitType::class)
+            ->createNamedBuilder('makemodel_form', AdminMakeModelType::class, $makeModel)
             ->getForm();
         $address = $user->getBillingAddress();
         $userAddressForm = $this->get('form.factory')
@@ -1118,7 +1128,7 @@ class AdminEmployeeController extends BaseController
                     $phone = new Phone();
                     $imeiValidator->checkSerial(
                         $phone,
-                        $makeModelForm->getData()['serial'],
+                        $makeModel->getSerialNumberOrImei(),
                         null,
                         $user,
                         null,
@@ -1130,6 +1140,8 @@ class AdminEmployeeController extends BaseController
                     );
 
                     return $this->redirectToRoute('admin_user', ['id' => $id]);
+                } else {
+                    $this->addFlash('error', 'Unable to run make/model check');
                 }
             } elseif ($request->request->has('sanctions_form')) {
                 $sanctionsForm->handleRequest($request);

@@ -100,4 +100,14 @@ $(function(){
         return true;
     }, 'Please enter a valid date of birth');
 
+    jQuery.validator.addMethod("isOverFive", function (value, element) {
+        if (value == 'less than 5') {
+            $('.other-inputs').prop('disabled', true);
+            return false;
+        } else {
+             $('.other-inputs').prop('disabled', false);
+            return true;
+        }
+    }, 'Sorry, we require at least 5 company phones to generate a custom quote. You can purchase policies directly via our site in other cases.');
+
 });
