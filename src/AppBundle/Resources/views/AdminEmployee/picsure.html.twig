@@ -54,13 +54,13 @@
             {% if 'picsure-ml-score' in file.getMetadata()|keys %}
             <p>ML Scores: 
                 {% if 'undamaged' in file.getMetadata()['picsure-ml-score']|keys %}
-                    undamaged ({{ file.getMetadata()['picsure-ml-score']['undamaged'] }}) 
+                    undamaged ({{ (file.getMetadata()['picsure-ml-score']['undamaged']*100.0)|number_format(2, '.', ',') }}&percnt;) 
                 {% endif %}
                 {% if 'invalid' in file.getMetadata()['picsure-ml-score']|keys %}
-                    invalid ({{ file.getMetadata()['picsure-ml-score']['invalid'] }}) 
+                    invalid ({{ (file.getMetadata()['picsure-ml-score']['invalid']*100.0)|number_format(2, '.', ',') }}&percnt;) 
                 {% endif %}
                 {% if 'damaged' in file.getMetadata()['picsure-ml-score']|keys %}
-                    damaged ({{ file.getMetadata()['picsure-ml-score']['damaged'] }}) 
+                    damaged ({{ (file.getMetadata()['picsure-ml-score']['damaged']*100.0)|number_format(2, '.', ',') }}&percnt;) 
                 {% endif %}
             </p>
             {% endif %}
