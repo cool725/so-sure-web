@@ -161,6 +161,8 @@ class PhoneInsuranceController extends BaseController
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
      * @Route("/insure/{make}+{model}", name="insure_make_model",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
+     * @Route("/purchase-phone/{make}+{model}+{memory}GB", name="purchase_phone_make_model_memory",
+     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
      */
     public function quoteAction(Request $request, $id = null, $make = null, $model = null, $memory = null)
     {
@@ -259,6 +261,14 @@ class PhoneInsuranceController extends BaseController
                 return new RedirectResponse($this->generateUrl('insure_make', ['make' => $phone->getMake()]));
             } else {
                 return new RedirectResponse($this->generateUrl('homepage'));
+            }
+        } elseif (in_array($request->get('_route'), ['purchase_phone_make_model_memory'])) {
+            // Multipolicy should skip user details
+            if ($this->getUser() && $this->getUser()->hasPolicy()) {
+                // don't check for partial partial as quote phone may be different from partial policy phone
+                return $this->redirectToRoute('purchase_step_policy');
+            } else {
+                return $this->redirectToRoute('purchase');
             }
         }
         /*
