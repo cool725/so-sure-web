@@ -52,13 +52,16 @@ body {
 
 	&--section {
 		margin-bottom: 25px;
+
+        .media-list {
+            margin-bottom: 30px;
+        }
 	}
 
     &--nav {
         background-color: $white;
         padding: 15px 0 0 0;
     }
-
 }
 
 // Switch policy
@@ -137,7 +140,7 @@ body {
 
     text-align: center !important;
 
-    h3 {
+    h3, h4 {
         margin-top:  10px;
     }
 }
@@ -188,31 +191,31 @@ body {
 
 // Invites
 
-.invite-list {
+// .invite-list {
 
-	> li {
-	    padding: 5px 0 10px;
-	    margin: 5px 0;
-	    border-bottom: 1px solid $grey-light;
+// 	> li {
+// 	    padding: 5px 0 10px;
+// 	    margin: 5px 0;
+// 	    border-bottom: 1px solid $grey-light;
 
-		&:first-of-type {
-			margin-top: 0;
-		}
+// 		&:first-of-type {
+// 			margin-top: 0;
+// 		}
 
-		&:last-of-type {
-		    margin-bottom: 0;
-		    border: none;
-		}
+// 		&:last-of-type {
+// 		    margin-bottom: 0;
+// 		    border: none;
+// 		}
 
-		img {
-			margin-right: 15px;
-		}
-	}
+// 		img {
+// 			margin-right: 15px;
+// 		}
+// 	}
 
-    @include breakpoint(tablet) {
-		margin-top: 20px;
-    }
-}
+//     @include breakpoint(tablet) {
+// 		margin-top: 20px;
+//     }
+// }
 
 // Invite Modal
 .modal-body {
@@ -241,4 +244,13 @@ body {
 
 .trust p {
   	text-align: center;
+}
+
+.connections-container {
+
+    h3 {
+        &:first-of-type {
+            margin-top: 0;
+        }
+    }
 }

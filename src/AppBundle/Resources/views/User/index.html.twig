@@ -31,21 +31,29 @@
         <div class="container">
 
             <div class="row">
-                <div class="col-sm-7 col-sm-push-5 col-md-8 col-md-push-4">
+                <div class="col-sm-7 col-sm-push-5 col-md-8 col-md-push-4 connections-container">
                     {% if policy.hasUnconnectedUserPolicies %}
                     <h3 class="text-grey-blue">Connect with your other policies</h3>
                     <div class="user-homepage--section">
                         {{ form_start(unconnected_user_policy_form, {'attr': { 'class': 'form-inline'}}) }}
-                            <ul class="list-unstyled invite-list">
+                            <ul class="media-list">
                                 {% for unconnectedPolicy in policy.unconnectedUserPolicies %}
-                                <li class="clearfix">
-                                    <img src="{{ app.user.getImageUrlFallback }}" class="img-circle pull-left" alt="">
-                                    <h4 class="h4 pull-left">{{ unconnectedPolicy.defaultName }}<br />
-                                    <small>{{ unconnectedPolicy.policyNumber }}<br>
-                                    Policy created on {{ unconnectedPolicy.start|date('d M Y H:i', 'Europe/London')  }}</small></h4>
-                                    <ul class="list-inline pull-right">
-                                        <li>{{ form_widget(attribute(unconnected_user_policy_form, 'connect_' ~ unconnectedPolicy.id), {'attr': {'class': 'btn btn-success  btn-xs'}}) }}</li>
-                                    </ul>
+                                <li class="media">
+                                    <div class="media-left">
+                                        <img src="{{ app.user.getImageUrlFallback }}" class="img-circle" alt="{{ unconnectedPolicy.defaultName }}" width="68px">
+                                    </div>
+                                    <div class="media-body">
+                                        <h4 class="media-heading">
+                                            {{ unconnectedPolicy.defaultName }} <br>
+                                            <small>
+                                                {{ unconnectedPolicy.policyNumber }} <br>
+                                                Policy created on {{ unconnectedPolicy.start|date('d M Y H:i', 'Europe/London') }}
+                                            </small>
+                                        </h4>
+                                        <ul class="list-inline">
+                                            <li>{{ form_widget(attribute(unconnected_user_policy_form, 'connect_' ~ unconnectedPolicy.id), {'attr': {'class': 'btn btn-green'}}) }}</li>
+                                        </ul>
+                                    </div>
                                 </li>
                                 {% endfor %}
                             </ul>
@@ -57,16 +65,24 @@
                     <h3 class="text-grey-blue">Received invitations</h3>
                     <div class="user-homepage--section">
                         {{ form_start(invitation_form, {'attr': { 'class': 'form-inline', 'autocomplete': 'off'}}) }}
-                            <ul class="list-unstyled invite-list">
+                            <ul class="media-list">
                                 {% for invitation in policy.user.unprocessedReceivedInvitations %}
-                                <li class="clearfix">
-                                    <img src="{{ invitation.inviter.getImageUrlFallback }}" class="img-circle pull-left" alt="">
-                                    <h4 class="h4 pull-left">{{ invitation.inviter.name }}<br>
-                                    <small>Received on {{ invitation.created|date('d M Y H:i', 'Europe/London')  }}</small></h4>
-                                    <ul class="list-inline pull-right">
-                                        <li>{{ form_widget(attribute(invitation_form, 'reject_' ~ invitation.id), {'attr': {'class': 'btn btn-danger  btn-xs'}}) }}</li>
-                                        <li>{{ form_widget(attribute(invitation_form, 'accept_' ~ invitation.id), {'attr': {'class': 'btn btn-success  btn-xs'}}) }}</li>
-                                    </ul>
+                                <li class="media">
+                                    <div class="media-left">
+                                        <img src="{{ invitation.inviter.getImageUrlFallback }}" class="img-circle" alt="{{ invitation.inviter.name }}" width="68px">
+                                    </div>
+                                    <div class="media-body">
+                                        <h4 class="media-heading">
+                                            {{ invitation.inviter.name }} <br>
+                                            <small>
+                                                Received on {{ invitation.created|date('d M Y H:i', 'Europe/London') }}
+                                            </small>
+                                        </h4>
+                                        <ul class="list-inline">
+                                            <li>{{ form_widget(attribute(invitation_form, 'reject_' ~ invitation.id), {'attr': {'class': 'btn btn-red'}}) }}</li>
+                                            <li>{{ form_widget(attribute(invitation_form, 'accept_' ~ invitation.id), {'attr': {'class': 'btn btn-green'}}) }}</li>
+                                        </ul>
+                                    </div>
                                 </li>
                                 {% endfor %}
                             </ul>
@@ -78,16 +94,24 @@
                     <h3 class="text-grey-blue">Sent invitations</h3>
                     <div class="user-homepage--section">
                         {{ form_start(sent_invitation_form, {'attr': { 'class': 'form-inline', 'autocomplete': 'off'}}) }}
-                            <ul class="list-unstyled invite-list">
+                            <ul class="media-list">
                                 {% for invitation in policy.sentInvitations %}
-                                <li class="clearfix">
-                                    <img src="{{ invitation.inviteeImageUrlFallback }}" class="img-circle pull-left" alt="">
-                                    <h4 class="h4 pull-left">{{ invitation.inviteeName }}<br>
-                                    <small>Sent on {{ invitation.created|date('d M Y H:i', 'Europe/London')  }}</small></h4>
-                                    <ul class="list-inline pull-right">
-                                        <li>{{ form_widget(attribute(sent_invitation_form, 'cancel_' ~ invitation.id), {'attr': {'class': 'btn btn-danger  btn-xs'}}) }}</li>
-                                        <li>{{ form_widget(attribute(sent_invitation_form, 'reinvite_' ~ invitation.id), {'attr': {'class': 'btn btn-success  btn-xs'}}) }}</li>
-                                    </ul>
+                                <li class="media">
+                                    <div class="media-left">
+                                        <img src="{{ invitation.inviteeImageUrlFallback }}" class="img-circle" alt="{{ invitation.inviteeName }}" width="68px">
+                                    </div>
+                                    <div class="media-body">
+                                        <h4 class="media-heading">
+                                            {{ invitation.inviteeName }} <br>
+                                            <small>
+                                                Sent on {{ invitation.created|date('d M Y H:i', 'Europe/London') }}
+                                            </small>
+                                        </h4>
+                                        <ul class="list-inline">
+                                            <li>{{ form_widget(attribute(sent_invitation_form, 'cancel_' ~ invitation.id), {'attr': {'class': 'btn btn-red'}}) }}</li>
+                                            <li>{{ form_widget(attribute(sent_invitation_form, 'reinvite_' ~ invitation.id), {'attr': {'class': 'btn btn-green'}}) }}</li>
+                                        </ul>
+                                    </div>
                                 </li>
                                 {% endfor %}
                             </ul>
@@ -134,7 +158,7 @@
                         <h3 class="text-grey-blue">Add Connections</h3>
                         <p>Want to add a connection? We've made it easy for you to do so with your very own unique sign up link. <br> Share the link or click 'Add connection' to get started.</p>
                         {# id="add-connect" used in tests #}
-                        <p class="text-center"><a id="add-connect" href="#" class="btn btn-primary " data-toggle="modal" data-target="#inviteModal"><i class="fa fa-plus" aria-hidden="true"></i> Add connection</a></p>
+                        <p class="text-center"><a id="add-connect" href="#" class="btn btn-blue btn-pad " data-toggle="modal" data-target="#inviteModal"><i class="fa fa-plus" aria-hidden="true"></i> Add connection</a></p>
                     </div>
                     {% endif %}
                 </div>
@@ -155,7 +179,7 @@
                                 <div class="input-group">
                                     {{ form_widget(scode_form.scode, {'attr': {'placeholder': 'Enter code', 'class': 'form-control'}}) }}
                                     <span class="input-group-btn">
-                                        {{ form_widget(scode_form.submit, {'label': 'Connect', 'attr': {'class': 'btn btn-success'}}) }}
+                                        {{ form_widget(scode_form.submit, {'label': 'Connect', 'attr': {'class': 'btn btn-green btn-pad'}}) }}
                                     </span>
                                 </div>
                                 <div class="help-block with-errors" id="scode-form-code-err"></div>
