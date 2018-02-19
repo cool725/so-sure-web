@@ -32,7 +32,7 @@ class ScheduledPaymentService
         $scheduledPayment->validateRunable($prefix, $date);
 
         $policy = $scheduledPayment->getPolicy();
-        $paymentMethod = $policy->getUser()->getPaymentMethod();
+        $paymentMethod = $policy->getPayerOrUser()->getPaymentMethod();
         if ($paymentMethod && $paymentMethod instanceof JudoPaymentMethod) {
             return $this->judopay->scheduledPayment(
                 $scheduledPayment,

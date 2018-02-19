@@ -708,7 +708,7 @@ class JudopayService
 
         $payment = null;
         $policy = $scheduledPayment->getPolicy();
-        $paymentMethod = $policy->getUser()->getPaymentMethod();
+        $paymentMethod = $policy->getPayerOrUser()->getPaymentMethod();
         try {
             if (!$paymentMethod || !$paymentMethod instanceof JudoPaymentMethod) {
                 throw new \Exception(sprintf(
