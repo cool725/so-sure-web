@@ -127,4 +127,10 @@ $(function(){
         e.preventDefault();
         window.location.reload(true);
     });
+
+    // FB Login - use class 'fb-login' to call
+    $('.fb-login').on('click', function(e) {
+        e.preventDefault();
+        fb_login();
+    });
 });
