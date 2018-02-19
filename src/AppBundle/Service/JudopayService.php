@@ -883,7 +883,7 @@ class JudopayService
         }
         $nextMonth->add(new \DateInterval('P1M'));
 
-        if (!$policy->getUser()->getPaymentMethod()->isCardExpired($nextMonth)) {
+        if (!$policy->getPayerOrUser()->getPaymentMethod()->isCardExpired($nextMonth)) {
             return false;
         }
 
@@ -893,7 +893,7 @@ class JudopayService
 
         $this->mailer->sendTemplate(
             sprintf('Your card is expiring next month'),
-            $policy->getUser()->getEmail(),
+            $policy->getPayerOrUser()->getEmail(),
             $htmlTemplate,
             ['policy' => $policy],
             $textTemplate,
