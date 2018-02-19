@@ -457,7 +457,8 @@ class PhoneInsuranceController extends BaseController
             $exp = $request->get('force');
         }
 
-        $template = 'AppBundle:PhoneInsurance:quote.html.twig';
+        // $template = 'AppBundle:PhoneInsurance:quote.html.twig';
+        $template = 'AppBundle:PhoneInsurance:quoteSticky.html.twig';
 
         if ($exp == 'new-sections') {
             $template = 'AppBundle:PhoneInsurance:quoteNewSections.html.twig';

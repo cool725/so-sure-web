@@ -1,0 +1,55 @@
+// quote.scss
+
+@import "../mixins";
+@import "../common/palette";
+@import "../common/paletteNew";
+@import "../common/type";
+@import "rewardCalculatorNew";
+
+body {
+	background-color: $off-white;
+}
+
+.navbar {
+	background-color: $white;
+}
+
+.quote {
+
+	&__box {
+		background-color: $white;
+		border: 1px solid $light-blue;
+		@include border-radius(6px);
+	}
+
+	&__left {
+
+	}
+
+	&__right {}
+}
+
+.stat-banner, .phone-details  {
+	padding: 20px 15px;
+	color: $white;
+
+	h3 {
+		color: $white;
+		margin-top: 0;
+	}
+
+	ul {
+		li {
+
+			&:before {
+			  content: '\2022';
+			  margin-right: 0.5em;
+			}
+		}
+	}
+
+	@include breakpoint(tablet) {
+		text-align: center;
+	}
+}
+
