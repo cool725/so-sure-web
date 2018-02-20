@@ -17,6 +17,7 @@ body {
 .quote {
 
 	&__box {
+		width: 100%;
 		background-color: $white;
 		border: 1px solid $lightest-blue;
 		@include border-radius(4px);
@@ -30,7 +31,6 @@ body {
 		}
 
 		&--list {
-			margin-bottom: 0;
 
 			li {
 				font-size: 18px;
@@ -39,6 +39,14 @@ body {
 				&:last-of-type {
 					margin-bottom: 0;
 				}
+
+				small {
+					color: $dark-grey;
+				}
+			}
+
+			@include breakpoint(laptop) {
+				margin-bottom: 0;
 			}
 		}
 	}
@@ -48,6 +56,10 @@ body {
 	}
 
 	&__right {}
+
+	&__cta {
+		margin-bottom: 30px;
+	}
 
 	&__price {
 		margin-bottom: 25px;
