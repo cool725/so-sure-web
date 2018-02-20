@@ -41,6 +41,14 @@
                 {# Quote Left #}
                 <div class="col-sm-4">
                     <div class="quote__box quote__left">
+                        <h2>
+                            {% if coming_soon %}
+                                <span>Better cover for your</span>
+                            {% else %}
+                                <span>Insurance for your</span>
+                            {% endif %}
+                            {{ phone.make }} {{ phone.model }} <small>{{ phone.memory }}GB</small>
+                        </h2>
                         Left
                     </div>
                 </div>
