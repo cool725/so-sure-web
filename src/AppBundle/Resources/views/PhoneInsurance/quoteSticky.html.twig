@@ -42,7 +42,6 @@
             <div class="row">
                 {# Quote Left #}
                 <div class="col-sm-5 col-md-4">
-                    {# <div data-spy="affix"> #}
                         <div class="quote__box quote__left">
                             <h3 class="text-center hide">
                                 {% if coming_soon %}
@@ -82,21 +81,36 @@
 
                         {# Call to action #}
                         {% if not coming_soon %}
-                            <div class="quote__cta text-center">
-                                <div class="form-group">
-                                    {{ form_start(buy_form) }}
-                                        {{ form_widget(buy_form.buy_tablet, {'label': 'Get Started', 'attr': {'class': 'btn btn-green btn-block btn-pad btn-big-text'}}) }}
-                                    {{ form_end(buy_form) }}
-                                </div>
-                                <a href="#"
-                                   data-toggle="modal"
-                                   data-target="#policy-modal"
-                                   id="policy-modal-trigger"
-                                   class="text-underline">
-                                   <small>Full Terms &amp; Conditions</small></a>
+                        <div class="quote__cta text-center">
+                            <div class="form-group">
+                                {{ form_start(buy_form) }}
+                                    {{ form_widget(buy_form.buy_tablet, {'label': 'Get Started', 'attr': {'class': 'btn btn-green btn-block btn-pad btn-big-text'}}) }}
+                                {{ form_end(buy_form) }}
                             </div>
+                            <a href="#"
+                               data-toggle="modal"
+                               data-target="#policy-modal"
+                               id="policy-modal-trigger"
+                               class="text-underline">
+                               <small>Full Terms &amp; Conditions</small></a>
+                        </div>
                         {% endif %}
-                    {# </div> #}
+
+{#                         <div class="quote__app">
+                            <p class="text-left"><strong>SIGN UP IN MINUTES</strong> using our handy app: less forms to fill, validate your phone instantly to reduce your excess by half!</p>
+                            <a class="ga-outbound-click"
+                               data-clicklabel="iTunes"
+                               href="{{ apple_download('homepage-pic-sure') }}"
+                               target="_blank">
+                                <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download so-sure on the App Store" /><span class="sr-only">so-sure app - Apple App Store</span>
+                            </a>
+                            <a class="ga-outbound-click"
+                               data-clicklabel="PlayStore"
+                               href="{{ google_download('homepage-pic-sure') }}"
+                               target="_blank">
+                                <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get so-sure on Google Play" /><span class="sr-only">so-sure app - Google Play</span>
+                           </a>
+                        </div> #}
                 </div>
 
                 {# Quote Right #}
@@ -163,6 +177,24 @@
                             </div>
                         </div>
                     </div>
+
+                    {# Call to action - mobile onlu #}
+                    {% if not coming_soon %}
+                    <div class="quote__cta text-center visible-xs">
+                        <div class="form-group">
+                            {{ form_start(buy_form_banner) }}
+                                {{ form_widget(buy_form_banner.buy, {'label': 'Get Started', 'attr': {'class': 'btn btn btn-green btn-block btn-pad btn-big-text'}}) }}
+                            {{ form_end(buy_form_banner) }}
+                        </div>
+                        <a href="#"
+                           data-toggle="modal"
+                           data-target="#policy-modal"
+                           id="policy-modal-trigger"
+                           class="text-underline">
+                           <small>Full Terms &amp; Conditions</small></a>
+                    </div>
+                    {% endif %}
+
                     <div class="quote__box quote__right">
                         <h3>Let's talk about excess</h3>
                         <p>Our excess is &pound;150. That's high, we know, but we're making sure that dishonest policyholders and fraudsters don't take advantage of us and our genuine customers.</p>
