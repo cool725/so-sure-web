@@ -71,7 +71,7 @@
 
                             {# Change Phone Size/make #}
                             {% if phones | length > 1 %}
-                                <h5 class="h-light">Wrong size storage?</h5>
+                                <h5 class="h-light">Wrong size {{ phone.model }}?</h5>
                                 <ul class="list-inline">
                                     {% for phone_mem in phones if phone_mem.id != phone.id %}
                                         <li><a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class="btn btn-blue-hollow">{{ phone_mem.memory }}GB</a></li>
