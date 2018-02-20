@@ -18,16 +18,46 @@ body {
 
 	&__box {
 		background-color: $white;
-		border: 1px solid $light-blue;
-		@include border-radius(6px);
+		border: 1px solid $lightest-blue;
+		@include border-radius(4px);
+
+		padding: 30px;
+		margin-bottom: 30px;
+
+		// Control the rhythm of box contents
+		* {
+			margin-top: 0;
+		}
+
+		&--list {
+			margin-bottom: 0;
+
+			li {
+				font-size: 18px;
+				margin-bottom: 15px;
+
+				&:last-of-type {
+					margin-bottom: 0;
+				}
+			}
+		}
 	}
 
 	&__left {
-
+		text-align: center;
 	}
 
 	&__right {}
+
+	&__price {
+		margin-bottom: 25px;
+
+		.h1 {
+			font-size: 52px;
+		}
+	}
 }
+
 
 .stat-banner, .phone-details  {
 	padding: 20px 15px;

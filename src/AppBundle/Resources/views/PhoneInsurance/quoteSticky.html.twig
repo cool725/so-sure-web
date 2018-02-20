@@ -2,6 +2,7 @@
 
 {# Set vars #}
 {% set new_stylesheet = 1 %}
+{% set new_footer = 1 %}
 
 {% block title %}so-sure -
     {{ phone }}{% endblock %}
@@ -9,12 +10,12 @@
     <meta name="description" content="For a small monthly fee your phone is covered for theft, loss, accidental damage and unauthorised usage."/>
     <meta name="keywords" content="mobile insurance, phone insurance, mobile phone insurance, cheap mobile phone insurance, cheap phone insurance, cheap mobile insurance, better phone insurance, better mobile phone insurance"/>
     <link rel="canonical" href="{{ url('quote_make_model', {'make': phone.make, 'model': phone.encodedModel}) }}" />
-
+{#
     <meta property="og:video" content="https://cdn.so-sure.com/video/explainer-subtitle-640.mp4" />
     <meta property="og:video:secure_url" content="https://cdn.so-sure.com/video/explainer-subtitle-640.mp4" />
     <meta property="og:video:type" content="video/mp4" />
     <meta property="og:video:width" content="640" />
-    <meta property="og:video:height" content="360" />
+    <meta property="og:video:height" content="360" /> #}
 {% endblock %}
 
 {% block stylesheets %}
@@ -35,27 +36,128 @@
                 {% else %}
                     <span>Insurance for your</span>
                 {% endif %}
-                {{ phone.make }} {{ phone.model }} <small>{{ phone.memory }}GB</small>
+                <span class="text-nowrap">{{ phone.make }} {{ phone.model }} <small>{{ phone.memory }}GB</span></small>
             </h1>
             <div class="row">
                 {# Quote Left #}
-                <div class="col-sm-4">
+                <div class="col-sm-5 col-md-4">
                     <div class="quote__box quote__left">
-                        <h2>
+                        <h3 class="text-center hide">
                             {% if coming_soon %}
                                 <span>Better cover for your</span>
                             {% else %}
                                 <span>Insurance for your</span>
                             {% endif %}
-                            {{ phone.make }} {{ phone.model }} <small>{{ phone.memory }}GB</small>
-                        </h2>
-                        Left
+                            <span class="text-nowrap">{{ phone.make }} {{ phone.model }} <small>{{ phone.memory }}GB</small></small>
+                        </h3>
+
+                        {# Price #}
+                        {% if coming_soon %}
+                            <div class="quote__price">
+                                <span class="quote__price h1 text-blue">&pound;4.99 - &pound;9.99</span> <br>
+                                <strong class="text-dark-grey">PER MONTH</strong>
+                            </div>
+                        {% else %}
+                            <div class="quote__price">
+                                <span class="h1 text-blue">&pound;{{ phone_price.monthlyPremiumPrice }}</span> <br>
+                                <strong class="text-dark-grey">PER MONTH</strong>
+                            </div>
+                        {% endif %}
+
+                        {# Change Phone Size/make #}
+                        {% if phones | length > 1 %}
+                            <h5 class="h-light">Wrong size storage?</h5>
+                            <ul class="list-inline">
+                                {% for phone_mem in phones if phone_mem.id != phone.id %}
+                                    <li><a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class="btn btn-blue-hollow">{{ phone_mem.memory }}GB</a></li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                        <a href="#" data-toggle="modal" data-target="#quoteModal"><u>I have a different phone</u></a>
                     </div>
+
+                    {# Call to action #}
+                    {% if not coming_soon %}
+                        <div class="quote__cta text-center">
+                            <div class="form-group">
+                                {{ form_start(buy_form) }}
+                                    {{ form_widget(buy_form.buy_tablet, {'label': 'Get Started', 'attr': {'class': 'btn btn-green btn-block btn-pad btn-big-text'}}) }}
+                                {{ form_end(buy_form) }}
+                            </div>
+                            <a href="#"
+                               data-toggle="modal"
+                               data-target="#policy-modal"
+                               id="policy-modal-trigger"
+                               class="text-underline">
+                               <small>Full Terms &amp; Conditions</small></a>
+                        </div>
+                    {% endif %}
                 </div>
                 {# Quote Right #}
-                <div class="col-sm-8">
+                <div class="col-sm-7 col-md-8">
                     <div class="quote__box quote__right">
-                        Right
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h3 class="h-light">What's covered</h3>
+                                <ul class="list-unstyled fa-list-bullet quote__box--list">
+                                    <li>
+                                        <i class="fa fa-check text-green" aria-hidden="true"></i>
+                                        Theft
+                                    </li>
+                                    <li>
+                                        <i class="fa fa-check text-green" aria-hidden="true"></i>
+                                        Loss
+                                    </li>
+                                    <li>
+                                        <i class="fa fa-check text-green" aria-hidden="true"></i>
+                                        Accidental damage <br>
+                                        <small>Including cracked screen &amp; water damage</small>
+                                    </li>
+                                    <li>
+                                        <i class="fa fa-check text-green" aria-hidden="true"></i>
+                                        Out of warranty breakdown
+                                    </li>
+                                    <li>
+                                        <i class="fa fa-check text-green" aria-hidden="true"></i>
+                                        Unauthorised network charges <br>
+                                        <small>Up to the value of &pound;1000 inc. VAT</small>
+                                    </li>
+                                    <li>
+                                        <i class="fa fa-check text-green" aria-hidden="true"></i>
+                                        Worldwide cover
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h3 class="h-light">
+                                    <img src="{{ cdn_url }}/images/logo/so-sure_so-sure-full-logo-blue-flat.svg" alt="so-sure" width="90px"> benefits
+                                </h3>
+                                <ul class="list-unstyled fa-list-bullet quote__box--list">
+                                    <li>
+                                        <i class="fa fa-check text-blue" aria-hidden="true"></i>
+                                        Next working day replacement or repair
+                                    </li>
+                                    <li>
+                                        <i class="fa fa-check text-blue" aria-hidden="true"></i>
+                                        24/7 live support
+                                    </li>
+                                    <li>
+                                        <i class="fa fa-check text-blue" aria-hidden="true"></i>
+                                        We insure old phones <br>
+                                        <small>Old &amp; refurbished up to 3 years old</small>
+                                    </li>
+                                    <li>
+                                        <i class="fa fa-check text-blue" aria-hidden="true"></i>
+                                        Instant cover when you purchase your policy
+                                    </li>
+                                    <li>
+                                        <i class="fa fa-check text-blue" aria-hidden="true"></i>
+                                        Up to 80% cashback every year <br>
+                                        <small>With our awesome 'Reward Pot' <a href="#"><u>find out more</u></a></small>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -105,7 +207,7 @@
 
 {% endblock %}
 
-{% block javascripts %}
+{# {% block javascripts %}
     {{ parent() }}
     {% javascripts
     'components/dot/doT.min.js'
@@ -114,6 +216,19 @@
     'components/fuse.js/fuse.min.js'
     'components/rangeslider.js/rangeslider.min.js'
     '@AppBundle/Resources/public/js/Default/modalVideo.js'
+    '@AppBundle/Resources/public/js/Default/sliderNew.js'
+    '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
+    '@AppBundle/Resources/public/js/Default/bannerSticky.js' %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %} #}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    'components/dot/doT.min.js'
+    'components/corejs-typeahead/typeahead.bundle.min.js'
+    'components/fuse.js/fuse.min.js'
+    'components/rangeslider.js/rangeslider.min.js'
     '@AppBundle/Resources/public/js/Default/sliderNew.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
     '@AppBundle/Resources/public/js/Default/bannerSticky.js' %}
