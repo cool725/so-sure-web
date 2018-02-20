@@ -263,7 +263,9 @@ class PhoneInsuranceController extends BaseController
                 return new RedirectResponse($this->generateUrl('homepage'));
             }
         } elseif (in_array($request->get('_route'), ['purchase_phone_make_model_memory'])) {
-            $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, ['Location' => 'offsite']);
+            $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, [
+                'Location' => 'offsite'
+            ]);
 
             // Multipolicy should skip user details
             if ($this->getUser() && $this->getUser()->hasPolicy()) {
