@@ -24,6 +24,7 @@ body {
 
 		padding: 30px;
 		margin-bottom: 30px;
+		position: relative;
 
 		// Control the rhythm of box contents
 		* {
@@ -49,6 +50,14 @@ body {
 				margin-bottom: 0;
 			}
 		}
+
+		ol {
+			padding: 25px;
+		}
+
+		table {
+			margin: 20px 0;
+		}
 	}
 
 	&__left {
@@ -72,11 +81,11 @@ body {
 
 
 .stat-banner, .phone-details  {
-	padding: 20px 15px;
-	color: $white;
+	// padding: 20px 15px;
+	// color: $white;
 
 	h3 {
-		color: $white;
+		// color: $white;
 		margin-top: 0;
 	}
 
@@ -95,3 +104,6 @@ body {
 	}
 }
 
+.footer-new {
+	margin-top: 0;
+}

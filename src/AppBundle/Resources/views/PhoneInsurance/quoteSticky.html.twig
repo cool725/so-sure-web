@@ -21,8 +21,8 @@
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets output='css/*.css'
-    '@AppBundle//Resources/public/sass/page/quoteSticky.scss'
     '@AppBundle//Resources/public/sass/page/homepage.scss'
+    '@AppBundle//Resources/public/sass/page/quoteSticky.scss'
     %}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
@@ -40,9 +40,11 @@
                 <span class="text-nowrap">{{ phone.make }} {{ phone.model }} <small>{{ phone.memory }}GB</span></small>
             </h1>
             <div class="row">
+
                 {# Quote Left #}
                 <div class="col-sm-5 col-md-4">
-                        <div class="quote__box quote__left">
+                    <div class="quote__left">
+                        <div class="quote__box">
                             <h3 class="text-center hide">
                                 {% if coming_soon %}
                                     <span>Better cover for your</span>
@@ -81,11 +83,97 @@
 
                         {# Call to action #}
                         {% if not coming_soon %}
-                        <div class="quote__cta text-center">
+                            <div class="quote__cta text-center">
+                                <div class="form-group">
+                                    {{ form_start(buy_form) }}
+                                        {{ form_widget(buy_form.buy_tablet, {'label': 'Get Started', 'attr': {'class': 'btn btn-green btn-block btn-pad btn-big-text'}}) }}
+                                    {{ form_end(buy_form) }}
+                                </div>
+                                <a href="#"
+                                   data-toggle="modal"
+                                   data-target="#policy-modal"
+                                   id="policy-modal-trigger"
+                                   class="text-underline">
+                                   <small>Full Terms &amp; Conditions</small></a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {# End Quote Left #}
+
+                {# Quote Right #}
+                <div class="col-sm-7 col-md-8">
+                    <div class="quote__right">
+                        <div class="quote__box">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h3>What's covered</h3>
+                                    <ul class="list-unstyled fa-list-bullet quote__box--list">
+                                        <li>
+                                            <i class="fa fa-check text-green" aria-hidden="true"></i>
+                                            Theft
+                                        </li>
+                                        <li>
+                                            <i class="fa fa-check text-green" aria-hidden="true"></i>
+                                            Loss
+                                        </li>
+                                        <li>
+                                            <i class="fa fa-check text-green" aria-hidden="true"></i>
+                                            Accidental damage <br>
+                                            <small>Including cracked screen &amp; water damage</small>
+                                        </li>
+                                        <li>
+                                            <i class="fa fa-check text-green" aria-hidden="true"></i>
+                                            Out of warranty breakdown
+                                        </li>
+                                        <li>
+                                            <i class="fa fa-check text-green" aria-hidden="true"></i>
+                                            Unauthorised network charges <br>
+                                            <small>Up to the value of &pound;1000 inc. VAT</small>
+                                        </li>
+                                        <li>
+                                            <i class="fa fa-check text-green" aria-hidden="true"></i>
+                                            Worldwide cover
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h3>What we offer</h3>
+                                    <ul class="list-unstyled fa-list-bullet quote__box--list">
+                                        <li>
+                                            <i class="fa fa-check text-blue" aria-hidden="true"></i>
+                                            Next working day replacement or repair
+                                        </li>
+                                        <li>
+                                            <i class="fa fa-check text-blue" aria-hidden="true"></i>
+                                            24/7 live support
+                                        </li>
+                                        <li>
+                                            <i class="fa fa-check text-blue" aria-hidden="true"></i>
+                                            We insure old phones <br>
+                                            <small>Old &amp; refurbished up to 3 years old</small>
+                                        </li>
+                                        <li>
+                                            <i class="fa fa-check text-blue" aria-hidden="true"></i>
+                                            Instant cover when you purchase your policy
+                                        </li>
+                                        <li>
+                                            <i class="fa fa-check text-blue" aria-hidden="true"></i>
+                                            Up to 80% cashback every year <br>
+                                            <small>With our awesome 'Reward Pot' <a href="#" data-scroll-to-anchor="#rewardpot" class="scroll-to"><u>find out more</u></a></small>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        {# Call to action - mobile only #}
+                        {% if not coming_soon %}
+                        <div class="quote__cta text-center visible-xs">
                             <div class="form-group">
-                                {{ form_start(buy_form) }}
-                                    {{ form_widget(buy_form.buy_tablet, {'label': 'Get Started', 'attr': {'class': 'btn btn-green btn-block btn-pad btn-big-text'}}) }}
-                                {{ form_end(buy_form) }}
+                                {{ form_start(buy_form_banner) }}
+                                    {{ form_widget(buy_form_banner.buy, {'label': 'Get Started', 'attr': {'class': 'btn btn btn-green btn-block btn-pad btn-big-text'}}) }}
+                                {{ form_end(buy_form_banner) }}
                             </div>
                             <a href="#"
                                data-toggle="modal"
@@ -96,136 +184,99 @@
                         </div>
                         {% endif %}
 
-{#                         <div class="quote__app">
-                            <p class="text-left"><strong>SIGN UP IN MINUTES</strong> using our handy app: less forms to fill, validate your phone instantly to reduce your excess by half!</p>
-                            <a class="ga-outbound-click"
-                               data-clicklabel="iTunes"
-                               href="{{ apple_download('homepage-pic-sure') }}"
-                               target="_blank">
-                                <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download so-sure on the App Store" /><span class="sr-only">so-sure app - Apple App Store</span>
-                            </a>
-                            <a class="ga-outbound-click"
-                               data-clicklabel="PlayStore"
-                               href="{{ google_download('homepage-pic-sure') }}"
-                               target="_blank">
-                                <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get so-sure on Google Play" /><span class="sr-only">so-sure app - Google Play</span>
-                           </a>
-                        </div> #}
-                </div>
+                        {# pic-sure #}
+                        <div class="quote__box">
+                            <h3>Let's talk about excess</h3>
+                            <p>Our excess is &pound;150. That's high, we know, but we're making sure that dishonest policyholders and fraudsters don't take advantage of us and our genuine customers.</p>
+                            <p>And that's why, by validating your phone with pic-sure technology, which takes less than 30 seconds, you can easily take your excess down to:</p>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th width="50%" class="h4">Excess <u>with</u> pic-sure <i class="fa fa-check fa-lg text-green" aria-hidden="true"></i></th>
+                                        <th width="50%" class="h4">Excess <u>without</u> pic-sure <i class="fa fa-times fa-lg text-red" aria-hidden="true"></i></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong class="h4">&pound;50</strong><br> <small>For Accidental damage, Breakdown</small></td>
+                                        <td><strong class="h4">&pound;150</strong><br> <small>For Theft, Loss, Accidental damage, Breakdown</small></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong class="h4">&pound;70</strong><br> <small>For Theft, Loss</small></td>
+                                        <td>-</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
 
-                {# Quote Right #}
-                <div class="col-sm-7 col-md-8">
-                    <div class="quote__box quote__right">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h3>What's covered</h3>
-                                <ul class="list-unstyled fa-list-bullet quote__box--list">
-                                    <li>
-                                        <i class="fa fa-check text-green" aria-hidden="true"></i>
-                                        Theft
-                                    </li>
-                                    <li>
-                                        <i class="fa fa-check text-green" aria-hidden="true"></i>
-                                        Loss
-                                    </li>
-                                    <li>
-                                        <i class="fa fa-check text-green" aria-hidden="true"></i>
-                                        Accidental damage <br>
-                                        <small>Including cracked screen &amp; water damage</small>
-                                    </li>
-                                    <li>
-                                        <i class="fa fa-check text-green" aria-hidden="true"></i>
-                                        Out of warranty breakdown
-                                    </li>
-                                    <li>
-                                        <i class="fa fa-check text-green" aria-hidden="true"></i>
-                                        Unauthorised network charges <br>
-                                        <small>Up to the value of &pound;1000 inc. VAT</small>
-                                    </li>
-                                    <li>
-                                        <i class="fa fa-check text-green" aria-hidden="true"></i>
-                                        Worldwide cover
-                                    </li>
-                                </ul>
+                        {# Reward pot #}
+                        <div class="quote__box" id="rewardpot">
+                            <h3>How Does the Reward Pot Work?</h3>
+
+                            {# Slider #}
+                            <div id="loading-overlay-init" class="loading-overlay" style="display:block;"></div>
+
+                            {# Set the start friends amount #}
+                            {% set start_friends = 0 %}
+
+                            {% set start_friends_rounded = start_friends|round() %}
+
+                            {# Set the amount of cashback #}
+                            {% set start_value = start_friends_rounded  * connection_value %}
+
+                            {# If greater than max pot, pot max is start value #}
+                            {% if start_value > max_pot %}
+                                {% set start_value = max_pot %}
+                            {% endif %}
+
+                            {# Start amount and work out monthly #}
+                            {% set start_premium = annual_premium - start_value %}
+                            {% set monthly_premium = start_premium / 12 %}
+
+                            <p class="lead">If you and your friends take good care of your phones and don’t need to claim, we’ll give you up to 80% of your premium back at the end of your policy year, see how much you could save below using our handy slider:</p>
+
+                            <h4 class="text-center text-blue">
+                                Effective <u>monthly</u> premium after cashback: <br>
+                                <small>(Cashback paid out end of policy year)</small>
+                            </h4>
+
+                            <div class="reward-slider">
+
+                                <output for="range" class="rewardslider__output">
+                                    <span id="premium" class="h3 text-white">&pound;{{ monthly_premium|number_format(2, '.', ',') }}</span><br>
+                                    <small class="text-nowrap">per month</small>
+                                </output>
+
+                                <input type="range"
+                                       id="reward-slider"
+                                       autocomplete="off"
+                                       min="0"
+                                       max="{{ max_connections }}"
+                                       value="{{ start_friends_rounded }}"
+                                       data-maxpot="{{ max_pot }}"
+                                       data-connection-value="{{ connection_value }}"
+                                       data-premium="{{ annual_premium }}"
+                                       data-monthly-premium="{{ monthly_premium }}">
                             </div>
-                            <div class="col-md-6">
-                                <h3>What we offer</h3>
-                                <ul class="list-unstyled fa-list-bullet quote__box--list">
-                                    <li>
-                                        <i class="fa fa-check text-blue" aria-hidden="true"></i>
-                                        Next working day replacement or repair
-                                    </li>
-                                    <li>
-                                        <i class="fa fa-check text-blue" aria-hidden="true"></i>
-                                        24/7 live support
-                                    </li>
-                                    <li>
-                                        <i class="fa fa-check text-blue" aria-hidden="true"></i>
-                                        We insure old phones <br>
-                                        <small>Old &amp; refurbished up to 3 years old</small>
-                                    </li>
-                                    <li>
-                                        <i class="fa fa-check text-blue" aria-hidden="true"></i>
-                                        Instant cover when you purchase your policy
-                                    </li>
-                                    <li>
-                                        <i class="fa fa-check text-blue" aria-hidden="true"></i>
-                                        Up to 80% cashback every year <br>
-                                        <small>With our awesome 'Reward Pot' <a href="#"><u>find out more</u></a></small>
-                                    </li>
-                                </ul>
-                            </div>
+                            <h4 class="text-blue text-center">Number of connections</h4>
+                            <h4></h4>
+{#                             <ol class="quote__box--list">
+                                <li>Invite your family and friends to join, connect with them and receive up to &pound;10 pp each in your individual Reward Pots</li>
+                                <li>Take a good care of your phone throughout the policy period and make no claims.</li>
+                                <li>At the end of the year, when you and your connections haven’t claimed, your Reward Pot is paid out to you</li>
+                            </ol> #}
                         </div>
                     </div>
-
-                    {# Call to action - mobile onlu #}
-                    {% if not coming_soon %}
-                    <div class="quote__cta text-center visible-xs">
-                        <div class="form-group">
-                            {{ form_start(buy_form_banner) }}
-                                {{ form_widget(buy_form_banner.buy, {'label': 'Get Started', 'attr': {'class': 'btn btn btn-green btn-block btn-pad btn-big-text'}}) }}
-                            {{ form_end(buy_form_banner) }}
-                        </div>
-                        <a href="#"
-                           data-toggle="modal"
-                           data-target="#policy-modal"
-                           id="policy-modal-trigger"
-                           class="text-underline">
-                           <small>Full Terms &amp; Conditions</small></a>
-                    </div>
-                    {% endif %}
-
-                    <div class="quote__box quote__right">
-                        <h3>Let's talk about excess</h3>
-                        <p>Our excess is &pound;150. That's high, we know, but we're making sure that dishonest policyholders and fraudsters don't take advantage of us and our genuine customers.</p>
-                        <p>And that's why, by validating your phone with pic-sure technology, which takes less than 30 seconds, you can easily take your excess down to:</p>
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th width="50%" class="h4">Excess <u>without</u> pic-sure</th>
-                                    <th width="50%" class="h4">Excess <u>with</u> pic-sure</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><strong class="h4">&pound;150</strong><br> <small>For Theft, Loss, Accidental damage, Breakdown</small></td>
-                                    <td><strong class="h4">&pound;50</strong><br> <small>For Accidental damage, Breakdown</small></td>
-                                </tr>
-                                <tr>
-                                    <td>-</td>
-                                    <td><strong class="h4">&pound;70</strong><br> <small>For Theft, Loss</small></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
                 </div>
+                {# End Quote Right #}
+
             </div>
         </div>
     </section>
 
-    {% include 'AppBundle::Default/_sectionComparison.html.twig' %}
+    {# {% include 'AppBundle::Default/_sectionComparison.html.twig' %} #}
 
-    <section class="phone-details background-blue">
+    <section class="section--pad phone-details background-white">
         <div class="container">
             <h3>About the {{ phone.make }} {{ phone.model }}</h3>
             <ul class="list-inline">
