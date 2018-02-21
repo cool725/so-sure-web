@@ -16,7 +16,7 @@
     {{ parent() }}
     {% stylesheets output='css/*.css'
     '@AppBundle//Resources/public/sass/page/homepage.scss'
-    '@AppBundle//Resources/public/sass/page/quoteSticky.scss'
+    '@AppBundle//Resources/public/sass/page/quoteNewDesign.scss'
     %}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
@@ -25,14 +25,6 @@
 
     <section class="section--pad quote">
         <div class="container">
-{#             <h1 class="h2 text-center">
-                {% if coming_soon %}
-                    <span>Better cover for your</span>
-                {% else %}
-                    <span>Insurance for your</span>
-                {% endif %}
-                <span class="text-nowrap">{{ phone.make }} {{ phone.model }} <small>{{ phone.memory }}GB</span></small>
-            </h1> #}
             <div class="row">
 
                 {# Quote Left #}
@@ -253,11 +245,6 @@
                                        data-monthly-premium="{{ monthly_premium }}">
                             </div>
                             <h4 class="text-blue text-center">Number of connections</h4>
-{#                             <ol class="quote__box--list">
-                                <li>Invite your family and friends to join, connect with them and receive up to &pound;10 pp each in your individual Reward Pots</li>
-                                <li>Take a good care of your phone throughout the policy period and make no claims.</li>
-                                <li>At the end of the year, when you and your connections haven’t claimed, your Reward Pot is paid out to you</li>
-                            </ol> #}
                         </div>
 
                         {# Phone stats #}

@@ -354,7 +354,7 @@ class PhoneInsuranceController extends BaseController
                     }
                     $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
 
-                    $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_SECTIONS);
+                    $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_NEW_QUOTE_DESIGN);
 
                     // Multipolicy should skip user details
                     if ($this->getUser() && $this->getUser()->hasPolicy()) {
@@ -377,7 +377,7 @@ class PhoneInsuranceController extends BaseController
                     }
                     $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
 
-                    $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_SECTIONS);
+                    $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_NEW_QUOTE_DESIGN);
 
                     // Multipolicy should skip user details
                     if ($this->getUser() && $this->getUser()->hasPolicy()) {
@@ -448,8 +448,8 @@ class PhoneInsuranceController extends BaseController
         );
 
         $exp = $this->get('app.sixpack')->participate(
-            SixpackService::EXPERIMENT_QUOTE_SECTIONS,
-            ['old-sections', 'new-sections'],
+            SixpackService::EXPERIMENT_NEW_QUOTE_DESIGN,
+            ['old-quote', 'new-quote-design'],
             false
         );
 
@@ -457,11 +457,10 @@ class PhoneInsuranceController extends BaseController
             $exp = $request->get('force');
         }
 
-        // $template = 'AppBundle:PhoneInsurance:quote.html.twig';
-        $template = 'AppBundle:PhoneInsurance:quoteSticky.html.twig';
+        $template = 'AppBundle:PhoneInsurance:quote.html.twig';
 
-        if ($exp == 'new-sections') {
-            $template = 'AppBundle:PhoneInsurance:quoteNewSections.html.twig';
+        if ($exp == 'new-sticky-quote') {
+            $template = 'AppBundle:PhoneInsurance:quoteNewDesign.html.twig';
         }
 
         if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
