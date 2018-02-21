@@ -10,12 +10,6 @@
     <meta name="description" content="For a small monthly fee your phone is covered for theft, loss, accidental damage and unauthorised usage."/>
     <meta name="keywords" content="mobile insurance, phone insurance, mobile phone insurance, cheap mobile phone insurance, cheap phone insurance, cheap mobile insurance, better phone insurance, better mobile phone insurance"/>
     <link rel="canonical" href="{{ url('quote_make_model', {'make': phone.make, 'model': phone.encodedModel}) }}" />
-{#
-    <meta property="og:video" content="https://cdn.so-sure.com/video/explainer-subtitle-640.mp4" />
-    <meta property="og:video:secure_url" content="https://cdn.so-sure.com/video/explainer-subtitle-640.mp4" />
-    <meta property="og:video:type" content="video/mp4" />
-    <meta property="og:video:width" content="640" />
-    <meta property="og:video:height" content="360" /> #}
 {% endblock %}
 
 {% block stylesheets %}
@@ -31,28 +25,28 @@
 
     <section class="section--pad quote">
         <div class="container">
-            <h1 class="h2 text-center">
+{#             <h1 class="h2 text-center">
                 {% if coming_soon %}
                     <span>Better cover for your</span>
                 {% else %}
                     <span>Insurance for your</span>
                 {% endif %}
                 <span class="text-nowrap">{{ phone.make }} {{ phone.model }} <small>{{ phone.memory }}GB</span></small>
-            </h1>
+            </h1> #}
             <div class="row">
 
                 {# Quote Left #}
                 <div class="col-sm-5 col-md-4">
                     <div class="quote__left">
                         <div class="quote__box">
-                            <h3 class="text-center hide">
+                            <h1 class="h3 text-center">
                                 {% if coming_soon %}
                                     <span>Better cover for your</span>
                                 {% else %}
                                     <span>Insurance for your</span>
                                 {% endif %}
                                 <span class="text-nowrap">{{ phone.make }} {{ phone.model }} <small>{{ phone.memory }}GB</small></small>
-                            </h3>
+                            </h1>
 
                             {# Price #}
                             {% if coming_soon %}
@@ -192,8 +186,8 @@
                             <table class="table">
                                 <thead>
                                     <tr>
-                                        <th width="50%" class="h4">Excess <u>with</u> pic-sure <i class="fa fa-check fa-lg text-green" aria-hidden="true"></i></th>
-                                        <th width="50%" class="h4">Excess <u>without</u> pic-sure <i class="fa fa-times fa-lg text-red" aria-hidden="true"></i></th>
+                                        <th valign="top" width="50%" class="h4">Excess <u>w ith</u> pic-sure <i class="fa fa-check fa-lg text-green" aria-hidden="true"></i></th>
+                                        <th valign="top" width="50%" class="h4">Excess <u>without</u> pic-sure <i class="fa fa-times fa-lg text-red" aria-hidden="true"></i></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -236,7 +230,7 @@
                             <p class="lead">If you and your friends take good care of your phones and don’t need to claim, we’ll give you up to 80% of your premium back at the end of your policy year, see how much you could save below using our handy slider:</p>
 
                             <h4 class="text-center text-blue">
-                                Effective <u>monthly</u> premium after cashback: <br>
+                                Effective <u>monthly</u> cost after cashback: <br>
                                 <small>(Cashback paid out end of policy year)</small>
                             </h4>
 
@@ -259,38 +253,34 @@
                                        data-monthly-premium="{{ monthly_premium }}">
                             </div>
                             <h4 class="text-blue text-center">Number of connections</h4>
-                            <h4></h4>
 {#                             <ol class="quote__box--list">
                                 <li>Invite your family and friends to join, connect with them and receive up to &pound;10 pp each in your individual Reward Pots</li>
                                 <li>Take a good care of your phone throughout the policy period and make no claims.</li>
                                 <li>At the end of the year, when you and your connections haven’t claimed, your Reward Pot is paid out to you</li>
                             </ol> #}
                         </div>
+
+                        {# Phone stats #}
+                        <div class="quote__box">
+                            <h3>About the {{ phone.make }} {{ phone.model }}</h3>
+                            <ul class="list-unstyled quote__box--list">
+                                <li>Camera: {{ phone.camera }} MP</li>
+                                <li>Size: {{ phone.getScreenPhysicalInch }}"</li>
+                                <li>Screen Resolution: {{ phone.getScreenResolution }}</li>
+                                <li>RAM: {{ phone.getRamDisplay }}</li>
+                            </ul>
+                            {% if phone.funFacts|length > 0 %}
+                                <p>{{ phone.funFacts|raw }}</p>
+                            {% endif %}
+                            {% if phone.description|length > 0 %}
+                                <p>{{ phone.description|raw }}</p>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
                 {# End Quote Right #}
 
             </div>
-        </div>
-    </section>
-
-    {# {% include 'AppBundle::Default/_sectionComparison.html.twig' %} #}
-
-    <section class="section--pad phone-details background-white">
-        <div class="container">
-            <h3>About the {{ phone.make }} {{ phone.model }}</h3>
-            <ul class="list-inline">
-                <li>Camera: {{ phone.camera }} MP</li>
-                <li>Size: {{ phone.getScreenPhysicalInch }}"</li>
-                <li>Screen Resolution: {{ phone.getScreenResolution }}</li>
-                <li>RAM: {{ phone.getRamDisplay }}</li>
-            </ul>
-            {% if phone.funFacts|length > 0 %}
-                <p>{{ phone.funFacts|raw }}</p>
-            {% endif %}
-            {% if phone.description|length > 0 %}
-                <p>{{ phone.description|raw }}</p>
-            {% endif %}
         </div>
     </section>
 
@@ -319,21 +309,6 @@
 
 {% endblock %}
 
-{# {% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-    'components/dot/doT.min.js'
-    'components/vimeo-player-js/player.min.js'
-    'components/corejs-typeahead/typeahead.bundle.min.js'
-    'components/fuse.js/fuse.min.js'
-    'components/rangeslider.js/rangeslider.min.js'
-    '@AppBundle/Resources/public/js/Default/modalVideo.js'
-    '@AppBundle/Resources/public/js/Default/sliderNew.js'
-    '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
-    '@AppBundle/Resources/public/js/Default/bannerSticky.js' %}
-    <script src="{{ asset_url }}"></script>{% endjavascripts %}
-{% endblock %} #}
-
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
@@ -345,6 +320,6 @@
     'components/rangeslider.js/rangeslider.min.js'
     '@AppBundle/Resources/public/js/Default/sliderNew.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
-    '@AppBundle/Resources/public/js/Default/bannerSticky.js' %}
+    '@AppBundle/Resources/public/js/Default/quote.js' %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}

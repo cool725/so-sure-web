@@ -24,7 +24,7 @@ body {
 
 		padding: 30px;
 		margin-bottom: 30px;
-		position: relative;
+		position: relative !important;
 
 		// Control the rhythm of box contents
 		* {
@@ -80,6 +80,7 @@ body {
 }
 
 .stat-banner, .phone-details  {
+	background-color: $off-white;
 
 	h3 {
 		// color: $white;
@@ -101,6 +102,14 @@ body {
 	}
 }
 
-.footer-new {
-	margin-top: 0;
+.affix {
+	position: static;
+
+	@include breakpoint(tablet) {
+		position: fixed;
+	}
+}
+
+.affix-bottom {
+	position: absolute;
 }
