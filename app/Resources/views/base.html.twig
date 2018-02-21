@@ -145,6 +145,9 @@
             <script src="/components/bootstrap-sass/bootstrap.js"></script>
         {% endif %}
 
+        {% if environment != 'prod' %}
+        {% endif %}
+
         {# Javascript #}
         {% block javascripts %}
             {% if hide_cookie_warning is defined and hide_cookie_warning %}
