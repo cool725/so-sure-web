@@ -3548,7 +3548,7 @@ class PhonePolicyTest extends WebTestCase
         
         $claim = new Claim();
         $claim->setType(Claim::TYPE_LOSS);
-        $claim->setStatus(Claim::STATUS_INREVIEW);
+        $claim->setStatus(Claim::STATUS_APPROVED);
         $policy->addClaim($claim);
 
         $renewalPolicy = $this->getRenewalPolicy($policy);
@@ -3571,6 +3571,41 @@ class PhonePolicyTest extends WebTestCase
 
         $claim->setStatus(Claim::STATUS_SETTLED);
         $policy->fullyExpire(new \DateTime("2017-02-30"));
+        $this->assertEquals(Policy::STATUS_EXPIRED, $policy->getStatus());
+
+        foreach ($policy->getPayments() as $payment) {
+            $this->assertFalse($payment instanceof PotRewardPayment);
+            $this->assertFalse($payment instanceof PolicyDiscountPayment);
+        }
+    }
+
+    public function testRenewActivateExpireWithMonitaryClaim()
+    {
+        $policy = $this->getPolicy(static::generateEmail('testRenewActivateExpireWithMonitaryClaim', $this));
+
+        $this->assertFalse($policy->isRenewed());
+
+        $claim = new Claim();
+        $claim->setType(Claim::TYPE_LOSS);
+        $claim->setStatus(Claim::STATUS_SETTLED);
+        $policy->addClaim($claim);
+
+        $renewalPolicy = $this->getRenewalPolicy($policy);
+
+        $this->assertFalse($policy->isRenewed());
+        $this->assertTrue($renewalPolicy->isRenewalAllowed(false, new \DateTime('2016-12-15')));
+
+        $renewalPolicy->renew(0, false, new \DateTime('2016-12-15'));
+
+        $this->assertTrue($policy->isRenewed());
+
+        $policy->expire(new \DateTime("2017-01-01"));
+        $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $policy->getStatus());
+
+        $renewalPolicy->activate(new \DateTime('2017-01-01'));
+        $this->assertEquals(Policy::STATUS_ACTIVE, $renewalPolicy->getStatus());
+
+        $policy->fullyExpire(new \DateTime("2017-01-29"));
         $this->assertEquals(Policy::STATUS_EXPIRED, $policy->getStatus());
 
         foreach ($policy->getPayments() as $payment) {

@@ -428,7 +428,7 @@ abstract class Policy
     protected $viewedCancellationPage;
 
     /**
-     * @MongoDB\Boolean()
+     * @MongoDB\Field(type="boolean")
      * @Gedmo\Versioned
      */
     protected $policyDiscountPresent;
@@ -3371,7 +3371,9 @@ abstract class Policy
             throw new \Exception('Unable to fully expire a policy if status is not expired-claimable or wait-claim');
         }
 
-        if ($this->hasOpenClaim() || $this->hasOpenNetworkClaim()) {
+        // If a user themselves already has successfully claimed, then their pot is already 0,
+        // so there is no need to wait on an open claim to complete as will not impact on pot rewards
+        if (!$this->hasMonetaryClaimed() && ($this->hasOpenClaim() || $this->hasOpenNetworkClaim())) {
             // if already set, avoid setting again as might trigger db logging
             if ($this->getStatus() == self::STATUS_EXPIRED_WAIT_CLAIM) {
                 return;

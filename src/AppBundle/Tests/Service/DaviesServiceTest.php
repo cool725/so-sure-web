@@ -430,7 +430,10 @@ class DaviesServiceTest extends WebTestCase
         $this->insureWarningExists('/finalSuspicion/');
     }
 
-
+    private function getRandomClaimNumber()
+    {
+        return sprintf('%6d', rand(1, 999999));
+    }
 
     private function getRandomPolicyNumber()
     {
@@ -905,6 +908,8 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->excess = 6;
         $daviesClaim->reserved = 0;
         $daviesClaim->replacementMake = 'Apple';
+        $daviesClaim->replacementModel = 'iPhone';
+        $daviesClaim->replacementReceivedDate = new \DateTime();
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr foo bar';
 
@@ -1523,20 +1528,30 @@ class DaviesServiceTest extends WebTestCase
     {
         $policy = static::createUserPolicy(true);
         $policy->getUser()->setEmail(static::generateEmail('testSaveClaimsNoClaimsFound', $this));
-        $claim = new Claim();
-        $claim->setType(Claim::TYPE_LOSS);
-        $claim->setStatus(Claim::STATUS_APPROVED);
-        $claim->setNumber(1234567890);
-        $policy->addClaim($claim);
+        $claim1 = new Claim();
+        $claim1->setType(Claim::TYPE_LOSS);
+        $claim1->setStatus(Claim::STATUS_APPROVED);
+        $claim1->setNumber($this->getRandomClaimNumber());
+        $policy->addClaim($claim1);
+
+        $yesterday = new \DateTime();
+        $yesterday = $yesterday->sub(new \DateInterval('P1D'));
+        $claim2 = new Claim();
+        $claim2->setRecordedDate($yesterday);
+        $claim2->setType(Claim::TYPE_LOSS);
+        $claim2->setStatus(Claim::STATUS_APPROVED);
+        $claim2->setNumber($this->getRandomClaimNumber());
+        $policy->addClaim($claim2);
 
         static::$dm->persist($policy->getUser());
         static::$dm->persist($policy);
-        static::$dm->persist($claim);
+        static::$dm->persist($claim1);
+        static::$dm->persist($claim2);
         static::$dm->flush();
 
         $daviesClaim = new DaviesClaim();
-        $daviesClaim->policyNumber = $claim->getPolicy()->getPolicyNumber();
-        $daviesClaim->claimNumber = '1234567890';
+        $daviesClaim->policyNumber = $claim1->getPolicy()->getPolicyNumber();
+        $daviesClaim->claimNumber = $claim2->getNumber();
         $daviesClaim->insuredName = 'foo bar';
         $daviesClaim->initialSuspicion = 'no';
         $daviesClaim->finalSuspicion = 'no';
@@ -1551,11 +1566,12 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaims = array($daviesClaim);
 
         static::$daviesService->saveClaims('', $daviesClaims);
-        $this->insureErrorDoesNotExist('/1234567890/');
+        $this->insureErrorDoesNotExist('/'.$claim1->getNumber().'/');
+        $this->insureErrorDoesNotExist('/'.$claim2->getNumber().'/');
 
         $daviesClaim = new DaviesClaim();
-        $daviesClaim->policyNumber = $claim->getPolicy()->getPolicyNumber();
-        $daviesClaim->claimNumber = '1234567891';
+        $daviesClaim->policyNumber = $claim1->getPolicy()->getPolicyNumber();
+        $daviesClaim->claimNumber = $this->getRandomClaimNumber();
         $daviesClaim->status = DaviesClaim::STATUS_CLOSED;
         $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
         $daviesClaim->insuredName = 'foo bar';
@@ -1568,6 +1584,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaims = array($daviesClaim);
 
         static::$daviesService->saveClaims('', $daviesClaims);
-        $this->insureErrorExists('/1234567890/');
+        $this->insureErrorDoesNotExist('/'.$claim1->getNumber().'/');
+        $this->insureErrorExists('/'.$claim2->getNumber().'/');
     }
 }

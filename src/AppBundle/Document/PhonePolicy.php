@@ -617,7 +617,10 @@ class PhonePolicy extends Policy
 
     public function isPicSureValidated()
     {
-        return $this->getPicSureStatus() == self::PICSURE_STATUS_APPROVED;
+        return in_array($this->getPicSureStatus(), [
+            self::PICSURE_STATUS_APPROVED,
+            self::PICSURE_STATUS_PREAPPROVED
+        ]);
     }
 
     public function getPolicyPicSureFiles()

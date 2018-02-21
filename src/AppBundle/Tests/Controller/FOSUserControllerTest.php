@@ -14,6 +14,12 @@ class FOSUserControllerTest extends BaseControllerTest
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
 
+    public function setUp()
+    {
+        parent::setUp();
+        self::$redis->flushdb();
+    }
+
     public function tearDown()
     {
     }

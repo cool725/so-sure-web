@@ -84,12 +84,6 @@ class LaunchUserService
             $this->mailchimp->subscribe($user->getEmail());
         }
 
-        /**
-         * Not necessary to email once we launch
-        if ($userCreated || $resend) {
-            $this->sendEmail($existingUser);
-        }
-        */
         \AppBundle\Classes\NoOp::ignore([$resend]);
 
         return ['user' => $existingUser, 'new' => $userCreated];
@@ -116,23 +110,5 @@ class LaunchUserService
         $referralUrl = $this->shortLink->addShortLink($url);
 
         return $referralUrl;
-    }
-
-    /**
-     * Send user a pre-launch email
-     *
-     * @param User $user
-     */
-    public function sendEmail(User $user)
-    {
-        $referralUrl = $this->getShortLink($user->getId());
-        $this->mailer->sendTemplate(
-            'Welcome to so-sure',
-            $user->getEmail(),
-            'AppBundle:Email:preLaunch.html.twig',
-            ['referral_url' => $referralUrl],
-            'AppBundle:Email:preLaunch.txt.twig',
-            ['referral_url' => $referralUrl]
-        );
     }
 }
