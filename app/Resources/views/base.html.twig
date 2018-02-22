@@ -145,9 +145,6 @@
             <script src="/components/bootstrap-sass/bootstrap.js"></script>
         {% endif %}
 
-        {% if environment != 'prod' %}
-        {% endif %}
-
         {# Javascript #}
         {% block javascripts %}
             {% if hide_cookie_warning is defined and hide_cookie_warning %}
@@ -159,6 +156,12 @@
                 {% javascripts
                 'components/cookieconsent/cookieconsent.min.js'
                 '@AppBundle/Resources/public/js/*' %}
+                <script src="{{ asset_url }}"></script>
+                {% endjavascripts %}
+            {% endif %}
+            {% if environment != 'prod' %}
+                {% javascripts
+                '@AppBundle/Resources/public/js/dev/*' %}
                 <script src="{{ asset_url }}"></script>
                 {% endjavascripts %}
             {% endif %}
