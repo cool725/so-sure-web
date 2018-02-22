@@ -1050,7 +1050,7 @@ class UserController extends BaseController
         );
 
         $this->get('app.sixpack')->convert(
-            SixpackService::EXPERIMENT_QUOTE_SECTIONS,
+            SixpackService::EXPERIMENT_NEW_QUOTE_DESIGN,
             SixpackService::KPI_POLICY_PURCHASE
         );
 
