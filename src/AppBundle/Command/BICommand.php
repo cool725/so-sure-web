@@ -172,7 +172,7 @@ class BICommand extends ContainerAwareCommand
             '"First Campaign Source"',
             '"First Referer"',
             '"Make"',
-            '""Make/Model"',
+            '"Make/Model"',
         ]);
         foreach ($policies as $policy) {
             $user = $policy->getUser();
