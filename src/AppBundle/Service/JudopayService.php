@@ -984,8 +984,8 @@ class JudopayService
             // web payment, so no device dna
             \AppBundle\Classes\NoOp::ignore([]);
         } else {
-            // We should always have the clientDetails
-            $this->logger->warning(sprintf('Missing JudoPay DeviceDna for user %s', $user->getId()));
+            // May not have for older customers
+            $this->logger->info(sprintf('Missing JudoPay DeviceDna for user %s', $user->getId()));
         }
 
         // populate the required data fields.
