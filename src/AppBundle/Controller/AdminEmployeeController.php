@@ -457,6 +457,11 @@ class AdminEmployeeController extends BaseController
         $swapPaymentPlanForm = $this->get('form.factory')
             ->createNamedBuilder('swap_payment_plan_form')->add('swap', SubmitType::class)
             ->getForm();
+        $payPolicyForm = $this->get('form.factory')
+            ->createNamedBuilder('pay_policy_form')
+            ->add('monthly', SubmitType::class)
+            ->add('yearly', SubmitType::class)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('cancel_form')) {
@@ -864,6 +869,39 @@ class AdminEmployeeController extends BaseController
                     );
                     // @codingStandardsIgnoreEnd
                 }
+            } elseif ($request->request->has('swap_payment_plan_form')) {
+                $payPolicyForm->handleRequest($request);
+                if ($payPolicyForm->isValid()) {
+                    $date = new \DateTime();
+                    $phone = $policy->getPhone();
+                    if ($payPolicyForm->get('monthly')->isClicked()) {
+                        $amount = $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(null, $date);
+                    } elseif ($payPolicyForm->get('yearly')->isClicked()) {
+                        $amount = $phone->getCurrentPhonePrice()->getYearlyPremiumPrice(null, $date);
+                    } else {
+                        throw new \Exception('1 or 12 payments only');
+                    }
+
+                    $details = $judopay->runTokenPayment(
+                        $policy->getUser(),
+                        $amount,
+                        $date->getTimestamp(),
+                        $policy->getId()
+                    );
+                    $judopay->add(
+                        $policy,
+                        $details['receiptId'],
+                        $details['consumer']['consumerToken'],
+                        $details['cardDetails']['cardToken'],
+                        Payment::SOURCE_TOKEN,
+                        $policy->getUser()->getPaymentMethod()->getDeviceDna(),
+                        $date
+                    );
+                    $this->addFlash(
+                        'success',
+                        'Policy is paid for'
+                    );
+                }
             }
         }
         $checks = $fraudService->runChecks($policy);
@@ -893,6 +931,7 @@ class AdminEmployeeController extends BaseController
             'debt_form' => $debtForm->createView(),
             'picsure_form' => $picsureForm->createView(),
             'swap_payment_plan_form' => $swapPaymentPlanForm->createView(),
+            'pay_policy_form' => $payPolicyForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),
