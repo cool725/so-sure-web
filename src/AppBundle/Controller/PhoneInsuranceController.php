@@ -447,10 +447,11 @@ class PhoneInsuranceController extends BaseController
             'slider_test' => 'slide-me',
         );
 
-        $exp = $this->get('app.sixpack')->participate(
+        $exp = $this->sixpack(
+            $request,
             SixpackService::EXPERIMENT_NEW_QUOTE_DESIGN,
             ['old-quote', 'new-quote-design'],
-            false
+            true
         );
 
         if ($request->get('force')) {
@@ -459,7 +460,7 @@ class PhoneInsuranceController extends BaseController
 
         $template = 'AppBundle:PhoneInsurance:quote.html.twig';
 
-        if ($exp == 'new-sticky-quote') {
+        if ($exp == 'new-quote-design') {
             $template = 'AppBundle:PhoneInsurance:quoteNewDesign.html.twig';
         }
 
