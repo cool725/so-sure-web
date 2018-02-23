@@ -895,6 +895,8 @@ class DaviesServiceTest extends WebTestCase
         $claim = new Claim();
         $policy->addClaim($claim);
 
+        $tenDaysAgo = new \DateTime();
+        $tenDaysAgo = $tenDaysAgo->sub(new \DateInterval('P10D'));
         $daviesClaim = new DaviesClaim();
         $daviesClaim->claimNumber = 1;
         $daviesClaim->status = 'open';
@@ -909,12 +911,42 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->reserved = 0;
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone';
-        $daviesClaim->replacementReceivedDate = new \DateTime();
+        $daviesClaim->replacementReceivedDate = $tenDaysAgo;
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr foo bar';
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
         $this->insureErrorExists('/does not have the correct phone replacement cost/');
+    }
+
+    public function testValidateClaimPhoneReplacementCostsCorrectTooRecent()
+    {
+        $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        $policy->addClaim($claim);
+
+        $fourDaysAgo = new \DateTime();
+        $fourDaysAgo = $fourDaysAgo->sub(new \DateInterval('P4D'));
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = 1;
+        $daviesClaim->status = 'open';
+        $daviesClaim->incurred = 6.68;
+        $daviesClaim->unauthorizedCalls = 1.01;
+        $daviesClaim->accessories = 1.03;
+        $daviesClaim->phoneReplacementCost = -50;
+        $daviesClaim->transactionFees = 1.11;
+        $daviesClaim->handlingFees = 1.19;
+        $daviesClaim->reciperoFee = 1.27;
+        $daviesClaim->excess = 6;
+        $daviesClaim->reserved = 0;
+        $daviesClaim->replacementMake = 'Apple';
+        $daviesClaim->replacementModel = 'iPhone';
+        $daviesClaim->replacementReceivedDate = $fourDaysAgo;
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->insureErrorDoesNotExist('/does not have the correct phone replacement cost/');
     }
 
     public function testValidateClaimDetailsIncurredCorrect()
@@ -1195,20 +1227,36 @@ class DaviesServiceTest extends WebTestCase
         //$daviesClaim->replacementModel = 'iPhone 8';
         //$daviesClaim->replacementReceivedDate = new \DateTime('2016-01-01');
 
+        $daviesClaim->status = 'closed';
+        $daviesClaim->miStatus = DaviesClaim::MISTATUS_WITHDRAWN;
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $this->insureErrorExists('/the replacement data not recorded/');
-        $this->insureErrorExists('/received date/');
-        $this->insureErrorExists('/imei/');
-        $this->insureErrorExists('/phone/');
+        $this->insureErrorExists('/previously approved, however is now withdrawn/');
+        $this->insureErrorDoesNotExist('/previously approved, however no longer appears to be/');
+        $this->insureErrorDoesNotExist('/the replacement data not recorded/');
+        $this->insureErrorDoesNotExist('/received date/');
+        $this->insureErrorDoesNotExist('/imei/');
+        $this->insureErrorDoesNotExist('/phone/');
+
+        self::$daviesService->clearErrors();
+
+        $daviesClaim->status = 'open';
+        $daviesClaim->miStatus = null;
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->insureErrorExists('/previously approved, however no longer appears to be/');
+        $this->insureErrorDoesNotExist('/the replacement data not recorded/');
+        $this->insureErrorDoesNotExist('/received date/');
+        $this->insureErrorDoesNotExist('/imei/');
+        $this->insureErrorDoesNotExist('/phone/');
 
         self::$daviesService->clearErrors();
 
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 8';
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
-        $this->insureErrorExists('/the replacement data not recorded/');
-        $this->insureErrorExists('/received date/');
-        $this->insureErrorExists('/imei/');
+        $this->insureErrorExists('/previously approved, however no longer appears to be/');
+        $this->insureErrorDoesNotExist('/the replacement data not recorded/');
+        $this->insureErrorDoesNotExist('/received date/');
+        $this->insureErrorDoesNotExist('/imei/');
         $this->insureErrorDoesNotExist('/phone/');
 
         self::$daviesService->clearErrors();
