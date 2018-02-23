@@ -238,15 +238,7 @@ class DaviesService extends S3EmailService
         }
         if ($daviesClaim->getClaimStatus()) {
             $claim->setStatus($daviesClaim->getClaimStatus());
-        } elseif ($daviesClaim->replacementImei && $claim->getStatus() == Claim::STATUS_INREVIEW) {
-            // If there's a replacement IMEI, the claim has definitely been approved
-            $claim->setStatus(Claim::STATUS_APPROVED);
-        } elseif ($daviesClaim->replacementReceivedDate && $claim->getStatus() == Claim::STATUS_INREVIEW) {
-            // If there's a replacement received date, the claim has definitely been approved
-            $claim->setStatus(Claim::STATUS_APPROVED);
-        } elseif ($daviesClaim->phoneReplacementCost < 0 && $claim->getStatus() == Claim::STATUS_INREVIEW) {
-            // If phone replacement value is negative, an excess payment has been applied to the account
-            // e.g. the user paid the excess, which indicates that the claim was approved
+        } elseif ($daviesClaim->isApproved() && $claim->getStatus() == Claim::STATUS_INREVIEW) {
             $claim->setStatus(Claim::STATUS_APPROVED);
         }
 
@@ -438,13 +430,22 @@ class DaviesService extends S3EmailService
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
-        if ($daviesClaim->isPhoneReplacementCostCorrect() === false) {
-            $msg = sprintf(
-                'Claim %s does not have the correct phone replacement cost. Expected > 0 Actual %0.2f',
-                $daviesClaim->claimNumber,
-                $daviesClaim->phoneReplacementCost
-            );
-            $this->errors[$daviesClaim->claimNumber][] = $msg;
+        $approvedDate = null;
+        if ($claim->getApprovedDate()) {
+            $approvedDate = $this->startOfDay(clone $claim->getApprovedDate());
+        } elseif ($daviesClaim->replacementReceivedDate) {
+            $approvedDate = $this->startOfDay(clone $daviesClaim->replacementReceivedDate);
+        }
+        if ($approvedDate) {
+            $fiveBusinessDays = $this->addBusinessDays($approvedDate, 5);
+            if ($daviesClaim->isPhoneReplacementCostCorrect() === false && $fiveBusinessDays < new \DateTime()) {
+                $msg = sprintf(
+                    'Claim %s does not have the correct phone replacement cost. Expected > 0 Actual %0.2f',
+                    $daviesClaim->claimNumber,
+                    $daviesClaim->phoneReplacementCost
+                );
+                $this->errors[$daviesClaim->claimNumber][] = $msg;
+            }
         }
 
         // We should always validate Recipero Fee if the fee is present or if the claim is closed
@@ -486,7 +487,22 @@ class DaviesService extends S3EmailService
 
         $twoWeekAgo = new \DateTime();
         $twoWeekAgo = $twoWeekAgo->sub(new \DateInterval('P2W'));
-        if ($claim->getApprovedDate() && $claim->getApprovedDate() <= $twoWeekAgo) {
+        if ($claim->getApprovedDate() && in_array($daviesClaim->getClaimStatus(), [
+            Claim::STATUS_DECLINED,
+            Claim::STATUS_WITHDRAWN
+        ])) {
+            $msg = sprintf(
+                'Claim %s was previously approved, however is now withdrawn/declined. SO-SURE to remove approved date',
+                $daviesClaim->claimNumber
+            );
+            $this->errors[$daviesClaim->claimNumber][] = $msg;
+        } elseif ($claim->getApprovedDate() && !$daviesClaim->isApproved()) {
+            $msg = sprintf(
+                'Claim %s was previously approved, however no longer appears to be. SO-SURE to remove approved date',
+                $daviesClaim->claimNumber
+            );
+            $this->errors[$daviesClaim->claimNumber][] = $msg;
+        } elseif ($claim->getApprovedDate() && $claim->getApprovedDate() <= $twoWeekAgo) {
             $items = [];
             if (!$daviesClaim->replacementReceivedDate) {
                 $items[] = 'received date';
