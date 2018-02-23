@@ -1215,7 +1215,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->incurred = 1;
         $daviesClaim->unauthorizedCalls = 1.01;
         $daviesClaim->accessories = 1.03;
-        $daviesClaim->phoneReplacementCost = 1.07;
+        $daviesClaim->phoneReplacementCost = 0;
         $daviesClaim->transactionFees = 1.11;
         $daviesClaim->handlingFees = 1.19;
         $daviesClaim->reciperoFee = 1.27;
@@ -1246,7 +1246,7 @@ class DaviesServiceTest extends WebTestCase
         $this->insureErrorDoesNotExist('/the replacement data not recorded/');
         $this->insureErrorDoesNotExist('/received date/');
         $this->insureErrorDoesNotExist('/imei/');
-        $this->insureErrorDoesNotExist('/phone/');
+        $this->insureErrorDoesNotExist('/; phone/');
 
         self::$daviesService->clearErrors();
 
@@ -1257,7 +1257,7 @@ class DaviesServiceTest extends WebTestCase
         $this->insureErrorDoesNotExist('/the replacement data not recorded/');
         $this->insureErrorDoesNotExist('/received date/');
         $this->insureErrorDoesNotExist('/imei/');
-        $this->insureErrorDoesNotExist('/phone/');
+        $this->insureErrorDoesNotExist('/; phone/');
 
         self::$daviesService->clearErrors();
 
@@ -1266,7 +1266,7 @@ class DaviesServiceTest extends WebTestCase
         $this->insureErrorExists('/the replacement data not recorded/');
         $this->insureErrorDoesNotExist('/received date/');
         $this->insureErrorExists('/imei/');
-        $this->insureErrorDoesNotExist('/phone/');
+        $this->insureErrorDoesNotExist('/; phone/');
 
         self::$daviesService->clearErrors();
 
@@ -1275,7 +1275,7 @@ class DaviesServiceTest extends WebTestCase
         $this->insureErrorDoesNotExist('/the replacement data not recorded/');
         $this->insureErrorDoesNotExist('/received date/');
         $this->insureErrorDoesNotExist('/imei/');
-        $this->insureErrorDoesNotExist('/phone/');
+        $this->insureErrorDoesNotExist('/; phone/');
     }
 
     public function testPostValidateClaimDetailsReceivedDate()
