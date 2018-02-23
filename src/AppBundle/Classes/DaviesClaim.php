@@ -357,7 +357,9 @@ class DaviesClaim extends DaviesExcel
         // Replacement imei or received date indicate a phone has been dispatched or received
         // Replacement make/model should also indicate but problematic as davies often enteres incorrectly
         // If phone replacement value is negative, an excess payment has been applied to the account
-        if ($this->replacementImei || $this->replacementReceivedDate || $this->phoneReplacementCost < 0) {
+        // If phone replacement value is positive, phone has been paid out
+        if ($this->replacementImei || $this->replacementReceivedDate || $this->phoneReplacementCost < 0 ||
+            $this->phoneReplacementCost > 0) {
             return true;
         }
 
