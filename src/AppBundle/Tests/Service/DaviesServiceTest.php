@@ -1227,7 +1227,8 @@ class DaviesServiceTest extends WebTestCase
         //$daviesClaim->replacementModel = 'iPhone 8';
         //$daviesClaim->replacementReceivedDate = new \DateTime('2016-01-01');
 
-        $daviesClaim->status = 'withdrawn';
+        $daviesClaim->status = 'closed';
+        $daviesClaim->miStatus = DaviesClaim::MISTATUS_WITHDRAWN;
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
         $this->insureErrorExists('/previously approved, however is now withdrawn/');
         $this->insureErrorDoesNotExist('/previously approved, however no longer appears to be/');
@@ -1239,6 +1240,7 @@ class DaviesServiceTest extends WebTestCase
         self::$daviesService->clearErrors();
 
         $daviesClaim->status = 'open';
+        $daviesClaim->miStatus = null;
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
         $this->insureErrorExists('/previously approved, however no longer appears to be/');
         $this->insureErrorDoesNotExist('/the replacement data not recorded/');
