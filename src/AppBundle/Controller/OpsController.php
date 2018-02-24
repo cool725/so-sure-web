@@ -100,6 +100,7 @@ class OpsController extends BaseController
         $invitation = $invitationRepo->findOneBy(['accepted' => null, 'rejected' => null, 'cancelled' => null]);
 
         $phoneRepo = $dm->getRepository(Phone::class);
+        $activePhone = $phoneRepo->findOneBy(['active' => true]);
         $upcomingPhone = $phoneRepo->findOneBy(['active' => true, 'phonePrices' => null]);
 
         $policyRepo = $dm->getRepository(Policy::class);
@@ -246,6 +247,7 @@ class OpsController extends BaseController
             'fully_expired_policy_nocashback' => $fullyExpiredPolicyNoCashback,
             'fully_expired_policy_cashback' => $fullyExpiredPolicyCashback,
             'upcoming_phone' => $upcomingPhone,
+            'active_phone' => $activePhone,
         ];
     }
 

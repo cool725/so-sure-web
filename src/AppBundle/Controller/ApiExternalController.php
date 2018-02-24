@@ -181,10 +181,10 @@ class ApiExternalController extends BaseController
     }
 
     /**
-     * @Route("/gocompare", name="api_key_gocompare")
+     * @Route("/gocompare/feed", name="api_external_gocompare_feed")
      * @Method({"POST"})
      */
-    public function goCompareAction(Request $request)
+    public function goCompareFeedAction(Request $request)
     {
         try {
             $goCompareKey = $this->getParameter('gocompare_key');
@@ -244,9 +244,45 @@ class ApiExternalController extends BaseController
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
-            $this->get('logger')->error('Error in api goCompareAction.', ['exception' => $e]);
+            $this->get('logger')->error('Error in api goCompareFeedAction.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
+    }
+
+    /**
+     * @Route("/gocompare/deeplink", name="api_external_gocompare_deeplink")
+     * @Method({"POST"})
+     */
+    public function goCompareDeeplinkAction(Request $request)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $reference = $this->getRequestString($request, 'reference');
+        $phone = $repo->find($reference);
+        if (!$phone) {
+            throw $this->createNotFoundException('Phone reference not found');
+        }
+
+        $this->setPhoneSession($request, $phone);
+
+        $user = new User();
+        $user->setFirstName($this->getRequestString($request, 'first_name'));
+        $user->setLastName($this->getRequestString($request, 'surname'));
+        $user->setEmail($this->getRequestString($request, 'email_address'));
+        $user->setBirthday(\DateTime::createFromFormat('Y-m-d', $this->getRequestString($request, 'dob')));
+        $user->setEnabled(true);
+
+        $userManager = $this->get('fos_user.user_manager');
+        $userManager->updateUser($user, true);
+        $dm->persist($user);
+        $dm->flush();
+
+        $this->get('fos_user.security.login_manager')->loginUser(
+            $this->getParameter('fos_user.firewall_name'),
+            $user
+        );
+
+        return $this->redirectToRoute('purchase');
     }
 }

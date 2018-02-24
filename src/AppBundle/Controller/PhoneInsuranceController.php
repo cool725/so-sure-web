@@ -239,20 +239,7 @@ class PhoneInsuranceController extends BaseController
             return new RedirectResponse($this->generateUrl('homepage'));
         }
 
-        $session = $request->getSession();
-        $session->set('quote', $phone->getId());
-        if ($phone->getMemory()) {
-            $session->set('quote_url', $this->generateUrl('quote_make_model_memory', [
-                'make' => $phone->getMake(),
-                'model' => $phone->getEncodedModel(),
-                'memory' => $phone->getMemory(),
-            ], UrlGeneratorInterface::ABSOLUTE_URL));
-        } else {
-            $session->set('quote_url', $this->generateUrl('quote_make_model', [
-                'make' => $phone->getMake(),
-                'model' => $phone->getEncodedModel(),
-            ], UrlGeneratorInterface::ABSOLUTE_URL));
-        }
+        $this->setPhoneSession($request, $phone);
 
         // We have run various tests for cpc traffic in the page where both manufacturer and homepage
         // outperformed quote page. Also homepage was better than manufacturer page
