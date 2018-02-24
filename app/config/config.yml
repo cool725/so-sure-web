@@ -441,6 +441,9 @@ nelmio_security:
                 - https://syndication.twitter.com
                 - https://www.google-analytics.com
                 - https://www.linkedin.com
+                - https://connect.facebook.net
+                - https://graylog.hotjar.com
+                - https://stats.g.doubleclick.net
                 - 'data:'
             font-src:
                 - 'self'
