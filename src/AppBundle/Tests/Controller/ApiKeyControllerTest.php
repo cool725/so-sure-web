@@ -45,6 +45,10 @@ class ApiKeyControllerTest extends BaseControllerTest
     }
 
     // gocompare
+
+    /**
+     *
+     */
     public function testGoCompare()
     {
         $data = '{"request": {
