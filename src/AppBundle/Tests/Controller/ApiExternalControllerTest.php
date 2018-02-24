@@ -4,9 +4,10 @@ namespace AppBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
+use AppBundle\Document\Phone;
 use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Classes\ApiErrorCode;
-use AppBundle\Classes\GoCompare;
+use AppBundle\Classes\GoCompare;    
 use AppBundle\Service\RateLimitService;
 
 /**
@@ -14,6 +15,14 @@ use AppBundle\Service\RateLimitService;
  */
 class ApiExternalControllerTest extends BaseControllerTest
 {
+    protected static $phone;
+    public static function setUpBeforeClass()
+    {
+        parent::setUpBeforeClass();
+        $phoneRepo = self::$dm->getRepository(Phone::class);
+        self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 6', 'memory' => 64]);
+    }
+
     // zendesk
 
     /**
@@ -323,7 +332,7 @@ class ApiExternalControllerTest extends BaseControllerTest
     /**
      *
      */
-    public function testGoCompare()
+    public function testGoCompareFeed()
     {
         $data = '{"request": {
   "gadgets" : [
@@ -379,7 +388,7 @@ class ApiExternalControllerTest extends BaseControllerTest
   ]
 }}';
         $url = sprintf(
-            '/external/gocompare?gocompare_key=%s',
+            '/external/gocompare/feed?gocompare_key=%s',
             static::$container->getParameter('gocompare_key')
         );
 
@@ -395,5 +404,30 @@ class ApiExternalControllerTest extends BaseControllerTest
         );
         $data = $this->verifyResponse(200);
         $this->assertEquals(45, count($data['response']), json_encode($data));
+    }
+
+    public function testGoCompareDeeplink()
+    {
+        $url = sprintf(
+            '/external/gocompare/deeplink'
+        );
+        $data  = [
+            'first_name' => 'foo',
+            'surname' => 'bar',
+            'email_address' => static::generateEmail('testGoCompareDeeplink', $this),
+            'dob' => '2018-01-01',
+            'reference' => static::$phone->getId(),
+        ];
+
+        $crawler =  static::$client->request(
+            "POST",
+            $url,
+            array(),
+            array(),
+            array(),
+            $data
+        );
+
+        $data = $this->verifyResponse(200);
     }
 }
