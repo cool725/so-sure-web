@@ -11,6 +11,6 @@ class Additions20171025 extends LoadPhoneData implements FixtureInterface
 {
     public function load(ObjectManager $manager)
     {
-        $this->loadCsv($manager, '20171025.csv', new \DateTime('2017-06-01'));
+        $this->loadCsv($manager, '20171025.csv', new \DateTime('2017-10-01'));
     }
 }

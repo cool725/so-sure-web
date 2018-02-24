@@ -15,6 +15,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\OptOut\EmailOptOut;
 
 use AppBundle\Classes\ApiErrorCode;
+use AppBundle\Classes\GoCompare;
 use AppBundle\Service\RateLimitService;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -174,6 +175,76 @@ class ApiExternalController extends BaseController
             return new JsonResponse([]);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api mixpanel delete.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
+     * @Route("/gocompare", name="api_key_gocompare")
+     * @Method({"POST"})
+     */
+    public function goCompareAction(Request $request)
+    {
+        try {
+            $goCompareKey = $this->getParameter('gocompare_key');
+            if ($request->get('gocompare_key') != $goCompareKey) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'Invalid key', 404);
+            }
+
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(Phone::class);
+
+            $phones = [];
+            $data = json_decode($request->getContent(), true)['request'];
+            foreach ($data['gadgets'] as $key => $gadget) {
+                $id = $gadget['gadget']['gadget_id'];
+                if ($id && $gadget['gadget']['loss_cover'] && isset(GoCompare::$models[$id])) {
+                    if ($query = GoCompare::$models[$id]) {
+                        if ($phone = $repo->findOneBy(array_merge($query, ['active' => true]))) {
+                            $phones[] = $phone;
+                        }
+                    }
+                }
+            }
+
+            $quotes = [];
+            foreach ($phones as $phone) {
+                $currentPhonePrice = $phone->getCurrentPhonePrice();
+                if (!$currentPhonePrice) {
+                    continue;
+                }
+
+                // If there is an end date, then quote should be valid until then
+                $quoteValidTo = $currentPhonePrice->getValidTo();
+                if (!$quoteValidTo) {
+                    $quoteValidTo = new \DateTime();
+                    $quoteValidTo->add(new \DateInterval('P1D'));
+                }
+
+                $promoAddition = 0;
+                $isPromoLaunch = false;
+
+                $quotes[] = ['rate' => [
+                    'reference' => $phone->getId(),
+                    'product_name' => $phone->__toString(),
+                    'monthly_premium' => $currentPhonePrice->getMonthlyPremiumPrice(),
+                    'annual_premium' => $currentPhonePrice->getYearlyPremiumPrice(),
+                    'additional_gadget' => 0,
+                ]];
+            }
+
+            $response = [
+                'response' => $quotes,
+            ];
+
+            return new JsonResponse($response);
+        } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api goCompareAction.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
