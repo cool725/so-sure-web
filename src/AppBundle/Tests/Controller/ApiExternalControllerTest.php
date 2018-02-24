@@ -7,7 +7,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\Phone;
 use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Classes\ApiErrorCode;
-use AppBundle\Classes\GoCompare;    
+use AppBundle\Classes\GoCompare;
 use AppBundle\Service\RateLimitService;
 
 /**
