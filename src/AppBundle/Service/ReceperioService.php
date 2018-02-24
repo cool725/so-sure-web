@@ -675,18 +675,22 @@ class ReceperioService extends BaseImeiService
                 } catch (ReciperoManualProcessException $e) {
                     if (!in_array($e->getCode(), [ReciperoManualProcessException::EMPTY_MAKES,
                         ReciperoManualProcessException::NO_MODEL_REFERENCE])) {
+                        // Don't pass exception as param (string ok) here. Message missing/confusing in rollbar
                         $this->logger->error(
-                            sprintf("Unable to recheck iPhone using imei as serial number '%s'", $imei),
-                            ['exception' => $e]
+                            sprintf(
+                                "Unable to recheck iPhone using imei as serial number '%s'. Exception: %s",
+                                $imei,
+                                $e->getMessage()
+                            )
                         );
                     }
                 }
             } else {
                 if (!in_array($e->getCode(), [ReciperoManualProcessException::EMPTY_MAKES,
                     ReciperoManualProcessException::NO_MODEL_REFERENCE])) {
+                    // Don't pass exception as param (string ok) here. Message missing/confusing in rollbar
                     $this->logger->error(
-                        sprintf("Unable to check serial number '%s'", $serialNumber),
-                        ['exception' => $e]
+                        sprintf("Unable to check serial number '%s'. Exception: %s", $serialNumber, $e->getMessage())
                     );
                 }
             }
