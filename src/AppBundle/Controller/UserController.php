@@ -112,9 +112,7 @@ class UserController extends BaseController
         }
 
         $renewMessage = false;
-        
         foreach ($user->getValidPolicies(true) as $checkPolicy) {
-            
             if ($checkPolicy->notifyRenewal() && !$checkPolicy->isRenewed() && !$checkPolicy->hasCashback()) {
                 $this->addFlash(
                     'success',
@@ -135,8 +133,6 @@ class UserController extends BaseController
                 } elseif ($checkPolicy->getPhone()->isGooglePlay()) {
                     $url = $this->generateUrl('download_google', ['medium' => 'pic-sure-warning']);
                 }
-               
-               
             }
         }
         if (!$renewMessage) {
@@ -400,19 +396,16 @@ class UserController extends BaseController
                 );
             }
         }
-          if ($url) {
-                    
+        if ($url) {
             $this->addFlash(
                 'warning',
                 sprintf(
                     'Your excess for policy %s is £150. <a href="%s">Reduce</a> it with pic-sure',
                     $checkPolicy->getPolicyNumber(),
                     $url
-                    )
-                );
-                  
-            } else {
-                
+                )
+            );
+        } else {
                 // @codingStandardsIgnoreStart
                 $this->addFlash(
                     'warning',
@@ -422,7 +415,7 @@ class UserController extends BaseController
                     )
                 );
                 // @codingStandardsIgnoreEnd
-            }
+        }
 
         $sixpack = $this->get('app.sixpack');
         $shareExperiment = $sixpack->participate(
