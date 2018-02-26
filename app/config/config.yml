@@ -386,36 +386,65 @@ nelmio_security:
             default-src:
                 - 'self'
                 - https://maxcdn.bootstrapcdn.com
-                - https://www.digits.com
+                - https://maxcdn.bootstrapcdn.com
+                - http://maxcdn.bootstrapcdn.com
+                - https://www.digits.com # necessary?
+                - https://*.optimizely.com
+                - https://*.intercomcdn.com
+                - https://*.intercom.io
+                - wss://*.intercom.io # necessary?
+                - wss://*.hotjar.com # necessary?
+                - https://*.hotjar.com
+                - https://app.getsentry.com # necessary?
+                - https://player.vimeo.com
+                - https://*.facebook.com
+                - http://*.facebook.com
+                - https://connect.facebook.net
+                - https://api.prodpad.com # necessary?
+                - https://*.postcodeanywhere.co.uk
+                - gsa://onpageload # necessary?
+                - https://*.doubleclick.net
+                - https://cdn.so-sure.com
+                - https://www.youtube.com
+                - https://*.fastly.net
+                - https://*.iubenda.com
+                - https://*.googletagmanager.com
+                - https://*.googlesyndication.com
+                - https://www.google-analytics.com
+                - https://*.google.com/ # necessary?
+                - https://*.google.ie # necessary?
+                - https://*.google.ie # necessary?
+                - https://platform.twitter.com
+                - https://syndication.twitter.com
+                - https://angel.co
+                - 'data:'
+            connect-src:
+                - 'self'
                 - https://*.optimizely.com
                 - https://*.intercomcdn.com
                 - https://*.intercom.io
                 - wss://*.intercom.io
-                - wss://*.hotjar.com
-                - https://app.getsentry.com
+                - https://app.getsentry.com # necessary?
                 - https://player.vimeo.com
                 - https://*.facebook.com
                 - http://*.facebook.com
-                - https://api.prodpad.com
+                - https://connect.facebook.net
                 - https://*.postcodeanywhere.co.uk
                 - https://*.hotjar.com
-                - https://*.google.ie
-                - gsa://onpageload
-                - https://*.doubleclick.net
-                - https://*.google.ie
-                - https://cdn.so-sure.com
+                - wss://*.hotjar.com
+                - https://graylog.hotjar.com # necessary?
+                - gsa://onpageload # necessary?
                 - https://www.youtube.com
                 - https://*.fastly.net
-                - https://maxcdn.bootstrapcdn.com
-                - http://maxcdn.bootstrapcdn.com
                 - https://*.iubenda.com
+                - https://*.google.ie # necessary?
                 - https://*.googletagmanager.com
                 - https://*.googlesyndication.com
-                - https://*.google.com/
+                - https://www.google-analytics.com
+                - https://stats.g.doubleclick.net
                 - https://platform.twitter.com
                 - https://syndication.twitter.com
-                - https://angel.co
-                - https://www.google-analytics.com
+                - https://www.linkedin.com
                 - 'data:'
             font-src:
                 - 'self'
@@ -450,16 +479,12 @@ nelmio_security:
                 - https://*.twimg.com
                 - https://*.twitter.com
                 - https://twitter.com
-                - https://*.digits.com
-                - https://ajax.googleapis.com
+                - https://*.ads-twitter.com
+                - https://*.digits.com # necessary?
                 - https://maxcdn.bootstrapcdn.com
-                - https://www.googletagmanager.com
-                - http://www.googletagmanager.com
-                - https://app.prodpad.com
+                - https://app.prodpad.com # necessary?
                 - https://cdn.iubenda.com
                 - http://cdn.iubenda.com
-                - https://www.google-analytics.com
-                - http://www.google-analytics.com
                 - https://*.facebook.net
                 - http://*.facebook.net
                 - https://*.facebook.com
@@ -468,22 +493,28 @@ nelmio_security:
                 - http://cdn.optimizely.com
                 - https://*.intercom.io
                 - https://*.intercomcdn.com
-                - https://*.ads-twitter.com
                 - https://*.hotjar.com
                 - http://*.hotjar.com
                 - https://*.pcapredict.com
                 - http://*.pcapredict.com
+                - https://ajax.googleapis.com
+                - https://www.google-analytics.com
+                - http://www.google-analytics.com
+                - https://www.googletagmanager.com
+                - http://www.googletagmanager.com
                 - http://*.googleadservices.com
                 - https://*.googleadservices.com
                 - https://*.googlesyndication.com
+                - https://www.googleadservices.com # necessary?
+                - https://*.doubleclick.net
+                - https://www.google.com
+                - https://*.doubleclick.net
                 - https://code.jquery.com
                 - https://cdn.heapanalytics.com
                 - https://*.maxcdn.com
                 - https://*.licdn.com # linkedin
                 - https://*.linkedin.com
                 - https://sdk.accountkit.com
-                - https://*.doubleclick.net
-                - https://www.google.com
                 - https://angel.co
                 # unbounce conversion
                 - https://d3pkntwtp2ukl5.cloudfront.net
@@ -492,8 +523,6 @@ nelmio_security:
                 - https://secure.adnxs.com
                 - https://www.workable.com
                 - 'data:'
-                - https://www.googleadservices.com
-                - https://*.doubleclick.net
                 - https://bat.bing.com
                 # https://en.wikipedia.org/wiki/List_of_Google_domains
                 - https://www.google.com

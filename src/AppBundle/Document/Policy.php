@@ -428,7 +428,7 @@ abstract class Policy
     protected $viewedCancellationPage;
 
     /**
-     * @MongoDB\Boolean()
+     * @MongoDB\Field(type="boolean")
      * @Gedmo\Versioned
      */
     protected $policyDiscountPresent;

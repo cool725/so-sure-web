@@ -161,6 +161,8 @@ class PhoneInsuranceController extends BaseController
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
      * @Route("/insure/{make}+{model}", name="insure_make_model",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
+     * @Route("/purchase-phone/{make}+{model}+{memory}GB", name="purchase_phone_make_model_memory",
+     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
      */
     public function quoteAction(Request $request, $id = null, $make = null, $model = null, $memory = null)
     {
@@ -237,20 +239,7 @@ class PhoneInsuranceController extends BaseController
             return new RedirectResponse($this->generateUrl('homepage'));
         }
 
-        $session = $request->getSession();
-        $session->set('quote', $phone->getId());
-        if ($phone->getMemory()) {
-            $session->set('quote_url', $this->generateUrl('quote_make_model_memory', [
-                'make' => $phone->getMake(),
-                'model' => $phone->getEncodedModel(),
-                'memory' => $phone->getMemory(),
-            ], UrlGeneratorInterface::ABSOLUTE_URL));
-        } else {
-            $session->set('quote_url', $this->generateUrl('quote_make_model', [
-                'make' => $phone->getMake(),
-                'model' => $phone->getEncodedModel(),
-            ], UrlGeneratorInterface::ABSOLUTE_URL));
-        }
+        $this->setPhoneSession($request, $phone);
 
         // We have run various tests for cpc traffic in the page where both manufacturer and homepage
         // outperformed quote page. Also homepage was better than manufacturer page
@@ -259,6 +248,18 @@ class PhoneInsuranceController extends BaseController
                 return new RedirectResponse($this->generateUrl('insure_make', ['make' => $phone->getMake()]));
             } else {
                 return new RedirectResponse($this->generateUrl('homepage'));
+            }
+        } elseif (in_array($request->get('_route'), ['purchase_phone_make_model_memory'])) {
+            $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, [
+                'Location' => 'offsite'
+            ]);
+
+            // Multipolicy should skip user details
+            if ($this->getUser() && $this->getUser()->hasPolicy()) {
+                // don't check for partial partial as quote phone may be different from partial policy phone
+                return $this->redirectToRoute('purchase_step_policy');
+            } else {
+                return $this->redirectToRoute('purchase');
             }
         }
         /*
@@ -354,7 +355,7 @@ class PhoneInsuranceController extends BaseController
                     }
                     $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
 
-                    $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_SECTIONS);
+                    $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_NEW_QUOTE_DESIGN);
 
                     // Multipolicy should skip user details
                     if ($this->getUser() && $this->getUser()->hasPolicy()) {
@@ -377,7 +378,7 @@ class PhoneInsuranceController extends BaseController
                     }
                     $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
 
-                    $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_SECTIONS);
+                    $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_NEW_QUOTE_DESIGN);
 
                     // Multipolicy should skip user details
                     if ($this->getUser() && $this->getUser()->hasPolicy()) {
@@ -447,10 +448,11 @@ class PhoneInsuranceController extends BaseController
             'slider_test' => 'slide-me',
         );
 
-        $exp = $this->get('app.sixpack')->participate(
-            SixpackService::EXPERIMENT_QUOTE_SECTIONS,
-            ['old-sections', 'new-sections'],
-            false
+        $exp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_NEW_QUOTE_DESIGN,
+            ['old-quote', 'new-quote-design'],
+            true
         );
 
         if ($request->get('force')) {
@@ -459,8 +461,8 @@ class PhoneInsuranceController extends BaseController
 
         $template = 'AppBundle:PhoneInsurance:quote.html.twig';
 
-        if ($exp == 'new-sections') {
-            $template = 'AppBundle:PhoneInsurance:quoteNewSections.html.twig';
+        if ($exp == 'new-quote-design') {
+            $template = 'AppBundle:PhoneInsurance:quoteNewDesign.html.twig';
         }
 
         if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {

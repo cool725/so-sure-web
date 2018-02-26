@@ -197,6 +197,16 @@
             <li>
                 <a href="{{ url('launch_usa') }}">USA Page</a>
             </li>
+            <li>
+                <form method="POST" action="{{ path('api_external_gocompare_deeplink') }}">
+                    <input type="hidden" name="reference" value="{{ active_phone.id }}">
+                    <input type="text" name="first_name" placeholder="First Name">
+                    <input type="text" name="surname" placeholder="Last Name">
+                    <input type="email" name="email_address" placeholder="email">
+                    <input type="text" name="dob" placeholder="DOB">
+                    <button type="submit" class="btn btn-success">GoCompare</button>
+                </form>
+            </li>
         </ul>
 
         <h4>Error pages</h4>

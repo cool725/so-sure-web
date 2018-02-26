@@ -6,6 +6,10 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\Process;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Aws\S3\S3Client;
+use Aws\S3\Exception\S3Exception;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\File\S3File;
 use PicsureMLBundle\Document\TrainingData;
@@ -21,19 +25,25 @@ class PicsureMLService
     /** @var Filesystem */
     protected $mountManager;
 
+    /** @var S3Client */
+    protected $s3;
+
     /**
      * @param DocumentManager $appDm
      * @param DocumentManager $picsureMLDm
      * @param Filesystem      $mountManager
+     * @param S3Client        $s3
      */
     public function __construct(
         DocumentManager $appDm,
         DocumentManager $picsureMLDm,
-        $mountManager
+        $mountManager,
+        S3Client $s3
     ) {
         $this->appDm = $appDm;
         $this->picsureMLDm = $picsureMLDm;
         $this->mountManager = $mountManager;
+        $this->s3 = $s3;
     }
 
     public function addFileForTraining($file, $status)
@@ -46,6 +56,35 @@ class PicsureMLService
             $this->picsureMLDm->persist($image);
         }
         $this->picsureMLDm->flush();
+    }
+
+    public function predict(S3File $file)
+    {
+        try {
+            $result = $this->s3->getObject(array(
+                'Bucket' => $file->getBucket(),
+                'Key'    => $file->getKey(),
+                'SaveAs' => '/tmp/'.$file->getFilename()
+            ));
+        } catch (S3Exception $e) {
+            throw new \Exception('Error downloading S3 file '.$file->getKey());
+        }
+
+        $process = new Process('python /var/ops/scripts/image/deep-learning/predict.py /tmp/'.$file->getFilename());
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            throw new ProcessFailedException($process);
+        }
+
+        $json = json_decode($process->getOutput(), true);
+
+        if (isset($json['error'])) {
+            throw new \Exception('Error: '.$json['error']['message']);
+        } else {
+            $file->addMetadata('picsure-ml-score', $json['scores']);
+            $this->appDm->flush();
+        }
     }
 
     public function sync()

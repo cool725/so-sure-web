@@ -2,7 +2,7 @@
 
 {# Set vars #}
 {% set new_stylesheet = 1 %}
-{% set make_extra = '' %}
+{% set new_footer = 1 %}
 {% if make == "Samsung" %}
     {% set make_extra = 'Galaxy' %}
 {% elseif make == "Apple" %}
@@ -21,8 +21,9 @@
     {% stylesheets output='css/*.css'
         'components/owl.carousel/owl.carousel.min.css'
         'components/owl.carousel/owl.theme.default.min.css'
-        '@AppBundle/Resources/public/sass/page/phoneLanding.scss'
-    %}
+        '@AppBundle/Resources/public/sass/page/phoneLandingNew.scss'
+        '@AppBundle/Resources/public/sass/page/homepage.scss'
+        'components/animate.css/animate.min.css' %}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
@@ -30,26 +31,257 @@
 
 {% block body %}
 
-    {% include 'AppBundle::Default/hero.html.twig' %}
+    {# Hero #}
+    <section class="homepage--hero">
 
-    {% include 'AppBundle::Default/press.html.twig' %}
+        <h1 class="homepage--hero-h1">Mobile Phone Insurance <br class="hidden-xs"> How it Should Be</h1>
 
-    {% include 'AppBundle::Default/whySoSure.html.twig' %}
+        <p class="lead">Providing exceptional experience when you claim, <br class="hidden-xs">and rewarding you and your friends when you don't</p>
 
-    {% include 'AppBundle::Default/saveMoney.html.twig' %}
+        {% if phone is defined and phone %}
+            {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type': 'homepage', 'id': phone.id })) }}
+        {% else %}
+            {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type': 'homepage' })) }}
+        {% endif %}
 
-    {% include 'AppBundle::Default/fasterClaims.html.twig' %}
+        <div id="hero-character_1"
+             class="homepage--hero__character">
+            <div class="homepage--hero__tooltip animated tada"
+                 data-content="Accidental damage cover, including cracked screen and water damage"></div>
+        </div>
+        <div id="hero-character_2"
+             class="homepage--hero__character">
+            <div class="homepage--hero__tooltip"
+                 data-content="Worldwide travel cover for trips not exceeding 90 days"></div>
+        </div>
+        <div id="hero-character_3_and_4"
+             class="homepage--hero__character clearfix">
+            <div class="left">
+                <div class="homepage--hero__tooltip"
+                 data-content="Refurbished and second-hand device cover, for phones up to 3 years old"></div>
+            </div>
+            <div class="right">
+                <div class="homepage--hero__tooltip"
+                 data-content="Out of warranty breakdown cover"></div>
+            </div>
+        </div>
+        <div id="hero-character_5_and_6"
+             class="homepage--hero__character clearfix">
+            <div class="left">
+                <div class="homepage--hero__tooltip"
+                 data-content="Theft and Loss cover as standard"></div>
+            </div>
+            <div class="right">
+                <div class="homepage--hero__tooltip"
+                 data-content="Unauthorised network charges cover (up to £1000 inc. VAT)"></div>
+            </div>
+        </div>
+        <div id="hero-character_7"
+             class="homepage--hero__character">
+            <div class="homepage--hero__tooltip homepage--hero__tooltip__reward"
+                 data-content="Next day phone replacement/repair or up to 80% of your money back when you and your friends don't claim"></div>
+             </div>
+        <div id="hero-character_8"
+             class="homepage--hero__character">
+            <div class="homepage--hero__tooltip"
+                 data-content="Accessories cover (up to £100 inc. VAT) for theft and loss claim"></div>
+        </div>
+    </section>
 
-    {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}
+    {# What is so-sure? #}
+    <section class="section--pad homepage--what-is-so-sure">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-7">
+                    <h2 class="h1">What is so-sure?</h2>
+                    <p class="lead">When insurance started in 17th century it was great: when you claimed you had customer red carpet treatment and when there were no claims, you got your money back.</p>
+                    <p class="lead">This is why our founder, Dylan, who spent the past 10 years working from inside the insurance world as a private equity investor, decided to take insurance back to its roots, providing you with a modern-day insurance, how it should be.</p>
+                    <p class="lead">Dylan redesigned insurance around the customer, which is why we get you back on your feet the next working day (as opposed to 4-18 days by our competition), and why you can get up to 80% of your money back, every year, when you and your friends don't claim.</p>
+                </div>
+                <div class="col-md-5">
+                    <div class="img-container">
+                        <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/so-sure_what_is_so-sure_new_old.png"
+                             alt="What is so-sure?"
+                             class="img-responsive img-responsive--center so-sure_homepage-what-is-so-sure lozad">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    {% include 'AppBundle::Default/partnership.html.twig' %}
+    {# Press #}
+    <section class="section--pad homepage--press">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-7">
+                    <h4>As Seen In</h4>
+                    <ul class="list-inline press-list">
+                        <li class="press-img the-guardian" title="The Guardian - Why Facebook and Microsoft say chatbots are the talk of the town"></li>
+                        <li class="press-img financial-times" title="Financial Times - Innovation to watch: Friends based insurance"></li>
+                        <li class="press-img insurance-post" title="Insurance Post - so-sure to launch revolutionary social peer-to-peer mobile insurance app"></li>
+                    </ul>
+                </div>
+                <div class="col-md-5">
+                    <h4>Awards</h4>
+                    <ul class="list-inline press-list">
+                        <li class="press-img digital-top-50" title="Digital Top 50 Awards 2016 - B2C Start-up"></li>
+                        <li class="press-img insurance-choice-awards" title="Insurance Choice Awards 2017 - ‘Best Insurance App' + 'Innovation of the Year' categories 2017"></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <section class="section-landing section-landing--title">
+    {# Cover Details #}
+    <section class="section--pad homepage--cover-details">
+        <div class="container">
+            <h2 class="h1">Cover Details</h2>
+            <p class="lead">We give you peace of mind and cover you for:</p>
+            <div class="row">
+                <div class="col-md-10 col-md-offset-1">
+                    <div class="row">
+                        <div class="col-sm-6 col-md-4">
+                            <div class="cover-img lozad theft"
+                                 data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
+                            <h4>Theft <br><small class="hidden-xs">&nbsp;</small></h4>
+                        </div>
+                         <div class="col-sm-6 col-md-4">
+                            <div class="cover-img lozad loss"
+                                 data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
+                            <h4>Loss <br><small class="hidden-xs">&nbsp;</small></h4>
+                        </div>
+                      <div class="col-sm-6 col-md-4">
+                            <div class="cover-img lozad accidental-damage"
+                                 data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
+                            <h4>Accidental Damage <br><small>Including cracked screen &amp; water damage </small></h4>
+                        </div>
+                        <div class="col-sm-6 col-md-4">
+                            <div class="cover-img lozad breakdown"
+                                 data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
+                            <h4>Out of Warranty Breakdown <br><small class="hidden-xs">&nbsp;</small></h4>
+                        </div>
+                       <div class="col-sm-6 col-md-4">
+                            <div class="cover-img lozad charges"
+                                 data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
+                            <h4>Unauthorised Network Charges <br><small >Up to the value of £1000 inc. VAT</small></h4>
+                        </div>
+                          <div class="col-sm-6 col-md-4">
+                            <div class="cover-img lozad accessories"
+                                 data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
+                            <h4>Accessories <br><small>Up to the value of £100 inc. VAT for theft or loss claims</small></h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Travel When Abroad #}
+    <section class="homepage--when-you-travel">
+        <div class="cloud cloud--top">
+            <img src="{{ cdn_url }}/images/homepage/so-sure_cloud_top_expanded.svg"
+                 alt="cloud top"
+                 align="top">
+        </div>
+        <div class="container">
+            <h2 class="h1">Including When You Travel Abroad</h2>
+            <p class="lead">We have your back whilst you're on the road (as long as your trip does not exceed 90 days)</p>
+            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                 data-src="{{ cdn_url }}/images/homepage/so-sure_airways.svg"
+                 alt="so-sure - airways"
+                 class="img-responsive img-responsive--center so-sure_airways lozad">
+        </div>
+        <div class="cloud cloud--bottom">
+            <img src="{{ cdn_url }}/images/homepage/so-sure_cloud_bottom_expanded.svg"
+                 alt="cloud bottom"
+                 align="bottom">
+        </div>
+    </section>
+
+    {# What we don't cover #}
+    <section class="homepage--what-we-dont-cover">
+        <div class="container">
+            <h2 class="text-center h1">What We Don't Cover</h2>
+            <ol class="ol--blue-counter">
+                <li class="h4 h-light">Excess<br>
+                    • pic-sure validated <i class="fa fa-question-circle" title="pic-sure is our free app-based process to prove your phone is in good working condition and your screen is not cracked"></i>: £70 for Theft/Loss and £50 for Accidental Damage/Breakdown.<br>
+                    • otherwise: £150 for Theft/Loss/Accidental Damage/Breakdown
+                </li>
+                <li class="h4 h-light">Theft, Loss, Accidental Damage or Breakdown where you have knowingly put your phone at risk</li>
+                <li class="h4 h-light">3+ claims for Loss and/or Theft in any policy year</li>
+            </ol>
+        </div>
+    </section>
+
+    <div class="curved-background curved-background__bg-blue hidden-xs">
+        <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 2000 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g id="Artboard" fill="#ffffff">
+                    <path d="M0,0 L2000,0 L2000,139.921588 C1890.08746,181.703317 1753.08746,201.692115 1589,199.887983 C1424.91254,198.083852 1258.91254,174.763587 1091,129.927189 C918.666667,89.9495926 740,69.9607942 555,69.9607942 C370,69.9607942 185,113.269857 0,199.887983 L0,0 Z" id="Rectangle" transform="translate(1000.000000, 100.000000) scale(-1, 1) translate(-1000.000000, -100.000000) "></path>
+                </g>
+            </g>
+        </svg>
+    </div>
+
+    {% include 'AppBundle::Default/_sectionRewardPot.html.twig' %}
+
+    <div class="curved-background hidden-xs">
+        <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 2000 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g id="Artboard" fill="#d6ebff">
+                    <path d="M0,0 L2000,0 L2000,139.921588 C1890.08746,181.703317 1753.08746,201.692115 1589,199.887983 C1424.91254,198.083852 1258.91254,174.763587 1091,129.927189 C918.666667,89.9495926 740,69.9607942 555,69.9607942 C370,69.9607942 185,113.269857 0,199.887983 L0,0 Z" id="Rectangle" transform="translate(1000.000000, 100.000000) scale(-1, 1) translate(-1000.000000, -100.000000) "></path>
+                </g>
+            </g>
+        </svg>
+    </div>
+
+    {# Claims procss #}
+    <section class="section--pad homepage--claims-process">
+        <div class="container">
+            <h2 class="h1">Our Claims Process is as <span class="text-nowrap">Easy as 1, 2, 3</span></h2>
+            <p class="lead">When something bad happens to your phone:</p>
+            <div class="row">
+                <div class="col-md-4">
+                    <span class="large-no large-no--arrow">1</span>
+                    <h4 class="h3 h-light text-blue">Contact Claims Team</h4>
+                    <p>These helpful people are here in the UK, available to answer your call 24-hrs a day, 7 days a week, 365 days a year when you have an issue with your phone. And if you need to start a claim, <a href="{{ path('claim') }}" class="text-nowrap">fill in the form here</a>.</p>
+                </div>
+                <div class="col-md-4">
+                    <span class="large-no large-no--arrow">2</span>
+                    <h4 class="h3 h-light text-blue">Review Claim</h4>
+                    <p>Our goal is for the claims to be handled almost instantly. Approving a claim takes on average less than one hour to process during normal business hours.*</p>
+                </div>
+                <div class="col-md-4">
+                    <span class="large-no">3</span>
+                    <h4 class="h3 h-light text-blue">Approve Claim</h4>
+                    <p>Once your claim is approved, we aim to have a replacement mobile phone delivered to you in the UK by the next working day.</p>
+                </div>
+            </div>
+            <p><small>* However in some cases, like theft, we may require additional information and documentation to fully review the incident and approve the claim. With your help, we aim to do this as soon as possible.</small></p>
+        </div>
+    </section>
+
+    {% include 'AppBundle::Default/_sectionComparison.html.twig' %}
+
+    {% include 'AppBundle::Default/_sectionFeedback.html.twig' %}
+
+
+    <div class="curved-background curved-background__bg-blue hidden-xs">
+        <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 2000 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g id="Artboard" fill="#ffffff">
+                    <path d="M0,0 L2000,0 L2000,139.921588 C1890.08746,181.703317 1753.08746,201.692115 1589,199.887983 C1424.91254,198.083852 1258.91254,174.763587 1091,129.927189 C918.666667,89.9495926 740,69.9607942 555,69.9607942 C370,69.9607942 185,113.269857 0,199.887983 L0,0 Z" id="Rectangle" transform="translate(1000.000000, 100.000000) scale(-1, 1) translate(-1000.000000, -100.000000) "></path>
+                </g>
+            </g>
+        </svg>
+    </div>
+
+    <section class="section-landing section-landing--title background-lightest-blue">
         <div class="container text-center">
             <div class="row">
                 <div class="col-md-12">
 
-                    <h1 class="text-blue">
+                    <h1 class="">
                         {{ make|capitalize }} {{ make_extra }} Insurance
                     </h1>
 
@@ -60,7 +292,7 @@
         </div>
     </section>
 
-    <section class="section-landing">
+    <section class="section--pad section-landing">
         <div class="container">
 
             <div class="owl-carousel owl-theme visible-xs">
@@ -125,16 +357,10 @@
                     </div>
                 </div>
             </div>
-
         </div>
-        {# Curve #}
-        <svg class="curved-background hidden-xs" viewBox="0 0 500 150" preserveAspectRatio="xMinYMin meet">
-            <path d="M0,100 C150,200 350,0 500,100 L500,00 L0,0 Z" style="stroke: none; fill:#f6f7fb;"></path>
-        </svg>
-        {# End Curve #}
     </section>
 
-    <section class="text-center section--pad">
+    <section class="text-center section--pad section-landing">
         <div class="container">
             <div class="landing-panel">
                 <div class="row">
@@ -212,11 +438,13 @@
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
+    'components/lozad/lozad.min.js'
     'components/dot/doT.min.js'
     'components/vimeo-player-js/player.min.js'
     '@AppBundle/Resources/public/js/Default/modalVideo.js'
     'components/corejs-typeahead/typeahead.bundle.min.js'
     'components/fuse.js/fuse.min.js'
+    '@AppBundle/Resources/public/js/Default/images.js'
     'components/owl.carousel/owl.carousel.min.js'
     '@AppBundle/Resources/public/js/Default/makeInsurance.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMake.js' %}

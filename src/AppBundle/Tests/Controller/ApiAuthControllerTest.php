@@ -3044,6 +3044,42 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals(PhonePolicy::PICSURE_STATUS_MANUAL, $updatedPolicy->getPicSureStatus());
     }
 
+    /**
+     *
+     */
+    public function testPicsureWithValidS3File()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testPicsureWithValidS3File', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+        $url = sprintf("/api/v1/auth/policy/%s/picsure", $policyData['id']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'bucket' => 'policy.so-sure.com',
+            'key' => 'testing/picsure-test.png',
+        ]);
+        $data = $this->verifyResponse(200);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $repo->find($policyData['id']);
+        $this->assertEquals(PhonePolicy::PICSURE_STATUS_MANUAL, $updatedPolicy->getPicSureStatus());
+
+        $repo = $dm->getRepository(PhonePolicy::class);
+        $updatedPolicy = $repo->find($policyData['id']);
+        $files = $updatedPolicy->getPolicyPicSureFiles();
+        $metadata = $files[0]->getMetadata();
+
+        $this->assertTrue(isset($metadata['picsure-ml-score']));
+    }
+
     // policy/{id}/reconnect
 
     /**

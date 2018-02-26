@@ -36,7 +36,7 @@ class SanctionsMatch
     protected $date;
 
     /**
-     * @MongoDB\Boolean()
+     * @MongoDB\Field(type="boolean")
      * @Gedmo\Versioned
      */
     protected $manuallyVerified;

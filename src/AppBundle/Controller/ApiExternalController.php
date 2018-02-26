@@ -15,6 +15,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\OptOut\EmailOptOut;
 
 use AppBundle\Classes\ApiErrorCode;
+use AppBundle\Classes\GoCompare;
 use AppBundle\Service\RateLimitService;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -177,5 +178,111 @@ class ApiExternalController extends BaseController
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
+    }
+
+    /**
+     * @Route("/gocompare/feed", name="api_external_gocompare_feed")
+     * @Method({"POST"})
+     */
+    public function goCompareFeedAction(Request $request)
+    {
+        try {
+            $goCompareKey = $this->getParameter('gocompare_key');
+            if ($request->get('gocompare_key') != $goCompareKey) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'Invalid key', 404);
+            }
+
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(Phone::class);
+
+            $phones = [];
+            $data = json_decode($request->getContent(), true)['request'];
+            foreach ($data['gadgets'] as $key => $gadget) {
+                $id = $gadget['gadget']['gadget_id'];
+                if ($id && $gadget['gadget']['loss_cover'] && isset(GoCompare::$models[$id])) {
+                    if ($query = GoCompare::$models[$id]) {
+                        if ($phone = $repo->findOneBy(array_merge($query, ['active' => true]))) {
+                            $phones[] = $phone;
+                        }
+                    }
+                }
+            }
+
+            $quotes = [];
+            foreach ($phones as $phone) {
+                $currentPhonePrice = $phone->getCurrentPhonePrice();
+                if (!$currentPhonePrice) {
+                    continue;
+                }
+
+                // If there is an end date, then quote should be valid until then
+                $quoteValidTo = $currentPhonePrice->getValidTo();
+                if (!$quoteValidTo) {
+                    $quoteValidTo = new \DateTime();
+                    $quoteValidTo->add(new \DateInterval('P1D'));
+                }
+
+                $promoAddition = 0;
+                $isPromoLaunch = false;
+
+                $quotes[] = ['rate' => [
+                    'reference' => $phone->getId(),
+                    'product_name' => $phone->__toString(),
+                    'monthly_premium' => $currentPhonePrice->getMonthlyPremiumPrice(),
+                    'annual_premium' => $currentPhonePrice->getYearlyPremiumPrice(),
+                    'additional_gadget' => 0,
+                ]];
+            }
+
+            $response = [
+                'response' => $quotes,
+            ];
+
+            return new JsonResponse($response);
+        } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api goCompareFeedAction.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
+     * @Route("/gocompare/deeplink", name="api_external_gocompare_deeplink")
+     * @Method({"POST"})
+     */
+    public function goCompareDeeplinkAction(Request $request)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $reference = $this->getRequestString($request, 'reference');
+        $phone = $repo->find($reference);
+        if (!$phone) {
+            throw $this->createNotFoundException('Phone reference not found');
+        }
+
+        $this->setPhoneSession($request, $phone);
+
+        $user = new User();
+        $user->setFirstName($this->getRequestString($request, 'first_name'));
+        $user->setLastName($this->getRequestString($request, 'surname'));
+        $user->setEmail($this->getRequestString($request, 'email_address'));
+        $user->setBirthday(\DateTime::createFromFormat('Y-m-d', $this->getRequestString($request, 'dob')));
+        $user->setEnabled(true);
+
+        $userManager = $this->get('fos_user.user_manager');
+        $userManager->updateUser($user, true);
+        $dm->persist($user);
+        $dm->flush();
+
+        $this->get('fos_user.security.login_manager')->loginUser(
+            $this->getParameter('fos_user.firewall_name'),
+            $user
+        );
+
+        return $this->redirectToRoute('purchase');
     }
 }

@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 use Pagerfanta\Pagerfanta;
 use Pagerfanta\Adapter\DoctrineODMMongoDBAdapter;
@@ -952,5 +953,23 @@ abstract class BaseController extends Controller
         }
 
         return $phone;
+    }
+
+    protected function setPhoneSession(Request $request, Phone $phone)
+    {
+        $session = $request->getSession();
+        $session->set('quote', $phone->getId());
+        if ($phone->getMemory()) {
+            $session->set('quote_url', $this->generateUrl('quote_make_model_memory', [
+                'make' => $phone->getMake(),
+                'model' => $phone->getEncodedModel(),
+                'memory' => $phone->getMemory(),
+            ], UrlGeneratorInterface::ABSOLUTE_URL));
+        } else {
+            $session->set('quote_url', $this->generateUrl('quote_make_model', [
+                'make' => $phone->getMake(),
+                'model' => $phone->getEncodedModel(),
+            ], UrlGeneratorInterface::ABSOLUTE_URL));
+        }
     }
 }

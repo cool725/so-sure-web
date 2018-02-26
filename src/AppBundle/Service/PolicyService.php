@@ -972,22 +972,15 @@ class PolicyService
         if ($policy->getPreviousPolicy()) {
             $baseTemplate = 'AppBundle:Email:policy/renew';
         }
-        $exp = $this->sixpackService->participate(
-            SixpackService::EXPERIMENT_CANCELLATION,
-            ['damage', 'cancel'],
-            true,
-            1,
-            $policy->getUser()->getId()
-        );
 
         try {
             $this->mailer->sendTemplate(
                 sprintf('Your so-sure policy %s', $policy->getPolicyNumber()),
                 $policy->getUser()->getEmail(),
                 sprintf('%s.html.twig', $baseTemplate),
-                ['policy' => $policy, 'cancellation_experiment' => $exp],
+                ['policy' => $policy],
                 sprintf('%s.txt.twig', $baseTemplate),
-                ['policy' => $policy, 'cancellation_experiment' => $exp],
+                ['policy' => $policy],
                 $attachmentFiles,
                 $bcc
             );

@@ -159,6 +159,12 @@
                 <script src="{{ asset_url }}"></script>
                 {% endjavascripts %}
             {% endif %}
+            {% if environment != 'prod' %}
+                {% javascripts
+                '@AppBundle/Resources/public/js/Dev/*' %}
+                <script src="{{ asset_url }}"></script>
+                {% endjavascripts %}
+            {% endif %}
         {% endblock %}
     </body>
 </html>

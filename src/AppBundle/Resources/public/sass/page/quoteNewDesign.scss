@@ -1,0 +1,115 @@
+// quote.scss
+
+@import "../mixins";
+@import "../common/palette";
+@import "../common/paletteNew";
+@import "../common/type";
+@import "rewardCalculatorNew";
+
+body {
+	background-color: $off-white;
+}
+
+.navbar {
+	background-color: $white;
+}
+
+.quote {
+
+	&__box {
+		width: 100%;
+		background-color: $white;
+		border: 1px solid $lightest-blue;
+		@include border-radius(4px);
+
+		padding: 30px;
+		margin-bottom: 30px;
+		position: relative !important;
+
+		// Control the rhythm of box contents
+		* {
+			margin-top: 0;
+		}
+
+		&--list {
+
+			li {
+				font-size: 18px;
+				margin-bottom: 15px;
+
+				&:last-of-type {
+					margin-bottom: 0;
+				}
+
+				small {
+					color: $dark-grey;
+				}
+			}
+
+			@include breakpoint(laptop) {
+				margin-bottom: 0;
+			}
+		}
+
+		ol {
+			padding: 25px;
+		}
+
+		table {
+			margin: 20px 0;
+		}
+	}
+
+	&__left {
+		text-align: center;
+	}
+
+	&__right { }
+
+	&__cta {
+		margin-bottom: 30px;
+	}
+
+	&__price {
+		margin-bottom: 25px;
+
+		.h1 {
+			font-size: 52px;
+		}
+	}
+}
+
+.stat-banner, .phone-details  {
+	background-color: $off-white;
+
+	h3 {
+		// color: $white;
+		margin-top: 0;
+	}
+
+	ul {
+		li {
+
+			&:before {
+			  content: '\2022';
+			  margin-right: 0.5em;
+			}
+		}
+	}
+
+	@include breakpoint(tablet) {
+		text-align: center;
+	}
+}
+
+.affix {
+	position: static;
+
+	@include breakpoint(tablet) {
+		position: fixed;
+	}
+}
+
+.affix-bottom {
+	position: absolute;
+}
