@@ -18,16 +18,53 @@
     <section class="user-homepage--content section--pad">
         <div class="container">
 
-            <div class="row">
-                <div class="col-md-12">
-                    <h2>My Policies</h2>
-                </div>
-            </div>
+            <h1>My Policies</h1>
+
             {% for policyItem in user.getDisplayablePoliciesSorted %}
             <div class="row">
                 <div class="col-md-6">
-                  <h4>{{ policyItem.phone }} <span class="badge">{{ policyItem.status|capitalize }}</span></h4>
-                  <p>{{ policyItem.policyNumber }} ({{ policyItem.start|date('dS M Y') }} - {{ policyItem.end|date('dS M Y') }})</p>
+                    <h4>{{ policyItem.phone }} <span class="badge">{{ policyItem.status|capitalize }}</span></h4>
+                    <p>{{ policyItem.policyNumber }} ({{ policyItem.start|date('dS M Y') }} - {{ policyItem.end|date('dS M Y') }})</p>
+                    <table class="table table-bordered table-mod text-center">
+                        <thead>
+                            <tr>
+                              <td width="20%">pic-sure <i class="fa fa-check text-green" aria-hidden="true"></i></td>
+                              <td>Cover</td>
+                              <td width="20%">Excess</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                              <td rowspan="2" valign="center"><img src="{{ cdn_url }}/images/user/pic-sure_validated_stamp.svg" alt="pic-sure valid" width="80px"></td>
+                              <td>Accidental damage/breakdown</td>
+                              <td>&pound;50</td>
+                            </tr>
+                            <tr>
+                              {# <td></td> #}
+                              <td>Theft/loss</td>
+                              <td>&pound;70</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <table class="table table-bordered table-mod text-center">
+                        <thead>
+                            <tr>
+                              <td width="20%">pic-sure <i class="fa fa-times text-red" aria-hidden="true"></i></td>
+                              <td>Cover</td>
+                              <td width="20%">Excess</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                              <td valign="middle"><img src="{{ cdn_url }}/images/user/pic-sure_non_validated_stamp.svg" alt="pic-sure valid" width="80px"></td>
+                              <td>Accidental damage/breakdown/Theft/loss</td>
+                              <td>&pound;150</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+
                 </div>
                 <div class="col-md-6">
                     <ul class="nav nav-pills">
@@ -77,5 +114,7 @@
             {% endif %}
         </div>
     </section>
+
+    <section class="section--pad"></section>
 
 {% endblock %}
