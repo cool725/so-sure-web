@@ -11,6 +11,13 @@
     padding: 20px !important;
 }
 
-.table-mod > tbody > tr > td {
-     vertical-align: middle;
+.table-mod {
+
+    > tbody {
+        > tr {
+            > td {
+                vertical-align: middle;
+            }
+        }
+    }
 }
