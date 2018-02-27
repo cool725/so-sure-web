@@ -965,16 +965,19 @@ abstract class BaseController extends Controller
         $session = $request->getSession();
         $session->set('quote', $phone->getId());
         if ($phone->getMemory()) {
-            $session->set('quote_url', $this->generateUrl('quote_make_model_memory', [
+            $url = $this->generateUrl('quote_make_model_memory', [
                 'make' => $phone->getMake(),
                 'model' => $phone->getEncodedModel(),
                 'memory' => $phone->getMemory(),
-            ], UrlGeneratorInterface::ABSOLUTE_URL));
+            ], UrlGeneratorInterface::ABSOLUTE_URL);
         } else {
-            $session->set('quote_url', $this->generateUrl('quote_make_model', [
+            $url = $this->generateUrl('quote_make_model', [
                 'make' => $phone->getMake(),
                 'model' => $phone->getEncodedModel(),
-            ], UrlGeneratorInterface::ABSOLUTE_URL));
+            ], UrlGeneratorInterface::ABSOLUTE_URL);
         }
+        $session->set('quote_url', $url);
+
+        return $url;
     }
 }
