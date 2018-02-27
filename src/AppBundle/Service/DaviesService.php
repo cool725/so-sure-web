@@ -297,6 +297,7 @@ class DaviesService extends S3EmailService
 
         $errors = $this->validator->validate($claim);
         if (count($errors) > 0) {
+            //\Doctrine\Common\Util\Debug::dump($errors, 3);
             $this->logger->error(sprintf(
                 'Claim %s/%s (status: %s) failed validation. Discarding updates. Error: %s',
                 $claim->getId(),
@@ -507,7 +508,7 @@ class DaviesService extends S3EmailService
             if (!$daviesClaim->replacementReceivedDate) {
                 $items[] = 'received date';
             }
-            if (!$daviesClaim->replacementImei) {
+            if (!$daviesClaim->replacementImei && !in_array('replacementImei', $daviesClaim->unobtainableFields)) {
                 $items[] = 'imei';
             }
             if (!$daviesClaim->replacementMake || !$daviesClaim->replacementModel) {
