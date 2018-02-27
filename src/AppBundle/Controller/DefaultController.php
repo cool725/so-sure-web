@@ -65,7 +65,7 @@ class DefaultController extends BaseController
             $this->get('logger')->debug(sprintf('Referral %s', $referral));
         }
 
-       $this->sixpack(
+        $this->sixpack(
             $request,
             SixpackService::EXPERIMENT_HOMEPAGE_AA_V2,
             ['A1', 'A2'],
