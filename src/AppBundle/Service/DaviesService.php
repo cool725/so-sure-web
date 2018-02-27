@@ -525,6 +525,14 @@ class DaviesService extends S3EmailService
             }
         }
 
+        if (!$daviesClaim->replacementImei && in_array('replacementImei', $daviesClaim->unobtainableFields)) {
+            $msg = sprintf(
+                'Claim %s does not have a replacement IMEI - unobtainable. Contact customer if possible.',
+                $daviesClaim->claimNumber
+            );
+            $this->warnings[$daviesClaim->claimNumber][] = $msg;
+        }
+
         $threeMonthsAgo = new \DateTime();
         $threeMonthsAgo = $threeMonthsAgo->sub(new \DateInterval('P3M'));
         if ($daviesClaim->isOpen() && $daviesClaim->replacementReceivedDate &&

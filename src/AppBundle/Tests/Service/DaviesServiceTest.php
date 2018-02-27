@@ -1628,7 +1628,7 @@ class DaviesServiceTest extends WebTestCase
     public function testSaveClaimUnknownReplacementImei()
     {
         $policy = static::createUserPolicy(true);
-        $policy->getUser()->setEmail(static::generateEmail('testSaveClaimValidReplacementImei', $this));
+        $policy->getUser()->setEmail(static::generateEmail('testSaveClaimUnknownReplacementImei', $this));
         $claim = new Claim();
         $claim->setNumber($this->getRandomClaimNumber());
         $claim->setType(Claim::TYPE_LOSS);
@@ -1651,7 +1651,10 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 4';
-        $daviesClaim->replacementImei = 'Unable to obtaina';
+        // fromArray will transform replacementImei = 'Unable to obtain' to a null value and add to unobtainableFields
+        // $daviesClaim->replacementImei = 'Unable to obtain';
+        $daviesClaim->unobtainableFields[] = 'replacementImei';
+
         $daviesClaim->replacementReceivedDate = new \DateTime();
         $this->assertTrue(static::$daviesService->saveClaim($daviesClaim, false));
         $this->assertEquals(
@@ -1660,10 +1663,11 @@ class DaviesServiceTest extends WebTestCase
             json_encode(self::$daviesService->getErrors())
         );
         $this->assertEquals(
-            0,
+            1,
             count(self::$daviesService->getWarnings()),
             json_encode(self::$daviesService->getWarnings())
         );
+        $this->insureWarningExists('/does not have a replacement IMEI/');
     }
 
     public function testSaveClaimsNoClaimsFound()
@@ -1695,8 +1699,8 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->policyNumber = $claim1->getPolicy()->getPolicyNumber();
         $daviesClaim->claimNumber = $claim2->getNumber();
         $daviesClaim->insuredName = 'foo bar';
-        $daviesClaim->initialSuspicion = 'no';
-        $daviesClaim->finalSuspicion = 'no';
+        $daviesClaim->initialSuspicion = false;
+        $daviesClaim->finalSuspicion = false;
         $daviesClaim->status = DaviesClaim::STATUS_CLOSED;
         $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
         $daviesClaim->replacementMake = 'Apple';
