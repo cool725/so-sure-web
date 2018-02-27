@@ -21,6 +21,7 @@ class SixpackService
     const LOG_MIXPANEL_NONE = 'none';
 
     //const EXPERIMENT_HOMEPAGE_AA = 'homepage-aa';
+    const EXPERIMENT_HOMEPAGE_AA_V2 = 'homepage-aa-v2';
     //const EXPERIMENT_LANDING_HOME = 'landing-or-home';
     //const EXPERIMENT_CPC_QUOTE_MANUFACTURER = 'cpc-quote-or-manufacturer';
     const EXPERIMENT_SHARE_MESSAGE = 'share-message';

@@ -1045,6 +1045,11 @@ class UserController extends BaseController
         //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_V1_V2OLD_V2NEW);
         // $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_FUNNEL_V1_V2);
         $this->get('app.sixpack')->convert(
+            SixpackService::EXPERIMENT_HOMEPAGE_AA_V2,
+            SixpackService::KPI_POLICY_PURCHASE
+        );
+
+        $this->get('app.sixpack')->convert(
             SixpackService::EXPERIMENT_HOMEPAGE_STICKYSEARCH_PICSURE,
             SixpackService::KPI_POLICY_PURCHASE
         );
