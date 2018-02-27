@@ -144,7 +144,7 @@ class SixpackService
                 $this->mixpanel->queuePersonProperties([sprintf('Sixpack: %s', $experiment) => $result], true);
             } else {
                 $this->mixpanel->queuePersonProperties(
-                    ['Sixpack' => sprintf('%s:%s', $experiment, $result)],
+                    ['Sixpack' => sprintf('%s=%s', $experiment, $result)],
                     false,
                     null,
                     true
