@@ -543,7 +543,7 @@ class DefaultController extends BaseController
         $exp = $this->get('app.sixpack')->participate(
             SixpackService::EXPERIMENT_PYG_HOME,
             ['pyg', 'home'],
-            SixpackService::SixpackService::LOG_MIXPANEL_NO_LOG
+            SixpackService::LOG_MIXPANEL_NONE
         );
         */
         //if ($exp == 'home') {

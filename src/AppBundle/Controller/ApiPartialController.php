@@ -71,7 +71,7 @@ class ApiPartialController extends BaseController
                         SixpackService::ALTERNATIVES_SHARE_MESSAGE_SIMPLE,
                         SixpackService::ALTERNATIVES_SHARE_MESSAGE_ORIGINAL
                     ],
-                    SixpackService::LOG_MIXPANEL_NO_LOG,
+                    SixpackService::LOG_MIXPANEL_NONE,
                     1,
                     $scode->getCode()
                 );
@@ -108,7 +108,7 @@ class ApiPartialController extends BaseController
                         SixpackService::ALTERNATIVES_APP_SHARE_METHOD_NATIVE,
                         SixpackService::ALTERNATIVES_APP_SHARE_METHOD_API
                     ],
-                    SixpackService::LOG_MIXPANEL_NO_LOG,
+                    SixpackService::LOG_MIXPANEL_NONE,
                     1,
                     $scode->getCode()
                 );
