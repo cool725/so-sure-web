@@ -134,7 +134,22 @@ class SixpackService
         $policyHolder = $this->requestService->getUser() && $this->requestService->getUser()->hasPolicy();
         if (($logMixpanel == self::LOG_MIXPANEL_CONVERSION && !$policyHolder) ||
             $logMixpanel == self::LOG_MIXPANEL_ALL) {
-            $this->mixpanel->queuePersonProperties([sprintf('Sixpack: %s', $experiment) => $result], true);
+            if (in_array($experiment, [
+                self::EXPERIMENT_APP_SHARE_METHOD,
+                self::EXPERIMENT_HOMEPAGE_STICKYSEARCH_PICSURE,
+                self::EXPERIMENT_NEW_QUOTE_DESIGN,
+                self::EXPERIMENT_POLICY_PDF_DOWNLOAD,
+                self::EXPERIMENT_SHARE_MESSAGE,
+            ])) {
+                $this->mixpanel->queuePersonProperties([sprintf('Sixpack: %s', $experiment) => $result], true);
+            } else {
+                $this->mixpanel->queuePersonProperties(
+                    ['Sixpack' => sprintf('%s: %s', $experiment, $result)],
+                    false,
+                    null,
+                    true
+                );                
+            }
         }
 
         return $result;
