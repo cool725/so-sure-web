@@ -18,6 +18,11 @@ parameters:
         - 57ef7c67a6b37e5b2359e995 # Patrick
     sosure_ips:
         - 86.26.167.103
+    roles:
+        - ROLE_ADMIN
+        - ROLE_CLAIMS
+        - ROLE_EMPLOYEE
+
 
 framework:
     #esi:             ~

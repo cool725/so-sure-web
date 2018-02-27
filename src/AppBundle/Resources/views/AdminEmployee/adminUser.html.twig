@@ -136,69 +136,107 @@
                         {% if user.allPolicies|length == 0 %}
                             No policies
                         {% endif %}
-                    </td>
+                    </td> 
                     <td>
                             <button type="button" class="btn btn-info" data-toggle="modal" data-target="#newPolicyModal"
                                 ><i class="fa fa-plus"></i> Add partial policy</button>
                     </td>
                 </tr>
-                <tr>
-                    <td>Recipero Make/Model Check</td>
-                    <td>{{ form_start(makemodel_form)}}
-                        <span class="text-danger">
-                        {{ form_errors(makemodel_form) }}
-                        {{ form_errors(makemodel_form.imei) }}
-                        {{ form_errors(makemodel_form.serialNumber) }}
-                        </span>
-                        {{ form_widget(makemodel_form.imei, {'attr': {'placeholder':'IMEI'}})}}
-                        <br>-- or --<br>
-                        {{ form_widget(makemodel_form.serialNumber, {'attr': {'placeholder':'Serial Number'}})}}
-                        <br>
-                        {{ form_widget(makemodel_form.check, {'attr': {'class': 'btn btn-info'}})}}
-                        {{ form_end(makemodel_form)}}
-                        <br>
-                        £0.05 to run check
-                    </td>
-                </tr>
-                <tr>
-                    <td>Sanctions</td>
-                    <td>
-                        {% if user.sanctionsChecks|length == 0%}
-                            No checks run
-                        {% endif %}
-                        {% for check in user.sanctionsChecks %}
-                            Ran: {{ check|date }}<br>
-                        {% endfor %}
-                        {% if user.sanctionsMatches|length == 0%}
-                            No matches
-                        {% endif %}
-                        {% for match in user.sanctionsMatches %}
-                            {% if match.manuallyVerified %}
-                                Confirmed not match: <del>{{ match.sanctions.name }}</del>
-                            {% else %}
-                                Possible match: <b>{{ match.sanctions.name }}</b>
-                            {% endif %}
-                            / Dob:
-                            {% if match.sanctions.birthday %}
-                                {% if match.sanctions.birthday|date('d M Y') == user.birthday|date('d M Y') %}
-                                    <b style="color: red">{{ match.sanctions.birthday|date('d M Y') }}</b>
-                                {% else %}
-                                    <b>{{ match.sanctions.birthday|date('d M Y') }}</b>
-                                {% endif %}
-                            {% else %}
-                                Unknown
-                            {% endif %}
-                            (L dist: {% if match.distance == 0 %}<b>0</b>{% else %}{{ match.distance }}{% endif %})
+                
+                    <tr>
+                        
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <td>Type:
+                          {% for ur in user_roles %}
+                                {{ ur }}<br>
+                            {% endfor %}
+                         </td>
+                         <td>
+                         </td>
+                        <td>
+                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#newRoleModal"><i class="fa fa-plus"></i> Edit Roles</button>
+                        </td>
+                    {% endif %}
+                    </tr>
+                
+                    <tr>
+                        <td>Recipero Make/Model Check</td>
+                        <td>{{ form_start(makemodel_form)}}
+                            <span class="text-danger">
+                            {{ form_errors(makemodel_form) }}
+                            {{ form_errors(makemodel_form.imei) }}
+                            {{ form_errors(makemodel_form.serialNumber) }}
+                            </span>
+                            {{ form_widget(makemodel_form.imei, {'attr': {'placeholder':'IMEI'}})}}
+                            <br>-- or --<br>
+                            {{ form_widget(makemodel_form.serialNumber, {'attr': {'placeholder':'Serial Number'}})}}
                             <br>
-                        {% endfor %}
-                    </td>
-                    <td>{{ form_start(sanctions_form)}}
-                        {{ form_widget(sanctions_form.confirm, {'label': 'Confirm NO match', 'attr': {'class': 'btn btn-info'}})}}
-                        {{ form_end(sanctions_form)}}
-                    </td>
-                </tr>
+                            {{ form_widget(makemodel_form.check, {'attr': {'class': 'btn btn-info'}})}}
+                            {{ form_end(makemodel_form)}}
+                            <br>
+                            £0.05 to run check
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Sanctions</td>
+                        <td>
+                            {% if user.sanctionsChecks|length == 0%}
+                                No checks run
+                            {% endif %}
+                            {% for check in user.sanctionsChecks %}
+                                Ran: {{ check|date }}<br>
+                            {% endfor %}
+                            {% if user.sanctionsMatches|length == 0%}
+                                No matches
+                            {% endif %}
+                            {% for match in user.sanctionsMatches %}
+                                {% if match.manuallyVerified %}
+                                    Confirmed not match: <del>{{ match.sanctions.name }}</del>
+                                {% else %}
+                                    Possible match: <b>{{ match.sanctions.name }}</b>
+                                {% endif %}
+                                / Dob:
+                                {% if match.sanctions.birthday %}
+                                    {% if match.sanctions.birthday|date('d M Y') == user.birthday|date('d M Y') %}
+                                        <b style="color: red">{{ match.sanctions.birthday|date('d M Y') }}</b>
+                                    {% else %}
+                                        <b>{{ match.sanctions.birthday|date('d M Y') }}</b>
+                                    {% endif %}
+                                {% else %}
+                                    Unknown
+                                {% endif %}
+                                (L dist: {% if match.distance == 0 %}<b>0</b>{% else %}{{ match.distance }}{% endif %})
+                                <br>
+                            {% endfor %}
+                        </td>
+                        <td>{{ form_start(sanctions_form)}}
+                            {{ form_widget(sanctions_form.confirm, {'label': 'Confirm NO match', 'attr': {'class': 'btn btn-info'}})}}
+                            {{ form_end(sanctions_form)}}
+                        </td>
+                    </tr>
+                
+                
             </table>
 </div>
+    {# MARIO #}
+    <div class="modal fade" id="newRoleModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            {{ form_start(role_form) }}
+            <div class="modal-body">
+                <div class="row">
+                    <div class="form-group col-sm-12">
+                        Role Type
+                    </div>
+                </div>
+
+                
+            </div>
+            {{ form_end(role_form) }} 
+        </div>
+      </div>
+    </div>
+    {# END MARIO #}
 
     <div class="modal fade" id="newPolicyModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">

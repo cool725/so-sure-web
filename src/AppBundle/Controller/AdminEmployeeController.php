@@ -41,6 +41,7 @@ use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\Stats;
 use AppBundle\Document\ImeiTrait;
 use AppBundle\Document\Form\AdminMakeModel;
+use AppBundle\Document\Form\Roles;
 use AppBundle\Document\OptOut\OptOut;
 use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\OptOut\SmsOptOut;
@@ -84,6 +85,7 @@ use AppBundle\Form\Type\UserPermissionType;
 use AppBundle\Form\Type\UserHighRiskType;
 use AppBundle\Form\Type\ClaimFlagsType;
 use AppBundle\Form\Type\AdminMakeModelType;
+use AppBundle\Form\Type\UserRoleType;
 use AppBundle\Exception\RedirectException;
 use AppBundle\Service\PushService;
 use AppBundle\Event\PicsureEvent;
@@ -948,9 +950,22 @@ class AdminEmployeeController extends BaseController
      */
     public function adminUserAction(Request $request, $id)
     {
+
+        // gets value of a parameter
+        $roles = $this->getParameter('roles');
+
         $dm = $this->getManager();
         $repo = $dm->getRepository(User::class);
         $user = $repo->find($id);
+
+        $userRoles = $user->getRoles();
+
+        // Removing ROLE_USER as it is always by default
+        $key = array_search('ROLE_USER', $userRoles);
+        if (false !== $key) {
+            unset($userRoles[$key]);
+        }
+        
         if (!$user) {
             throw $this->createNotFoundException('User not found');
         }
@@ -990,7 +1005,6 @@ class AdminEmployeeController extends BaseController
         $userAddressForm = $this->get('form.factory')
             ->createNamedBuilder('user_address_form', AddressType::class, $address)
             ->getForm();
-
         $policyData = new SalvaPhonePolicy();
         $policyForm = $this->get('form.factory')
             ->createNamedBuilder('policy_form', PartialPolicyType::class, $policyData)
@@ -999,8 +1013,34 @@ class AdminEmployeeController extends BaseController
             ->createNamedBuilder('sanctions_form')
             ->add('confirm', SubmitType::class)
             ->getForm();
+        $role = new Roles();
+        $roleForm = $this->get('form.factory')
+            ->createNamedBuilder('user_role_form', UserRoleType::class, $role)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
+            if ($request->request->has('user_role_form')) {
+                $roleForm->handleRequest($request);
+                if ($roleForm->isValid()) {
+                    if (null === $user->getConfirmationToken()) {
+                        /** @var $tokenGenerator \FOS\UserBundle\Util\TokenGeneratorInterface */
+                        $tokenGenerator = $this->get('fos_user.util.token_generator');
+                        $user->setConfirmationToken($tokenGenerator->generateToken());
+                    }
+                    $newRoles = $request->request->get("user_role_form")['roles'];
+
+                    $user->setRoles($newRoles);
+                    $this->get('fos_user.user_manager')->updateUser($user);
+
+                    $this->addFlash(
+                        'success',
+                        'Role updated'
+                    );
+
+                    return new RedirectResponse($this->generateUrl('admin_user', ['id' => $id]));
+                }
+            }
+
             if ($request->request->has('reset_form')) {
                 $resetForm->handleRequest($request);
                 if ($resetForm->isValid()) {
@@ -1198,11 +1238,14 @@ class AdminEmployeeController extends BaseController
                 }
             }
         }
+               
+
 
         return [
             'user' => $user,
             'reset_form' => $resetForm->createView(),
             'policy_form' => $policyForm->createView(),
+            'role_form' => $roleForm->createView(),
             'user_detail_form' => $userDetailForm->createView(),
             'user_email_form' => $userEmailForm->createView(),
             'user_address_form' => $userAddressForm->createView(),
@@ -1213,6 +1256,8 @@ class AdminEmployeeController extends BaseController
             'postcode' => $postcode,
             'census' => $census,
             'income' => $income,
+            'roles' => $roles,
+            'user_roles' => $userRoles,
         ];
     }
 
