@@ -148,7 +148,7 @@ class SixpackService
                     false,
                     null,
                     true
-                );                
+                );
             }
         }
 
