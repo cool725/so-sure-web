@@ -36,7 +36,7 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
             '42794',
             'Samsung',
             'S6',
-            '351236666677777',
+            '149358212660892',
             '42794',
             '£250.49',
             '£5.29',
@@ -68,7 +68,7 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(5.29, $davies->unauthorizedCalls);
         $this->assertEquals(250.49, $davies->incurred);
 
-        $this->assertEquals('351236666677777', $davies->replacementImei);
+        $this->assertEquals('149358212660892', $davies->replacementImei);
         $this->assertEquals('Samsung', $davies->replacementMake);
         $this->assertEquals('S6', $davies->replacementModel);
         $this->assertEquals('Samsung S6', $davies->getReplacementPhoneDetails());
@@ -95,7 +95,7 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
             '42461',
             'Samsung',
             'S6',
-            '351236666677777',
+            '149358212660892',
             '42461',
             '£250.49',
             '£5.29',
@@ -135,7 +135,7 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
             'TBC',
             'Samsung',
             'Galaxy S7 edge (32 GB)',
-            '351236666677777',
+            '149358212660892',
             'TBC',
             '£0.01',
             '£700.00',
@@ -174,7 +174,7 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0.04, $davies->unauthorizedCalls);
         $this->assertEquals(-35, $davies->incurred);
 
-        $this->assertEquals('351236666677777', $davies->replacementImei);
+        $this->assertEquals('149358212660892', $davies->replacementImei);
         $this->assertEquals('Samsung', $davies->replacementMake);
         $this->assertEquals('Galaxy S7 edge (32 GB)', $davies->replacementModel);
         $this->assertEquals('Samsung Galaxy S7 edge (32 GB)', $davies->getReplacementPhoneDetails());
@@ -199,7 +199,7 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
             'TBC',
             'Samsung',
             'Galaxy S7 edge (32 GB)',
-            '351236666677777',
+            '149358212660892',
             'TBC',
             '£0.01',
             '£700.00',
@@ -242,7 +242,80 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(0.04, $davies->unauthorizedCalls);
         $this->assertEquals(-35, $davies->incurred);
 
-        $this->assertEquals('351236666677777', $davies->replacementImei);
+        $this->assertEquals('149358212660892', $davies->replacementImei);
+        $this->assertEquals('Samsung', $davies->replacementMake);
+        $this->assertEquals('Galaxy S7 edge (32 GB)', $davies->replacementModel);
+        $this->assertEquals('Samsung Galaxy S7 edge (32 GB)', $davies->getReplacementPhoneDetails());
+        $this->assertEquals('red', $davies->risk);
+        $this->assertFalse($davies->initialSuspicion);
+        $this->assertTrue($davies->finalSuspicion);
+    }
+
+    public function testFromArrayV8UnobtaintableImei()
+    {
+        // @codingStandardsIgnoreStart
+        $data = [
+            'So-Sure -Mobile',
+            '320170109000912',
+            'Mr Steve Morrison',
+            'TR11 2HR',
+            '21/12/2016',
+            '03/11/2016',
+            '02/11/2017',
+            'Accidental Damage - Dropped In Water',
+            'The insured went out for lunch and fell off his motorbike. The insureds phone was in his pocket and this got damage. The screen has got lines across and the back of the phone has completely shattered.',
+            'In Street',
+            'Open',
+            '',
+            'TBC',
+            'Samsung',
+            'Galaxy S7 edge (32 GB)',
+            'Unable to obtain',
+            'TBC',
+            '£0.01',
+            '£700.00',
+            '£0.02',
+            '£0.03',
+            '£0.04',
+            '£0.05',
+            '£1.08',
+            '£0.06',
+            '£0.26',
+            '£700.26',
+            '-£35.00',
+            '£15.00',
+            '£50.00',
+            'Mob/2016/5500048',
+            '09/01/2017',
+            '09/01/2017',
+            'TBC',
+            'Discount Tyres Redruth Ltd, School Lane, TR15 2DU',
+            '£700.26',
+            'red',
+            '10',
+            'Ok',
+            'Suspicious'
+        ];
+        // @codingStandardsIgnoreEnd
+
+        $davies = new DaviesClaim();
+        $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V8);
+        $this->assertEquals(new \DateTime('2017-11-02'), $davies->endDate);
+        $this->assertEquals(new \DateTime('2016-11-03'), $davies->startDate);
+
+        $this->assertEquals(1.08, $davies->reciperoFee);
+        $this->assertEquals(700.26, $davies->reserved);
+        $this->assertEquals(50, $davies->excess);
+        $this->assertEquals(15, $davies->handlingFees);
+        $this->assertEquals(0.06, $davies->transactionFees);
+        $this->assertEquals(0.01, $davies->phoneReplacementCost);
+        $this->assertEquals(0.02, $davies->accessories);
+        $this->assertEquals(0.04, $davies->unauthorizedCalls);
+        $this->assertEquals(-35, $davies->incurred);
+
+        $this->assertNull($davies->replacementImei);
+        $this->assertEquals(1, count($davies->unobtainableFields));
+        $this->assertEquals('replacementImei', $davies->unobtainableFields[0]);
         $this->assertEquals('Samsung', $davies->replacementMake);
         $this->assertEquals('Galaxy S7 edge (32 GB)', $davies->replacementModel);
         $this->assertEquals('Samsung Galaxy S7 edge (32 GB)', $davies->getReplacementPhoneDetails());
@@ -270,7 +343,7 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
             'TBC',
             'Samsung',
             'Galaxy S7 edge (32 GB)',
-            '351236666677777',
+            '149358212660892',
             'TBC',
             '£0.01',
             '£700.00',
@@ -318,7 +391,7 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
             'TBC',
             'Samsung',
             'Galaxy S7 edge (32 GB)',
-            '351236666677777',
+            '149358212660892',
             'TBC',
             '£0.01',
             '£700.00',
@@ -367,7 +440,7 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
             'TBC',
             'Samsung',
             'Galaxy S7 edge (32 GB)',
-            '351236666677777',
+            '149358212660892',
             'TBC',
             '£0.01',
             '£700.00',
@@ -419,7 +492,7 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
             'TBC',
             'Samsung',
             'Galaxy S7 edge (32 GB)',
-            '3512366666777',
+            '4935821266089',
             'TBC',
             '£0.01',
             '£700.00',
@@ -478,7 +551,7 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
             '345678',
             'Samsung',
             'S6',
-            '351236666677777',
+            '149358212660892',
             '345678',
             '250.49',
             '5.29',
@@ -521,7 +594,7 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
             '42461',
             'Samsung',
             'S6',
-            '351236666677777',
+            '149358212660892',
             '42461',
             '250.49',
             '5.29',
@@ -560,7 +633,7 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
             '42794',
             'Samsung',
             'S6',
-            '351236666677777',
+            '149358212660892',
             '40000',
             '£250.49',
             '£5.29',
@@ -603,7 +676,7 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
             '42461',
             'Samsung',
             'S6',
-            '351236666677777',
+            '149358212660892',
             '42461',
             '250.49',
             '5.29',
@@ -670,7 +743,7 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
             'TBC',
             'Samsung',
             'Galaxy S7 edge (32 GB)',
-            '351236666677777',
+            '149358212660892',
             'TBC',
             '£0.01',
             '£700.00',
@@ -720,7 +793,7 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
             'TBC',
             'Samsung',
             'Galaxy S7 edge (32 GB)',
-            '351236666677777',
+            '149358212660892',
             'TBC',
             '£0.01',
             '£700.00',
@@ -770,7 +843,7 @@ class DaviesClaimTest extends \PHPUnit_Framework_TestCase
             'TBC',
             'Samsung',
             'Galaxy S7 edge (32 GB)',
-            '351236666677777',
+            '149358212660892',
             'TBC',
             '£0.01',
             '£700.00',
