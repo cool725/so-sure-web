@@ -61,6 +61,8 @@ class UserController extends BaseController
      */
     public function indexAction(Request $request, $policyId = null)
     {
+
+
         $dm = $this->getManager();
         $policyRepo = $dm->getRepository(Policy::class);
         $scodeRepo = $dm->getRepository(SCode::class);
@@ -110,36 +112,6 @@ class UserController extends BaseController
                 $this->generateUrl('user_renew_policy', ['id' => $policy->getPreviousPolicy()->getId()])
             );
         }
-
-        $renewMessage = false;
-        foreach ($user->getValidPolicies(true) as $checkPolicy) {
-            if ($checkPolicy->notifyRenewal() && !$checkPolicy->isRenewed() && !$checkPolicy->hasCashback()) {
-                $this->addFlash(
-                    'success',
-                    sprintf(
-                        '%s is ready for <a href="%s">renewal</a>',
-                        $checkPolicy->getPolicyNumber(),
-                        $this->generateUrl('user_renew_policy', ['id' => $checkPolicy->getId()])
-                    )
-                );
-                $renewMessage = true;
-            }
-           
-            if ($checkPolicy->getPolicyTerms()->isPicSureEnabled() && !$checkPolicy->isPicSureValidated()) {
-                $url = null;
-                // TODO: Change to branch open pic-sure link
-                if ($checkPolicy->getPhone()->isITunes()) {
-                    $url = $this->generateUrl('download_apple', ['medium' => 'pic-sure-warning']);
-                } elseif ($checkPolicy->getPhone()->isGooglePlay()) {
-                    $url = $this->generateUrl('download_google', ['medium' => 'pic-sure-warning']);
-                }
-            }
-        }
-        if (!$renewMessage) {
-            $this->addCashbackFlash();
-        }
-        $this->addRepurchaseExpiredPolicyFlash();
-        $this->addUnInitPolicyInsureFlash();
 
         $scode = null;
         if ($session = $this->get('session')) {
@@ -396,26 +368,57 @@ class UserController extends BaseController
                 );
             }
         }
-        if ($url) {
-            $this->addFlash(
-                'warning',
-                sprintf(
-                    'Your excess for policy %s is £150. <a href="%s">Reduce</a> it with pic-sure',
-                    $checkPolicy->getPolicyNumber(),
-                    $url
-                )
-            );
-        } else {
-                // @codingStandardsIgnoreStart
+
+        $renewMessage = false;
+        foreach ($user->getValidPolicies(true) as $checkPolicy) {
+            if ($checkPolicy->notifyRenewal() && !$checkPolicy->isRenewed() && !$checkPolicy->hasCashback()) {
                 $this->addFlash(
-                    'warning',
+                    'success',
                     sprintf(
-                        'Your excess for policy %s is £150. <a href="#" class="open-intercom">Reduce</a> it by sending us a photo of your screen.',
-                        $checkPolicy->getPolicyNumber()
+                        '%s is ready for <a href="%s">renewal</a>',
+                        $checkPolicy->getPolicyNumber(),
+                        $this->generateUrl('user_renew_policy', ['id' => $checkPolicy->getId()])
                     )
                 );
-                // @codingStandardsIgnoreEnd
+                $renewMessage = true;
+            }
+           
+            if ($checkPolicy->getPolicyTerms()->isPicSureEnabled() && !$checkPolicy->isPicSureValidated()) {
+                $url = null;
+                // TODO: Change to branch open pic-sure link
+                if ($checkPolicy->getPhone()->isITunes()) {
+                    $url = $this->generateUrl('download_apple', ['medium' => 'pic-sure-warning']);
+                } elseif ($checkPolicy->getPhone()->isGooglePlay()) {
+                    $url = $this->generateUrl('download_google', ['medium' => 'pic-sure-warning']);
+                }
+                if ($url) {
+                    $this->addFlash(
+                        'warning',
+                        sprintf(
+                            'Your excess for policy %s is £150. <a href="%s">Reduce</a> it with pic-sure',
+                            $checkPolicy->getPolicyNumber(),
+                            $url
+                        )
+                    );
+                } else {
+                    // @codingStandardsIgnoreStart
+                    $this->addFlash(
+                        'warning',
+                        sprintf(
+                            'Your excess for policy %s is £150. <a href="#" class="open-intercom">Reduce</a> it by sending us a photo of your screen.',
+                            $checkPolicy->getPolicyNumber()
+                        )
+                    );
+                    // @codingStandardsIgnoreEnd
+                }
+            }
         }
+        if (!$renewMessage) {
+            $this->addCashbackFlash();
+        }
+        $this->addRepurchaseExpiredPolicyFlash();
+        $this->addUnInitPolicyInsureFlash();
+        
 
         $sixpack = $this->get('app.sixpack');
         $shareExperiment = $sixpack->participate(
