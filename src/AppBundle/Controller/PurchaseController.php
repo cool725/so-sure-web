@@ -519,7 +519,7 @@ class PurchaseController extends BaseController
             $request,
             SixpackService::EXPERIMENT_POLICY_PDF_DOWNLOAD,
             ['no-pdf-download', 'pdf-download'],
-            false
+            SixpackService::LOG_MIXPANEL_NONE // keep consistent with running test; change for future
         );
 
         $now = new \DateTime();

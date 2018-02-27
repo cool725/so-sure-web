@@ -423,7 +423,7 @@ class UserController extends BaseController
                 SixpackService::ALTERNATIVES_SHARE_MESSAGE_SIMPLE,
                 SixpackService::ALTERNATIVES_SHARE_MESSAGE_ORIGINAL
             ],
-            false,
+            SixpackService::LOG_MIXPANEL_NONE,
             1,
             $policy->getStandardSCode()->getCode()
         );

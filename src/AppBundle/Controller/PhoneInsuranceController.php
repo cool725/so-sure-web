@@ -452,7 +452,7 @@ class PhoneInsuranceController extends BaseController
             $request,
             SixpackService::EXPERIMENT_NEW_QUOTE_DESIGN,
             ['old-quote', 'new-quote-design'],
-            true
+            SixpackService::LOG_MIXPANEL_ALL // keep consistent with running test; change for future
         );
 
         if ($request->get('force')) {
