@@ -89,7 +89,8 @@ class DefaultController extends BaseController
             'phone'           => $this->getQuerystringPhone($request),
         );
 
-        return $this->render('AppBundle:Default:index.html.twig', $data);
+        // return $this->render('AppBundle:Default:index.html.twig', $data);
+        return $this->render('AppBundle:Default:indexContentShuffle.html.twig', $data);
     }
 
 

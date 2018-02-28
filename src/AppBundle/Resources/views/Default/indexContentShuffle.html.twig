@@ -1,0 +1,437 @@
+{% extends 'base.html.twig' %}
+
+{# Set vars #}
+{% set new_stylesheet = 1 %}
+{% set new_footer = 1 %}
+
+{% block title %}so-sure - Welcome to Social Insurance{% endblock %}
+{% block meta %}
+    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
+    <meta name="keywords" content="mobile phone insurance, social insurance"/>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets output='css/*.css'
+    'components/animate.css/animate.min.css'
+    '@AppBundle/Resources/public/sass/page/homepage.scss'
+ %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{% block body %}
+
+    {# Hero #}
+    <section class="homepage--hero">
+
+        <h1 class="homepage--hero-h1">Mobile Insurance <br>That Gives Back</h1>
+
+        <p class="lead">We reward you when you don’t claim, <br class="hidden-xs"> and protect you when you do. Simple.</p>
+
+        {% if phone is defined and phone %}
+            {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type': select_phone_type, 'id': phone.id })) }}
+        {% else %}
+            {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type': select_phone_type })) }}
+        {% endif %}
+
+        <div id="hero-character_1"
+             class="homepage--hero__character">
+            <div class="homepage--hero__tooltip animated tada"
+                 data-content="Accidental damage cover, including cracked screen and water damage"></div>
+        </div>
+        <div id="hero-character_2"
+             class="homepage--hero__character">
+            <div class="homepage--hero__tooltip"
+                 data-content="Worldwide travel cover for trips not exceeding 90 days"></div>
+        </div>
+        <div id="hero-character_3_and_4"
+             class="homepage--hero__character clearfix">
+            <div class="left">
+                <div class="homepage--hero__tooltip"
+                 data-content="Refurbished and second-hand device cover, for phones up to 3 years old"></div>
+            </div>
+            <div class="right">
+                <div class="homepage--hero__tooltip"
+                 data-content="Out of warranty breakdown cover"></div>
+            </div>
+        </div>
+        <div id="hero-character_5_and_6"
+             class="homepage--hero__character clearfix">
+            <div class="left">
+                <div class="homepage--hero__tooltip"
+                 data-content="Theft and Loss cover as standard"></div>
+            </div>
+            <div class="right">
+                <div class="homepage--hero__tooltip"
+                 data-content="Unauthorised network charges cover (up to £1000 inc. VAT)"></div>
+            </div>
+        </div>
+        <div id="hero-character_7"
+             class="homepage--hero__character">
+            <div class="homepage--hero__tooltip homepage--hero__tooltip__reward"
+                 data-content="Next day phone replacement/repair or up to 80% of your money back when you and your friends don't claim"></div>
+             </div>
+        <div id="hero-character_8"
+             class="homepage--hero__character">
+            <div class="homepage--hero__tooltip"
+                 data-content="Accessories cover (up to £100 inc. VAT) for theft and loss claim"></div>
+        </div>
+    </section>
+
+    {# Press #}
+    <section class="section--pad homepage--press">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <h4 class="h-light">as seen in</h4>
+                    <ul class="list-inline press-list text-center">
+                        <li class="press-img the-guardian" title="The Guardian - Why Facebook and Microsoft say chatbots are the talk of the town"></li>
+                        <li class="press-img financial-times" title="Financial Times - Innovation to watch: Friends based insurance"></li>
+                        <li class="press-img insurance-post" title="Insurance Post - so-sure to launch revolutionary social peer-to-peer mobile insurance app"></li>
+                    </ul>
+                    <h4 class="h-light">awards</h4>
+                    <ul class="list-inline press-list text-center">
+                        <li class="press-img digital-top-50" title="Digital Top 50 Awards 2016 - B2C Start-up"></li>
+                        <li class="press-img insurance-choice-awards" title="Insurance Choice Awards 2017 - ‘Best Insurance App' + 'Innovation of the Year' categories 2017"></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Why we're better than the rest #}
+    <section class="section--pad homepage--why-we-are-better">
+        <div class="container">
+            <h2 class="text-center h1">Why we're better than the rest</h2>
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="img-container">
+                        <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/so-sure_balloon_better.svg"
+                             class="img-responsive img-responsive--center so-sure_homepage-balloon lozad" alt="We lift you up when something bad happens">
+                    </div>
+                </div>
+                <div class="col-md-7">
+                    <ol class="ol--blue-counter">
+                        <li>
+                            <h3 class="text-blue">We don’t hide behind the small print and painful claims process</h3>
+                            <p>We’re upfront and honest with our customers on what is covered, what is not, and what the claims process looks like. This means that there’s no nasty surprises when you have an issue with your device. And you don’t need a law degree to understand our policy - everything is explained in plain English.</p>
+                        </li>
+                        <li>
+                            <h3 class="text-blue">If something bad happens, we aim to provide next working day repair or replacement</h3>
+                            <p>As simple as that. It sucks to be without your phone, we understand it and work with a global phone provider and world-class logistics company who help us get a model back in your hands the next working day.</p>
+                        </li>
+                        <li>
+                            <h3 class="text-blue">And if you’re careful, we reward you with up to 80% of your money</h3>
+                            <p>Connect with your family and friends and get up to 80% of your money back if you and your connections don’t claim. It finally pays to be careful!</p>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+            <div class="text-center">
+                <a href="#"
+                   class="btn btn-blue btn-pad btn-lg scroll-to"
+                   data-scroll-to-anchor=".homepage--we-compare-well"><i class="fa fa-angle-down hidden-xs" aria-hidden="true"></i> &nbsp; <strong>We're still up to 40% cheaper than traditional insurers</strong> &nbsp; <i class="fa fa-angle-down hidden-xs" aria-hidden="true"></i></a>
+            </div>
+        </div>
+    </section>
+
+    {# Cover Details #}
+    <section class="section--pad homepage--cover-details">
+        <div class="container">
+            <h2 class="h1">Cover Details</h2>
+            <p class="lead">We give you peace of mind and cover you for:</p>
+            <div class="row">
+                <div class="col-md-10 col-md-offset-1">
+                    <div class="row">
+                        <div class="col-sm-6 col-md-4">
+                            <div class="cover-img lozad theft"
+                                 data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
+                            <h4>Theft <br><small class="hidden-xs">&nbsp;</small></h4>
+                        </div>
+                         <div class="col-sm-6 col-md-4">
+                            <div class="cover-img lozad loss"
+                                 data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
+                            <h4>Loss <br><small class="hidden-xs">&nbsp;</small></h4>
+                        </div>
+                      <div class="col-sm-6 col-md-4">
+                            <div class="cover-img lozad accidental-damage"
+                                 data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
+                            <h4>Accidental Damage <br><small>Including cracked screen &amp; water damage </small></h4>
+                        </div>
+                        <div class="col-sm-6 col-md-4">
+                            <div class="cover-img lozad breakdown"
+                                 data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
+                            <h4>Out of Warranty Breakdown <br><small class="hidden-xs">&nbsp;</small></h4>
+                        </div>
+                       <div class="col-sm-6 col-md-4">
+                            <div class="cover-img lozad charges"
+                                 data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
+                            <h4>Unauthorised Network Charges <br><small >Up to the value of £1000 inc. VAT</small></h4>
+                        </div>
+                          <div class="col-sm-6 col-md-4">
+                            <div class="cover-img lozad accessories"
+                                 data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
+                            <h4>Accessories <br><small>Up to the value of £100 inc. VAT for theft or loss claims</small></h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Travel When Abroad #}
+    <section class="homepage--when-you-travel">
+        <div class="cloud cloud--top">
+            <img src="{{ cdn_url }}/images/homepage/so-sure_cloud_top_expanded.svg"
+                 alt="cloud top"
+                 align="top">
+        </div>
+        <div class="container">
+            <h2 class="h1">Including When You Travel Abroad</h2>
+            <p class="lead">We have your back whilst you're on the road (as long as your trip does not exceed 90 days)</p>
+            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                 data-src="{{ cdn_url }}/images/homepage/so-sure_airways.svg"
+                 alt="so-sure - airways"
+                 class="img-responsive img-responsive--center so-sure_airways lozad">
+        </div>
+        <div class="cloud cloud--bottom">
+            <img src="{{ cdn_url }}/images/homepage/so-sure_cloud_bottom_expanded.svg"
+                 alt="cloud bottom"
+                 align="bottom">
+        </div>
+    </section>
+
+    {# What we don't cover #}
+    <section class="homepage--what-we-dont-cover">
+        <div class="container">
+            <h2 class="text-center h1">What We Don't Cover</h2>
+            <ol class="ol--blue-counter">
+                <li class="h4 h-light">Excess<br>
+                    • pic-sure validated <i class="fa fa-question-circle" title="pic-sure is our free app-based process to prove your phone is in good working condition and your screen is not cracked"></i>: £70 for Theft/Loss and £50 for Accidental Damage/Breakdown.<br>
+                    • otherwise: £150 for Theft/Loss/Accidental Damage/Breakdown
+                </li>
+                <li class="h4 h-light">Theft, Loss, Accidental Damage or Breakdown where you have knowingly put your phone at risk</li>
+                <li class="h4 h-light">3+ claims for Loss and/or Theft in any policy year</li>
+            </ol>
+        </div>
+    </section>
+
+    {# pic-sure #}
+    {% if pic_sure is defined and pic_sure == true %}
+
+        <div class="curved-background curved-background__bg-blue hidden-xs">
+            <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 2000 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                    <g id="Artboard" fill="#ffffff">
+                        <path d="M0,0 L2000,0 L2000,139.921588 C1890.08746,181.703317 1753.08746,201.692115 1589,199.887983 C1424.91254,198.083852 1258.91254,174.763587 1091,129.927189 C918.666667,89.9495926 740,69.9607942 555,69.9607942 C370,69.9607942 185,113.269857 0,199.887983 L0,0 Z" id="Rectangle" transform="translate(1000.000000, 100.000000) scale(-1, 1) translate(-1000.000000, -100.000000) "></path>
+                    </g>
+                </g>
+            </svg>
+        </div>
+
+        <section class="section--pad homepage--pic-sure section--arrow section--arrow__lightest-blue">
+            <div class="container">
+                <h2 class="h1 text-center">Let's talk about excess</h2>
+                <p class="lead">Our excess is &pound;150. That's high, we know, but we're making sure that dishonest policyholders and fraudsters don't take advantage of us and our genuine customers.</p>
+                <p class="lead p-arrow">And that's why, by validating your phone with <strong>pic-sure technology</strong>, which takes less than 30 seconds, you can easily take your excess down to:</p>
+                <table class="table hidden-xs">
+                    <thead>
+                        <tr>
+                            <td width="50%" class="h3 contrast">Excess <u>without</u> pic-sure</td>
+                            <td width="50%" class="h3 sosure">Excess <u>with</u> pic-sure</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="contrast" align="middle" valign="middle">
+                                <span class="text-blue h1">£150</span><br>
+                                FOR THEFT/LOSS/ACCIDENTAL DAMAGE/BREAKDOWN
+                            </td>
+                            <td class="sosure" align="middle" valign="middle">
+                                <span class="text-blue h1">£50</span><br>
+                                FOR ACCIDENTAL DAMAGE/BREAKDOWN <br><br>
+                                <span class="text-blue h1">£70</span><br>
+                                FOR THEFT/LOSS
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="table visible-xs">
+                    <thead>
+                        <tr>
+                            <td width="100%" class="h3 contrast">Excess <u>without</u> pic-sure</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="contrast" align="middle" valign="middle">
+                                <span class="text-blue h1">£150</span><br>
+                                FOR THEFT/LOSS/ACCIDENTAL DAMAGE/BREAKDOWN
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="table visible-xs">
+                    <thead>
+                        <tr>
+                            <td width="100%" class="h3 sosure">Excess <u>with</u> pic-sure</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="sosure" align="middle" valign="middle">
+                                <span class="text-blue h1">£50</span><br>
+                                FOR ACCIDENTAL DAMAGE/BREAKDOWN <br><br>
+                                <span class="text-blue h1">£70</span><br>
+                                FOR THEFT/LOSS
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <section class="section--pad homepage--pic-sure-steps">
+            <div class="container">
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/pic-sure_step_1.svg"
+                                 class="lozad" alt="">
+                        <h3>1. Download</h3>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="pic-sure">
+                            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                                 data-src="{{ cdn_url }}/images/homepage/pic-sure_step_2_mirror_frame.svg"
+                                 class="lozad pic-sure--mirror"
+                                 alt="Mirror frame">
+                            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                                 data-src="{{ cdn_url }}/images/homepage/pic-sure_step_2_phone_back.svg"
+                                 class="lozad pic-sure--phone-back animated infinite pulse"
+                                 alt="Phone Back">
+                            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                                 data-src="{{ cdn_url }}/images/homepage/pic-sure_step_2_mirror_reflection.svg"
+                                 class="lozad pic-sure--mirror-reflection"
+                                 alt="Mirror reflection">
+                            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
+                                 data-src="{{ cdn_url }}/images/homepage/pic-sure_step_2_phone_front_qr.svg"
+                                 class="lozad pic-sure--phone-front animated infinite pulse"
+                                 alt="Phone Front">
+                        </div>
+                        <h3>2. Validate with pic-sure</h3>
+                    </div>
+                    <div class="col-md-4">
+                        <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/pic-sure_step_3.svg"
+                                 class="lozad" alt="">
+                        <h3>3. Reduce your excess</h3>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="section--pad">
+            <div class="container">
+                <div class="app-link text-center">
+                    <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/pic-sure_phones.png"
+                                 class="lozad" alt="" width="200px">
+                    <h3>Available on:</h3>
+                    <a class="ga-outbound-click"
+                       data-clicklabel="iTunes"
+                       href="{{ apple_download('homepage-pic-sure') }}"
+                       target="_blank">
+                        <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download so-sure on the App Store" /><span class="sr-only">so-sure app - Apple App Store</span>
+                    </a>
+                    <a class="ga-outbound-click"
+                       data-clicklabel="PlayStore"
+                       href="{{ google_download('homepage-pic-sure') }}"
+                       target="_blank">
+                        <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get so-sure on Google Play" /><span class="sr-only">so-sure app - Google Play</span>
+                   </a>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+
+    <div class="curved-background curved-background__bg-blue hidden-xs">
+        <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 2000 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g id="Artboard" fill="#ffffff">
+                    <path d="M0,0 L2000,0 L2000,139.921588 C1890.08746,181.703317 1753.08746,201.692115 1589,199.887983 C1424.91254,198.083852 1258.91254,174.763587 1091,129.927189 C918.666667,89.9495926 740,69.9607942 555,69.9607942 C370,69.9607942 185,113.269857 0,199.887983 L0,0 Z" id="Rectangle" transform="translate(1000.000000, 100.000000) scale(-1, 1) translate(-1000.000000, -100.000000) "></path>
+                </g>
+            </g>
+        </svg>
+    </div>
+
+    {% include 'AppBundle::Default/_sectionRewardPot.html.twig' %}
+
+    <div class="curved-background hidden-xs">
+        <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 2000 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g id="Artboard" fill="#d6ebff">
+                    <path d="M0,0 L2000,0 L2000,139.921588 C1890.08746,181.703317 1753.08746,201.692115 1589,199.887983 C1424.91254,198.083852 1258.91254,174.763587 1091,129.927189 C918.666667,89.9495926 740,69.9607942 555,69.9607942 C370,69.9607942 185,113.269857 0,199.887983 L0,0 Z" id="Rectangle" transform="translate(1000.000000, 100.000000) scale(-1, 1) translate(-1000.000000, -100.000000) "></path>
+                </g>
+            </g>
+        </svg>
+    </div>
+
+    {# Claims procss #}
+    <section class="section--pad homepage--claims-process">
+        <div class="container">
+            <h2 class="h1">Our Claims Process is as <span class="text-nowrap">Easy as 1, 2, 3</span></h2>
+            <p class="lead">When something bad happens to your phone:</p>
+            <div class="row">
+                <div class="col-md-4">
+                    <span class="large-no large-no--arrow">1</span>
+                    <h4 class="h3 h-light text-blue">Contact Claims Team</h4>
+                    <p>These helpful people are here in the UK, available to answer your call 24-hrs a day, 7 days a week, 365 days a year when you have an issue with your phone. And if you need to start a claim, <a href="{{ path('claim') }}" class="text-nowrap">fill in the form here</a>.</p>
+                </div>
+                <div class="col-md-4">
+                    <span class="large-no large-no--arrow">2</span>
+                    <h4 class="h3 h-light text-blue">Review Claim</h4>
+                    <p>Our goal is for the claims to be handled almost instantly. Approving a claim takes on average less than one hour to process during normal business hours.*</p>
+                </div>
+                <div class="col-md-4">
+                    <span class="large-no">3</span>
+                    <h4 class="h3 h-light text-blue">Approve Claim</h4>
+                    <p>Once your claim is approved, we aim to have a replacement mobile phone delivered to you in the UK by the next working day.</p>
+                </div>
+            </div>
+            <p><small>* However in some cases, like theft, we may require additional information and documentation to fully review the incident and approve the claim. With your help, we aim to do this as soon as possible.</small></p>
+        </div>
+    </section>
+
+    {% include 'AppBundle::Default/_sectionComparison.html.twig' %}
+
+    {% include 'AppBundle::Default/_sectionFeedback.html.twig' %}
+
+    {# Instant Quote #}
+    <section class="homepage--instant-quote">
+        <div class="container">
+            <h2 class="text-center h1">Get Your Instant Quote</h2>
+            {% if phone is defined and phone %}
+                {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'footer', 'id': phone.id })) }}
+            {% else %}
+                {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'footer'})) }}
+            {% endif %}
+            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/so-sure_form_rocket.svg"
+                 class="img-responsive form-rocket lozad" alt="so-sure - rocket">
+        </div>
+    </section>
+
+    {# Page Modals #}
+    {% include 'AppBundle::Default/_coverModals.html.twig' %}
+    {# End Page Modals #}
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    'components/lozad/lozad.min.js'
+    'components/dot/doT.min.js'
+    'components/corejs-typeahead/typeahead.bundle.min.js'
+    'components/fuse.js/fuse.min.js'
+    '@AppBundle/Resources/public/js/Default/images.js'
+    '@AppBundle/Resources/public/js/Default/homepage.js'
+    '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
+ %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}
+
