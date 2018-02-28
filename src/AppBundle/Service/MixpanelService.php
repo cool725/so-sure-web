@@ -680,6 +680,9 @@ class MixpanelService
         return $this->queueTrackAll($event, $properties, null, true);
     }
 
+    /**
+     * Try to match logic in sixpack (ops/ansible/roles/web1604/templates/sixpack-config.yml.j2)
+     */
     public function isUserAgentAllowed($userAgent)
     {
         $parser = Parser::create();
