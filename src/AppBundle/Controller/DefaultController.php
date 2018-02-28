@@ -83,10 +83,9 @@ class DefaultController extends BaseController
 
         $data = array(
             // Make sure to check homepage landing below too
-            'select_phone_type'   => $exp == 'sticky-search' ? 'homepage-sticky' : 'homepage',
-            'pic_sure'        => $exp == 'picsure',
-            'referral'        => $referral,
-            'phone'           => $this->getQuerystringPhone($request),
+            'select_phone_type' => $exp == 'sticky-search' ? 'homepage-sticky' : 'homepage',
+            'referral'          => $referral,
+            'phone'             => $this->getQuerystringPhone($request),
         );
 
         if ($request->get('force')) {
