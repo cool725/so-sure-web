@@ -7,9 +7,15 @@ use AppBundle\Document\DateTrait;
 
 class DaviesExcel
 {
-    protected function nullIfBlank($field)
+    protected function nullIfBlank($field, $fieldName = null, $ref = null)
     {
         if (!$field || $this->isNullableValue($field)) {
+            return null;
+        } elseif ($this->isUnobtainableValue($field)) {
+            if ($fieldName && $ref) {
+                $ref->unobtainableFields[] = $fieldName;
+            }
+
             return null;
         }
 
@@ -39,6 +45,13 @@ class DaviesExcel
             'N/A', 'n/a', 'NA', 'na', '#N/A', 'Not Applicable']);
     }
 
+    protected function isUnobtainableValue($value)
+    {
+        // possible values that Davies might use as placeholders
+        // when a field is required by their system, but data will never be provided
+        return in_array(trim(strtolower($value)), ['unable to obtain']);
+    }
+
     /**
      * @param mixed   $days           int (excel number of days from 1/1/1900) or string date 31/1/2016
      * @param boolean $skipEndCheck   future dates are normally disallowed except for policy end date
@@ -47,7 +60,7 @@ class DaviesExcel
     protected function excelDate($days, $skipEndCheck = false, $nullIfTooEarly = false)
     {
         try {
-            if (!$days || $this->isNullableValue($days)) {
+            if (!$days || $this->isNullableValue($days) || $this->isUnobtainableValue($days)) {
                 return null;
             }
 

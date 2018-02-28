@@ -239,7 +239,7 @@ class PhoneInsuranceController extends BaseController
             return new RedirectResponse($this->generateUrl('homepage'));
         }
 
-        $this->setPhoneSession($request, $phone);
+        $quoteUrl = $this->setPhoneSession($request, $phone);
 
         // We have run various tests for cpc traffic in the page where both manufacturer and homepage
         // outperformed quote page. Also homepage was better than manufacturer page
@@ -310,16 +310,16 @@ class PhoneInsuranceController extends BaseController
                             sprintf('Your saved so-sure quote for %s', $phone),
                             $lead->getEmail(),
                             'AppBundle:Email:quote/priceGuarentee.html.twig',
-                            ['phone' => $phone, 'sevenDays' => $sevenDays, 'quoteUrl' => $session->get('quote_url')],
+                            ['phone' => $phone, 'sevenDays' => $sevenDays, 'quoteUrl' => $quoteUrl],
                             'AppBundle:Email:quote/priceGuarentee.txt.twig',
-                            ['phone' => $phone, 'sevenDays' => $sevenDays, 'quoteUrl' => $session->get('quote_url')]
+                            ['phone' => $phone, 'sevenDays' => $sevenDays, 'quoteUrl' => $quoteUrl]
                         );
                         $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_LEAD_CAPTURE);
                         $this->get('app.mixpanel')->queuePersonProperties([
                             '$email' => $lead->getEmail()
                         ], true);
                         $this->get('app.intercom')->queueLead($lead, IntercomService::QUEUE_EVENT_SAVE_QUOTE, [
-                            'quoteUrl' => $session->get('quote_url'),
+                            'quoteUrl' => $quoteUrl,
                             'phone' => $phone->__toString(),
                             'price' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
                             'expires' => $sevenDays,
@@ -422,6 +422,10 @@ class PhoneInsuranceController extends BaseController
             }
 
             $this->get('app.sixpack')->convert(
+                SixpackService::EXPERIMENT_HOMEPAGE_AA_V2
+            );
+
+            $this->get('app.sixpack')->convert(
                 SixpackService::EXPERIMENT_HOMEPAGE_STICKYSEARCH_PICSURE
             );
         }
@@ -452,7 +456,7 @@ class PhoneInsuranceController extends BaseController
             $request,
             SixpackService::EXPERIMENT_NEW_QUOTE_DESIGN,
             ['old-quote', 'new-quote-design'],
-            true
+            SixpackService::LOG_MIXPANEL_ALL // keep consistent with running test; change for future
         );
 
         if ($request->get('force')) {

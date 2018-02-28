@@ -422,12 +422,14 @@ class ApiExternalControllerTest extends BaseControllerTest
         $crawler =  static::$client->request(
             "POST",
             $url,
-            array(),
-            array(),
-            array(),
             $data
         );
 
-        $data = $this->verifyResponse(200);
+        $data = $this->verifyResponse(
+            302,
+            null,
+            null,
+            sprintf("%s %s", static::$phone->__toString(), static::$phone->getId())
+        );
     }
 }

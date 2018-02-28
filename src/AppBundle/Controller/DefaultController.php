@@ -65,11 +65,18 @@ class DefaultController extends BaseController
             $this->get('logger')->debug(sprintf('Referral %s', $referral));
         }
 
+        $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_HOMEPAGE_AA_V2,
+            ['A1', 'A2'],
+            SixpackService::LOG_MIXPANEL_CONVERSION
+        );
+
         $exp = $this->sixpack(
             $request,
             SixpackService::EXPERIMENT_HOMEPAGE_STICKYSEARCH_PICSURE,
             ['v2', 'sticky-search', 'picsure'],
-            true
+            SixpackService::LOG_MIXPANEL_ALL // keep consistent with running test; change for future
         );
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
@@ -543,7 +550,7 @@ class DefaultController extends BaseController
         $exp = $this->get('app.sixpack')->participate(
             SixpackService::EXPERIMENT_PYG_HOME,
             ['pyg', 'home'],
-            true
+            SixpackService::LOG_MIXPANEL_NONE
         );
         */
         //if ($exp == 'home') {

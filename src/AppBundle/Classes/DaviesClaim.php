@@ -4,11 +4,13 @@ namespace AppBundle\Classes;
 use AppBundle\Document\Claim;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\ImeiTrait;
 
 class DaviesClaim extends DaviesExcel
 {
     use CurrencyTrait;
     use DateTrait;
+    use ImeiTrait;
 
     const SHEET_NAME_V8 = 'Created - Cumulative';
     const SHEET_NAME_V7 = 'Created - Cumulative';
@@ -142,6 +144,13 @@ class DaviesClaim extends DaviesExcel
     public $daysSinceInception;
     public $initialSuspicion;
     public $finalSuspicion;
+
+    public $unobtainableFields;
+
+    public function __construct()
+    {
+        $this->unobtainableFields = [];
+    }
 
     public function getIncurred()
     {
@@ -395,7 +404,7 @@ class DaviesClaim extends DaviesExcel
             $this->brightstarProductNumber = $this->nullIfBlank($data[++$i]);
             $this->replacementMake = $this->nullIfBlank($data[++$i]);
             $this->replacementModel = $this->nullIfBlank($data[++$i]);
-            $this->replacementImei = $this->nullIfBlank($data[++$i]);
+            $this->replacementImei = $this->nullIfBlank($data[++$i], 'replacementImei', $this);
             $this->replacementReceivedDate = $this->excelDate($data[++$i], false, true);
 
             if (in_array($columns, [self::COLUMN_COUNT_V6, self::COLUMN_COUNT_V7, self::COLUMN_COUNT_V8])) {
@@ -477,8 +486,7 @@ class DaviesClaim extends DaviesExcel
                 throw new \Exception('Unknown or missing claim type');
             }
 
-            if ($this->replacementImei && strlen($this->replacementImei) > 0 &&
-                !preg_match('/^[0-9]{15}$/', $this->replacementImei)) {
+            if ($this->replacementImei && !$this->isImei($this->replacementImei)) {
                 throw new \Exception(sprintf('Invalid replacement imei %s', $this->replacementImei));
             }
         } catch (\Exception $e) {

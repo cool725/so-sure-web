@@ -20,6 +20,7 @@ class MixpanelService
 
     const QUEUE_PERSON_PROPERTIES = 'person';
     const QUEUE_PERSON_PROPERTIES_ONCE = 'person-once';
+    const QUEUE_PERSON_PROPERTIES_UNION = 'person-union';
     const QUEUE_PERSON_INCREMENT = 'person-increment';
     const QUEUE_TRACK = 'track';
     const QUEUE_ALIAS = 'alias';
@@ -399,6 +400,13 @@ class MixpanelService
                     $ip = isset($data['ip']) ? $data['ip'] : null;
 
                     $this->setPersonPropertiesOnce($data['userId'], $data['properties'], $ip);
+                } elseif ($action == self::QUEUE_PERSON_PROPERTIES_UNION) {
+                    if (!isset($data['userId']) || !isset($data['properties'])) {
+                        throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
+                    }
+                    $ip = isset($data['ip']) ? $data['ip'] : null;
+
+                    $this->unionPersonProperties($data['userId'], $data['properties'], $ip);
                 } elseif ($action == self::QUEUE_PERSON_INCREMENT) {
                     if (!isset($data['userId']) || !isset($data['properties']) ||
                         !isset($data['properties']['field']) || !isset($data['properties']['incrementBy'])) {
@@ -507,7 +515,7 @@ class MixpanelService
         ]);
     }
 
-    public function queuePersonProperties(array $personProperties, $setOnce = false, $user = null)
+    public function queuePersonProperties(array $personProperties, $setOnce = false, $user = null, $union = false)
     {
         // don't send empty data
         if (count($personProperties) == 0) {
@@ -526,6 +534,8 @@ class MixpanelService
 
         if ($setOnce) {
             $this->queue(self::QUEUE_PERSON_PROPERTIES_ONCE, $userId, $personProperties);
+        } elseif ($union) {
+            $this->queue(self::QUEUE_PERSON_PROPERTIES_UNION, $userId, $personProperties);
         } else {
             $this->queue(self::QUEUE_PERSON_PROPERTIES, $userId, $personProperties);
         }
@@ -560,6 +570,22 @@ class MixpanelService
 
         //$this->mixpanel->identify($userId);
         $this->mixpanel->people->setOnce($userId, $personProperties, $ip);
+    }
+
+    private function unionPersonProperties($userId, array $personProperties, $ip = null)
+    {
+        if (!$this->canSend()) {
+            return;
+        }
+
+        foreach ($personProperties as $key => $value) {
+            // odd behvaoiur in php array where if value is array, then union is used, otherwise append
+            // as we're always wanting union for this operation, ensure array is passed
+            if (gettype($value) != "array") {
+                $value = [$value];
+            }
+            $this->mixpanel->people->append($userId, $key, $value, $ip);
+        }
     }
 
     private function track($userId, $event, $properties)
@@ -654,6 +680,9 @@ class MixpanelService
         return $this->queueTrackAll($event, $properties, null, true);
     }
 
+    /**
+     * Try to match logic in sixpack (ops/ansible/roles/web1604/templates/sixpack-config.yml.j2)
+     */
     public function isUserAgentAllowed($userAgent)
     {
         $parser = Parser::create();

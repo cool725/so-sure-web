@@ -61,6 +61,8 @@ class UserController extends BaseController
      */
     public function indexAction(Request $request, $policyId = null)
     {
+
+
         $dm = $this->getManager();
         $policyRepo = $dm->getRepository(Policy::class);
         $scodeRepo = $dm->getRepository(SCode::class);
@@ -110,55 +112,6 @@ class UserController extends BaseController
                 $this->generateUrl('user_renew_policy', ['id' => $policy->getPreviousPolicy()->getId()])
             );
         }
-
-        $renewMessage = false;
-        foreach ($user->getValidPolicies(true) as $checkPolicy) {
-            if ($checkPolicy->notifyRenewal() && !$checkPolicy->isRenewed() && !$checkPolicy->hasCashback()) {
-                $this->addFlash(
-                    'success',
-                    sprintf(
-                        '%s is ready for <a href="%s">renewal</a>',
-                        $checkPolicy->getPolicyNumber(),
-                        $this->generateUrl('user_renew_policy', ['id' => $checkPolicy->getId()])
-                    )
-                );
-                $renewMessage = true;
-            }
-            if ($checkPolicy->getPolicyTerms()->isPicSureEnabled() && !$checkPolicy->isPicSureValidated()) {
-                $url = null;
-                // TODO: Change to branch open pic-sure link
-                if ($checkPolicy->getPhone()->isITunes()) {
-                    $url = $this->generateUrl('download_apple', ['medium' => 'pic-sure-warning']);
-                } elseif ($checkPolicy->getPhone()->isGooglePlay()) {
-                    $url = $this->generateUrl('download_google', ['medium' => 'pic-sure-warning']);
-                }
-                if ($url) {
-                    $this->addFlash(
-                        'warning',
-                        sprintf(
-                            'Your excess for policy %s is £150. <a href="%s">Reduce</a> it with pic-sure',
-                            $checkPolicy->getPolicyNumber(),
-                            $url
-                        )
-                    );
-                } else {
-                    // @codingStandardsIgnoreStart
-                    $this->addFlash(
-                        'warning',
-                        sprintf(
-                            'Your excess for policy %s is £150. <a href="#" class="open-intercom">Reduce</a> it by sending us a photo of your screen.',
-                            $checkPolicy->getPolicyNumber()
-                        )
-                    );
-                    // @codingStandardsIgnoreEnd
-                }
-            }
-        }
-        if (!$renewMessage) {
-            $this->addCashbackFlash();
-        }
-        $this->addRepurchaseExpiredPolicyFlash();
-        $this->addUnInitPolicyInsureFlash();
 
         $scode = null;
         if ($session = $this->get('session')) {
@@ -416,6 +369,57 @@ class UserController extends BaseController
             }
         }
 
+        $renewMessage = false;
+        foreach ($user->getValidPolicies(true) as $checkPolicy) {
+            if ($checkPolicy->notifyRenewal() && !$checkPolicy->isRenewed() && !$checkPolicy->hasCashback()) {
+                $this->addFlash(
+                    'success',
+                    sprintf(
+                        '%s is ready for <a href="%s">renewal</a>',
+                        $checkPolicy->getPolicyNumber(),
+                        $this->generateUrl('user_renew_policy', ['id' => $checkPolicy->getId()])
+                    )
+                );
+                $renewMessage = true;
+            }
+           
+            if ($checkPolicy->getPolicyTerms()->isPicSureEnabled() && !$checkPolicy->isPicSureValidated()) {
+                $url = null;
+                // TODO: Change to branch open pic-sure link
+                if ($checkPolicy->getPhone()->isITunes()) {
+                    $url = $this->generateUrl('download_apple', ['medium' => 'pic-sure-warning']);
+                } elseif ($checkPolicy->getPhone()->isGooglePlay()) {
+                    $url = $this->generateUrl('download_google', ['medium' => 'pic-sure-warning']);
+                }
+                if ($url) {
+                    $this->addFlash(
+                        'warning',
+                        sprintf(
+                            'Your excess for policy %s is £150. <a href="%s">Reduce</a> it with pic-sure',
+                            $checkPolicy->getPolicyNumber(),
+                            $url
+                        )
+                    );
+                } else {
+                    // @codingStandardsIgnoreStart
+                    $this->addFlash(
+                        'warning',
+                        sprintf(
+                            'Your excess for policy %s is £150. <a href="#" class="open-intercom">Reduce</a> it by sending us a photo of your screen.',
+                            $checkPolicy->getPolicyNumber()
+                        )
+                    );
+                    // @codingStandardsIgnoreEnd
+                }
+            }
+        }
+        if (!$renewMessage) {
+            $this->addCashbackFlash();
+        }
+        $this->addRepurchaseExpiredPolicyFlash();
+        $this->addUnInitPolicyInsureFlash();
+        
+
         $sixpack = $this->get('app.sixpack');
         $shareExperiment = $sixpack->participate(
             SixpackService::EXPERIMENT_SHARE_MESSAGE,
@@ -423,7 +427,7 @@ class UserController extends BaseController
                 SixpackService::ALTERNATIVES_SHARE_MESSAGE_SIMPLE,
                 SixpackService::ALTERNATIVES_SHARE_MESSAGE_ORIGINAL
             ],
-            false,
+            SixpackService::LOG_MIXPANEL_NONE,
             1,
             $policy->getStandardSCode()->getCode()
         );
@@ -1044,6 +1048,11 @@ class UserController extends BaseController
         //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_V1_V2);
         //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_V1_V2OLD_V2NEW);
         // $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_FUNNEL_V1_V2);
+        $this->get('app.sixpack')->convert(
+            SixpackService::EXPERIMENT_HOMEPAGE_AA_V2,
+            SixpackService::KPI_POLICY_PURCHASE
+        );
+
         $this->get('app.sixpack')->convert(
             SixpackService::EXPERIMENT_HOMEPAGE_STICKYSEARCH_PICSURE,
             SixpackService::KPI_POLICY_PURCHASE

@@ -13,7 +13,15 @@ class SixpackService
 {
     const TIMEOUT = 3;
 
+    // assume conversion is occuring at user purchase (exclude existing policy holders)
+    const LOG_MIXPANEL_CONVERSION = 'conversion';
+    // always log to mixpanel
+    const LOG_MIXPANEL_ALL = 'all';
+    // don't log to mixpanel
+    const LOG_MIXPANEL_NONE = 'none';
+
     //const EXPERIMENT_HOMEPAGE_AA = 'homepage-aa';
+    const EXPERIMENT_HOMEPAGE_AA_V2 = 'homepage-aa-v2';
     //const EXPERIMENT_LANDING_HOME = 'landing-or-home';
     //const EXPERIMENT_CPC_QUOTE_MANUFACTURER = 'cpc-quote-or-manufacturer';
     const EXPERIMENT_SHARE_MESSAGE = 'share-message';
@@ -86,7 +94,7 @@ class SixpackService
     public function participate(
         $experiment,
         $alternatives,
-        $logMixpanel = false,
+        $logMixpanel = self::LOG_MIXPANEL_NONE,
         $trafficFraction = 1,
         $clientId = null
     ) {
@@ -123,8 +131,25 @@ class SixpackService
             $this->logger->error(sprintf('Failed exp %s', $experiment), ['exception' => $e]);
         }
 
-        if ($logMixpanel) {
-            $this->mixpanel->queuePersonProperties([sprintf('Sixpack: %s', $experiment) => $result], false);
+        $policyHolder = $this->requestService->getUser() && $this->requestService->getUser()->hasPolicy();
+        if (($logMixpanel == self::LOG_MIXPANEL_CONVERSION && !$policyHolder) ||
+            $logMixpanel == self::LOG_MIXPANEL_ALL) {
+            if (in_array($experiment, [
+                self::EXPERIMENT_APP_SHARE_METHOD,
+                self::EXPERIMENT_HOMEPAGE_STICKYSEARCH_PICSURE,
+                self::EXPERIMENT_NEW_QUOTE_DESIGN,
+                self::EXPERIMENT_POLICY_PDF_DOWNLOAD,
+                self::EXPERIMENT_SHARE_MESSAGE,
+            ])) {
+                $this->mixpanel->queuePersonProperties([sprintf('Sixpack: %s', $experiment) => $result], true);
+            } else {
+                $this->mixpanel->queuePersonProperties(
+                    ['Sixpack' => sprintf('%s=%s', $experiment, $result)],
+                    false,
+                    null,
+                    true
+                );
+            }
         }
 
         return $result;
