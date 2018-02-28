@@ -950,10 +950,6 @@ class AdminEmployeeController extends BaseController
      */
     public function adminUserAction(Request $request, $id)
     {
-
-        // gets value of a parameter
-        $roles = $this->getParameter('roles');
-
         $dm = $this->getManager();
         $repo = $dm->getRepository(User::class);
         $user = $repo->find($id);
@@ -1220,10 +1216,7 @@ class AdminEmployeeController extends BaseController
                 }
             }
         }
-               
-        // var_dump($roleForm->createView());
-        // die("fdfd");
-
+        
         return [
             'user' => $user,
             'reset_form' => $resetForm->createView(),
@@ -1239,8 +1232,6 @@ class AdminEmployeeController extends BaseController
             'postcode' => $postcode,
             'census' => $census,
             'income' => $income,
-            'roles' => $roles,
-            
         ];
     }
 
