@@ -146,12 +146,10 @@
                     <tr>
                         
                     {% if is_granted('ROLE_ADMIN') %}
-                        <td>Type:
-                          {% for ur in user_roles %}
+                        <td colspan="2">Type:
+                          {% for ur in user.roles %}
                                 {{ ur }}<br>
                             {% endfor %}
-                         </td>
-                         <td>
                          </td>
                         <td>
                             <button type="button" class="btn btn-info" data-toggle="modal" data-target="#newRoleModal"><i class="fa fa-plus"></i> Edit Roles</button>
@@ -160,7 +158,7 @@
                     </tr>
                 
                     <tr>
-                        <td>Recipero Make/Model Check</td>
+                        <td colspan="2">Recipero Make/Model Check</td>
                         <td>{{ form_start(makemodel_form)}}
                             <span class="text-danger">
                             {{ form_errors(makemodel_form) }}
@@ -218,26 +216,21 @@
                 
             </table>
 </div>
-    {# MARIO #}
+    
     <div class="modal fade" id="newRoleModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
             {{ form_start(role_form) }}
             <div class="modal-body">
-                <div class="row">
-                    <div class="form-group col-sm-12">
-                        Role Type
-                    </div>
-                </div>
-
-                
+                <span class="text-danger">
+                    {{ form_errors(role_form) }}
+                </span>
+                {{ form_widget(role_form.roles)}}
             </div>
             {{ form_end(role_form) }} 
         </div>
       </div>
     </div>
-    {# END MARIO #}
-
     <div class="modal fade" id="newPolicyModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">
         <div class="modal-content">

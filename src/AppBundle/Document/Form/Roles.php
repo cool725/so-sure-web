@@ -15,15 +15,6 @@ class Roles
     protected $roles;
     protected $rolesConfig;
 
-    public function __construct()
-    {
-        // GET ROLES PARAMETER FROM CONFIG.YML. TODO
-        // SETTING ROLES PARAMETER
-        $this->rolesConfig = array( 'ROLE_ADMIN' => 'ROLE_ADMIN',
-                                    'ROLE_CLAIM' => 'ROLE_CLAIM',
-                                    'ROLE_EMPLOYEE' => 'ROLE_EMPLOYEE');
-    }
-
     public function getRoles()
     {
         return $this->roles;

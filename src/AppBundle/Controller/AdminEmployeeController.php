@@ -958,14 +958,6 @@ class AdminEmployeeController extends BaseController
         $repo = $dm->getRepository(User::class);
         $user = $repo->find($id);
 
-        $userRoles = $user->getRoles();
-
-        // Removing ROLE_USER as it is always by default
-        $key = array_search('ROLE_USER', $userRoles);
-        if (false !== $key) {
-            unset($userRoles[$key]);
-        }
-        
         if (!$user) {
             throw $this->createNotFoundException('User not found');
         }
@@ -1022,26 +1014,16 @@ class AdminEmployeeController extends BaseController
             if ($request->request->has('user_role_form')) {
                 $roleForm->handleRequest($request);
                 if ($roleForm->isValid()) {
-                    if (null === $user->getConfirmationToken()) {
-                        /** @var $tokenGenerator \FOS\UserBundle\Util\TokenGeneratorInterface */
-                        $tokenGenerator = $this->get('fos_user.util.token_generator');
-                        $user->setConfirmationToken($tokenGenerator->generateToken());
-                    }
-                    $newRoles = $request->request->get("user_role_form")['roles'];
-
+                    $newRoles = $role->getRoles();
                     $user->setRoles($newRoles);
                     $this->get('fos_user.user_manager')->updateUser($user);
-
                     $this->addFlash(
                         'success',
-                        'Role updated'
+                        'Role(s) updated'
                     );
-
                     return new RedirectResponse($this->generateUrl('admin_user', ['id' => $id]));
                 }
-            }
-
-            if ($request->request->has('reset_form')) {
+            } elseif ($request->request->has('reset_form')) {
                 $resetForm->handleRequest($request);
                 if ($resetForm->isValid()) {
                     if (null === $user->getConfirmationToken()) {
@@ -1239,7 +1221,8 @@ class AdminEmployeeController extends BaseController
             }
         }
                
-
+        // var_dump($roleForm->createView());
+        // die("fdfd");
 
         return [
             'user' => $user,
@@ -1257,7 +1240,7 @@ class AdminEmployeeController extends BaseController
             'census' => $census,
             'income' => $income,
             'roles' => $roles,
-            'user_roles' => $userRoles,
+            
         ];
     }
 
