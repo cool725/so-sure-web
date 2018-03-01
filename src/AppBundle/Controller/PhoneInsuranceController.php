@@ -138,10 +138,10 @@ class PhoneInsuranceController extends BaseController
         );
 
         $template = 'AppBundle:PhoneInsurance:makeInsurance.html.twig';
-        if (in_array($request->get('_route'), ['insure_make'])) { 
+        if (in_array($request->get('_route'), ['insure_make'])) {
             $template = 'AppBundle:PhoneInsurance:makeInsuranceBottomOld.html.twig';
             if ($exp == 'new') {
-               $template = 'AppBundle:Default:makeInsuranceBottom.html.twig';
+                $template = 'AppBundle:Default:makeInsuranceBottom.html.twig';
             }
         }
 
