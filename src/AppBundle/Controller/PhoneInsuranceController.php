@@ -135,7 +135,6 @@ class PhoneInsuranceController extends BaseController
             $request,
             SixpackService::EXPERIMENT_CPC_OLD_NEW,
             ['cpc-old', 'cpc-new'],
-            SixpackService::LOG_MIXPANEL_ALL // keep consistent with running test; change for future
         );
 
         $template = 'AppBundle:PhoneInsurance:makeInsurance.html.twig';
@@ -147,6 +146,9 @@ class PhoneInsuranceController extends BaseController
 
         $event = MixpanelService::EVENT_MANUFACTURER_PAGE;
 
+        if (in_array($request->get('_route'), ['insure_make'])) {
+            $event = MixpanelService::EVENT_CPC_MANUFACTURER_PAGE;
+        }
 
         $this->get('app.mixpanel')->queueTrackWithUtm($event, [
             'Manufacturer' => $make,
