@@ -40,7 +40,7 @@ class SixpackService
     // const EXPERIMENT_HOMEPAGE_STICKYSEARCH_PICSURE = 'homepage-v2-sticksearch-picsure';
     const EXPERIMENT_HOMEPAGE_STICKYSEARCH_SHUFFLE = 'homepage-v2-sticksearch-shuffle';
     // const EXPERIMENT_QUOTE_SECTIONS = 'quote-sections';
-    const EXPERIMENT_POLICY_PDF_DOWNLOAD = 'policy-pdf-download';
+    // const EXPERIMENT_POLICY_PDF_DOWNLOAD = 'policy-pdf-download';
     //const EXPERIMENT_CANCELLATION = 'cancellation';
     const EXPERIMENT_NEW_QUOTE_DESIGN = 'new-quote-design';
 
@@ -143,7 +143,6 @@ class SixpackService
             if (in_array($experiment, [
                 self::EXPERIMENT_APP_SHARE_METHOD,
                 self::EXPERIMENT_NEW_QUOTE_DESIGN,
-                self::EXPERIMENT_POLICY_PDF_DOWNLOAD,
                 self::EXPERIMENT_SHARE_MESSAGE,
             ])) {
                 $this->mixpanel->queuePersonProperties([sprintf('Sixpack: %s', $experiment) => $result], true);
