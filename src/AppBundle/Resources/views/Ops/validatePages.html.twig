@@ -129,6 +129,15 @@
                     No remainder policy available
                 {% endif %}
             </li>
+            <li>
+                <a href="{{ url('user_policy_list') }}?_impersonate={{ picsure_approved_policy.user.email }}">User Policy List pic-sure Approved</a> <b>(auto impersonate {{ picsure_approved_policy.user.email }})</b>
+            </li>
+            <li>
+                <a href="{{ url('user_policy_list') }}?_impersonate={{ picsure_rejected_policy.user.email }}">User Policy List pic-sure Rejected</a> <b>(auto impersonate {{ picsure_rejected_policy.user.email }})</b>
+            </li>
+            <li>
+                <a href="{{ url('user_policy_list') }}?_impersonate={{ non_picsure_policy.user.email }}">User Policy List non-pic-sure policy</a> <b>(auto impersonate {{ non_picsure_policy.user.email }})</b>
+            </li>
         </ul>
 
         <h4>Renewals</h4>

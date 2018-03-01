@@ -6,6 +6,7 @@ use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Phone;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PolicyTerms;
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
@@ -37,7 +38,10 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     const CONNECTIONS_RANDOM = 'random';
     const CONNECTIONS_ONE = 1;
 
-     /**
+    const PICSURE_RANDOM = 'random';
+    const PICSURE_NON_POLICY = 'n/a';
+
+    /**
      * @var ContainerInterface
      */
     private $container;
@@ -175,11 +179,31 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         //\Doctrine\Common\Util\Debug::dump($networkUser);
 
         $user = $this->newUser('user-claimed@so-sure.net');
-        $user->setPlainPassword('w3ares0sure!');
+        $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
         $user->setEnabled(true);
         $manager->persist($user);
         $this->newPolicy($manager, $user, $count++, self::CLAIM_SETTLED_LOSS);
         $this->addConnections($manager, $user, [$networkUser], 1);
+
+        $user = $this->newUser('non-picsure@so-sure.net');
+        $user->setPlainPassword(\AppBundle\DataFixtures\MongoDB\b\User\LoadUserData::DEFAULT_PASSWORD);
+        $user->setEnabled(true);
+        $manager->persist($user);
+        $policy = $this->newPolicy(
+            $manager,
+            $user,
+            $count++,
+            self::CLAIM_NONE,
+            null,
+            null,
+            null,
+            false,
+            true,
+            null,
+            true,
+            3,
+            self::PICSURE_NON_POLICY
+        );
 
         // Users for iOS Testing
         $iphoneUI = $this->getIPhoneUI($manager);
@@ -504,7 +528,8 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $sendInvitation = true,
         $days = null,
         $policyDiscount = null,
-        $paidMonths = null
+        $paidMonths = null,
+        $picSure = self::PICSURE_RANDOM
     ) {
         if (!$phone) {
             $phone = $this->getRandomPhone($manager);
@@ -512,6 +537,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $dm = $this->container->get('doctrine_mongodb.odm.default_document_manager');
         $policyTermsRepo = $dm->getRepository(PolicyTerms::class);
         $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
+        $nonPicSureTerms = $policyTermsRepo->findOneBy(['version' => 'Version 1 June 2016']);
 
         $startDate = new \DateTime();
         if ($days === null) {
@@ -523,7 +549,11 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $policy = new SalvaPhonePolicy();
         $policy->setPhone($phone);
         $policy->setImei($this->generateRandomImei());
-        $policy->init($user, $latestTerms);
+        if ($picSure == self::PICSURE_NON_POLICY) {
+            $policy->init($user, $nonPicSureTerms);            
+        } else {
+            $policy->init($user, $latestTerms);            
+        }
         if (!$code) {
             $policy->createAddSCode($count);
         } else {
@@ -607,6 +637,20 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $policy->create(-5000 + $count, strtoupper($env), $startDate);
         $now = new \DateTime();
         $policy->setStatus(SalvaPhonePolicy::STATUS_ACTIVE);
+        if ($picSure == self::PICSURE_RANDOM) {
+            $picSureStatus = null;
+            $rand = rand(0, 3);
+            if ($rand == 0) {
+                $picSureStatus = PhonePolicy::PICSURE_STATUS_APPROVED;
+            } elseif ($rand == 1) {
+                $picSureStatus = PhonePolicy::PICSURE_STATUS_REJECTED;
+            } elseif ($rand == 2) {
+                $picSureStatus = PhonePolicy::PICSURE_STATUS_INVALID;
+            } elseif ($rand == 3) {
+                $picSureStatus = PhonePolicy::PICSURE_STATUS_MANUAL;
+            }
+            $policy->setPicSureStatus($picSureStatus);
+        }
 
         $policyService = $this->container->get('app.policy');
         $policyService->generateScheduledPayments($policy, $startDate);
