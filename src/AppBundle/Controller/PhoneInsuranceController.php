@@ -134,7 +134,7 @@ class PhoneInsuranceController extends BaseController
         $exp = $this->sixpack(
             $request,
             SixpackService::EXPERIMENT_CPC_OLD_NEW,
-            ['cpcold', 'cpc-new'],
+            ['cpc-old', 'cpc-new'],
             SixpackService::LOG_MIXPANEL_ALL // keep consistent with running test; change for future
         );
 
