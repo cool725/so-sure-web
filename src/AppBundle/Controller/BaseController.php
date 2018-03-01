@@ -36,6 +36,7 @@ use Gedmo\Loggable\Document\LogEntry;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 use AppBundle\Validator\Constraints\AlphanumericValidator;
 use AppBundle\Validator\Constraints\AgeValidator;
+use AppBundle\Service\SixpackService;
 
 abstract class BaseController extends Controller
 {
