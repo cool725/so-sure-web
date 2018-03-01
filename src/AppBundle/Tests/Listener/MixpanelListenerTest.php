@@ -43,6 +43,7 @@ class MixpanelListenerTest extends WebTestCase
     protected static $userManager;
     protected static $mixpanelService;
     protected static $policyService;
+    protected static $requestService;
     protected static $redis;
 
     public static function setUpBeforeClass()
@@ -60,6 +61,7 @@ class MixpanelListenerTest extends WebTestCase
         self::$userRepo = self::$dm->getRepository(User::class);
         self::$userManager = self::$container->get('fos_user.user_manager');
         self::$mixpanelService = self::$container->get('app.mixpanel');
+        self::$requestService = self::$container->get('app.request');
         self::$policyService = self::$container->get('app.policy');
         self::$redis = self::$container->get('snc_redis.default');
     }
@@ -83,11 +85,11 @@ class MixpanelListenerTest extends WebTestCase
 
         $policy->setStatus(PhonePolicy::STATUS_PENDING);
 
-        static::$mixpanelService->setEnvironment('prod');
+        static::$requestService->setEnvironment('prod');
         static::$policyService->setEnvironment('prod');
         static::$policyService->create($policy);
         static::$policyService->setEnvironment('test');
-        static::$mixpanelService->setEnvironment('test');
+        static::$requestService->setEnvironment('test');
 
         $this->assertTrue($policy->isValidPolicy());
 
@@ -125,9 +127,9 @@ class MixpanelListenerTest extends WebTestCase
         $this->assertEquals(0, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
 
         $listener = new MixpanelListener(static::$mixpanelService);
-        static::$mixpanelService->setEnvironment('prod');
+        static::$requestService->setEnvironment('prod');
         $listener->onPaymentSuccessEvent(new PaymentEvent($payment));
-        static::$mixpanelService->setEnvironment('test');
+        static::$requestService->setEnvironment('test');
 
         // person & track
         $this->assertEquals(3, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
@@ -157,9 +159,9 @@ class MixpanelListenerTest extends WebTestCase
         $this->assertEquals(0, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
 
         $listener = new MixpanelListener(static::$mixpanelService);
-        static::$mixpanelService->setEnvironment('prod');
+        static::$requestService->setEnvironment('prod');
         $listener->onPolicyCancelledEvent(new PolicyEvent($policy));
-        static::$mixpanelService->setEnvironment('test');
+        static::$requestService->setEnvironment('test');
 
         // Expect a user update + a policy cancel event
         $this->assertEquals(3, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
@@ -189,9 +191,9 @@ class MixpanelListenerTest extends WebTestCase
         $this->assertEquals(0, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
 
         $listener = new MixpanelListener(static::$mixpanelService);
-        static::$mixpanelService->setEnvironment('prod');
+        static::$requestService->setEnvironment('prod');
         $listener->onPolicyCashbackEvent(new PolicyEvent($policy));
-        static::$mixpanelService->setEnvironment('test');
+        static::$requestService->setEnvironment('test');
 
         // Expect a user update + a policy cancel event
         $this->assertEquals(3, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
@@ -221,9 +223,9 @@ class MixpanelListenerTest extends WebTestCase
         $this->assertEquals(0, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
 
         $listener = new MixpanelListener(static::$mixpanelService);
-        static::$mixpanelService->setEnvironment('prod');
+        static::$requestService->setEnvironment('prod');
         $listener->onPolicyRenewedEvent(new PolicyEvent($policy));
-        static::$mixpanelService->setEnvironment('test');
+        static::$requestService->setEnvironment('test');
 
         // Expect a user update + a policy cancel event
         $this->assertEquals(3, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
@@ -253,9 +255,9 @@ class MixpanelListenerTest extends WebTestCase
         $this->assertEquals(0, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));
 
         $listener = new MixpanelListener(static::$mixpanelService);
-        static::$mixpanelService->setEnvironment('prod');
+        static::$requestService->setEnvironment('prod');
         $listener->onPolicyDeclineRenewedEvent(new PolicyEvent($policy));
-        static::$mixpanelService->setEnvironment('test');
+        static::$requestService->setEnvironment('test');
 
         // Expect a user update + a policy cancel event
         $this->assertEquals(3, static::$redis->llen(MixpanelService::KEY_MIXPANEL_QUEUE));

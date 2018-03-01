@@ -100,6 +100,11 @@ class SixpackService
     ) {
         // default to first option
         $result = $alternatives[0];
+
+        if ($this->requestService->isExcludedAnalytics()) {
+            return $result;
+        }
+
         try {
             if (!$clientId) {
                 $clientId = $this->requestService->getUser() ?
