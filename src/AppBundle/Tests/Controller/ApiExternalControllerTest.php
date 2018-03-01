@@ -12,6 +12,7 @@ use AppBundle\Service\RateLimitService;
 
 /**
  * @group functional-net
+ * AppBundle\\Tests\\Controller\\ApiExternalControllerTest
  */
 class ApiExternalControllerTest extends BaseControllerTest
 {
@@ -431,5 +432,47 @@ class ApiExternalControllerTest extends BaseControllerTest
             null,
             sprintf("%s %s", static::$phone->__toString(), static::$phone->getId())
         );
+        $redirectUrl = self::$router->generate('purchase');
+        $this->assertTrue(self::$client->getResponse()->isRedirect($redirectUrl));
+    }
+
+    public function testGoCompareDeeplinkDuplicateUser()
+    {
+        $email = self::generateEmail('testGoCompareDeeplinkDuplicateUser', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+
+        $url = sprintf(
+            '/external/gocompare/deeplink'
+        );
+        $data  = [
+            'first_name' => 'foo',
+            'surname' => 'bar',
+            'email_address' => $email,
+            'dob' => '2018-01-01',
+            'reference' => static::$phone->getId(),
+        ];
+
+        $crawler =  static::$client->request(
+            "POST",
+            $url,
+            $data
+        );
+
+        $data = $this->verifyResponse(
+            302,
+            null,
+            null,
+            sprintf("%s %s", static::$phone->__toString(), static::$phone->getId())
+        );
+        $redirectUrl = self::$router->generate('fos_user_security_login');
+        $this->assertTrue(self::$client->getResponse()->isRedirect($redirectUrl));
     }
 }
