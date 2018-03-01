@@ -147,7 +147,7 @@ class PhoneInsuranceController extends BaseController
 
         if ($exp == 'new') {
             $template = 'AppBundle:Default:makeInsuranceBottom.html.twig';
-         }
+        }
 
         $this->get('app.mixpanel')->queueTrackWithUtm($event, [
             'Manufacturer' => $make,
