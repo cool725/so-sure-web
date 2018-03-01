@@ -132,14 +132,16 @@ class PhoneInsuranceController extends BaseController
         }
 
         $template = 'AppBundle:PhoneInsurance:makeInsurance.html.twig';
+
         if (in_array($request->get('_route'), ['insure_make'])) {
-            $template = 'AppBundle:PhoneInsurance:makeInsuranceBottom.html.twig';
+            $template = 'AppBundle:PhoneInsurance:makeInsuranceBottomOld.html.twig';
         }
 
         $event = MixpanelService::EVENT_MANUFACTURER_PAGE;
         if (in_array($request->get('_route'), ['insure_make'])) {
             $event = MixpanelService::EVENT_CPC_MANUFACTURER_PAGE;
         }
+
         $this->get('app.mixpanel')->queueTrackWithUtm($event, [
             'Manufacturer' => $make,
         ]);
