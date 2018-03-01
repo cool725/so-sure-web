@@ -513,13 +513,6 @@ class PurchaseController extends BaseController
             }
         }
 
-        $exp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_POLICY_PDF_DOWNLOAD,
-            ['no-pdf-download', 'pdf-download'],
-            SixpackService::LOG_MIXPANEL_NONE // keep consistent with running test; change for future
-        );
-
         $now = new \DateTime();
         $billingDate = $this->adjustDayForBilling($now);
 
