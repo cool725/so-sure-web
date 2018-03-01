@@ -11,14 +11,18 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class BacsType extends AbstractType
+class DirectBacsReceiptType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $now = new \DateTime();
+        $year = $now->format('Y');
+        $years = [$year, $year - 1];
         $builder
-            ->add('name', TextType::class, ['required' => true])
-            ->add('sortcode', TextType::class, ['required' => true])
-            ->add('accountNumber', TextType::class, ['required' => true])
+            ->add('date', DateType::class, ['required' => true, 'years' => $years])
+            ->add('amount', TextType::class, ['required' => true])
+            ->add('notes', TextType::class, ['required' => true])
+            ->add('reference', TextType::class, ['required' => true])
             ->add('save', SubmitType::class)
         ;
     }
@@ -26,7 +30,7 @@ class BacsType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'AppBundle\Document\BacsPaymentMethod',
+            'data_class' => 'AppBundle\Document\Payment\BacsPayment',
         ));
     }
 }

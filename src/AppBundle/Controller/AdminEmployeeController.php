@@ -59,7 +59,7 @@ use AppBundle\Document\Form\Chargebacks;
 use AppBundle\Form\Type\AddressType;
 use AppBundle\Form\Type\BillingDayType;
 use AppBundle\Form\Type\CancelPolicyType;
-use AppBundle\Form\Type\BacsType;
+use AppBundle\Form\Type\DirectBacsReceiptType;
 use AppBundle\Form\Type\ClaimType;
 use AppBundle\Form\Type\ClaimSearchType;
 use AppBundle\Form\Type\ChargebacksType;
@@ -405,7 +405,7 @@ class AdminEmployeeController extends BaseController
         $bacsPayment->setAmount($policy->getPremium()->getYearlyPremiumPrice());
 
         $bacsForm = $this->get('form.factory')
-            ->createNamedBuilder('bacs_form', BacsType::class, $bacsPayment)
+            ->createNamedBuilder('bacs_form', DirectBacsReceiptType::class, $bacsPayment)
             ->getForm();
         $createForm = $this->get('form.factory')
             ->createNamedBuilder('create_form')

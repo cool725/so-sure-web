@@ -1123,12 +1123,12 @@ class UserController extends BaseController
         );
     }
     /**
-     * @Route("/payment-details", name="user_card_details")
-     * @Route("/payment-details/{policyId}", name="user_card_details_policy",
+     * @Route("/payment-details", name="user_payment_details")
+     * @Route("/payment-details/{policyId}", name="user_payment_details_policy",
      *      requirements={"policyId":"[0-9a-f]{24,24}"})
      * @Template
      */
-    public function cardDetailsAction(Request $request, $policyId = null)
+    public function paymentDetailsAction(Request $request, $policyId = null)
     {
         $user = $this->getUser();
         $dm = $this->getManager();
@@ -1146,12 +1146,16 @@ class UserController extends BaseController
             return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
         }
 
-        $webpay = $this->get('app.judopay')->webRegister(
-            $user,
-            $request->getClientIp(),
-            $request->headers->get('User-Agent'),
-            $policy
-        );
+        $bacs = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
+        $webpay = null;
+        if ($user->getPaymentMethod() instanceof JudoPaymentMethod) {
+            $webpay = $this->get('app.judopay')->webRegister(
+                $user,
+                $request->getClientIp(),
+                $request->headers->get('User-Agent'),
+                $policy
+            );
+        }
         $billing = new BillingDay();
         $billing->setPolicy($policy);
         $billingForm = $this->get('form.factory')
@@ -1174,7 +1178,7 @@ class UserController extends BaseController
                         'Thanks for your request. We will be in touch soon.'
                     );
 
-                    return $this->redirectToRoute('user_card_details_policy', ['policyId' => $policyId]);
+                    return $this->redirectToRoute('user_payment_details_policy', ['policyId' => $policyId]);
                 }
             }
         }
@@ -1185,6 +1189,7 @@ class UserController extends BaseController
             'user' => $user,
             'policy' => $policy,
             'billing_form' => $billingForm->createView(),
+            'bacs' => $bacs,
         ];
 
         return $data;

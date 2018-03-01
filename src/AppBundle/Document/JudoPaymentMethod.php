@@ -52,6 +52,11 @@ class JudoPaymentMethod extends PaymentMethod
      */
     protected $deviceDna;
 
+    public function getName()
+    {
+        return 'Card Payment';
+    }
+
     public function setCustomerToken($customerToken)
     {
         $this->customerToken = $customerToken;

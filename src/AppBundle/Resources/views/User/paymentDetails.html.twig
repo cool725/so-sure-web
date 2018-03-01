@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{# Set vars #}
+{% set new_stylesheet = 1 %}
+{% set new_footer = 1 %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets output='css/*.css'
+    '@AppBundle/Resources/public/sass/page/user.scss'%}
+    <link rel="stylesheet" href="{{ asset_url }}"> {% endstylesheets %}
+{% endblock %}
+
+{% block body %}
+  {% include 'AppBundle:User:userNav.html.twig' %}
+
+  <div class="tab-content">
+    <div id="tab-card" class="tab-pane fade in active">
+      {% include 'AppBundle:User:cardDetails.html.twig' %}
+    </div>
+    <div id="tab-bacs" class="tab-pane fade in">
+      {% include 'AppBundle:User:bacsDetails.html.twig' %}
+    </div>
+  </div>
+{% endblock %}

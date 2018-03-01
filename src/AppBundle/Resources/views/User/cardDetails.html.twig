@@ -1,27 +1,23 @@
-{% extends 'base.html.twig' %}
-
-{# Set vars #}
-{% set new_stylesheet = 1 %}
-{% set new_footer = 1 %}
-
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-    '@AppBundle/Resources/public/sass/page/user.scss'%}
-    <link rel="stylesheet" href="{{ asset_url }}"> {% endstylesheets %}
-{% endblock %}
-
-{% block body %}
-  {% include 'AppBundle:User:userNav.html.twig' %}
 
     <section class="user-homepage--content section--pad">
         <div class="container">
-
             <div class="row">
                 <div class="col-md-12">
                     <h2>Your Payment Details</h2>
                 </div>
             </div>
+            {% if bacs %}
+            <div class="row">
+                <div class="col-md-6">
+                  <h4>Your payment method:</h4>
+                </div>
+                <div class="col-md-4">
+                  <br />
+                  <p>{{ user.paymentMethod.name }}</p>
+                  <a href="#tab-bacs" class="btn btn-success" data-toggle="tab">Change to Direct Debit</a>
+                </div>
+            </div>
+            {% endif %}
             <div class="row">
                 <div class="col-md-6">
                   <h4>Your card:</h4>
@@ -88,5 +84,3 @@
       </div>
     </div>
   {% endif %}
-
-{% endblock %}

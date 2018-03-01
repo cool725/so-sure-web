@@ -26,6 +26,8 @@ abstract class PaymentMethod
      */
     protected $firstProblem;
 
+    abstract function getName();
+
     public function getFirstProblem()
     {
         return $this->firstProblem;

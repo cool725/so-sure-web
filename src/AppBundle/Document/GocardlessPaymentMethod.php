@@ -23,6 +23,11 @@ class GocardlessPaymentMethod extends PaymentMethod
     /** @MongoDB\Field(type="collection") */
     protected $accountHashes = array();
 
+    public function getName()
+    {
+        return 'Direct Debit';
+    }
+
     public function setCustomerId($customerId)
     {
         $this->customerId = $customerId;
