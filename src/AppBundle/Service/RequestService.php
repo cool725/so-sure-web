@@ -237,9 +237,13 @@ class RequestService
         return false;
     }
 
-    public function isExcludedAnalyticsUserAgent()
+    public function isExcludedAnalyticsUserAgent($userAgent = null)
     {
-        if (!$userAgent = $this->getUserAgent()) {
+        if (!$userAgent) {
+            $userAgent = $this->getUserAgent();
+        }
+
+        if (!$userAgent) {
             return false;
         }
 
