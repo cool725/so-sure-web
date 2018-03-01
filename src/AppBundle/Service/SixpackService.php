@@ -142,7 +142,6 @@ class SixpackService
             $logMixpanel == self::LOG_MIXPANEL_ALL) {
             if (in_array($experiment, [
                 self::EXPERIMENT_APP_SHARE_METHOD,
-                self::EXPERIMENT_HOMEPAGE_STICKYSEARCH_PICSURE,
                 self::EXPERIMENT_NEW_QUOTE_DESIGN,
                 self::EXPERIMENT_POLICY_PDF_DOWNLOAD,
                 self::EXPERIMENT_SHARE_MESSAGE,
