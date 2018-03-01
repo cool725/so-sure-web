@@ -3,17 +3,17 @@
 namespace AppBundle\Tests\Service;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use AppBundle\Service\PushService;
 
 /**
  * @group functional-nonet
+ * AppBundle\\Tests\\Service\\RequestServiceTest
  */
-class MixpanelServiceTest extends WebTestCase
+class RequestServiceTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
-    protected static $mixpanel;
+    protected static $requestService;
 
     public static function setUpBeforeClass()
     {
@@ -26,19 +26,19 @@ class MixpanelServiceTest extends WebTestCase
 
          //now we can instantiate our service (if you want a fresh one for
          //each test method, do this in setUp() instead
-         self::$mixpanel = self::$container->get('app.mixpanel');
+         self::$requestService = self::$container->get('app.request');
     }
 
     public function tearDown()
     {
     }
 
-    public function testBlankUserAgent()
+    public function testIsExcludedAnalyticsUserAgentBlank()
     {
-        $this->assertTrue(self::$mixpanel->isUserAgentAllowed(''));
+        $this->assertFalse(self::$requestService->isExcludedAnalyticsUserAgent(''));
     }
 
-    public function testDisallowedUserAgent()
+    public function testIsExcludedAnalyticsUserAgentTrue()
     {
         // from bots found in mixpanel and
         // https://deviceatlas.com/blog/list-of-web-crawlers-user-agents
@@ -77,7 +77,7 @@ class MixpanelServiceTest extends WebTestCase
         // @codingStandardsIgnoreEnd
         
         foreach ($agents as $agent) {
-            $this->assertFalse(self::$mixpanel->isUserAgentAllowed($agent), $agent);
+            $this->assertTrue(self::$requestService->isExcludedAnalyticsUserAgent($agent), $agent);
         }
     }
 }

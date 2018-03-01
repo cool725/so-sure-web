@@ -277,6 +277,7 @@ services:
             - "@logger"
             - "@security.token_storage"
             - "%sosure_employee_cookie_value%"
+            - "%kernel.environment%"
 
     app.twig.branch:
         class: AppBundle\Service\BranchTwigExtension
@@ -579,7 +580,6 @@ services:
             - "@snc_redis.default"
             - "@mixpanel"
             - "@app.request"
-            - "%kernel.environment%"
             - "%mixpanel_apisecret%"
             - "@app.stats"
             - "@census.search"
