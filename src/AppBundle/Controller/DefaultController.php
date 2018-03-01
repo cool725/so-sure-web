@@ -74,8 +74,8 @@ class DefaultController extends BaseController
 
         $exp = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_HOMEPAGE_STICKYSEARCH_PICSURE,
-            ['v2', 'sticky-search', 'picsure'],
+            SixpackService::EXPERIMENT_HOMEPAGE_STICKYSEARCH_SHUFFLE,
+            ['v2', 'sticky-search', 'shuffle'],
             SixpackService::LOG_MIXPANEL_ALL // keep consistent with running test; change for future
         );
 
@@ -83,13 +83,18 @@ class DefaultController extends BaseController
 
         $data = array(
             // Make sure to check homepage landing below too
-            'select_phone_type'   => $exp == 'sticky-search' ? 'homepage-sticky' : 'homepage',
-            'pic_sure'        => $exp == 'picsure',
-            'referral'        => $referral,
-            'phone'           => $this->getQuerystringPhone($request),
+            'select_phone_type' => $exp == 'sticky-search' ? 'homepage-sticky' : 'homepage',
+            'referral'          => $referral,
+            'phone'             => $this->getQuerystringPhone($request),
         );
 
-        return $this->render('AppBundle:Default:index.html.twig', $data);
+        $template = 'AppBundle:Default:index.html.twig';
+
+        if ($exp == 'shuffle') {
+            $template = 'AppBundle:Default:indexContentShuffle.html.twig';
+        }
+
+        return $this->render($template, $data);
     }
 
 
