@@ -82,15 +82,15 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-12 text-center">
-                    <span class="h3 h-light">as seen in</span>
+                    {# <span class="h3 h-light">as seen</span> #}
                     <ul class="list-inline press-list text-center">
                         <li class="press-img the-guardian" title="The Guardian - Why Facebook and Microsoft say chatbots are the talk of the town"></li>
                         <li class="press-img financial-times" title="Financial Times - Innovation to watch: Friends based insurance"></li>
                         <li class="press-img insurance-post" title="Insurance Post - so-sure to launch revolutionary social peer-to-peer mobile insurance app"></li>
                         <li class="press-img moneycouk" title="As seen on Money.co.uk"></li>
-                    </ul>
-                    <span class="h3 h-light">awards</span>
-                    <ul class="list-inline press-list text-center">
+                    {# </ul> #}
+                    {# <span class="h3 h-light">awards</span> #}
+                    {# <ul class="list-inline press-list text-center"> #}
                         <li class="press-img digital-top-50" title="Digital Top 50 Awards 2016 - B2C Start-up"></li>
                         <li class="press-img insurance-choice-awards" title="Insurance Choice Awards 2017 - ‘Best Insurance App' + 'Innovation of the Year' categories 2017"></li>
                     </ul>
@@ -112,34 +112,44 @@
     {# Why we're better than the rest #}
     <section class="section--pad homepage--why-we-are-better">
         <div class="container">
-            <h2 class="text-center h1">Why us?</h2>
+            <h2 class="text-center h1 text-blue">Why us?</h2>
 
             <div class="row">
                 <div class="col-md-8 col-md-offset-2">
-                    <p class="lead">We don’t hide behind small print and convoluted processes, we reward you when you don’t claim, and protect you when you do. It’s that simple</p>
-                    <ol class="ol--blue-counter">
+                    <p class="lead">We don’t hide behind small print and convoluted processes, we reward you when you don’t claim, and protect you when you do. It’s that simple.</p>
+                    <ul class="list-unstyled">
                         <li>
-                            <h3 class="text-blue">Hassle-Free Claims</h3>
-                            <p>Easy claims process through our app, website or speaking with a real human here in the UK! We aim to process your claim in less than one hour.</p>
+                            <span class="h3 text-blue">Hassle-Free Claims</span>
+                            <p class="lead">Easy claims process through our app, website or speaking with a real human here in the UK! We aim to process your claim in less than one hour.</p>
                         </li>
                         <li>
-                            <h3 class="text-blue">Next Working Day Replacement</h3>
-                            <p>We get you cant live without your phone, so should the worst happen we aim to replace or repair it the next working day.</p>
+                            <span class="h3 text-blue">Next Working Day Replacement</span>
+                            <p class="lead">We get you can't live without your phone, so should the worst happen we aim to replace or repair it the next working day.</p>
                         </li>
                         <li>
-                            <h3 class="text-blue">Rewards</h3>
-                            <p>We believe life is better together. Thats why we've created insurance thats, well, social. Connect your policy to friends and family and if none of you claim get up to 80% of your money back. No other insurance provider will do this as they are...greedy.</p>
+                            <span class="h3 text-blue">Rewards</span>
+                            <p class="lead">We believe life is better together. That's why we've created insurance that's, well, social. Connect your policy to friends and family and if none of you claim get up to 80% of your money back. No other insurance provider will do this as they are... greedy.</p>
                         </li>
-                    </ol>
+                    </ul>
                 </div>
             </div>
-            <div class="text-center">
+ {#            <div class="text-center">
                 <a href="#"
                    class="btn btn-blue btn-pad btn-lg scroll-to"
                    data-scroll-to-anchor=".homepage--we-compare-well"><i class="fa fa-angle-down hidden-xs" aria-hidden="true"></i> &nbsp; <strong>We're still up to 40% cheaper than traditional insurers</strong> &nbsp; <i class="fa fa-angle-down hidden-xs" aria-hidden="true"></i></a>
-            </div>
+            </div> #}
         </div>
     </section>
+
+    <div class="curved-background curved-background__bg-white hidden-xs">
+        <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 2000 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g id="Artboard" fill="#D7EBFE">
+                    <path d="M0,0 L2000,0 L2000,139.921588 C1890.08746,181.703317 1753.08746,201.692115 1589,199.887983 C1424.91254,198.083852 1258.91254,174.763587 1091,129.927189 C918.666667,89.9495926 740,69.9607942 555,69.9607942 C370,69.9607942 185,113.269857 0,199.887983 L0,0 Z" id="Rectangle" transform="translate(1000.000000, 100.000000) scale(-1, 1) translate(-1000.000000, -100.000000) "></path>
+                </g>
+            </g>
+        </svg>
+    </div>
 
     {# Cover Details #}
     <section class="section--pad homepage--cover-details">
@@ -197,11 +207,11 @@
     </div>
 
     <section class="section--pad homepage--pic-sure section--arrow section--arrow__lightest-blue">
-        <div class="container">
-            <h2 class="h1 text-center">Let's talk about excess</h2>
-            <p class="lead">Our excess is &pound;150. That's high, we know, but we're making sure that dishonest policyholders and fraudsters don't take advantage of us and our genuine customers.</p>
-            <p class="lead p-arrow">And that's why, by validating your phone with <strong>pic-sure technology</strong>, which takes less than 30 seconds, you can easily take your excess down to:</p>
-            <table class="table hidden-xs">
+        <div class="container text-center">
+            <h2 class="h1">Our App and Low Excess</h2>
+            <p class="lead text-left">Our app allows you to validate and insure your phone in a matter of seconds. By using our pic-sure technology you can greatly reduce your excess from our standard £150 to just £50, and be covered immediately.</p>
+            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/iphone_x_app_dash.svg" class="lozad" width="300px">
+{#             <table class="table hidden-xs">
                 <thead>
                     <tr>
                         <td width="50%" class="h3 contrast">Excess <u>without</u> pic-sure</td>
@@ -254,11 +264,13 @@
                         </td>
                     </tr>
                 </tbody>
-            </table>
+            </table> #}
         </div>
     </section>
+
     <section class="section--pad homepage--pic-sure-steps">
         <div class="container">
+            <h3 class="h2 text-center">Here's How it Works</h3>
             <div class="row text-center">
                 <div class="col-md-4">
                     <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/pic-sure_step_1.svg"
@@ -292,30 +304,34 @@
                     <h3>3. Reduce your excess</h3>
                 </div>
             </div>
-        </div>
-    </section>
-    <section class="section--pad">
-        <div class="container">
-            <div class="app-link text-center">
-                <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/pic-sure_phones.png"
-                             class="lozad" alt="" width="200px">
-                <h3>Available on:</h3>
-                <a class="ga-outbound-click"
-                   data-clicklabel="iTunes"
-                   href="{{ apple_download('homepage-pic-sure') }}"
-                   target="_blank">
-                    <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download so-sure on the App Store" /><span class="sr-only">so-sure app - Apple App Store</span>
-                </a>
-                <a class="ga-outbound-click"
-                   data-clicklabel="PlayStore"
-                   href="{{ google_download('homepage-pic-sure') }}"
-                   target="_blank">
-                    <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get so-sure on Google Play" /><span class="sr-only">so-sure app - Google Play</span>
-               </a>
+            <div class="row">
+                <div class="col-md-10 col-md-offset-1">
+                    <p><strong>pic-sure</strong> is our <strong>fraud</strong> technology and takes less than 30 seconds to use. Simply download our app, get insured, and then take a phone selfie in the dedicated <strong>pic-sure</strong> section. Once the selfie has been approved, your new and improved excess will be revealed.</p>
+                    <p>Our technology helps us avoid pesky fraudsters, who already have a cracked screen when they buy a policy from us.</p>
+                    <p>Plus when you need to claim, it makes the process a whole lot quicker. Win win for all!</p>
+                </div>
             </div>
+            <ul class="list-inline text-center">
+                <br>
+                <li>
+                    <a class="ga-outbound-click"
+                       data-clicklabel="iTunes"
+                       href="{{ apple_download('homepage-pic-sure') }}"
+                       target="_blank">
+                        <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download so-sure on the App Store" /><span class="sr-only">so-sure app - Apple App Store</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="ga-outbound-click"
+                       data-clicklabel="PlayStore"
+                       href="{{ google_download('homepage-pic-sure') }}"
+                       target="_blank">
+                        <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get so-sure on Google Play" /><span class="sr-only">so-sure app - Google Play</span>
+                   </a>
+                </li>
+            </ul>
         </div>
     </section>
-
 
     <div class="curved-background curved-background__bg-blue hidden-xs">
         <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 2000 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -340,11 +356,11 @@
                     <h2 class="h1">Social Rewards, Life's Better Together.</h2>
                     <p class="lead">When you connect your policy with friends and family and no-one claims, we'll give you up to <mark class="background-white">80% of your premium back</mark> at the end of your policy year. Last year we paid thousands back to our lovely customers (need to check this amount). Here's how it works:</p>
                     <ol class="ol--blue-counter">
-                        <li class="lead">Once you have a policy download our nifty app</li>
+                        <li class="h3">Once you have a policy download our nifty app</li>
                         <br>
-                        <li class="lead">Invite your friends and family in just a few clicks</li>
+                        <li class="h3">Invite your friends and family in just a few clicks</li>
                         <br>
-                        <li class="lead">All careful with your phones for the year and then get cash back. Yes its that simple :)</li>
+                        <li class="h3">All careful with your phones for the year and then get cash back. Yes its that simple :)</li>
                     </ol>
                 </div>
             </div>
