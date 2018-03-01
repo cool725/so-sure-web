@@ -172,12 +172,26 @@
                             </tr>
                         </tbody>
                     </table>
-                    <h3>How to use pic-sure?</h3>
-                    <ol>
-                        <li class="h4">Download our app</li>
-                        <li class="h4">Validate with pic-sure</li>
-                        <li class="h4">Reduce your excess</li>
-                    </ol>
+                    <div class="text-center">
+                        <h4>How to use pic-sure?</h4>
+                        <p>Download our app, validate with pic-sure, reduce your excess. <br> It's that simple!</p>
+                        {% if policy.phone.iTunes %}
+                            <a class="ga-outbound-click"
+                               data-clicklabel="iTunes"
+                               href="{{ apple_download('my-policies-modal') }}"
+                               target="_blank">
+                                <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download so-sure on the App Store" /><span class="sr-only">so-sure app - Apple App Store</span>
+                            </a>
+                        {% endif %}
+                        {% if policy.phone.googlePlay %}
+                            <a class="ga-outbound-click"
+                               data-clicklabel="PlayStore"
+                               href="{{ google_download('my-policies-modal') }}"
+                               target="_blank">
+                                <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get so-sure on Google Play" /><span class="sr-only">so-sure app - Google Play</span>
+                            </a>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
