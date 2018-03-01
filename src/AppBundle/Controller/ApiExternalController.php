@@ -256,20 +256,33 @@ class ApiExternalController extends BaseController
      */
     public function goCompareDeeplinkAction(Request $request)
     {
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Phone::class);
+        $email = $this->getRequestString($request, 'email_address');
         $reference = $this->getRequestString($request, 'reference');
-        $phone = $repo->find($reference);
+
+        $dm = $this->getManager();
+        $phoneRepo = $dm->getRepository(Phone::class);
+        $phone = $phoneRepo->find($reference);
         if (!$phone) {
             throw $this->createNotFoundException('Phone reference not found');
         }
 
         $this->setPhoneSession($request, $phone);
 
+        $userRepo = $dm->getRepository(User::class);
+        $user = $userRepo->findOneBy(['emailCanonical' => strtolower($email)]);
+        if ($user) {
+            // @codingStandardsIgnoreStart
+            $err = 'It looks like you already have an account.  Please try logging in with your details';
+            // @codingStandardsIgnoreEnd
+            $this->addFlash('error', $err);
+
+            return $this->redirectToRoute('fos_user_security_login');
+        }
+
         $user = new User();
         $user->setFirstName($this->getRequestString($request, 'first_name'));
         $user->setLastName($this->getRequestString($request, 'surname'));
-        $user->setEmail($this->getRequestString($request, 'email_address'));
+        $user->setEmail($email);
         $user->setBirthday(\DateTime::createFromFormat('Y-m-d', $this->getRequestString($request, 'dob')));
         $user->setEnabled(true);
 
