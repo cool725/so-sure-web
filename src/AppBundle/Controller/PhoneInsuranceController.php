@@ -131,20 +131,27 @@ class PhoneInsuranceController extends BaseController
             ksort($phonesMem[$phone->getName()]['mem']);
         }
 
+        $exp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_CPC_OLD_NEW,
+            ['cpcold', 'cpc-new'],
+            SixpackService::LOG_MIXPANEL_ALL // keep consistent with running test; change for future
+        );
+
         $template = 'AppBundle:PhoneInsurance:makeInsurance.html.twig';
 
-        if (in_array($request->get('_route'), ['insure_make'])) {
-            $template = 'AppBundle:PhoneInsurance:makeInsuranceBottomOld.html.twig';
+
+        if ($exp == 'shuffle') {
+            $template = 'AppBundle:Default:indexContentShuffleOld.html.twig';
         }
 
         $event = MixpanelService::EVENT_MANUFACTURER_PAGE;
-        if (in_array($request->get('_route'), ['insure_make'])) {
-            $event = MixpanelService::EVENT_CPC_MANUFACTURER_PAGE;
-        }
+
 
         $this->get('app.mixpanel')->queueTrackWithUtm($event, [
             'Manufacturer' => $make,
         ]);
+
         $data = ['phones' => $phonesMem, 'make' => $make];
 
         return $this->render($template, $data);
