@@ -293,5 +293,5 @@ class RequestService
         }
 
         return false;
-    }    
+    }
 }
