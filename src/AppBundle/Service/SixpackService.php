@@ -143,7 +143,6 @@ class SixpackService
                 self::EXPERIMENT_APP_SHARE_METHOD,
                 self::EXPERIMENT_HOMEPAGE_STICKYSEARCH_PICSURE,
                 self::EXPERIMENT_NEW_QUOTE_DESIGN,
-                self::EXPERIMENT_POLICY_PDF_DOWNLOAD,
                 self::EXPERIMENT_SHARE_MESSAGE,
             ])) {
                 $this->mixpanel->queuePersonProperties([sprintf('Sixpack: %s', $experiment) => $result], true);
