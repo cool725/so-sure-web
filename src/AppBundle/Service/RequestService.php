@@ -8,6 +8,7 @@ use AppBundle\Document\User;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\IpUtils;
 use Mobile_Detect;
+use UAParser\Parser;
 
 class RequestService
 {
@@ -20,23 +21,32 @@ class RequestService
     protected $tokenStorage;
     protected $adminCookieValue;
     protected $mobileDetect;
+    protected $environment;
+
+    public function setEnvironment($environment)
+    {
+        $this->environment = $environment;
+    }
 
     /**
      * @param RequestStack    $requestStack
      * @param LoggerInterface $logger
      * @param                 $tokenStorage
      * @param string          $adminCookieValue
+     * @param string          $environment
      */
     public function __construct(
         RequestStack $requestStack,
         LoggerInterface $logger,
         $tokenStorage,
-        $adminCookieValue
+        $adminCookieValue,
+        $environment
     ) {
         $this->requestStack = $requestStack;
         $this->logger = $logger;
         $this->tokenStorage = $tokenStorage;
         $this->adminCookieValue = $adminCookieValue;
+        $this->environment = $environment;
         if ($request = $this->requestStack->getCurrentRequest()) {
             $this->mobileDetect = new Mobile_Detect($this->requestStack->getCurrentRequest()->server->all());
         }
@@ -192,6 +202,25 @@ class RequestService
         return false;
     }
 
+    public function isExcludedAnalytics()
+    {
+        if ($this->environment == 'test') {
+            return true;
+        }
+
+        if ($this->isExcludedAnalyticsUserAgent()) {
+            return true;
+        }
+
+        if ($this->environment == 'prod' &&
+            ($this->isSoSureEmployee() ||
+            $this->isExcludedAnalyticsIp())) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function isExcludedAnalyticsIp()
     {
         if ($clientIp = $this->getClientIp()) {
@@ -203,6 +232,64 @@ class RequestService
                 '217.158.0.52', // davies
                 // '10.0.2.2', // for debugging - vagrant
             ]);
+        }
+
+        return false;
+    }
+
+    public function isExcludedAnalyticsUserAgent($userAgent = null)
+    {
+        if (!$userAgent) {
+            $userAgent = $this->getUserAgent();
+        }
+
+        if (!$userAgent) {
+            return false;
+        }
+
+        $parser = Parser::create();
+        $userAgentDetails = $parser->parse($userAgent);
+
+        if (stripos($userAgentDetails->ua->family, 'bot') !== false) {
+            return true;
+        }
+        if (stripos($userAgentDetails->ua->family, 'spider') !== false) {
+            return true;
+        }
+        if (stripos($userAgentDetails->ua->family, 'crawler') !== false) {
+            return true;
+        }
+
+        // exclude bots from tracking
+        if (in_array($userAgentDetails->ua->family, [
+            'PhantomJS',
+            'Yahoo! Slurp',
+            'Apache-HttpClient',
+            'Java',
+            'Python Requests',
+            'Python-urllib',
+            'Scrapy',
+            'Google',
+            'ia_archiver',
+            'SimplePie',
+        ])) {
+            return true;
+        }
+
+        if (stripos($userAgent, 'StatusCake') !== false) {
+            return true;
+        }
+        if (stripos($userAgent, 'okhttp') !== false) {
+            return true;
+        }
+        if (stripos($userAgent, 'curl') !== false) {
+            return true;
+        }
+        if (stripos($userAgent, 'ips-agent') !== false) {
+            return true;
+        }
+        if (stripos($userAgent, 'ScoutJet') !== false) {
+            return true;
         }
 
         return false;

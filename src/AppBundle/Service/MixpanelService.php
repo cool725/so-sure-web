@@ -109,8 +109,6 @@ class MixpanelService
     /** @var RequestService */
     protected $requestService;
 
-    protected $environment;
-
     protected $mixpanelData;
 
     /** @var StatsService */
@@ -119,18 +117,12 @@ class MixpanelService
     /** @var SearchService */
     protected $searchService;
 
-    public function setEnvironment($environment)
-    {
-        $this->environment = $environment;
-    }
-
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
      * @param                 $redis
      * @param Mixpanel        $mixpanel
      * @param RequestService  $requestService
-     * @param string          $environment
      * @param string          $apiSecret
      * @param StatsService    $stats
      * @param SearchService   $searchService
@@ -141,7 +133,6 @@ class MixpanelService
         $redis,
         Mixpanel $mixpanel,
         RequestService $requestService,
-        $environment,
         $apiSecret,
         $stats,
         SearchService $searchService
@@ -151,7 +142,6 @@ class MixpanelService
         $this->redis = $redis;
         $this->mixpanel = $mixpanel;
         $this->requestService = $requestService;
-        $this->environment = $environment;
         $this->mixpanelData = new DataExportApi($apiSecret);
         $this->stats = $stats;
         $this->searchService = $searchService;
@@ -159,19 +149,7 @@ class MixpanelService
 
     private function canSend()
     {
-        if ($this->environment == 'test') {
-            return false;
-        }
-
-        if ($userAgent = $this->requestService->getUserAgent()) {
-            if (!$this->isUserAgentAllowed($userAgent)) {
-                return false;
-            }
-        }
-
-        if ($this->environment == 'prod' &&
-            ($this->requestService->isSoSureEmployee() ||
-            $this->requestService->isExcludedAnalyticsIp())) {
+        if ($this->requestService->isExcludedAnalytics()) {
             return false;
         }
 
@@ -678,56 +656,6 @@ class MixpanelService
     public function queueTrackWithUtm($event, array $properties = null)
     {
         return $this->queueTrackAll($event, $properties, null, true);
-    }
-
-    public function isUserAgentAllowed($userAgent)
-    {
-        $parser = Parser::create();
-        $userAgentDetails = $parser->parse($userAgent);
-
-        if (stripos($userAgentDetails->ua->family, 'bot') !== false) {
-            return false;
-        }
-        if (stripos($userAgentDetails->ua->family, 'spider') !== false) {
-            return false;
-        }
-        if (stripos($userAgentDetails->ua->family, 'crawler') !== false) {
-            return false;
-        }
-
-        // exclude bots from tracking
-        if (in_array($userAgentDetails->ua->family, [
-            'PhantomJS',
-            'Yahoo! Slurp',
-            'Apache-HttpClient',
-            'Java',
-            'Python Requests',
-            'Python-urllib',
-            'Scrapy',
-            'Google',
-            'ia_archiver',
-            'SimplePie',
-        ])) {
-            return false;
-        }
-
-        if (stripos($userAgent, 'StatusCake') !== false) {
-            return false;
-        }
-        if (stripos($userAgent, 'okhttp') !== false) {
-            return false;
-        }
-        if (stripos($userAgent, 'curl') !== false) {
-            return false;
-        }
-        if (stripos($userAgent, 'ips-agent') !== false) {
-            return false;
-        }
-        if (stripos($userAgent, 'ScoutJet') !== false) {
-            return false;
-        }
-
-        return true;
     }
 
     public function queueTrackWithUser($user, $event, array $properties = null)
