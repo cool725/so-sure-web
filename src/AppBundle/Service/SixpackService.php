@@ -39,7 +39,7 @@ class SixpackService
     // const EXPERIMENT_FUNNEL_V1_V2 = 'funnel-v1-v2';
     const EXPERIMENT_HOMEPAGE_STICKYSEARCH_PICSURE = 'homepage-v2-sticksearch-picsure';
     // const EXPERIMENT_QUOTE_SECTIONS = 'quote-sections';
-    const EXPERIMENT_POLICY_PDF_DOWNLOAD = 'policy-pdf-download';
+    // const EXPERIMENT_POLICY_PDF_DOWNLOAD = 'policy-pdf-download';
     //const EXPERIMENT_CANCELLATION = 'cancellation';
     const EXPERIMENT_NEW_QUOTE_DESIGN = 'new-quote-design';
 

@@ -382,7 +382,7 @@ class UserController extends BaseController
                 );
                 $renewMessage = true;
             }
-           
+
             if ($checkPolicy->getPolicyTerms()->isPicSureEnabled() && !$checkPolicy->isPicSureValidated()) {
                 $url = null;
                 // TODO: Change to branch open pic-sure link
@@ -418,7 +418,7 @@ class UserController extends BaseController
         }
         $this->addRepurchaseExpiredPolicyFlash();
         $this->addUnInitPolicyInsureFlash();
-        
+
 
         $sixpack = $this->get('app.sixpack');
         $shareExperiment = $sixpack->participate(
@@ -1060,11 +1060,6 @@ class UserController extends BaseController
 
         $this->get('app.sixpack')->convert(
             SixpackService::EXPERIMENT_NEW_QUOTE_DESIGN,
-            SixpackService::KPI_POLICY_PURCHASE
-        );
-
-        $this->get('app.sixpack')->convert(
-            SixpackService::EXPERIMENT_POLICY_PDF_DOWNLOAD,
             SixpackService::KPI_POLICY_PURCHASE
         );
 

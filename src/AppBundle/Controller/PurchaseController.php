@@ -470,8 +470,6 @@ class PurchaseController extends BaseController
                                 'Policy Id' => $policy->getId(),
                             ]);
 
-                            $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_POLICY_PDF_DOWNLOAD);
-
                             // There was an odd case of next not being detected as clicked
                             // perhaps a brower issue with multiple buttons
                             // just in case, assume judo pay if we don't detect existing
