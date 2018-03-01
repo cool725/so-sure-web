@@ -97,24 +97,38 @@ class PicsureMLController extends BaseController
      */
     public function picsureImageAction($file)
     {
-        $filesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3policy_fs');
+        $policyFilesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3policy_fs');
         $environment = $this->getParameter('kernel.environment');
         $file = str_replace(sprintf('%s/', $environment), '', $file);
 
-        if (!$filesystem->has($file)) {
-            throw $this->createNotFoundException(sprintf('URL not found %s', $file));
-        }
+        if (!$policyFilesystem->has($file)) {
+            $picsureFilesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3picsure_fs');
+            if (!$picsureFilesystem->has($file)) {
+                throw $this->createNotFoundException(sprintf('URL not found %s', $file));
+            }
 
-        $mimetype = $filesystem->getMimetype($file);
-        return StreamedResponse::create(
-            function () use ($file, $filesystem) {
-                $stream = $filesystem->readStream($file);
-                echo stream_get_contents($stream);
-                flush();
-            },
-            200,
-            array('Content-Type' => $mimetype)
-        );
+            $mimetype = $picsureFilesystem->getMimetype($file);
+            return StreamedResponse::create(
+                function () use ($file, $picsureFilesystem) {
+                    $stream = $picsureFilesystem->readStream($file);
+                    echo stream_get_contents($stream);
+                    flush();
+                },
+                200,
+                array('Content-Type' => $mimetype)
+            );
+        } else {
+            $mimetype = $policyFilesystem->getMimetype($file);
+            return StreamedResponse::create(
+                function () use ($file, $policyFilesystem) {
+                    $stream = $policyFilesystem->readStream($file);
+                    echo stream_get_contents($stream);
+                    flush();
+                },
+                200,
+                array('Content-Type' => $mimetype)
+            );
+        }
         /*
         $filesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3picsure_fs');
 
@@ -133,6 +147,24 @@ class PicsureMLController extends BaseController
             array('Content-Type' => $mimetype)
         );
         */
+    }
+
+    /**
+     * @Route("/picsure-ml/predict/{id}", name="admin_picsure_ml_predict")
+     * @Template
+     */
+    public function predictAction(Request $request, $id)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(S3File::class);
+
+        $picsureFile = $repo->find($id);
+        if ($picsureFile) {
+            $service = $this->get('picsureml.picsureml');
+            $service->predict($picsureFile);
+        }
+
+        return new RedirectResponse($this->generateUrl('admin_picsure'));
     }
 
     /**

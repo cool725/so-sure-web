@@ -29,6 +29,12 @@ class PicsureMLCommand extends ContainerAwareCommand
                 InputOption::VALUE_NONE,
                 'Output csv of training data'
             )
+            ->addOption(
+                'versionNumber',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Version of the training data'
+            )
         ;
     }
 
@@ -36,17 +42,22 @@ class PicsureMLCommand extends ContainerAwareCommand
     {
         $sync = true === $input->getOption('sync');
         $csv = true === $input->getOption('output');
+        $version = $input->getOption('versionNumber');
 
         if ($sync) {
             $output->writeln(sprintf('Sync...'));
             $picsureMLService = $this->getContainer()->get('picsureml.picsureml');
-            $picsureMLService->sync();
+            $picsureMLService->sync($output);
             $output->writeln(sprintf('Done'));
         } elseif ($csv) {
-            $output->writeln(sprintf('Output...'));
-            $picsureMLService = $this->getContainer()->get('picsureml.picsureml');
-            $picsureMLService->output($output);
-            $output->writeln(sprintf('Done'));
+            if (!empty($version)) {
+                $output->writeln(sprintf('Output...'));
+                $picsureMLService = $this->getContainer()->get('picsureml.picsureml');
+                $picsureMLService->output($version, $output);
+                $output->writeln(sprintf('Done'));
+            } else {
+                $output->writeln(sprintf('Error: version number required'));
+            }
         }
 
     }

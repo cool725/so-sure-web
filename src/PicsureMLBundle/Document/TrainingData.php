@@ -20,6 +20,11 @@ class TrainingData
     protected $id;
 
     /**
+     * @MongoDB\Field(type="string", name="bucket")
+     */
+    protected $bucket;
+
+    /**
      * @MongoDB\Field(type="string", name="imagePath")
      */
     protected $imagePath;
@@ -53,6 +58,16 @@ class TrainingData
     public function getId()
     {
         return $this->id;
+    }
+
+    public function setBucket($bucket)
+    {
+        $this->bucket = $bucket;
+    }
+
+    public function getBucket()
+    {
+        return $this->bucket;
     }
 
     public function setImagePath($imagePath)

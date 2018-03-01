@@ -44,6 +44,36 @@
 <div class="row" style="margin-top: 20px;">
     {% for file in policy.getPolicyPicSureFiles %}
     <div class="col-md-12 text-center">
+            {% if 'picsure-ml-score' in file.getMetadata()|keys %}
+            <p>
+                <span style="padding: 15px 16px; margin-right: 16px; border-radius: 16px;
+                {% if 'picsure-ml-status' in file.getMetadata()|keys and 'picsure-ml-confidence' in file.getMetadata()|keys %}
+                    {% if file.getMetadata()['picsure-ml-status'] == "undamaged" %}
+                        background-color: rgba(91,162,45,{{ file.getMetadata()['picsure-ml-confidence']|number_format(2, '.', ',') }});
+                    {% elseif file.getMetadata()['picsure-ml-status'] == "invalid" %}
+                        background-color: rgba(255,215,38,{{ file.getMetadata()['picsure-ml-confidence']|number_format(2, '.', ',') }});
+                    {% elseif file.getMetadata()['picsure-ml-status'] == "damaged" %}
+                        background-color: rgba(255,102,102,{{ file.getMetadata()['picsure-ml-confidence']|number_format(2, '.', ',') }});
+                    {% endif %}
+                    "><strong>ML Testing:</strong> {{ file.getMetadata()['picsure-ml-status']|capitalize }}
+                    with confidence {{ file.getMetadata()['picsure-ml-confidence']*100.0|number_format(2, '.', ',') }}&percnt;
+                {% else %}
+                ">ML Testing:
+                {% endif %}
+                |
+                {% if 'undamaged' in file.getMetadata()['picsure-ml-score']|keys %}
+                    undamaged ({{ (file.getMetadata()['picsure-ml-score']['undamaged']*100.0)|number_format(0, '.', ',') }}&percnt;) 
+                {% endif %}
+                {% if 'invalid' in file.getMetadata()['picsure-ml-score']|keys %}
+                    invalid ({{ (file.getMetadata()['picsure-ml-score']['invalid']*100.0)|number_format(0, '.', ',') }}&percnt;) 
+                {% endif %}
+                {% if 'damaged' in file.getMetadata()['picsure-ml-score']|keys %}
+                    damaged ({{ (file.getMetadata()['picsure-ml-score']['damaged']*100.0)|number_format(0, '.', ',') }}&percnt;) 
+                {% endif %}
+                </span>
+                <a class="btn btn-primary" href="{{ path('admin_picsure_ml_predict', {'id': file.getId()}) }}"><i class="fa fa-refresh"></i> Re-run</a>
+            {% endif %}
+            </p>
             <a href="{{ s3DownloadLink(file.bucket, file.key) }}" target="_blank">
                 <i class="fa fa-external-link"></i> {{ file.key }}
                 {% if policy.picSureStatus == 'manual' %}
@@ -51,19 +81,6 @@
                 <img src="{{ path('admin_picsure_image', {'file': file.key }) }}" style="max-width: 100%">
                 {% endif %}
             </a>
-            {% if 'picsure-ml-score' in file.getMetadata()|keys %}
-            <p>ML Scores: 
-                {% if 'undamaged' in file.getMetadata()['picsure-ml-score']|keys %}
-                    undamaged ({{ (file.getMetadata()['picsure-ml-score']['undamaged']*100.0)|number_format(2, '.', ',') }}&percnt;) 
-                {% endif %}
-                {% if 'invalid' in file.getMetadata()['picsure-ml-score']|keys %}
-                    invalid ({{ (file.getMetadata()['picsure-ml-score']['invalid']*100.0)|number_format(2, '.', ',') }}&percnt;) 
-                {% endif %}
-                {% if 'damaged' in file.getMetadata()['picsure-ml-score']|keys %}
-                    damaged ({{ (file.getMetadata()['picsure-ml-score']['damaged']*100.0)|number_format(2, '.', ',') }}&percnt;) 
-                {% endif %}
-            </p>
-            {% endif %}
     </div>
     {% endfor %}
 </div>
