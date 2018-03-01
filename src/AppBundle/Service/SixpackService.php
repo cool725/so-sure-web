@@ -44,7 +44,7 @@ class SixpackService
     //const EXPERIMENT_CANCELLATION = 'cancellation';
     const EXPERIMENT_NEW_QUOTE_DESIGN = 'new-quote-design';
 
-    const EXPERIMENT_CPC_OLD_NEW = 'cpcold-cpcnew';
+    const EXPERIMENT_CPC_OLD_NEW = 'cpc-old-cpcnew';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_SHARE_MESSAGE_ORIGINAL = 'original';
