@@ -16,6 +16,7 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Cashback;
 use AppBundle\Document\Phone;
+use AppBundle\Document\PolicyTerms;
 use AppBundle\Service\MixpanelService;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use AppBundle\Document\Invitation\EmailInvitation;
@@ -137,8 +138,7 @@ class OpsController extends BaseController
             'picSureStatus' => PhonePolicy::PICSURE_STATUS_REJECTED,
         ]);
         $nonPicSurePolicy = $policyRepo->findOneBy([
-            'status' => Policy::STATUS_ACTIVE,
-            'terms.$id' => ['$ne' => new \MongoId($picSureRejectedPolicy->getPolicyTerms()->getId())],
+            'policyTerms.$id' => ['$ne' => new \MongoId($picSureRejectedPolicy->getPolicyTerms()->getId())],
         ]);
         $unpaidPolicy = $policyRepo->findOneBy([
             'status' => Policy::STATUS_UNPAID,
