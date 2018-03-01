@@ -38,28 +38,32 @@
                             <div class="col-sm-6 col-md-3">
                                 <a href="#"
                                    id="reason-1"
-                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel"
+                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel sosure-track"
+                                   data-event="click-cancel-damage"
                                    data-reason="Already broken or damaged"
                                    data-target="#reason-1-info">Already broken or damaged</a>
                             </div>
                             <div class="col-sm-6 col-md-3">
                                 <a href="#"
                                    id="reason-2"
-                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel"
+                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel sosure-track"
+                                   data-event="click-cancel-cost"
                                    data-reason="Too expensive"
                                    data-target="#reason-2-info">I found a cheaper quote</a>
                             </div>
                             <div class="col-sm-6 col-md-3">
                                 <a href="#"
                                    id="reason-3"
-                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel"
+                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel sosure-track"
+                                   data-event="click-cancel-elsewhere"
                                    data-reason="I found another provider"
                                    data-target="#reason-3-info">I found another provider</a>
                             </div>
                             <div class="col-sm-6 col-md-3">
                                 <a href="#"
                                    id="reason-4"
-                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel"
+                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel sosure-track"
+                                   data-event="click-cancel-existing"
                                    data-reason="Already covered"
                                    data-target="#reason-4-info">Already covered</a>
                             </div>
@@ -68,28 +72,32 @@
                             <div class="col-sm-6 col-md-3">
                                 <a href="#"
                                    id="reason-5"
-                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel"
+                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel sosure-track"
+                                   data-event="click-cancel-undesired"
                                    data-reason="I don't want insurance"
                                    data-target="#reason-5-info">I don't want insurance</a>
                             </div>
                             <div class="col-sm-6 col-md-3">
                                 <a href="#"
                                    id="reason-6"
-                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel"
+                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel sosure-track"
+                                   data-event="click-cancel-technical"
                                    data-reason="Technical difficulties"
                                    data-target="#reason-6-info">Technical difficulties</a>
                             </div>
                             <div class="col-sm-6 col-md-3">
                                 <a href="#"
                                    id="reason-7"
-                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel"
+                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel sosure-track"
+                                   data-event="click-cancel-pic-sure"
                                    data-reason="pic-sure is annoying"
                                    data-target="#reason-7-info">pic-sure is annoying</a>
                             </div>
                             <div class="col-sm-6 col-md-3">
                                 <a href="#"
                                    id="reason-8"
-                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel"
+                                   class="btn btn-blue-hollow btn-block btn-pad btn-cancel sosure-track"
+                                   data-event="click-cancel-other"
                                    data-reason="other"
                                    data-target="#reason-8-info">Other...</a>
                             </div>
@@ -112,7 +120,8 @@
                 <div class="information--controls clearfix">
                     <a href="#"class="btn btn-link btn-back pull-left"><i class="fa fa-arrow-left fa-lg" aria-hidden="true"></i><span class="sr-only">back</span></a>
                     <a href="#"
-                       class="btn btn-grey btn-pad btn-cancel-policy"
+                       class="btn btn-grey btn-pad btn-cancel-policy sosure-track"
+                       data-event="cancel-damaged"
                        data-reason="damaged">Cancel my policy
                     </a>
                 </div>
@@ -137,7 +146,8 @@
                     </a>
                     {# TODO: Link this to feedback form??? #}
                     <a href="#"
-                       class="btn btn-grey btn-pad btn-cancel-policy"
+                       class="btn btn-grey btn-pad btn-cancel-policy sosure-track"
+                       data-event="cancel-cost"
                        data-reason="cost">I'll cancel
                     </a>
                 </div>
@@ -162,7 +172,8 @@
                        class="btn btn-green btn-pad">Ok, I'll stay
                     </a>
                     <a href="#"
-                       class="btn btn-grey btn-pad btn-cancel-policy"
+                       class="btn btn-grey btn-pad btn-cancel-policy sosure-track"
+                       data-event="cancel-elsewhere"
                        data-reason="elsewhere">I'll cancel
                     </a>
                 </div>
@@ -222,7 +233,8 @@
                        class="btn btn-green btn-pad">Ok, I'll stay
                     </a>
                     <a href="#"
-                       class="btn btn-grey btn-pad btn-cancel-policy"
+                       class="btn btn-grey btn-pad btn-cancel-policy sosure-track"
+                       data-event="cancel-existing"
                        data-reason="existing">I'll cancel
                     </a>
                 </div>
@@ -239,7 +251,8 @@
                        class="btn btn-green btn-pad">Ok, I'll stay
                     </a>
                     <a href="#"
-                       class="btn btn-grey btn-pad btn-cancel-policy"
+                       class="btn btn-grey btn-pad btn-cancel-policy sosure-track"
+                       data-event="cancel-undesired"
                        data-reason="undesired">I'll cancel
                     </a>
                 </div>
@@ -255,7 +268,8 @@
                        class="btn btn-green btn-pad">Ok, I'll stay
                     </a>
                     <a href="#"
-                       class="btn btn-grey btn-pad btn-cancel-policy"
+                       class="btn btn-grey btn-pad btn-cancel-policy sosure-track"
+                       data-event="cancel-technical"
                        data-reason="technical">I'll cancel
                     </a>
                 </div>
@@ -277,7 +291,8 @@
                        class="btn btn-green btn-pad">Ok, I'll stay
                     </a>
                     <a href="#"
-                       class="btn btn-grey btn-pad btn-cancel-policy"
+                       class="btn btn-grey btn-pad btn-cancel-policy sosure-track"
+                       data-event="cancel-pic-sure"
                        data-reason="pic-sure">I'll cancel
                     </a>
                 </div>
@@ -296,7 +311,8 @@
                     </a>
                     <a href="#"
                        id="btn-cancel-policy-other"
-                       class="btn btn-grey btn-pad btn-cancel-policy"
+                       class="btn btn-grey btn-pad btn-cancel-policy sosure-track"
+                       data-event="cancel-unknown"
                        data-reason="unknown">Cancel my policy
                     </a>
                 </div>
