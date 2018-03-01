@@ -218,7 +218,7 @@ class RequestService
             return true;
         }
 
-        return false;        
+        return false;
     }
 
     public function isExcludedAnalyticsIp()
