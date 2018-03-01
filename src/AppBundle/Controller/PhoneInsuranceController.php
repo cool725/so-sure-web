@@ -131,18 +131,30 @@ class PhoneInsuranceController extends BaseController
             ksort($phonesMem[$phone->getName()]['mem']);
         }
 
+        $exp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_CPC_MANUFACTURER_OLD_NEW,
+            ['old', 'new']
+        );
+
         $template = 'AppBundle:PhoneInsurance:makeInsurance.html.twig';
         if (in_array($request->get('_route'), ['insure_make'])) {
-            $template = 'AppBundle:PhoneInsurance:makeInsuranceBottom.html.twig';
+            $template = 'AppBundle:PhoneInsurance:makeInsuranceBottomOld.html.twig';
+            if ($exp == 'new') {
+                $template = 'AppBundle:PhoneInsurance:makeInsuranceBottom.html.twig';
+            }
         }
 
         $event = MixpanelService::EVENT_MANUFACTURER_PAGE;
+
         if (in_array($request->get('_route'), ['insure_make'])) {
-            $event = MixpanelService::EVENT_CPC_MANUFACTURER_PAGE;
+             $event = MixpanelService::EVENT_CPC_MANUFACTURER_PAGE;
         }
+
         $this->get('app.mixpanel')->queueTrackWithUtm($event, [
             'Manufacturer' => $make,
         ]);
+
         $data = ['phones' => $phonesMem, 'make' => $make];
 
         return $this->render($template, $data);
@@ -427,6 +439,10 @@ class PhoneInsuranceController extends BaseController
 
             $this->get('app.sixpack')->convert(
                 SixpackService::EXPERIMENT_HOMEPAGE_STICKYSEARCH_SHUFFLE
+            );
+
+            $this->get('app.sixpack')->convert(
+                SixpackService::EXPERIMENT_CPC_MANUFACTURER_OLD_NEW
             );
         }
 

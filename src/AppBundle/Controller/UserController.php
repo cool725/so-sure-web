@@ -1054,6 +1054,10 @@ class UserController extends BaseController
         );
 
         $this->get('app.sixpack')->convert(
+            SixpackService::EXPERIMENT_CPC_MANUFACTURER_OLD_NEW,
+            SixpackService::KPI_POLICY_PURCHASE
+        );
+        $this->get('app.sixpack')->convert(
             SixpackService::EXPERIMENT_HOMEPAGE_STICKYSEARCH_SHUFFLE,
             SixpackService::KPI_POLICY_PURCHASE
         );
