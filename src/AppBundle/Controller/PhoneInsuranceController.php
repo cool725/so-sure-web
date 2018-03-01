@@ -134,21 +134,20 @@ class PhoneInsuranceController extends BaseController
         $exp = $this->sixpack(
             $request,
             SixpackService::EXPERIMENT_CPC_OLD_NEW,
-            ['cpc-old', 'cpc-new'],
+            ['old', 'new'],
         );
 
         $template = 'AppBundle:PhoneInsurance:makeInsurance.html.twig';
 
-
-        if ($exp == 'shuffle') {
-            $template = 'AppBundle:Default:indexContentShuffleOld.html.twig';
-        }
-
         $event = MixpanelService::EVENT_MANUFACTURER_PAGE;
 
         if (in_array($request->get('_route'), ['insure_make'])) {
-            $event = MixpanelService::EVENT_CPC_MANUFACTURER_PAGE;
+            $template = 'AppBundle:PhoneInsurance:makeInsuranceBottomOld.html.twig';
         }
+
+        if ($exp == 'new') {
+            $template = 'AppBundle:Default:makeInsuranceBottom.html.twig';
+         }
 
         $this->get('app.mixpanel')->queueTrackWithUtm($event, [
             'Manufacturer' => $make,
