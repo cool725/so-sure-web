@@ -88,10 +88,6 @@ class DefaultController extends BaseController
             'phone'             => $this->getQuerystringPhone($request),
         );
 
-        if ($request->get('force')) {
-            $exp = $request->get('force');
-        }
-
         $template = 'AppBundle:Default:index.html.twig';
 
         if ($exp == 'shuffle') {
