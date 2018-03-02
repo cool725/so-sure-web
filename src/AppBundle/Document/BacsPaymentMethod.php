@@ -11,28 +11,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 class BacsPaymentMethod extends PaymentMethod
 {
     /**
-     * @AppAssert\AlphanumericSpaceDot()
-     * @Assert\Length(min="1", max="100")
-     * @MongoDB\Field(type="string")
+     * @MongoDB\EmbedOne(targetDocument="BankAccount")
      * @Gedmo\Versioned
      */
-    protected $accountName;
-    
-    /**
-     * @AppAssert\Token()
-     * @Assert\Length(min="1", max="50")
-     * @MongoDB\Field(type="string")
-     * @Gedmo\Versioned
-     */
-    protected $sortCode;
-
-    /**
-     * @AppAssert\Token()
-     * @Assert\Length(min="1", max="50")
-     * @MongoDB\Field(type="string")
-     * @Gedmo\Versioned
-     */
-    protected $accountNumber;
+    protected $bankAccount;
 
     /**
      * @Assert\Type("bool")
@@ -41,34 +23,14 @@ class BacsPaymentMethod extends PaymentMethod
      */
     protected $soleSignature;
 
-    public function setAccountName($accountName)
+    public function setBankAccount(BankAccount $bankAccount)
     {
-        $this->accountName = $accountName;
+        $this->bankAccount = $bankAccount;
     }
 
-    public function getAccountName()
+    public function getBankAccount()
     {
-        return $this->accountName;
-    }
-
-    public function setSortCode($sortCode)
-    {
-        $this->sortCode = $sortCode;
-    }
-
-    public function getSortCode()
-    {
-        return $this->sortCode;
-    }
-
-    public function setAccountNumber($accountNumber)
-    {
-        $this->accountNumber = $accountNumber;
-    }
-
-    public function getAccountNumber()
-    {
-        return $this->accountNumber;
+        return $this->bankAccount;
     }
 
     public function setSoleSignature($soleSignature)
@@ -79,25 +41,5 @@ class BacsPaymentMethod extends PaymentMethod
     public function getSoleSignature()
     {
         return $this->soleSignature;
-    }
-
-    public function isValid()
-    {
-        return strlen($this->getAccountName()) > 2 && strlen($this->getAccountNumber()) == 8 &&
-            strlen($this->getSortCode()) == 6;
-    }
-
-    public function getDisplayableAccountNumber()
-    {
-        if ($this->getAccountNumber() && strlen($this->getAccountNumber()) == 8) {
-            return sprintf("XXXX%s", substr($this->getAccountNumber(), 4, 4));
-        }
-
-        return null;
-    }
-
-    public function __toString()
-    {
-        return sprintf("%s %s %s", $this->getAccountName(), $this->getSortCode(), $this->getDisplayableAccountNumber());
     }
 }

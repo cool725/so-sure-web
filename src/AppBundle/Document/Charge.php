@@ -21,6 +21,7 @@ class Charge
     const TYPE_MAKEMODEL = 'makemodel';
     const TYPE_CLAIMSCHECK = 'claimscheck';
     const TYPE_CLAIMSDAMAGE = 'claimsdamage';
+    const TYPE_BANK_ACCOUNT = 'bank-account';
 
     public static $prices = [
         self::TYPE_ADDRESS => 0.037, // ex vat
@@ -29,6 +30,7 @@ class Charge
         self::TYPE_MAKEMODEL => 0.05, // ex vat
         self::TYPE_CLAIMSCHECK => 0.9, // ex vat
         self::TYPE_CLAIMSDAMAGE => 0.02, // ex vat
+        self::TYPE_BANK_ACCOUNT => 0.037, // ex vat
     ];
 
     /**

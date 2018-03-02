@@ -6,14 +6,19 @@ use AppBundle\Document\Address;
 use AppBundle\Document\Charge;
 use AppBundle\Document\User;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 
 class PCAService
 {
+    const TIMEOUT = 5;
     const REDIS_POSTCODE_KEY = 'postcode';
     const REDIS_ADDRESS_KEY_FORMAT = 'address:%s:%s';
+    const REDIS_BANK_KEY_FORMAT = 'bank:%s:%s';
     const CACHE_TIME = 84600; // 1 day
     const FIND_URL = "http://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Find/v2.10/xmla.ws";
     const RETRIEVE_URL = "http://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Retrieve/v2.10/xmla.ws";
+    const BANK_ACCOUNT_URL = "https://services.postcodeanywhere.co.uk/BankAccountValidation/Interactive/Validate/v2.00/json.ws";
 
     /** @var LoggerInterface */
     protected $logger;
@@ -48,6 +53,82 @@ class PCAService
     public function normalizePostcode($postcode)
     {
         return strtoupper(str_replace(' ', '', trim($postcode)));
+    }
+
+    public function normalizeSortCode($sortCode)
+    {
+        $minusDash = str_replace('-', '', trim($sortCode));
+        
+        return str_replace(' ', '', $minusDash);
+    }
+
+    public function normalizeAccountNumber($accountNumber)
+    {
+        return str_replace(' ', '', trim($accountNumber));
+    }
+
+    public function getBankAccount($sortCode, $accountNumber, User $user = null)
+    {
+        $sortCode = $this->normalizeSortCode($sortCode);
+        $accountNumber = $this->normalizeAccountNumber($accountNumber);
+
+        $redisKey = sprintf(self::REDIS_BANK_KEY_FORMAT, $sortCode, $accountNumber);
+        if ($value = $this->redis->get($redisKey)) {
+            return unserialize($value);
+        }
+
+        // Use BX1 1LT as a hard coded address for testing
+        // (its a non-geographical postcode for Lloyds Bank, so is hopefully safe ;)
+        if ($sortCode == " 00-00-99") {
+            $bankAccount = new BankAccount();
+            $bankAccount->setSortCode($sortCode);
+            $bankAccount->setAccountNumber($accountNumber);
+            $address = new Address();
+            $address->setLine1('so-sure Test Address Line 1');
+            $address->setLine2('so-sure Test Address Line 2');
+            $address->setLine3('so-sure Test Address Line 3');
+            $address->setCity('so-sure Test City');
+            $address->setPostcode('BX1 1LT');
+            $bankAccount->setAddress($address);
+            $this->cacheBankAccountResults($sortCode, $accountNumber, $bankAccount);
+
+            return $address;
+        } elseif ($sortCode == "999999") {
+            // Used for testing invalid postcode - pseudo-postcodes for england
+            return null;
+        } elseif ($this->environment != 'prod') {
+            // 00-00-99/12345678 is a free search via pca, so can used for non production environments
+            $sortCode = " 000099";
+            $accountNumber = "12345678";
+        }
+
+        $data = $this->findBankAccount($sortCode, $accountNumber);
+        if ($data) {
+            $key = array_keys($data)[0];
+
+            $address = $this->retreive($key);
+            $this->cacheResults($postcode, $number, $address);
+
+            // ignore free check
+            if ($postcode != "WR53DA") {
+                $charge = new Charge();
+                try {
+                    $charge->setType(Charge::TYPE_ADDRESS);
+                    $charge->setUser($user);
+                    $charge->setDetails(sprintf('%s, %s', $postcode, $number));
+                    $this->dm->persist($charge);
+                    $this->dm->flush();
+                } catch (\Exception $e) {
+                    // Better to swallow this than fail
+                    $this->logger->warning('Error saving address charge.', ['exception' => $e]);
+                }
+            }
+
+            return $address;
+        }
+
+        return null;
+        
     }
 
     /**
@@ -118,6 +199,12 @@ class PCAService
         $redisKey = sprintf(self::REDIS_ADDRESS_KEY_FORMAT, $postcode, $number);
         $this->redis->setex($redisKey, self::CACHE_TIME, serialize($address));
         $this->redis->hset(self::REDIS_POSTCODE_KEY, $postcode, 1);
+    }
+
+    protected function cacheBankAccountResults($sortCode, $accountNumber, $bankAccount)
+    {
+        $redisKey = sprintf(self::REDIS_BANK_KEY_FORMAT, $sortCode, $accountNumber);
+        $this->redis->setex($redisKey, self::CACHE_TIME, serialize($bankAccount));
     }
 
     public function validateSortCode($sortCode)
@@ -252,6 +339,33 @@ class PCAService
         }
 
         return null;
+    }
+
+    /**
+     * Call PCA Bank Account to validate sortcode/account number
+     *
+     * @param string $sortCode
+     * @param string $accountNumber
+     */
+    public function findBankAccount($sortCode, $accountNumber)
+    {
+        $data = [
+            'Key' => $this->apiKey,
+            'AccountNumber' => $accountNumber,
+            'SortCode' => $sortCode,
+        ];
+        $url = sprintf("%s?%s", self::BANK_ACCOUNT_URL, http_build_query($data));
+
+        $client = new Client();
+        $res = $client->request('GET', $url, ['connect_timeout' => self::TIMEOUT, 'timeout' => self::TIMEOUT]);
+
+        $body = (string) $res->getBody();
+
+        $data = json_decode($body, true);
+        
+        $this->logger->info(sprintf('Bank Account lookup for %s %s %s', $sortCode, $bankAccount, json_encode($data)));
+
+        return $data;
     }
 
     /**

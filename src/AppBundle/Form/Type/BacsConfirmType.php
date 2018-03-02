@@ -31,7 +31,7 @@ class BacsConfirmType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'AppBundle\Document\BacsPaymentMethod',
+            'data_class' => 'AppBundle\Document\BankAccount',
         ));
     }
 }

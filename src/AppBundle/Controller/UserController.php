@@ -17,6 +17,7 @@ use AppBundle\Document\Cashback;
 use AppBundle\Document\Feature;
 use AppBundle\Document\User;
 use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\BankAccount;
 use AppBundle\Document\Form\Renew;
 use AppBundle\Document\Form\RenewCashback;
 use AppBundle\Form\Type\BacsType;
@@ -1167,8 +1168,9 @@ class UserController extends BaseController
         $bacsForm = $this->get('form.factory')
             ->createNamedBuilder('bacs_form', BacsType::class, $bacsPaymentMethod)
             ->getForm();
+        $bankAccount = new BankAccount();
         $bacsConfirmForm = $this->get('form.factory')
-            ->createNamedBuilder('bacs_confirm_form', BacsConfirmType::class, $bacsPaymentMethod)
+            ->createNamedBuilder('bacs_confirm_form', BacsConfirmType::class, $bankAccount)
             ->getForm();
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('billing_form')) {
