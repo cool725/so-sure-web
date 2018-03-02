@@ -20,7 +20,10 @@ class BacsType extends AbstractType
             ->add('accountName', TextType::class, ['required' => true])
             ->add('sortCode', TextType::class, ['required' => true])
             ->add('accountNumber', TextType::class, ['required' => true])
-            ->add('soleSignature', CheckboxType::class, ['label' => 'I am the sole signature on the account', 'required' => true])
+            ->add('soleSignature', CheckboxType::class, [
+                'label' => 'I am the sole signature on the account',
+                'required' => true
+            ])
             ->add('save', SubmitType::class)
         ;
     }

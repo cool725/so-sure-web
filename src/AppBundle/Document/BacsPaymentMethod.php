@@ -39,7 +39,7 @@ class BacsPaymentMethod extends PaymentMethod
      * @MongoDB\Field(type="boolean")
      * @Gedmo\Versioned
      */
-    protected $soleSignature;    
+    protected $soleSignature;
     
     public function setAccountName($accountName)
     {
