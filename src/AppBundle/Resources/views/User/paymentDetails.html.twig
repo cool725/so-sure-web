@@ -12,28 +12,29 @@
 {% endblock %}
 
 {% block body %}
-  {% include 'AppBundle:User:userNav.html.twig' %}
+    {% include 'AppBundle:User:userNav.html.twig' %}
 
-  {% set active_tab = 'card' %}
-  {% if bacsPaymentMethod and bacsPaymentMethod.isValid %}
-    {% set active_tab = 'bacs-setup-confirm' %}
-  {% elseif user.paymentMethod.type == 'bacs' %}
-    {% set active_tab = 'bacs' %}
-  {% endif %}
-  <div class="tab-content">
-    <div id="tab-card" class="tab-pane fade in {% if active_tab == 'card' %}active{% endif %}">
-      {% include 'AppBundle:User:cardDetails.html.twig' %}
+    {% set active_tab = 'card' %}
+    {% if bacsPaymentMethod and bacsPaymentMethod.isValid %}
+        % set active_tab = 'bacs-setup-confirm' %}
+    {% elseif user.paymentMethod.type == 'bacs' %}
+        {% set active_tab = 'bacs' %}
+    {% endif %}
+
+    <div class="tab-content">
+        <div id="tab-card" class="tab-pane fade in {% if active_tab == 'card' %}active{% endif %}">
+            {% include 'AppBundle:User:cardDetails.html.twig' %}
+        </div>
+        <div id="tab-bacs" class="tab-pane fade in {% if active_tab == 'bacs' %}active{% endif %}">
+            {% include 'AppBundle:User:bacsDetails.html.twig' %}
+        </div>
+        <div id="tab-bacs-setup" class="tab-pane fade in">
+            {% include 'AppBundle:User:bacsSetupDetails.html.twig' %}
+        </div>
+        <div id="tab-bacs-setup-confirm" class="tab-pane fade in {% if active_tab == 'bacs-setup-confirm' %}active{% endif %}">
+            {% include 'AppBundle:User:bacsSetupConfirm.html.twig' %}
+        </div>
     </div>
-    <div id="tab-bacs" class="tab-pane fade in {% if active_tab == 'bacs' %}active{% endif %}">
-      {% include 'AppBundle:User:bacsDetails.html.twig' %}
-    </div>
-    <div id="tab-bacs-setup" class="tab-pane fade in">
-      {% include 'AppBundle:User:bacsSetupDetails.html.twig' %}
-    </div>
-    <div id="tab-bacs-setup-confirm" class="tab-pane fade in {% if active_tab == 'bacs-setup-confirm' %}active{% endif %}">
-      {% include 'AppBundle:User:bacsSetupConfirm.html.twig' %}
-    </div>
-  </div>
 
   {% if policy.premiumPlan == 'monthly' %}
     <div class="modal fade" id="billingModal" tabindex="-1" role="dialog">
@@ -65,4 +66,12 @@
       </div>
     </div>
   {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    'components/jquery-mask-plugin/jquery.mask.min.js'
+    '@AppBundle/Resources/public/js/User/payment.js' %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}

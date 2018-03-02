@@ -1,61 +1,50 @@
+<section class="user-homepage--content section--pad">
+    <div class="container">
 
-    <section class="user-homepage--content section--pad">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12">
-                    <h2>Your Payment Details</h2>
-                </div>
-            </div>
-            {% if bacs %}
-            <div class="row">
-                <div class="col-md-6">
-                  <h4>Your current payment method:</h4>
-                </div>
-                <div class="col-md-4">
-                  <br />
-                  <p>{% if user.paymentMethod.type == "judo" %}Credit/Debit Card{% elseif user.paymentMethod.type == "bacs" %}Direct Debit{% else %}Unknown{% endif %}</p>
-                  <a href="{% if user.paymentMethod.type == "bacs" %}#tab-bacs{% else %}#tab-bacs-setup{% endif %}" class="btn btn-success" data-toggle="tab">
+        <h2>Payment Details</h2>
+
+        {% if bacs %}
+        <div class="row">
+            <div class="col-sm-6">
+                <h4>Your current payment method:</h4>
+                <p class="lead">{% if user.paymentMethod.type == "judo" %}Credit/Debit Card{% elseif user.paymentMethod.type == "bacs" %}Direct Debit{% else %}Unknown{% endif %}</p>
+                <a href="{% if user.paymentMethod.type == "bacs" %}#tab-bacs{% else %}#tab-bacs-setup{% endif %}"
+                   class="btn btn-blue-hollow"
+                   data-toggle="tab">
                     {% if user.paymentMethod.type == "judo" %}
-                      Change to Direct Debit
+                        Change to Direct Debit
                     {% else %}
-                      Back to Direct Debit
+                        Back to Direct Debit
                     {% endif %}
-                  </a>
-                </div>
+                </a>
             </div>
-            {% endif %}
-            <div class="row">
-                <div class="col-md-6">
-                  <h4>Your card:</h4>
-                  <p>{% if user.paymentMethod.type == "judo" %}{{ user.paymentMethod }}{% else %}Not setup{% endif %}</p>
-                </div>
-                <div class="col-md-4">
-                    <br />
-                      {% if webpay_action and webpay_reference %}
-                      <form action="{{ webpay_action }}" method="post" id="webpay-form">
-                          <div class="row">
-                              <div class="form-group col-sm-12">
-                                  <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
-                                  <input type="submit" class="btn btn-primary " value="Update your card details">
-                              </div>
-                          </div>
-                      </form>
-                    {% endif %}
-                </div>
-            </div>
-            {% if policy.premiumPlan == 'monthly' %}
-            <div class="row">
-                <div class="col-md-6">
-                  <h4>Billing date:</h4>
-                  <p>Monthly on the {{ policy.billing|date('jS','Europe/London') }} around {{ policy.billing|date('H','Europe/London') }}:00</p>
-                </div>
-                <div class="col-md-4">
-                    <br />
-                    <button title="Change" type="button" class="btn btn-primary"
-                            data-toggle="modal" data-target="#billingModal"
-                    ><i class="fa fa-edit"></i> Change</button>
-                </div>
-            </div>
-            {% endif %}
         </div>
-  </section>
+        {% endif %}
+        <div class="row">
+            <div class="col-sm-6">
+                <h4>Your card:</h4>
+                <p class="lead">{% if user.paymentMethod.type == "judo" %}{{ user.paymentMethod }}{% else %}Not setup{% endif %}</p>
+                {% if webpay_action and webpay_reference %}
+                <form action="{{ webpay_action }}" method="post" id="webpay-form">
+                    <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
+                    <input type="submit" class="btn btn-blue-hollow" value="Update your card details">
+                </form>
+                {% endif %}
+            </div>
+        </div>
+        {% if policy.premiumPlan == 'monthly' %}
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>Billing date:</h4>
+                    <p>Monthly on the {{ policy.billing|date('jS','Europe/London') }} around {{ policy.billing|date('H','Europe/London') }}:00</p>
+                    <button title="Change"
+                            type="button"
+                            class="btn btn-blue-hollow"
+                            data-toggle="modal"
+                            data-target="#billingModal">
+                        <i class="fa fa-edit"></i> Change</button>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>

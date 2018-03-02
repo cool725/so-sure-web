@@ -23,7 +23,7 @@ $(function(){
     var bonusDaysLeft   = $(connectionChart).data('bonus-days-remaining');
 
     var totalBonus = Math.round((bonusDaysLeft / totalBonusDays) * 100);
-    var bonus = totalBonus / 100; 
+    var bonus = totalBonus / 100;
 
     // console.log(bonus);
 
@@ -37,18 +37,6 @@ $(function(){
     });
 
     // Connect with
-    // $('#connect-with').click(function(event) {
-
-    //     event.preventDefault();
-
-    //     $('html, body').animate({
-    //         scrollTop: $('#connect-with-box').offset().top - 100
-    //     }, 1500);
-
-    //     $('#connect-with-box').addClass('box-border--highlight');
-    // });    
-
-    // Connect with
     $('#scode-link').click(function(event) {
         event.preventDefault();
 
@@ -58,12 +46,12 @@ $(function(){
 
         $('#scode-box').addClass('box-border--highlight');
     });
-    
+
     // Copy button on scode
     var clipboard = new Clipboard('.btn-copy');
 
     $('.btn-copy').tooltip({
-        'title':'Copied', 
+        'title':'Copied',
         'trigger':'manual'
     });
 
@@ -74,7 +62,7 @@ $(function(){
     clipboard.on('success', function(event) {
         console.log(event);
         $('.btn-copy').tooltip('show');
-        setTimeout(function() { $('.btn-copy').tooltip('hide'); }, 1500);        
+        setTimeout(function() { $('.btn-copy').tooltip('hide'); }, 1500);
     });
 
     // Share buttons
@@ -94,20 +82,8 @@ $(function(){
     });
 
     // Rollover control
-
     $('.coffee-stamp').each(function(){
         $(this).popover();
     });
-
-
-    // if ($('.coffee-stamp').each().data('has-claim', 'false')) {
-
-    //     console.log('No claims');
-
-    // } else {
-
-    //     console.log('Claimed');
-    
-    // }
 
 });
