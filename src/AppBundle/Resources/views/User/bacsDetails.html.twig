@@ -6,15 +6,42 @@
                     <h2>Your Payment Details</h2>
                 </div>
             </div>
+            {% if bacs %}
             <div class="row">
                 <div class="col-md-6">
-                  <h4>Your payment method:</h4>
+                  <h4>Your current payment method:</h4>
                 </div>
                 <div class="col-md-4">
                   <br />
-                  <p>{{ user.paymentMethod.name }}</p>
+                  <p>{% if user.paymentMethod.type == "judo" %}Credit/Debit Card{% elseif user.paymentMethod.type == "bacs" %}Direct Debit{% else %}Unknown{% endif %}</p>
                   <a href="#tab-card" class="btn btn-success" data-toggle="tab">Change to Credit/Debit Card</a>
                 </div>
             </div>
+            {% endif %}
+            <div class="row">
+                <div class="col-md-6">
+                  <h4>Your direct debit:</h4>
+                  <p>{% if user.paymentMethod.type == "bacs" %}{{ user.paymentMethod }}{% else %}Not setup{% endif %}</p>
+                </div>
+                <div class="col-md-4">
+                    <br />
+                  <a href="#tab-bacs-setup" class="btn btn-primary" data-toggle="tab">Upate Details</a>
+                </div>
+            </div>
+            {% if policy.premiumPlan == 'monthly' %}
+            <div class="row">
+                <div class="col-md-6">
+                  <h4>Billing date:</h4>
+                  <p>Monthly on the {{ policy.billing|date('jS','Europe/London') }} around {{ policy.billing|date('H','Europe/London') }}:00</p>
+                </div>
+                <div class="col-md-4">
+                    <br />
+                    <button title="Change" type="button" class="btn btn-primary"
+                            data-toggle="modal" data-target="#billingModal"
+                    ><i class="fa fa-edit"></i> Change</button>
+                </div>
+            </div>
+            {% endif %}
         </div>
   </section>
+

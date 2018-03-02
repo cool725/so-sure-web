@@ -9,19 +9,25 @@
             {% if bacs %}
             <div class="row">
                 <div class="col-md-6">
-                  <h4>Your payment method:</h4>
+                  <h4>Your current payment method:</h4>
                 </div>
                 <div class="col-md-4">
                   <br />
-                  <p>{{ user.paymentMethod.name }}</p>
-                  <a href="#tab-bacs" class="btn btn-success" data-toggle="tab">Change to Direct Debit</a>
+                  <p>{% if user.paymentMethod.type == "judo" %}Credit/Debit Card{% elseif user.paymentMethod.type == "bacs" %}Direct Debit{% else %}Unknown{% endif %}</p>
+                  <a href="{% if user.paymentMethod.type == "bacs" %}#tab-bacs{% else %}#tab-bacs-setup{% endif %}" class="btn btn-success" data-toggle="tab">
+                    {% if user.paymentMethod.type == "judo" %}
+                      Change to Direct Debit
+                    {% else %}
+                      Back to Direct Debit
+                    {% endif %}
+                  </a>
                 </div>
             </div>
             {% endif %}
             <div class="row">
                 <div class="col-md-6">
                   <h4>Your card:</h4>
-                  <p>{{ user.paymentMethod }}</p>
+                  <p>{% if user.paymentMethod.type == "judo" %}{{ user.paymentMethod }}{% else %}Not setup{% endif %}</p>
                 </div>
                 <div class="col-md-4">
                     <br />
@@ -53,34 +59,3 @@
             {% endif %}
         </div>
   </section>
-
-  {% if policy.premiumPlan == 'monthly' %}
-    <div class="modal fade" id="billingModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            {{ form_start(billing_form) }}
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-            <h4 class="modal-title">Request Billing Date Change</h4>
-          </div>
-          <div class="modal-body">
-            <p>
-                Please change my billing date from the {{ policy.billing|date('jS','Europe/London') }} to the {{ form_widget(billing_form.day) }} each month.
-            </p>
-            <p>
-                Note the following:
-                <ul>
-                    <li>You can't be behind in your payments. We will be unable to change your billing date until your account has a £0 balance.</li>
-                    <li>If the request day is earlier than the current day, you will be billed immediately for this month (e.g. today is the 15th, your payment is currently due on the 30th, but you want to change to the 1st. This month, you will be billed on the 15th, but next month will be on the 1st).</li>
-                    <li>If you request to change the date close to when the payment is due, you may need to wait an additional month before we're able to change the payment date.</li>
-                </ul>
-            </p>
-          </div>
-          <div class="modal-footer">
-            {{ form_widget(billing_form.update, {'label': 'Change billing date', 'attr': {'class': 'btn btn-danger confirm-usertoken-clear'}}) }}
-          </div>
-            {{ form_end(billing_form) }}
-        </div>
-      </div>
-    </div>
-  {% endif %}

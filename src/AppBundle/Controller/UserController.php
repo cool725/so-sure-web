@@ -16,8 +16,10 @@ use AppBundle\Document\SCode;
 use AppBundle\Document\Cashback;
 use AppBundle\Document\Feature;
 use AppBundle\Document\User;
+use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\Form\Renew;
 use AppBundle\Document\Form\RenewCashback;
+use AppBundle\Form\Type\BacsType;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\EmailInvitationType;
 use AppBundle\Form\Type\UserEmailType;
@@ -1147,19 +1149,22 @@ class UserController extends BaseController
         }
 
         $bacs = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
+        // TODO: Move to ajax call
         $webpay = null;
-        if ($user->getPaymentMethod() instanceof JudoPaymentMethod) {
-            $webpay = $this->get('app.judopay')->webRegister(
-                $user,
-                $request->getClientIp(),
-                $request->headers->get('User-Agent'),
-                $policy
-            );
-        }
+        $webpay = $this->get('app.judopay')->webRegister(
+            $user,
+            $request->getClientIp(),
+            $request->headers->get('User-Agent'),
+            $policy
+        );
         $billing = new BillingDay();
         $billing->setPolicy($policy);
         $billingForm = $this->get('form.factory')
             ->createNamedBuilder('billing_form', BillingDayType::class, $billing)
+            ->getForm();
+        $bacsPaymentMethod = new BacsPaymentMethod();
+        $bacsForm = $this->get('form.factory')
+            ->createNamedBuilder('bacs_form', BacsType::class, $bacsPaymentMethod)
             ->getForm();
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('billing_form')) {
@@ -1180,6 +1185,19 @@ class UserController extends BaseController
 
                     return $this->redirectToRoute('user_payment_details_policy', ['policyId' => $policyId]);
                 }
+            } elseif ($request->request->has('bacs_form')) {
+                $bacsForm->handleRequest($request);
+                if ($bacsForm->isValid()) {
+                    $user->setPaymentMethod($bacsPaymentMethod);
+                    $dm->flush();
+
+                    $this->addFlash(
+                        'success',
+                        'Your bacs is now setup.'
+                    );
+
+                    return $this->redirectToRoute('user_payment_details_policy', ['policyId' => $policyId]);
+                }
             }
         }
 
@@ -1189,6 +1207,7 @@ class UserController extends BaseController
             'user' => $user,
             'policy' => $policy,
             'billing_form' => $billingForm->createView(),
+            'bacs_form' => $bacsForm->createView(),
             'bacs' => $bacs,
         ];
 

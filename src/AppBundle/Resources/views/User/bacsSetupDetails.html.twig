@@ -1,0 +1,75 @@
+
+    <section class="user-homepage--content section--pad">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2>Your Payment Details</h2>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                  <h4>Your current payment method:</h4>
+                </div>
+                <div class="col-md-4">
+                  <br />
+                  <p>{% if user.paymentMethod.type == "judo" %}Credit/Debit Card{% elseif user.paymentMethod.type == "bacs" %}Direct Debit{% else %}Unknown{% endif %}</p>
+                  <a href="#tab-card" class="btn btn-success" data-toggle="tab">
+                    {% if user.paymentMethod.type == "judo" %}
+                      Back to Credit/Debit Card
+                    {% else %}
+                      Change to Credit/Debit Card
+                    {% endif %}
+                  </a>
+                </div>
+            </div>
+            
+            <hr/>
+            <div class="row">
+                <div class="col-md-12">
+                    <h2>Setup Direct Debit</h2>
+                </div>
+            </div>
+            {{ form_start(bacs_form) }}
+            <div class="row">
+                <div class="col-md-6">
+                  <h4>Name:</h4>
+                </div>
+                <div class="col-md-4">
+                  <br />
+                  <p>{{ form_widget(bacs_form.accountName, {'attr': {'placeholder_text': 'Must match your account name', 'class': ''}}) }}</p>
+                  <p>The bank account must be in the policy holder's name "{{ user.name }}"</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                  <h4>Sort Code:</h4>
+                </div>
+                <div class="col-md-4">
+                  <br />
+                  <p>{{ form_widget(bacs_form.sortCode, {'attr': {'placeholder_text': '', 'class': ''}}) }}</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                  <h4>Account Number:</h4>
+                </div>
+                <div class="col-md-4">
+                  <br />
+                  <p>{{ form_widget(bacs_form.accountNumber, {'attr': {'placeholder_text': '', 'class': ''}}) }}</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-10">
+                  <p class="text-center">{{ form_widget(bacs_form.soleSignature, {'attr': {'placeholder_text': '', 'class': ''}}) }}
+                  {{ form_label(bacs_form.soleSignature) }}
+                  </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-10">
+                  <p class="text-center">{{ form_widget(bacs_form.save, {'attr': {'placeholder_text': '', 'class': 'btn btn-success'}}) }}</p>
+                </div>
+            </div>
+            {{ form_end(bacs_form) }}
+        </div>
+  </section>
