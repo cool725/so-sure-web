@@ -40,7 +40,7 @@ class BacsPaymentMethod extends PaymentMethod
      * @Gedmo\Versioned
      */
     protected $soleSignature;
-    
+
     public function setAccountName($accountName)
     {
         $this->accountName = $accountName;
@@ -73,7 +73,7 @@ class BacsPaymentMethod extends PaymentMethod
 
     public function setSoleSignature($soleSignature)
     {
-        $this->soleSignature = $soleSignature;
+        $this->soleSignature = filter_var($soleSignature, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
     }
 
     public function getSoleSignature()
@@ -83,8 +83,8 @@ class BacsPaymentMethod extends PaymentMethod
 
     public function isValid()
     {
-        // TODO: Fix me
-        return true;
+        return strlen($this->getAccountName()) > 2 && strlen($this->getAccountNumber()) == 8 &&
+            strlen($this->getSortCode()) == 6;
     }
 
     public function getDisplayableAccountNumber()

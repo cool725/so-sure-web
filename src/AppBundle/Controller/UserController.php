@@ -20,6 +20,7 @@ use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\Form\Renew;
 use AppBundle\Document\Form\RenewCashback;
 use AppBundle\Form\Type\BacsType;
+use AppBundle\Form\Type\BacsConfirmType;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\EmailInvitationType;
 use AppBundle\Form\Type\UserEmailType;
@@ -1166,6 +1167,9 @@ class UserController extends BaseController
         $bacsForm = $this->get('form.factory')
             ->createNamedBuilder('bacs_form', BacsType::class, $bacsPaymentMethod)
             ->getForm();
+        $bacsConfirmForm = $this->get('form.factory')
+            ->createNamedBuilder('bacs_confirm_form', BacsConfirmType::class, $bacsPaymentMethod)
+            ->getForm();
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('billing_form')) {
                 $billingForm->handleRequest($request);
@@ -1188,6 +1192,13 @@ class UserController extends BaseController
             } elseif ($request->request->has('bacs_form')) {
                 $bacsForm->handleRequest($request);
                 if ($bacsForm->isValid()) {
+                    $bacsConfirmForm = $this->get('form.factory')
+                        ->createNamedBuilder('bacs_confirm_form', BacsConfirmType::class, $bacsPaymentMethod)
+                        ->getForm();
+                }
+            } elseif ($request->request->has('bacs_confirm_form')) {
+                $bacsConfirmForm->handleRequest($request);
+                if ($bacsConfirmForm->isValid()) {
                     $user->setPaymentMethod($bacsPaymentMethod);
                     $dm->flush();
 
@@ -1208,7 +1219,9 @@ class UserController extends BaseController
             'policy' => $policy,
             'billing_form' => $billingForm->createView(),
             'bacs_form' => $bacsForm->createView(),
+            'bacs_confirm_form' => $bacsConfirmForm->createView(),
             'bacs' => $bacs,
+            'bacsPaymentMethod' => $bacsPaymentMethod,
         ];
 
         return $data;
