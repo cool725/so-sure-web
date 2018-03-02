@@ -41,6 +41,7 @@ use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\Stats;
 use AppBundle\Document\ImeiTrait;
 use AppBundle\Document\Form\AdminMakeModel;
+use AppBundle\Document\Form\Roles;
 use AppBundle\Document\OptOut\OptOut;
 use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Document\OptOut\SmsOptOut;
@@ -84,6 +85,7 @@ use AppBundle\Form\Type\UserPermissionType;
 use AppBundle\Form\Type\UserHighRiskType;
 use AppBundle\Form\Type\ClaimFlagsType;
 use AppBundle\Form\Type\AdminMakeModelType;
+use AppBundle\Form\Type\UserRoleType;
 use AppBundle\Exception\RedirectException;
 use AppBundle\Service\PushService;
 use AppBundle\Event\PicsureEvent;
@@ -951,6 +953,7 @@ class AdminEmployeeController extends BaseController
         $dm = $this->getManager();
         $repo = $dm->getRepository(User::class);
         $user = $repo->find($id);
+
         if (!$user) {
             throw $this->createNotFoundException('User not found');
         }
@@ -990,7 +993,6 @@ class AdminEmployeeController extends BaseController
         $userAddressForm = $this->get('form.factory')
             ->createNamedBuilder('user_address_form', AddressType::class, $address)
             ->getForm();
-
         $policyData = new SalvaPhonePolicy();
         $policyForm = $this->get('form.factory')
             ->createNamedBuilder('policy_form', PartialPolicyType::class, $policyData)
@@ -999,9 +1001,26 @@ class AdminEmployeeController extends BaseController
             ->createNamedBuilder('sanctions_form')
             ->add('confirm', SubmitType::class)
             ->getForm();
+        $role = new Roles();
+        $role->setRoles($user->getRoles());
+        $roleForm = $this->get('form.factory')
+            ->createNamedBuilder('user_role_form', UserRoleType::class, $role)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
-            if ($request->request->has('reset_form')) {
+            if ($request->request->has('user_role_form')) {
+                $roleForm->handleRequest($request);
+                if ($roleForm->isValid()) {
+                    $newRoles = $role->getRoles();
+                    $user->setRoles($newRoles);
+                    $this->get('fos_user.user_manager')->updateUser($user);
+                    $this->addFlash(
+                        'success',
+                        'Role(s) updated'
+                    );
+                    return new RedirectResponse($this->generateUrl('admin_user', ['id' => $id]));
+                }
+            } elseif ($request->request->has('reset_form')) {
                 $resetForm->handleRequest($request);
                 if ($resetForm->isValid()) {
                     if (null === $user->getConfirmationToken()) {
@@ -1198,11 +1217,12 @@ class AdminEmployeeController extends BaseController
                 }
             }
         }
-
+        
         return [
             'user' => $user,
             'reset_form' => $resetForm->createView(),
             'policy_form' => $policyForm->createView(),
+            'role_form' => $roleForm->createView(),
             'user_detail_form' => $userDetailForm->createView(),
             'user_email_form' => $userEmailForm->createView(),
             'user_address_form' => $userAddressForm->createView(),
