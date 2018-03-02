@@ -18,16 +18,67 @@
     <section class="user-homepage--content section--pad">
         <div class="container">
 
-            <div class="row">
-                <div class="col-md-12">
-                    <h2>My Policies</h2>
-                </div>
-            </div>
+            <h1>My Policies</h1>
+
             {% for policyItem in user.getDisplayablePoliciesSorted %}
             <div class="row">
                 <div class="col-md-6">
-                  <h4>{{ policyItem.phone }} <span class="badge">{{ policyItem.status|capitalize }}</span></h4>
-                  <p>{{ policyItem.policyNumber }} ({{ policyItem.start|date('dS M Y') }} - {{ policyItem.end|date('dS M Y') }})</p>
+                    <h4>{{ policyItem.phone }} <span class="badge">{{ policyItem.status|capitalize }}</span></h4>
+                    <p>{{ policyItem.policyNumber }} ({{ policyItem.start|date('dS M Y') }} - {{ policyItem.end|date('dS M Y') }})</p>
+
+                    {% if policyItem.isPicSurePolicy %}
+                        <table class="table table-bordered table-mod text-center">
+                            <thead>
+                                <tr>
+                                    <td width="20%">
+                                        {% if policyItem.isPicSureValidated %}
+                                            pic-sure <i class="fa fa-check text-green" aria-hidden="true"></i>
+                                        {% else %}
+                                            <a href="#" data-toggle="modal" data-target="#pic-sure">pic-sure <i class="fa fa-exclamation-triangle text-blue" aria-hidden="true"></i></a>
+                                        {% endif %}
+                                    </td>
+                                    <td>Cover</td>
+                                    <td width="20%">Excess</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td rowspan="2" valign="center">
+                                        {% if policyItem.isPicSureValidated %}
+                                            <img src="{{ cdn_url }}/images/user/pic-sure_validated_stamp.svg" alt="pic-sure valid" width="80px">
+                                        {% else %}
+                                            <img src="{{ cdn_url }}/images/user/pic-sure_non_validated_stamp.svg" alt="pic-sure valid" width="80px">
+                                        {% endif %}
+                                   </td>
+                                    <td>Accidental Damage/Breakdown</td>
+                                    <td>&pound;{{ policyItem.getExcessValue('damage')|number_format(0, '.', ',') }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Theft/Loss</td>
+                                    <td>&pound;{{ policyItem.getExcessValue('theft')|number_format(0, '.', ',') }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <table class="table table-bordered table-mod text-center">
+                            <thead>
+                                <tr>
+                                    <td>Cover</td>
+                                    <td width="20%">Excess</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Accidental Damage/Breakdown</td>
+                                    <td>&pound;{{ policyItem.getExcessValue('damage')|number_format(0, '.', ',') }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Theft/Loss</td>
+                                    <td>&pound;{{ policyItem.getExcessValue('theft')|number_format(0, '.', ',') }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    {% endif %}
                 </div>
                 <div class="col-md-6">
                     <ul class="nav nav-pills">
@@ -77,5 +128,70 @@
             {% endif %}
         </div>
     </section>
+
+    <section class="section--pad"></section>
+
+    <div class="modal fade"
+         id="pic-sure"
+         tabindex="-1"
+         role="dialog"
+         aria-labelledby="pic-sure-modal"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h3 class="text-center">Validate phone with pic-sure</h3>
+                </div>
+                <div class="modal-body">
+                    <p>Our excess is £150. That's high, we know, but we're making sure that dishonest policyholders and fraudsters don't take advantage of us and our genuine customers.</p>
+                    <p>And that's why, by validating your phone with pic-sure technology, which takes less than 30 seconds, you can easily take your excess down to:</p>
+                    <table class="table table-bordered table-mod text-center">
+                        <thead>
+                            <tr>
+                                <th class="text-center" width="50%"><u>Excess without pic-sure</u></th>
+                                <th class="text-center" width="50%">Excess <U>with</U> pic-sure</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td rowspan="2" align="center">
+                                    <strong>&pound;150</strong><br>
+                                    <span>Theft/Loss/Accidental Damage/Breakdown</span>
+                                </td>
+                                <td align="center">
+                                    <strong>&pound;50</strong><br>
+                                    <span>Accidental Damage/Breakdown</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="center">
+                                    <strong>&pound;70</strong><br>
+                                    <span>Theft/Loss</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="text-center">
+                        <h4>How to use pic-sure?</h4>
+                        <p>Download our app, validate with pic-sure, reduce your excess. <br> It's that simple!</p>
+                        <a class="ga-outbound-click"
+                           data-clicklabel="iTunes"
+                           href="{{ apple_download('my-policies-modal') }}"
+                           target="_blank">
+                            <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download so-sure on the App Store" /><span class="sr-only">so-sure app - Apple App Store</span>
+                        </a>
+                        <a class="ga-outbound-click"
+                           data-clicklabel="PlayStore"
+                           href="{{ google_download('my-policies-modal') }}"
+                           target="_blank">
+                            <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get so-sure on Google Play" /><span class="sr-only">so-sure app - Google Play</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
 {% endblock %}

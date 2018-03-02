@@ -13,8 +13,10 @@ use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Document\User;
 use AppBundle\Document\SCode;
 use AppBundle\Document\Policy;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Cashback;
 use AppBundle\Document\Phone;
+use AppBundle\Document\PolicyTerms;
 use AppBundle\Service\MixpanelService;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use AppBundle\Document\Invitation\EmailInvitation;
@@ -128,6 +130,17 @@ class OpsController extends BaseController
             }
         }
 
+        $picSureApprovedPolicy = $policyRepo->findOneBy([
+            'status' => Policy::STATUS_ACTIVE,
+            'picSureStatus' => PhonePolicy::PICSURE_STATUS_APPROVED,
+        ]);
+        $picSureRejectedPolicy = $policyRepo->findOneBy([
+            'status' => Policy::STATUS_ACTIVE,
+            'picSureStatus' => PhonePolicy::PICSURE_STATUS_REJECTED,
+        ]);
+        $nonPicSurePolicy = $policyRepo->findOneBy([
+            'policyTerms.$id' => ['$ne' => new \MongoId($picSureRejectedPolicy->getPolicyTerms()->getId())],
+        ]);
         $unpaidPolicy = $policyRepo->findOneBy([
             'status' => Policy::STATUS_UNPAID,
             'policyDiscountPresent' => ['$ne' => true],
@@ -227,6 +240,9 @@ class OpsController extends BaseController
         return [
             'scode' => $scode->getCode(),
             'invitation' => $invitation,
+            'picsure_approved_policy' => $picSureApprovedPolicy,
+            'picsure_rejected_policy' => $picSureRejectedPolicy,
+            'non_picsure_policy' => $nonPicSurePolicy,
             'unpaid_policy' => $unpaidPolicy,
             'unpaid_policydiscount_policy' => $unpaidPolicyDiscountPolicy,
             'valid_policy' => $validPolicy,

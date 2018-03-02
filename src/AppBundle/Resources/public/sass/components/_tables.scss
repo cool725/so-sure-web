@@ -10,3 +10,14 @@
 .faster-claims-table td {
     padding: 20px !important;
 }
+
+.table-mod {
+
+    > tbody {
+        > tr {
+            > td {
+                vertical-align: middle;
+            }
+        }
+    }
+}

@@ -239,10 +239,10 @@ class MonitorService
             try {
                 $total = $this->mixpanel->getUserCount();
             } catch (\Exception $e) {
-                if ($count > 5) {
+                if ($count > 15) {
                     throw $e;
                 }
-                sleep(1);
+                sleep(2);
             }
 
             $count++;

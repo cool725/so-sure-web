@@ -583,9 +583,18 @@ class PhonePolicy extends Policy
         return 'Mob';
     }
 
+    public function isPicSurePolicy()
+    {
+        if (!$this->getPolicyTerms()) {
+            return null;
+        }
+
+        return $this->getPolicyTerms()->isPicSureEnabled();
+    }
+
     public function getPicSureStatus()
     {
-        if (!$this->picSureStatus && $this->getPolicyTerms() && !$this->getPolicyTerms()->isPicSureEnabled()) {
+        if (!$this->picSureStatus && !$this->isPicSurePolicy()) {
             return self::PICSURE_STATUS_DISABLED;
         }
 
@@ -635,6 +644,11 @@ class PhonePolicy extends Policy
         } else {
             return false;
         }
+    }
+
+    public function getExcessValue($type)
+    {
+        return Claim::getExcessValue($type, $this->isPicSureValidated(), $this->isPicSurePolicy());
     }
 
     public function toApiArray()
