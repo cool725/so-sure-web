@@ -173,6 +173,8 @@ class BICommand extends ContainerAwareCommand
             '"First Referer"',
             '"Make"',
             '"Make/Model"',
+            '"Connections"',
+            '"Invitations"',
         ]);
         foreach ($policies as $policy) {
             $user = $policy->getUser();
@@ -210,6 +212,8 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getReferer() : ''),
                 sprintf('"%s"', $policy->getPhone()->getMake()),
                 sprintf('"%s %s"', $policy->getPhone()->getMake(), $policy->getPhone()->getModel()),
+                sprintf('"%d"', count($policy->getConnections())),
+                sprintf('"%d"', count($policy->getInvitations())),
             ]);
         }
         $this->uploadS3(implode(PHP_EOL, $lines), 'policies.csv');
