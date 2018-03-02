@@ -33,18 +33,18 @@
             </div>
         </div>
         {% if policy.premiumPlan == 'monthly' %}
-            <div class="row">
-                <div class="col-md-6">
-                    <h4>Billing date:</h4>
-                    <p>Monthly on the {{ policy.billing|date('jS','Europe/London') }} around {{ policy.billing|date('H','Europe/London') }}:00</p>
-                    <button title="Change"
-                            type="button"
-                            class="btn btn-blue-hollow"
-                            data-toggle="modal"
-                            data-target="#billingModal">
-                        <i class="fa fa-edit"></i> Change</button>
-                </div>
+        <div class="row">
+            <div class="col-md-6">
+                <h4>Billing date:</h4>
+                <p>Monthly on the {{ policy.billing|date('jS','Europe/London') }} around {{ policy.billing|date('H','Europe/London') }}:00</p>
+                <button title="Change"
+                        type="button"
+                        class="btn btn-blue-hollow"
+                        data-toggle="modal"
+                        data-target="#billingModal">
+                    <i class="fa fa-edit"></i> Change</button>
             </div>
+        </div>
         {% endif %}
     </div>
 </section>

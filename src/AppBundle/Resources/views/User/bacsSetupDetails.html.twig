@@ -20,7 +20,9 @@
                     </div>
                     <div class="form-group">
                         {{ form_widget(bacs_form.save, {'attr': {'class': 'btn btn-green btn-pad btn-block'}}) }}
-                        <a href="#tab-card" class="btn btn-blue-hollow btn-block btn-pad" data-toggle="tab">
+                    </div>
+                    <div class="form-group">
+                        <a href="#tab-card" class="btn btn-blue-hollow" data-toggle="tab">
                             {% if user.paymentMethod.type == "judo" %}
                                 Back to Credit/Debit Card
                             {% else %}
