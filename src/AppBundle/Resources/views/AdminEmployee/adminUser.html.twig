@@ -197,6 +197,19 @@
                         {{ form_end(sanctions_form)}}
                     </td>
                 </tr>
+                <tr>
+                    <td colspan="1">Roles</td>
+                    <td>
+                        {% for ur in user.roles %}
+                            {{ ur }}<br>
+                        {% endfor %}
+                    </td>
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <td>
+                            <button type="button" class="btn btn-info" data-toggle="modal" data-target="#newRoleModal"><i class="fa fa-plus"></i> Edit Roles</button>
+                        </td>
+                    {% endif %}
+                </tr>
             </table>
 </div>
 
@@ -444,4 +457,27 @@
         </div>
       </div>
     </div>
+
+    <div class="modal fade" id="newRoleModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            {{ form_start(role_form) }}
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Edit User Roles</h4>
+          </div>
+            <div class="modal-body">
+                <span class="text-danger">
+                    {{ form_errors(role_form) }}
+                </span>
+                {{ form_widget(role_form.roles)}}
+            </div>
+          <div class="modal-footer">
+                {{ form_widget(role_form.save, {'label': 'Update Roles', 'attr': {'class': 'btn btn-success'}}) }}
+          </div>
+            {{ form_end(role_form) }} 
+        </div>
+      </div>
+    </div>
+
 {% endblock %}

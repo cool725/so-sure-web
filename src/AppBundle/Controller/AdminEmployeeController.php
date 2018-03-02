@@ -1002,6 +1002,7 @@ class AdminEmployeeController extends BaseController
             ->add('confirm', SubmitType::class)
             ->getForm();
         $role = new Roles();
+        $role->setRoles($user->getRoles());
         $roleForm = $this->get('form.factory')
             ->createNamedBuilder('user_role_form', UserRoleType::class, $role)
             ->getForm();

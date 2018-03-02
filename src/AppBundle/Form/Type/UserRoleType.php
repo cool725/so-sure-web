@@ -30,7 +30,7 @@ class UserRoleType extends AbstractType
             'required'  => true,
             'multiple'=>true
         ))
-        ->add('Save', SubmitType::class) ;
+        ->add('save', SubmitType::class) ;
 
     }
     
