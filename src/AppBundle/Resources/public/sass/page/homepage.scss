@@ -384,59 +384,67 @@
     }
 
     &--press {
-        text-align: center;
-
-        .press-img {
-            width: 200px; height: 100px;
-            background: transparent url('#{$cdn_url}/images/homepage/press/in_the_press_sprite_2x_new.png') no-repeat;
-            background-size: 1139px;
-        }
-
-        .the-guardian {
-            background-position: 10px 0;
-
-            @include breakpoint(tablet) {
-                background-position: 0 0;
-            }
-        }
-
-        .financial-times {
-            background-position: -200px 0;
-        }
-
-        .insurance-post {
-            background-position: -400px 0;
-        }
-
-        .moneycouk {
-            width: 150px;
-            background-position: -900px 0;
-        }
-
-        .digital-top-50 {
-            width: 160px;
-            background-position: -600px 0;
-
-            @include breakpoint(tablet) {
-                background-position: -585px 0;
-            }
-        }
-
-        .insurance-choice-awards {
-            width: 150px;
-            background-position: -734px 0;
-
-            @include breakpoint(tablet) {
-                background-position: -735px 0;
-            }
-        }
-
+        // text-align: center;
         h4 {
-            margin: 0 0 0 5px;
+            text-align:center;
+            margin: 0;
         }
 
-        @include breakpoint(laptop) {
-            text-align: left;
+        .press-list {
+
+            li {
+                width: 200px; height: 100px;
+                background: transparent url('#{$cdn_url}/images/homepage/press/in_the_press_sprite_fixed_width_x2.png') no-repeat;
+                background-size: 1200px;
+
+                &:nth-child(2) {
+                    background-position: -200px 0;
+                }
+
+                &:nth-child(3) {
+                    background-position: -400px 0;
+                }
+
+                &:nth-child(4) {
+                    background-position: -600px 0;
+                }
+
+                &:nth-child(5) {
+                    background-position: -800px 0;
+                }
+
+                &:nth-child(6) {
+                    background-position: -1000px 0;
+                }
+            }
+
+            &--1 {
+                text-align: center;
+
+                li {
+                    &:nth-child(2) {
+                        background-position: -200px 0;
+                    }
+
+                    &:nth-child(3) {
+                        background-position: -400px 0;
+                    }
+                }
+            }
+
+            &--2 {
+                text-align: center;
+
+                li {
+                    &:nth-child(1) {
+                        background-position: -600px 0;
+                    }
+
+                    &:nth-child(2) {
+                        background-position: -800px 0;
+                    }
+                }
+            }
         }
     }
 
