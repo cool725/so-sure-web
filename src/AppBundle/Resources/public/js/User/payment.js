@@ -2,6 +2,6 @@
 $(function(){
 
     // Payments page
-    $('.sort-code').mask('00-00-00');
+    // $('.sort-code').mask('00-00-00');
 
 });

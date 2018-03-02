@@ -1,10 +1,22 @@
 <section class="user-homepage--content section--pad">
     <div class="container">
         <ul class="list-unstyled">
-            <li class="h2">{{ bacsPaymentMethod.accountName }}</li>
-            <li class="h2">{{ bacsPaymentMethod.sortCode }}</li>
-            <li class="h2">{{ bacsPaymentMethod.displayableAccountNumber }}</li>
+            <li>
+                <small class="text-dark-grey">Name on account</small><br>
+                <span class="h3">{{ bacsPaymentMethod.accountName }}</span>
+            </li>
+            <li>
+                <small class="text-dark-grey">Sort code</small><br>
+                <span class="h3">{{ bacsPaymentMethod.sortCode }}</span>
+            </li>
+            <li>
+                <small class="text-dark-grey">Account number</small><br>
+                <span class="h3">{{ bacsPaymentMethod.displayableAccountNumber }}</span>
+            </li>
         </ul>
-        {{ form(bacs_confirm_form) }}
+        {{ form_start(bacs_confirm_form) }}
+            {{ form_widget(bacs_confirm_form.save, {'attr': {'class': 'btn btn-green'}}) }}
+        {{ form_end(bacs_confirm_form) }}
+        <p>Your payments are protected by the <a href="#" data-toggle="modal" data-target="#modal-dd">Direct Debit Guarantee</a></p>
     </div>
 </section>
