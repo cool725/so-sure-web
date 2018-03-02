@@ -18,17 +18,15 @@
                         {{ form_widget(bacs_form.soleSignature, {'attr': {'class': ''}}) }}
                         {{ form_label(bacs_form.soleSignature) }}
                     </div>
-                    <div class="form-group">
-                        {{ form_widget(bacs_form.save, {'attr': {'class': 'btn btn-green btn-pad btn-block'}}) }}
-                    </div>
-                    <div class="form-group">
-                        <a href="#tab-card" class="btn btn-blue-hollow" data-toggle="tab">
-                            {% if user.paymentMethod.type == "judo" %}
-                                Back to Credit/Debit Card
-                            {% else %}
-                                Change to Credit/Debit Card
-                            {% endif %}
-                        </a>
+                    <div class="row">
+                        <div class="col-xs-6 form-group">
+                            <a href="#tab-card" class="btn btn-blue-hollow btn-block" data-toggle="tab">
+                                Back
+                            </a>
+                        </div>
+                        <div class="col-xs-6 form-group">
+                            {{ form_widget(bacs_form.save, {'attr': {'class': 'btn btn-green btn-block'}}) }}
+                        </div>
                     </div>
                 {{ form_end(bacs_form) }}
             </div>

@@ -1,26 +1,10 @@
-
-    <section class="user-homepage--content section--pad">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12">
-                    <h2>{{ bacsPaymentMethod.accountName }}</h2>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <h2>{{ bacsPaymentMethod.sortCode }}</h2>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <h2>{{ bacsPaymentMethod.displayableAccountNumber }}</h2>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-12">
-                    {{ form(bacs_confirm_form) }}
-                </div>
-            </div>
-        </div>
-  </section>
+<section class="user-homepage--content section--pad">
+    <div class="container">
+        <ul class="list-unstyled">
+            <li class="h2">{{ bacsPaymentMethod.accountName }}</li>
+            <li class="h2">{{ bacsPaymentMethod.sortCode }}</li>
+            <li class="h2">{{ bacsPaymentMethod.displayableAccountNumber }}</li>
+        </ul>
+        {{ form(bacs_confirm_form) }}
+    </div>
+</section>
