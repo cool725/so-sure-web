@@ -271,12 +271,7 @@ class ApiExternalController extends BaseController
         $userRepo = $dm->getRepository(User::class);
         $user = $userRepo->findOneBy(['emailCanonical' => strtolower($email)]);
         if ($user) {
-            // @codingStandardsIgnoreStart
-            $err = 'It looks like you already have an account.  Please try logging in with your details';
-            // @codingStandardsIgnoreEnd
-            $this->addFlash('error', $err);
-
-            return $this->redirectToRoute('fos_user_security_login');
+            return $this->redirectToRoute('quote_phone', ['id' => $phone->getId()]);
         }
 
         $user = new User();
@@ -296,6 +291,6 @@ class ApiExternalController extends BaseController
             $user
         );
 
-        return $this->redirectToRoute('purchase');
+        return $this->redirectToRoute('quote_phone', ['id' => $phone->getId()]);
     }
 }
