@@ -525,7 +525,6 @@ class PurchaseController extends BaseController
             'webpay_action' => $webpay ? $webpay['post_url'] : null,
             'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
             'policy_key' => $this->getParameter('policy_key'),
-            'pdf_download' => $exp == 'pdf-download',
             'phones' => $phone ? $phoneRepo->findBy(
                 ['active' => true, 'make' => $phone->getMake(), 'model' => $phone->getModel()],
                 ['memory' => 'asc']
