@@ -140,14 +140,6 @@ services:
             - "@app.shortlink"
             - "@app.branch"
 
-    app.digits:
-        class: AppBundle\Service\DigitsService
-        arguments:
-            - "@doctrine_mongodb.odm.default_document_manager"
-            - "@logger"
-            - "%digits_consumer_key%"
-            - "%allowed_digits_consumer_keys%"
-
     app.push:
         class: AppBundle\Service\PushService
         arguments:

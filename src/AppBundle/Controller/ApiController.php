@@ -68,10 +68,7 @@ class ApiController extends BaseController
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
                 }
             } elseif (isset($data['oauth_echo_user'])) {
-                $oauthEchoUserData = $data['oauth_echo_user'];
-                if (!$this->validateFields($oauthEchoUserData, ['provider', 'credentials'])) {
-                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
-                }
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UPGRADE_APP, 'Digits is not available', 422);
             } elseif (isset($data['account_kit_user'])) {
                 $accountKitUserData = $data['account_kit_user'];
                 if (!$this->validateFields($accountKitUserData, ['authorization_code'])) {
@@ -90,12 +87,6 @@ class ApiController extends BaseController
             } elseif ($facebookUserData) {
                 $facebookId = $this->getDataString($facebookUserData, 'facebook_id');
                 $user = $repo->findOneBy(['facebookId' => $facebookId]);
-            } elseif ($oauthEchoUserData) {
-                $provider = $this->getDataString($oauthEchoUserData, 'provider');
-                $credentials = $this->getDataString($oauthEchoUserData, 'credentials');
-
-                $digits = $this->get('app.digits');
-                $user = $digits->validateUser($provider, $credentials, $this->getCognitoIdentityId($request));
             } elseif ($accountKitUserData) {
                 $authorizationCode = $this->getDataString($accountKitUserData, 'authorization_code');
 

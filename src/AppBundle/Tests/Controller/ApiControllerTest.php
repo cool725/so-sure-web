@@ -281,39 +281,14 @@ class ApiControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(500);
     }
 
-    public function testLoginMissingOAuthParam()
-    {
-        $cognitoIdentityId = $this->getUnauthIdentity();
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('oauth_echo_user' => [
-            'provider' => 'foo'
-        ]));
-        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
-
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('oauth_echo_user' => [
-            'credentials' => 'foo'
-        ]));
-        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
-    }
-
-    public function testLoginOAuthException()
+    public function testLoginOAuthDigigtsNotSupported()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('oauth_echo_user' => [
             'provider' => 'foo',
             'credentials' => 'bar',
         ]));
-        $data = $this->verifyResponse(500);
-    }
-
-    public function testLoginOAuthFailure()
-    {
-        $consumerKey = static::$container->getParameter('digits_consumer_key');
-        $cognitoIdentityId = $this->getUnauthIdentity();
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('oauth_echo_user' => [
-            'provider' => 'https://api.digits.com',
-            'credentials' => sprintf('oauth_consumer_key="%s"', $consumerKey),
-        ]));
-        $data = $this->verifyResponse(500);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_UPGRADE_APP);
     }
 
    // ping
