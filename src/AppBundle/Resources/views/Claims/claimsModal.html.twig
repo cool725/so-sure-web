@@ -1,7 +1,11 @@
     <div class="modal fade" id="claimsModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document" style="width: 50%">
         <div class="modal-content">
-        <form id="phone-alternative-form" method="post" action="{{ path('admin_claims_update_claim') }}">
+        {% if policyId is defined and policyId %}
+            <form id="phone-alternative-form" method="post" action="{{ path('admin_claims_update_claim_policy', {'route': route, 'policyId': policyId}) }}">
+        {% else %}
+            <form id="phone-alternative-form" method="post" action="{{ path('admin_claims_update_claim', {'route': route}) }}">
+        {% endif %}
             <input type="hidden" name="id" id="claims-detail-id"></input>
             <input type="hidden" name="token" value="{{  csrf_token('default') }}"></input>
             <div class="modal-header">

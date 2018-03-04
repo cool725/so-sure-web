@@ -384,10 +384,11 @@ class AdminController extends BaseController
     }
 
     /**
-     * @Route("/claims/update-claim", name="admin_claims_update_claim")
+     * @Route("/claims/update-claim/{route}", name="admin_claims_update_claim")
+     * @Route("/claims/update-claim/{route}/{policyId}", name="admin_claims_update_claim_policy")
      * @Method({"POST"})
      */
-    public function adminClaimsUpdateClaimAction(Request $request)
+    public function adminClaimsUpdateClaimAction(Request $request, $route = null, $policyId = null)
     {
         if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
             throw new \InvalidArgumentException('Invalid csrf token');
@@ -413,9 +414,15 @@ class AdminController extends BaseController
                 $claim->setReplacementPhone($phone);
             }
         }
-            $dm->flush();
+        $dm->flush();
 
-        return $this->redirectToRoute('admin_claims');
+        if ($policyId) {
+            return $this->redirectToRoute($route, ['id' => $policyId]);
+        } elseif ($route) {
+            return $this->redirectToRoute($route);
+        } else {
+            return $this->redirectToRoute('admin_claims');
+        }
     }
 
     /**
