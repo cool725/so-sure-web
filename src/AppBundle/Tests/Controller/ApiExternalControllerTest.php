@@ -432,7 +432,7 @@ class ApiExternalControllerTest extends BaseControllerTest
             null,
             sprintf("%s %s", static::$phone->__toString(), static::$phone->getId())
         );
-        $redirectUrl = self::$router->generate('purchase');
+        $redirectUrl = self::$router->generate('quote_phone', ['id' => static::$phone->getId()]);
         $this->assertTrue(self::$client->getResponse()->isRedirect($redirectUrl));
     }
 
@@ -472,7 +472,7 @@ class ApiExternalControllerTest extends BaseControllerTest
             null,
             sprintf("%s %s", static::$phone->__toString(), static::$phone->getId())
         );
-        $redirectUrl = self::$router->generate('fos_user_security_login');
+        $redirectUrl = self::$router->generate('quote_phone', ['id' => static::$phone->getId()]);
         $this->assertTrue(self::$client->getResponse()->isRedirect($redirectUrl));
     }
 }
