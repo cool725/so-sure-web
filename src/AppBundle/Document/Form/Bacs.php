@@ -16,14 +16,14 @@ class Bacs
     protected $accountName;
     
     /**
-     * @AppAssert\Token()
-     * @Assert\Length(min="1", max="50")
+     * @AppAssert\SortCode()
+     * @Assert\Length(min="6", max="6")
      */
     protected $sortCode;
 
     /**
-     * @AppAssert\Token()
-     * @Assert\Length(min="1", max="50")
+     * @AppAssert\BankAccountNumber()
+     * @Assert\Length(min="8", max="8")
      */
     protected $accountNumber;
 
@@ -48,7 +48,7 @@ class Bacs
 
     public function setSortCode($sortCode)
     {
-        $this->sortCode = $sortCode;
+        $this->sortCode = str_replace('-', '', $sortCode);
     }
 
     public function getSortCode()

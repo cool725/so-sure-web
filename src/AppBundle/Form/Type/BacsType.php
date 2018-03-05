@@ -19,7 +19,7 @@ class BacsType extends AbstractType
     {
         $builder
             ->add('accountName', TextType::class, ['required' => true])
-            ->add('sortCode', TextType::class, ['required' => true])
+            ->add('sortCode', TextType::class, ['required' => true, 'attr' => ['maxlength' => 8]])
             ->add('accountNumber', TextType::class, ['required' => true])
             ->add('soleSignature', CheckboxType::class, [
                 'label' => 'I am the sole signature on the account',

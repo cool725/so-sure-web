@@ -25,17 +25,18 @@ class BankAccount
     protected $accountName;
     
     /**
-     * @AppAssert\Token()
-     * @Assert\Length(min="1", max="50")
+     * @AppAssert\SortCode()
      * @MongoDB\Field(type="string")
+     * @Assert\Length(min="6", max="6")
      * @Gedmo\Versioned
      */
     protected $sortCode;
 
     /**
      * @AppAssert\Token()
-     * @Assert\Length(min="1", max="50")
+     * @AppAssert\BankAccountNumber()
      * @MongoDB\Field(type="string")
+     * @Assert\Length(min="8", max="8")
      * @Gedmo\Versioned
      */
     protected $accountNumber;
@@ -58,7 +59,7 @@ class BankAccount
 
     public function setSortCode($sortCode)
     {
-        $this->sortCode = $sortCode;
+        $this->sortCode = str_replace('-', '', $sortCode);
     }
 
     public function getSortCode()
