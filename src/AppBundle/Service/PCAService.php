@@ -3,14 +3,18 @@ namespace AppBundle\Service;
 
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\Address;
+use AppBundle\Document\BankAccount;
 use AppBundle\Document\Charge;
 use AppBundle\Document\User;
+use AppBundle\Document\BacsTrait;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 
 class PCAService
 {
+    use BacsTrait;
+
     const TIMEOUT = 5;
     const REDIS_POSTCODE_KEY = 'postcode';
     const REDIS_ADDRESS_KEY_FORMAT = 'address:%s:%s';
@@ -18,7 +22,9 @@ class PCAService
     const CACHE_TIME = 84600; // 1 day
     const FIND_URL = "http://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Find/v2.10/xmla.ws";
     const RETRIEVE_URL = "http://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Retrieve/v2.10/xmla.ws";
+    // @codingStandardsIgnoreStart
     const BANK_ACCOUNT_URL = "https://services.postcodeanywhere.co.uk/BankAccountValidation/Interactive/Validate/v2.00/json.ws";
+    // @codingStandardsIgnoreEnd
 
     /** @var LoggerInterface */
     protected $logger;
@@ -55,18 +61,6 @@ class PCAService
         return strtoupper(str_replace(' ', '', trim($postcode)));
     }
 
-    public function normalizeSortCode($sortCode)
-    {
-        $minusDash = str_replace('-', '', trim($sortCode));
-        
-        return str_replace(' ', '', $minusDash);
-    }
-
-    public function normalizeAccountNumber($accountNumber)
-    {
-        return str_replace(' ', '', trim($accountNumber));
-    }
-
     public function getBankAccount($sortCode, $accountNumber, User $user = null)
     {
         $sortCode = $this->normalizeSortCode($sortCode);
@@ -77,9 +71,8 @@ class PCAService
             return unserialize($value);
         }
 
-        // Use BX1 1LT as a hard coded address for testing
-        // (its a non-geographical postcode for Lloyds Bank, so is hopefully safe ;)
-        if ($sortCode == " 00-00-99") {
+        // Use 00-00-99 / 87654321 for testing. as 00-00-99/12345678 is used for testing for pca-predict, should be ok
+        if ($sortCode == "000099" && $accountNumber == "87654321") {
             $bankAccount = new BankAccount();
             $bankAccount->setSortCode($sortCode);
             $bankAccount->setAccountNumber($accountNumber);
@@ -92,30 +85,28 @@ class PCAService
             $bankAccount->setAddress($address);
             $this->cacheBankAccountResults($sortCode, $accountNumber, $bankAccount);
 
-            return $address;
-        } elseif ($sortCode == "999999") {
-            // Used for testing invalid postcode - pseudo-postcodes for england
-            return null;
+            return $bankAccount;
         } elseif ($this->environment != 'prod') {
             // 00-00-99/12345678 is a free search via pca, so can used for non production environments
-            $sortCode = " 000099";
+            $sortCode = "000099";
             $accountNumber = "12345678";
         }
 
-        $data = $this->findBankAccount($sortCode, $accountNumber);
-        if ($data) {
-            $key = array_keys($data)[0];
-
-            $address = $this->retreive($key);
-            $this->cacheResults($postcode, $number, $address);
+        $bankAccount = $this->findBankAccount($sortCode, $accountNumber);
+        if ($bankAccount) {
+            $this->cacheBankAccountResults($sortCode, $accountNumber, $bankAccount);
 
             // ignore free check
-            if ($postcode != "WR53DA") {
+            if (!($sortCode == "000099" && $accountNumber == "12345678")) {
                 $charge = new Charge();
                 try {
-                    $charge->setType(Charge::TYPE_ADDRESS);
+                    $charge->setType(Charge::TYPE_BANK_ACCOUNT);
                     $charge->setUser($user);
-                    $charge->setDetails(sprintf('%s, %s', $postcode, $number));
+                    $charge->setDetails(sprintf(
+                        '%s %s',
+                        $this->displayableSortCode($sortCode),
+                        $this->displayableAccountNumber($number)
+                    ));
                     $this->dm->persist($charge);
                     $this->dm->flush();
                 } catch (\Exception $e) {
@@ -124,7 +115,7 @@ class PCAService
                 }
             }
 
-            return $address;
+            return $bankAccount;
         }
 
         return null;
@@ -363,9 +354,10 @@ class PCAService
 
         $data = json_decode($body, true);
         
-        $this->logger->info(sprintf('Bank Account lookup for %s %s %s', $sortCode, $bankAccount, json_encode($data)));
+        $this->logger->info(sprintf('Bank Account lookup for %s %s %s', $sortCode, $accountNumber, json_encode($data)));
 
-        return $data;
+        $bankAccount = new BankAccount();
+        return $bankAccount;
     }
 
     /**

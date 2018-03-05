@@ -50,6 +50,6 @@ class BacsPaymentMethod extends PaymentMethod
 
     public function __toString()
     {
-        return $this->getBankAccount() ? $this->getBankAccount()->__toString() : '';        
+        return $this->getBankAccount() ? $this->getBankAccount()->__toString() : '';
     }
 }

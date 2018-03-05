@@ -44,6 +44,14 @@ class PCAServiceTest extends WebTestCase
         $this->assertTrue(self::$redis->hexists(PCAService::REDIS_POSTCODE_KEY, 'BX11LT') == 1);
     }
 
+    public function testGetBankAccountCaching()
+    {
+        self::$redis->flushdb();
+        $this->assertFalse(self::$redis->exists(sprintf(PCAService::REDIS_BANK_KEY_FORMAT, '000099', '12345678')) == 1);
+        $address = self::$pca->getBankAccount('000099', '12345678');
+        $this->assertTrue(self::$redis->exists(sprintf(PCAService::REDIS_BANK_KEY_FORMAT, '000099', '12345678')) == 1);
+    }
+
     public function testNormalize()
     {
         $this->assertEquals('SE152SZ', self::$pca->normalizePostcode('se15 2sz '));

@@ -16,6 +16,8 @@ use VasilDakov\Postcode\Postcode;
  */
 class BankAccount
 {
+    use BacsTrait;
+
     /**
      * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="1", max="100")
@@ -59,7 +61,7 @@ class BankAccount
 
     public function setSortCode($sortCode)
     {
-        $this->sortCode = str_replace('-', '', $sortCode);
+        $this->sortCode = $this->normalizeSortCode($sortCode);
     }
 
     public function getSortCode()
@@ -69,7 +71,7 @@ class BankAccount
 
     public function setAccountNumber($accountNumber)
     {
-        $this->accountNumber = $accountNumber;
+        $this->accountNumber = $this->normalizeAccountNumber($accountNumber);
     }
 
     public function getAccountNumber()
@@ -93,13 +95,14 @@ class BankAccount
             strlen($this->getAccountNumber()) <= 10 && strlen($this->getSortCode()) == 6;
     }
 
+    public function getDisplayableSortCode()
+    {
+        return $this->displayableSortCode($this->getSortCode());
+    }
+
     public function getDisplayableAccountNumber()
     {
-        if ($this->getAccountNumber() && strlen($this->getAccountNumber()) == 8) {
-            return sprintf("XXXX%s", substr($this->getAccountNumber(), 4, 4));
-        }
-
-        return null;
+        return $this->displayableAccountNumber($this->getAccountNumber());
     }
 
     public function __toString()

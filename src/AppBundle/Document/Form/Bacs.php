@@ -4,11 +4,14 @@ namespace AppBundle\Document\Form;
 
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\BacsTrait;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 
 class Bacs
 {
+    use BacsTrait;
+
     /**
      * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="1", max="100")
@@ -48,7 +51,7 @@ class Bacs
 
     public function setSortCode($sortCode)
     {
-        $this->sortCode = str_replace('-', '', $sortCode);
+        $this->sortCode = $this->normalizeSortCode($sortCode);
     }
 
     public function getSortCode()
@@ -58,7 +61,7 @@ class Bacs
 
     public function setAccountNumber($accountNumber)
     {
-        $this->accountNumber = $accountNumber;
+        $this->accountNumber = $this->normalizeAccountNumber($accountNumber);
     }
 
     public function getAccountNumber()
@@ -111,6 +114,6 @@ class Bacs
     
     public function getDisplayableAccountNumber()
     {
-        return $this->transformBankAccount()->getDisplayableAccountNumber();        
+        return $this->transformBankAccount()->getDisplayableAccountNumber();
     }
 }
