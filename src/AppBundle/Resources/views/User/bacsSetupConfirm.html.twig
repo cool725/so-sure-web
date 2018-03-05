@@ -3,15 +3,15 @@
         <ul class="list-unstyled">
             <li>
                 <small class="text-dark-grey">Name on account</small><br>
-                <span class="h3">{{ bacsPaymentMethod.accountName }}</span>
+                <span class="h3">{{ bacs.accountName }}</span>
             </li>
             <li>
                 <small class="text-dark-grey">Sort code</small><br>
-                <span class="h3">{{ bacsPaymentMethod.sortCode }}</span>
+                <span class="h3">{{ bacs.sortCode }}</span>
             </li>
             <li>
                 <small class="text-dark-grey">Account number</small><br>
-                <span class="h3">{{ bacsPaymentMethod.displayableAccountNumber }}</span>
+                <span class="h3">{{ bacs.displayableAccountNumber }}</span>
             </li>
         </ul>
         {{ form_start(bacs_confirm_form) }}

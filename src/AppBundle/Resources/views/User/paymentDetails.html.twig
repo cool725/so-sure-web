@@ -15,7 +15,7 @@
     {% include 'AppBundle:User:userNav.html.twig' %}
 
     {% set active_tab = 'card' %}
-    {% if bacsPaymentMethod and bacsPaymentMethod.isValid %}
+    {% if bacs and bacs.isValid %}
         {% set active_tab = 'bacs-setup-confirm' %}
     {% elseif user.paymentMethod.type == 'bacs' %}
         {% set active_tab = 'bacs' %}

@@ -42,4 +42,14 @@ class BacsPaymentMethod extends PaymentMethod
     {
         return $this->soleSignature;
     }
+
+    public function isValid()
+    {
+        return $this->getBankAccount() ? $this->getBankAccount()->isValid() : false;
+    }
+
+    public function __toString()
+    {
+        return $this->getBankAccount() ? $this->getBankAccount()->__toString() : '';        
+    }
 }

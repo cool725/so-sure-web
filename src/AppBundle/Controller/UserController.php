@@ -20,6 +20,7 @@ use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\Form\Renew;
 use AppBundle\Document\Form\RenewCashback;
+use AppBundle\Document\Form\Bacs;
 use AppBundle\Form\Type\BacsType;
 use AppBundle\Form\Type\BacsConfirmType;
 use AppBundle\Form\Type\PhoneType;
@@ -1150,7 +1151,7 @@ class UserController extends BaseController
             return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
         }
 
-        $bacs = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
+        $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
         // TODO: Move to ajax call
         $webpay = null;
         $webpay = $this->get('app.judopay')->webRegister(
@@ -1164,13 +1165,13 @@ class UserController extends BaseController
         $billingForm = $this->get('form.factory')
             ->createNamedBuilder('billing_form', BillingDayType::class, $billing)
             ->getForm();
-        $bacsPaymentMethod = new BacsPaymentMethod();
+        $bacs = new Bacs();
         $bacsForm = $this->get('form.factory')
-            ->createNamedBuilder('bacs_form', BacsType::class, $bacsPaymentMethod)
+            ->createNamedBuilder('bacs_form', BacsType::class, $bacs)
             ->getForm();
-        $bankAccount = new BankAccount();
+        $bacsConfirm = new Bacs();
         $bacsConfirmForm = $this->get('form.factory')
-            ->createNamedBuilder('bacs_confirm_form', BacsConfirmType::class, $bankAccount)
+            ->createNamedBuilder('bacs_confirm_form', BacsConfirmType::class, $bacsConfirm)
             ->getForm();
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('billing_form')) {
@@ -1194,14 +1195,15 @@ class UserController extends BaseController
             } elseif ($request->request->has('bacs_form')) {
                 $bacsForm->handleRequest($request);
                 if ($bacsForm->isValid()) {
+                    $bacsConfirm = clone $bacs;
                     $bacsConfirmForm = $this->get('form.factory')
-                        ->createNamedBuilder('bacs_confirm_form', BacsConfirmType::class, $bacsPaymentMethod)
+                        ->createNamedBuilder('bacs_confirm_form', BacsConfirmType::class, $bacsConfirm)
                         ->getForm();
                 }
             } elseif ($request->request->has('bacs_confirm_form')) {
                 $bacsConfirmForm->handleRequest($request);
                 if ($bacsConfirmForm->isValid()) {
-                    $user->setPaymentMethod($bacsPaymentMethod);
+                    $user->setPaymentMethod($bacsConfirm->transformBacsPaymentMethod());
                     $dm->flush();
 
                     $this->addFlash(
@@ -1222,8 +1224,8 @@ class UserController extends BaseController
             'billing_form' => $billingForm->createView(),
             'bacs_form' => $bacsForm->createView(),
             'bacs_confirm_form' => $bacsConfirmForm->createView(),
+            'bacs_feature' => $bacsFeature,
             'bacs' => $bacs,
-            'bacsPaymentMethod' => $bacsPaymentMethod,
         ];
 
         return $data;

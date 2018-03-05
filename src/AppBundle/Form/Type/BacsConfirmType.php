@@ -20,10 +20,6 @@ class BacsConfirmType extends AbstractType
             ->add('accountName', HiddenType::class, ['required' => true])
             ->add('sortCode', HiddenType::class, ['required' => true])
             ->add('accountNumber', HiddenType::class, ['required' => true])
-            ->add('soleSignature', HiddenType::class, [
-                'label' => 'I am the sole signature on the account',
-                'required' => true
-            ])
             ->add('save', SubmitType::class)
         ;
     }
@@ -31,7 +27,7 @@ class BacsConfirmType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'AppBundle\Document\BankAccount',
+           'data_class' => 'AppBundle\Document\Form\Bacs',
         ));
     }
 }
