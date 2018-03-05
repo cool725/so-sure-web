@@ -1,6 +1,6 @@
 {% import "::macros.html.twig" as macros %}
 
-<footer class="footer-new">
+<footer class="footer-new {% if homepage is defined and homepage%}footer-homepage{% endif %}">
     <div class="container">
         <div class="row">
             <div class="col-md-10">
