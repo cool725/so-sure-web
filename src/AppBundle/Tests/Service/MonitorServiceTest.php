@@ -48,6 +48,9 @@ class MonitorServiceIpTest extends WebTestCase
     public function testClaimsSettledUnprocessedOk()
     {
         self::$monitor->claimsSettledUnprocessed();
+
+        // test is if the above generates an exception
+        $this->assertTrue(true);
     }
 
     /**

@@ -16,7 +16,7 @@ use AppBundle\Validator\Constraints\RenewalConnectionsAmountValidator;
  *
  * AppBundle\\Tests\\Validator\\RenewalConnectionsAmountValidatorTest
  */
-class RenewalConnectionsAmountValidatorTest extends \PHPUnit_Framework_TestCase
+class RenewalConnectionsAmountValidatorTest extends \PHPUnit\Framework\TestCase
 {
     protected static $constraint;
 

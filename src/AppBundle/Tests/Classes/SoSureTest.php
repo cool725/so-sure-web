@@ -7,7 +7,7 @@ use AppBundle\Classes\SoSure;
 /**
  * @group unit
  */
-class SoSureTest extends \PHPUnit_Framework_TestCase
+class SoSureTest extends \PHPUnit\Framework\TestCase
 {
     public static function setUpBeforeClass()
     {
@@ -17,7 +17,7 @@ class SoSureTest extends \PHPUnit_Framework_TestCase
     {
     }
 
-    public function hasSoSureEmail()
+    public function testHasSoSureEmail()
     {
         $this->assertTrue(SoSure::hasSoSureEmail('foo@so-Sure.com'));
         $this->assertTrue(SoSure::hasSoSureEmail('foo@so-sure.com'));

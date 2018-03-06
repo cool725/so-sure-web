@@ -7,7 +7,7 @@ use AppBundle\Classes\Rollbar;
 /**
  * @group unit
  */
-class RollbarTest extends \PHPUnit_Framework_TestCase
+class RollbarTest extends \PHPUnit\Framework\TestCase
 {
     public static function setUpBeforeClass()
     {

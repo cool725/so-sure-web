@@ -12,7 +12,7 @@ use AppBundle\Document\Payment\JudoPayment;
 /**
  * @group unit
  */
-class ScheduledPaymentTest extends \PHPUnit_Framework_TestCase
+class ScheduledPaymentTest extends \PHPUnit\Framework\TestCase
 {
     public static function setUpBeforeClass()
     {
@@ -126,6 +126,9 @@ class ScheduledPaymentTest extends \PHPUnit_Framework_TestCase
         $policy->addScheduledPayment($scheduledPayment);
 
         $scheduledPayment->validateRunable('TESTING', new \DateTime('2016-01-01 02:00'));
+
+        // test is if the above generates an exception
+        $this->assertTrue(true);
     }
 
     /**

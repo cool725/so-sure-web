@@ -241,6 +241,9 @@ class InvitationTest extends WebTestCase
         $invitationC->setPolicy($policyB);
         self::$dm->persist($invitationC);
         self::$dm->flush();
+
+        // test is if the above generates an exception
+        $this->assertTrue(true);
     }
 
     public function testNonDuplicateSms()
@@ -278,5 +281,8 @@ class InvitationTest extends WebTestCase
         $invitationC->setPolicy($policyB);
         self::$dm->persist($invitationC);
         self::$dm->flush();
+
+        // test is if the above generates an exception
+        $this->assertTrue(true);
     }
 }

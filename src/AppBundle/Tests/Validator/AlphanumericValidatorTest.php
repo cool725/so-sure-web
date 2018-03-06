@@ -9,7 +9,7 @@ use AppBundle\Validator\Constraints\AlphanumericValidator;
 /**
  * @group unit
  */
-class AlphanumericValidatorTest extends \PHPUnit_Framework_TestCase
+class AlphanumericValidatorTest extends \PHPUnit\Framework\TestCase
 {
     protected static $constraint;
 
