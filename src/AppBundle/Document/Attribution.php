@@ -116,6 +116,14 @@ class Attribution
      */
     protected $referer;
 
+    /**
+     * Make sure to sync choices with RequestService
+     * @Assert\Choice({"Desktop", "Tablet", "Mobile"}, strict=true)
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $deviceCategory;
+
     public function setCampaignName($campaignName)
     {
         $this->campaignName = $campaignName;
@@ -178,6 +186,16 @@ class Attribution
         return $this->referer;
     }
 
+    public function setDeviceCategory($deviceCategory)
+    {
+        $this->deviceCategory = $deviceCategory;
+    }
+
+    public function getDeviceCategory()
+    {
+        return $this->deviceCategory;
+    }
+
     public function equals($attribution)
     {
         if (!$attribution) {
@@ -212,6 +230,9 @@ class Attribution
         }
         if (strlen($this->getReferer()) > 0) {
             $lines[] = sprintf("Referer: %s", $this->getReferer());
+        }
+        if (strlen($this->getDeviceCategory()) > 0) {
+            $lines[] = sprintf("Device Category: %s", $this->getDeviceCategory());
         }
 
         return implode($glue, $lines);

@@ -12,6 +12,11 @@ use UAParser\Parser;
 
 class RequestService
 {
+    // Sync with Documents\Attribution::deviceCategory
+    const DEVICE_CATEGORY_MOBILE = 'Mobile';
+    const DEVICE_CATEGORY_TABLET = 'Tablet';
+    const DEVICE_CATEGORY_DESKTOP = 'Desktop';
+
     /** @var RequestStack */
     protected $requestStack;
 
@@ -155,13 +160,14 @@ class RequestService
 
     public function getDeviceCategory()
     {
+        // Sync with Documents\Attribution::deviceCategory
         // Tablet detection must be first
         if ($this->isTabletDevice()) {
-            return 'Tablet';
+            return self::DEVICE_CATEGORY_TABLET;
         } elseif ($this->isMobileDevice()) {
-            return 'Mobile';
+            return self::DEVICE_CATEGORY_MOBILE;
         } else {
-            return 'Desktop';
+            return self::DEVICE_CATEGORY_DESKTOP;
         }
     }
 
