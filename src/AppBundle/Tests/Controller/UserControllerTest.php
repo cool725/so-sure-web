@@ -361,12 +361,12 @@ class UserControllerTest extends BaseControllerTest
 
         self::$client->followRedirects();
         $crawler = self::$client->request('GET', '/user/contact-details');
-        self::verifyResponse(200);
+        self::verifyResponse(200, null, null, '/user/contact-details');
 
         $form = $crawler->selectButton('user_email_form[update]')->form();
         $form['user_email_form[email]'] = self::generateEmail('testUserChangeEmailActual-new', $this);
         $crawler = self::$client->submit($form);
-        self::verifyResponse(200);
+        self::verifyResponse(200, null, null, 'Submit email update./');
         $this->expectFlashSuccess($crawler, 'email address is updated');
     }
 

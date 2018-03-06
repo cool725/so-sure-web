@@ -15,7 +15,7 @@ use AppBundle\Tests\UserClassTrait;
 /**
  * @group unit
  */
-class ConnectionTest extends \PHPUnit_Framework_TestCase
+class ConnectionTest extends \PHPUnit\Framework\TestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
 

@@ -9,7 +9,7 @@ use AppBundle\Validator\Constraints\UkMobileValidator;
 /**
  * @group unit
  */
-class UkMobileValidatorTest extends \PHPUnit_Framework_TestCase
+class UkMobileValidatorTest extends \PHPUnit\Framework\TestCase
 {
     protected static $constraint;
 

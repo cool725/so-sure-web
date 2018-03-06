@@ -231,6 +231,9 @@ class DaviesServiceTest extends WebTestCase
 
         self::$daviesService->saveClaims(1, [$daviesClosed, $daviesClosed]);
         self::$daviesService->saveClaims(1, [$daviesClosed, $daviesOpen]);
+
+        // test is if the above generates an exception
+        $this->assertTrue(true);
     }
 
     public function testSaveClaimsOpen()

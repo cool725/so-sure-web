@@ -302,10 +302,9 @@ class SalvaExportServiceTest extends WebTestCase
         $chargeback->setDate($now);
         $chargeback->setSource(Payment::SOURCE_ADMIN);
         $chargeback->setAmount(0 - $policy->getPremiumInstallmentPrice());
-        static::$dm->persist($chargeback);
-        static::$dm->flush();
-
         $policy->addPayment($chargeback);
+        $chargeback->setPolicy($policy);
+        static::$dm->persist($chargeback);
         static::$dm->flush();
 
         //\Doctrine\Common\Util\Debug::dump($updatedPolicy->getPayments());

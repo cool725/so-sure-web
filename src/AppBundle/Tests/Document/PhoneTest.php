@@ -9,7 +9,7 @@ use AppBundle\Document\PhonePrice;
 /**
  * @group unit
  */
-class PhoneTest extends \PHPUnit_Framework_TestCase
+class PhoneTest extends \PHPUnit\Framework\TestCase
 {
     public static function setUpBeforeClass()
     {

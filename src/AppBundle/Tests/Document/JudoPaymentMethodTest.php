@@ -7,7 +7,7 @@ use AppBundle\Document\JudoPaymentMethod;
 /**
  * @group unit
  */
-class JudoPaymentMethodTest extends \PHPUnit_Framework_TestCase
+class JudoPaymentMethodTest extends \PHPUnit\Framework\TestCase
 {
     public static function setUpBeforeClass()
     {

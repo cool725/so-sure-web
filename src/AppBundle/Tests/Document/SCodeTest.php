@@ -7,7 +7,7 @@ use AppBundle\Document\SCode;
 /**
  * @group unit
  */
-class SCodeTest extends \PHPUnit_Framework_TestCase
+class SCodeTest extends \PHPUnit\Framework\TestCase
 {
     public static function setUpBeforeClass()
     {

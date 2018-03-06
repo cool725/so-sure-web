@@ -107,5 +107,8 @@ class PushListenerTest extends WebTestCase
 
         $listener = new PushListener(static::$pushService);
         $listener->onPolicyPendingRenewalEvent(new PolicyEvent($policy));
+
+        // test is if the above generates an exception
+        $this->assertTrue(true);
     }
 }
