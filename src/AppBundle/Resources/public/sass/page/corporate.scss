@@ -161,14 +161,22 @@ img[data-src] {
 }
 
 .curved-background {
-    display: inline-block;
-    position: absolute;
-    top: 100%; left: 0;
-    z-index: 2;
-}
+    height: 200px;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
 
-.curved-background-top {
-    top: 0;
+    background-color: $white;
+
+    svg {
+        width: 100%;
+        position: absolute;
+        top: 0; left: 0;
+    }
+
+    &__bg-blue {
+        background-color: $lightest-blue;
+    }
 }
 
 .section-fix {
@@ -187,55 +195,6 @@ img[data-src] {
         position: relative;
         z-index: 10;
     }
-
-    // &:before, &:after {
-    //     content: '';
-    //     position: absolute;
-    //     bottom: 0;
-    //     background-repeat: no-repeat;
-    // }
-
-    // &:before {
-    //     width: 600px; height: 450px;
-    //     left: 0;
-    //     z-index: 8;
-    //     background-position: left bottom;
-    //     background-image: url('https://cdn.so-sure.com/images/corporate/so-sure_skyline-simple-left-bottom.svg');
-    //     background-size: 30%;
-    //     @include breakpoint(midtablet) {
-    //         background-size: 40%;
-    //     }
-    //     @include breakpoint(tablet) {
-    //         background-size: 50%;
-    //     }
-    //     @include breakpoint(laptop) {
-    //         background-size: 55%;
-    //     }
-    //     @include breakpoint(desktop) {
-    //         background-size: 70%;
-    //     }
-    // }
-
-    // &:after {
-    //     width: 352px; height: 450px;
-    //     right: 0;
-    //     z-index: 7;
-    //     background-position: right bottom;
-    //     background-image: url('https://cdn.so-sure.com/images/corporate/so-sure_skyline-simple-right-bottom.svg');
-    //     background-size: 40%;
-    //     @include breakpoint(midtablet) {
-    //         background-size: 50%;
-    //     }
-    //     @include breakpoint(tablet) {
-    //         background-size: 65%;
-    //     }
-    //     @include breakpoint(laptop) {
-    //         background-size: 75%;
-    //     }
-    //     @include breakpoint(desktop) {
-    //         background-size: 90%;
-    //     }
-    // }
 }
 
 // Press
