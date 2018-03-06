@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "fca852c3a311ee0bd7e205b4e21e1df3",
-    "content-hash": "09b1c778b03c67ffbb20803833cfb407",
+    "hash": "faec763d89e688c8347b314334b86f91",
+    "content-hash": "f6e5b5864d60cb6f2d1b337ad6af153d",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
@@ -7548,16 +7548,16 @@
         },
         {
             "name": "phing/phing",
-            "version": "2.16.1.2",
+            "version": "2.16.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/so-sure/phing.git",
-                "reference": "b1c4bbe19dc806efd39986dd64b7770d56841608"
+                "reference": "4202260bff51f88cf5789453798e6c2847d3f208"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/so-sure/phing/zipball/b1c4bbe19dc806efd39986dd64b7770d56841608",
-                "reference": "b1c4bbe19dc806efd39986dd64b7770d56841608",
+                "url": "https://api.github.com/repos/so-sure/phing/zipball/4202260bff51f88cf5789453798e6c2847d3f208",
+                "reference": "4202260bff51f88cf5789453798e6c2847d3f208",
                 "shasum": ""
             },
             "require": {
@@ -7648,7 +7648,7 @@
                 "slack": "https://www.phing.info/slack",
                 "docs": "https://www.phing.info/docs/guide/stable/"
             },
-            "time": "2017-12-11 08:44:49"
+            "time": "2018-03-06 09:12:08"
         },
         {
             "name": "phpdocumentor/reflection-common",
