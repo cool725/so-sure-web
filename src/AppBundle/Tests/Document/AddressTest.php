@@ -7,7 +7,7 @@ use AppBundle\Document\Address;
 /**
  * @group unit
  */
-class AddressTest extends \PHPUnit_Framework_TestCase
+class AddressTest extends \PHPUnit\Framework\TestCase
 {
     public static function setUpBeforeClass()
     {
@@ -21,6 +21,9 @@ class AddressTest extends \PHPUnit_Framework_TestCase
     {
         $address = new Address();
         $address->setType(Address::TYPE_BILLING);
+
+        // test is if the above generates an exception
+        $this->assertTrue(true);
     }
 
     /**

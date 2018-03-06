@@ -11,7 +11,7 @@ use AppBundle\Document\CurrencyTrait;
 /**
  * @group unit
  */
-class JudoPaymentTest extends \PHPUnit_Framework_TestCase
+class JudoPaymentTest extends \PHPUnit\Framework\TestCase
 {
     use CurrencyTrait;
 

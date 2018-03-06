@@ -7,7 +7,7 @@ use AppBundle\Document\Attribution;
 /**
  * @group unit
  */
-class AttributionTest extends \PHPUnit_Framework_TestCase
+class AttributionTest extends \PHPUnit\Framework\TestCase
 {
     public static function setUpBeforeClass()
     {

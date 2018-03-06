@@ -9,7 +9,7 @@ use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 /**
  * @group unit
  */
-class AlphanumericSpaceDotValidatorTest extends \PHPUnit_Framework_TestCase
+class AlphanumericSpaceDotValidatorTest extends \PHPUnit\Framework\TestCase
 {
     protected static $constraint;
 

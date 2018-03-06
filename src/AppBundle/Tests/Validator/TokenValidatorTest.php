@@ -8,7 +8,7 @@ use AppBundle\Validator\Constraints\TokenValidator;
 /**
  * @group unit
  */
-class TokenValidatorTest extends \PHPUnit_Framework_TestCase
+class TokenValidatorTest extends \PHPUnit\Framework\TestCase
 {
     protected static $constraint;
 

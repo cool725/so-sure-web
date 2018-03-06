@@ -11,7 +11,7 @@ use AppBundle\Document\Payment\JudoPayment;
 /**
  * @group unit
  */
-class SalvaTest extends \PHPUnit_Framework_TestCase
+class SalvaTest extends \PHPUnit\Framework\TestCase
 {
     public static function setUpBeforeClass()
     {

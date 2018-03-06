@@ -9,7 +9,7 @@ use AppBundle\Validator\Constraints\PhoneNumberValidator;
 /**
  * @group unit
  */
-class PhoneNumberValidatorTest extends \PHPUnit_Framework_TestCase
+class PhoneNumberValidatorTest extends \PHPUnit\Framework\TestCase
 {
     protected static $constraint;
 

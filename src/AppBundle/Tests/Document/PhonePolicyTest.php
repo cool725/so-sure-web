@@ -965,6 +965,9 @@ class PhonePolicyTest extends WebTestCase
         $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
         $policy->setPotValue(80);
+
+        // test is if the above generates an exception
+        $this->assertTrue(true);
     }
 
     public function testPolicyEndDate()
@@ -3138,6 +3141,9 @@ class PhonePolicyTest extends WebTestCase
         $claim3->setStatus(Claim::STATUS_APPROVED);
         $claim3->setType(Claim::TYPE_THEFT);
         $policy->addClaim($claim3);
+
+        // test is if the above generates an exception
+        $this->assertTrue(true);
     }
 
     /**

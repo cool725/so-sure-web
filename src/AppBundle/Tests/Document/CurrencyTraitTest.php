@@ -7,7 +7,7 @@ use AppBundle\Document\CurrencyTrait;
 /**
  * @group unit
  */
-class CurrencyTraitTest extends \PHPUnit_Framework_TestCase
+class CurrencyTraitTest extends \PHPUnit\Framework\TestCase
 {
     use CurrencyTrait;
 
