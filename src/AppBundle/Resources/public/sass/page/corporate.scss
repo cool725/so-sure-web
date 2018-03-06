@@ -5,7 +5,7 @@
 @import "../common/paletteNew";
 
 body {
-    background-color: $white;
+    background-color: $off-white;
 }
 
 .navbar {
@@ -176,6 +176,10 @@ img[data-src] {
 
     &__bg-blue {
         background-color: $lightest-blue;
+    }
+
+    &__bg-off-white {
+        background-color: $off-white;
     }
 }
 
