@@ -231,10 +231,9 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%d"', count($policy->getInvitations())),
                 sprintf('"%s"', $policy->getPicSureStatus() ? $policy->getPicSureStatus() : 'unstarted'),
                 sprintf('"%s"', $policy->getLeadSource()),
-                sprintf('"%s"', $policy->getFirstSuccessfulUserPaymentCredit() ?
-                    $policy->getFirstSuccessfulUserPaymentCredit()->getSource() :
-                    ''
-                ),
+                // @codingStandardsIgnoreStart
+                sprintf('"%s"', $policy->getFirstSuccessfulUserPaymentCredit() ? $policy->getFirstSuccessfulUserPaymentCredit()->getSource() : ''),
+                // @codingStandardsIgnoreEnd
             ]);
         }
         $this->uploadS3(implode(PHP_EOL, $lines), 'policies.csv');
@@ -321,6 +320,7 @@ class BICommand extends ContainerAwareCommand
             '"Connection Date"',
         ]);
         foreach ($connections as $connection) {
+            // @codingStandardsIgnoreStart
             $lines[] = implode(',', [
                 sprintf('"%s"', $connection->getSourcePolicy() ? $connection->getSourcePolicy()->getPolicyNumber() : ''),
                 sprintf('"%s"', $connection->getLinkedPolicy() ? $connection->getLinkedPolicy()->getPolicyNumber() : ''),
@@ -328,6 +328,7 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $connection->getInvitation() ? $connection->getInvitation()->getChannel() : ''),
                 sprintf('"%s"', $connection->getDate() ? $connection->getDate()->format('Y-m-d H:i:s') : ''),
             ]);
+            // @codingStandardsIgnoreEnd
         }
         $this->uploadS3(implode(PHP_EOL, $lines), 'connections.csv');
 
