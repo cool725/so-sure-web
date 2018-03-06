@@ -221,6 +221,10 @@ class MixpanelService
                     $attribution->setReferer($data['Referer']);
                     $dataPresent = true;
                 }
+                if (isset($data['Device Category'])) {
+                    $attribution->setDeviceCategory($data['Device Category']);
+                    $dataPresent = true;
+                }
 
                 if ($dataPresent) {
                     $user->setAttribution($attribution);
@@ -250,6 +254,10 @@ class MixpanelService
                 }
                 if (isset($data['Latest Referer'])) {
                     $latestAttribution->setReferer($data['Latest Referer']);
+                    $dataPresent = true;
+                }
+                if (isset($data['Latest Device Category'])) {
+                    $attribution->setDeviceCategory($data['Latest Device Category']);
                     $dataPresent = true;
                 }
                 if ($dataPresent) {
@@ -767,6 +775,12 @@ class MixpanelService
         }
         $utm = $this->requestService->getUtm();
         $referer = $this->requestService->getReferer();
+        $deviceCategory = null;
+        if ($userAgent = $this->requestService->getUserAgent()) {
+            $parser = Parser::create();
+            $userAgentDetails = $parser->parse($userAgent);
+            $deviceCategory = $this->requestService->getDeviceCategory();
+        }
 
         $transform = [];
         if ($utm) {
@@ -793,6 +807,10 @@ class MixpanelService
             if (strtolower($refererDomain) != strtolower($currentDomain)) {
                 $transform[sprintf('%sReferer', $prefix)] = $referer;
             }
+        }
+
+        if ($deviceCategory) {
+            $transform[sprintf('%sDevice Category', $prefix)] = $deviceCategory;
         }
 
         return $transform;
