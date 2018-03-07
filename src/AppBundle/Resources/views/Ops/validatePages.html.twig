@@ -1,5 +1,8 @@
 {% extends 'base.html.twig' %}
 
+{# Set vars #}
+{% set new_footer = 1 %}
+
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
@@ -260,9 +263,7 @@
             </li>
         </ul>
     </section>
-    <section class="section--pad"></section>
 </div>
 {% endblock %}
 
-{% block footer %}
-{% endblock %}
+{# {% block footer %}{% endblock %} #}

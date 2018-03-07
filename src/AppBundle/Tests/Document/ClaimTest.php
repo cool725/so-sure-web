@@ -7,7 +7,7 @@ use AppBundle\Document\Claim;
 /**
  * @group unit
  */
-class ClaimTest extends \PHPUnit_Framework_TestCase
+class ClaimTest extends \PHPUnit\Framework\TestCase
 {
     public static function setUpBeforeClass()
     {
@@ -30,6 +30,9 @@ class ClaimTest extends \PHPUnit_Framework_TestCase
         $claim = new Claim();
         $claim->setType(Claim::TYPE_EXTENDED_WARRANTY);
         $claim->setStatus(Claim::STATUS_APPROVED);
+
+        // test is if the above generates an exception
+        $this->assertTrue(true);
     }
 
     public function testSetStatusSettled()
@@ -37,6 +40,9 @@ class ClaimTest extends \PHPUnit_Framework_TestCase
         $claim = new Claim();
         $claim->setType(Claim::TYPE_EXTENDED_WARRANTY);
         $claim->setStatus(Claim::STATUS_SETTLED);
+
+        // test is if the above generates an exception
+        $this->assertTrue(true);
     }
 
     /**

@@ -224,14 +224,6 @@ services:
             - [setMailer, ['@app.mailer']]
             - [setStatsd, ['@statsd']]
 
-    app.deviceatlas:
-        class: AppBundle\Service\DeviceAtlasService
-        arguments:
-            - "@logger"
-            - "@doctrine_mongodb.odm.default_document_manager"
-            - "@snc_redis.default"
-            - "@app.mailer"
-
     app.sanctions:
         class: AppBundle\Service\SanctionsService
         arguments:

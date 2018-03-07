@@ -202,8 +202,11 @@ class JudopayServiceTest extends WebTestCase
             self::$JUDO_TEST_CARD_EXP,
             self::$JUDO_TEST_CARD_PIN
         );
-        $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token', Payment::SOURCE_WEB_API);
         // should be allowed
+        $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token', Payment::SOURCE_WEB_API);
+
+        // test is if the above generates an exception
+        $this->assertTrue(true);
     }
 
     public function testJudoExceptionStatusPending()

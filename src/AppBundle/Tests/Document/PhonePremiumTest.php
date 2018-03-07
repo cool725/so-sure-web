@@ -7,7 +7,7 @@ use AppBundle\Document\PhonePremium;
 /**
  * @group unit
  */
-class PhonePremiumTest extends \PHPUnit_Framework_TestCase
+class PhonePremiumTest extends \PHPUnit\Framework\TestCase
 {
     public static function setUpBeforeClass()
     {

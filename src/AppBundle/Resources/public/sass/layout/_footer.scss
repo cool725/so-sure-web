@@ -70,4 +70,15 @@
 			float: right;
 		}
 	}
+
+    @include breakpoint(tablet) {
+        margin-top: 30px;
+    }
+}
+
+.footer-homepage {
+    @include breakpoint(tablet) {
+        padding-top: 100px;
+        margin-top: -40px;
+    }
 }

@@ -44,6 +44,11 @@ class BaseControllerTest extends WebTestCase
         parent::setUp();
         $this->expectNoUserChangeEvent();
     }
+    
+    public function testINeedATest()
+    {
+        $this->assertTrue(true);
+    }
 
     // helpers
 
@@ -148,7 +153,7 @@ class BaseControllerTest extends WebTestCase
         $crawler = self::$client->request('GET', $loginLocation);
         self::$client->followRedirects(false);
         if ($expectedHttpCode) {
-            self::verifyResponse($expectedHttpCode);
+            self::verifyResponse($expectedHttpCode, null, null, 'Failed to Login');
             if ($expectedHttpCode > 200) {
                 return;
             }

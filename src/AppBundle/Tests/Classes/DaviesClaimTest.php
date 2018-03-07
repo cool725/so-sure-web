@@ -8,7 +8,7 @@ use AppBundle\Document\Claim;
 /**
  * @group unit
  */
-class DaviesClaimTest extends \PHPUnit_Framework_TestCase
+class DaviesClaimTest extends \PHPUnit\Framework\TestCase
 {
     public static function setUpBeforeClass()
     {

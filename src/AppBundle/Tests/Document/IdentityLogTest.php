@@ -12,7 +12,7 @@ use AppBundle\Document\IdentityLog;
 /**
  * @group unit
  */
-class IdentityLogTest extends \PHPUnit_Framework_TestCase
+class IdentityLogTest extends \PHPUnit\Framework\TestCase
 {
 
     public static function setUpBeforeClass()

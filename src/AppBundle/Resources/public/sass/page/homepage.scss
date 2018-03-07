@@ -1043,14 +1043,6 @@
     }
 }
 
-.footer-new {
-    @include breakpoint(tablet) {
-        padding-top: 100px;
-        margin-top: -40px;
-    }
-}
-
-
 // TODO: Move!
 .search-phone-form--homepage {
     max-width: 450px;

@@ -7,7 +7,7 @@ use AppBundle\Document\DateTrait;
 /**
  * @group unit
  */
-class DateTraitTest extends \PHPUnit_Framework_TestCase
+class DateTraitTest extends \PHPUnit\Framework\TestCase
 {
     use DateTrait;
 

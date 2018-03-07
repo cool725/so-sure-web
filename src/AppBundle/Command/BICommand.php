@@ -12,6 +12,8 @@ use AppBundle\Document\User;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\Invitation\Invitation;
+use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Classes\SoSure;
 
 class BICommand extends ContainerAwareCommand
@@ -51,6 +53,16 @@ class BICommand extends ContainerAwareCommand
         }
 
         $lines = $this->exportUsers();
+        if ($debug) {
+            $output->write(json_encode($lines, JSON_PRETTY_PRINT));
+        }
+
+        $lines = $this->exportInvitations();
+        if ($debug) {
+            $output->write(json_encode($lines, JSON_PRETTY_PRINT));
+        }
+
+        $lines = $this->exportConnections();
         if ($debug) {
             $output->write(json_encode($lines, JSON_PRETTY_PRINT));
         }
@@ -175,6 +187,9 @@ class BICommand extends ContainerAwareCommand
             '"Make/Model"',
             '"Connections"',
             '"Invitations"',
+            '"pic-sure Status"',
+            '"Lead Source"',
+            '"First Payment Source"',
         ]);
         foreach ($policies as $policy) {
             $user = $policy->getUser();
@@ -212,8 +227,13 @@ class BICommand extends ContainerAwareCommand
                 sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getReferer() : ''),
                 sprintf('"%s"', $policy->getPhone()->getMake()),
                 sprintf('"%s %s"', $policy->getPhone()->getMake(), $policy->getPhone()->getModel()),
-                sprintf('"%d"', count($policy->getConnections())),
+                sprintf('"%d"', count($policy->getStandardConnections())),
                 sprintf('"%d"', count($policy->getInvitations())),
+                sprintf('"%s"', $policy->getPicSureStatus() ? $policy->getPicSureStatus() : 'unstarted'),
+                sprintf('"%s"', $policy->getLeadSource()),
+                // @codingStandardsIgnoreStart
+                sprintf('"%s"', $policy->getFirstSuccessfulUserPaymentCredit() ? $policy->getFirstSuccessfulUserPaymentCredit()->getSource() : ''),
+                // @codingStandardsIgnoreEnd
             ]);
         }
         $this->uploadS3(implode(PHP_EOL, $lines), 'policies.csv');
@@ -259,6 +279,58 @@ class BICommand extends ContainerAwareCommand
             ]);
         }
         $this->uploadS3(implode(PHP_EOL, $lines), 'users.csv');
+
+        return $lines;
+    }
+
+    private function exportInvitations()
+    {
+        $repo = $this->getManager()->getRepository(Invitation::class);
+        $invitations = $repo->findAll();
+        $lines = [];
+        $lines[] = implode(',', [
+            '"Source Policy"',
+            '"Invitation Date"',
+            '"Invitation Method"',
+            '"Accepted Date"',
+        ]);
+        foreach ($invitations as $invitation) {
+            $lines[] = implode(',', [
+                sprintf('"%s"', $invitation->getPolicy() ? $invitation->getPolicy()->getPolicyNumber() : ''),
+                sprintf('"%s"', $invitation->getCreated() ? $invitation->getCreated()->format('Y-m-d H:i:s') : ''),
+                sprintf('"%s"', $invitation->getChannel()),
+                sprintf('"%s"', $invitation->getAccepted() ? $invitation->getAccepted()->format('Y-m-d H:i:s') : ''),
+            ]);
+        }
+        $this->uploadS3(implode(PHP_EOL, $lines), 'invitations.csv');
+
+        return $lines;
+    }
+
+    private function exportConnections()
+    {
+        $repo = $this->getManager()->getRepository(StandardConnection::class);
+        $connections = $repo->findAll();
+        $lines = [];
+        $lines[] = implode(',', [
+            '"Source Policy"',
+            '"Linked Policy"',
+            '"Invitation Date"',
+            '"Invitation Method"',
+            '"Connection Date"',
+        ]);
+        foreach ($connections as $connection) {
+            // @codingStandardsIgnoreStart
+            $lines[] = implode(',', [
+                sprintf('"%s"', $connection->getSourcePolicy() ? $connection->getSourcePolicy()->getPolicyNumber() : ''),
+                sprintf('"%s"', $connection->getLinkedPolicy() ? $connection->getLinkedPolicy()->getPolicyNumber() : ''),
+                sprintf('"%s"', $connection->getInitialInvitationDate() ? $connection->getInitialInvitationDate()->format('Y-m-d H:i:s') : ''),
+                sprintf('"%s"', $connection->getInvitation() ? $connection->getInvitation()->getChannel() : ''),
+                sprintf('"%s"', $connection->getDate() ? $connection->getDate()->format('Y-m-d H:i:s') : ''),
+            ]);
+            // @codingStandardsIgnoreEnd
+        }
+        $this->uploadS3(implode(PHP_EOL, $lines), 'connections.csv');
 
         return $lines;
     }
