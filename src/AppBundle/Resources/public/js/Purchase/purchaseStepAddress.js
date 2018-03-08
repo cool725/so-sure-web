@@ -425,34 +425,9 @@ $(function(){
                 'We couldn\x27t find that address. Make sure you have a space in the postcode (e.g SW1A 2AA). Or use manual entry.',
               '</div>'
             ].join('\n'),
-            suggestion: doT.template('<div></div>')
+            suggestion: doT.template('<div data-hj-suppress="">{{=it.Text}}</div>')
         }
     });
-
-    // Suppress hotjar
-    // function supressHotjar(color) {
-    //     // $('.tt-input').data('data-hj-suppress', '');
-    //     $('.tt-input').each(function() {
-    //         $(this).data('data-hj-suppress', '1');
-    //         // Test
-    //         $(this).css('color', color);
-    //     });
-    //     $('.tt-suggestion').each(function() {
-    //         $(this).data('data-hj-suppress', '1');
-    //         // Test
-    //         $(this).css('color', color);
-    //     });
-    // }
-
-    // $('.typeahead').bind('typeahead:open', function(ev, suggestion) {
-    //     color = 'red';
-    //     supressHotjar(color);
-    // });
-
-    // $('.typeahead').bind('typeahead:render', function(ev, suggestion) {
-    //     color = 'blue';
-    //     supressHotjar(color);
-    // });
 
     $('.typeahead').bind('typeahead:select', function(ev, suggestion) {
         sosure.purchaseStepAddress.selectAddress(suggestion);
