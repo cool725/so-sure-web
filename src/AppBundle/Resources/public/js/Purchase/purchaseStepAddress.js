@@ -428,10 +428,21 @@ $(function(){
         }
     });
 
+    // Suppress hotjar
+    function supressHotjar() {
+        $('.tt-input, .tt-suggestion').data('data-hj-suppress', '');
+    }
+
+    $('.typeahead').bind('typeahead:render', function(ev, suggestion) {
+        supressHotjar();
+    });
+
+    $('.typeahead').bind('typeahead:open', function(ev, suggestion) {
+        supressHotjar();
+    });
+
     $('.typeahead').bind('typeahead:select', function(ev, suggestion) {
         sosure.purchaseStepAddress.selectAddress(suggestion);
     });
-
-    $('.tt-input, .tt-suggestion').data('data-hj-suppres', '');
 
 });
