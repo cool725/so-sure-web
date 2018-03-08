@@ -27,7 +27,8 @@ class PaymentRepository extends DocumentRepository
                 'chargeback',
                 'potReward',
                 'policyDiscount',
-                'debtCollection'
+                'debtCollection',
+                'policyDiscountRefund',
             ])
             ->getQuery()
             ->execute();
