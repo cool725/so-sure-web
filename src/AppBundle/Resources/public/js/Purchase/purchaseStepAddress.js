@@ -429,6 +429,9 @@ $(function(){
         }
     });
 
+    //Suppress hotjar on input
+    $('.tt-input').data('data-hj-suppres', '');
+
     $('.typeahead').bind('typeahead:select', function(ev, suggestion) {
         sosure.purchaseStepAddress.selectAddress(suggestion);
     });
