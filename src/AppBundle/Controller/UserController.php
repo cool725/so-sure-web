@@ -1007,7 +1007,7 @@ class UserController extends BaseController
      * @Route("/welcome/{id}", name="user_welcome_policy_id")
      * @Template
      */
-    public function welcomeAction($id = null)
+    public function welcomeAction(Request $request, $id = null)
     {
         $dm = $this->getManager();
         $user = $this->getUser();
@@ -1036,6 +1036,15 @@ class UserController extends BaseController
             $policy->setVisitedWelcomePage(new \DateTime());
             $dm->flush($policy);
         }
+
+        $exp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_USER_WELCOME_MODAL,
+            ['no-modal', 'welcome-modal'],
+            SixpackService::LOG_MIXPANEL_CONVERSION,
+            1,
+            $user->getId()
+        );
 
         //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_LANDING_HOME);
         //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_CPC_QUOTE_MANUFACTURER);
@@ -1085,6 +1094,7 @@ class UserController extends BaseController
             'policy_key' => $this->getParameter('policy_key'),
             'policy' => $user->getLatestPolicy(),
             'has_visited_welcome_page' => $pageVisited,
+            'user_modal_welcome' => $exp,
         );
     }
     /**

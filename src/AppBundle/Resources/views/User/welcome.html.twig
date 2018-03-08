@@ -239,52 +239,54 @@
         </div>
     </div>
 
-    <div class="modal modal-new fade"
-         id="welcome-modal"
-         tabindex="-1"
-         role="dialog"
-         aria-labelledby="welcome-modal"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                    <h3 class="h2">You've made a great choice</h3>
-                </div>
-                <div class="modal-body">
-                    <p class="lead">Just to make you feel even better about your policy, here's some feel-good info:</p>
-                    <div class="row">
-                        <div class="col-md-4">
-                            <img src="{{ cdn_url }}/images/user/welcome_modal_my_bank_.svg">
-                            <div class="h4">Banks</div>
-                            <p>Often you're not covered immediately or for loss/theft (with us you are). Banks typically have high excess in some cases over &pound;200 (with us its as low as &pound;50)</p>
-                        </div>
-                        <div class="col-md-4">
-                            <img src="{{ cdn_url }}/images/user/welcome_modal_home_insurance_.svg">
-                            <div class="h4">Home insurance</div>
-                            <p>Won't get you up and running with a new phone the next working day (unlike us). Plus some home insurance can take from 7-14 days for a replacement, and increase your excess next year if you make a claim, ouch, we won't.</p>
-                        </div>
-                        <div class="col-md-4">
-                            <img src="{{ cdn_url }}/images/user/welcome_modal_cheap_insurance_.svg">
-                            <div class="h4">Cheap Insurance</div>
-                            <p>Yes, we may be slightly more expensive than some of the independent insurers out there, but our claims process is super simpler, hassle free and we only decline 3% of claims (not 50% as norm).</p>
+    {% if user_modal_welcome is defined and user_modal_welcome == 'welcome-modal' %}
+        <div class="modal modal-new fade"
+             id="welcome-modal"
+             tabindex="-1"
+             role="dialog"
+             aria-labelledby="welcome-modal"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h3 class="h2">You've made a great choice</h3>
+                    </div>
+                    <div class="modal-body">
+                        <p class="lead">Just to make you feel even better about your policy, here's some feel-good info:</p>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <img src="{{ cdn_url }}/images/user/welcome_modal_my_bank_.svg">
+                                <div class="h4">Banks</div>
+                                <p>Often you're not covered immediately or for loss/theft (with us you are). Banks typically have high excess in some cases over &pound;200 (with us its as low as &pound;50)</p>
+                            </div>
+                            <div class="col-md-4">
+                                <img src="{{ cdn_url }}/images/user/welcome_modal_home_insurance_.svg">
+                                <div class="h4">Home insurance</div>
+                                <p>Won't get you up and running with a new phone the next working day (unlike us). Plus some home insurance can take from 7-14 days for a replacement, and increase your excess next year if you make a claim, ouch, we won't.</p>
+                            </div>
+                            <div class="col-md-4">
+                                <img src="{{ cdn_url }}/images/user/welcome_modal_cheap_insurance_.svg">
+                                <div class="h4">Cheap Insurance</div>
+                                <p>Yes, we may be slightly more expensive than some of the independent insurers out there, but our claims process is super simpler, hassle free and we only decline 3% of claims (not 50% as norm).</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <div class="row">
-                        <div class="col-md-6 col-md-offset-3">
-                            <a href="#" class="btn btn-blue btn-block btn-pad" data-dismiss="modal">Right choice, indeed!</a>
+                    <div class="modal-footer">
+                        <div class="row">
+                            <div class="col-md-6 col-md-offset-3">
+                                <a href="#" class="btn btn-blue btn-block btn-pad" data-dismiss="modal">Right choice, indeed!</a>
+                            </div>
                         </div>
+                        <hr>
+                        <p>Plus we're upfront and honest and don't hide behind small print, that's why our customer satisfaction rates are better than Apples (so-sure's NPS is 73, apples is 72 - how good is that?).</p>
                     </div>
-                    <hr>
-                    <p>Plus we're upfront and honest and don't hide behind small print, that's why our customer satisfaction rates are better than Apples (so-sure's NPS is 73, apples is 72 - how good is that?).</p>
                 </div>
             </div>
         </div>
-    </div>
+    {% endif %}
     {# End Page Modals #}
 
 {% endblock %}
