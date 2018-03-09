@@ -16,6 +16,9 @@ use PicsureMLBundle\Document\TrainingData;
 
 class PicsureMLService
 {
+    const S3BUCKET_POLICY = 'policy.so-sure.com';
+    const S3BUCKET_PICSURE = 'picsure.so-sure.com';
+
     /** @var DocumentManager */
     protected $appDm;
 
@@ -51,7 +54,7 @@ class PicsureMLService
         $repo = $this->picsureMLDm->getRepository(TrainingData::class);
         if ($file->getFileType() == 'PicSureFile' && !$repo->imageExists($file->getKey())) {
             $image = new TrainingData();
-            $image->setBucket('policy.so-sure.com');
+            $image->setBucket(PicsureMLService::S3BUCKET_POLICY);
             $image->setImagePath($file->getKey());
             $image->setLabel($status);
             $this->picsureMLDm->persist($image);
@@ -84,9 +87,9 @@ class PicsureMLService
             throw new \Exception('Error: '.$json['error']['message']);
         } else {
             $scores = array();
-            $scores['undamaged'] = floatval($json['scores']['undamaged']);
-            $scores['invalid'] = floatval($json['scores']['invalid']);
-            $scores['damaged'] = floatval($json['scores']['damaged']);
+            $scores[TrainingData::LABEL_UNDAMAGED] = floatval($json['scores'][TrainingData::LABEL_UNDAMAGED]);
+            $scores[TrainingData::LABEL_INVALID] = floatval($json['scores'][TrainingData::LABEL_INVALID]);
+            $scores[TrainingData::LABEL_DAMAGED] = floatval($json['scores'][TrainingData::LABEL_DAMAGED]);
             arsort($scores);
 
             $status = "";
@@ -104,7 +107,7 @@ class PicsureMLService
                 $threshold -= 0.05;
             }
             if (!$found) {
-                $status = "dont know";
+                $status = TrainingData::LABEL_UNKNOWN;
             }
 
             $file->addMetadata('picsure-ml-score', $json['scores']);
@@ -114,7 +117,7 @@ class PicsureMLService
         }
     }
 
-    public function sync(OutputInterface $output)
+    public function sync()
     {
         $imageRepo = $this->picsureMLDm->getRepository(TrainingData::class);
         $images = $imageRepo->createQueryBuilder()
@@ -131,7 +134,7 @@ class PicsureMLService
         foreach ($picsureFiles as $file) {
             if (!in_array($file->getKey(), $paths)) {
                 $image = new TrainingData();
-                $image->setBucket('policy.so-sure.com');
+                $image->setBucket(PicsureMLService::S3BUCKET_POLICY);
                 $image->setImagePath($file->getKey());
                 $metadata = $file->getMetadata();
                 $status = null;
@@ -151,30 +154,21 @@ class PicsureMLService
             }
         }
 
-        try {
-            $result = $this->s3->listObjects(array(
-                'Bucket' => 'picsure.so-sure.com',
-                'Prefix' => 'external-data/'
-            ));
-
-            foreach ($result['Contents'] as $object) {
-                if (strlen($object['Key']) > 14) {
-                    if (!in_array($object['Key'], $paths)) {
-                        $image = new TrainingData();
-                        $image->setBucket('picsure.so-sure.com');
-                        $image->setImagePath($object['Key']);
-                        $this->picsureMLDm->persist($image);
-                    }
-                }
+        $filesystem = $this->mountManager->getFilesystem('s3picsure_fs');
+        $result = $filesystem->listContents('external-data', true);
+        foreach ($result as $object) {
+            if (!in_array($object['path'], $paths)) {
+                $image = new TrainingData();
+                $image->setBucket(PicsureMLService::S3BUCKET_PICSURE);
+                $image->setImagePath($object['path']);
+                $this->picsureMLDm->persist($image);
             }
-        } catch (S3Exception $e) {
-            $output->writeln(sprintf('Error getting external images: %s', $e->getMessage()));
         }
 
         $this->picsureMLDm->flush();
     }
 
-    public function output($version, OutputInterface $output)
+    public function output($version)
     {
         $filesystem = $this->mountManager->getFilesystem('s3picsure_fs');
 
@@ -206,8 +200,10 @@ class PicsureMLService
                 fclose($stream);
             }
         } catch (IOExceptionInterface $e) {
-            $output->writeln(sprintf('Error writing csv: %s', $e->getPath()));
+            return sprintf('Error writing csv: %s', $e->getPath());
         }
+
+        return true;
     }
 /*
     public function sync($filesystem)

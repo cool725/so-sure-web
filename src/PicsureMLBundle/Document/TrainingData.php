@@ -13,6 +13,7 @@ class TrainingData
     const LABEL_UNDAMAGED = 'undamaged';
     const LABEL_INVALID = 'invalid';
     const LABEL_DAMAGED = 'damaged';
+    const LABEL_UNKNOWN = 'damaged';
 
     /**
      * @MongoDB\Id(strategy="auto")

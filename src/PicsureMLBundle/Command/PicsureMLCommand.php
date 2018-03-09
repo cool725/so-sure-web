@@ -47,13 +47,16 @@ class PicsureMLCommand extends ContainerAwareCommand
         if ($sync) {
             $output->writeln(sprintf('Sync...'));
             $picsureMLService = $this->getContainer()->get('picsureml.picsureml');
-            $picsureMLService->sync($output);
+            $picsureMLService->sync();
             $output->writeln(sprintf('Done'));
         } elseif ($csv) {
             if (!empty($version)) {
                 $output->writeln(sprintf('Output...'));
                 $picsureMLService = $this->getContainer()->get('picsureml.picsureml');
-                $picsureMLService->output($version, $output);
+                $result = $picsureMLService->output($version);
+                if ($result !== true) {
+                    $output->writeln($result);
+                }
                 $output->writeln(sprintf('Done'));
             } else {
                 $output->writeln(sprintf('Error: version number required'));
