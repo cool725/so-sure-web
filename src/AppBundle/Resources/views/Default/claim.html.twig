@@ -2,7 +2,7 @@
 
 {# Set vars #}
 {% set new_stylesheet = 1 %}
-
+{% set new_footer = 1 %}
 
 {% block title %}so-sure - Make a claim
 {% endblock %}
@@ -10,7 +10,8 @@
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets output='css/*.css'
-        '@AppBundle/Resources/public/sass/page/corporate.scss'
+    '@AppBundle/Resources/public/sass/page/homepage.scss'
+    '@AppBundle/Resources/public/sass/page/corporate.scss'
     %}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
@@ -19,29 +20,58 @@
 
 {% block body %}
 
-    <div class="background-off-white">
 
     <section class="corporate-hero" id="hero-welcome">
         <div class="corporate-hero-inner">
-
-            <h1 class="text-blue">Don't worry - We've got you covered</h1>
-            <p class="lead">We're sorry to hear something bad has happened to your phone, but hey, that's why we're here. Let us guide you through the process so we can get your claim approved and a replacement phone to you ASAP.</p>
-
-            {# <p class="lead">Questions? See our claims <a href="/help/support/making-a-claim">FAQ</a>.</p> #}
-            <a id="corporate-get-quote"
-               href="#"
+            <h1 class="text-blue">Don't worry. We’ve got you covered.</h1>
+            <p class="lead">Let us guide you through the process so we can get your claim approved and a replacement phone to you ASAP.</p>
+            <a href="#"
                class="btn btn-green btn-lg scroll-to"
-               data-scroll-to-anchor="#claim-form">Make a claim</a>
+               data-scroll-to-anchor="#claim-form-container">Make a claim</a>
         </div>
     </section>
 
-    <section class="section-corporate section-corporate-form section-corporate-pad section-corporate-pad-both" id="corporate-get-quote-form">
+    {# Claims procss #}
+    <section class="section--pad homepage--claims-process">
+        <div class="container">
+            <h2 class="text-blue">Our hassle-free claims process</h2>
+            <p class="lead">When something bad happens to your phone:</p>
+            <div class="row">
+                <div class="col-md-4">
+                    <span class="large-no large-no--arrow">1</span>
+                    <h4 class="h3 text-blue">Contact Claims Team</h4>
+                    <p class="text-left">Let us know what happened. You can do this by <a href="#" class="text-nowrap scroll-to" data-scroll-to-anchor="#claim-form">filling in the form below</a>, or calling our claims team on 0344 856 0852 <small>(local rates apply)</small></p>
+                </div>
+                <div class="col-md-4">
+                    <span class="large-no large-no--arrow">2</span>
+                    <h4 class="h3 text-blue">Review Claim</h4>
+                    <p class="text-left">Our UK based claims team will review your claim and reach out with a request for any further details or documents (if necessary). We aim to do this within a matter of hours during UK business hours.</p>
+                </div>
+                <div class="col-md-4">
+                    <span class="large-no">3</span>
+                    <h4 class="h3 text-blue">Approve Claim</h4>
+                    <p class="text-left">Once your claim is approved, we take your excess payment over the phone and aim to get a replacement phone in the next working day. If you prefer to have your phone repaired, it may take more time.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section--pad background-lightest-blue">
         <div class="container">
             <div class="row">
                 <div class="col-md-10 col-md-offset-1">
+                    <p class="h3">If you had your phone stolen or lost, please call your network to block your phone and get a crime reference number from your local police station. For loss you can also declare online <a href="https://www.reportmyloss.com/uk/register" target="_blank">Report My Loss</a>.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-                    <h2 class="text-blue text-center">Let us know a few more details and one of our claim handlers
-                    will call you during business hours</h2>
+    <section id="claim-form-container" class="section-corporate section-corporate-form section-corporate-pad section-corporate-pad-both">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2">
+
+                    <h3 class="text-blue text-center">Let us know a few more details and one of our claim handlers will call you during business hours</h3>
 
                     {{ form_start(claim_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'id':'claim-form', 'data-client-validation': form_client_validation }}) }}
                         <div class="row">
@@ -149,9 +179,8 @@
         </div>
     </section>
 
-    </div>
-
     {# Page Modals #}
+    {# End Page Modals #}
 
 {% endblock %}
 
