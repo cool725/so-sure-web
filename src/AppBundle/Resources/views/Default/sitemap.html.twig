@@ -20,15 +20,20 @@
 
 {% block body %}
     {% set prev_path = '' %}
-    <ul>
-        {% for entity in entities %}
-            {% set path = path_info(entity.url)['dirname'] %}
-            {% if path != prev_path %}
-                </ul><h2>{{ path }}</h2>
-            {% endif %}
-            {% set prev_path = path %}
-            <li><a href="{{ entity.url }}">{{ entity.url }}</a></li>            
-        {% endfor %}
-    </ul>
+    <div class="container">
+        <div class="col-md-12">
+            <h1>Sitemap</h1>
+            <ul class="list-unstyled">
+                {% for entity in entities %}
+                    {% set path = path_info(entity.url)['dirname'] %}
+                    {% if path != prev_path %}
+                        </ul><h2>{{ path }}</h2><ul class="list-unstyled">
+                    {% endif %}
+                    {% set prev_path = path %}
+                    <li><a href="{{ entity.url }}">{{ entity.url }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
 {% endblock %}
 
