@@ -430,7 +430,7 @@ $(function(){
     });
 
     //Suppress hotjar on input
-    $('.tt-input').data('data-hj-suppres', '');
+    $('.tt-input').data('data-hj-suppress', '');
 
     $('.typeahead').bind('typeahead:select', function(ev, suggestion) {
         sosure.purchaseStepAddress.selectAddress(suggestion);
