@@ -96,7 +96,7 @@ if [ "$RUN_FILTER" == "" ]; then
 else
   ./vendor/phing/phing/bin/phing -f build/test.xml test:unit
   echo ./build/phpunit.sh --filter "$RUN_FILTER" --bootstrap vendor/autoload.php src/AppBundle/    
-  ./build/phpunit.sh --filter "$RUN_FILTER" --log-json /tmp/phpunit.json --bootstrap vendor/autoload.php src/AppBundle/
+  ./build/phpunit.sh --filter "$RUN_FILTER" --bootstrap vendor/autoload.php src/AppBundle/
 fi
 if [ "$SKIP_PHING" == "0" ]; then
   ./vendor/phing/phing/bin/phing force:cs
