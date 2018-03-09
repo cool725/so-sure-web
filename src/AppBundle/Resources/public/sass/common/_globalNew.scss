@@ -95,7 +95,7 @@ a {
 hr {
 	border: 0;
 	margin: 30px 0;
-	border-top: 2px dashed $light-blue;
+	border-top: 1px dashed $light-blue;
 }
 
 mark {
@@ -246,6 +246,11 @@ mark {
 .fade-img {
   animation-name: fade;
   animation-duration: 0.4s;
+}
+
+.img-center {
+	display: block;
+	margin: 0 auto;
 }
 
 @keyframes fade {
