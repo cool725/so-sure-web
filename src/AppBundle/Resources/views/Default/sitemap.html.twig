@@ -27,7 +27,11 @@
                 {% for entity in entities %}
                     {% set path = path_info(entity.url)['dirname'] %}
                     {% if path != prev_path %}
-                        </ul><h2>{{ path }}</h2><ul class="list-unstyled">
+                        </ul>
+                    {% if path != "http:" %}
+                        <h2>{{ path }}</h2>
+                    {% endif %}
+                    <ul class="list-unstyled">
                     {% endif %}
                     {% set prev_path = path %}
                     <li><a href="{{ entity.url }}">{{ entity.url }}</a></li>
