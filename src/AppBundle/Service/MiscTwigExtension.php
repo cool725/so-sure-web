@@ -38,12 +38,18 @@ class MiscTwigExtension extends \Twig_Extension
     {
         return array(
             new \Twig_SimpleFunction('equal_to_two_dp', [$this, 'areEqualToTwoDp']),
+            new \Twig_SimpleFunction('path_info', [$this, 'pathInfo']),
         );
     }
 
     public function jsonDecode($json)
     {
         return json_decode($json);
+    }
+
+    public function pathInfo($path)
+    {
+        return pathinfo($path);
     }
 
     public function getName()

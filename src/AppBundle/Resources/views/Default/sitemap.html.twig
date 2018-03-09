@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{# Set vars #}
+{% set new_stylesheet = 1 %}
+{% set new_footer = 1 %}
+
+{% block title %}so-sure Sitemap
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets output='css/*.css'
+    '@AppBundle/Resources/public/sass/page/homepage.scss'
+    '@AppBundle/Resources/public/sass/page/corporate.scss'
+    %}
+    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{# {% block nav %}{% endblock %} #}
+
+{% block body %}
+    {% set prev_path = '' %}
+    <ul>
+        {% for entity in entities %}
+            {% set path = path_info(entity.url)['dirname'] %}
+            {% if path != prev_path %}
+                </ul><h2>{{ path }}</h2>
+            {% endif %}
+            {% set prev_path = path %}
+            <li><a href="{{ entity.url }}">{{ entity.url }}</a></li>            
+        {% endfor %}
+    </ul>
+{% endblock %}
+

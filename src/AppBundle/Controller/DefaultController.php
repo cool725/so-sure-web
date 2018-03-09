@@ -984,4 +984,26 @@ class DefaultController extends BaseController
             'utm_campaign' => 'trinitiymaxwell',
         ]));
     }
+
+    /**
+     * @Route("/sitemap", name="sitemap")
+     * @Template()
+     */
+    public function sitemapAction()
+    {
+        $dpn = $this->get('dpn_xml_sitemap.manager');
+        $entities = $dpn->getSitemapEntries();
+        uasort($entities, function($a, $b) {
+            $dirA = pathinfo($a->getUrl())['dirname'];
+            $dirB = pathinfo($b->getUrl())['dirname'];
+            if ($dirA != $dirB) {
+                return $dirA > $dirB;
+            }
+
+            return $a->getUrl() > $b->getUrl(); 
+        });
+        return [
+            'entities' => $entities,
+        ];
+    }
 }
