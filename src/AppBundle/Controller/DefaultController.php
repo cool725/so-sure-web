@@ -993,14 +993,14 @@ class DefaultController extends BaseController
     {
         $dpn = $this->get('dpn_xml_sitemap.manager');
         $entities = $dpn->getSitemapEntries();
-        uasort($entities, function($a, $b) {
+        uasort($entities, function ($a, $b) {
             $dirA = pathinfo($a->getUrl())['dirname'];
             $dirB = pathinfo($b->getUrl())['dirname'];
             if ($dirA != $dirB) {
                 return $dirA > $dirB;
             }
 
-            return $a->getUrl() > $b->getUrl(); 
+            return $a->getUrl() > $b->getUrl();
         });
         return [
             'entities' => $entities,
