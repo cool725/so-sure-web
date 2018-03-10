@@ -16,6 +16,7 @@ use AppBundle\Document\Feature;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Document\PolicyTerms;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
@@ -63,7 +64,18 @@ class ApiViewController extends BaseController
             $terms->getVersionNumber()
         );
 
-        return $this->render($template, $data);
+        $html = $this->renderView($template, $data);
+        $noH1 = $request->get('noH1');
+        if ($noH1) {
+            $html = str_replace('<h3', '<h4', $html);
+            $html = str_replace('</h3', '</h4', $html);
+            $html = str_replace('<h2', '<h3', $html);
+            $html = str_replace('</h2', '</h3', $html);
+            $html = str_replace('<h1', '<h2', $html);
+            $html = str_replace('</h1', '</h2', $html);
+        }
+
+        return new Response($html);
     }
 
     /**

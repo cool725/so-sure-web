@@ -222,6 +222,13 @@ $(function(){
             $('.search-phone-text').focus();
         });
     }
+    
+    if ($('.modal-policy').length) {
+        var url = $('.modal-policy').data('url');
+        $('.modal-policy').load(url, function() {
+            sosure.globals.policyTerms();
+        });
+    }
 
 });
 

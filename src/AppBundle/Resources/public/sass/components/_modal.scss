@@ -78,11 +78,11 @@
 
 .modal-policy {
 
-	h1 {
+	h2 {
 		font-size: 24px;
 	}
 
-	h2 {
+	h3 {
 		margin: 0 0 15px;
 		padding: 10px 30px 10px 15px;
 		background-color: $grey-light;
@@ -101,11 +101,11 @@
 		}
 	}
 
-	h2.section-open:after {
+	h3.section-open:after {
 		content: '\f078';
 	}
 
-	h3 {
+	h4 {
 		font-size: 16px;
 	}
 
