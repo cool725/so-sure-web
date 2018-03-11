@@ -424,10 +424,16 @@ $(function(){
               '<div class="empty-message">',
                 'We couldn\x27t find that address. Make sure you have a space in the postcode (e.g SW1A 2AA). Or use manual entry.',
               '</div>'
-            ].join('\n')
+            ].join('\n'),
+            suggestion: doT.template('<div data-hj-suppress="">{{=it.Text}}</div>')
         }
     });
+
+    //Suppress hotjar on input
+    $('.tt-input').data('data-hj-suppress', '');
+
     $('.typeahead').bind('typeahead:select', function(ev, suggestion) {
         sosure.purchaseStepAddress.selectAddress(suggestion);
     });
+
 });
