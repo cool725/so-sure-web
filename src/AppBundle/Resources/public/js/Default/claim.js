@@ -102,3 +102,13 @@ sosure.claim = (function() {
 $(function(){
     sosure.claim.init();
 });
+
+$(function(){
+
+    if ($('.has-error').length) {
+        $('html,body').animate({
+           scrollTop: $("#claim-form-container").offset().top
+        });
+    }
+
+});
