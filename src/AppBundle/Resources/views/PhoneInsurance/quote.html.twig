@@ -178,10 +178,17 @@
                                     <li><i class="fa fa-check text-blue" aria-hidden="true"></i> Instant cover when you purchase your policy</li>
                                     <li><i class="fa fa-check text-blue" aria-hidden="true"></i> Up to 80% cashback every year</li>
                                 </ul>
+                                {% if intercom_test == 'intercom' %}
+                                    <div class="text-center">
+                                        <a href="mailto:hello@wearesosure.com?subject=More information about your {{ phone }} policy" class="open-intercom text-underline">
+                                            Questions? Start a CHAT with us
+                                        </a>
+                                    </div>
+                                {% endif %}
                             </div>
                         </div>
                         {# CTA #}
-                        <div class="quote__cta visible-xs text-center">
+                        <div class="quote__cta visible-xs text-center" {% if intercom_test == "intercom" %}style="margin-top: 20px"{% endif %}>
                             <div class="form-group">
                                 {{ form_start(buy_form_banner) }}
                                     {{ form_widget(buy_form_banner.buy, {'label': 'Get Started', 'attr': {'class': 'btn btn btn-green btn-block btn-pad btn-big-text'}}) }}
