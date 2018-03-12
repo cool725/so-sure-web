@@ -15,6 +15,7 @@ class DebtCollectionPayment extends Payment
 {
     public function __construct()
     {
+        parent::__construct();
         $this->setSuccess(true);
         $this->setSource(self::SOURCE_SYSTEM);
     }

@@ -25,6 +25,7 @@ use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\ValidationData;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
+use AppBundle\Exception\ValidationException;
 
 /**
  * @Route("/external")

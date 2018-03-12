@@ -71,7 +71,7 @@ class SCodeCommand extends BaseCommand
             }
             $scode = $policy->getStandardSCode();
             $this->printSCode($output, $scode);
-            $this->updateSCode($output, $scode, $updateType);
+            $this->updateSCode($output, $scode, $updateType, $policyNumber);
             $dm->flush();
         } else {
             if ($updateSource == 'google') {
@@ -100,7 +100,7 @@ class SCodeCommand extends BaseCommand
         $output->writeln('Finished');
     }
 
-    private function updateSCode($output, $scode, $updateType)
+    private function updateSCode($output, $scode, $updateType, $policyNumber = null)
     {
         if (!$scode) {
             throw new \Exception(sprintf('Unable to find scode for policy %s', $policyNumber));

@@ -4,6 +4,7 @@ namespace AppBundle\Document\Form;
 
 use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
+use AppBundle\Document\User;
 use AppBundle\Document\Address;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;

@@ -225,7 +225,7 @@ class ReportingService
                 true
             ));
         }
-        $data[sprintf('endingExpiredPolicies', $key)] = $policyRepo->countAllEndingPolicies(
+        $data['endingExpiredPolicies'] = $policyRepo->countAllEndingPolicies(
             null,
             $start,
             $end,
@@ -755,7 +755,7 @@ class ReportingService
             $data['rewardPot'] += $rewardPot;
             $data['rewardPotExcludingIptRebate'] += $rewardPotExcludingIptRebate;
             $newWrittenPremium = $this->toTwoDp(
-                $policy->getGwpPaid() - $policy->getCoverholderCommissionPaid() - $rewardPotInclIptRebate
+                $policy->getGwpPaid() - $policy->getCoverholderCommissionPaid() - $rewardPot
             );
             $data['netWrittenPremium'] += $newWrittenPremium;
             $underwritersPreferredReturn = $this->toTwoDp(

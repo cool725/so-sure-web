@@ -121,10 +121,10 @@ class ClaimsService
                             ['policy' => $claim->getPolicy()]
                         );
                     } catch (\Exception $ex) {
-                        $this->logger->error(sprintf(
+                        $this->logger->error(
                             "Error sending pic-sure validated claim review email.",
                             ['exception' => $ex]
-                        ));
+                        );
                     }
                 }
             }
@@ -204,7 +204,7 @@ class ClaimsService
                 ['claim' => $claim, 'policy' => $policy]
             );
         } catch (\Exception $e) {
-            $this->logger->error(sprintf("Error in notifyPolicyShouldBeCancelled.", ['exception' => $e]));
+            $this->logger->error("Error in notifyPolicyShouldBeCancelled.", ['exception' => $e]);
         }
     }
     public function setMailerMailer($mailer)

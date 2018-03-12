@@ -434,10 +434,10 @@ class DefaultController extends BaseController
             $ukMobileNumber = $this->normalizeUkMobile($mobileNumber, true);
             $lead = $repo->findOneBy(['mobileNumber' => $ukMobileNumber]);
             if ($lead) {
-                $this->addFlash('error', sprintf(
-                    "Oops, looks like we already sent you a link.",
-                    $mobileNumber
-                ));
+                $this->addFlash(
+                    'error',
+                    "Oops, looks like we already sent you a link."
+                );
             } elseif (!$this->isValidUkMobile($ukMobileNumber)) {
                 $this->addFlash('error', sprintf(
                     '%s does not appear to be a valid UK Mobile Number',
@@ -455,10 +455,10 @@ class DefaultController extends BaseController
                     $lead->setSource(Lead::SOURCE_TEXT_ME);
                     $dm->persist($lead);
                     $dm->flush();
-                    $this->addFlash('success', sprintf(
-                        'You should receive a download link shortly',
-                        $ukMobileNumber
-                    ));
+                    $this->addFlash(
+                        'success',
+                        'You should receive a download link shortly'
+                    );
                 } else {
                     $this->addFlash('error', sprintf(
                         'Sorry, we had a problem sending a link to %s',

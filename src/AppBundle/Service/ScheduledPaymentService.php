@@ -11,6 +11,12 @@ use Psr\Log\LoggerInterface;
 
 class ScheduledPaymentService
 {
+    /** @var JudopayService $judopay */
+    protected $judopay;
+
+    /** @var LoggerInterface $logger */
+    protected $logger;
+
     /**
      * @param JudopayService  $judopay
      * @param LoggerInterface $logger

@@ -21,7 +21,7 @@ class SCodeService
     /** @var RouterService */
     protected $routerService;
 
-    /** @var ShortLink */
+    /** @var ShortLinkService */
     protected $shortLink;
 
     /** @var BranchService */

@@ -884,6 +884,7 @@ class AdminEmployeeController extends BaseController
                         throw new \Exception('1 or 12 payments only');
                     }
 
+                    $judopay = $this->get('app.judopay');
                     $details = $judopay->runTokenPayment(
                         $policy->getUser(),
                         $amount,
@@ -1614,7 +1615,7 @@ class AdminEmployeeController extends BaseController
                     } else {
                         throw new \InvalidArgumentException(sprintf(
                             'Unable to add reward connection. %s',
-                            (string) $emailForm->getErrors()
+                            (string) $connectForm->getErrors()
                         ));
                     }
                 } elseif ($request->request->has('rewardForm')) {
@@ -1649,7 +1650,7 @@ class AdminEmployeeController extends BaseController
                     } else {
                         throw new \InvalidArgumentException(sprintf(
                             'Unable to add reward. %s',
-                            (string) $emailForm->getErrors()
+                            (string) $rewardForm->getErrors()
                         ));
                     }
                 }
@@ -1712,7 +1713,7 @@ class AdminEmployeeController extends BaseController
                         $company = $companyRepo->find($belongForm->getData()['companyId']);
                         if (!$company) {
                             throw new \InvalidArgumentException(sprintf(
-                                'Unable to add user to company. Company is missing',
+                                'Unable to add user (%s) to company. Company is missing',
                                 $belongForm->getData()['email']
                             ));
                         }
@@ -1731,7 +1732,7 @@ class AdminEmployeeController extends BaseController
                     } else {
                         throw new \InvalidArgumentException(sprintf(
                             'Unable to add user to company. %s',
-                            (string) $emailForm->getErrors()
+                            (string) $belongForm->getErrors()
                         ));
                     }
                 } elseif ($request->request->has('companyForm')) {
@@ -1756,7 +1757,7 @@ class AdminEmployeeController extends BaseController
                     } else {
                         throw new \InvalidArgumentException(sprintf(
                             'Unable to add company. %s',
-                            (string) $emailForm->getErrors()
+                            (string) $companyForm->getErrors()
                         ));
                     }
                 }

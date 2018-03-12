@@ -49,6 +49,26 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use AppBundle\Exception\DuplicateInvitationException;
 use AppBundle\Exception\ValidationException;
 
+use AppBundle\Exception\RateLimitException;
+use AppBundle\Exception\ProcessedException;
+use AppBundle\Exception\SelfInviteException;
+use AppBundle\Exception\FullPotException;
+use AppBundle\Exception\InvalidPolicyException;
+use AppBundle\Exception\OptOutException;
+use AppBundle\Exception\ConnectedInvitationException;
+use AppBundle\Exception\ClaimException;
+use AppBundle\Exception\PaymentDeclinedException;
+use AppBundle\Exception\InvalidPremiumException;
+use AppBundle\Exception\InvalidUserDetailsException;
+use AppBundle\Exception\GeoRestrictedException;
+use AppBundle\Exception\DuplicateImeiException;
+use AppBundle\Exception\LostStolenImeiException;
+use AppBundle\Exception\InvalidImeiException;
+use AppBundle\Exception\ImeiBlacklistedException;
+use AppBundle\Exception\ImeiPhoneMismatchException;
+use AppBundle\Exception\InvalidEmailException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
 /**
  * @Route("/user")
  */
@@ -1042,7 +1062,6 @@ class UserController extends BaseController
             SixpackService::EXPERIMENT_USER_WELCOME_MODAL,
             ['no-modal', 'welcome-modal'],
             SixpackService::LOG_MIXPANEL_CONVERSION,
-            1,
             $user->getId()
         );
 
@@ -1252,7 +1271,7 @@ class UserController extends BaseController
      * @Route("/fb", name="user_facebook")
      * @Template
      */
-    public function fbAction()
+    public function fbAction(Request $request)
     {
         throw $this->createAccessDeniedException('Coming soon');
 

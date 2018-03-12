@@ -662,7 +662,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $oldPasswords = $this->getPreviousPasswords();
 
         if (!is_array($oldPasswords)) {
-            $oldPasswords = $user->getPreviousPasswords->getValues();
+            $oldPasswords = $this->getPreviousPasswords()->getValues();
         }
         if (count($oldPasswords) == 0) {
             return $this->created;
