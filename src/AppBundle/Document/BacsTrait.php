@@ -22,7 +22,7 @@ trait BacsTrait
             return sprintf("%s-%s-%s", substr($sortCode, 0, 2), substr($sortCode, 2, 2), substr($sortCode, 4, 2));
         }
 
-        return null;        
+        return null;
     }
 
     public function displayableAccountNumber($accountNumber)
