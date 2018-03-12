@@ -263,7 +263,7 @@ class PhonePolicy extends Policy
 
     public function isValidAppleSerialNumber()
     {
-        return $this->isAppleSerialNumber($this->getSerialNumber);
+        return $this->isAppleSerialNumber($this->getSerialNumber());
     }
 
     public function getPhoneData()

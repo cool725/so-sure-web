@@ -22,6 +22,7 @@ use AppBundle\Service\RateLimitService;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use AppBundle\Exception\ValidationException;
 
 /**
  * @Route("/api/v1/unauth")

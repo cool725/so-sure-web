@@ -15,6 +15,7 @@ class BacsPayment extends Payment
 {
     public function __construct()
     {
+        parent::__construct();
         $this->setSuccess(true);
     }
 

@@ -11,10 +11,6 @@ class PhonePrice extends Price
 {
     use CurrencyTrait;
 
-    public function __construct()
-    {
-    }
-
     public function getMaxPot($isPromoLaunch = false)
     {
         if ($isPromoLaunch) {

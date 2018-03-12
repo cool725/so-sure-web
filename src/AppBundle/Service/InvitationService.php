@@ -67,7 +67,7 @@ class InvitationService
     /** @var RouterService */
     protected $routerService;
 
-    /** @var ShortLink */
+    /** @var ShortLinkService */
     protected $shortLink;
 
     /** @var SmsService */

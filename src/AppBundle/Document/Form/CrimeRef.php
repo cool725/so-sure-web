@@ -32,6 +32,12 @@ class CrimeRef
      */
     protected $crimeRef;
 
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="50")
+     */
+    protected $type;
+
     public function getForce()
     {
         return $this->force;

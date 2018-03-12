@@ -630,10 +630,10 @@ class PurchaseController extends BaseController
                 if (!$policy->isValidPolicy($policy->getPolicyPrefix($this->getParameter('kernel.environment')))) {
                     throw $e;
                 }
-                $this->get('logger')->warning(sprintf(
+                $this->get('logger')->warning(
                     'Duplicate re-use of judo receipt. Possible refresh issue, so ignoring and continuing',
                     ['exception' => $e]
-                ));
+                );
             }
 
             if ($webType == JudopayService::WEB_TYPE_REMAINDER) {

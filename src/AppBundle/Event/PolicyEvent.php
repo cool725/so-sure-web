@@ -4,6 +4,7 @@ namespace AppBundle\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 use AppBundle\Document\Policy;
+use AppBundle\Document\PhonePolicy;
 
 class PolicyEvent extends Event
 {
@@ -23,7 +24,7 @@ class PolicyEvent extends Event
 
     const EVENT_UPDATED_POT = 'event.policy.pot';
 
-    /** @var PhonePolicy */
+    /** @var Policy */
     protected $policy;
     protected $date;
 

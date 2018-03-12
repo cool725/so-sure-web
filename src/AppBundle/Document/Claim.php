@@ -1072,7 +1072,6 @@ class Claim
             'type' => $this->getType(),
             'status' => $this->getStatus(),
             'daviesStatus' => $this->getDaviesStatus(),
-            'notes' => $this->getNotes(),
             'initialSuspicion' => $this->getInitialSuspicion(),
             'finalSuspicion' => $this->getFinalSuspicion(),
             'shouldCancelPolicy' => $this->getShouldCancelPolicy(),

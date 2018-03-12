@@ -23,6 +23,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use AppBundle\Exception\MonitorException;
+use AppBundle\Exception\ValidationException;
 
 /**
  * @Route("/api/v1/key")

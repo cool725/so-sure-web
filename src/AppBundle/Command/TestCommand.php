@@ -39,7 +39,7 @@ class TestCommand extends BaseCommand
         if ($id) {
             $policy = $policyRepo->find($id);
             if (!$policy) {
-                throw new \Exception(sprintf('Unable to find policy for %s', $policyNumber));
+                throw new \Exception(sprintf('Unable to find policy for %s', $id));
             }
             /*
             print_r($policy->getStart());

@@ -298,7 +298,7 @@ class ReceperioService extends BaseImeiService
         if (!$policy) {
             $this->logger->warning(sprintf(
                 'Missing serial recheck as policy has not been created for serial %s [%s]',
-                $serial,
+                $serialNumber,
                 json_encode($data)
             ));
 
@@ -823,15 +823,6 @@ class ReceperioService extends BaseImeiService
             $this->logger->error(
                 sprintf("Unable to check serial number '%s'", $serialNumber),
                 ['exception' => $e]
-            );
-
-            // If there are any issues, assume true and manually process queue later
-            $this->queueMessage(
-                self::CHECK_SERIAL,
-                $phone->getId(),
-                $user ? $user->getId() : null,
-                null,
-                $serialNumber
             );
 
             return true;

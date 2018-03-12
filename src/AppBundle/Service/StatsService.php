@@ -86,7 +86,7 @@ class StatsService
         $this->dm->flush();
     }
 
-    public function increment($name, $date = null)
+    public function increment($name, $date = null, $overwrite = false)
     {
         if (!$date) {
             $date = new \DateTime();
@@ -107,7 +107,7 @@ class StatsService
         $this->dm->flush();
     }
 
-    public function decrement($name, $date)
+    public function decrement($name, $date, $overwrite = false)
     {
         $repo = $this->dm->getRepository(Stats::class);
         $stat = $repo->findOneBy(['name' => $name, 'date' => $this->startOfDay($date)]);

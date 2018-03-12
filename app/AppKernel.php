@@ -30,7 +30,7 @@ class AppKernel extends Kernel
             new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
             new JMS\AopBundle\JMSAopBundle(),
             new JMS\SecurityExtraBundle\JMSSecurityExtraBundle(),
-            new JMS\DiExtraBundle\JMSDiExtraBundle($this),
+            new JMS\DiExtraBundle\JMSDiExtraBundle(),
             new WhiteOctober\PagerfantaBundle\WhiteOctoberPagerfantaBundle(),
             new AppBundle\AppBundle(),
             new CensusBundle\CensusBundle(),

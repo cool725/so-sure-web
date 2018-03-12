@@ -22,7 +22,7 @@ class LaunchUserService
     protected $templating;
     protected $router;
 
-    /** @var ShortLink */
+    /** @var ShortLinkService */
     protected $shortLink;
 
     /**

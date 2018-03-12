@@ -288,25 +288,25 @@ class ValidatePolicyCommand extends BaseCommand
                 $policyService = $this->getContainer()->get('app.policy');
                 if ($policyService->adjustScheduledPayments($policy)) {
                     $lines[] = sprintf(
-                        'Adjusted Incorrect scheduled payments',
+                        'Adjusted Incorrect scheduled payments for policy %s',
                         $policy->getPolicyNumber()
                     );
                 } else {
                     $policy = $this->getManager()->merge($policy);
                     $lines[] = sprintf(
-                        'WARNING!! Failed to adjusted Incorrect scheduled payments',
+                        'WARNING!! Failed to adjusted Incorrect scheduled payments for olicy %s',
                         $policy->getPolicyNumber()
                     );
                 }
             } else {
                 if ($closeToExpiration) {
                     $lines[] = sprintf(
-                        'Expected Incorrect scheduled payments - within 2 weeks of cancellation date',
+                        'Expected Incorrect scheduled payments - within 2 weeks of cancellation date for %s',
                         $policy->getPolicyNumber()
                     );
                 } else {
                     $lines[] = sprintf(
-                        'WARNING!! Incorrect scheduled payments',
+                        'WARNING!! Incorrect scheduled payments for policy %s',
                         $policy->getPolicyNumber()
                     );
                 }
@@ -328,7 +328,7 @@ class ValidatePolicyCommand extends BaseCommand
         if ($data['warnClaim'] && $policy->hasMonetaryClaimed()) {
             $this->header($policy, $policies, $lines);
             $lines[] = sprintf(
-                'WARNING!! - Prior successful claim (extra care should be used to avoid cancellation)',
+                'WARNING!! - Prior successful claim (extra care should be used to avoid cancellation) for %s',
                 $policy->getPolicyNumber()
             );
         }

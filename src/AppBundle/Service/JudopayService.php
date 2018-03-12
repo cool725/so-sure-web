@@ -4,7 +4,7 @@ namespace AppBundle\Service;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
-use JudoPay;
+use Judopay;
 
 use AppBundle\Classes\Salva;
 
@@ -48,10 +48,10 @@ class JudopayService
     /** @var LoggerInterface */
     protected $logger;
 
-    /** @var JudoPay */
+    /** @var Judopay */
     protected $apiClient;
 
-    /** @var JudoPay */
+    /** @var Judopay */
     protected $webClient;
 
     /** @var string */

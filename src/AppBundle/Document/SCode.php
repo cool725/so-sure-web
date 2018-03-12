@@ -223,7 +223,7 @@ class SCode
     public function setType($type)
     {
         if (!in_array($type, [self::TYPE_STANDARD, self::TYPE_MULTIPAY, self::TYPE_REWARD])) {
-            throw new \InvalidArgumentException(sprintf('%s is not a valid type'));
+            throw new \InvalidArgumentException(sprintf('%s is not a valid type', $type));
         }
 
         $this->type = $type;

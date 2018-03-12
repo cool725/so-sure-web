@@ -11,6 +11,7 @@ use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\Invitation\Invitation;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Symfony\Component\HttpFoundation\Request;
 
 class RateLimitService
 {

@@ -20,6 +20,7 @@ use AppBundle\Document\Payment\PotRewardPayment;
 use AppBundle\Document\Payment\SoSurePotRewardPayment;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Payment\DebtCollectionPayment;
+use AppBundle\Document\Payment\SoSurePayment;
 use AppBundle\Exception\ClaimException;
 
 /**

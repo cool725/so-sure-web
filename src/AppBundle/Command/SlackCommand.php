@@ -107,8 +107,7 @@ class SlackCommand extends ContainerAwareCommand
             $text = sprintf(
                 "*Policy <%s|%s> has been cancelled w/success claim. User must re-purchase policy or pay outstanding amount.*",
                 $router->generateUrl('admin_policy', ['id' => $policy->getId()]),
-                $policy->getPolicyNumber(),
-                $diff->days
+                $policy->getPolicyNumber()
             );
             $lines[] = $text;
 
@@ -120,36 +119,6 @@ class SlackCommand extends ContainerAwareCommand
 
         return $lines;
     }
-
-    public function isCancelledAndPaymentOwed()
-    {
-        if (!$this->isFullyPaid() &&
-            count($this->getApprovedClaims(true, true)) > 0 &&
-            $this->getStatus() == self::STATUS_CANCELLED &&
-            $this->getCancelledReason() != self::CANCELLED_UPGRADE) {
-            foreach ($this->getApprovedClaims(true, true) as $claim) {
-                if ($claim->getLinkedPolicy()) {
-                    // if this is the linked policy, then its automatically a cancelled w/payment owed
-                    if ($claim->getLinkedPolicy()->getId() == $this->getId()) {
-                        // print 'same' . PHP_EOL;
-                        return true;
-                    } elseif (!$claim->getLinkedPolicy()->isActive()) {
-                        // there was a linked policy, but its not active, so again ists a cancelled w/payment owed
-                        // print 'inactive' . PHP_EOL;
-                        return true;
-                    }
-                } else {
-                    // if there isn't a linked policy for one of the claims, then the policy must be this one
-                    // e.g. automatically a cancelled w/payment owed
-                    // print 'unlinked' . PHP_EOL;
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
 
     private function unpaid($channel, $skipSlack)
     {
