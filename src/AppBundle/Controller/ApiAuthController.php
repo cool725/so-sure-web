@@ -1126,7 +1126,7 @@ class ApiAuthController extends BaseController
             $message = \Swift_Message::newInstance()
                 ->setSubject(sprintf('New pic-sure image to process [%s]', $environment))
                 ->setFrom('tech@so-sure.com')
-                ->setTo('tech+ops@so-sure.com')
+                ->setTo('pic-sure@so-sure.com')
                 ->setBody('<a href="https://wearesosure.com/admin/picsure">Admin site</a>', 'text/html');
             $this->get('mailer')->send($message);
 

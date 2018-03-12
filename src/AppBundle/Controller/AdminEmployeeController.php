@@ -1251,9 +1251,13 @@ class AdminEmployeeController extends BaseController
         $form->handleRequest($request);
         $status = $form->get('status')->getData();
         $claimNumber = $form->get('number')->getData();
+        $claimId = $form->get('id')->getData();
         $qb = $qb->field('status')->in($status);
         if (strlen($claimNumber) > 0) {
             $qb = $qb->field('number')->equals(new MongoRegex(sprintf("/.*%s.*/i", $claimNumber)));
+        }
+        if (strlen($claimId) > 0) {
+            $qb = $qb->field('id')->equals(new \MongoId($claimId));
         }
         $qb = $qb->sort('replacementReceivedDate', 'desc')
                 ->sort('approvedDate', 'desc')

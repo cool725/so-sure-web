@@ -29,10 +29,15 @@
             </div>
         </div>
         <div class="row">
-            <div class="form-group col-sm-6">
-                {{ form_label(form.number, 'Claim Number', {'label_attr': {'class': 'col-sm-3'}}) }}
+            <div class="form-group col-sm-5">
+                {{ form_label(form.number, 'Claim Number', {'label_attr': {'class': 'col-sm-4'}}) }}
                 {{ form_errors(form.number) }}
                 {{ form_widget(form.number, {'attr': {'class': 'col-sm-3 claim-status'}}) }}
+            </div>
+            <div class="form-group col-sm-5">
+                {{ form_label(form.id, 'Claim Id', {'label_attr': {'class': 'col-sm-3'}}) }}
+                {{ form_errors(form.id) }}
+                {{ form_widget(form.id, {'attr': {'class': 'col-sm-7 claim-status'}}) }}
             </div>
             <div class="form-group">
               <div class="col-sm-2 text-center">
