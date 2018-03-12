@@ -411,6 +411,12 @@ class PhoneInsuranceController extends BaseController
 
         // only need to run this once - if its a post, then ignore
         if ('GET' === $request->getMethod() && $phone->getCurrentPhonePrice()) {
+            $expIntercom = $this->sixpack(
+                $request,
+                SixpackService::EXPERIMENT_QUOTE_INTERCOM_PURCHASE,
+                ['none', 'intercom']
+            );
+
             $event = MixpanelService::EVENT_QUOTE_PAGE;
             if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
                 $event = MixpanelService::EVENT_CPC_QUOTE_PAGE;
@@ -466,6 +472,7 @@ class PhoneInsuranceController extends BaseController
             'coming_soon' => $phone->getCurrentPhonePrice() ? false : true,
             //'slider_test' => $sliderTest,
             'slider_test' => 'slide-me',
+            'intercom_test' => $expIntercom,
         );
 
         $exp = $this->sixpack(
