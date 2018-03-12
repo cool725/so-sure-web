@@ -107,6 +107,11 @@ class BankAccount
 
     public function __toString()
     {
-        return sprintf("%s %s %s", $this->getAccountName(), $this->getSortCode(), $this->getDisplayableAccountNumber());
+        return sprintf(
+            "%s %s %s",
+            $this->getAccountName(),
+            $this->getDisplayableSortCode(),
+            $this->getDisplayableAccountNumber()
+        );
     }
 }

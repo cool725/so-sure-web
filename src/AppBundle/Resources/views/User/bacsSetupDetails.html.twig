@@ -20,7 +20,7 @@
                     </div>
                     <div class="row">
                         <div class="col-xs-6 form-group">
-                            <a href="#tab-card" class="btn btn-blue-hollow btn-block" data-toggle="tab">
+                            <a href="{% if user.paymentMethod.type == "bacs" %}#tab-bacs{% else %}#tab-bacs-setup{% endif %}" class="btn btn-blue-hollow btn-block" data-toggle="tab">
                                 Back
                             </a>
                         </div>
