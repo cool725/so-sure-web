@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Listener;
 
+use AppBundle\Document\Payment\BacsPayment;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Listener\UserListener;
@@ -223,6 +224,7 @@ class RefundListenerTest extends WebTestCase
         $policy->setStatus(PhonePolicy::STATUS_CANCELLED);
         static::$dm->flush();
 
+        $now = new \DateTime();
         $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger, 'test');
         $listener->onPolicyCancelledEvent(new PolicyEvent($policy));
 
@@ -237,6 +239,15 @@ class RefundListenerTest extends WebTestCase
 
         // bacs initial, bacs refund for cancellation
         $this->assertEquals(2, count($policy->getPayments()));
+
+        $foundRefund = false;
+        foreach ($policy->getPayments() as $payment) {
+            if ($payment instanceof BacsPayment && $payment->getAmount() < 0) {
+                $this->assertEquals($now, $payment->getDate());
+                $foundRefund = true;
+            }
+        }
+        $this->assertTrue($foundRefund);
     }
 
     public function testRefundFreeNovPromo()
