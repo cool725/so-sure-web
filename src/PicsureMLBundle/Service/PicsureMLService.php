@@ -16,6 +16,9 @@ use PicsureMLBundle\Document\TrainingData;
 
 class PicsureMLService
 {
+    const S3BUCKET_POLICY = 'policy.so-sure.com';
+    const S3BUCKET_PICSURE = 'picsure.so-sure.com';
+
     /** @var DocumentManager */
     protected $appDm;
 
@@ -51,6 +54,7 @@ class PicsureMLService
         $repo = $this->picsureMLDm->getRepository(TrainingData::class);
         if ($file->getFileType() == 'PicSureFile' && !$repo->imageExists($file->getKey())) {
             $image = new TrainingData();
+            $image->setBucket(PicsureMLService::S3BUCKET_POLICY);
             $image->setImagePath($file->getKey());
             $image->setLabel($status);
             $this->picsureMLDm->persist($image);
@@ -82,16 +86,39 @@ class PicsureMLService
         if (isset($json['error'])) {
             throw new \Exception('Error: '.$json['error']['message']);
         } else {
+            $scores = array();
+            $scores[TrainingData::LABEL_UNDAMAGED] = floatval($json['scores'][TrainingData::LABEL_UNDAMAGED]);
+            $scores[TrainingData::LABEL_INVALID] = floatval($json['scores'][TrainingData::LABEL_INVALID]);
+            $scores[TrainingData::LABEL_DAMAGED] = floatval($json['scores'][TrainingData::LABEL_DAMAGED]);
+            arsort($scores);
+
+            $status = "";
+            $confidence = 0.0;
+            $threshold = 1.0;
+            $found = false;
+
+            reset($scores);
+            while (!$found && $threshold > 0.05) {
+                if (current($scores) > $threshold) {
+                    $status = key($scores);
+                    $confidence = $threshold;
+                    $found = true;
+                }
+                $threshold -= 0.05;
+            }
+            if (!$found) {
+                $status = TrainingData::LABEL_UNKNOWN;
+            }
+
             $file->addMetadata('picsure-ml-score', $json['scores']);
+            $file->addMetadata('picsure-ml-status', $status);
+            $file->addMetadata('picsure-ml-confidence', $confidence);
             $this->appDm->flush();
         }
     }
 
     public function sync()
     {
-        $s3Repo = $this->appDm->getRepository(S3File::class);
-        $picsureFiles = $s3Repo->findBy(['fileType' => 'picsure']);
-
         $imageRepo = $this->picsureMLDm->getRepository(TrainingData::class);
         $images = $imageRepo->createQueryBuilder()
                         ->select('imagePath')
@@ -101,9 +128,13 @@ class PicsureMLService
             $paths[] = $image->getImagePath();
         }
 
+        $s3Repo = $this->appDm->getRepository(S3File::class);
+        $picsureFiles = $s3Repo->findBy(['fileType' => 'picsure']);
+
         foreach ($picsureFiles as $file) {
             if (!in_array($file->getKey(), $paths)) {
                 $image = new TrainingData();
+                $image->setBucket(PicsureMLService::S3BUCKET_POLICY);
                 $image->setImagePath($file->getKey());
                 $metadata = $file->getMetadata();
                 $status = null;
@@ -123,10 +154,21 @@ class PicsureMLService
             }
         }
 
+        $filesystem = $this->mountManager->getFilesystem('s3picsure_fs');
+        $result = $filesystem->listContents('external-data', true);
+        foreach ($result as $object) {
+            if (!in_array($object['path'], $paths)) {
+                $image = new TrainingData();
+                $image->setBucket(PicsureMLService::S3BUCKET_PICSURE);
+                $image->setImagePath($object['path']);
+                $this->picsureMLDm->persist($image);
+            }
+        }
+
         $this->picsureMLDm->flush();
     }
 
-    public function output(OutputInterface $output)
+    public function output($version)
     {
         $filesystem = $this->mountManager->getFilesystem('s3picsure_fs');
 
@@ -140,7 +182,8 @@ class PicsureMLService
         foreach ($results as $result) {
             if ($result->hasLabel()) {
                 $csv[] = sprintf(
-                    "%s,%s",
+                    "%s/%s,%s",
+                    $result->getBucket(),
                     $result->getImagePath(),
                     $result->getLabel()
                 );
@@ -153,12 +196,14 @@ class PicsureMLService
             $fs->dumpFile($file, implode(PHP_EOL, $csv));
             $stream = fopen($file, 'r+');
             if ($stream != false) {
-                $filesystem->putStream('training-data.csv', $stream);
+                $filesystem->putStream(sprintf("trained-data/%s/training-data.csv", $version), $stream);
                 fclose($stream);
             }
         } catch (IOExceptionInterface $e) {
-            $output->writeln(sprintf('Error writing csv: %s', $e->getPath()));
+            return sprintf('Error writing csv: %s', $e->getPath());
         }
+
+        return true;
     }
 /*
     public function sync($filesystem)

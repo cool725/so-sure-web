@@ -92,10 +92,10 @@ class PicsureMLController extends BaseController
     }
 
     /**
-     * @Route("/picsure-ml/image/{file}", name="admin_picsure_ml_image", requirements={"file"=".*"})
+     * @Route("/picsure-ml/image/policy/{file}", name="admin_picsure_ml_image_policy", requirements={"file"=".*"})
      * @Template()
      */
-    public function picsureImageAction($file)
+    public function picsureImagePolicyAction($file)
     {
         $filesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3policy_fs');
         $environment = $this->getParameter('kernel.environment');
@@ -115,9 +115,15 @@ class PicsureMLController extends BaseController
             200,
             array('Content-Type' => $mimetype)
         );
-        /*
-        $filesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3picsure_fs');
+    }
 
+    /**
+     * @Route("/picsure-ml/image/picsure/{file}", name="admin_picsure_ml_image_picsure", requirements={"file"=".*"})
+     * @Template()
+     */
+    public function picsureImagePicsureAction($file)
+    {
+        $filesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3picsure_fs');
         if (!$filesystem->has($file)) {
             throw $this->createNotFoundException(sprintf('URL not found %s', $file));
         }
@@ -132,7 +138,24 @@ class PicsureMLController extends BaseController
             200,
             array('Content-Type' => $mimetype)
         );
-        */
+    }
+
+    /**
+     * @Route("/picsure-ml/predict/{id}", name="admin_picsure_ml_predict")
+     * @Template
+     */
+    public function predictAction($id)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(S3File::class);
+
+        $picsureFile = $repo->find($id);
+        if ($picsureFile) {
+            $service = $this->get('picsureml.picsureml');
+            $service->predict($picsureFile);
+        }
+
+        return new RedirectResponse($this->generateUrl('admin_picsure'));
     }
 
     /**

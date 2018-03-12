@@ -38,7 +38,11 @@
         <div class="col-md-3">
             <div class="picsure-image">
                 <a href="{{ path('admin_picsure_ml_edit', {'id': image.id }) }}">
-                    <img src="{{ path('admin_picsure_ml_image', {'file': image.imagePath }) }}">
+                    {% if image.bucket == "policy.so-sure.com" %}
+                        <img src="{{ path('admin_picsure_ml_image_policy', {'file': image.imagePath }) }}">
+                    {% elseif image.bucket == "picsure.so-sure.com" %}
+                        <img src="{{ path('admin_picsure_ml_image_picsure', {'file': image.imagePath }) }}">
+                    {% endif %}
                     {% if image.label == "undamaged" %}
                         <span class="label label-success">Undamaged</span>
                     {% elseif image.label == "invalid" %}

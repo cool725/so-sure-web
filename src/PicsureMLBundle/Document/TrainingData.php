@@ -13,11 +13,17 @@ class TrainingData
     const LABEL_UNDAMAGED = 'undamaged';
     const LABEL_INVALID = 'invalid';
     const LABEL_DAMAGED = 'damaged';
+    const LABEL_UNKNOWN = 'damaged';
 
     /**
      * @MongoDB\Id(strategy="auto")
      */
     protected $id;
+
+    /**
+     * @MongoDB\Field(type="string", name="bucket")
+     */
+    protected $bucket;
 
     /**
      * @MongoDB\Field(type="string", name="imagePath")
@@ -53,6 +59,16 @@ class TrainingData
     public function getId()
     {
         return $this->id;
+    }
+
+    public function setBucket($bucket)
+    {
+        $this->bucket = $bucket;
+    }
+
+    public function getBucket()
+    {
+        return $this->bucket;
     }
 
     public function setImagePath($imagePath)

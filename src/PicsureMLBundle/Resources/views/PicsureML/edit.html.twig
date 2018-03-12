@@ -31,17 +31,23 @@
 {% block body %}
 <div class="container">
     <a href="{{ path('admin_picsure_ml') }}">Back to Picsure ML</a>
-    <h3>Label: {{ image.imagePath }}</h3>
+    <h3>Image: {{ image.imagePath }}</h3>
 
     {{ form_start(picsure_label_form)}}
 
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-8">
             <div class="content-right">
-                <img src="{{ path('admin_picsure_ml_image', {'file': image.imagePath }) }}">
+                <div class="picsure-image-edit">
+                {% if image.bucket == "policy.so-sure.com" %}
+                    <img src="{{ path('admin_picsure_ml_image_policy', {'file': image.imagePath }) }}">
+                {% elseif image.bucket == "picsure.so-sure.com" %}
+                    <img src="{{ path('admin_picsure_ml_image_picsure', {'file': image.imagePath }) }}">
+                {% endif %}
+                </div>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="content-left">
                 <div class="text-right">
                     <div class="form-group">
