@@ -368,6 +368,7 @@ class PhoneInsuranceController extends BaseController
                     $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
 
                     $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_NEW_QUOTE_DESIGN);
+                    $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_INTERCOM_PURCHASE);
 
                     // Multipolicy should skip user details
                     if ($this->getUser() && $this->getUser()->hasPolicy()) {
@@ -391,6 +392,7 @@ class PhoneInsuranceController extends BaseController
                     $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
 
                     $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_NEW_QUOTE_DESIGN);
+                    $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_INTERCOM_PURCHASE);
 
                     // Multipolicy should skip user details
                     if ($this->getUser() && $this->getUser()->hasPolicy()) {
