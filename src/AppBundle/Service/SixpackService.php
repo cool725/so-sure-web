@@ -43,6 +43,7 @@ class SixpackService
     // const EXPERIMENT_POLICY_PDF_DOWNLOAD = 'policy-pdf-download';
     //const EXPERIMENT_CANCELLATION = 'cancellation';
     const EXPERIMENT_NEW_QUOTE_DESIGN = 'new-quote-design';
+    const EXPERIMENT_SAVE_QUOTE_24HOURS = 'save-quote-24-hours';
 
     const EXPERIMENT_USER_WELCOME_MODAL = 'welcome-modal';
 

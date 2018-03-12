@@ -301,12 +301,22 @@ class PhoneInsuranceController extends BaseController
             ->add('claim_used', HiddenType::class)
             ->getForm();
 
+        $daysTest = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_SAVE_QUOTE_24HOURS,
+            ['7days', '24hours']
+        );
+
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('lead_form')) {
                 try {
                     $leadForm->handleRequest($request);
 
                     if ($leadForm->isValid()) {
+                        $this->get('app.sixpack')->convert(
+                            SixpackService::EXPERIMENT_SAVE_QUOTE_24HOURS
+                        );
+
                         $leadRepo = $dm->getRepository(Lead::class);
                         $existingLead = $leadRepo->findOneBy(['email' => strtolower($lead->getEmail())]);
                         if (!$existingLead) {
@@ -315,27 +325,29 @@ class PhoneInsuranceController extends BaseController
                         } else {
                             $lead = $existingLead;
                         }
-                        $sevenDays = new \DateTime();
-                        $sevenDays = $sevenDays->add(new \DateInterval('P7D'));
+                        $days = new \DateTime();
+                        $days = $days->add(new \DateInterval(sprintf('P%dD', $daysTest == '7days' ? 7 : 1)));
                         $mailer = $this->get('app.mailer');
                         $mailer->sendTemplate(
                             sprintf('Your saved so-sure quote for %s', $phone),
                             $lead->getEmail(),
                             'AppBundle:Email:quote/priceGuarentee.html.twig',
-                            ['phone' => $phone, 'sevenDays' => $sevenDays, 'quoteUrl' => $quoteUrl],
+                            ['phone' => $phone, 'days' => $days, 'quoteUrl' => $quoteUrl],
                             'AppBundle:Email:quote/priceGuarentee.txt.twig',
-                            ['phone' => $phone, 'sevenDays' => $sevenDays, 'quoteUrl' => $quoteUrl]
+                            ['phone' => $phone, 'days' => $days, 'quoteUrl' => $quoteUrl]
                         );
                         $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_LEAD_CAPTURE);
                         $this->get('app.mixpanel')->queuePersonProperties([
                             '$email' => $lead->getEmail()
                         ], true);
-                        $this->get('app.intercom')->queueLead($lead, IntercomService::QUEUE_EVENT_SAVE_QUOTE, [
-                            'quoteUrl' => $quoteUrl,
-                            'phone' => $phone->__toString(),
-                            'price' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-                            'expires' => $sevenDays,
-                        ]);
+                        if ($daysTest == '7days') {
+                            $this->get('app.intercom')->queueLead($lead, IntercomService::QUEUE_EVENT_SAVE_QUOTE, [
+                                'quoteUrl' => $quoteUrl,
+                                'phone' => $phone->__toString(),
+                                'price' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+                                'expires' => $sevenDays,
+                            ]);
+                        }
 
                         $this->addFlash('success', sprintf(
                             "Thanks! Your quote is guaranteed now and we'll send you an email confirmation."
@@ -464,6 +476,7 @@ class PhoneInsuranceController extends BaseController
             'comparision' => $phone->getComparisions(),
             'comparision_max' => $maxComparision,
             'coming_soon' => $phone->getCurrentPhonePrice() ? false : true,
+            'days_test' => $daysTest,
             //'slider_test' => $sliderTest,
             'slider_test' => 'slide-me',
         );
