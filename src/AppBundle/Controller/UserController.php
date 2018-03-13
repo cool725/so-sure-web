@@ -165,6 +165,8 @@ class UserController extends BaseController
                         'success',
                         sprintf('%s was invited', $emailInvitiation->getEmail())
                     );
+                } catch (SelfInviteException $e) {
+                    $this->addFlash('error', 'Sorry, you are not able to invite yourself');
                 } catch (\Exception $e) {
                     $msg = sprintf('Sorry, there was an error inviting %s', $emailInvitiation->getEmail());
                     $this->get('logger')->error($msg, ['exception' => $e]);
