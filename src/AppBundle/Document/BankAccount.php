@@ -25,7 +25,15 @@ class BankAccount
      * @Gedmo\Versioned
      */
     protected $accountName;
-    
+
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="100")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $bankName;
+
     /**
      * @AppAssert\SortCode()
      * @MongoDB\Field(type="string")
@@ -57,6 +65,16 @@ class BankAccount
     public function getAccountName()
     {
         return $this->accountName;
+    }
+
+    public function setBankName($bankName)
+    {
+        $this->bankName = $bankName;
+    }
+
+    public function getBankName()
+    {
+        return $this->bankName;
     }
 
     public function setSortCode($sortCode)

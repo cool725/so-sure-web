@@ -9,7 +9,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\BacsTrait;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
+use AppBundle\Exception\NonDirectDebitBankException;
 
 class PCAService
 {
@@ -38,6 +38,7 @@ class PCAService
     /** @var string */
     protected $environment;
 
+    /** @var \Predis\Client */
     protected $redis;
 
     /**
@@ -61,6 +62,13 @@ class PCAService
         return strtoupper(str_replace(' ', '', trim($postcode)));
     }
 
+    /**
+     * @param string    $sortCode
+     * @param string    $accountNumber
+     * @param User|null $user
+     * @return BankAccount|null
+     * @throws NonDirectDebitBankException
+     */
     public function getBankAccount($sortCode, $accountNumber, User $user = null)
     {
         $sortCode = $this->normalizeSortCode($sortCode);
@@ -82,7 +90,7 @@ class PCAService
             $address->setLine3('so-sure Test Address Line 3');
             $address->setCity('so-sure Test City');
             $address->setPostcode('BX1 1LT');
-            $bankAccount->setAddress($address);
+            $bankAccount->setBankAddress($address);
             $this->cacheBankAccountResults($sortCode, $accountNumber, $bankAccount);
 
             return $bankAccount;
@@ -105,7 +113,7 @@ class PCAService
                     $charge->setDetails(sprintf(
                         '%s %s',
                         $this->displayableSortCode($sortCode),
-                        $this->displayableAccountNumber($number)
+                        $this->displayableAccountNumber($accountNumber)
                     ));
                     $this->dm->persist($charge);
                     $this->dm->flush();
@@ -123,9 +131,10 @@ class PCAService
     }
 
     /**
-     * @param string $postcode
-     * @param string $number   Optional house number
-     * @param User   $user     Optional user
+     * @param string    $postcode
+     * @param string    $number
+     * @param User|null $user
+     * @return Address|null
      */
     public function getAddress($postcode, $number, User $user = null)
     {
@@ -255,9 +264,9 @@ class PCAService
 
     /**
      * Call pca find to get list of addresses that match criteria
-     *
      * @param string $postcode
-     * @param string $number   Optional house number
+     * @param string $number
+     * @return array|null
      */
     public function find($postcode, $number)
     {
@@ -315,6 +324,7 @@ class PCAService
         $url = sprintf("%s?%s", self::RETRIEVE_URL, http_build_query($data));
 
         //Make the request to Postcode Anywhere and parse the XML returned
+        /** @var \SimpleXMLElement $file */
         $file = simplexml_load_file($url);
         try {
             $this->checkError($file);
@@ -337,6 +347,8 @@ class PCAService
      *
      * @param string $sortCode
      * @param string $accountNumber
+     * @return BankAccount
+     * @throws NonDirectDebitBankException
      */
     public function findBankAccount($sortCode, $accountNumber)
     {
@@ -352,23 +364,40 @@ class PCAService
 
         $body = (string) $res->getBody();
 
-        $data = json_decode($body, true);
-        
-        $this->logger->info(sprintf('Bank Account lookup for %s %s %s', $sortCode, $accountNumber, json_encode($data)));
+        $data = json_decode($body, true)[0];
 
+        // @codingStandardsIgnoreStart
+        // {"IsCorrect":"True","IsDirectDebitCapable":"True","StatusInformation":"CautiousOK","CorrectedSortCode":"000099","CorrectedAccountNumber":"12345678","IBAN":"GB27NWBK00009912345678","Bank":"TEST BANK PLC PLC","BankBIC":"NWBKGB21","Branch":"Worcester","BranchBIC":"18R","ContactAddressLine1":"2 High Street","ContactAddressLine2":"Smallville","ContactPostTown":"Worcester","ContactPostcode":"WR2 6NJ","ContactPhone":"01234 456789","ContactFax":"","FasterPaymentsSupported":"False","CHAPSSupported":"True"}
+        // @codingStandardsIgnoreEnd
+        $this->logger->info(sprintf('Bank Account lookup for %s %s %s', $sortCode, $accountNumber, json_encode($data)));
+        if (!$data['IsDirectDebitCapable']) {
+            throw new NonDirectDebitBankException('Account is not dd capable');
+        }
         $bankAccount = new BankAccount();
+        $bankAccount->setBankName($data['Bank']);
+        $bankAccount->setSortCode($data['CorrectedSortCode']);
+        $bankAccount->setAccountNumber($data['CorrectedAccountNumber']);
+        $address = new Address();
+        $address->setLine1($data['ContactAddressLine1']);
+        $address->setLine2($data['ContactAddressLine2']);
+        $address->setCity($data['ContactPostTown']);
+        $address->setPostcode($data['ContactPostcode']);
+        $bankAccount->setBankAddress($address);
+
         return $bankAccount;
     }
 
     /**
      * Transform xml row to address
      *
-     * @param $row
+     * @param mixed $row
      *
-     * return @Address
+     * @return Address
      */
     public function transformAddress($row)
     {
+        // TODO: Move to method, but will need to fix test cases
+        /** @var \SimpleXMLElement $row */
         $address = new Address();
         $line1 = (string) $row->attributes()->Line1;
         $line2 = (string) $row->attributes()->Line2;
@@ -391,6 +420,11 @@ class PCAService
         return $address;
     }
 
+    /**
+     * @param $file
+     * @param null $postcode
+     * @throws \Exception
+     */
     private function checkError($file, $postcode = null)
     {
         //Check for an error, if there is one then throw an exception
