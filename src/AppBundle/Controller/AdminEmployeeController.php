@@ -871,7 +871,7 @@ class AdminEmployeeController extends BaseController
                     );
                     // @codingStandardsIgnoreEnd
                 }
-            } elseif ($request->request->has('swap_payment_plan_form')) {
+            } elseif ($request->request->has('pay_policy_form')) {
                 $payPolicyForm->handleRequest($request);
                 if ($payPolicyForm->isValid()) {
                     $date = new \DateTime();
