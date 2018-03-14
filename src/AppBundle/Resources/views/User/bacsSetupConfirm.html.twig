@@ -23,7 +23,9 @@
                     <li>
                         <small class="text-dark-grey">Bank/Building society address</small><br>
                         <span class="h3">
+                            {% if bacs.bankAddress %}
                             {{ bacs.bankAddress.stringImplode('<br>')|raw }}
+                            {% endif %}
                         </span>
                     </li>
                 </ul>
@@ -32,9 +34,23 @@
                 <ul class="list-unstyled">
                     <li>
                         <small class="text-dark-grey">Reference Number</small><br>
-                        <span class="h3"></span>
+                        <span class="h3">XXX</span>
+                    </li>
+                    <li>
+                        <small class="text-dark-grey">Collection frequency</small><br>
+                        <span class="h3">First collection: XX</span><br>
+                        <small class="text-dark-grey">(Collected on the XX of each month thereafter)</small><br>
+                    </li>
+                    <li>
+                        <small class="text-dark-grey">Payment amount</small><br>
+                        <span class="h3">£</span>
                     </li>
                 </ul>
+                <p>
+                    I confirm that the above details are correct and payment to SO-SURE LIMITED will be first
+                    collected on the XX. You will receive confirmation of this direct debit via email along
+                    with any future notices.
+                </p>
             </div>
         </div>
         <div class="row">

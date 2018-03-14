@@ -42,8 +42,20 @@ class Bacs extends BankAccount
     public function transformBacsPaymentMethod()
     {
         $bacsPaymentMethod = new BacsPaymentMethod();
-        $bacsPaymentMethod->setBankAccount($this);
+        $bacsPaymentMethod->setBankAccount($this->toBankAccount());
 
         return $bacsPaymentMethod;
+    }
+
+    public function toBankAccount()
+    {
+        $bankAccount = new BankAccount();
+        $bankAccount->setBankName($this->getBankName());
+        $bankAccount->setAccountNumber($this->getAccountNumber());
+        $bankAccount->setSortCode($this->getSortCode());
+        $bankAccount->setAccountName($this->getAccountName());
+        $bankAccount->setBankAddress($this->getBankAddress());
+
+        return $bankAccount;
     }
 }
