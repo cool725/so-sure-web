@@ -15,6 +15,7 @@ class Charge
 {
     use CurrencyTrait;
 
+    // sync with $type choices
     const TYPE_ADDRESS = 'address';
     const TYPE_SMS = 'sms';
     const TYPE_GSMA = 'gsma';
@@ -46,7 +47,8 @@ class Charge
     protected $createdDate;
 
     /**
-     * @Assert\Choice({"address", "sms", "gsma", "makemodel", "claimscheck", "claimsdamage"}, strict=true)
+     * @Assert\Choice({"address", "sms", "gsma", "makemodel", "claimscheck", "claimsdamage", "bank-account"},
+     *     strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */

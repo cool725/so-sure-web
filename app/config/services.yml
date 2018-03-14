@@ -909,6 +909,12 @@ services:
         tags:
             - { name: form.type }
 
+    app.form.type.bacs:
+        class: AppBundle\Form\Type\BacsType
+        arguments: ["@app.address", "%form_required%"]
+        tags:
+            - { name: form.type }
+
     app.form.type.cashback:
         class: AppBundle\Form\Type\CashbackType
         arguments: ["@request_stack", "%form_required%"]

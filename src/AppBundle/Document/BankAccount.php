@@ -97,7 +97,7 @@ class BankAccount
         return $this->accountNumber;
     }
 
-    public function setBankAddress(Address $address)
+    public function setBankAddress(Address $address = null)
     {
         $this->bankAddress = $address;
     }
@@ -107,10 +107,10 @@ class BankAccount
         return $this->bankAddress;
     }
 
-    public function isValid()
+    public function isValid($transformed = true)
     {
-        return strlen($this->getAccountName()) > 2 && strlen($this->getAccountNumber()) >= 6 &&
-            strlen($this->getAccountNumber()) <= 10 && strlen($this->getSortCode()) == 6;
+        return $this->validateSortCode($this->getSortCode())
+            && $this->validateAccountNumber($this->getAccountNumber(), $transformed);
     }
 
     public function getDisplayableSortCode()

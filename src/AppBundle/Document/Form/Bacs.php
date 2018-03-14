@@ -3,81 +3,21 @@
 namespace AppBundle\Document\Form;
 
 use AppBundle\Document\BankAccount;
+use AppBundle\Document\Address;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BacsTrait;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 
-class Bacs
+class Bacs extends BankAccount
 {
     use BacsTrait;
 
     /**
-     * @AppAssert\AlphanumericSpaceDot()
-     * @Assert\Length(min="1", max="100")
-     */
-    protected $accountName;
-    
-    /**
-     * @AppAssert\SortCode()
-     * @Assert\Length(min="6", max="6")
-     */
-    protected $sortCode;
-
-    /**
-     * @AppAssert\BankAccountNumber()
-     * @Assert\Length(min="8", max="8")
-     */
-    protected $accountNumber;
-
-    /**
      * @Assert\Type("bool")
+     * @Assert\IsTrue
      */
     protected $soleSignature;
-
-    /**
-     */
-    protected $bankAddress;
-
-    public function setAccountName($accountName)
-    {
-        $this->accountName = $accountName;
-    }
-
-    public function getAccountName()
-    {
-        return $this->accountName;
-    }
-
-    public function setSortCode($sortCode)
-    {
-        $this->sortCode = $this->normalizeSortCode($sortCode);
-    }
-
-    public function getSortCode()
-    {
-        return $this->sortCode;
-    }
-
-    public function setAccountNumber($accountNumber)
-    {
-        $this->accountNumber = $this->normalizeAccountNumber($accountNumber);
-    }
-
-    public function getAccountNumber()
-    {
-        return $this->accountNumber;
-    }
-
-    public function setBankAddress(Address $address)
-    {
-        $this->bankAddress = $address;
-    }
-
-    public function getBankAddress()
-    {
-        return $this->bankAddress;
-    }
 
     public function setSoleSignature($soleSignature)
     {
@@ -89,31 +29,21 @@ class Bacs
         return $this->soleSignature;
     }
 
-    public function transformBankAccount()
+    public function setBankAccount(BankAccount $bankAccount = null)
     {
-        $bankAccount = new BankAccount();
-        $bankAccount->setAccountName($this->getAccountName());
-        $bankAccount->setAccountNumber($this->getAccountNumber());
-        $bankAccount->setSortCode($this->getSortCode());
-
-        return $bankAccount;
+        if ($bankAccount) {
+            $this->setBankAddress($bankAccount->getBankAddress());
+            $this->setSortCode($bankAccount->getSortCode());
+            $this->setAccountNumber($bankAccount->getAccountNumber());
+            $this->setBankName($bankAccount->getBankName());
+        }
     }
 
     public function transformBacsPaymentMethod()
     {
         $bacsPaymentMethod = new BacsPaymentMethod();
-        $bacsPaymentMethod->setBankAccount($this->transformBankAccount());
+        $bacsPaymentMethod->setBankAccount($this);
 
         return $bacsPaymentMethod;
-    }
-
-    public function isValid()
-    {
-        return $this->transformBankAccount()->isValid();
-    }
-    
-    public function getDisplayableAccountNumber()
-    {
-        return $this->transformBankAccount()->getDisplayableAccountNumber();
     }
 }

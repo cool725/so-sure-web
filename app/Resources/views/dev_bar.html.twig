@@ -7,6 +7,7 @@
                     <li><a href="{{ path('ops_pages') }}"><i class="fa fa-wrench fa-lg"></i></a></li>
                     <li><a href="{{ path('quote_make_model_memory', {'make':'Apple','model':'iPhone 7','memory':128}) }}"><i class="fa fa-mobile fa-lg" title="Quick Quote"></i></a></li>
                     <li><a href="#" id="dev-reload"><i class="fa fa-refresh fa-lg" aria-hidden="true"></i></a></li>
+                    <li><a href="#" id="dev-modal" data-toggle="modal" data-target="#devModal"><i class="fa fa-info fa-lg" aria-hidden="true"></i></a></li>
                     {% if distraction_free is defined and distraction_free == 1 and app.user is not null and app.user %}
                         {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
                             <li><a href="{{ path('homepage', {'_impersonate': '_exit'}) }}">Exit <strong>{{ app.user.email }}</strong></a></li>
@@ -19,4 +20,47 @@
             </div>
         </div>
     </nav>
+
+    <div class="modal fade" id="devModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document" style="width: 60%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Dev Modal</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            Postcode:
+                        </div>
+                        <div class="col-sm-6">
+                            <ul>
+                                <li>BX1 1LT</li>
+                            </ul>
+                        </div>
+                        <div class="col-sm-12">
+                            Card:
+                        </div>
+                        <div class="col-sm-6">
+                            <ul>
+                                <li>4921810000005462 12/20 441</li>
+                            </ul>
+                        </div>
+                        <div class="col-sm-12">
+                            Bacs:
+                        </div>
+                        <div class="col-sm-6">
+                            <ul>
+                                <li>Ok: 000099 87654321</li>
+                                <li>Adjusted: 000099 876543</li>
+                                <li>No DD: 000099 00000000</li>
+                                <li>Fail: 000099 99999999</li>
+                                <li>PCA: 000099 12345678</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endif %}

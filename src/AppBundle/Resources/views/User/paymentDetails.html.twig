@@ -15,7 +15,9 @@
     {% include 'AppBundle:User:userNav.html.twig' %}
 
     {% set active_tab = 'card' %}
-    {% if bacs and bacs.isValid %}
+    {% if form_errors(bacs_form.accountName) or form_errors(bacs_form.sortCode) or form_errors(bacs_form.accountNumber) or form_errors(bacs_form.soleSignature) %}
+        {% set active_tab = 'bacs-setup' %}
+    {% elseif bacs and bacs.isValid %}
         {% set active_tab = 'bacs-setup-confirm' %}
     {% elseif user.paymentMethod.type == 'bacs' %}
         {% set active_tab = 'bacs' %}
@@ -28,7 +30,7 @@
         <div id="tab-bacs" class="tab-pane fade in {% if active_tab == 'bacs' %}active{% endif %}">
             {% include 'AppBundle:User:bacsDetails.html.twig' %}
         </div>
-        <div id="tab-bacs-setup" class="tab-pane fade in">
+        <div id="tab-bacs-setup" class="tab-pane fade in {% if active_tab == 'bacs-setup' %}active{% endif %}">
             {% include 'AppBundle:User:bacsSetupDetails.html.twig' %}
         </div>
         <div id="tab-bacs-setup-confirm" class="tab-pane fade in {% if active_tab == 'bacs-setup-confirm' %}active{% endif %}">

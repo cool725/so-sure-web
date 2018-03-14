@@ -48,9 +48,17 @@ class PCAServiceTest extends WebTestCase
     public function testGetBankAccountCaching()
     {
         self::$redis->flushdb();
-        $this->assertFalse(self::$redis->exists(sprintf(PCAService::REDIS_BANK_KEY_FORMAT, '000099', '12345678')) == 1);
-        $address = self::$pca->getBankAccount('000099', '12345678');
-        $this->assertTrue(self::$redis->exists(sprintf(PCAService::REDIS_BANK_KEY_FORMAT, '000099', '12345678')) == 1);
+        $this->assertFalse(self::$redis->exists(sprintf(
+            PCAService::REDIS_BANK_KEY_FORMAT,
+            '000099',
+            '87654321'
+        )) == 1);
+        $address = self::$pca->getBankAccount('000099', '87654321');
+        $this->assertTrue(self::$redis->exists(sprintf(
+            PCAService::REDIS_BANK_KEY_FORMAT,
+            '000099',
+            '87654321'
+        )) == 1);
     }
 
     public function testNormalize()

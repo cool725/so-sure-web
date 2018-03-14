@@ -9,7 +9,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\BacsTrait;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use GuzzleHttp\Client;
-use AppBundle\Exception\NonDirectDebitBankException;
+use AppBundle\Exception\DirectDebitBankException;
 
 class PCAService
 {
@@ -25,6 +25,13 @@ class PCAService
     // @codingStandardsIgnoreStart
     const BANK_ACCOUNT_URL = "https://services.postcodeanywhere.co.uk/BankAccountValidation/Interactive/Validate/v2.00/json.ws";
     // @codingStandardsIgnoreEnd
+    const TEST_SORT_CODE = "000099";
+    const TEST_ACCOUNT_NUMBER_PCA = "12345678";
+    const TEST_ACCOUNT_NUMBER_OK = "87654321";
+    const TEST_ACCOUNT_NUMBER_ADJUSTED = "876543";
+    const TEST_ACCOUNT_NUMBER_NO_DD = "00000000";
+    const TEST_ACCOUNT_NUMBER_INVALID_SORT_CODE = "99999998";
+    const TEST_ACCOUNT_NUMBER_INVALID_ACCOUNT_NUMBER = "99999999";
 
     /** @var LoggerInterface */
     protected $logger;
@@ -67,7 +74,7 @@ class PCAService
      * @param string    $accountNumber
      * @param User|null $user
      * @return BankAccount|null
-     * @throws NonDirectDebitBankException
+     * @throws DirectDebitBankException
      */
     public function getBankAccount($sortCode, $accountNumber, User $user = null)
     {
@@ -80,10 +87,17 @@ class PCAService
         }
 
         // Use 00-00-99 / 87654321 for testing. as 00-00-99/12345678 is used for testing for pca-predict, should be ok
-        if ($sortCode == "000099" && $accountNumber == "87654321") {
+        if ($sortCode == self::TEST_SORT_CODE && in_array($accountNumber, [
+            self::TEST_ACCOUNT_NUMBER_OK,
+            self::TEST_ACCOUNT_NUMBER_ADJUSTED
+        ])) {
             $bankAccount = new BankAccount();
+            $bankAccount->setBankName('foo bank');
             $bankAccount->setSortCode($sortCode);
             $bankAccount->setAccountNumber($accountNumber);
+            if ($accountNumber == self::TEST_ACCOUNT_NUMBER_ADJUSTED) {
+                $bankAccount->setAccountNumber(sprintf("%s00", $accountNumber));
+            }
             $address = new Address();
             $address->setLine1('so-sure Test Address Line 1');
             $address->setLine2('so-sure Test Address Line 2');
@@ -94,10 +108,16 @@ class PCAService
             $this->cacheBankAccountResults($sortCode, $accountNumber, $bankAccount);
 
             return $bankAccount;
+        } elseif ($sortCode == self::TEST_SORT_CODE && $accountNumber == self::TEST_ACCOUNT_NUMBER_INVALID_SORT_CODE) {
+            throw new DirectDebitBankException('Bad sort code', DirectDebitBankException::ERROR_SORT_CODE);
+        } elseif ($sortCode == self::TEST_SORT_CODE && $accountNumber == self::TEST_ACCOUNT_NUMBER_INVALID_ACCOUNT_NUMBER) {
+            throw new DirectDebitBankException('No direct debit', DirectDebitBankException::ERROR_ACCOUNT_NUMBER);
+        } elseif ($sortCode == self::TEST_SORT_CODE && $accountNumber == self::TEST_ACCOUNT_NUMBER_NO_DD) {
+            throw new DirectDebitBankException('No direct debit', DirectDebitBankException::ERROR_NON_DIRECT_DEBIT);
         } elseif ($this->environment != 'prod') {
             // 00-00-99/12345678 is a free search via pca, so can used for non production environments
-            $sortCode = "000099";
-            $accountNumber = "12345678";
+            $sortCode = self::TEST_SORT_CODE;
+            $accountNumber = self::TEST_ACCOUNT_NUMBER_PCA;
         }
 
         $bankAccount = $this->findBankAccount($sortCode, $accountNumber);
@@ -105,7 +125,7 @@ class PCAService
             $this->cacheBankAccountResults($sortCode, $accountNumber, $bankAccount);
 
             // ignore free check
-            if (!($sortCode == "000099" && $accountNumber == "12345678")) {
+            if (!($sortCode == self::TEST_SORT_CODE && $accountNumber == self::TEST_ACCOUNT_NUMBER_PCA)) {
                 $charge = new Charge();
                 try {
                     $charge->setType(Charge::TYPE_BANK_ACCOUNT);
@@ -205,16 +225,6 @@ class PCAService
     {
         $redisKey = sprintf(self::REDIS_BANK_KEY_FORMAT, $sortCode, $accountNumber);
         $this->redis->setex($redisKey, self::CACHE_TIME, serialize($bankAccount));
-    }
-
-    public function validateSortCode($sortCode)
-    {
-        return true;
-    }
-
-    public function validateAccountNumber($accountNumber)
-    {
-        return true;
     }
 
     /**
@@ -348,7 +358,7 @@ class PCAService
      * @param string $sortCode
      * @param string $accountNumber
      * @return BankAccount
-     * @throws NonDirectDebitBankException
+     * @throws DirectDebitBankException
      */
     public function findBankAccount($sortCode, $accountNumber)
     {
@@ -370,8 +380,12 @@ class PCAService
         // {"IsCorrect":"True","IsDirectDebitCapable":"True","StatusInformation":"CautiousOK","CorrectedSortCode":"000099","CorrectedAccountNumber":"12345678","IBAN":"GB27NWBK00009912345678","Bank":"TEST BANK PLC PLC","BankBIC":"NWBKGB21","Branch":"Worcester","BranchBIC":"18R","ContactAddressLine1":"2 High Street","ContactAddressLine2":"Smallville","ContactPostTown":"Worcester","ContactPostcode":"WR2 6NJ","ContactPhone":"01234 456789","ContactFax":"","FasterPaymentsSupported":"False","CHAPSSupported":"True"}
         // @codingStandardsIgnoreEnd
         $this->logger->info(sprintf('Bank Account lookup for %s %s %s', $sortCode, $accountNumber, json_encode($data)));
-        if (!$data['IsDirectDebitCapable']) {
-            throw new NonDirectDebitBankException('Account is not dd capable');
+        if ($data['StatusInformation'] == "UnknownSortCode") {
+            throw new DirectDebitBankException('Unknown sort code', DirectDebitBankException::ERROR_SORT_CODE);
+        } elseif ($data['StatusInformation'] == "InvalidAccountNumber") {
+            throw new DirectDebitBankException('Invalid account number', DirectDebitBankException::ERROR_ACCOUNT_NUMBER);
+        } elseif (!$data['IsDirectDebitCapable']) {
+            throw new DirectDebitBankException('Account is not dd capable', DirectDebitBankException::ERROR_NON_DIRECT_DEBIT);
         }
         $bankAccount = new BankAccount();
         $bankAccount->setBankName($data['Bank']);

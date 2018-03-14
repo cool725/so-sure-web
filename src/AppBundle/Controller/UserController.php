@@ -2,9 +2,11 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Service\PCAService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -72,6 +74,7 @@ use AppBundle\Exception\InvalidImeiException;
 use AppBundle\Exception\ImeiBlacklistedException;
 use AppBundle\Exception\ImeiPhoneMismatchException;
 use AppBundle\Exception\InvalidEmailException;
+use AppBundle\Exception\DirectDebitBankException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -1162,14 +1165,17 @@ class UserController extends BaseController
         );
         $billing = new BillingDay();
         $billing->setPolicy($policy);
+        /** @var FormInterface $billingForm */
         $billingForm = $this->get('form.factory')
             ->createNamedBuilder('billing_form', BillingDayType::class, $billing)
             ->getForm();
         $bacs = new Bacs();
+        /** @var FormInterface $bacsForm */
         $bacsForm = $this->get('form.factory')
             ->createNamedBuilder('bacs_form', BacsType::class, $bacs)
             ->getForm();
         $bacsConfirm = new Bacs();
+        /** @var FormInterface $bacsConfirmForm */
         $bacsConfirmForm = $this->get('form.factory')
             ->createNamedBuilder('bacs_confirm_form', BacsConfirmType::class, $bacsConfirm)
             ->getForm();
@@ -1195,10 +1201,14 @@ class UserController extends BaseController
             } elseif ($request->request->has('bacs_form')) {
                 $bacsForm->handleRequest($request);
                 if ($bacsForm->isValid()) {
-                    $bacsConfirm = clone $bacs;
-                    $bacsConfirmForm = $this->get('form.factory')
-                        ->createNamedBuilder('bacs_confirm_form', BacsConfirmType::class, $bacsConfirm)
-                        ->getForm();
+                    if (!$bacs->isValid()) {
+                        $this->addFlash('error', 'Sorry, but this bank account is not valid');
+                    } else {
+                        $bacsConfirm = clone $bacs;
+                        $bacsConfirmForm = $this->get('form.factory')
+                            ->createNamedBuilder('bacs_confirm_form', BacsConfirmType::class, $bacsConfirm)
+                            ->getForm();
+                    }
                 }
             } elseif ($request->request->has('bacs_confirm_form')) {
                 $bacsConfirmForm->handleRequest($request);
