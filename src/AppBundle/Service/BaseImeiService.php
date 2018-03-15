@@ -189,6 +189,7 @@ class BaseImeiService
             }
             $imeiLine++;
         }
+        $serialNumber = null;
         $serialLine = $lines[$imeiLine - 3];
         $serialLineData = explode(' ', $serialLine);
         foreach ($serialLineData as $serialNumber) {
@@ -281,7 +282,7 @@ class BaseImeiService
         ];
     }
 
-    public function ocrRaw($filename, $extension = null, $engine = OEM_TESSERACT_CUBE_COMBINED)
+    public function ocrRaw($filename, $extension = null, $engine = self::OEM_TESSERACT_CUBE_COMBINED)
     {
         $imagine = new \Imagine\Gd\Imagine();
         $image = $imagine->open($filename);

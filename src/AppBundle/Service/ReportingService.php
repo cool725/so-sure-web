@@ -781,6 +781,8 @@ class ReportingService
     
     private function getQuarterlyPLDates(\DateTime $date)
     {
+        $start = null;
+        $end = null;
         // Quarters are defined Sept-Nov, Dec-Feb, Mar-May, Jun-Aug
         $date = clone $date;
         $month = $date->format('n');

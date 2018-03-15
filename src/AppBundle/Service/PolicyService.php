@@ -798,6 +798,7 @@ class PolicyService
             $date->sub(new \DateInterval(sprintf('P%dD', $date->format('d') - 28)));
         }
 
+        $paymentItem = null;
         if (!$numPayments) {
             if ($policy->getPremiumInstallments()) {
                 $numPayments = $policy->getPremiumInstallments();

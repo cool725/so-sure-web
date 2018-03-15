@@ -422,6 +422,7 @@ class PhoneInsuranceController extends BaseController
         $maxConnections = $phone->getCurrentPhonePrice() ? $phone->getCurrentPhonePrice()->getMaxConnections() : 8;
         $annualPremium = $phone->getCurrentPhonePrice() ? $phone->getCurrentPhonePrice()->getYearlyPremiumPrice() : 100;
         $maxComparision = $phone->getMaxComparision() ? $phone->getMaxComparision() : 80;
+        $expIntercom = null;
 
         // only need to run this once - if its a post, then ignore
         if ('GET' === $request->getMethod() && $phone->getCurrentPhonePrice()) {

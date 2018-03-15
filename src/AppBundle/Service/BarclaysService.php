@@ -66,6 +66,7 @@ class BarclaysService
                         throw new \Exception('Unknown currency');
                     }
 
+                    $amount = 0;
                     if ($line['Transaction type'] == "Sale") {
                         $amount = $line['Transaction amount'];
                         $payments += $line['Transaction amount'];
@@ -102,6 +103,7 @@ class BarclaysService
         $paymentRepo = $this->dm->getRepository(JudoPayment::class);
         foreach ($lines as $line) {
             $transactionDate = new \DateTime($line['Transaction date']);
+            $amount = 0;
             if ($line['Transaction type'] == "Sale") {
                 $amount = $line['Transaction amount'];
             } elseif ($line['Transaction type'] == "Sales Refund") {

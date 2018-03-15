@@ -105,6 +105,7 @@ class SanctionsService
         $sanctionsRepo = $this->dm->getRepository(Sanctions::class);
         $this->loadSanctions();
 
+        $metaphone = null;
         $matches = [];
         $names = explode(' ', $company->getName());
         foreach ($names as $name) {

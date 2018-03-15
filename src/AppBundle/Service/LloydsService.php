@@ -103,6 +103,7 @@ class LloydsService
                         $processedDate = $processedDate->sub(new \DateInterval('P1Y'));
                     }
 
+                    $amount = 0;
                     if (is_numeric($line['Credit Amount'])) {
                         $amount = $line['Credit Amount'];
                     } elseif (is_numeric($line['Debit Amount'])) {

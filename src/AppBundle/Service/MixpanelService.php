@@ -359,6 +359,7 @@ class MixpanelService
                 }
                 $data = unserialize($queueItem);
 
+                $action = null;
                 if (isset($data['action'])) {
                     $action = $data['action'];
                 }

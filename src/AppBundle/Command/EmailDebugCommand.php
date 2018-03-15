@@ -178,6 +178,7 @@ class EmailDebugCommand extends BaseCommand
             $dm = $this->getManager();
             $repo = $dm->getRepository(Policy::class);
             $policies = $repo->findBy(['status' => Policy::STATUS_ACTIVE]);
+            $policy = null;
             foreach ($policies as $policy) {
                 break;
             }
@@ -191,6 +192,7 @@ class EmailDebugCommand extends BaseCommand
             $dm = $this->getManager();
             $repo = $dm->getRepository(Policy::class);
             $policies = $repo->findBy(['status' => Policy::STATUS_ACTIVE]);
+            $policy = null;
             foreach ($policies as $policy) {
                 break;
             }

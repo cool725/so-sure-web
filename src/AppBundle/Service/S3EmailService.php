@@ -113,6 +113,8 @@ abstract class S3EmailService
         foreach ($keys as $key) {
             $this->clearWarnings();
             $this->clearErrors();
+            $excelFile = null;
+            $emailFile = null;
             $lines[] = sprintf('Processing %s/%s', $this->path, $key);
             $processed = false;
             try {

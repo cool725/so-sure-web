@@ -46,6 +46,7 @@ class ApiKeyController extends BaseController
 
             $dm = $this->getManager();
             $repo = $dm->getRepository(Phone::class);
+            $query = null;
             if ($make && $model) {
                 $query = ['make' => $make, 'model' => $model, 'active' => true];
             } elseif ($make) {

@@ -93,6 +93,17 @@ class OpsController extends BaseController
         if ($this->isProduction()) {
             throw $this->createAccessDeniedException('Only for dev use');
         }
+        $validPolicy = null;
+        $validMultiplePolicy = null;
+        $validRenwalPolicyMonthlyNoPot = null;
+        $validRenwalPolicyYearlyNoPot = null;
+        $validRenwalPolicyYearlyOnlyNoPot = null;
+        $validRenwalPolicyYearlyOnlyWithPot = null;
+        $validRemainderPolicy = null;
+        $policyCancelledAndPaymentOwed = null;
+        $claimedPolicy = null;
+        $validRenwalPolicyMonthlyWithPot = null;
+        $validRenwalPolicyYearlyWithPot = null;
 
         $dm = $this->getManager();
         $scodeRepo = $dm->getRepository(SCode::class);
