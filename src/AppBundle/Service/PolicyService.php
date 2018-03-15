@@ -910,6 +910,13 @@ class PolicyService
 
         $this->cancelledPolicyEmail($policy);
         $this->cancelledPolicySms($policy);
+        if (count($policy->getConnections()) > 0 && $reason == Policy::CANCELLED_UPGRADE) {
+            $this->logger->warning(sprintf(
+                'Policy %s/%s was cancelled for upgrade. Remember to add connnections to new policy',
+                $policy->getPolicyNumber(),
+                $policy->getId()
+            ));
+        }
 
         $this->dispatchEvent(PolicyEvent::EVENT_CANCELLED, new PolicyEvent($policy));
     }
