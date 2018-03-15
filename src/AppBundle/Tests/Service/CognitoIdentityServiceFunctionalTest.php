@@ -14,7 +14,6 @@ class CognitoIdentityServiceFunctionalTest extends WebTestCase
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
     protected static $cognito;
-    protected static $userManager;
     protected static $userProvider;
 
     public static function setUpBeforeClass()

@@ -15,7 +15,6 @@ class SanctionsServiceTest extends WebTestCase
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
     protected static $sanctions;
-    protected static $dm;
 
     public static function setUpBeforeClass()
     {

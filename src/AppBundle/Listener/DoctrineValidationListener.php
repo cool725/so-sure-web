@@ -5,6 +5,7 @@ namespace AppBundle\Listener;
 use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 use AppBundle\Event\ObjectEvent;
+use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class DoctrineValidationListener
 {

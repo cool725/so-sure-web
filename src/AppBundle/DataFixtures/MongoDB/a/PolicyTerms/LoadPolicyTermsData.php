@@ -21,8 +21,6 @@ use Faker;
 // @codingStandardsIgnoreFile
 class LoadPolicyTermsData implements FixtureInterface, ContainerAwareInterface
 {
-    use \AppBundle\Tests\UserClassTrait;
-
      /**
      * @var ContainerInterface
      */

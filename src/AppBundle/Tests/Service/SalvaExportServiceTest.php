@@ -27,13 +27,9 @@ class SalvaExportServiceTest extends WebTestCase
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
     protected static $salva;
-    protected static $dm;
-    protected static $policyService;
-    protected static $userManager;
     protected static $xmlFile;
     protected static $policyRepo;
     protected static $dispatcher;
-    protected static $phone;
     protected static $judopay;
 
     public static function setUpBeforeClass()

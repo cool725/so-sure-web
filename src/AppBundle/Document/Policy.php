@@ -1790,8 +1790,6 @@ abstract class Policy
         return $this->visitedWelcomePage;
     }
 
-    abstract public function validatePremium($adjust, \DateTime $date);
-
     public function getPremiumInstallmentCount()
     {
         if (!$this->isPolicy()) {
@@ -3067,7 +3065,7 @@ abstract class Policy
         }
 
         foreach ($this->getPreviousPolicy()->getStandardConnections() as $connection) {
-            $renew = count($this->getRenewalConnections()) < $this->getMaxConnections($date);
+            $renew = count($this->getRenewalConnections()) < $this->getMaxConnections();
             if ($connection->getLinkedPolicy()->isActive(true) &&
                 $connection->getLinkedPolicy()->isConnected($this->getPreviousPolicy())) {
                 $this->addRenewalConnection($connection->createRenewal($renew));
@@ -3161,13 +3159,6 @@ abstract class Policy
 
         $this->updatePotValue();
     }
-
-    abstract public function setPolicyDetailsForPendingRenewal(
-        Policy $policy,
-        \DateTime $startDate,
-        PolicyTerms $terms
-    );
-    abstract public function setPolicyDetailsForRepurchase(Policy $policy, \DateTime $startDate);
 
     public function createPendingRenewal(PolicyTerms $terms, \DateTime $date = null)
     {
@@ -3449,6 +3440,17 @@ abstract class Policy
     abstract public function getMaxPot();
     abstract public function getConnectionValue();
     abstract public function getPolicyNumberPrefix();
+    abstract public function getAllowedConnectionValue(\DateTime $date = null);
+    abstract public function getAllowedPromoConnectionValue(\DateTime $date = null);
+    abstract public function getTotalConnectionValue(\DateTime $date = null);
+    abstract public function isSameInsurable(Policy $policy);
+    abstract public function validatePremium($adjust, \DateTime $date);
+    abstract public function setPolicyDetailsForPendingRenewal(
+        Policy $policy,
+        \DateTime $startDate,
+        PolicyTerms $terms
+    );
+    abstract public function setPolicyDetailsForRepurchase(Policy $policy, \DateTime $startDate);
 
     public function isPotCompletelyFilled()
     {
@@ -4224,8 +4226,6 @@ abstract class Policy
 
         return false;
     }
-
-    abstract public function isSameInsurable(Policy $policy);
 
     protected function toApiArray()
     {

@@ -18,6 +18,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Payment\JudoPayment;
+use AppBundle\Document\Payment\SoSurePayment;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Service\SalvaExportService;
 use AppBundle\Listener\RefundListener;
@@ -34,14 +35,10 @@ class RefundListenerTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
-    protected static $dm;
     protected static $userRepo;
-    protected static $userManager;
     protected static $judopayService;
-    protected static $policyService;
     protected static $redis;
     protected static $logger;
-    protected static $phone;
 
     public static function setUpBeforeClass()
     {

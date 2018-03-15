@@ -16,7 +16,6 @@ class BarclaysServiceTest extends WebTestCase
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
     protected static $barclays;
-    protected static $dm;
     protected static $rootDir;
 
     public static function setUpBeforeClass()

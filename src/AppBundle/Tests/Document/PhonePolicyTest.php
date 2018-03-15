@@ -36,11 +36,7 @@ class PhonePolicyTest extends WebTestCase
     use UserClassTrait;
 
     protected static $container;
-    protected static $dm;
-    protected static $phone;
     protected static $invitationService;
-    protected static $userManager;
-    protected static $policyService;
 
     public static function setUpBeforeClass()
     {

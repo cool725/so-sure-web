@@ -413,11 +413,11 @@ class DaviesClaim extends DaviesExcel
 
             if (in_array($columns, [self::COLUMN_COUNT_V6, self::COLUMN_COUNT_V7, self::COLUMN_COUNT_V8])) {
                 $this->phoneReplacementCost = $this->nullIfBlank($data[++$i]);
-                $this->phoneReplacementCostReserved = $this->nullIfBlank($data[++$i]);
+                $this->phoneReplacementCostReserve = $this->nullIfBlank($data[++$i]);
                 $this->accessories = $this->nullIfBlank($data[++$i]);
-                $this->accessoriesReserved = $this->nullIfBlank($data[++$i]);
+                $this->accessoriesReserve = $this->nullIfBlank($data[++$i]);
                 $this->unauthorizedCalls = $this->nullIfBlank($data[++$i]);
-                $this->unauthorizedCallsReserved = $this->nullIfBlank($data[++$i]);
+                $this->unauthorizedCallsReserve = $this->nullIfBlank($data[++$i]);
                 $this->reciperoFee = $this->nullIfBlank($data[++$i]);
                 $this->transactionFees = $this->nullIfBlank($data[++$i]);
                 $this->feesReserve = $this->nullIfBlank($data[++$i]);

@@ -38,11 +38,8 @@ class IntercomListenerTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
-    protected static $dm;
     protected static $userRepo;
-    protected static $userManager;
     protected static $intercomService;
-    protected static $policyService;
     protected static $redis;
 
     public static function setUpBeforeClass()

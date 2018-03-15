@@ -20,8 +20,6 @@ class AdminEmployeeControllerTest extends BaseControllerTest
     use \AppBundle\Tests\PhingKernelClassTrait;
     use CurrencyTrait;
 
-    protected static $dm;
-
     public function tearDown()
     {
     }

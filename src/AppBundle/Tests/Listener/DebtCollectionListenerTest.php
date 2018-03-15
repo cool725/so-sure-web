@@ -31,14 +31,10 @@ class DebtCollectionListenerTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
-    protected static $dm;
     protected static $userRepo;
-    protected static $userManager;
     protected static $judopayService;
-    protected static $policyService;
     protected static $redis;
     protected static $logger;
-    protected static $phone;
 
     public static function setUpBeforeClass()
     {

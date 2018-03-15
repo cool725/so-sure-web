@@ -16,7 +16,6 @@ class LloydsServiceTest extends WebTestCase
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
     protected static $lloyds;
-    protected static $dm;
     protected static $rootDir;
 
     public static function setUpBeforeClass()

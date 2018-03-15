@@ -16,7 +16,6 @@ class ReceperioServicePaidTest extends WebTestCase
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
     protected static $imei;
-    protected static $dm;
     protected static $phoneRepo;
 
     public static function setUpBeforeClass()

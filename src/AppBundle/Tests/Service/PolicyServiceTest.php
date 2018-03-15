@@ -42,12 +42,8 @@ class PolicyServiceTest extends WebTestCase
     use \AppBundle\Document\DateTrait;
 
     protected static $container;
-    protected static $policyService;
-    protected static $dm;
     protected static $policyRepo;
-    protected static $userManager;
     protected static $judopay;
-    protected static $phone;
 
     public static function setUpBeforeClass()
     {

@@ -26,9 +26,7 @@ class DaviesServiceTest extends WebTestCase
     use DateTrait;
 
     protected static $container;
-    protected static $dm;
     protected static $daviesService;
-    protected static $phone;
     protected static $phoneA;
     protected static $phoneB;
 

@@ -22,6 +22,8 @@ class FOSUBUserProvider extends BaseClass
 
     protected $authService;
 
+    protected $facebook;
+
     public function setRequestStack(RequestStack $requestStack)
     {
         $this->requestStack = $requestStack;

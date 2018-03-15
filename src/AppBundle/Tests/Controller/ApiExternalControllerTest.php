@@ -16,7 +16,6 @@ use AppBundle\Service\RateLimitService;
  */
 class ApiExternalControllerTest extends BaseControllerTest
 {
-    protected static $phone;
     public static function setUpBeforeClass()
     {
         parent::setUpBeforeClass();

@@ -64,13 +64,6 @@ class PhoneNumberValidatorTest extends \PHPUnit\Framework\TestCase
         $validator->validate('+12(34)5-678 90123.4567890', self::$constraint);
     }
     
-    /**
-     * Configure a Validator.
-     *
-     * @param string $expectedMessage The expected message on a validation violation, if any.
-     *
-     * @return AcmeBundle\Validator\Constraints\MobileValidator
-     */
     public function configureValidator($expectedMessage = null)
     {
         // mock the violation builder

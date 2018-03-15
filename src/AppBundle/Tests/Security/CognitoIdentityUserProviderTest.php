@@ -15,7 +15,6 @@ class CognitoIdentityUserProviderTest extends WebTestCase
     protected static $container;
     protected static $cognito;
     protected static $userProvider;
-    protected static $userManager;
 
     public static function setUpBeforeClass()
     {

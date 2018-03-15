@@ -64,13 +64,6 @@ class MobileValidatorTest extends \PHPUnit\Framework\TestCase
         $validator->validate('07775740400', self::$constraint);
     }
 
-    /**
-     * Configure a MobileValidator.
-     *
-     * @param string $expectedMessage The expected message on a validation violation, if any.
-     *
-     * @return AcmeBundle\Validator\Constraints\MobileValidator
-     */
     public function configureValidator($expectedMessage = null)
     {
         // mock the violation builder

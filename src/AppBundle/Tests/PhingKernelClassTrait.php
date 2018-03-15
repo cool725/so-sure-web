@@ -10,7 +10,7 @@ trait PhingKernelClassTrait
      */
     public static function getKernelClass()
     {
-        $count = count(explode("\\", PhingTestKernel::class));
+        $count = count(explode("\\", PhingKernelClassTrait::class));
         $prev = str_repeat("/..", $count);
         $INCLUDE = sprintf('%s%s/app/AppKernel.php', __DIR__, $prev);
         require_once $INCLUDE;

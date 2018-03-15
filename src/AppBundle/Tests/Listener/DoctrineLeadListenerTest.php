@@ -19,8 +19,6 @@ class DoctrineLeadListenerTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
-    protected static $dm;
-    protected static $userManager;
     protected static $testUser;
 
     public static function setUpBeforeClass()

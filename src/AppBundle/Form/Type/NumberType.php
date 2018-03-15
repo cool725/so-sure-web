@@ -8,10 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 class NumberType extends AbstractType
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
             'compound' => false,

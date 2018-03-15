@@ -46,11 +46,6 @@ class Income
      */
     protected $netAfterHousing;
 
-    public function getType()
-    {
-        return $this->type;
-    }
-
     public function getMSOA()
     {
         return $this->msoa;

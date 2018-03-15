@@ -16,9 +16,9 @@ use AppBundle\Document\Policy;
  */
 class InvitationTest extends WebTestCase
 {
+    use \AppBundle\Tests\UserClassTrait;
     use \AppBundle\Tests\PhingKernelClassTrait;
     protected static $container;
-    protected static $dm;
 
     public static function setUpBeforeClass()
     {

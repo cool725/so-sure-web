@@ -8,12 +8,11 @@ use AppBundle\Document\Claim;
 /**
  * @group functional-nonet
  */
-class MonitorServiceIpTest extends WebTestCase
+class MonitorServiceTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
-    protected static $dm;
     protected static $monitor;
 
     public static function setUpBeforeClass()

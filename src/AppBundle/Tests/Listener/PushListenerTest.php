@@ -36,11 +36,8 @@ class PushListenerTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
-    protected static $dm;
     protected static $userRepo;
-    protected static $userManager;
     protected static $pushService;
-    protected static $policyService;
 
     public static function setUpBeforeClass()
     {

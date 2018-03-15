@@ -19,11 +19,8 @@ class ClaimsServiceTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
-    protected static $policyService;
-    protected static $dm;
     protected static $policyRepo;
     protected static $lostPhoneRepo;
-    protected static $userManager;
     protected static $claimsService;
     protected static $invitationService;
 
