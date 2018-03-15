@@ -21,10 +21,7 @@ class DoctrinePolicyListenerTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
-    protected static $dm;
-    protected static $userManager;
     protected static $testUser;
-    protected static $policyService;
 
     public static function setUpBeforeClass()
     {

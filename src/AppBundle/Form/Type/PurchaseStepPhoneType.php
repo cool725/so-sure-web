@@ -34,6 +34,8 @@ class PurchaseStepPhoneType extends AbstractType
 
     private $imeiService;
 
+    protected $logger;
+
     /**
      * @param RequestStack $requestStack
      * @param boolean      $required

@@ -214,7 +214,7 @@ class ScheduledPayment
             ));
         }
 
-        if (!$this->isBillable($prefix)) {
+        if (!$this->isBillable()) {
             throw new \Exception(sprintf(
                 'Scheduled payment %s is not billable (status: %s)',
                 $this->getId(),

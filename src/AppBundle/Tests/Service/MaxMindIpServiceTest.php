@@ -10,16 +10,14 @@ use GeoJson\Geometry\Point;
 /**
  * @group functional-nonet
  */
-class MaxMindServiceIpTest extends WebTestCase
+class MaxMindIpServiceTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
     protected static $geoip;
     protected static $launch;
-    protected static $dm;
     protected static $userRepo;
-    protected static $userManager;
 
     public static function setUpBeforeClass()
     {

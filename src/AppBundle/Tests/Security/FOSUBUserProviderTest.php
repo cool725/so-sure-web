@@ -17,9 +17,7 @@ class FOSUBUserProviderTest extends WebTestCase
     protected static $container;
     protected static $cognito;
     protected static $userProvider;
-    protected static $userManager;
     protected static $userService;
-    protected static $dm;
 
     public static function setUpBeforeClass()
     {

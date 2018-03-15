@@ -49,13 +49,6 @@ class AlphanumericValidatorTest extends \PHPUnit\Framework\TestCase
         $validator->validate('$', self::$constraint);
     }
 
-    /**
-     * Configure a AlphanumericValidator.
-     *
-     * @param string $expectedMessage The expected message on a validation violation, if any.
-     *
-     * @return AcmeBundle\Validator\Constraints\AlphanumericValidator
-     */
     public function configureValidator($expectedMessage = null)
     {
         // mock the violation builder

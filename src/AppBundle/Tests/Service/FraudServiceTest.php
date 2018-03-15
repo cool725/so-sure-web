@@ -20,9 +20,7 @@ class FraudServiceTest extends WebTestCase
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
     protected static $fraudService;
-    protected static $dm;
     protected static $policyRepo;
-    protected static $userManager;
 
     public static function setUpBeforeClass()
     {

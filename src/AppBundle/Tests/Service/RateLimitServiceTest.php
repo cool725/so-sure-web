@@ -16,7 +16,6 @@ class RateLimitServiceTest extends WebTestCase
     protected static $container;
     protected static $rateLimit;
     protected static $redis;
-    protected static $dm;
 
     public static function setUpBeforeClass()
     {

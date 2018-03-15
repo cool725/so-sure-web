@@ -16,6 +16,9 @@ class DebtCollectionListener
     /** @var LoggerInterface */
     protected $logger;
 
+    /** @var DocumentManager */
+    protected $dm;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger

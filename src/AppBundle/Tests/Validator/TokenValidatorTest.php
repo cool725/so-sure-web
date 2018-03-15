@@ -39,13 +39,6 @@ class TokenValidatorTest extends \PHPUnit\Framework\TestCase
         $validator->validate('$', self::$constraint);
     }
 
-    /**
-     * Configure a TokenValidator.
-     *
-     * @param string $expectedMessage The expected message on a validation violation, if any.
-     *
-     * @return AcmeBundle\Validator\Constraints\TokenValidator
-     */
     public function configureValidator($expectedMessage = null)
     {
         // mock the violation builder

@@ -14,9 +14,9 @@ use AppBundle\Document\Address;
  */
 class InvoiceTest extends WebTestCase
 {
+    use \AppBundle\Tests\UserClassTrait;
     use \AppBundle\Tests\PhingKernelClassTrait;
     protected static $container;
-    protected static $dm;
 
     public static function setUpBeforeClass()
     {

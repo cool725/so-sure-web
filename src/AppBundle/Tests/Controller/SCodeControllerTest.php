@@ -15,8 +15,6 @@ class SCodeControllerTest extends BaseControllerTest
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
 
-    protected static $phone;
-
     public function tearDown()
     {
     }

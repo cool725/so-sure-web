@@ -45,13 +45,9 @@ class InvitationServiceTest extends WebTestCase
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
     protected static $gocardless;
-    protected static $dm;
     protected static $userRepo;
-    protected static $userManager;
     protected static $invitationService;
-    protected static $phone;
     protected static $phone2;
-    protected static $policyService;
     protected static $scodeService;
 
     public static function setUpBeforeClass()
@@ -75,8 +71,7 @@ class InvitationServiceTest extends WebTestCase
             self::$container->get('templating'),
             self::$container->get('app.router'),
             'foo@foo.com',
-            'bar',
-            'http://localhost'
+            'bar'
         );
         self::$invitationService = self::$container->get('app.invitation');
         self::$invitationService->setMailer($mailer);

@@ -26,6 +26,11 @@ trait UserClassTrait
     use CurrencyTrait;
     use ImeiTrait;
 
+    protected static $policyService;
+    protected static $phone;
+    protected static $userManager;
+    protected static $dm;
+
     public static $JUDO_TEST_CARD_NUM = '4921 8100 0000 5462';
     public static $JUDO_TEST_CARD_LAST_FOUR = '5462';
     public static $JUDO_TEST_CARD_EXP = '12/20';

@@ -16,9 +16,7 @@ class SmsServiceTest extends WebTestCase
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
     protected static $sms;
-    protected static $dm;
     protected static $userRepo;
-    protected static $userManager;
 
     public static function setUpBeforeClass()
     {

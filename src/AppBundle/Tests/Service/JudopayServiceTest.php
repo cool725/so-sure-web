@@ -28,10 +28,7 @@ class JudopayServiceTest extends WebTestCase
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
     protected static $judopay;
-    protected static $dm;
     protected static $userRepo;
-    protected static $userManager;
-    protected static $policyService;
 
     public static function setUpBeforeClass()
     {

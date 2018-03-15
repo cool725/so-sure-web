@@ -83,13 +83,6 @@ class UkMobileValidatorTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals('', $validator->conform('0777574040'));
     }
 
-    /**
-     * Configure a MobileValidator.
-     *
-     * @param string $expectedMessage The expected message on a validation violation, if any.
-     *
-     * @return AcmeBundle\Validator\Constraints\MobileValidator
-     */
     public function configureValidator($expectedMessage = null)
     {
         // mock the violation builder

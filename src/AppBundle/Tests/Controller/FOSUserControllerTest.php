@@ -296,7 +296,7 @@ class FOSUserControllerTest extends BaseControllerTest
             );
         } else {
             $this->assertEquals(
-                sprintf('http://localhost/resetting/request', urlencode($email)),
+                'http://localhost/resetting/request',
                 self::$client->getHistory()->current()->getUri()
             );
         }

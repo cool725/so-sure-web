@@ -45,13 +45,9 @@ class SCodeServiceTest extends WebTestCase
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
     protected static $gocardless;
-    protected static $dm;
     protected static $userRepo;
-    protected static $userManager;
     protected static $invitationService;
-    protected static $phone;
     protected static $phone2;
-    protected static $policyService;
     protected static $scodeService;
 
     public static function setUpBeforeClass()

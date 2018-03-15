@@ -15,7 +15,6 @@ class CognitoIdentityAuthenticatorTest extends WebTestCase
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
     protected static $auth;
-    protected static $userManager;
     protected static $userProvider;
     protected static $cognito;
 

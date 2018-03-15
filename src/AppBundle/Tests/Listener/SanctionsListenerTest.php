@@ -27,7 +27,6 @@ class SanctionsListenerTest extends WebTestCase
     use \AppBundle\Tests\UserClassTrait;
 
     protected static $container;
-    protected static $dm;
     protected static $redis;
     protected static $sanctionsService;
 

@@ -345,7 +345,7 @@ class PhoneInsuranceController extends BaseController
                                 'quoteUrl' => $quoteUrl,
                                 'phone' => $phone->__toString(),
                                 'price' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-                                'expires' => $sevenDays,
+                                'expires' => $days,
                             ]);
                         }
 

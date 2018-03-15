@@ -35,10 +35,10 @@ class LoadUserData implements FixtureInterface, ContainerAwareInterface
         $this->newUser('claims@so-sure.com', self::DEFAULT_PASSWORD, 'so-sure', 'Claims', ['ROLE_CLAIMS']);
         $this->newUser('employee@so-sure.com', self::DEFAULT_PASSWORD, 'so-sure', 'Employee', ['ROLE_EMPLOYEE']);
         $manager->flush();
-        // $this->valdiateGedmoLogging();
+        // $this->valdiateGedmoLogging($manager);
     }
 
-    private function valdiateGedmoLogging()
+    private function valdiateGedmoLogging($manager)
     {
         $dm = $this->container->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(User::class);

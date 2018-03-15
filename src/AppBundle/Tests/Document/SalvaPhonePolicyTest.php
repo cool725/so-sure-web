@@ -29,11 +29,7 @@ class SalvaPhonePolicyTest extends WebTestCase
     use DateTrait;
 
     protected static $container;
-    protected static $dm;
-    protected static $phone;
     protected static $phone6;
-    protected static $policyService;
-    protected static $userManager;
     protected static $judopay;
 
     public static function setUpBeforeClass()

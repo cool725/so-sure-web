@@ -12,13 +12,10 @@ class BaseControllerTest extends WebTestCase
     use \AppBundle\Tests\UserClassTrait;
     protected static $client;
     protected static $container;
-    protected static $userManager;
-    protected static $dm;
     protected static $identity;
     protected static $jwt;
     protected static $router;
     protected static $redis;
-    protected static $policyService;
     protected static $invitationService;
 
     public function tearDown()

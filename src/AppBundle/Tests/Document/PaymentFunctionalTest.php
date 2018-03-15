@@ -23,8 +23,6 @@ class PaymentFunctionalTest extends WebTestCase
     use UserClassTrait;
 
     protected static $container;
-    protected static $dm;
-    protected static $phone;
 
     public static function setUpBeforeClass()
     {

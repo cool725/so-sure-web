@@ -11,9 +11,9 @@ use AppBundle\Document\User;
 class LaunchUserServiceTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
+    use \AppBundle\Tests\UserClassTrait;
     protected static $container;
     protected static $launch;
-    protected static $dm;
     protected static $userRepo;
 
     public static function setUpBeforeClass()

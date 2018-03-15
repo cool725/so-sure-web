@@ -2,11 +2,12 @@
 namespace AppBundle\Classes;
 
 use AppBundle\Document\Claim;
-use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
 
 class DaviesExcel
 {
+    use DateTrait;
+
     protected function nullIfBlank($field, $fieldName = null, $ref = null)
     {
         if (!$field || $this->isNullableValue($field)) {

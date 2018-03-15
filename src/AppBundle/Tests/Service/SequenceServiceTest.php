@@ -16,7 +16,6 @@ class SequenceServiceTest extends WebTestCase
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
     protected static $sms;
-    protected static $dm;
     protected static $sequence;
 
     public static function setUpBeforeClass()

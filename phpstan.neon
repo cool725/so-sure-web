@@ -1,0 +1,7 @@
+parameters:
+        level:
+                - 0
+        paths: 
+                - src
+        ignoreErrors:
+                - '#Function mailparse_msg_.*#'

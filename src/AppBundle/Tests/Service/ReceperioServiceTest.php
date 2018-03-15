@@ -22,9 +22,7 @@ class ReceperioServiceTest extends WebTestCase
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
     protected static $imei;
-    protected static $dm;
     protected static $phoneRepo;
-    protected static $phone;
     protected static $phoneA;
     protected static $phoneB;
     protected static $phoneC;

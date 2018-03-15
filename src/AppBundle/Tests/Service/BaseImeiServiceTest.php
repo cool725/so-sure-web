@@ -20,7 +20,6 @@ class BaseImeiServiceTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
-    protected static $dm;
     protected static $imei;
     protected static $rootDir;
     protected static $filesystem;

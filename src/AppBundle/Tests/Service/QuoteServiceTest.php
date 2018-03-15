@@ -16,7 +16,6 @@ class QuoteServiceTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
-    protected static $dm;
     protected static $quoteService;
     protected static $rootDir;
     protected static $redis;

@@ -8,7 +8,7 @@ use AppBundle\Classes\DaviesClaim;
 /**
  * @group functional-nonet
  */
-class ExcelTest extends WebTestCase
+class ExcelServiceTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;

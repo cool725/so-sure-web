@@ -16,6 +16,7 @@ use AppBundle\Document\Payment\PolicyDiscountPayment;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\SCode;
+use AppBundle\Document\ImeiTrait;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Classes\Salva;
@@ -28,7 +29,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 // @codingStandardsIgnoreFile
 class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 {
-    use \AppBundle\Tests\UserClassTrait;
+    use ImeiTrait;
 
     const CLAIM_NONE = 'none';
     const CLAIM_RANDOM = 'random';
