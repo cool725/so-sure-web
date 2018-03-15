@@ -6,6 +6,7 @@ use Aws\S3\S3Client;
 use AppBundle\Classes\DaviesClaim;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Phone;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Feature;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
@@ -14,6 +15,7 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 use VasilDakov\Postcode\Postcode;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 use AppBundle\Exception\ValidationException;
+use AppBundle\Repository\ClaimRepository;
 
 class DaviesService extends S3EmailService
 {
@@ -26,6 +28,7 @@ class DaviesService extends S3EmailService
     /** @var FeatureService */
     protected $featureService;
 
+    /** @var MailerService */
     protected $mailer;
     protected $validator;
 
@@ -218,6 +221,12 @@ class DaviesService extends S3EmailService
         return $claim;
     }
 
+    /**
+     * @param $daviesClaim
+     * @param $skipImeiUpdate
+     * @return bool
+     * @throws \Exception
+     */
     public function saveClaim($daviesClaim, $skipImeiUpdate)
     {
         if ($daviesClaim->hasError()) {
@@ -317,6 +326,11 @@ class DaviesService extends S3EmailService
         return count($errors) == 0;
     }
 
+    /**
+     * @param Claim       $claim
+     * @param DaviesClaim $daviesClaim
+     * @throws \Exception
+     */
     public function validateClaimDetails(Claim $claim, DaviesClaim $daviesClaim)
     {
         if (strtolower($claim->getPolicy()->getPolicyNumber()) != strtolower($daviesClaim->getPolicyNumber())) {
@@ -428,7 +442,13 @@ class DaviesService extends S3EmailService
                 $daviesClaim->getExpectedIncurred(),
                 $daviesClaim->incurred
             );
-            $this->errors[$daviesClaim->claimNumber][] = $msg;
+            // seems to be an issue with small difference in the incurred value related to receipero fees
+            // if under £2, then assume that to be the case and move to the fees section
+            if (abs($daviesClaim->getExpectedIncurred() - $daviesClaim->incurred) < 2) {
+                $this->fees[$daviesClaim->claimNumber][] = $msg;
+            } else {
+                $this->errors[$daviesClaim->claimNumber][] = $msg;
+            }
         }
 
         $approvedDate = null;
@@ -533,6 +553,22 @@ class DaviesService extends S3EmailService
             $this->warnings[$daviesClaim->claimNumber][] = $msg;
         }
 
+        if (!$daviesClaim->replacementImei && $daviesClaim->getClaimStatus() == Claim::STATUS_SETTLED) {
+            $msg = sprintf(
+                'Claim %s is settled without a replacement imei.',
+                $daviesClaim->claimNumber
+            );
+            $this->errors[$daviesClaim->claimNumber][] = $msg;
+        }
+
+        if (!$claim->getReplacementPhone() && $daviesClaim->getClaimStatus() == Claim::STATUS_SETTLED) {
+            $msg = sprintf(
+                'Claim %s is settled without a replacement phone being set. SO-SURE to set replacement phone.',
+                $daviesClaim->claimNumber
+            );
+            $this->errors[$daviesClaim->claimNumber][] = $msg;
+        }
+
         $threeMonthsAgo = new \DateTime();
         $threeMonthsAgo = $threeMonthsAgo->sub(new \DateInterval('P3M'));
         if ($daviesClaim->isOpen() && $daviesClaim->replacementReceivedDate &&
@@ -591,8 +627,15 @@ class DaviesService extends S3EmailService
         return $phone;
     }
 
+    /**
+     * @param Claim       $claim
+     * @param DaviesClaim $daviesClaim
+     * @param boolean     $skipImeiUpdate
+     * @throws \Exception
+     */
     public function updatePolicy(Claim $claim, DaviesClaim $daviesClaim, $skipImeiUpdate)
     {
+        /** @var PhonePolicy $policy */
         $policy = $claim->getPolicy();
         // Closed claims should not replace the imei as if there are multiple claims
         // for a policy it will trigger a salva policy update
@@ -652,6 +695,7 @@ class DaviesService extends S3EmailService
         $successFiles = $fileRepo->findBy(['success' => true], ['created' => 'desc'], 1);
         $successFile = count($successFiles) > 0 ? $successFiles[0] : null;
 
+        /** @var ClaimRepository $claimsRepo */
         $claimsRepo = $this->dm->getRepository(Claim::class);
         $claims = $claimsRepo->findOutstanding();
 
@@ -682,9 +726,6 @@ class DaviesService extends S3EmailService
 
         $successFiles = $fileRepo->findBy(['success' => true], ['created' => 'desc'], 1);
         $successFile = count($successFiles) > 0 ? $successFiles[0] : null;
-
-        $claimsRepo = $this->dm->getRepository(Claim::class);
-        $claims = $claimsRepo->findOutstanding();
 
         if (count($this->errors) > 0) {
             $emails = 'tech+ops@so-sure.com';

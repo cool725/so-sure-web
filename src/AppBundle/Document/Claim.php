@@ -108,6 +108,7 @@ class Claim
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
+     * @var \DateTime
      */
     protected $recordedDate;
 
@@ -115,6 +116,7 @@ class Claim
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
+     * @var \DateTime
      */
     protected $lossDate;
 
@@ -122,6 +124,7 @@ class Claim
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
+     * @var \DateTime
      */
     protected $notificationDate;
 
@@ -129,6 +132,7 @@ class Claim
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
+     * @var \DateTime
      */
     protected $replacementReceivedDate;
 
@@ -136,6 +140,7 @@ class Claim
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
+     * @var \DateTime
      */
     protected $createdDate;
 
@@ -143,6 +148,7 @@ class Claim
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
+     * @var \DateTime
      */
     protected $approvedDate;
 
@@ -150,6 +156,7 @@ class Claim
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
+     * @var \DateTime
      */
     protected $closedDate;
 
@@ -617,6 +624,9 @@ class Claim
         $this->location = $location;
     }
 
+    /**
+     * @return \DateTime
+     */
     public function getLossDate()
     {
         return $this->lossDate;
@@ -627,6 +637,9 @@ class Claim
         $this->lossDate = $lossDate;
     }
 
+    /**
+     * @return \DateTime
+     */
     public function getNotificationDate()
     {
         return $this->notificationDate;
@@ -637,6 +650,9 @@ class Claim
         $this->notificationDate = $notificationDate;
     }
 
+    /**
+     * @return \DateTime
+     */
     public function getCreatedDate()
     {
         return $this->createdDate;
@@ -647,6 +663,9 @@ class Claim
         $this->createdDate = $createdDate;
     }
 
+    /**
+     * @return \DateTime
+     */
     public function getApprovedDate()
     {
         return $this->approvedDate;
@@ -657,6 +676,9 @@ class Claim
         $this->approvedDate = $approvedDate;
     }
 
+    /**
+     * @return \DateTime
+     */
     public function getClosedDate()
     {
         return $this->closedDate;
