@@ -100,11 +100,13 @@ class ImeiCommand extends ContainerAwareCommand
         $phone = $this->getPhone($device, $memory);
         $imeiService = $this->getContainer()->get('app.imei');
 
+        $policy = null;
         if ($policyId) {
             $policy = $this->getPolicy($policyId);
         } elseif ($register !== null || $claimscheck) {
             $policy = $this->getPolicyByImei($imei);
         }
+        $claim = null;
         if ($claimId) {
             $claim = $this->getClaim($claimId);
         } elseif ($claimNumber) {

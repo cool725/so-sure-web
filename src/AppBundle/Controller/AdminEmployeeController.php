@@ -796,6 +796,8 @@ class AdminEmployeeController extends BaseController
                 if ($debtForm->isValid()) {
                     $policy->setDebtCollector(Policy::DEBT_COLLECTOR_WISE);
                     $dm->flush();
+                    $email = null;
+                    $customerSubject = null;
 
                     if ($policy->getDebtCollector() == Policy::DEBT_COLLECTOR_WISE) {
                         $email = 'debts@awise.demon.co.uk';
@@ -1820,6 +1822,7 @@ class AdminEmployeeController extends BaseController
         $policyRepo = $dm->getRepository(PhonePolicy::class);
         $statsRepo = $dm->getRepository(Stats::class);
         $numWeeks = 4;
+        $weeks = [];
 
         if (!$now) {
             $now = new \DateTime();

@@ -977,6 +977,7 @@ class IntercomService
                     }
                 }
 
+                $lastSeen = null;
                 if ($lead->last_request_at) {
                     $lastSeen = \DateTime::createFromFormat('U', $lead->last_request_at);
                 } elseif ($lead->updated_at) {
@@ -1059,6 +1060,7 @@ class IntercomService
                     }
                 }
 
+                $lastSeen = null;
                 if ($user->last_request_at) {
                     $lastSeen = \DateTime::createFromFormat('U', $user->last_request_at);
                 } elseif ($user->updated_at) {

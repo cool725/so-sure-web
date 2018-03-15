@@ -105,7 +105,7 @@ class DefaultController extends BaseController
      */
     public function homepageLanding(Request $request)
     {
-
+        $data = null;
         if ($request->get('_route') == "reimagined") {
             $data = array(
                 'select_phone_type' => 'homepage',
@@ -562,6 +562,7 @@ class DefaultController extends BaseController
         return new RedirectResponse($this->generateUrl('homepage'));
         //}
 
+        $data = null;
         if ($request->get('_route') == "so_sure_vs_protect_your_bubble_phone_insurance" ||
             $request->get('_route') == "so_sure_vs_protect_your_bubble") {
             $data = [
@@ -680,6 +681,9 @@ class DefaultController extends BaseController
      */
     public function insuredWithVodafone(Request $request)
     {
+        $phoneName = null;
+        $phonePrice = null;
+        $quoteRoute = null;
         if ($request->get('_route') == "samsung_s7_insured_with_vodafone") {
             $phoneName = "Samsung S7";
             $phonePrice = "7.99";
@@ -752,6 +756,8 @@ class DefaultController extends BaseController
      */
     public function insuredWithMobileNetwork(Request $request)
     {
+        $phone = null;
+        $phoneName = null;
         $repo = $this->getManager()->getRepository(Phone::class);
         if ($request->get('_route') == "samsung_s7_insured_with_your_mobile_network") {
             $phone = $repo->findOneBy([

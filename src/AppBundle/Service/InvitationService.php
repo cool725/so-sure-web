@@ -720,6 +720,7 @@ class InvitationService
         $user = null;
         $badge = null;
         $messageData = null;
+        $message = null;
         if ($type == PushService::MESSAGE_CONNECTED) {
             $user = $invitation->getInviter();
             $message = sprintf(

@@ -927,10 +927,12 @@ class ApiAuthController extends BaseController
      */
     public function payPolicyAction(Request $request, $id)
     {
+        $dm = $this->getManager();
+        $judoData = null;
+        $existingData = null;
         try {
             $this->get('statsd')->startTiming("api.payPolicy");
             $data = json_decode($request->getContent(), true)['body'];
-            $judoData = null;
             if (isset($data['bank_account'])) {
                 // Not doing anymore, but too many tests currently expect gocardless, so allow for non-prod
                 if ($this->isProduction()) {
@@ -969,7 +971,6 @@ class ApiAuthController extends BaseController
                 );
             }
 
-            $dm = $this->getManager();
             $repo = $dm->getRepository(Policy::class);
             $policy = $repo->find($id);
             if (!$policy) {
@@ -1092,13 +1093,14 @@ class ApiAuthController extends BaseController
      */
     public function picsureAction(Request $request, $id)
     {
+        $dm = $this->getManager();
+        $data = null;
         try {
             $data = json_decode($request->getContent(), true)['body'];
             if (!$this->validateFields($data, ['bucket', 'key'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
 
-            $dm = $this->getManager();
             $repo = $dm->getRepository(Policy::class);
             $policy = $repo->find($id);
             if (!$policy) {
