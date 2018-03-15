@@ -14,6 +14,9 @@ class SequenceService
     const SEQUENCE_INVOICE = 'invoice';
     const SEQUENCE_INVOICE_INVALID = 'invoice-invalid';
 
+    const SEQUENCE_BACS_REFERENCE = 'bacs-reference';
+    const SEQUENCE_BACS_REFERENCE_INVALID = 'bacs-reference-invalid';
+
     /** @var DocumentManager */
     protected $dm;
 

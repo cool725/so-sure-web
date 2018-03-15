@@ -52,6 +52,14 @@ class BankAccount
     protected $accountNumber;
 
     /**
+     * @AppAssert\Token()
+     * @MongoDB\Field(type="string")
+     * @Assert\Length(min="6", max="18")
+     * @Gedmo\Versioned
+     */
+    protected $reference;
+
+    /**
      * @MongoDB\EmbedOne(targetDocument="Address")
      * @Gedmo\Versioned
      */
@@ -121,6 +129,24 @@ class BankAccount
     public function getDisplayableAccountNumber()
     {
         return $this->displayableAccountNumber($this->getAccountNumber());
+    }
+
+    public function setReference($reference)
+    {
+        $this->reference = $reference;
+    }
+
+    public function getReference()
+    {
+        return $this->reference;
+    }
+
+    public function generateReference(User $user, $sequence)
+    {
+        $reference = sprintf('%s5%010d', strtoupper(substr($user->getLastName(), 0, 1)), $sequence);
+        $this->setReference($reference);
+
+        return $reference;
     }
 
     public function __toString()

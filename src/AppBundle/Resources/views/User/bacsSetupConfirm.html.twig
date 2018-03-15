@@ -34,16 +34,16 @@
                 <ul class="list-unstyled">
                     <li>
                         <small class="text-dark-grey">Reference Number</small><br>
-                        <span class="h3">XXX</span>
+                        <span class="h3">{{  bacs.reference }}</span>
                     </li>
                     <li>
                         <small class="text-dark-grey">Collection frequency</small><br>
                         <span class="h3">First collection: XX</span><br>
-                        <small class="text-dark-grey">(Collected on the XX of each month thereafter)</small><br>
+                        <small class="text-dark-grey">(Collected on the {{ policy.billing|date('jS','Europe/London') }} of each month thereafter)</small><br>
                     </li>
                     <li>
                         <small class="text-dark-grey">Payment amount</small><br>
-                        <span class="h3">£</span>
+                        <span class="h3">£{{ policy.getPremiumInstallmentPrice(true)|number_format(2, '.', ',') }}</span>
                     </li>
                 </ul>
                 <p>

@@ -25,7 +25,7 @@
                     </div>
                     <div class="row">
                         <div class="col-xs-6 form-group">
-                            <a href="{% if user.paymentMethod.type == "bacs" %}#tab-bacs{% else %}#tab-bacs-setup{% endif %}" class="btn btn-blue-hollow btn-block" data-toggle="tab">
+                            <a href="{% if user.paymentMethod.type == "bacs" %}#tab-bacs{% else %}#tab-card{% endif %}" class="btn btn-blue-hollow btn-block" data-toggle="tab">
                                 Back
                             </a>
                         </div>
@@ -34,6 +34,9 @@
                         </div>
                     </div>
                     <p>Your payments are protected by the <a href="#" data-toggle="modal" data-target="#modal-dd">Direct Debit Guarantee</a></p>
+                    <p>SO-SURE Limited</p>
+                    <p>10 Finsbury Square, London EC2A 1AF, GB</p>
+                    <p>+44 20 3872 2370 <a href="mailto:hello@wearesosure.com">hello@wearesosure.com</a></p>
                 {{ form_end(bacs_form) }}
             </div>
         </div>

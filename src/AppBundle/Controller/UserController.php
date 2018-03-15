@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Service\PCAService;
+use AppBundle\Service\SequenceService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -1155,6 +1156,14 @@ class UserController extends BaseController
         }
 
         $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
+        // For now, only allow 1 policy with bacs
+        if ($bacsFeature && count($user->getValidPolicies(true)) > 1) {
+            $bacsFeature = false;
+        }
+        // For now, only allow monthly policies with bacs
+        if ($bacsFeature && $policy->getPremiumPlan() != Policy::PLAN_MONTHLY) {
+            $bacsFeature = false;
+        }
         // TODO: Move to ajax call
         $webpay = null;
         $webpay = $this->get('app.judopay')->webRegister(
@@ -1204,11 +1213,22 @@ class UserController extends BaseController
                     if (!$bacs->isValid()) {
                         $this->addFlash('error', 'Sorry, but this bank account is not valid');
                     } else {
+                        /** @var SequenceService $sequenceService */
+                        $sequenceService = $this->get('app.sequence');
+                        if ($this->getParameter('kernel.environment') == 'prod') {
+                            $seq = $sequenceService->getSequenceId(SequenceService::SEQUENCE_BACS_REFERENCE);
+                        } else {
+                            $seq = $sequenceService->getSequenceId(SequenceService::SEQUENCE_BACS_REFERENCE_INVALID);
+                        }
+                        $ref = $bacs->generateReference($user, $seq);
                         $bacsConfirm = clone $bacs;
                         $bacsConfirmForm = $this->get('form.factory')
                             ->createNamedBuilder('bacs_confirm_form', BacsConfirmType::class, $bacsConfirm)
                             ->getForm();
                     }
+                } else {
+                    $this->addFlash('error',
+                        sprintf('Sorry, but this bank account is not valid %s', (string) $bacsForm->getErrors(true, false)));
                 }
             } elseif ($request->request->has('bacs_confirm_form')) {
                 $bacsConfirmForm->handleRequest($request);

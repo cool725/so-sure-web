@@ -55,6 +55,7 @@ class Bacs extends BankAccount
         $bankAccount->setSortCode($this->getSortCode());
         $bankAccount->setAccountName($this->getAccountName());
         $bankAccount->setBankAddress($this->getBankAddress());
+        $bankAccount->setReference($this->getReference());
 
         return $bankAccount;
     }

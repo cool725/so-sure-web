@@ -110,7 +110,8 @@ class PCAService
             return $bankAccount;
         } elseif ($sortCode == self::TEST_SORT_CODE && $accountNumber == self::TEST_ACCOUNT_NUMBER_INVALID_SORT_CODE) {
             throw new DirectDebitBankException('Bad sort code', DirectDebitBankException::ERROR_SORT_CODE);
-        } elseif ($sortCode == self::TEST_SORT_CODE && $accountNumber == self::TEST_ACCOUNT_NUMBER_INVALID_ACCOUNT_NUMBER) {
+        } elseif ($sortCode == self::TEST_SORT_CODE &&
+            $accountNumber == self::TEST_ACCOUNT_NUMBER_INVALID_ACCOUNT_NUMBER) {
             throw new DirectDebitBankException('No direct debit', DirectDebitBankException::ERROR_ACCOUNT_NUMBER);
         } elseif ($sortCode == self::TEST_SORT_CODE && $accountNumber == self::TEST_ACCOUNT_NUMBER_NO_DD) {
             throw new DirectDebitBankException('No direct debit', DirectDebitBankException::ERROR_NON_DIRECT_DEBIT);
@@ -120,7 +121,12 @@ class PCAService
             $accountNumber = self::TEST_ACCOUNT_NUMBER_PCA;
         }
 
-        $bankAccount = $this->findBankAccount($sortCode, $accountNumber);
+        try {
+            $bankAccount = $this->findBankAccount($sortCode, $accountNumber);
+        } catch(DirectDebitBankException $e) {
+            throw $e;
+        }
+
         if ($bankAccount) {
             $this->cacheBankAccountResults($sortCode, $accountNumber, $bankAccount);
 
@@ -383,9 +389,15 @@ class PCAService
         if ($data['StatusInformation'] == "UnknownSortCode") {
             throw new DirectDebitBankException('Unknown sort code', DirectDebitBankException::ERROR_SORT_CODE);
         } elseif ($data['StatusInformation'] == "InvalidAccountNumber") {
-            throw new DirectDebitBankException('Invalid account number', DirectDebitBankException::ERROR_ACCOUNT_NUMBER);
+            throw new DirectDebitBankException(
+                'Invalid account number',
+                DirectDebitBankException::ERROR_ACCOUNT_NUMBER
+            );
         } elseif (!$data['IsDirectDebitCapable']) {
-            throw new DirectDebitBankException('Account is not dd capable', DirectDebitBankException::ERROR_NON_DIRECT_DEBIT);
+            throw new DirectDebitBankException(
+                'Account is not dd capable',
+                DirectDebitBankException::ERROR_NON_DIRECT_DEBIT
+            );
         }
         $bankAccount = new BankAccount();
         $bankAccount->setBankName($data['Bank']);

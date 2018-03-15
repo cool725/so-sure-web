@@ -65,7 +65,9 @@ class BacsType extends AbstractType
                 if ($e->getCode() == DirectDebitBankException::ERROR_SORT_CODE) {
                     $form->get('sortCode')->addError(new FormError('Sort code does not exist'));
                 } elseif ($e->getCode() == DirectDebitBankException::ERROR_ACCOUNT_NUMBER) {
-                    $form->get('accountNumber')->addError(new FormError('Account number is invalid for this sort code'));
+                    $form->get('accountNumber')->addError(
+                        new FormError('Account number is invalid for this sort code')
+                    );
                 } elseif ($e->getCode() == DirectDebitBankException::ERROR_NON_DIRECT_DEBIT) {
                     $form->get('accountNumber')->addError(new FormError('Account does not support direct debit'));
                 }
