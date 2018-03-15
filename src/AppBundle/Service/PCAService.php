@@ -123,7 +123,7 @@ class PCAService
 
         try {
             $bankAccount = $this->findBankAccount($sortCode, $accountNumber);
-        } catch(DirectDebitBankException $e) {
+        } catch (DirectDebitBankException $e) {
             throw $e;
         }
 

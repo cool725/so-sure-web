@@ -1226,9 +1226,6 @@ class UserController extends BaseController
                             ->createNamedBuilder('bacs_confirm_form', BacsConfirmType::class, $bacsConfirm)
                             ->getForm();
                     }
-                } else {
-                    $this->addFlash('error',
-                        sprintf('Sorry, but this bank account is not valid %s', (string) $bacsForm->getErrors(true, false)));
                 }
             } elseif ($request->request->has('bacs_confirm_form')) {
                 $bacsConfirmForm->handleRequest($request);
