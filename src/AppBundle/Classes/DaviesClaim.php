@@ -95,8 +95,11 @@ class DaviesClaim extends DaviesExcel
     public $insuredName;
     public $riskPostCode;
     public $shippingAddress;
+    /** @var \DateTime */
     public $lossDate;
+    /** @var \DateTime */
     public $startDate;
+    /** @var \DateTime */
     public $endDate;
 
     // losss, theft, damage??
@@ -114,6 +117,7 @@ class DaviesClaim extends DaviesExcel
     public $replacementMake;
     public $replacementModel;
     public $replacementImei;
+    /** @var \DateTime */
     public $replacementReceivedDate;
 
     public $phoneReplacementCost;

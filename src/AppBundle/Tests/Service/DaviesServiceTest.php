@@ -1002,6 +1002,31 @@ class DaviesServiceTest extends WebTestCase
         $this->insureErrorExists('/does not have the correct incurred value/');
     }
 
+    public function testValidateClaimDetailsIncurredIncorrectForFees()
+    {
+        $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        $policy->addClaim($claim);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = 1;
+        $daviesClaim->status = 'open';
+        $daviesClaim->incurred = 1;
+        $daviesClaim->unauthorizedCalls = 1.01;
+        $daviesClaim->accessories = 1.03;
+        $daviesClaim->phoneReplacementCost = 1.07;
+        $daviesClaim->transactionFees = 1.11;
+        $daviesClaim->handlingFees = 1.19;
+        $daviesClaim->reciperoFee = 1.27;
+        $daviesClaim->excess = 1.5;
+        $daviesClaim->reserved = 0;
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->insureErrorExists('/does not have the correct incurred value/');
+    }
+
     public function testValidateClaimDetailsReciperoFee()
     {
         $policy = static::createUserPolicy(true);
@@ -1735,5 +1760,108 @@ class DaviesServiceTest extends WebTestCase
         static::$daviesService->saveClaims('', $daviesClaims);
         $this->insureErrorDoesNotExist('/'.$claim1->getNumber().'/');
         $this->insureErrorExists('/'.$claim2->getNumber().'/');
+    }
+
+    public function testSaveClaimMissingReplacementImeiPhone()
+    {
+        $policy = static::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('testSaveClaimMissingReplacementImeiPhone', $this));
+        $claim = new Claim();
+        $claim->setNumber($this->getRandomClaimNumber());
+        $claim->setType(Claim::TYPE_LOSS);
+        $claim->setStatus(Claim::STATUS_SETTLED);
+        $policy->addClaim($claim);
+        static::$dm->persist($policy->getUser());
+        static::$dm->persist($policy);
+        static::$dm->persist($claim);
+        static::$dm->flush();
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = $claim->getNumber();
+        $daviesClaim->incurred = 70;
+        $daviesClaim->reserved = 0;
+        $daviesClaim->excess = 70;
+        $daviesClaim->initialSuspicion = false;
+        $daviesClaim->finalSuspicion = false;
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+        $daviesClaim->status = DaviesClaim::STATUS_CLOSED;
+        $daviesClaim->miStatus = DaviesClaim::MISTATUS_SETTLED;
+        $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
+        $daviesClaim->replacementMake = 'Apple';
+        $daviesClaim->replacementModel = 'iPhone 4';
+        //$daviesClaim->replacementImei = $this->generateRandomImei();
+        $daviesClaim->replacementReceivedDate = new \DateTime();
+        $this->assertTrue(static::$daviesService->saveClaim($daviesClaim, false));
+        $this->assertEquals(
+            2,
+            count(self::$daviesService->getErrors()[$claim->getNumber()]),
+            json_encode(self::$daviesService->getErrors())
+        );
+        $this->assertEquals(
+            0,
+            count(self::$daviesService->getWarnings()),
+            json_encode(self::$daviesService->getWarnings())
+        );
+        $this->insureErrorExists('/settled without a replacement imei/');
+        $this->insureErrorExists('/settled without a replacement phone/');
+
+        self::$daviesService->clearErrors();
+        self::$daviesService->clearWarnings();
+        self::$daviesService->clearFees();
+
+        $daviesClaim->replacementImei = $this->generateRandomImei();
+        $this->assertTrue(static::$daviesService->saveClaim($daviesClaim, false));
+        $this->assertEquals(
+            1,
+            count(self::$daviesService->getErrors()[$claim->getNumber()]),
+            json_encode(self::$daviesService->getErrors())
+        );
+        $this->insureErrorDoesNotExist('/settled without a replacement imei/');
+    }
+
+    public function testSaveClaimMissingReplacementPhone()
+    {
+        $policy = static::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('testSaveClaimMissingReplacementPhone', $this));
+        $claim = new Claim();
+        $claim->setNumber($this->getRandomClaimNumber());
+        $claim->setType(Claim::TYPE_LOSS);
+        $claim->setStatus(Claim::STATUS_SETTLED);
+        $claim->setReplacementPhone(static::$phone);
+        $policy->addClaim($claim);
+        static::$dm->persist($policy->getUser());
+        static::$dm->persist($policy);
+        static::$dm->persist($claim);
+        static::$dm->flush();
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = $claim->getNumber();
+        $daviesClaim->incurred = 70;
+        $daviesClaim->reserved = 0;
+        $daviesClaim->excess = 70;
+        $daviesClaim->initialSuspicion = false;
+        $daviesClaim->finalSuspicion = false;
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+        $daviesClaim->status = DaviesClaim::STATUS_CLOSED;
+        $daviesClaim->miStatus = DaviesClaim::MISTATUS_SETTLED;
+        $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
+        $daviesClaim->replacementMake = 'Apple';
+        $daviesClaim->replacementModel = 'iPhone 4';
+        //$daviesClaim->replacementImei = $this->generateRandomImei();
+        $daviesClaim->replacementReceivedDate = new \DateTime();
+        $this->assertTrue(static::$daviesService->saveClaim($daviesClaim, false));
+        $this->assertEquals(
+            1,
+            count(self::$daviesService->getErrors()[$claim->getNumber()]),
+            json_encode(self::$daviesService->getErrors())
+        );
+        $this->assertEquals(
+            0,
+            count(self::$daviesService->getWarnings()),
+            json_encode(self::$daviesService->getWarnings())
+        );
+        $this->insureErrorDoesNotExist('/settled without a replacement phone/');
     }
 }
