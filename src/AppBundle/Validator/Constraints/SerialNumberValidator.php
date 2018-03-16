@@ -2,17 +2,13 @@
 
 namespace AppBundle\Validator\Constraints;
 
+use AppBundle\Document\ImeiTrait;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
 class SerialNumberValidator extends ConstraintValidator
 {
-    protected $imei;
-
-    public function __construct($imei)
-    {
-        $this->imei = $imei;
-    }
+    use ImeiTrait;
 
     public function validate($value, Constraint $constraint)
     {
@@ -20,7 +16,8 @@ class SerialNumberValidator extends ConstraintValidator
         if (strlen($value) == 0) {
             return;
         }
-        if (!$this->imei->isAppleSerialNumber($value)) {
+
+        if (!$this->isAppleSerialNumber($value)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('%string%', $value)
                 ->addViolation();

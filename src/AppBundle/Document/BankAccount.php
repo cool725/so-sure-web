@@ -20,6 +20,7 @@ class BankAccount
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
+     * @AppAssert\BankAccountName()
      * @Assert\Length(min="1", max="100")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned

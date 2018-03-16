@@ -2,17 +2,13 @@
 
 namespace AppBundle\Validator\Constraints;
 
+use AppBundle\Document\ImeiTrait;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
 class ImeiValidator extends ConstraintValidator
 {
-    protected $imei;
-
-    public function __construct($imei)
-    {
-        $this->imei = $imei;
-    }
+    use ImeiTrait;
 
     public function validate($value, Constraint $constraint)
     {
@@ -20,7 +16,8 @@ class ImeiValidator extends ConstraintValidator
         if (strlen($value) == 0) {
             return;
         }
-        if (!$this->imei->isImei($value)) {
+
+        if (!$this->isImei($value)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('%string%', $value)
                 ->addViolation();

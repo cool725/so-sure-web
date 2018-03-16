@@ -2,17 +2,13 @@
 
 namespace AppBundle\Validator\Constraints;
 
+use AppBundle\Document\BacsTrait;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
 class BankAccountNumberValidator extends ConstraintValidator
 {
-    protected $banking;
-
-    public function __construct($banking)
-    {
-        $this->banking = $banking;
-    }
+    use BacsTrait;
 
     public function validate($value, Constraint $constraint)
     {
@@ -20,7 +16,7 @@ class BankAccountNumberValidator extends ConstraintValidator
             return;
         }
 
-        if (!$this->banking->validateAccountNumber($value)) {
+        if (!$this->validateAccountNumber($value)) {
             $this->context->buildViolation($constraint->message)
                 ->setParameter('%string%', $value)
                 ->addViolation();
