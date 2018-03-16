@@ -94,6 +94,8 @@ class OpsController extends BaseController
             throw $this->createAccessDeniedException('Only for dev use');
         }
         $validPolicy = null;
+        $validPolicyMonthly = null;
+        $validPolicyYearly = null;
         $validMultiplePolicy = null;
         $validRenwalPolicyMonthlyNoPot = null;
         $validRenwalPolicyYearlyNoPot = null;
