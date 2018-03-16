@@ -35,10 +35,11 @@ class ClaimsController extends BaseController
 {
     /**
      * @Route("/", name="claims_home")
+     * @Template
      */
     public function indexAction()
     {
-        return $this->redirectToRoute('claims_policies');
+        return [];
     }
 
     /**
@@ -62,9 +63,26 @@ class ClaimsController extends BaseController
     }
 
     /**
-     * @Route("/user/{id}", name="claims_user")
+     * @Route("/users", name="claims_users")
+     * @Template()
      */
-    public function claimsUserAction($id)
+    public function usersAction(Request $request)
+    {
+        try {
+            $data = $this->searchUsers($request);
+        } catch (RedirectException $e) {
+            return new RedirectResponse($e->getMessage());
+        }
+        return array_merge($data, [
+            'policy_route' => 'claim_policy',
+        ]);
+    }
+
+    /**
+     * @Route("/user/{id}", name="claims_user")
+     * @Template()
+     */
+    public function userAction($id)
     {
         if ($this->get('security.authorization_checker')->isGranted('ROLE_EMPLOYEE')) {
             $this->addFlash('warning', 'Redirected to Admin Site');
@@ -78,13 +96,11 @@ class ClaimsController extends BaseController
         if (!$user) {
             throw $this->createNotFoundException('User not found');
         }
-        foreach ($user->getPolicies() as $policy) {
-            if ($policy->isPolicy()) {
-                return $this->redirectToRoute('claims_policy', ['id' => $policy->getId()]);
-            }
-        }
 
-        throw $this->createNotFoundException('User does not have an active policy');
+        return [
+            'user' => $user,
+            'policy_route' => 'claims_policy',
+        ];
     }
 
     /**

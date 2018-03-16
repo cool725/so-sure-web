@@ -6,9 +6,6 @@
         <div class="col-sm-8">
             <h2>User - {{ user.name }}</h2>
         </div>
-        <div class="col-sm-4" style="margin-top: 20px">
-            <i class="fa fa-warning" title="TODO: Edit name/mobile/email (only if policy not purchase!!)"></i>
-        </div>
     </div>
             <table class="table table-striped">
                 <tr>
@@ -20,12 +17,14 @@
                     <td>Email</td>
                     <td>{{ user.email }} </td>
                     <td>
+                        {% if reset_form is defined %}
                         {{ form_start(reset_form) }}
                         {{ form_widget(reset_form.reset, {'label': 'Send reset email', 'attr': {'class': 'btn btn-danger'}}) }}
                         {{ form_end(reset_form) }}
 
                             <button type="button" class="btn btn-info" data-toggle="modal" data-target="#userEmailModal"
                             ><i class="fa fa-edit"></i> Change Email Address</button>
+                        {% endif %}
                     </td>
                 </tr>
                 <tr>
@@ -36,8 +35,10 @@
                         {% endif %}
                     </td>
                     <td>
+                        {% if user_detail_form is defined %}
                             <button type="button" class="btn btn-info" data-toggle="modal" data-target="#userDetailModal"
                             ><i class="fa fa-edit"></i> Edit User Details</button>
+                        {% endif %}
                     </td>
                 </tr>
                 <tr>
@@ -49,17 +50,20 @@
                     <td>{% if user.birthday %}{{ user.birthday|date('d M Y', 'Europe/London') }}{% else %}Not set{% endif %}
                     </td>
                     <td>
+                        {% if user_detail_form is defined %}
                             <button type="button" class="btn btn-info" data-toggle="modal" data-target="#userDetailModal"
                             ><i class="fa fa-edit"></i> Edit User Details</button>
+                        {% endif %}
                     </td>
                 </tr>
                 <tr>
                     <td>Mobile</td>
                     <td>{{ user.mobileNumber }}</td>
                     <td>
+                        {% if user_detail_form is defined %}
                             <button type="button" class="btn btn-info" data-toggle="modal" data-target="#userDetailModal"
                             ><i class="fa fa-edit"></i> Edit User Details</button>
-
+                        {% endif %}
                     </td>
                 </tr>
                 <tr>
@@ -68,26 +72,28 @@
                         {% if user.billingAddress%}
                         [<a target="blank" href="http://maps.google.com/?q={{ user.billingAddress.postcode }}">{{ user.billingAddress.postcode }}</a>]
                         {% endif %}
-                    {% if postcode and postcode.location %}
+                    {% if postcode is defined and postcode and postcode.location %}
                         [<a target="blank" href="http://maps.google.com/?ll={{ postcode.location.coordinates[1]}},{{ postcode.location.coordinates[0]}}">
                             Postcode match
                         </a>]
                     {% endif %}
-                    {% if census %}
+                    {% if census is defined and census %}
                         [<a target="blank" href="http://maps.google.com/?ll={{ census.location.coordinates[1]}},{{ census.location.coordinates[0]}}">
                             Census match
                         </a>]
                         <br>
                         {{ census.getSuperGroup }} / {{ census.getGroup }} / {{ census.getSubGroup }}
                     {% endif %}
-                    {% if income %}
+                    {% if income is defined and income %}
                         <br>
                         £{{ income.total.income|number_format(0, '.', ',') }} weekly income
                     {% endif %}
                     </td>
                     <td>
+                        {% if user_address_form is defined %}
                         <button type="button" class="btn btn-info" data-toggle="modal" data-target="#userAddressModal"
                         ><i class="fa fa-edit"></i> Edit User Address</button>
+                        {% endif %}
                     </td>
                 </tr>
                 <tr>
@@ -100,8 +106,10 @@
                         {%endif %}
                     </td>
                     <td>
+                        {% if user_permission_form is defined %}
                             <button type="button" class="btn btn-info" data-toggle="modal" data-target="#userPermissionModal"
                             ><i class="fa fa-edit"></i> Edit User Permissions</button>
+                        {% endif %}
                     </td>
                 </tr>
                 <tr>
@@ -114,8 +122,10 @@
                         {%endif %}
                     </td>
                     <td>
+                        {% if user_high_risk_form is defined %}
                             <button type="button" class="btn btn-info" data-toggle="modal" data-target="#userHighRiskModal"
                             ><i class="fa fa-edit"></i> Edit User High Risk</button>
+                        {% endif %}
                     </td>
                 </tr>
                 <tr>
@@ -123,13 +133,13 @@
                     <td>
                         {% for policy in user.allPolicies %}
                             {% if policy.policyNumber|length > 0 %}
-                                <a href="{{ path('admin_policy', {'id': policy.id }) }}">
+                                <a href="{{ path(policy_route, {'id': policy.id }) }}">
                                     {{ policy.policyNumber }}
                                 </a> ({{ policy.status }})
                             {% elseif policy.status == 'pending-renewal' %}
-                                <a href="{{ path('admin_policy', {'id': policy.id }) }}">{{ policy.id }}</a> (Pending Renwal)
+                                <a href="{{ path(policy_route, {'id': policy.id }) }}">{{ policy.id }}</a> (Pending Renwal)
                             {% else %}
-                                <a href="{{ path('admin_policy', {'id': policy.id }) }}">{{ policy.id }} (In progress)</a>
+                                <a href="{{ path(policy_route, {'id': policy.id }) }}">{{ policy.id }} (In progress)</a>
                             {% endif %}
                             <br />
                         {% endfor %}
@@ -138,13 +148,17 @@
                         {% endif %}
                     </td>
                     <td>
+                        {% if policy_form is defined %}
                             <button type="button" class="btn btn-info" data-toggle="modal" data-target="#newPolicyModal"
                                 ><i class="fa fa-plus"></i> Add partial policy</button>
+                        {% endif %}
                     </td>
                 </tr>
+                {% if makemodel_form is defined %}
                 <tr>
                     <td>Recipero Make/Model Check</td>
-                    <td>{{ form_start(makemodel_form)}}
+                    <td>
+                        {{ form_start(makemodel_form)}}
                         <span class="text-danger">
                         {{ form_errors(makemodel_form) }}
                         {{ form_errors(makemodel_form.imei) }}
@@ -160,6 +174,8 @@
                         £0.05 to run check
                     </td>
                 </tr>
+                {% endif %}
+                {% if is_granted('ROLE_EMPLOYEE') %}
                 <tr>
                     <td>Sanctions</td>
                     <td>
@@ -192,9 +208,12 @@
                             <br>
                         {% endfor %}
                     </td>
-                    <td>{{ form_start(sanctions_form)}}
+                    <td>
+                        {% if sanctions_form is defined %}
+                        {{ form_start(sanctions_form)}}
                         {{ form_widget(sanctions_form.confirm, {'label': 'Confirm NO match', 'attr': {'class': 'btn btn-info'}})}}
                         {{ form_end(sanctions_form)}}
+                        {% endif %}
                     </td>
                 </tr>
                 <tr>
@@ -210,9 +229,10 @@
                         </td>
                     {% endif %}
                 </tr>
+                {% endif %}
             </table>
 </div>
-
+{% if policy_form is defined %}
     <div class="modal fade" id="newPolicyModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -261,7 +281,8 @@
         </div>
       </div>
     </div>
-
+{% endif %}
+{% if user_detail_form is defined %}
     <div class="modal fade" id="userDetailModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document" style="width: 60%;">
         <div class="modal-content">
@@ -305,7 +326,8 @@
         </div>
       </div>
     </div>
-
+{% endif %}
+{% if user_email_form is defined %}
     <div class="modal fade" id="userEmailModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document" style="width: 60%;">
         <div class="modal-content">
@@ -332,7 +354,8 @@
         </div>
       </div>
     </div>
-
+{% endif %}
+{% if user_address_form is defined %}
     <div class="modal fade" id="userAddressModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document" style="width: 60%;">
         <div class="modal-content">
@@ -395,7 +418,8 @@
         </div>
       </div>
     </div>
-
+{% endif %}
+{% if user_permission_form is defined %}
     <div class="modal fade" id="userPermissionModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document" style="width: 60%;">
         <div class="modal-content">
@@ -429,7 +453,8 @@
         </div>
       </div>
     </div>
-
+{% endif %}
+{% if user_high_risk_form is defined %}
     <div class="modal fade" id="userHighRiskModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document" style="width: 60%;">
         <div class="modal-content">
@@ -457,7 +482,8 @@
         </div>
       </div>
     </div>
-
+{% endif %}
+{% if role_form is defined %}
     <div class="modal fade" id="newRoleModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -479,5 +505,5 @@
         </div>
       </div>
     </div>
-
+{% endif %}
 {% endblock %}
