@@ -1,0 +1,15 @@
+{% extends 'admin_claims_base.html.twig' %}
+
+{% block body %}
+    {% set style = "text-align: center; height: 100px; margin-bottom: 20px; padding-top: 30px; font-size: 24px; vertical-align: middle; border-radius: 5px; border: solid 1px;" %}
+<div class="container" style="margin-bottom: 50px; margin-top: 70px;"  >
+    <div class="row">
+        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
+            <a href="{{ path('claims_policies') }}"><i class="fa fa-file-pdf-o fa-large"></i> Policies</a>
+        </div>
+        <div class="col-md-3 col-md-offset-1" style="{{ style }};">
+            <a href="{{ path('claims_users') }}"><i class="fa fa-users fa-large"></i> Users</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

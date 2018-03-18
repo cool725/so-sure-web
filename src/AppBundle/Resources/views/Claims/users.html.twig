@@ -1,0 +1,111 @@
+{% extends 'admin_claims_base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets output='css/*.css'
+    '@AppBundle/Resources/public/sass/page/admin.scss'
+ %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{% block body %}
+<div class="container" id="claim-handling">
+    <h2>Search</h2>
+    <p><em>Tip: Only one of these fields is required to perform a search.</em></p>
+    {{ form_start(form, {'attr': {'class': 'form-inline'}}) }}
+    <div class="bg-info" style="border-radius: 4px; padding: 20px;">
+      <div class="row">
+        <div class="form-group col-sm-4">
+            {{ form_label(form.lastname, 'Lastname') }}
+            {{ form_errors(form.lastname) }}
+            {{ form_widget(form.lastname) }}
+        </div>
+        <div class="form-group col-sm-4">
+            {{ form_label(form.mobile, 'Mobile Number') }}
+            {{ form_errors(form.mobile) }}
+            {{ form_widget(form.mobile) }}
+        </div>
+        <div class="form-group col-sm-4">
+            {{ form_label(form.email, 'Email') }}
+            {{ form_errors(form.email) }}
+            {{ form_widget(form.email) }}
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group col-sm-4">
+            {{ form_label(form.postcode, 'Postcode') }}
+            {{ form_errors(form.postcode) }}
+            {{ form_widget(form.postcode) }}
+        </div>
+        <div class="form-group text-center col-sm-4" style="padding-top: 10px;">
+            {{ form_widget(form.search, {'label': 'Search', 'attr': {'class': 'btn btn-primary'}}) }}
+        </div>
+      </div>
+    </div>
+    <div class="hidden">
+        {{ form_widget(form.facebookId) }}
+        {{ form_widget(form.sosure) }}
+        {{ form_widget(form.allSanctions) }}
+        {{ form_widget(form.waitingSanctions) }}
+    </div>
+    {{ form_end(form) }}
+    <div class="row" style="margin-top: 20px">
+        <div class="col-md-8">
+            <h2>{{ pager.nbResults }} Results</h2>
+        </div>
+    </div>
+    {% if users.count == 0 %}
+    <div class="row-fluid">
+        <h2>No users found</h2>
+    </div>
+    {% else %}
+    <div class="row-fluid">
+        <div class="col-md-12">
+          <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                    <tr>
+                        <th>Has Policy?</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Mobile</th>
+                        <th>Facebook</th>
+                        <th>User Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for user in users %}
+                        <tr>
+                            <td>{% if user.hasPolicy %}Yes{% else %}-{% endif %}</td>
+                            <td>{{ user.firstname }} {{ user.lastname }}</td>
+                            <td>
+                                {% if is_granted('ROLE_CLAIMS') %}
+                                    <a href="{{ path('claims_user', {'id': user.id }) }}">{{ user.email }}</a>
+                                {% elseif is_granted('ROLE_EMPLOYEE') %}
+                                    <a href="{{ path('admin_user', {'id': user.id }) }}">{{ user.email }}</a>
+                                {% else %}
+                                    {{ user.email }}
+                                {% endif %}
+                            </td>
+                            <td>{{ user.mobileNumber }}</td>
+                            <td>{% if user.facebookId | length > 0 %}Yes{% else %}No{% endif %}</td>
+                            <td>{% if user.locked %}locked{% elseif user.enabled %}enabled{% else %}disabled{%endif %}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    </form>
+
+    {% if users.count > 0 %}
+    <div class="pagerfanta text-center">
+        {{ pagerfanta(pager, 'twitter_bootstrap3') }}
+    </div>
+    {% endif %}
+    <div style="padding-bottom: 50px"></div>
+</div>
+
+
+{% endblock %}

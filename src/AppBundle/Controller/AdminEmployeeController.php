@@ -949,7 +949,7 @@ class AdminEmployeeController extends BaseController
 
     /**
      * @Route("/user/{id}", name="admin_user")
-     * @Template
+     * @Template("AppBundle::Claims/user.html.twig")
      */
     public function adminUserAction(Request $request, $id)
     {
@@ -1236,6 +1236,7 @@ class AdminEmployeeController extends BaseController
             'postcode' => $postcode,
             'census' => $census,
             'income' => $income,
+            'policy_route' => 'admin_policy',
         ];
     }
 
