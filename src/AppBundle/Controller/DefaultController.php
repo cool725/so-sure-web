@@ -231,7 +231,7 @@ class DefaultController extends BaseController
             } elseif ($this->isGranted('ROLE_EMPLOYEE')) {
                 return $this->redirectToRoute('admin_home');
             } elseif ($this->isGranted('ROLE_CLAIMS')) {
-                return $this->redirectToRoute('claims_home');
+                return $this->redirectToRoute('claims_policies');
             } elseif ($this->isGranted('ROLE_USER')) {
                 return $this->redirectToRoute('user_home');
             }
