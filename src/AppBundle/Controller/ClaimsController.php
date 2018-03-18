@@ -27,6 +27,7 @@ use Pagerfanta\Pagerfanta;
 use Pagerfanta\Adapter\DoctrineODMMongoDBAdapter;
 use MongoRegex;
 use CensusBundle\Document\Postcode;
+use AppBundle\Exception\RedirectException;
 
 /**
  * @Route("/claims")
