@@ -6,6 +6,7 @@ use AppBundle\Service\RequestService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+use AppBundle\Document\User;
 
 class BankAccountNameValidator extends ConstraintValidator
 {
@@ -30,6 +31,7 @@ class BankAccountNameValidator extends ConstraintValidator
 
         $this->context->buildViolation($constraint->message)
             ->setParameter('%string%', $value)
+            ->setParameter('%name%', $user ? $user->getName() : 'Unknown')
             ->addViolation();
     }
 
@@ -41,13 +43,13 @@ class BankAccountNameValidator extends ConstraintValidator
         }
 
         // last name must be in the account name
-        if (stripos($value, strtolower($user->getLastName())) !== false) {
+        if (stripos($name, strtolower($user->getLastName())) !== false) {
             // manually verify cases where the first name isn't present
             // may want to check initials, etc in the future
-            if (stripos($value, strtolower($user->getFirstName())) === false) {
+            if (stripos($name, strtolower($user->getFirstName())) === false) {
                 $this->logger->warning(sprintf(
                     'Validate Bank Account Name %s for User %s / %s',
-                    $value,
+                    $name,
                     $user->getName(),
                     $user->getId()
                 ));

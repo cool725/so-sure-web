@@ -9,5 +9,5 @@ use Symfony\Component\Validator\Constraint;
  */
 class BankAccountName extends Constraint
 {
-    public $message = '%string% does not appear to match the policy holder name.';
+    public $message = '%string% does not match the policy holder name %name%.';
 }
