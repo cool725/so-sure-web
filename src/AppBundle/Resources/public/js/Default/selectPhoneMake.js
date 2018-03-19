@@ -223,19 +223,15 @@ $(function(){
         });
     }
 
-    // Load policy mobile data
-    function loadPolicy() {
-        $(this).find('.modal-body').load(url, function(){
-            sosure.globals.policyTerms();
-        });
-    }
-
+    // Load policy doc
     if ($('.modal-policy').length) {
 
-        var url = $('.modal-policy').data('url');
-
         $(this).on('shown.bs.modal', function() {
-            loadPolicy();
+            var url = $('.modal-policy').data('url');
+
+            $(this).find('.modal-body').load(url, function(){
+                sosure.globals.policyTerms();
+            });
         });
     }
 

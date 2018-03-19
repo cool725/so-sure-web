@@ -248,7 +248,7 @@ $(function(){
 
     $('.policy-doc-toggle').click(function(event) {
         $('.modal-policy').toggle(function() {
-            $(this).find('.modal-policy--inner').load(url, function(){
+            $(this).load(url, function(){
                 sosure.globals.policyTerms();
                 $(this).removeClass('text-center');
             });
