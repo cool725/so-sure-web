@@ -82,7 +82,7 @@ class DateTraitTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->assertEquals(
-            new \DateTime('2018-03-25 12:04'),
+            new \DateTime('2018-03-23 12:04'),
             $this->addBusinessDays(new \DateTime('2018-03-19 12:04'), 4)
         );
     }
