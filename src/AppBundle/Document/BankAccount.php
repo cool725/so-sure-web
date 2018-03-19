@@ -17,6 +17,7 @@ use VasilDakov\Postcode\Postcode;
 class BankAccount
 {
     use BacsTrait;
+    use DateTrait;
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
@@ -59,6 +60,14 @@ class BankAccount
      * @Gedmo\Versioned
      */
     protected $reference;
+
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     * @Gedmo\Versioned
+     * @var \DateTime
+     */
+    protected $mandate;
 
     /**
      * @MongoDB\EmbedOne(targetDocument="Address")
@@ -148,6 +157,41 @@ class BankAccount
         $this->setReference($reference);
 
         return $reference;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getMandate()
+    {
+        return $this->mandate;
+    }
+
+    /**
+     * @param \DateTime $mandate
+     */
+    public function setMandate(\DateTime $mandate)
+    {
+        $this->mandate = $mandate;
+    }
+
+    public function getPaymentDate(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        $days = 4;
+        if ($this->getMandate()) {
+            $days = 3;
+        }
+        // TODO: Check timezone
+        // 3pm cutoff or will date place the following day
+        if ($this->isWeekDay($date) && $date->format('H') >= 15) {
+            $days++;
+        }
+
+        return $this->addBusinessDays($date, $days);
     }
 
     public function __toString()

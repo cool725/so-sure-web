@@ -4,6 +4,40 @@ namespace AppBundle\Document;
 
 trait DateTrait
 {
+    public static function getBankHolidays()
+    {
+        // https://www.gov.uk/bank-holidays
+        return [
+            new \DateTime('2018-01-01'),
+            new \DateTime('2018-03-30'),
+            new \DateTime('2018-04-02'),
+            new \DateTime('2018-05-07'),
+            new \DateTime('2018-05-28'),
+            new \DateTime('2018-08-27'),
+            new \DateTime('2018-12-25'),
+            new \DateTime('2018-12-26'),
+            new \DateTime('2019-01-01'),
+            new \DateTime('2019-04-19'),
+            new \DateTime('2019-04-22'),
+            new \DateTime('2019-05-06'),
+            new \DateTime('2019-05-27'),
+            new \DateTime('2019-08-26'),
+            new \DateTime('2019-12-25'),
+            new \DateTime('2019-12-26'),
+        ];
+    }
+
+    public function isBankHoliday(\DateTime $date)
+    {
+        foreach (static::getBankHolidays() as $bankHoliday) {
+            if ($bankHoliday->diff($date)->days == 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function startOfPreviousMonth(\DateTime $date = null)
     {
         $startMonth = $this->startOfMonth($date);
@@ -68,12 +102,24 @@ trait DateTrait
         return $after;
     }
 
+    public function isWeekDay(\DateTime $date)
+    {
+        return !in_array((int) $date->format('w'), [0, 6]);
+    }
+
     public function addBusinessDays($date, $days)
     {
         $businessDays = clone $date;
         while ($days > 0) {
+            $isBusinessDay = true;
             $businessDays->add(new \DateInterval('P1D'));
-            if (!in_array((int) $businessDays->format('w'), [0, 6])) {
+            if (!$this->isWeekDay($businessDays)) {
+                $isBusinessDay = false;
+            } elseif ($this->isBankHoliday(($businessDays))) {
+                $isBusinessDay = false;
+            }
+
+            if ($isBusinessDay) {
                 $days--;
             }
         }
@@ -85,8 +131,15 @@ trait DateTrait
     {
         $businessDays = clone $date;
         while ($days > 0) {
+            $isBusinessDay = true;
             $businessDays->sub(new \DateInterval('P1D'));
-            if (!in_array((int) $businessDays->format('w'), [0, 6])) {
+            if (!$this->isWeekDay($businessDays)) {
+                $isBusinessDay = false;
+            } elseif ($this->isBankHoliday(($businessDays))) {
+                $isBusinessDay = false;
+            }
+
+            if ($isBusinessDay) {
                 $days--;
             }
         }

@@ -25,7 +25,7 @@ class BankAccountNameValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         $user = $this->requestService->getUser();
-        if ($this->isAccountName($user, $value) !== false) {
+        if ($this->isAccountName($value, $user) !== false) {
             return;
         }
 
@@ -35,7 +35,7 @@ class BankAccountNameValidator extends ConstraintValidator
             ->addViolation();
     }
 
-    public function isAccountName(User $user, $name)
+    public function isAccountName($name, User $user = null)
     {
         // if the user isn't present, probably a non-session access - eg. backend task, so we don't want to trigger
         if (!$user) {
