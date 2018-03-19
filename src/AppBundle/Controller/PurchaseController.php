@@ -680,9 +680,9 @@ class PurchaseController extends BaseController
     {
         if ($webType == JudopayService::WEB_TYPE_CARD_DETAILS) {
             if ($policy) {
-                return $this->redirectToRoute('user_card_details_policy', ['policyId' => $policy->getId()]);
+                return $this->redirectToRoute('user_payment_details_policy', ['policyId' => $policy->getId()]);
             } else {
-                return $this->redirectToRoute('user_card_details');
+                return $this->redirectToRoute('user_payment_details');
             }
         } elseif ($webType == JudopayService::WEB_TYPE_REMAINDER) {
             return $this->redirectToRoute('purchase_remainder_policy', ['id' => $policy->getId()]);

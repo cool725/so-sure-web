@@ -3,17 +3,35 @@ namespace AppBundle\Service;
 
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\Address;
+use AppBundle\Document\BankAccount;
 use AppBundle\Document\Charge;
 use AppBundle\Document\User;
+use AppBundle\Document\BacsTrait;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use GuzzleHttp\Client;
+use AppBundle\Exception\DirectDebitBankException;
 
 class PCAService
 {
+    use BacsTrait;
+
+    const TIMEOUT = 5;
     const REDIS_POSTCODE_KEY = 'postcode';
     const REDIS_ADDRESS_KEY_FORMAT = 'address:%s:%s';
+    const REDIS_BANK_KEY_FORMAT = 'bank:%s:%s';
     const CACHE_TIME = 84600; // 1 day
     const FIND_URL = "http://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Find/v2.10/xmla.ws";
     const RETRIEVE_URL = "http://services.postcodeanywhere.co.uk/CapturePlus/Interactive/Retrieve/v2.10/xmla.ws";
+    // @codingStandardsIgnoreStart
+    const BANK_ACCOUNT_URL = "https://services.postcodeanywhere.co.uk/BankAccountValidation/Interactive/Validate/v2.00/json.ws";
+    // @codingStandardsIgnoreEnd
+    const TEST_SORT_CODE = "000099";
+    const TEST_ACCOUNT_NUMBER_PCA = "12345678";
+    const TEST_ACCOUNT_NUMBER_OK = "87654321";
+    const TEST_ACCOUNT_NUMBER_ADJUSTED = "876543";
+    const TEST_ACCOUNT_NUMBER_NO_DD = "00000000";
+    const TEST_ACCOUNT_NUMBER_INVALID_SORT_CODE = "99999998";
+    const TEST_ACCOUNT_NUMBER_INVALID_ACCOUNT_NUMBER = "99999999";
 
     /** @var LoggerInterface */
     protected $logger;
@@ -27,6 +45,7 @@ class PCAService
     /** @var string */
     protected $environment;
 
+    /** @var \Predis\Client */
     protected $redis;
 
     /**
@@ -51,9 +70,97 @@ class PCAService
     }
 
     /**
-     * @param string $postcode
-     * @param string $number   Optional house number
-     * @param User   $user     Optional user
+     * @param string    $sortCode
+     * @param string    $accountNumber
+     * @param User|null $user
+     * @return BankAccount|null
+     * @throws DirectDebitBankException
+     */
+    public function getBankAccount($sortCode, $accountNumber, User $user = null)
+    {
+        $sortCode = $this->normalizeSortCode($sortCode);
+        $accountNumber = $this->normalizeAccountNumber($accountNumber);
+
+        $redisKey = sprintf(self::REDIS_BANK_KEY_FORMAT, $sortCode, $accountNumber);
+        if ($value = $this->redis->get($redisKey)) {
+            return unserialize($value);
+        }
+
+        // Use 00-00-99 / 87654321 for testing. as 00-00-99/12345678 is used for testing for pca-predict, should be ok
+        if ($sortCode == self::TEST_SORT_CODE && in_array($accountNumber, [
+            self::TEST_ACCOUNT_NUMBER_OK,
+            self::TEST_ACCOUNT_NUMBER_ADJUSTED
+        ])) {
+            $bankAccount = new BankAccount();
+            $bankAccount->setBankName('foo bank');
+            $bankAccount->setSortCode($sortCode);
+            $bankAccount->setAccountNumber($accountNumber);
+            if ($accountNumber == self::TEST_ACCOUNT_NUMBER_ADJUSTED) {
+                $bankAccount->setAccountNumber(sprintf("%s00", $accountNumber));
+            }
+            $address = new Address();
+            $address->setLine1('so-sure Test Address Line 1');
+            $address->setLine2('so-sure Test Address Line 2');
+            $address->setLine3('so-sure Test Address Line 3');
+            $address->setCity('so-sure Test City');
+            $address->setPostcode('BX1 1LT');
+            $bankAccount->setBankAddress($address);
+            $this->cacheBankAccountResults($sortCode, $accountNumber, $bankAccount);
+
+            return $bankAccount;
+        } elseif ($sortCode == self::TEST_SORT_CODE && $accountNumber == self::TEST_ACCOUNT_NUMBER_INVALID_SORT_CODE) {
+            throw new DirectDebitBankException('Bad sort code', DirectDebitBankException::ERROR_SORT_CODE);
+        } elseif ($sortCode == self::TEST_SORT_CODE &&
+            $accountNumber == self::TEST_ACCOUNT_NUMBER_INVALID_ACCOUNT_NUMBER) {
+            throw new DirectDebitBankException('No direct debit', DirectDebitBankException::ERROR_ACCOUNT_NUMBER);
+        } elseif ($sortCode == self::TEST_SORT_CODE && $accountNumber == self::TEST_ACCOUNT_NUMBER_NO_DD) {
+            throw new DirectDebitBankException('No direct debit', DirectDebitBankException::ERROR_NON_DIRECT_DEBIT);
+        } elseif ($this->environment != 'prod') {
+            // 00-00-99/12345678 is a free search via pca, so can used for non production environments
+            $sortCode = self::TEST_SORT_CODE;
+            $accountNumber = self::TEST_ACCOUNT_NUMBER_PCA;
+        }
+
+        try {
+            $bankAccount = $this->findBankAccount($sortCode, $accountNumber);
+        } catch (DirectDebitBankException $e) {
+            throw $e;
+        }
+
+        if ($bankAccount) {
+            $this->cacheBankAccountResults($sortCode, $accountNumber, $bankAccount);
+
+            // ignore free check
+            if (!($sortCode == self::TEST_SORT_CODE && $accountNumber == self::TEST_ACCOUNT_NUMBER_PCA)) {
+                $charge = new Charge();
+                try {
+                    $charge->setType(Charge::TYPE_BANK_ACCOUNT);
+                    $charge->setUser($user);
+                    $charge->setDetails(sprintf(
+                        '%s %s',
+                        $this->displayableSortCode($sortCode),
+                        $this->displayableAccountNumber($accountNumber)
+                    ));
+                    $this->dm->persist($charge);
+                    $this->dm->flush();
+                } catch (\Exception $e) {
+                    // Better to swallow this than fail
+                    $this->logger->warning('Error saving address charge.', ['exception' => $e]);
+                }
+            }
+
+            return $bankAccount;
+        }
+
+        return null;
+        
+    }
+
+    /**
+     * @param string    $postcode
+     * @param string    $number
+     * @param User|null $user
+     * @return Address|null
      */
     public function getAddress($postcode, $number, User $user = null)
     {
@@ -120,14 +227,10 @@ class PCAService
         $this->redis->hset(self::REDIS_POSTCODE_KEY, $postcode, 1);
     }
 
-    public function validateSortCode($sortCode)
+    protected function cacheBankAccountResults($sortCode, $accountNumber, $bankAccount)
     {
-        return true;
-    }
-
-    public function validateAccountNumber($accountNumber)
-    {
-        return true;
+        $redisKey = sprintf(self::REDIS_BANK_KEY_FORMAT, $sortCode, $accountNumber);
+        $this->redis->setex($redisKey, self::CACHE_TIME, serialize($bankAccount));
     }
 
     /**
@@ -177,9 +280,9 @@ class PCAService
 
     /**
      * Call pca find to get list of addresses that match criteria
-     *
      * @param string $postcode
-     * @param string $number   Optional house number
+     * @param string $number
+     * @return array|null
      */
     public function find($postcode, $number)
     {
@@ -237,6 +340,7 @@ class PCAService
         $url = sprintf("%s?%s", self::RETRIEVE_URL, http_build_query($data));
 
         //Make the request to Postcode Anywhere and parse the XML returned
+        /** @var \SimpleXMLElement $file */
         $file = simplexml_load_file($url);
         try {
             $this->checkError($file);
@@ -255,14 +359,71 @@ class PCAService
     }
 
     /**
+     * Call PCA Bank Account to validate sortcode/account number
+     *
+     * @param string $sortCode
+     * @param string $accountNumber
+     * @return BankAccount
+     * @throws DirectDebitBankException
+     */
+    public function findBankAccount($sortCode, $accountNumber)
+    {
+        $data = [
+            'Key' => $this->apiKey,
+            'AccountNumber' => $accountNumber,
+            'SortCode' => $sortCode,
+        ];
+        $url = sprintf("%s?%s", self::BANK_ACCOUNT_URL, http_build_query($data));
+
+        $client = new Client();
+        $res = $client->request('GET', $url, ['connect_timeout' => self::TIMEOUT, 'timeout' => self::TIMEOUT]);
+
+        $body = (string) $res->getBody();
+
+        $data = json_decode($body, true)[0];
+
+        // @codingStandardsIgnoreStart
+        // {"IsCorrect":"True","IsDirectDebitCapable":"True","StatusInformation":"CautiousOK","CorrectedSortCode":"000099","CorrectedAccountNumber":"12345678","IBAN":"GB27NWBK00009912345678","Bank":"TEST BANK PLC PLC","BankBIC":"NWBKGB21","Branch":"Worcester","BranchBIC":"18R","ContactAddressLine1":"2 High Street","ContactAddressLine2":"Smallville","ContactPostTown":"Worcester","ContactPostcode":"WR2 6NJ","ContactPhone":"01234 456789","ContactFax":"","FasterPaymentsSupported":"False","CHAPSSupported":"True"}
+        // @codingStandardsIgnoreEnd
+        $this->logger->info(sprintf('Bank Account lookup for %s %s %s', $sortCode, $accountNumber, json_encode($data)));
+        if ($data['StatusInformation'] == "UnknownSortCode") {
+            throw new DirectDebitBankException('Unknown sort code', DirectDebitBankException::ERROR_SORT_CODE);
+        } elseif ($data['StatusInformation'] == "InvalidAccountNumber") {
+            throw new DirectDebitBankException(
+                'Invalid account number',
+                DirectDebitBankException::ERROR_ACCOUNT_NUMBER
+            );
+        } elseif (!$data['IsDirectDebitCapable']) {
+            throw new DirectDebitBankException(
+                'Account is not dd capable',
+                DirectDebitBankException::ERROR_NON_DIRECT_DEBIT
+            );
+        }
+        $bankAccount = new BankAccount();
+        $bankAccount->setBankName($data['Bank']);
+        $bankAccount->setSortCode($data['CorrectedSortCode']);
+        $bankAccount->setAccountNumber($data['CorrectedAccountNumber']);
+        $address = new Address();
+        $address->setLine1($data['ContactAddressLine1']);
+        $address->setLine2($data['ContactAddressLine2']);
+        $address->setCity($data['ContactPostTown']);
+        $address->setPostcode($data['ContactPostcode']);
+        $bankAccount->setBankAddress($address);
+
+        return $bankAccount;
+    }
+
+    /**
      * Transform xml row to address
      *
-     * @param $row
+     * @param mixed $row
      *
-     * return @Address
+     * @return Address
      */
     public function transformAddress($row)
     {
+        // TODO: Move to method, but will need to fix test cases
+        /** @var \SimpleXMLElement $row */
         $address = new Address();
         $line1 = (string) $row->attributes()->Line1;
         $line2 = (string) $row->attributes()->Line2;
@@ -285,6 +446,11 @@ class PCAService
         return $address;
     }
 
+    /**
+     * @param $file
+     * @param null $postcode
+     * @throws \Exception
+     */
     private function checkError($file, $postcode = null)
     {
         //Check for an error, if there is one then throw an exception

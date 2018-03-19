@@ -1,0 +1,37 @@
+<section class="user-homepage--content section--pad">
+    <div class="container">
+
+        <h2>Your Payment Details</h2>
+
+        {% if bacs %}
+        <div class="row">
+            <div class="col-md-6">
+                <h4>Your current payment method:</h4>
+                <p>{% if user.paymentMethod.type == "judo" %}Credit/Debit Card{% elseif user.paymentMethod.type == "bacs" %}Direct Debit{% else %}Unknown{% endif %}</p>
+                <a href="#tab-card" class="btn btn-blue-hollow" data-toggle="tab">Change to Credit/Debit Card</a>
+            </div>
+        </div>
+        {% endif %}
+        <div class="row">
+            <div class="col-md-6">
+                <h4>Your direct debit:</h4>
+                <p>{% if user.paymentMethod.type == "bacs" %}{{ user.paymentMethod }}{% else %}Not setup{% endif %}</p>
+                <a href="#tab-bacs-setup" class="btn btn-blue-hollow" data-toggle="tab">Upate Details</a>
+            </div>
+        </div>
+        {% if policy.premiumPlan == 'monthly' %}
+        <div class="row">
+            <div class="col-md-6">
+                <h4>Billing date:</h4>
+                <p>Monthly on the {{ policy.billing|date('jS','Europe/London') }}</p>
+                <p>(or next working day after in the case of weekends/bank holidays)</p>
+                {#
+                <button title="Change" type="button" class="btn btn-blue-hollow"
+                        data-toggle="modal" data-target="#billingModal">
+                    <i class="fa fa-edit"></i> Change</button>
+                 #}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>

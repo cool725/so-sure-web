@@ -15,12 +15,14 @@ class Charge
 {
     use CurrencyTrait;
 
+    // sync with $type choices
     const TYPE_ADDRESS = 'address';
     const TYPE_SMS = 'sms';
     const TYPE_GSMA = 'gsma';
     const TYPE_MAKEMODEL = 'makemodel';
     const TYPE_CLAIMSCHECK = 'claimscheck';
     const TYPE_CLAIMSDAMAGE = 'claimsdamage';
+    const TYPE_BANK_ACCOUNT = 'bank-account';
 
     public static $prices = [
         self::TYPE_ADDRESS => 0.037, // ex vat
@@ -29,6 +31,7 @@ class Charge
         self::TYPE_MAKEMODEL => 0.05, // ex vat
         self::TYPE_CLAIMSCHECK => 0.9, // ex vat
         self::TYPE_CLAIMSDAMAGE => 0.02, // ex vat
+        self::TYPE_BANK_ACCOUNT => 0.037, // ex vat
     ];
 
     /**
@@ -44,7 +47,8 @@ class Charge
     protected $createdDate;
 
     /**
-     * @Assert\Choice({"address", "sms", "gsma", "makemodel", "claimscheck", "claimsdamage"}, strict=true)
+     * @Assert\Choice({"address", "sms", "gsma", "makemodel", "claimscheck", "claimsdamage", "bank-account"},
+     *     strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */

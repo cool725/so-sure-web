@@ -94,6 +94,8 @@ class OpsController extends BaseController
             throw $this->createAccessDeniedException('Only for dev use');
         }
         $validPolicy = null;
+        $validPolicyMonthly = null;
+        $validPolicyYearly = null;
         $validMultiplePolicy = null;
         $validRenwalPolicyMonthlyNoPot = null;
         $validRenwalPolicyYearlyNoPot = null;
@@ -168,6 +170,18 @@ class OpsController extends BaseController
                 break;
             }
             $position--;
+        }
+        foreach ($validPolicies as $validPolicyMonthly) {
+            if (!$validPolicyMonthly->hasMonetaryClaimed() &&
+                $validPolicyMonthly->getPremiumPlan() == Policy::PLAN_MONTHLY) {
+                break;
+            }
+        }
+        foreach ($validPolicies as $validPolicyYearly) {
+            if (!$validPolicyYearly->hasMonetaryClaimed() &&
+                $validPolicyYearly->getPremiumPlan() == Policy::PLAN_YEARLY) {
+                break;
+            }
         }
         foreach ($validPolicies as $validMultiplePolicy) {
             $user = $validMultiplePolicy->getUser();
@@ -257,6 +271,8 @@ class OpsController extends BaseController
             'unpaid_policy' => $unpaidPolicy,
             'unpaid_policydiscount_policy' => $unpaidPolicyDiscountPolicy,
             'valid_policy' => $validPolicy,
+            'valid_policy_monthly' => $validPolicyMonthly,
+            'valid_policy_annual' => $validPolicyYearly,
             'cancelled_fraud_policy' => $cancelledFraudPolicy,
             'cancelled_policy' => $cancelledPolicy,
             'valid_multiple_policy' => $validMultiplePolicy,

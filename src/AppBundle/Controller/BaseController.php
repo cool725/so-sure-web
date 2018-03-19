@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\ControllerTrait;
 
 use Pagerfanta\Pagerfanta;
 use Pagerfanta\Adapter\DoctrineODMMongoDBAdapter;
@@ -41,6 +42,7 @@ use AppBundle\Service\SixpackService;
 abstract class BaseController extends Controller
 {
     use PhoneTrait;
+    use ControllerTrait;
 
     public function isDataStringPresent($data, $field)
     {

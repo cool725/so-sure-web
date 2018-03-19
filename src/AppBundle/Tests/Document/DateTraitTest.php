@@ -80,6 +80,20 @@ class DateTraitTest extends \PHPUnit\Framework\TestCase
             new \DateTime('2016-12-13 00:00'),
             $this->addBusinessDays(new \DateTime('2016-12-09 00:00'), 2)
         );
+
+        $this->assertEquals(
+            new \DateTime('2018-03-23 12:04'),
+            $this->addBusinessDays(new \DateTime('2018-03-19 12:04'), 4)
+        );
+    }
+
+    public function testAddBusinessDaysWithHoliday()
+    {
+        // weekend
+        $this->assertEquals(
+            new \DateTime('2018-01-02 00:00'),
+            $this->addBusinessDays(new \DateTime('2017-12-29 00:00'), 1)
+        );
     }
 
     public function testSubBusinessDays()
@@ -94,6 +108,15 @@ class DateTraitTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             new \DateTime('2016-12-09 00:00'),
             $this->subBusinessDays(new \DateTime('2016-12-13 00:00'), 2)
+        );
+    }
+
+    public function testSubBusinessDaysWithHoliday()
+    {
+        // weekend
+        $this->assertEquals(
+            new \DateTime('2017-12-29 00:00'),
+            $this->subBusinessDays(new \DateTime('2018-01-02 00:00'), 1)
         );
     }
 }

@@ -3,8 +3,8 @@
 {% block toolbar %}
     {% set icon %}
         {# this is the content displayed as a panel in the toolbar #}
-        <span class="icon"><img src="..." alt=""/></span>
-        <span class="sf-toolbar-status"><strong class="text-red">{{ environment }}</strong></span>
+        <span class="icon" style="margin-top: 7px;"> <i class="fa fa-magic fa-2x"></i></span>
+        <span  style="margin-top: 0px;"><strong class="text-red">{{ environment }}</strong></span>
     {% endset %}
 
     {% set text %}
@@ -16,6 +16,10 @@
 
         <div class="sf-toolbar-info-piece">
             <b><a href="{{ path('quote_make_model_memory', {'make':'Apple','model':'iPhone 7','memory':128}) }}">Quote <i class="fa fa-mobile fa-lg" title="Quick Quote"></i></a></b>
+        </div>
+
+        <div class="sf-toolbar-info-piece">
+            <b><a href="#" id="dev-modal" data-toggle="modal" data-target="#devModal">Info  <i class="fa fa-info fa-lg" title="Accounts Info"></i></a></b>
         </div>
     {% endset %}
 

@@ -68,11 +68,11 @@
                     </li>
                     {% endif %}
                     {% if (policy is defined and policy) or app.user.getLatestPolicy %}
-                    <li role="presentation" class="{% if app.request.get('_route') == 'user_card_details' or app.request.get('_route') == 'user_card_details_policy' %}active{% endif %}">
+                    <li role="presentation" class="{% if app.request.get('_route') == 'user_payment_details' or app.request.get('_route') == 'user_payment_details_policy' %}active{% endif %}">
                         {% if policy is defined and policy %}
-                            <a href="{{ path('user_card_details_policy', {'policyId': policy.id}) }}">Payment Details</a>
+                            <a href="{{ path('user_payment_details_policy', {'policyId': policy.id}) }}">Payment Details</a>
                         {% elseif app.user.getLatestPolicy %}
-                            <a href="{{ path('user_card_details') }}">Payment Details</a>
+                            <a href="{{ path('user_payment_details') }}">Payment Details</a>
                         {% endif %}
                     </a></li>
                     {% endif %}

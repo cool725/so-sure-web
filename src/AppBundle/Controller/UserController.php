@@ -2,9 +2,12 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Service\PCAService;
+use AppBundle\Service\SequenceService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -16,8 +19,13 @@ use AppBundle\Document\SCode;
 use AppBundle\Document\Cashback;
 use AppBundle\Document\Feature;
 use AppBundle\Document\User;
+use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\BankAccount;
 use AppBundle\Document\Form\Renew;
 use AppBundle\Document\Form\RenewCashback;
+use AppBundle\Document\Form\Bacs;
+use AppBundle\Form\Type\BacsType;
+use AppBundle\Form\Type\BacsConfirmType;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\EmailInvitationType;
 use AppBundle\Form\Type\UserEmailType;
@@ -67,6 +75,7 @@ use AppBundle\Exception\InvalidImeiException;
 use AppBundle\Exception\ImeiBlacklistedException;
 use AppBundle\Exception\ImeiPhoneMismatchException;
 use AppBundle\Exception\InvalidEmailException;
+use AppBundle\Exception\DirectDebitBankException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
@@ -1123,12 +1132,12 @@ class UserController extends BaseController
         );
     }
     /**
-     * @Route("/payment-details", name="user_card_details")
-     * @Route("/payment-details/{policyId}", name="user_card_details_policy",
+     * @Route("/payment-details", name="user_payment_details")
+     * @Route("/payment-details/{policyId}", name="user_payment_details_policy",
      *      requirements={"policyId":"[0-9a-f]{24,24}"})
      * @Template
      */
-    public function cardDetailsAction(Request $request, $policyId = null)
+    public function paymentDetailsAction(Request $request, $policyId = null)
     {
         $user = $this->getUser();
         $dm = $this->getManager();
@@ -1146,6 +1155,17 @@ class UserController extends BaseController
             return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
         }
 
+        $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
+        // For now, only allow 1 policy with bacs
+        if ($bacsFeature && count($user->getValidPolicies(true)) > 1) {
+            $bacsFeature = false;
+        }
+        // For now, only allow monthly policies with bacs
+        if ($bacsFeature && $policy->getPremiumPlan() != Policy::PLAN_MONTHLY) {
+            $bacsFeature = false;
+        }
+        // TODO: Move to ajax call
+        $webpay = null;
         $webpay = $this->get('app.judopay')->webRegister(
             $user,
             $request->getClientIp(),
@@ -1154,8 +1174,19 @@ class UserController extends BaseController
         );
         $billing = new BillingDay();
         $billing->setPolicy($policy);
+        /** @var FormInterface $billingForm */
         $billingForm = $this->get('form.factory')
             ->createNamedBuilder('billing_form', BillingDayType::class, $billing)
+            ->getForm();
+        $bacs = new Bacs();
+        /** @var FormInterface $bacsForm */
+        $bacsForm = $this->get('form.factory')
+            ->createNamedBuilder('bacs_form', BacsType::class, $bacs)
+            ->getForm();
+        $bacsConfirm = new Bacs();
+        /** @var FormInterface $bacsConfirmForm */
+        $bacsConfirmForm = $this->get('form.factory')
+            ->createNamedBuilder('bacs_confirm_form', BacsConfirmType::class, $bacsConfirm)
             ->getForm();
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('billing_form')) {
@@ -1174,7 +1205,40 @@ class UserController extends BaseController
                         'Thanks for your request. We will be in touch soon.'
                     );
 
-                    return $this->redirectToRoute('user_card_details_policy', ['policyId' => $policyId]);
+                    return $this->redirectToRoute('user_payment_details_policy', ['policyId' => $policyId]);
+                }
+            } elseif ($request->request->has('bacs_form')) {
+                $bacsForm->handleRequest($request);
+                if ($bacsForm->isValid()) {
+                    if (!$bacs->isValid()) {
+                        $this->addFlash('error', 'Sorry, but this bank account is not valid');
+                    } else {
+                        /** @var SequenceService $sequenceService */
+                        $sequenceService = $this->get('app.sequence');
+                        if ($this->getParameter('kernel.environment') == 'prod') {
+                            $seq = $sequenceService->getSequenceId(SequenceService::SEQUENCE_BACS_REFERENCE);
+                        } else {
+                            $seq = $sequenceService->getSequenceId(SequenceService::SEQUENCE_BACS_REFERENCE_INVALID);
+                        }
+                        $ref = $bacs->generateReference($user, $seq);
+                        $bacsConfirm = clone $bacs;
+                        $bacsConfirmForm = $this->get('form.factory')
+                            ->createNamedBuilder('bacs_confirm_form', BacsConfirmType::class, $bacsConfirm)
+                            ->getForm();
+                    }
+                }
+            } elseif ($request->request->has('bacs_confirm_form')) {
+                $bacsConfirmForm->handleRequest($request);
+                if ($bacsConfirmForm->isValid()) {
+                    $user->setPaymentMethod($bacsConfirm->transformBacsPaymentMethod());
+                    $dm->flush();
+
+                    $this->addFlash(
+                        'success',
+                        'Your bacs is now setup.'
+                    );
+
+                    return $this->redirectToRoute('user_payment_details_policy', ['policyId' => $policyId]);
                 }
             }
         }
@@ -1185,6 +1249,10 @@ class UserController extends BaseController
             'user' => $user,
             'policy' => $policy,
             'billing_form' => $billingForm->createView(),
+            'bacs_form' => $bacsForm->createView(),
+            'bacs_confirm_form' => $bacsConfirmForm->createView(),
+            'bacs_feature' => $bacsFeature,
+            'bacs' => $bacs,
         ];
 
         return $data;

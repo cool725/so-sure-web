@@ -92,6 +92,9 @@ class RequestService
         return null;
     }
 
+    /**
+     * @return User|null
+     */
     public function getUser()
     {
         if ($this->tokenStorage->getToken()) {

@@ -909,6 +909,12 @@ services:
         tags:
             - { name: form.type }
 
+    app.form.type.bacs:
+        class: AppBundle\Form\Type\BacsType
+        arguments: ["@app.address", "%form_required%"]
+        tags:
+            - { name: form.type }
+
     app.form.type.cashback:
         class: AppBundle\Form\Type\CashbackType
         arguments: ["@request_stack", "%form_required%"]
@@ -989,13 +995,11 @@ services:
 
     app.validator.imei:
         class: AppBundle\Validator\Constraints\ImeiValidator
-        arguments: ["@app.imei"]
         tags:
             - { name: validator.constraint_validator }
 
     app.validator.serialnumber:
         class: AppBundle\Validator\Constraints\SerialNumberValidator
-        arguments: ["@app.imei"]
         tags:
             - { name: validator.constraint_validator }
 
@@ -1007,13 +1011,19 @@ services:
 
     app.validator.sortcode:
         class: AppBundle\Validator\Constraints\SortCodeValidator
-        arguments: ["@app.address"]
         tags:
             - { name: validator.constraint_validator }
 
     app.validator.bankaccountnumber:
         class: AppBundle\Validator\Constraints\BankAccountNumberValidator
-        arguments: ["@app.address"]
+        tags:
+            - { name: validator.constraint_validator }
+
+    app.validator.bankaccountname:
+        class: AppBundle\Validator\Constraints\BankAccountNameValidator
+        arguments:
+            - "@app.request"
+            - "@logger"
         tags:
             - { name: validator.constraint_validator }
 

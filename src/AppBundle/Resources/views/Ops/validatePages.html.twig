@@ -69,7 +69,10 @@
                 <a href="{{ url('user_home') }}?_impersonate={{ valid_multiple_policy.user.email }}">User Home - Multiple Policy</a> <b>(auto impersonate {{ valid_multiple_policy.user.email }})</b>
             </li>
             <li>
-                <a href="{{ url('user_home') }}?_impersonate={{ valid_policy.user.email }}">User Home</a> <b>(auto impersonate {{ valid_policy.user.email }})</b>
+                <a href="{{ url('user_home') }}?_impersonate={{ valid_policy_monthly.user.email }}">User Home - Monthly</a> <b>(auto impersonate {{ valid_policy_monthly.user.email }})</b>
+            </li>
+            <li>
+                <a href="{{ url('user_home') }}?_impersonate={{ valid_policy_annual.user.email }}">User Home - Annual</a> <b>(auto impersonate {{ valid_policy_annual.user.email }})</b>
             </li>
             <li>
                 <a href="{{ url('user_home') }}?_impersonate={{ invitation.inviter.email }}">User Home - Sent Invitation</a> <b>(auto impersonate {{ invitation.inviter.email }})</b>

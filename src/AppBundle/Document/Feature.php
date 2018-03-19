@@ -18,6 +18,7 @@ class Feature
     const FEATURE_DAVIES_IMPORT_ERROR_EMAIL = 'davies-import-error-email';
     const FEATURE_STARLING = 'starling';
     const FEATURE_SALVA_POLICY_UPDATE = 'salva-policy-update';
+    const FEATURE_BACS = 'bacs';
 
     public static $features = [
         self::FEATURE_QUOTE_LEAD,
@@ -27,6 +28,7 @@ class Feature
         self::FEATURE_DAVIES_IMPORT_ERROR_EMAIL,
         self::FEATURE_STARLING,
         self::FEATURE_SALVA_POLICY_UPDATE,
+        self::FEATURE_BACS,
     ];
 
     /**

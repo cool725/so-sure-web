@@ -8,6 +8,7 @@ use AppBundle\Service\PCAService;
 
 /**
  * @group functional-nonet
+ * AppBundle\\Tests\\Service\\PCAServiceTest
  */
 class PCAServiceTest extends WebTestCase
 {
@@ -42,6 +43,22 @@ class PCAServiceTest extends WebTestCase
         $address = self::$pca->getAddress('BX11LT', null);
         $this->assertEquals('BX1 1LT', $address->getPostCode());
         $this->assertTrue(self::$redis->hexists(PCAService::REDIS_POSTCODE_KEY, 'BX11LT') == 1);
+    }
+
+    public function testGetBankAccountCaching()
+    {
+        self::$redis->flushdb();
+        $this->assertFalse(self::$redis->exists(sprintf(
+            PCAService::REDIS_BANK_KEY_FORMAT,
+            '000099',
+            '87654321'
+        )) == 1);
+        $address = self::$pca->getBankAccount('000099', '87654321');
+        $this->assertTrue(self::$redis->exists(sprintf(
+            PCAService::REDIS_BANK_KEY_FORMAT,
+            '000099',
+            '87654321'
+        )) == 1);
     }
 
     public function testNormalize()
