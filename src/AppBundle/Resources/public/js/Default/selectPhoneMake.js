@@ -224,14 +224,18 @@ $(function(){
     }
 
     // Load policy mobile data
+    function loadPolicy() {
+        $(this).find('.modal-body').load(url, function(){
+            sosure.globals.policyTerms();
+        });
+    }
+
     if ($('.modal-policy').length) {
 
         var url = $('.modal-policy').data('url');
 
         $(this).on('shown.bs.modal', function() {
-            $(this).find('.modal-body').load(url, function(){
-                sosure.globals.policyTerms();
-            });
+            loadPolicy();
         });
     }
 
