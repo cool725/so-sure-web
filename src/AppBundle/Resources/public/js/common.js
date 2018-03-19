@@ -17,9 +17,10 @@ sosure.globals = (function() {
         $('.modal-policy').find('table').addClass('table, table-bordered');
         // Hide the sections content
         $('.section-header').nextAll().not('h2').not('.section-header').hide();
-        // Do stuff
-        $('.section-header').on('click', function() {
-            console.log($(this).attr('id'));
+        $('.section-header').unbind('click').click(function(e) {
+            e.preventDefault();
+            $(this).nextUntil('.section-header').toggle();
+            $(this).toggleClass('section-open');
         });
     }
 
