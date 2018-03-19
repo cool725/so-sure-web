@@ -8,6 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ODM\MongoDB\DocumentRepository;
+use PicsureMLBundle\Document\TrainingData;
 
 class LabelType extends AbstractType
 {
@@ -17,9 +18,9 @@ class LabelType extends AbstractType
             ->add('label', ChoiceType::class, [
                 'choices'  => array(
                     'None' => null,
-                    'Undamaged' => 'undamaged',
-                    'Invalid' => 'invalid',
-                    'Damaged' => 'damaged',
+                    'Undamaged' => TrainingData::LABEL_UNDAMAGED,
+                    'Invalid' => TrainingData::LABEL_INVALID,
+                    'Damaged' => TrainingData::LABEL_DAMAGED,
                 ),
                 'placeholder' => false,
                 'expanded' => true,
