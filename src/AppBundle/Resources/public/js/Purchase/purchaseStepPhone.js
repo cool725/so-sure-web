@@ -175,12 +175,12 @@ $(function(){
     });
 
     // Load the policy doc
-    var url = $('.modal-policy').data('url');
+    var url = $('.modal-policy--embedded').data('url');
 
     $('.policy-doc-toggle').click(function(e) {
         e.preventDefault();
 
-        $('.modal-policy').toggle(function() {
+        $('.modal-policy--embedded').toggle(function() {
             $(this).load(url, function(){
                 sosure.globals.policyTerms();
                 $(this).removeClass('text-center');

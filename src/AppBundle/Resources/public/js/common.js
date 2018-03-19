@@ -12,9 +12,9 @@ sosure.globals = (function() {
     self.policyTerms = function() {
         // Policy Modal
         // Find the headings to add class
-        $('.modal-policy').find('h3').addClass('section-header');
+        $('.modal-policy, .modal-policy--embedded').find('h3').addClass('section-header');
         // Find the tables to add some styling classes
-        $('.modal-policy').find('table').addClass('table, table-bordered');
+        $('.modal-policy, .modal-policy--embedded').find('table').addClass('table, table-bordered');
         // Hide the sections content
         $('.section-header').nextAll().not('h2').not('.section-header').hide();
         $('.section-header').unbind('click').click(function(e) {
