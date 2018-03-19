@@ -173,4 +173,18 @@ $(function(){
         $('#purchase_form_serialNumber').removeAttr("required");
         $('#step--validate').click();
     });
+
+    // Load the policy doc
+    var url = $('.modal-policy').data('url');
+
+    $('.policy-doc-toggle').click(function(e) {
+        e.preventDefault();
+
+        $('.modal-policy').toggle(function() {
+            $(this).load(url, function(){
+                sosure.globals.policyTerms();
+                $(this).removeClass('text-center');
+            });
+        });
+    });
 });
