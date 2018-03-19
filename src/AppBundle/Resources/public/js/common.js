@@ -8,21 +8,18 @@ sosure.globals = (function() {
     self.setDevice = function(device_category) {
         self.device_category = device_category;
     }
-    
+
     self.policyTerms = function() {
         // Policy Modal
         // Find the headings to add class
-        $('#policy-modal, .modal-policy').find('h3').addClass('section-header');
+        $('.modal-policy').find('h3').addClass('section-header');
         // Find the tables to add some styling classes
-        $('#policy-modal, .modal-policy').find('table').addClass('table, table-bordered');
+        $('.modal-policy').find('table').addClass('table, table-bordered');
         // Hide the sections content
         $('.section-header').nextAll().not('h2').not('.section-header').hide();
-        // Click function
-        $('.section-header').each(function(index) {    
-            $(this).on('click', function(event) {
-                $(this).nextUntil('.section-header').toggle();
-                $(this).toggleClass('section-open');
-            });
+        // Do stuff
+        $('.section-header').on('click', function() {
+            console.log($(this).attr('id'));
         });
     }
 
@@ -121,6 +118,5 @@ $(function(){
     if (jQuery.fn.popover) {
         $('[data-toggle="popover"]').popover();
     }
-    
-    sosure.globals.policyTerms();
+
 });

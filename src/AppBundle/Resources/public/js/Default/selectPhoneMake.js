@@ -222,11 +222,16 @@ $(function(){
             $('.search-phone-text').focus();
         });
     }
-    
+
+    // Load policy mobile data
     if ($('.modal-policy').length) {
+
         var url = $('.modal-policy').data('url');
-        $('.modal-policy').load(url, function() {
-            sosure.globals.policyTerms();
+
+        $(this).on('shown.bs.modal', function() {
+            $(this).find('.modal-body').load(url, function(){
+                sosure.globals.policyTerms();
+            });
         });
     }
 

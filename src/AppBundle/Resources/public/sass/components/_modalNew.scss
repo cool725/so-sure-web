@@ -178,10 +178,11 @@
 
     .modal-dialog {
         width: 100%;
-        margin: 0 auto;
+        margin: 0px auto;
 
         @include breakpoint(tablet) {
             width: 750px;
+            margin: 25px auto;
         }
 
         @include breakpoint(laptop) {

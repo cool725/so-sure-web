@@ -284,8 +284,7 @@
                 </div>
                 <div class="modal-body modal-policy" data-url="{{ url('latest_policy_terms', {'policy_key': policy_key, 'maxPotValue':  max_pot, 'include': true, 'noH1': true }) }}">
                     <div class="text-center" style="margin-bottom: 20px;">
-                        <i class="fa fa-spinner fa-pulse fa-2x fa-fw text-blue"></i>
-                        Loading...
+                        <img src="{{ cdn_url }}/images/spinner.svg" alt="Loading...">
                     </div>
                 </div>
             </div>
