@@ -1076,43 +1076,6 @@ class UserController extends BaseController
             $user->getId()
         );
 
-        //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_LANDING_HOME);
-        //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_CPC_QUOTE_MANUFACTURER);
-        //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_PHONE_IMAGE);
-        //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_SLIDER);
-        //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_PYG_HOME);
-        //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_SIMPLE_COMPLEX_SPLIT);
-        //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_SIMPLE_SPLIT);
-        //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_CPC_MANUFACTURER_WITH_HOME);
-        //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_V1_V2);
-        //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_V1_V2OLD_V2NEW);
-        // $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_FUNNEL_V1_V2);
-        $this->get('app.sixpack')->convert(
-            SixpackService::EXPERIMENT_QUOTE_INTERCOM_PURCHASE,
-            SixpackService::KPI_POLICY_PURCHASE
-        );
-        $this->get('app.sixpack')->convert(
-            SixpackService::EXPERIMENT_HOMEPAGE_AA_V2,
-            SixpackService::KPI_POLICY_PURCHASE
-        );
-
-        $this->get('app.sixpack')->convert(
-            SixpackService::EXPERIMENT_CPC_MANUFACTURER_OLD_NEW,
-            SixpackService::KPI_POLICY_PURCHASE
-        );
-        $this->get('app.sixpack')->convert(
-            SixpackService::EXPERIMENT_HOMEPAGE_STICKYSEARCH_SHUFFLE,
-            SixpackService::KPI_POLICY_PURCHASE
-        );
-
-        $this->get('app.sixpack')->convert(
-            SixpackService::EXPERIMENT_NEW_QUOTE_DESIGN,
-            SixpackService::KPI_POLICY_PURCHASE
-        );
-        $this->get('app.sixpack')->convert(
-            SixpackService::EXPERIMENT_MONEY_UNBOUNCE
-        );
-
         $countUnprocessedInvitations = count($user->getUnprocessedReceivedInvitations());
         if ($countUnprocessedInvitations > 0) {
             $message = sprintf(

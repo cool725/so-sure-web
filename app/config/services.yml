@@ -773,6 +773,13 @@ services:
             -  { name: kernel.event_listener, event: event.policy.cashback, method: onPolicyCashbackEvent }
             -  { name: kernel.event_listener, event: event.policy.declined-renewal, method: onPolicyDeclineRenewedEvent }
 
+    app.listener.sixpack:
+        class:   AppBundle\Listener\SixpackListener
+        arguments:
+            - "@app.sixpack"
+        tags:
+            -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
+
     app.listener.push:
         class:   AppBundle\Listener\PushListener
         arguments:
