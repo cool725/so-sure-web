@@ -521,7 +521,7 @@ class AdminController extends BaseController
      * @Route("/bacs/{year}/{month}", name="admin_bacs_date")
      * @Template
      */
-    public function bacsAction(Request $request, $year = null, $month = null)
+    public function bacsAction($year = null, $month = null)
     {
         $now = new \DateTime();
         if (!$year) {
