@@ -53,5 +53,8 @@ class GoCompare
 
       835 => ['make' => 'Google', 'model' => 'Pixel 2', 'memory' => 128],
       836 => ['make' => 'Google', 'model' => 'Pixel 2 XL', 'memory' => 128],
+
+      1239 => ['make' => 'Samsung', 'model' => 'Galaxy S9', 'memory' => 64],
+      1240 => ['make' => 'Samsung', 'model' => 'Galaxy S9+', 'memory' => 128],
     ];
 }
