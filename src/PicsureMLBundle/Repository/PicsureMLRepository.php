@@ -21,8 +21,7 @@ class PicsureMLRepository extends DocumentRepository
 
     public function getTotalCount()
     {
-        return $this->createQueryBuilder('d')
-                ->select('count(d.id)')
+        return $this->createQueryBuilder()
                 ->getQuery()
                 ->execute()
                 ->count();
@@ -30,8 +29,7 @@ class PicsureMLRepository extends DocumentRepository
 
     public function getNoneCount()
     {
-        return $this->createQueryBuilder('d')
-                ->select('count(d.id)')
+        return $this->createQueryBuilder()
                 ->field('label')->equals(null)
                 ->getQuery()
                 ->execute()
@@ -40,8 +38,7 @@ class PicsureMLRepository extends DocumentRepository
 
     public function getUndamagedCount()
     {
-        return $this->createQueryBuilder('d')
-                ->select('count(d.id)')
+        return $this->createQueryBuilder()
                 ->field('label')->equals(TrainingData::LABEL_UNDAMAGED)
                 ->getQuery()
                 ->execute()
@@ -50,8 +47,7 @@ class PicsureMLRepository extends DocumentRepository
 
     public function getInvalidCount()
     {
-        return $this->createQueryBuilder('d')
-                ->select('count(d.id)')
+        return $this->createQueryBuilder()
                 ->field('label')->equals(TrainingData::LABEL_INVALID)
                 ->getQuery()
                 ->execute()
@@ -60,8 +56,7 @@ class PicsureMLRepository extends DocumentRepository
 
     public function getDamagedCount()
     {
-        return $this->createQueryBuilder('d')
-                ->select('count(d.id)')
+        return $this->createQueryBuilder()
                 ->field('label')->equals(TrainingData::LABEL_DAMAGED)
                 ->getQuery()
                 ->execute()
