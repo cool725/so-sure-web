@@ -95,6 +95,11 @@
 	@include btn(transparent, $white, $white);
 }
 
+.btn-link {
+	@include btn(transparent, $blue, $blue);
+	text-decoration: underline;
+}
+
 // Active Buttons
 .btn.active {
 	box-shadow: none;
