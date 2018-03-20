@@ -48,6 +48,12 @@ class BacsCommand extends BaseCommand
                 InputOption::VALUE_NONE,
                 'Skip s3 upload'
             )
+            ->addOption(
+                'skip-email',
+                null,
+                InputOption::VALUE_NONE,
+                'Skip sending email confirmation'
+            )
         ;
     }
 
@@ -63,6 +69,7 @@ class BacsCommand extends BaseCommand
         $date = $input->getOption('date');
         $skipSftp = true === $input->getOption('skip-sftp');
         $skipS3 = true === $input->getOption('skip-s3');
+        $skipEmail = true === $input->getOption('skip-email');
         $processingDate = null;
         if ($date) {
             $processingDate = new \DateTime($date);
@@ -95,6 +102,7 @@ class BacsCommand extends BaseCommand
             $output->writeln('No data present. Skipping upload(s)');
             $skipSftp = true;
             $skipS3 = true;
+            $skipEmail = true;
         }
 
         $now = new \DateTime();
@@ -107,14 +115,24 @@ class BacsCommand extends BaseCommand
             $output->writeln(sprintf('Uploaded sftp file %s', $filename));
         }
         if (!$skipS3) {
-            $this->uploadS3(implode(PHP_EOL, $lines), $filename, $data);
+            $this->uploadS3(implode(PHP_EOL, $lines), $filename, $processingDate, $data);
             $output->writeln(sprintf('Uploaded s3 file %s', $filename));
         }
 
         $this->getManager()->flush();
-        $output->writeln('Saved changes to db. Finished');
+        $output->writeln('Saved changes to db.');
 
-        // TODO: EMail bacs@so-sure.com
+        if (!$skipEmail) {
+            $mailer = $this->getContainer()->get('app.mailer');
+            $mailer->send(
+                'Bacs File Ready to Process',
+                'bacs@so-sure.com',
+                sprintf('File %s is ready to process. Data: %s', $filename, json_encode($data))
+            );
+            $output->writeln('Confirmation email sent');
+        }
+
+        $output->writeln('Finished');
     }
 
     private function getHeader()
@@ -206,7 +224,7 @@ class BacsCommand extends BaseCommand
         return $files;
     }
 
-    public function uploadS3($data, $filename, $metadata = null)
+    public function uploadS3($data, $filename, \DateTime $date, $metadata = null)
     {
         $password = $this->getContainer()->getParameter('accesspay_s3file_password');
         $tmpFile = sprintf('%s/%s', sys_get_temp_dir(), $filename);
@@ -225,6 +243,7 @@ class BacsCommand extends BaseCommand
         $file = new AccessPayFile();
         $file->setBucket(self::S3_BUCKET);
         $file->setKey($s3Key);
+        $file->setDate($date);
 
         foreach ($metadata as $key => $value) {
             $file->addMetadata($key, $value);

@@ -1,0 +1,44 @@
+{% extends 'admin_claims_base.html.twig' %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+        '@AppBundle/Resources/public/js/Admin/month.js'
+    %}
+    <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock %}
+
+{% block body %}
+<div class="container" style="margin-bottom: 50px">
+
+<div class="row">
+    <div class="col-md-6">
+        <h1>so-sure Bacs for {{ month }} / {{ year }}</h1>
+    </div>
+    <form class="month-form form-inline" method="POST" autocomplete="off">
+    <div class="col-md-4">
+        <div class="form-group" style="padding-top: 15px;">
+            <div class="input-group date month" data-url="{{ path('admin_bacs') }}">
+                <input name="bacs" type='text' class="form-control" value="{{month}}-{{year}}" />
+                <span class="input-group-addon">
+                    <span class="fa fa-calendar"></span>
+                </span>
+            </div>
+            <div class="input-group">
+                <div class="input-group-btn">
+                    <button class="btn btn-success"><i class="fa fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    </form>
+</div>
+    {% for file in files %}
+    <div class="row">
+        <h4>{{ file.key }} {{ file.metadata|json_encode }}</h4>
+    </div>
+    {% endfor %}
+
+
+{% endblock %}
