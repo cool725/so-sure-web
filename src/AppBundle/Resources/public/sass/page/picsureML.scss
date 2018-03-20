@@ -28,6 +28,21 @@
 		}
 	}
 
+	#picsureml_search_form_label {
+		label {
+			padding: 12px 12px 12px 6px;
+		}
+	}
+
+	#picsureml_search_form_images_per_page {
+		label {
+			padding: 12px 12px 12px 6px;
+		}
+		input {
+			max-width: 60px;
+		}	
+	}
+
 	.picsure-image-edit {
 		img {
 			max-width: 100%;

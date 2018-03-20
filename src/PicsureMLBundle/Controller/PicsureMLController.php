@@ -38,16 +38,32 @@ class PicsureMLController extends BaseController
         $picsureMLSearchForm->handleRequest($request);
 
         $label = $picsureMLSearchForm->get('label')->getData();
+        $imagesPerPage = $picsureMLSearchForm->get('images_per_page')->getData();
+
+        if ($imagesPerPage == null) {
+            $imagesPerPage = 30;
+        }
 
         $dm = $this->getPicsureMLManager();
         $repo = $dm->getRepository(TrainingData::class);
 
-        $qb = $repo->createQueryBuilder()
-            ->field('label')->equals($label)
-            ->sort('id', 'desc');
-        $pager = $this->pager($request, $qb, 30);
+        $qb = $repo->createQueryBuilder();
+        if ($label != null) {
+            if ($label == 'none') {
+                $qb->field('label')->equals(null);
+            } else {
+                $qb->field('label')->equals($label);
+            }
+        }
+        $qb->sort('id', 'desc');
+        $pager = $this->pager($request, $qb, $imagesPerPage);
 
         return [
+            'n_images' => $repo->getTotalCount(),
+            'n_none_images' => $repo->getNoneCount(),
+            'n_undamaged_images' => $repo->getUndamagedCount(),
+            'n_invalid_images' => $repo->getInvalidCount(),
+            'n_damaged_images' => $repo->getDamagedCount(),
             'label' => $label,
             'picsureml_search_form' => $picsureMLSearchForm->createView(),
             'images' => $pager->getCurrentPageResults(),
@@ -113,39 +129,24 @@ class PicsureMLController extends BaseController
             $filesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3policy_fs');
             $environment = $this->getParameter('kernel.environment');
             $file = str_replace(sprintf('%s/', $environment), '', $file);
-
-            if (!$filesystem->has($file)) {
-                throw $this->createNotFoundException(sprintf('URL not found %s', $file));
-            }
-
-            $mimetype = $filesystem->getMimetype($file);
-            return StreamedResponse::create(
-                function () use ($file, $filesystem) {
-                    $stream = $filesystem->readStream($file);
-                    echo stream_get_contents($stream);
-                    flush();
-                },
-                200,
-                array('Content-Type' => $mimetype)
-            );
-        }
-        else {
+        } else {
             $filesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3picsure_fs');
-            if (!$filesystem->has($file)) {
-                throw $this->createNotFoundException(sprintf('URL not found %s', $file));
-            }
-
-            $mimetype = $filesystem->getMimetype($file);
-            return StreamedResponse::create(
-                function () use ($file, $filesystem) {
-                    $stream = $filesystem->readStream($file);
-                    echo stream_get_contents($stream);
-                    flush();
-                },
-                200,
-                array('Content-Type' => $mimetype)
-            );
         }
+
+        if (!$filesystem->has($file)) {
+            throw $this->createNotFoundException(sprintf('URL not found %s', $file));
+        }
+
+        $mimetype = $filesystem->getMimetype($file);
+        return StreamedResponse::create(
+            function () use ($file, $filesystem) {
+                $stream = $filesystem->readStream($file);
+                echo stream_get_contents($stream);
+                flush();
+            },
+            200,
+            array('Content-Type' => $mimetype)
+        );
     }
 
     /**

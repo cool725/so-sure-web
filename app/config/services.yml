@@ -1108,6 +1108,12 @@ services:
             -  { name: kernel.event_listener, event: event.picsure.invalid, method: onInvalidEvent }
             -  { name: kernel.event_listener, event: event.picsure.rejected, method: onDamagedEvent }
 
+    picsureml.form.type.search:
+        class: PicsureMLBundle\Form\Type\PicsureMLSearchType
+        arguments: ["@request_stack", "%form_required%"]
+        tags:
+            - { name: form.type }
+
     picsureml.form.type.annotate:
         class: PicsureMLBundle\Form\Type\AnnotateType
         arguments: ["@request_stack", "%form_required%"]

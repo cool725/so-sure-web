@@ -22,14 +22,25 @@
 
 {% block body %}
 <div class="container">
-    <h3>Picsure Machine Learning {{ label }}</h3>
-    <div class="bg-info text-center" style="border-radius: 10px; padding: 20px; margin-bottom: 20px;">
+    {% if label == null %}
+        <h3>Picsure Machine Learning</h3>
+    {% else %}
+        <h3>Picsure Machine Learning - {{ label|capitalize }}</h3>
+    {% endif %}
+    <p><strong>{{ n_images }} Images</strong> ({{ n_none_images }} None - {{ n_undamaged_images }} Undamaged - {{ n_invalid_images }} Invalid - {{ n_damaged_images }} Damaged) </p>
+    <div class="bg-info text-center" style="border-radius: 10px; padding: 20px 20px 12px 20px; margin-bottom: 20px;">
     {{ form_start(picsureml_search_form) }}
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-6">
             {{ form_widget(picsureml_search_form.label) }}
         </div>
         <div class="col-md-4">
+            <div id="picsureml_search_form_images_per_page">
+                {{ form_label(picsureml_search_form.images_per_page) }}
+                {{ form_widget(picsureml_search_form.images_per_page) }}
+            </div>
+        </div>
+        <div class="col-md-2">
             {{ form_widget(picsureml_search_form.search, {'attr':{'class':'btn btn-info'}}) }}
         </div>
     </div>

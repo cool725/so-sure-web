@@ -1,14 +1,12 @@
 <?php
 
-namespace AppBundle\Form\Type;
+namespace PicsureMLBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use PicsureMLBundle\Document\TrainingData;
@@ -39,11 +37,16 @@ class PicsureMLSearchType extends AbstractType
                 'multiple' => false,
                 'expanded' => true,
                 'choices' => [
-                    'None' => null,
+                    'All' => null,
+                    'None' => 'none',
                     'Undamaged' => TrainingData::LABEL_UNDAMAGED,
                     'Invalid' => TrainingData::LABEL_INVALID,
                     'Damaged' => TrainingData::LABEL_DAMAGED,
                 ]
+            ])
+            ->add('images_per_page', IntegerType::class, [
+                'required' => true,
+                'attr' => array('min' => 1, 'placeholder' => 30)
             ])
             ->add('search', SubmitType::class)
         ;
@@ -53,6 +56,9 @@ class PicsureMLSearchType extends AbstractType
             $form = $event->getForm();
             if ($currentRequest->query->get('label')) {
                 $form->get('label')->setData($currentRequest->query->get('label'));
+            }
+            if ($currentRequest->query->get('images_per_page')) {
+                $form->get('images_per_page')->setData($currentRequest->query->get('images_per_page'));
             }
         });
     }
