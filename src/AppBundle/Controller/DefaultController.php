@@ -97,6 +97,26 @@ class DefaultController extends BaseController
         return $this->render($template, $data);
     }
 
+    /**
+     * @Route("/money", name="money")
+     */
+    public function moneyLanding(Request $request)
+    {
+        $exp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_MONEY_UNBOUNCE,
+            ['sosure', 'unbounce'],
+            SixpackService::LOG_MIXPANEL_CONVERSION
+        );
+        if ($exp == 'sosure') {
+            return $this->redirectToRoute('homepage');
+        } else {
+            return new RedirectResponse(sprintf(
+                'https://campaign.wearesosure.com/money_comparisons/?%s',
+                $request->getQueryString()
+            ));
+        }
+    }
 
     /**
      * @Route("/reimagined", name="reimagined")
