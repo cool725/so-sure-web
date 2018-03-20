@@ -91,6 +91,22 @@ abstract class LoadPhoneData implements ContainerAwareInterface
             'tech+ops@so-sure.com',
             'tech@so-sure.com'
         );
+
+        // @codingStandardsIgnoreStart
+        $body = sprintf(
+            'The following phones have been added to the so-sure site. Ensure that tech has the latest go-compare model reference sheet and adds the go-compare reference numbers. New advertising can be added.<br><br>%s',
+            implode('<br>', $lines)
+        );
+        // @codingStandardsIgnoreEnd
+        $mailer->send(
+            'New Phones have been added',
+            'marketing@so-sure.com',
+            $body,
+            null,
+            null,
+            'tech+ops@so-sure.com',
+            'tech@so-sure.com'
+        );
     }
 
     private function setSuggestedReplacement($manager, $data)
