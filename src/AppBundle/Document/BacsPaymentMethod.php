@@ -13,6 +13,7 @@ class BacsPaymentMethod extends PaymentMethod
     /**
      * @MongoDB\EmbedOne(targetDocument="BankAccount")
      * @Gedmo\Versioned
+     * @var BankAccount
      */
     protected $bankAccount;
 
@@ -23,11 +24,17 @@ class BacsPaymentMethod extends PaymentMethod
      */
     protected $soleSignature;
 
+    /**
+     * @param BankAccount $bankAccount
+     */
     public function setBankAccount(BankAccount $bankAccount)
     {
         $this->bankAccount = $bankAccount;
     }
 
+    /**
+     * @return BankAccount
+     */
     public function getBankAccount()
     {
         return $this->bankAccount;

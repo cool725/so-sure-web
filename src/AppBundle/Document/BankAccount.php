@@ -19,6 +19,11 @@ class BankAccount
     use BacsTrait;
     use DateTrait;
 
+    const MANDATE_PENDING_INIT = 'pending-init';
+    const MANDATE_PENDING_APPROVAL = 'pending-approval';
+    const MANDATE_SUCCESS = 'success';
+    const MANDATE_FAILURE = 'failure';
+
     /**
      * @AppAssert\AlphanumericSpaceDot()
      * @AppAssert\BankAccountName()
@@ -62,18 +67,22 @@ class BankAccount
     protected $reference;
 
     /**
-     * @Assert\DateTime()
-     * @MongoDB\Field(type="date")
+     * @Assert\Choice({"pending-init", "pending-approval", "success", "failure"}, strict=true)
+     * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
-     * @var \DateTime
      */
-    protected $mandate;
+    protected $mandateStatus;
 
     /**
      * @MongoDB\EmbedOne(targetDocument="Address")
      * @Gedmo\Versioned
      */
     protected $bankAddress;
+
+    public function __construct()
+    {
+        $this->setMandateStatus(self::MANDATE_PENDING_INIT);
+    }
 
     public function setAccountName($accountName)
     {
@@ -159,20 +168,14 @@ class BankAccount
         return $reference;
     }
 
-    /**
-     * @return \DateTime
-     */
-    public function getMandate()
+    public function getMandateStatus()
     {
-        return $this->mandate;
+        return $this->mandateStatus;
     }
 
-    /**
-     * @param \DateTime $mandate
-     */
-    public function setMandate(\DateTime $mandate)
+    public function setMandateStatus($mandateStatus)
     {
-        $this->mandate = $mandate;
+        $this->mandateStatus = $mandateStatus;
     }
 
     public function getPaymentDate(\DateTime $date = null)
@@ -182,7 +185,7 @@ class BankAccount
         }
 
         $days = 4;
-        if ($this->getMandate()) {
+        if ($this->getMandateStatus() == self::MANDATE_SUCCESS) {
             $days = 3;
         }
         // TODO: Check timezone

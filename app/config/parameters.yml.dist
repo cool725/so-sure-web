@@ -134,3 +134,8 @@ parameters:
     intercom_secure: ''
     intercom_secure_android: ''
     intercom_secure_ios: ''
+
+    accesspay_server: ''
+    accesspay_username: ''
+    accesspay_password: ''
+    accesspay_keyfile: ''
