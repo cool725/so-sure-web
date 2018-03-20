@@ -49,11 +49,11 @@ class UserRepository extends DocumentRepository
             ->count() > 0;
     }
 
-    public function existsAnotherUser(User $user = null, $email = null, $facebookId = null, $mobileNumber = null)
+    public function getDuplicateUsers(User $user = null, $email = null, $facebookId = null, $mobileNumber = null)
     {
         // If there's nothing to query, then another user doesn't exist
         if (!$email && !$facebookId && !$mobileNumber) {
-            return false;
+            return null;
         }
 
         $qb = $this->createQueryBuilder();
@@ -72,9 +72,13 @@ class UserRepository extends DocumentRepository
         }
 
         return $qb
-            ->getQuery()
-            ->execute()
-            ->count() > 0;
+                ->getQuery()
+                ->execute();
+    }
+
+    public function existsAnotherUser(User $user = null, $email = null, $facebookId = null, $mobileNumber = null)
+    {
+        return $this->getDuplicateUsers($user, $email, $facebookId, $mobileNumber)->count() > 0;
     }
 
     public function getDuplicatePostcodeCount(User $user)

@@ -123,7 +123,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
         $crawler = $this->createPurchaseUserNew($user, 'foo bar', new \DateTime('1980-01-01'));
         self::verifyResponse(302);
-
+print_r(self::$client->getResponse());
         $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-policy'));
     }
 

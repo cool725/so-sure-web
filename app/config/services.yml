@@ -16,6 +16,7 @@ services:
             - [setRequestStack, ['@request_stack']]
             - [setEncoderFactory, ["@security.encoder_factory"]]
             - [setAuthService, ["@security.authorization_checker"]]
+            - [setDm, ["@doctrine_mongodb.odm.default_document_manager"]]
 
     app.user.cognitoidentity:
         class: AppBundle\Security\CognitoIdentityUserProvider
