@@ -17,6 +17,7 @@ sosure.globals = (function() {
         $('.modal-policy, .modal-policy--embedded').find('table').addClass('table, table-bordered');
         // Hide the sections content
         $('.section-header').nextAll().not('h2').not('.section-header').hide();
+        // Togggle sections
         $('.section-header').unbind('click').click(function(e) {
             e.preventDefault();
             $(this).nextUntil('.section-header').toggle();

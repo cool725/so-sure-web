@@ -175,16 +175,20 @@ $(function(){
     });
 
     // Load the policy doc
-    var url = $('.modal-policy--embedded').data('url');
+    var url  = $('.modal-policy--embedded').data('url');
+    var done = false;
 
     $('.policy-doc-toggle').click(function(e) {
         e.preventDefault();
-
         $('.modal-policy--embedded').toggle(function() {
-            $(this).load(url, function(){
-                sosure.globals.policyTerms();
-                $(this).removeClass('text-center');
-            });
+            if (done != true) {
+                $(this).load(url, function(){
+                    sosure.globals.policyTerms();
+                    $(this).removeClass('text-center');
+                });
+
+                done = true;
+            }
         });
     });
 });
