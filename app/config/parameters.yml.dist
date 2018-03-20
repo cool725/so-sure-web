@@ -139,3 +139,4 @@ parameters:
     accesspay_username: ''
     accesspay_password: ''
     accesspay_keyfile: ''
+    accesspay_s3file_password: 'changeme'

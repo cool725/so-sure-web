@@ -64,7 +64,8 @@
         "thiagoalessio/tesseract_ocr": "^1.1",
         "imagine/imagine": "^0.7.1",
         "peerj/peerj-user-security-bundle": "^0.2",
-        "phpseclib/phpseclib": "^2.0"
+        "phpseclib/phpseclib": "^2.0",
+        "defuse/php-encryption": "^2.1"
     },
     "require-dev": {
         "sensio/generator-bundle": "~3.0",

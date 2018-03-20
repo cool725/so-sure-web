@@ -5,6 +5,7 @@ namespace AppBundle\Command;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Repository\UserRepository;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -16,6 +17,7 @@ use phpseclib\Crypt\RSA;
 class BacsCommand extends BaseCommand
 {
     use DateTrait;
+    const S3_BUCKET = 'admin.so-sure.com';
 
     protected function configure()
     {
@@ -50,7 +52,7 @@ class BacsCommand extends BaseCommand
     }
 
     /**
-     * @param InputInterface $input
+     * @param InputInterface  $input
      * @param OutputInterface $output
      * @return int|null|void
      * @throws \Exception
@@ -73,9 +75,11 @@ class BacsCommand extends BaseCommand
         if ($debug) {
             $output->writeln($this->getHeader());
         }
+        $data = [];
 
         $output->writeln('Exporting Mandates');
         $mandates = $this->exportMandates($processingDate);
+        $data['ddi'] = count($mandates);
         if ($debug) {
             $output->writeln(json_encode($mandates, JSON_PRETTY_PRINT));
         }
@@ -87,7 +91,7 @@ class BacsCommand extends BaseCommand
         }
 
         $lines = array_merge($mandates, $payments);
-        if (($debug && count($lines) == 1) || count($lines) == 0) {
+        if (count($lines) == 0) {
             $output->writeln('No data present. Skipping upload(s)');
             $skipSftp = true;
             $skipS3 = true;
@@ -103,13 +107,13 @@ class BacsCommand extends BaseCommand
             $output->writeln(sprintf('Uploaded sftp file %s', $filename));
         }
         if (!$skipS3) {
-            $this->uploadS3(implode(PHP_EOL, $lines), $filename);
+            $this->uploadS3(implode(PHP_EOL, $lines), $filename, $data);
             $output->writeln(sprintf('Uploaded s3 file %s', $filename));
         }
 
         $this->getManager()->flush();
         $output->writeln('Saved changes to db. Finished');
-        
+
         // TODO: EMail bacs@so-sure.com
     }
 
@@ -202,19 +206,33 @@ class BacsCommand extends BaseCommand
         return $files;
     }
 
-    public function uploadS3($data, $filename)
+    public function uploadS3($data, $filename, $metadata = null)
     {
+        $password = $this->getContainer()->getParameter('accesspay_s3file_password');
         $tmpFile = sprintf('%s/%s', sys_get_temp_dir(), $filename);
+        $encTempFile = sprintf('%s/enc-%s', sys_get_temp_dir(), $filename);
         file_put_contents($tmpFile, $data);
-        $s3Key = sprintf('%s/bi/%s', $this->getEnvironment(), $filename);
+        \Defuse\Crypto\File::encryptFileWithPassword($tmpFile, $encTempFile, $password);
+        unlink($tmpFile);
+        $s3Key = sprintf('%s/bacs/%s', $this->getEnvironment(), $filename);
 
         $this->getS3()->putObject(array(
-            'Bucket' => 'admin.so-sure.com',
+            'Bucket' => self::S3_BUCKET,
             'Key'    => $s3Key,
-            'SourceFile' => $tmpFile,
+            'SourceFile' => $encTempFile,
         ));
 
-        unlink($tmpFile);
+        $file = new AccessPayFile();
+        $file->setBucket(self::S3_BUCKET);
+        $file->setKey($s3Key);
+
+        foreach ($metadata as $key => $value) {
+            $file->addMetadata($key, $value);
+        }
+
+        $this->getManager()->persist($file);
+
+        unlink($encTempFile);
 
         return $s3Key;
     }

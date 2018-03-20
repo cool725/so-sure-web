@@ -188,9 +188,8 @@ class BankAccount
         if ($this->getMandateStatus() == self::MANDATE_SUCCESS) {
             $days = 3;
         }
-        // TODO: Check timezone
-        // 3pm cutoff or will date place the following day
-        if ($this->isWeekDay($date) && $date->format('H') >= 15) {
+        // 2pm cutoff (UTC for cronjob) or will take place the following day
+        if ($this->isWeekDay($date) && $date->format('H') >= 14) {
             $days++;
         }
 
