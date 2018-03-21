@@ -59,6 +59,8 @@ class PicsureMLSearchType extends AbstractType
             }
             if ($currentRequest->query->get('images_per_page')) {
                 $form->get('images_per_page')->setData($currentRequest->query->get('images_per_page'));
+            } else {
+                $form->get('images_per_page')->setData(30);
             }
         });
     }

@@ -41,7 +41,7 @@ class PicsureMLController extends BaseController
         $imagesPerPage = $this->getRequestString($request, 'images_per_page');
 
         if ($imagesPerPage == null) {
-            $imagesPerPage = 30;
+            $imagesPerPage = $picsureMLSearchForm->get('images_per_page')->getData();
         }
 
         $dm = $this->getPicsureMLManager();
