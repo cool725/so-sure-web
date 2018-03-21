@@ -16,7 +16,7 @@ use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Classes\SoSure;
 
-class BICommand extends ContainerAwareCommand
+class BICommand extends BaseCommand
 {
     protected function configure()
     {
@@ -333,21 +333,6 @@ class BICommand extends ContainerAwareCommand
         $this->uploadS3(implode(PHP_EOL, $lines), 'connections.csv');
 
         return $lines;
-    }
-
-    private function getManager()
-    {
-        return $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-    }
-
-    public function getS3()
-    {
-        return $this->getContainer()->get("aws.s3");
-    }
-
-    public function getEnvironment()
-    {
-        return $this->getContainer()->getParameter("kernel.environment");
     }
 
     public function uploadS3($data, $filename)

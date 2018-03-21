@@ -517,6 +517,32 @@ class AdminController extends BaseController
     }
 
     /**
+     * @Route("/bacs", name="admin_bacs")
+     * @Route("/bacs/{year}/{month}", name="admin_bacs_date")
+     * @Template
+     */
+    public function bacsAction($year = null, $month = null)
+    {
+        $now = new \DateTime();
+        if (!$year) {
+            $year = $now->format('Y');
+        }
+        if (!$month) {
+            $month = $now->format('m');
+        }
+        $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
+
+        $dm = $this->getManager();
+        $s3FileRepo = $dm->getRepository(S3File::class);
+
+        return [
+            'year' => $year,
+            'month' => $month,
+            'files' => $s3FileRepo->getAllFiles($date, 'accesspay'),
+        ];
+    }
+
+    /**
      * @Route("/banking", name="admin_banking")
      * @Route("/banking/{year}/{month}", name="admin_banking_date")
      * @Template
