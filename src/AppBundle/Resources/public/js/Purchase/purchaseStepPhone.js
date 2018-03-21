@@ -175,13 +175,13 @@ $(function(){
     });
 
     // Load the policy doc
-    if ($('.modal-policy').length) {
+    if ($('.modal-policy-embedded').length) {
 
         // Content to load
-        var url = $('.modal-policy').data('url');
+        var url   = $('.modal-policy-embedded').data('url');
 
         function loadDoc() {
-            $('.modal-policy').load(url, function(responseTxt, statusTxt, xhr) {
+            $('.modal-policy-embedded').load(url, function(responseTxt, statusTxt, xhr) {
                 if (statusTxt == 'success') {
                     sosure.globals.policyTerms();
                 }
@@ -196,7 +196,7 @@ $(function(){
             e.preventDefault();
 
             // Expand content
-            $('.modal-policy').toggle(function() {
+            $('.modal-policy-embedded').toggle(function() {
                 loadDoc();
             });
 
