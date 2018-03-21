@@ -317,6 +317,14 @@ class MonitorService
         }
     }
 
+    public function checkMixpanelQueue()
+    {
+        $count = $this->mixpanel->countQueue();
+        if ($count > 50) {
+            throw new MonitorException(sprintf('There are %d outstanding messages in the queue', $count));
+        }
+    }
+
     public function policyTerms()
     {
         $repo = $this->dm->getRepository(PolicyTerms::class);
