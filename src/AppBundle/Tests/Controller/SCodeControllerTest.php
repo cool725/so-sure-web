@@ -21,6 +21,7 @@ class SCodeControllerTest extends BaseControllerTest
 
     public function testSCodeNonUser()
     {
+        self::$phone = null;
         $this->createSCode('testSCodeNonUser-code');
 
         $repo = self::$dm->getRepository(SCode::class);
@@ -36,6 +37,7 @@ class SCodeControllerTest extends BaseControllerTest
 
     public function testSCodeUser()
     {
+        self::$phone = null;
         $this->createSCode('testSCodeUser-code');
 
         $email = self::generateEmail('testSCodeUser', $this);
