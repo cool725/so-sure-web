@@ -166,6 +166,11 @@ class MixpanelService
         return $this->redis->lrange(self::KEY_MIXPANEL_QUEUE, 0, $max);
     }
 
+    public function countQueue()
+    {
+        return $this->redis->llen(self::KEY_MIXPANEL_QUEUE);
+    }
+
     public function attribution($userId)
     {
         $repo = $this->dm->getRepository(User::class);
