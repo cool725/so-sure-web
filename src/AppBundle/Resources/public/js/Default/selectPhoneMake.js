@@ -189,7 +189,7 @@ $(function(){
                 $('.tt-suggestion').find('a[href="'+path_suggestion+'"]').parent().parent().addClass('tt-selected').siblings().removeClass('tt-selected');
             }
 
-            menuHold();
+            // menuHold();
         });
 
         $(input).bind('typeahead:change', function(ev, suggestion) {
