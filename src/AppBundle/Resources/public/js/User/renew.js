@@ -229,20 +229,38 @@ $(function(){
     });
 
     // Load the policy doc
-    var url  = $('.modal-policy--embedded').data('url');
-    var done = false;
+    if ($('.modal-policy').length) {
 
-    $('.policy-doc-toggle').click(function(e) {
-        e.preventDefault();
-        $('.modal-policy--embedded').toggle(function() {
-            if (done != true) {
-                $(this).load(url, function(){
+        // Content to load
+        var url = $('.modal-policy').data('url');
+
+        function loadDoc() {
+            $('.modal-policy').load(url, function(responseTxt, statusTxt, xhr) {
+                if (statusTxt == 'success') {
                     sosure.globals.policyTerms();
-                    $(this).removeClass('text-center');
-                });
+                }
+                if (statusTxt == 'error') {
+                    $('#reload-policy').show();
+                }
+            });
+        }
 
-                done = true;
-            }
+        // Toggle content
+        $('.policy-doc-toggle').click(function(e) {
+
+            // Expand content
+            $('.modal-policy').toggle(function() {
+                loadDoc();
+            });
+
         });
-    });
+
+        // Try and reload
+        $('#reload-policy').click(function(event) {
+
+            $('#reload-policy').hide();
+
+            loadDoc();
+        });
+    }
 });
