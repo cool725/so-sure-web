@@ -101,6 +101,36 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = $this->createPurchaseUserNew($user, 'not me', new \DateTime('1980-01-01'));
 
         self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-policy'));
+    }
+
+    public function testPurchaseExistingUserWithPolicyDiffDetailsNew()
+    {
+        $phone = $this->setRandomPhone();
+
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testPurchaseExistingUserWithPolicyDiffDetailsNew', $this),
+            'foo'
+        );
+        // TODO: add policy
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-01-01'), true);
+        static::$policyService->setEnvironment('test');
+        static::$dm->flush();
+
+        $crawler = $this->createPurchaseUserNew($user, 'not me', new \DateTime('1980-01-01'));
+
+        self::verifyResponse(302);
         $this->assertTrue(self::$client->getResponse()->isRedirect('/login'));
     }
 
@@ -123,7 +153,6 @@ class PurchaseControllerTest extends BaseControllerTest
 
         $crawler = $this->createPurchaseUserNew($user, 'foo bar', new \DateTime('1980-01-01'));
         self::verifyResponse(302);
-print_r(self::$client->getResponse());
         $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-policy'));
     }
 
@@ -148,7 +177,7 @@ print_r(self::$client->getResponse());
         $crawler = $this->createPurchaseUserNew($user, 'foo bar', new \DateTime('1980-01-01'));
 
         self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect('/login'));
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-policy'));
     }
 
     public function testPurchaseExistingUserSameDetailsWithMultiplePartialPolicyNew()
