@@ -135,7 +135,7 @@ class SixpackService
                 } elseif (in_array($experiment, self::$authExperiments)) {
                     $clientId = $this->requestService->getUser()->getId();
                 } else {
-                    throw new \Exception(sprintf('Exp %s is not in auth or unauth array'));
+                    throw new \Exception(sprintf('Exp %s is not in auth or unauth array', $experiment));
                 }
             }
             $data = [
@@ -193,7 +193,7 @@ class SixpackService
         } elseif (in_array($experiment, self::$authExperiments)) {
             $converted = $this->convertByClientId($this->requestService->getUser()->getId(), $experiment, $kpi);
         } else {
-            throw new \Exception(sprintf('Exp %s is not in auth or unauth array'));
+            throw new \Exception(sprintf('Exp %s is not in auth or unauth array', $experiment));
         }
 
         if (!$converted && $expectParticipating) {
