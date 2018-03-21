@@ -25,6 +25,7 @@ class SoSure
 
     // make sure uppper case/normalised
     // TN15 7LY add Jan 2017 due to suspecion of fraud in those postcodes based on claims we receieved
-    // P£21 7TB added 16/8/17 due to explainable but odd situation from customer triggering manual fraud suspicion
-    public static $yearlyOnlyPostcodes = ['TN15 7LY', 'PE21 7TB'];
+    // PE21 7TB added 16/8/17 due to explainable but odd situation from customer triggering manual fraud suspicion
+    // OL11 1QA added 21/3/18 due to suspecion of fraud
+    public static $yearlyOnlyPostcodes = ['TN15 7LY', 'PE21 7TB', 'OL11 1QA'];
 }
