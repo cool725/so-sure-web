@@ -37,8 +37,8 @@ class PicsureMLController extends BaseController
             ->getForm();
         $picsureMLSearchForm->handleRequest($request);
 
-        $label = $picsureMLSearchForm->get('label')->getData();
-        $imagesPerPage = $picsureMLSearchForm->get('images_per_page')->getData();
+        $label = $this->getRequestString($request, 'label');
+        $imagesPerPage = $this->getRequestString($request, 'images_per_page');
 
         if ($imagesPerPage == null) {
             $imagesPerPage = 30;
