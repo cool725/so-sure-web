@@ -7,7 +7,7 @@
         <div class="row">
             <div class="col-md-6">
                 <h4>Your current payment method:</h4>
-                <p>{% if user.paymentMethod.type == "judo" %}Credit/Debit Card{% elseif user.paymentMethod.type == "bacs" %}Direct Debit{% else %}Unknown{% endif %}</p>
+                <p>{% if user.paymentMethod and user.paymentMethod.type == "judo" %}Credit/Debit Card{% elseif user.paymentMethod and user.paymentMethod.type == "bacs" %}Direct Debit{% else %}Unknown{% endif %}</p>
                 <a href="#tab-card" class="btn btn-blue-hollow" data-toggle="tab">Change to Credit/Debit Card</a>
             </div>
         </div>
@@ -15,7 +15,7 @@
         <div class="row">
             <div class="col-md-6">
                 <h4>Your direct debit:</h4>
-                <p>{% if user.paymentMethod.type == "bacs" %}{{ user.paymentMethod }}{% else %}Not setup{% endif %}</p>
+                <p>{% if user.paymentMethod and user.paymentMethod.type == "bacs" %}{{ user.paymentMethod }}{% else %}Not setup{% endif %}</p>
                 <a href="#tab-bacs-setup" class="btn btn-blue-hollow" data-toggle="tab">Upate Details</a>
             </div>
         </div>

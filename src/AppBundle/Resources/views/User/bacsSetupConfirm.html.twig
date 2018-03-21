@@ -1,28 +1,31 @@
 <section class="user-homepage--content section--pad">
     <div class="container">
-        <h2>Please <span class="text-underline">double check</span> your details before confirming!</h2>
+
+        <h2><span class="sr-only">Setup Direct Debit</span><img src="{{ cdn_url }}/images/direct-debit-logo.svg" alt="Direct Debit"></h2>
+        <p class="lead">Please <u>DOUBLE CHECK</u> your details before confirming!</p>
+
         <div class="row">
-            <div class="col-sm-6">
-                <ul class="list-unstyled">
+            <div class="col-sm-6 col-md-4">
+                <ul class="list-unstyled bacs-list">
                     <li>
                         <small class="text-dark-grey">Name of account holder</small><br>
-                        <span class="h3">{{ bacs.accountName }}</span>
+                        <span class="h4">{{ bacs.accountName }}</span>
                     </li>
                     <li>
                         <small class="text-dark-grey">Sort code</small><br>
-                        <span class="h3">{{ bacs.getDisplayableSortCode }}</span>
+                        <span class="h4">{{ bacs.getDisplayableSortCode }}</span>
                     </li>
                     <li>
                         <small class="text-dark-grey">Account number</small><br>
-                        <span class="h3">{{ bacs.getDisplayableAccountNumber }}</span>
+                        <span class="h4">{{ bacs.getDisplayableAccountNumber }}</span>
                     </li>
                     <li>
                         <small class="text-dark-grey">Bank/Building society</small><br>
-                        <span class="h3">{{ bacs.bankName }}</span>
+                        <span class="h4">{{ bacs.bankName }}</span>
                     </li>
                     <li>
                         <small class="text-dark-grey">Bank/Building society address</small><br>
-                        <span class="h3">
+                        <span class="h4">
                             {% if bacs.bankAddress %}
                             {{ bacs.bankAddress.stringImplode('<br>')|raw }}
                             {% endif %}
@@ -30,20 +33,20 @@
                     </li>
                 </ul>
             </div>
-            <div class="col-sm-6">
-                <ul class="list-unstyled">
+            <div class="col-sm-6 col-md-4">
+                <ul class="list-unstyled bacs-list">
                     <li>
                         <small class="text-dark-grey">Reference Number</small><br>
-                        <span class="h3">{{  bacs.reference }}</span>
+                        <span class="h4">{{  bacs.reference }}</span>
                     </li>
                     <li>
                         <small class="text-dark-grey">Collection frequency</small><br>
-                        <span class="h3">First collection: {{ bacs.getPaymentDate|date('d F','Europe/London') }}</span><br>
+                        <span class="h4">First collection: {{ bacs.getPaymentDate|date('d F','Europe/London') }}</span><br>
                         <small class="text-dark-grey">(Collected on the {{ policy.billing|date('jS','Europe/London') }} of each month thereafter)</small><br>
                     </li>
                     <li>
                         <small class="text-dark-grey">Payment amount</small><br>
-                        <span class="h3">£{{ policy.getPremiumInstallmentPrice(true)|number_format(2, '.', ',') }}</span>
+                        <span class="h4">£{{ policy.getPremiumInstallmentPrice(true)|number_format(2, '.', ',') }}</span>
                     </li>
                 </ul>
                 <p>
@@ -53,21 +56,24 @@
                 </p>
             </div>
         </div>
+        {{ form_start(bacs_confirm_form) }}
         <div class="row">
-            <div class="col-sm-6">
-                {{ form_start(bacs_confirm_form) }}
-                <div class="col-xs-6 form-group">
-                    <a href="#tab-bacs-setup" class="btn btn-blue-hollow btn-block" data-toggle="tab">
-                        Back
-                    </a>
+            <div class="col-sm-6 col-md-4">
+                <div class="form-group">
+                    {{ form_widget(bacs_confirm_form.save, {'label': 'Confirm', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
                 </div>
-                <div class="col-xs-6 form-group">
-                    {{ form_widget(bacs_confirm_form.save, {'label': 'Confirm', 'attr': {'class': 'btn btn-green btn-block'}}) }}
+                <div class="form-group">
+                    <a href="#tab-bacs-setup" class="btn btn-blue-hollow btn-block btn-pad" data-toggle="tab">Back</a>
                 </div>
-
-                {{ form_end(bacs_confirm_form) }}
-                <p>Your payments are protected by the <a href="#" data-toggle="modal" data-target="#modal-dd">Direct Debit Guarantee</a></p>
+                <p><small>Your payments are protected by the <a href="#" data-toggle="modal" data-target="#modal-dd" class="text-nowrap">Direct Debit Guarantee</a></small>.</p>
+                <address>
+                    <strong>SO-SURE Limited</strong><br>
+                    10 Finsbury Square, London EC2A 1AF, GB<br>
+                    +44 20 3872 2370, <a href="mailto:hello@wearesosure.com">hello@wearesosure.com</a>
+                </address>
+                <img src="{{ cdn_url }}/images/direct-debit-logo.svg" alt="Direct Debit" width="100px">
             </div>
         </div>
+        {{ form_end(bacs_confirm_form) }}
     </div>
 </section>
