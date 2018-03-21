@@ -193,6 +193,7 @@ $(function(){
 
         // Toggle content
         $('.policy-doc-toggle').click(function(e) {
+            e.preventDefault();
 
             // Expand content
             $('.modal-policy').toggle(function() {

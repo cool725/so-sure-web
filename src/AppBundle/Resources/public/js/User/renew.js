@@ -247,10 +247,12 @@ $(function(){
 
         // Toggle content
         $('.policy-doc-toggle').click(function(e) {
+            e.preventDefault();
+            loadDoc();
 
             // Expand content
             $('.modal-policy').toggle(function() {
-                loadDoc();
+
             });
 
         });
