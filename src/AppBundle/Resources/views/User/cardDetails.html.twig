@@ -7,11 +7,11 @@
         <div class="row">
             <div class="col-sm-6">
                 <h4>Your current payment method:</h4>
-                <p class="lead">{% if user.paymentMethod.type == "judo" %}Credit/Debit Card{% elseif user.paymentMethod.type == "bacs" %}Direct Debit{% else %}Unknown{% endif %}</p>
-                <a href="{% if user.paymentMethod.type == "bacs" %}#tab-bacs{% else %}#tab-bacs-setup{% endif %}"
+                <p class="lead">{% if not user.paymentMethod or user.paymentMethod.type == "judo" %}Credit/Debit Card{% elseif user.paymentMethod.type == "bacs" %}Direct Debit{% else %}Unknown{% endif %}</p>
+                <a href="{% if user.paymentMethod and user.paymentMethod.type == "bacs" %}#tab-bacs{% else %}#tab-bacs-setup{% endif %}"
                    class="btn btn-blue-hollow"
                    data-toggle="tab">
-                    {% if user.paymentMethod.type == "judo" %}
+                    {% if not user.paymentMethod or user.paymentMethod.type == "judo" %}
                         Change to Direct Debit
                     {% else %}
                         Back to Direct Debit
@@ -23,7 +23,7 @@
         <div class="row">
             <div class="col-sm-6">
                 <h4>Your card:</h4>
-                <p class="lead">{% if user.paymentMethod.type == "judo" %}{{ user.paymentMethod }}{% else %}Not setup{% endif %}</p>
+                <p class="lead">{% if user.paymentMethod and user.paymentMethod.type == "judo" %}{{ user.paymentMethod }}{% else %}Not setup{% endif %}</p>
                 {% if webpay_action and webpay_reference %}
                 <form action="{{ webpay_action }}" method="post" id="webpay-form">
                     <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">

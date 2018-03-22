@@ -511,7 +511,7 @@ class JudopayService
         }
 
         $judo = $user->getPaymentMethod();
-        if (!$judo) {
+        if (!$judo || !$judo instanceof JudoPaymentMethod) {
             $judo = new JudoPaymentMethod();
             $user->setPaymentMethod($judo);
         }

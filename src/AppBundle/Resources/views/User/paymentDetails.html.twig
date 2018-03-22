@@ -19,7 +19,7 @@
         {% set active_tab = 'bacs-setup' %}
     {% elseif bacs and bacs.isValid %}
         {% set active_tab = 'bacs-setup-confirm' %}
-    {% elseif user.paymentMethod.type == 'bacs' %}
+    {% elseif user.paymentMethod and user.paymentMethod.type == 'bacs' %}
         {% set active_tab = 'bacs' %}
     {% endif %}
 

@@ -3,6 +3,10 @@
 @import "../mixins";
 @import "../common/palette";
 
+.container {
+    padding-bottom: 50px;
+}
+
 .claim-status label {
     margin-left: 3px;
     margin-right: 10px;
