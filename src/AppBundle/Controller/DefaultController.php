@@ -169,19 +169,6 @@ class DefaultController extends BaseController
             $phoneMake->setMake($phone->getMake());
         }
 
-
-    //     if ($request->getMethod() == "GET") {
-    //         $phone = $deviceAtlas->getPhone($request);
-    //         /*
-    //         if (!$phone) {
-    //             $phone = $this->getDefaultPhone();
-    //         }
-    //         */
-    //         if ($phone instanceof Phone) {
-    //             $phoneMake->setMake($phone->getMake());
-    //         }
-    //     }
-
         // throw new \Exception($id);
 
         if ($phone && in_array($type, ['purchase-select', 'purchase-change'])) {
@@ -193,10 +180,7 @@ class DefaultController extends BaseController
         } elseif ($phone && in_array($type, ['learn-more'])) {
             $session = $request->getSession();
             $session->set('quote', $phone->getId());
-
-           // return $this->redirectToRoute('learn_more_phone', ['id' => $id]);
         }
-
 
         $formPhone = $this->get('form.factory')
             ->createNamedBuilder('launch_phone', PhoneMakeType::class, $phoneMake, [
@@ -205,8 +189,6 @@ class DefaultController extends BaseController
             ->getForm();
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('launch_phone')) {
-                // handle request / isvalid doesn't really work well with jquery form adjustment
-                // $formPhone->handleRequest($request);
                 $phoneMake->setPhoneId($request->get('launch_phone')['phoneId']);
                 if ($phoneMake->getPhoneId()) {
                     $phone = $phoneRepo->find($phoneMake->getPhoneId());
@@ -228,11 +210,6 @@ class DefaultController extends BaseController
                 }
             }
         }
-
-    //     return [
-    //         'form_phone' => $formPhone->createView(),
-    //         'phones' => $this->getPhonesArray(),
-    //     ];
 
         return [
             'form_phone' => $formPhone->createView(),

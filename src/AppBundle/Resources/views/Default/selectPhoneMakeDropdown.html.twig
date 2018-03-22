@@ -8,12 +8,24 @@
     {% endif %}
 
     {{ form_start(form_phone) }}
-
-        {{ form_widget(form_phone.make, { 'attr': {'class': 'select-phone-dropdown select-phone-make'}}) }}
-
-        {{ form_widget(form_phone.phoneId, { 'attr': {'class': 'select-phone-dropdown select-phones'}}) }}
-
-        {{ form_widget(form_phone.next, {'label': buttonText, 'attr': {'class': 'btn btn-primary btn-rounded'}}) }}
-
+        <div class="form-group">
+            {{ form_widget(form_phone.make, {
+              'attr': {
+                'class': 'select-phone-dropdown select-phone-make form-control'
+            }}) }}
+        </div>
+        <div class="form-group">
+            {{ form_widget(form_phone.phoneId, {
+              'attr': {
+                'class': 'select-phone-dropdown select-phones form-control',
+            }}) }}
+        </div>
+        <div class="form-group">
+            {{ form_widget(form_phone.next, {
+              'label': buttonText,
+              'attr': {
+                'class': 'btn btn-green btn-block btn-pad'
+            }}) }}
+        </div>
     {{ form_end(form_phone) }}
 </div>
