@@ -1047,7 +1047,7 @@ services:
         class: AppBundle\Security\AccessDeniedHttpExceptionVoter
         arguments:
             - "@request_stack"
-            - "%sosure_ips%"
+            - ["%sosure_rwe_ip%", "%sosure_patrick_ip%"]
         tags:
             - { name: staffim_rollbar.report_voter }
 
