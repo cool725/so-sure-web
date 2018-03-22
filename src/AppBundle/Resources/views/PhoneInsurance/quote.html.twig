@@ -49,26 +49,14 @@
                                 <span class="text-nowrap h3">only £{{ phone_price.monthlyPremiumPrice }} per month</span>
                             {% endif %}
                         </h1>
-{#                         <p><small><a href="#" class="text-underline" data-toggle="collapse" href="#collapsePhones" aria-expanded="false" aria-controls="collapsePhones">Wrong size {{ phone.model }} or different phone?</a></small></p>
-                        <div class="box-border-grey collapse" id="collapsePhones">
-                            <ul class="list-inline">
-                                {% for phone_mem in phones if phone_mem.id != phone.id %}
-                                    <li><a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class="btn btn-blue-hollow">{{ phone_mem.memory }}GB</a></li>
-                                {% endfor %}
-                            </ul>
-                            <a href="#" data-toggle="modal" data-target="#quoteModal"><u>I have a different phone</u></a>
-                        </div> #}
-
-
-
                         {% if phones | length > 1 %}
                             <a class="btn btn-link" role="button" data-toggle="collapse" href="#collapsePhones" aria-expanded="false" aria-controls="collapsePhones">Not your phone?</a>
-                            <div class="box-border-grey collapse" id="collapsePhones">
-                                <ul class="list-inline">
-                                    {% for phone_mem in phones if phone_mem.id != phone.id %}
-                                        <li><a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class="btn btn-blue-hollow">{{ phone_mem.memory }}GB</a></li>
+                            <div class="collapse" id="collapsePhones">
+                                <div class="btn-group" role="group">
+                                    {% for phone_mem in phones %}
+                                        <a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class="btn {% if phone_mem.id == phone.id  %}btn-blue{% else %}btn-blue-hollow{% endif %}">{{ phone_mem.memory }}GB</a>
                                     {% endfor %}
-                                </ul>
+                                </div>
                                 <a class="btn btn-link" href="#" data-toggle="modal" data-target="#quoteModal"><u>I have a different phone</u></a>
                             </div>
                         {% else %}
