@@ -188,7 +188,25 @@ $(function(){
                 // If more than 1 option highlight the buttons to alert the user there are options
                 $('.tt-suggestion').find('a[href="'+path_suggestion+'"]').parent().parent().addClass('tt-selected').siblings().removeClass('tt-selected');
             }
+            menuHold();
         });
+
+        $(input).bind('typeahead:change', function(ev, suggestion) {
+            sosure.selectPhoneMake.setFormActionVal(form, input);
+        });
+
+        // Keeps the menu open whilst the new page loads
+        function menuHold() {
+            // Prevent default behaviour
+            $(input).bind('typeahead:beforeclose', function(ev, suggestion) {
+                ev.preventDefault();
+
+                // Add back behavior on click off
+                $(document).click(function(event) {
+                    $(input).unbind('typeahead:beforeclose');
+                });
+            });
+        }
 
         $(input).bind('typeahead:change', function(ev, suggestion) {
             sosure.selectPhoneMake.setFormActionVal(form, input);
