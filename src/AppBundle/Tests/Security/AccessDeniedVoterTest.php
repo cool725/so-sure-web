@@ -7,6 +7,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * @group functional-nonet
+ * AppBundle\\Tests\\Security\\AccessDeniedVoterTest
  */
 class AccessDeniedVoterTest extends WebTestCase
 {
