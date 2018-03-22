@@ -42,7 +42,13 @@
                     </h1>
                     <p class="lead" id="hero-description">Introducing so-sure, a better kind of phone insurance that allows you to get up to 80% of your money back when you connect with those you trust &amp; none of you claim.</p>
 
-                    {{ render(controller('AppBundle:Default:selectPhoneMakeSearch')) }}
+                    {# Phone Search #}
+                    {% if device_category() == 'Mobile' %}
+                        {{ render(controller('AppBundle:Default:selectPhoneMakeDropdown')) }}
+                    {% else %}
+                        {{ render(controller('AppBundle:Default:selectPhoneMakeSearch')) }}
+                    {% endif %}
+                    {# End Phone Search #}
 
                 </div>
             </div>
@@ -81,6 +87,7 @@
     'components/corejs-typeahead/typeahead.bundle.min.js'
     'components/fuse.js/fuse.min.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMakeSearch.js'
+    '@AppBundle/Resources/public/js/Default/selectPhoneMakeDropdown.js'
  %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}

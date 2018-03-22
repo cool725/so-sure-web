@@ -37,11 +37,31 @@
 
         <p class="lead">Providing exceptional experience when you claim, <br class="hidden-xs">and rewarding you and your friends when you don't</p>
 
-        {% if phone is defined and phone %}
-            {{ render(controller('AppBundle:Default:selectPhoneMakeSearch', {'type': 'homepage', 'id': phone.id })) }}
+        {# Phone Search #}
+        {% if device_category() == 'Mobile' %}
+            {% if phone is defined and phone %}
+                {{ render(controller('AppBundle:Default:selectPhoneMakeDropdown', {
+                    'type': select_phone_type,
+                    'id': phone.id
+                })) }}
+            {% else %}
+                {{ render(controller('AppBundle:Default:selectPhoneMakeDropdown', {
+                    'type': select_phone_type,
+                })) }}
+            {% endif %}
         {% else %}
-            {{ render(controller('AppBundle:Default:selectPhoneMakeSearch', {'type': 'homepage' })) }}
+            {% if phone is defined and phone %}
+                {{ render(controller('AppBundle:Default:selectPhoneMakeSearch', {
+                    'type': select_phone_type,
+                    'id': phone.id
+                })) }}
+            {% else %}
+                {{ render(controller('AppBundle:Default:selectPhoneMakeSearch', {
+                    'type': select_phone_type,
+                })) }}
+            {% endif %}
         {% endif %}
+        {# End Phone Search #}
 
         <div id="hero-character_1"
              class="homepage--hero__character">
@@ -446,6 +466,7 @@
     '@AppBundle/Resources/public/js/Default/images.js'
     'components/owl.carousel/owl.carousel.min.js'
     '@AppBundle/Resources/public/js/Default/makeInsurance.js'
-    '@AppBundle/Resources/public/js/Default/selectPhoneMakeSearch.js' %}
+    '@AppBundle/Resources/public/js/Default/selectPhoneMakeSearch.js'
+    '@AppBundle/Resources/public/js/Default/selectPhoneMakeDropdown.js' %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
