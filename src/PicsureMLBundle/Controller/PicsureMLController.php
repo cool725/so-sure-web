@@ -16,6 +16,7 @@ use AppBundle\Controller\BaseController;
 use AppBundle\Document\File\S3File;
 use PicsureMLBundle\Service\PicsureMLService;
 use PicsureMLBundle\Document\TrainingData;
+use PicsureMLBundle\Form\Type\PicsureMLSearchType;
 use PicsureMLBundle\Form\Type\LabelType;
 
 /**
@@ -31,14 +32,40 @@ class PicsureMLController extends BaseController
      */
     public function indexAction(Request $request)
     {
+        $picsureMLSearchForm = $this->get('form.factory')
+            ->createNamedBuilder('picsureml_search_form', PicsureMLSearchType::class, null, ['method' => 'GET'])
+            ->getForm();
+        $picsureMLSearchForm->handleRequest($request);
+
+        $label = $this->getRequestString($request, 'label');
+        $imagesPerPage = $this->getRequestString($request, 'images_per_page');
+
+        if ($imagesPerPage == null) {
+            $imagesPerPage = $picsureMLSearchForm->get('images_per_page')->getData();
+        }
+
         $dm = $this->getPicsureMLManager();
         $repo = $dm->getRepository(TrainingData::class);
 
         $qb = $repo->createQueryBuilder();
+        if ($label != null) {
+            if ($label == 'none') {
+                $qb->field('label')->equals(null);
+            } else {
+                $qb->field('label')->equals($label);
+            }
+        }
         $qb->sort('id', 'desc');
-        $pager = $this->pager($request, $qb, 12);
+        $pager = $this->pager($request, $qb, $imagesPerPage);
 
         return [
+            'n_images' => $repo->getTotalCount(),
+            'n_none_images' => $repo->getNoneCount(),
+            'n_undamaged_images' => $repo->getUndamagedCount(),
+            'n_invalid_images' => $repo->getInvalidCount(),
+            'n_damaged_images' => $repo->getDamagedCount(),
+            'label' => $label,
+            'picsureml_search_form' => $picsureMLSearchForm->createView(),
             'images' => $pager->getCurrentPageResults(),
             'pager' => $pager
         ];
@@ -58,15 +85,15 @@ class PicsureMLController extends BaseController
         }
 
         $imagesForm = $this->get('form.factory')
-            ->createNamedBuilder('picsure_label_form', LabelType::class, $image)
+            ->createNamedBuilder('picsureml_label_form', LabelType::class, $image)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
-            if ($request->request->has('picsure_label_form')) {
+            if ($request->request->has('picsureml_label_form')) {
                 $imagesForm->handleRequest($request);
                 if ($imagesForm->isValid()) {
                     $dm->flush();
-                    if (array_key_exists('previous', $request->request->get('picsure_label_form'))) {
+                    if (array_key_exists('previous', $request->request->get('picsureml_label_form'))) {
                         $prevId = $repo->getPreviousImage($id);
                         if ($prevId) {
                             return $this->redirectToRoute('admin_picsure_ml_edit', ['id' => $prevId]);
@@ -87,43 +114,25 @@ class PicsureMLController extends BaseController
 
         return [
             'image' => $image,
-            'picsure_label_form' => $imagesForm->createView(),
+            'picsureml_label_form' => $imagesForm->createView(),
         ];
     }
 
     /**
      * @Route("/picsure-ml/image/policy/{file}", name="admin_picsure_ml_image_policy", requirements={"file"=".*"})
-     * @Template()
-     */
-    public function picsureImagePolicyAction($file)
-    {
-        $filesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3policy_fs');
-        $environment = $this->getParameter('kernel.environment');
-        $file = str_replace(sprintf('%s/', $environment), '', $file);
-
-        if (!$filesystem->has($file)) {
-            throw $this->createNotFoundException(sprintf('URL not found %s', $file));
-        }
-
-        $mimetype = $filesystem->getMimetype($file);
-        return StreamedResponse::create(
-            function () use ($file, $filesystem) {
-                $stream = $filesystem->readStream($file);
-                echo stream_get_contents($stream);
-                flush();
-            },
-            200,
-            array('Content-Type' => $mimetype)
-        );
-    }
-
-    /**
      * @Route("/picsure-ml/image/picsure/{file}", name="admin_picsure_ml_image_picsure", requirements={"file"=".*"})
      * @Template()
      */
-    public function picsureImagePicsureAction($file)
+    public function picsureImageAction(Request $request, $file)
     {
-        $filesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3picsure_fs');
+        if ($request->get('_route') == "admin_picsure_ml_image_policy") {
+            $filesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3policy_fs');
+            $environment = $this->getParameter('kernel.environment');
+            $file = str_replace(sprintf('%s/', $environment), '', $file);
+        } else {
+            $filesystem = $this->get('oneup_flysystem.mount_manager')->getFilesystem('s3picsure_fs');
+        }
+
         if (!$filesystem->has($file)) {
             throw $this->createNotFoundException(sprintf('URL not found %s', $file));
         }
