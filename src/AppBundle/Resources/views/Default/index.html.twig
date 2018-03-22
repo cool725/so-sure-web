@@ -49,10 +49,11 @@
         {% endif %}
 
         {% if phone is defined and phone %}
-            {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type': select_phone_type, 'id': phone.id })) }}
+            {{ render(controller('AppBundle:Default:selectPhoneMakeV3', {'type': select_phone_type, 'id': phone.id })) }}
         {% else %}
-            {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type': select_phone_type })) }}
+            {{ render(controller('AppBundle:Default:selectPhoneMakeV3', {'type': select_phone_type })) }}
         {% endif %}
+
         <div id="hero-character_1"
              class="homepage--hero__character">
             <div class="homepage--hero__tooltip animated tada"

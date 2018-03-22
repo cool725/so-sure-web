@@ -225,6 +225,66 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/select-phone-v3", name="select_phone_make_v3")
+     * @Route("/select-phone-v3/{type}", name="select_phone_make_v3_type")
+     * @Route("/select-phone-v3/{type}/{id}", name="select_phone_make_v3_type_id")
+     * @Template()
+     */
+    public function selectPhoneMakeV3Action(Request $request, $type = null, $id = null)
+    {
+        $deviceAtlas = $this->get('app.deviceatlas');
+        $dm = $this->getManager();
+        $phoneRepo = $dm->getRepository(Phone::class);
+        $phoneMake = new PhoneMake();
+        if ($request->getMethod() == "GET") {
+            $phone = $deviceAtlas->getPhone($request);
+            /*
+            if (!$phone) {
+                $phone = $this->getDefaultPhone();
+            }
+            */
+            if ($phone instanceof Phone) {
+                $phoneMake->setMake($phone->getMake());
+            }
+        }
+        $formPhone = $this->get('form.factory')
+            ->createNamedBuilder('launch_phone', PhoneMakeType::class, $phoneMake, [
+                'action' => $this->generateUrl('select_phone_make'),
+            ])
+            ->getForm();
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('launch_phone')) {
+                // handle request / isvalid doesn't really work well with jquery form adjustment
+                // $formPhone->handleRequest($request);
+                $phoneMake->setPhoneId($request->get('launch_phone')['phoneId']);
+                if ($phoneMake->getPhoneId()) {
+                    $phone = $phoneRepo->find($phoneMake->getPhoneId());
+                    if (!$phone) {
+                        throw new \Exception('unknown phone');
+                    }
+                    if ($phone->getMemory()) {
+                        return $this->redirectToRoute('quote_make_model_memory', [
+                            'make' => $phone->getMake(),
+                            'model' => $phone->getEncodedModel(),
+                            'memory' => $phone->getMemory(),
+                        ]);
+                    } else {
+                        return $this->redirectToRoute('quote_make_model', [
+                            'make' => $phone->getMake(),
+                            'model' => $phone->getEncodedModel(),
+                        ]);
+                    }
+                }
+            }
+        }
+
+        return [
+            'form_phone' => $formPhone->createView(),
+            'phones' => $this->getPhonesArray(),
+        ];
+    }
+
+    /**
      * @Route("/search-phone", name="search_phone_data")
      * @Route("/search-phone-combined", name="search_phone_combined_data")
      */
