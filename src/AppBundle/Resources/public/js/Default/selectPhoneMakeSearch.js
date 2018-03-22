@@ -223,7 +223,7 @@ $(function(){
 
     // Load policy doc
     if ($('.modal-policy').length) {
-        $(this).on('shown.bs.modal', function() {
+        $('#policy-modal').on('shown.bs.modal', function() {
 
             // Content to load
             var url = $('.modal-policy').data('url');
