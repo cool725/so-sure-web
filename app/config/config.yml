@@ -74,6 +74,7 @@ twig:
         consumer_payout: "17.2"
         ipt_rebate: "1.5"
         davies_ip: "%davies_ip%"
+        sosure_ips: "%sosure_ips%"
         environment: "%kernel.environment%"
         digits_consumer_key: "%digits_consumer_key%"
         form_client_validation: true
