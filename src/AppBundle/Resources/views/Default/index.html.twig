@@ -48,11 +48,31 @@
             <p class="lead">Providing exceptional experience when you claim, <br class="hidden-xs">and rewarding you and your friends when you don't</p>
         {% endif %}
 
-        {% if phone is defined and phone %}
-            {{ render(controller('AppBundle:Default:selectPhoneMakeDropdown', {'type': select_phone_type, 'id': phone.id })) }}
+        {# Phone Search #}
+        {% if device_category() == 'Mobile' %}
+            {% if phone is defined and phone %}
+                {{ render(controller('AppBundle:Default:selectPhoneMakeDropdown', {
+                    'type': select_phone_type,
+                    'id': phone.id
+                })) }}
+            {% else %}
+                {{ render(controller('AppBundle:Default:selectPhoneMakeDropdown', {
+                    'type': select_phone_type,
+                })) }}
+            {% endif %}
         {% else %}
-            {{ render(controller('AppBundle:Default:selectPhoneMakeDropdown', {'type': select_phone_type })) }}
+            {% if phone is defined and phone %}
+                {{ render(controller('AppBundle:Default:selectPhoneMakeSearch', {
+                    'type': select_phone_type,
+                    'id': phone.id
+                })) }}
+            {% else %}
+                {{ render(controller('AppBundle:Default:selectPhoneMakeSearch', {
+                    'type': select_phone_type,
+                })) }}
+            {% endif %}
         {% endif %}
+        {# End Phone Search #}
 
         <div id="hero-character_1"
              class="homepage--hero__character">
@@ -312,19 +332,39 @@
     {% include 'AppBundle::Default/_sectionFeedback.html.twig' %}
 
     {# Instant Quote #}
-{#     <section class="homepage--instant-quote">
+    <section class="homepage--instant-quote">
         <div class="container">
             <h2 class="text-center h1">Get Your Instant Quote</h2>
-            {% if phone is defined and phone %}
-                {{ render(controller('AppBundle:Default:selectPhoneMakeSearch', {'type':'footer', 'id': phone.id })) }}
+            {# Phone Search #}
+            {% if device_category() == 'Mobile' %}
+                {% if phone is defined and phone %}
+                    {{ render(controller('AppBundle:Default:selectPhoneMakeDropdown', {
+                        'type': select_phone_type,
+                        'id': phone.id
+                    })) }}
+                {% else %}
+                    {{ render(controller('AppBundle:Default:selectPhoneMakeDropdown', {
+                        'type': select_phone_type,
+                    })) }}
+                {% endif %}
             {% else %}
-                {{ render(controller('AppBundle:Default:selectPhoneMakeSearch', {'type':'footer'})) }}
+                {% if phone is defined and phone %}
+                    {{ render(controller('AppBundle:Default:selectPhoneMakeSearch', {
+                        'type': select_phone_type,
+                        'id': phone.id
+                    })) }}
+                {% else %}
+                    {{ render(controller('AppBundle:Default:selectPhoneMakeSearch', {
+                        'type': select_phone_type,
+                    })) }}
+                {% endif %}
             {% endif %}
+            {# End Phone Search #}
             <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/so-sure_form_rocket.svg"
                  class="img-responsive form-rocket lozad" alt="so-sure - rocket">
         </div>
     </section>
- #}
+
     {# Page Modals #}
     {% include 'AppBundle::Default/_coverModals.html.twig' %}
     {# End Page Modals #}
@@ -340,6 +380,7 @@
     'components/fuse.js/fuse.min.js'
     '@AppBundle/Resources/public/js/Default/images.js'
     '@AppBundle/Resources/public/js/Default/homepage.js'
+    '@AppBundle/Resources/public/js/Default/selectPhoneMakeSearch.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMakeDropdown.js'
  %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
