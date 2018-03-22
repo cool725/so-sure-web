@@ -2,6 +2,8 @@
 
 namespace AppBundle\Listener;
 
+use AppBundle\Service\MailerService;
+use FOS\UserBundle\Mailer\Mailer;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\Security\Core\Event\AuthenticationFailureEvent;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -29,6 +31,9 @@ class SecurityListener
     /** @var MixpanelService */
     protected $mixpanel;
 
+    /** @var MailerService */
+    protected $mailerService;
+
     protected $redis;
     protected $dm;
 
@@ -38,7 +43,8 @@ class SecurityListener
         $dispatcher,
         MixpanelService $mixpanel,
         $redis,
-        $dm
+        $dm,
+        MailerService $mailerService
     ) {
         $this->logger = $logger;
         $this->requestStack = $requestStack;
@@ -46,6 +52,7 @@ class SecurityListener
         $this->mixpanel = $mixpanel;
         $this->redis = $redis;
         $this->dm = $dm;
+        $this->mailerService = $mailerService;
     }
 
     /**
@@ -105,7 +112,9 @@ class SecurityListener
         // Get the attempted username.
         if ($token instanceof UsernamePasswordToken) {
             $username = $token->getUsername();
+            /** @var \AppBundle\Repository\UserRepository */
             $repo = $this->dm->getRepository(User::class);
+            /** @var User $user */
             $user = $repo->findOneBy(['usernameCanonical' => strtolower($username)]);
             if ($user && ($user->hasEmployeeRole() || $user->hasClaimsRole())) {
                 $key = sprintf(self::LOGIN_FAILURE_KEY, strtolower($username));
@@ -113,9 +122,19 @@ class SecurityListener
                 // PCI doesn't state how long a failed login persists. 1 hour should be enough for brute force
                 $this->redis->expire($key, 3600);
                 // PCI requirements - 6 failed logins
-                if ($count >= 6) {
+                if ($count >= 6 && !$user->isLocked()) {
                     $user->setLocked(true);
                     $this->dm->flush();
+                    // @codingStandardsIgnoreStart
+                    $this->mailerService->send(
+                        'Your so-sure account is now locked',
+                         $user->getEmail(),
+                        sprintf('Hi %s, Please contact <a href="mailto:support@wearesosure.com">support@wearesosure.com</a> to unlock your account', $user->getName()),
+                        sprintf("Hi %s,Please contact support@wearesosure.com to unlock your account", $user->getName()),
+                        null,
+                        "tech@so-sure.com"
+                    );
+                    // @codingStandardsIgnoreEnd
                 }
             }
         }
