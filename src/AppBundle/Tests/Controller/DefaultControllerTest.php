@@ -64,8 +64,8 @@ class DefaultControllerTest extends BaseControllerTest
     public function testQuotePhoneRouteMakeModelMemory()
     {
         $url = self::$router->generate('quote_make_model_memory', [
-            'make' => 'Apple',
-            'model' => 'iPhone+6S',
+            'make' => 'apple',
+            'model' => 'iphone+6S',
             'memory' => 64,
         ]);
 
@@ -76,13 +76,13 @@ class DefaultControllerTest extends BaseControllerTest
     public function testQuotePhoneSpaceRouteMakeModelMemory()
     {
         $url = self::$router->generate('quote_make_model_memory', [
-            'make' => 'Apple',
-            'model' => 'iPhone 6S',
+            'make' => 'apple',
+            'model' => 'iphone 6s',
             'memory' => 64,
         ]);
         $redirectUrl = self::$router->generate('quote_make_model_memory', [
-            'make' => 'Apple',
-            'model' => 'iPhone+6S',
+            'make' => 'apple',
+            'model' => 'iphone+6s',
             'memory' => 64,
         ]);
 
@@ -96,8 +96,8 @@ class DefaultControllerTest extends BaseControllerTest
     public function testQuotePhoneRouteMakeModel()
     {
         $crawler = self::$client->request('GET', self::$router->generate('quote_make_model', [
-            'make' => 'Apple',
-            'model' => 'iPhone+6S',
+            'make' => 'apple',
+            'model' => 'iphone+6s',
         ]));
         self::verifyResponse(200);
     }
@@ -105,12 +105,12 @@ class DefaultControllerTest extends BaseControllerTest
     public function testQuotePhoneSpaceRouteMakeModel()
     {
         $url = self::$router->generate('quote_make_model', [
-            'make' => 'Apple',
-            'model' => 'iPhone 6S',
+            'make' => 'apple',
+            'model' => 'iphone 6s',
         ]);
         $redirectUrl = self::$router->generate('quote_make_model', [
-            'make' => 'Apple',
-            'model' => 'iPhone+6S',
+            'make' => 'apple',
+            'model' => 'iphone+6s',
         ]);
 
         $crawler = self::$client->request('GET', $url);

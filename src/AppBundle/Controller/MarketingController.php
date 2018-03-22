@@ -25,8 +25,8 @@ class MarketingController extends BaseController
     public function iPhone8RedirectAction()
     {
         return new RedirectResponse($this->generateUrl('quote_make_model', [
-            'make' => 'Apple',
-            'model' => 'iPhone+8',
+            'make' => 'apple',
+            'model' => 'iphone+8',
             'utm_medium' => 'flyer',
             'utm_source' => 'sosure',
             'utm_campaign' => 'iPhone8',

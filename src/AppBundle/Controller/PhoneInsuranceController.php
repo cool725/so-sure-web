@@ -116,6 +116,7 @@ class PhoneInsuranceController extends BaseController
 
         $phonesMem = [];
         foreach ($phones as $phone) {
+            /** @var Phone $phone */
             if (!isset($phonesMem[$phone->getName()])) {
                 $phonesMem[$phone->getName()] = [
                     'make' => $phone->getMake(),
@@ -126,7 +127,11 @@ class PhoneInsuranceController extends BaseController
             }
             $phonesMem[$phone->getName()]['mem'][$phone->getMemory()] = $this->generateUrl(
                 'quote_make_model_memory',
-                ['make' => $phone->getMake(), 'model' => $phone->getModel(), 'memory' => $phone->getMemory()]
+                [
+                    'make' => $phone->getMakeCanonical(),
+                    'model' => $phone->getModelCanonical(),
+                    'memory' => $phone->getMemory()
+                ]
             );
             ksort($phonesMem[$phone->getName()]['mem']);
         }
@@ -187,21 +192,21 @@ class PhoneInsuranceController extends BaseController
             $phone = $repo->find($id);
             if ($phone->getMemory()) {
                 return $this->redirectToRoute('quote_make_model_memory', [
-                    'make' => $phone->getMake(),
-                    'model' => $phone->getEncodedModel(),
+                    'make' => $phone->getMakeCanonical(),
+                    'model' => $phone->getEncodedModelCanonical(),
                     'memory' => $phone->getMemory(),
                 ], 301);
             } else {
                 return $this->redirectToRoute('quote_make_model', [
-                    'make' => $phone->getMake(),
-                    'model' => $phone->getEncodedModel(),
+                    'make' => $phone->getMakeCanonical(),
+                    'model' => $phone->getEncodedModelCanonical(),
                 ], 301);
             }
         } elseif ($memory) {
             $phone = $repo->findOneBy([
                 'active' => true,
-                'make' => $make,
-                'model' => $decodedModel,
+                'makeCanonical' => strtolower($make),
+                'modelCanonical' => strtolower($decodedModel),
                 'memory' => (int) $memory
             ]);
             // check for historical urls
@@ -214,15 +219,15 @@ class PhoneInsuranceController extends BaseController
                 ]);
                 if ($phone) {
                     return $this->redirectToRoute('quote_make_model_memory', [
-                        'make' => $phone->getMake(),
-                        'model' => $phone->getEncodedModel(),
+                        'make' => $phone->getMakeCanonical(),
+                        'model' => $phone->getEncodedModelCanonical(),
                         'memory' => $phone->getMemory(),
                     ], 301);
                 }
             }
         } else {
             $phones = $repo->findBy(
-                ['active' => true, 'make' => $make, 'model' => $decodedModel],
+                ['active' => true, 'makeCanonical' => strtolower($make), 'modelCanonical' => strtolower($decodedModel)],
                 ['memory' => 'asc'],
                 1
             );
@@ -233,8 +238,8 @@ class PhoneInsuranceController extends BaseController
                 $phone = $repo->findOneBy(['active' => true, 'make' => $make, 'model' => $model]);
                 if ($phone) {
                     return $this->redirectToRoute('quote_make_model', [
-                        'make' => $phone->getMake(),
-                        'model' => $phone->getEncodedModel()
+                        'make' => $phone->getMakeCanonical(),
+                        'model' => $phone->getEncodedModelCanonical()
                     ], 301);
                 }
             }
@@ -249,6 +254,12 @@ class PhoneInsuranceController extends BaseController
             ));
 
             return new RedirectResponse($this->generateUrl('homepage'));
+        } elseif (!$phone->isSameMakeModelCanonical($make, $model)) {
+            return $this->redirectToRoute('quote_make_model_memory', [
+                'make' => $phone->getMakeCanonical(),
+                'model' => $phone->getEncodedModelCanonical(),
+                'memory' => $phone->getMemory(),
+            ], 301);
         }
 
         $quoteUrl = $this->setPhoneSession($request, $phone);

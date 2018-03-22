@@ -28,13 +28,13 @@
                 <a href="{{ url('homepage') }}">Home</a>
             </li>
             <li>
-                <a href="{{ url('quote_make_model', {'make':'Apple','model':'iPhone+6S'}) }}">Quote</a>
+                <a href="{{ url('quote_make_model', {'make':'apple','model':'iphone+6s'}) }}">Quote</a>
             </li>
             <li>
                 {% if upcoming_phone %}
-                <a href="{{ url('quote_make_model', {'make': upcoming_phone.make,'model': upcoming_phone.model, 'force': 'old'}) }}">Quote - Upcoming Phone (old)</a>
+                <a href="{{ url('quote_make_model', {'make': upcoming_phone.makeCanonical,'model': upcoming_phone.modelCanonical, 'force': 'old'}) }}">Quote - Upcoming Phone (old)</a>
                 &nbsp;&nbsp;&nbsp;&nbsp;
-                <a href="{{ url('quote_make_model', {'make': upcoming_phone.make,'model': upcoming_phone.model, 'force': 'split'}) }}">Quote - Upcoming Phone (split)</a>
+                <a href="{{ url('quote_make_model', {'make': upcoming_phone.makeCanonical,'model': upcoming_phone.modelCanonical, 'force': 'split'}) }}">Quote - Upcoming Phone (split)</a>
                 {% else %}
                     No Upcoming Phone in DB
                 {% endif %}
