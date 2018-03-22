@@ -58,7 +58,7 @@
                                 <h5 class="h-light">Wrong size {{ phone.model }}?</h5>
                                 <div class="btn-group" role="group">
                                     {% for phone_mem in phones %}
-                                        <a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class="btn {% if phone_mem.id == phone.id  %}btn-blue{% else %}btn-blue-hollow{% endif %}">{{ phone_mem.memory }}GB</a>
+                                        <a {% if phone_mem.id != phone.id  %}href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}"{% else %}disabled{% endif %} class="btn {% if phone_mem.id == phone.id  %}btn-blue{% else %}btn-blue-hollow{% endif %}">{{ phone_mem.memory }}GB</a>
                                     {% endfor %}
                                 </div>
                                 <br>
