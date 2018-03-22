@@ -46,7 +46,13 @@
             <input type="password" id="password" name="_password" required="required" placeholder="Password" class="form-control input-lg" />
         </div>
         {% if error %}
-            <div class="error-text" style="padding-bottom: 10px;">Looks like the email address or password you’ve entered is incorrect. Please try again.</div>
+            <div class="error-text" style="padding-bottom: 10px;">
+                {% if app.request.clientIp == davies_ip or app.request.clientIp in sosure_ips %}
+                    Looks like the email address or password you’ve entered is incorrect, or <strong>your password has expired</strong>. Please try again. You may want to <a href="{{ path('fos_user_resetting_request') }}">reset your password</a>.
+                {% else %}
+                    Looks like the email address or password you’ve entered is incorrect. Please try again. You may want to <a href="{{ path('fos_user_resetting_request') }}">reset your password</a>.
+                {% endif %}
+            </div>
         {% endif %}
         <div class="form-group">
             <input type="submit" id="_submit" name="_submit" value="Login" class="btn btn-success btn-block"/>
