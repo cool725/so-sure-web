@@ -64,6 +64,21 @@ class SixpackService
     // Completed test - SW-45
     // const EXPERIMENT_QUOTE_CALC_LOWER = 'quote-calc-lower';
 
+    public static $unauthExperiments = [
+        self::EXPERIMENT_HOMEPAGE_AA_V2,
+        self::EXPERIMENT_HOMEPAGE_STICKYSEARCH_SHUFFLE,
+        self::EXPERIMENT_NEW_QUOTE_DESIGN,
+        self::EXPERIMENT_SAVE_QUOTE_24HOURS,
+        self::EXPERIMENT_CPC_MANUFACTURER_OLD_NEW,
+        self::EXPERIMENT_QUOTE_INTERCOM_PURCHASE,
+        self::EXPERIMENT_MONEY_UNBOUNCE,
+    ];
+
+    public static $authExperiments = [
+        self::EXPERIMENT_SHARE_MESSAGE,
+        self::EXPERIMENT_APP_SHARE_METHOD,
+    ];
+
     /** @var LoggerInterface */
     protected $logger;
 
@@ -115,9 +130,13 @@ class SixpackService
 
         try {
             if (!$clientId) {
-                $clientId = $this->requestService->getUser() ?
-                    $this->requestService->getUser()->getId() :
-                    $this->requestService->getTrackingId();
+                if (in_array($experiment, self::$unauthExperiments)) {
+                    $clientId = $this->requestService->getTrackingId();
+                } elseif (in_array($experiment, self::$authExperiments)) {
+                    $clientId = $this->requestService->getUser()->getId();
+                } else {
+                    throw new \Exception(sprintf('Exp %s is not in auth or unauth array', $experiment));
+                }
             }
             $data = [
                 'experiment' => $experiment,
@@ -168,18 +187,21 @@ class SixpackService
 
     public function convert($experiment, $kpi = null, $expectParticipating = false)
     {
-        $unauth = $this->convertByClientId($this->requestService->getTrackingId(), $experiment, $kpi);
-        $auth = null;
-        if ($user = $this->requestService->getUser()) {
-            $auth = $this->convertByClientId($user->getId(), $experiment, $kpi);
+        $converted = false;
+        if (in_array($experiment, self::$unauthExperiments)) {
+            $converted = $this->convertByClientId($this->requestService->getTrackingId(), $experiment, $kpi);
+        } elseif (in_array($experiment, self::$authExperiments)) {
+            $converted = $this->convertByClientId($this->requestService->getUser()->getId(), $experiment, $kpi);
+        } else {
+            throw new \Exception(sprintf('Exp %s is not in auth or unauth array', $experiment));
         }
 
-        if (!$unauth && !$auth && $expectParticipating) {
-            if ($user) {
+        if (!$converted && $expectParticipating) {
+            if ($this->requestService->getUser()) {
                 $this->logger->warning(sprintf(
                     'Expected participation in experiment %s for user %s',
                     $experiment,
-                    $user->getId()
+                    $this->requestService->getUser()->getId()
                 ));
             } else {
                 $this->logger->warning(sprintf(
