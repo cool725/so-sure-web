@@ -208,10 +208,6 @@ $(function(){
             });
         }
 
-        $(input).bind('typeahead:change', function(ev, suggestion) {
-            sosure.selectPhoneMake.setFormActionVal(form, input);
-        });
-
         if (index == 0) {
             // Focus Search Box if url param
             if (window.location.href.indexOf('?quote=1') != -1) {
