@@ -29,6 +29,11 @@ $(function(){
 
     // When user selects option update results
     $('.select-phone-make').on('change', function(e) {
+        if ($(this).val() != '') {
+            $('.select-phones').show();
+        } else {
+            $('.select-phones').hide();
+        }
         updatePhones();
     });
 
