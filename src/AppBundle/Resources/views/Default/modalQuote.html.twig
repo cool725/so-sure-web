@@ -12,11 +12,11 @@
             </div>
             <div class="modal-body">
                 {% if selectPhoneMakeType is defined and selectPhoneMakeType and phoneId is defined and phoneId %}
-                    {{ render(controller('AppBundle:Default:selectPhoneMake', {'type': selectPhoneMakeType, 'id': phoneId})) }}
+                    {{ render(controller('AppBundle:Default:selectPhoneMakeDropdown', {'type': selectPhoneMakeType, 'id': phoneId})) }}
                 {% elseif selectPhoneMakeType is defined and selectPhoneMakeType %}
-                    {{ render(controller('AppBundle:Default:selectPhoneMake', {'type': selectPhoneMakeType})) }}
+                    {{ render(controller('AppBundle:Default:selectPhoneMakeDropdown', {'type': selectPhoneMakeType})) }}
                 {% else %}
-                    {{ render(controller('AppBundle:Default:selectPhoneMake')) }}
+                    {{ render(controller('AppBundle:Default:selectPhoneMakeDropdown')) }}
                 {% endif %}
                 <h4 class="text-blue text-center hidden-xs">Popular models we insure:</h4>
                 <ul class="list-inline text-center modal-phone--link-list hidden-xs">

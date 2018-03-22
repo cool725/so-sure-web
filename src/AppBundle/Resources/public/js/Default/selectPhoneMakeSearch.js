@@ -1,4 +1,3 @@
-
 var sosure = sosure || {};
 
 sosure.selectPhoneMake = (function() {

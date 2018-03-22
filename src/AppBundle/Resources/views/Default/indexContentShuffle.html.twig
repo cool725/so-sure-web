@@ -27,9 +27,9 @@
         <p class="lead">We reward you when you don’t claim, <br class="hidden-xs"> and protect you when you do. Simple.</p>
 
         {% if phone is defined and phone %}
-            {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type': select_phone_type, 'id': phone.id })) }}
+            {{ render(controller('AppBundle:Default:selectPhoneMakeSearch', {'type': select_phone_type, 'id': phone.id })) }}
         {% else %}
-            {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type': select_phone_type })) }}
+            {{ render(controller('AppBundle:Default:selectPhoneMakeSearch', {'type': select_phone_type })) }}
         {% endif %}
 
         <div id="hero-character_1"
@@ -469,9 +469,9 @@
         <div class="container">
             <h2 class="text-center h1">Get Your Instant Quote</h2>
             {% if phone is defined and phone %}
-                {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'footer', 'id': phone.id })) }}
+                {{ render(controller('AppBundle:Default:selectPhoneMakeSearch', {'type':'footer', 'id': phone.id })) }}
             {% else %}
-                {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'footer'})) }}
+                {{ render(controller('AppBundle:Default:selectPhoneMakeSearch', {'type':'footer'})) }}
             {% endif %}
             <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/so-sure_form_rocket.svg"
                  class="img-responsive form-rocket lozad" alt="so-sure - rocket">
@@ -493,7 +493,7 @@
     'components/fuse.js/fuse.min.js'
     '@AppBundle/Resources/public/js/Default/images.js'
     '@AppBundle/Resources/public/js/Default/homepage.js'
-    '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
+    '@AppBundle/Resources/public/js/Default/selectPhoneMakeSearch.js'
  %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}

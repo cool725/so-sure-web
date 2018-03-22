@@ -29,7 +29,7 @@
                         <span class="h2">Get up to 80% of your money back.</span>
                     </h1>
                     <div class="text-center">
-                        {{ render(controller('AppBundle:Default:selectPhoneMakeV2')) }}
+                        {{ render(controller('AppBundle:Default:selectPhoneMakeSearch')) }}
                     </div>
                     {% if invitation %}
                         <br>
@@ -75,7 +75,7 @@
     'components/vimeo-player-js/player.min.js'
     'components/corejs-typeahead/typeahead.bundle.min.js'
     'components/fuse.js/fuse.min.js'
-    '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
+    '@AppBundle/Resources/public/js/Default/selectPhoneMakeSearch.js'
  %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}

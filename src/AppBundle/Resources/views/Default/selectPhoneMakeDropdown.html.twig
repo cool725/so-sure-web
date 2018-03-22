@@ -1,0 +1,19 @@
+<div id="select-phone-data" class="search-phone-form--homepage" data-phones='{{ phones|json_encode|raw }}'>
+    {% if type is defined and type == 'purchase-select' %}
+        {% set buttonText = 'Select Phone' %}
+    {% elseif type is defined and type == 'purchase-change' %}
+        {% set buttonText = 'Select Phone' %}
+    {% else %}
+        {% set buttonText = 'Quote me' %}
+    {% endif %}
+
+    {{ form_start(form_phone) }}
+
+        {{ form_widget(form_phone.make, { 'attr': {'class': 'select-phone-dropdown select-phone-make'}}) }}
+
+        {{ form_widget(form_phone.phoneId, { 'attr': {'class': 'select-phone-dropdown select-phones'}}) }}
+
+        {{ form_widget(form_phone.next, {'label': buttonText, 'attr': {'class': 'btn btn-primary btn-rounded'}}) }}
+
+    {{ form_end(form_phone) }}
+</div>

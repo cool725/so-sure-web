@@ -10,7 +10,7 @@
     'components/dot/doT.min.js'
     'components/corejs-typeahead/typeahead.bundle.min.js'
     'components/fuse.js/fuse.min.js'
-    '@AppBundle/Resources/public/js/Default/selectPhoneMake.js'
+    '@AppBundle/Resources/public/js/Default/selectPhoneMakeSearch.js'
  %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
@@ -40,7 +40,7 @@
                   {% endif %}
                 </div>
                 <div class="col-md-6 section--pad">
-                    {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type':'homepage'})) }}
+                    {{ render(controller('AppBundle:Default:selectPhoneMakeSearch', {'type':'homepage'})) }}
                 </div>
               {% else %}
                 <div class="col-md-12">

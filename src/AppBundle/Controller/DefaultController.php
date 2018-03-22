@@ -153,19 +153,34 @@ class DefaultController extends BaseController
 
 
     /**
-     * @Route("/select-phone", name="select_phone_make")
-     * @Route("/select-phone/{type}/{id}", name="select_phone_make_type_id")
-     * @Route("/select-phone/{type}", name="select_phone_make_type")
+     * @Route("/select-phone-dropdown", name="select_phone_make_dropdown")
+     * @Route("/select-phone-dropdown/{type}/{id}", name="select_phone_make_dropdown_type_id")
+     * @Route("/select-phone-dropdown/{type}", name="select_phone_make_dropdown_type")
      * @Template()
      */
-    public function selectPhoneMakeAction(Request $request, $type = null, $id = null)
+    public function selectPhoneMakeDropdownAction(Request $request, $type = null, $id = null)
     {
         $dm = $this->getManager();
         $phoneRepo = $dm->getRepository(Phone::class);
         $phone = null;
+        $phoneMake = new PhoneMake();
         if ($id) {
             $phone = $phoneRepo->find($id);
+            $phoneMake->setMake($phone->getMake());
         }
+
+
+    //     if ($request->getMethod() == "GET") {
+    //         $phone = $deviceAtlas->getPhone($request);
+    //         /*
+    //         if (!$phone) {
+    //             $phone = $this->getDefaultPhone();
+    //         }
+    //         */
+    //         if ($phone instanceof Phone) {
+    //             $phoneMake->setMake($phone->getMake());
+    //         }
+    //     }
 
         // throw new \Exception($id);
 
@@ -182,74 +197,10 @@ class DefaultController extends BaseController
            // return $this->redirectToRoute('learn_more_phone', ['id' => $id]);
         }
 
-        return [
-            'phones' => $this->getPhonesArray(),
-            'type' => $type,
-            'phone' => $phone,
-        ];
-    }
 
-    /**
-     * @Route("/select-phone-v2", name="select_phone_make_v2")
-     * @Route("/select-phone-v2/{type}", name="select_phone_make_v2_type")
-     * @Route("/select-phone-v2/{type}/{id}", name="select_phone_make_v2_type_id")
-     * @Template()
-     */
-    public function selectPhoneMakeV2Action(Request $request, $type = null, $id = null)
-    {
-        $dm = $this->getManager();
-        $phoneRepo = $dm->getRepository(Phone::class);
-        $phone = null;
-        if ($id) {
-            $phone = $phoneRepo->find($id);
-        }
-
-        if ($phone && in_array($type, ['purchase-select', 'purchase-change'])) {
-            $session = $request->getSession();
-            $session->set('quote', $phone->getId());
-
-            // don't check for partial partial as selected phone may be different from partial policy phone
-            return $this->redirectToRoute('purchase_step_policy');
-        } elseif ($phone && in_array($type, ['learn-more'])) {
-            $session = $request->getSession();
-            $session->set('quote', $phone->getId());
-
-           // return $this->redirectToRoute('learn_more_phone', ['id' => $id]);
-        }
-
-        return [
-            'phones' => $this->getPhonesArray(),
-            'type' => $type,
-            'phone' => $phone,
-        ];
-    }
-
-    /**
-     * @Route("/select-phone-v3", name="select_phone_make_v3")
-     * @Route("/select-phone-v3/{type}", name="select_phone_make_v3_type")
-     * @Route("/select-phone-v3/{type}/{id}", name="select_phone_make_v3_type_id")
-     * @Template()
-     */
-    public function selectPhoneMakeV3Action(Request $request, $type = null, $id = null)
-    {
-        $deviceAtlas = $this->get('app.deviceatlas');
-        $dm = $this->getManager();
-        $phoneRepo = $dm->getRepository(Phone::class);
-        $phoneMake = new PhoneMake();
-        if ($request->getMethod() == "GET") {
-            $phone = $deviceAtlas->getPhone($request);
-            /*
-            if (!$phone) {
-                $phone = $this->getDefaultPhone();
-            }
-            */
-            if ($phone instanceof Phone) {
-                $phoneMake->setMake($phone->getMake());
-            }
-        }
         $formPhone = $this->get('form.factory')
             ->createNamedBuilder('launch_phone', PhoneMakeType::class, $phoneMake, [
-                'action' => $this->generateUrl('select_phone_make'),
+                'action' => $this->generateUrl('select_phone_make_dropdown'),
             ])
             ->getForm();
         if ('POST' === $request->getMethod()) {
@@ -278,9 +229,51 @@ class DefaultController extends BaseController
             }
         }
 
+    //     return [
+    //         'form_phone' => $formPhone->createView(),
+    //         'phones' => $this->getPhonesArray(),
+    //     ];
+
         return [
             'form_phone' => $formPhone->createView(),
             'phones' => $this->getPhonesArray(),
+            'type' => $type,
+            'phone' => $phone,
+        ];
+    }
+
+    /**
+     * @Route("/select-phone-search", name="select_phone_make_search")
+     * @Route("/select-phone-search/{type}", name="select_phone_make_search_type")
+     * @Route("/select-phone-search/{type}/{id}", name="select_phone_make_search_type_id")
+     * @Template()
+     */
+    public function selectPhoneMakeSearchAction(Request $request, $type = null, $id = null)
+    {
+        $dm = $this->getManager();
+        $phoneRepo = $dm->getRepository(Phone::class);
+        $phone = null;
+        if ($id) {
+            $phone = $phoneRepo->find($id);
+        }
+
+        if ($phone && in_array($type, ['purchase-select', 'purchase-change'])) {
+            $session = $request->getSession();
+            $session->set('quote', $phone->getId());
+
+            // don't check for partial partial as selected phone may be different from partial policy phone
+            return $this->redirectToRoute('purchase_step_policy');
+        } elseif ($phone && in_array($type, ['learn-more'])) {
+            $session = $request->getSession();
+            $session->set('quote', $phone->getId());
+
+           // return $this->redirectToRoute('learn_more_phone', ['id' => $id]);
+        }
+
+        return [
+            'phones' => $this->getPhonesArray(),
+            'type' => $type,
+            'phone' => $phone,
         ];
     }
 
