@@ -107,7 +107,7 @@
 {% endblock %}
 
 {% block modals %}
-    <div class="modal modal-purchase modal-policy fade"
+    <div class="modal modal-purchase fade"
          id="renewModal"
          tabindex="-1"
          role="dialog">
@@ -136,9 +136,11 @@
                         </div>
                         {{ form_end(renew_form) }}
                     </div>
-                    <div id="policy-doc" class="modal-body__policy-doc" style="display:none;">
-                        <button type="button" class="close policy-doc-toggle" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot, 'include': true })) }}
+                    <div class="modal-policy-embedded" data-url="{{ url('latest_policy_terms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot, 'include': true, 'noH1': true }) }}" style="display: none;">
+                        <div class="text-center" style="margin-bottom: 20px;">
+                            <img src="{{ cdn_url }}/images/spinner.svg" alt="Loading..."><br>
+                            <a href="#" id="reload-policy" class="btn btn-blue-hollow" style="display:none;"><i class="fa fa-refresh" aria-hidden="true"></i> reload</a>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -9,6 +9,22 @@ sosure.globals = (function() {
         self.device_category = device_category;
     }
 
+    self.policyTerms = function() {
+        // Policy Modal
+        // Find the headings to add class
+        $('.modal-policy, .modal-policy-embedded').find('h3').addClass('section-header');
+        // Find the tables to add some styling classes
+        $('.modal-policy, .modal-policy-embedded').find('table').addClass('table, table-bordered');
+        // Hide the sections content
+        $('.section-header').nextAll().not('h2').not('.section-header').hide();
+        // Togggle sections
+        $('.section-header').unbind('click').click(function(e) {
+            e.preventDefault();
+            $(this).nextUntil('.section-header').toggle();
+            $(this).toggleClass('section-open');
+        });
+    }
+
     return self;
 })();
 
@@ -104,22 +120,5 @@ $(function(){
     if (jQuery.fn.popover) {
         $('[data-toggle="popover"]').popover();
     }
-
-    // Policy Modal
-    // Find the headings to add class
-    $('#policy-modal, .modal-policy').find('h2').addClass('section-header');
-    // Find the tables to add some styling classes
-    $('#policy-modal, .modal-policy').find('table').addClass('table, table-bordered');
-    // Hide the sections content
-    $('.section-header').nextAll().not('h1').not('.section-header').hide();
-    // Click function
-    $('.section-header').each(function(index) {
-
-        $(this).on('click', function(event) {
-            $(this).nextUntil('.section-header').toggle();
-            $(this).toggleClass('section-open');
-        });
-
-    });
 
 });

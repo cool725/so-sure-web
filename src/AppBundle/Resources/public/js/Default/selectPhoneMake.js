@@ -222,5 +222,41 @@ $(function(){
         });
     }
 
+    // Load policy doc
+    if ($('.modal-policy').length) {
+        $(this).on('shown.bs.modal', function() {
+
+            // Content to load
+            var url = $('.modal-policy').data('url');
+
+            // Append to body
+            $(this).find('.modal-body').load(url, function(responseTxt, statusTxt, xhr){
+                if (statusTxt == 'success') {
+                    sosure.globals.policyTerms();
+                }
+                // If error show reload button
+                if (statusTxt == 'error') {
+                    $('#reload-policy').show();
+                }
+            });
+
+            // Try and reload
+            $('#reload-policy').click(function(event) {
+
+                $('#reload-policy').hide();
+
+                $('.modal-body').load(url, function(responseTxt, statusTxt, xhr) {
+                    if (statusTxt == 'success') {
+                        sosure.globals.policyTerms();
+                    }
+                    if (statusTxt == 'error') {
+                        $('#reload-policy').show();
+                    }
+                });
+            });
+        });
+    }
+
+
 });
 

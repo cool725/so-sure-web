@@ -228,5 +228,40 @@ $(function(){
         $(this).parent().parent().click();
     });
 
+    // Load the policy doc
+    if ($('.modal-policy-embedded').length) {
 
+        // Content to load
+        var url   = $('.modal-policy-embedded').data('url');
+
+        function loadDoc() {
+            $('.modal-policy-embedded').load(url, function(responseTxt, statusTxt, xhr) {
+                if (statusTxt == 'success') {
+                    sosure.globals.policyTerms();
+                }
+                if (statusTxt == 'error') {
+                    $('#reload-policy').show();
+                }
+            });
+        }
+
+        // Toggle content
+        $('.policy-doc-toggle').click(function(e) {
+            e.preventDefault();
+
+            // Expand content
+            $('.modal-policy-embedded').toggle(function() {
+                loadDoc();
+            });
+
+        });
+
+        // Try and reload
+        $('#reload-policy').click(function(event) {
+
+            $('#reload-policy').hide();
+
+            loadDoc();
+        });
+    }
 });

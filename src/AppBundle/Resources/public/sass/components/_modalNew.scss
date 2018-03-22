@@ -178,7 +178,7 @@
 
     .modal-dialog {
         width: 100%;
-        margin: 0 auto;
+        margin: 0px auto;
 
         @include breakpoint(tablet) {
             width: 750px;
@@ -217,13 +217,13 @@
     }
 }
 
-.modal-policy {
+.modal-policy, .modal-policy-embedded {
 
-    h1 {
+    h2 {
         font-size: 24px;
     }
 
-    h2 {
+    h3 {
         margin: 0 0 15px;
         padding: 10px 30px 10px 15px;
         background-color: $grey-light;
@@ -242,7 +242,7 @@
         }
     }
 
-    h2.section-open:after {
+    h3.section-open:after {
         content: '\f078';
     }
 

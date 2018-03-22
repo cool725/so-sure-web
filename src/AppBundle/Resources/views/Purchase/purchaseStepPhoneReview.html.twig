@@ -230,14 +230,19 @@
                     </a>
                     {% endif %}
                 </div>
-                <div class="modal modal-purchase modal-policy fade"
+                <div class="modal modal-purchase fade"
                      id="reviewModal"
                      tabindex="-1"
                      role="dialog">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <button type="button"
+                                        class="close"
+                                        data-dismiss="modal"
+                                        aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                </button>
                                 <h3 class="modal-title text-blue">Before you proceed! <br>Please confirm the following are correct:</h3>
                             </div>
                             <div class="modal-body">
@@ -263,9 +268,11 @@
                                         <p class="help-block text-center"><small>You will be taken to our payment service provider Judo Pay</small></p>
                                     </div>
                                 </div>
-                                <div id="policy-doc" class="modal-body__policy-doc" style="display:none;">
-                                    <button type="button" class="close policy-doc-toggle" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                    {{ render(controller('AppBundle:ApiView:policyLatestTerms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot })) }}
+                                <div class="modal-policy-embedded" data-url="{{ url('latest_policy_terms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot, 'include': true, 'noH1': true }) }}" style="display: none;">
+                                    <div class="text-center" style="margin-bottom: 20px;">
+                                        <img src="{{ cdn_url }}/images/spinner.svg" alt="Loading..."><br>
+                                        <a href="#" id="reload-policy" class="btn btn-blue-hollow" style="display:none;"><i class="fa fa-refresh" aria-hidden="true"></i> reload</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -286,7 +293,7 @@
 
 {% include 'AppBundle::Default/modalQuote.html.twig' with {'selectPhoneMakeType': 'purchase-change'} %}
 
-<div class="modal modal-middle fade"
+<div class="modal fade"
      id="appleModal"
      tabindex="-1"
      role="dialog">
@@ -312,7 +319,7 @@
     </div>
 </div>
 
-<div class="modal modal-middle fade"
+<div class="modal fade"
      id="nonAppleModal"
      tabindex="-1"
      role="dialog">
