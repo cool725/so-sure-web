@@ -399,7 +399,6 @@ nelmio_security:
                 - https://*.intercomcdn.com
                 - https://*.intercom.io
                 - wss://*.intercom.io # necessary?
-                - https://intercom-sheets.com
                 - wss://*.hotjar.com # necessary?
                 - https://*.hotjar.com
                 - https://app.getsentry.com # necessary?
@@ -431,7 +430,6 @@ nelmio_security:
                 - https://*.optimizely.com
                 - https://*.intercomcdn.com
                 - https://*.intercom.io
-                - https://intercom-sheets.com
                 - wss://*.intercom.io
                 - https://app.getsentry.com # necessary?
                 - https://player.vimeo.com
@@ -461,7 +459,6 @@ nelmio_security:
                 - https://cdn.so-sure.com
                 - https://*.gstatic.com
                 - https://*.intercomcdn.com
-                - https://intercom-sheets.com
                 - https://*.fastly.net
                 - https://maxcdn.bootstrapcdn.com
                 - 'data:'
@@ -482,6 +479,7 @@ nelmio_security:
                 - https://*.google.com/
                 - https://platform.twitter.com
                 - https://syndication.twitter.com
+                - https://intercom-sheets.com
             script-src:
                 - 'self'
                 - 'unsafe-inline'
@@ -504,7 +502,6 @@ nelmio_security:
                 - http://cdn.optimizely.com
                 - https://*.intercom.io
                 - https://*.intercomcdn.com
-                - https://intercom-sheets.com
                 - https://*.hotjar.com
                 - http://*.hotjar.com
                 - https://*.pcapredict.com
