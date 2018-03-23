@@ -1,4 +1,4 @@
-<div id="select-phone-data" class="search-phone-form--homepage" data-phones='{{ phones|json_encode|raw }}'>
+<div id="select-phone-data" class="search-phone-form--homepage" data-phones="{{ phones|json_encode|raw }}">
     {% if type is defined and type == 'purchase-select' %}
         {% set buttonText = 'Select Phone' %}
     {% elseif type is defined and type == 'purchase-change' %}
@@ -17,7 +17,7 @@
         <div class="form-group">
             {{ form_widget(form_phone.phoneId, {
               'attr': {
-                'class': 'select-phones form-control',
+                'class': 'select-phones form-control animated pulse',
                 'style': 'display: none;'
             }}) }}
         </div>
@@ -25,7 +25,8 @@
             {{ form_widget(form_phone.next, {
               'label': buttonText,
               'attr': {
-                'class': 'btn btn-green btn-block btn-pad'
+                'id': 'dropdownSearch'
+                'class': 'btn btn-green btn-block btn-pad animated pulse',
             }}) }}
         </div>
     {{ form_end(form_phone) }}
