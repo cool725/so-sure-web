@@ -49,7 +49,7 @@
         {% endif %}
 
         {# Phone Search #}
-        {% if device_category() == 'Mobile' %}
+        {% if device_category() == 'Desktop' %}
             {% if phone is defined and phone %}
                 {{ render(controller('AppBundle:Default:selectPhoneMakeDropdown', {
                     'type': select_phone_type,

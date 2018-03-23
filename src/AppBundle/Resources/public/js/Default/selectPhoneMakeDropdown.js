@@ -3,6 +3,8 @@ $(function(){
     // Phone data
     var phones = $('#select-phone-data').data('phones');
 
+    console.log(phones);
+
     // Update the select
     var updatePhones = function() {
         // Make value
@@ -21,6 +23,9 @@ $(function(){
             options.append($('<option />').val('').text('Select your phone make first'));
         }
 
+        console.log(make);
+        console.log(phones[make]);
+
         // Get phones from list and add to options
         $.each(phones[make], function(key, value) {
             options.append($('<option />').val(key).text(value));
@@ -29,11 +34,11 @@ $(function(){
 
     // When user selects option update results
     $('.select-phone-make').on('change', function(e) {
-        if ($(this).val() != '') {
-            $('.select-phones').show();
-        } else {
-            $('.select-phones').hide();
-        }
+        // if ($(this).val() != '') {
+        //     $('.select-phones').show();
+        // } else {
+        //     $('.select-phones').hide();
+        // }
         updatePhones();
     });
 
