@@ -45,14 +45,19 @@ class PhoneMakeType extends AbstractType
             $phonePlaceholder = sprintf('Select your %s device', $make);
         }
         $models[''] = $phonePlaceholder;
+        $memory[''] = $phonePlaceholder;
         $builder
             ->add('make', ChoiceType::class, [
                     'placeholder' => 'Select phone make',
                     'choices' => $this->dm->getRepository(Phone::class)->findActiveMakes(),
                     'required' => $this->required
             ])
-            ->add('phoneId', ChoiceType::class, [
-                    'choices' => $models,
+            ->add('model', ChoiceType::class, [
+                'choices' => $models,
+                'required' => $this->required
+            ])
+            ->add('memory', ChoiceType::class, [
+                    'choices' => $memory,
                     'required' => $this->required
             ])
             ->add('next', SubmitType::class)

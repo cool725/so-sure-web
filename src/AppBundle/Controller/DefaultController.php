@@ -189,9 +189,9 @@ class DefaultController extends BaseController
             ->getForm();
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('launch_phone')) {
-                $phoneMake->setPhoneId($request->get('launch_phone')['phoneId']);
-                if ($phoneMake->getPhoneId()) {
-                    $phone = $phoneRepo->find($phoneMake->getPhoneId());
+                $phoneId = $this->getDataString($request->get('launch_phone'), 'memory');
+                if ($phoneId) {
+                    $phone = $phoneRepo->find($phoneId);
                     if (!$phone) {
                         throw new \Exception('unknown phone');
                     }

@@ -6,29 +6,49 @@ $(function(){
     console.log(phones);
 
     // Update the select
-    var updatePhones = function() {
+    var updateModels = function() {
         // Make value
         var make = $('.select-phone-make').val();
-
-        // Model Options
-        var options = $('.select-phones');
+        var model = $('.select-phone-model');
+        var memory = $('.select-phone-memory');
 
         // Clear incase make changed
-        options.empty();
+        model.empty();
+        memory.empty();
 
         // If make selected customise default value
         if (make) {
-            options.append($('<option />').val('').text('Select your ' + make + ' device'));
+            model.append($('<option />').val('').text('Select your ' + make + ' device'));
         } else {
-            options.append($('<option />').val('').text('Select your phone make first'));
+            model.append($('<option />').val('').text('Select your phone make first'));
         }
-
-        console.log(make);
-        console.log(phones[make]);
+        memory.append($('<option />').val('').text('Select your phone model first'));
 
         // Get phones from list and add to options
         $.each(phones[make], function(key, value) {
-            options.append($('<option />').val(key).text(value));
+            model.append($('<option />').val(key).text(key));
+        });
+    }
+
+    var updateMemory = function() {
+        // Make value
+        var make = $('.select-phone-make').val();
+        var model = $('.select-phone-model').val();
+        var memory = $('.select-phone-memory');
+
+        // Clear incase model changed
+        memory.empty();
+
+        // If model selected customise default value
+        if (model) {
+            memory.append($('<option />').val('').text('Select your ' + model + ' memory'));
+        } else {
+            memory.append($('<option />').val('').text('Select your phone model first'));
+        }
+
+        // Get phones from list and add to options
+        $.each(phones[make][model], function(key, value) {
+            memory.append($('<option />').val(key).text(value));
         });
     }
 
@@ -39,8 +59,13 @@ $(function(){
         // } else {
         //     $('.select-phones').hide();
         // }
-        updatePhones();
+        updateModels();
     });
 
-    updatePhones();
+    // When user selects option update results
+    $('.select-phone-model').on('change', function(e) {
+        updateMemory();
+    });
+
+    updateModels();
 });

@@ -43,9 +43,9 @@
                 <div class="col-md-6 section--pad">
                     {# Phone Search #}
                     {% if device_category() == 'Mobile' %}
-                        {{ render(controller('AppBundle:Default:selectPhoneMakeDropdown', 'type': 'homepage')) }}
+                        {{ render(controller('AppBundle:Default:selectPhoneMakeDropdown', {'type': 'homepage'})) }}
                     {% else %}
-                        {{ render(controller('AppBundle:Default:selectPhoneMakeSearch', 'type': 'homepage')) }}
+                        {{ render(controller('AppBundle:Default:selectPhoneMakeSearch', {'type': 'homepage'})) }}
                     {% endif %}
                     {# End Phone Search #}
                 </div>
