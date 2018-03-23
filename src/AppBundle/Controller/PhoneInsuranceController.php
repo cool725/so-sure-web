@@ -213,8 +213,8 @@ class PhoneInsuranceController extends BaseController
             if (!$phone || stripos($model, ' ') !== false) {
                 $phone = $repo->findOneBy([
                     'active' => true,
-                    'make' => $make,
-                    'model' => $model,
+                    'makeCanonical' => strtolower($make),
+                    'modelCanonical' => strtolower($model),
                     'memory' => (int) $memory
                 ]);
                 if ($phone) {

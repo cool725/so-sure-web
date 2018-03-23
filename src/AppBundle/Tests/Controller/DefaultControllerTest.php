@@ -65,7 +65,7 @@ class DefaultControllerTest extends BaseControllerTest
     {
         $url = self::$router->generate('quote_make_model_memory', [
             'make' => 'apple',
-            'model' => 'iphone+6S',
+            'model' => 'iphone+6s',
             'memory' => 64,
         ]);
 
@@ -87,8 +87,8 @@ class DefaultControllerTest extends BaseControllerTest
         ]);
 
         $crawler = self::$client->request('GET', $url);
-        self::verifyResponse(301);
-        $this->assertTrue(self::$client->getResponse()->isRedirect($redirectUrl));
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect($redirectUrl), json_encode($crawler->html()));
         $crawler = self::$client->followRedirect();
         self::verifyResponse(200);
     }
@@ -114,7 +114,7 @@ class DefaultControllerTest extends BaseControllerTest
         ]);
 
         $crawler = self::$client->request('GET', $url);
-        self::verifyResponse(301);
+        self::verifyResponse(302);
         $this->assertTrue(self::$client->getResponse()->isRedirect($redirectUrl));
         $crawler = self::$client->followRedirect();
         self::verifyResponse(200);

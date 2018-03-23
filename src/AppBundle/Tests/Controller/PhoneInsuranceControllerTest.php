@@ -19,7 +19,7 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
 
     public function testPhoneSearchPhoneInsuranceByPhoneName()
     {
-        $crawler = self::$client->request('GET', '/phone-insurance/Apple+iPhone+7');
+        $crawler = self::$client->request('GET', '/phone-insurance/apple+iphone+7');
         $data = self::$client->getResponse();
         $this->assertEquals(200, $data->getStatusCode());
         self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
@@ -32,8 +32,8 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
         $url = sprintf('/phone-insurance/%s', $phone->getId());
         $redirectUrl = sprintf(
             '/phone-insurance/%s+%s+%sGB',
-            $phone->getMake(),
-            $phone->getEncodedModel(),
+            $phone->getMakeCanonical(),
+            $phone->getEncodedModelCanonical(),
             $phone->getMemory()
         );
         $crawler = self::$client->request('GET', $url);
