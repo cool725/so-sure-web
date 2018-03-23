@@ -3,8 +3,6 @@ $(function(){
     // Phone data
     var phones = $('#select-phone-data').data('phones');
 
-    console.log(phones);
-
     // Update the select
     var updateModels = function() {
         // Make value
@@ -22,6 +20,7 @@ $(function(){
         } else {
             model.append($('<option />').val('').text('Select your phone make first'));
         }
+
         memory.append($('<option />').val('').text('Select your phone model first'));
 
         // Get phones from list and add to options
@@ -52,19 +51,48 @@ $(function(){
         });
     }
 
+    var checkForm = function() {
+
+        // Make value
+        var make = $('.select-phone-make').val();
+        var model = $('.select-phone-model').val();
+        var memory = $('.select-phone-memory').val();
+
+        if (make != '') {
+            console.log(make);
+            $('.select-phone-model').show();
+        } else {
+            $('.select-phone-model').hide();
+        }
+        if (model != '') {
+            console.log(model);
+            $('.select-phone-memory').show();
+        } else {
+            $('.select-phone-memory').hide();
+        }
+        if (memory != '') {
+            console.log('Selected option');
+            $('#launch_phone_next').show();
+        } else {
+            $('#launch_phone_next').hide();
+        }
+    }
+
     // When user selects option update results
     $('.select-phone-make').on('change', function(e) {
-        // if ($(this).val() != '') {
-        //     $('.select-phones').show();
-        // } else {
-        //     $('.select-phones').hide();
-        // }
         updateModels();
+        checkForm();
     });
 
     // When user selects option update results
     $('.select-phone-model').on('change', function(e) {
         updateMemory();
+        checkForm();
+    });
+
+    // When user selects option update results
+    $('.select-phone-memory').on('change', function(e) {
+        checkForm();
     });
 
     updateModels();

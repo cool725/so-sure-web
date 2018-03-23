@@ -1049,6 +1049,15 @@
 }
 
 // TODO: Move!
+.dropdown-phone-form--homepage {
+    max-width: 450px;
+    background-color: $white;
+    padding: 0;
+    position: relative;
+    margin: 0 auto;
+    z-index: 5;
+}
+
 .search-phone-form--homepage {
     max-width: 450px;
     background-color: $white;
