@@ -105,7 +105,9 @@ sosure.selectPhoneMake = (function() {
 })();
 
 $(function(){
-    sosure.selectPhoneMake.init();
+    if ($('.search-phone-form').length) {
+        sosure.selectPhoneMake.init();
+    }
 });
 
 $(function(){

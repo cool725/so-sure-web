@@ -49,7 +49,8 @@
         {% endif %}
 
         {# Phone Search #}
-        {% if device_category() == 'Desktop' %}
+        {% if device_category() == 'Mobile' %}
+            <h3 class="text-red">Mobile</h3>
             {% if phone is defined and phone %}
                 {{ render(controller('AppBundle:Default:selectPhoneMakeDropdown', {
                     'type': select_phone_type,
@@ -61,6 +62,7 @@
                 })) }}
             {% endif %}
         {% else %}
+            <h3 class="text-red">Desktop</h3>
             {% if phone is defined and phone %}
                 {{ render(controller('AppBundle:Default:selectPhoneMakeSearch', {
                     'type': select_phone_type,
