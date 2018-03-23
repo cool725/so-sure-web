@@ -15,7 +15,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use AppBundle\Controller\BaseController;
 use AppBundle\Document\File\S3File;
 use PicsureMLBundle\Service\PicsureMLService;
+use PicsureMLBundle\Document\TrainingVersionsInfo;
 use PicsureMLBundle\Document\TrainingData;
+use PicsureMLBundle\Form\Type\PicsureMLVersionType;
 use PicsureMLBundle\Form\Type\PicsureMLSearchType;
 use PicsureMLBundle\Form\Type\LabelType;
 
@@ -32,6 +34,17 @@ class PicsureMLController extends BaseController
      */
     public function indexAction(Request $request)
     {
+        $dm = $this->getPicsureMLManager();
+        $versionsRepo = $dm->getRepository(TrainingVersionsInfo::class);
+        $dataRepo = $dm->getRepository(TrainingData::class);
+
+        $versions = [1, 2];
+
+        $picsureMLVersionForm = $this->get('form.factory')
+            ->createNamedBuilder('picsureml_version_form', PicsureMLVersionType::class, ['choices' => $versions], ['method' => 'GET'])
+            ->getForm();
+        $picsureMLVersionForm->handleRequest($request);
+
         $picsureMLSearchForm = $this->get('form.factory')
             ->createNamedBuilder('picsureml_search_form', PicsureMLSearchType::class, null, ['method' => 'GET'])
             ->getForm();
@@ -44,10 +57,7 @@ class PicsureMLController extends BaseController
             $imagesPerPage = $picsureMLSearchForm->get('images_per_page')->getData();
         }
 
-        $dm = $this->getPicsureMLManager();
-        $repo = $dm->getRepository(TrainingData::class);
-
-        $qb = $repo->createQueryBuilder();
+        $qb = $dataRepo->createQueryBuilder();
         if ($label != null) {
             if ($label == 'none') {
                 $qb->field('label')->equals(null);
@@ -59,11 +69,12 @@ class PicsureMLController extends BaseController
         $pager = $this->pager($request, $qb, $imagesPerPage);
 
         return [
-            'n_images' => $repo->getTotalCount(),
-            'n_none_images' => $repo->getNoneCount(),
-            'n_undamaged_images' => $repo->getUndamagedCount(),
-            'n_invalid_images' => $repo->getInvalidCount(),
-            'n_damaged_images' => $repo->getDamagedCount(),
+            'picsureml_version_form' => $picsureMLVersionForm->createView(),
+            'n_images' => $dataRepo->getTotalCount(),
+            'n_none_images' => $dataRepo->getNoneCount(),
+            'n_undamaged_images' => $dataRepo->getUndamagedCount(),
+            'n_invalid_images' => $dataRepo->getInvalidCount(),
+            'n_damaged_images' => $dataRepo->getDamagedCount(),
             'label' => $label,
             'picsureml_search_form' => $picsureMLSearchForm->createView(),
             'images' => $pager->getCurrentPageResults(),
@@ -147,6 +158,18 @@ class PicsureMLController extends BaseController
             200,
             array('Content-Type' => $mimetype)
         );
+    }
+
+    /**
+     * @Route("/picsure-ml/new-version", name="admin_picsure_ml_new_version")
+     * @Template
+     */
+    public function newVersionAction(Request $request)
+    {
+        $service = $this->get('picsureml.picsureml');
+        $service->createNewTrainingVersion();
+        
+        return new RedirectResponse($this->generateUrl('admin_picsure_ml'));
     }
 
     /**

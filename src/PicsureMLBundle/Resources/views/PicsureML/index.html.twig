@@ -27,25 +27,39 @@
     {% else %}
         <h3>Picsure Machine Learning - {{ label|capitalize }}</h3>
     {% endif %}
-    <p><strong>{{ n_images }} Images</strong> ({{ n_none_images }} None - {{ n_undamaged_images }} Undamaged - {{ n_invalid_images }} Invalid - {{ n_damaged_images }} Damaged) </p>
-    <div class="bg-info text-center" style="border-radius: 10px; padding: 20px 20px 12px 20px; margin-bottom: 20px;">
-    {{ form_start(picsureml_search_form) }}
-    <div class="row">
-        <div class="col-md-6">
-            {{ form_widget(picsureml_search_form.label) }}
-        </div>
-        <div class="col-md-4">
-            <div id="picsureml_search_form_images_per_page">
-                {{ form_label(picsureml_search_form.images_per_page) }}
-                {{ form_widget(picsureml_search_form.images_per_page) }}
+    <div class="bg-info text-center" style="border-radius: 10px; padding: 20px 20px 12px 20px; margin-bottom: 10px;">
+        {{ form_start(picsureml_version_form) }}
+        <div class="row">
+            <div class="col-md-9">
+                {{ form_widget(picsureml_version_form.version) }}
+                {{ form_widget(picsureml_version_form.apply, {'attr':{'class':'btn btn-info'}}) }}
+            </div>
+            <div class="col-md-3">
+                <a class="btn btn-primary"
+                        href="{{ path('admin_picsure_ml_new_version') }}"><i class="fa fa-plus"></i> New version</a>
             </div>
         </div>
-        <div class="col-md-2">
-            {{ form_widget(picsureml_search_form.search, {'attr':{'class':'btn btn-info'}}) }}
-        </div>
+        {{ form_end(picsureml_version_form) }}
     </div>
-    {{ form_end(picsureml_search_form) }}
-</div>
+    <p style="text-align: center;"><strong>{{ n_images }} Images</strong> ({{ n_none_images }} None - {{ n_undamaged_images }} Undamaged - {{ n_invalid_images }} Invalid - {{ n_damaged_images }} Damaged) </p>
+    <div class="bg-info text-center" style="border-radius: 10px; padding: 20px 20px 12px 20px; margin-bottom: 20px;">
+        {{ form_start(picsureml_search_form) }}
+        <div class="row">
+            <div class="col-md-6">
+                {{ form_widget(picsureml_search_form.label) }}
+            </div>
+            <div class="col-md-4">
+                <div id="picsureml_search_form_images_per_page">
+                    {{ form_label(picsureml_search_form.images_per_page) }}
+                    {{ form_widget(picsureml_search_form.images_per_page) }}
+                </div>
+            </div>
+            <div class="col-md-2">
+                {{ form_widget(picsureml_search_form.search, {'attr':{'class':'btn btn-info'}}) }}
+            </div>
+        </div>
+        {{ form_end(picsureml_search_form) }}
+    </div>
 
     {# 
     <div class="container-action">

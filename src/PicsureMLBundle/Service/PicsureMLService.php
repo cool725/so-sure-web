@@ -12,6 +12,7 @@ use Aws\S3\S3Client;
 use Aws\S3\Exception\S3Exception;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\File\S3File;
+use PicsureMLBundle\Document\TrainingVersionsInfo;
 use PicsureMLBundle\Document\TrainingData;
 
 class PicsureMLService
@@ -60,6 +61,32 @@ class PicsureMLService
             $this->picsureMLDm->persist($image);
         }
         $this->picsureMLDm->flush();
+    }
+
+    public function createNewTrainingVersion() {
+        $repo = $this->picsureMLDm->getRepository(TrainingVersionsInfo::class);
+        $versionInfo = $repo->findAll();
+
+        if (count($versionInfo) == 0) {
+            $versionInfo = $repo->create();
+        } else {
+            $versionInfo = $versionInfo[0];
+            $versionInfo->addVersion($versionInfo->getLatestVersion()+1);
+        }
+
+        $this->picsureMLDm->persist($versionInfo);
+        $this->picsureMLDm->flush();
+    }
+
+    public function getTrainingVersions() {
+        $repo = $this->picsureMLDm->getRepository(TrainingVersionsInfo::class);
+        $versionInfo = $repo->findAll();
+
+        if (count($versionInfo) == 0) {
+            return [];
+        } else {
+            return $versionInfo[0]->getVersions();
+        }
     }
 
     public function predict(S3File $file)

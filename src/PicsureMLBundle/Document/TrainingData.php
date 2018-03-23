@@ -6,7 +6,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @MongoDB\Document(repositoryClass="PicsureMLBundle\Repository\PicsureMLRepository")
+ * @MongoDB\Document(repositoryClass="PicsureMLBundle\Repository\TrainingDataRepository")
  */
 class TrainingData
 {
@@ -31,6 +31,17 @@ class TrainingData
     protected $imagePath;
 
     /**
+     * @Assert\Choice({"undamaged", "invalid", "damaged"}, strict=true)
+     * @MongoDB\Field(type="string", name="label")
+     */
+    protected $label;
+
+    /**
+     * @MongoDB\Field(type="collection", name="versions")
+     */
+    protected $versions = array();
+
+    /**
      * @MongoDB\Field(type="integer", name="x")
      */
     //protected $x;
@@ -49,12 +60,6 @@ class TrainingData
      * @MongoDB\Field(type="integer", name="height")
      */
     //protected $height;
-
-    /**
-     * @Assert\Choice({"undamaged", "invalid", "damaged"}, strict=true)
-     * @MongoDB\Field(type="string", name="label")
-     */
-    protected $label;
 
     public function getId()
     {
@@ -94,6 +99,16 @@ class TrainingData
     public function hasLabel()
     {
         return $this->label != null;
+    }
+
+    public function addVersion($version)
+    {
+        $this->versions[] = $version;
+    }
+
+    public function getVersions()
+    {
+        return $this->versions;
     }
 
     /*

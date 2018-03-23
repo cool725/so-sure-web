@@ -5,7 +5,7 @@ namespace PicsureMLBundle\Repository;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use PicsureMLBundle\Document\TrainingData;
 
-class PicsureMLRepository extends DocumentRepository
+class TrainingDataRepository extends DocumentRepository
 {
 
     public function imageExists($path)

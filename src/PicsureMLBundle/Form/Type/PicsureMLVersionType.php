@@ -10,11 +10,12 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use PicsureMLBundle\Document\TrainingData;
+use PicsureMLBundle\Service\PicsureMLService;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 
-class PicsureMLSearchType extends AbstractType
+class PicsureMLVersionType extends AbstractType
 {
     /**
      * @var RequestStack
@@ -22,9 +23,15 @@ class PicsureMLSearchType extends AbstractType
     private $requestStack;
 
     /**
-     * @param RequestStack $requestStack
+     * @var PicsureMLService
      */
-    public function __construct(RequestStack $requestStack)
+    private $picsureMLService;
+
+    /**
+     * @param RequestStack $requestStack
+     * @param PicsureMLService $picsureMLService
+     */
+    public function __construct(RequestStack $requestStack, PicsureMLService $picsureMLService)
     {
         $this->requestStack = $requestStack;
     }
@@ -32,35 +39,22 @@ class PicsureMLSearchType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('label', ChoiceType::class, [
+            ->add('version', ChoiceType::class, [
                 'required' => true,
-                'multiple' => false,
-                'expanded' => true,
                 'choices' => [
-                    'All' => null,
-                    'None' => 'none',
-                    'Undamaged' => TrainingData::LABEL_UNDAMAGED,
-                    'Invalid' => TrainingData::LABEL_INVALID,
-                    'Damaged' => TrainingData::LABEL_DAMAGED,
+                    'None' => null,
                 ]
             ])
-            ->add('images_per_page', IntegerType::class, [
-                'required' => true,
-                'attr' => array('min' => 1, 'placeholder' => 32)
-            ])
-            ->add('search', SubmitType::class)
+            ->add('apply', SubmitType::class)
         ;
 
         $currentRequest = $this->requestStack->getCurrentRequest();
         $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) use ($currentRequest) {
             $form = $event->getForm();
-            if ($currentRequest->query->get('label')) {
-                $form->get('label')->setData($currentRequest->query->get('label'));
-            }
-            if ($currentRequest->query->get('images_per_page')) {
-                $form->get('images_per_page')->setData($currentRequest->query->get('images_per_page'));
+            if ($currentRequest->query->get('version')) {
+                $form->get('version')->setData($currentRequest->query->get('version'));
             } else {
-                $form->get('images_per_page')->setData(32);
+                $form->get('version')->setData(null);
             }
         });
     }
