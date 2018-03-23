@@ -246,7 +246,7 @@ snc_redis:
 
     session:
         client: session
-        ttl: 900 # 15 minutes - refreshed on page access; PCI Requirement for 15 
+        ttl: 900 # 15 minutes - refreshed on page access; PCI Requirement for 15
 
     swiftmailer:
         client: mailer
@@ -479,6 +479,7 @@ nelmio_security:
                 - https://*.google.com/
                 - https://platform.twitter.com
                 - https://syndication.twitter.com
+                - https://intercom-sheets.com
             script-src:
                 - 'self'
                 - 'unsafe-inline'
@@ -765,6 +766,7 @@ nelmio_security:
                 - https://*.twimg.com
                 - https://*.intercomassets.com
                 - https://*.intercomcdn.com
+                - https://intercom-sheets.com
                 - https://t.co
                 - https://*.doubleclick.net
                 - https://*.googleadservices.com
