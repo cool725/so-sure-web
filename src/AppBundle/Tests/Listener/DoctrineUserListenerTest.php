@@ -2,7 +2,9 @@
 
 namespace AppBundle\Tests\Listener;
 
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Listener\DoctrineUserListener;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
@@ -10,6 +12,7 @@ use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
 use AppBundle\Event\UserEvent;
 use AppBundle\Event\UserEmailEvent;
 use AppBundle\Document\User;
+use AppBundle\Document\PhonePolicy;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -19,6 +22,7 @@ class DoctrineUserListenerTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
+    /** @var Container */
     protected static $container;
     protected static $testUser;
 
@@ -35,6 +39,7 @@ class DoctrineUserListenerTest extends WebTestCase
         //each test method, do this in setUp() instead
         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         self::$userManager = self::$container->get('fos_user.user_manager');
+        self::$policyService = self::$container->get('app.policy');
     }
 
     public function tearDown()
@@ -200,5 +205,57 @@ class DoctrineUserListenerTest extends WebTestCase
         // same but different
         $user->setEmail(strtolower(static::generateEmail('testUpdateUserEmailChangedButSame', $this)));
         static::$dm->flush();
+    }
+
+    public function testUserPolicyPreRemove()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testUserPolicyPreRemove', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy);
+        static::$policyService->setEnvironment('test');
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+
+        $exception = false;
+        try {
+            static::$dm->remove($user);
+            static::$dm->flush();
+        } catch (\Exception $e) {
+            $exception = true;
+        }
+        $this->assertTrue($exception);
+        /** @var DocumentManager $dm */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(User::class);
+        $updatedUser = $repo->find($user->getId());
+        $this->assertNotNull($updatedUser);
+    }
+
+    public function testUserPartialPolicyPreRemove()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testUserPartialPolicyPreRemove', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+
+        $exception = false;
+        try {
+            static::$dm->remove($user);
+            static::$dm->flush();
+        } catch (\Exception $e) {
+            $exception = true;
+        }
+        $this->assertFalse($exception);
+        /** @var DocumentManager $dm */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(User::class);
+        $updatedUser = $repo->find($user->getId());
+        $this->assertNull($updatedUser);
     }
 }

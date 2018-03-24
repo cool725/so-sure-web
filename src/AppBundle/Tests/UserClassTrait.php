@@ -19,6 +19,8 @@ use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Connection\RenewalConnection;
 use AppBundle\Classes\Salva;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Security\FOSUBUserProvider;
+use AppBundle\Service\PolicyService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
 trait UserClassTrait
@@ -26,9 +28,16 @@ trait UserClassTrait
     use CurrencyTrait;
     use ImeiTrait;
 
+    /** @var PolicyService */
     protected static $policyService;
+
+    /** @var Phone */
     protected static $phone;
+
+    /** @var FOSUBUserProvider */
     protected static $userManager;
+
+    /** @var DocumentManager */
     protected static $dm;
 
     public static $JUDO_TEST_CARD_NUM = '4921 8100 0000 5462';
