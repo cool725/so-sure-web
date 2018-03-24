@@ -78,7 +78,11 @@ class UserRepository extends DocumentRepository
 
     public function existsAnotherUser(User $user = null, $email = null, $facebookId = null, $mobileNumber = null)
     {
-        return $this->getDuplicateUsers($user, $email, $facebookId, $mobileNumber)->count() > 0;
+        if ($duplicate = $this->getDuplicateUsers($user, $email, $facebookId, $mobileNumber)) {
+            return $duplicate->count() > 0;
+        }
+
+        return false;
     }
 
     public function getDuplicatePostcodeCount(User $user)
