@@ -114,8 +114,8 @@ class DefaultControllerTest extends BaseControllerTest
         ]);
 
         $crawler = self::$client->request('GET', $url);
-        self::verifyResponse(302);
-        $this->assertTrue(self::$client->getResponse()->isRedirect($redirectUrl));
+        self::verifyResponse(301);
+        $this->assertTrue(self::$client->getResponse()->isRedirect($redirectUrl), $crawler->html());
         $crawler = self::$client->followRedirect();
         self::verifyResponse(200);
     }
@@ -203,67 +203,6 @@ class DefaultControllerTest extends BaseControllerTest
         self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 2);
     }
 
-    public function testPhoneSearch()
-    {
-        //prepare list of all phones for the search
-        self::$client->request('GET', '/search-phone-combined');
-        $data = self::$client->getResponse();
-        $this->assertEquals(200, $data->getStatusCode());
-        $phones = json_decode($data->getContent(), true);
-
-        //find iphone 7 for the test
-        $onephone = array_filter($phones, function ($item) {
-            return ($item['name'] === 'Apple iPhone 7') ? true : false;
-        });
-
-        // number of expected additional variants in memory dropdown menu.
-        $numLinks = 2;
-
-        foreach ($onephone as $phone) {
-            $testPhone = new Phone();
-            $testPhone->setModel($phone['name']);
-            $name = $testPhone->getEncodedModel();
-
-            //fetch page for each phone and save internal linking to alternative memory models
-            $alternate = [];
-
-            foreach ($phone['sizes'] as $size) {
-                $alternate[$size['memory']] = [];
-                //final url after 301
-                $expected_redirect = sprintf(
-                    PurchaseControllerTest::SEARCH_URL2_TEMPLATE,
-                    $name,
-                    $size['memory']
-                );
-                //initial url from search form
-                $initial_url = sprintf(
-                    PurchaseControllerTest::SEARCH_URL1_TEMPLATE,
-                    $size['id']
-                );
-                //expecting 301, and redirect to proper named url
-                self::$client->request('GET', $initial_url);
-                $data = self::$client->getResponse();
-                $this->assertEquals(301, $data->getStatusCode());
-                $this->assertEquals($expected_redirect, $data->getTargetUrl());
-
-                //load each page and fetch dropdown links for memory alternatives
-                $crawler = self::$client->followRedirect();
-                $data = self::$client->getResponse();
-                foreach ($crawler->filter('.memory-dropdown')->filter('li')->filter('a') as $li) {
-                    $link = $li->getAttribute('href');
-                    if ($link == '#') {
-                        continue;
-                    }
-                    $alternate[$size['memory']][$li->nodeValue] = $li->getAttribute('href');
-                }
-            }
-
-            foreach (array_keys($alternate) as $key) {
-                $this->assertEquals($numLinks, count($alternate[$key]));
-                $this->areLinksValid($name, $key, array_keys($alternate), $alternate[$key]);
-            }
-        }
-    }
     public function areLinksValid($name, $key, $allKeys, $phoneLinks)
     {
         //each page contains link to different memory models of the current phone

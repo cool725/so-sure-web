@@ -236,7 +236,11 @@ class PhoneInsuranceController extends BaseController
                 $phone = $phones[0];
             } else {
                 // check for historical urls
-                $phone = $repo->findOneBy(['active' => true, 'make' => $make, 'model' => $model]);
+                $phone = $repo->findOneBy([
+                    'active' => true,
+                    'makeCanonical' => strtolower($make),
+                    'modelCanonical' => strtolower($model)
+                ]);
                 if ($phone) {
                     return $this->redirectToRoute('quote_make_model', [
                         'make' => $phone->getMakeCanonical(),

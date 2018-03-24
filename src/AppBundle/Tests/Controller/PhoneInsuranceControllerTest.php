@@ -49,7 +49,7 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
 
     public function testSessionPurchasePhone()
     {
-        $crawler = self::$client->request('GET', '/purchase-phone/Apple+iPhone+7+32GB');
+        $crawler = self::$client->request('GET', '/purchase-phone/apple+iphone+7+32GB');
         $data = self::$client->getResponse();
 
         // should be redirected to redirect url
