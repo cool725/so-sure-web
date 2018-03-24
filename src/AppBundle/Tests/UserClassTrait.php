@@ -23,6 +23,7 @@ use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Service\PolicyService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use FOS\UserBundle\Model\UserManagerInterface;
+use Symfony\Component\DependencyInjection\Container;
 
 trait UserClassTrait
 {
@@ -627,7 +628,8 @@ trait UserClassTrait
     }
 
     /**
-     * @param User $user
+     * @param Container $container
+     * @param User      $user
      * @return User|null
      */
     protected function assertUserExists($container, User $user)
