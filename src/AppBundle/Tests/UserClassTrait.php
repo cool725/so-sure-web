@@ -22,6 +22,7 @@ use AppBundle\Document\PhonePolicy;
 use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Service\PolicyService;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use FOS\UserBundle\Model\UserManagerInterface;
 
 trait UserClassTrait
 {
@@ -34,7 +35,7 @@ trait UserClassTrait
     /** @var Phone */
     protected static $phone;
 
-    /** @var FOSUBUserProvider */
+    /** @var UserManagerInterface */
     protected static $userManager;
 
     /** @var DocumentManager */
@@ -623,5 +624,49 @@ trait UserClassTrait
         }
 
         return [$policyA, $policyB];
+    }
+
+    /**
+     * @param User $user
+     * @return User|null
+     */
+    protected function assertUserExists(User $user)
+    {
+        /** @var DocumentManager $dm */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(User::class);
+        $updatedUser = $repo->find($user->getId());
+        $this->assertNotNull($updatedUser);
+
+        return $updatedUser;
+    }
+
+    protected function assertUserDoesNotExist(User $user)
+    {
+        /** @var DocumentManager $dm */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(User::class);
+        $updatedUser = $repo->find($user->getId());
+        $this->assertNull($updatedUser);
+    }
+
+    protected function assertPolicyExists(Policy $policy)
+    {
+        /** @var DocumentManager $dm */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $repo->find($policy->getId());
+        $this->assertNotNull($updatedPolicy);
+
+        return $updatedPolicy;
+    }
+
+    protected function assertPolicyDoesNotExist(Policy $policy)
+    {
+        /** @var DocumentManager $dm */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $repo->find($policy->getId());
+        $this->assertNull($updatedPolicy);
     }
 }

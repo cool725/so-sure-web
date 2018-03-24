@@ -88,11 +88,7 @@ class DoctrinePolicyListenerTest extends WebTestCase
             $exception = true;
         }
         $this->assertTrue($exception);
-        /** @var DocumentManager $dm */
-        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(Policy::class);
-        $updatedPolicy = $repo->find($policy->getId());
-        $this->assertNotNull($updatedPolicy);
+        $this->assertPolicyExists($policy);
     }
 
     public function testPartialPolicyPreRemove()
@@ -112,11 +108,7 @@ class DoctrinePolicyListenerTest extends WebTestCase
             $exception = true;
         }
         $this->assertFalse($exception);
-        /** @var DocumentManager $dm */
-        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(Policy::class);
-        $updatedPolicy = $repo->find($policy->getId());
-        $this->assertNull($updatedPolicy);
+        $this->assertPolicyDoesNotExist($policy);
     }
 
     private function runPreUpdate($policy, $count, $changeSet)

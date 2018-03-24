@@ -228,11 +228,7 @@ class DoctrineUserListenerTest extends WebTestCase
             $exception = true;
         }
         $this->assertTrue($exception);
-        /** @var DocumentManager $dm */
-        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(User::class);
-        $updatedUser = $repo->find($user->getId());
-        $this->assertNotNull($updatedUser);
+        $this->assertUserExists($user);
     }
 
     public function testUserPartialPolicyPreRemove()
@@ -252,10 +248,6 @@ class DoctrineUserListenerTest extends WebTestCase
             $exception = true;
         }
         $this->assertFalse($exception);
-        /** @var DocumentManager $dm */
-        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(User::class);
-        $updatedUser = $repo->find($user->getId());
-        $this->assertNull($updatedUser);
+        $this->assertUserDoesNotExist($user);
     }
 }

@@ -150,7 +150,7 @@ class BaseControllerTest extends WebTestCase
         $crawler = self::$client->request('GET', $loginLocation);
         self::$client->followRedirects(false);
         if ($expectedHttpCode) {
-            self::verifyResponse($expectedHttpCode, null, null, 'Failed to Login');
+            self::verifyResponse($expectedHttpCode, null, null, 'Failed to start login');
             if ($expectedHttpCode > 200) {
                 return;
             }
@@ -166,7 +166,7 @@ class BaseControllerTest extends WebTestCase
         self::$client->followRedirects();
         $crawler = self::$client->submit($form);
         if ($expectedHttpCode) {
-            self::verifyResponse($expectedHttpCode);
+            self::verifyResponse($expectedHttpCode, null, null, 'Failed to login');
         }
         self::$client->followRedirects(false);
         if ($expectedLocation) {

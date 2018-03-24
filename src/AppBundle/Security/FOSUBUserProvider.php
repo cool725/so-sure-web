@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Security;
 
+use AppBundle\Document\PhoneTrait;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface;
 use HWI\Bundle\OAuthBundle\Security\Core\User\FOSUBUserProvider as BaseClass;
@@ -14,6 +15,8 @@ use AppBundle\Validator\Constraints\UkMobileValidator;
 
 class FOSUBUserProvider extends BaseClass
 {
+    use PhoneTrait;
+
     const SERVICE_ACCOUNTKIT = 'accountkit';
 
     /** @var RequestStack */
@@ -317,6 +320,9 @@ class FOSUBUserProvider extends BaseClass
         if (!$users || count($users) == 0) {
             return true;
         }
+        $email = strtolower($email);
+        $mobile = $this->normalizeUkMobile($mobile);
+
         foreach ($users as $duplicate) {
             /** @var User $duplicate */
             // any user who has a non-partial policy can not be changed
@@ -328,15 +334,15 @@ class FOSUBUserProvider extends BaseClass
             }
 
             // One duplicate may match multiple items
-            if (!$user || $duplicate->getMobileNumber() == $user->getMobileNumber()) {
+            if ($duplicate->getMobileNumber() == $mobile) {
                 $duplicate->setMobileNumber(null);
             }
-            if (!$user || $duplicate->getFacebookId() == $user->getFacebookId()) {
+            if ($duplicate->getFacebookId() == $facebookId) {
                 $duplicate->setFacebookId(null);
                 $duplicate->setFacebookAccessToken(null);
             }
             // as username is tied to email for our case, delete the duplicate user
-            if (!$user || $duplicate->getEmailCanonical() == $user->getEmailCanonical()) {
+            if ($duplicate->getEmailCanonical() == $email) {
                 if ($duplicate->hasPartialPolicy()) {
                     foreach ($duplicate->getPartialPolicies() as $partialPolicy) {
                         $this->dm->remove($partialPolicy);
@@ -346,6 +352,7 @@ class FOSUBUserProvider extends BaseClass
             }
         }
         $this->dm->flush();
+        $this->dm->clear();
         if ($userRepo->existsAnotherUser(
             $user,
             $email,
