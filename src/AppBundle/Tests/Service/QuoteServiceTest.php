@@ -89,7 +89,7 @@ class QuoteServiceTest extends WebTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->expect($mailer, 0, 'Unknown device queried: "One"');
+        $this->expect($mailer, 0, 'Unknown device queried');
         self::$quoteService->setMailerMailer($mailer);
         self::$quoteService->getQuotes(null, 'A0001', 3000);
         $key = sprintf(QuoteService::REDIS_UNKNOWN_EMAIL_KEY_FORMAT, 'A0001');
