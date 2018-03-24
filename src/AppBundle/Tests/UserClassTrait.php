@@ -630,10 +630,10 @@ trait UserClassTrait
      * @param User $user
      * @return User|null
      */
-    protected function assertUserExists(User $user)
+    protected function assertUserExists($container, User $user)
     {
         /** @var DocumentManager $dm */
-        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $container->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(User::class);
         $updatedUser = $repo->find($user->getId());
         $this->assertNotNull($updatedUser);
@@ -641,19 +641,19 @@ trait UserClassTrait
         return $updatedUser;
     }
 
-    protected function assertUserDoesNotExist(User $user)
+    protected function assertUserDoesNotExist($container, User $user)
     {
         /** @var DocumentManager $dm */
-        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $container->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(User::class);
         $updatedUser = $repo->find($user->getId());
         $this->assertNull($updatedUser);
     }
 
-    protected function assertPolicyExists(Policy $policy)
+    protected function assertPolicyExists($container, Policy $policy)
     {
         /** @var DocumentManager $dm */
-        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $container->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(Policy::class);
         $updatedPolicy = $repo->find($policy->getId());
         $this->assertNotNull($updatedPolicy);
@@ -661,10 +661,10 @@ trait UserClassTrait
         return $updatedPolicy;
     }
 
-    protected function assertPolicyDoesNotExist(Policy $policy)
+    protected function assertPolicyDoesNotExist($container, Policy $policy)
     {
         /** @var DocumentManager $dm */
-        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $dm = $container->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(Policy::class);
         $updatedPolicy = $repo->find($policy->getId());
         $this->assertNull($updatedPolicy);

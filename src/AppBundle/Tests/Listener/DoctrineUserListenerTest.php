@@ -228,7 +228,7 @@ class DoctrineUserListenerTest extends WebTestCase
             $exception = true;
         }
         $this->assertTrue($exception);
-        $this->assertUserExists($user);
+        $this->assertUserExists(self::$container, $user);
     }
 
     public function testUserPartialPolicyPreRemove()
@@ -248,6 +248,6 @@ class DoctrineUserListenerTest extends WebTestCase
             $exception = true;
         }
         $this->assertFalse($exception);
-        $this->assertUserDoesNotExist($user);
+        $this->assertUserDoesNotExist(self::$container, $user);
     }
 }

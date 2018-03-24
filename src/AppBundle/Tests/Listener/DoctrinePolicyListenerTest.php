@@ -88,7 +88,7 @@ class DoctrinePolicyListenerTest extends WebTestCase
             $exception = true;
         }
         $this->assertTrue($exception);
-        $this->assertPolicyExists($policy);
+        $this->assertPolicyExists(self::$container, $policy);
     }
 
     public function testPartialPolicyPreRemove()
@@ -108,7 +108,7 @@ class DoctrinePolicyListenerTest extends WebTestCase
             $exception = true;
         }
         $this->assertFalse($exception);
-        $this->assertPolicyDoesNotExist($policy);
+        $this->assertPolicyDoesNotExist(self::$container, $policy);
     }
 
     private function runPreUpdate($policy, $count, $changeSet)

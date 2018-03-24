@@ -256,8 +256,8 @@ class FOSUBUserProviderTest extends WebTestCase
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
 
         $this->assertTrue(static::$userService->resolveDuplicateUsers(null, $email, null, null));
-        $this->assertUserDoesNotExist($user);
-        $this->assertPolicyDoesNotExist($policy);
+        $this->assertUserDoesNotExist(self::$container, $user);
+        $this->assertPolicyDoesNotExist(self::$container, $policy);
     }
 
     public function testResolveDuplicateUsersMobile()
@@ -278,9 +278,9 @@ class FOSUBUserProviderTest extends WebTestCase
             $user->getMobileNumber(),
             null
         ));
-        $updatedUser = $this->assertUserExists($user);
+        $updatedUser = $this->assertUserExists(self::$container, $user);
         $this->assertEquals('', $updatedUser->getMobileNumber());
-        $this->assertPolicyExists($policy);
+        $this->assertPolicyExists(self::$container, $policy);
     }
 
     public function testResolveDuplicateUsersFacebook()
@@ -297,9 +297,9 @@ class FOSUBUserProviderTest extends WebTestCase
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
 
         $this->assertTrue(static::$userService->resolveDuplicateUsers(null, $emailOther, null, $user->getFacebookId()));
-        $updatedUser = $this->assertUserExists($user);
+        $updatedUser = $this->assertUserExists(self::$container, $user);
         $this->assertNull($updatedUser->getFacebookId());
-        $this->assertPolicyExists($policy);
+        $this->assertPolicyExists(self::$container, $policy);
     }
 
     public function testResolveDuplicateUsersEmailPolicy()
@@ -318,8 +318,8 @@ class FOSUBUserProviderTest extends WebTestCase
         $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
 
         $this->assertFalse(static::$userService->resolveDuplicateUsers(null, $email, null, null));
-        $this->assertUserExists($user);
-        $this->assertPolicyExists($policy);
+        $this->assertUserExists(self::$container, $user);
+        $this->assertPolicyExists(self::$container, $policy);
     }
 
     public function testResolveDuplicateUsersMobilePolicy()
@@ -344,8 +344,8 @@ class FOSUBUserProviderTest extends WebTestCase
             $user->getMobileNumber(),
             null
         ));
-        $this->assertUserExists($user);
-        $this->assertPolicyExists($policy);
+        $this->assertUserExists(self::$container, $user);
+        $this->assertPolicyExists(self::$container, $policy);
     }
 
     public function testResolveDuplicateUsersFacebookPolicy()
@@ -371,8 +371,8 @@ class FOSUBUserProviderTest extends WebTestCase
             null,
             $user->getFacebookId()
         ));
-        $this->assertUserExists($user);
-        $this->assertPolicyExists($policy);
+        $this->assertUserExists(self::$container, $user);
+        $this->assertPolicyExists(self::$container, $policy);
     }
 
     protected function createResourceOwnerMock($resourceOwnerName = null)
