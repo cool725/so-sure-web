@@ -189,6 +189,7 @@ class PhoneInsuranceController extends BaseController
         $phone = null;
         $decodedModel = Phone::decodeModel($model);
         if ($id) {
+            /** @var Phone $phone */
             $phone = $repo->find($id);
             if ($phone->getMemory()) {
                 return $this->redirectToRoute('quote_make_model_memory', [
