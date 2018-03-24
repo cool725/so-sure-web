@@ -16,6 +16,7 @@ services:
             - [setRequestStack, ['@request_stack']]
             - [setEncoderFactory, ["@security.encoder_factory"]]
             - [setAuthService, ["@security.authorization_checker"]]
+            - [setDm, ["@doctrine_mongodb.odm.default_document_manager"]]
 
     app.user.cognitoidentity:
         class: AppBundle\Security\CognitoIdentityUserProvider
@@ -640,6 +641,7 @@ services:
             -  { name: doctrine_mongodb.odm.event_listener, event: postPersist }
             -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
             -  { name: doctrine_mongodb.odm.event_listener, event: postUpdate  }
+            -  { name: doctrine_mongodb.odm.event_listener, event: preRemove  }
 
     doctrine.listener.company:
         class:   AppBundle\Listener\DoctrineCompanyListener
@@ -679,6 +681,7 @@ services:
             - "%kernel.environment%"
         tags:
             -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
+            -  { name: doctrine_mongodb.odm.event_listener, event: preRemove  }
 
     doctrine.listener.validation:
         class:   AppBundle\Listener\DoctrineValidationListener

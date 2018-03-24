@@ -341,7 +341,7 @@ class UserControllerTest extends BaseControllerTest
     public function testUserChangeEmailActual()
     {
         $email = self::generateEmail('testUserChangeEmailActual', $this);
-        $password = 'foo';
+        $password = 'fooBar123!';
         $phone = self::getRandomPhone(self::$dm);
 
         $user = self::createUser(
