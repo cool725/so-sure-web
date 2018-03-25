@@ -74,7 +74,12 @@
                         <tr>
                             <td>Overall Approved Claim Rate- rolling 12mo [KPI: 65] <i class="fa fa-info" title="12 month FNOL that were approved / current active policies"></i></td>
                             {% for week in weeks %}
-                                <td>{{ week.period.data['approvedClaimRate']|number_format(1, '.', ',') }}%</td>
+                                <td>{%  if (week.total.data['newPolicies'] - week.total.data['endingEndingPolicies']) != 0  %}
+                                        {{ (100 * week.period.data['rolling-yearly-claims-totals'] / (week.total.data['newPolicies'] - week.total.data['endingEndingPolicies']))|number_format(1, '.', ',') }}%
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
                             {% endfor %}
                         </tr>
                         <tr>
