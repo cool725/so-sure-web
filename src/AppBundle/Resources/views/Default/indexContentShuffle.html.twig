@@ -27,9 +27,9 @@
         <p class="lead">We reward you when you don’t claim, <br class="hidden-xs"> and protect you when you do. Simple.</p>
 
         {% if phone is defined and phone %}
-            {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type': select_phone_type, 'id': phone.id })) }}
+            {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type': 'homepage-sticky', 'id': phone.id })) }}
         {% else %}
-            {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type': select_phone_type })) }}
+            {{ render(controller('AppBundle:Default:selectPhoneMakeV2', {'type': 'homepage-sticky' })) }}
         {% endif %}
 
         <div id="hero-character_1"

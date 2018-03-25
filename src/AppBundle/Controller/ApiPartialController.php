@@ -48,7 +48,7 @@ class ApiPartialController extends BaseController
         try {
             $sixpack = $this->get('app.sixpack');
 
-            if ($name == SixpackService::EXPERIMENT_SHARE_MESSAGE) {
+            if ($name == SixpackService::EXPIRED_EXPERIMENT_SHARE_MESSAGE) {
                 $user = $this->getUser();
                 if (!$user || !$user instanceof User || !$user->hasActivePolicy()) {
                     throw new NotFoundHttpException();
@@ -65,24 +65,14 @@ class ApiPartialController extends BaseController
                     throw new NotFoundHttpException();
                 }
 
-                $experiment = $sixpack->participate(
-                    SixpackService::EXPERIMENT_SHARE_MESSAGE,
-                    [
-                        SixpackService::ALTERNATIVES_SHARE_MESSAGE_SIMPLE,
-                        SixpackService::ALTERNATIVES_SHARE_MESSAGE_ORIGINAL
-                    ],
-                    SixpackService::LOG_MIXPANEL_NONE,
-                    1,
-                    $scode->getCode()
-                );
                 $text = $sixpack->getText(
-                    SixpackService::EXPERIMENT_SHARE_MESSAGE,
-                    $experiment,
+                    SixpackService::EXPIRED_EXPERIMENT_SHARE_MESSAGE,
+                    SixpackService::ALTERNATIVES_SHARE_MESSAGE_SIMPLE,
                     [$scode->getShareLink(), $scode->getCode()]
                 );
 
                 return new JsonResponse([
-                    'option' => $experiment,
+                    'option' => SixpackService::ALTERNATIVES_SHARE_MESSAGE_SIMPLE,
                     'text' => $text
                 ]);
             } elseif ($name == SixpackService::EXPERIMENT_APP_SHARE_METHOD) {
@@ -142,19 +132,7 @@ class ApiPartialController extends BaseController
         try {
             $sixpack = $this->get('app.sixpack');
 
-            if ($name == SixpackService::EXPERIMENT_SHARE_MESSAGE) {
-                $id = $this->getRequestString($request, 'id');
-                if ($id) {
-                    $experiment = $sixpack->convertByClientId(
-                        $id,
-                        SixpackService::EXPERIMENT_SHARE_MESSAGE
-                    );
-                } else {
-                    $experiment = $sixpack->convert(
-                        SixpackService::EXPERIMENT_SHARE_MESSAGE
-                    );
-                }
-
+            if ($name == SixpackService::EXPIRED_EXPERIMENT_SHARE_MESSAGE) {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::SUCCESS,
                     '',
