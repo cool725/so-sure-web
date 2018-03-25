@@ -673,8 +673,11 @@ class ReceperioService extends BaseImeiService
                 try {
                     return $this->runCheckSerial($phone, $imei, $user, $warnMismatch);
                 } catch (ReciperoManualProcessException $e) {
-                    if (!in_array($e->getCode(), [ReciperoManualProcessException::EMPTY_MAKES,
-                        ReciperoManualProcessException::NO_MODEL_REFERENCE])) {
+                    if (!in_array($e->getCode(), [
+                        ReciperoManualProcessException::EMPTY_MAKES,
+                        ReciperoManualProcessException::NO_MODEL_REFERENCE,
+                        ReciperoManualProcessException::MAKE_MODEL_MEMORY_MISMATCH,
+                    ])) {
                         // Don't pass exception as param (string ok) here. Message missing/confusing in rollbar
                         $this->logger->error(
                             sprintf(
@@ -684,10 +687,21 @@ class ReceperioService extends BaseImeiService
                             )
                         );
                     }
+                    // For most recipero errors where the data isn't what we expect, go ahead and allow the
+                    // purchase to go ahead
+                    return !in_array($e->getCode(), [
+                        ReciperoManualProcessException::MAKE_MODEL_MEMORY_MISMATCH,
+                        ReciperoManualProcessException::MODEL_MISMATCH,
+                        ReciperoManualProcessException::MEMORY_MISMATCH,
+                        ReciperoManualProcessException::DEVICE_NOT_FOUND,
+                    ]);
                 }
             } else {
-                if (!in_array($e->getCode(), [ReciperoManualProcessException::EMPTY_MAKES,
-                    ReciperoManualProcessException::NO_MODEL_REFERENCE])) {
+                if (!in_array($e->getCode(), [
+                    ReciperoManualProcessException::EMPTY_MAKES,
+                    ReciperoManualProcessException::NO_MODEL_REFERENCE,
+                    ReciperoManualProcessException::MAKE_MODEL_MEMORY_MISMATCH,
+                ])) {
                     // Don't pass exception as param (string ok) here. Message missing/confusing in rollbar
                     $this->logger->error(
                         sprintf("Unable to check serial number '%s'. Exception: %s", $serialNumber, $e->getMessage())
@@ -696,7 +710,12 @@ class ReceperioService extends BaseImeiService
             }
             // For most recipero errors where the data isn't what we expect, go ahead and allow the
             // purchase to go ahead
-            return true;
+            return !in_array($e->getCode(), [
+                ReciperoManualProcessException::MAKE_MODEL_MEMORY_MISMATCH,
+                ReciperoManualProcessException::MODEL_MISMATCH,
+                ReciperoManualProcessException::MEMORY_MISMATCH,
+                ReciperoManualProcessException::DEVICE_NOT_FOUND,
+            ]);
         }
     }
 
