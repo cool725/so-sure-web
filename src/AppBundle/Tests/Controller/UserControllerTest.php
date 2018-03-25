@@ -357,6 +357,8 @@ class UserControllerTest extends BaseControllerTest
 
         $this->assertTrue($policy->getUser()->hasActivePolicy());
 
+        self::$client = self::createClient();
+
         $this->login($email, $password, 'user/');
 
         self::$client->followRedirects();
