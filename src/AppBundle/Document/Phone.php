@@ -474,6 +474,11 @@ class Phone
         return str_replace(' ', '+', $model);
     }
 
+    public function getEncodedModelCanonical()
+    {
+        return strtolower($this->getEncodedModel());
+    }
+
     /**
       * TODO: Adjust cdn images to use encodedModel instead
       */
@@ -509,6 +514,11 @@ class Phone
         }
 
         $this->modelCanonical = strtolower($model);
+    }
+
+    public function isSameMakeModelCanonical($make, $model)
+    {
+        return $this->getMakeCanonical() == $make && $this->getEncodedModelCanonical() == $model;
     }
 
     public function getSearchQuerystring()

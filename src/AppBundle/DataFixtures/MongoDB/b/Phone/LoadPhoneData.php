@@ -235,14 +235,14 @@ abstract class LoadPhoneData implements ContainerAwareInterface
         if ($make != "ALL") {
             if ($memory) {
                 $this->container->get('router')->generate('quote_make_model_memory', [
-                    'make' => $make,
-                    'model' => $model,
+                    'make' => strtolower($make),
+                    'model' => strtolower($model),
                     'memory' => $memory,
                 ]);
             } else {
                 $this->container->get('router')->generate('quote_make_model', [
-                    'make' => $make,
-                    'model' => $model,
+                    'make' => strtolower($make),
+                    'model' => strtolower($model),
                 ]);
             }
         }
