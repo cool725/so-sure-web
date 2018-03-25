@@ -58,10 +58,12 @@ class SalvaExportServiceTest extends WebTestCase
         $phoneRepo = self::$dm->getRepository(Phone::class);
         self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
 
+        // @codingStandardsIgnoreStart
         // testPaymentsCashback is erroring:
         // The "MongoDBODMProxies\__CG__\AppBundle\Document\SalvaPhonePolicy" document with identifier "5ab790f063623960a3731908" could not be found.
         // one of the other tests seems to creating a payment that doesn't have a related policy (or deleting the policy)
-        // easies to just delete all data prior to running
+        // easiest to just delete all data prior to running
+        // @codingStandardsIgnoreEnd
         $paymentRepo = self::$dm->getRepository(Payment::class);
         $payments = $paymentRepo->findAll();
         foreach ($payments as $payment) {
