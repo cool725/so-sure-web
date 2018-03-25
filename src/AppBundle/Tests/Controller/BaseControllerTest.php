@@ -132,6 +132,13 @@ class BaseControllerTest extends WebTestCase
         }
     }
 
+    protected function logout()
+    {
+        self::$client->followRedirects();
+        $crawler = self::$client->request('GET', '/logout');
+        self::$client->followRedirects(false);
+    }
+
     protected function login(
         $username,
         $password,
@@ -140,9 +147,7 @@ class BaseControllerTest extends WebTestCase
         $expectedHttpCode = 200
     ) {
         if ($loginLocation) {
-            self::$client->followRedirects();
-            $crawler = self::$client->request('GET', '/logout');
-            self::$client->followRedirects(false);
+            $this->logout();
         } else {
             $loginLocation = '/login';
         }
