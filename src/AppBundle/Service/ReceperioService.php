@@ -684,6 +684,14 @@ class ReceperioService extends BaseImeiService
                             )
                         );
                     }
+                    // For most recipero errors where the data isn't what we expect, go ahead and allow the
+                    // purchase to go ahead
+                    return !in_array($e->getCode(), [
+                        ReciperoManualProcessException::MAKE_MODEL_MEMORY_MISMATCH,
+                        ReciperoManualProcessException::MODEL_MISMATCH,
+                        ReciperoManualProcessException::MEMORY_MISMATCH,
+                        ReciperoManualProcessException::DEVICE_NOT_FOUND,
+                    ]);
                 }
             } else {
                 if (!in_array($e->getCode(), [ReciperoManualProcessException::EMPTY_MAKES,
@@ -696,7 +704,12 @@ class ReceperioService extends BaseImeiService
             }
             // For most recipero errors where the data isn't what we expect, go ahead and allow the
             // purchase to go ahead
-            return true;
+            return !in_array($e->getCode(), [
+                ReciperoManualProcessException::MAKE_MODEL_MEMORY_MISMATCH,
+                ReciperoManualProcessException::MODEL_MISMATCH,
+                ReciperoManualProcessException::MEMORY_MISMATCH,
+                ReciperoManualProcessException::DEVICE_NOT_FOUND,
+            ]);
         }
     }
 
