@@ -48,7 +48,7 @@ class PhoneMakeType extends AbstractType
         $memory[''] = $phonePlaceholder;
         $builder
             ->add('make', ChoiceType::class, [
-                    'placeholder' => 'Select phone make',
+                    'placeholder' => 'Select phone make to get a quote',
                     'choices' => $this->dm->getRepository(Phone::class)->findActiveMakes(),
                     'required' => $this->required
             ])

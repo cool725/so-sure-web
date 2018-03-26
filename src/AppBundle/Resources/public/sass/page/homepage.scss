@@ -75,14 +75,9 @@
         &-h1 {
             color: $primary-blue;
 
-            font-size: 28px;
-            line-height: 36px;
-            margin: 0 0 15px;
-
-            @include breakpoint(mobileishup) {
-                font-size: 30px;
-                line-height: 38px;
-            }
+            font-size: 30px;
+            line-height: 40px;
+            margin-bottom: 10px;
 
             @include breakpoint(tablet) {
                 font-size: 42px;

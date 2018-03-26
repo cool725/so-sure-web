@@ -9,6 +9,9 @@
 
     {{ form_start(form_phone) }}
         <div class="form-group">
+            <span id="phone" class="h4"></span>
+        </div>
+        <div class="form-group">
             {{ form_widget(form_phone.make, {
               'attr': {
                 'class': 'select-phone-make form-control'
