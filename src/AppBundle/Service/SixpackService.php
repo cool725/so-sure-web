@@ -205,6 +205,11 @@ class SixpackService
 
     public function convertByClientId($clientId, $experiment, $kpi = null)
     {
+        if (!$clientId || strlen($clientId) == 0) {
+            $this->logger->info(sprintf('Missing clientId for experiment %s', $experiment));
+
+            return;
+        }
         try {
             $data = [
                 'experiment' => $experiment,
