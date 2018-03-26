@@ -136,18 +136,9 @@ class PhoneInsuranceController extends BaseController
             ksort($phonesMem[$phone->getName()]['mem']);
         }
 
-        $exp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_CPC_MANUFACTURER_OLD_NEW,
-            ['old', 'new']
-        );
-
         $template = 'AppBundle:PhoneInsurance:makeInsurance.html.twig';
         if (in_array($request->get('_route'), ['insure_make'])) {
-            $template = 'AppBundle:PhoneInsurance:makeInsuranceBottomOld.html.twig';
-            if ($exp == 'new') {
-                $template = 'AppBundle:PhoneInsurance:makeInsuranceBottom.html.twig';
-            }
+            $template = 'AppBundle:PhoneInsurance:makeInsuranceBottom.html.twig';
         }
 
         $event = MixpanelService::EVENT_MANUFACTURER_PAGE;
@@ -395,7 +386,6 @@ class PhoneInsuranceController extends BaseController
                     }
                     $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
 
-                    $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_NEW_QUOTE_DESIGN);
                     $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_INTERCOM_PURCHASE);
 
                     // Multipolicy should skip user details
@@ -419,7 +409,6 @@ class PhoneInsuranceController extends BaseController
                     }
                     $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
 
-                    $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_NEW_QUOTE_DESIGN);
                     $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_INTERCOM_PURCHASE);
 
                     // Multipolicy should skip user details
@@ -473,14 +462,6 @@ class PhoneInsuranceController extends BaseController
             $this->get('app.sixpack')->convert(
                 SixpackService::EXPERIMENT_HOMEPAGE_AA_V2
             );
-
-            $this->get('app.sixpack')->convert(
-                SixpackService::EXPERIMENT_HOMEPAGE_STICKYSEARCH_SHUFFLE
-            );
-
-            $this->get('app.sixpack')->convert(
-                SixpackService::EXPERIMENT_CPC_MANUFACTURER_OLD_NEW
-            );
         }
 
         $data = array(
@@ -507,22 +488,7 @@ class PhoneInsuranceController extends BaseController
             'intercom_test' => $expIntercom,
         );
 
-        $exp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_NEW_QUOTE_DESIGN,
-            ['old-quote', 'new-quote-design'],
-            SixpackService::LOG_MIXPANEL_ALL // keep consistent with running test; change for future
-        );
-
-        if ($request->get('force')) {
-            $exp = $request->get('force');
-        }
-
         $template = 'AppBundle:PhoneInsurance:quote.html.twig';
-
-        if ($exp == 'new-quote-design') {
-            $template = 'AppBundle:PhoneInsurance:quoteNewDesign.html.twig';
-        }
 
         if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
             return $this->render($template, $data);

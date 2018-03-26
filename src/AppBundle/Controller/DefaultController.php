@@ -72,27 +72,14 @@ class DefaultController extends BaseController
             SixpackService::LOG_MIXPANEL_CONVERSION
         );
 
-        $exp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_HOMEPAGE_STICKYSEARCH_SHUFFLE,
-            ['v2', 'sticky-search', 'shuffle'],
-            SixpackService::LOG_MIXPANEL_ALL // keep consistent with running test; change for future
-        );
-
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         $data = array(
-            // Make sure to check homepage landing below too
-            'select_phone_type' => $exp == 'sticky-search' ? 'homepage-sticky' : 'homepage',
             'referral'          => $referral,
             'phone'             => $this->getQuerystringPhone($request),
         );
 
         $template = 'AppBundle:Default:index.html.twig';
-
-        if ($exp == 'shuffle') {
-            $template = 'AppBundle:Default:indexContentShuffle.html.twig';
-        }
 
         return $this->render($template, $data);
     }
@@ -128,7 +115,6 @@ class DefaultController extends BaseController
         $data = null;
         if ($request->get('_route') == "reimagined") {
             $data = array(
-                'select_phone_type' => 'homepage',
                 'main'              => 'Mobile Insurance',
                 'main_cont'         => 'Re-Imagined',
                 'sub'               => 'Quicker. Easier. Jargon Free.',
@@ -136,7 +122,6 @@ class DefaultController extends BaseController
             );
         } elseif ($request->get('_route') == "hasslefree") {
             $data = array(
-                'select_phone_type' => 'homepage',
                 'main'              => 'Hassle Free',
                 'main_cont'         => 'Mobile Insurance',
                 'sub'               => 'We dont give you the run around when you claim.',
