@@ -106,6 +106,11 @@ class TrainingData
         $this->versions[] = $version;
     }
 
+    public function setVersions($versions)
+    {
+        $this->versions = $versions;
+    }
+
     public function getVersions()
     {
         return $this->versions;

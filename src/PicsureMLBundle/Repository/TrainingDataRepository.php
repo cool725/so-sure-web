@@ -19,45 +19,23 @@ class TrainingDataRepository extends DocumentRepository
             ->count() > 0;
     }
 
-    public function getTotalCount()
+    public function getTotalCount($version, $label)
     {
-        return $this->createQueryBuilder()
-                ->getQuery()
-                ->execute()
-                ->count();
-    }
+        $qb = $this->createQueryBuilder();
 
-    public function getNoneCount()
-    {
-        return $this->createQueryBuilder()
-                ->field('label')->equals(null)
-                ->getQuery()
-                ->execute()
-                ->count();
-    }
+        if ($version != null) {
+            $qb->field('versions')->in(array($version));
+        }
 
-    public function getUndamagedCount()
-    {
-        return $this->createQueryBuilder()
-                ->field('label')->equals(TrainingData::LABEL_UNDAMAGED)
-                ->getQuery()
-                ->execute()
-                ->count();
-    }
+        if ($label != null) {
+            if ($label == 'none') {
+                $qb->field('label')->equals(null);
+            } else {
+                $qb->field('label')->equals($label);
+            }
+        }
 
-    public function getInvalidCount()
-    {
-        return $this->createQueryBuilder()
-                ->field('label')->equals(TrainingData::LABEL_INVALID)
-                ->getQuery()
-                ->execute()
-                ->count();
-    }
-
-    public function getDamagedCount()
-    {
-        return $this->createQueryBuilder()
-                ->field('label')->equals(TrainingData::LABEL_DAMAGED)
+        return $qb
                 ->getQuery()
                 ->execute()
                 ->count();

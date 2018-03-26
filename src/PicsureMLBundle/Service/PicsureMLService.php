@@ -72,6 +72,7 @@ class PicsureMLService
         } else {
             $versionInfo = $versionInfo[0];
             $versionInfo->addVersion($versionInfo->getLatestVersion()+1);
+            $versionInfo->setLatestVersion($versionInfo->getLatestVersion()+1);
         }
 
         $this->picsureMLDm->persist($versionInfo);
@@ -201,6 +202,7 @@ class PicsureMLService
 
         $repo = $this->picsureMLDm->getRepository(TrainingData::class);
         $qb = $repo->createQueryBuilder();
+        $qb->field('versions')->in(array($version));
         $qb->sort('id', 'desc');
         $results = $qb->getQuery()->execute();
 

@@ -17,8 +17,8 @@ use AppBundle\Document\File\S3File;
 use PicsureMLBundle\Service\PicsureMLService;
 use PicsureMLBundle\Document\TrainingVersionsInfo;
 use PicsureMLBundle\Document\TrainingData;
-use PicsureMLBundle\Form\Type\PicsureMLVersionType;
-use PicsureMLBundle\Form\Type\PicsureMLSearchType;
+use PicsureMLBundle\Document\Form\Search;
+use PicsureMLBundle\Form\Type\SearchType;
 use PicsureMLBundle\Form\Type\LabelType;
 
 /**
@@ -35,29 +35,27 @@ class PicsureMLController extends BaseController
     public function indexAction(Request $request)
     {
         $dm = $this->getPicsureMLManager();
-        $versionsRepo = $dm->getRepository(TrainingVersionsInfo::class);
-        $dataRepo = $dm->getRepository(TrainingData::class);
+        $repo = $dm->getRepository(TrainingData::class);
 
-        $versions = [1, 2];
-
-        $picsureMLVersionForm = $this->get('form.factory')
-            ->createNamedBuilder('picsureml_version_form', PicsureMLVersionType::class, ['choices' => $versions], ['method' => 'GET'])
-            ->getForm();
-        $picsureMLVersionForm->handleRequest($request);
-
+        $search = new Search();
         $picsureMLSearchForm = $this->get('form.factory')
-            ->createNamedBuilder('picsureml_search_form', PicsureMLSearchType::class, null, ['method' => 'GET'])
+            ->createNamedBuilder('picsureml_search_form', SearchType::class, $search, ['method' => 'GET'])
             ->getForm();
+
         $picsureMLSearchForm->handleRequest($request);
 
-        $label = $this->getRequestString($request, 'label');
-        $imagesPerPage = $this->getRequestString($request, 'images_per_page');
+        $version = $search->getVersion();
+        $label = $search->getLabel();
+        $imagesPerPage = $search->getImagesPerPage();
 
         if ($imagesPerPage == null) {
             $imagesPerPage = $picsureMLSearchForm->get('images_per_page')->getData();
         }
 
-        $qb = $dataRepo->createQueryBuilder();
+        $qb = $repo->createQueryBuilder();
+        if ($version != null) {
+            $qb->field('versions')->in(array($version));
+        }
         if ($label != null) {
             if ($label == 'none') {
                 $qb->field('label')->equals(null);
@@ -69,12 +67,12 @@ class PicsureMLController extends BaseController
         $pager = $this->pager($request, $qb, $imagesPerPage);
 
         return [
-            'picsureml_version_form' => $picsureMLVersionForm->createView(),
-            'n_images' => $dataRepo->getTotalCount(),
-            'n_none_images' => $dataRepo->getNoneCount(),
-            'n_undamaged_images' => $dataRepo->getUndamagedCount(),
-            'n_invalid_images' => $dataRepo->getInvalidCount(),
-            'n_damaged_images' => $dataRepo->getDamagedCount(),
+            'n_images' => $repo->getTotalCount($version, null),
+            'n_none_images' => $repo->getTotalCount($version, 'none'),
+            'n_undamaged_images' => $repo->getTotalCount($version, TrainingData::LABEL_UNDAMAGED),
+            'n_invalid_images' => $repo->getTotalCount($version, TrainingData::LABEL_INVALID),
+            'n_damaged_images' => $repo->getTotalCount($version, TrainingData::LABEL_DAMAGED),
+            'version' => $version,
             'label' => $label,
             'picsureml_search_form' => $picsureMLSearchForm->createView(),
             'images' => $pager->getCurrentPageResults(),
