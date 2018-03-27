@@ -36,11 +36,10 @@
         {{ form_start(picsureml_search_form) }}
         <div class="row">
             <div class="col-md-6">
-                <div>
+                <div id="picsureml_search_form_version">
                     {{ form_label(picsureml_search_form.version) }}
                     {{ form_widget(picsureml_search_form.version) }}
-                    <a class="btn btn-primary"
-                        href="{{ path('admin_picsure_ml_new_version') }}"><i class="fa fa-plus"></i> New version</a>
+                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#newVersionModal"><i class="fa fa-plus"></i> New version</button>
                 </div>
                 <div>
                     {{ form_widget(picsureml_search_form.label) }}
@@ -94,6 +93,36 @@
     {% endfor %}
     </div>
 {% endif %}
+</div>
+
+<div class="modal fade" id="newVersionModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+        {{ form_start(picsureml_newversion_form) }}
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">New version</h4>
+        <p>Choose an existing version to create this version from an older one or select None to create an empty version.</p>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+            <div class="form-group col-sm-4">
+                {{ form_label(picsureml_newversion_form.version, 'Version') }}
+            </div>
+            <div class="form-group col-sm-4">
+                {{ form_errors(picsureml_newversion_form.version) }}
+                {{ form_widget(picsureml_newversion_form.version) }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group text-center col-sm-12" style="padding-top: 10px;">
+                {{ form_widget(picsureml_newversion_form.add, {'label': 'Create New Version', 'attr': {'class': 'btn btn-warning'}}) }}
+            </div>
+        </div>
+      </div>
+        {{ form_end(picsureml_newversion_form) }}
+    </div>
+  </div>
 </div>
 
 {% if images.count > 0 %}

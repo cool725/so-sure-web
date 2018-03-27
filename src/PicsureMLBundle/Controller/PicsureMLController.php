@@ -18,7 +18,9 @@ use PicsureMLBundle\Service\PicsureMLService;
 use PicsureMLBundle\Document\TrainingVersionsInfo;
 use PicsureMLBundle\Document\TrainingData;
 use PicsureMLBundle\Document\Form\Search;
+use PicsureMLBundle\Document\Form\NewVersion;
 use PicsureMLBundle\Form\Type\SearchType;
+use PicsureMLBundle\Form\Type\NewVersionType;
 use PicsureMLBundle\Form\Type\LabelType;
 
 /**
@@ -41,6 +43,23 @@ class PicsureMLController extends BaseController
         $picsureMLSearchForm = $this->get('form.factory')
             ->createNamedBuilder('picsureml_search_form', SearchType::class, $search, ['method' => 'GET'])
             ->getForm();
+
+        $newVersion = new NewVersion();
+        $picsureMLNewVersionForm = $this->get('form.factory')
+            ->createNamedBuilder('picsureml_newversion_form', NewVersionType::class, $newVersion)
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('picsureml_newversion_form')) {
+                $picsureMLNewVersionForm->handleRequest($request);
+                if ($picsureMLNewVersionForm->isValid()) {
+                    $version = $picsureMLNewVersionForm->get('version')->getData();
+                    $service = $this->get('picsureml.picsureml');
+                    $service->createNewTrainingVersion($version);
+                    return new RedirectResponse($this->generateUrl('admin_picsure_ml'));
+                }
+            }
+        }
 
         $picsureMLSearchForm->handleRequest($request);
 
@@ -75,6 +94,7 @@ class PicsureMLController extends BaseController
             'version' => $version,
             'label' => $label,
             'picsureml_search_form' => $picsureMLSearchForm->createView(),
+            'picsureml_newversion_form' => $picsureMLNewVersionForm->createView(),
             'images' => $pager->getCurrentPageResults(),
             'pager' => $pager
         ];
@@ -109,7 +129,7 @@ class PicsureMLController extends BaseController
                         } else {
                             return $this->redirectToRoute('admin_picsure_ml');
                         }
-                    } else {
+                    } elseif (array_key_exists('next', $request->request->get('picsureml_label_form'))) {
                         $nextId = $repo->getNextImage($id);
                         if ($nextId) {
                             return $this->redirectToRoute('admin_picsure_ml_edit', ['id' => $nextId]);
@@ -156,18 +176,6 @@ class PicsureMLController extends BaseController
             200,
             array('Content-Type' => $mimetype)
         );
-    }
-
-    /**
-     * @Route("/picsure-ml/new-version", name="admin_picsure_ml_new_version")
-     * @Template
-     */
-    public function newVersionAction(Request $request)
-    {
-        $service = $this->get('picsureml.picsureml');
-        $service->createNewTrainingVersion();
-        
-        return new RedirectResponse($this->generateUrl('admin_picsure_ml'));
     }
 
     /**

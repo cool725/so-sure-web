@@ -10,11 +10,10 @@ class TrainingVersionsInfoRepository extends DocumentRepository
 
     public function create()
     {
-		$versionInfo = new TrainingVersionsInfo();
-		$versionInfo->addVersion(1);
-		$versionInfo->setLatestVersion(1);
+        $versionInfo = new TrainingVersionsInfo();
+        $versionInfo->addVersion(1);
+        $versionInfo->setLatestVersion(1);
 
-		return $versionInfo;
+        return $versionInfo;
     }
-
 }

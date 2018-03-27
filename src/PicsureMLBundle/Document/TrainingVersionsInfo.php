@@ -50,5 +50,4 @@ class TrainingVersionsInfo
     {
         return $this->versions;
     }
-
 }

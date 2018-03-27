@@ -1122,6 +1122,12 @@ services:
         tags:
             - { name: form.type }
 
+    picsureml.form.type.newversion:
+        class: PicsureMLBundle\Form\Type\NewVersionType
+        arguments: ["@picsureml.picsureml", "%form_required%"]
+        tags:
+            - { name: form.type }
+
     picsureml.form.type.annotate:
         class: PicsureMLBundle\Form\Type\AnnotateType
         arguments: ["@request_stack", "%form_required%"]

@@ -63,7 +63,8 @@ class PicsureMLService
         $this->picsureMLDm->flush();
     }
 
-    public function createNewTrainingVersion() {
+    public function createNewTrainingVersion($version)
+    {
         $repo = $this->picsureMLDm->getRepository(TrainingVersionsInfo::class);
         $versionInfo = $repo->findAll();
 
@@ -76,10 +77,24 @@ class PicsureMLService
         }
 
         $this->picsureMLDm->persist($versionInfo);
+
+        if ($version !== null) {
+            $repo = $this->picsureMLDm->getRepository(TrainingData::class);
+            $qb = $repo->createQueryBuilder();
+            $qb->field('versions')->in(array($version));
+            $results = $qb->getQuery()->execute();
+
+            foreach ($results as $data) {
+                $data->addVersion($versionInfo->getLatestVersion());
+                $this->picsureMLDm->persist($data);
+            }
+        }
+
         $this->picsureMLDm->flush();
     }
 
-    public function getTrainingVersions() {
+    public function getTrainingVersions()
+    {
         $repo = $this->picsureMLDm->getRepository(TrainingVersionsInfo::class);
         $versionInfo = $repo->findAll();
 

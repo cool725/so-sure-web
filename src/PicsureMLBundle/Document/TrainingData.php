@@ -37,11 +37,6 @@ class TrainingData
     protected $label;
 
     /**
-     * @MongoDB\Field(type="collection", name="versions")
-     */
-    protected $versions = array();
-
-    /**
      * @MongoDB\Field(type="integer", name="x")
      */
     //protected $x;
@@ -60,6 +55,11 @@ class TrainingData
      * @MongoDB\Field(type="integer", name="height")
      */
     //protected $height;
+
+    /**
+     * @MongoDB\Field(type="collection", name="versions")
+     */
+    protected $versions = array();
 
     public function getId()
     {
