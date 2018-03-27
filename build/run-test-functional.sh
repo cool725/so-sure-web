@@ -101,10 +101,10 @@ else
   echo ./build/phpunit.sh --filter "$RUN_FILTER" --bootstrap vendor/autoload.php src/AppBundle/    
   ./build/phpunit.sh --filter "$RUN_FILTER" --bootstrap vendor/autoload.php src/AppBundle/
 fi
+if [ "$SKIP_FLUSH_REDIS" == "0" ]; then
+  app/console --env=test redis:flushdb -n
+fi
 if [ "$SKIP_PHING" == "0" ]; then
   ./vendor/phing/phing/bin/phing force:cs
   casperjs test /var/ops/scripts/monitor/casper/sosure.js --url="http://localhost"
-fi
-if [ "$SKIP_FLUSH_REDIS" == "0" ]; then
-  app/console --env=test redis:flushdb -n
 fi
