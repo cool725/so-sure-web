@@ -81,10 +81,10 @@ $(function(){
             var phone = $('#phone');
 
             if (make != '') {
-                // $('.select-phone-make').hide();
-                $('.select-phone-model').show();
+                $('.select-phone-model').show(function() {
+                    $(this).trigger('mouseup');
+                });
             } else {
-                // $('.select-phone-make').show();
                 $('.select-phone-model').hide();
             }
             if (model != '') {
