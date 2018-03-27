@@ -145,6 +145,12 @@ services:
             - "@app.shortlink"
             - "@app.branch"
 
+    app.bacs:
+        class: AppBundle\Service\BacsService
+        arguments:
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+
     app.push:
         class: AppBundle\Service\PushService
         arguments:

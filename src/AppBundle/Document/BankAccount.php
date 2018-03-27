@@ -23,6 +23,7 @@ class BankAccount
     const MANDATE_PENDING_APPROVAL = 'pending-approval';
     const MANDATE_SUCCESS = 'success';
     const MANDATE_FAILURE = 'failure';
+    const MANDATE_CANCELLED = 'cancelled';
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
