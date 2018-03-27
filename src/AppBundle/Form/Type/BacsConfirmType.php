@@ -14,6 +14,8 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
+use AppBundle\Exception\DirectDebitBankException;
+use Symfony\Component\Form\FormError;
 
 class BacsConfirmType extends AbstractType
 {
