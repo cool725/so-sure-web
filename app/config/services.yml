@@ -88,11 +88,15 @@ services:
             - "@app.sms"
             - "@app.feature"
 
-    app.scheduledpayment:
-        class: AppBundle\Service\ScheduledPaymentService
+    app.payment:
+        class: AppBundle\Service\PaymentService
         arguments:
             - "@app.judopay"
             - "@logger"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@app.sequence"
+            - "@app.mailer"
+            - "%kernel.environment%"
 
     app.barclays:
         class: AppBundle\Service\BarclaysService
@@ -922,6 +926,12 @@ services:
 
     app.form.type.bacs:
         class: AppBundle\Form\Type\BacsType
+        arguments: ["@app.address", "%form_required%"]
+        tags:
+            - { name: form.type }
+
+    app.form.type.bacsconfirm:
+        class: AppBundle\Form\Type\BacsConfirmType
         arguments: ["@app.address", "%form_required%"]
         tags:
             - { name: form.type }

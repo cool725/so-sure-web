@@ -1,0 +1,129 @@
+{% set logo_image = 'directdebit' %}
+{% extends 'AppBundle:Email:base.html.twig' %}
+{% import "AppBundle:Email:macros.html.twig" as macros %}
+{% block title %}Your so-sure Direct Debit Confirmation And Payment Schedule{% endblock %}
+{% block body %}
+	{{ macros.start_table() }}
+		<h1>
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		</h1>
+		<div style="font-size: 14px; text-align: left;">
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		   <div style="font-size: 14px; text-align: left;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+				<h2>Your so-sure Direct Debit Confirmation And Payment Schedule</h2>
+				<br><br>
+				   <table width="100%">
+					   <tr>
+						   <td width="50%">
+							   Name of account holder
+						   </td>
+						   <td width="50%">
+							   Reference number
+						   </td>
+					   </tr>
+					   <tr>
+						   <td width="50%">
+							   {{ user.paymentMethod.bankAccount.accountName }}
+						   </td>
+						   <td width="50%">
+							   {{ user.paymentMethod.bankAccount.reference }}
+						   </td>
+					   </tr>
+					   <tr>
+						   <td width="50%">
+                               Sort code
+                           </td>
+						   <td width="50%">
+							   Collection frequency
+						   </td>
+					   </tr>
+					   <tr>
+						   <td width="50%">
+							   {{ user.paymentMethod.bankAccount.getDisplayableSortCode }}
+						   </td>
+						   <td width="50%">
+							   First Collection: {{  user.paymentMethod.bankAccount.getPaymentDate|date('d F','Europe/London') }}<br>
+							   (Collected on the {{ policy.billing|date('jS','Europe/London') }} of each month thereafter)
+						   </td>
+					   </tr>
+					   <tr>
+						   <td width="50%">
+							   Account number
+						   </td>
+						   <td width="50%">
+							   Payment amount
+						   </td>
+					   </tr>
+					   <tr>
+						   <td width="50%">
+							   {{ user.paymentMethod.bankAccount.getDisplayableAccountNumber }}
+						   </td>
+						   <td width="50%">
+							   £{{ policy.getPremiumInstallmentPrice(true)|number_format(2, '.', ',') }}
+						   </td>
+					   </tr>
+					   <tr>
+						   <td width="50%">
+							   Bank/Building society
+						   </td>
+						   <td width="50%">
+						   </td>
+					   </tr>
+					   <tr>
+						   <td width="50%">
+							   {{ user.paymentMethod.bankAccount.bankName }}
+						   </td>
+						   <td width="50%">
+						   </td>
+					   </tr>
+                       {% if user.paymentMethod.bankAccount.bankAddress %}
+					   <tr>
+						   <td width="50%">
+							   Bank/Building society address
+						   </td>
+						   <td width="50%">
+						   </td>
+					   </tr>
+					   <tr>
+						   <td width="50%">
+							   {{ user.paymentMethod.bankAccount.bankAddress.stringImplode('<br>')|raw }}
+						   </td>
+						   <td width="50%">
+						   </td>
+					   </tr>
+					   {%  endif %}
+				   </table>
+				   <br><br>
+				   If any of the above details are incorrect please update them online.  Alternatively, you can call us on +44 330 223 4948. You have the right to cancel your Direct Debit at any time. A copy of the Direct Debit Guarantee is below.
+				   <br><br>
+		<div style="font-size: 14px; text-align: left;">
+		   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+		   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+		<table border="1" cellpadding="20" cellspacing="0" height="100%" width="100%" id="ddguarentee">
+    <tr>
+        <td align="center" valign="top">
+			<img src="{{ cdn_url }}/images/direct-debit-logo.svg" alt="Direct Debit"><br><br>
+			Direct Debit Guarantee<br><br>
+				<ul class="lead">
+					<li>The Guarantee is offered by all banks and building societies that accept instructions to pay Direct Debits</li>
+					<li>If there are any changes to the amount, date or frequency of your Direct Debit the organisation will notify you (normally 10 working days) in advance of your account being debited or as otherwise agreed. If you request the organisation to collect a payment, confirmation of the amount and date will be given to you at the time of the request</li>
+					<li>
+						If an error is made in the payment of your Direct Debit, by the organisation or your bank or building society, you are entitled to a full and immediate refund of the amount paid from your bank or building society
+
+						<ul>
+							<li>If you receive a refund you are not entitled to, you must pay it back when the organisation asks you to</li>
+						</ul>
+
+					</li>
+					<li>You can cancel a Direct Debit at any time by simply contacting your bank or building society. Written confirmation may be required. Please also notify the organisation.</li>
+				</ul>
+		</td>
+	</tr>
+		</table>
+
+			</div>
+		</div>
+
+		   </div></div>
+	{{ macros.end_table() }}
+{% endblock %}
