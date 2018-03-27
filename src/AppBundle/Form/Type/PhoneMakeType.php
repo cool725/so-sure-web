@@ -50,7 +50,8 @@ class PhoneMakeType extends AbstractType
             ->add('make', ChoiceType::class, [
                     'placeholder' => 'Select phone make to get a quote',
                     'choices' => $this->dm->getRepository(Phone::class)->findActiveMakes(),
-                    'required' => $this->required
+                    'required' => $this->required,
+                    'preferred_choices' => array('Apple', 'Samsung'),
             ])
             ->add('model', ChoiceType::class, [
                 'choices' => $models,
