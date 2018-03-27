@@ -29,7 +29,7 @@ class PaymentService
     protected $mailer;
 
     /** @var SequenceService $sequenceService */
-    protected  $sequenceService;
+    protected $sequenceService;
 
     /** @var string */
     protected $environment;
