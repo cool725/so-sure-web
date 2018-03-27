@@ -4,7 +4,6 @@ $(function(){
 
         // Phone data
         var phones = $('#select-phone-data').data('phones');
-        console.log(phones);
 
         // Update the select
         var updateModels = function() {
@@ -33,7 +32,7 @@ $(function(){
             });
 
             // Update text
-            phone.text(make);
+            // phone.text(make);
         }
 
         var updateMemory = function() {
@@ -59,7 +58,7 @@ $(function(){
             });
 
             // Update text
-            phone.text(make + ' > ' + model);
+            // phone.text(make + ' > ' + model);
         }
 
         var updateFinal = function() {
@@ -70,7 +69,7 @@ $(function(){
             var phone = $('#phone');
 
             // Update text
-            phone.text(make + ' > ' + model + ' > ' + memory);
+            // phone.text(make + ' > ' + model + ' > ' + memory);
         }
 
         var checkForm = function() {
@@ -82,17 +81,17 @@ $(function(){
             var phone = $('#phone');
 
             if (make != '') {
-                $('.select-phone-make').hide();
+                // $('.select-phone-make').hide();
                 $('.select-phone-model').show();
             } else {
-                $('.select-phone-make').show();
+                // $('.select-phone-make').show();
                 $('.select-phone-model').hide();
             }
             if (model != '') {
-                $('.select-phone-model').hide();
+                // $('.select-phone-model').hide();
                 $('.select-phone-memory').show();
             } else {
-                $('.select-phone-model').show();
+                // $('.select-phone-model').show();
                 $('.select-phone-memory').hide();
             }
             if (memory != '') {
