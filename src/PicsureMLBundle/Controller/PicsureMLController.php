@@ -73,7 +73,7 @@ class PicsureMLController extends BaseController
 
         $qb = $repo->createQueryBuilder();
         if ($version != null) {
-            $qb->field('versions')->in(array($version));
+            $qb->field('versions')->equals($version);
         }
         if ($label != null) {
             if ($label == 'none') {
