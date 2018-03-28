@@ -68,7 +68,7 @@ class BankAccount
     protected $reference;
 
     /**
-     * @Assert\Choice({"pending-init", "pending-approval", "success", "failure"}, strict=true)
+     * @Assert\Choice({"pending-init", "pending-approval", "success", "failure", "cancelled"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */

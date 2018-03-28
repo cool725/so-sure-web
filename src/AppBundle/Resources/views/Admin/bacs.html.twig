@@ -12,33 +12,83 @@
 {% block body %}
 <div class="container" style="margin-bottom: 50px">
 
-<div class="row">
-    <div class="col-md-6">
-        <h1>so-sure Bacs for {{ month }} / {{ year }}</h1>
-    </div>
-    <form class="month-form form-inline" method="POST" autocomplete="off">
-    <div class="col-md-4">
-        <div class="form-group" style="padding-top: 15px;">
-            <div class="input-group date month" data-url="{{ path('admin_bacs') }}">
-                <input name="bacs" type='text' class="form-control" value="{{month}}-{{year}}" />
-                <span class="input-group-addon">
-                    <span class="fa fa-calendar"></span>
-                </span>
+    <div class="row">
+        <div class="col-md-5">
+            <h1>so-sure Bacs for {{ month }} / {{ year }}</h1>
+        </div>
+        <form class="month-form form-inline" method="POST" autocomplete="off">
+            <div class="col-md-3">
+                <div class="form-group" style="padding-top: 15px;">
+                    <div class="input-group date month" data-url="{{ path('admin_bacs') }}">
+                        <input name="bacs" type='text' class="form-control" value="{{month}}-{{year}}" />
+                        <span class="input-group-addon">
+                            <span class="fa fa-calendar"></span>
+                        </span>
+                    </div>
+                    <div class="input-group">
+                        <div class="input-group-btn">
+                            <button class="btn btn-success"><i class="fa fa-arrow-right"></i></button>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="input-group">
-                <div class="input-group-btn">
-                    <button class="btn btn-success"><i class="fa fa-arrow-right"></i></button>
+            <div class="col-md-4">
+                <div class="form-group" style="padding-top: 15px;">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#uploadModal"
+                        > Upload Report</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div id="claimPolicyItem">
+        <ul class="nav nav-tabs nav-justified">
+            <li role="presentation" class="active"><a href="#dddc">Debits/Credits</a></li>
+            <li role="presentation"><a href="#reports">Bacs Reports</a></li>
+        </ul>
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane" id="dddc">
+
+                {% for file in files %}
+                <div class="row">
+                    <h4>{{ file.key }} {{ file.metadata|json_encode }}</h4>
+                </div>
+                {% endfor %}
+            </div>
+            <div role="tabpanel" class="tab-pane" id="reports">
+                <h2>Addacs</h2>
+                {% for file in addacs %}
+                    <div class="row">
+                        <h4>{{ file.key }} {{ file.metadata|json_encode }}</h4>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="uploadModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Bacs Report Upload</h4>
+                </div>
+                <div class="modal-body">
+                    {{ form_start(uploadForm) }}
+                    <div class="form-group">
+                        {{ form_label(uploadForm.file, 'File') }}
+                        {{ form_errors(uploadForm.file) }}
+                        {{ form_widget(uploadForm.file) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_widget(uploadForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-success'}}) }}
+                    </div>
+                    {{ form_end(uploadForm) }}
                 </div>
             </div>
         </div>
     </div>
-    </form>
-</div>
-    {% for file in files %}
-    <div class="row">
-        <h4>{{ file.key }} {{ file.metadata|json_encode }}</h4>
-    </div>
-    {% endfor %}
-
 
 {% endblock %}

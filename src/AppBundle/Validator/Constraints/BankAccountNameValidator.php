@@ -40,6 +40,10 @@ class BankAccountNameValidator extends ConstraintValidator
         // if the user isn't present, probably a non-session access - eg. backend task, so we don't want to trigger
         if (!$user) {
             return null;
+        } elseif ($user->hasEmployeeRole()) {
+            // in order to upload addacs files which may invalidate the mandates, we need to be able to avoid
+            // triggering this validator as will be updating an account that isn't theirs
+            return null;
         }
 
         // last name must be in the account name

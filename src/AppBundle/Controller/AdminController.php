@@ -2,9 +2,13 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Service\BacsService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -521,7 +525,7 @@ class AdminController extends BaseController
      * @Route("/bacs/{year}/{month}", name="admin_bacs_date")
      * @Template
      */
-    public function bacsAction($year = null, $month = null)
+    public function bacsAction(Request $request, $year = null, $month = null)
     {
         $now = new \DateTime();
         if (!$year) {
@@ -535,10 +539,26 @@ class AdminController extends BaseController
         $dm = $this->getManager();
         $s3FileRepo = $dm->getRepository(S3File::class);
 
+        $form = $this->createFormBuilder()
+            ->add('file', FileType::class)
+            ->add('upload', SubmitType::class)
+            ->getForm();
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $file = $form->getData()['file'];
+            /** @var BacsService $bacs */
+            $bacs = $this->get('app.bacs');
+            $bacs->processUpload($file);
+
+            return new RedirectResponse($this->generateUrl('admin_bacs_date', ['year' => $year, 'month' => $month]));
+        }
+
         return [
             'year' => $year,
             'month' => $month,
             'files' => $s3FileRepo->getAllFiles($date, 'accesspay'),
+            'addacs' => $s3FileRepo->getAllFiles($date, 'bacsReportAddacs'),
+            'uploadForm' => $form->createView(),
         ];
     }
 

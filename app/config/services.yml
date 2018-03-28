@@ -150,6 +150,9 @@ services:
         arguments:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
+            - "@aws.s3"
+            - "%accesspay_s3file_password%"
+            - "%kernel.environment%"
 
     app.push:
         class: AppBundle\Service\PushService
