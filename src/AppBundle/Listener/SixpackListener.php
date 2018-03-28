@@ -20,9 +20,15 @@ class SixpackListener
         $this->sixpack = $sixpack;
     }
 
+    /**
+     * @param PolicyEvent $event
+     * @throws \Exception
+     */
     public function onPolicyCreatedEvent(PolicyEvent $event)
     {
-        $policy = $event->getPolicy();
+        \AppBundle\Classes\NoOp::ignore([$event]);
+
+        // $policy = $event->getPolicy();
         //$this->sixpack->convert(SixpackService::EXPERIMENT_LANDING_HOME);
         //$this->sixpack->convert(SixpackService::EXPERIMENT_CPC_QUOTE_MANUFACTURER);
         //$this->sixpack->convert(SixpackService::EXPERIMENT_HOMEPAGE_PHONE_IMAGE);
@@ -40,20 +46,6 @@ class SixpackListener
         );
         $this->sixpack->convert(
             SixpackService::EXPERIMENT_HOMEPAGE_AA_V2,
-            SixpackService::KPI_POLICY_PURCHASE
-        );
-
-        $this->sixpack->convert(
-            SixpackService::EXPERIMENT_CPC_MANUFACTURER_OLD_NEW,
-            SixpackService::KPI_POLICY_PURCHASE
-        );
-        $this->sixpack->convert(
-            SixpackService::EXPERIMENT_HOMEPAGE_STICKYSEARCH_SHUFFLE,
-            SixpackService::KPI_POLICY_PURCHASE
-        );
-
-        $this->sixpack->convert(
-            SixpackService::EXPERIMENT_NEW_QUOTE_DESIGN,
             SixpackService::KPI_POLICY_PURCHASE
         );
         $this->sixpack->convert(

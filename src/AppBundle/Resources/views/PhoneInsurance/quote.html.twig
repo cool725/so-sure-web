@@ -6,7 +6,7 @@
 {% block title %}{{ phone.model }} Insurance - {{ phone.make }} - so-sure: Social Insurance{% endblock %}
 {% block meta %}
     <meta name="description" content="For a small monthly fee your phone is covered for theft, loss, accidental damage and unauthorised usage."/>
-    <link rel="canonical" href="{{ url('quote_make_model', {'make': phone.make, 'model': phone.encodedModel}) }}" />
+    <link rel="canonical" href="{{ url('quote_make_model', {'make': phone.makeCanonical, 'model': phone.encodedModelCanonical}) }}" />
 
     <meta property="og:video" content="https://cdn.so-sure.com/video/explainer-subtitle-640.mp4" />
     <meta property="og:video:secure_url" content="https://cdn.so-sure.com/video/explainer-subtitle-640.mp4" />
@@ -54,7 +54,7 @@
                             <div class="collapse" id="collapsePhones">
                                 <div class="btn-group" role="group">
                                     {% for phone_mem in phones %}
-                                        <a {% if phone_mem.id != phone.id  %}href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}"{% else %}disabled{% endif %} class="btn {% if phone_mem.id == phone.id  %}btn-blue{% else %}btn-blue-hollow{% endif %}">{{ phone_mem.memory }}GB</a>
+                                        <a {% if phone_mem.id != phone.id  %}href="{{ path('quote_make_model_memory', {'make': phone_mem.makeCanonical, 'model': phone_mem.encodedModelCanonical, 'memory': phone_mem.memory}) }}"{% else %}disabled{% endif %} class="btn {% if phone_mem.id == phone.id  %}btn-blue{% else %}btn-blue-hollow{% endif %}">{{ phone_mem.memory }}GB</a>
                                     {% endfor %}
                                 </div>
                                 <a class="btn btn-link" href="#" data-toggle="modal" data-target="#quoteModal"><u>I have a different phone</u></a>

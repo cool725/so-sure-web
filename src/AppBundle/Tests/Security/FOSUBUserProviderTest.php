@@ -2,8 +2,9 @@
 
 namespace AppBundle\Tests\Security;
 
+use AppBundle\Security\FOSUBUserProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use AppBundle\Controller\OpsController;
+use AppBundle\Document\PhonePolicy;
 
 /**
  * @group functional-net
@@ -17,6 +18,7 @@ class FOSUBUserProviderTest extends WebTestCase
     protected static $container;
     protected static $cognito;
     protected static $userProvider;
+    /** @var FOSUBUserProvider */
     protected static $userService;
 
     public static function setUpBeforeClass()
@@ -35,10 +37,18 @@ class FOSUBUserProviderTest extends WebTestCase
         self::$userManager = self::$container->get('fos_user.user_manager');
         self::$userService = self::$container->get('app.user');
         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$policyService = self::$container->get('app.policy');
     }
 
     public function tearDown()
     {
+        self::$dm->clear();
+    }
+
+    public function setUp()
+    {
+        parent::setUp();
+        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
     }
 
     public function testLoadUserByOAuthUserResponsePhone()
@@ -232,6 +242,137 @@ class FOSUBUserProviderTest extends WebTestCase
         static::$dm->flush();
         $this->assertNotEquals($t, $user->getPassword());
         sleep(1);
+    }
+
+    public function testResolveDuplicateUsersEmail()
+    {
+        $email = static::generateEmail('testResolveDuplicateUsersEmail', $this);
+        $user = static::createUser(
+            static::$userManager,
+            $email,
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+
+        $this->assertTrue(static::$userService->resolveDuplicateUsers(null, $email, null, null));
+        $this->assertUserDoesNotExist(self::$container, $user);
+        $this->assertPolicyDoesNotExist(self::$container, $policy);
+    }
+
+    public function testResolveDuplicateUsersMobile()
+    {
+        $email = static::generateEmail('testResolveDuplicateUsersMobile', $this);
+        $emailOther = static::generateEmail('testResolveDuplicateUsersMobile-other', $this);
+        $user = static::createUser(
+            static::$userManager,
+            $email,
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+
+        $this->assertTrue(static::$userService->resolveDuplicateUsers(
+            null,
+            $emailOther,
+            $user->getMobileNumber(),
+            null
+        ));
+        $updatedUser = $this->assertUserExists(self::$container, $user);
+        $this->assertEquals('', $updatedUser->getMobileNumber());
+        $this->assertPolicyExists(self::$container, $policy);
+    }
+
+    public function testResolveDuplicateUsersFacebook()
+    {
+        $email = static::generateEmail('testResolveDuplicateUsersFacebook', $this);
+        $emailOther = static::generateEmail('testResolveDuplicateUsersMobile-other', $this);
+        $user = static::createUser(
+            static::$userManager,
+            $email,
+            'bar',
+            static::$dm
+        );
+        $user->setFacebookId(rand(1, 999999));
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+
+        $this->assertTrue(static::$userService->resolveDuplicateUsers(null, $emailOther, null, $user->getFacebookId()));
+        $updatedUser = $this->assertUserExists(self::$container, $user);
+        $this->assertNull($updatedUser->getFacebookId());
+        $this->assertPolicyExists(self::$container, $policy);
+    }
+
+    public function testResolveDuplicateUsersEmailPolicy()
+    {
+        $email = static::generateEmail('testResolveDuplicateUsersEmailPolicy', $this);
+        $user = static::createUser(
+            static::$userManager,
+            $email,
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy);
+        static::$policyService->setEnvironment('test');
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+
+        $this->assertFalse(static::$userService->resolveDuplicateUsers(null, $email, null, null));
+        $this->assertUserExists(self::$container, $user);
+        $this->assertPolicyExists(self::$container, $policy);
+    }
+
+    public function testResolveDuplicateUsersMobilePolicy()
+    {
+        $email = static::generateEmail('testResolveDuplicateUsersMobilePolicy', $this);
+        $emailOther = static::generateEmail('testResolveDuplicateUsersMobilePolicy-other', $this);
+        $user = static::createUser(
+            static::$userManager,
+            $email,
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy);
+        static::$policyService->setEnvironment('test');
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+
+        $this->assertFalse(static::$userService->resolveDuplicateUsers(
+            null,
+            $emailOther,
+            $user->getMobileNumber(),
+            null
+        ));
+        $this->assertUserExists(self::$container, $user);
+        $this->assertPolicyExists(self::$container, $policy);
+    }
+
+    public function testResolveDuplicateUsersFacebookPolicy()
+    {
+        $email = static::generateEmail('testResolveDuplicateUsersFacebookPolicy', $this);
+        $emailOther = static::generateEmail('testResolveDuplicateUsersFacebookPolicy-other', $this);
+        $user = static::createUser(
+            static::$userManager,
+            $email,
+            'bar',
+            static::$dm
+        );
+        $user->setFacebookId(rand(1, 999999));
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy);
+        static::$policyService->setEnvironment('test');
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+
+        $this->assertFalse(static::$userService->resolveDuplicateUsers(
+            null,
+            $emailOther,
+            null,
+            $user->getFacebookId()
+        ));
+        $this->assertUserExists(self::$container, $user);
+        $this->assertPolicyExists(self::$container, $policy);
     }
 
     protected function createResourceOwnerMock($resourceOwnerName = null)

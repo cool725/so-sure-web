@@ -116,6 +116,7 @@ class PhoneInsuranceController extends BaseController
 
         $phonesMem = [];
         foreach ($phones as $phone) {
+            /** @var Phone $phone */
             if (!isset($phonesMem[$phone->getName()])) {
                 $phonesMem[$phone->getName()] = [
                     'make' => $phone->getMake(),
@@ -126,23 +127,18 @@ class PhoneInsuranceController extends BaseController
             }
             $phonesMem[$phone->getName()]['mem'][$phone->getMemory()] = $this->generateUrl(
                 'quote_make_model_memory',
-                ['make' => $phone->getMake(), 'model' => $phone->getModel(), 'memory' => $phone->getMemory()]
+                [
+                    'make' => $phone->getMakeCanonical(),
+                    'model' => $phone->getModelCanonical(),
+                    'memory' => $phone->getMemory()
+                ]
             );
             ksort($phonesMem[$phone->getName()]['mem']);
         }
 
-        $exp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_CPC_MANUFACTURER_OLD_NEW,
-            ['old', 'new']
-        );
-
         $template = 'AppBundle:PhoneInsurance:makeInsurance.html.twig';
         if (in_array($request->get('_route'), ['insure_make'])) {
-            $template = 'AppBundle:PhoneInsurance:makeInsuranceBottomOld.html.twig';
-            if ($exp == 'new') {
-                $template = 'AppBundle:PhoneInsurance:makeInsuranceBottom.html.twig';
-            }
+            $template = 'AppBundle:PhoneInsurance:makeInsuranceBottom.html.twig';
         }
 
         $event = MixpanelService::EVENT_MANUFACTURER_PAGE;
@@ -184,45 +180,46 @@ class PhoneInsuranceController extends BaseController
         $phone = null;
         $decodedModel = Phone::decodeModel($model);
         if ($id) {
+            /** @var Phone $phone */
             $phone = $repo->find($id);
             if ($phone->getMemory()) {
                 return $this->redirectToRoute('quote_make_model_memory', [
-                    'make' => $phone->getMake(),
-                    'model' => $phone->getEncodedModel(),
+                    'make' => $phone->getMakeCanonical(),
+                    'model' => $phone->getEncodedModelCanonical(),
                     'memory' => $phone->getMemory(),
                 ], 301);
             } else {
                 return $this->redirectToRoute('quote_make_model', [
-                    'make' => $phone->getMake(),
-                    'model' => $phone->getEncodedModel(),
+                    'make' => $phone->getMakeCanonical(),
+                    'model' => $phone->getEncodedModelCanonical(),
                 ], 301);
             }
         } elseif ($memory) {
             $phone = $repo->findOneBy([
                 'active' => true,
-                'make' => $make,
-                'model' => $decodedModel,
+                'makeCanonical' => strtolower($make),
+                'modelCanonical' => strtolower($decodedModel),
                 'memory' => (int) $memory
             ]);
             // check for historical urls
             if (!$phone || stripos($model, ' ') !== false) {
                 $phone = $repo->findOneBy([
                     'active' => true,
-                    'make' => $make,
-                    'model' => $model,
+                    'makeCanonical' => strtolower($make),
+                    'modelCanonical' => strtolower($model),
                     'memory' => (int) $memory
                 ]);
                 if ($phone) {
                     return $this->redirectToRoute('quote_make_model_memory', [
-                        'make' => $phone->getMake(),
-                        'model' => $phone->getEncodedModel(),
+                        'make' => $phone->getMakeCanonical(),
+                        'model' => $phone->getEncodedModelCanonical(),
                         'memory' => $phone->getMemory(),
                     ], 301);
                 }
             }
         } else {
             $phones = $repo->findBy(
-                ['active' => true, 'make' => $make, 'model' => $decodedModel],
+                ['active' => true, 'makeCanonical' => strtolower($make), 'modelCanonical' => strtolower($decodedModel)],
                 ['memory' => 'asc'],
                 1
             );
@@ -230,11 +227,15 @@ class PhoneInsuranceController extends BaseController
                 $phone = $phones[0];
             } else {
                 // check for historical urls
-                $phone = $repo->findOneBy(['active' => true, 'make' => $make, 'model' => $model]);
+                $phone = $repo->findOneBy([
+                    'active' => true,
+                    'makeCanonical' => strtolower($make),
+                    'modelCanonical' => strtolower($model)
+                ]);
                 if ($phone) {
                     return $this->redirectToRoute('quote_make_model', [
-                        'make' => $phone->getMake(),
-                        'model' => $phone->getEncodedModel()
+                        'make' => $phone->getMakeCanonical(),
+                        'model' => $phone->getEncodedModelCanonical()
                     ], 301);
                 }
             }
@@ -249,6 +250,12 @@ class PhoneInsuranceController extends BaseController
             ));
 
             return new RedirectResponse($this->generateUrl('homepage'));
+        } elseif (!$phone->isSameMakeModelCanonical($make, $model)) {
+            return $this->redirectToRoute('quote_make_model_memory', [
+                'make' => $phone->getMakeCanonical(),
+                'model' => $phone->getEncodedModelCanonical(),
+                'memory' => $phone->getMemory(),
+            ], 301);
         }
 
         $quoteUrl = $this->setPhoneSession($request, $phone);
@@ -379,7 +386,6 @@ class PhoneInsuranceController extends BaseController
                     }
                     $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
 
-                    $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_NEW_QUOTE_DESIGN);
                     $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_INTERCOM_PURCHASE);
 
                     // Multipolicy should skip user details
@@ -403,7 +409,6 @@ class PhoneInsuranceController extends BaseController
                     }
                     $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
 
-                    $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_NEW_QUOTE_DESIGN);
                     $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_INTERCOM_PURCHASE);
 
                     // Multipolicy should skip user details
@@ -457,14 +462,6 @@ class PhoneInsuranceController extends BaseController
             $this->get('app.sixpack')->convert(
                 SixpackService::EXPERIMENT_HOMEPAGE_AA_V2
             );
-
-            $this->get('app.sixpack')->convert(
-                SixpackService::EXPERIMENT_HOMEPAGE_STICKYSEARCH_SHUFFLE
-            );
-
-            $this->get('app.sixpack')->convert(
-                SixpackService::EXPERIMENT_CPC_MANUFACTURER_OLD_NEW
-            );
         }
 
         $data = array(
@@ -491,22 +488,7 @@ class PhoneInsuranceController extends BaseController
             'intercom_test' => $expIntercom,
         );
 
-        $exp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_NEW_QUOTE_DESIGN,
-            ['old-quote', 'new-quote-design'],
-            SixpackService::LOG_MIXPANEL_ALL // keep consistent with running test; change for future
-        );
-
-        if ($request->get('force')) {
-            $exp = $request->get('force');
-        }
-
         $template = 'AppBundle:PhoneInsurance:quote.html.twig';
-
-        if ($exp == 'new-quote-design') {
-            $template = 'AppBundle:PhoneInsurance:quoteNewDesign.html.twig';
-        }
 
         if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
             return $this->render($template, $data);
