@@ -41,6 +41,15 @@ class KernelListenerTest extends BaseControllerTest
         $this->assertEquals('foo', $utm['source']);
     }
 
+    public function testUtmSourcePost()
+    {
+        $client = self::createClient();
+        $crawler = $client->request('POST', '/?utm_source=foo');
+        $session = $client->getContainer()->get('session');
+        $utm = unserialize($session->get('utm'));
+        $this->assertEquals('foo', $utm['source']);
+    }
+
     public function testUtmMedium()
     {
         $client = self::createClient();

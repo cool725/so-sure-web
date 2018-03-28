@@ -464,12 +464,19 @@ class Phone
 
     public function getModelCanonical()
     {
-        return $this->model;
+        return $this->modelCanonical;
     }
 
     public function getEncodedModel()
     {
-        $model = str_replace('+', '-Plus', $this->getModel());
+        $model = str_replace('+', '-plus', $this->getModel());
+
+        return str_replace(' ', '+', $model);
+    }
+
+    public function getEncodedModelCanonical()
+    {
+        $model = str_replace('+', '-plus', $this->getModelCanonical());
 
         return str_replace(' ', '+', $model);
     }
@@ -488,13 +495,14 @@ class Phone
     {
         $decodedModel = str_replace('+', ' ', $encodedModel);
         $decodedModel = str_replace('-Plus', '+', $decodedModel);
+        $decodedModel = str_replace('-plus', '+', $decodedModel);
 
         return $decodedModel;
     }
 
     public function setModel($model)
     {
-        if (stripos($model, '-Plus') !== false) {
+        if (stripos($model, '-plus') !== false) {
             throw new \Exception(sprintf('%s contains -Plus which will break encoding rules', $model));
         }
 
@@ -504,11 +512,16 @@ class Phone
 
     public function setModelCanonical($model)
     {
-        if (stripos($model, '-Plus') !== false) {
+        if (stripos($model, '-plus') !== false) {
             throw new \Exception(sprintf('%s contains -Plus which will break encoding rules', $model));
         }
 
         $this->modelCanonical = strtolower($model);
+    }
+
+    public function isSameMakeModelCanonical($make, $model)
+    {
+        return $this->getMakeCanonical() == $make && $this->getEncodedModelCanonical() == $model;
     }
 
     public function getSearchQuerystring()

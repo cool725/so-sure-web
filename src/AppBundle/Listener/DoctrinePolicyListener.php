@@ -38,6 +38,17 @@ class DoctrinePolicyListener
         }
     }
 
+    public function preRemove(LifecycleEventArgs $eventArgs)
+    {
+        /** @var Policy $document */
+        $document = $eventArgs->getDocument();
+        if ($document instanceof Policy) {
+            if ($document->getStatus()) {
+                throw new \Exception(sprintf('Unable to delete policy %s with status', $document->getId()));
+            }
+        }
+    }
+
     private function triggerEvent(Policy $policy, $eventType)
     {
         $event = new PolicyEvent($policy);

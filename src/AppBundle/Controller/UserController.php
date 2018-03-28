@@ -289,10 +289,6 @@ class UserController extends BaseController
                         );
                         $this->get('app.sixpack')->convertByClientId(
                             $code,
-                            SixpackService::EXPERIMENT_SHARE_MESSAGE
-                        );
-                        $this->get('app.sixpack')->convertByClientId(
-                            $code,
                             SixpackService::EXPERIMENT_APP_SHARE_METHOD
                         );
                     } else {
@@ -452,19 +448,9 @@ class UserController extends BaseController
 
 
         $sixpack = $this->get('app.sixpack');
-        $shareExperiment = $sixpack->participate(
-            SixpackService::EXPERIMENT_SHARE_MESSAGE,
-            [
-                SixpackService::ALTERNATIVES_SHARE_MESSAGE_SIMPLE,
-                SixpackService::ALTERNATIVES_SHARE_MESSAGE_ORIGINAL
-            ],
-            SixpackService::LOG_MIXPANEL_NONE,
-            1,
-            $policy->getStandardSCode()->getCode()
-        );
         $shareExperimentText = $sixpack->getText(
-            SixpackService::EXPERIMENT_SHARE_MESSAGE,
-            $shareExperiment,
+            SixpackService::EXPIRED_EXPERIMENT_SHARE_MESSAGE,
+            SixpackService::ALTERNATIVES_SHARE_MESSAGE_SIMPLE,
             [$policy->getStandardSCode()->getShareLink(), $policy->getStandardSCode()->getCode()]
         );
 

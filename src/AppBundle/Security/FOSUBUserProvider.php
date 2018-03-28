@@ -1,6 +1,8 @@
 <?php
 namespace AppBundle\Security;
 
+use AppBundle\Document\PhoneTrait;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface;
 use HWI\Bundle\OAuthBundle\Security\Core\User\FOSUBUserProvider as BaseClass;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -13,6 +15,8 @@ use AppBundle\Validator\Constraints\UkMobileValidator;
 
 class FOSUBUserProvider extends BaseClass
 {
+    use PhoneTrait;
+
     const SERVICE_ACCOUNTKIT = 'accountkit';
 
     /** @var RequestStack */
@@ -23,6 +27,9 @@ class FOSUBUserProvider extends BaseClass
     protected $authService;
 
     protected $facebook;
+
+    /** @var DocumentManager */
+    protected $dm;
 
     public function setRequestStack(RequestStack $requestStack)
     {
@@ -37,6 +44,14 @@ class FOSUBUserProvider extends BaseClass
     public function setAuthService($authService)
     {
         $this->authService = $authService;
+    }
+
+    /**
+     * @param DocumentManager $dm
+     */
+    public function setDm(DocumentManager $dm)
+    {
+        $this->dm = $dm;
     }
 
     /**
@@ -283,5 +298,70 @@ class FOSUBUserProvider extends BaseClass
         }
 
         return false;
+    }
+
+    /**
+     * @param User   $user
+     * @param string $email
+     * @param string $mobile
+     * @param string $facebookId
+     * @return bool True if resolved; false if unable to resolve (e.g. user must login as policy exists)
+     */
+    public function resolveDuplicateUsers(User $user = null, $email = null, $mobile = null, $facebookId = null)
+    {
+        /** @var \AppBundle\Repository\UserRepository $userRepo */
+        $userRepo = $this->dm->getRepository(User::class);
+        $users = $userRepo->getDuplicateUsers(
+            $user,
+            $email,
+            $facebookId,
+            $mobile
+        );
+        if (!$users || count($users) == 0) {
+            return true;
+        }
+        $email = strtolower($email);
+        $mobile = $this->normalizeUkMobile($mobile);
+
+        foreach ($users as $duplicate) {
+            /** @var User $duplicate */
+            // any user who has a non-partial policy can not be changed
+            if (count($duplicate->getCreatedPolicies()) > 0) {
+                // Go ahead and continue here rather than return false
+                // There may be many associated accounts with duplicate info and so clearing/deleting
+                // all duplicates, may help in some cases
+                continue;
+            }
+
+            // One duplicate may match multiple items
+            if ($duplicate->getMobileNumber() == $mobile) {
+                $duplicate->setMobileNumber(null);
+            }
+            if ($duplicate->getFacebookId() == $facebookId) {
+                $duplicate->setFacebookId(null);
+                $duplicate->setFacebookAccessToken(null);
+            }
+            // as username is tied to email for our case, delete the duplicate user
+            if ($duplicate->getEmailCanonical() == $email) {
+                if ($duplicate->hasPartialPolicy()) {
+                    foreach ($duplicate->getPartialPolicies() as $partialPolicy) {
+                        $this->dm->remove($partialPolicy);
+                    }
+                }
+                $this->dm->remove($duplicate);
+            }
+        }
+        $this->dm->flush();
+        $this->dm->clear();
+        if ($userRepo->existsAnotherUser(
+            $user,
+            $email,
+            $facebookId,
+            $mobile
+        )) {
+            return false;
+        }
+
+        return true;
     }
 }

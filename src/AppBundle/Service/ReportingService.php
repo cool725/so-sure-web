@@ -360,9 +360,7 @@ class ReportingService
 
         $rolling12MonthClaims = $claimsRepo->findFNOLClaims($rolling12Months, $end);
         $rolling12MonthClaimsTotals = Claim::sumClaims($rolling12MonthClaims);
-        $data['approvedClaimRate'] = $data['totalActivePolicies'] != 0 ?
-            100 * $rolling12MonthClaimsTotals['approved-settled'] / $data['totalActivePolicies'] :
-            'n/a';
+        $data['rolling-yearly-claims-totals'] = $rolling12MonthClaimsTotals['approved-settled'];
 
         return [
             'start' => $start,

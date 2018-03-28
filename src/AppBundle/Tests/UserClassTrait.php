@@ -19,16 +19,27 @@ use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Connection\RenewalConnection;
 use AppBundle\Classes\Salva;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Security\FOSUBUserProvider;
+use AppBundle\Service\PolicyService;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use FOS\UserBundle\Model\UserManagerInterface;
+use Symfony\Component\DependencyInjection\Container;
 
 trait UserClassTrait
 {
     use CurrencyTrait;
     use ImeiTrait;
 
+    /** @var PolicyService */
     protected static $policyService;
+
+    /** @var Phone */
     protected static $phone;
+
+    /** @var UserManagerInterface */
     protected static $userManager;
+
+    /** @var DocumentManager */
     protected static $dm;
 
     public static $JUDO_TEST_CARD_NUM = '4921 8100 0000 5462';
@@ -614,5 +625,50 @@ trait UserClassTrait
         }
 
         return [$policyA, $policyB];
+    }
+
+    /**
+     * @param Container $container
+     * @param User      $user
+     * @return User|null
+     */
+    protected function assertUserExists($container, User $user)
+    {
+        /** @var DocumentManager $dm */
+        $dm = $container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(User::class);
+        $updatedUser = $repo->find($user->getId());
+        $this->assertNotNull($updatedUser);
+
+        return $updatedUser;
+    }
+
+    protected function assertUserDoesNotExist($container, User $user)
+    {
+        /** @var DocumentManager $dm */
+        $dm = $container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(User::class);
+        $updatedUser = $repo->find($user->getId());
+        $this->assertNull($updatedUser);
+    }
+
+    protected function assertPolicyExists($container, Policy $policy)
+    {
+        /** @var DocumentManager $dm */
+        $dm = $container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $repo->find($policy->getId());
+        $this->assertNotNull($updatedPolicy);
+
+        return $updatedPolicy;
+    }
+
+    protected function assertPolicyDoesNotExist($container, Policy $policy)
+    {
+        /** @var DocumentManager $dm */
+        $dm = $container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $repo->find($policy->getId());
+        $this->assertNull($updatedPolicy);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Repository\PhoneRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -694,10 +695,15 @@ abstract class BaseController extends Controller
         return $validator->conform(substr($value, 0, $length));
     }
 
+    /**
+     * @param Request $request
+     * @return null|Phone
+     */
     protected function getSessionQuotePhone(Request $request)
     {
         $session = $request->getSession();
         $dm = $this->getManager();
+        /** @var PhoneRepository $phoneRepo */
         $phoneRepo = $dm->getRepository(Phone::class);
 
         $phone = null;
@@ -969,14 +975,14 @@ abstract class BaseController extends Controller
         $session->set('quote', $phone->getId());
         if ($phone->getMemory()) {
             $url = $this->generateUrl('quote_make_model_memory', [
-                'make' => $phone->getMake(),
-                'model' => $phone->getEncodedModel(),
+                'make' => $phone->getMakeCanonical(),
+                'model' => $phone->getEncodedModelCanonical(),
                 'memory' => $phone->getMemory(),
             ], UrlGeneratorInterface::ABSOLUTE_URL);
         } else {
             $url = $this->generateUrl('quote_make_model', [
-                'make' => $phone->getMake(),
-                'model' => $phone->getEncodedModel(),
+                'make' => $phone->getMakeCanonical(),
+                'model' => $phone->getEncodedModelCanonical(),
             ], UrlGeneratorInterface::ABSOLUTE_URL);
         }
         $session->set('quote_url', $url);
