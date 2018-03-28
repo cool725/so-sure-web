@@ -51,19 +51,24 @@
 <div class="container">
     <div class="bg-info" style="border-radius: 10px; padding: 10px;">
     <div class="row">
-      <div class="col-sm-8 col-offset-sm-1">
+      <div class="col-sm-5">
         <h4 class="text-center"><strong>Phones</strong></h4>
       </div>
-      <div class="col-sm-1">
-        <button class="btn btn-success pull-right"  data-toggle="modal" data-target="#newPhoneModal">
+      <div class="col-sm-2">
+        <button class="btn btn-success"  data-toggle="modal" data-target="#newPhoneModal">
           <i class="fa fa-plus"></i> Add upcoming phone
         </button>
       </div>
-        <div class="col-sm-2">
-            <button class="btn btn-success pull-right"  data-toggle="modal" data-target="#checkPriceModal">
-                Calculate Premium
-            </button>
-        </div>
+      <div class="col-sm-3">
+        <button class="btn btn-success pull-right"  data-toggle="modal" data-target="#additionalPhonesModal">
+          <i class="fa fa-refresh"></i> Load additional phones
+        </button>
+      </div>
+      <div class="col-sm-2">
+          <button class="btn btn-success"  data-toggle="modal" data-target="#checkPriceModal">
+              Calculate Premium
+          </button>
+      </div>
     </div>
     <div class="row">
     {{ form_start(form) }}
@@ -493,4 +498,37 @@
         </div>
       </div>
     </div>
+
+    <div class="modal fade" id="additionalPhonesModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document" style="width: 60%;">
+        <div class="modal-content">
+        {{ form_start(additional_phones) }}
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Additional Phones</h4>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+                <div class="col-sm-12">
+                  <p>Please select the file of additional phones to load into the database.</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-sm-4">
+                    {{ form_label(additional_phones.file, 'File') }}
+                </div>
+                <div class="form-group col-sm-4">
+                    {{ form_errors(additional_phones.file) }}
+                    {{ form_widget(additional_phones.file) }}
+                </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            {{ form_widget(additional_phones.load, {'attr':{'class': 'btn btn-success'}}) }}
+          </div>
+        {{ form_end(additional_phones) }}
+        </div>
+      </div>
+    </div>    
 {% endblock %}

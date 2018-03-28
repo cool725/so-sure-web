@@ -101,16 +101,19 @@ use Pagerfanta\Adapter\DoctrineODMMongoDBAdapter;
 use MongoRegex;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use CensusBundle\Document\Postcode;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
 /**
  * @Route("/admin")
  * @Security("has_role('ROLE_EMPLOYEE')")
  */
-class AdminEmployeeController extends BaseController
+class AdminEmployeeController extends BaseController implements ContainerAwareInterface
 {
     use DateTrait;
     use CurrencyTrait;
     use ImeiTrait;
+    use ContainerAwareTrait;
 
     /**
      * @Route("/", name="admin_home")
@@ -128,6 +131,7 @@ class AdminEmployeeController extends BaseController
     public function phonesAction(Request $request)
     {
         $expectedClaimFrequency = $this->getParameter('expected_claim_frequency');
+        $phoneService = $this->get('app.phone');
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
         $makes = $repo->findActiveMakes();
@@ -147,6 +151,14 @@ class AdminEmployeeController extends BaseController
             ->add('model', TextType::class)
             ->add('add', SubmitType::class)
             ->getForm();
+        $additionalPhonesForm = $this->get('form.factory')
+            ->createNamedBuilder('additional_phones_form')
+            ->add('file', ChoiceType::class, [
+                'required' => true,
+                'choices' => $phoneService->getAdditionalPhones(),
+            ])
+            ->add('load', SubmitType::class)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('new_phone_form')) {
@@ -163,6 +175,22 @@ class AdminEmployeeController extends BaseController
                     $this->addFlash('success', sprintf(
                         'Added phone. %s',
                         $phone
+                    ));
+
+                    return new RedirectResponse($this->generateUrl('admin_phones'));
+                }
+            } elseif ($request->request->has('additional_phones_form')) {
+                $additionalPhonesForm->handleRequest($request);
+                if ($additionalPhonesForm->isValid()) {
+                    $additionalPhones = $phoneService->getAdditionalPhonesInstance(
+                        $additionalPhonesForm->get('file')->getData()
+                    );
+                    $additionalPhones->setContainer($this->container);
+                    $additionalPhones->load($dm);
+
+                    $this->addFlash('success', sprintf(
+                        'Loaded additional phones: %s',
+                        $additionalPhonesForm->get('file')->getData()
                     ));
 
                     return new RedirectResponse($this->generateUrl('admin_phones'));
@@ -234,6 +262,7 @@ class AdminEmployeeController extends BaseController
             'pager' => $pager,
             'new_phone' => $newPhoneForm->createView(),
             'makes' => $makes,
+            'additional_phones' => $additionalPhonesForm->createView(),
         ];
     }
 
