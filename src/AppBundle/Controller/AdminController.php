@@ -548,7 +548,17 @@ class AdminController extends BaseController
             $file = $form->getData()['file'];
             /** @var BacsService $bacs */
             $bacs = $this->get('app.bacs');
-            $bacs->processUpload($file);
+            if ($bacs->processUpload($file)) {
+                $this->addFlash(
+                    'success',
+                    'Successfully uploaded & processed file'
+                );
+            } else {
+                $this->addFlash(
+                    'success',
+                    'Unable to process file - see rollbar error message'
+                );
+            }
 
             return new RedirectResponse($this->generateUrl('admin_bacs_date', ['year' => $year, 'month' => $month]));
         }
@@ -558,6 +568,8 @@ class AdminController extends BaseController
             'month' => $month,
             'files' => $s3FileRepo->getAllFiles($date, 'accesspay'),
             'addacs' => $s3FileRepo->getAllFiles($date, 'bacsReportAddacs'),
+            'auddis' => $s3FileRepo->getAllFiles($date, 'bacsReportAuddis'),
+            'input' => $s3FileRepo->getAllFiles($date, 'bacsReportInput'),
             'uploadForm' => $form->createView(),
         ];
     }

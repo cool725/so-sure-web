@@ -57,10 +57,46 @@
                 {% endfor %}
             </div>
             <div role="tabpanel" class="tab-pane" id="reports">
-                <h2>Addacs</h2>
+                <h2>Input Files <span class="small">(confirmation of debit/credit)</span></h2>
+                {% if input|length == 0 %}
+                    <p>No files present</p>
+                {% endif %}
+                {% for file in input %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ file.key }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ file.metadata|json_encode }}
+                        </div>
+                    </div>
+                {% endfor %}
+                <h2>Auddis <span class="small">(Direct debit setups)</span></h2>
+                {% if auddis|length == 0 %}
+                    <p>No files present</p>
+                {% endif %}
+                {% for file in auddis %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            {{ file.key }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ file.metadata|json_encode }}
+                        </div>
+                    </div>
+                {% endfor %}
+                <h2>Addacs <span class="small">(Direct debit cancellations)</span></h2>
+                {% if addacs|length == 0 %}
+                    <p>No files present</p>
+                {% endif %}
                 {% for file in addacs %}
                     <div class="row">
-                        <h4>{{ file.key }} {{ file.metadata|json_encode }}</h4>
+                        <div class="col-md-6">
+                            {{ file.key }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ file.metadata|json_encode }}
+                        </div>
                     </div>
                 {% endfor %}
             </div>

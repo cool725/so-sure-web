@@ -5,6 +5,7 @@ use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\File\BacsReportAddacsFile;
 use AppBundle\Document\File\BacsReportAuddisFile;
+use AppBundle\Document\File\BacsReportInputFile;
 use AppBundle\Document\File\UploadFile;
 use AppBundle\Document\User;
 use AppBundle\Repository\UserRepository;
@@ -73,19 +74,26 @@ class BacsService
         $tmpFile = $file->move(sys_get_temp_dir());
         $uploadFile = null;
         $metadata = null;
-        if (stripos($file->getClientOriginalName(), "ADDACS Reports") !== false) {
+        if (stripos($file->getClientOriginalName(), "ADDACS") !== false) {
             $metadata = $this->addacs($tmpFile);
             $uploadFile = new BacsReportAddacsFile();
-        } elseif (stripos($file->getClientOriginalName(), "AUDDIS Reports") !== false) {
+        } elseif (stripos($file->getClientOriginalName(), "AUDDIS") !== false) {
                 $metadata = $this->auddis($tmpFile);
                 $uploadFile = new BacsReportAuddisFile();
+        } elseif (stripos($file->getClientOriginalName(), "INPUT") !== false) {
+            $metadata = $this->input($tmpFile);
+            $uploadFile = new BacsReportInputFile();
         } else {
             $this->logger->error(sprintf('Unknown bacs report file %s', $file->getClientOriginalName()));
+
+            return false;
         }
 
         if ($uploadFile) {
             $this->uploadS3($tmpFile, $file->getClientOriginalName(), $uploadFile, null, $metadata);
         }
+
+        return true;
     }
 
     public function uploadS3($tmpFile, $filename, UploadFile $uploadFile, \DateTime $date = null, $metadata = null)
@@ -196,31 +204,41 @@ class BacsService
         }
     }
 
-    private function validateSun(\DOMElement $element)
+    private function validateSun(\DOMElement $element, $userNumberAttribute = 'user-number')
     {
-        $sun = $element->attributes->getNamedItem('user-number')->nodeValue;
+        $sun = $element->attributes->getNamedItem($userNumberAttribute)->nodeValue;
         if ($sun != self::SUN) {
             throw new \Exception(sprintf('Invalid SUN %s', $sun));
         }
     }
 
+    private function getRecordType(\DOMElement $element)
+    {
+        return $element->attributes->getNamedItem('record-type')->nodeValue;
+    }
+
     private function validateRecordType(\DOMElement $element, $expectedRecordType)
     {
-        $recordType = $element->attributes->getNamedItem('record-type')->nodeValue;
+        $recordType = $this->getRecordType($element);
         if ($recordType != $expectedRecordType) {
             throw new \Exception(sprintf('Unexpected record type %s', $recordType));
+        }
+    }
+
+    private function validateFileType(\DOMElement $element)
+    {
+        $fileType = $element->attributes->getNamedItem('file-type')->nodeValue;
+        if ($fileType != 'LIVE') {
+            throw new \Exception(sprintf('Invalid File Type %s', $fileType));
         }
     }
 
     public function auddis($file)
     {
         $results = [
-            'success' => true,
-            'instructions' => 0,
-            'user' => 0,
-            'bank' => 0,
-            'deceased' => 0,
-            'transfer' => 0,
+            'records' => 0,
+            'accepted-ddi' => 0,
+            'rejected-ddi' => 0,
         ];
 
         $xml = file_get_contents($file);
@@ -234,9 +252,76 @@ class BacsService
         /** @var \DOMElement $element */
         foreach ($elementList as $element) {
             $this->validateSun($element);
-            $this->validateRecordType($element, "V");
+            $this->validateFileType($element);
+            $recordType = $this->getRecordType($element);
+            if ($recordType == "V") {
+                // successful record
+            } elseif ($recordType == "R") {
+                $errorsList = $xpath->query('//BACSDocument/Data/MessagingAdvices/MessagingError');
+                foreach ($errorsList as $error) {
+                    $results['errors'][] = $error->attributes->getNamedItem('line1')->nodeValue;
+                }
 
-            $results['instructions']++;
+            } else {
+                throw new \Exception(sprintf('Unknown record type %s', $recordType));
+            }
+            $results['file-numbers'][] = $element->attributes->getNamedItem('originator-file-number')->nodeValue;
+            $results['records']++;
+            $results['accepted-ddi'] += $element->attributes->getNamedItem('accepted-ddi')->nodeValue;;
+            $results['rejected-ddi'] += $element->attributes->getNamedItem('rejected-ddi')->nodeValue;;
+        }
+
+        return $results;
+    }
+
+    public function input($file)
+    {
+        $results = [];
+
+        $xml = file_get_contents($file);
+        $dom = new DOMDocument();
+        $dom->loadXML($xml, LIBXML_NOBLANKS);
+        $xpath = new DOMXPath($dom);
+
+        $elementList = $xpath->query('//BACSDocument/Data/InputReport/Header/ProcessingDate');
+        /** @var \DOMElement $element */
+        foreach ($elementList as $element) {
+            $results['processing-date'] = $element->attributes->getNamedItem('date')->nodeValue;
+        }
+
+        $elementList = $xpath->query('//BACSDocument/Data/InputReport/Submission/UserFile/InputUserFile/UserFileInformation');
+        /** @var \DOMElement $element */
+        foreach ($elementList as $element) {
+            $this->validateSun($element, 'userNumber');
+            $results['file-numbers'][] = $element->attributes->getNamedItem('userFileNumber')->nodeValue;
+        }
+
+        $elementList = $xpath->query('//BACSDocument/Data/InputReport/Submission/UserFile/InputUserFile/InputReportSummary/AccountTotals/AccountTotal/CreditEntry/AcceptedRecords');
+        /** @var \DOMElement $element */
+        foreach ($elementList as $element) {
+            $results['credit-accepted-records'] = $element->attributes->getNamedItem('numberOf')->nodeValue;
+            $results['credit-accepted-value'] = $element->attributes->getNamedItem('valueOf')->nodeValue;
+        }
+
+        $elementList = $xpath->query('//BACSDocument/Data/InputReport/Submission/UserFile/InputUserFile/InputReportSummary/AccountTotals/AccountTotal/CreditEntry/RejectedRecords');
+        /** @var \DOMElement $element */
+        foreach ($elementList as $element) {
+            $results['credit-rejected-records'] = $element->attributes->getNamedItem('numberOf')->nodeValue;
+            $results['credit-rejected-value'] = $element->attributes->getNamedItem('valueOf')->nodeValue;
+        }
+
+        $elementList = $xpath->query('//BACSDocument/Data/InputReport/Submission/UserFile/InputUserFile/InputReportSummary/AccountTotals/AccountTotal/DebitEntry/AcceptedRecords');
+        /** @var \DOMElement $element */
+        foreach ($elementList as $element) {
+            $results['debit-accepted-records'] = $element->attributes->getNamedItem('numberOf')->nodeValue;
+            $results['debit-accepted-value'] = $element->attributes->getNamedItem('valueOf')->nodeValue;
+        }
+
+        $elementList = $xpath->query('//BACSDocument/Data/InputReport/Submission/UserFile/InputUserFile/InputReportSummary/AccountTotals/AccountTotal/DebitEntry/RejectedRecords');
+        /** @var \DOMElement $element */
+        foreach ($elementList as $element) {
+            $results['debit-rejected-records'] = $element->attributes->getNamedItem('numberOf')->nodeValue;
+            $results['debit-rejected-value'] = $element->attributes->getNamedItem('valueOf')->nodeValue;
         }
 
         return $results;
