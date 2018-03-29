@@ -27,7 +27,8 @@ use AppBundle\Validator\Constraints as AppAssert;
  *      "brightstar"="BrightstarFile",
  *      "picsure"="PicSureFile",
  *      "accesspay"="AccessPayFile",
- *      "bacsReportAddacs"="BacsReportAddacsFile"
+ *      "bacsReportAddacs"="BacsReportAddacsFile",
+ *      "bacsReportAuddis"="BacsReportAuddisFile"
  * })
  * @Gedmo\Loggable
  */

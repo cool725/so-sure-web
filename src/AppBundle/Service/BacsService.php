@@ -4,6 +4,7 @@ namespace AppBundle\Service;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\File\BacsReportAddacsFile;
+use AppBundle\Document\File\BacsReportAuddisFile;
 use AppBundle\Document\File\UploadFile;
 use AppBundle\Document\User;
 use AppBundle\Repository\UserRepository;
@@ -17,11 +18,19 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class BacsService
 {
     const S3_BUCKET = 'admin.so-sure.com';
+    const SUN = '176198';
 
     const ADDACS_REASON_BANK = 0;
     const ADDACS_REASON_USER = 1;
     const ADDACS_REASON_DECEASED = 2;
     const ADDACS_REASON_TRANSFER = 3;
+
+    const AUDDIS_REASON_USER = 1;
+    const AUDDIS_REASON_DECEASED = 2;
+    const AUDDIS_REASON_TRANSFER = 3;
+    const AUDDIS_REASON_NO_ACCOUNT = 5;
+    const AUDDIS_REASON_NO_INSTRUCTION = 6;
+    const AUDDIS_REASON_NON_ZERO = 7;
 
     /** @var LoggerInterface */
     protected $logger;
@@ -67,6 +76,9 @@ class BacsService
         if (stripos($file->getClientOriginalName(), "ADDACS Reports") !== false) {
             $metadata = $this->addacs($tmpFile);
             $uploadFile = new BacsReportAddacsFile();
+        } elseif (stripos($file->getClientOriginalName(), "AUDDIS Reports") !== false) {
+                $metadata = $this->auddis($tmpFile);
+                $uploadFile = new BacsReportAuddisFile();
         } else {
             $this->logger->error(sprintf('Unknown bacs report file %s', $file->getClientOriginalName()));
         }
@@ -130,11 +142,15 @@ class BacsService
         $dom->loadXML($xml, LIBXML_NOBLANKS);
         $xpath = new DOMXPath($dom);
 
-        $elementList = $xpath->query('//BACSDocument/Data/MessagingAdvices/MessagingAdvice');
-        foreach ($elementList as $element) {
-            $results['instructions']++;
+        $this->validateMessageHeader($xpath);
 
-            /** @var \DOMElement $element */
+        $elementList = $xpath->query('//BACSDocument/Data/MessagingAdvices/MessagingAdvice');
+        /** @var \DOMElement $element */
+        foreach ($elementList as $element) {
+            $this->validateSun($element);
+            $this->validateRecordType($element, "A");
+
+            $results['instructions']++;
             $reason = $element->attributes->getNamedItem('reason-code')->nodeValue;
             $reference = $element->attributes->getNamedItem('reference')->nodeValue;
             $user = $repo->findOneBy(['paymentMethod.bankAccount.reference' => $reference]);
@@ -163,7 +179,64 @@ class BacsService
                 $results['deceased']++;
                 // TODO: cancel policy, lock user account, unsub user from emails
                 $this->logger->error(sprintf('Deceased user - cancel policy %s', $reference));
+            } else {
+                $this->logger->error(sprintf('Unknown reason %s (Ref: %s)', $reason, $reference));
             }
+        }
+
+        return $results;
+    }
+
+    private function validateMessageHeader($xpath)
+    {
+        $elementList = $xpath->query('//BACSDocument/Data/MessagingAdvices/MessagingHeader');
+        /** @var \DOMElement $element */
+        foreach ($elementList as $element) {
+            $this->validateSun($element);
+        }
+    }
+
+    private function validateSun(\DOMElement $element)
+    {
+        $sun = $element->attributes->getNamedItem('user-number')->nodeValue;
+        if ($sun != self::SUN) {
+            throw new \Exception(sprintf('Invalid SUN %s', $sun));
+        }
+    }
+
+    private function validateRecordType(\DOMElement $element, $expectedRecordType)
+    {
+        $recordType = $element->attributes->getNamedItem('record-type')->nodeValue;
+        if ($recordType != $expectedRecordType) {
+            throw new \Exception(sprintf('Unexpected record type %s', $recordType));
+        }
+    }
+
+    public function auddis($file)
+    {
+        $results = [
+            'success' => true,
+            'instructions' => 0,
+            'user' => 0,
+            'bank' => 0,
+            'deceased' => 0,
+            'transfer' => 0,
+        ];
+
+        $xml = file_get_contents($file);
+        $dom = new DOMDocument();
+        $dom->loadXML($xml, LIBXML_NOBLANKS);
+        $xpath = new DOMXPath($dom);
+
+        $this->validateMessageHeader($xpath);
+
+        $elementList = $xpath->query('//BACSDocument/Data/MessagingAdvices/MessagingAdvice');
+        /** @var \DOMElement $element */
+        foreach ($elementList as $element) {
+            $this->validateSun($element);
+            $this->validateRecordType($element, "V");
+
+            $results['instructions']++;
         }
 
         return $results;
