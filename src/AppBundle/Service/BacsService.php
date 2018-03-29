@@ -261,14 +261,13 @@ class BacsService
                 foreach ($errorsList as $error) {
                     $results['errors'][] = $error->attributes->getNamedItem('line1')->nodeValue;
                 }
-
             } else {
                 throw new \Exception(sprintf('Unknown record type %s', $recordType));
             }
             $results['file-numbers'][] = $element->attributes->getNamedItem('originator-file-number')->nodeValue;
             $results['records']++;
-            $results['accepted-ddi'] += $element->attributes->getNamedItem('accepted-ddi')->nodeValue;;
-            $results['rejected-ddi'] += $element->attributes->getNamedItem('rejected-ddi')->nodeValue;;
+            $results['accepted-ddi'] += $element->attributes->getNamedItem('accepted-ddi')->nodeValue;
+            $results['rejected-ddi'] += $element->attributes->getNamedItem('rejected-ddi')->nodeValue;
         }
 
         return $results;
@@ -289,35 +288,45 @@ class BacsService
             $results['processing-date'] = $element->attributes->getNamedItem('date')->nodeValue;
         }
 
+        // @codingStandardsIgnoreStart
         $elementList = $xpath->query('//BACSDocument/Data/InputReport/Submission/UserFile/InputUserFile/UserFileInformation');
+        // @codingStandardsIgnoreEnd
         /** @var \DOMElement $element */
         foreach ($elementList as $element) {
             $this->validateSun($element, 'userNumber');
             $results['file-numbers'][] = $element->attributes->getNamedItem('userFileNumber')->nodeValue;
         }
 
+        // @codingStandardsIgnoreStart
         $elementList = $xpath->query('//BACSDocument/Data/InputReport/Submission/UserFile/InputUserFile/InputReportSummary/AccountTotals/AccountTotal/CreditEntry/AcceptedRecords');
+        // @codingStandardsIgnoreEnd
         /** @var \DOMElement $element */
         foreach ($elementList as $element) {
             $results['credit-accepted-records'] = $element->attributes->getNamedItem('numberOf')->nodeValue;
             $results['credit-accepted-value'] = $element->attributes->getNamedItem('valueOf')->nodeValue;
         }
 
+        // @codingStandardsIgnoreStart
         $elementList = $xpath->query('//BACSDocument/Data/InputReport/Submission/UserFile/InputUserFile/InputReportSummary/AccountTotals/AccountTotal/CreditEntry/RejectedRecords');
+        // @codingStandardsIgnoreEnd
         /** @var \DOMElement $element */
         foreach ($elementList as $element) {
             $results['credit-rejected-records'] = $element->attributes->getNamedItem('numberOf')->nodeValue;
             $results['credit-rejected-value'] = $element->attributes->getNamedItem('valueOf')->nodeValue;
         }
 
+        // @codingStandardsIgnoreStart
         $elementList = $xpath->query('//BACSDocument/Data/InputReport/Submission/UserFile/InputUserFile/InputReportSummary/AccountTotals/AccountTotal/DebitEntry/AcceptedRecords');
+        // @codingStandardsIgnoreEnd
         /** @var \DOMElement $element */
         foreach ($elementList as $element) {
             $results['debit-accepted-records'] = $element->attributes->getNamedItem('numberOf')->nodeValue;
             $results['debit-accepted-value'] = $element->attributes->getNamedItem('valueOf')->nodeValue;
         }
 
+        // @codingStandardsIgnoreStart
         $elementList = $xpath->query('//BACSDocument/Data/InputReport/Submission/UserFile/InputUserFile/InputReportSummary/AccountTotals/AccountTotal/DebitEntry/RejectedRecords');
+        // @codingStandardsIgnoreEnd
         /** @var \DOMElement $element */
         foreach ($elementList as $element) {
             $results['debit-rejected-records'] = $element->attributes->getNamedItem('numberOf')->nodeValue;
