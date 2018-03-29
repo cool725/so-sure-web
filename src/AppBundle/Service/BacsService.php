@@ -256,6 +256,7 @@ class BacsService
             $recordType = $this->getRecordType($element);
             if ($recordType == "V") {
                 // successful record
+                \AppBundle\Classes\NoOp::ignore([]);
             } elseif ($recordType == "R") {
                 $errorsList = $xpath->query('//BACSDocument/Data/MessagingAdvices/MessagingError');
                 foreach ($errorsList as $error) {
