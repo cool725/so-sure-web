@@ -11,7 +11,6 @@ $(function(){
             var make = $('.select-phone-make').val();
             var model = $('.select-phone-model');
             var memory = $('.select-phone-memory');
-            var phone = $('#phone');
 
             // Clear incase make changed
             model.empty();
@@ -24,15 +23,32 @@ $(function(){
                 model.append($('<option />').val('').text('Select your phone make first'));
             }
 
+            // Clear the other select out
             memory.append($('<option />').val('').text('Select your phone model first'));
 
-            // Get phones from list and add to options
+            // Add Title - Top Models
+            model.append($('<option disabled />').val('').text('Top Models'));
+
+            // Get phones from list and show featured
             $.each(phones[make], function(key, value) {
-                model.append($('<option />').val(key).text(key));
+                $.each(value, function(key2, mod) {
+                    if (mod['featured'] && !model.find('option[value="' + key +'"]').length) {
+                        model.append($('<option />').val(key).text(key));
+                    }
+                });
             });
 
-            // Update text
-            // phone.text(make);
+            // Add Title - Models
+            model.append($('<option disabled />').val('').text('Models'));
+
+            // Get phones from list and show the rest
+            $.each(phones[make], function(key, value) {
+                $.each(value, function(key2, mod) {
+                    if (!mod['featured'] && !model.find('option[value="' + key +'"]').length) {
+                        model.append($('<option />').val(key).text(key));
+                    }
+                });
+            });
         }
 
         var updateMemory = function() {
@@ -40,7 +56,7 @@ $(function(){
             var make = $('.select-phone-make').val();
             var model = $('.select-phone-model').val();
             var memory = $('.select-phone-memory');
-            var phone = $('#phone');
+            var memoryOpt = false;
 
             // Clear incase model changed
             memory.empty();
@@ -54,11 +70,13 @@ $(function(){
 
             // Get phones from list and add to options
             $.each(phones[make][model], function(key, value) {
-                memory.append($('<option />').val(key).text(value + ' GB'));
+                memory.append($('<option />').val(key).text(value['memory'] + ' GB'));
             });
 
-            // Update text
-            // phone.text(make + ' > ' + model);
+            // if ($(memory).find('option').length) {
+            //     // console.log('One option');
+            //     oneOpt = true;
+            // }
         }
 
         var updateFinal = function() {
@@ -66,10 +84,6 @@ $(function(){
             var make = $('.select-phone-make').val();
             var model = $('.select-phone-model').val();
             var memory = $('.select-phone-memory').val();
-            var phone = $('#phone');
-
-            // Update text
-            // phone.text(make + ' > ' + model + ' > ' + memory);
         }
 
         var checkForm = function() {
@@ -78,7 +92,10 @@ $(function(){
             var make = $('.select-phone-make').val();
             var model = $('.select-phone-model').val();
             var memory = $('.select-phone-memory').val();
-            var phone = $('#phone');
+
+            var opt = $('.select-phone-memory').children('option').length;
+
+            console.log(opt);
 
             if (make != '') {
                 $('.select-phone-model').show(function() {
@@ -88,10 +105,8 @@ $(function(){
                 $('.select-phone-model').hide();
             }
             if (model != '') {
-                // $('.select-phone-model').hide();
                 $('.select-phone-memory').show();
             } else {
-                // $('.select-phone-model').show();
                 $('.select-phone-memory').hide();
             }
             if (memory != '') {

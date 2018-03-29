@@ -211,6 +211,8 @@ class DefaultController extends BaseController
             }
         }
 
+        // throw new \Exception(print_r($this->getPhonesArray(), true));
+
         return [
             'form_phone' => $formPhone->createView(),
             'phones' => $this->getPhonesArray(),
