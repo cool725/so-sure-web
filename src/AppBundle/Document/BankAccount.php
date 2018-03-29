@@ -23,6 +23,7 @@ class BankAccount
     const MANDATE_PENDING_APPROVAL = 'pending-approval';
     const MANDATE_SUCCESS = 'success';
     const MANDATE_FAILURE = 'failure';
+    const MANDATE_CANCELLED = 'cancelled';
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
@@ -67,7 +68,7 @@ class BankAccount
     protected $reference;
 
     /**
-     * @Assert\Choice({"pending-init", "pending-approval", "success", "failure"}, strict=true)
+     * @Assert\Choice({"pending-init", "pending-approval", "success", "failure", "cancelled"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
