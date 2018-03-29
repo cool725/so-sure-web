@@ -478,6 +478,11 @@ services:
             - "@snc_redis.default"
             - "@logger"
 
+    app.phone:
+        class: AppBundle\Service\PhoneService
+        arguments:
+            - "@logger"
+
     app.logger.rollbar:
         class: AppBundle\Classes\Rollbar
         arguments:

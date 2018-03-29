@@ -87,4 +87,15 @@ class PhoneRepository extends DocumentRepository
             ->getQuery()
             ->execute();
     }
+
+    public function alreadyExists($make, $model, $memory)
+    {
+        return $this->createQueryBuilder()
+                ->field('make')->equals($make)
+                ->field('model')->equals($model)
+                ->field('memory')->equals((int) $memory)
+                ->getQuery()
+                ->execute()
+                ->count() > 0;
+    }
 }
