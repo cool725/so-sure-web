@@ -155,7 +155,10 @@ class SixpackService
         } catch (\Exception $e) {
             $this->logger->error(sprintf('Failed exp %s', $experiment), ['exception' => $e]);
         }
-
+        $this->mixpanel->queueTrack(
+            MixpanelService::EVENT_SIXPACK,
+            ['Experiment' => $experiment, 'Result' => $result]
+        );
         $policyHolder = $this->requestService->getUser() && $this->requestService->getUser()->hasPolicy();
         if (($logMixpanel == self::LOG_MIXPANEL_CONVERSION && !$policyHolder) ||
             $logMixpanel == self::LOG_MIXPANEL_ALL) {
@@ -205,6 +208,11 @@ class SixpackService
 
     public function convertByClientId($clientId, $experiment, $kpi = null)
     {
+        if (!$clientId || strlen($clientId) == 0) {
+            $this->logger->info(sprintf('Missing clientId for experiment %s', $experiment));
+
+            return;
+        }
         try {
             $data = [
                 'experiment' => $experiment,

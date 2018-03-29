@@ -70,10 +70,8 @@ class PolicySearchType extends AbstractType
                 'choices' => [
                     'IMEI' => [
                         'Patrick iPhone' => '355424073417084',
-                        'iPhone 6S Plus' => '353287074257748',
-                        'Julien 5c' => '013834002513072',
-                        'Jamie Nexus 5X' => '353627075075872',
-                        'Jamie iPhone' => '359285060633868',
+                        'SoSure 6S Plus' => '353287074257748',
+                        'Julien SE' => '355440072416935',
                     ],
                     'Facebook' => [
                         'Patrick (Global?)' => '10153878106240169',

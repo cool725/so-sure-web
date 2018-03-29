@@ -34,7 +34,6 @@
     <h3>Image: {{ image.imagePath }}</h3>
 
     {{ form_start(picsureml_label_form)}}
-
     <div class="row">
         <div class="col-md-8">
             <div class="content-right">
@@ -51,13 +50,19 @@
             <div class="content-left">
                 <div class="text-right">
                     <div class="form-group">
+                        {{ form_widget(picsureml_label_form.previous, {'label': 'Previous', 'attr': {'class': 'btn btn-success'}}) }}
+                        {{ form_widget(picsureml_label_form.save, {'label': 'Save', 'attr': {'class': 'btn btn-success'}}) }}
+                        {{ form_widget(picsureml_label_form.next, {'label': 'Next', 'attr': {'class': 'btn btn-success'}}) }}
+                    </div>
+                    <div class="form-group">
                         {{ form_label(picsureml_label_form.label, 'Label:') }}
                         {{ form_widget(picsureml_label_form.label) }}
                         {{ form_errors(picsureml_label_form.label) }}
                     </div>
                     <div class="form-group">
-                        {{ form_widget(picsureml_label_form.previous, {'label': 'Previous', 'attr': {'class': 'btn btn-success'}}) }}
-                        {{ form_widget(picsureml_label_form.next, {'label': 'Next', 'attr': {'class': 'btn btn-success'}}) }}
+                        {{ form_label(picsureml_label_form.versions, 'Versions:') }}
+                        {{ form_widget(picsureml_label_form.versions) }}
+                        {{ form_errors(picsureml_label_form.versions) }}
                     </div>
                 </div>
             </div>

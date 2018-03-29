@@ -157,6 +157,12 @@ abstract class LoadPhoneData implements ContainerAwareInterface
                 }
             }
 
+            // check if the phone is already in the database
+            $repo = $manager->getRepository(Phone::class);
+            if ($repo->alreadyExists($data[0], $data[1], $data[3])) {
+                throw new \Exception(sprintf('The device %s / %s / %sGB is already in the database', $data[0], $data[1], $data[3]));
+            }
+
             $phone = new Phone();
             $phone->init(
                 $data[0], // $make

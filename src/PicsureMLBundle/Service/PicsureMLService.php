@@ -12,6 +12,7 @@ use Aws\S3\S3Client;
 use Aws\S3\Exception\S3Exception;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\File\S3File;
+use PicsureMLBundle\Document\TrainingVersionsInfo;
 use PicsureMLBundle\Document\TrainingData;
 
 class PicsureMLService
@@ -60,6 +61,43 @@ class PicsureMLService
             $this->picsureMLDm->persist($image);
         }
         $this->picsureMLDm->flush();
+    }
+
+    public function createNewTrainingVersion($version)
+    {
+        $repo = $this->picsureMLDm->getRepository(TrainingVersionsInfo::class);
+        $versionInfo = $repo->findAll();
+
+        $versionInfo = $versionInfo[0];
+        $versionInfo->addVersion($versionInfo->getLatestVersion()+1);
+        $versionInfo->setLatestVersion($versionInfo->getLatestVersion()+1);
+        $this->picsureMLDm->persist($versionInfo);
+
+        if ($version !== null) {
+            $repo = $this->picsureMLDm->getRepository(TrainingData::class);
+            $qb = $repo->createQueryBuilder();
+            $qb->field('versions')->equals($version);
+            $results = $qb->getQuery()->execute();
+
+            foreach ($results as $data) {
+                $data->addVersion($versionInfo->getLatestVersion());
+                $this->picsureMLDm->persist($data);
+            }
+        }
+
+        $this->picsureMLDm->flush();
+    }
+
+    public function getTrainingVersions()
+    {
+        $repo = $this->picsureMLDm->getRepository(TrainingVersionsInfo::class);
+        $versionInfo = $repo->findAll();
+
+        if (count($versionInfo) == 0) {
+            return [];
+        } else {
+            return $versionInfo[0]->getVersions();
+        }
     }
 
     public function predict(S3File $file)
@@ -174,6 +212,7 @@ class PicsureMLService
 
         $repo = $this->picsureMLDm->getRepository(TrainingData::class);
         $qb = $repo->createQueryBuilder();
+        $qb->field('versions')->equals($version);
         $qb->sort('id', 'desc');
         $results = $qb->getQuery()->execute();
 
