@@ -56,7 +56,6 @@ $(function(){
             var make = $('.select-phone-make').val();
             var model = $('.select-phone-model').val();
             var memory = $('.select-phone-memory');
-            var memoryOpt = false;
 
             // Clear incase model changed
             memory.empty();
@@ -72,11 +71,6 @@ $(function(){
             $.each(phones[make][model], function(key, value) {
                 memory.append($('<option />').val(key).text(value['memory'] + ' GB'));
             });
-
-            // if ($(memory).find('option').length) {
-            //     // console.log('One option');
-            //     oneOpt = true;
-            // }
         }
 
         var updateFinal = function() {
@@ -89,27 +83,21 @@ $(function(){
         var checkForm = function() {
 
             // All values
-            var make = $('.select-phone-make').val();
-            var model = $('.select-phone-model').val();
-            var memory = $('.select-phone-memory').val();
+            var make = $('.select-phone-make');
+            var model = $('.select-phone-model');
+            var memory = $('.select-phone-memory');
 
-            var opt = $('.select-phone-memory').children('option').length;
-
-            console.log(opt);
-
-            if (make != '') {
-                $('.select-phone-model').show(function() {
-                    $(this).trigger('mouseup');
-                });
+            if (make.val() != '') {
+                $('.select-phone-model').show()
             } else {
                 $('.select-phone-model').hide();
             }
-            if (model != '') {
+            if (model.val() != '') {
                 $('.select-phone-memory').show();
             } else {
                 $('.select-phone-memory').hide();
             }
-            if (memory != '') {
+            if (memory.val() != '') {
                 $('#launch_phone_next').show();
             } else {
                 $('#launch_phone_next').hide()
@@ -125,7 +113,7 @@ $(function(){
         // When user selects option update results
         $('.select-phone-model').on('change', function(e) {
             updateMemory();
-            checkForm();
+            checkForm();;
         });
 
         // When user selects option update results
