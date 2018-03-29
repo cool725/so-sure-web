@@ -74,25 +74,28 @@ class DefaultController extends BaseController
 
         $exp = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_HOMEPAGE_STICKYSEARCH_SHUFFLE,
-            ['v2', 'sticky-search', 'shuffle'],
+            SixpackService::EXPERIMENT_MOBILE_SEARCH_DROPDOWN,
+            ['mobile-search', 'mobile-dropdown-search'],
             SixpackService::LOG_MIXPANEL_ALL // keep consistent with running test; change for future
         );
+
+        $mobSearchDropdown = false;
+
+        if ($exp == 'mobile-dropdown-search') {
+            $mobSearchDropdown = true;
+        }
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         $data = array(
             // Make sure to check homepage landing below too
-            'select_phone_type' => $exp == 'sticky-search' ? 'homepage-sticky' : 'homepage',
-            'referral'          => $referral,
-            'phone'             => $this->getQuerystringPhone($request),
+            'exp_dropdown_search' => $mobSearchDropdown,
+            'select_phone_type'   => $exp == 'sticky-search' ? 'homepage-sticky' : 'homepage',
+            'referral'            => $referral,
+            'phone'               => $this->getQuerystringPhone($request),
         );
 
         $template = 'AppBundle:Default:index.html.twig';
-
-        if ($exp == 'shuffle') {
-            $template = 'AppBundle:Default:indexContentShuffle.html.twig';
-        }
 
         return $this->render($template, $data);
     }

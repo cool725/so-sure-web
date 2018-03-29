@@ -137,6 +137,12 @@ class PhoneInsuranceController extends BaseController
             ['old', 'new']
         );
 
+        $exp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_MOBILE_SEARCH_DROPDOWN,
+            ['mobile-search', 'mobile-dropdown-search']
+        );
+
         $template = 'AppBundle:PhoneInsurance:makeInsurance.html.twig';
         if (in_array($request->get('_route'), ['insure_make'])) {
             $template = 'AppBundle:PhoneInsurance:makeInsuranceBottomOld.html.twig';
