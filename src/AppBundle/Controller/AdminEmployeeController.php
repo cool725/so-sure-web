@@ -155,7 +155,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->createNamedBuilder('additional_phones_form')
             ->add('file', ChoiceType::class, [
                 'required' => true,
-                'choices' => $phoneService->getAdditionalPhones(),
+                'choices' => $phoneService->getAdditionalPhones($this->container->getParameter('kernel.root_dir')),
             ])
             ->add('load', SubmitType::class)
             ->getForm();
@@ -180,21 +180,35 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     return new RedirectResponse($this->generateUrl('admin_phones'));
                 }
             } elseif ($request->request->has('additional_phones_form')) {
-                $additionalPhonesForm->handleRequest($request);
-                if ($additionalPhonesForm->isValid()) {
-                    $additionalPhones = $phoneService->getAdditionalPhonesInstance(
-                        $additionalPhonesForm->get('file')->getData()
+                if ($this->getUser()->hasRole('ROLE_ADMIN')) {
+                    $additionalPhonesForm->handleRequest($request);
+                    if ($additionalPhonesForm->isValid()) {
+                        $additionalPhones = $phoneService->getAdditionalPhonesInstance(
+                            $additionalPhonesForm->get('file')->getData()
+                        );
+                        if ($additionalPhones !== null) {
+                            $additionalPhones->setContainer($this->container);
+                            $additionalPhones->load($dm);
+
+                            $this->addFlash('success', sprintf(
+                                'Loaded additional phones: %s',
+                                $additionalPhonesForm->get('file')->getData()
+                            ));
+                        } else {
+                            $this->addFlash('error', sprintf(
+                                'Error loading additional phones: %s',
+                                $additionalPhonesForm->get('file')->getData()
+                            ));
+                        }
+                    }
+                } else {
+                    $this->addFlash(
+                        'error',
+                        'You don\'t have the permissions to load additional phones'
                     );
-                    $additionalPhones->setContainer($this->container);
-                    $additionalPhones->load($dm);
-
-                    $this->addFlash('success', sprintf(
-                        'Loaded additional phones: %s',
-                        $additionalPhonesForm->get('file')->getData()
-                    ));
-
-                    return new RedirectResponse($this->generateUrl('admin_phones'));
                 }
+
+                return new RedirectResponse($this->generateUrl('admin_phones'));
             }
         }
 

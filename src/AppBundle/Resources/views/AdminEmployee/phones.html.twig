@@ -59,11 +59,13 @@
           <i class="fa fa-plus"></i> Add upcoming phone
         </button>
       </div>
+      {% if is_granted('ROLE_ADMIN') %}
       <div class="col-sm-3">
         <button class="btn btn-success pull-right"  data-toggle="modal" data-target="#additionalPhonesModal">
           <i class="fa fa-refresh"></i> Load additional phones
         </button>
       </div>
+      {% endif %}
       <div class="col-sm-2">
           <button class="btn btn-success"  data-toggle="modal" data-target="#checkPriceModal">
               Calculate Premium
@@ -499,6 +501,7 @@
       </div>
     </div>
 
+    {% if is_granted('ROLE_ADMIN') %}
     <div class="modal fade" id="additionalPhonesModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document" style="width: 60%;">
         <div class="modal-content">
@@ -530,5 +533,6 @@
         {{ form_end(additional_phones) }}
         </div>
       </div>
-    </div>    
+    </div>  
+    {% endif %}  
 {% endblock %}

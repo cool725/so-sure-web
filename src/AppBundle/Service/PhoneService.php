@@ -19,11 +19,12 @@ class PhoneService
         $this->logger = $logger;
     }
 
-    public function getAdditionalPhones()
+    public function getAdditionalPhones($rootdir)
     {
         $finder = new Finder();
-        $finder->directories()->in(__DIR__.'/../DataFixtures/MongoDB/b/Phone');
+        $finder->directories()->in($rootdir.'/../src/AppBundle/DataFixtures/MongoDB/b/Phone');
         $finder->name('Additions*');
+        $finder->notName('Additions20160101');
         $finder->sort(function ($a, $b) {
             return strcmp($b->getRealpath(), $a->getRealpath());
         });
