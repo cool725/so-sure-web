@@ -21,10 +21,9 @@ class SixpackService
     const LOG_MIXPANEL_NONE = 'none';
 
     //const EXPERIMENT_HOMEPAGE_AA = 'homepage-aa';
-    const EXPERIMENT_HOMEPAGE_AA_V2 = 'homepage-aa-v2';
+    //const EXPERIMENT_QUOTE_CALC_LOWER = 'quote-calc-lower';
     //const EXPERIMENT_LANDING_HOME = 'landing-or-home';
     //const EXPERIMENT_CPC_QUOTE_MANUFACTURER = 'cpc-quote-or-manufacturer';
-    const EXPERIMENT_SHARE_MESSAGE = 'share-message';
     //const EXPERIMENT_HOMEPAGE_PHONE_IMAGE = 'homepage-phone-image';
     // const EXPERIMENT_QUOTE_SLIDER = 'quote-slider';
     //const EXPERIMENT_PYG_HOME= 'pyg-or-home';
@@ -35,26 +34,25 @@ class SixpackService
     //const EXPERIMENT_POSTCODE = 'postcode';
     //const EXPERIMENT_HOMEPAGE_V1_V2 = 'homepage-v1-v2';
     //const EXPERIMENT_HOMEPAGE_V1_V2OLD_V2NEW = 'homepage-v1-v2old-v2new';
-    const EXPERIMENT_APP_SHARE_METHOD = 'app-share-method';
-    // const EXPERIMENT_FUNNEL_V1_V2 = 'funnel-v1-v2';
-    // const EXPERIMENT_HOMEPAGE_STICKYSEARCH_PICSURE = 'homepage-v2-sticksearch-picsure';
-    const EXPERIMENT_HOMEPAGE_STICKYSEARCH_SHUFFLE = 'homepage-v2-sticksearch-shuffle';
-    // const EXPERIMENT_QUOTE_SECTIONS = 'quote-sections';
-    // const EXPERIMENT_POLICY_PDF_DOWNLOAD = 'policy-pdf-download';
+    //const EXPERIMENT_FUNNEL_V1_V2 = 'funnel-v1-v2';
+    //const EXPERIMENT_HOMEPAGE_STICKYSEARCH_PICSURE = 'homepage-v2-sticksearch-picsure';
+    //const EXPERIMENT_HOMEPAGE_STICKYSEARCH_SHUFFLE = 'homepage-v2-sticksearch-shuffle';
+    //const EXPERIMENT_QUOTE_SECTIONS = 'quote-sections';
+    //const EXPERIMENT_POLICY_PDF_DOWNLOAD = 'policy-pdf-download';
     //const EXPERIMENT_CANCELLATION = 'cancellation';
-    const EXPERIMENT_NEW_QUOTE_DESIGN = 'new-quote-design';
+    //const EXPERIMENT_NEW_QUOTE_DESIGN = 'new-quote-design';
+    //const EXPERIMENT_CPC_MANUFACTURER_OLD_NEW = 'cpc-manufacturer-old-new';
+
+    const EXPERIMENT_HOMEPAGE_AA_V2 = 'homepage-aa-v2';
+    const EXPERIMENT_APP_SHARE_METHOD = 'app-share-method';
     const EXPERIMENT_SAVE_QUOTE_24HOURS = 'save-quote-24-hours';
-
     const EXPERIMENT_USER_WELCOME_MODAL = 'welcome-modal';
-
-    const EXPERIMENT_CPC_MANUFACTURER_OLD_NEW = 'cpc-manufacturer-old-new';
     const EXPERIMENT_QUOTE_INTERCOM_PURCHASE = 'quote-intercom-purchase';
     const EXPERIMENT_MONEY_UNBOUNCE = 'money-unbounce';
 
     const EXPERIMENT_MOBILE_SEARCH_DROPDOWN = 'mobile-dropdown-search';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
-    const ALTERNATIVES_SHARE_MESSAGE_ORIGINAL = 'original';
 
     const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';
     const ALTERNATIVES_APP_SHARE_METHOD_API = 'api';
@@ -63,8 +61,18 @@ class SixpackService
     const KPI_QUOTE = 'quote';
     const KPI_POLICY_PURCHASE = 'policy-purchase';
 
-    // Completed test - SW-45
-    // const EXPERIMENT_QUOTE_CALC_LOWER = 'quote-calc-lower';
+    const EXPIRED_EXPERIMENT_SHARE_MESSAGE = 'share-message';
+
+    public static $unauthExperiments = [
+        self::EXPERIMENT_HOMEPAGE_AA_V2,
+        self::EXPERIMENT_SAVE_QUOTE_24HOURS,
+        self::EXPERIMENT_QUOTE_INTERCOM_PURCHASE,
+        self::EXPERIMENT_MONEY_UNBOUNCE,
+    ];
+
+    public static $authExperiments = [
+        self::EXPERIMENT_APP_SHARE_METHOD,
+    ];
 
     /** @var LoggerInterface */
     protected $logger;
@@ -117,9 +125,13 @@ class SixpackService
 
         try {
             if (!$clientId) {
-                $clientId = $this->requestService->getUser() ?
-                    $this->requestService->getUser()->getId() :
-                    $this->requestService->getTrackingId();
+                if (in_array($experiment, self::$unauthExperiments)) {
+                    $clientId = $this->requestService->getTrackingId();
+                } elseif (in_array($experiment, self::$authExperiments)) {
+                    $clientId = $this->requestService->getUser()->getId();
+                } else {
+                    throw new \Exception(sprintf('Exp %s is not in auth or unauth array', $experiment));
+                }
             }
             $data = [
                 'experiment' => $experiment,
@@ -145,14 +157,15 @@ class SixpackService
         } catch (\Exception $e) {
             $this->logger->error(sprintf('Failed exp %s', $experiment), ['exception' => $e]);
         }
-
+        $this->mixpanel->queueTrack(
+            MixpanelService::EVENT_SIXPACK,
+            ['Experiment' => $experiment, 'Result' => $result]
+        );
         $policyHolder = $this->requestService->getUser() && $this->requestService->getUser()->hasPolicy();
         if (($logMixpanel == self::LOG_MIXPANEL_CONVERSION && !$policyHolder) ||
             $logMixpanel == self::LOG_MIXPANEL_ALL) {
             if (in_array($experiment, [
                 self::EXPERIMENT_APP_SHARE_METHOD,
-                self::EXPERIMENT_NEW_QUOTE_DESIGN,
-                self::EXPERIMENT_SHARE_MESSAGE,
             ])) {
                 $this->mixpanel->queuePersonProperties([sprintf('Sixpack: %s', $experiment) => $result], true);
             } else {
@@ -170,18 +183,21 @@ class SixpackService
 
     public function convert($experiment, $kpi = null, $expectParticipating = false)
     {
-        $unauth = $this->convertByClientId($this->requestService->getTrackingId(), $experiment, $kpi);
-        $auth = null;
-        if ($user = $this->requestService->getUser()) {
-            $auth = $this->convertByClientId($user->getId(), $experiment, $kpi);
+        $converted = false;
+        if (in_array($experiment, self::$unauthExperiments)) {
+            $converted = $this->convertByClientId($this->requestService->getTrackingId(), $experiment, $kpi);
+        } elseif (in_array($experiment, self::$authExperiments)) {
+            $converted = $this->convertByClientId($this->requestService->getUser()->getId(), $experiment, $kpi);
+        } else {
+            throw new \Exception(sprintf('Exp %s is not in auth or unauth array', $experiment));
         }
 
-        if (!$unauth && !$auth && $expectParticipating) {
-            if ($user) {
+        if (!$converted && $expectParticipating) {
+            if ($this->requestService->getUser()) {
                 $this->logger->warning(sprintf(
                     'Expected participation in experiment %s for user %s',
                     $experiment,
-                    $user->getId()
+                    $this->requestService->getUser()->getId()
                 ));
             } else {
                 $this->logger->warning(sprintf(
@@ -194,6 +210,11 @@ class SixpackService
 
     public function convertByClientId($clientId, $experiment, $kpi = null)
     {
+        if (!$clientId || strlen($clientId) == 0) {
+            $this->logger->info(sprintf('Missing clientId for experiment %s', $experiment));
+
+            return;
+        }
         try {
             $data = [
                 'experiment' => $experiment,
@@ -239,7 +260,7 @@ class SixpackService
 
     public function getText($experiment, $alternative, $data = null)
     {
-        if ($experiment == self::EXPERIMENT_SHARE_MESSAGE) {
+        if ($experiment == self::EXPIRED_EXPERIMENT_SHARE_MESSAGE) {
             // Expected [0] => 'share link', [1] => 'share code'
             if (count($data) != 2) {
                 return null;
@@ -247,14 +268,6 @@ class SixpackService
 
             if ($alternative == self::ALTERNATIVES_SHARE_MESSAGE_SIMPLE) {
                 return sprintf("Join me on so-sure, really cheap and pretty clever %s", $data[0]);
-            } elseif ($alternative == self::ALTERNATIVES_SHARE_MESSAGE_ORIGINAL) {
-                // @codingStandardsIgnoreStart
-                return sprintf(
-                    "Hey, I've just joined so-sure – better insurance that is up to 80%% cheaper if you and your friends don't claim. Finally, makes phone insurance worthwhile! You're careful, connect with me! Download here: %s. Add my code after you pay: %s",
-                    $data[0],
-                    $data[1]
-                );
-                // @codingStandardsIgnoreEnd
             }
         }
 

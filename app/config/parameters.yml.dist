@@ -140,3 +140,5 @@ parameters:
     accesspay_password: ''
     accesspay_keyfile: ''
     accesspay_s3file_password: 'changeme'
+
+    expected_claim_frequency: 2

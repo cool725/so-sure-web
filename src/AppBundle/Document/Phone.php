@@ -55,7 +55,21 @@ class Phone
      * @Assert\Length(min="1", max="50")
      * @MongoDB\Field(type="string")
      */
+    protected $makeCanonical;
+
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="50")
+     * @MongoDB\Field(type="string")
+     */
     protected $alternativeMake;
+
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="50")
+     * @MongoDB\Field(type="string")
+     */
+    protected $alternativeMakeCanonical;
 
     /**
      * @AppAssert\Token()
@@ -63,6 +77,13 @@ class Phone
      * @MongoDB\Field(type="string")
      */
     protected $model;
+
+    /**
+     * @AppAssert\Token()
+     * @Assert\Length(min="1", max="50")
+     * @MongoDB\Field(type="string")
+     */
+    protected $modelCanonical;
 
     /**
      * @MongoDB\Field(type="collection")
@@ -238,8 +259,8 @@ class Phone
             $date = new \DateTime();
         }
         $this->active = true;
-        $this->make = $make;
-        $this->model = $model;
+        $this->setMake($make);
+        $this->setModel($model);
         $this->devices = $devices;
         $this->memory = $memory;
         $this->initialPrice = strlen($initialPrice) > 0 ? $initialPrice : null;
@@ -402,6 +423,17 @@ class Phone
     public function setMake($make)
     {
         $this->make = $make;
+        $this->setMakeCanonical($make);
+    }
+
+    public function getMakeCanonical()
+    {
+        return $this->makeCanonical;
+    }
+
+    public function setMakeCanonical($make)
+    {
+        $this->makeCanonical = strtolower($make);
     }
 
     public function getAlternativeMake()
@@ -412,6 +444,17 @@ class Phone
     public function setAlternativeMake($alternativeMake)
     {
         $this->alternativeMake = $alternativeMake;
+        $this->setAlternativeMakeCanonical($alternativeMake);
+    }
+
+    public function getAlternativeMakeCanonical()
+    {
+        return $this->alternativeMakeCanonical;
+    }
+
+    public function setAlternativeMakeCanonical($alternativeMake)
+    {
+        $this->alternativeMakeCanonical = strtolower($alternativeMake);
     }
 
     public function getModel()
@@ -419,9 +462,21 @@ class Phone
         return $this->model;
     }
 
+    public function getModelCanonical()
+    {
+        return $this->modelCanonical;
+    }
+
     public function getEncodedModel()
     {
-        $model = str_replace('+', '-Plus', $this->getModel());
+        $model = str_replace('+', '-plus', $this->getModel());
+
+        return str_replace(' ', '+', $model);
+    }
+
+    public function getEncodedModelCanonical()
+    {
+        $model = str_replace('+', '-plus', $this->getModelCanonical());
 
         return str_replace(' ', '+', $model);
     }
@@ -440,17 +495,33 @@ class Phone
     {
         $decodedModel = str_replace('+', ' ', $encodedModel);
         $decodedModel = str_replace('-Plus', '+', $decodedModel);
+        $decodedModel = str_replace('-plus', '+', $decodedModel);
 
         return $decodedModel;
     }
 
     public function setModel($model)
     {
-        if (stripos($model, '-Plus') !== false) {
+        if (stripos($model, '-plus') !== false) {
             throw new \Exception(sprintf('%s contains -Plus which will break encoding rules', $model));
         }
 
         $this->model = $model;
+        $this->setModelCanonical($model);
+    }
+
+    public function setModelCanonical($model)
+    {
+        if (stripos($model, '-plus') !== false) {
+            throw new \Exception(sprintf('%s contains -Plus which will break encoding rules', $model));
+        }
+
+        $this->modelCanonical = strtolower($model);
+    }
+
+    public function isSameMakeModelCanonical($make, $model)
+    {
+        return $this->getMakeCanonical() == $make && $this->getEncodedModelCanonical() == $model;
     }
 
     public function getSearchQuerystring()

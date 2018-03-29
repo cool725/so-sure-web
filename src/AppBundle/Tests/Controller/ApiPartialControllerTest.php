@@ -47,7 +47,7 @@ class ApiPartialControllerTest extends BaseControllerTest
     public function testABWithRequiredUserNoUser()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
-        $url = sprintf('/api/v1/partial/ab/%s?_method=GET', SixpackService::EXPERIMENT_SHARE_MESSAGE);
+        $url = sprintf('/api/v1/partial/ab/%s?_method=GET', SixpackService::EXPIRED_EXPERIMENT_SHARE_MESSAGE);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, array());
         $data = $this->verifyResponse(404, ApiErrorCode::ERROR_NOT_FOUND);
     }
@@ -65,7 +65,7 @@ class ApiPartialControllerTest extends BaseControllerTest
         $policy->setStatus(Policy::STATUS_ACTIVE);
         self::$dm->flush();
 
-        $url = sprintf('/api/v1/partial/ab/%s?_method=GET', SixpackService::EXPERIMENT_SHARE_MESSAGE);
+        $url = sprintf('/api/v1/partial/ab/%s?_method=GET', SixpackService::EXPIRED_EXPERIMENT_SHARE_MESSAGE);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, array());
         $data = $this->verifyResponse(200);
     }
@@ -86,7 +86,7 @@ class ApiPartialControllerTest extends BaseControllerTest
         }
         self::$dm->flush();
 
-        $url = sprintf('/api/v1/partial/ab/%s?_method=GET', SixpackService::EXPERIMENT_SHARE_MESSAGE);
+        $url = sprintf('/api/v1/partial/ab/%s?_method=GET', SixpackService::EXPIRED_EXPERIMENT_SHARE_MESSAGE);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, array());
         $data = $this->verifyResponse(404);
 

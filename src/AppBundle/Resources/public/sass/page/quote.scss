@@ -16,29 +16,30 @@
 		text-align: center;
 
 		h1 {
-			font-size: 24px;
+			// font-size: 24px;
+            margin-bottom: 0;
 		}
 
-		.memory-dropdown-list {
-			display: inline;
+		// .memory-dropdown-list {
+		// 	display: inline;
 
-		    a {
-		    	&:hover, &:focus {
-		    		text-decoration: none;
-		    	}
-		    }
-		}
+		//     a {
+		//     	&:hover, &:focus {
+		//     		text-decoration: none;
+		//     	}
+		//     }
+		// }
 
-		.memory-dropdown {
-			font-family: $avenir-book;
-		    min-width: 200px !important;
-		    left: auto; right: auto;
+		// .memory-dropdown {
+		// 	font-family: $avenir-book;
+		//     min-width: 200px !important;
+		//     left: auto; right: auto;
 
 
-		    @include breakpoint(mobileishup) {
-				right: 0 !important;
-		    }
-		}
+		//     @include breakpoint(mobileishup) {
+		// 		right: 0 !important;
+		//     }
+		// }
 
 		@include breakpoint(laptop) {
 			margin-right: 10px;
@@ -46,7 +47,7 @@
 			border-right: 2px dashed $lightest-blue;
 
 			h1 {
-				font-size: 30px;
+				// font-size: 30px;
 			}
 		}
 	}

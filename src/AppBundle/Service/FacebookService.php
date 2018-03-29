@@ -66,7 +66,7 @@ class FacebookService
         $this->fb = new Facebook([
           'app_id' => $this->appId,
           'app_secret' => $this->secret,
-          'default_graph_version' => 'v2.5',
+          'default_graph_version' => 'v2.12',
           'default_access_token' => $token,
         ]);
 

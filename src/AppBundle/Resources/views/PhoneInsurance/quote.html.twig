@@ -6,7 +6,7 @@
 {% block title %}{{ phone.model }} Insurance - {{ phone.make }} - so-sure: Social Insurance{% endblock %}
 {% block meta %}
     <meta name="description" content="For a small monthly fee your phone is covered for theft, loss, accidental damage and unauthorised usage."/>
-    <link rel="canonical" href="{{ url('quote_make_model', {'make': phone.make, 'model': phone.encodedModel}) }}" />
+    <link rel="canonical" href="{{ url('quote_make_model', {'make': phone.makeCanonical, 'model': phone.encodedModelCanonical}) }}" />
 
     <meta property="og:video" content="https://cdn.so-sure.com/video/explainer-subtitle-640.mp4" />
     <meta property="og:video:secure_url" content="https://cdn.so-sure.com/video/explainer-subtitle-640.mp4" />
@@ -31,56 +31,39 @@
                 {# Quote Left #}
                 <div class="col-md-8">
                     <div class="quote__left">
-                            <h1 class="h2">
-                                {% if coming_soon %}
-                                    <span class="text-blue">Better cover for your</span>
-                                {% else %}
-                                    <span class="text-blue">Insurance for your</span>
-                                {% endif %}
-                                <div class="dropdown memory-dropdown-list">
-                                    <a href="#"
-                                       class="dropdown-toggle text-nowrap"
-                                       type="button"
-                                       id="memoryDropdownList"
-                                       data-toggle="dropdown"
-                                       aria-haspopup="true"
-                                       aria-expanded="true">
-                                        {{ phone }}
-                                        <i class="fa fa-caret-down" aria-hidden="true"></i>
-                                    </a>
-                                    <ul class="dropdown-menu memory-dropdown" aria-labelledby="memoryDropdownList">
-                                        {% if phones | length > 1 %}
-                                            <li class="dropdown-header">Select alternate model</li>
-                                            {% for phone_mem in phones if phone_mem.id != phone.id %}
-                                                <li>
-                                                    <a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class=""> {{ phone.model }} - {{ phone_mem.memory }}GB</a>
-                                                </li>
-                                            {% endfor %}
-                                            <li role="separator" class="divider"></li>
-                                        {% endif %}
-                                        <li><a href="#" data-toggle="modal" data-target="#quoteModal"> I have a different phone</a></li>
-                                    </ul>
+                        <h1 class="h2">
+                            {% if coming_soon %}
+                                <span>Better cover for your</span>
+                            {% else %}
+                                <span>Insurance for your</span>
+                            {% endif %}
+                            <span class="text-nowrap">{{ phone }}</span><br>
+                            {% if coming_soon %}
+                                <span class="text-nowrap h3">is coming soon!</span>
+                                <p><a href="mailto:hello@wearesosure.com" class="open-intercom">Tell me when</a> it's available.</p>
+                                <p class="h2">
+                                    <strong>£4.99 - £9.99 per month</strong><br>
+                                    <small>(typical policy pricing)</small>
+                                <p>
+                            {% else %}
+                                <span class="text-nowrap h3">only £{{ phone_price.monthlyPremiumPrice }} per month</span>
+                            {% endif %}
+                        </h1>
+                        {% if phones | length > 1 %}
+                            <a class="btn btn-link" role="button" data-toggle="collapse" href="#collapsePhones" aria-expanded="false" aria-controls="collapsePhones">Not your phone?</a>
+                            <div class="collapse" id="collapsePhones">
+                                <div class="btn-group" role="group">
+                                    {% for phone_mem in phones %}
+                                        <a {% if phone_mem.id != phone.id  %}href="{{ path('quote_make_model_memory', {'make': phone_mem.makeCanonical, 'model': phone_mem.encodedModelCanonical, 'memory': phone_mem.memory}) }}"{% else %}disabled{% endif %} class="btn {% if phone_mem.id == phone.id  %}btn-blue{% else %}btn-blue-hollow{% endif %}">{{ phone_mem.memory }}GB</a>
+                                    {% endfor %}
                                 </div>
-                                <br>
+                                <a class="btn btn-link" href="#" data-toggle="modal" data-target="#quoteModal"><u>I have a different phone</u></a>
+                            </div>
+                        {% else %}
+                            <a href="#" class="btn btn-link" role="button" data-toggle="modal" data-target="#quoteModal"><u>I have a different phone</u></a>
+                        {% endif %}
 
-                                {% if coming_soon %}
-                                    {# if phone.isApple and phone.model =='iPhone X'
-                                        <span class="text-nowrap h2">is coming soon!</span>
-                                        <p><a href="mailto:hello@wearesosure.com?subject=Let me know about the iPhone X 256GB Model" class="open-intercom">Tell me when</a> it's available.</p>
-                                        <h4 class="text-blue" style="margin-top: 10px">IMPORTANT! <small>If you have the 256GB model, </small>DO NOT<small> purchase insurance for the iPhone X 64GB. We will not be able to cover you.</small></h4>
-                                    #}
-                                        <span class="text-nowrap h2">is coming soon!</span>
-                                        <p><a href="mailto:hello@wearesosure.com" class="open-intercom">Tell me when</a> it's available.</p>
-                                        <p class="h2">
-                                            <strong>£4.99 - £9.99 per month</strong><br>
-                                            <small>(typical policy pricing)</small>
-                                        <p>
-                                {% else %}
-                                    <span class="text-nowrap h2">only £{{ phone_price.monthlyPremiumPrice }} per month</span>
-                                {% endif %}
-                            </h1>
-
-                        <h4 class="text-blue" style="margin-top: 10px">Effective monthly premium after cashback:<br><small>(Cashback paid out end of policy year)</small></h4>
+                        <h4 class="text-blue" style="margin-top: 20px">Effective monthly premium after cashback:<br><small>(Cashback paid out end of policy year)</small></h4>
 
                         {# Slider #}
                         <div id="loading-overlay-init" class="loading-overlay" style="display:block;"></div>

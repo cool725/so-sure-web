@@ -84,6 +84,20 @@ class DoctrineUserListener
         }
     }
 
+    public function preRemove(LifecycleEventArgs $eventArgs)
+    {
+        /** @var User $document */
+        $document = $eventArgs->getDocument();
+        if ($document instanceof User) {
+            if (count($document->getCreatedPolicies()) > 0) {
+                throw new \Exception(sprintf(
+                    'Unable to delete user %s w/non-partial policy',
+                    $document->getId()
+                ));
+            }
+        }
+    }
+
     private function triggerEvent(User $user, $eventType)
     {
         $event = new UserEvent($user);

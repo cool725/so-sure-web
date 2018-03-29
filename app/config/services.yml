@@ -16,6 +16,7 @@ services:
             - [setRequestStack, ['@request_stack']]
             - [setEncoderFactory, ["@security.encoder_factory"]]
             - [setAuthService, ["@security.authorization_checker"]]
+            - [setDm, ["@doctrine_mongodb.odm.default_document_manager"]]
 
     app.user.cognitoidentity:
         class: AppBundle\Security\CognitoIdentityUserProvider
@@ -87,11 +88,15 @@ services:
             - "@app.sms"
             - "@app.feature"
 
-    app.scheduledpayment:
-        class: AppBundle\Service\ScheduledPaymentService
+    app.payment:
+        class: AppBundle\Service\PaymentService
         arguments:
             - "@app.judopay"
             - "@logger"
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@app.sequence"
+            - "@app.mailer"
+            - "%kernel.environment%"
 
     app.barclays:
         class: AppBundle\Service\BarclaysService
@@ -477,6 +482,11 @@ services:
             - "@snc_redis.default"
             - "@logger"
 
+    app.phone:
+        class: AppBundle\Service\PhoneService
+        arguments:
+            - "@logger"
+
     app.logger.rollbar:
         class: AppBundle\Classes\Rollbar
         arguments:
@@ -640,6 +650,7 @@ services:
             -  { name: doctrine_mongodb.odm.event_listener, event: postPersist }
             -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
             -  { name: doctrine_mongodb.odm.event_listener, event: postUpdate  }
+            -  { name: doctrine_mongodb.odm.event_listener, event: preRemove  }
 
     doctrine.listener.company:
         class:   AppBundle\Listener\DoctrineCompanyListener
@@ -679,6 +690,7 @@ services:
             - "%kernel.environment%"
         tags:
             -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
+            -  { name: doctrine_mongodb.odm.event_listener, event: preRemove  }
 
     doctrine.listener.validation:
         class:   AppBundle\Listener\DoctrineValidationListener
@@ -772,6 +784,13 @@ services:
             -  { name: kernel.event_listener, event: event.policy.renewed, method: onPolicyRenewedEvent }
             -  { name: kernel.event_listener, event: event.policy.cashback, method: onPolicyCashbackEvent }
             -  { name: kernel.event_listener, event: event.policy.declined-renewal, method: onPolicyDeclineRenewedEvent }
+
+    app.listener.sixpack:
+        class:   AppBundle\Listener\SixpackListener
+        arguments:
+            - "@app.sixpack"
+        tags:
+            -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
 
     app.listener.push:
         class:   AppBundle\Listener\PushListener
@@ -912,6 +931,12 @@ services:
 
     app.form.type.bacs:
         class: AppBundle\Form\Type\BacsType
+        arguments: ["@app.address", "%form_required%"]
+        tags:
+            - { name: form.type }
+
+    app.form.type.bacsconfirm:
+        class: AppBundle\Form\Type\BacsConfirmType
         arguments: ["@app.address", "%form_required%"]
         tags:
             - { name: form.type }
@@ -1110,8 +1135,14 @@ services:
             -  { name: kernel.event_listener, event: event.picsure.rejected, method: onDamagedEvent }
 
     picsureml.form.type.search:
-        class: PicsureMLBundle\Form\Type\PicsureMLSearchType
-        arguments: ["@request_stack", "%form_required%"]
+        class: PicsureMLBundle\Form\Type\SearchType
+        arguments: ["@request_stack", "@picsureml.picsureml", "%form_required%"]
+        tags:
+            - { name: form.type }
+
+    picsureml.form.type.newversion:
+        class: PicsureMLBundle\Form\Type\NewVersionType
+        arguments: ["@picsureml.picsureml", "%form_required%"]
         tags:
             - { name: form.type }
 
@@ -1123,6 +1154,6 @@ services:
 
     picsureml.form.type.label:
         class: PicsureMLBundle\Form\Type\LabelType
-        arguments: ["@request_stack", "%form_required%"]
+        arguments: ["@picsureml.picsureml", "%form_required%"]
         tags:
             - { name: form.type }

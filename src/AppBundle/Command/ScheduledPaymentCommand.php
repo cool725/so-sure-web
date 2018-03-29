@@ -2,6 +2,8 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Repository\PolicyRepository;
+use AppBundle\Repository\ScheduledPaymentRepository;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -56,6 +58,14 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
         ;
     }
 
+    /**
+     * @param InputInterface  $input
+     * @param OutputInterface $output
+     * @return int|null|void
+     * @throws \Doctrine\ODM\MongoDB\LockException
+     * @throws \Doctrine\ODM\MongoDB\Mapping\MappingException
+     * @throws \Exception
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $id = $input->getOption('id');
@@ -71,11 +81,12 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
 
         $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
         $logger = $this->getContainer()->get('logger');
-        $scheduledPaymentService = $this->getContainer()->get('app.scheduledpayment');
+        $paymentService = $this->getContainer()->get('app.payment');
+        /** @var ScheduledPaymentRepository $repo */
         $repo = $dm->getRepository(ScheduledPayment::class);
         if ($id) {
             $scheduledPayment = $repo->find($id);
-            $scheduledPayment = $scheduledPaymentService->scheduledPayment(
+            $scheduledPayment = $paymentService->scheduledPayment(
                 $scheduledPayment,
                 $prefix,
                 $scheduledDate,
@@ -84,6 +95,7 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
             $this->displayScheduledPayment($scheduledPayment, $output);
             //\Doctrine\Common\Util\Debug::dump($scheduledPayment);
         } elseif ($policyNumber) {
+            /** @var PolicyRepository $policyRepo */
             $policyRepo = $dm->getRepository(Policy::class);
             $policy = $policyRepo->findOneBy(['policyNumber' => $policyNumber]);
             if (!$policy) {
@@ -95,6 +107,7 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
         } else {
             $scheduledPayments = $repo->findScheduled();
             foreach ($scheduledPayments as $scheduledPayment) {
+                /** @var ScheduledPayment $scheduledPayment */
                 if (!$scheduledPayment->isBillable()) {
                     $output->writeln(sprintf(
                         'Skipping Scheduled Payment %s as policy is not billable',
@@ -116,7 +129,7 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
 
                 try {
                     if (!$show) {
-                        $scheduledPayment = $scheduledPaymentService->scheduledPayment($scheduledPayment, $prefix);
+                        $scheduledPayment = $paymentService->scheduledPayment($scheduledPayment, $prefix);
                     }
                     $this->displayScheduledPayment($scheduledPayment, $output);
                 } catch (\Exception $e) {

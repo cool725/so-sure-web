@@ -341,7 +341,7 @@ class UserControllerTest extends BaseControllerTest
     public function testUserChangeEmailActual()
     {
         $email = self::generateEmail('testUserChangeEmailActual', $this);
-        $password = 'foo';
+        $password = 'fooBar123!';
         $phone = self::getRandomPhone(self::$dm);
 
         $user = self::createUser(
@@ -356,6 +356,8 @@ class UserControllerTest extends BaseControllerTest
         self::$dm->flush();
 
         $this->assertTrue($policy->getUser()->hasActivePolicy());
+
+        self::$client = self::createClient();
 
         $this->login($email, $password, 'user/');
 

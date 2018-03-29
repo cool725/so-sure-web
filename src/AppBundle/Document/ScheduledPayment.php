@@ -69,6 +69,7 @@ class ScheduledPayment
     /**
      * @MongoDB\ReferenceOne(targetDocument="Policy", inversedBy="scheduledPayments")
      * @Gedmo\Versioned
+     * @var Policy
      */
     protected $policy;
 

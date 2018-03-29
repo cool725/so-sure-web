@@ -303,73 +303,73 @@ class ReceperioServiceTest extends WebTestCase
     public function testAppleManualProcessSerialRetry()
     {
         $this->assertFalse(self::$imei->runMakeModelCheck(ReceperioService::TEST_INVALID_SERIAL));
-        self::$imei->checkSerial(
+        $this->assertTrue(self::$imei->checkSerial(
             static::$phoneA,
             ReceperioService::TEST_MANUAL_PROCESS_SERIAL,
             $this->generateRandomImei()
-        );
+        ));
         $this->assertEquals('serial', self::$imei->getResponseData());
     }
 
     public function testAppleInvalidSerialNoRetry()
     {
         $this->assertFalse(self::$imei->runMakeModelCheck(ReceperioService::TEST_INVALID_SERIAL));
-        self::$imei->checkSerial(
+        $this->assertFalse(self::$imei->checkSerial(
             static::$phoneA,
             ReceperioService::TEST_INVALID_SERIAL,
             null
-        );
+        ));
         $this->assertNotEquals('serial', self::$imei->getResponseData());
     }
 
     public function testAppleValidSerial()
     {
-        $this->runCheckSerial(
+        $this->assertTrue($this->runCheckSerial(
             static::$phoneE,
             self::TEST_IPHONE_SERIAL_VALID,
             null
-        );
+        ));
         $this->assertContains(PhonePolicy::MAKEMODEL_VALID_SERIAL, self::$imei->getMakeModelValidatedStatus());
     }
 
     public function testAppleInvalidModel()
     {
-        $this->runCheckSerial(
+        $this->assertFalse($this->runCheckSerial(
             static::$phoneA,
             self::TEST_IPHONE_SERIAL_INVALID,
             self::TEST_IPHONE_IMEI_VALID
-        );
+        ));
         $this->assertContains(PhonePolicy::MAKEMODEL_MODEL_MISMATCH, self::$imei->getMakeModelValidatedStatus());
     }
 
     public function testAppleValidIMEI()
     {
-        $this->runCheckSerial(
+        $this->assertTrue($this->runCheckSerial(
             static::$phoneE,
             self::TEST_IPHONE_SERIAL_INVALID2,
             self::TEST_IPHONE_IMEI_VALID
-        );
+        ));
         $this->assertContains(PhonePolicy::MAKEMODEL_VALID_IMEI, self::$imei->getMakeModelValidatedStatus());
     }
 
     public function testAndroidSerialInvalid()
     {
         // message from recipero will be valid but serials check is ignored
-        $this->runCheckSerial(
+        $this->assertTrue($this->runCheckSerial(
             static::$phoneD,
             self::TEST_ANDROID_SERIAL_INVALID,
             null
-        );
+        ));
         $this->assertContains(PhonePolicy::MAKEMODEL_VALID_IMEI, self::$imei->getMakeModelValidatedStatus());
     }
 
     public function testAndroidSerialValid()
     {
-        $this->runCheckSerial(
+        $this->assertTrue($this->runCheckSerial(
             static::$phoneD,
             self::TEST_ANDROID_SERIAL_VALID,
             null
-        );
+        ));
         $this->assertContains(PhonePolicy::MAKEMODEL_VALID_IMEI, self::$imei->getMakeModelValidatedStatus());
     }
 
@@ -398,12 +398,14 @@ class ReceperioServiceTest extends WebTestCase
                 self::$imei->setResponseData(unserialize(self::TEST_MSG_ANDROID_SERIAL), true);
                 break;
         }
-        self::$imei->checkSerial(
+        $result = self::$imei->checkSerial(
             $phone,
             $serialNumber,
             $imei
         );
 
         self::$imei->setResponseData(null, true);
+
+        return $result;
     }
 }

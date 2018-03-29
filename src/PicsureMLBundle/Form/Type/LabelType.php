@@ -9,9 +9,26 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use PicsureMLBundle\Document\TrainingData;
+use PicsureMLBundle\Service\PicsureMLService;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormEvent;
 
 class LabelType extends AbstractType
 {
+
+    /**
+     * @var PicsureMLService
+     */
+    private $picsureMLService;
+
+    /**
+     * @param PicsureMLService $picsureMLService
+     */
+    public function __construct(PicsureMLService $picsureMLService)
+    {
+        $this->picsureMLService = $picsureMLService;
+    }
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -28,8 +45,26 @@ class LabelType extends AbstractType
                 'required' => false
             ])
             ->add('previous', SubmitType::class)
+            ->add('save', SubmitType::class)
             ->add('next', SubmitType::class)
         ;
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            $form = $event->getForm();
+            
+            $choices = array();
+            $existingVersions = $this->picsureMLService->getTrainingVersions();
+            foreach ($existingVersions as $version) {
+                $choices[$version] = $version;
+            }
+
+            $form->add('versions', ChoiceType::class, [
+                'required' => true,
+                'expanded' => true,
+                'multiple' => true,
+                'choices' => $choices
+            ]);
+        });
     }
 
     public function configureOptions(OptionsResolver $resolver)

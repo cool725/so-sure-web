@@ -173,7 +173,8 @@ class OpsController extends BaseController
         }
         foreach ($validPolicies as $validPolicyMonthly) {
             if (!$validPolicyMonthly->hasMonetaryClaimed() &&
-                $validPolicyMonthly->getPremiumPlan() == Policy::PLAN_MONTHLY) {
+                $validPolicyMonthly->getPremiumPlan() == Policy::PLAN_MONTHLY &&
+                count($validPolicyMonthly->getUser()->getValidPolicies(true)) == 1) {
                 break;
             }
         }

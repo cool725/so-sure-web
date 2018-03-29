@@ -72,6 +72,7 @@ class DefaultController extends BaseController
             SixpackService::LOG_MIXPANEL_CONVERSION
         );
 
+
         $exp = $this->sixpack(
             $request,
             SixpackService::EXPERIMENT_MOBILE_SEARCH_DROPDOWN,
@@ -131,7 +132,6 @@ class DefaultController extends BaseController
         $data = null;
         if ($request->get('_route') == "reimagined") {
             $data = array(
-                'select_phone_type' => 'homepage',
                 'main'              => 'Mobile Insurance',
                 'main_cont'         => 'Re-Imagined',
                 'sub'               => 'Quicker. Easier. Jargon Free.',
@@ -139,7 +139,6 @@ class DefaultController extends BaseController
             );
         } elseif ($request->get('_route') == "hasslefree") {
             $data = array(
-                'select_phone_type' => 'homepage',
                 'main'              => 'Hassle Free',
                 'main_cont'         => 'Mobile Insurance',
                 'sub'               => 'We dont give you the run around when you claim.',
@@ -743,56 +742,56 @@ class DefaultController extends BaseController
             $phoneName = "Samsung S7";
             $phonePrice = "7.99";
             $quoteRoute = $this->generateUrl('quote_make_model_memory', [
-                'make' => 'Samsung',
-                'model' => 'Galaxy+S7',
+                'make' => 'samsung',
+                'model' => 'galaxy+s7',
                 'memory' => '32'
             ]);
         } elseif ($request->get('_route') == "google_pixel_insured_with_vodafone") {
             $phoneName = "Google Pixel";
             $phonePrice = "8.49";
             $quoteRoute = $this->generateUrl('quote_make_model_memory', [
-                'make' => 'Google',
-                'model' => 'Pixel',
+                'make' => 'google',
+                'model' => 'pixel',
                 'memory' => '32'
             ]);
         } elseif ($request->get('_route') == "iphone_SE_insured_with_vodafone") {
             $phoneName = "iPhone SE";
             $phonePrice = "6.99";
             $quoteRoute = $this->generateUrl('quote_make_model_memory', [
-                'make' => 'Apple',
-                'model' => 'iPhone+SE',
+                'make' => 'apple',
+                'model' => 'iphone+se',
                 'memory' => '16'
             ]);
         } elseif ($request->get('_route') == "iphone_7_plus_insured_with_vodafone") {
             $phoneName = "iPhone 7 Plus";
             $phonePrice = "9.99";
             $quoteRoute = $this->generateUrl('quote_make_model_memory', [
-                'make' => 'Apple',
-                'model' => 'iPhone+7+Plus',
+                'make' => 'apple',
+                'model' => 'iphone+7+plus',
                 'memory' => '32'
             ]);
         } elseif ($request->get('_route') == "iphone_7_insured_with_vodafone") {
             $phoneName = "iPhone 7";
             $phonePrice = "7.99";
             $quoteRoute = $this->generateUrl('quote_make_model_memory', [
-                'make' => 'Apple',
-                'model' => 'iPhone+7',
+                'make' => 'apple',
+                'model' => 'iphone+7',
                 'memory' => '32'
             ]);
         } elseif ($request->get('_route') == "iphone_6s_insured_with_vodafone") {
             $phoneName = "iPhone 6S";
             $phonePrice = "7.99";
             $quoteRoute = $this->generateUrl('quote_make_model_memory', [
-                'make' => 'Apple',
-                'model' => 'iPhone+6S',
+                'make' => 'apple',
+                'model' => 'iphone+6s',
                 'memory' => '32'
             ]);
         } elseif ($request->get('_route') == "iphone_6_insured_with_vodafone") {
             $phoneName = "iPhone 6";
             $phonePrice = "7.99";
             $quoteRoute = $this->generateUrl('quote_make_model_memory', [
-                'make' => 'Apple',
-                'model' => 'iPhone+6',
+                'make' => 'apple',
+                'model' => 'iphone+6',
                 'memory' => '16'
             ]);
         }
@@ -1026,8 +1025,8 @@ class DefaultController extends BaseController
     public function iPhone8RedirectAction()
     {
         return new RedirectResponse($this->generateUrl('quote_make_model', [
-            'make' => 'Apple',
-            'model' => 'iPhone+8',
+            'make' => 'apple',
+            'model' => 'iphone+8',
             'utm_medium' => 'flyer',
             'utm_source' => 'sosure',
             'utm_campaign' => 'iPhone8',

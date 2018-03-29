@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -65,6 +66,9 @@ class EmailDebugCommand extends BaseCommand
         $variation = $input->getOption('variation');
 
         $templates = [
+            'bacs' => [
+                'bacs/notification',
+            ],
             'cashback' => [
                 'cashback/approved-reduced',
                 'cashback/approved',
@@ -138,7 +142,16 @@ class EmailDebugCommand extends BaseCommand
             return;
         }
         $data = [];
-        if (in_array($template, $templates['cashback'])) {
+        if (in_array($template, $templates['bacs'])) {
+            $dm = $this->getManager();
+            /** @var UserRepository $repo */
+            $repo = $dm->getRepository(User::class);
+            $user = $repo->findOneBy(['paymentMethod.type' => 'bacs']);
+            $data = [
+                'user' => $user,
+                'policy' => $user->getLatestPolicy(),
+            ];
+        } elseif (in_array($template, $templates['cashback'])) {
             $dm = $this->getManager();
             $repo = $dm->getRepository(Cashback::class);
             $data = [

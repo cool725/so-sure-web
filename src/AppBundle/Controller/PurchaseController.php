@@ -4,9 +4,14 @@ namespace AppBundle\Controller;
 
 use AppBundle\Exception\InvalidEmailException;
 use AppBundle\Exception\InvalidFullNameException;
+use AppBundle\Repository\PaymentRepository;
+use AppBundle\Repository\PhoneRepository;
+use AppBundle\Repository\PolicyRepository;
+use AppBundle\Security\FOSUBUserProvider;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -100,6 +105,7 @@ class PurchaseController extends BaseController
         }
 
         $dm = $this->getManager();
+        /** @var PhoneRepository $phoneRepo */
         $phoneRepo = $dm->getRepository(Phone::class);
         $phone = $this->getSessionQuotePhone($request);
 
@@ -109,6 +115,7 @@ class PurchaseController extends BaseController
         } elseif ($session->get('email')) {
             $purchase->setEmail($session->get('email'));
         }
+        /** @var Form $purchaseForm */
         $purchaseForm = $this->get('form.factory')
             ->createNamedBuilder('purchase_form', PurchaseStepPersonalAddressType::class, $purchase)
             ->getForm();
@@ -117,45 +124,34 @@ class PurchaseController extends BaseController
             if ($request->request->has('purchase_form')) {
                 $purchaseForm->handleRequest($request);
                 if ($purchaseForm->isValid()) {
-                    $userRepo = $dm->getRepository(User::class);
-                    $userExists = $userRepo->existsAnotherUser(
+                    /** @var FOSUBUserProvider $userService */
+                    $userService = $this->get('app.user');
+                    if (!$userService->resolveDuplicateUsers(
                         $user,
                         $purchase->getEmail(),
-                        null,
-                        $purchase->getMobileNumber()
-                    );
-                    if ($userExists) {
-                        $existingUser = $userRepo->findOneBy(['emailCanonical' => strtolower($purchase->getEmail())]);
-                        // If the user didn't start a policy at all
-                        // and all of their details match
-                        // then just let the user proceeed as if they entered data for the first time
-                        // however, make sure to clear out the address just in case to prevent
-                        // data disclosure
-                        if ($existingUser && count($existingUser->getPolicies()) == 0 &&
-                            $purchase->matchesUser($existingUser)) {
-                            $existingUser->clearBillingAddress();
-                            $user = $existingUser;
-                        } else {
-                            $this->get('app.mixpanel')->queueTrack(
-                                MixpanelService::EVENT_TEST,
-                                ['Test Name' => 'Purchase Login Redirect']
-                            );
-                            $this->get('logger')->info(sprintf(
-                                '%s received an already have account error and was taken to the login page',
-                                $purchase->getEmail()
-                            ));
-                            // @codingStandardsIgnoreStart
-                            $err = 'It looks like you already have an account.  Please try logging in with your details';
-                            // @codingStandardsIgnoreEnd
-                            $this->addFlash('error', $err);
+                        $purchase->getMobileNumber(),
+                        null
+                    )) {
+                        $this->get('app.mixpanel')->queueTrack(
+                            MixpanelService::EVENT_TEST,
+                            ['Test Name' => 'Purchase Login Redirect']
+                        );
+                        $this->get('logger')->info(sprintf(
+                            '%s received an already have account error and was taken to the login page',
+                            $purchase->getEmail()
+                        ));
+                        // @codingStandardsIgnoreStart
+                        $err = 'It looks like you already have an account.  Please try logging in with your details';
+                        // @codingStandardsIgnoreEnd
+                        $this->addFlash('error', $err);
 
-                            return $this->redirectToRoute('fos_user_security_login');
-                        }
+                        return $this->redirectToRoute('fos_user_security_login');
                     }
 
                     $newUser = false;
                     if (!$user) {
                         $userManager = $this->get('fos_user.user_manager');
+                        /** @var User $user */
                         $user = $userManager->createUser();
                         $user->setEnabled(true);
                         $newUser = true;
@@ -276,13 +272,16 @@ class PurchaseController extends BaseController
         }
 
         $dm = $this->getManager();
+        /** @var PhoneRepository $phoneRepo */
         $phoneRepo = $dm->getRepository(Phone::class);
+        /** @var PolicyRepository $policyRepo */
         $policyRepo = $dm->getRepository(Policy::class);
 
         $phone = $this->getSessionQuotePhone($request);
 
         $purchase = new PurchaseStepPhone();
         $purchase->setUser($user);
+        /** @var PhonePolicy $policy */
         $policy = null;
         if ($id) {
             $policy = $policyRepo->find($id);
@@ -322,6 +321,7 @@ class PurchaseController extends BaseController
         $purchase->setAgreed(true);
         $purchase->setNew(true);
 
+        /** @var Form $purchaseForm */
         $purchaseForm = $this->get('form.factory')
             ->createNamedBuilder('purchase_form', PurchaseStepPhoneType::class, $purchase)
             ->getForm();
@@ -581,6 +581,7 @@ class PurchaseController extends BaseController
         $user = $this->getUser();
         $dm = $this->getManager();
         $judo = $this->get('app.judopay');
+        /** @var PaymentRepository $repo */
         $repo = $dm->getRepository(Payment::class);
         $payment = $repo->findOneBy(['reference' => $request->get('Reference')]);
         if (!$payment) {

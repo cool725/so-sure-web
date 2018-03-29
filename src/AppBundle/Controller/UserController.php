@@ -289,10 +289,6 @@ class UserController extends BaseController
                         );
                         $this->get('app.sixpack')->convertByClientId(
                             $code,
-                            SixpackService::EXPERIMENT_SHARE_MESSAGE
-                        );
-                        $this->get('app.sixpack')->convertByClientId(
-                            $code,
                             SixpackService::EXPERIMENT_APP_SHARE_METHOD
                         );
                     } else {
@@ -452,19 +448,9 @@ class UserController extends BaseController
 
 
         $sixpack = $this->get('app.sixpack');
-        $shareExperiment = $sixpack->participate(
-            SixpackService::EXPERIMENT_SHARE_MESSAGE,
-            [
-                SixpackService::ALTERNATIVES_SHARE_MESSAGE_SIMPLE,
-                SixpackService::ALTERNATIVES_SHARE_MESSAGE_ORIGINAL
-            ],
-            SixpackService::LOG_MIXPANEL_NONE,
-            1,
-            $policy->getStandardSCode()->getCode()
-        );
         $shareExperimentText = $sixpack->getText(
-            SixpackService::EXPERIMENT_SHARE_MESSAGE,
-            $shareExperiment,
+            SixpackService::EXPIRED_EXPERIMENT_SHARE_MESSAGE,
+            SixpackService::ALTERNATIVES_SHARE_MESSAGE_SIMPLE,
             [$policy->getStandardSCode()->getShareLink(), $policy->getStandardSCode()->getCode()]
         );
 
@@ -1076,43 +1062,6 @@ class UserController extends BaseController
             $user->getId()
         );
 
-        //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_LANDING_HOME);
-        //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_CPC_QUOTE_MANUFACTURER);
-        //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_PHONE_IMAGE);
-        //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_SLIDER);
-        //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_PYG_HOME);
-        //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_SIMPLE_COMPLEX_SPLIT);
-        //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_SIMPLE_SPLIT);
-        //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_CPC_MANUFACTURER_WITH_HOME);
-        //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_V1_V2);
-        //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_HOMEPAGE_V1_V2OLD_V2NEW);
-        // $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_FUNNEL_V1_V2);
-        $this->get('app.sixpack')->convert(
-            SixpackService::EXPERIMENT_QUOTE_INTERCOM_PURCHASE,
-            SixpackService::KPI_POLICY_PURCHASE
-        );
-        $this->get('app.sixpack')->convert(
-            SixpackService::EXPERIMENT_HOMEPAGE_AA_V2,
-            SixpackService::KPI_POLICY_PURCHASE
-        );
-
-        $this->get('app.sixpack')->convert(
-            SixpackService::EXPERIMENT_CPC_MANUFACTURER_OLD_NEW,
-            SixpackService::KPI_POLICY_PURCHASE
-        );
-        $this->get('app.sixpack')->convert(
-            SixpackService::EXPERIMENT_HOMEPAGE_STICKYSEARCH_SHUFFLE,
-            SixpackService::KPI_POLICY_PURCHASE
-        );
-
-        $this->get('app.sixpack')->convert(
-            SixpackService::EXPERIMENT_NEW_QUOTE_DESIGN,
-            SixpackService::KPI_POLICY_PURCHASE
-        );
-        $this->get('app.sixpack')->convert(
-            SixpackService::EXPERIMENT_MONEY_UNBOUNCE
-        );
-
         $countUnprocessedInvitations = count($user->getUnprocessedReceivedInvitations());
         if ($countUnprocessedInvitations > 0) {
             $message = sprintf(
@@ -1167,14 +1116,19 @@ class UserController extends BaseController
         if ($bacsFeature && $policy->getPremiumPlan() != Policy::PLAN_MONTHLY) {
             $bacsFeature = false;
         }
+        $paymentService = $this->get('app.payment');
         // TODO: Move to ajax call
         $webpay = null;
-        $webpay = $this->get('app.judopay')->webRegister(
-            $user,
-            $request->getClientIp(),
-            $request->headers->get('User-Agent'),
-            $policy
-        );
+        try {
+            $webpay = $this->get('app.judopay')->webRegister(
+                $user,
+                $request->getClientIp(),
+                $request->headers->get('User-Agent'),
+                $policy
+            );
+        } catch (\Exception $e) {
+            $this->get('logger')->error(sprintf('Unable to create web registration for user %s', $user->getId()));
+        }
         $billing = new BillingDay();
         $billing->setPolicy($policy);
         /** @var FormInterface $billingForm */
@@ -1216,14 +1170,7 @@ class UserController extends BaseController
                     if (!$bacs->isValid()) {
                         $this->addFlash('error', 'Sorry, but this bank account is not valid');
                     } else {
-                        /** @var SequenceService $sequenceService */
-                        $sequenceService = $this->get('app.sequence');
-                        if ($this->getParameter('kernel.environment') == 'prod') {
-                            $seq = $sequenceService->getSequenceId(SequenceService::SEQUENCE_BACS_REFERENCE);
-                        } else {
-                            $seq = $sequenceService->getSequenceId(SequenceService::SEQUENCE_BACS_REFERENCE_INVALID);
-                        }
-                        $ref = $bacs->generateReference($user, $seq);
+                        $paymentService->generateBacsReference($bacs, $user);
                         $bacsConfirm = clone $bacs;
                         $bacsConfirmForm = $this->get('form.factory')
                             ->createNamedBuilder('bacs_confirm_form', BacsConfirmType::class, $bacsConfirm)
@@ -1233,8 +1180,7 @@ class UserController extends BaseController
             } elseif ($request->request->has('bacs_confirm_form')) {
                 $bacsConfirmForm->handleRequest($request);
                 if ($bacsConfirmForm->isValid()) {
-                    $user->setPaymentMethod($bacsConfirm->transformBacsPaymentMethod());
-                    $dm->flush();
+                    $paymentService->confirmBacs($policy, $bacsConfirm->transformBacsPaymentMethod());
 
                     $this->addFlash(
                         'success',

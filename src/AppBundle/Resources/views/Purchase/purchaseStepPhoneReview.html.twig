@@ -48,7 +48,7 @@
                             <li class="dropdown-header">Select alternate model</li>
                             {% for phone_mem in phones if phone_mem.id != phone.id %}
                                 <li>
-                                    <a href="{{ path('quote_make_model_memory', {'make': phone_mem.make, 'model': phone_mem.encodedModel, 'memory': phone_mem.memory}) }}" class=""> {{ phone.model }} - {{ phone_mem.memory }}GB</a>
+                                    <a href="{{ path('quote_make_model_memory', {'make': phone_mem.makeCanonical, 'model': phone_mem.encodedModelCanonical, 'memory': phone_mem.memory}) }}" class=""> {{ phone.model }} - {{ phone_mem.memory }}GB</a>
                                 </li>
                             {% endfor %}
                             <li role="separator" class="divider"></li>
