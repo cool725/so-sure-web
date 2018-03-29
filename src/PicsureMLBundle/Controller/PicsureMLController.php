@@ -15,8 +15,12 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use AppBundle\Controller\BaseController;
 use AppBundle\Document\File\S3File;
 use PicsureMLBundle\Service\PicsureMLService;
+use PicsureMLBundle\Document\TrainingVersionsInfo;
 use PicsureMLBundle\Document\TrainingData;
-use PicsureMLBundle\Form\Type\PicsureMLSearchType;
+use PicsureMLBundle\Document\Form\Search;
+use PicsureMLBundle\Document\Form\NewVersion;
+use PicsureMLBundle\Form\Type\SearchType;
+use PicsureMLBundle\Form\Type\NewVersionType;
 use PicsureMLBundle\Form\Type\LabelType;
 
 /**
@@ -32,22 +36,45 @@ class PicsureMLController extends BaseController
      */
     public function indexAction(Request $request)
     {
+        $dm = $this->getPicsureMLManager();
+        $repo = $dm->getRepository(TrainingData::class);
+
+        $search = new Search();
         $picsureMLSearchForm = $this->get('form.factory')
-            ->createNamedBuilder('picsureml_search_form', PicsureMLSearchType::class, null, ['method' => 'GET'])
+            ->createNamedBuilder('picsureml_search_form', SearchType::class, $search, ['method' => 'GET'])
             ->getForm();
+
+        $newVersion = new NewVersion();
+        $picsureMLNewVersionForm = $this->get('form.factory')
+            ->createNamedBuilder('picsureml_newversion_form', NewVersionType::class, $newVersion)
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('picsureml_newversion_form')) {
+                $picsureMLNewVersionForm->handleRequest($request);
+                if ($picsureMLNewVersionForm->isValid()) {
+                    $version = $picsureMLNewVersionForm->get('version')->getData();
+                    $service = $this->get('picsureml.picsureml');
+                    $service->createNewTrainingVersion($version);
+                    return new RedirectResponse($this->generateUrl('admin_picsure_ml'));
+                }
+            }
+        }
+
         $picsureMLSearchForm->handleRequest($request);
 
-        $label = $this->getRequestString($request, 'label');
-        $imagesPerPage = $this->getRequestString($request, 'images_per_page');
+        $version = $search->getVersion();
+        $label = $search->getLabel();
+        $imagesPerPage = $search->getImagesPerPage();
 
         if ($imagesPerPage == null) {
             $imagesPerPage = $picsureMLSearchForm->get('images_per_page')->getData();
         }
 
-        $dm = $this->getPicsureMLManager();
-        $repo = $dm->getRepository(TrainingData::class);
-
         $qb = $repo->createQueryBuilder();
+        if ($version != null) {
+            $qb->field('versions')->equals($version);
+        }
         if ($label != null) {
             if ($label == 'none') {
                 $qb->field('label')->equals(null);
@@ -59,13 +86,15 @@ class PicsureMLController extends BaseController
         $pager = $this->pager($request, $qb, $imagesPerPage);
 
         return [
-            'n_images' => $repo->getTotalCount(),
-            'n_none_images' => $repo->getNoneCount(),
-            'n_undamaged_images' => $repo->getUndamagedCount(),
-            'n_invalid_images' => $repo->getInvalidCount(),
-            'n_damaged_images' => $repo->getDamagedCount(),
+            'n_images' => $repo->getTotalCount($version, null),
+            'n_none_images' => $repo->getTotalCount($version, 'none'),
+            'n_undamaged_images' => $repo->getTotalCount($version, TrainingData::LABEL_UNDAMAGED),
+            'n_invalid_images' => $repo->getTotalCount($version, TrainingData::LABEL_INVALID),
+            'n_damaged_images' => $repo->getTotalCount($version, TrainingData::LABEL_DAMAGED),
+            'version' => $version,
             'label' => $label,
             'picsureml_search_form' => $picsureMLSearchForm->createView(),
+            'picsureml_newversion_form' => $picsureMLNewVersionForm->createView(),
             'images' => $pager->getCurrentPageResults(),
             'pager' => $pager
         ];
@@ -100,7 +129,7 @@ class PicsureMLController extends BaseController
                         } else {
                             return $this->redirectToRoute('admin_picsure_ml');
                         }
-                    } else {
+                    } elseif (array_key_exists('next', $request->request->get('picsureml_label_form'))) {
                         $nextId = $repo->getNextImage($id);
                         if ($nextId) {
                             return $this->redirectToRoute('admin_picsure_ml_edit', ['id' => $nextId]);

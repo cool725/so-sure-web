@@ -1120,8 +1120,14 @@ services:
             -  { name: kernel.event_listener, event: event.picsure.rejected, method: onDamagedEvent }
 
     picsureml.form.type.search:
-        class: PicsureMLBundle\Form\Type\PicsureMLSearchType
-        arguments: ["@request_stack", "%form_required%"]
+        class: PicsureMLBundle\Form\Type\SearchType
+        arguments: ["@request_stack", "@picsureml.picsureml", "%form_required%"]
+        tags:
+            - { name: form.type }
+
+    picsureml.form.type.newversion:
+        class: PicsureMLBundle\Form\Type\NewVersionType
+        arguments: ["@picsureml.picsureml", "%form_required%"]
         tags:
             - { name: form.type }
 
@@ -1133,6 +1139,6 @@ services:
 
     picsureml.form.type.label:
         class: PicsureMLBundle\Form\Type\LabelType
-        arguments: ["@request_stack", "%form_required%"]
+        arguments: ["@picsureml.picsureml", "%form_required%"]
         tags:
             - { name: form.type }
