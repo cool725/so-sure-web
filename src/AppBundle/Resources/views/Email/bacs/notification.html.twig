@@ -138,36 +138,32 @@
                         <div class="row">
                           <table class="row__table" width="100%" align="center" role="presentation" border="0" cellpadding="0" cellspacing="0" style="table-layout: fixed;">
                             <tr class="row__row">
-                              <td class="column col-sm-12" width="300" style="padding-bottom: 15px;width: 50%" align="left" valign="top"> <span class="lighter-text" style="color: #777777; font-size: 13px;">Name of account holder</span> <br/> <strong style="color: #000000;">{{ user.paymentMethod.bankAccount.accountName }}</strong> </td>
-                              <td class="column col-sm-12" width="300" style="padding-bottom: 15px;width: 50%"
-                                align="left" valign="top"> <span class="lighter-text" style="color: #777777; font-size: 13px;">Reference number</span> <br/> <strong style="color: #000000;">{{ user.paymentMethod.bankAccount.reference }}</strong> </td>
+                              <td class="column col-sm-12" width="300" style="padding-bottom: 15px;width: 50%" align="left" valign="top"> <span class="lighter-text" style="color: #777777; font-size: 13px; font-family: 'Nunito',Helvetica,Arial,sans-serif;">Name of account holder</span> <br/> <strong style="font-family: 'Nunito',Helvetica,Arial,sans-serif; color: #000000;">{{ user.paymentMethod.bankAccount.accountName }}</strong>                                </td>
+                              <td class="column col-sm-12" width="300" style="padding-bottom: 15px;width: 50%" align="left" valign="top"> <span class="lighter-text" style="color: #777777; font-size: 13px; font-family: 'Nunito',Helvetica,Arial,sans-serif;">Reference number</span> <br/> <strong style="font-family: 'Nunito',Helvetica,Arial,sans-serif; color: #000000;">{{ user.paymentMethod.bankAccount.reference }}</strong>                                </td>
                             </tr>
                           </table>
                         </div>
                         <div class="row">
                           <table class="row__table" width="100%" align="center" role="presentation" border="0" cellpadding="0" cellspacing="0" style="table-layout: fixed;">
                             <tr class="row__row">
-                              <td class="column col-sm-12" width="300" style="padding-bottom: 15px;width: 50%" align="left" valign="top"> <span class="lighter-text" style="color: #777777; font-size: 13px;">Sort code</span> <br/> <strong style="color: #000000;">{{ user.paymentMethod.bankAccount.getDisplayableSortCode }}</strong> </td>
-                              <td class="column col-sm-12" width="300" style="padding-bottom: 15px;width: 50%"
-                                align="left" valign="top"> <span class="lighter-text" style="color: #777777; font-size: 13px;">Collection frequency</span> <br/> <span class="lighter-text" style="color: #777777; font-size: 13px;">First collection:</span> <strong style="color: #000000;">{{  user.paymentMethod.bankAccount.getPaymentDate|date('d F','Europe/London') }}</strong><br/> <span class="lighter-text" style="color: #777777; font-size: 13px;"><small>(Collected on the {{ policy.billing|date('jS','Europe/London') }} of each month thereafter)</small></span> </td>
+                              <td class="column col-sm-12" width="300" style="padding-bottom: 15px;width: 50%" align="left" valign="top"> <span class="lighter-text" style="color: #777777; font-size: 13px; font-family: 'Nunito',Helvetica,Arial,sans-serif;">Sort code</span> <br/> <strong style="font-family: 'Nunito',Helvetica,Arial,sans-serif; color: #000000;">{{ user.paymentMethod.bankAccount.getDisplayableSortCode }}</strong>                                </td>
+                              <td class="column col-sm-12" width="300" style="padding-bottom: 15px;width: 50%" align="left" valign="top"> <span class="lighter-text" style="color: #777777; font-size: 13px; font-family: 'Nunito',Helvetica,Arial,sans-serif;">Collection frequency</span> <br/> <span class="lighter-text" style="color: #777777; font-size: 13px; font-family: 'Nunito',Helvetica,Arial,sans-serif;">First collection:</span>                                <strong style="font-family: 'Nunito',Helvetica,Arial,sans-serif; color: #000000;">{{  user.paymentMethod.bankAccount.getPaymentDate|date('d F','Europe/London') }}</strong> <br/> <span class="lighter-text" style="color: #777777; font-size: 13px; font-family: 'Nunito',Helvetica,Arial,sans-serif;"><small>(Collected on the {{ policy.billing|date('jS','Europe/London') }} of each month thereafter)</small></span>                                </td>
                             </tr>
                           </table>
                         </div>
                         <div class="row">
                           <table class="row__table" width="100%" align="center" role="presentation" border="0" cellpadding="0" cellspacing="0" style="table-layout: fixed;">
                             <tr class="row__row">
-                              <td class="column col-sm-12" width="300" style="padding-bottom: 15px;width: 50%" align="left" valign="top"> <span class="lighter-text" style="color: #777777; font-size: 13px;">Account number</span> <br/> <strong style="color: #000000;">{{ user.paymentMethod.bankAccount.getDisplayableAccountNumber }}</strong> </td>
-                              <td class="column col-sm-12" width="300" style="padding-bottom: 15px;width: 50%"
-                                align="left" valign="top"> <span class="lighter-text" style="color: #777777; font-size: 13px;">Payment amount</span> <br/> <strong style="color: #000000;">&pound;{{ policy.getPremiumInstallmentPrice(true)|number_format(2, '.', ',') }}</strong> </td>
+                              <td class="column col-sm-12" width="300" style="padding-bottom: 15px;width: 50%" align="left" valign="top"> <span class="lighter-text" style="color: #777777; font-size: 13px; font-family: 'Nunito',Helvetica,Arial,sans-serif;">Account number</span> <br/> <strong style="font-family: 'Nunito',Helvetica,Arial,sans-serif; color: #000000;">{{ user.paymentMethod.bankAccount.getDisplayableAccountNumber }}</strong>                                </td>
+                              <td class="column col-sm-12" width="300" style="padding-bottom: 15px;width: 50%" align="left" valign="top"> <span class="lighter-text" style="color: #777777; font-size: 13px; font-family: 'Nunito',Helvetica,Arial,sans-serif;">Payment amount</span> <br/> <strong style="font-family: 'Nunito',Helvetica,Arial,sans-serif; color: #000000;">&pound;{{ policy.getPremiumInstallmentPrice(true)|number_format(2, '.', ',') }}</strong>                                </td>
                             </tr>
                           </table>
                         </div>
                         <div class="row">
                           <table class="row__table" width="100%" align="center" role="presentation" border="0" cellpadding="0" cellspacing="0" style="table-layout: fixed;">
                             <tr class="row__row">
-                              <td class="column col-sm-12" width="300" style="padding-bottom: 15px;width: 50%" align="left" valign="top"> <span class="lighter-text" style="color: #777777; font-size: 13px;">Bank/Building society</span> <br/> <strong style="color: #000000;">{{ user.paymentMethod.bankAccount.bankName }}</strong> </td>
-                              <td class="column col-sm-12" width="300" style="padding-bottom: 15px;width: 50%"
-                                align="left" valign="top"> </td>
+                              <td class="column col-sm-12" width="300" style="padding-bottom: 15px;width: 50%" align="left" valign="top"> <span class="lighter-text" style="color: #777777; font-size: 13px; font-family: 'Nunito',Helvetica,Arial,sans-serif;">Bank/Building society</span> <br/> <strong style="font-family: 'Nunito',Helvetica,Arial,sans-serif; color: #000000;">{{ user.paymentMethod.bankAccount.bankName }}</strong>                                </td>
+                              <td class="column col-sm-12" width="300" style="padding-bottom: 15px;width: 50%" align="left" valign="top"> </td>
                             </tr>
                           </table>
                         </div>
@@ -175,9 +171,8 @@
                         <div class="row">
                           <table class="row__table" width="100%" align="center" role="presentation" border="0" cellpadding="0" cellspacing="0" style="table-layout: fixed;">
                             <tr class="row__row">
-                              <td class="column col-sm-12" width="300" style="padding-bottom: 15px;width: 50%" align="left" valign="top"> <span class="lighter-text" style="color: #777777; font-size: 13px;">Bank/Building society address</span> <br/> <strong style="color: #000000;">{{ user.paymentMethod.bankAccount.bankAddress.stringImplode('<br>')|raw }}</strong> </td>
-                              <td class="column col-sm-12" width="300" style="padding-bottom: 15px;width: 50%"
-                                align="left" valign="top"> </td>
+                              <td class="column col-sm-12" width="300" style="padding-bottom: 15px;width: 50%" align="left" valign="top"> <span class="lighter-text" style="color: #777777; font-size: 13px; font-family: 'Nunito',Helvetica,Arial,sans-serif;">Bank/Building society address</span> <br/> <strong style="font-family: 'Nunito',Helvetica,Arial,sans-serif; color: #000000;">{{ user.paymentMethod.bankAccount.bankAddress.stringImplode('<br>')|raw }}</strong>                                </td>
+                              <td class="column col-sm-12" width="300" style="padding-bottom: 15px;width: 50%" align="left" valign="top"> </td>
                             </tr>
                           </table>
                         </div>
