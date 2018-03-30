@@ -221,6 +221,24 @@ class BacsService
         );
     }
 
+    public function notifyMandateCancelledByNameChange(User $user)
+    {
+        $baseTemplate = 'AppBundle:Email:bacs/mandateCancelledNameChange';
+        $templateHtml = sprintf('%s.html.twig', $baseTemplate);
+        $templateText = sprintf('%s.txt.twig', $baseTemplate);
+
+        $this->mailerService->sendTemplate(
+            'Your Direct Debit Cancellation',
+            $user->getEmail(),
+            $templateHtml,
+            ['user' => $user],
+            $templateText,
+            ['user' => $user],
+            null,
+            'bcc@so-sure.com'
+        );
+    }
+
     private function validateMessageHeader($xpath)
     {
         $elementList = $xpath->query('//BACSDocument/Data/MessagingAdvices/MessagingHeader');

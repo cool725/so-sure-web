@@ -10,6 +10,7 @@ use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\User;
 use AppBundle\Event\UserEvent;
 use AppBundle\Event\UserEmailEvent;
+use AppBundle\Service\BacsService;
 use AppBundle\Service\MailerService;
 use AppBundle\Validator\Constraints\BankAccountNameValidator;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -29,19 +30,25 @@ class BacsListener
     /** @var BankAccountNameValidator */
     protected $bankAccountNameValidator;
 
+    /** @var BacsService */
+    protected $bacsService;
+
     /**
      * @param DocumentManager          $dm
      * @param LoggerInterface          $logger
      * @param BankAccountNameValidator $bankAccountNameValidator
+     * @param BacsService              $bacsService
      */
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
-        BankAccountNameValidator $bankAccountNameValidator
+        BankAccountNameValidator $bankAccountNameValidator,
+        BacsService $bacsService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->bankAccountNameValidator = $bankAccountNameValidator;
+        $this->bacsService = $bacsService;
     }
 
     /**
@@ -59,6 +66,7 @@ class BacsListener
                 $user
             )) {
                 $bankAccount->setMandateStatus(BankAccount::MANDATE_CANCELLED);
+                $this->bacsService->notifyMandateCancelledByNameChange($user);
             }
         }
     }

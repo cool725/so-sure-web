@@ -69,6 +69,7 @@ class EmailDebugCommand extends BaseCommand
             'bacs' => [
                 'bacs/notification',
                 'bacs/mandateCancelled',
+                'bacs/mandateCancelledNameChange',
             ],
             'cashback' => [
                 'cashback/approved-reduced',
