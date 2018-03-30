@@ -2,6 +2,7 @@
 namespace AppBundle\Service;
 
 use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\File\DirectDebitNotificationFile;
 use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\JudoPaymentMethod;
@@ -16,6 +17,8 @@ use Psr\Log\LoggerInterface;
 
 class PaymentService
 {
+    const S3_BUCKET = 'policy.so-sure.com';
+
     /** @var JudopayService $judopay */
     protected $judopay;
 
@@ -37,6 +40,10 @@ class PaymentService
     /** @var FraudService */
     protected $fraudService;
 
+    protected $templating;
+    protected $snappyPdf;
+    protected $s3;
+
     /**
      * PaymentService constructor.
      * @param JudopayService  $judopay
@@ -46,6 +53,9 @@ class PaymentService
      * @param MailerService   $mailer
      * @param string          $environment
      * @param FraudService    $fraudService
+     * @param                 $templating
+     * @param                 $snappyPdf
+     * @param                 $s3
      */
     public function __construct(
         JudopayService $judopay,
@@ -54,7 +64,10 @@ class PaymentService
         SequenceService $sequenceService,
         MailerService $mailer,
         $environment,
-        FraudService $fraudService
+        FraudService $fraudService,
+        $templating,
+        $snappyPdf,
+        $s3
     ) {
         $this->judopay = $judopay;
         $this->logger = $logger;
@@ -63,6 +76,9 @@ class PaymentService
         $this->sequenceService = $sequenceService;
         $this->environment = $environment;
         $this->fraudService = $fraudService;
+        $this->templating = $templating;
+        $this->snappyPdf = $snappyPdf;
+        $this->s3 = $s3;
     }
 
     public function scheduledPayment(
@@ -116,6 +132,7 @@ class PaymentService
     {
         $policy->getUser()->setPaymentMethod($bacsPaymentMethod);
         $this->dm->flush();
+
         $this->mailer->sendTemplate(
             sprintf('Your Direct Debit Confirmation'),
             $policy->getUser()->getEmail(),
@@ -126,6 +143,9 @@ class PaymentService
             null,
             'bcc@so-sure.com'
         );
+
+        $this->generateBacsPdf($policy);
+
         if ($this->fraudService->getDuplicateBankAccounts($policy) > 0) {
             $this->mailer->send(
                 'Duplicate bank account',
@@ -133,5 +153,65 @@ class PaymentService
                 sprintf('Check %s / %s', $policy->getPolicyNumber(), $policy->getId())
             );
         }
+    }
+
+    public function generateBacsPdf(Policy $policy)
+    {
+        $now = new \DateTime();
+        $bankAccount = $policy->getUser()->getPaymentMethod()->getBankAccount();
+        $filename = sprintf(
+            "%s-%s-%s.pdf",
+            $policy->getId(),
+            $bankAccount->getReference(),
+            $now->format('U')
+        );
+        $tmpFile = sprintf(
+            "%s/%s",
+            sys_get_temp_dir(),
+            $filename
+        );
+        if (file_exists($tmpFile)) {
+            unlink($tmpFile);
+        }
+
+        $this->snappyPdf->setOption('orientation', 'Portrait');
+        $this->snappyPdf->setOption('lowquality', false);
+        $this->snappyPdf->setOption('page-size', 'A4');
+        $this->snappyPdf->setOption('margin-top', '1');
+        $this->snappyPdf->setOption('margin-bottom', '1');
+        $this->snappyPdf->generateFromHtml(
+            $this->templating->render('AppBundle:Email:bacs/notification.html.twig', [
+                'user' => $policy->getUser(),
+                'policy' => $policy
+            ]),
+            $tmpFile
+        );
+
+        $date = new \DateTime();
+        $ddNotificationFile = new DirectDebitNotificationFile();
+        $ddNotificationFile->setBucket(self::S3_BUCKET);
+        $ddNotificationFile->setKeyFormat(
+            $this->environment . '/dd-notification/' . $date->format('Y') . '/%s'
+        );
+        $ddNotificationFile->setFileName($filename);
+        $policy->addPolicyFile($ddNotificationFile);
+        $this->dm->flush();
+
+        $this->uploadS3($tmpFile, $ddNotificationFile->getKey());
+
+        return $tmpFile;
+    }
+
+    public function uploadS3($file, $key)
+    {
+        if ($this->environment == "test") {
+            return;
+        }
+
+        $result = $this->s3->putObject(array(
+            'Bucket' => self::S3_BUCKET,
+            'Key'    => $key,
+            'SourceFile' => $file,
+        ));
     }
 }
