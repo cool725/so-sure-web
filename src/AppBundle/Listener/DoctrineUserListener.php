@@ -73,6 +73,18 @@ class DoctrineUserListener
                 $event = new UserEvent($document);
                 $this->dispatcher->dispatch(UserEvent::EVENT_PASSWORD_CHANGED, $event);
             }
+
+            $fields = [
+                'firstName',
+                'lastName',
+            ];
+            foreach ($fields as $field) {
+                if ($eventArgs->hasChangedField($field) && strlen(trim($eventArgs->getOldValue($field))) > 0 &&
+                    $eventArgs->getOldValue($field) != $eventArgs->getNewValue($field)) {
+                    $event = new UserEvent($document);
+                    $this->dispatcher->dispatch(UserEvent::EVENT_NAME_UPDATED, $event);
+                }
+            }
         }
     }
 

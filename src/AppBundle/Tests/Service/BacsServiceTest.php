@@ -58,7 +58,7 @@ class BacsServiceTest extends WebTestCase
         $user->setPaymentMethod($bacs);
         static::$dm->flush();
 
-        $this->assertTrue(self::$bacsService->addacs(self::$xmlFile));
+        $this->assertTrue(self::$bacsService->addacs(self::$xmlFile)['success']);
 
         $updatedUser = $this->assertUserExists(self::$container, $user);
         $this->assertEquals(
