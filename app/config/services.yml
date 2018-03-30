@@ -157,6 +157,7 @@ services:
             - "@aws.s3"
             - "%accesspay_s3file_password%"
             - "%kernel.environment%"
+            - "@app.mailer"
 
     app.push:
         class: AppBundle\Service\PushService
