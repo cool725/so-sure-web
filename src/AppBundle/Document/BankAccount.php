@@ -88,6 +88,14 @@ class BankAccount
      */
     protected $bankAddress;
 
+    /**
+     * @AppAssert\Token()
+     * @MongoDB\Field(type="string")
+     * @Assert\Length(min="8", max="256")
+     * @Gedmo\Versioned
+     */
+    protected $hashedAccount;
+
     public function __construct()
     {
         $this->setMandateStatus(self::MANDATE_PENDING_INIT);
@@ -116,6 +124,7 @@ class BankAccount
     public function setSortCode($sortCode)
     {
         $this->sortCode = $this->normalizeSortCode($sortCode);
+        $this->generateHashedAccount();
     }
 
     public function getSortCode()
@@ -126,6 +135,7 @@ class BankAccount
     public function setAccountNumber($accountNumber)
     {
         $this->accountNumber = $this->normalizeAccountNumber($accountNumber);
+        $this->generateHashedAccount();
     }
 
     public function getAccountNumber()
@@ -141,6 +151,23 @@ class BankAccount
     public function getBankAddress()
     {
         return $this->bankAddress;
+    }
+
+    public function getHashedAccount()
+    {
+        return $this->hashedAccount;
+    }
+
+    public function setHashedAccount($hashedAccount)
+    {
+        $this->hashedAccount = $hashedAccount;
+    }
+
+    public function generateHashedAccount()
+    {
+        $this->setHashedAccount(
+            sha1(sprintf("%s%s", $this->getSortCode(), $this->getAccountNumber()))
+        );
     }
 
     public function isValid($transformed = true)

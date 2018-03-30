@@ -34,6 +34,9 @@ class PaymentService
     /** @var string */
     protected $environment;
 
+    /** @var FraudService */
+    protected $fraudService;
+
     /**
      * PaymentService constructor.
      * @param JudopayService  $judopay
@@ -42,6 +45,7 @@ class PaymentService
      * @param SequenceService $sequenceService
      * @param MailerService   $mailer
      * @param string          $environment
+     * @param FraudService    $fraudService
      */
     public function __construct(
         JudopayService $judopay,
@@ -49,7 +53,8 @@ class PaymentService
         DocumentManager $dm,
         SequenceService $sequenceService,
         MailerService $mailer,
-        $environment
+        $environment,
+        FraudService $fraudService
     ) {
         $this->judopay = $judopay;
         $this->logger = $logger;
@@ -57,6 +62,7 @@ class PaymentService
         $this->mailer = $mailer;
         $this->sequenceService = $sequenceService;
         $this->environment = $environment;
+        $this->fraudService = $fraudService;
     }
 
     public function scheduledPayment(
@@ -120,5 +126,12 @@ class PaymentService
             null,
             'bcc@so-sure.com'
         );
+        if ($this->fraudService->getDuplicateBankAccounts($policy) > 0) {
+            $this->mailer->send(
+                'Duplicate bank account',
+                'tech@so-sure.com',
+                sprintf('Check %s / %s', $policy->getPolicyNumber(), $policy->getId())
+            );
+        }
     }
 }
