@@ -205,19 +205,17 @@ class BacsService
     private function notifyMandateCancelled(User $user)
     {
         $baseTemplate = 'AppBundle:Email:bacs/mandateCancelled';
-        if ($user->getAvgPolicyClaims() > 0) {
-            $baseTemplate = 'AppBundle:Email:bacs/mandateCancelled';
-        }
-        $templateHtml = '';
-        $templateText = '';
+        $claimed = $user->getAvgPolicyClaims() > 0;
+        $templateHtml = sprintf('%s.html.twig', $baseTemplate);
+        $templateText = sprintf('%s.txt.twig', $baseTemplate);
 
         $this->mailerService->sendTemplate(
             'Your Direct Debit Cancellation',
             $user->getEmail(),
             $templateHtml,
-            ['user' => $user],
+            ['user' => $user, 'claimed' => $claimed],
             $templateText,
-            ['user' => $user],
+            ['user' => $user, 'claimed' => $claimed],
             null,
             'bcc@so-sure.com'
         );

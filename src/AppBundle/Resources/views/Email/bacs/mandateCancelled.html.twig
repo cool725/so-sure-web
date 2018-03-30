@@ -11,7 +11,18 @@
 	   <div style="font-size: 14px; text-align: center;">
            <span style="font-family:arial,helvetica neue,helvetica,sans-serif">
                Hi {{ user.name }},<br><br>
-               You recently cancelled your direct debit with so-sure.
+               You recently cancelled your direct debit with so-sure. This does not automatically
+			   cancel your policy with so-sure.
+			   <br><br>
+			   You can easily setup your direct debit again (or switch to debit/credit card payments)
+			   by logging into your account at https://wearesosure.com.
+			   <br><br>
+			   {% if claimed %}
+				   Your contract with so-sure is for a 1 year period.  If you have had a successful claim
+				   during that period you will be liable for the remainder of the premium due.
+			   {% else %}
+				   Should you wish to cancel your policy with so-sure, please email us at support@wearesosure.com.
+			   {% endif %}
            </span>
 	   </div>
 	</div>
