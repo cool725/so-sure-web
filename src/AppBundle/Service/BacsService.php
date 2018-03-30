@@ -265,6 +265,7 @@ class BacsService
             } else {
                 throw new \Exception(sprintf('Unknown record type %s', $recordType));
             }
+            $results['serial-number'] = $element->attributes->getNamedItem('vol-serial-number')->nodeValue;
             $results['file-numbers'][] = $element->attributes->getNamedItem('originator-file-number')->nodeValue;
             $results['records']++;
             $results['accepted-ddi'] += $element->attributes->getNamedItem('accepted-ddi')->nodeValue;
@@ -287,6 +288,12 @@ class BacsService
         /** @var \DOMElement $element */
         foreach ($elementList as $element) {
             $results['processing-date'] = $element->attributes->getNamedItem('date')->nodeValue;
+        }
+
+        $elementList = $xpath->query('//BACSDocument/Data/InputReport/Submission/SubmissionInformation');
+        /** @var \DOMElement $element */
+        foreach ($elementList as $element) {
+            $results['serial-number'] = $element->attributes->getNamedItem('volumeSerialNumber')->nodeValue;
         }
 
         // @codingStandardsIgnoreStart
@@ -335,5 +342,34 @@ class BacsService
         }
 
         return $results;
+    }
+
+    public function approveMandates($serialNumber, $actualSerialNumber = null)
+    {
+        if (!$serialNumber) {
+            return false;
+        }
+
+        /** @var UserRepository $repo */
+        $repo = $this->dm->getRepository(User::class);
+        $users = $repo->findBy(['paymentMethod.bankAccount.mandateSerialNumber' => $serialNumber]);
+        foreach ($users as $user) {
+            /** @var User $user */
+            /** @var BacsPaymentMethod $paymentMethod */
+            $paymentMethod = $user->getPaymentMethod();
+            if (!$paymentMethod || !$paymentMethod instanceof BacsPaymentMethod) {
+                continue;
+            }
+            $bankAccount = $paymentMethod->getBankAccount();
+            // TODO: How can we determine which mandates are successful vs failure
+            $bankAccount->setMandateStatus(BankAccount::MANDATE_SUCCESS);
+            if ($actualSerialNumber) {
+                $bankAccount->setMandateSerialNumber($actualSerialNumber);
+            }
+        }
+
+        $this->dm->flush();
+
+        return true;
     }
 }

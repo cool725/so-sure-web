@@ -7,6 +7,7 @@ use AppBundle\Document\BankAccount;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Repository\UserRepository;
+use AppBundle\Service\SequenceService;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -79,13 +80,18 @@ class BacsCommand extends BaseCommand
         }
         $output->writeln(sprintf('Using processing date %s', $processingDate->format('d-M-Y')));
 
+        $sequenceService = $this->getContainer()->get('app.sequence');
+        $serialNumber = $sequenceService->getSequenceId(SequenceService::SEQUENCE_BACS_SERIAL_NUMBER);
+        $serialNumber = sprintf("S-%06d", $serialNumber);
+        $output->writeln(sprintf('Using serial number %s', $serialNumber));
+
         if ($debug) {
             $output->writeln($this->getHeader());
         }
         $data = [];
 
         $output->writeln('Exporting Mandates');
-        $mandates = $this->exportMandates($processingDate);
+        $mandates = $this->exportMandates($processingDate, $serialNumber);
         $data['ddi'] = count($mandates);
         if ($debug) {
             $output->writeln(json_encode($mandates, JSON_PRETTY_PRINT));
@@ -152,7 +158,7 @@ class BacsCommand extends BaseCommand
         ]);
     }
 
-    private function exportMandates(\DateTime $date, $includeHeader = false)
+    private function exportMandates(\DateTime $date, $serialNumber, $includeHeader = false)
     {
         /** @var UserRepository $repo */
         $repo = $this->getManager()->getRepository(User::class);
@@ -179,6 +185,7 @@ class BacsCommand extends BaseCommand
                 '""',
             ]);
             $paymentMethod->getBankAccount()->setMandateStatus(BankAccount::MANDATE_PENDING_APPROVAL);
+            $paymentMethod->getBankAccount()->setMandateSerialNumber($serialNumber);
         }
 
         return $lines;

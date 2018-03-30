@@ -2,6 +2,8 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Form\Type\BacsMandatesType;
+use AppBundle\Form\Type\BacsUploadFileType;
 use AppBundle\Service\BacsService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -539,28 +541,58 @@ class AdminController extends BaseController
         $dm = $this->getManager();
         $s3FileRepo = $dm->getRepository(S3File::class);
 
-        $form = $this->createFormBuilder()
-            ->add('file', FileType::class)
-            ->add('upload', SubmitType::class)
+        /** @var BacsService $bacs */
+        $bacs = $this->get('app.bacs');
+        $uploadForm = $this->get('form.factory')
+            ->createNamedBuilder('upload', BacsUploadFileType::class)
             ->getForm();
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            $file = $form->getData()['file'];
-            /** @var BacsService $bacs */
-            $bacs = $this->get('app.bacs');
-            if ($bacs->processUpload($file)) {
-                $this->addFlash(
-                    'success',
-                    'Successfully uploaded & processed file'
-                );
-            } else {
-                $this->addFlash(
-                    'success',
-                    'Unable to process file - see rollbar error message'
-                );
-            }
+        $mandatesForm = $this->get('form.factory')
+            ->createNamedBuilder('mandates', BacsMandatesType::class)
+            ->getForm();
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('upload')) {
+                $uploadForm->handleRequest($request);
+                if ($uploadForm->isSubmitted() && $uploadForm->isValid()) {
+                    $file = $uploadForm->getData()['file'];
+                    if ($bacs->processUpload($file)) {
+                        $this->addFlash(
+                            'success',
+                            'Successfully uploaded & processed file'
+                        );
+                    } else {
+                        $this->addFlash(
+                            'error',
+                            'Unable to process file - see rollbar error message'
+                        );
+                    }
 
-            return new RedirectResponse($this->generateUrl('admin_bacs_date', ['year' => $year, 'month' => $month]));
+                    return new RedirectResponse($this->generateUrl('admin_bacs_date', [
+                        'year' => $year,
+                        'month' => $month
+                    ]));
+                }
+            } elseif ($request->request->has('mandates')) {
+                $mandatesForm->handleRequest($request);
+                if ($mandatesForm->isSubmitted() && $mandatesForm->isValid()) {
+                    $serialNumber = $mandatesForm->getData()['serialNumber'];
+                    if ($bacs->approveMandates($serialNumber)) {
+                        $this->addFlash(
+                            'success',
+                            'Successfully approved mandates'
+                        );
+                    } else {
+                        $this->addFlash(
+                            'error',
+                            'Unable to approve mandates'
+                        );
+                    }
+
+                    return new RedirectResponse($this->generateUrl('admin_bacs_date', [
+                        'year' => $year,
+                        'month' => $month
+                    ]));
+                }
+            }
         }
 
         return [
@@ -570,7 +602,8 @@ class AdminController extends BaseController
             'addacs' => $s3FileRepo->getAllFiles($date, 'bacsReportAddacs'),
             'auddis' => $s3FileRepo->getAllFiles($date, 'bacsReportAuddis'),
             'input' => $s3FileRepo->getAllFiles($date, 'bacsReportInput'),
-            'uploadForm' => $form->createView(),
+            'uploadForm' => $uploadForm->createView(),
+            'mandatesForm' => $mandatesForm->createView(),
         ];
     }
 

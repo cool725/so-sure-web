@@ -75,6 +75,14 @@ class BankAccount
     protected $mandateStatus;
 
     /**
+     * @AppAssert\Token()
+     * @Assert\Length(min="1", max="10")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $mandateSerialNumber;
+
+    /**
      * @MongoDB\EmbedOne(targetDocument="Address")
      * @Gedmo\Versioned
      */
@@ -177,6 +185,16 @@ class BankAccount
     public function setMandateStatus($mandateStatus)
     {
         $this->mandateStatus = $mandateStatus;
+    }
+
+    public function getMandateSerialNumber()
+    {
+        return $this->mandateSerialNumber;
+    }
+
+    public function setMandateSerialNumber($serialNumber)
+    {
+        $this->mandateSerialNumber = $serialNumber;
     }
 
     public function getPaymentDate(\DateTime $date = null)
