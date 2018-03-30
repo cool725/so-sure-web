@@ -48,25 +48,31 @@ class BacsService
     /** @var string */
     protected $environment;
 
+    /** @var MailerService */
+    protected $mailerService;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
      * @param S3Client        $s3
      * @param string          $fileEncryptionPassword
      * @param string          $environment
+     * @param MailerService   $mailerService
      */
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
         S3Client $s3,
         $fileEncryptionPassword,
-        $environment
+        $environment,
+        MailerService $mailerService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->s3 = $s3;
         $this->fileEncryptionPassword = $fileEncryptionPassword;
         $this->environment = $environment;
+        $this->mailerService = $mailerService;
     }
 
     public function processUpload(UploadedFile $file)
@@ -171,6 +177,7 @@ class BacsService
             /** @var BacsPaymentMethod $bacs */
             $bacs = $user->getPaymentMethod();
             $bacs->getBankAccount()->setMandateStatus(BankAccount::MANDATE_CANCELLED);
+            $this->notifyMandateCancelled($user);
             if ($reason == self::ADDACS_REASON_TRANSFER) {
                 $results['transer']++;
                 // TODO: automate transfer
@@ -193,6 +200,27 @@ class BacsService
         }
 
         return $results;
+    }
+
+    private function notifyMandateCancelled(User $user)
+    {
+        $baseTemplate = 'AppBundle:Email:bacs/mandateCancelled';
+        if ($user->getAvgPolicyClaims() > 0) {
+            $baseTemplate = 'AppBundle:Email:bacs/mandateCancelled';
+        }
+        $templateHtml = '';
+        $templateText = '';
+
+        $this->mailerService->sendTemplate(
+            'Your Direct Debit Cancellation',
+            $user->getEmail(),
+            $templateHtml,
+            ['user' => $user],
+            $templateText,
+            ['user' => $user],
+            null,
+            'bcc@so-sure.com'
+        );
     }
 
     private function validateMessageHeader($xpath)
