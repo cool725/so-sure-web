@@ -58,18 +58,47 @@ class BacsListenerTest extends WebTestCase
             'foo'
         );
         $user->setFirstName('foo');
+        $user->setLastName('bar');
         $bankAccount = new BankAccount();
+        $bankAccount->setAccountName('f bar');
         $bacs = new BacsPaymentMethod();
         $bacs->setBankAccount($bankAccount);
         $user->setPaymentMethod($bacs);
         static::$dm->flush();
 
-        $user->setFirstName('bar');
+        $user->setLastName('rab');
         static::$dm->flush();
 
         $updatedUser = $this->assertUserExists(self::$container, $user);
         $this->assertEquals(
             BankAccount::MANDATE_CANCELLED,
+            $updatedUser->getPaymentMethod()->getBankAccount()->getMandateStatus()
+        );
+    }
+
+    public function testUserChangeNameSameAccount()
+    {
+        $user = static::createUser(
+            self::$userManager,
+            self::generateEmail('testUserChangeNameSameAccount', $this),
+            'foo'
+        );
+        $user->setFirstName('foo');
+        $user->setLastName('bar');
+        $bankAccount = new BankAccount();
+        $bankAccount->setAccountName('f bar');
+        $bankAccount->setMandateStatus(BankAccount::MANDATE_SUCCESS);
+        $bacs = new BacsPaymentMethod();
+        $bacs->setBankAccount($bankAccount);
+        $user->setPaymentMethod($bacs);
+        static::$dm->flush();
+
+        $user->setFirstName('f');
+        static::$dm->flush();
+
+        $updatedUser = $this->assertUserExists(self::$container, $user);
+        $this->assertEquals(
+            BankAccount::MANDATE_SUCCESS,
             $updatedUser->getPaymentMethod()->getBankAccount()->getMandateStatus()
         );
     }
