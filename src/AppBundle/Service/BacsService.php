@@ -228,7 +228,7 @@ class BacsService
         $templateText = sprintf('%s.txt.twig', $baseTemplate);
 
         $this->mailerService->sendTemplate(
-            'Your Direct Debit Cancellation',
+            'Your recent name change',
             $user->getEmail(),
             $templateHtml,
             ['user' => $user],
