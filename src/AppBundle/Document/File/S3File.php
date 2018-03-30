@@ -29,7 +29,8 @@ use AppBundle\Validator\Constraints as AppAssert;
  *      "accesspay"="AccessPayFile",
  *      "bacsReportAddacs"="BacsReportAddacsFile",
  *      "bacsReportAuddis"="BacsReportAuddisFile",
- *      "bacsReportInput"="BacsReportInputFile"
+ *      "bacsReportInput"="BacsReportInputFile",
+ *      "ddNotification"="DirectDebitNotificationFile"
  * })
  * @Gedmo\Loggable
  */

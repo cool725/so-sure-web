@@ -187,34 +187,30 @@ class PaymentService
             $tmpFile
         );
 
-        $this->uploadS3($tmpFile, $filename);
-
+        $date = new \DateTime();
         $ddNotificationFile = new DirectDebitNotificationFile();
         $ddNotificationFile->setBucket(self::S3_BUCKET);
-        $ddNotificationFile->setKey($this->getS3Key($filename));
+        $ddNotificationFile->setKeyFormat(
+            $this->environment . '/dd-notification/' . $date->format('Y') . '/%s'
+        );
+        $ddNotificationFile->setFileName($filename);
         $policy->addPolicyFile($ddNotificationFile);
         $this->dm->flush();
+
+        $this->uploadS3($tmpFile, $ddNotificationFile->getKey());
 
         return $tmpFile;
     }
 
-    public function getS3Key($filename)
-    {
-        $date = new \DateTime();
-        return sprintf('%s/dd-notification/%s/%s', $this->environment, $date->format('Y'), $filename);
-    }
-
-    public function uploadS3($file, $filename)
+    public function uploadS3($file, $key)
     {
         if ($this->environment == "test") {
             return;
         }
 
-        $s3Key = $this->getS3Key($filename);
-
         $result = $this->s3->putObject(array(
             'Bucket' => self::S3_BUCKET,
-            'Key'    => $s3Key,
+            'Key'    => $key,
             'SourceFile' => $file,
         ));
     }
