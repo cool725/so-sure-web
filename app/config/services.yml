@@ -914,6 +914,17 @@ services:
         tags:
             - { name: form.type }
 
+    app.form.type.bacsuploadfile:
+        class: AppBundle\Form\Type\BacsUploadFileType
+        tags:
+            - { name: form.type }
+
+    app.form.type.mandates:
+        class: AppBundle\Form\Type\BacsMandatesType
+        arguments: ["@doctrine_mongodb.odm.default_document_manager"]
+        tags:
+            - { name: form.type }
+
     app.form.type.claimfnol:
         class: AppBundle\Form\Type\ClaimFnolType
         arguments: ["%form_required%"]
