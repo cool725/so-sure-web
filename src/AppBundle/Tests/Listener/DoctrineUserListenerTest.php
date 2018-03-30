@@ -74,6 +74,36 @@ class DoctrineUserListenerTest extends WebTestCase
         $this->assertTrue(count($events->getDocument()->getPreviousPasswords()) > 0);
     }
 
+    public function testPreUpdateName()
+    {
+        $user = new User();
+        $user->setEmail(static::generateEmail('testPreUpdateName', $this));
+        static::$dm->persist($user);
+        $listener = $this->createUserEventListener($user, $this->never(), UserEvent::EVENT_NAME_UPDATED);
+
+        $changeSet = ['firstName' => ['a', 'a']];
+        $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
+        $listener->preUpdate($events);
+
+        $listener = $this->createUserEventListener($user, $this->once(), UserEvent::EVENT_NAME_UPDATED);
+
+        $changeSet = ['firstName' => ['a', 'b']];
+        $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
+        $listener->preUpdate($events);
+
+        $listener = $this->createUserEventListener($user, $this->never(), UserEvent::EVENT_NAME_UPDATED);
+
+        $changeSet = ['lastName' => ['a', 'a']];
+        $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
+        $listener->preUpdate($events);
+
+        $listener = $this->createUserEventListener($user, $this->once(), UserEvent::EVENT_NAME_UPDATED);
+
+        $changeSet = ['lastName' => ['a', 'b']];
+        $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
+        $listener->preUpdate($events);
+    }
+
     public function testPostUpdate()
     {
         $user = new User();
