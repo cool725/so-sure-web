@@ -98,6 +98,9 @@ services:
             - "@app.mailer"
             - "%kernel.environment%"
             - "@app.fraud"
+            - "@templating"
+            - "@knp_snappy.pdf"
+            - "@aws.s3"
 
     app.barclays:
         class: AppBundle\Service\BarclaysService
