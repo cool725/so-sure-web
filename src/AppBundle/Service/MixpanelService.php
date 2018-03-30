@@ -263,7 +263,7 @@ class MixpanelService
                     $dataPresent = true;
                 }
                 if (isset($data['Latest Device Category'])) {
-                    $attribution->setDeviceCategory($data['Latest Device Category']);
+                    $latestAttribution->setDeviceCategory($data['Latest Device Category']);
                     $dataPresent = true;
                 }
                 if ($dataPresent) {
