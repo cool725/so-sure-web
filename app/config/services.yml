@@ -750,6 +750,7 @@ services:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
             - "@app.validator.bankaccountname"
+            - "@app.bacs"
         tags:
             -  { name: kernel.event_listener, event: event.user.name.updated, method: onUserNameChangedEvent }
 
