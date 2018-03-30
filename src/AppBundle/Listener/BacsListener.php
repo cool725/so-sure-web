@@ -51,7 +51,7 @@ class BacsListener
     {
         $user = $event->getUser();
         $paymentMethod = $user->getPaymentMethod();
-        if ($paymentMethod->getType() == "bacs") {
+        if ($paymentMethod && $paymentMethod->getType() == "bacs") {
             /** @var BacsPaymentMethod $paymentMethod */
             $bankAccount = $paymentMethod->getBankAccount();
             if ($bankAccount && !$this->bankAccountNameValidator->isAccountName(
