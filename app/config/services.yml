@@ -97,6 +97,7 @@ services:
             - "@app.sequence"
             - "@app.mailer"
             - "%kernel.environment%"
+            - "@app.fraud"
 
     app.barclays:
         class: AppBundle\Service\BarclaysService
