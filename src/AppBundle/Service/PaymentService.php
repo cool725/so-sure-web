@@ -141,7 +141,7 @@ class PaymentService
             'AppBundle:Email:bacs/notification.txt.twig',
             ['user' => $policy->getUser(), 'policy' => $policy],
             null,
-            'bcc@so-sure.com'
+            'bcc-ddnotifications@so-sure.com'
         );
 
         $this->generateBacsPdf($policy);

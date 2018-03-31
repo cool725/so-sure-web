@@ -6,6 +6,7 @@ use AppBundle\Document\BankAccount;
 use AppBundle\Document\Address;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BacsTrait;
+use AppBundle\Document\IdentityLog;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 
@@ -39,15 +40,15 @@ class Bacs extends BankAccount
         }
     }
 
-    public function transformBacsPaymentMethod()
+    public function transformBacsPaymentMethod(IdentityLog $identityLog = null)
     {
         $bacsPaymentMethod = new BacsPaymentMethod();
-        $bacsPaymentMethod->setBankAccount($this->toBankAccount());
+        $bacsPaymentMethod->setBankAccount($this->toBankAccount($identityLog));
 
         return $bacsPaymentMethod;
     }
 
-    public function toBankAccount()
+    public function toBankAccount(IdentityLog $identityLog = null)
     {
         $bankAccount = new BankAccount();
         $bankAccount->setBankName($this->getBankName());
@@ -56,6 +57,7 @@ class Bacs extends BankAccount
         $bankAccount->setAccountName($this->getAccountName());
         $bankAccount->setBankAddress($this->getBankAddress());
         $bankAccount->setReference($this->getReference());
+        $bankAccount->setIdentityLog($identityLog);
 
         return $bankAccount;
     }
