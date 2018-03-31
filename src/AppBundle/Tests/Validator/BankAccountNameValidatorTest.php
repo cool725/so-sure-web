@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Validator;
 
+use AppBundle\Document\User;
 use AppBundle\Validator\Constraints\BankAccountName;
 use AppBundle\Validator\Constraints\BankAccountNameValidator;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -45,6 +46,23 @@ class BankAccountNameValidatorTest extends WebTestCase
         $validator = $this->configureValidator();
 
         $validator->validate('foo bar', self::$constraint);
+    }
+
+    public function testIsAccountName()
+    {
+        $validator = $this->configureValidator();
+        $this->assertNull($validator->isAccountName('foo', null));
+
+        $user = new User();
+        $user->setFirstName('foo');
+        $user->setLastName('bar');
+        $this->assertTrue($validator->isAccountName('foo bar', $user));
+        $this->assertTrue($validator->isAccountName('f bar', $user));
+        $this->assertTrue($validator->isAccountName('bar', $user));
+
+        $this->assertFalse($validator->isAccountName('f', $user));
+        $this->assertFalse($validator->isAccountName('foobar', $user));
+        $this->assertFalse($validator->isAccountName('f barf', $user));
     }
 
     public function configureValidator($expectedMessage = null)

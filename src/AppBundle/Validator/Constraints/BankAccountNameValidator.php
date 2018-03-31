@@ -47,10 +47,10 @@ class BankAccountNameValidator extends ConstraintValidator
         }
 
         // last name must be in the account name
-        if (stripos($name, strtolower($user->getLastName())) !== false) {
+        if (preg_match('/\b('.$user->getLastName().')\b/i', $name)) {
             // manually verify cases where the first name isn't present
             // may want to check initials, etc in the future
-            if (stripos($name, strtolower($user->getFirstName())) === false) {
+            if (preg_match('/\b('.$user->getFirstName().')\b/i', $name)) {
                 $this->logger->warning(sprintf(
                     'Validate Bank Account Name %s for User %s / %s',
                     $name,
