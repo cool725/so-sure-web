@@ -1180,7 +1180,10 @@ class UserController extends BaseController
             } elseif ($request->request->has('bacs_confirm_form')) {
                 $bacsConfirmForm->handleRequest($request);
                 if ($bacsConfirmForm->isValid()) {
-                    $paymentService->confirmBacs($policy, $bacsConfirm->transformBacsPaymentMethod());
+                    $paymentService->confirmBacs(
+                        $policy,
+                        $bacsConfirm->transformBacsPaymentMethod($this->getIdentityLogWeb($request))
+                    );
 
                     $this->addFlash(
                         'success',

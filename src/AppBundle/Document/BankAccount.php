@@ -96,6 +96,12 @@ class BankAccount
      */
     protected $hashedAccount;
 
+    /**
+     * @MongoDB\EmbedOne(targetDocument="IdentityLog")
+     * @Gedmo\Versioned
+     */
+    protected $identityLog;
+
     public function __construct()
     {
         $this->setMandateStatus(self::MANDATE_PENDING_INIT);
@@ -222,6 +228,16 @@ class BankAccount
     public function setMandateSerialNumber($serialNumber)
     {
         $this->mandateSerialNumber = $serialNumber;
+    }
+
+    public function getIdentityLog()
+    {
+        return $this->identityLog;
+    }
+
+    public function setIdentityLog($identityLog)
+    {
+        $this->identityLog = $identityLog;
     }
 
     public function getPaymentDate(\DateTime $date = null)
