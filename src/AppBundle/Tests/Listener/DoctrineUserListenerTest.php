@@ -2,6 +2,9 @@
 
 namespace AppBundle\Tests\Listener;
 
+use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\BankAccount;
+use AppBundle\Event\BacsEvent;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\Container;
@@ -104,6 +107,30 @@ class DoctrineUserListenerTest extends WebTestCase
         $listener->preUpdate($events);
     }
 
+    public function testPreUpdateBankAccount()
+    {
+        $user = new User();
+        $bankAccount = new BankAccount();
+        $bankAccount->setSortCode('000099');
+        $bankAccount->setAccountNumber('12345678');
+        $bacs = new BacsPaymentMethod();
+        $bacs->setBankAccount($bankAccount);
+        $user->setPaymentMethod($bacs);
+        $user->setEmail(static::generateEmail('testPreUpdateBankAccount', $this));
+        static::$dm->persist($user);
+        $listener = $this->createBacsEventListener($bankAccount, $this->once(), BacsEvent::EVENT_UPDATED);
+
+        $changeSet = ['paymentMethod.bankAccount.sortCode' => ['000099', '000098']];
+        $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
+        $listener->preUpdate($events);
+
+        $listener = $this->createBacsEventListener($bankAccount, $this->once(), BacsEvent::EVENT_UPDATED);
+
+        $changeSet = ['paymentMethod.bankAccount.accountNumber' => ['12345678', '87654321']];
+        $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
+        $listener->preUpdate($events);
+    }
+
     public function testPostUpdate()
     {
         $user = new User();
@@ -174,6 +201,22 @@ class DoctrineUserListenerTest extends WebTestCase
         $dispatcher->expects($count)
                      ->method('dispatch')
                      ->with($eventType, $event);
+
+        $listener = new DoctrineUserListener($dispatcher);
+
+        return $listener;
+    }
+
+    private function createBacsEventListener($bankAccount, $count, $eventType)
+    {
+        $event = new BacsEvent($bankAccount);
+
+        $dispatcher = $this->getMockBuilder('EventDispatcherInterface')
+            ->setMethods(array('dispatch'))
+            ->getMock();
+        $dispatcher->expects($count)
+            ->method('dispatch')
+            ->with($eventType, $event);
 
         $listener = new DoctrineUserListener($dispatcher);
 

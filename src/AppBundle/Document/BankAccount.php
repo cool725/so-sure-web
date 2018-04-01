@@ -356,4 +356,15 @@ class BankAccount
             $this->getDisplayableAccountNumber()
         );
     }
+
+    public static function create($accountName, $sortCode, $accountNumber, $reference)
+    {
+        $bankAccount = new BankAccount();
+        $bankAccount->setAccountNumber($accountNumber);
+        $bankAccount->setSortCode($sortCode);
+        $bankAccount->setAccountName($accountName);
+        $bankAccount->setReference($reference);
+
+        return $bankAccount;
+    }
 }

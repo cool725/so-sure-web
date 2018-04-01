@@ -2,6 +2,8 @@
 
 namespace AppBundle\Listener;
 
+use AppBundle\Document\BankAccount;
+use AppBundle\Event\BacsEvent;
 use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 use AppBundle\Document\User;
@@ -83,6 +85,36 @@ class DoctrineUserListener
                     $eventArgs->getOldValue($field) != $eventArgs->getNewValue($field)) {
                     $event = new UserEvent($document);
                     $this->dispatcher->dispatch(UserEvent::EVENT_NAME_UPDATED, $event);
+                }
+            }
+
+            $fields = [
+                'paymentMethod.bankAccount.sortCode',
+                'paymentMethod.bankAccount.accountNumber',
+            ];
+            foreach ($fields as $field) {
+                if ($eventArgs->hasChangedField($field) && strlen(trim($eventArgs->getOldValue($field))) > 0 &&
+                    $eventArgs->getOldValue($field) != $eventArgs->getNewValue($field)) {
+                    $accountName = $eventArgs->hasChangedField('paymentMethod.bankAccount.accountName') ?
+                        $eventArgs->getOldValue('paymentMethod.bankAccount.accountName') :
+                        $document->getPaymentMethod()->getBankAccount()->getAccountName();
+                    $sortCode = $eventArgs->hasChangedField('paymentMethod.bankAccount.sortCode') ?
+                        $eventArgs->getOldValue('paymentMethod.bankAccount.sortCode') :
+                        $document->getPaymentMethod()->getBankAccount()->getSortCode();
+                    $accountNumber = $eventArgs->hasChangedField('paymentMethod.bankAccount.accountNumber') ?
+                        $eventArgs->getOldValue('paymentMethod.bankAccount.accountNumber') :
+                        $document->getPaymentMethod()->getBankAccount()->getAccountNumber();
+                    $reference = $eventArgs->hasChangedField('paymentMethod.bankAccount.reference') ?
+                        $eventArgs->getOldValue('paymentMethod.bankAccount.reference') :
+                        $document->getPaymentMethod()->getBankAccount()->getReference();
+                    $bankAccount = BankAccount::create(
+                        $accountName,
+                        $sortCode,
+                        $accountNumber,
+                        $reference
+                    );
+                    $event = new BacsEvent($bankAccount);
+                    $this->dispatcher->dispatch(BacsEvent::EVENT_UPDATED, $event);
                 }
             }
         }
