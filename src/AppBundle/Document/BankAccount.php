@@ -102,6 +102,20 @@ class BankAccount
      */
     protected $identityLog;
 
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     * @Gedmo\Versioned
+     */
+    protected $initialNotificationDate;
+
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     * @Gedmo\Versioned
+     */
+    protected $standardNotificationDate;
+
     public function __construct()
     {
         $this->setMandateStatus(self::MANDATE_PENDING_INIT);
@@ -238,6 +252,81 @@ class BankAccount
     public function setIdentityLog($identityLog)
     {
         $this->identityLog = $identityLog;
+    }
+
+    public function getInitialNotificationDate()
+    {
+        return $this->initialNotificationDate;
+    }
+
+    public function setInitialNotificationDate(\DateTime $initialNotificationDate = null)
+    {
+        $this->initialNotificationDate = $initialNotificationDate;
+    }
+
+    public function getStandardNotificationDate()
+    {
+        return $this->standardNotificationDate;
+    }
+
+    public function setStandardNotificationDate(\DateTime $standardNotificationDate = null)
+    {
+        $this->standardNotificationDate = $standardNotificationDate;
+    }
+
+    public function allowedInitialProcessing(\DateTime $processingDate = null)
+    {
+        if (!$processingDate) {
+            $processingDate = new \DateTime();
+            $processingDate = $this->addBusinessDays($processingDate, 1);
+        }
+        $processingDate = $this->startOfDay($processingDate);
+
+        // Rule: Service users must collect the Direct Debit on or within 3 working days after the specified due date
+        // as advised to the payer on the advance notice.
+        $minAllowedDate = clone $this->getInitialNotificationDate();
+        $maxAllowedDate = clone $this->getInitialNotificationDate();
+        $maxAllowedDate = $this->addBusinessDays($maxAllowedDate, 3);
+        $maxAllowedDate = $this->startOfDay($maxAllowedDate);
+
+        $minDiff = $processingDate->diff($minAllowedDate);
+        $maxDiff = $processingDate->diff($maxAllowedDate);
+
+        return ($minDiff->days == 0 || $minDiff->invert == 1) && ($maxDiff->days == 0 || $maxDiff->invert == 0);
+    }
+
+    public function allowedStandardProcessing(\DateTime $processingDate = null)
+    {
+        if (!$processingDate) {
+            $processingDate = new \DateTime();
+            $processingDate = $this->addBusinessDays($processingDate, 1);
+        }
+        $processingDate = $this->startOfDay($processingDate);
+        $processingDay = $processingDate->format('j');
+
+        // Rule: Service users must collect the Direct Debit on or within 3 working days after the specified due date
+        // as advised to the payer on the advance notice.
+        $minAllowedDate = clone $this->getStandardNotificationDate();
+        $maxAllowedDate = clone $this->getStandardNotificationDate();
+        $maxAllowedDate = $this->addBusinessDays($maxAllowedDate, 3);
+        $maxAllowedDate = $this->startOfDay($maxAllowedDate);
+        $minAllowedDay = $minAllowedDate->format('j');
+        $maxAllowedDay = $maxAllowedDate->format('j');
+
+        // standard month
+        if ($maxAllowedDay > $minAllowedDay) {
+            return $processingDay >= $minAllowedDay && $processingDay <= $maxAllowedDay;
+        } else {
+            // example case: 28 -> 3; 30 > 28
+            if ($processingDay >= $minAllowedDay) {
+                return true;
+            } elseif ($processingDay <= $maxAllowedDay) {
+                // example case: 28 -> 3; 1 < 3
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
 
     public function getPaymentDate(\DateTime $date = null)

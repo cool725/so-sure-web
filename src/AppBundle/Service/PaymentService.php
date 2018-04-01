@@ -131,6 +131,10 @@ class PaymentService
     public function confirmBacs(Policy $policy, BacsPaymentMethod $bacsPaymentMethod)
     {
         $policy->getUser()->setPaymentMethod($bacsPaymentMethod);
+        $bacsPaymentMethod->getBankAccount()->setInitialNotificationDate(
+            $bacsPaymentMethod->getBankAccount()->getPaymentDate()
+        );
+        $bacsPaymentMethod->getBankAccount()->setStandardNotificationDate($policy->getBilling());
         $this->dm->flush();
 
         $this->mailer->sendTemplate(
