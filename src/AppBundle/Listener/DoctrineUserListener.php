@@ -9,6 +9,7 @@ use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 use AppBundle\Document\User;
 use AppBundle\Event\UserEvent;
 use AppBundle\Event\UserEmailEvent;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class DoctrineUserListener
@@ -16,9 +17,13 @@ class DoctrineUserListener
     /** @var EventDispatcher */
     protected $dispatcher;
 
-    public function __construct($dispatcher)
+    /** @var LoggerInterface */
+    protected $logger;
+
+    public function __construct($dispatcher, LoggerInterface $logger)
     {
         $this->dispatcher = $dispatcher;
+        $this->logger = $logger;
     }
 
     public function postPersist(LifecycleEventArgs $eventArgs)
@@ -88,25 +93,36 @@ class DoctrineUserListener
                 }
             }
 
-            $fields = [
-                'paymentMethod.bankAccount.sortCode',
-                'paymentMethod.bankAccount.accountNumber',
-            ];
-            foreach ($fields as $field) {
-                if ($eventArgs->hasChangedField($field) && strlen(trim($eventArgs->getOldValue($field))) > 0 &&
-                    $eventArgs->getOldValue($field) != $eventArgs->getNewValue($field)) {
-                    $accountName = $eventArgs->hasChangedField('paymentMethod.bankAccount.accountName') ?
-                        $eventArgs->getOldValue('paymentMethod.bankAccount.accountName') :
-                        $document->getPaymentMethod()->getBankAccount()->getAccountName();
-                    $sortCode = $eventArgs->hasChangedField('paymentMethod.bankAccount.sortCode') ?
-                        $eventArgs->getOldValue('paymentMethod.bankAccount.sortCode') :
-                        $document->getPaymentMethod()->getBankAccount()->getSortCode();
-                    $accountNumber = $eventArgs->hasChangedField('paymentMethod.bankAccount.accountNumber') ?
-                        $eventArgs->getOldValue('paymentMethod.bankAccount.accountNumber') :
-                        $document->getPaymentMethod()->getBankAccount()->getAccountNumber();
-                    $reference = $eventArgs->hasChangedField('paymentMethod.bankAccount.reference') ?
-                        $eventArgs->getOldValue('paymentMethod.bankAccount.reference') :
-                        $document->getPaymentMethod()->getBankAccount()->getReference();
+            if ($eventArgs->hasChangedField('paymentMethod')) {
+                /** @var BankAccount $oldBankAccount */
+                $oldBankAccount = $eventArgs->getOldValue('paymentMethod')->getBankAccount();
+                /** @var BankAccount $newBankAccount */
+                $newBankAccount = $eventArgs->getNewValue('paymentMethod')->getBankAccount();
+
+                $bankAccountUpdated = false;
+
+                $accountName = $document->getPaymentMethod()->getBankAccount()->getAccountName();
+                $accountNumber = $document->getPaymentMethod()->getBankAccount()->getAccountNumber();
+                $sortCode = $document->getPaymentMethod()->getBankAccount()->getSortCode();
+                $reference = $document->getPaymentMethod()->getBankAccount()->getReference();
+                if ($oldBankAccount->getAccountNumber() != $newBankAccount->getAccountNumber()) {
+                    $accountNumber = $oldBankAccount->getAccountNumber();
+                    $bankAccountUpdated = true;
+                }
+                if ($oldBankAccount->getSortCode() != $newBankAccount->getSortCode()) {
+                    $sortCode = $oldBankAccount->getSortCode();
+                    $bankAccountUpdated = true;
+                }
+                if ($oldBankAccount->getAccountName() != $newBankAccount->getAccountName()) {
+                    $accountName = $oldBankAccount->getAccountName();
+                    $bankAccountUpdated = true;
+                }
+                if ($oldBankAccount->getReference() != $newBankAccount->getReference()) {
+                    $reference = $oldBankAccount->getReference();
+                    $bankAccountUpdated = true;
+                }
+//throw new \Exception(sprintf('%s %s', $oldBankAccount->getSortCode(), $newBankAccount->getSortCode()));
+                if ($bankAccountUpdated) {
                     $bankAccount = BankAccount::create(
                         $accountName,
                         $sortCode,

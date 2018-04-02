@@ -661,6 +661,7 @@ services:
         class:   AppBundle\Listener\DoctrineUserListener
         arguments:
             - "@event_dispatcher"
+            - "@logger"
         tags:
             -  { name: doctrine_mongodb.odm.event_listener, event: postPersist }
             -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }

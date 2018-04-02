@@ -425,21 +425,26 @@ class BacsService
 
     public function queueCancelBankAccount(BankAccount $bankAccount, $id)
     {
-        $this->redis->lpush(self::KEY_BACS_CANCEL, json_encode([
-            'sortCode' => $bankAccount->getSortCode(),
-            'accountNumber' => $bankAccount->getAccountNumber(),
-            'accountName' => $bankAccount->getAccountName(),
-            'reference' => $bankAccount->getReference(),
-            'id' => $id,
-        ]));
+        $this->redis->hset(
+            self::KEY_BACS_CANCEL,
+            $bankAccount->getReference(),
+            json_encode([
+                'sortCode' => $bankAccount->getSortCode(),
+                'accountNumber' => $bankAccount->getAccountNumber(),
+                'accountName' => $bankAccount->getAccountName(),
+                'reference' => $bankAccount->getReference(),
+                'id' => $id,
+            ])
+        );
     }
 
     public function getBacsCancellations()
     {
         $cancellations = [];
-        while (($data = $this->redis->lpop(self::KEY_BACS_CANCEL)) !== null) {
+        foreach ($this->redis->hgetall(self::KEY_BACS_CANCEL) as $key => $data) {
             $cancellations[] = json_decode($data, true);
         }
+        $this->redis->del(self::KEY_BACS_CANCEL);
 
         return $cancellations;
     }
