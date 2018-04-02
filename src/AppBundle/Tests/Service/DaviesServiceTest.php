@@ -896,8 +896,8 @@ class DaviesServiceTest extends WebTestCase
         $claim = new Claim();
         $policy->addClaim($claim);
 
-        $tenDaysAgo = new \DateTime();
-        $tenDaysAgo = $tenDaysAgo->sub(new \DateInterval('P10D'));
+        $twelveDaysAgo = new \DateTime();
+        $twelveDaysAgo = $twelveDaysAgo->sub(new \DateInterval('P12D'));
         $daviesClaim = new DaviesClaim();
         $daviesClaim->claimNumber = 1;
         $daviesClaim->status = 'open';
@@ -912,7 +912,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->reserved = 0;
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone';
-        $daviesClaim->replacementReceivedDate = $tenDaysAgo;
+        $daviesClaim->replacementReceivedDate = $twelveDaysAgo;
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
         $daviesClaim->insuredName = 'Mr foo bar';
 
