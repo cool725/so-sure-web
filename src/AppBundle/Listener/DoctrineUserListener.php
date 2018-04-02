@@ -2,6 +2,7 @@
 
 namespace AppBundle\Listener;
 
+use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Event\BacsEvent;
 use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
@@ -95,11 +96,13 @@ class DoctrineUserListener
 
             if ($eventArgs->hasChangedField('paymentMethod')) {
                 /** @var BankAccount $oldBankAccount */
-                $oldBankAccount = $eventArgs->getOldValue('paymentMethod') ?
+                $oldBankAccount = $eventArgs->getOldValue('paymentMethod') &&
+                    $eventArgs->getOldValue('paymentMethod') instanceof BacsPaymentMethod ?
                     $eventArgs->getOldValue('paymentMethod')->getBankAccount() :
                     null;
                 /** @var BankAccount $newBankAccount */
-                $newBankAccount = $eventArgs->getNewValue('paymentMethod') ?
+                $newBankAccount = $eventArgs->getNewValue('paymentMethod') &&
+                    $eventArgs->getNewValue('paymentMethod') instanceof BacsPaymentMethod ?
                     $eventArgs->getNewValue('paymentMethod')->getBankAccount() :
                     null;
                 if ($oldBankAccount && $newBankAccount) {
