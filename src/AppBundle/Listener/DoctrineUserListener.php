@@ -95,42 +95,47 @@ class DoctrineUserListener
 
             if ($eventArgs->hasChangedField('paymentMethod')) {
                 /** @var BankAccount $oldBankAccount */
-                $oldBankAccount = $eventArgs->getOldValue('paymentMethod')->getBankAccount();
+                $oldBankAccount = $eventArgs->getOldValue('paymentMethod') ?
+                    $eventArgs->getOldValue('paymentMethod')->getBankAccount() :
+                    null;
                 /** @var BankAccount $newBankAccount */
-                $newBankAccount = $eventArgs->getNewValue('paymentMethod')->getBankAccount();
+                $newBankAccount = $eventArgs->getNewValue('paymentMethod') ?
+                    $eventArgs->getNewValue('paymentMethod')->getBankAccount() :
+                    null;
+                if ($oldBankAccount && $newBankAccount) {
+                    $bankAccountUpdated = false;
 
-                $bankAccountUpdated = false;
+                    $accountName = $document->getPaymentMethod()->getBankAccount()->getAccountName();
+                    $accountNumber = $document->getPaymentMethod()->getBankAccount()->getAccountNumber();
+                    $sortCode = $document->getPaymentMethod()->getBankAccount()->getSortCode();
+                    $reference = $document->getPaymentMethod()->getBankAccount()->getReference();
+                    if ($oldBankAccount->getAccountNumber() != $newBankAccount->getAccountNumber()) {
+                        $accountNumber = $oldBankAccount->getAccountNumber();
+                        $bankAccountUpdated = true;
+                    }
+                    if ($oldBankAccount->getSortCode() != $newBankAccount->getSortCode()) {
+                        $sortCode = $oldBankAccount->getSortCode();
+                        $bankAccountUpdated = true;
+                    }
+                    if ($oldBankAccount->getAccountName() != $newBankAccount->getAccountName()) {
+                        $accountName = $oldBankAccount->getAccountName();
+                        $bankAccountUpdated = true;
+                    }
+                    if ($oldBankAccount->getReference() != $newBankAccount->getReference()) {
+                        $reference = $oldBankAccount->getReference();
+                        $bankAccountUpdated = true;
+                    }
 
-                $accountName = $document->getPaymentMethod()->getBankAccount()->getAccountName();
-                $accountNumber = $document->getPaymentMethod()->getBankAccount()->getAccountNumber();
-                $sortCode = $document->getPaymentMethod()->getBankAccount()->getSortCode();
-                $reference = $document->getPaymentMethod()->getBankAccount()->getReference();
-                if ($oldBankAccount->getAccountNumber() != $newBankAccount->getAccountNumber()) {
-                    $accountNumber = $oldBankAccount->getAccountNumber();
-                    $bankAccountUpdated = true;
-                }
-                if ($oldBankAccount->getSortCode() != $newBankAccount->getSortCode()) {
-                    $sortCode = $oldBankAccount->getSortCode();
-                    $bankAccountUpdated = true;
-                }
-                if ($oldBankAccount->getAccountName() != $newBankAccount->getAccountName()) {
-                    $accountName = $oldBankAccount->getAccountName();
-                    $bankAccountUpdated = true;
-                }
-                if ($oldBankAccount->getReference() != $newBankAccount->getReference()) {
-                    $reference = $oldBankAccount->getReference();
-                    $bankAccountUpdated = true;
-                }
-//throw new \Exception(sprintf('%s %s', $oldBankAccount->getSortCode(), $newBankAccount->getSortCode()));
-                if ($bankAccountUpdated) {
-                    $bankAccount = BankAccount::create(
-                        $accountName,
-                        $sortCode,
-                        $accountNumber,
-                        $reference
-                    );
-                    $event = new BacsEvent($bankAccount, $document->getId());
-                    $this->dispatcher->dispatch(BacsEvent::EVENT_UPDATED, $event);
+                    if ($bankAccountUpdated) {
+                        $bankAccount = BankAccount::create(
+                            $accountName,
+                            $sortCode,
+                            $accountNumber,
+                            $reference
+                        );
+                        $event = new BacsEvent($bankAccount, $document->getId());
+                        $this->dispatcher->dispatch(BacsEvent::EVENT_UPDATED, $event);
+                    }
                 }
             }
         }
