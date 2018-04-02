@@ -187,7 +187,7 @@ class DoctrineUserListenerTest extends WebTestCase
 
     public function testPreUpdateBankAccountSameNumber()
     {
-        $user = $this->account('testPreUpdateBankAccountNumber');
+        $user = $this->account('testPreUpdateBankAccountSameNumber');
         $bacs = $user->getPaymentMethod();
 
         $listener = $this->createBacsEventListener(

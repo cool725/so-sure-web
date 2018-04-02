@@ -114,7 +114,8 @@ class BacsListenerTest extends WebTestCase
 
     public function testBankAccountChangedEvent()
     {
-        $this->assertEquals(0, count(self::$redis->lrange(BacsService::KEY_BACS_CANCEL, 0, -1)));
+        self::$redis->flushdb();
+        $this->assertEquals(0, self::$redis->hlen(BacsService::KEY_BACS_CANCEL));
         $bankAccount = new BankAccount();
         $bankAccount->setAccountName('f bar');
         $bankAccount->setAccountNumber('12345678');
@@ -124,7 +125,7 @@ class BacsListenerTest extends WebTestCase
 
         self::$bacsListener->onBankAccountChangedEvent($bacsEvent);
 
-        $this->assertEquals(1, count(self::$redis->lrange(BacsService::KEY_BACS_CANCEL, 0, -1)));
+        $this->assertEquals(1, self::$redis->hlen(BacsService::KEY_BACS_CANCEL));
         $cancellations = self::$bacsService->getBacsCancellations();
         $data = $cancellations[0];
         $this->assertEquals($bankAccount->getSortCode(), $data['sortCode']);
