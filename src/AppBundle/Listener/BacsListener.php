@@ -8,6 +8,7 @@ use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\User;
+use AppBundle\Event\BacsEvent;
 use AppBundle\Event\UserEvent;
 use AppBundle\Event\UserEmailEvent;
 use AppBundle\Service\BacsService;
@@ -69,5 +70,15 @@ class BacsListener
                 $this->bacsService->notifyMandateCancelledByNameChange($user);
             }
         }
+    }
+
+    /**
+     * @param BacsEvent $event
+     */
+    public function onBankAccountChangedEvent(BacsEvent $event)
+    {
+        $bankAccount = $event->getBankAccount();
+        $id = $event->getId();
+        $this->bacsService->queueCancelBankAccount($bankAccount, $id);
     }
 }

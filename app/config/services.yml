@@ -158,6 +158,7 @@ services:
             - "%accesspay_s3file_password%"
             - "%kernel.environment%"
             - "@app.mailer"
+            - "@snc_redis.default"
 
     app.push:
         class: AppBundle\Service\PushService
@@ -753,6 +754,7 @@ services:
             - "@app.bacs"
         tags:
             -  { name: kernel.event_listener, event: event.user.name.updated, method: onUserNameChangedEvent }
+            -  { name: kernel.event_listener, event: event.bacs.updated, method: onBankAccountChangedEvent }
 
     app.listener.debtCollection:
         class:   AppBundle\Listener\DebtCollectionListener

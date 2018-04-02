@@ -13,9 +13,18 @@ class BacsEvent extends Event
     /** @var BankAccount */
     protected $bankAccount;
 
-    public function __construct(BankAccount $bankAccount)
+    /** @var string */
+    protected $id;
+
+    public function __construct(BankAccount $bankAccount, $id)
     {
         $this->bankAccount = $bankAccount;
+        $this->id = $id;
+    }
+
+    public function getId()
+    {
+        return $this->id;
     }
 
     public function getBankAccount()

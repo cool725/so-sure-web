@@ -113,7 +113,7 @@ class DoctrineUserListener
                         $accountNumber,
                         $reference
                     );
-                    $event = new BacsEvent($bankAccount);
+                    $event = new BacsEvent($bankAccount, $document->getId());
                     $this->dispatcher->dispatch(BacsEvent::EVENT_UPDATED, $event);
                 }
             }

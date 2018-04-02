@@ -7,6 +7,7 @@ use AppBundle\Document\BankAccount;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Repository\UserRepository;
+use AppBundle\Service\BacsService;
 use AppBundle\Service\SequenceService;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -89,6 +90,13 @@ class BacsCommand extends BaseCommand
             $output->writeln($this->getHeader());
         }
         $data = [];
+
+        $output->writeln('Exporting Mandate Cancellations');
+        $mandateCancellations = $this->exportMandateCancellations($processingDate, $serialNumber);
+        $data['ddi-cancellations'] = count($mandateCancellations);
+        if ($debug) {
+            $output->writeln(json_encode($mandateCancellations, JSON_PRETTY_PRINT));
+        }
 
         $output->writeln('Exporting Mandates');
         $mandates = $this->exportMandates($processingDate, $serialNumber);
@@ -186,6 +194,34 @@ class BacsCommand extends BaseCommand
             ]);
             $paymentMethod->getBankAccount()->setMandateStatus(BankAccount::MANDATE_PENDING_APPROVAL);
             $paymentMethod->getBankAccount()->setMandateSerialNumber($serialNumber);
+        }
+
+        return $lines;
+    }
+
+    private function exportMandateCancellations(\DateTime $date, $serialNumber, $includeHeader = false)
+    {
+        /** @var BacsService $bacsService */
+        $bacsService = $this->getContainer()->get('app.bacs');
+        $cancellations = $bacsService->getBacsCancellations();
+        $lines = [];
+        if ($includeHeader) {
+            $lines[] = $this->getHeader();
+        }
+        foreach ($cancellations as $cancellation) {
+            $lines[] = implode(',', [
+                sprintf('"%s"', $date->format('d-m-y')),
+                '"Cancel Mandate"',
+                '"0C"', // new Auddis
+                sprintf('"%s"', $cancellation['accountName']),
+                sprintf('"%s"', $cancellation['sortCode']),
+                sprintf('"%s"', $cancellation['accountNumber']),
+                '"0"', // £0 for Addis setup
+                sprintf('"%s"', $cancellation['reference']),
+                sprintf('"%s"', $cancellation['id']),
+                '""',
+                '""',
+            ]);
         }
 
         return $lines;

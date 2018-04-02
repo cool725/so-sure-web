@@ -118,13 +118,23 @@ class DoctrineUserListenerTest extends WebTestCase
         $user->setPaymentMethod($bacs);
         $user->setEmail(static::generateEmail('testPreUpdateBankAccount', $this));
         static::$dm->persist($user);
-        $listener = $this->createBacsEventListener($bankAccount, $this->once(), BacsEvent::EVENT_UPDATED);
+        $listener = $this->createBacsEventListener(
+            $bankAccount,
+            $user->getId(),
+            $this->once(),
+            BacsEvent::EVENT_UPDATED
+        );
 
         $changeSet = ['paymentMethod.bankAccount.sortCode' => ['000099', '000098']];
         $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
         $listener->preUpdate($events);
 
-        $listener = $this->createBacsEventListener($bankAccount, $this->once(), BacsEvent::EVENT_UPDATED);
+        $listener = $this->createBacsEventListener(
+            $bankAccount,
+            $user->getId(),
+            $this->once(),
+            BacsEvent::EVENT_UPDATED
+        );
 
         $changeSet = ['paymentMethod.bankAccount.accountNumber' => ['12345678', '87654321']];
         $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
@@ -207,9 +217,9 @@ class DoctrineUserListenerTest extends WebTestCase
         return $listener;
     }
 
-    private function createBacsEventListener($bankAccount, $count, $eventType)
+    private function createBacsEventListener($bankAccount, $id, $count, $eventType)
     {
-        $event = new BacsEvent($bankAccount);
+        $event = new BacsEvent($bankAccount, $id);
 
         $dispatcher = $this->getMockBuilder('EventDispatcherInterface')
             ->setMethods(array('dispatch'))
