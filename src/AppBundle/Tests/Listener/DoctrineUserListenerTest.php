@@ -54,7 +54,7 @@ class DoctrineUserListenerTest extends WebTestCase
         $user = new User();
         $user->setEmail(static::generateEmail('pre', $this));
         static::$dm->persist($user);
-        $listener = new DoctrineUserListener(null);
+        $listener = new DoctrineUserListener(null, self::$container->get('logger'));
 
         $changeSet = ['confirmationToken' => ['123', null], 'passwordRequestedAt' => [new \DateTime(), null]];
         $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
@@ -319,7 +319,7 @@ class DoctrineUserListenerTest extends WebTestCase
                      ->method('dispatch')
                      ->with($eventType, $event);
 
-        $listener = new DoctrineUserListener($dispatcher);
+        $listener = new DoctrineUserListener($dispatcher, self::$container->get('logger'));
 
         return $listener;
     }
@@ -351,7 +351,7 @@ class DoctrineUserListenerTest extends WebTestCase
                      ->method('dispatch')
                      ->with($eventType, $event);
 
-        $listener = new DoctrineUserListener($dispatcher);
+        $listener = new DoctrineUserListener($dispatcher, self::$container->get('logger'));
 
         return $listener;
     }
