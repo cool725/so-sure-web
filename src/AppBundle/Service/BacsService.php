@@ -20,6 +20,7 @@ class BacsService
 {
     const S3_BUCKET = 'admin.so-sure.com';
     const SUN = '176198';
+    const KEY_BACS_CANCEL = 'bacs:cancel';
 
     const ADDACS_REASON_BANK = 0;
     const ADDACS_REASON_USER = 1;
@@ -51,6 +52,8 @@ class BacsService
     /** @var MailerService */
     protected $mailerService;
 
+    protected $redis;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
@@ -58,6 +61,7 @@ class BacsService
      * @param string          $fileEncryptionPassword
      * @param string          $environment
      * @param MailerService   $mailerService
+     * @param                 $redis
      */
     public function __construct(
         DocumentManager $dm,
@@ -65,7 +69,8 @@ class BacsService
         S3Client $s3,
         $fileEncryptionPassword,
         $environment,
-        MailerService $mailerService
+        MailerService $mailerService,
+        $redis
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -73,6 +78,7 @@ class BacsService
         $this->fileEncryptionPassword = $fileEncryptionPassword;
         $this->environment = $environment;
         $this->mailerService = $mailerService;
+        $this->redis = $redis;
     }
 
     public function processUpload(UploadedFile $file)
@@ -415,5 +421,31 @@ class BacsService
         $this->dm->flush();
 
         return true;
+    }
+
+    public function queueCancelBankAccount(BankAccount $bankAccount, $id)
+    {
+        $this->redis->hset(
+            self::KEY_BACS_CANCEL,
+            $bankAccount->getReference(),
+            json_encode([
+                'sortCode' => $bankAccount->getSortCode(),
+                'accountNumber' => $bankAccount->getAccountNumber(),
+                'accountName' => $bankAccount->getAccountName(),
+                'reference' => $bankAccount->getReference(),
+                'id' => $id,
+            ])
+        );
+    }
+
+    public function getBacsCancellations()
+    {
+        $cancellations = [];
+        foreach ($this->redis->hgetall(self::KEY_BACS_CANCEL) as $key => $data) {
+            $cancellations[] = json_decode($data, true);
+        }
+        $this->redis->del(self::KEY_BACS_CANCEL);
+
+        return $cancellations;
     }
 }

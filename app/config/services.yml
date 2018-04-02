@@ -158,6 +158,7 @@ services:
             - "%accesspay_s3file_password%"
             - "%kernel.environment%"
             - "@app.mailer"
+            - "@snc_redis.default"
 
     app.push:
         class: AppBundle\Service\PushService
@@ -660,6 +661,7 @@ services:
         class:   AppBundle\Listener\DoctrineUserListener
         arguments:
             - "@event_dispatcher"
+            - "@logger"
         tags:
             -  { name: doctrine_mongodb.odm.event_listener, event: postPersist }
             -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
@@ -753,6 +755,7 @@ services:
             - "@app.bacs"
         tags:
             -  { name: kernel.event_listener, event: event.user.name.updated, method: onUserNameChangedEvent }
+            -  { name: kernel.event_listener, event: event.bacs.updated, method: onBankAccountChangedEvent }
 
     app.listener.debtCollection:
         class:   AppBundle\Listener\DebtCollectionListener

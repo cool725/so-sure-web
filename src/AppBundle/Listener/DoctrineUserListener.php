@@ -2,11 +2,15 @@
 
 namespace AppBundle\Listener;
 
+use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\BankAccount;
+use AppBundle\Event\BacsEvent;
 use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 use AppBundle\Document\User;
 use AppBundle\Event\UserEvent;
 use AppBundle\Event\UserEmailEvent;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class DoctrineUserListener
@@ -14,9 +18,13 @@ class DoctrineUserListener
     /** @var EventDispatcher */
     protected $dispatcher;
 
-    public function __construct($dispatcher)
+    /** @var LoggerInterface */
+    protected $logger;
+
+    public function __construct($dispatcher, LoggerInterface $logger)
     {
         $this->dispatcher = $dispatcher;
+        $this->logger = $logger;
     }
 
     public function postPersist(LifecycleEventArgs $eventArgs)
@@ -83,6 +91,54 @@ class DoctrineUserListener
                     $eventArgs->getOldValue($field) != $eventArgs->getNewValue($field)) {
                     $event = new UserEvent($document);
                     $this->dispatcher->dispatch(UserEvent::EVENT_NAME_UPDATED, $event);
+                }
+            }
+
+            if ($eventArgs->hasChangedField('paymentMethod')) {
+                /** @var BankAccount $oldBankAccount */
+                $oldBankAccount = $eventArgs->getOldValue('paymentMethod') &&
+                    $eventArgs->getOldValue('paymentMethod') instanceof BacsPaymentMethod ?
+                    $eventArgs->getOldValue('paymentMethod')->getBankAccount() :
+                    null;
+                /** @var BankAccount $newBankAccount */
+                $newBankAccount = $eventArgs->getNewValue('paymentMethod') &&
+                    $eventArgs->getNewValue('paymentMethod') instanceof BacsPaymentMethod ?
+                    $eventArgs->getNewValue('paymentMethod')->getBankAccount() :
+                    null;
+                if ($oldBankAccount && $newBankAccount) {
+                    $bankAccountUpdated = false;
+
+                    $accountName = $document->getPaymentMethod()->getBankAccount()->getAccountName();
+                    $accountNumber = $document->getPaymentMethod()->getBankAccount()->getAccountNumber();
+                    $sortCode = $document->getPaymentMethod()->getBankAccount()->getSortCode();
+                    $reference = $document->getPaymentMethod()->getBankAccount()->getReference();
+                    if ($oldBankAccount->getAccountNumber() != $newBankAccount->getAccountNumber()) {
+                        $accountNumber = $oldBankAccount->getAccountNumber();
+                        $bankAccountUpdated = true;
+                    }
+                    if ($oldBankAccount->getSortCode() != $newBankAccount->getSortCode()) {
+                        $sortCode = $oldBankAccount->getSortCode();
+                        $bankAccountUpdated = true;
+                    }
+                    if ($oldBankAccount->getAccountName() != $newBankAccount->getAccountName()) {
+                        $accountName = $oldBankAccount->getAccountName();
+                        $bankAccountUpdated = true;
+                    }
+                    if ($oldBankAccount->getReference() != $newBankAccount->getReference()) {
+                        $reference = $oldBankAccount->getReference();
+                        $bankAccountUpdated = true;
+                    }
+
+                    if ($bankAccountUpdated) {
+                        $bankAccount = BankAccount::create(
+                            $accountName,
+                            $sortCode,
+                            $accountNumber,
+                            $reference
+                        );
+                        $event = new BacsEvent($bankAccount, $document->getId());
+                        $this->dispatcher->dispatch(BacsEvent::EVENT_UPDATED, $event);
+                    }
                 }
             }
         }

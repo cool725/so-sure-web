@@ -4,7 +4,9 @@ namespace AppBundle\Tests\Listener;
 
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
+use AppBundle\Event\BacsEvent;
 use AppBundle\Listener\BacsListener;
+use AppBundle\Service\BacsService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,8 +29,12 @@ class BacsListenerTest extends WebTestCase
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
     protected static $userRepo;
-    protected static $testUser;
-    protected static $testUser2;
+    protected static $redis;
+    /** @var BacsService */
+    protected static $bacsService;
+
+    /** @var BacsListener */
+    protected static $bacsListener;
 
     public static function setUpBeforeClass()
     {
@@ -44,6 +50,9 @@ class BacsListenerTest extends WebTestCase
         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         self::$userRepo = self::$dm->getRepository(User::class);
         self::$userManager = self::$container->get('fos_user.user_manager');
+        self::$bacsListener = self::$container->get('app.listener.bacs');
+        self::$redis = self::$container->get('snc_redis.default');
+        self::$bacsService = self::$container->get('app.bacs');
     }
 
     public function tearDown()
@@ -101,5 +110,28 @@ class BacsListenerTest extends WebTestCase
             BankAccount::MANDATE_SUCCESS,
             $updatedUser->getPaymentMethod()->getBankAccount()->getMandateStatus()
         );
+    }
+
+    public function testBankAccountChangedEvent()
+    {
+        self::$redis->flushdb();
+        $this->assertEquals(0, self::$redis->hlen(BacsService::KEY_BACS_CANCEL));
+        $bankAccount = new BankAccount();
+        $bankAccount->setAccountName('f bar');
+        $bankAccount->setAccountNumber('12345678');
+        $bankAccount->setSortCode('000099');
+        $bankAccount->setReference('123');
+        $bacsEvent = new BacsEvent($bankAccount, '9');
+
+        self::$bacsListener->onBankAccountChangedEvent($bacsEvent);
+
+        $this->assertEquals(1, self::$redis->hlen(BacsService::KEY_BACS_CANCEL));
+        $cancellations = self::$bacsService->getBacsCancellations();
+        $data = $cancellations[0];
+        $this->assertEquals($bankAccount->getSortCode(), $data['sortCode']);
+        $this->assertEquals($bankAccount->getAccountName(), $data['accountName']);
+        $this->assertEquals($bankAccount->getAccountNumber(), $data['accountNumber']);
+        $this->assertEquals($bankAccount->getReference(), $data['reference']);
+        $this->assertEquals('9', $data['id']);
     }
 }
