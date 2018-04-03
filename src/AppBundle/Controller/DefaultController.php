@@ -72,26 +72,17 @@ class DefaultController extends BaseController
             SixpackService::LOG_MIXPANEL_CONVERSION
         );
 
-
         $exp = $this->sixpack(
             $request,
             SixpackService::EXPERIMENT_MOBILE_SEARCH_DROPDOWN,
-            ['mobile-search', 'mobile-dropdown-search'],
-            SixpackService::LOG_MIXPANEL_ALL // keep consistent with running test; change for future
+            ['mobile-search', 'mobile-dropdown-search']
         );
-
-        $mobSearchDropdown = false;
-
-        if ($exp == 'mobile-dropdown-search') {
-            $mobSearchDropdown = true;
-        }
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         $data = array(
             // Make sure to check homepage landing below too
-            'exp_dropdown_search' => $mobSearchDropdown,
-            'select_phone_type'   => $exp == 'sticky-search' ? 'homepage-sticky' : 'homepage',
+            'exp_dropdown_search' => $exp,
             'referral'            => $referral,
             'phone'               => $this->getQuerystringPhone($request),
         );

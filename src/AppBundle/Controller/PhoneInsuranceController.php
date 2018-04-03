@@ -136,11 +136,11 @@ class PhoneInsuranceController extends BaseController
             ksort($phonesMem[$phone->getName()]['mem']);
         }
 
-        $exp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_MOBILE_SEARCH_DROPDOWN,
-            ['mobile-search', 'mobile-dropdown-search']
-        );
+        $template = 'AppBundle:PhoneInsurance:makeInsurance.html.twig';
+
+        if (in_array($request->get('_route'), ['insure_make'])) {
+             $template = 'AppBundle:PhoneInsurance:makeInsuranceBottom.html.twig';
+        }
 
         $event = MixpanelService::EVENT_MANUFACTURER_PAGE;
 
@@ -462,6 +462,10 @@ class PhoneInsuranceController extends BaseController
 
             $this->get('app.sixpack')->convert(
                 SixpackService::EXPERIMENT_HOMEPAGE_AA_V2
+            );
+
+            $this->get('app.sixpack')->convert(
+                SixpackService::EXPERIMENT_MOBILE_SEARCH_DROPDOWN
             );
         }
 
