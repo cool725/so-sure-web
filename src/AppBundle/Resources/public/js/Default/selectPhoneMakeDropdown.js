@@ -3,10 +3,11 @@ $(function(){
     if ($('.dropdown-phone-form').length) {
 
         // Phone data
-        var phones = $('#select-phone-data').data('phones');
+        var phones = $('[id^=select-phone-data]').data('phones');
 
         // Update the select
         var updateModels = function() {
+
             // Make value
             var make = $('.select-phone-make').val();
             var model = $('.select-phone-model');
@@ -83,25 +84,30 @@ $(function(){
         // When user selects option update results
         $('.select-phone-make').on('change', function(e) {
 
+            var form = $(this).closest('form').attr('id');
+
             // Update Models
             updateModels();
+
             if ($(this).val() != '') {
-                $('.select-phone-model').show()
+                $('#' + form).find('.select-phone-model').show()
             } else {
-                $('.select-phone-model').hide();
+                $('#' + form).find('.select-phone-model').hide();
             }
         });
 
         // When user selects option update results
         $('.select-phone-model').on('change', function(e) {
 
+            var form = $(this).closest('form').attr('id');
+
             // Update Memory
             updateMemory();
 
             if ($(this).val() != '') {
-                $('.select-phone-memory').show();
+                $('#' + form).find('.select-phone-memory').show();
             } else {
-                $('.select-phone-memory').hide();
+                $('#' + form).find('.select-phone-memory').hide();
             }
         });
 
@@ -112,10 +118,12 @@ $(function(){
             // var memOpt = $(this).children('option').not('[value=""]').size();
             // console.log(memOpt);
 
+            var form = $(this).closest('form').attr('id');
+
             if ($(this).val() != '') {
-                $('#launch_phone_next').show();
+                $('#' + form).find('.select-phone-btn').show();
             } else {
-                $('#launch_phone_next').hide()
+                $('#' + form).find('.select-phone-btn').hide()
             }
         });
 
