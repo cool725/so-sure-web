@@ -1313,7 +1313,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         return [
             'claims' => $pager->getCurrentPageResults(),
             'pager' => $pager,
-            'phones' => $dm->getRepository(Phone::class)->findActive()->getQuery()->execute(),
+            'phones' => $dm->getRepository(Phone::class)->findAll()->getQuery()->execute(),
             'claim_types' => Claim::$claimTypes,
             'form' => $form->createView(),
         ];
