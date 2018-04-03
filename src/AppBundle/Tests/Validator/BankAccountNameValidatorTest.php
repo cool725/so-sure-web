@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Validator;
 use AppBundle\Document\User;
 use AppBundle\Validator\Constraints\BankAccountName;
 use AppBundle\Validator\Constraints\BankAccountNameValidator;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -56,13 +57,40 @@ class BankAccountNameValidatorTest extends WebTestCase
         $user = new User();
         $user->setFirstName('foo');
         $user->setLastName('bar');
+
+        $validator->setLogger($this->configureLoggerWarning($this->never()));
         $this->assertTrue($validator->isAccountName('foo bar', $user));
+
+        $validator->setLogger($this->configureLoggerWarning($this->once()));
         $this->assertTrue($validator->isAccountName('f bar', $user));
+
+        $validator->setLogger($this->configureLoggerWarning($this->once()));
         $this->assertTrue($validator->isAccountName('bar', $user));
 
+        $validator->setLogger($this->configureLoggerWarning($this->never()));
         $this->assertFalse($validator->isAccountName('f', $user));
+
+        $validator->setLogger($this->configureLoggerWarning($this->never()));
         $this->assertFalse($validator->isAccountName('foobar', $user));
+
+        $validator->setLogger($this->configureLoggerWarning($this->never()));
         $this->assertFalse($validator->isAccountName('f barf', $user));
+    }
+
+    public function configureLoggerWarning($number)
+    {
+        // mock the violation builder
+        $builder = $this->getMockBuilder(LoggerInterface::class)
+            ->disableOriginalConstructor()
+            ->setMethods(array('warning', 'error', 'emergency', 'critical', 'notice', 'info', 'alert', 'debug', 'log'))
+            ->getMock()
+        ;
+
+        $builder->expects($number)
+            ->method('warning')
+        ;
+
+        return $builder;
     }
 
     public function configureValidator($expectedMessage = null)
