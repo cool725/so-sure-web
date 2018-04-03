@@ -61,6 +61,24 @@ class PhoneRepository extends DocumentRepository
         return $qb->getQuery()->execute();
     }
     
+    public function findActiveInactive()
+    {
+        $qb = $this->createQueryBuilder();
+        $qb->addAnd($qb->expr()->field('os')->in([
+            Phone::OS_CYANOGEN,
+            Phone::OS_ANDROID,
+            Phone::OS_IOS,
+            Phone::OS_WINDOWS,
+        ]));
+        $qb->addAnd($qb->expr()->field('make')->notEqual("ALL"));
+        $qb->addAnd($qb->expr()->field('phonePrices')->notEqual(null));
+        $qb->sort('make', 'asc')
+            ->sort('model', 'asc')
+            ->sort('memory', 'asc');
+
+        return $qb;
+    }
+
     public function alternatives(Phone $phone)
     {
         $qb = $this->createQueryBuilder();
