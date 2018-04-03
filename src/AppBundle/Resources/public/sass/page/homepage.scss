@@ -1185,7 +1185,7 @@
 
 .search-phone-form--sticky {
     position: fixed;
-    top: 55px; left: 0; right: 0;
+    top: 60px; left: 0; right: 0;
     z-index: 999;
 
     margin-left: 10px;
@@ -1240,7 +1240,8 @@
 }
 
 .dropdown-phone-form.search-phone-form--sticky {
-    background-color: $primary-blue;
+    top: 55px;
+    background-color: $black-opaque;
 
     @include border-bottom-radius(4px);
 }

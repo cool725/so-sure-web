@@ -88,8 +88,10 @@ $(function(){
             updateModels();
 
             if ($(this).val() != '') {
-                $('.select-phone-model').show()
+                // $(this).hide();
+                $('.select-phone-model').show();
             } else {
+                // $(this).show();
                 $('.select-phone-model').hide();
             }
         });
@@ -101,8 +103,10 @@ $(function(){
             updateMemory();
 
             if ($(this).val() != '') {
+                // $(this).hide();
                 $('.select-phone-memory').show();
             } else {
+                // $(this).show();
                 $('.select-phone-memory').hide();
             }
         });

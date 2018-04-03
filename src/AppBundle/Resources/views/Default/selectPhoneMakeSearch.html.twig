@@ -9,7 +9,6 @@
 {% set phonePath    = 'quote_phone' %}
 {% set pathSuffix   = '' %}
 {% set formID       = '' %}
-{% set stickySearch = true %}
 {% set formClass    = 'form-inline--homepage select-phone-form' %}
 
 {% if phone %}
@@ -28,9 +27,9 @@
     {% set uid    = '-2' %}
 {% endif %}
 
-<div id="select-phone-data{{ uid }}"
+<div id="select-phone-data"
      class="search-phone-form search-phone-form--homepage"
-     data-sticky-search="{{ stickySearch }}">
+     data-sticky-search="true">
 
     <form method="get"
           id="{{ formID }}{{ uid }}"
