@@ -11,6 +11,7 @@ use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
+use AppBundle\Repository\ScheduledPaymentRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use FOS\UserBundle\Mailer\Mailer;
 use Psr\Log\LoggerInterface;
@@ -79,6 +80,45 @@ class PaymentService
         $this->templating = $templating;
         $this->snappyPdf = $snappyPdf;
         $this->s3 = $s3;
+    }
+
+    public function getAllValidScheduledPaymentsForType($prefix, $type, \DateTime $scheduledDate = null)
+    {
+        $results = [];
+
+        /** @var ScheduledPaymentRepository $repo */
+        $repo = $this->dm->getRepository(ScheduledPayment::class);
+        $scheduledPayments = $repo->findScheduled($scheduledDate);
+        foreach ($scheduledPayments as $scheduledPayment) {
+            /** @var ScheduledPayment $scheduledPayment */
+            if (!$scheduledPayment->isBillable()) {
+                continue;
+            }
+            if (!$scheduledPayment->getPolicy()->isValidPolicy($prefix)) {
+                continue;
+            }
+            if (!$scheduledPayment->getPolicy()->getPayerOrUser()) {
+                $this->logger->warning(sprintf(
+                    'Policy %s/%s does not have a user (payer)',
+                    $scheduledPayment->getPolicy()->getPolicyNumber(),
+                    $scheduledPayment->getPolicy()->getId()
+                ));
+                continue;
+            }
+            if (!$scheduledPayment->getPolicy()->getPayerOrUser()->getPaymentMethod() instanceof $type) {
+                continue;
+            }
+            if (!$scheduledPayment->getPolicy()->getPayerOrUser()->hasValidPaymentMethod()) {
+                $this->logger->warning(sprintf(
+                    'User %s does not have a valid payment method',
+                    $scheduledPayment->getPolicy()->getPayerOrUser()->getId()
+                ));
+            }
+
+            $results[] = $scheduledPayment;
+        }
+
+        return $results;
     }
 
     public function scheduledPayment(

@@ -2,6 +2,8 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -105,28 +107,12 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
                 $this->displayScheduledPayment($scheduledPayment, $output);
             }
         } else {
-            $scheduledPayments = $repo->findScheduled();
+            $scheduledPayments = $paymentService->getAllValidScheduledPaymentsForType(
+                $prefix,
+                JudoPaymentMethod::class
+            );
             foreach ($scheduledPayments as $scheduledPayment) {
                 /** @var ScheduledPayment $scheduledPayment */
-                if (!$scheduledPayment->isBillable()) {
-                    $output->writeln(sprintf(
-                        'Skipping Scheduled Payment %s as policy is not billable',
-                        $scheduledPayment->getId()
-                    ));
-                    $this->displayScheduledPayment($scheduledPayment, $output);
-                    continue;
-                }
-                if (!$scheduledPayment->getPolicy()->isValidPolicy($prefix)) {
-                    $output->writeln(sprintf(
-                        'Skipping Scheduled Payment %s/%s as policy is not valid for prefix %s',
-                        $scheduledPayment->getPolicy()->getPolicyNumber(),
-                        $scheduledPayment->getId(),
-                        $prefix
-                    ));
-                    $this->displayScheduledPayment($scheduledPayment, $output);
-                    continue;
-                }
-
                 try {
                     if (!$show) {
                         $scheduledPayment = $paymentService->scheduledPayment($scheduledPayment, $prefix);

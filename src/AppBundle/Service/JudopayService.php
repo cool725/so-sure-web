@@ -1042,7 +1042,7 @@ class JudopayService
         if (!$amount) {
             $amount = $policy->getPremium()->getMonthlyPremiumPrice();
         }
-        $user = $policy->getPayer();
+        $user = $policy->getPayerOrUser();
 
         $payment = new JudoPayment();
         $payment->setAmount($amount);

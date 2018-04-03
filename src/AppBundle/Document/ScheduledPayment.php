@@ -18,6 +18,7 @@ class ScheduledPayment
     use CurrencyTrait;
 
     const STATUS_SCHEDULED = 'scheduled';
+    const STATUS_PENDING = 'pending';
     const STATUS_SUCCESS = 'success';
     const STATUS_FAILED = 'failed';
     const STATUS_CANCELLED = 'cancelled';
@@ -39,7 +40,7 @@ class ScheduledPayment
     protected $created;
 
     /**
-     * @Assert\Choice({"scheduled", "success", "failed", "cancelled"}, strict=true)
+     * @Assert\Choice({"scheduled", "success", "failed", "cancelled", "pending"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
