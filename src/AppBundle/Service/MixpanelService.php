@@ -222,7 +222,7 @@ class MixpanelService
                 if (isset($data['Campaign Name'])) {
                     $attribution->setCampaignName($this->conformAlphanumericSpaceDotPipe(
                         urldecode($data['Campaign Name']),
-                            250
+                        250
                     ));
                     $dataPresent = true;
                 }
