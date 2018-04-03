@@ -16,6 +16,11 @@ class BankAccountNameValidator extends ConstraintValidator
     /** @var LoggerInterface $logger */
     protected $logger;
 
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
     public function __construct(RequestService $requestService, LoggerInterface $logger)
     {
         $this->requestService = $requestService;
@@ -50,7 +55,7 @@ class BankAccountNameValidator extends ConstraintValidator
         if (preg_match('/\b('.$user->getLastName().')\b/i', $name)) {
             // manually verify cases where the first name isn't present
             // may want to check initials, etc in the future
-            if (preg_match('/\b('.$user->getFirstName().')\b/i', $name)) {
+            if (!preg_match('/\b('.$user->getFirstName().')\b/i', $name)) {
                 $this->logger->warning(sprintf(
                     'Validate Bank Account Name %s for User %s / %s',
                     $name,
