@@ -469,6 +469,7 @@ nelmio_security:
                 - https://js.intercomcdn.com
                 - https://*.fastly.net
                 - https://maxcdn.bootstrapcdn.com
+                - https://fonts.googleapis.com
                 - 'data:'
             child-src:
                 - 'self'
@@ -489,6 +490,7 @@ nelmio_security:
                 - https://syndication.twitter.com
                 - https://share.intercom.io
                 - https://intercom-sheets.com
+                - https://js.intercomcdn.com
                 - https://fast.wistia.net
             script-src:
                 - 'self'
@@ -792,6 +794,7 @@ nelmio_security:
                 - https://www.gstatic.com
                 - https://chart.googleapis.com
                 - https://bat.bing.com
+                - https://www.googletagmanager.com
                 # linkedin
                 - https://secure.adnxs.com
                 - https://*.bizographics.com
