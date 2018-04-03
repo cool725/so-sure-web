@@ -328,18 +328,13 @@
         <div class="container">
             <h2 class="text-center h1">Get Your Instant Quote</h2>
             {# Phone Search #}
-            {% if device_category() == 'Mobile' and exp_dropdown_search == 'mobile-dropdown-search' %}
-                {% set select_template = 'AppBundle:Default:selectPhoneMakeDropdown' %}
-            {% else %}
-                {% set select_template = 'AppBundle:Default:selectPhoneMakeSearch' %}
-            {% endif %}
             {% if phone is defined and phone %}
-                {{ render(controller(select_template, {
+                {{ render(controller('AppBundle:Default:selectPhoneMakeSearch', {
                     'type': 'footer',
                     'id': phone.id
                 })) }}
             {% else %}
-                {{ render(controller(select_template, {
+                {{ render(controller('AppBundle:Default:selectPhoneMakeSearch', {
                     'type': 'footer',
                 })) }}
             {% endif %}

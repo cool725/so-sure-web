@@ -3,7 +3,7 @@ $(function(){
     if ($('.dropdown-phone-form').length) {
 
         // Phone data
-        var phones = $('[id^=select-phone-data]').data('phones');
+        var phones = $('[id=select-phone-data]').data('phones');
 
         // Update the select
         var updateModels = function() {
@@ -84,30 +84,26 @@ $(function(){
         // When user selects option update results
         $('.select-phone-make').on('change', function(e) {
 
-            var form = $(this).closest('form').attr('id');
-
             // Update Models
             updateModels();
 
             if ($(this).val() != '') {
-                $('#' + form).find('.select-phone-model').show()
+                $('.select-phone-model').show()
             } else {
-                $('#' + form).find('.select-phone-model').hide();
+                $('.select-phone-model').hide();
             }
         });
 
         // When user selects option update results
         $('.select-phone-model').on('change', function(e) {
 
-            var form = $(this).closest('form').attr('id');
-
             // Update Memory
             updateMemory();
 
             if ($(this).val() != '') {
-                $('#' + form).find('.select-phone-memory').show();
+                $('.select-phone-memory').show();
             } else {
-                $('#' + form).find('.select-phone-memory').hide();
+                $('.select-phone-memory').hide();
             }
         });
 
@@ -118,12 +114,10 @@ $(function(){
             // var memOpt = $(this).children('option').not('[value=""]').size();
             // console.log(memOpt);
 
-            var form = $(this).closest('form').attr('id');
-
             if ($(this).val() != '') {
-                $('#' + form).find('.select-phone-btn').show();
+                $('.select-phone-btn').show();
             } else {
-                $('#' + form).find('.select-phone-btn').hide()
+                $('.select-phone-btn').hide()
             }
         });
 

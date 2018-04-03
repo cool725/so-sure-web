@@ -9,7 +9,7 @@
 {% set phonePath    = 'quote_phone' %}
 {% set pathSuffix   = '' %}
 {% set formID       = '' %}
-{% set stickySearch = false %}
+{% set stickySearch = true %}
 {% set formClass    = 'form-inline--homepage select-phone-form' %}
 
 {% if phone %}
@@ -21,7 +21,7 @@
     {% set uid    = '-1' %}
 {% elseif type is defined and type == 'homepage-sticky' %}
     {% set formID = 'search-phone-form-homepage' %}
-    {% set uid    = '-1' %}
+    {# {% set uid    = '-1' %} #}
     {% set stickySearch = true %}
 {% elseif type is defined and type == 'footer' %}
     {% set formID    = 'search-phone-form-footer' %}

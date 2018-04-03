@@ -24,7 +24,7 @@ $(function(){
     // Sticky Search - Homepage only
     function stickySearch() {
         var windowTop  = $(window).scrollTop();
-        var searchBox  = $('#select-phone-data-1');
+        var searchBox  = $('#select-phone-data');
         var offsetTop  = $('.homepage--hero').height();
         var hitPoint   = $('.homepage--instant-quote').offset().top;
 
@@ -35,7 +35,11 @@ $(function(){
         }
     }
 
-    if ($('#select-phone-data-1').data('sticky-search') == true) {
+    if ($('#select-phone-data').data('sticky-search') == true) {
+        $(window).scroll(stickySearch);
+    }
+
+    if ($('#select-phone-data').data('sticky-search') == true) {
         $(window).scroll(stickySearch);
     }
 
