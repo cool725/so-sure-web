@@ -1108,6 +1108,15 @@ class UserController extends BaseController
         }
 
         $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
+
+        // for initial testing, allow selected so-sure users to access bacs
+        if (!$bacsFeature && in_array($user->getEmailCanonical(), [
+            'patrick@urg.name',
+            'nickwaller@outlook.com',
+        ])) {
+            $bacsFeature = true;
+        }
+
         // For now, only allow 1 policy with bacs
         if ($bacsFeature && count($user->getValidPolicies(true)) > 1) {
             $bacsFeature = false;
