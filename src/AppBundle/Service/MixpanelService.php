@@ -1,6 +1,8 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Validator\Constraints\AlphanumericSpaceDotPipeValidator;
+use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -188,6 +190,20 @@ class MixpanelService
         return $this->attributionByUser($user);
     }
 
+    protected function conformAlphanumericSpaceDotPipe($value, $length)
+    {
+        $validator = new AlphanumericSpaceDotPipeValidator();
+
+        return $validator->conform(substr($value, 0, $length));
+    }
+
+    protected function conformAlphanumericSpaceDot($value, $length)
+    {
+        $validator = new AlphanumericSpaceDotValidator();
+
+        return $validator->conform(substr($value, 0, $length));
+    }
+
     public function attributionByUser(User $user = null)
     {
         $data = null;
@@ -204,23 +220,38 @@ class MixpanelService
                 $attribution = new Attribution();
                 $dataPresent = false;
                 if (isset($data['Campaign Name'])) {
-                    $attribution->setCampaignName(urldecode($data['Campaign Name']));
+                    $attribution->setCampaignName($this->conformAlphanumericSpaceDotPipe(
+                        urldecode($data['Campaign Name']),
+                            250
+                    ));
                     $dataPresent = true;
                 }
                 if (isset($data['Campaign Source'])) {
-                    $attribution->setCampaignSource(urldecode($data['Campaign Source']));
+                    $attribution->setCampaignSource($this->conformAlphanumericSpaceDot(
+                        urldecode($data['Campaign Source']),
+                        250
+                    ));
                     $dataPresent = true;
                 }
                 if (isset($data['Campaign Medium'])) {
-                    $attribution->setCampaignMedium(urldecode($data['Campaign Medium']));
+                    $attribution->setCampaignMedium($this->conformAlphanumericSpaceDot(
+                        urldecode($data['Campaign Medium']),
+                        250
+                    ));
                     $dataPresent = true;
                 }
                 if (isset($data['Campaign Term'])) {
-                    $attribution->setCampaignTerm(urldecode($data['Campaign Term']));
+                    $attribution->setCampaignTerm($this->conformAlphanumericSpaceDot(
+                        urldecode($data['Campaign Term']),
+                        250
+                    ));
                     $dataPresent = true;
                 }
                 if (isset($data['Campaign Content'])) {
-                    $attribution->setCampaignContent(urldecode($data['Campaign Content']));
+                    $attribution->setCampaignContent($this->conformAlphanumericSpaceDot(
+                        urldecode($data['Campaign Content']),
+                        250
+                    ));
                     $dataPresent = true;
                 }
                 if (isset($data['Referer'])) {
