@@ -13,10 +13,21 @@ use AppBundle\Validator\Constraints as AppAssert;
  */
 class BacsPayment extends Payment
 {
-    public function __construct()
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
+    protected $manual;
+
+    public function isManual()
     {
-        parent::__construct();
-        $this->setSuccess(true);
+        return $this->manual;
+    }
+
+    public function setManual($manual)
+    {
+        $this->manual = $manual;
     }
 
     public function isSuccess()

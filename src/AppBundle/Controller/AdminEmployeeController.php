@@ -444,6 +444,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->getForm();
         $bacsPayment = new BacsPayment();
         $bacsPayment->setSource(Payment::SOURCE_ADMIN);
+        $bacsPayment->setManual(true);
+        $bacsPayment->setSuccess(true);
         $bacsPayment->setDate(new \DateTime());
         $bacsPayment->setAmount($policy->getPremium()->getYearlyPremiumPrice());
 
