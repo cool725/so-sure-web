@@ -55,5 +55,8 @@ class SixpackListener
         $this->sixpack->convert(
             SixpackService::EXPERIMENT_MONEY_UNBOUNCE
         );
+        $this->sixpack->convert(
+            SixpackService::EXPERIMENT_CPC_QUOTE_HOMEPAGE
+        );
     }
 }
