@@ -267,6 +267,7 @@ class PolicyService
         Phone $phone,
         $imei,
         $serialNumber,
+        $modelNumber,
         IdentityLog $identityLog = null,
         $phoneData = null
     ) {
@@ -291,6 +292,7 @@ class PolicyService
             $policy->setPhone($phone);
             $policy->setImei($imei);
             $policy->setSerialNumber($serialNumber);
+            $policy->setModelNumber($modelNumber);
             $policy->setIdentityLog($identityLog);
             $policy->setPhoneData($phoneData);
 

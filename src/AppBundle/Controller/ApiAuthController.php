@@ -485,6 +485,8 @@ class ApiAuthController extends BaseController
                 $serialNumber = $imei;
             }
 
+            $modelNumber = $this->getDataString($phonePolicyData, 'model_number');
+
             try {
                 // Device/memory/serial/rooted were not present in initial version of app.
                 // TODO: Add app version to request and if app version > number, then require instead of optional
@@ -513,6 +515,7 @@ class ApiAuthController extends BaseController
                 $phone,
                 $imei,
                 $serialNumber,
+                $modelNumber,
                 $this->getIdentityLog($request),
                 json_encode([
                     'make' => $this->getDataString($phonePolicyData, 'make'),
