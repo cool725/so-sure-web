@@ -1233,16 +1233,22 @@ class PhonePolicyTest extends WebTestCase
 
         $this->assertFalse($policyA->isFullyPaid());
         $bacs = new BacsPayment();
+        $bacs->setManual(true);
+        $bacs->setSuccess(true);
         $bacs->setAmount($policyA->getPremium()->getMonthlyPremiumPrice());
         $policyA->addPayment($bacs);
         $this->assertFalse($policyA->isFullyPaid());
 
         $bacs = new BacsPayment();
+        $bacs->setManual(true);
+        $bacs->setSuccess(true);
         $bacs->setAmount($policyA->getPremium()->getMonthlyPremiumPrice() * 11);
         $policyA->addPayment($bacs);
         $this->assertTrue($policyA->isFullyPaid());
 
         $bacs = new BacsPayment();
+        $bacs->setManual(true);
+        $bacs->setSuccess(true);
         $bacs->setAmount($policyA->getPremium()->getMonthlyPremiumPrice());
         $policyA->addPayment($bacs);
         $this->assertTrue($policyA->isFullyPaid());
@@ -1275,12 +1281,18 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($policyC->isCancelledAndPaymentOwed());
 
         $bacsA = new BacsPayment();
+        $bacsA->setManual(true);
+        $bacsA->setSuccess(true);
         $bacsA->setAmount($policyA->getPremium()->getMonthlyPremiumPrice());
         $policyA->addPayment($bacsA);
         $bacsB = new BacsPayment();
+        $bacsB->setManual(true);
+        $bacsB->setSuccess(true);
         $bacsB->setAmount($policyB->getPremium()->getMonthlyPremiumPrice());
         $policyB->addPayment($bacsB);
         $bacsC = new BacsPayment();
+        $bacsC->setManual(true);
+        $bacsC->setSuccess(true);
         $bacsC->setAmount($policyC->getPremium()->getMonthlyPremiumPrice());
         $policyC->addPayment($bacsC);
 
@@ -1302,12 +1314,18 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($policyC->isCancelledAndPaymentOwed());
 
         $bacsA = new BacsPayment();
+        $bacsA->setManual(true);
+        $bacsA->setSuccess(true);
         $bacsA->setAmount($policyA->getPremium()->getMonthlyPremiumPrice() * 11);
         $policyA->addPayment($bacsA);
         $bacsB = new BacsPayment();
+        $bacsB->setManual(true);
+        $bacsB->setSuccess(true);
         $bacsB->setAmount($policyB->getPremium()->getMonthlyPremiumPrice() * 11);
         $policyB->addPayment($bacsB);
         $bacsC = new BacsPayment();
+        $bacsC->setManual(true);
+        $bacsC->setSuccess(true);
         $bacsC->setAmount($policyC->getPremium()->getMonthlyPremiumPrice() * 11);
         $policyC->addPayment($bacsC);
 

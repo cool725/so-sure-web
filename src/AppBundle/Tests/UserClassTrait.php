@@ -292,6 +292,8 @@ trait UserClassTrait
     public static function addBacsPayment($policy, $amount, $commission, $date = null)
     {
         $payment = new BacsPayment();
+        $payment->setManual(true);
+        $payment->setSuccess(true);
         $payment->setAmount($amount);
         $payment->setTotalCommission($commission);
         if ($date) {
