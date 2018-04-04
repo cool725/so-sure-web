@@ -1239,13 +1239,17 @@
     }
 }
 
-.dropdown-phone-form #close-sticky {
+.dropdown-phone-form #reset-sticky {
     display: none;
 }
 
 .dropdown-phone-form.search-phone-form--sticky {
     top: 55px;
-    background-color: $primary-blue;
+    background-color: $white-opaque;
 
     @include border-bottom-radius(4px);
+
+    // .dropdown-phone-form #reset-sticky {
+    //     display: none;
+    // }
 }

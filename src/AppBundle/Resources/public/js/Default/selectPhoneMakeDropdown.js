@@ -81,11 +81,11 @@ $(function(){
             var model = $('.select-phone-model');
             var memory = $('.select-phone-memory');
 
-            // make.empty();
+            make.val('');
             model.empty().hide();
             memory.empty().hide();
-            $('.select-phone-memory').hide();
-            $('#close-sticky').hide();
+            $('.select-phone-btn').hide();
+            $('#reset-sticky').hide();
 
             updateModels();
         }
@@ -97,10 +97,8 @@ $(function(){
             updateModels();
 
             if ($(this).val() != '') {
-                // $(this).hide();
                 $('.select-phone-model').show();
             } else {
-                // $(this).show();
                 $('.select-phone-model').hide();
             }
         });
@@ -112,10 +110,8 @@ $(function(){
             updateMemory();
 
             if ($(this).val() != '') {
-                // $(this).hide();
                 $('.select-phone-memory').show();
             } else {
-                // $(this).show();
                 $('.select-phone-memory').hide();
             }
         });
@@ -129,7 +125,7 @@ $(function(){
 
             if ($(this).val() != '') {
                 $('.select-phone-btn').show();
-                $('#close-sticky').css('display', 'block');
+                $('#reset-sticky').css('display', 'block');
             } else {
                 $('.select-phone-btn').hide()
             }
@@ -137,7 +133,7 @@ $(function(){
 
         updateModels();
 
-        $('#close-sticky').click(function(e) {
+        $('#reset-sticky').click(function(e) {
             e.preventDefault();
             resetAll();
         });
