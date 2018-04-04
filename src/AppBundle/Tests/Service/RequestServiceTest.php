@@ -33,6 +33,29 @@ class RequestServiceTest extends WebTestCase
     {
     }
 
+    public function testGetDeviceOS()
+    {
+        $this->assertEquals(
+            'iOS',
+            self::$requestService->getDeviceOS('Mozilla/5.0 (iPhone; CPU iPhone OS 10_2_1 like Mac OS X) AppleWebKit/602.4.6 (KHTML, like Gecko) Version/10.0 Mobile/14D27 Safari/602.1')
+        );
+
+        $this->assertEquals(
+            'Android',
+            self::$requestService->getDeviceOS('Mozilla/5.0 (Linux; Android 7.0; SAMSUNG SM-G950F Build/NRD90M) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/5.2 Chrome/51.0.2704.106 Mobile Safari/537.36')
+        );
+
+        $this->assertEquals(
+            'Mac OS X',
+            self::$requestService->getDeviceOS('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/534.57.2 (KHTML,  like Gecko) Version/5.1.7 Safari/534.57.2')
+        );
+
+        $this->assertEquals(
+            'Windows 7',
+            self::$requestService->getDeviceOS('Mozilla/5.0 (Windows; U; Windows NT 6.1; sv-SE) AppleWebKit/533.19.4 (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4')
+        );
+    }
+
     public function testIsExcludedAnalyticsUserAgentBlank()
     {
         $this->assertFalse(self::$requestService->isExcludedAnalyticsUserAgent(''));

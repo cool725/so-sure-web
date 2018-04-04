@@ -174,6 +174,33 @@ class RequestService
         }
     }
 
+    public function getDeviceOS($userAgent = null)
+    {
+        if (!$userAgent) {
+            $userAgent = $this->getUserAgent();
+        }
+
+        if (!$userAgent) {
+            return null;
+        }
+
+        $parser = Parser::create();
+        $userAgentDetails = $parser->parse($userAgent);
+
+        return $userAgentDetails->os->family;
+        /*
+        if ($this->mobileDetect) {
+            foreach (Mobile_Detect::getOperatingSystems() as $operatingSystem) {
+                if ($this->mobileDetect->is($operatingSystem)) {
+                    return $operatingSystem;
+                }
+            }
+        }
+
+        return null;
+        */
+    }
+
     public function getTrackingId()
     {
         if ($request = $this->requestStack->getCurrentRequest()) {
