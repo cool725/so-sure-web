@@ -22,6 +22,10 @@
     {% set formID = 'search-phone-form-homepage' %}
     {# {% set uid    = '-1' %} #}
     {% set stickySearch = true %}
+{% elseif type == 'purchase-select' %}
+    {% set basePath = '/select-phone-search/purchase-select/' %}
+{% elseif type == 'purchase-change' %}
+    {% set basePath = '/select-phone-search/purchase-change/' %}
 {% elseif type is defined and type == 'footer' %}
     {% set formID    = 'search-phone-form-footer' %}
     {% set uid    = '-2' %}
