@@ -35,6 +35,7 @@ class RequestServiceTest extends WebTestCase
 
     public function testGetDeviceOS()
     {
+        // @codingStandardsIgnoreStart
         $this->assertEquals(
             'iOS',
             self::$requestService->getDeviceOS('Mozilla/5.0 (iPhone; CPU iPhone OS 10_2_1 like Mac OS X) AppleWebKit/602.4.6 (KHTML, like Gecko) Version/10.0 Mobile/14D27 Safari/602.1')
@@ -54,6 +55,7 @@ class RequestServiceTest extends WebTestCase
             'Windows 7',
             self::$requestService->getDeviceOS('Mozilla/5.0 (Windows; U; Windows NT 6.1; sv-SE) AppleWebKit/533.19.4 (KHTML, like Gecko) Version/5.0.3 Safari/533.19.4')
         );
+        // @codingStandardsIgnoreEnd
     }
 
     public function testIsExcludedAnalyticsUserAgentBlank()
