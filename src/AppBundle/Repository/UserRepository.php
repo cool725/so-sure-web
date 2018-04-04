@@ -3,6 +3,8 @@
 namespace AppBundle\Repository;
 
 use AppBundle\Document\Address;
+use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\BankAccount;
 use AppBundle\Document\User;
 use AppBundle\Document\PhoneTrait;
 use Doctrine\ODM\MongoDB\DocumentRepository;
@@ -44,9 +46,9 @@ class UserRepository extends DocumentRepository
         }
 
         return $qb
-            ->getQuery()
-            ->execute()
-            ->count() > 0;
+                ->getQuery()
+                ->execute()
+                ->count() > 0;
     }
 
     public function getDuplicateUsers(User $user = null, $email = null, $facebookId = null, $mobileNumber = null)
@@ -72,8 +74,8 @@ class UserRepository extends DocumentRepository
         }
 
         return $qb
-                ->getQuery()
-                ->execute();
+            ->getQuery()
+            ->execute();
     }
 
     public function existsAnotherUser(User $user = null, $email = null, $facebookId = null, $mobileNumber = null)
@@ -112,6 +114,10 @@ class UserRepository extends DocumentRepository
         } elseif ($user->getPaymentMethod() instanceof GocardlessPaymentMethod) {
             $accountHashes = $user->getPaymentMethod() ? $user->getPaymentMethod()->getAccountHashes() : ['NotAHash'];
             $qb->field('paymentMethod.accountHashes')->in($accountHashes);
+        } elseif ($user->getPaymentMethod() instanceof BacsPaymentMethod) {
+            $accountHash = $user->getPaymentMethod()->getBankAccount() ?
+                $user->getPaymentMethod()->getBankAccount()->getHashedAccount() : 'NotAHash';
+            $qb->field('paymentMethod.bankAccount.hashedAccount')->equals($accountHash);
         } else {
             throw new \Exception('User is missing a payment type');
         }
@@ -141,5 +147,13 @@ class UserRepository extends DocumentRepository
         return $qb
             ->getQuery()
             ->execute();
+    }
+
+    public function findPendingMandates()
+    {
+        $qb = $this->createQueryBuilder()
+            ->field('paymentMethod.bankAccount.mandateStatus')->equals(BankAccount::MANDATE_PENDING_APPROVAL);
+
+        return $qb;
     }
 }

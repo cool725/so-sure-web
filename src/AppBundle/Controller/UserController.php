@@ -1108,6 +1108,15 @@ class UserController extends BaseController
         }
 
         $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
+
+        // for initial testing, allow selected so-sure users to access bacs
+        if (!$bacsFeature && in_array($user->getEmailCanonical(), [
+            'patrick@urg.name',
+            'nickwaller@outlook.com',
+        ])) {
+            $bacsFeature = true;
+        }
+
         // For now, only allow 1 policy with bacs
         if ($bacsFeature && count($user->getValidPolicies(true)) > 1) {
             $bacsFeature = false;
@@ -1180,11 +1189,14 @@ class UserController extends BaseController
             } elseif ($request->request->has('bacs_confirm_form')) {
                 $bacsConfirmForm->handleRequest($request);
                 if ($bacsConfirmForm->isValid()) {
-                    $paymentService->confirmBacs($policy, $bacsConfirm->transformBacsPaymentMethod());
+                    $paymentService->confirmBacs(
+                        $policy,
+                        $bacsConfirm->transformBacsPaymentMethod($this->getIdentityLogWeb($request))
+                    );
 
                     $this->addFlash(
                         'success',
-                        'Your bacs is now setup.'
+                        'Your direct debit is now setup. You will receive an email confirmation shortly.'
                     );
 
                     return $this->redirectToRoute('user_payment_details_policy', ['policyId' => $policyId]);

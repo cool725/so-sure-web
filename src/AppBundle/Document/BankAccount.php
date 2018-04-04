@@ -23,6 +23,7 @@ class BankAccount
     const MANDATE_PENDING_APPROVAL = 'pending-approval';
     const MANDATE_SUCCESS = 'success';
     const MANDATE_FAILURE = 'failure';
+    const MANDATE_CANCELLED = 'cancelled';
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
@@ -30,6 +31,7 @@ class BankAccount
      * @Assert\Length(min="1", max="100")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
+     * @var string
      */
     protected $accountName;
 
@@ -38,6 +40,7 @@ class BankAccount
      * @Assert\Length(min="1", max="100")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
+     * @var string
      */
     protected $bankName;
 
@@ -46,6 +49,7 @@ class BankAccount
      * @MongoDB\Field(type="string")
      * @Assert\Length(min="6", max="6")
      * @Gedmo\Versioned
+     * @var string
      */
     protected $sortCode;
 
@@ -55,6 +59,7 @@ class BankAccount
      * @MongoDB\Field(type="string")
      * @Assert\Length(min="8", max="8")
      * @Gedmo\Versioned
+     * @var string
      */
     protected $accountNumber;
 
@@ -63,21 +68,73 @@ class BankAccount
      * @MongoDB\Field(type="string")
      * @Assert\Length(min="6", max="18")
      * @Gedmo\Versioned
+     * @var string
      */
     protected $reference;
 
     /**
-     * @Assert\Choice({"pending-init", "pending-approval", "success", "failure"}, strict=true)
+     * @Assert\Choice({"pending-init", "pending-approval", "success", "failure", "cancelled"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
+     * @var string
      */
     protected $mandateStatus;
 
     /**
+     * @AppAssert\Token()
+     * @Assert\Length(min="1", max="10")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     * @var string
+     */
+    protected $mandateSerialNumber;
+
+    /**
      * @MongoDB\EmbedOne(targetDocument="Address")
      * @Gedmo\Versioned
+     * @var Address
      */
     protected $bankAddress;
+
+    /**
+     * @AppAssert\Token()
+     * @MongoDB\Field(type="string")
+     * @Assert\Length(min="8", max="256")
+     * @Gedmo\Versioned
+     * @var string
+     */
+    protected $hashedAccount;
+
+    /**
+     * @MongoDB\EmbedOne(targetDocument="IdentityLog")
+     * @Gedmo\Versioned
+     * @var IdentityLog
+     */
+    protected $identityLog;
+
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     * @Gedmo\Versioned
+     * @var \DateTime
+     */
+    protected $initialNotificationDate;
+
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     * @Gedmo\Versioned
+     * @var \DateTime
+     */
+    protected $standardNotificationDate;
+
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     * @var boolean
+     */
+    protected $firstPayment;
 
     public function __construct()
     {
@@ -107,6 +164,7 @@ class BankAccount
     public function setSortCode($sortCode)
     {
         $this->sortCode = $this->normalizeSortCode($sortCode);
+        $this->generateHashedAccount();
     }
 
     public function getSortCode()
@@ -117,6 +175,7 @@ class BankAccount
     public function setAccountNumber($accountNumber)
     {
         $this->accountNumber = $this->normalizeAccountNumber($accountNumber);
+        $this->generateHashedAccount();
     }
 
     public function getAccountNumber()
@@ -132,6 +191,23 @@ class BankAccount
     public function getBankAddress()
     {
         return $this->bankAddress;
+    }
+
+    public function getHashedAccount()
+    {
+        return $this->hashedAccount;
+    }
+
+    public function setHashedAccount($hashedAccount)
+    {
+        $this->hashedAccount = $hashedAccount;
+    }
+
+    public function generateHashedAccount()
+    {
+        $this->setHashedAccount(
+            sha1(sprintf("%s%s", $this->getSortCode(), $this->getAccountNumber()))
+        );
     }
 
     public function isValid($transformed = true)
@@ -164,6 +240,7 @@ class BankAccount
     {
         $reference = sprintf('%s5%010d', strtoupper(substr($user->getLastName(), 0, 1)), $sequence);
         $this->setReference($reference);
+        $this->setFirstPayment(true);
 
         return $reference;
     }
@@ -176,6 +253,120 @@ class BankAccount
     public function setMandateStatus($mandateStatus)
     {
         $this->mandateStatus = $mandateStatus;
+    }
+
+    public function getMandateSerialNumber()
+    {
+        return $this->mandateSerialNumber;
+    }
+
+    public function setMandateSerialNumber($serialNumber)
+    {
+        $this->mandateSerialNumber = $serialNumber;
+    }
+
+    public function getIdentityLog()
+    {
+        return $this->identityLog;
+    }
+
+    public function setIdentityLog($identityLog)
+    {
+        $this->identityLog = $identityLog;
+    }
+
+    public function getInitialNotificationDate()
+    {
+        return $this->initialNotificationDate;
+    }
+
+    public function setInitialNotificationDate(\DateTime $initialNotificationDate = null)
+    {
+        $this->initialNotificationDate = $initialNotificationDate;
+    }
+
+    public function getStandardNotificationDate()
+    {
+        return $this->standardNotificationDate;
+    }
+
+    public function setStandardNotificationDate(\DateTime $standardNotificationDate = null)
+    {
+        $this->standardNotificationDate = $standardNotificationDate;
+    }
+
+    public function isFirstPayment()
+    {
+        return $this->firstPayment;
+    }
+
+    public function setFirstPayment($firstPayment)
+    {
+        $this->firstPayment = $firstPayment;
+    }
+
+    public function allowedProcessing(\DateTime $processingDate = null)
+    {
+        if ($this->isFirstPayment()) {
+            return $this->allowedInitialProcessing($processingDate);
+        } else {
+            return $this->allowedStandardProcessing($processingDate);
+        }
+    }
+
+    public function allowedInitialProcessing(\DateTime $processingDate = null)
+    {
+        if (!$processingDate) {
+            $processingDate = new \DateTime();
+            $processingDate = $this->addBusinessDays($processingDate, 1);
+        }
+        $processingDate = $this->startOfDay($processingDate);
+
+        // Rule: Service users must collect the Direct Debit on or within 3 working days after the specified due date
+        // as advised to the payer on the advance notice.
+        $minAllowedDate = clone $this->getInitialNotificationDate();
+        $maxAllowedDate = clone $this->getInitialNotificationDate();
+        $maxAllowedDate = $this->addBusinessDays($maxAllowedDate, 3);
+        $maxAllowedDate = $this->startOfDay($maxAllowedDate);
+
+        $minDiff = $processingDate->diff($minAllowedDate);
+        $maxDiff = $processingDate->diff($maxAllowedDate);
+
+        return ($minDiff->days == 0 || $minDiff->invert == 1) && ($maxDiff->days == 0 || $maxDiff->invert == 0);
+    }
+
+    public function allowedStandardProcessing(\DateTime $processingDate = null)
+    {
+        if (!$processingDate) {
+            $processingDate = new \DateTime();
+            $processingDate = $this->addBusinessDays($processingDate, 1);
+        }
+        $processingDate = $this->startOfDay($processingDate);
+        $processingDay = $processingDate->format('j');
+
+        // Rule: Service users must collect the Direct Debit on or within 3 working days after the specified due date
+        // as advised to the payer on the advance notice.
+        $minAllowedDate = clone $this->getStandardNotificationDate();
+        $maxAllowedDate = clone $this->getStandardNotificationDate();
+        $maxAllowedDate = $this->addBusinessDays($maxAllowedDate, 3);
+        $maxAllowedDate = $this->startOfDay($maxAllowedDate);
+        $minAllowedDay = $minAllowedDate->format('j');
+        $maxAllowedDay = $maxAllowedDate->format('j');
+
+        // standard month
+        if ($maxAllowedDay > $minAllowedDay) {
+            return $processingDay >= $minAllowedDay && $processingDay <= $maxAllowedDay;
+        } else {
+            // example case: 28 -> 3; 30 > 28
+            if ($processingDay >= $minAllowedDay) {
+                return true;
+            } elseif ($processingDay <= $maxAllowedDay) {
+                // example case: 28 -> 3; 1 < 3
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
 
     public function getPaymentDate(\DateTime $date = null)
@@ -204,5 +395,16 @@ class BankAccount
             $this->getDisplayableSortCode(),
             $this->getDisplayableAccountNumber()
         );
+    }
+
+    public static function create($accountName, $sortCode, $accountNumber, $reference)
+    {
+        $bankAccount = new BankAccount();
+        $bankAccount->setAccountNumber($accountNumber);
+        $bankAccount->setSortCode($sortCode);
+        $bankAccount->setAccountName($accountName);
+        $bankAccount->setReference($reference);
+
+        return $bankAccount;
     }
 }

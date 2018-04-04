@@ -2,6 +2,9 @@
 
 namespace AppBundle\Tests\Listener;
 
+use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\BankAccount;
+use AppBundle\Event\BacsEvent;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\Container;
@@ -51,7 +54,7 @@ class DoctrineUserListenerTest extends WebTestCase
         $user = new User();
         $user->setEmail(static::generateEmail('pre', $this));
         static::$dm->persist($user);
-        $listener = new DoctrineUserListener(null);
+        $listener = new DoctrineUserListener(null, self::$container->get('logger'));
 
         $changeSet = ['confirmationToken' => ['123', null], 'passwordRequestedAt' => [new \DateTime(), null]];
         $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
@@ -72,6 +75,177 @@ class DoctrineUserListenerTest extends WebTestCase
         $listener->preUpdate($events);
 
         $this->assertTrue(count($events->getDocument()->getPreviousPasswords()) > 0);
+    }
+
+    public function testPreUpdateName()
+    {
+        $user = new User();
+        $user->setEmail(static::generateEmail('testPreUpdateName', $this));
+        static::$dm->persist($user);
+        $listener = $this->createUserEventListener($user, $this->never(), UserEvent::EVENT_NAME_UPDATED);
+
+        $changeSet = ['firstName' => ['a', 'a']];
+        $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
+        $listener->preUpdate($events);
+
+        $listener = $this->createUserEventListener($user, $this->once(), UserEvent::EVENT_NAME_UPDATED);
+
+        $changeSet = ['firstName' => ['a', 'b']];
+        $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
+        $listener->preUpdate($events);
+
+        $listener = $this->createUserEventListener($user, $this->never(), UserEvent::EVENT_NAME_UPDATED);
+
+        $changeSet = ['lastName' => ['a', 'a']];
+        $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
+        $listener->preUpdate($events);
+
+        $listener = $this->createUserEventListener($user, $this->once(), UserEvent::EVENT_NAME_UPDATED);
+
+        $changeSet = ['lastName' => ['a', 'b']];
+        $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
+        $listener->preUpdate($events);
+    }
+
+    private function account($email)
+    {
+        $user = new User();
+        $bankAccount = new BankAccount();
+        $bankAccount->setSortCode('000099');
+        $bankAccount->setAccountNumber('12345678');
+        $bacs = new BacsPaymentMethod();
+        $bacs->setBankAccount($bankAccount);
+        $user->setPaymentMethod($bacs);
+        $user->setEmail(static::generateEmail($email, $this));
+        static::$dm->persist($user);
+
+        return $user;
+    }
+
+    public function testPreUpdateBankAccountSortCode()
+    {
+        $user = $this->account('testPreUpdateBankAccountSortCode');
+        $bacs = $user->getPaymentMethod();
+
+        $listener = $this->createBacsEventListener(
+            $bacs->getBankAccount(),
+            $user->getId(),
+            $this->once(),
+            BacsEvent::EVENT_UPDATED
+        );
+
+        $updatedBacs = clone $bacs;
+        $updatedBankAccount = clone $bacs->getBankAccount();
+        $updatedBankAccount->setSortCode('000098');
+        $updatedBacs->setBankAccount($updatedBankAccount);
+        $changeSet = ['paymentMethod' => [$bacs, $updatedBacs]];
+        $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
+        $listener->preUpdate($events);
+    }
+
+    public function testPreUpdateBankAccountSameSortCode()
+    {
+        $user = $this->account('testPreUpdateBankAccountSameSortCode');
+        $bacs = $user->getPaymentMethod();
+
+        $listener = $this->createBacsEventListener(
+            $bacs->getBankAccount(),
+            $user->getId(),
+            $this->never(),
+            BacsEvent::EVENT_UPDATED
+        );
+
+        $updatedBacs = clone $bacs;
+        $updatedBankAccount = clone $bacs->getBankAccount();
+        $updatedBankAccount->setSortCode('000099');
+        $updatedBacs->setBankAccount($updatedBankAccount);
+        $changeSet = ['paymentMethod' => [$bacs, $updatedBacs]];
+        $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
+        $listener->preUpdate($events);
+    }
+
+    public function testPreUpdateBankAccountNumber()
+    {
+        $user = $this->account('testPreUpdateBankAccountNumber');
+        $bacs = $user->getPaymentMethod();
+
+        $listener = $this->createBacsEventListener(
+            $bacs->getBankAccount(),
+            $user->getId(),
+            $this->once(),
+            BacsEvent::EVENT_UPDATED
+        );
+
+        $updatedBacs = clone $bacs;
+        $updatedBankAccount = clone $bacs->getBankAccount();
+        $updatedBankAccount->setAccountNumber('87654321');
+        $updatedBacs->setBankAccount($updatedBankAccount);
+        $changeSet = ['paymentMethod' => [$bacs, $updatedBacs]];
+        $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
+        $listener->preUpdate($events);
+    }
+
+    public function testPreUpdateBankAccountSameNumber()
+    {
+        $user = $this->account('testPreUpdateBankAccountSameNumber');
+        $bacs = $user->getPaymentMethod();
+
+        $listener = $this->createBacsEventListener(
+            $bacs->getBankAccount(),
+            $user->getId(),
+            $this->never(),
+            BacsEvent::EVENT_UPDATED
+        );
+
+        $updatedBacs = clone $bacs;
+        $updatedBankAccount = clone $bacs->getBankAccount();
+        $updatedBankAccount->setAccountNumber('12345678');
+        $updatedBacs->setBankAccount($updatedBankAccount);
+        $changeSet = ['paymentMethod' => [$bacs, $updatedBacs]];
+        $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
+        $listener->preUpdate($events);
+    }
+
+    public function testPreUpdateBankAccountReference()
+    {
+        $user = $this->account('testPreUpdateBankAccountReference');
+        $bacs = $user->getPaymentMethod();
+
+        $listener = $this->createBacsEventListener(
+            $bacs->getBankAccount(),
+            $user->getId(),
+            $this->once(),
+            BacsEvent::EVENT_UPDATED
+        );
+
+        $updatedBacs = clone $bacs;
+        $updatedBankAccount = clone $bacs->getBankAccount();
+        $updatedBankAccount->setReference('999');
+        $updatedBacs->setBankAccount($updatedBankAccount);
+        $changeSet = ['paymentMethod' => [$bacs, $updatedBacs]];
+        $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
+        $listener->preUpdate($events);
+    }
+
+    public function testPreUpdateBankAccountName()
+    {
+        $user = $this->account('testPreUpdateBankAccountName');
+        $bacs = $user->getPaymentMethod();
+
+        $listener = $this->createBacsEventListener(
+            $bacs->getBankAccount(),
+            $user->getId(),
+            $this->once(),
+            BacsEvent::EVENT_UPDATED
+        );
+
+        $updatedBacs = clone $bacs;
+        $updatedBankAccount = clone $bacs->getBankAccount();
+        $updatedBankAccount->setAccountName('a boo');
+        $updatedBacs->setBankAccount($updatedBankAccount);
+        $changeSet = ['paymentMethod' => [$bacs, $updatedBacs]];
+        $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
+        $listener->preUpdate($events);
     }
 
     public function testPostUpdate()
@@ -145,7 +319,23 @@ class DoctrineUserListenerTest extends WebTestCase
                      ->method('dispatch')
                      ->with($eventType, $event);
 
-        $listener = new DoctrineUserListener($dispatcher);
+        $listener = new DoctrineUserListener($dispatcher, self::$container->get('logger'));
+
+        return $listener;
+    }
+
+    private function createBacsEventListener($bankAccount, $id, $count, $eventType)
+    {
+        $event = new BacsEvent($bankAccount, $id);
+
+        $dispatcher = $this->getMockBuilder('EventDispatcherInterface')
+            ->setMethods(array('dispatch'))
+            ->getMock();
+        $dispatcher->expects($count)
+            ->method('dispatch')
+            ->with($eventType, $event);
+
+        $listener = new DoctrineUserListener($dispatcher, self::$container->get('logger'));
 
         return $listener;
     }
@@ -161,7 +351,7 @@ class DoctrineUserListenerTest extends WebTestCase
                      ->method('dispatch')
                      ->with($eventType, $event);
 
-        $listener = new DoctrineUserListener($dispatcher);
+        $listener = new DoctrineUserListener($dispatcher, self::$container->get('logger'));
 
         return $listener;
     }

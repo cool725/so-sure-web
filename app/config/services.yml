@@ -97,6 +97,10 @@ services:
             - "@app.sequence"
             - "@app.mailer"
             - "%kernel.environment%"
+            - "@app.fraud"
+            - "@templating"
+            - "@knp_snappy.pdf"
+            - "@aws.s3"
 
     app.barclays:
         class: AppBundle\Service\BarclaysService
@@ -144,6 +148,17 @@ services:
             - "@app.router"
             - "@app.shortlink"
             - "@app.branch"
+
+    app.bacs:
+        class: AppBundle\Service\BacsService
+        arguments:
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "@aws.s3"
+            - "%accesspay_s3file_password%"
+            - "%kernel.environment%"
+            - "@app.mailer"
+            - "@snc_redis.default"
 
     app.push:
         class: AppBundle\Service\PushService
@@ -646,6 +661,7 @@ services:
         class:   AppBundle\Listener\DoctrineUserListener
         arguments:
             - "@event_dispatcher"
+            - "@logger"
         tags:
             -  { name: doctrine_mongodb.odm.event_listener, event: postPersist }
             -  { name: doctrine_mongodb.odm.event_listener, event: preUpdate  }
@@ -729,6 +745,17 @@ services:
             -  { name: kernel.event_listener, event: event.user.updated, method: onUserUpdatedEvent }
             -  { name: kernel.event_listener, event: event.user.email.changed, method: onUserEmailChangedEvent }
             -  { name: kernel.event_listener, event: event.user.password.changed, method: onUserPasswordChangedEvent }
+
+    app.listener.bacs:
+        class:   AppBundle\Listener\BacsListener
+        arguments:
+            - "@doctrine_mongodb.odm.default_document_manager"
+            - "@logger"
+            - "@app.validator.bankaccountname"
+            - "@app.bacs"
+        tags:
+            -  { name: kernel.event_listener, event: event.user.name.updated, method: onUserNameChangedEvent }
+            -  { name: kernel.event_listener, event: event.bacs.updated, method: onBankAccountChangedEvent }
 
     app.listener.debtCollection:
         class:   AppBundle\Listener\DebtCollectionListener
@@ -902,6 +929,17 @@ services:
     app.form.type.phonemake:
         class: AppBundle\Form\Type\PhoneMakeType
         arguments: ["@doctrine_mongodb.odm.default_document_manager", "%form_required%"]
+        tags:
+            - { name: form.type }
+
+    app.form.type.bacsuploadfile:
+        class: AppBundle\Form\Type\BacsUploadFileType
+        tags:
+            - { name: form.type }
+
+    app.form.type.mandates:
+        class: AppBundle\Form\Type\BacsMandatesType
+        arguments: ["@doctrine_mongodb.odm.default_document_manager"]
         tags:
             - { name: form.type }
 

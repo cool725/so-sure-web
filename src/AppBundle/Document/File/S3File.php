@@ -26,7 +26,11 @@ use AppBundle\Validator\Constraints as AppAssert;
  *      "imeiUpload"="ImeiUploadFile",
  *      "brightstar"="BrightstarFile",
  *      "picsure"="PicSureFile",
- *      "accesspay"="AccessPayFile"
+ *      "accesspay"="AccessPayFile",
+ *      "bacsReportAddacs"="BacsReportAddacsFile",
+ *      "bacsReportAuddis"="BacsReportAuddisFile",
+ *      "bacsReportInput"="BacsReportInputFile",
+ *      "ddNotification"="DirectDebitNotificationFile"
  * })
  * @Gedmo\Loggable
  */

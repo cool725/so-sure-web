@@ -1,0 +1,29 @@
+{% extends 'AppBundle:Email:base.html.twig' %}
+{% import "AppBundle:Email:macros.html.twig" as macros %}
+{% block title %}Your Recent Name Change{% endblock %}
+{% block body %}
+	{{ macros.start_table() }}
+	<h1>
+	   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+	</h1>
+	<div style="font-size: 14px; text-align: left;">
+	   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+	   <div style="font-size: 14px; text-align: center;">
+           <span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+               Hi {{ user.name }},<br><br>
+               You recently changed your name on your so-sure policy.
+			   <br><br>
+			   As part of our security measures, we require that our direct debit bank accounts match our policy
+			   holder names. Due to your name change, this is no longer the case with your policy
+			   and so we have had to cancel your existing direct debit.
+			   <br><br>
+			   You can easily setup your direct debit again (or switch to debit/credit card payments)
+			   by logging into your account at https://wearesosure.com.
+			   <br><br>
+			   Alternatively, if you are in the middle of a name change and your bank account is still in your previous name,
+			   please do let us know and we can re-enable direct debit (we may need a document or two).
+           </span>
+	   </div>
+	</div>
+	{{ macros.end_table() }}
+{% endblock %}

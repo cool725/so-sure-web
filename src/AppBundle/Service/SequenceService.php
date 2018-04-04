@@ -17,6 +17,9 @@ class SequenceService
     const SEQUENCE_BACS_REFERENCE = 'bacs-reference';
     const SEQUENCE_BACS_REFERENCE_INVALID = 'bacs-reference-invalid';
 
+    const SEQUENCE_BACS_SERIAL_NUMBER = 'bacs-serial-number';
+    const SEQUENCE_BACS_SERIAL_NUMBER_INVALID = 'bacs-serial-number-invalid';
+
     /** @var DocumentManager */
     protected $dm;
 

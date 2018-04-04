@@ -16,6 +16,11 @@ class BankAccountNameValidator extends ConstraintValidator
     /** @var LoggerInterface $logger */
     protected $logger;
 
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
     public function __construct(RequestService $requestService, LoggerInterface $logger)
     {
         $this->requestService = $requestService;
@@ -40,13 +45,17 @@ class BankAccountNameValidator extends ConstraintValidator
         // if the user isn't present, probably a non-session access - eg. backend task, so we don't want to trigger
         if (!$user) {
             return null;
+        } elseif ($user->hasEmployeeRole()) {
+            // in order to upload addacs files which may invalidate the mandates, we need to be able to avoid
+            // triggering this validator as will be updating an account that isn't theirs
+            return null;
         }
 
         // last name must be in the account name
-        if (stripos($name, strtolower($user->getLastName())) !== false) {
+        if (preg_match('/\b('.$user->getLastName().')\b/i', $name)) {
             // manually verify cases where the first name isn't present
             // may want to check initials, etc in the future
-            if (stripos($name, strtolower($user->getFirstName())) === false) {
+            if (!preg_match('/\b('.$user->getFirstName().')\b/i', $name)) {
                 $this->logger->warning(sprintf(
                     'Validate Bank Account Name %s for User %s / %s',
                     $name,

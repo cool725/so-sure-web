@@ -68,6 +68,8 @@ class EmailDebugCommand extends BaseCommand
         $templates = [
             'bacs' => [
                 'bacs/notification',
+                'bacs/mandateCancelled',
+                'bacs/mandateCancelledNameChange',
             ],
             'cashback' => [
                 'cashback/approved-reduced',
@@ -110,6 +112,9 @@ class EmailDebugCommand extends BaseCommand
             ],
         ];
         $variations = [
+            'bacs' => [
+                'cancelledClaimed',
+            ],
             'policyRenewal' => [
                 'potIncrease',
                 'potDecrease',
@@ -150,6 +155,7 @@ class EmailDebugCommand extends BaseCommand
             $data = [
                 'user' => $user,
                 'policy' => $user->getLatestPolicy(),
+                'claimed' => $variation == 'cancelledClaimed' ? true : false,
             ];
         } elseif (in_array($template, $templates['cashback'])) {
             $dm = $this->getManager();

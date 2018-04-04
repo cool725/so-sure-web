@@ -2,9 +2,16 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Form\Type\BacsMandatesType;
+use AppBundle\Form\Type\BacsUploadFileType;
+use AppBundle\Repository\File\S3FileRepository;
+use AppBundle\Service\BacsService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -65,6 +72,7 @@ use AppBundle\Form\Type\LloydsFileType;
 use AppBundle\Form\Type\PendingPolicyCancellationType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Pagerfanta\Pagerfanta;
@@ -518,10 +526,10 @@ class AdminController extends BaseController
 
     /**
      * @Route("/bacs", name="admin_bacs")
-     * @Route("/bacs/{year}/{month}", name="admin_bacs_date")
+     * @Route("/bacs/{year}/{month}", name="admin_bacs_date", requirements={"year":"[0-9]{4,4}","month":"[0-9]{1,2}"})
      * @Template
      */
-    public function bacsAction($year = null, $month = null)
+    public function bacsAction(Request $request, $year = null, $month = null)
     {
         $now = new \DateTime();
         if (!$year) {
@@ -535,11 +543,96 @@ class AdminController extends BaseController
         $dm = $this->getManager();
         $s3FileRepo = $dm->getRepository(S3File::class);
 
+        /** @var BacsService $bacs */
+        $bacs = $this->get('app.bacs');
+        $uploadForm = $this->get('form.factory')
+            ->createNamedBuilder('upload', BacsUploadFileType::class)
+            ->getForm();
+        $mandatesForm = $this->get('form.factory')
+            ->createNamedBuilder('mandates', BacsMandatesType::class)
+            ->getForm();
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('upload')) {
+                $uploadForm->handleRequest($request);
+                if ($uploadForm->isSubmitted() && $uploadForm->isValid()) {
+                    $file = $uploadForm->getData()['file'];
+                    if ($bacs->processUpload($file)) {
+                        $this->addFlash(
+                            'success',
+                            'Successfully uploaded & processed file'
+                        );
+                    } else {
+                        $this->addFlash(
+                            'error',
+                            'Unable to process file - see rollbar error message'
+                        );
+                    }
+
+                    return new RedirectResponse($this->generateUrl('admin_bacs_date', [
+                        'year' => $year,
+                        'month' => $month
+                    ]));
+                }
+            } elseif ($request->request->has('mandates')) {
+                $mandatesForm->handleRequest($request);
+                if ($mandatesForm->isSubmitted() && $mandatesForm->isValid()) {
+                    $serialNumber = $mandatesForm->getData()['serialNumber'];
+                    if ($bacs->approveMandates($serialNumber)) {
+                        $this->addFlash(
+                            'success',
+                            'Successfully approved mandates'
+                        );
+                    } else {
+                        $this->addFlash(
+                            'error',
+                            'Unable to approve mandates'
+                        );
+                    }
+
+                    return new RedirectResponse($this->generateUrl('admin_bacs_date', [
+                        'year' => $year,
+                        'month' => $month
+                    ]));
+                }
+            }
+        }
+
         return [
             'year' => $year,
             'month' => $month,
             'files' => $s3FileRepo->getAllFiles($date, 'accesspay'),
+            'addacs' => $s3FileRepo->getAllFiles($date, 'bacsReportAddacs'),
+            'auddis' => $s3FileRepo->getAllFiles($date, 'bacsReportAuddis'),
+            'input' => $s3FileRepo->getAllFiles($date, 'bacsReportInput'),
+            'uploadForm' => $uploadForm->createView(),
+            'mandatesForm' => $mandatesForm->createView(),
         ];
+    }
+
+    /**
+     * @Route("/bacs/file/{id}", name="admin_bacs_file")
+     */
+    public function bacsFileAction($id)
+    {
+        $dm = $this->getManager();
+        /** @var S3FileRepository $repo */
+        $repo = $dm->getRepository(S3File::class);
+        $s3File = $repo->find($id);
+        if (!$s3File) {
+            throw new NotFoundHttpException();
+        }
+
+        /** @var BacsService $bacs */
+        $bacs = $this->get('app.bacs');
+
+        $file = $bacs->downloadS3($s3File);
+        return StreamedResponse::create(
+            function () use ($file) {
+                readfile($file);
+            },
+            200,
+            array('Content-Type' => 'text/xml')
+        );
     }
 
     /**
