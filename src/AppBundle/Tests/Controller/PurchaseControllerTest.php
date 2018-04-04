@@ -878,7 +878,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     private function changePhone($phone)
     {
-        $crawler = self::$client->request('GET', sprintf('/select-phone-v2/purchase-change/%s', $phone->getId()));
+        $crawler = self::$client->request('GET', sprintf('/select-phone-search/purchase-change/%s', $phone->getId()));
         $crawler = self::$client->followRedirect();
 
         return $crawler;
@@ -992,7 +992,7 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', '/purchase/');
         $data = self::$client->getResponse();
         $this->assertEquals(200, $data->getStatusCode());
-        self::verifySearchFormData($crawler->filter('form'), '/select-phone/purchase-change/', 1);
+        self::verifySearchFormData($crawler->filter('form'), '/select-phone-search/purchase-change/', 1);
     }
 
     public function testPhoneSearchUserInvalidPolicy()
