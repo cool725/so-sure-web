@@ -120,7 +120,7 @@ class BacsCommand extends BaseCommand
             $output->writeln(json_encode($payments, JSON_PRETTY_PRINT));
         }
 
-        $lines = array_merge($mandates, $payments);
+        $lines = array_merge($mandateCancellations, $mandates, $payments);
         if (count($lines) == 0) {
             $output->writeln('No data present. Skipping upload(s)');
             $skipSftp = true;
