@@ -1,0 +1,62 @@
+{% set uid = '' %}
+{% set formId = 'dropdown-phone-form' %}
+{% set buttonText = 'Quote me' %}
+
+{% if type is defined and type == 'purchase-select' %}
+    {% set buttonText = 'Select Phone' %}
+{% elseif type is defined and type == 'purchase-change' %}
+    {% set buttonText = 'Select Phone' %}
+{% elseif type is defined and type == 'homepage-sticky' %}
+    {% set uid = '-1' %}
+    {% set formId = 'dropdown-phone-form' ~ uid %}
+{% elseif type is defined and type == 'footer' %}
+    {% set uid = '-2' %}
+    {% set formId = 'dropdown-phone-form' ~ uid %}
+{% else %}
+    {% set buttonText = 'Quote me' %}
+{% endif %}
+
+<div id="select-phone-data"
+     class="dropdown-phone-form"
+     data-phones='{{ phones|json_encode|raw }}'
+     data-sticky-search="true">
+
+    {{ form_start(form_phone, { 'attr': { 'id': formId }}) }}
+    <div class="form-group">
+        <span id="phone" class="h4"></span>
+    </div>
+    <div class="form-group">
+        {{ form_widget(form_phone.make, {
+          'separator': '',
+          'attr': {
+            'class': 'select-phone-make form-control animated pulse'
+        }}) }}
+    </div>
+    <div class="form-group">
+        {{ form_widget(form_phone.model, {
+          'attr': {
+            'class': 'select-phone-model form-control animated pulse',
+            'style': 'display:none;'
+        }}) }}
+    </div>
+    <div class="form-group">
+        {{ form_widget(form_phone.memory, {
+            'attr': {
+                'class': 'select-phone-memory form-control animated pulse',
+                'style': 'display:none;'
+            }}) }}
+    </div>
+    <div class="form-group">
+        {{ form_widget(form_phone.next, {
+          'label': buttonText,
+          'attr': {
+            'class': 'btn btn-green btn-block btn-pad animated pulse select-phone-btn',
+            'style': 'display:none;'
+        }}) }}
+    </div>
+    {{ form_end(form_phone) }}
+
+    <div class="form-group">
+        <a id="reset-sticky" href="#" class="btn btn-link btn-block"><i class="fa fa-undo" aria-hidden="true"></i> reset</a>
+    </div>
+</div>

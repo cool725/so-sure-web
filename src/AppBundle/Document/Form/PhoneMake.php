@@ -18,6 +18,16 @@ class PhoneMake
     /**
      * @var string
      */
+    protected $model;
+
+    /**
+     * @var string
+     */
+    protected $memory;
+
+    /**
+     * @var string
+     */
     protected $phoneId;
 
     public function getMake()
@@ -30,13 +40,33 @@ class PhoneMake
         $this->make = $make;
     }
 
-    public function getPhoneId()
+    public function setModel($model)
     {
-        return $this->phoneId;
+        $this->model = $model;
+    }
+
+    public function getModel()
+    {
+        return $this->model;
+    }
+
+    public function setMemory($memory)
+    {
+        $this->memory = $memory;
+    }
+
+    public function getMemory()
+    {
+        return $this->memory;
     }
 
     public function setPhoneId($phoneId)
     {
         $this->phoneId = $phoneId;
+    }
+
+    public function getPhoneId()
+    {
+        return $this->phoneId;
     }
 }

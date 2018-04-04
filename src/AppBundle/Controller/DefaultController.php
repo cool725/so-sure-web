@@ -72,11 +72,19 @@ class DefaultController extends BaseController
             SixpackService::LOG_MIXPANEL_CONVERSION
         );
 
+        $exp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_MOBILE_SEARCH_DROPDOWN,
+            ['mobile-search', 'mobile-dropdown-search']
+        );
+
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         $data = array(
-            'referral'          => $referral,
-            'phone'             => $this->getQuerystringPhone($request),
+            // Make sure to check homepage landing below too
+            'exp_dropdown_search' => $exp,
+            'referral'            => $referral,
+            'phone'               => $this->getQuerystringPhone($request),
         );
 
         $template = 'AppBundle:Default:index.html.twig';
@@ -138,18 +146,20 @@ class DefaultController extends BaseController
 
 
     /**
-     * @Route("/select-phone", name="select_phone_make")
-     * @Route("/select-phone/{type}/{id}", name="select_phone_make_type_id")
-     * @Route("/select-phone/{type}", name="select_phone_make_type")
+     * @Route("/select-phone-dropdown", name="select_phone_make_dropdown")
+     * @Route("/select-phone-dropdown/{type}/{id}", name="select_phone_make_dropdown_type_id")
+     * @Route("/select-phone-dropdown/{type}", name="select_phone_make_dropdown_type")
      * @Template()
      */
-    public function selectPhoneMakeAction(Request $request, $type = null, $id = null)
+    public function selectPhoneMakeDropdownAction(Request $request, $type = null, $id = null)
     {
         $dm = $this->getManager();
         $phoneRepo = $dm->getRepository(Phone::class);
         $phone = null;
+        $phoneMake = new PhoneMake();
         if ($id) {
             $phone = $phoneRepo->find($id);
+            $phoneMake->setMake($phone->getMake());
         }
 
         // throw new \Exception($id);
@@ -163,11 +173,41 @@ class DefaultController extends BaseController
         } elseif ($phone && in_array($type, ['learn-more'])) {
             $session = $request->getSession();
             $session->set('quote', $phone->getId());
-
-           // return $this->redirectToRoute('learn_more_phone', ['id' => $id]);
         }
 
+        $formPhone = $this->get('form.factory')
+            ->createNamedBuilder('launch_phone', PhoneMakeType::class, $phoneMake, [
+                'action' => $this->generateUrl('select_phone_make_dropdown'),
+            ])
+            ->getForm();
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('launch_phone')) {
+                $phoneId = $this->getDataString($request->get('launch_phone'), 'memory');
+                if ($phoneId) {
+                    $phone = $phoneRepo->find($phoneId);
+                    if (!$phone) {
+                        throw new \Exception('unknown phone');
+                    }
+                    if ($phone->getMemory()) {
+                        return $this->redirectToRoute('quote_make_model_memory', [
+                            'make' => $phone->getMake(),
+                            'model' => $phone->getEncodedModel(),
+                            'memory' => $phone->getMemory(),
+                        ]);
+                    } else {
+                        return $this->redirectToRoute('quote_make_model', [
+                            'make' => $phone->getMake(),
+                            'model' => $phone->getEncodedModel(),
+                        ]);
+                    }
+                }
+            }
+        }
+
+        // throw new \Exception(print_r($this->getPhonesArray(), true));
+
         return [
+            'form_phone' => $formPhone->createView(),
             'phones' => $this->getPhonesArray(),
             'type' => $type,
             'phone' => $phone,
@@ -175,12 +215,12 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/select-phone-v2", name="select_phone_make_v2")
-     * @Route("/select-phone-v2/{type}", name="select_phone_make_v2_type")
-     * @Route("/select-phone-v2/{type}/{id}", name="select_phone_make_v2_type_id")
+     * @Route("/select-phone-search", name="select_phone_make_search")
+     * @Route("/select-phone-search/{type}", name="select_phone_make_search_type")
+     * @Route("/select-phone-search/{type}/{id}", name="select_phone_make_search_type_id")
      * @Template()
      */
-    public function selectPhoneMakeV2Action(Request $request, $type = null, $id = null)
+    public function selectPhoneMakeSearchAction(Request $request, $type = null, $id = null)
     {
         $dm = $this->getManager();
         $phoneRepo = $dm->getRepository(Phone::class);

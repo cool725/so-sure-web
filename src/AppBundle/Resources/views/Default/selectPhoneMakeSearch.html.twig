@@ -1,7 +1,6 @@
 {# Set type of form dependant where used or default #}
 {# if basepath or formID is changed - change PurchaseControllerTest test cases #}
 
-
 {# default to #}
 {% set uid          = 'search-phone-form' %}
 {% set buttonText   = 'Instant Quote' %}
@@ -10,7 +9,6 @@
 {% set phonePath    = 'quote_phone' %}
 {% set pathSuffix   = '' %}
 {% set formID       = '' %}
-{% set stickySearch = false %}
 {% set formClass    = 'form-inline--homepage select-phone-form' %}
 
 {% if phone %}
@@ -22,17 +20,16 @@
     {% set uid    = '-1' %}
 {% elseif type is defined and type == 'homepage-sticky' %}
     {% set formID = 'search-phone-form-homepage' %}
-    {% set uid    = '-1' %}
+    {# {% set uid    = '-1' %} #}
     {% set stickySearch = true %}
 {% elseif type is defined and type == 'footer' %}
     {% set formID    = 'search-phone-form-footer' %}
     {% set uid    = '-2' %}
 {% endif %}
 
-<div id="select-phone-data{{ uid }}"
+<div id="select-phone-data"
      class="search-phone-form search-phone-form--homepage"
-     data-phones='{{ phones|json_encode|raw }}'
-     data-sticky-search="{{ stickySearch }}">
+     data-sticky-search="true">
 
     <form method="get"
           id="{{ formID }}{{ uid }}"
@@ -48,7 +45,7 @@
              id="search-phone{{ uid }}"
              class="required search-phone-text search-phone"
              placeholder="Find your phone e.g. iPhone 8 Plus..."
-             value="{% if phone %}{{ phone.make }} {{ phone.model }}{% endif %}" />
+             value="" />
     </form>
 
     {# TODO: Move to footer #}

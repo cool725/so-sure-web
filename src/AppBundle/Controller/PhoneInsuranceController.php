@@ -137,8 +137,9 @@ class PhoneInsuranceController extends BaseController
         }
 
         $template = 'AppBundle:PhoneInsurance:makeInsurance.html.twig';
+
         if (in_array($request->get('_route'), ['insure_make'])) {
-            $template = 'AppBundle:PhoneInsurance:makeInsuranceBottom.html.twig';
+             $template = 'AppBundle:PhoneInsurance:makeInsuranceBottom.html.twig';
         }
 
         $event = MixpanelService::EVENT_MANUFACTURER_PAGE;
@@ -461,6 +462,10 @@ class PhoneInsuranceController extends BaseController
 
             $this->get('app.sixpack')->convert(
                 SixpackService::EXPERIMENT_HOMEPAGE_AA_V2
+            );
+
+            $this->get('app.sixpack')->convert(
+                SixpackService::EXPERIMENT_MOBILE_SEARCH_DROPDOWN
             );
         }
 

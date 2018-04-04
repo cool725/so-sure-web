@@ -11,13 +11,27 @@
                 <h3 class="text-center">Find your phone</h3>
             </div>
             <div class="modal-body">
-                {% if selectPhoneMakeType is defined and selectPhoneMakeType and phoneId is defined and phoneId %}
-                    {{ render(controller('AppBundle:Default:selectPhoneMake', {'type': selectPhoneMakeType, 'id': phoneId})) }}
-                {% elseif selectPhoneMakeType is defined and selectPhoneMakeType %}
-                    {{ render(controller('AppBundle:Default:selectPhoneMake', {'type': selectPhoneMakeType})) }}
+
+                {# Phone Search #}
+                {% if device_category() == 'Mobile' %}
+                    {% set select_template = 'AppBundle:Default:selectPhoneMakeDropdown' %}
                 {% else %}
-                    {{ render(controller('AppBundle:Default:selectPhoneMake')) }}
+                    {% set select_template = 'AppBundle:Default:selectPhoneMakeSearch' %}
                 {% endif %}
+                {% if selectPhoneMakeType is defined and selectPhoneMakeType and phoneId is defined and phoneId %}
+                    {{ render(controller(select_template, {
+                        'type': selectPhoneMakeType,
+                        'id': phone.id
+                    })) }}
+                {% elseif selectPhoneMakeType is defined and selectPhoneMakeType %}
+                    {{ render(controller(select_template, {
+                        'type': selectPhoneMakeType
+                    })) }}
+                {% else %}
+                    {{ render(controller(select_template)) }}
+                {% endif %}
+                {# End Phone Search #}
+
                 <h4 class="text-blue text-center hidden-xs">Popular models we insure:</h4>
                 <ul class="list-inline text-center modal-phone--link-list hidden-xs">
                     <li>

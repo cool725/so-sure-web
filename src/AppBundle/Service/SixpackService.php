@@ -50,6 +50,8 @@ class SixpackService
     const EXPERIMENT_QUOTE_INTERCOM_PURCHASE = 'quote-intercom-purchase';
     const EXPERIMENT_MONEY_UNBOUNCE = 'money-unbounce';
 
+    const EXPERIMENT_MOBILE_SEARCH_DROPDOWN = 'mobile-dropdown-search';
+
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
 
     const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';
@@ -66,6 +68,7 @@ class SixpackService
         self::EXPERIMENT_SAVE_QUOTE_24HOURS,
         self::EXPERIMENT_QUOTE_INTERCOM_PURCHASE,
         self::EXPERIMENT_MONEY_UNBOUNCE,
+        self::EXPERIMENT_MOBILE_SEARCH_DROPDOWN,
     ];
 
     public static $authExperiments = [

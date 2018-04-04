@@ -75,14 +75,9 @@
         &-h1 {
             color: $primary-blue;
 
-            font-size: 28px;
-            line-height: 36px;
-            margin: 0 0 15px;
-
-            @include breakpoint(mobileishup) {
-                font-size: 30px;
-                line-height: 38px;
-            }
+            font-size: 30px;
+            line-height: 40px;
+            margin-bottom: 10px;
 
             @include breakpoint(tablet) {
                 font-size: 42px;
@@ -322,7 +317,7 @@
                 // Tablet
                 @include breakpoint(tablet) {
                     // padding: 20px 15px 270px;
-                    padding: 20px 15px 170px;
+                    padding: 20px 15px 270px;
                     background-size: 70%;
                 }
 
@@ -1049,6 +1044,15 @@
 }
 
 // TODO: Move!
+.dropdown-phone-form--homepage {
+    max-width: 450px;
+    background-color: $white;
+    padding: 0;
+    position: relative;
+    margin: 0 auto;
+    z-index: 5;
+}
+
 .search-phone-form--homepage {
     max-width: 450px;
     background-color: $white;
@@ -1181,7 +1185,7 @@
 
 .search-phone-form--sticky {
     position: fixed;
-    top: 55px; left: 0; right: 0;
+    top: 60px; left: 0; right: 0;
     z-index: 999;
 
     margin-left: 10px;
@@ -1235,4 +1239,17 @@
     }
 }
 
+.dropdown-phone-form #reset-sticky {
+    display: none;
+}
 
+.dropdown-phone-form.search-phone-form--sticky {
+    top: 55px;
+    background-color: $black-opaque;
+
+    @include border-bottom-radius(4px);
+
+    #reset-sticky {
+        color: $white;
+    }
+}
