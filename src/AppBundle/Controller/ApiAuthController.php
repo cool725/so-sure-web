@@ -1504,9 +1504,10 @@ class ApiAuthController extends BaseController
 
     /**
      * @Route("/policy/{id}/terms", name="api_auth_get_policy_terms")
+     * @Route("/policy/v2/{id}/terms", name="api_auth_get_policy_terms2")
      * @Method({"GET"})
      */
-    public function getPolicyTermsAction($id)
+    public function getPolicyTermsAction(Request $request, $id)
     {
         try {
             $dm = $this->getManager();
@@ -1527,16 +1528,29 @@ class ApiAuthController extends BaseController
                 );
             }
             $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
-            $policyTermsRoute = $this->get('router')->generate(
-                'policy_terms',
-                [
-                    'id' => $policy->getId(),
-                    'policy_key' => $this->getParameter('policy_key'),
-                    'maxPotValue' => $policy->getMaxPot(),
-                    'yearlyPremium' => $policy->getPremium()->getYearlyPremiumPrice(),
-                ],
-                false
-            );
+            if ($request->get('_route') == 'api_auth_get_policy_terms') {
+                $policyTermsRoute = $this->get('router')->generate(
+                    'policy_terms',
+                    [
+                        'id' => $policy->getId(),
+                        'policy_key' => $this->getParameter('policy_key'),
+                        'maxPotValue' => $policy->getMaxPot(),
+                        'yearlyPremium' => $policy->getPremium()->getYearlyPremiumPrice(),
+                    ],
+                    false
+                );
+            } else {
+                $policyTermsRoute = $this->get('router')->generate(
+                    'policy_terms2',
+                    [
+                        'id' => $policy->getId(),
+                        'policy_key' => $this->getParameter('policy_key'),
+                        'maxPotValue' => $policy->getMaxPot(),
+                        'yearlyPremium' => $policy->getPremium()->getYearlyPremiumPrice(),
+                    ],
+                    false
+                );
+            }
             $policyTermsUrl = sprintf("%s%s", $this->getParameter('web_base_url'), $policyTermsRoute);
 
             return new JsonResponse($policy->getPolicyTerms()->toApiArray($policyTermsUrl));

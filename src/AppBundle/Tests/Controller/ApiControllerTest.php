@@ -316,6 +316,8 @@ class ApiControllerTest extends BaseControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $getData = $this->verifyResponse(200);
         $policyTermsUrl = self::$router->generate('latest_policy_terms');
+
+        var_dump($getData["view_url"]);
         $this->assertTrue(stripos($getData["view_url"], $policyTermsUrl) >= 0);
         $this->assertTrue(stripos($getData["view_url"], 'http') >= 0);
         $this->assertTrue(stripos($getData["view_url"], 'Version') >= 0);

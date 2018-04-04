@@ -3860,7 +3860,29 @@ class ApiAuthControllerTest extends BaseControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $getData = $this->verifyResponse(200);
         $policyUrl = self::$router->generate('policy_terms', ['id' => $policyId]);
-        //print $getData["view_url"];
+        $this->assertTrue(stripos($getData["view_url"], $policyUrl) >= 0);
+        $this->assertTrue(stripos($getData["view_url"], 'http') >= 0);
+    }
+
+    /**
+     *
+     */
+    public function testGetPolicyTerms2()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('policy-terms2', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $createData = $this->verifyResponse(200);
+        $policyId = $createData['id'];
+
+        $url = sprintf('/api/v1/auth/policy/v2/%s/terms?maxPotValue=62.8&_method=GET', $policyId);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $getData = $this->verifyResponse(200);
+        $policyUrl = self::$router->generate('policy_terms2', ['id' => $policyId]);
         $this->assertTrue(stripos($getData["view_url"], $policyUrl) >= 0);
         $this->assertTrue(stripos($getData["view_url"], 'http') >= 0);
     }
