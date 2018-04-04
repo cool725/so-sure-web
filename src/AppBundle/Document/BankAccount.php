@@ -31,6 +31,7 @@ class BankAccount
      * @Assert\Length(min="1", max="100")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
+     * @var string
      */
     protected $accountName;
 
@@ -39,6 +40,7 @@ class BankAccount
      * @Assert\Length(min="1", max="100")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
+     * @var string
      */
     protected $bankName;
 
@@ -47,6 +49,7 @@ class BankAccount
      * @MongoDB\Field(type="string")
      * @Assert\Length(min="6", max="6")
      * @Gedmo\Versioned
+     * @var string
      */
     protected $sortCode;
 
@@ -56,6 +59,7 @@ class BankAccount
      * @MongoDB\Field(type="string")
      * @Assert\Length(min="8", max="8")
      * @Gedmo\Versioned
+     * @var string
      */
     protected $accountNumber;
 
@@ -64,6 +68,7 @@ class BankAccount
      * @MongoDB\Field(type="string")
      * @Assert\Length(min="6", max="18")
      * @Gedmo\Versioned
+     * @var string
      */
     protected $reference;
 
@@ -71,6 +76,7 @@ class BankAccount
      * @Assert\Choice({"pending-init", "pending-approval", "success", "failure", "cancelled"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
+     * @var string
      */
     protected $mandateStatus;
 
@@ -79,12 +85,14 @@ class BankAccount
      * @Assert\Length(min="1", max="10")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
+     * @var string
      */
     protected $mandateSerialNumber;
 
     /**
      * @MongoDB\EmbedOne(targetDocument="Address")
      * @Gedmo\Versioned
+     * @var Address
      */
     protected $bankAddress;
 
@@ -93,12 +101,14 @@ class BankAccount
      * @MongoDB\Field(type="string")
      * @Assert\Length(min="8", max="256")
      * @Gedmo\Versioned
+     * @var string
      */
     protected $hashedAccount;
 
     /**
      * @MongoDB\EmbedOne(targetDocument="IdentityLog")
      * @Gedmo\Versioned
+     * @var IdentityLog
      */
     protected $identityLog;
 
@@ -106,6 +116,7 @@ class BankAccount
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
+     * @var \DateTime
      */
     protected $initialNotificationDate;
 
@@ -113,8 +124,17 @@ class BankAccount
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
+     * @var \DateTime
      */
     protected $standardNotificationDate;
+
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     * @var boolean
+     */
+    protected $firstPayment;
 
     public function __construct()
     {
@@ -220,6 +240,7 @@ class BankAccount
     {
         $reference = sprintf('%s5%010d', strtoupper(substr($user->getLastName(), 0, 1)), $sequence);
         $this->setReference($reference);
+        $this->setFirstPayment(true);
 
         return $reference;
     }
@@ -272,6 +293,25 @@ class BankAccount
     public function setStandardNotificationDate(\DateTime $standardNotificationDate = null)
     {
         $this->standardNotificationDate = $standardNotificationDate;
+    }
+
+    public function isFirstPayment()
+    {
+        return $this->firstPayment;
+    }
+
+    public function setFirstPayment($firstPayment)
+    {
+        $this->firstPayment = $firstPayment;
+    }
+
+    public function allowedProcessing(\DateTime $processingDate = null)
+    {
+        if ($this->isFirstPayment()) {
+            return $this->allowedInitialProcessing($processingDate);
+        } else {
+            return $this->allowedStandardProcessing($processingDate);
+        }
     }
 
     public function allowedInitialProcessing(\DateTime $processingDate = null)

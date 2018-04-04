@@ -6,11 +6,14 @@ use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\AccessPayFile;
+use AppBundle\Document\ScheduledPayment;
 use AppBundle\Repository\UserRepository;
 use AppBundle\Service\BacsService;
+use AppBundle\Service\PaymentService;
 use AppBundle\Service\SequenceService;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
 use AppBundle\Document\User;
 use phpseclib\Net\SFTP;
@@ -56,6 +59,11 @@ class BacsCommand extends BaseCommand
                 InputOption::VALUE_NONE,
                 'Skip sending email confirmation'
             )
+            ->addArgument(
+                'prefix',
+                InputArgument::REQUIRED,
+                'Prefix'
+            )
         ;
     }
 
@@ -72,6 +80,7 @@ class BacsCommand extends BaseCommand
         $skipSftp = true === $input->getOption('skip-sftp');
         $skipS3 = true === $input->getOption('skip-s3');
         $skipEmail = true === $input->getOption('skip-email');
+        $prefix = $input->getArgument('prefix');
         $processingDate = null;
         if ($date) {
             $processingDate = new \DateTime($date);
@@ -106,7 +115,7 @@ class BacsCommand extends BaseCommand
         }
 
         $output->writeln('Exporting Payments');
-        $payments = $this->exportPayments($processingDate);
+        $payments = $this->exportPayments($prefix, $processingDate);
         if ($debug) {
             $output->writeln(json_encode($payments, JSON_PRETTY_PRINT));
         }
@@ -227,11 +236,81 @@ class BacsCommand extends BaseCommand
         return $lines;
     }
 
-    private function exportPayments(\DateTime $date, $includeHeader = false)
+    private function exportPayments($prefix, \DateTime $date, $includeHeader = false)
     {
         $lines = [];
         if ($includeHeader) {
             $lines[] = $this->getHeader();
+        }
+        /** @var PaymentService $paymentService */
+        $paymentService = $this->getContainer()->get('app.payment');
+
+        // get all scheduled payments for bacs that should occur within the next 3 business days in order to allow
+        // time for the bacs cycle
+        $advanceDate = clone $date;
+        $advanceDate = $this->addBusinessDays($advanceDate, 3);
+
+        $scheduledPayments = $paymentService->getAllValidScheduledPaymentsForType(
+            $prefix,
+            BacsPaymentMethod::class,
+            $advanceDate
+        );
+        foreach ($scheduledPayments as $scheduledPayment) {
+            /** @var ScheduledPayment $scheduledPayment */
+            /** @var BacsPaymentMethod $bacs */
+            $bacs = $scheduledPayment->getPolicy()->getUser()->getPaymentMethod();
+            if (!$bacs || !$bacs->getBankAccount()) {
+                $msg = sprintf(
+                    'Skipping scheduled payment %s as unable to determine payment method or missing bank account',
+                    $scheduledPayment->getId()
+                );
+                $this->getContainer()->get('logger')->warning($msg);
+                continue;
+            }
+
+            $bankAccount = $bacs->getBankAccount();
+            if ($bankAccount->getMandateStatus() != BankAccount::MANDATE_SUCCESS) {
+                $msg = sprintf(
+                    'Skipping scheduled payment %s as mandate is not enabled (%s)',
+                    $scheduledPayment->getId(),
+                    $bankAccount->getMandateStatus()
+                );
+                // for first payment, would expected that mandate may not yet be setup
+                if ($bankAccount->isFirstPayment()) {
+                    $this->getContainer()->get('logger')->info($msg);
+                } else {
+                    $this->getContainer()->get('logger')->warning($msg);
+                }
+                continue;
+            }
+            if (!$bankAccount->allowedProcessing($scheduledPayment->getScheduled())) {
+                $msg = sprintf(
+                    'Skipping scheduled payment %s as processing date is not allowed (%s / initial: %s)',
+                    $scheduledPayment->getId(),
+                    $scheduledPayment->getScheduled()->format('d-m-y'),
+                    $bankAccount->isFirstPayment() ? 'yes' : 'no'
+                );
+                $this->getContainer()->get('logger')->error($msg);
+                continue;
+            }
+
+            $lines[] = implode(',', [
+                sprintf('"%s"', $scheduledPayment->getScheduled()->format('d-m-y')),
+                '"Scheduled Payment"',
+                $bankAccount->isFirstPayment() ? '"01"' : '"17"',
+                sprintf('"%s"', $bankAccount->getAccountName()),
+                sprintf('"%s"', $bankAccount->getSortCode()),
+                sprintf('"%s"', $bankAccount->getAccountNumber()),
+                sprintf('"%0.2f"', $scheduledPayment->getAmount()),
+                sprintf('"%s"', $bankAccount->getReference()),
+                sprintf('"%s"', $scheduledPayment->getPolicy()->getUser()->getId()),
+                sprintf('"%s"', $scheduledPayment->getPolicy()->getId()),
+                sprintf('"SP-%s"', $scheduledPayment->getId()),
+            ]);
+            $scheduledPayment->setStatus(ScheduledPayment::STATUS_PENDING);
+            if ($bankAccount->isFirstPayment()) {
+                $bankAccount->setFirstPayment(false);
+            }
         }
 
         return $lines;
