@@ -60,7 +60,7 @@
                                 <li class="dropdown-header">Select alternate model</li>
                                 {% for phone_mem in phones if phone_mem.id != phone.id %}
                                     <li>
-                                        <a href="{{ path('select_phone_make_type_id', {'type': 'purchase-change', 'id': phone_mem.id}) }}" class=""> {{ phone.model }} - {{ phone_mem.memory }}GB</a>
+                                        <a href="{{ path('select_phone_make_search_type_id', {'type': 'purchase-change', 'id': phone_mem.id}) }}" class=""> {{ phone.model }} - {{ phone_mem.memory }}GB</a>
                                     </li>
                                 {% endfor %}
                                 <li role="separator" class="divider"></li>
