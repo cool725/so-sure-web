@@ -109,14 +109,36 @@ $(function(){
 $(function(){
 
     // Payment buttons action radio buttons
-    $('.payment--btn').click(function(event) {
+    // $('.payment--btn').click(function(event) {
 
-        $(this).toggleClass('payment--btn-selected')
-        .siblings()
-        .removeClass('payment--btn-selected');
+    //     $(this).toggleClass('payment--btn-selected')
+    //     .siblings()
+    //     .removeClass('payment--btn-selected');
 
-        var value = $(this).data('value');
-        $('input[name="purchase_form[amount]"][value="' + value + '"]').prop('checked', true);
+    //     var value = $(this).data('value');
+    //     $('input[name="purchase_form[amount]"][value="' + value + '"]').prop('checked', true);
+    // });
+
+    // $('input[type=radio]').click(function () {
+    //     if($(this).prop("checked")) {
+    //         alert("checked!");
+    //     }
+    // });
+
+    $('#purchase_form_amount_0').click(function(e) {
+        if($(this).prop('checked')) {
+            $('.payment-options--info .month').show();
+            console.log(this + 'Checked');
+            $('.payment-options--info .year').hide();
+        }
+    });
+
+    $('#purchase_form_amount_1').click(function(e) {
+        if($(this).prop('checked')) {
+            $('.payment-options--info .year').show();
+            console.log(this + 'Checked');
+            $('.payment-options--info .month').hide();
+        }
     });
 
     // Validate step

@@ -63,76 +63,68 @@
                     <span class="title-price">for just <span class="text-blue">£{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</span> a year</span>
                 {% endif %}
             </h1>
-            <ul class="list-unstyled benefits--review-mobile visible-xs">
-                <li class="h4">
-                    <i class="fa fa-check text-green" aria-hidden="true"></i> Loss</li>
-                <li class="h4">
-                    <i class="fa fa-check text-green" aria-hidden="true"></i> Theft</li>
-                <li class="h4"><i class="fa fa-check text-green" aria-hidden="true"></i> Accidental damage</li>
-                <li class="h4"><i class="fa fa-check text-green" aria-hidden="true"></i> Out of warranty breakdown</li>
-                <li class="h4"><i class="fa fa-check text-green" aria-hidden="true"></i> Worldwide coverage</li>
-            </ul>
-            <div class="benefits--review-desktop hidden-xs">
-                <div class="benefits--inner">
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-loss.svg" alt="Loss" title="Loss">
-                            <h4 class="h-light">Loss</h4>
-                            <p><small>Including up to £1,000 of unauthorised network charges</small></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-theft.svg" alt="Theft" title="Theft">
-                            <h4 class="h-light">Theft</h4>
-                            <p><small>Including accessories up to £100 inc. VAT</small></p>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-water-damage.svg" alt="Accidental Damage" title="Accidental damage">
-                            <h4 class="h-light">Accidental damage</h4>
-                            <p><small>Including cracked screen &amp; water damage</small></p>
-                        </div>
-                        <div class="col-sm-6">
-                            <img src="{{ cdn_url }}/images/library_benefits/so-sure_cover-breakdown.svg" alt="Out of warranty breakdown" title="Out of warranty breakdown">
-                            <h4 class="h-light">Out of warranty breakdown</h4>
-                            <p><small>Including faults of mobile phone</small></p>
-                        </div>
-                    </div>
-                    <h4 class="text-center">Plus worldwide cover on trips not exceeding 90 days</h4>
+
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2">
+                    <blockquote>
+                        <p>"Superb service with my first use of so-sure. I couldn’t be happier with the way my claim was handled and I got my phone the next day"</p>
+                        <footer>
+                            Ben Allssop, London.
+                        </footer>
+                    </blockquote>
                 </div>
             </div>
+
+{#             <h4 class="text-center">How would you like to pay?</h4>
+            <ul class="list-inline text-center">
+                {% if app.user.allowedMonthlyPayments %}
+                    <li>
+                        <a href="#"
+                           class="btn btn-blue">Monthly &pound;{{ phone.currentPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</a>
+                    </li>
+                {% endif %}
+                {% if app.user.allowedYearlyPayments %}
+                    <li>
+                        <a href="#"
+                           class="btn btn-blue">Yearly &pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</a>
+                    </li>
+                {% endif %}
+            </ul> #}
         </div>
     </div>
     <div class="payment--step">
         <div class="payment--step-inner clearfix">
-            <h4>How would you like to pay?<br>
-            <small>(Select an option below)</small></h4>
-            {% if app.user.allowedMonthlyPayments %}
-            <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two payment--btn-left {% endif %} {% if purchase_form.vars.value.amount == phone.currentPhonePrice.monthlyPremiumPrice %}payment--btn-selected{% endif %}" id="payment--monthly" data-value="{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}">
-                <div class="payment--btn-inner {% if not app.user.allowedYearlyPayments %} payment--btn-inner-single {% endif %}">
-                    <span class="billed visible-xs">Monthly <br></span>
-                    <span class="amount">£{{ phone.currentPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}
-                    <span class="hidden-xs">a month</span><br></span>
-                    <small class="visible-xs">Billed on {{ billing_date|date('jS') }} of each month</small>
-                    <small class="hidden-xs">You will be billed on the {{ billing_date|date('jS') }}  of each month</small>
+            {# <h4>How would you like to pay?<br> #}
+            {# <small>(Select an option below)</small></h4> #}
+
+            {% if app.user.allowedMonthlyPayments and test is defined %}
+                <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two payment--btn-left {% endif %} {% if purchase_form.vars.value.amount == phone.currentPhonePrice.monthlyPremiumPrice %}payment--btn-selected{% endif %}" id="payment--monthly" data-value="{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}">
+
+                    <div class="payment--btn-inner {% if not app.user.allowedYearlyPayments %} payment--btn-inner-single {% endif %}">
+
+                        <span class="billed visible-xs">Monthly <br></span>
+                        <span class="amount">£{{ phone.currentPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}
+                        <span class="hidden-xs">a month</span><br></span>
+                        <small class="visible-xs">Billed on {{ billing_date|date('jS') }} of each month</small>
+                        <small class="hidden-xs">You will be billed on the {{ billing_date|date('jS') }}  of each month</small>
+                    </div>
                 </div>
-            </div>
             {% endif %}
-            {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %}
-            <div class="payment--btn-or">
-                OR
-            </div>
-            {% endif %}
-            {% if app.user.allowedYearlyPayments %}
-            <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two payment--btn-right {% endif %} {% if purchase_form.vars.value.amount == phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) %}payment--btn-selected{% endif %}" id="payment--yearly" data-value="{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}">
-                <div class="payment--btn-inner {% if not app.user.allowedMonthlyPayments %} payment--btn-inner-single {% endif %}">
-                    <span class="billed visible-xs">Yearly <br></span>
-                    <span class="amount">£{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}
-                    <span class="hidden-xs">a year</span><br></span>
-                    <small class="visible-xs">Billed on date of purchase</small>
-                    <small class="hidden-xs">You will be billed for the year on purchase</small>
+            {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments and test is defined %}
+                <div class="payment--btn-or">
+                    OR
                 </div>
-            </div>
+            {% endif %}
+            {% if app.user.allowedYearlyPayments and test is defined %}
+                <div class="payment--btn {% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %} payment--btn-two payment--btn-right {% endif %} {% if purchase_form.vars.value.amount == phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) %}payment--btn-selected{% endif %}" id="payment--yearly" data-value="{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}">
+                    <div class="payment--btn-inner {% if not app.user.allowedMonthlyPayments %} payment--btn-inner-single {% endif %}">
+                        <span class="billed visible-xs">Yearly <br></span>
+                        <span class="amount">£{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}
+                        <span class="hidden-xs">a year</span><br></span>
+                        <small class="visible-xs">Billed on date of purchase</small>
+                        <small class="hidden-xs">You will be billed for the year on purchase</small>
+                    </div>
+                </div>
             {% endif %}
         </div>
     </div>
@@ -141,9 +133,18 @@
 
             {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'data-client-validation': form_client_validation, 'autocomplete': 'off' }}) }}
 
+                <h4 class="text-center">How would you like to pay?</h4>
+
                 <div class="form-group payment-options {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
                     {{ form_label(purchase_form.amount, 'Payment Options:', { 'label_attr': {'class': 'sr-only'} }) }}
                     {{ form_widget(purchase_form.amount) }}
+
+                    <div class="payment-options--info">
+                        <span class="year help-block">You will be billed the full amount on your purchase date.</span>
+                        <span class="month help-block ">You will be billed on the {{ billing_date|date('jS') }} of each month. If that’s inconvenient, you will be able to change your monthly billing day after purchase in your payment settings.</span>
+                    </div>
+
+
                     <div class="help-block with-errors">{{ form_errors(purchase_form.amount) }}</div>
                 </div>
 

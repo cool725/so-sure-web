@@ -68,7 +68,7 @@ class PurchaseStepPhoneType extends AbstractType
                 $form->remove('imei');
                 $form->add('imei', TelType::class, ['attr' => ['readonly' => true], 'required' => $this->required]);
             }
- 
+
             if ($purchase->getPhone()) {
                 $price = $purchase->getPhone()->getCurrentPhonePrice();
                 $additionalPremium = $purchase->getUser()->getAdditionalPremium();
@@ -89,6 +89,9 @@ class PurchaseStepPhoneType extends AbstractType
                         'expanded' => 'true',
                         'required' => $this->required,
                         'disabled' => $purchase->allowedAmountChange() ? false : true,
+                        'attr' => [
+                            'class' => '',
+                        ],
                     ]);
                 }
 
