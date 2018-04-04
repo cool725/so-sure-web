@@ -3,7 +3,7 @@ $(function(){
     if ($('.dropdown-phone-form').length) {
 
         // Phone data
-        var phones = $('[id=select-phone-data]').data('phones');
+        var phones = $('#select-phone-data').data('phones');
 
         // Update the select
         var updateModels = function() {
@@ -74,11 +74,20 @@ $(function(){
             });
         }
 
-        var updateFinal = function() {
+        var resetAll = function() {
+
             // Make value
-            var make = $('.select-phone-make').val();
-            var model = $('.select-phone-model').val();
-            var memory = $('.select-phone-memory').val();
+            var make = $('.select-phone-make');
+            var model = $('.select-phone-model');
+            var memory = $('.select-phone-memory');
+
+            // make.empty();
+            model.empty().hide();
+            memory.empty().hide();
+            $('.select-phone-memory').hide();
+            $('#close-sticky').hide();
+
+            updateModels();
         }
 
         // When user selects option update results
@@ -120,6 +129,7 @@ $(function(){
 
             if ($(this).val() != '') {
                 $('.select-phone-btn').show();
+                $('#close-sticky').css('display', 'block');
             } else {
                 $('.select-phone-btn').hide()
             }
@@ -127,5 +137,9 @@ $(function(){
 
         updateModels();
 
+        $('#close-sticky').click(function(e) {
+            e.preventDefault();
+            resetAll();
+        });
     }
 });

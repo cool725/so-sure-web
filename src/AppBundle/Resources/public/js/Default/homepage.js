@@ -35,11 +35,7 @@ $(function(){
         }
     }
 
-    if ($('#select-phone-data').data('sticky-search') == true) {
-        $(window).scroll(stickySearch);
-    }
-
-    if ($('#select-phone-data').data('sticky-search') == true) {
+    if ($('#select-phone-data').data('sticky-search') == true ) {
         $(window).scroll(stickySearch);
     }
 

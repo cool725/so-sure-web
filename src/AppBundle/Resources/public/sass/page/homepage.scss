@@ -1239,9 +1239,13 @@
     }
 }
 
+.dropdown-phone-form #close-sticky {
+    display: none;
+}
+
 .dropdown-phone-form.search-phone-form--sticky {
     top: 55px;
-    background-color: $black-opaque;
+    background-color: $primary-blue;
 
     @include border-bottom-radius(4px);
 }
