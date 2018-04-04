@@ -1245,11 +1245,11 @@
 
 .dropdown-phone-form.search-phone-form--sticky {
     top: 55px;
-    background-color: $white-opaque;
+    background-color: $black-opaque;
 
     @include border-bottom-radius(4px);
 
-    // .dropdown-phone-form #reset-sticky {
-    //     display: none;
-    // }
+    #reset-sticky {
+        color: $white;
+    }
 }
