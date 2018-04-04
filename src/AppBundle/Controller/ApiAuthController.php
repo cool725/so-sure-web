@@ -1529,28 +1529,20 @@ class ApiAuthController extends BaseController
             }
             $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
             if ($request->get('_route') == 'api_auth_get_policy_terms') {
-                $policyTermsRoute = $this->get('router')->generate(
-                    'policy_terms',
-                    [
-                        'id' => $policy->getId(),
-                        'policy_key' => $this->getParameter('policy_key'),
-                        'maxPotValue' => $policy->getMaxPot(),
-                        'yearlyPremium' => $policy->getPremium()->getYearlyPremiumPrice(),
-                    ],
-                    false
-                );
+                $termsRoute = 'policy_terms';
             } else {
-                $policyTermsRoute = $this->get('router')->generate(
-                    'policy_terms2',
-                    [
-                        'id' => $policy->getId(),
-                        'policy_key' => $this->getParameter('policy_key'),
-                        'maxPotValue' => $policy->getMaxPot(),
-                        'yearlyPremium' => $policy->getPremium()->getYearlyPremiumPrice(),
-                    ],
-                    false
-                );
+                $termsRoute = 'policy_terms2';
             }
+            $policyTermsRoute = $this->get('router')->generate(
+                'policy_terms2',
+                [
+                    'id' => $policy->getId(),
+                    'policy_key' => $this->getParameter('policy_key'),
+                    'maxPotValue' => $policy->getMaxPot(),
+                    'yearlyPremium' => $policy->getPremium()->getYearlyPremiumPrice(),
+                ],
+                false
+            );
             $policyTermsUrl = sprintf("%s%s", $this->getParameter('web_base_url'), $policyTermsRoute);
 
             return new JsonResponse($policy->getPolicyTerms()->toApiArray($policyTermsUrl));
