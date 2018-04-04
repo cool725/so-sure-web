@@ -88,7 +88,7 @@ class BacsCommand extends BaseCommand
             $processingDate = new \DateTime();
             $processingDate = $this->addBusinessDays($processingDate, 1);
         }
-        $output->writeln(sprintf('Using processing date %s', $processingDate->format('d-M-Y')));
+        $output->writeln(sprintf('Using processing date %s', $processingDate->format('d/M/Y')));
 
         $sequenceService = $this->getContainer()->get('app.sequence');
         $serialNumber = $sequenceService->getSequenceId(SequenceService::SEQUENCE_BACS_SERIAL_NUMBER);
@@ -189,7 +189,7 @@ class BacsCommand extends BaseCommand
             /** @var BacsPaymentMethod $paymentMethod */
             $paymentMethod = $user->getPaymentMethod();
             $lines[] = implode(',', [
-                sprintf('"%s"', $date->format('d-m-y')),
+                sprintf('"%s"', $date->format('d/m/y')),
                 '"Initial Mandate"',
                 '"0N"', // new Auddis
                 sprintf('"%s"', $paymentMethod->getBankAccount()->getAccountName()),
@@ -219,7 +219,7 @@ class BacsCommand extends BaseCommand
         }
         foreach ($cancellations as $cancellation) {
             $lines[] = implode(',', [
-                sprintf('"%s"', $date->format('d-m-y')),
+                sprintf('"%s"', $date->format('d/m/y')),
                 '"Cancel Mandate"',
                 '"0C"', // new Auddis
                 sprintf('"%s"', $cancellation['accountName']),
@@ -287,7 +287,7 @@ class BacsCommand extends BaseCommand
                 $msg = sprintf(
                     'Skipping scheduled payment %s as processing date is not allowed (%s / initial: %s)',
                     $scheduledPayment->getId(),
-                    $scheduledPayment->getScheduled()->format('d-m-y'),
+                    $scheduledPayment->getScheduled()->format('d/m/y'),
                     $bankAccount->isFirstPayment() ? 'yes' : 'no'
                 );
                 $this->getContainer()->get('logger')->error($msg);
@@ -295,7 +295,7 @@ class BacsCommand extends BaseCommand
             }
 
             $lines[] = implode(',', [
-                sprintf('"%s"', $scheduledPayment->getScheduled()->format('d-m-y')),
+                sprintf('"%s"', $scheduledPayment->getScheduled()->format('d/m/y')),
                 '"Scheduled Payment"',
                 $bankAccount->isFirstPayment() ? '"01"' : '"17"',
                 sprintf('"%s"', $bankAccount->getAccountName()),
