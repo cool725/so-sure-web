@@ -631,7 +631,7 @@ class AdminController extends BaseController
                 readfile($file);
             },
             200,
-            array('Content-Type' => 'text/xml')
+            array('Content-Type' => 'text/plain')
         );
     }
 
