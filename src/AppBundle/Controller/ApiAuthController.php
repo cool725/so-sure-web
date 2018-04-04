@@ -258,7 +258,13 @@ class ApiAuthController extends BaseController
             } elseif ($action == 'reinvite') {
                 $this->denyAccessUnlessGranted(InvitationVoter::REINVITE, $invitation);
                 //\Doctrine\Common\Util\Debug::dump($invitation);
-                $invitationService->reinvite($invitation);
+                if (!$invitationService->reinvite($invitation)) {
+                    return $this->getErrorJsonResponse(
+                        ApiErrorCode::ERROR_INVITATION_LIMIT,
+                        'Unable to re-invite',
+                        422
+                    );
+                }
             } else {
                 return $this->getErrorJsonResponse(
                     ApiErrorCode::ERROR_INVALD_DATA_FORMAT,
