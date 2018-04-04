@@ -1130,6 +1130,8 @@ class InvitationService
             $this->sendPush($invitation, PushService::MESSAGE_INVITATION);
             $this->sendEvent($invitation, InvitationEvent::EVENT_REINVITED);
         } elseif ($invitation instanceof SmsInvitation) {
+            $invitation->setStatus(Invitation::STATUS_SKIPPED);
+            $this->dm->flush();
             $this->logger->info('SMS Reinvitations are not currently supported');
 
             return false;
