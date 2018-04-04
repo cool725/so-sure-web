@@ -139,7 +139,7 @@
                     {{ form_label(purchase_form.amount, 'Payment Options:', { 'label_attr': {'class': 'sr-only'} }) }}
                     {{ form_widget(purchase_form.amount) }}
 
-                    <div class="payment-options--info alert alert-info">
+                    <div class="payment-options--info help-block">
                         <small class="year">You will be billed the full amount on your purchase date.</small>
                         <small class="month "><strong>You will be billed on the {{ billing_date|date('jS') }}</strong> of each month. If that’s inconvenient, you will be able to change your monthly billing day after purchase in your payment settings.</small>
                     </div>
@@ -154,7 +154,7 @@
                     <label class="samsung-imei">Numbers only please (no / required)</label>
                     <div class="help-block with-errors">{{ form_errors(purchase_form.imei) }}</div>
                     <div class="help-block">
-                        Dial *#06# on your phone keypad to display your IMEI number. It doesn’t cost you anything to do so.
+                        Dial <strong>*#06#</strong> on your phone keypad to display your IMEI number. It doesn’t cost you anything to do so.
 {#                         <a href="#"
                            class="text-underline"
                            data-toggle="modal"
@@ -176,7 +176,7 @@
                                data-target=&quot;{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}&quot;&gt;Go to Settings &gt; General &gt; About.&lt;/a&gt; #}
                         </div>
                         <div class="help-block">
-                            You can also log into your iTunes account and find the IMEI &amp; Serial Numbers display on the phone information screen
+                            You can also log into your iTunes account and find the IMEI &amp; Serial Numbers display on the phone information screen.
                         </div>
                     </div>
                 {% endif %}
