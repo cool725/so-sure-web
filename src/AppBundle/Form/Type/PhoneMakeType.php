@@ -55,6 +55,8 @@ class PhoneMakeType extends AbstractType
                     'group_by' => function($value) {
                         if ($value === 'Apple' or $value === 'Samsung') {
                             return 'Top Makes: ';
+                        } else {
+                            return 'Other Makes: ';
                         }
                     }
             ])
