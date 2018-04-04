@@ -1113,6 +1113,8 @@ class UserController extends BaseController
         if (!$bacsFeature && in_array($user->getEmailCanonical(), [
             'patrick@urg.name',
             'nickwaller@outlook.com',
+            'ju.champagne@wanadoo.fr',
+            'datkiewicz.marta@gmail.com',
         ])) {
             $bacsFeature = true;
         }
