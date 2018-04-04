@@ -1113,11 +1113,12 @@ class ApiAuthController extends BaseController
                 'Key'    => $this->getDataString($data, 'key'),
             ));
 
-            if (!($result['ContentType'] == 'image/jpeg' || $result['ContentType'] == 'image/png')) {
+            if (!in_array($result['ContentType'], array('image/jpeg', 'image/png'))) {
                 $msg = sprintf(
-                    'Invalid file s3://%s/%s',
+                    'Invalid file s3://%s/%s of type %s',
                     $this->getDataString($data, 'bucket'),
-                    $this->getDataString($data, 'key')
+                    $this->getDataString($data, 'key'),
+                    $result['ContentType']
                 );
                 $this->get('logger')->error($msg);
 
