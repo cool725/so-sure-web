@@ -6,6 +6,7 @@ use AppBundle\Document\BankAccount;
 use AppBundle\Document\File\BacsReportAddacsFile;
 use AppBundle\Document\File\BacsReportAuddisFile;
 use AppBundle\Document\File\BacsReportInputFile;
+use AppBundle\Document\File\S3File;
 use AppBundle\Document\File\UploadFile;
 use AppBundle\Document\User;
 use AppBundle\Repository\UserRepository;
@@ -141,6 +142,28 @@ class BacsService
         unlink($encTempFile);
 
         return $s3Key;
+    }
+
+    public function downloadS3(S3File $s3File)
+    {
+        $filename = $s3File->getFilename();
+        if (!$filename || strlen($filename) == 0) {
+            $key = explode('/', $s3File->getKey());
+            $filename = $key[count($key) - 1];
+        }
+        $encTempFile = sprintf('%s/enc-%s', sys_get_temp_dir(), $filename);
+        $tempFile = sprintf('%s/%s', sys_get_temp_dir(), $filename);
+        //file_put_contents($tempFile, null);
+
+        $this->s3->getObject(array(
+            'Bucket' => self::S3_BUCKET,
+            'Key'    => $s3File->getKey(),
+            'SaveAs' => $encTempFile
+        ));
+        \Defuse\Crypto\File::decryptFileWithPassword($encTempFile, $tempFile, $this->fileEncryptionPassword);
+        unlink($encTempFile);
+
+        return $tempFile;
     }
 
     public function addacs($file)
