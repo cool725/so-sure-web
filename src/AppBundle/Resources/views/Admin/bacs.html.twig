@@ -52,7 +52,13 @@
 
                 {% for file in files %}
                 <div class="row">
-                    <h4>{{ file.key }} {{ file.metadata|json_encode }}</h4>
+                    <div class="col-md-6">
+                        {{ file.key }}
+                        <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank"><i class="fa fa-download"></i></a>
+                    </div>
+                    <div class="col-md-6">
+                        {{ file.metadata|json_encode }}
+                    </div>
                 </div>
                 {% endfor %}
             </div>
@@ -65,6 +71,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             {{ file.key }}
+                            <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank"><i class="fa fa-download"></i></a>
                         </div>
                         <div class="col-md-6">
                             {{ file.metadata|json_encode }}
@@ -88,6 +95,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             {{ file.key }}
+                            <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank"><i class="fa fa-download"></i></a>
                         </div>
                         <div class="col-md-6">
                             {{ file.metadata|json_encode }}
@@ -102,6 +110,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             {{ file.key }}
+                            <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank"><i class="fa fa-download"></i></a>
                         </div>
                         <div class="col-md-6">
                             {{ file.metadata|json_encode }}

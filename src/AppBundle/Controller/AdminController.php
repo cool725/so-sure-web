@@ -4,6 +4,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\Form\Type\BacsMandatesType;
 use AppBundle\Form\Type\BacsUploadFileType;
+use AppBundle\Repository\File\S3FileRepository;
 use AppBundle\Service\BacsService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -524,7 +525,7 @@ class AdminController extends BaseController
 
     /**
      * @Route("/bacs", name="admin_bacs")
-     * @Route("/bacs/{year}/{month}", name="admin_bacs_date")
+     * @Route("/bacs/{year}/{month}", name="admin_bacs_date", requirements={"year":"[0-9]{4,4}","month":"[0-9]{1,2}"})
      * @Template
      */
     public function bacsAction(Request $request, $year = null, $month = null)
@@ -605,6 +606,32 @@ class AdminController extends BaseController
             'uploadForm' => $uploadForm->createView(),
             'mandatesForm' => $mandatesForm->createView(),
         ];
+    }
+
+    /**
+     * @Route("/bacs/file/{id}", name="admin_bacs_file")
+     */
+    public function bacsFileAction($id)
+    {
+        $dm = $this->getManager();
+        /** @var S3FileRepository $repo */
+        $repo = $dm->getRepository(S3File::class);
+        $s3File = $repo->find($id);
+        if (!$s3File) {
+            throw new NotFoundHttpException();
+        }
+
+        /** @var BacsService $bacs */
+        $bacs = $this->get('app.bacs');
+
+        $file = $bacs->downloadS3($s3File);
+        return StreamedResponse::create(
+            function () use ($file) {
+                readfile($file);
+            },
+            200,
+            array('Content-Type' => 'text/xml')
+        );
     }
 
     /**
