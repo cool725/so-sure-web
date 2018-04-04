@@ -52,11 +52,11 @@ class PhoneMakeType extends AbstractType
                     'choices' => $this->dm->getRepository(Phone::class)->findActiveMakes(),
                     'required' => $this->required,
                     'preferred_choices' => array('Apple', 'Samsung'),
-                    'group_by' => function($value) {
+                    'group_by' => function ($value) {
                         if ($value === 'Apple' or $value === 'Samsung') {
-                            return 'Top Makes: ';
+                            return 'Top Makes:';
                         } else {
-                            return 'Other Makes: ';
+                            return 'Other Makes:';
                         }
                     }
             ])
