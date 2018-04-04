@@ -26,6 +26,15 @@
     {% set basePath = '/select-phone-search/purchase-select/' %}
 {% elseif type == 'purchase-change' %}
     {% set basePath = '/select-phone-search/purchase-change/' %}
+{% elseif type == 'learn-more' %}
+    {# TODO - Add route action back to learn more #}
+    {% set buttonText   = 'Learn more' %}
+    {% set phonePath    = 'learn_more_phone' %}
+    {% set buttonCSS    = 'btn btn-green btn-block btn-pad' %}
+    {% if phone %}
+      {% set formAction   = path('learn_more_phone', {'id': phone.id }) %}
+    {% endif %}
+    {% set pathSuffix   = '/learn-more' %}
 {% elseif type is defined and type == 'footer' %}
     {% set formID    = 'search-phone-form-footer' %}
     {% set uid    = '-2' %}
