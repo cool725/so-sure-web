@@ -128,7 +128,6 @@ $(function(){
     $('#purchase_form_amount_0').click(function(e) {
         if($(this).prop('checked')) {
             $('.payment-options--info .month').show();
-            console.log(this + 'Checked');
             $('.payment-options--info .year').hide();
         }
     });
@@ -136,7 +135,6 @@ $(function(){
     $('#purchase_form_amount_1').click(function(e) {
         if($(this).prop('checked')) {
             $('.payment-options--info .year').show();
-            console.log(this + 'Checked');
             $('.payment-options--info .month').hide();
         }
     });

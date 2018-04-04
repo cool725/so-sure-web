@@ -139,9 +139,9 @@
                     {{ form_label(purchase_form.amount, 'Payment Options:', { 'label_attr': {'class': 'sr-only'} }) }}
                     {{ form_widget(purchase_form.amount) }}
 
-                    <div class="payment-options--info">
-                        <span class="year help-block">You will be billed the full amount on your purchase date.</span>
-                        <span class="month help-block ">You will be billed on the {{ billing_date|date('jS') }} of each month. If that’s inconvenient, you will be able to change your monthly billing day after purchase in your payment settings.</span>
+                    <div class="payment-options--info alert alert-info">
+                        <small class="year">You will be billed the full amount on your purchase date.</small>
+                        <small class="month "><strong>You will be billed on the {{ billing_date|date('jS') }}</strong> of each month. If that’s inconvenient, you will be able to change your monthly billing day after purchase in your payment settings.</small>
                     </div>
 
 
@@ -153,12 +153,13 @@
                     {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control imei', 'placeholder':'IMEI Number'}}) }}
                     <label class="samsung-imei">Numbers only please (no / required)</label>
                     <div class="help-block with-errors">{{ form_errors(purchase_form.imei) }}</div>
-                    <div class="help-block text-center">
-                        <a href="#"
+                    <div class="help-block">
+                        Dial *#06# on your phone keypad to display your IMEI number. It doesn’t cost you anything to do so.
+{#                         <a href="#"
                            class="text-underline"
                            data-toggle="modal"
                            data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}"
-                           >Dial *#06# to show your IMEI number.</a>
+                           >Dial *#06# to show your IMEI number.</a> #}
                     </div>
                 </div>
 
@@ -167,15 +168,19 @@
                         {{ form_label(purchase_form.serialNumber, 'Serial Number:', { 'label_attr': {'class': 'sr-only'} }) }}
                         {{ form_widget(purchase_form.serialNumber, {'attr':{'class':'form-control',  'pattern': '[a-zA-Z0-9]{5,32}', 'title': 'Enter a valid serial number', 'placeholder':'Serial Number'}}) }}
                         <div class="help-block with-errors">{{ form_errors(purchase_form.serialNumber) }}</div>
-                        <div class="help-block text-center">
-                            <a href="#"
-                               class="text-underline"
-                               data-toggle="modal"
-                               data-target="{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}">Go to Settings > General > About.</a>
+                        <div class="help-block">
+                            To find your IMEI &amp; Serial Numbers open your phone Settings, navigate to General and view About. The Serial Number is listed about halfway down the screen and the IMEI is a few rows below that.
+{#                             &lt;a href=&quot;#&quot;
+                               class=&quot;text-underline&quot;
+                               data-toggle=&quot;modal&quot;
+                               data-target=&quot;{% if purchase_form.serialNumber is defined %}#appleModal{% else %}#nonAppleModal{% endif %}&quot;&gt;Go to Settings &gt; General &gt; About.&lt;/a&gt; #}
+                        </div>
+                        <div class="help-block">
+                            You can also log into your iTunes account and find the IMEI &amp; Serial Numbers display on the phone information screen
                         </div>
                     </div>
                 {% endif %}
-
+{#
                 <div class="form-group">
                     <div class="text-break text-grey">
                         <div class="line"></div>OR<div class="line"></div>
@@ -194,9 +199,9 @@
                         {{ form_widget(purchase_form.fileValid) }}
                     </div>
                     <div class="help-block with-errors">{{ form_errors(purchase_form.fileValid) }}</div>
-                </div>
+                </div> #}
 
-                {% if phone.googlePlay or phone.iTunes %}
+{#                 {% if phone.googlePlay or phone.iTunes %}
                     <div class="text-break text-grey">
                         <div class="line"></div>OR<div class="line"></div>
                     </div>
@@ -209,7 +214,7 @@
                             <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('purchase-flow') }}" target="_blank"><img src="{{ cdn_url }}/images/purchase/app_download_purchase_app_store_2x.png" alt="Available on the AppStore" class="img-responsive img-responsive--center"></a>
                         {% endif %}
                     </div>
-                {% endif %}
+                {% endif %} #}
 
                 <div class="form-group form-group-break">
                     <a href="#"

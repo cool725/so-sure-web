@@ -55,8 +55,8 @@ class PurchaseStepPhoneType extends AbstractType
         $builder
             ->add('imei', TelType::class, ['required' => $this->required])
             ->add('agreed', CheckboxType::class, ['required' => $this->required])
-            ->add('file', FileType::class, ['attr' => ['accept' => 'image/*,.png,.jpg,.jpeg,.gif']])
-            ->add('fileValid', CheckboxType::class)
+            // ->add('file', FileType::class, ['attr' => ['accept' => 'image/*,.png,.jpg,.jpeg,.gif']])
+            // ->add('fileValid', CheckboxType::class)
             ->add('next', SubmitType::class)
         ;
 
