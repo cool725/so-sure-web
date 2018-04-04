@@ -27,6 +27,8 @@ use AppBundle\Document\Payment\PolicyDiscountPayment;
 
 /**
  * @group functional-net
+ *
+ * AppBundle\\Tests\\Controller\\ApiAuthControllerTest
  */
 class ApiAuthControllerTest extends BaseControllerTest
 {
