@@ -79,7 +79,7 @@ sosure.purchaseStepPhone = (function() {
 
             errorPlacement: function(error, element) {
                 if (element.attr('name') == 'purchase_form[amount]') {
-                    $('.payment--step h4 small').addClass('error');
+                    $('.payment-options h4').addClass('error');
                 } else {
                     error.insertAfter(element);
                 }
@@ -93,12 +93,6 @@ sosure.purchaseStepPhone = (function() {
         });
     }
 
-    self.step_continue = function() {
-        if (self.form.valid() == true){
-            $('#reviewModal').modal();
-        }
-    }
-
     return self;
 })();
 
@@ -109,20 +103,24 @@ $(function(){
 $(function(){
 
     // Payment buttons action radio buttons
-    $('.payment--btn').click(function(event) {
+    $('.payment-options--btn').click(function(event) {
+        // Toggle Class on Btns
+        $('.payment-options--btn').removeClass('payment-options--btn-selected animated pulse');
+        $(this).addClass('payment-options--btn-selected animated pulse');
 
-        $(this).toggleClass('payment--btn-selected')
-        .siblings()
-        .removeClass('payment--btn-selected');
-
+        // Grab data from btn value to input
         var value = $(this).data('value');
+        var help  = $(this).data('help-block');
+
+        // Select the radio
         $('input[name="purchase_form[amount]"][value="' + value + '"]').prop('checked', true);
+
+        // Modify the help text accordingly
+        $('.payment-options--info').text(help);
     });
 
-    // Validate step
-    $('#step--validate').click(function(e) {
-        e.preventDefault();
-        sosure.purchaseStepPhone.step_continue();
+    $('input[name="purchase_form[amount]').change(function(e) {
+        console.log('Yes');
     });
 
     if ($.trim($('#Reference').val()).length > 0) {
@@ -152,62 +150,4 @@ $(function(){
             $('.samsung-imei').hide();
         }
     });
-
-    // Hide/Show policy doc
-    $('.policy-doc-toggle').click(function(e) {
-        // e.preventDefault();
-        $('.modal-body__policy-doc').toggle();
-    });
-
-    $('#policy-modal, .modal-policy').on('hide.bs.modal', function (event) {
-        $('.modal-body__policy-doc').hide();
-    });
-
-    $('#purchase_form_file').on('change', function() {
-        $('#upload-file-info').html('<i class="fa fa-file"></i> <span id="upload-file-name"></span>');
-        // Use cation - .name is original client name and can have script input
-        $('#upload-file-name').text(this.files[0].name);
-        $('#purchase_form_imei').rules("remove");
-        $('#purchase_form_imei').removeAttr("required");
-        $('#purchase_form_serialNumber').rules("remove");
-        $('#purchase_form_serialNumber').removeAttr("required");
-        $('#step--validate').click();
-    });
-
-    // Load the policy doc
-    if ($('.modal-policy-embedded').length) {
-
-        // Content to load
-        var url   = $('.modal-policy-embedded').data('url');
-
-        function loadDoc() {
-            $('.modal-policy-embedded').load(url, function(responseTxt, statusTxt, xhr) {
-                if (statusTxt == 'success') {
-                    sosure.globals.policyTerms();
-                }
-                if (statusTxt == 'error') {
-                    $('#reload-policy').show();
-                }
-            });
-        }
-
-        // Toggle content
-        $('.policy-doc-toggle').click(function(e) {
-            e.preventDefault();
-
-            // Expand content
-            $('.modal-policy-embedded').toggle(function() {
-                loadDoc();
-            });
-
-        });
-
-        // Try and reload
-        $('#reload-policy').click(function(event) {
-
-            $('#reload-policy').hide();
-
-            loadDoc();
-        });
-    }
 });
