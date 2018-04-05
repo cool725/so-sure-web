@@ -267,7 +267,7 @@ class PolicyService
         Phone $phone,
         $imei,
         $serialNumber,
-        $modelNumber,
+        $modelNumber = null,
         IdentityLog $identityLog = null,
         $phoneData = null
     ) {

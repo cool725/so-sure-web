@@ -1144,6 +1144,49 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_INVALID_VALIDATION);
     }
 
+    public function testNewPolicyWithModelNumber()
+    {
+        $this->clearRateLimit();
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testNewPolicyWithModelNumber', $this),
+            'foo',
+            true
+        );
+        self::addAddress($user);
+        self::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $imei = self::generateRandomImei();
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
+            'imei' => $imei,
+            'serial_number' => '23423423342',
+            'model_number' => 'foo',
+            'make' => 'HTC',
+            'device' => 'A0001',
+            'memory' => 64,
+            'rooted' => false,
+            'validation_data' => $this->getValidationData(
+                $cognitoIdentityId,
+                [
+                    'imei' => $imei,
+                    'device' => 'A0001',
+                    'memory' => 64,
+                    'rooted' => false,
+                    'serial_number' => '23423423342'
+                ]
+            ),
+        ]]);
+        $data = $this->verifyResponse(200);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $userRepo = $dm->getRepository(User::class);
+        $user = $userRepo->find($user->getId());
+        $policies = $user->getPolicies();
+        $this->assertEquals(1, count($policies));
+        $this->assertEquals('foo', $policies[0]->getModelNumber());
+    }
+
     public function testNewPolicyDisabledUser()
     {
         $this->clearRateLimit();
