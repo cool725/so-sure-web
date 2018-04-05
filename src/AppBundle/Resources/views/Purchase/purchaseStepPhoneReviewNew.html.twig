@@ -160,6 +160,11 @@
                     </div>
                 {% endif %}
 
+                <div class="hidden">
+                    {{ form_widget(purchase_form.fileValid) }}
+                    {{ form_widget(purchase_form.file, {'attr': {'style':'display:none'}}) }}
+                </div>
+
                 <h3>Before you continue</h3>
                 <p>Please confirm that the following are correct:</p>
                 <ol>
