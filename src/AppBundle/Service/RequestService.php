@@ -327,6 +327,9 @@ class RequestService
         if (stripos($userAgent, 'ScoutJet') !== false) {
             return true;
         }
+        if (stripos($userAgent, 'Go-http-client') !== false) {
+            return true;
+        }
 
         return false;
     }

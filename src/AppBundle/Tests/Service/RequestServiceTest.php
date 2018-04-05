@@ -98,6 +98,7 @@ class RequestServiceTest extends WebTestCase
             'curl/7.35.0',
             'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:14.0; ips-agent) Gecko/20100101 Firefox/14.0.1',
             'Mozilla/5.0 (compatible; ScoutJet; +http://www.scoutjet.com/)',
+            'Go-http-client/1.1',
         ];
         // @codingStandardsIgnoreEnd
         
