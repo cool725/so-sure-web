@@ -51,6 +51,7 @@ class SixpackService
     const EXPERIMENT_MONEY_UNBOUNCE = 'money-unbounce';
     const EXPERIMENT_MOBILE_SEARCH_DROPDOWN = 'mobile-dropdown-search';
     const EXPERIMENT_STEP_3 = 'step-3-payment-new';
+    const EXPERIMENT_CPC_QUOTE_HOMEPAGE = 'cpc-quote-or-homepage';
 
     const EXPERIMENT_CPC_QUOTE_HOMEPAGE = 'cpc-quote-or-homepage';
 
@@ -71,6 +72,7 @@ class SixpackService
         self::EXPERIMENT_MONEY_UNBOUNCE,
         self::EXPERIMENT_MOBILE_SEARCH_DROPDOWN,
         self::EXPERIMENT_STEP_3,
+        self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
     ];
 
     public static $authExperiments = [

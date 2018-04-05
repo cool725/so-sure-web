@@ -203,6 +203,11 @@ class BacsCommand extends BaseCommand
             ]);
             $paymentMethod->getBankAccount()->setMandateStatus(BankAccount::MANDATE_PENDING_APPROVAL);
             $paymentMethod->getBankAccount()->setMandateSerialNumber($serialNumber);
+
+            // do not attempt to take payment until 2 business days after to allow for mandate
+            $initialPaymentSubmissionDate = new \DateTime();
+            $initialPaymentSubmissionDate = $this->addBusinessDays($initialPaymentSubmissionDate, 2);
+            $paymentMethod->getBankAccount()->setInitialPaymentSubmissionDate($initialPaymentSubmissionDate);
         }
 
         return $lines;
@@ -238,12 +243,16 @@ class BacsCommand extends BaseCommand
 
     private function exportPayments($prefix, \DateTime $date, $includeHeader = false)
     {
+        $now = new \DateTime();
         $lines = [];
         if ($includeHeader) {
             $lines[] = $this->getHeader();
         }
         /** @var PaymentService $paymentService */
         $paymentService = $this->getContainer()->get('app.payment');
+
+        /** @var BacsService $bacsService */
+        $bacsService = $this->getContainer()->get('app.bacs');
 
         // get all scheduled payments for bacs that should occur within the next 3 business days in order to allow
         // time for the bacs cycle
@@ -283,6 +292,15 @@ class BacsCommand extends BaseCommand
                 }
                 continue;
             }
+            if (!$bankAccount->allowedSubmission()) {
+                $msg = sprintf(
+                    'Skipping payment %s as submission is not yet allowed (must be at least %s)',
+                    $scheduledPayment->getId(),
+                    $bankAccount->getInitialPaymentSubmissionDate()->format('d/m/y')
+                );
+                $this->getContainer()->get('logger')->error($msg);
+                continue;
+            }
             if (!$bankAccount->allowedProcessing($scheduledPayment->getScheduled())) {
                 $msg = sprintf(
                     'Skipping scheduled payment %s as processing date is not allowed (%s / initial: %s)',
@@ -293,6 +311,13 @@ class BacsCommand extends BaseCommand
                 $this->getContainer()->get('logger')->error($msg);
                 continue;
             }
+
+            $payment = $bacsService->bacsPayment(
+                $scheduledPayment->getPolicy(),
+                'Scheduled Payment',
+                $scheduledPayment->getAmount()
+            );
+            $scheduledPayment->setPayment($payment);
 
             $lines[] = implode(',', [
                 sprintf('"%s"', $scheduledPayment->getScheduled()->format('d/m/y')),

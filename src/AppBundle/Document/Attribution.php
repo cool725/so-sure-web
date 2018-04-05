@@ -124,6 +124,14 @@ class Attribution
      */
     protected $deviceCategory;
 
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="100")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $deviceOS;
+
     public function setCampaignName($campaignName)
     {
         $this->campaignName = $campaignName;
@@ -196,6 +204,16 @@ class Attribution
         return $this->deviceCategory;
     }
 
+    public function setDeviceOS($deviceOS)
+    {
+        $this->deviceOS = $deviceOS;
+    }
+
+    public function getDeviceOS()
+    {
+        return $this->deviceOS;
+    }
+
     public function equals($attribution)
     {
         if (!$attribution) {
@@ -233,6 +251,9 @@ class Attribution
         }
         if (strlen($this->getDeviceCategory()) > 0) {
             $lines[] = sprintf("Device Category: %s", $this->getDeviceCategory());
+        }
+        if (strlen($this->getDeviceOS()) > 0) {
+            $lines[] = sprintf("Device OS: %s", $this->getDeviceOS());
         }
 
         return implode($glue, $lines);

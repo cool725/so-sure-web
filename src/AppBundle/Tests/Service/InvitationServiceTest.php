@@ -710,9 +710,6 @@ class InvitationServiceTest extends WebTestCase
         $this->assertTrue($invitation instanceof SmsInvitation);
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testSmsInvitationReinviteOptOut()
     {
         $user = static::createUser(
@@ -742,8 +739,8 @@ class InvitationServiceTest extends WebTestCase
         // allow reinvitation
         $invitation->setNextReinvited(new \DateTime('2016-01-01'));
 
-        // sms reinvites are currently not allowed - exception thrown
-        self::$invitationService->reinvite($invitation);
+        // sms reinvites are currently not allowed
+        $this->assertFalse(self::$invitationService->reinvite($invitation));
 
         $this->assertEquals(SmsInvitation::STATUS_SKIPPED, $invitation->getStatus());
     }

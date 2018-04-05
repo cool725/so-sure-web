@@ -27,6 +27,8 @@ use AppBundle\Document\Payment\PolicyDiscountPayment;
 
 /**
  * @group functional-net
+ *
+ * AppBundle\\Tests\\Controller\\ApiAuthControllerTest
  */
 class ApiAuthControllerTest extends BaseControllerTest
 {
@@ -3022,8 +3024,8 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
-            'bucket' => 'help.so-sure.com',
-            'key' => 'vagrant/KEY_NOT_FOUND',
+            'bucket' => 'ops.so-sure.com',
+            'key' => 'php-unit-tests/Controller/ApiAuthControllerTest/KEY_NOT_FOUND',
         ]);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PICSURE_FILE_NOT_FOUND);
 
@@ -3033,8 +3035,30 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals(PhonePolicy::PICSURE_STATUS_INVALID, $updatedPolicy->getPicSureStatus());
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
-            'bucket' => 'help.so-sure.com',
-            'key' => 'vagrant/sitemap.xml',
+            'bucket' => 'ops.so-sure.com',
+            'key' => 'php-unit-tests/Controller/ApiAuthControllerTest/picsure-invalid.txt',
+        ]);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PICSURE_FILE_INVALID);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $repo->find($policyData['id']);
+        $this->assertEquals(PhonePolicy::PICSURE_STATUS_INVALID, $updatedPolicy->getPicSureStatus());
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'bucket' => 'ops.so-sure.com',
+            'key' => 'php-unit-tests/Controller/ApiAuthControllerTest/picsure-valid1.jpg',
+        ]);
+        $data = $this->verifyResponse(200);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $repo->find($policyData['id']);
+        $this->assertEquals(PhonePolicy::PICSURE_STATUS_MANUAL, $updatedPolicy->getPicSureStatus());
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'bucket' => 'ops.so-sure.com',
+            'key' => 'php-unit-tests/Controller/ApiAuthControllerTest/picsure-valid2.png',
         ]);
         $data = $this->verifyResponse(200);
 
