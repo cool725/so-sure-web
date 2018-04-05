@@ -2093,13 +2093,13 @@ class InvitationServiceTest extends WebTestCase
 
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(EmailOptOut::class);
-        $this->assertEquals(0, count($repo->findBy(['email' => strtolower($email)])));
+        $this->assertEquals(0, count($repo->findBy(['email' => mb_strtolower($email)])));
 
         static::$invitationService->optout($email, EmailOptOut::OPTOUT_CAT_ALL);
-        $this->assertEquals(1, count($repo->findBy(['email' => strtolower($email)])));
+        $this->assertEquals(1, count($repo->findBy(['email' => mb_strtolower($email)])));
 
         static::$invitationService->optout($email, EmailOptOut::OPTOUT_CAT_ALL);
-        $this->assertEquals(1, count($repo->findBy(['email' => strtolower($email)])));
+        $this->assertEquals(1, count($repo->findBy(['email' => mb_strtolower($email)])));
     }
 
     public function testRejectAllInvitations()

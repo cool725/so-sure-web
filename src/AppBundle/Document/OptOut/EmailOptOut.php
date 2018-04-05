@@ -24,6 +24,6 @@ class EmailOptOut extends OptOut
 
     public function setEmail($email)
     {
-        $this->email = strtolower($email);
+        $this->email = mb_strtolower($email);
     }
 }

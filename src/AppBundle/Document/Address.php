@@ -160,19 +160,19 @@ class Address
     public function stringImplode($glue)
     {
         $lines = [];
-        if (strlen($this->getLine1()) > 0) {
+        if (mb_strlen($this->getLine1()) > 0) {
             $lines[] = $this->getLine1();
         }
-        if (strlen($this->getLine2()) > 0) {
+        if (mb_strlen($this->getLine2()) > 0) {
             $lines[] = $this->getLine2();
         }
-        if (strlen($this->getLine3()) > 0) {
+        if (mb_strlen($this->getLine3()) > 0) {
             $lines[] = $this->getLine3();
         }
-        if (strlen($this->getCity()) > 0) {
+        if (mb_strlen($this->getCity()) > 0) {
             $lines[] = $this->getCity();
         }
-        if (strlen($this->getPostcode()) > 0) {
+        if (mb_strlen($this->getPostcode()) > 0) {
             $lines[] = $this->getPostcode();
         }
 

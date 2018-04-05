@@ -25,7 +25,7 @@ class S3TwigExtension extends \Twig_Extension
 
     public function s3DownloadLink($bucket, $key)
     {
-        if (!$key || strlen(trim($key)) == 0) {
+        if (!$key || mb_strlen(trim($key)) == 0) {
             return null;
         }
 

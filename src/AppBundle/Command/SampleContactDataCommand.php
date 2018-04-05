@@ -65,9 +65,9 @@ class SampleContactDataCommand extends ContainerAwareCommand
         if ($rand == 1) {
             $email = sprintf("%s.%s@%s", $firstName, $lastName, explode("@", $email)[1]);
         } elseif ($rand == 2) {
-            $email = sprintf("%s%s@%s", substr($firstName, 0, 1), $lastName, explode("@", $email)[1]);
+            $email = sprintf("%s%s@%s", mb_substr($firstName, 0, 1), $lastName, explode("@", $email)[1]);
         } elseif ($rand == 3) {
-            $email = sprintf("%s%s%02d@%s", substr($firstName, 0, 1), $lastName, rand(1, 99), explode("@", $email)[1]);
+            $email = sprintf("%s%s%02d@%s", mb_substr($firstName, 0, 1), $lastName, rand(1, 99), explode("@", $email)[1]);
         }
 
         return $email;

@@ -519,7 +519,7 @@ class Claim
     {
         $validator = new AlphanumericSpaceDotValidator();
 
-        $this->replacementPhoneDetails = $validator->conform(substr($replacementPhoneDetails, 0, 100));
+        $this->replacementPhoneDetails = $validator->conform(mb_substr($replacementPhoneDetails, 0, 100));
     }
 
     public function getReplacementImei()
@@ -601,7 +601,7 @@ class Claim
     {
         $validator = new AlphanumericSpaceDotValidator();
 
-        $this->notes = $validator->conform(substr($notes, 0, 500));
+        $this->notes = $validator->conform(mb_substr($notes, 0, 500));
     }
 
     public function getDescription()

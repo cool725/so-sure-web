@@ -154,7 +154,7 @@ class IntercomCommand extends ContainerAwareCommand
     private function getUser($email)
     {
         $repo = $this->getUserRepository();
-        $user = $repo->findOneBy(['emailCanonical' => strtolower($email)]);
+        $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
         if (!$user) {
             throw new \Exception('unable to find user');
         }

@@ -68,7 +68,7 @@ class CognitoIdentityUserProvider implements UserProviderInterface
      */
     public function loadUserByCognitoIdentityId($cognitoIdentityId)
     {
-        if (!$cognitoIdentityId || strlen($cognitoIdentityId) == 0) {
+        if (!$cognitoIdentityId || mb_strlen($cognitoIdentityId) == 0) {
             return null;
         }
 
@@ -119,7 +119,7 @@ class CognitoIdentityUserProvider implements UserProviderInterface
      */
     public function loadUserByUserToken($userToken)
     {
-        if (strlen($userToken) == 0) {
+        if (mb_strlen($userToken) == 0) {
             return null;
         }
 

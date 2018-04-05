@@ -393,7 +393,7 @@ class DoctrineUserListenerTest extends WebTestCase
             'foo'
         );
         // same but different
-        $user->setEmail(strtolower(static::generateEmail('testUpdateUserEmailChangedButSame', $this)));
+        $user->setEmail(mb_strtolower(static::generateEmail('testUpdateUserEmailChangedButSame', $this)));
         static::$dm->flush();
     }
 

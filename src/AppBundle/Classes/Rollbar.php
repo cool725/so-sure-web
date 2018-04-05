@@ -27,13 +27,13 @@ class Rollbar extends \RollbarNotifier
             // Verify: GET -UsEd -H "HOST: 52.19.177.49" https://wearesosure.com
             if (($source instanceof \UnexpectedValueException ||
                 $source instanceof \Symfony\Component\HttpKernel\Exception\BadRequestHttpException) &&
-                stripos($source->getMessage(), "Untrusted Host") !== false) {
+                mb_stripos($source->getMessage(), "Untrusted Host") !== false) {
                 return true;
             }
 
             // Verify: GET -UsEd https://wearesosure.com/login_check
             if ($source instanceof \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException &&
-                stripos($source->getMessage(), "GET /login_check") !== false) {
+                mb_stripos($source->getMessage(), "GET /login_check") !== false) {
                 return true;
             }
 

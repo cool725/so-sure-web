@@ -56,17 +56,17 @@ class PushCommand extends ContainerAwareCommand
         // 'arn:aws:sns:eu-west-1:812402538357:endpoint/APNS_SANDBOX/so-sure_ios_dev/86a504df-8470-3c9e-a60e-7611df452f08',
         // @codingStandardsIgnoreEnd
 
-        if (strlen($email) > 0) {
+        if (mb_strlen($email) > 0) {
             $user = $this->getUser($email);
             if (!$user) {
                 throw new \Exception('Unable to find user');
             }
-            if (strlen($user->getSnsEndpoint()) == 0) {
+            if (mb_strlen($user->getSnsEndpoint()) == 0) {
                 throw new \Exception('User does not have a sns endpoint registered');
             }
             $push->sendToUser($messageType, $user, $message);
             $output->writeln('Sent message');
-        } elseif (strlen($arn) > 0) {
+        } elseif (mb_strlen($arn) > 0) {
             $push->send($messageType, $arn, $message);
             $output->writeln('Sent message');
         } else {

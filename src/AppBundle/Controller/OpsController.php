@@ -356,7 +356,7 @@ class OpsController extends BaseController
         }
 
         if (isset($violationReport['csp-report']['blocked-uri'])) {
-            $host = strtolower(parse_url($violationReport['csp-report']['blocked-uri'], PHP_URL_HOST));
+            $host = mb_strtolower(parse_url($violationReport['csp-report']['blocked-uri'], PHP_URL_HOST));
             if (in_array($host, [
                 'nikkomsgchannel',
                 'www.bizographics.com',
@@ -387,7 +387,7 @@ class OpsController extends BaseController
                 return new JsonResponse(['details' => 'Ignore Ip'], 204);
             }
 
-            if (in_array(strtolower($violationReport['csp-report']['blocked-uri']), [
+            if (in_array(mb_strtolower($violationReport['csp-report']['blocked-uri']), [
                 'blob'
             ])) {
                 $logger->debug(sprintf(
@@ -398,7 +398,7 @@ class OpsController extends BaseController
                 return new JsonResponse(['details' => 'Ignore url'], 204);
             }
 
-            $scheme = strtolower(parse_url($violationReport['csp-report']['blocked-uri'], PHP_URL_SCHEME));
+            $scheme = mb_strtolower(parse_url($violationReport['csp-report']['blocked-uri'], PHP_URL_SCHEME));
             if (in_array($scheme, [
                 'ms-appx-web',
                 'none',
@@ -413,8 +413,8 @@ class OpsController extends BaseController
 
         // any violation on http are not relivant - should only be https
         if (isset($violationReport['csp-report']['document-uri'])) {
-            $host = strtolower(parse_url($violationReport['csp-report']['document-uri'], PHP_URL_HOST));
-            $scheme = strtolower(parse_url($violationReport['csp-report']['document-uri'], PHP_URL_SCHEME));
+            $host = mb_strtolower(parse_url($violationReport['csp-report']['document-uri'], PHP_URL_HOST));
+            $scheme = mb_strtolower(parse_url($violationReport['csp-report']['document-uri'], PHP_URL_SCHEME));
             if ($scheme == "http" && $host == "wearesosure.com") {
                 $logger->debug(sprintf('Content-Security-Policy called with non-https host: %s', $host));
 

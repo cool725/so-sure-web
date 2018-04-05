@@ -12,7 +12,7 @@ class SortCodeValidator extends ConstraintValidator
 
     public function validate($value, Constraint $constraint)
     {
-        if (strlen($value) == 0) {
+        if (mb_strlen($value) == 0) {
             return;
         }
 

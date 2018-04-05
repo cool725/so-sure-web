@@ -13,7 +13,7 @@ class UkMobileValidator extends ConstraintValidator
             throw new \Exception(sprintf('Expected string %s', json_encode($value)));
         }
         // allow empty string in validation
-        if (strlen($value) == 0) {
+        if (mb_strlen($value) == 0) {
             return;
         }
 

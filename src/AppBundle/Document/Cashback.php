@@ -269,8 +269,8 @@ class Cashback
         // we assume a basic validation on the object beforehand, however do very basic checks
         // for missing data
         if (!$this->getAccountName() || !$this->getAccountNumber() || !$this->getSortCode()
-            || strlen($this->getAccountName()) == 0 || strlen($this->getAccountNumber()) == 0 ||
-            strlen($this->getSortCode()) == 0) {
+            || mb_strlen($this->getAccountName()) == 0 || mb_strlen($this->getAccountNumber()) == 0 ||
+            mb_strlen($this->getSortCode()) == 0) {
             // keep the failed status
             if ($this->getStatus() == self::STATUS_FAILED) {
                 return self::STATUS_FAILED;

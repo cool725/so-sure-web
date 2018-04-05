@@ -111,7 +111,7 @@ class SCodeCommand extends BaseCommand
             $shareLink = $branch->generateSCode($scode->getCode());
             $scode->setShareLink($shareLink);
         } elseif ($updateType == 'branch') {
-            if (stripos($scode->getShareLink(), $this->getContainer()->getParameter('branch_domain')) !== false) {
+            if (mb_stripos($scode->getShareLink(), $this->getContainer()->getParameter('branch_domain')) !== false) {
                 $branch->update($scode->getShareLink(), [
                     '$desktop_url' => $routerService->generateUrl('scode', ['code' => $scode->getCode()]),
                 ]);

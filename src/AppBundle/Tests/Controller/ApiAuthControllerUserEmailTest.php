@@ -62,7 +62,7 @@ class ApiAuthControllerUserEmailTest extends BaseControllerTest
         $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, $data);
         $result = $this->verifyResponse(200);
         $this->assertEquals(
-            strtolower(self::generateEmail('testUpdateUserChangeEmail-updated', $this)),
+            mb_strtolower(self::generateEmail('testUpdateUserChangeEmail-updated', $this)),
             $result['email']
         );
         /** @var EventDataCollector $eventDataCollector */
@@ -86,7 +86,7 @@ class ApiAuthControllerUserEmailTest extends BaseControllerTest
         ];
         $crawler = static::putRequest(self::$client, $cognitoIdentityId, $url, $data);
         $result = $this->verifyResponse(200);
-        $this->assertEquals(strtolower(self::generateEmail('testUpdateUserNoChangeEmail', $this)), $result['email']);
+        $this->assertEquals(mb_strtolower(self::generateEmail('testUpdateUserNoChangeEmail', $this)), $result['email']);
         /** @var EventDataCollector $eventDataCollector */
         //$eventDataCollector = self::$client->getProfile()->getCollector('events');
        // print_r($eventDataCollector);
@@ -102,7 +102,7 @@ class ApiAuthControllerUserEmailTest extends BaseControllerTest
 
         $invitation = new EmailInvitation();
         $invitation->setInviter($inviter);
-        $invitation->setEmail(strtolower(self::generateEmail('testUserCreateNoChangeEmail', $this)));
+        $invitation->setEmail(mb_strtolower(self::generateEmail('testUserCreateNoChangeEmail', $this)));
         self::$dm->persist($invitation);
         self::$dm->flush();
 
@@ -117,7 +117,7 @@ class ApiAuthControllerUserEmailTest extends BaseControllerTest
             'Possible underlying indication that the UserChanged Event was fired'
         );
         $data = $this->verifyResponse(200);
-        $this->assertEquals(strtolower(self::generateEmail('testUserCreateNoChangeEmail', $this)), $data['email']);
+        $this->assertEquals(mb_strtolower(self::generateEmail('testUserCreateNoChangeEmail', $this)), $data['email']);
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $userRepo = $dm->getRepository(User::class);

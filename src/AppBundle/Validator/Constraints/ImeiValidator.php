@@ -13,7 +13,7 @@ class ImeiValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         // allow empty string in validation
-        if (strlen($value) == 0) {
+        if (mb_strlen($value) == 0) {
             return;
         }
 

@@ -140,8 +140,8 @@ class PurchaseStepPersonalAddress
         $this->name = trim($name);
         $parts = explode(" ", trim($name));
         if (count($parts) == 2) {
-            $this->setFirstName(ucfirst(strtolower($parts[0])));
-            $this->setLastName(ucfirst(strtolower($parts[1])));
+            $this->setFirstName(ucfirst(mb_strtolower($parts[0])));
+            $this->setLastName(ucfirst(mb_strtolower($parts[1])));
         }
     }
 
@@ -290,7 +290,7 @@ class PurchaseStepPersonalAddress
     {
         //\Doctrine\Common\Util\Debug::dump($this);
         //\Doctrine\Common\Util\Debug::dump($user);
-        $match = strtolower($this->getEmail()) == $user->getEmailCanonical() &&
+        $match = mb_strtolower($this->getEmail()) == $user->getEmailCanonical() &&
             $this->getFirstName() == $user->getFirstName() &&
             $this->getLastName() == $user->getLastName() &&
             $this->getMobileNumber() == $user->getMobileNumber() &&

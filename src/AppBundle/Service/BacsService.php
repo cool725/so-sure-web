@@ -91,13 +91,13 @@ class BacsService
         $tmpFile = $file->move(sys_get_temp_dir());
         $uploadFile = null;
         $metadata = null;
-        if (stripos($file->getClientOriginalName(), "ADDACS") !== false) {
+        if (mb_stripos($file->getClientOriginalName(), "ADDACS") !== false) {
             $metadata = $this->addacs($tmpFile);
             $uploadFile = new BacsReportAddacsFile();
-        } elseif (stripos($file->getClientOriginalName(), "AUDDIS") !== false) {
+        } elseif (mb_stripos($file->getClientOriginalName(), "AUDDIS") !== false) {
             $metadata = $this->auddis($tmpFile);
             $uploadFile = new BacsReportAuddisFile();
-        } elseif (stripos($file->getClientOriginalName(), "INPUT") !== false) {
+        } elseif (mb_stripos($file->getClientOriginalName(), "INPUT") !== false) {
             $metadata = $this->input($tmpFile);
             $uploadFile = new BacsReportInputFile();
         } else {
@@ -151,7 +151,7 @@ class BacsService
     public function downloadS3(S3File $s3File)
     {
         $filename = $s3File->getFilename();
-        if (!$filename || strlen($filename) == 0) {
+        if (!$filename || mb_strlen($filename) == 0) {
             $key = explode('/', $s3File->getKey());
             $filename = $key[count($key) - 1];
         }

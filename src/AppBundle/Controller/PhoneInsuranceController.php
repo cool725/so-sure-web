@@ -198,16 +198,16 @@ class PhoneInsuranceController extends BaseController
         } elseif ($memory) {
             $phone = $repo->findOneBy([
                 'active' => true,
-                'makeCanonical' => strtolower($make),
-                'modelCanonical' => strtolower($decodedModel),
+                'makeCanonical' => mb_strtolower($make),
+                'modelCanonical' => mb_strtolower($decodedModel),
                 'memory' => (int) $memory
             ]);
             // check for historical urls
-            if (!$phone || stripos($model, ' ') !== false) {
+            if (!$phone || mb_stripos($model, ' ') !== false) {
                 $phone = $repo->findOneBy([
                     'active' => true,
-                    'makeCanonical' => strtolower($make),
-                    'modelCanonical' => strtolower($model),
+                    'makeCanonical' => mb_strtolower($make),
+                    'modelCanonical' => mb_strtolower($model),
                     'memory' => (int) $memory
                 ]);
                 if ($phone) {
@@ -220,18 +220,18 @@ class PhoneInsuranceController extends BaseController
             }
         } else {
             $phones = $repo->findBy(
-                ['active' => true, 'makeCanonical' => strtolower($make), 'modelCanonical' => strtolower($decodedModel)],
+                ['active' => true, 'makeCanonical' => mb_strtolower($make), 'modelCanonical' => mb_strtolower($decodedModel)],
                 ['memory' => 'asc'],
                 1
             );
-            if (count($phones) != 0 && stripos($model, ' ') === false) {
+            if (count($phones) != 0 && mb_stripos($model, ' ') === false) {
                 $phone = $phones[0];
             } else {
                 // check for historical urls
                 $phone = $repo->findOneBy([
                     'active' => true,
-                    'makeCanonical' => strtolower($make),
-                    'modelCanonical' => strtolower($model)
+                    'makeCanonical' => mb_strtolower($make),
+                    'modelCanonical' => mb_strtolower($model)
                 ]);
                 if ($phone) {
                     return $this->redirectToRoute('quote_make_model', [
@@ -336,7 +336,7 @@ class PhoneInsuranceController extends BaseController
                         );
 
                         $leadRepo = $dm->getRepository(Lead::class);
-                        $existingLead = $leadRepo->findOneBy(['email' => strtolower($lead->getEmail())]);
+                        $existingLead = $leadRepo->findOneBy(['email' => mb_strtolower($lead->getEmail())]);
                         if (!$existingLead) {
                             $dm->persist($lead);
                             $dm->flush();
@@ -556,7 +556,7 @@ class PhoneInsuranceController extends BaseController
                 ['memory' => 'asc'],
                 1
             );
-            if (count($phones) != 0 && stripos($model, ' ') === false) {
+            if (count($phones) != 0 && mb_stripos($model, ' ') === false) {
                 $phone = $phones[0];
             }
         }
