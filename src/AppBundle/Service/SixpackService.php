@@ -53,8 +53,6 @@ class SixpackService
     const EXPERIMENT_STEP_3 = 'step-3-payment-new';
     const EXPERIMENT_CPC_QUOTE_HOMEPAGE = 'cpc-quote-or-homepage';
 
-    const EXPERIMENT_CPC_QUOTE_HOMEPAGE = 'cpc-quote-or-homepage';
-
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';
     const ALTERNATIVES_APP_SHARE_METHOD_API = 'api';
