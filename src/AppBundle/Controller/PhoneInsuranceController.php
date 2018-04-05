@@ -220,7 +220,11 @@ class PhoneInsuranceController extends BaseController
             }
         } else {
             $phones = $repo->findBy(
-                ['active' => true, 'makeCanonical' => mb_strtolower($make), 'modelCanonical' => mb_strtolower($decodedModel)],
+                [
+                    'active' => true,
+                    'makeCanonical' => mb_strtolower($make),
+                    'modelCanonical' => mb_strtolower($decodedModel)
+                ],
                 ['memory' => 'asc'],
                 1
             );

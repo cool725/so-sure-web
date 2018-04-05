@@ -151,7 +151,9 @@ class ApiControllerTest extends BaseControllerTest
         $client = static::createClient();
         $dm = $client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(User::class);
-        $user = $repo->findOneBy(['emailCanonical' => mb_strtolower(static::generateEmail('rate-limit-login-ok', $this))]);
+        $user = $repo->findOneBy([
+            'emailCanonical' => mb_strtolower(static::generateEmail('rate-limit-login-ok', $this))
+        ]);
         $this->assertFalse($user->isLocked());
     }
 
