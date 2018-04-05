@@ -1219,6 +1219,8 @@ class PolicyServiceTest extends WebTestCase
         );
 
         $bacs = new BacsPayment();
+        $bacs->setManual(true);
+        $bacs->setSuccess(true);
         $bacs->setAmount($policy->getPhone()->getCurrentPhonePrice()->getYearlyPremiumPrice());
         $policy->addPayment($bacs);
         static::$dm->flush();
