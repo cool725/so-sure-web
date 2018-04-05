@@ -179,7 +179,7 @@
                         {{ form_widget(purchase_form.existing, {'label': 'Pay with card on file', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
                         {{ form_widget(purchase_form.next, {'label': 'Pay with a new card', 'attr': {'class': 'btn btn-default btn-block btn-pad'}}) }}
                     {% else %}
-                        {{ form_widget(purchase_form.next, {'label': 'Proceed to payment', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
+                        {{ form_widget(purchase_form.next, {'label': 'I agree, proceed to payment', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
                     {% endif %}
                 </div>
                 <div class="form-group text-center">
@@ -284,7 +284,6 @@
     '@AppBundle/Resources/public/js/Default/jqueryValidatorMethods.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMakeSearch.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMakeDropdown.js'
-    '@AppBundle/Resources/public/js/Purchase/purchaseStep.js'
     '@AppBundle/Resources/public/js/Purchase/purchaseStepPhoneNew.js' %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
