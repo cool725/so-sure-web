@@ -262,6 +262,10 @@ class MixpanelService
                     $attribution->setDeviceCategory($data['Device Category']);
                     $dataPresent = true;
                 }
+                if (isset($data['Device OS'])) {
+                    $attribution->setDeviceOS($data['Device OS']);
+                    $dataPresent = true;
+                }
 
                 if ($dataPresent) {
                     $user->setAttribution($attribution);
@@ -295,6 +299,10 @@ class MixpanelService
                 }
                 if (isset($data['Latest Device Category'])) {
                     $latestAttribution->setDeviceCategory($data['Latest Device Category']);
+                    $dataPresent = true;
+                }
+                if (isset($data['Latest Device OS'])) {
+                    $latestAttribution->setDeviceOS($data['Latest Device OS']);
                     $dataPresent = true;
                 }
                 if ($dataPresent) {
@@ -815,10 +823,12 @@ class MixpanelService
         $utm = $this->requestService->getUtm();
         $referer = $this->requestService->getReferer();
         $deviceCategory = null;
+        $deviceOS = null;
         if ($userAgent = $this->requestService->getUserAgent()) {
             $parser = Parser::create();
             $userAgentDetails = $parser->parse($userAgent);
             $deviceCategory = $this->requestService->getDeviceCategory();
+            $deviceOS = $this->requestService->getDeviceOS();
         }
 
         $transform = [];
@@ -850,6 +860,10 @@ class MixpanelService
 
         if ($deviceCategory) {
             $transform[sprintf('%sDevice Category', $prefix)] = $deviceCategory;
+        }
+
+        if ($deviceOS) {
+            $transform[sprintf('%sDevice OS', $prefix)] = $deviceOS;
         }
 
         return $transform;
