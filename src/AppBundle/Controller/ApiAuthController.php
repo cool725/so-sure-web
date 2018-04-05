@@ -1534,7 +1534,7 @@ class ApiAuthController extends BaseController
                 $termsRoute = 'policy_terms2';
             }
             $policyTermsRoute = $this->get('router')->generate(
-                'policy_terms2',
+                $termsRoute,
                 [
                     'id' => $policy->getId(),
                     'policy_key' => $this->getParameter('policy_key'),

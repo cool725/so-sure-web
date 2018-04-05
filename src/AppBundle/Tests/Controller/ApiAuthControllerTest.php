@@ -41,6 +41,7 @@ class ApiAuthControllerTest extends BaseControllerTest
     protected static $testUserDisabled;
     protected static $reward;
     protected static $expiredPhone;
+    protected static $policyKey;
 
     public function tearDown()
     {
@@ -84,6 +85,8 @@ class ApiAuthControllerTest extends BaseControllerTest
 
         $phoneRepo = static::$dm->getRepository(Phone::class);
         self::$expiredPhone = $phoneRepo->findOneBy(['make' => 'Apple', 'model' => 'iPhone 4']);
+
+        self::$policyKey = static::$container->getParameter('policy_key');
 
         static::$dm->flush();
     }
@@ -3867,6 +3870,34 @@ class ApiAuthControllerTest extends BaseControllerTest
     /**
      *
      */
+    public function testGetPolicyTermsHtml()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('policy-terms-html', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $createData = $this->verifyResponse(200);
+        $policyId = $createData['id'];
+
+        $url = sprintf(
+            '/view/policy/%s/terms?policy_key=%s&maxPotValue=0&yearlyPremium=85.80',
+            $policyId,
+            static::$policyKey
+        );
+        $crawler = self::$client->request('GET', $url);
+        self::verifyResponse(200);
+        $body = self::$client->getResponse()->getContent();
+
+        $this->assertTrue(stripos($body, 'h1') >= 0);
+        $this->assertFalse(stripos($body, 'h4'));
+    }
+
+    /**
+     *
+     */
     public function testGetPolicyTerms2()
     {
         $user = self::createUser(
@@ -3885,6 +3916,34 @@ class ApiAuthControllerTest extends BaseControllerTest
         $policyUrl = self::$router->generate('policy_terms2', ['id' => $policyId]);
         $this->assertTrue(stripos($getData["view_url"], $policyUrl) >= 0);
         $this->assertTrue(stripos($getData["view_url"], 'http') >= 0);
+    }
+
+    /**
+     *
+     */
+    public function testGetPolicyTerms2Html()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('policy-terms2-html', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $createData = $this->verifyResponse(200);
+        $policyId = $createData['id'];
+
+        $url = sprintf(
+            '/view/policy/v2/%s/terms?policy_key=%s&maxPotValue=0&yearlyPremium=85.80',
+            $policyId,
+            static::$policyKey
+        );
+        $crawler = self::$client->request('GET', $url);
+        self::verifyResponse(200);
+        $body = self::$client->getResponse()->getContent();
+
+        $this->assertFalse(stripos($body, 'h1'));
+        $this->assertTrue(stripos($body, 'h4') >= 0);
     }
 
     // secret
