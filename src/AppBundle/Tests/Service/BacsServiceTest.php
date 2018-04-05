@@ -51,10 +51,11 @@ class BacsServiceTest extends WebTestCase
             static::generateEmail('testBacsXml', $this),
             'bar'
         );
-        $this->setValidBacsPaymentMethod($user);
+        $this->setValidBacsPaymentMethod($user, 'SOSURE01');
         static::$dm->flush();
 
-        $this->assertTrue(self::$bacsService->addacs(self::$xmlFile)['success']);
+        $results = self::$bacsService->addacs(self::$xmlFile);
+        $this->assertTrue($results['success']);
 
         $updatedUser = $this->assertUserExists(self::$container, $user);
         $this->assertEquals(
@@ -63,11 +64,14 @@ class BacsServiceTest extends WebTestCase
         );
     }
 
-    private function setValidBacsPaymentMethod(User $user)
+    private function setValidBacsPaymentMethod(User $user, $reference = null)
     {
         $bankAccount = new BankAccount();
         $bankAccount->setMandateStatus(BankAccount::MANDATE_SUCCESS);
-        $bankAccount->setReference(sprintf('SOSURE%d', rand(1, 999999)));
+        if (!$reference) {
+            $reference = sprintf('SOSURE%d', rand(1, 999999));
+        }
+        $bankAccount->setReference($reference);
         $bankAccount->setSortCode('000099');
         $bankAccount->setAccountNumber('87654321');
         $bankAccount->setAccountName($user->getName());
