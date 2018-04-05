@@ -1063,7 +1063,7 @@ class UserController extends BaseController
         );
 
         $this->get('app.sixpack')->convert(
-            SixpackService::EXPERIMENT_STEP_3,
+            SixpackService::EXPERIMENT_STEP_3
         );
 
         $countUnprocessedInvitations = count($user->getUnprocessedReceivedInvitations());
