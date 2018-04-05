@@ -245,6 +245,9 @@ class BacsCommand extends BaseCommand
         /** @var PaymentService $paymentService */
         $paymentService = $this->getContainer()->get('app.payment');
 
+        /** @var BacsService $bacsService */
+        $bacsService = $this->getContainer()->get('app.bacs');
+
         // get all scheduled payments for bacs that should occur within the next 3 business days in order to allow
         // time for the bacs cycle
         $advanceDate = clone $date;
@@ -293,6 +296,13 @@ class BacsCommand extends BaseCommand
                 $this->getContainer()->get('logger')->error($msg);
                 continue;
             }
+
+            $payment = $bacsService->bacsPayment(
+                $scheduledPayment->getPolicy(),
+                'Scheduled Payment',
+                $scheduledPayment->getAmount()
+            );
+            $scheduledPayment->setPayment($payment);
 
             $lines[] = implode(',', [
                 sprintf('"%s"', $scheduledPayment->getScheduled()->format('d/m/y')),

@@ -8,6 +8,10 @@ use AppBundle\Document\File\BacsReportAuddisFile;
 use AppBundle\Document\File\BacsReportInputFile;
 use AppBundle\Document\File\S3File;
 use AppBundle\Document\File\UploadFile;
+use AppBundle\Document\Payment\BacsPayment;
+use AppBundle\Document\Payment\Payment;
+use AppBundle\Document\Policy;
+use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\User;
 use AppBundle\Repository\UserRepository;
 use Aws\S3\S3Client;
@@ -91,8 +95,8 @@ class BacsService
             $metadata = $this->addacs($tmpFile);
             $uploadFile = new BacsReportAddacsFile();
         } elseif (stripos($file->getClientOriginalName(), "AUDDIS") !== false) {
-                $metadata = $this->auddis($tmpFile);
-                $uploadFile = new BacsReportAuddisFile();
+            $metadata = $this->auddis($tmpFile);
+            $uploadFile = new BacsReportAuddisFile();
         } elseif (stripos($file->getClientOriginalName(), "INPUT") !== false) {
             $metadata = $this->input($tmpFile);
             $uploadFile = new BacsReportInputFile();
@@ -122,7 +126,7 @@ class BacsService
 
         $this->s3->putObject(array(
             'Bucket' => self::S3_BUCKET,
-            'Key'    => $s3Key,
+            'Key' => $s3Key,
             'SourceFile' => $encTempFile,
         ));
 
@@ -157,7 +161,7 @@ class BacsService
 
         $this->s3->getObject(array(
             'Bucket' => self::S3_BUCKET,
-            'Key'    => $s3File->getKey(),
+            'Key' => $s3File->getKey(),
             'SaveAs' => $encTempFile
         ));
         \Defuse\Crypto\File::decryptFileWithPassword($encTempFile, $tempFile, $this->fileEncryptionPassword);
@@ -470,5 +474,35 @@ class BacsService
         $this->redis->del(self::KEY_BACS_CANCEL);
 
         return $cancellations;
+    }
+
+    public function bacsPayment(Policy $policy, $notes, $amount = null, \DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        if (!$amount) {
+            $amount = $policy->getPremium()->getMonthlyPremiumPrice();
+        }
+        $user = $policy->getPayerOrUser();
+
+        $payment = new BacsPayment();
+        $payment->setAmount($amount);
+        $payment->setNotes($notes);
+        $payment->setUser($policy->getUser());
+        $payment->setSource(Payment::SOURCE_TOKEN);
+        $policy->addPayment($payment);
+
+        if (!$user->hasValidPaymentMethod()) {
+            throw new \Exception(sprintf(
+                'User %s does not have a valid payment method (Policy %s)',
+                $user->getId(),
+                $policy->getId()
+            ));
+        }
+        $this->dm->persist($payment);
+
+        return $payment;
     }
 }
