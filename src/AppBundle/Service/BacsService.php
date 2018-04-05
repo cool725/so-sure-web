@@ -76,8 +76,7 @@ class BacsService
         $environment,
         MailerService $mailerService,
         $redis
-    )
-    {
+    ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->s3 = $s3;
