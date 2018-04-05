@@ -29,9 +29,9 @@ class DaviesExcel
             return null;
         }
 
-        if (in_array(strtolower($field), ['ok'])) {
+        if (in_array(mb_strtolower($field), ['ok'])) {
             return false;
-        } elseif (in_array(strtolower($field), ['suspicious'])) {
+        } elseif (in_array(mb_strtolower($field), ['suspicious'])) {
             return true;
         }
 
@@ -50,7 +50,7 @@ class DaviesExcel
     {
         // possible values that Davies might use as placeholders
         // when a field is required by their system, but data will never be provided
-        return in_array(trim(strtolower($value)), ['unable to obtain']);
+        return in_array(trim(mb_strtolower($value)), ['unable to obtain']);
     }
 
     /**

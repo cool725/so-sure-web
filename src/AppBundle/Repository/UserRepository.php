@@ -37,7 +37,7 @@ class UserRepository extends DocumentRepository
     public function existsUser($email, $facebookId = null, $mobileNumber = null)
     {
         $qb = $this->createQueryBuilder();
-        $qb->addOr($qb->expr()->field('emailCanonical')->equals(strtolower($email)));
+        $qb->addOr($qb->expr()->field('emailCanonical')->equals(mb_strtolower($email)));
         if ($facebookId) {
             $qb->addOr($qb->expr()->field('facebookId')->equals(trim($facebookId)));
         }
@@ -63,8 +63,8 @@ class UserRepository extends DocumentRepository
             $qb->field('id')->notEqual($user->getId());
         }
         if ($email) {
-            $qb->addOr($qb->expr()->field('emailCanonical')->equals(strtolower($email)));
-            $qb->addOr($qb->expr()->field('usernameCanonical')->equals(strtolower($email)));
+            $qb->addOr($qb->expr()->field('emailCanonical')->equals(mb_strtolower($email)));
+            $qb->addOr($qb->expr()->field('usernameCanonical')->equals(mb_strtolower($email)));
         }
         if ($facebookId) {
             $qb->addOr($qb->expr()->field('facebookId')->equals(trim($facebookId)));

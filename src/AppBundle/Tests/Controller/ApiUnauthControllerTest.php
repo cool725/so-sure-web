@@ -27,7 +27,7 @@ class ApiUnauthControllerTest extends BaseControllerTest
             'cognito_id' => self::$identity->getId(),
         ));
         $data = $this->verifyResponse(200);
-        $this->assertTrue(strlen($data['token']) > 20);
+        $this->assertTrue(mb_strlen($data['token']) > 20);
     }
 
     public function testTokenUnauthOkNoVersionRecordMobileIdentifier()
@@ -44,7 +44,7 @@ class ApiUnauthControllerTest extends BaseControllerTest
             'cognito_id' => self::$identity->getId(),
         ));
         $data = $this->verifyResponse(200);
-        $this->assertTrue(strlen($data['token']) > 20);
+        $this->assertTrue(mb_strlen($data['token']) > 20);
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(User::class);
@@ -75,7 +75,7 @@ class ApiUnauthControllerTest extends BaseControllerTest
             'cognito_id' => self::$identity->getId(),
         ));
         $data = $this->verifyResponse(200);
-        $this->assertTrue(strlen($data['token']) > 20);
+        $this->assertTrue(mb_strlen($data['token']) > 20);
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(User::class);

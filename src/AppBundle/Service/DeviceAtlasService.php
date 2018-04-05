@@ -92,7 +92,7 @@ class DeviceAtlasService
         $playRepo = $this->dm->getRepository(PlayDevice::class);
         $phoneRepo = $this->dm->getRepository(Phone::class);
 
-        if ($marketingName && strlen($marketingName) > 0) {
+        if ($marketingName && mb_strlen($marketingName) > 0) {
             $names = [
                 sprintf("%s %s", $manufacturer, $marketingName),
                 $marketingName,

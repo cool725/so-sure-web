@@ -53,7 +53,7 @@ class PushService
         Policy $policy = null
     ) {
         $this->logger->debug(sprintf('Push triggered to user id: %s %s', $user->getId(), $message));
-        if (!$user->getSnsEndpoint() || strlen(trim($user->getSnsEndpoint())) == 0) {
+        if (!$user->getSnsEndpoint() || mb_strlen(trim($user->getSnsEndpoint())) == 0) {
             $this->logger->debug(sprintf('Push skipped (no endpoint)'));
 
             return;

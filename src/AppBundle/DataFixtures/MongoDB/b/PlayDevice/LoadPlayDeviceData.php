@@ -66,6 +66,6 @@ class LoadPlayDeviceData implements FixtureInterface, ContainerAwareInterface
 
         $validator = new TokenValidator();
 
-        return $validator->conform(substr($data, 0, $length));
+        return $validator->conform(mb_substr($data, 0, $length));
     }
 }

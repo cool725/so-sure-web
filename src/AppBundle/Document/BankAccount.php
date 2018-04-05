@@ -248,7 +248,7 @@ class BankAccount
 
     public function generateReference(User $user, $sequence)
     {
-        $reference = sprintf('%s5%010d', strtoupper(substr($user->getLastName(), 0, 1)), $sequence);
+        $reference = sprintf('%s5%010d', mb_strtoupper(mb_substr($user->getLastName(), 0, 1)), $sequence);
         $this->setReference($reference);
         $this->setFirstPayment(true);
 

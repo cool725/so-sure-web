@@ -11,4 +11,9 @@
    <exclude name="PEAR.Commenting.FunctionComment.MissingParamName" />
    <exclude name="PEAR.Commenting.FunctionComment.Missing" />
  </rule>
+<rule ref="Generic.PHP.ForbiddenFunctions">
+  <properties>
+    <property name="forbiddenFunctions" type="array" value="mail=>mb_mail,strlen=>mb_strlen,strpos=>mb_strpos,strrpos=>mb_strrpos,substr=>mb_substr,strtolower=>mb_strtolower,strtoupper=>mb_strtoupper,stripos=>mb_stripos,strripos=>mb_strripos,strstr=>mb_strstr,stristr=>mb_stristr,strrchr=>mb_strrchr,substr_count=>mb_substr_count,ereg=>mb_ereg,eregi=>mb_eregi,ereg_replace=>mb_ereg_replace,eregi_replace=>mb_eregi_replace,split=>mb_split"/>
+  </properties>
+</rule>
 </ruleset>

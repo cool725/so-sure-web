@@ -18,7 +18,7 @@ class SoSure
 
     public static function hasSoSureEmail($email)
     {
-        return stripos($email, '@so-sure.com') !== false;
+        return mb_stripos($email, '@so-sure.com') !== false;
     }
 
     // make sure uppper case/normalised

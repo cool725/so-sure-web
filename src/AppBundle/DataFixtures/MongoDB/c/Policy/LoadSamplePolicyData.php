@@ -458,9 +458,9 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             if ($rand == 1) {
                 $email = sprintf("%s.%s@%s", $user->getFirstName(), $user->getLastName(), explode("@", $email)[1]);
             } elseif ($rand == 2) {
-                $email = sprintf("%s%s@%s", substr($user->getFirstName(), 0, 1), $user->getLastName(), explode("@", $email)[1]);
+                $email = sprintf("%s%s@%s", mb_substr($user->getFirstName(), 0, 1), $user->getLastName(), explode("@", $email)[1]);
             } elseif ($rand == 3) {
-                $email = sprintf("%s%s%2d@%s", substr($user->getFirstName(), 0, 1), $user->getLastName(), rand(1, 99), explode("@", $email)[1]);
+                $email = sprintf("%s%s%2d@%s", mb_substr($user->getFirstName(), 0, 1), $user->getLastName(), rand(1, 99), explode("@", $email)[1]);
             }
         }
         $email = str_replace(' ', '', $email);
@@ -635,7 +635,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
         $manager->persist($policy);
         $env = $this->container->getParameter('kernel.environment');
-        $policy->create(-5000 + $count, strtoupper($env), $startDate);
+        $policy->create(-5000 + $count, mb_strtoupper($env), $startDate);
         $now = new \DateTime();
         $policy->setStatus(SalvaPhonePolicy::STATUS_ACTIVE);
         if ($picSure == self::PICSURE_RANDOM) {

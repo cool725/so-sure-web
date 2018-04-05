@@ -259,7 +259,7 @@ class InvitationService
             throw new OptOutException(sprintf('Email %s has opted out', $email));
         }
 
-        if ($policy->getUser()->getEmailCanonical() == strtolower($email)) {
+        if ($policy->getUser()->getEmailCanonical() == mb_strtolower($email)) {
             throw new SelfInviteException('User can not invite themself');
         }
     }
@@ -294,7 +294,7 @@ class InvitationService
         $this->validateSoSurePolicyEmail($policy, $email);
 
         $userRepo = $this->dm->getRepository(User::class);
-        $invitee = $userRepo->findOneBy(['emailCanonical' => strtolower($email)]);
+        $invitee = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
         $inviteePolicies = 0;
         if ($invitee) {
             $inviteePolicies = count($invitee->getValidPolicies(true));
@@ -671,11 +671,11 @@ class InvitationService
 
     public function resolveSCode($scode)
     {
-        if (strlen($scode) <= 8) {
+        if (mb_strlen($scode) <= 8) {
             return $scode;
         }
 
-        if (stripos($scode, "http") === false) {
+        if (mb_stripos($scode, "http") === false) {
             $url = sprintf("http://%s", $scode);
         } else {
             $url = $scode;
@@ -690,7 +690,7 @@ class InvitationService
             ]);
 
             // Branch now performs a javascript redirect using window.location
-            $host = strtolower(parse_url($url, PHP_URL_HOST));
+            $host = mb_strtolower(parse_url($url, PHP_URL_HOST));
             if (in_array($host, ['sosure.app.link', 'sosure.test-app.link'])) {
                 $body = (string) $res->getBody();
                 $pattern = '/.*window\.location\s*=.*["](http[^"]*)["].*/m';
@@ -1193,7 +1193,7 @@ class InvitationService
     public function rejectAllInvitations($email)
     {
         $inviteRepo = $this->dm->getRepository(EmailInvitation::class);
-        $invitations = $inviteRepo->findBy(['email' => strtolower($email)]);
+        $invitations = $inviteRepo->findBy(['email' => mb_strtolower($email)]);
         foreach ($invitations as $invitation) {
             if (!$invitation->isProcessed()) {
                 $invitation->setRejected(new \DateTime());

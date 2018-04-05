@@ -187,7 +187,7 @@ abstract class S3EmailService
         $keys = [];
         foreach ($iterator as $object) {
             if ($object['Size'] > 0 &&
-                stripos($object['Key'], 'AMAZON_SES_SETUP_NOTIFICATION') === false) {
+                mb_stripos($object['Key'], 'AMAZON_SES_SETUP_NOTIFICATION') === false) {
                 $keys[] = $object['Key'];
             }
         }
