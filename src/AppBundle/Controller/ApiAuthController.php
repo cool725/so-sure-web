@@ -1118,6 +1118,23 @@ class ApiAuthController extends BaseController
                 'Bucket' => $this->getDataString($data, 'bucket'),
                 'Key'    => $this->getDataString($data, 'key'),
             ));
+
+            if (!in_array($result['ContentType'], array('image/jpeg', 'image/png'))) {
+                $msg = sprintf(
+                    'Invalid file s3://%s/%s of type %s',
+                    $this->getDataString($data, 'bucket'),
+                    $this->getDataString($data, 'key'),
+                    $result['ContentType']
+                );
+                $this->get('logger')->error($msg);
+
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_POLICY_PICSURE_FILE_INVALID,
+                    $msg,
+                    422
+                );
+            }
+
             $picsure = new PicSureFile();
             $picsure->setBucket($this->getDataString($data, 'bucket'));
             $picsure->setKey($this->getDataString($data, 'key'));
