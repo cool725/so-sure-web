@@ -11,6 +11,8 @@ class SoSure
 
     const SOSURE_TRACKING_SESSION_NAME = 'sosure-tracking';
 
+    const SOSURE_EMPLOYEE_SALES_EMAIL = 'sales@so-sure.com';
+
     const POLICY_START = "2016-09-01";
     const TIMEZONE = "Europe/London";
 
