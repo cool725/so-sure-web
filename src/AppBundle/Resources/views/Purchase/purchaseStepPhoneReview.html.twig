@@ -136,12 +136,49 @@
                 <h4 class="text-center">How would you like to pay?</h4>
 
                 <div class="form-group payment-options {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
+
+
                     {{ form_label(purchase_form.amount, 'Payment Options:', { 'label_attr': {'class': 'sr-only'} }) }}
                     {{ form_widget(purchase_form.amount) }}
 
+                    <div class="row">
+                        {% if app.user.allowedYearlyPayments %}
+                        <div class="{% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %}col-xs-6{% else %}col-xs-12{% endif %}">
+                            <div class="payment-options--btn
+                                 {% if purchase_form.vars.value.amount == phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) %}
+                                    payment--btn-selected
+                                 {% endif %}"
+                                 id="payment--yearly"
+                                 data-value="{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}">
+                                {% if purchase_form.vars.value.amount == phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) %}
+                                    <i class="fa fa-check-circle" aria-hidden="true"></i>
+                                {% endif %}
+                                <h4 class="h-light">Yearly</h4>
+                                <span class="h3">&pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if app.user.allowedMonthlyPayments %}
+                        <div class="{% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %}col-xs-6{% else %}col-xs-12{% endif %}">
+                            <div class="payment-options--btn
+                                 {% if purchase_form.vars.value.amount == phone.currentPhonePrice.monthlyPremiumPrice %}
+                                    payment-options--btn-selected
+                                 {% endif %}"
+                                 id="payment--monthly"
+                                 data-value="{{ phone.currentPhonePrice.monthlyPremiumPrice|number_format(2, '.', ',') }}">
+                                {% if purchase_form.vars.value.amount == phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) %}
+                                    <i class="fa fa-check-circle" aria-hidden="true"></i>
+                                {% endif %}
+                                <h4 class="h-light">Monthly</h4>
+                                <span class="h3">&pound;{{ phone.currentPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</span>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
                     <div class="payment-options--info help-block">
-                        <small class="year">You will be billed the full amount on your purchase date.</small>
-                        <small class="month "><strong>You will be billed on the {{ billing_date|date('jS') }}</strong> of each month. If that’s inconvenient, you will be able to change your monthly billing day after purchase in your payment settings.</small>
+                        <small class="year {% if purchase_form.vars.value.amount == phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) %}payment-options--help-text{% endif %}">You will be billed the full amount on your purchase date.</small>
+                        <small class="month {% if purchase_form.vars.value.amount == phone.currentPhonePrice.monthlyPremiumPrice %}payment-options--help-text{% endif %}"><strong>You will be billed on the {{ billing_date|date('jS') }}</strong> of each month. If that’s inconvenient, you will be able to change your monthly billing day after purchase in your payment settings.</small>
                     </div>
 
 

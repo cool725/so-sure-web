@@ -109,35 +109,34 @@ $(function(){
 $(function(){
 
     // Payment buttons action radio buttons
-    // $('.payment--btn').click(function(event) {
+    $('.payment-options--btn').click(function(event) {
+        // Toggle Class on Btns
+        $('.payment-options--btn').removeClass('payment-options--btn-selected');
+        $(this).addClass('payment-options--btn-selected');
 
-    //     $(this).toggleClass('payment--btn-selected')
-    //     .siblings()
-    //     .removeClass('payment--btn-selected');
+        // Add value to input
+        var value = $(this).data('value');
+        $('input[name="purchase_form[amount]"][value="' + value + '"]').prop('checked', true);
+    });
 
-    //     var value = $(this).data('value');
-    //     $('input[name="purchase_form[amount]"][value="' + value + '"]').prop('checked', true);
-    // });
+    $('input[name="purchase_form[amount]').change(function(e) {
+        console.log('Yes');
+    });
 
-    // $('input[type=radio]').click(function () {
-    //     if($(this).prop("checked")) {
-    //         alert("checked!");
+
+    // $('#purchase_form_amount_0').click(function(e) {
+    //     if($(this).prop('checked')) {
+    //         $('.payment-options--info .month').show();
+    //         $('.payment-options--info .year').hide();
     //     }
     // });
 
-    $('#purchase_form_amount_0').click(function(e) {
-        if($(this).prop('checked')) {
-            $('.payment-options--info .month').show();
-            $('.payment-options--info .year').hide();
-        }
-    });
-
-    $('#purchase_form_amount_1').click(function(e) {
-        if($(this).prop('checked')) {
-            $('.payment-options--info .year').show();
-            $('.payment-options--info .month').hide();
-        }
-    });
+    // $('#purchase_form_amount_1').click(function(e) {
+    //     if($(this).prop('checked')) {
+    //         $('.payment-options--info .year').show();
+    //         $('.payment-options--info .month').hide();
+    //     }
+    // });
 
     // Validate step
     $('#step--validate').click(function(e) {

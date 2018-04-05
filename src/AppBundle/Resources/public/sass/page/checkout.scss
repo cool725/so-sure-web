@@ -8,10 +8,6 @@
 @import "../components/buttonsNew";
 @import "checkoutNav";
 
-// body {
-//     overflow-x: hidden;
-// }
-
 .checkout {
 
     h1 {
@@ -124,8 +120,56 @@ blockquote {
 
 .payment-options {
 
-    .year {
-        display: none;
+    &--btn {
+
+        padding: 15px;
+        border: 1px solid $primary-blue;
+
+        h4, .h3 {
+            color: $dark-grey;
+        }
+
+        @include border-radius(4px);
+
+        * {
+            margin: 0;
+        }
+
+        &:hover, &:focus {
+            cursor: pointer;
+            background-color: $primary-blue;
+
+            h4, .h3 {
+                color: $white;
+            }
+        }
+
+        &:active {
+            background-color: darken($primary-blue, 15%);
+        }
+
+    }
+
+    &--btn-selected {
+        cursor: pointer;
+        background: $primary-blue url('#{$cdn_url}/images/library_benefits/so-sure_cover-tick.svg') 90% center no-repeat;
+        background-size: 32px;
+
+        h4, .h3 {
+            color: $white;
+        }
+    }
+
+    &--info {
+        margin-top: 15px;
+
+        small {
+            display: none;
+        }
+
+        .payment-options--help-text {
+            display: inline;
+        }
     }
 }
 
