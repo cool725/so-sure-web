@@ -131,7 +131,7 @@ class RefundListener
                     $refund->setNotes($notes);
                     $refund->setSource(Payment::SOURCE_SYSTEM);
                     $refund->setRefundTotalCommission($refundCommissionAmount);
-                    $refund->setManual($payment->getManual());
+                    $refund->setManual($payment->isManual());
                     $refund->setSuccess(true);
                     $payment->getPolicy()->addPayment($refund);
                     $this->dm->persist($refund);
