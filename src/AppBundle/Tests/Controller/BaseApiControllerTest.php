@@ -161,7 +161,7 @@ class BaseApiControllerTest extends BaseControllerTest
         return $payment;
     }
 
-    private function createMultiPayRequest($payerEmail, $payeeEmail, $real = false)
+    protected function createMultiPayRequest($payerEmail, $payeeEmail, $real = false)
     {
         // Payer
         $payerUser = self::createUser(
