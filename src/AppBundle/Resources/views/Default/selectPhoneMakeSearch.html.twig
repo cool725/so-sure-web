@@ -2,7 +2,7 @@
 {# if basepath or formID is changed - change PurchaseControllerTest test cases #}
 
 {# default to #}
-{% set uid          = '' %}
+{% set uid          = 'search-phone-form' %}
 {% set buttonText   = 'Instant Quote' %}
 {% set buttonCSS    = 'btn btn-blue btn-pad btn-block' %}
 {% set basePath     = '/phone-insurance/' %}
@@ -16,11 +16,9 @@
 {% endif %}
 
 {% if type is defined and type == 'homepage' %}
-    {% set formID = 'search-phone-form-homepage' %}
     {% set uid    = '-1' %}
 {% elseif type is defined and type == 'homepage-sticky' %}
-    {% set formID = 'search-phone-form-homepage' %}
-    {# {% set uid    = '-1' %} #}
+    {% set uid    = '-1' %}
     {% set stickySearch = true %}
 {% elseif type == 'purchase-select' %}
     {% set basePath = '/select-phone-search/purchase-select/' %}
