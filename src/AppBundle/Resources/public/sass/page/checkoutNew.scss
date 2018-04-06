@@ -12,10 +12,10 @@
 
     h1 {
         text-align: center;
-        line-height: 30px;
+        line-height: 32px;
 
         .title-top {
-            font-size: 18px;
+            font-size: 24px;
         }
 
         .title-top-all {
@@ -23,7 +23,7 @@
         }
 
         .title-phone {
-            font-size: 25px;
+            font-size: 28px;
             cursor: pointer;
         }
 
@@ -42,7 +42,7 @@
         }
 
         .title-price {
-            font-size: 20px;
+            font-size: 22px;
         }
 
         @include breakpoint(tablet) {
@@ -93,7 +93,7 @@
             padding-left: 20px;
 
             li {
-                margin-bottom: 15px;
+                margin: 15px 0;
             }
         }
     }
@@ -123,14 +123,43 @@
 }
 
 blockquote {
-    margin-top: 0;
+
+
+    footer {
+        img {
+            border-radius: 50%;
+            border: 15px solid $off-white;
+
+            &:hover {
+                border-color: $lightest-blue;
+            }
+        }
+    }
+}
+
+.speech-bubble {
+    text-align: center;
+    position: relative;
+    font-size: 18px;
+    // padding: 20px 30px;
+    margin: 20px 0 30px;
+    // color: $white;
+    // background: $primary-blue;
+    @include border-radius(20px);
+
+    @include breakpoint(tablet) {
+        font-size: 24px;
+        margin: 30px 0 40px;
+    }
 }
 
 .payment-options {
+    margin: 30px 0;
 
     &--btn {
-
+        text-align: center;
         padding: 15px;
+        margin-bottom: 15px;
         border: 1px solid $primary-blue;
 
         h4, .h3 {
@@ -160,203 +189,30 @@ blockquote {
 
     &--btn-selected {
         cursor: pointer;
-        background: $primary-blue url('#{$cdn_url}/images/library_benefits/so-sure_cover-tick.svg') 90% center no-repeat;
+        background: $primary-blue url('#{$cdn_url}/images/library_benefits/so-sure_cover-tick.svg') center no-repeat;
         background-size: 32px;
 
         h4, .h3 {
             color: $white;
         }
-    }
 
-    &--info {
-        margin-top: 15px;
-
-        small {
-            display: none;
-        }
-
-        .payment-options--help-text {
-            display: inline;
-        }
-    }
-}
-
-// .payment--step {
-//     background-color: $off-white;
-//     border-top: 1px solid $pale-grey;
-//     border-bottom: 1px solid $pale-grey;
-//     text-align: center;
-
-//     &-inner {
-//         max-width: 700px;
-//         position: relative;
-//         margin: 0 auto;
-//         padding: 0;
-//         border-left: 1px solid $pale-grey;
-//         border-right: 1px solid $pale-grey;
-
-//         h4 {
-//             margin: 10px 0;
-//         }
-//     }
-
-//     .payment--btn {
-//         padding: 15px 0;
-//         background-color: $off-white;
-//         border-top: 1px solid $pale-grey;
-
-//         cursor: pointer;
-
-//         font-family: $avenir-heavy;
-//         color: $dark-grey;
-
-//         &:first-of-type {
-//             border-right: 1px solid $pale-grey;
-//         }
-
-//         &:hover, &:focus {
-//             background-color: $light-blue;
-//             color: $white;
-//         }
-
-//         .billed {
-//             font-size: 16px;
-//         }
-
-//         .amount {
-//             font-size: 24px;
-//         }
-
-//         small {
-//             font-size: 12px;
-//             font-family: $avenir-book;
-//         }
-
-//         &-or {
-//             width: 40px; height: 40px;
-//             @include border-radius(50%);
-//             font-weight: bold;
-//             line-height: 25px;
-//             padding: 8px;
-//             color: $primary-blue;
-//             background-color: $white;
-//             border: 1px solid $primary-blue;
-//             position: absolute;
-//             left: 50%; bottom: 50%;
-//             margin-left: -20px;
-//             margin-bottom: -55px;
-//         }
-//     }
-
-//     .payment--btn-two {
-//         width: 50%;
-//         float: left;
-//     }
-
-//     .payment--btn-inner-single {
-//         margin: 0 auto;
-//     }
-
-//     .payment--btn-selected {
-//         background-color: $primary-blue;
-
-//         .payment--btn-inner {
-//             background: transparent url('#{$cdn_url}/images/library_benefits/so-sure_cover-tick.svg') center no-repeat;
-//             color: $white;
-//         }
-//     }
-
-//     .payment--no-btn {
-//         padding: 15px 0;
-//         // background-color: $white;
-//         border-top: 1px solid $pale-grey;
-
-//         font-family: $avenir-heavy;
-//         color: $dark-grey;
-
-//         .billed {
-//             font-size: 16px;
-//         }
-
-//         .amount {
-//             font-size: 24px;
-//         }
-
-//         .no-btn {
-//             color: $primary-blue;
-//         }
-
-//         small {
-//             font-size: 12px;
-//             font-family: $avenir-book;
-//         }
-//     }
-// }
-
-// .payment--step + .payment--step {
-//     border-bottom: none;
-//     border-top: none;
-// }
-
-
-
-// Cover / Benefits
-.owl-carousel {
-
-    .item {
-        text-align: center;
-
-        img {
-            width: 100px; height: 100px;
-            display: block;
-            margin: 0 auto 15px;
+        @include breakpoint(tablet) {
+            background-position: 10% center;
         }
     }
 
-    h5 {
-        line-height: 1.5;
-    }
+    // &--info {
+    //     margin-top: 15px;
 
+    //     small {
+    //         display: none;
+    //     }
+
+    //     .payment-options--help-text {
+    //         display: inline;
+    //     }
+    // }
 }
-
-.cover-list {
-    text-align: center;
-
-    li {
-        width: 130px;
-    }
-
-    img {
-        width: 100px; height: 100px;
-        display: block;
-        margin: 0 auto 15px;
-    }
-
-    h5 {
-        // text-align: center;
-    }
-}
-
-// .benefits--review-mobile {
-//     margin: 0 -15px;
-//     padding: 0 30px 20px;
-//     background: url('#{$cdn_url}/images/library_benefits/so-sure_cover-globe.svg') no-repeat;
-//     background-position: right -110px bottom -22px;
-
-//     li {
-//         margin: 15px 0;
-//     }
-// }
-
-// #purchase-step-review {
-
-//     @include breakpoint(tablet) {
-//         .checkout--top {
-//             background: url('#{$cdn_url}/images/library_benefits/so-sure_cover-globe-large.svg') no-repeat;
-//             background-position: right -180px bottom 0px;
-//         }
-//     }
-// }
 
 .benefits--review-desktop {
     padding-bottom: 20px;
