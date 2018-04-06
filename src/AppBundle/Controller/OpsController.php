@@ -193,6 +193,8 @@ class OpsController extends BaseController
                 count($validPolicyMonthly->getUser()->getValidPolicies(true)) == 1 &&
                 $validPolicyMonthly->isPolicyPaidToDate(new \DateTime())) {
                 break;
+            } else {
+                $validPolicyMonthly = null;
             }
         }
         foreach ($validPolicies as $unpaidValidPolicyMonthly) {
@@ -202,6 +204,8 @@ class OpsController extends BaseController
                 count($unpaidValidPolicyMonthly->getUser()->getValidPolicies(true)) == 1 &&
                 !$unpaidValidPolicyMonthly->isPolicyPaidToDate(new \DateTime())) {
                 break;
+            } else {
+                $unpaidValidPolicyMonthly = null;
             }
         }
         foreach ($validPolicies as $validPolicyYearly) {
@@ -209,6 +213,8 @@ class OpsController extends BaseController
             if (!$validPolicyYearly->hasMonetaryClaimed() &&
                 $validPolicyYearly->getPremiumPlan() == Policy::PLAN_YEARLY) {
                 break;
+            } else {
+                $validPolicyYearly = null;
             }
         }
         foreach ($validPolicies as $validMultiplePolicy) {
@@ -216,6 +222,8 @@ class OpsController extends BaseController
             $user = $validMultiplePolicy->getUser();
             if (count($user->getValidPolicies(true)) > 1 && $user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
                 break;
+            } else {
+                $validMultiplePolicy = null;
             }
         }
         foreach ($validPolicies as $validRenwalPolicyMonthlyNoPot) {
