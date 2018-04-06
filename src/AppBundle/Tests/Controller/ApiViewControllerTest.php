@@ -153,4 +153,88 @@ class ApiViewControllerTest extends BaseControllerTest
 
         $this->assertEquals($data, $pdf);
     }
+
+    /**
+     *
+     */
+    public function testGetPolicyTermsHtml()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('policy-terms-html', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $createData = $this->verifyResponse(200);
+        $policyId = $createData['id'];
+
+        $url = sprintf(
+            '/view/policy/%s/terms?policy_key=%s&maxPotValue=0&yearlyPremium=85.80',
+            $policyId,
+            static::$policyKey
+        );
+        $crawler = self::$client->request('GET', $url);
+        self::verifyResponse(200);
+        $body = self::$client->getResponse()->getContent();
+
+        $this->assertTrue(stripos($body, 'h1') >= 0);
+        $this->assertFalse(stripos($body, 'h4'));
+    }
+
+    /**
+     *
+     */
+    public function testGetPolicyTerms2Html()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('policy-terms2-html', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $createData = $this->verifyResponse(200);
+        $policyId = $createData['id'];
+
+        $url = sprintf(
+            '/view/policy/v2/%s/terms?policy_key=%s&maxPotValue=0&yearlyPremium=85.80',
+            $policyId,
+            static::$policyKey
+        );
+        $crawler = self::$client->request('GET', $url);
+        self::verifyResponse(200);
+        $body = self::$client->getResponse()->getContent();
+
+        $this->assertFalse(stripos($body, 'h1'));
+        $this->assertTrue(stripos($body, 'h4') >= 0);
+    }
+
+    /**
+     *
+     */
+    public function testGetPolicyTermsHtmlH1()
+    {
+        $url = sprintf('/view/policy/terms?policy_key=%s&maxPotValue=62.8&noH1=0', static::$policyKey);
+        $crawler = self::$client->request('GET', $url);
+        self::verifyResponse(200);
+        $body = self::$client->getResponse()->getContent();
+
+        $this->assertTrue(stripos($body, 'h1') >= 0);
+        $this->assertFalse(stripos($body, 'h4'));
+    }
+
+    /**
+     *
+     */
+    public function testGetPolicyTermsHtmlNoH1()
+    {
+        $url = sprintf('/view/policy/terms?policy_key=%s&maxPotValue=62.8&noH1=1', static::$policyKey);
+        $crawler = self::$client->request('GET', $url);
+        self::verifyResponse(200);
+        $body = self::$client->getResponse()->getContent();
+
+        $this->assertFalse(stripos($body, 'h1'));
+        $this->assertTrue(stripos($body, 'h4') >= 0);
+    }
 }

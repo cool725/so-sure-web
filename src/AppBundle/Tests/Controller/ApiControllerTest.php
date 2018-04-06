@@ -334,34 +334,6 @@ class ApiControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
     }
 
-    /**
-     *
-     */
-    public function testGetPolicyTermsHtmlH1()
-    {
-        $url = sprintf('/view/policy/terms?policy_key=%s&maxPotValue=62.8&noH1=0', static::$policyKey);
-        $crawler = self::$client->request('GET', $url);
-        self::verifyResponse(200);
-        $body = self::$client->getResponse()->getContent();
-
-        $this->assertTrue(stripos($body, 'h1') >= 0);
-        $this->assertFalse(stripos($body, 'h4'));
-    }
-
-    /**
-     *
-     */
-    public function testGetPolicyTermsHtmlNoH1()
-    {
-        $url = sprintf('/view/policy/terms?policy_key=%s&maxPotValue=62.8&noH1=1', static::$policyKey);
-        $crawler = self::$client->request('GET', $url);
-        self::verifyResponse(200);
-        $body = self::$client->getResponse()->getContent();
-
-        $this->assertFalse(stripos($body, 'h1'));
-        $this->assertTrue(stripos($body, 'h4') >= 0);
-    }
-
     // quote
 
     /**
