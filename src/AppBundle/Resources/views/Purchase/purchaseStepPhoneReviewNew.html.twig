@@ -66,9 +66,9 @@
             </h1>
             <div class="row">
                 <div class="col-sm-8 col-sm-offset-2 col-md-8 col-md-offset-2">
-                    <div class="speech-bubble animated bounceIn clearfix">Superb service with my first use of so-sure. I couldn't be happier with the way my claim was handled and I got my phone the next day 😁 <br><small>Ben Allssop, London.</small></div>
+                    <div class="speech-bubble animated fadeInLeft clearfix">Superb service with my first use of so-sure. I couldn't be happier with the way my claim was handled and I got my phone the next day 😁 <br><small>Ben Allssop, London.</small></div>
                     <div class="payment-options">
-                        <h3 class="text-center">How would you like to pay?</h3>
+                        <h3 class="text-center">1. How would you like to pay?</h3>
                         <div class="row">
                             {% if app.user.allowedYearlyPayments %}
                             <div class="{% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %}col-xs-6{% else %}col-xs-12{% endif %}">
@@ -113,10 +113,10 @@
         </div>
     </div>
 
-    <div class="checkout--step checkout--step-payment">
-        <div class="container">
+    {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'data-client-validation': form_client_validation, 'autocomplete': 'off' }}) }}
 
-            {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'data-client-validation': form_client_validation, 'autocomplete': 'off' }}) }}
+        <div class="checkout--step checkout--step-payment">
+            {# <div class="container-fluid"> #}
 
                 <div class="form-group {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
                     {{ form_label(purchase_form.amount, 'Payment Options:', { 'label_attr': {'class': 'sr-only'} }) }}
@@ -124,9 +124,9 @@
                     <div class="help-block with-errors sr-only">{{ form_errors(purchase_form.amount) }}</div>
                 </div>
 
-                <h3>Your device details</h3>
-
                 <div class="form-group {% if form_errors(purchase_form.imei) %}has-error{% endif %}">
+                    <h3>2. Your device details</h3>
+
                     {{ form_label(purchase_form.imei, 'IMEI Number:', { 'label_attr': {'class': 'sr-only'} }) }}
                     {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control imei', 'placeholder':'IMEI Number'}}) }}
                     <label class="samsung-imei">Numbers only please (no / required)</label>
@@ -155,20 +155,22 @@
                     {{ form_widget(purchase_form.file, {'attr': {'style':'display:none'}}) }}
                 </div>
 
-                <h3>Before you continue</h3>
+                <div class="checkout--step-confirm">
+                    <div class="inner">
+                        <h3>3. Before you continue</h3>
 
-                <div class="alert alert-info">
-                    <p>Please confirm that the following are correct:</p>
-                    <ol>
-                        <li>My phone is in full working condition and my screen is not cracked.</li>
-                        <li>I am a resident of the United Kingdom.</li>
-                        <li>I have read &amp; understood the <a class="policy-doc-toggle" href="#policy-doc" data-toggle="modal" data-target="#policy-modal" id="policy-modal-trigger">so-sure policy document</a>.</li>
-                    </ol>
+                        <p>Please confirm that the following are correct:</p>
+                        <ol>
+                            <li>My phone is in full working condition and my screen is not cracked.</li>
+                            <li>I am a resident of the United Kingdom.</li>
+                            <li>I have read &amp; understood the <a class="policy-doc-toggle" href="#policy-doc" data-toggle="modal" data-target="#policy-modal" id="policy-modal-trigger">so-sure policy document</a>.</li>
+                        </ol>
 
-                    <p><small>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</small></p>
+                        <small>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</small>
 
-                    <div class="form-group" style="display: none">
-                        {{ form_widget(purchase_form.agreed, {'label': ' I confirm the above is correct', 'value': 'checked'}) }}
+                        <div class="form-group" style="display: none">
+                            {{ form_widget(purchase_form.agreed, {'label': ' I confirm the above is correct', 'value': 'checked'}) }}
+                        </div>
                     </div>
                 </div>
 
@@ -180,18 +182,33 @@
                         {{ form_widget(purchase_form.next, {'label': 'I agree, proceed to payment', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
                     {% endif %}
                 </div>
+
+                <div class="form-group">
+                    {% if app.request.get('_route') == "purchase_step_policy_id" %}
+                    <a href="{{ path('user_home') }}"
+                       class="btn btn-blue-hollow btn-block btn-pad">
+                        Back
+                    </a>
+                    {% else %}
+                    <a href="{{ path('purchase_step_personal') }}"
+                       class="btn btn-blue-hollow btn-block btn-pad">
+                        Back
+                    </a>
+                    {% endif %}
+                </div>
+
                 <div class="form-group text-center">
                     <small class="text-grey">Powered by</small> <br>
                     <img src="{{ cdn_url }}/images/purchase/judo_pay_logo.svg" alt="Judo Pay" title="Powered by - Judo Pay" width="70px">
                 </div>
 
-            {{ form_end(purchase_form) }}
-
-            <form action="{{ webpay_action }}" method="post" id="webpay-form">
-                <input id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
-            </form>
+                <form action="{{ webpay_action }}" method="post" id="webpay-form">
+                    <input id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
+                </form>
+            {# </div> #}
         </div>
-    </div>
+
+    {{ form_end(purchase_form) }}
 
 </section>
 

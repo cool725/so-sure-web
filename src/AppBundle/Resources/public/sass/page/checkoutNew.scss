@@ -88,14 +88,6 @@
         .form-group-break {
             margin-top: 30px;
         }
-
-        ol {
-            padding-left: 20px;
-
-            li {
-                margin: 15px 0;
-            }
-        }
     }
 
     .radio {
@@ -106,13 +98,53 @@
         height: 1px;
         overflow: hidden;
     }
+
+    &-confirm {
+        background: $white;
+        border-top: 1px solid $pale-grey;
+        border-bottom: 1px solid $pale-grey;
+        margin: 20px 0;
+        padding: 20px 0 30px;
+
+        .inner {
+            max-width: 345px;
+            margin: 0 auto;
+
+            h3 {
+                margin-top: 0;
+            }
+
+            ol {
+                padding-left: 20px;
+
+                li {
+                    margin: 15px 0;
+                }
+            }
+        }
+        // margin-left: -30px;
+        // margin-right: -30px;
+    }
 }
 
-.checkout--step-payment {
-    // padding: 20px 0;
-    // background-color: $white;
-    border-color: transparent;
+.checkout--step.checkout--step-payment {
+
+    .form-group {
+        max-width: 345px;
+        margin-left: auto;
+        margin-right: auto;
+
+        h3 {
+            margin-top: 0;
+        }
+    }
 }
+
+// .checkout--step-payment {
+//     // padding: 20px 0;
+//     // background-color: $white;
+//     border-color: transparent;
+// }
 
 .step {
 
@@ -141,15 +173,41 @@ blockquote {
     text-align: center;
     position: relative;
     font-size: 18px;
-    // padding: 20px 30px;
-    margin: 20px 0 30px;
-    // color: $white;
-    // background: $primary-blue;
+    margin: 30px 0;
     @include border-radius(20px);
 
     @include breakpoint(tablet) {
         font-size: 24px;
-        margin: 30px 0 40px;
+        margin: 40px 0;
+    }
+
+    &:before, &:after {
+        font-family: serif;
+        font-size: 80px;
+        color: $grey;
+        line-height: 0;
+        position: absolute;
+    }
+
+    &:before {
+        content: open-quote;
+        top: -5px; left: 50%;
+        margin-left: -20px;
+
+        @include breakpoint(tablet) {
+            top: 10px; left: -35px;
+            margin: 0;
+        }
+    }
+
+    &:after {
+        display: none;
+        content: close-quote;
+
+        @include breakpoint(tablet) {
+            display: block;
+            bottom: 10px; right: -35px;
+        }
     }
 }
 
