@@ -98,7 +98,9 @@ class BacsCommand extends BaseCommand
         if ($debug) {
             $output->writeln($this->getHeader());
         }
-        $data = [];
+        $data = [
+            'serial-number' => $serialNumber,
+        ];
 
         $output->writeln('Exporting Mandate Cancellations');
         $mandateCancellations = $this->exportMandateCancellations($processingDate, $serialNumber);
@@ -115,7 +117,8 @@ class BacsCommand extends BaseCommand
         }
 
         $output->writeln('Exporting Payments');
-        $payments = $this->exportPayments($prefix, $processingDate);
+        $payments = $this->exportPayments($prefix, $processingDate, $data);
+        $data['payments'] = count($payments);
         if ($debug) {
             $output->writeln(json_encode($payments, JSON_PRETTY_PRINT));
         }
@@ -241,7 +244,7 @@ class BacsCommand extends BaseCommand
         return $lines;
     }
 
-    private function exportPayments($prefix, \DateTime $date, $includeHeader = false)
+    private function exportPayments($prefix, \DateTime $date, &$metadata, $includeHeader = false)
     {
         $now = new \DateTime();
         $lines = [];
@@ -264,6 +267,7 @@ class BacsCommand extends BaseCommand
             BacsPaymentMethod::class,
             $advanceDate
         );
+        $metadata['payment-amount'] = 0;
         foreach ($scheduledPayments as $scheduledPayment) {
             /** @var ScheduledPayment $scheduledPayment */
             /** @var BacsPaymentMethod $bacs */
@@ -319,6 +323,7 @@ class BacsCommand extends BaseCommand
             );
             $scheduledPayment->setPayment($payment);
 
+            $metadata['payment-amount'] += $scheduledPayment->getAmount();
             $lines[] = implode(',', [
                 sprintf('"%s"', $scheduledPayment->getScheduled()->format('d/m/y')),
                 '"Scheduled Payment"',
