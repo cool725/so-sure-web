@@ -15,7 +15,7 @@ Bank/Building society address:
 {% endif %}
 Reference number: {{ user.paymentMethod.bankAccount.reference }}
 Collection frequency:
-  First Collection: {{  user.paymentMethod.bankAccount.getPaymentDate|date('d F','Europe/London') }}
+  First Collection: {{  user.paymentMethod.bankAccount.getFirstPaymentDate(user)|date('d F','Europe/London') }}
   (Collected on the {{ policy.billing|date('jS','Europe/London') }} of each month thereafter)
 Payment amount: £{{ policy.getPremiumInstallmentPrice(true)|number_format(2, '.', ',') }}
 
