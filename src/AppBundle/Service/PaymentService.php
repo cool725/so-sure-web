@@ -172,7 +172,7 @@ class PaymentService
     {
         $policy->getUser()->setPaymentMethod($bacsPaymentMethod);
         $bacsPaymentMethod->getBankAccount()->setInitialNotificationDate(
-            $bacsPaymentMethod->getBankAccount()->getPaymentDate()
+            $bacsPaymentMethod->getBankAccount()->getFirstPaymentDate($policy->getUser())
         );
         $bacsPaymentMethod->getBankAccount()->setStandardNotificationDate($policy->getBilling());
         $this->dm->flush();

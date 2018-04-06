@@ -120,6 +120,7 @@ abstract class Policy
     /**
      * @MongoDB\ReferenceOne(targetDocument="User", inversedBy="policies")
      * @Gedmo\Versioned
+     * @var User
      */
     protected $user;
 
@@ -232,6 +233,7 @@ abstract class Policy
     /**
      * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Cashback", cascade={"persist"}, orphanRemoval="true")
      * @Gedmo\Versioned
+     * @var Cashback
      */
     protected $cashback;
 
@@ -698,6 +700,9 @@ abstract class Policy
         });
     }
 
+    /**
+     * @return Cashback
+     */
     public function getCashback()
     {
         return $this->cashback;
@@ -724,6 +729,9 @@ abstract class Policy
         $this->cashback = null;
     }
 
+    /**
+     * @return User
+     */
     public function getUser()
     {
         return $this->user;

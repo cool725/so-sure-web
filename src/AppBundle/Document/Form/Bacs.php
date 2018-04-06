@@ -7,6 +7,8 @@ use AppBundle\Document\Address;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BacsTrait;
 use AppBundle\Document\IdentityLog;
+use AppBundle\Document\Policy;
+use AppBundle\Document\User;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 
