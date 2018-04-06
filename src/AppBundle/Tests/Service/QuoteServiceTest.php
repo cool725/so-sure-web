@@ -47,7 +47,7 @@ class QuoteServiceTest extends WebTestCase
             ->method('send')
             ->with($this->callback(
                 function ($mail) use ($needle) {
-                    return stripos($mail->getBody(), $needle) !== false;
+                    return mb_stripos($mail->getBody(), $needle) !== false;
                 }
             ));
     }

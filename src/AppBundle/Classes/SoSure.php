@@ -11,12 +11,14 @@ class SoSure
 
     const SOSURE_TRACKING_SESSION_NAME = 'sosure-tracking';
 
+    const SOSURE_EMPLOYEE_SALES_EMAIL = 'sales@so-sure.com';
+
     const POLICY_START = "2016-09-01";
     const TIMEZONE = "Europe/London";
 
     public static function hasSoSureEmail($email)
     {
-        return stripos($email, '@so-sure.com') !== false;
+        return mb_stripos($email, '@so-sure.com') !== false;
     }
 
     // make sure uppper case/normalised

@@ -849,7 +849,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals('GB', $policy->getIdentityLog()->getCountry());
         $this->assertEquals([-0.13,51.5], $policy->getIdentityLog()->getLoc()->coordinates);
 
-        $this->assertTrue(strlen($data['id']) > 5);
+        $this->assertTrue(mb_strlen($data['id']) > 5);
         $this->assertTrue(in_array('A0001', $data['phone_policy']['phone']['devices']));
         $this->assertGreaterThan(0, $data['monthly_premium']);
         $this->assertGreaterThan(0, $data['yearly_premium']);
@@ -971,7 +971,7 @@ class ApiAuthControllerTest extends BaseControllerTest
 
         $data = $this->verifyResponse(200);
 
-        $this->assertTrue(strlen($data['id']) > 5);
+        $this->assertTrue(mb_strlen($data['id']) > 5);
         $this->assertTrue(in_array('A0001', $data['phone_policy']['phone']['devices']));
         $this->assertGreaterThan(0, $data['monthly_premium']);
         $this->assertGreaterThan(0, $data['yearly_premium']);
@@ -1306,7 +1306,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         ]]);
         $data = $this->verifyResponse(200);
 
-        $this->assertTrue(strlen($data['id']) > 5);
+        $this->assertTrue(mb_strlen($data['id']) > 5);
         $this->assertEquals('64', $data['phone_policy']['phone']['memory']);
     }
 
@@ -2505,7 +2505,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         ]);
         $data = $this->verifyResponse(200);
         $this->assertEquals(
-            strtolower(self::generateEmail('new-email-rejected-invitee', $this)),
+            mb_strtolower(self::generateEmail('new-email-rejected-invitee', $this)),
             $data['invitation_detail']
         );
         $this->assertEquals('functional test', $data['name']);
@@ -2549,7 +2549,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         ]);
         $data = $this->verifyResponse(200);
         $this->assertEquals(
-            strtolower(self::generateEmail('DuplicateEmailInvitation-invitee', $this)),
+            mb_strtolower(self::generateEmail('DuplicateEmailInvitation-invitee', $this)),
             $data['invitation_detail']
         );
         $this->assertEquals('functional test', $data['name']);
@@ -2836,7 +2836,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(200);
         $this->assertEquals('foo bar', $data['name']);
         $this->assertEquals(
-            strtolower(self::generateEmail('testNewFacebookInvitation-invitee', $this)),
+            mb_strtolower(self::generateEmail('testNewFacebookInvitation-invitee', $this)),
             $data['invitation_detail']
         );
 
@@ -3536,8 +3536,8 @@ class ApiAuthControllerTest extends BaseControllerTest
             'policy_id' => $policyId,
         ]);
         $getData = $this->verifyResponse(200);
-        $this->assertEquals(8, strlen($getData['code']));
-        $this->assertGreaterThan(8, strlen($getData['share_link']));
+        $this->assertEquals(8, mb_strlen($getData['code']));
+        $this->assertGreaterThan(8, mb_strlen($getData['share_link']));
         $this->assertEquals(SCode::TYPE_STANDARD, $getData['type']);
         $this->assertNotEquals($oldCode, $getData['code']);
 
@@ -3742,7 +3742,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         ]);
         $getData = $this->verifyResponse(200);
         $sCode = $getData['code'];
-        $this->assertEquals(8, strlen($sCode));
+        $this->assertEquals(8, mb_strlen($sCode));
 
         // Payee
         $payeeUser = self::createUser(
@@ -3853,7 +3853,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         ]);
         $getData = $this->verifyResponse(200);
         $sCode = $getData['code'];
-        $this->assertEquals(8, strlen($sCode));
+        $this->assertEquals(8, mb_strlen($sCode));
 
         $url = sprintf('/api/v1/auth/scode/%s?_method=PUT', $sCode);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
@@ -3885,8 +3885,8 @@ class ApiAuthControllerTest extends BaseControllerTest
         $getData = $this->verifyResponse(200);
         $policyUrl = self::$router->generate('policy_terms', ['id' => $policyId]);
         //print $getData["view_url"];
-        $this->assertTrue(stripos($getData["view_url"], $policyUrl) >= 0);
-        $this->assertTrue(stripos($getData["view_url"], 'http') >= 0);
+        $this->assertTrue(mb_stripos($getData["view_url"], $policyUrl) >= 0);
+        $this->assertTrue(mb_stripos($getData["view_url"], 'http') >= 0);
     }
 
     // secret
@@ -5034,7 +5034,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         ]);
         $getData = $this->verifyResponse(200);
         $sCode = $getData['code'];
-        $this->assertEquals(8, strlen($sCode));
+        $this->assertEquals(8, mb_strlen($sCode));
 
         // Payee
         $payeeUser = self::createUser(

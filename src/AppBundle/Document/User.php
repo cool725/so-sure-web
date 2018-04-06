@@ -1329,7 +1329,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     public function hasEmail()
     {
-        return strlen(trim($this->getEmail())) > 0;
+        return mb_strlen(trim($this->getEmail())) > 0;
     }
 
     public function hasPaymentMethod()
@@ -1538,10 +1538,10 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             );
         }
 
-        if (strlen($this->getFirstName()) > 0) {
-            $initial = strtolower($this->getFirstName()[0]);
+        if (mb_strlen($this->getFirstName()) > 0) {
+            $initial = mb_strtolower($this->getFirstName()[0]);
         } else {
-            $initial = strtolower($this->getEmail()[0]);
+            $initial = mb_strtolower($this->getEmail()[0]);
         }
         return $this->gravatarImageFallback(
             $this->getEmail(),
@@ -1572,10 +1572,10 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function hasValidDetails()
     {
         // TODO: Improve validation
-        if (strlen($this->getFirstName()) == 0 ||
-            strlen($this->getLastName()) == 0 ||
-            strlen($this->getEmail()) == 0 ||
-            strlen($this->getMobileNumber()) == 0 ||
+        if (mb_strlen($this->getFirstName()) == 0 ||
+            mb_strlen($this->getLastName()) == 0 ||
+            mb_strlen($this->getEmail()) == 0 ||
+            mb_strlen($this->getMobileNumber()) == 0 ||
             !$this->getBirthday()) {
             return false;
         }
@@ -1600,7 +1600,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
         $postcode = new Postcode($this->getBillingAddress()->getPostcode());
 
-        if (in_array(strtoupper($postcode->outcode()), SoSure::$yearlyOnlyPostcodeOutcodes)) {
+        if (in_array(mb_strtoupper($postcode->outcode()), SoSure::$yearlyOnlyPostcodeOutcodes)) {
             return false;
         } elseif (in_array($postcode->normalise(), SoSure::$yearlyOnlyPostcodes)) {
             return false;

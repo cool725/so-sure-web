@@ -100,7 +100,7 @@ class FOSUBUserProvider extends BaseClass
         #if ($search == "facebook_id") {
         #    $search = "facebookId";
         #}
-        if (!$username || !$search || strlen(trim($username)) == 0 || strlen(trim($search)) == 0) {
+        if (!$username || !$search || mb_strlen(trim($username)) == 0 || mb_strlen(trim($search)) == 0) {
             // if username or search is empty, it could return the first in the db
             throw new \Exception(sprintf(
                 'Unable to detect search %s',
@@ -129,7 +129,7 @@ class FOSUBUserProvider extends BaseClass
                 return null;
             }
 
-            if ($this->userManager->findUserBy(['emailCanonical' => strtolower($response->getEmail())])) {
+            if ($this->userManager->findUserBy(['emailCanonical' => mb_strtolower($response->getEmail())])) {
                 $msg = 'You appear to already have an account, but its not connected. Please login and connect.';
 
                 if ($request = $this->requestStack->getCurrentRequest()) {
@@ -201,7 +201,7 @@ class FOSUBUserProvider extends BaseClass
     {
         $validator = new AlphanumericValidator();
 
-        return $validator->conform(substr($value, 0, $length));
+        return $validator->conform(mb_substr($value, 0, $length));
     }
 
     private function getLongLivedAccessToken(UserResponseInterface $response)
@@ -320,7 +320,7 @@ class FOSUBUserProvider extends BaseClass
         if (!$users || count($users) == 0) {
             return true;
         }
-        $email = strtolower($email);
+        $email = mb_strtolower($email);
         $mobile = $this->normalizeUkMobile($mobile);
 
         foreach ($users as $duplicate) {

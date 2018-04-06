@@ -57,7 +57,7 @@ class HelpController extends BaseController
         }
 
         $mimetype = $filesystem->getMimetype($file);
-        if (stripos($mimetype, 'text/html') !== false) {
+        if (mb_stripos($mimetype, 'text/html') !== false) {
             $html = $filesystem->read($file);
             $crawler = new Crawler($html);
             return [

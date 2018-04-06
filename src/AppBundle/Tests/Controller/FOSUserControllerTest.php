@@ -73,7 +73,7 @@ class FOSUserControllerTest extends BaseControllerTest
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $userRepo = $dm->getRepository(User::class);
-        $updatedUser2 = $userRepo->findOneBy(['emailCanonical' => strtolower($email)]);
+        $updatedUser2 = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
         $this->assertNotEquals($updatedUser2->getPassword(), $password1);
         $this->assertNotEquals($updatedUser2->getPassword(), $password2);
         $this->assertTrue(count($updatedUser2->getPreviousPasswords()) > 0);
@@ -131,7 +131,7 @@ class FOSUserControllerTest extends BaseControllerTest
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $userRepo = $dm->getRepository(User::class);
-        $updatedUser2 = $userRepo->findOneBy(['emailCanonical' => strtolower($email)]);
+        $updatedUser2 = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
         $this->assertNotEquals($updatedUser2->getPassword(), $password1);
         $this->assertNotEquals($updatedUser2->getPassword(), $password2);
         $this->assertTrue(count($updatedUser2->getPreviousPasswords()) > 0);
@@ -188,7 +188,7 @@ class FOSUserControllerTest extends BaseControllerTest
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $userRepo = $dm->getRepository(User::class);
-        $updatedUser2 = $userRepo->findOneBy(['emailCanonical' => strtolower($email)]);
+        $updatedUser2 = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
         $this->assertNotEquals($updatedUser2->getPassword(), $password1);
         $this->assertNotEquals($updatedUser2->getPassword(), $password2);
         $this->assertTrue(count($updatedUser2->getPreviousPasswords()) > 0);
@@ -303,15 +303,15 @@ class FOSUserControllerTest extends BaseControllerTest
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $userRepo = $dm->getRepository(User::class);
-        $updatedUser = $userRepo->findOneBy(['emailCanonical' => strtolower($email)]);
+        $updatedUser = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
         if ($expectSuccess) {
             $this->assertTrue(
-                strlen($updatedUser->getConfirmationToken()) > 10,
+                mb_strlen($updatedUser->getConfirmationToken()) > 10,
                 sprintf('Unable to find reset token: %s', $crawler->html())
             );
         } else {
             $this->assertTrue(
-                strlen($updatedUser->getConfirmationToken()) == 0,
+                mb_strlen($updatedUser->getConfirmationToken()) == 0,
                 sprintf('Found unexpected reset token: %s', $crawler->html())
             );
         }

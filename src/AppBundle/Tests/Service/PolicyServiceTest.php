@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Document\Company;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
@@ -221,7 +222,7 @@ class PolicyServiceTest extends WebTestCase
         $this->assertTrue($updatedPolicy->isPolicy(), 'Policy must have a status');
         $this->assertTrue($updatedPolicy->isValidPolicy(), 'Policy must be valid');
         $this->assertTrue(
-            stripos($updatedPolicy->getPolicyNumber(), 'Mob/') !== false,
+            mb_stripos($updatedPolicy->getPolicyNumber(), 'Mob/') !== false,
             'Policy number must contain Mob'
         );
     }
@@ -244,7 +245,7 @@ class PolicyServiceTest extends WebTestCase
         $updatedPolicy = static::$policyRepo->find($policy->getId());
         $this->assertTrue($updatedPolicy->isPolicy(), 'Policy must have a status');
         $this->assertFalse($updatedPolicy->isValidPolicy());
-        $this->assertTrue(stripos($updatedPolicy->getPolicyNumber(), 'INVALID/') !== false);
+        $this->assertTrue(mb_stripos($updatedPolicy->getPolicyNumber(), 'INVALID/') !== false);
     }
 
     public function testCreatePolicyDuplicateCreate()
@@ -272,7 +273,7 @@ class PolicyServiceTest extends WebTestCase
         $this->assertTrue($updatedPolicy->isPolicy(), 'Policy must have a status');
         $this->assertTrue($updatedPolicy->isValidPolicy(), 'Policy must be valid');
         $this->assertTrue(
-            stripos($updatedPolicy->getPolicyNumber(), 'Mob/') !== false,
+            mb_stripos($updatedPolicy->getPolicyNumber(), 'Mob/') !== false,
             'Policy number must contain Mob'
         );
         $this->assertEquals(new \DateTime('2016-01-01'), $updatedPolicy->getStart());
@@ -286,7 +287,7 @@ class PolicyServiceTest extends WebTestCase
         $this->assertTrue($updatedPolicy->isPolicy(), 'Policy must have a status');
         $this->assertTrue($updatedPolicy->isValidPolicy(), 'Policy must be valid');
         $this->assertTrue(
-            stripos($updatedPolicy->getPolicyNumber(), 'Mob/') !== false,
+            mb_stripos($updatedPolicy->getPolicyNumber(), 'Mob/') !== false,
             'Policy number must contain Mob'
         );
         $this->assertEquals(new \DateTime('2016-01-01'), $updatedPolicy->getStart());
@@ -1305,6 +1306,44 @@ class PolicyServiceTest extends WebTestCase
         $this->assertEquals(new \DateTimeZone(Salva::SALVA_TIMEZONE), $renewalPolicy->getStart()->getTimeZone());
     }
 
+    public function testPolicyPendingRenewalCompany()
+    {
+        $company = new Company();
+
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPolicyPendingRenewalCompany', $this),
+            'bar',
+            static::$dm
+        );
+
+        static::$dm->persist($company);
+
+        $user->setCompany($company);
+
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-06-01'), true);
+        static::$policyService->setEnvironment('test');
+        static::$dm->flush();
+        $this->assertEquals(new \DateTimeZone(Salva::SALVA_TIMEZONE), $policy->getStart()->getTimeZone());
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+
+        $renewalPolicy = static::$policyService->createPendingRenewal(
+            $policy,
+            new \DateTime('2017-05-15')
+        );
+    }
+
     public function testPolicyRenewMultiPay()
     {
         $payer = static::createUser(
@@ -2081,7 +2120,7 @@ class PolicyServiceTest extends WebTestCase
             static::$policyService->cancel($updatedPolicy, Policy::CANCELLED_UNPAID, true, new \DateTime('2016-01-14'));
         } catch (\Exception $e) {
             $exception = true;
-            $this->assertTrue(stripos($e->getMessage(), 'less than 15 days in unpaid state') > 0);
+            $this->assertTrue(mb_stripos($e->getMessage(), 'less than 15 days in unpaid state') > 0);
         }
         $this->assertTrue($exception);
     }
@@ -4406,7 +4445,7 @@ class PolicyServiceTest extends WebTestCase
             ->with($this->callback(
                 function ($mail) use ($email) {
                     return in_array($email, array_keys($mail->getTo())) &&
-                        stripos($mail->getSubject(), 'your so-sure Reward Pot') !== false;
+                        mb_stripos($mail->getSubject(), 'your so-sure Reward Pot') !== false;
                 }
             ));
     }
@@ -4418,7 +4457,7 @@ class PolicyServiceTest extends WebTestCase
             ->with($this->callback(
                 function ($mail) use ($email) {
                     return in_array($email, array_keys($mail->getTo())) &&
-                        stripos($mail->getSubject(), 'is now cancelled') !== false;
+                        mb_stripos($mail->getSubject(), 'is now cancelled') !== false;
                 }
             ));
     }
@@ -4430,7 +4469,7 @@ class PolicyServiceTest extends WebTestCase
             ->with($this->callback(
                 function ($mail) use ($email) {
                     return in_array($email, array_keys($mail->getTo())) &&
-                        stripos($mail->getSubject(), 'is now finished') !== false;
+                        mb_stripos($mail->getSubject(), 'is now finished') !== false;
                 }
             ));
     }

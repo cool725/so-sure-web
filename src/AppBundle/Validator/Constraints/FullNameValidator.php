@@ -10,7 +10,7 @@ class FullNameValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         // allow blank string - different validations should be used for null/not null
-        if (strlen(trim($value)) == 0) {
+        if (mb_strlen(trim($value)) == 0) {
             return;
         }
 

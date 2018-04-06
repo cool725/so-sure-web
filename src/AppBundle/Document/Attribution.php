@@ -186,7 +186,7 @@ class Attribution
     {
         $validator = new AlphanumericSpaceDotValidator();
 
-        $this->referer = $validator->conform(substr($referer, 0, 1500));
+        $this->referer = $validator->conform(mb_substr($referer, 0, 1500));
     }
 
     public function getReferer()
@@ -231,28 +231,28 @@ class Attribution
     public function stringImplode($glue)
     {
         $lines = [];
-        if (strlen($this->getCampaignName()) > 0) {
+        if (mb_strlen($this->getCampaignName()) > 0) {
             $lines[] = sprintf("Name: %s", $this->getCampaignName());
         }
-        if (strlen($this->getCampaignSource()) > 0) {
+        if (mb_strlen($this->getCampaignSource()) > 0) {
             $lines[] = sprintf("Source: %s", $this->getCampaignSource());
         }
-        if (strlen($this->getCampaignMedium()) > 0) {
+        if (mb_strlen($this->getCampaignMedium()) > 0) {
             $lines[] = sprintf("Medium: %s", $this->getCampaignMedium());
         }
-        if (strlen($this->getCampaignContent()) > 0) {
+        if (mb_strlen($this->getCampaignContent()) > 0) {
             $lines[] = sprintf("Content: %s", $this->getCampaignContent());
         }
-        if (strlen($this->getCampaignTerm()) > 0) {
+        if (mb_strlen($this->getCampaignTerm()) > 0) {
             $lines[] = sprintf("Term: %s", $this->getCampaignTerm());
         }
-        if (strlen($this->getReferer()) > 0) {
+        if (mb_strlen($this->getReferer()) > 0) {
             $lines[] = sprintf("Referer: %s", $this->getReferer());
         }
-        if (strlen($this->getDeviceCategory()) > 0) {
+        if (mb_strlen($this->getDeviceCategory()) > 0) {
             $lines[] = sprintf("Device Category: %s", $this->getDeviceCategory());
         }
-        if (strlen($this->getDeviceOS()) > 0) {
+        if (mb_strlen($this->getDeviceOS()) > 0) {
             $lines[] = sprintf("Device OS: %s", $this->getDeviceOS());
         }
 
@@ -261,8 +261,8 @@ class Attribution
 
     public function getNormalizedCampaignSource()
     {
-        $source = strtolower(trim($this->getCampaignSource()));
-        if (strlen(trim($source)) == 0) {
+        $source = mb_strtolower(trim($this->getCampaignSource()));
+        if (mb_strlen(trim($source)) == 0) {
             $source = self::SOURCE_UNTRACKED;
         }
 

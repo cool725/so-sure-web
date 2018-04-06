@@ -43,7 +43,7 @@ class ApiExternalControllerTest extends BaseControllerTest
         );
         
         $data = $this->verifyResponse(200);
-        $this->assertTrue(strlen($data['jwt']) > 20);
+        $this->assertTrue(mb_strlen($data['jwt']) > 20);
     }
 
     public function testZendeskUserNotFound()

@@ -73,11 +73,11 @@ class BranchService
         if ($source || $medium || $campaign) {
             $appleCampaign = urlencode(sprintf('%s-%s-%s', $source, $campaign, $medium));
             // 40 char limit https://itunespartner.apple.com/en/apps/faq/App%20Analytics_Campaigns
-            if (strlen($appleCampaign) > 40) {
+            if (mb_strlen($appleCampaign) > 40) {
                 $appleCampaign = urlencode(sprintf('%s-%s', $source, $campaign));
             }
-            if (strlen($appleCampaign) > 40) {
-                $appleCampaign = substr(urlencode(sprintf('%s', $campaign)), 0, 40);
+            if (mb_strlen($appleCampaign) > 40) {
+                $appleCampaign = mb_substr(urlencode(sprintf('%s', $campaign)), 0, 40);
             }
 
             return http_build_query(['cs' => $appleCampaign]);

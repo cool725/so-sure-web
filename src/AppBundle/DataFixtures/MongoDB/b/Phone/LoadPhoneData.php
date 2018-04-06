@@ -152,7 +152,7 @@ abstract class LoadPhoneData implements ContainerAwareInterface
 
             $devices = str_getcsv($data[4], ",", "'");
             foreach ($devices as $device) {
-                if (stripos($device, "‘") !== false || stripos($device, "’") !== false) {
+                if (mb_stripos($device, "‘") !== false || mb_stripos($device, "’") !== false) {
                     throw new \Exception(sprintf('Invalid apple quote for device %s', $device));
                 }
             }
@@ -192,7 +192,7 @@ abstract class LoadPhoneData implements ContainerAwareInterface
             $resolution = explode('x', str_replace(' ', '', $data[17]));
             $releaseDate = null;
             $releaseDateText = str_replace(' ', '', $data[21]);
-            if (strlen($releaseDateText) > 0) {
+            if (mb_strlen($releaseDateText) > 0) {
                 $releaseDate = \DateTime::createFromFormat('m/y', $releaseDateText);
                 if (!$releaseDate) {
                     throw new \Exception('Unknown date format');
@@ -241,14 +241,14 @@ abstract class LoadPhoneData implements ContainerAwareInterface
         if ($make != "ALL") {
             if ($memory) {
                 $this->container->get('router')->generate('quote_make_model_memory', [
-                    'make' => strtolower($make),
-                    'model' => strtolower($model),
+                    'make' => mb_strtolower($make),
+                    'model' => mb_strtolower($model),
                     'memory' => $memory,
                 ]);
             } else {
                 $this->container->get('router')->generate('quote_make_model', [
-                    'make' => strtolower($make),
-                    'model' => strtolower($model),
+                    'make' => mb_strtolower($make),
+                    'model' => mb_strtolower($model),
                 ]);
             }
         }

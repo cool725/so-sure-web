@@ -949,7 +949,7 @@ class ReceperioService extends BaseImeiService
         $device = $modelData['modelreference'];
         // Devices are cased as not sure what google will do in the future
         // but recipero usually upper cases modelreference
-        if (in_array(strtoupper($device), $phone->getDevicesAsUpper())) {
+        if (in_array(mb_strtoupper($device), $phone->getDevicesAsUpper())) {
             return true;
         } else {
             $this->statsd->increment('recipero.makeModelMismatch');
@@ -975,7 +975,7 @@ class ReceperioService extends BaseImeiService
     public function isSameApplePhone(Phone $phone, $serialNumber, $modelData, $data, $warnMismatch = true)
     {
 
-        if (strtolower($modelData['name']) != strtolower($phone->getModel())) {
+        if (mb_strtolower($modelData['name']) != mb_strtolower($phone->getModel())) {
             $this->statsd->increment('recipero.makeModelMismatch');
             $errMessage = sprintf(
                 "Mismatching model %s for serial number %s. Data: %s",
@@ -1021,7 +1021,7 @@ class ReceperioService extends BaseImeiService
         $this->validateMakeModeResponseMakes($serialNumber, $data);
 
         $makeData = $data['makes'][0];
-        $make = strtolower($makeData['make']);
+        $make = mb_strtolower($makeData['make']);
         $isApple = $make == 'apple';
         $isIMEI = $this->isImei($serialNumber);
 

@@ -123,4 +123,15 @@ class SCodeServiceTest extends WebTestCase
         $this->assertEquals(SCode::TYPE_STANDARD, $scode->getType());
         $this->assertEquals('abbb0003', $scode->getCode());
     }
+
+    public function testGenerateUniqueSCodeMB()
+    {
+        $user = new User();
+        $user->setFirstName("żbieta");
+        $user->setLastName("Eżbieta");
+
+        $scode = static::$scodeService->generateUniqueSCode($user, SCode::TYPE_STANDARD);
+        $this->assertEquals(SCode::TYPE_STANDARD, $scode->getType());
+        $this->assertEquals('żeżb0001', $scode->getCode());
+    }
 }

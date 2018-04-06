@@ -212,7 +212,7 @@ class SixpackService
 
     public function convertByClientId($clientId, $experiment, $kpi = null)
     {
-        if (!$clientId || strlen($clientId) == 0) {
+        if (!$clientId || mb_strlen($clientId) == 0) {
             $this->logger->info(sprintf('Missing clientId for experiment %s', $experiment));
 
             return;
@@ -247,8 +247,8 @@ class SixpackService
             // There appears to be an error with sixpack in use that is returning experiment does not exist
             // rather than this client was not participating
             // {"status": "failed", "message": "experiment does not exist"}
-            if (stripos($data['message'], 'not participating') !== false ||
-                stripos($data['message'], 'experiment does not exist') !== false) {
+            if (mb_stripos($data['message'], 'not participating') !== false ||
+                mb_stripos($data['message'], 'experiment does not exist') !== false) {
                 return null;
             } else {
                 $this->logger->error(sprintf('Failed converting exp %s', $experiment), ['exception' => $e]);

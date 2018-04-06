@@ -1185,7 +1185,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 $userEmailForm->handleRequest($request);
                 if ($userEmailForm->isValid()) {
                     $userRepo = $this->getManager()->getRepository(User::class);
-                    $existingUser = $userRepo->findOneBy(['emailCanonical' => strtolower($user->getEmail())]);
+                    $existingUser = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($user->getEmail())]);
                     if ($existingUser) {
                         // @codingStandardsIgnoreStart
                         $this->addFlash(
@@ -1301,10 +1301,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $claimNumber = $form->get('number')->getData();
         $claimId = $form->get('id')->getData();
         $qb = $qb->field('status')->in($status);
-        if (strlen($claimNumber) > 0) {
+        if (mb_strlen($claimNumber) > 0) {
             $qb = $qb->field('number')->equals(new MongoRegex(sprintf("/.*%s.*/i", $claimNumber)));
         }
-        if (strlen($claimId) > 0) {
+        if (mb_strlen($claimId) > 0) {
             $qb = $qb->field('id')->equals(new \MongoId($claimId));
         }
         $qb = $qb->sort('replacementReceivedDate', 'desc')
@@ -1642,7 +1642,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $connectForm->handleRequest($request);
                     if ($connectForm->isValid()) {
                         if ($sourceUser = $userRepo->findOneBy([
-                                'emailCanonical' => strtolower($connectForm->getData()['email'])
+                                'emailCanonical' => mb_strtolower($connectForm->getData()['email'])
                             ])) {
                             $reward = $rewardRepo->find($connectForm->getData()['rewardId']);
                             $invitationService = $this->get('app.invitation');
@@ -1686,7 +1686,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $dm->persist($reward);
 
                         $code = $this->getDataString($rewardForm->getData(), 'code');
-                        if (strlen($code) > 0) {
+                        if (mb_strlen($code) > 0) {
                             $scode = new SCode();
                             $scode->setCode($code);
                             $scode->setReward($reward);
@@ -1753,7 +1753,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     $belongForm->handleRequest($request);
                     if ($belongForm->isValid()) {
                         $user = $userRepo->findOneBy([
-                            'emailCanonical' => strtolower($belongForm->getData()['email'])
+                            'emailCanonical' => mb_strtolower($belongForm->getData()['email'])
                         ]);
                         if (!$user) {
                             $userManager = $this->get('fos_user.user_manager');
