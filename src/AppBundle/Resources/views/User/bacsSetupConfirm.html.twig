@@ -41,7 +41,7 @@
                     </li>
                     <li>
                         <small class="text-dark-grey">Collection frequency</small><br>
-                        <span class="h4">First collection: {{ bacs.getPaymentDate|date('d F','Europe/London') }}</span><br>
+                        <span class="h4">First collection: {{ bacs.getFirstPaymentDate(app.user)|date('d F','Europe/London') }}</span><br>
                         <small class="text-dark-grey">(Collected on the {{ policy.billing|date('jS','Europe/London') }} of each month thereafter)</small><br>
                     </li>
                     <li>
@@ -51,7 +51,7 @@
                 </ul>
                 <p>
                     I confirm that the above details are correct and payment to SO-SURE LIMITED will be first
-                    collected on {{ bacs.getPaymentDate|date('d F','Europe/London') }}. You will receive confirmation of this direct debit along
+                    collected on {{ bacs.getFirstPaymentDate(app.user)|date('d F','Europe/London') }}. You will receive confirmation of this direct debit along
                     with any future notices via <strong>email</strong>.
                 </p>
             </div>
