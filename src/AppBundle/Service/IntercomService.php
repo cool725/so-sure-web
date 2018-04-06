@@ -363,10 +363,10 @@ class IntercomService
             $data = [];
         }
         $data['email'] = $lead->getEmail();
-        if (strlen($lead->getName()) > 0) {
+        if (mb_strlen($lead->getName()) > 0) {
             $data['name'] = $lead->getName();
         }
-        if (strlen($lead->getSource()) > 0) {
+        if (mb_strlen($lead->getSource()) > 0) {
             $data['custom_attributes']['source'] = $lead->getSource();
         }
         if ($lead->getIntercomId()) {
@@ -714,7 +714,7 @@ class IntercomService
     private function findUser($email)
     {
         $repo = $this->dm->getRepository(User::class);
-        $user = $repo->findOneBy(['emailCanonical' => strtolower($email)]);
+        $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
 
         return $user;
     }
@@ -722,7 +722,7 @@ class IntercomService
     private function findLead($email)
     {
         $repo = $this->dm->getRepository(Lead::class);
-        $lead = $repo->findOneBy(['email' => strtolower($email)]);
+        $lead = $repo->findOneBy(['email' => mb_strtolower($email)]);
 
         return $lead;
     }
@@ -925,7 +925,7 @@ class IntercomService
 
         if (!$foundUserOrLead) {
             $lead = new Lead();
-            $lead->setEmail(strtolower($email));
+            $lead->setEmail(mb_strtolower($email));
             if ($source) {
                 $lead->setSource($source);
             }
@@ -967,7 +967,7 @@ class IntercomService
             $page++;
             $pages = $resp->pages->total_pages;
             foreach ($resp->contacts as $lead) {
-                if (strlen(trim($lead->email)) > 0) {
+                if (mb_strlen(trim($lead->email)) > 0) {
                     $optedOut = $emailOptOutRepo->isOptedOut($lead->email, EmailOptOut::OPTOUT_CAT_AQUIRE) ||
                         $emailOptOutRepo->isOptedOut($lead->email, EmailOptOut::OPTOUT_CAT_RETAIN);
                     if ($lead->unsubscribed_from_emails && !$optedOut) {
@@ -1022,7 +1022,7 @@ class IntercomService
             $page++;
             $pages = $resp->pages->total_pages;
             foreach ($resp->users as $user) {
-                if (strlen(trim($user->email)) > 0) {
+                if (mb_strlen(trim($user->email)) > 0) {
                     $doNotContact = false;
                     foreach ($user->tags->tags as $tag) {
                         $tagName = html_entity_decode($tag->name, ENT_QUOTES | ENT_XML1, 'UTF-8');
@@ -1032,7 +1032,7 @@ class IntercomService
                         }
                         */
                         if (!$doNotContact) {
-                            $doNotContact = stripos($tagName, self::TAG_DONT_CONTACT) !== false;
+                            $doNotContact = mb_stripos($tagName, self::TAG_DONT_CONTACT) !== false;
                         }
                     }
                     if (!$doNotContact) {
@@ -1050,7 +1050,7 @@ class IntercomService
                         $output[] = sprintf("Added optout for %s", $user->email);
                     } elseif (!$user->unsubscribed_from_emails && $optedOut) {
                         // sosure user listener -> queue -> intercom update issue
-                        $sosureUser = $userRepo->findOneBy(['emailCanonical' => strtolower($user->email)]);
+                        $sosureUser = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($user->email)]);
                         if ($sosureUser) {
                             $this->updateUser($sosureUser);
                             $output[] = sprintf("Resync intercom user for %s", $user->email);

@@ -82,7 +82,7 @@ class LloydsService
                         // Incoming faster payments
                         // 28/04/2017,FPI,'30-65-41,36346160,XXX...XXX ,,425.53,2733.96
                         $processedDate = \DateTime::createFromFormat("d/m/Y", $line['Transaction Date']);
-                    } elseif (stripos($line['Transaction Description'], 'MDIR') === false ||
+                    } elseif (mb_stripos($line['Transaction Description'], 'MDIR') === false ||
                         count($processedDates) < 2) {
                         $this->logger->warning(sprintf(
                             'Skipping line as unable to parse description. %s',

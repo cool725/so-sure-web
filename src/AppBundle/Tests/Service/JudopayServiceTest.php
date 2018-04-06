@@ -285,7 +285,7 @@ class JudopayServiceTest extends WebTestCase
         $updatedPolicy = $repo->find($policy->getId());
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $updatedPolicy->getStatus());
-        $this->assertGreaterThan(5, strlen($updatedPolicy->getPolicyNumber()));
+        $this->assertGreaterThan(5, mb_strlen($updatedPolicy->getPolicyNumber()));
     }
 
     public function testJudoAdditionalUnexpectedPayment()
@@ -348,7 +348,7 @@ class JudopayServiceTest extends WebTestCase
         static::$policyService->setEnvironment('test');
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
-        $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
+        $this->assertGreaterThan(5, mb_strlen($policy->getPolicyNumber()));
     }
 
     public function testJudoRefund()
@@ -370,7 +370,7 @@ class JudopayServiceTest extends WebTestCase
         static::$policyService->setEnvironment('test');
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
-        $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
+        $this->assertGreaterThan(5, mb_strlen($policy->getPolicyNumber()));
 
         $payment = $policy->getLastSuccessfulUserPaymentCredit();
 
@@ -409,7 +409,7 @@ class JudopayServiceTest extends WebTestCase
         static::$policyService->setEnvironment('test');
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
-        $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
+        $this->assertGreaterThan(5, mb_strlen($policy->getPolicyNumber()));
 
         $payment = $policy->getPayments()[0];
 
@@ -450,7 +450,7 @@ class JudopayServiceTest extends WebTestCase
         // @codingStandardsIgnoreEnd
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
-        $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
+        $this->assertGreaterThan(5, mb_strlen($policy->getPolicyNumber()));
 
         $this->assertEquals(11, count($policy->getScheduledPayments()));
         $scheduledPayment = $policy->getScheduledPayments()[0];
@@ -489,7 +489,7 @@ class JudopayServiceTest extends WebTestCase
         // @codingStandardsIgnoreEnd
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
-        $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
+        $this->assertGreaterThan(5, mb_strlen($policy->getPolicyNumber()));
 
         $this->assertEquals(11, count($policy->getScheduledPayments()));
         $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice(), $policy->getPremiumPaid());
@@ -539,7 +539,7 @@ class JudopayServiceTest extends WebTestCase
         // @codingStandardsIgnoreEnd
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
-        $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
+        $this->assertGreaterThan(5, mb_strlen($policy->getPolicyNumber()));
 
         $policy->setStatus(Policy::STATUS_UNPAID);
         self::$dm->flush();
@@ -592,7 +592,7 @@ class JudopayServiceTest extends WebTestCase
         // @codingStandardsIgnoreEnd
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
-        $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
+        $this->assertGreaterThan(5, mb_strlen($policy->getPolicyNumber()));
         $this->assertTrue($policy->getUser()->hasValidPaymentMethod());
 
         $policy->getUser()->getPaymentMethod()->addCardToken(
@@ -642,7 +642,7 @@ class JudopayServiceTest extends WebTestCase
         // @codingStandardsIgnoreEnd
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
-        $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
+        $this->assertGreaterThan(5, mb_strlen($policy->getPolicyNumber()));
         $this->assertTrue($policy->getUser()->hasValidPaymentMethod());
 
         $policy->getUser()->setPaymentMethod(null);
@@ -690,7 +690,7 @@ class JudopayServiceTest extends WebTestCase
         // @codingStandardsIgnoreEnd
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
-        $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
+        $this->assertGreaterThan(5, mb_strlen($policy->getPolicyNumber()));
         $this->assertEquals(11, count($policy->getScheduledPayments()));
         $this->assertEquals(self::$JUDO_TEST_CARD_LAST_FOUR, $policy->getPayments()[0]->getCardLastFour());
 
@@ -787,7 +787,7 @@ class JudopayServiceTest extends WebTestCase
         // @codingStandardsIgnoreEnd
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
-        $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
+        $this->assertGreaterThan(5, mb_strlen($policy->getPolicyNumber()));
         $this->assertEquals(11, count($policy->getScheduledPayments()));
         $this->assertEquals(self::$JUDO_TEST_CARD_LAST_FOUR, $policy->getPayments()[0]->getCardLastFour());
 
@@ -849,7 +849,7 @@ class JudopayServiceTest extends WebTestCase
         // @codingStandardsIgnoreEnd
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
-        $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
+        $this->assertGreaterThan(5, mb_strlen($policy->getPolicyNumber()));
         $this->assertEquals(11, count($policy->getScheduledPayments()));
         $this->assertEquals(self::$JUDO_TEST_CARD_LAST_FOUR, $policy->getPayments()[0]->getCardLastFour());
 
@@ -995,7 +995,7 @@ class JudopayServiceTest extends WebTestCase
         // @codingStandardsIgnoreEnd
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
-        $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
+        $this->assertGreaterThan(5, mb_strlen($policy->getPolicyNumber()));
         $this->assertEquals(11, count($policy->getScheduledPayments()));
         $this->assertEquals(self::$JUDO_TEST_CARD_LAST_FOUR, $policy->getPayments()[0]->getCardLastFour());
 
@@ -1061,7 +1061,7 @@ class JudopayServiceTest extends WebTestCase
         // @codingStandardsIgnoreEnd
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
-        $this->assertGreaterThan(5, strlen($policy->getPolicyNumber()));
+        $this->assertGreaterThan(5, mb_strlen($policy->getPolicyNumber()));
         $this->assertEquals(11, count($policy->getScheduledPayments()));
         $this->assertEquals(self::$JUDO_TEST_CARD_LAST_FOUR, $policy->getPayments()[0]->getCardLastFour());
 
@@ -1218,7 +1218,7 @@ class JudopayServiceTest extends WebTestCase
         $updatedPolicy1 = $repo->find($policy1->getId());
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $updatedPolicy1->getStatus());
-        $this->assertGreaterThan(5, strlen($updatedPolicy1->getPolicyNumber()));
+        $this->assertGreaterThan(5, mb_strlen($updatedPolicy1->getPolicyNumber()));
 
         static::$policyService->setEnvironment('prod');
         self::$judopay->existing($policy2, $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
@@ -1228,7 +1228,7 @@ class JudopayServiceTest extends WebTestCase
         $updatedPolicy2 = $repo->find($policy2->getId());
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $updatedPolicy2->getStatus());
-        $this->assertGreaterThan(5, strlen($updatedPolicy2->getPolicyNumber()));
+        $this->assertGreaterThan(5, mb_strlen($updatedPolicy2->getPolicyNumber()));
 
         static::$policyService->setEnvironment('prod');
         $invalidPremium = false;
@@ -1253,7 +1253,7 @@ class JudopayServiceTest extends WebTestCase
         $updatedPolicy3 = $repo->find($policy3->getId());
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $updatedPolicy3->getStatus());
-        $this->assertGreaterThan(5, strlen($updatedPolicy3->getPolicyNumber()));
+        $this->assertGreaterThan(5, mb_strlen($updatedPolicy3->getPolicyNumber()));
     }
 
     public function testJudoCommissionAmounts()

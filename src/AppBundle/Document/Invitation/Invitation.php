@@ -357,7 +357,7 @@ abstract class Invitation
         }
 
         if ($this instanceof EmailInvitation) {
-            $initial = strtolower($this->getEmail()[0]);
+            $initial = mb_strtolower($this->getEmail()[0]);
 
             return $this->gravatarImageFallback(
                 $this->getEmail(),

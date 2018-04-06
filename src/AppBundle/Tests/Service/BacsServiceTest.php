@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Service;
 
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
+use AppBundle\Document\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -50,20 +51,43 @@ class BacsServiceTest extends WebTestCase
             static::generateEmail('testBacsXml', $this),
             'bar'
         );
-        $bankAccount = new BankAccount();
-        $bankAccount->setMandateStatus(BankAccount::MANDATE_SUCCESS);
-        $bankAccount->setReference('SOSURE01');
-        $bacs = new BacsPaymentMethod();
-        $bacs->setBankAccount($bankAccount);
-        $user->setPaymentMethod($bacs);
+        $this->setValidBacsPaymentMethod($user, 'SOSURE01');
         static::$dm->flush();
 
-        $this->assertTrue(self::$bacsService->addacs(self::$xmlFile)['success']);
+        $results = self::$bacsService->addacs(self::$xmlFile);
+        $this->assertTrue($results['success']);
 
         $updatedUser = $this->assertUserExists(self::$container, $user);
         $this->assertEquals(
             BankAccount::MANDATE_CANCELLED,
             $updatedUser->getPaymentMethod()->getBankAccount()->getMandateStatus()
         );
+    }
+
+    private function setValidBacsPaymentMethod(User $user, $reference = null)
+    {
+        $bankAccount = new BankAccount();
+        $bankAccount->setMandateStatus(BankAccount::MANDATE_SUCCESS);
+        if (!$reference) {
+            $reference = sprintf('SOSURE%d', rand(1, 999999));
+        }
+        $bankAccount->setReference($reference);
+        $bankAccount->setSortCode('000099');
+        $bankAccount->setAccountNumber('87654321');
+        $bankAccount->setAccountName($user->getName());
+        $bacs = new BacsPaymentMethod();
+        $bacs->setBankAccount($bankAccount);
+        $user->setPaymentMethod($bacs);
+    }
+
+    public function testBacsPayment()
+    {
+        $policy = static::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('testBacsPayment', $this));
+        $this->setValidBacsPaymentMethod($policy->getUser());
+        $payment = static::$bacsService->bacsPayment($policy, 'test', 1.01);
+        $this->assertEquals(1.01, $payment->getAmount());
+        $this->assertEquals('test', $payment->getNotes());
+        $this->assertNull($payment->isSuccess());
     }
 }

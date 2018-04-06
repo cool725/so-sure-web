@@ -145,4 +145,14 @@ class BankAccountTest extends \PHPUnit\Framework\TestCase
             $bankAccount->allowedStandardProcessing(new \DateTime('2018-03-06'))
         );
     }
+
+    public function testAllowedSubmission()
+    {
+        $bankAccount = new BankAccount();
+        $bankAccount->setInitialPaymentSubmissionDate(new \DateTime('2018-02-28 09:00'));
+        $this->assertFalse($bankAccount->allowedSubmission(new \DateTime('2018-02-27 23:00')));
+        $this->assertTrue($bankAccount->allowedSubmission(new \DateTime('2018-02-28 01:00')));
+        $this->assertTrue($bankAccount->allowedSubmission(new \DateTime('2018-02-28 11:00')));
+        $this->assertTrue($bankAccount->allowedSubmission(new \DateTime('2018-02-29 01:00')));
+    }
 }

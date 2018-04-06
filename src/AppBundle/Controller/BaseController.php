@@ -47,7 +47,7 @@ abstract class BaseController extends Controller
 
     public function isDataStringPresent($data, $field)
     {
-        return strlen($this->getDataString($data, $field)) > 0;
+        return mb_strlen($this->getDataString($data, $field)) > 0;
     }
 
     protected function getDataBool($data, $field)
@@ -310,7 +310,7 @@ abstract class BaseController extends Controller
             if (is_bool($data[$field])) {
                 return true;
             }
-            if (is_array($data[$field]) || strlen(trim($data[$field])) == 0) {
+            if (is_array($data[$field]) || mb_strlen(trim($data[$field])) == 0) {
                 return false;
             }
         }
@@ -329,7 +329,7 @@ abstract class BaseController extends Controller
     protected function validateQueryFields(Request $request, $fields)
     {
         foreach ($fields as $field) {
-            if (strlen($this->getRequestString($request, $field)) == 0) {
+            if (mb_strlen($this->getRequestString($request, $field)) == 0) {
                 return false;
             }
         }
@@ -395,7 +395,7 @@ abstract class BaseController extends Controller
 
     protected function dataToMongoSearch($qb, $data, $mongoField, $run = false, $exact = false)
     {
-        if (strlen($data) == 0) {
+        if (mb_strlen($data) == 0) {
             return null;
         }
 
@@ -455,7 +455,7 @@ abstract class BaseController extends Controller
     {
         //look for the referer route
         $referer = $request->headers->get('referer');
-        if (strlen($referer) > 0) {
+        if (mb_strlen($referer) > 0) {
             return $referer;
         }
 
@@ -689,14 +689,14 @@ abstract class BaseController extends Controller
     {
         $validator = new AlphanumericSpaceDotValidator();
 
-        return $validator->conform(substr($value, 0, $length));
+        return $validator->conform(mb_substr($value, 0, $length));
     }
 
     protected function conformAlphanumeric($value, $length)
     {
         $validator = new AlphanumericValidator();
 
-        return $validator->conform(substr($value, 0, $length));
+        return $validator->conform(mb_substr($value, 0, $length));
     }
 
     /**

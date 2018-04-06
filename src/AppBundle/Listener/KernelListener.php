@@ -67,15 +67,15 @@ class KernelListener
         $referer = $request->headers->get('referer');
         $refererDomain = parse_url($referer, PHP_URL_HOST);
         $currentDomain = parse_url($request->getUri(), PHP_URL_HOST);
-        if (strtolower($refererDomain) != strtolower($currentDomain)) {
+        if (mb_strtolower($refererDomain) != mb_strtolower($currentDomain)) {
             $session = $request->getSession();
             $session->set('referer', $referer);
         }
 
         // In case a session that was started in-app, is re-used in the main webbrowser
         if ($session && $session->get('sosure-app') == "1"
-            && stripos($request->getPathInfo(), '/help') !== 0
-            && stripos($request->getPathInfo(), '/_') !== 0) {
+            && mb_stripos($request->getPathInfo(), '/help') !== 0
+            && mb_stripos($request->getPathInfo(), '/_') !== 0) {
             $session->remove('sosure-app');
         }
     }

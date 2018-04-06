@@ -68,7 +68,7 @@ class SecurityListener
         //   https://github.com/symfony/symfony/commit/2d17a0cac6cada236a4dfe8392738f8b176b26e4
         // so as a workaround, just ignore the api path
         //throw new \Exception(stripos($event->getRequest()->getPathInfo(), '/api/'));
-        if ($event->getRequest() && stripos($event->getRequest()->getPathInfo(), '/api/') === 0) {
+        if ($event->getRequest() && mb_stripos($event->getRequest()->getPathInfo(), '/api/') === 0) {
             $this->logger->debug(sprintf(
                 'Skipping actual interative login path: %s',
                 $event->getRequest()->getPathInfo()
@@ -93,7 +93,7 @@ class SecurityListener
         $user = $event->getAuthenticationToken()->getUser();
         $user->setLatestWebIdentityLog($identityLog);
 
-        if ($event->getRequest() && stripos($event->getRequest()->getPathInfo(), '/purchase/') === 0) {
+        if ($event->getRequest() && mb_stripos($event->getRequest()->getPathInfo(), '/purchase/') === 0) {
             $this->logger->debug(sprintf(
                 'Skipping mixpanel login event for purchase flow login path: %s',
                 $event->getRequest()->getPathInfo()
@@ -102,7 +102,7 @@ class SecurityListener
         }
         $this->mixpanel->queueTrackWithUser($user, MixpanelService::EVENT_LOGIN);
 
-        $key = sprintf(self::LOGIN_FAILURE_KEY, strtolower($user->getUsername()));
+        $key = sprintf(self::LOGIN_FAILURE_KEY, mb_strtolower($user->getUsername()));
         $this->redis->del($key);
     }
 
@@ -115,9 +115,9 @@ class SecurityListener
             /** @var \AppBundle\Repository\UserRepository */
             $repo = $this->dm->getRepository(User::class);
             /** @var User $user */
-            $user = $repo->findOneBy(['usernameCanonical' => strtolower($username)]);
+            $user = $repo->findOneBy(['usernameCanonical' => mb_strtolower($username)]);
             if ($user && ($user->hasEmployeeRole() || $user->hasClaimsRole())) {
-                $key = sprintf(self::LOGIN_FAILURE_KEY, strtolower($username));
+                $key = sprintf(self::LOGIN_FAILURE_KEY, mb_strtolower($username));
                 $count = $this->redis->incr($key);
                 // PCI doesn't state how long a failed login persists. 1 hour should be enough for brute force
                 $this->redis->expire($key, 3600);

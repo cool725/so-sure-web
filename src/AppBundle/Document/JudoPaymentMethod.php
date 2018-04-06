@@ -163,7 +163,7 @@ class JudoPaymentMethod extends PaymentMethod
             return null;
         }
 
-        $date = new \DateTime(sprintf('%s-%s-01', substr($end, 2, 2), substr($end, 0, 2)));
+        $date = new \DateTime(sprintf('%s-%s-01', mb_substr($end, 2, 2), mb_substr($end, 0, 2)));
 
         return $this->endOfMonth($date);
     }

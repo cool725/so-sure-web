@@ -39,7 +39,7 @@ class ConnectionRepository extends BaseDocumentRepository
             ->getQuery()
             ->execute();
         foreach ($connectionSourceLinks as $connectionSourceLink) {
-            if ($connectionSourceLink->getLinkedUser()->getEmailCanonical() == strtolower($email)) {
+            if ($connectionSourceLink->getLinkedUser()->getEmailCanonical() == mb_strtolower($email)) {
                 return true;
             }
         }
@@ -49,7 +49,7 @@ class ConnectionRepository extends BaseDocumentRepository
             ->getQuery()
             ->execute();
         foreach ($connectionLinkSources as $connectionLinkSource) {
-            if ($connectionLinkSource->getSourceUser()->getEmailCanonical() == strtolower($email)) {
+            if ($connectionLinkSource->getSourceUser()->getEmailCanonical() == mb_strtolower($email)) {
                 return true;
             }
         }

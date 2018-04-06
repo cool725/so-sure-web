@@ -631,7 +631,7 @@ class AdminController extends BaseController
                 readfile($file);
             },
             200,
-            array('Content-Type' => 'text/xml')
+            array('Content-Type' => 'text/plain')
         );
     }
 
@@ -738,13 +738,13 @@ class AdminController extends BaseController
         $dailyBarclaysProcessing = BarclaysFile::combineDailyProcessing($barclaysFiles);
         $totalTransaction = 0;
         foreach ($dailyTransaction as $key => $value) {
-            if (stripos($key, sprintf('%d%02d', $year, $month)) !== false) {
+            if (mb_stripos($key, sprintf('%d%02d', $year, $month)) !== false) {
                 $totalTransaction += (float) $value;
             }
         }
         $totalBarclaysProcessing = 0;
         foreach ($dailyBarclaysProcessing as $key => $value) {
-            if (stripos($key, sprintf('%d%02d', $year, $month)) !== false) {
+            if (mb_stripos($key, sprintf('%d%02d', $year, $month)) !== false) {
                 $totalBarclaysProcessing += (float) $value;
             }
         }
@@ -754,13 +754,13 @@ class AdminController extends BaseController
         $dailyLloydsProcessing = LloydsFile::combineDailyProcessing($lloydsFiles);
         $totalReceived = 0;
         foreach ($dailyReceived as $key => $value) {
-            if (stripos($key, sprintf('%d%02d', $year, $month)) !== false) {
+            if (mb_stripos($key, sprintf('%d%02d', $year, $month)) !== false) {
                 $totalReceived += (float) $value;
             }
         }
         $totalLloydsProcessing = 0;
         foreach ($dailyLloydsProcessing as $key => $value) {
-            if (stripos($key, sprintf('%d%02d', $year, $month)) !== false) {
+            if (mb_stripos($key, sprintf('%d%02d', $year, $month)) !== false) {
                 $totalLloydsProcessing += (float) $value;
             }
         }

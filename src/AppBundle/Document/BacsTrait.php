@@ -18,12 +18,12 @@ trait BacsTrait
 
     public function displayableSortCode($sortCode)
     {
-        if ($sortCode && strlen($sortCode) == 6) {
+        if ($sortCode && mb_strlen($sortCode) == 6) {
             return sprintf(
                 "%s-%s-%s",
-                substr($sortCode, 0, 2),
-                substr($sortCode, 2, 2),
-                substr($sortCode, 4, 2)
+                mb_substr($sortCode, 0, 2),
+                mb_substr($sortCode, 2, 2),
+                mb_substr($sortCode, 4, 2)
             );
         }
 
@@ -32,8 +32,8 @@ trait BacsTrait
 
     public function displayableAccountNumber($accountNumber)
     {
-        if ($accountNumber && strlen($accountNumber) == 8) {
-            return sprintf("XXXX%s", substr($accountNumber, 4, 4));
+        if ($accountNumber && mb_strlen($accountNumber) == 8) {
+            return sprintf("XXXX%s", mb_substr($accountNumber, 4, 4));
         }
 
         return null;
@@ -41,12 +41,12 @@ trait BacsTrait
 
     public function validateSortCode($sortCode)
     {
-        return strlen($this->normalizeSortCode($sortCode)) == 6;
+        return mb_strlen($this->normalizeSortCode($sortCode)) == 6;
     }
 
     public function validateAccountNumber($accountNumber, $transformed = true)
     {
-        $len = strlen($this->normalizeAccountNumber($accountNumber));
+        $len = mb_strlen($this->normalizeAccountNumber($accountNumber));
         // Older format can be between 6 & 10 digits apparently
         if ($transformed) {
             return $len == 8;

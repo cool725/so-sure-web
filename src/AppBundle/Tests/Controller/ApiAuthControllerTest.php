@@ -27,6 +27,8 @@ use AppBundle\Document\Payment\PolicyDiscountPayment;
 
 /**
  * @group functional-net
+ *
+ * AppBundle\\Tests\\Controller\\ApiAuthControllerTest
  */
 class ApiAuthControllerTest extends BaseControllerTest
 {
@@ -850,7 +852,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals('GB', $policy->getIdentityLog()->getCountry());
         $this->assertEquals([-0.13,51.5], $policy->getIdentityLog()->getLoc()->coordinates);
 
-        $this->assertTrue(strlen($data['id']) > 5);
+        $this->assertTrue(mb_strlen($data['id']) > 5);
         $this->assertTrue(in_array('A0001', $data['phone_policy']['phone']['devices']));
         $this->assertGreaterThan(0, $data['monthly_premium']);
         $this->assertGreaterThan(0, $data['yearly_premium']);
@@ -972,7 +974,7 @@ class ApiAuthControllerTest extends BaseControllerTest
 
         $data = $this->verifyResponse(200);
 
-        $this->assertTrue(strlen($data['id']) > 5);
+        $this->assertTrue(mb_strlen($data['id']) > 5);
         $this->assertTrue(in_array('A0001', $data['phone_policy']['phone']['devices']));
         $this->assertGreaterThan(0, $data['monthly_premium']);
         $this->assertGreaterThan(0, $data['yearly_premium']);
@@ -1307,7 +1309,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         ]]);
         $data = $this->verifyResponse(200);
 
-        $this->assertTrue(strlen($data['id']) > 5);
+        $this->assertTrue(mb_strlen($data['id']) > 5);
         $this->assertEquals('64', $data['phone_policy']['phone']['memory']);
     }
 
@@ -2506,7 +2508,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         ]);
         $data = $this->verifyResponse(200);
         $this->assertEquals(
-            strtolower(self::generateEmail('new-email-rejected-invitee', $this)),
+            mb_strtolower(self::generateEmail('new-email-rejected-invitee', $this)),
             $data['invitation_detail']
         );
         $this->assertEquals('functional test', $data['name']);
@@ -2550,7 +2552,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         ]);
         $data = $this->verifyResponse(200);
         $this->assertEquals(
-            strtolower(self::generateEmail('DuplicateEmailInvitation-invitee', $this)),
+            mb_strtolower(self::generateEmail('DuplicateEmailInvitation-invitee', $this)),
             $data['invitation_detail']
         );
         $this->assertEquals('functional test', $data['name']);
@@ -2837,7 +2839,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(200);
         $this->assertEquals('foo bar', $data['name']);
         $this->assertEquals(
-            strtolower(self::generateEmail('testNewFacebookInvitation-invitee', $this)),
+            mb_strtolower(self::generateEmail('testNewFacebookInvitation-invitee', $this)),
             $data['invitation_detail']
         );
 
@@ -3025,8 +3027,8 @@ class ApiAuthControllerTest extends BaseControllerTest
         $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
-            'bucket' => 'help.so-sure.com',
-            'key' => 'vagrant/KEY_NOT_FOUND',
+            'bucket' => 'ops.so-sure.com',
+            'key' => 'php-unit-tests/Controller/ApiAuthControllerTest/KEY_NOT_FOUND',
         ]);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PICSURE_FILE_NOT_FOUND);
 
@@ -3036,8 +3038,30 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertEquals(PhonePolicy::PICSURE_STATUS_INVALID, $updatedPolicy->getPicSureStatus());
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
-            'bucket' => 'help.so-sure.com',
-            'key' => 'vagrant/sitemap.xml',
+            'bucket' => 'ops.so-sure.com',
+            'key' => 'php-unit-tests/Controller/ApiAuthControllerTest/picsure-invalid.txt',
+        ]);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_PICSURE_FILE_INVALID);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $repo->find($policyData['id']);
+        $this->assertEquals(PhonePolicy::PICSURE_STATUS_INVALID, $updatedPolicy->getPicSureStatus());
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'bucket' => 'ops.so-sure.com',
+            'key' => 'php-unit-tests/Controller/ApiAuthControllerTest/picsure-valid1.jpg',
+        ]);
+        $data = $this->verifyResponse(200);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $repo->find($policyData['id']);
+        $this->assertEquals(PhonePolicy::PICSURE_STATUS_MANUAL, $updatedPolicy->getPicSureStatus());
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'bucket' => 'ops.so-sure.com',
+            'key' => 'php-unit-tests/Controller/ApiAuthControllerTest/picsure-valid2.png',
         ]);
         $data = $this->verifyResponse(200);
 
@@ -3515,8 +3539,8 @@ class ApiAuthControllerTest extends BaseControllerTest
             'policy_id' => $policyId,
         ]);
         $getData = $this->verifyResponse(200);
-        $this->assertEquals(8, strlen($getData['code']));
-        $this->assertGreaterThan(8, strlen($getData['share_link']));
+        $this->assertEquals(8, mb_strlen($getData['code']));
+        $this->assertGreaterThan(8, mb_strlen($getData['share_link']));
         $this->assertEquals(SCode::TYPE_STANDARD, $getData['type']);
         $this->assertNotEquals($oldCode, $getData['code']);
 
@@ -3721,7 +3745,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         ]);
         $getData = $this->verifyResponse(200);
         $sCode = $getData['code'];
-        $this->assertEquals(8, strlen($sCode));
+        $this->assertEquals(8, mb_strlen($sCode));
 
         // Payee
         $payeeUser = self::createUser(
@@ -3832,7 +3856,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         ]);
         $getData = $this->verifyResponse(200);
         $sCode = $getData['code'];
-        $this->assertEquals(8, strlen($sCode));
+        $this->assertEquals(8, mb_strlen($sCode));
 
         $url = sprintf('/api/v1/auth/scode/%s?_method=PUT', $sCode);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
@@ -5035,7 +5059,7 @@ class ApiAuthControllerTest extends BaseControllerTest
         ]);
         $getData = $this->verifyResponse(200);
         $sCode = $getData['code'];
-        $this->assertEquals(8, strlen($sCode));
+        $this->assertEquals(8, mb_strlen($sCode));
 
         // Payee
         $payeeUser = self::createUser(

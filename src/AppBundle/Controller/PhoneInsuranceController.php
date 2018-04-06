@@ -198,16 +198,16 @@ class PhoneInsuranceController extends BaseController
         } elseif ($memory) {
             $phone = $repo->findOneBy([
                 'active' => true,
-                'makeCanonical' => strtolower($make),
-                'modelCanonical' => strtolower($decodedModel),
+                'makeCanonical' => mb_strtolower($make),
+                'modelCanonical' => mb_strtolower($decodedModel),
                 'memory' => (int) $memory
             ]);
             // check for historical urls
-            if (!$phone || stripos($model, ' ') !== false) {
+            if (!$phone || mb_stripos($model, ' ') !== false) {
                 $phone = $repo->findOneBy([
                     'active' => true,
-                    'makeCanonical' => strtolower($make),
-                    'modelCanonical' => strtolower($model),
+                    'makeCanonical' => mb_strtolower($make),
+                    'modelCanonical' => mb_strtolower($model),
                     'memory' => (int) $memory
                 ]);
                 if ($phone) {
@@ -220,18 +220,22 @@ class PhoneInsuranceController extends BaseController
             }
         } else {
             $phones = $repo->findBy(
-                ['active' => true, 'makeCanonical' => strtolower($make), 'modelCanonical' => strtolower($decodedModel)],
+                [
+                    'active' => true,
+                    'makeCanonical' => mb_strtolower($make),
+                    'modelCanonical' => mb_strtolower($decodedModel)
+                ],
                 ['memory' => 'asc'],
                 1
             );
-            if (count($phones) != 0 && stripos($model, ' ') === false) {
+            if (count($phones) != 0 && mb_stripos($model, ' ') === false) {
                 $phone = $phones[0];
             } else {
                 // check for historical urls
                 $phone = $repo->findOneBy([
                     'active' => true,
-                    'makeCanonical' => strtolower($make),
-                    'modelCanonical' => strtolower($model)
+                    'makeCanonical' => mb_strtolower($make),
+                    'modelCanonical' => mb_strtolower($model)
                 ]);
                 if ($phone) {
                     return $this->redirectToRoute('quote_make_model', [
@@ -264,11 +268,21 @@ class PhoneInsuranceController extends BaseController
         // We have run various tests for cpc traffic in the page where both manufacturer and homepage
         // outperformed quote page. Also homepage was better than manufacturer page
         if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
+            $exp = $this->sixpack(
+                $request,
+                SixpackService::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
+                ['homepage', 'quote']
+            );
+            if ($exp == 'homepage') {
+                return new RedirectResponse($this->generateUrl('homepage'));
+            }
+            /*
             if (in_array($make, ["Samsung", "Apple", "OnePlus", "Sony"])) {
                 return new RedirectResponse($this->generateUrl('insure_make', ['make' => $phone->getMake()]));
             } else {
                 return new RedirectResponse($this->generateUrl('homepage'));
             }
+            */
         } elseif (in_array($request->get('_route'), ['purchase_phone_make_model_memory'])) {
             $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, [
                 'Location' => 'offsite'
@@ -326,7 +340,7 @@ class PhoneInsuranceController extends BaseController
                         );
 
                         $leadRepo = $dm->getRepository(Lead::class);
-                        $existingLead = $leadRepo->findOneBy(['email' => strtolower($lead->getEmail())]);
+                        $existingLead = $leadRepo->findOneBy(['email' => mb_strtolower($lead->getEmail())]);
                         if (!$existingLead) {
                             $dm->persist($lead);
                             $dm->flush();
@@ -546,7 +560,7 @@ class PhoneInsuranceController extends BaseController
                 ['memory' => 'asc'],
                 1
             );
-            if (count($phones) != 0 && stripos($model, ' ') === false) {
+            if (count($phones) != 0 && mb_stripos($model, ' ') === false) {
                 $phone = $phones[0];
             }
         }

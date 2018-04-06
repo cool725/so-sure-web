@@ -1113,6 +1113,8 @@ class UserController extends BaseController
         if (!$bacsFeature && in_array($user->getEmailCanonical(), [
             'patrick@urg.name',
             'nickwaller@outlook.com',
+            'ju.champagne@wanadoo.fr',
+            'datkiewicz.marta@gmail.com',
         ])) {
             $bacsFeature = true;
         }
@@ -1246,7 +1248,7 @@ class UserController extends BaseController
                 $userEmailForm->handleRequest($request);
                 if ($userEmailForm->isValid()) {
                     $userRepo = $this->getManager()->getRepository(User::class);
-                    $existingUser = $userRepo->findOneBy(['emailCanonical' => strtolower($user->getEmail())]);
+                    $existingUser = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($user->getEmail())]);
                     if ($existingUser) {
                         // @codingStandardsIgnoreStart
                         $this->addFlash(

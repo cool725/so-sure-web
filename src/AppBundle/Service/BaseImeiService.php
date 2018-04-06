@@ -184,7 +184,7 @@ class BaseImeiService
         $lines = preg_split("/\\r\\n|\\r|\\n/", $results);
         foreach ($lines as $line) {
             $line = str_replace(' ', '', $line);
-            if (stripos($line, $imei) !== false) {
+            if (mb_stripos($line, $imei) !== false) {
                 break;
             }
             $imeiLine++;

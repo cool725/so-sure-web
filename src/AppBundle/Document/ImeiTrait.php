@@ -14,7 +14,7 @@ trait ImeiTrait
 
         // strange bug - only sometimes will return 11 digits
         // TODO - fix this
-        if (strlen($serialNumber) != 12) {
+        if (mb_strlen($serialNumber) != 12) {
             return self::generateRandomAppleSerialNumber();
         }
 
@@ -32,7 +32,7 @@ trait ImeiTrait
 
         // strange bug - only sometimes will return 14 digits
         // TODO - fix this
-        if (strlen($result) != 15) {
+        if (mb_strlen($result) != 15) {
             return self::generateRandomImei();
         }
 
@@ -63,7 +63,7 @@ trait ImeiTrait
      */
     public function isImei($imei)
     {
-        return $this->isLuhn($imei) && strlen($imei) == 15;
+        return $this->isLuhn($imei) && mb_strlen($imei) == 15;
     }
 
     /**
@@ -83,6 +83,6 @@ trait ImeiTrait
 
     public function isAppleSerialNumber($serialNumber)
     {
-        return strlen($serialNumber) == 12;
+        return mb_strlen($serialNumber) == 12;
     }
 }

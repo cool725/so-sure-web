@@ -121,6 +121,16 @@ class BankAccount
     protected $initialNotificationDate;
 
     /**
+     * First date when payment can be submitted (after mandate approved)
+     *
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     * @Gedmo\Versioned
+     * @var \DateTime
+     */
+    protected $initialPaymentSubmissionDate;
+
+    /**
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
@@ -238,7 +248,7 @@ class BankAccount
 
     public function generateReference(User $user, $sequence)
     {
-        $reference = sprintf('%s5%010d', strtoupper(substr($user->getLastName(), 0, 1)), $sequence);
+        $reference = sprintf('%s5%010d', mb_strtoupper(mb_substr($user->getLastName(), 0, 1)), $sequence);
         $this->setReference($reference);
         $this->setFirstPayment(true);
 
@@ -285,6 +295,16 @@ class BankAccount
         $this->initialNotificationDate = $initialNotificationDate;
     }
 
+    public function getInitialPaymentSubmissionDate()
+    {
+        return $this->initialPaymentSubmissionDate;
+    }
+
+    public function setInitialPaymentSubmissionDate($initialPaymentSubmissionDate)
+    {
+        $this->initialPaymentSubmissionDate = $initialPaymentSubmissionDate;
+    }
+
     public function getStandardNotificationDate()
     {
         return $this->standardNotificationDate;
@@ -303,6 +323,23 @@ class BankAccount
     public function setFirstPayment($firstPayment)
     {
         $this->firstPayment = $firstPayment;
+    }
+
+    public function allowedSubmission(\DateTime $now = null)
+    {
+        if (!$now) {
+            $now = new \DateTime();
+        }
+        $now = $this->startOfDay($now);
+        $initial = clone $this->getInitialPaymentSubmissionDate();
+        $initial = $this->startOfDay($initial);
+
+        $diff = $initial->diff($now);
+        if (($diff->days > 0 && !$diff->invert) || $diff->days == 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public function allowedProcessing(\DateTime $processingDate = null)

@@ -105,10 +105,10 @@ class ApiControllerTest extends BaseControllerTest
         ]));
         $data = $this->verifyResponse(200);
         $this->assertEquals('foo@api.bar.com', $data['email']);
-        $this->assertTrue(strlen($data['cognito_token']['id']) > 10);
-        $this->assertTrue(strlen($data['cognito_token']['token']) > 10);
-        $this->assertTrue(strlen($data['intercom_token']['android_hash']) > 10, json_encode($data));
-        $this->assertTrue(strlen($data['intercom_token']['ios_hash']) > 10);
+        $this->assertTrue(mb_strlen($data['cognito_token']['id']) > 10);
+        $this->assertTrue(mb_strlen($data['cognito_token']['token']) > 10);
+        $this->assertTrue(mb_strlen($data['intercom_token']['android_hash']) > 10, json_encode($data));
+        $this->assertTrue(mb_strlen($data['intercom_token']['ios_hash']) > 10);
     }
 
     public function testRateLimitLoginLocksUser()
@@ -127,7 +127,7 @@ class ApiControllerTest extends BaseControllerTest
         $client = static::createClient();
         $dm = $client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(User::class);
-        $user = $repo->findOneBy(['emailCanonical' => strtolower(static::generateEmail('rate-limit-login', $this))]);
+        $user = $repo->findOneBy(['emailCanonical' => mb_strtolower(static::generateEmail('rate-limit-login', $this))]);
         $this->assertTrue($user->isLocked());
     }
 
@@ -155,7 +155,9 @@ class ApiControllerTest extends BaseControllerTest
         $client = static::createClient();
         $dm = $client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(User::class);
-        $user = $repo->findOneBy(['emailCanonical' => strtolower(static::generateEmail('rate-limit-login-ok', $this))]);
+        $user = $repo->findOneBy([
+            'emailCanonical' => mb_strtolower(static::generateEmail('rate-limit-login-ok', $this))
+        ]);
         $this->assertFalse($user->isLocked());
     }
 
@@ -320,9 +322,9 @@ class ApiControllerTest extends BaseControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $getData = $this->verifyResponse(200);
         $policyTermsUrl = self::$router->generate('latest_policy_terms');
-        $this->assertTrue(stripos($getData["view_url"], $policyTermsUrl) >= 0);
-        $this->assertTrue(stripos($getData["view_url"], 'http') >= 0);
-        $this->assertTrue(stripos($getData["view_url"], 'Version') >= 0);
+        $this->assertTrue(mb_stripos($getData["view_url"], $policyTermsUrl) >= 0);
+        $this->assertTrue(mb_stripos($getData["view_url"], 'http') >= 0);
+        $this->assertTrue(mb_stripos($getData["view_url"], 'Version') >= 0);
     }
 
     public function testGetPolicyTermsValidation()
@@ -578,7 +580,7 @@ class ApiControllerTest extends BaseControllerTest
             'referral_code' => $user->getId(),
         ));
         $data = $this->verifyResponse(200);
-        $this->assertTrue(strlen($data['url']) > 0);
+        $this->assertTrue(mb_strlen($data['url']) > 0);
 
         // For some reason, querying with the same client/dm is not updating getting the latest record
         $client = static::createClient();
@@ -616,7 +618,7 @@ class ApiControllerTest extends BaseControllerTest
         // New DM required as some type of caching is occurring
         $repo = $this->getNewDocumentManager()->getRepository(User::class);
         $queryUser = $repo->find($user->getId());
-        $this->assertTrue(strlen($queryUser->getConfirmationToken()) > 5);
+        $this->assertTrue(mb_strlen($queryUser->getConfirmationToken()) > 5);
     }
 
     public function testResetNoUser()
@@ -700,13 +702,13 @@ class ApiControllerTest extends BaseControllerTest
         $url = sprintf('/api/v1/scode/%s?_method=GET', $sCode->getCode());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $getData = $this->verifyResponse(200);
-        $this->assertEquals(8, strlen($getData['code']));
+        $this->assertEquals(8, mb_strlen($getData['code']));
         $this->assertEquals(SCode::TYPE_STANDARD, $getData['type']);
         $this->assertEquals(true, $getData['active']);
 
         $shareUrl = self::$router->generate('scode', ['code' => $sCode->getCode()]);
-        $this->assertTrue(stripos($getData["share_link"], $shareUrl) >= 0);
-        $this->assertTrue(stripos($getData["share_link"], 'http') >= 0);
+        $this->assertTrue(mb_stripos($getData["share_link"], $shareUrl) >= 0);
+        $this->assertTrue(mb_stripos($getData["share_link"], 'http') >= 0);
     }
 
     public function testGetInactiveSCode()
@@ -749,7 +751,7 @@ class ApiControllerTest extends BaseControllerTest
             'token' => $user->getToken()
         ));
         $data = $this->verifyResponse(200);
-        $this->assertTrue(strlen($data['token']) > 20);
+        $this->assertTrue(mb_strlen($data['token']) > 20);
     }
 
     public function testTokenBad()
@@ -864,8 +866,8 @@ class ApiControllerTest extends BaseControllerTest
         $this->assertEquals($birthday->format(\DateTime::ATOM), $user->getBirthday()->format(\DateTime::ATOM));
         $this->assertEquals('Foo', $user->getFirstName());
         $this->assertEquals('Bar', $user->getLastName());
-        $this->assertTrue(strlen($data['intercom_token']['android_hash']) > 10, json_encode($data));
-        $this->assertTrue(strlen($data['intercom_token']['ios_hash']) > 10);
+        $this->assertTrue(mb_strlen($data['intercom_token']['android_hash']) > 10, json_encode($data));
+        $this->assertTrue(mb_strlen($data['intercom_token']['ios_hash']) > 10);
     }
 
     public function testUserBadName()
@@ -996,11 +998,11 @@ class ApiControllerTest extends BaseControllerTest
             'referer' => 'foo',
         ));
         $data = $this->verifyResponse(200);
-        $this->assertEquals(strtolower(static::generateEmail('create-campaign', $this)), $data['email']);
+        $this->assertEquals(mb_strtolower(static::generateEmail('create-campaign', $this)), $data['email']);
 
         $repo = self::$dm->getRepository(User::class);
         $fooUser = $repo->findOneBy([
-            'emailCanonical' => strtolower(static::generateEmail('create-campaign', $this))
+            'emailCanonical' => mb_strtolower(static::generateEmail('create-campaign', $this))
         ]);
         $this->assertTrue($fooUser !== null);
         $this->assertEquals('foo', $fooUser->getReferer());
@@ -1014,12 +1016,12 @@ class ApiControllerTest extends BaseControllerTest
             'email' => static::generateEmail('create-prelaunch', $this),
         ));
         $data = $this->verifyResponse(200);
-        $this->assertEquals(strtolower(static::generateEmail('create-prelaunch', $this)), $data['email']);
+        $this->assertEquals(mb_strtolower(static::generateEmail('create-prelaunch', $this)), $data['email']);
         $token = $data['user_token']['token'];
 
         $repo = self::$dm->getRepository(User::class);
         $user = $repo->findOneBy([
-            'emailCanonical' => strtolower(static::generateEmail('create-prelaunch', $this))
+            'emailCanonical' => mb_strtolower(static::generateEmail('create-prelaunch', $this))
         ]);
         $this->assertTrue($user !== null);
         $this->assertNull($user->getLastLogin());
@@ -1041,7 +1043,7 @@ class ApiControllerTest extends BaseControllerTest
         // New DM required as some type of caching is occurring
         $repo = $this->getNewDocumentManager()->getRepository(User::class);
         $userUpdated = $repo->findOneBy([
-            'emailCanonical' => strtolower(static::generateEmail('create-prelaunch', $this))
+            'emailCanonical' => mb_strtolower(static::generateEmail('create-prelaunch', $this))
         ]);
         $this->assertTrue($userUpdated !== null);
         $this->assertNotNull($userUpdated->getLastLogin());
@@ -1056,12 +1058,12 @@ class ApiControllerTest extends BaseControllerTest
             'email' => static::generateEmail('create-prelaunch-loggedin', $this),
         ));
         $data = $this->verifyResponse(200);
-        $this->assertEquals(strtolower(static::generateEmail('create-prelaunch-loggedin', $this)), $data['email']);
+        $this->assertEquals(mb_strtolower(static::generateEmail('create-prelaunch-loggedin', $this)), $data['email']);
         $token = $data['user_token']['token'];
 
         $repo = self::$dm->getRepository(User::class);
         $user = $repo->findOneBy([
-            'emailCanonical' => strtolower(static::generateEmail('create-prelaunch-loggedin', $this))
+            'emailCanonical' => mb_strtolower(static::generateEmail('create-prelaunch-loggedin', $this))
         ]);
         $this->assertTrue($user !== null);
         $this->assertNull($user->getLastLogin());
@@ -1087,7 +1089,7 @@ class ApiControllerTest extends BaseControllerTest
             'mobile_number' => $mobile
         ));
         $data = $this->verifyResponse(200);
-        $this->assertEquals(strtolower(static::generateEmail('api-new-user-mobile', $this)), $data['email']);
+        $this->assertEquals(mb_strtolower(static::generateEmail('api-new-user-mobile', $this)), $data['email']);
         $this->assertEquals($mobile, $data['mobile_number']);
     }
 

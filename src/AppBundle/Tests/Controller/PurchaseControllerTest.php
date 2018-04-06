@@ -61,7 +61,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $userRepo = $dm->getRepository(User::class);
-        $user = $userRepo->findOneBy(['emailCanonical' => strtolower($email)]);
+        $user = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
         $now = new \DateTime();
 
         $this->assertNotNull($user->getIdentityLog());
@@ -706,9 +706,9 @@ class PurchaseControllerTest extends BaseControllerTest
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $leadRepo = $dm->getRepository(Lead::class);
-        $lead = $leadRepo->findOneBy(['email' => strtolower($email)]);
+        $lead = $leadRepo->findOneBy(['email' => mb_strtolower($email)]);
         $this->assertNotNull($lead);
-        $this->assertEquals(strtolower($email), $lead->getEmail());
+        $this->assertEquals(mb_strtolower($email), $lead->getEmail());
         $this->assertEquals('foo bar', $lead->getName());
     }
 
@@ -788,9 +788,9 @@ class PurchaseControllerTest extends BaseControllerTest
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $leadRepo = $dm->getRepository(Lead::class);
-        $lead = $leadRepo->findOneBy(['email' => strtolower($email)]);
+        $lead = $leadRepo->findOneBy(['email' => mb_strtolower($email)]);
         $this->assertNotNull($lead);
-        $this->assertEquals(strtolower($email), $lead->getEmail());
+        $this->assertEquals(mb_strtolower($email), $lead->getEmail());
         $this->assertNull($lead->getName());
     }
 
@@ -878,7 +878,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     private function changePhone($phone)
     {
-        $crawler = self::$client->request('GET', sprintf('/select-phone-v2/purchase-change/%s', $phone->getId()));
+        $crawler = self::$client->request('GET', sprintf('/select-phone-search/purchase-change/%s', $phone->getId()));
         $crawler = self::$client->followRedirect();
 
         return $crawler;
@@ -992,7 +992,7 @@ class PurchaseControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', '/purchase/');
         $data = self::$client->getResponse();
         $this->assertEquals(200, $data->getStatusCode());
-        self::verifySearchFormData($crawler->filter('form'), '/select-phone/purchase-change/', 1);
+        self::verifySearchFormData($crawler->filter('form'), '/select-phone-search/purchase-change/', 1);
     }
 
     public function testPhoneSearchUserInvalidPolicy()

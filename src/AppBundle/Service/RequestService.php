@@ -174,6 +174,33 @@ class RequestService
         }
     }
 
+    public function getDeviceOS($userAgent = null)
+    {
+        if (!$userAgent) {
+            $userAgent = $this->getUserAgent();
+        }
+
+        if (!$userAgent) {
+            return null;
+        }
+
+        $parser = Parser::create();
+        $userAgentDetails = $parser->parse($userAgent);
+
+        return $userAgentDetails->os->family;
+        /*
+        if ($this->mobileDetect) {
+            foreach (Mobile_Detect::getOperatingSystems() as $operatingSystem) {
+                if ($this->mobileDetect->is($operatingSystem)) {
+                    return $operatingSystem;
+                }
+            }
+        }
+
+        return null;
+        */
+    }
+
     public function getTrackingId()
     {
         if ($request = $this->requestStack->getCurrentRequest()) {
@@ -259,13 +286,13 @@ class RequestService
         $parser = Parser::create();
         $userAgentDetails = $parser->parse($userAgent);
 
-        if (stripos($userAgentDetails->ua->family, 'bot') !== false) {
+        if (mb_stripos($userAgentDetails->ua->family, 'bot') !== false) {
             return true;
         }
-        if (stripos($userAgentDetails->ua->family, 'spider') !== false) {
+        if (mb_stripos($userAgentDetails->ua->family, 'spider') !== false) {
             return true;
         }
-        if (stripos($userAgentDetails->ua->family, 'crawler') !== false) {
+        if (mb_stripos($userAgentDetails->ua->family, 'crawler') !== false) {
             return true;
         }
 
@@ -285,19 +312,22 @@ class RequestService
             return true;
         }
 
-        if (stripos($userAgent, 'StatusCake') !== false) {
+        if (mb_stripos($userAgent, 'StatusCake') !== false) {
             return true;
         }
-        if (stripos($userAgent, 'okhttp') !== false) {
+        if (mb_stripos($userAgent, 'okhttp') !== false) {
             return true;
         }
-        if (stripos($userAgent, 'curl') !== false) {
+        if (mb_stripos($userAgent, 'curl') !== false) {
             return true;
         }
-        if (stripos($userAgent, 'ips-agent') !== false) {
+        if (mb_stripos($userAgent, 'ips-agent') !== false) {
             return true;
         }
-        if (stripos($userAgent, 'ScoutJet') !== false) {
+        if (mb_stripos($userAgent, 'ScoutJet') !== false) {
+            return true;
+        }
+        if (mb_stripos($userAgent, 'Go-http-client') !== false) {
             return true;
         }
 
