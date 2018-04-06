@@ -10,7 +10,7 @@ use AppBundle\Service\RateLimitService;
 /**
  * @group functional-net
  */
-class ApiUnauthControllerTest extends BaseControllerTest
+class ApiUnauthControllerTest extends BaseApiControllerTest
 {
     // token unauth
 

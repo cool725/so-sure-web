@@ -13,12 +13,21 @@ use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 /**
  * @group functional-nonet
  */
-class ApiViewControllerTest extends BaseControllerTest
+class ApiViewControllerTest extends BaseApiControllerTest
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
 
+    protected static $policyKey;
+
     public function tearDown()
     {
+    }
+
+    public static function setUpBeforeClass()
+    {
+        parent::setUpBeforeClass();
+
+        self::$policyKey = static::$container->getParameter('policy_key');
     }
 
     public function testPolicyTerms()
@@ -178,8 +187,8 @@ class ApiViewControllerTest extends BaseControllerTest
         self::verifyResponse(200);
         $body = self::$client->getResponse()->getContent();
 
-        $this->assertTrue(stripos($body, 'h1') >= 0);
-        $this->assertFalse(stripos($body, 'h4'));
+        $this->assertTrue(mb_stripos($body, 'h1') >= 0);
+        $this->assertFalse(mb_stripos($body, 'h4'));
     }
 
     /**
@@ -206,8 +215,8 @@ class ApiViewControllerTest extends BaseControllerTest
         self::verifyResponse(200);
         $body = self::$client->getResponse()->getContent();
 
-        $this->assertFalse(stripos($body, 'h1'));
-        $this->assertTrue(stripos($body, 'h4') >= 0);
+        $this->assertFalse(mb_stripos($body, 'h1'));
+        $this->assertTrue(mb_stripos($body, 'h4') >= 0);
     }
 
     /**
@@ -220,8 +229,8 @@ class ApiViewControllerTest extends BaseControllerTest
         self::verifyResponse(200);
         $body = self::$client->getResponse()->getContent();
 
-        $this->assertTrue(stripos($body, 'h1') >= 0);
-        $this->assertFalse(stripos($body, 'h4'));
+        $this->assertTrue(mb_stripos($body, 'h1') >= 0);
+        $this->assertFalse(mb_stripos($body, 'h4'));
     }
 
     /**
@@ -234,7 +243,7 @@ class ApiViewControllerTest extends BaseControllerTest
         self::verifyResponse(200);
         $body = self::$client->getResponse()->getContent();
 
-        $this->assertFalse(stripos($body, 'h1'));
-        $this->assertTrue(stripos($body, 'h4') >= 0);
+        $this->assertFalse(mb_stripos($body, 'h1'));
+        $this->assertTrue(mb_stripos($body, 'h4') >= 0);
     }
 }
