@@ -13,7 +13,7 @@ use AppBundle\Service\RateLimitService;
 /**
  * @group functional-net
  */
-class ApiKeyControllerTest extends BaseControllerTest
+class ApiKeyControllerTest extends BaseApiControllerTest
 {
     // quote
 

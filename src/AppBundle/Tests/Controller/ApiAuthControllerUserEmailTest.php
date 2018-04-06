@@ -22,7 +22,7 @@ use AppBundle\Document\Invitation\EmailInvitation;
 /**
  * @group functional-net
  */
-class ApiAuthControllerUserEmailTest extends BaseControllerTest
+class ApiAuthControllerUserEmailTest extends BaseApiControllerTest
 {
     const VALID_IMEI = '356938035643809';
     const INVALID_IMEI = '356938035643808';

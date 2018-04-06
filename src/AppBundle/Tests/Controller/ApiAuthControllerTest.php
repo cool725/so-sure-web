@@ -30,7 +30,7 @@ use AppBundle\Document\Payment\PolicyDiscountPayment;
  *
  * AppBundle\\Tests\\Controller\\ApiAuthControllerTest
  */
-class ApiAuthControllerTest extends BaseControllerTest
+class ApiAuthControllerTest extends BaseApiControllerTest
 {
     const VALID_IMEI = '356938035643809';
     const INVALID_IMEI = '356938035643808';
@@ -3884,7 +3884,29 @@ class ApiAuthControllerTest extends BaseControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $getData = $this->verifyResponse(200);
         $policyUrl = self::$router->generate('policy_terms', ['id' => $policyId]);
-        //print $getData["view_url"];
+        $this->assertTrue(mb_stripos($getData["view_url"], $policyUrl) >= 0);
+        $this->assertTrue(mb_stripos($getData["view_url"], 'http') >= 0);
+    }
+
+    /**
+     *
+     */
+    public function testGetPolicyTerms2()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('policy-terms2', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $createData = $this->verifyResponse(200);
+        $policyId = $createData['id'];
+
+        $url = sprintf('/api/v1/auth/policy/v2/%s/terms?maxPotValue=62.8&_method=GET', $policyId);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $getData = $this->verifyResponse(200);
+        $policyUrl = self::$router->generate('policy_terms2', ['id' => $policyId]);
         $this->assertTrue(mb_stripos($getData["view_url"], $policyUrl) >= 0);
         $this->assertTrue(mb_stripos($getData["view_url"], 'http') >= 0);
     }
@@ -4872,216 +4894,6 @@ class ApiAuthControllerTest extends BaseControllerTest
         $this->assertTrue(count($data['quotes']) > 1);
         $this->assertGreaterThan(0, $data['quotes'][0]['monthly_premium']);
         $this->assertGreaterThan(0, $data['quotes'][0]['yearly_premium']);
-    }
-
-    // helpers
-
-    /**
-     *
-     */
-    protected function generatePolicy($cognitoIdentityId, $user, $clearRateLimit = true, $name = null)
-    {
-        if ($user) {
-            $this->updateUserDetails($cognitoIdentityId, $user);
-        }
-
-        if ($clearRateLimit) {
-            $this->clearRateLimit();
-        }
-        $imei = self::generateRandomImei();
-        $phonePolicy = [
-            'imei' => $imei,
-            'make' => 'OnePlus',
-            'device' => 'A0001',
-            'serial_number' => 'foo',
-            'memory' => 63,
-            'rooted' => false,
-            'validation_data' => $this->getValidationData($cognitoIdentityId, ['imei' => $imei]),
-        ];
-        if ($name) {
-            $phonePolicy['name'] = $name;
-        }
-
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', [
-            'phone_policy' => $phonePolicy
-        ]);
-        $this->verifyResponse(200);
-
-        return $crawler;
-    }
-
-    protected function updateUserDetails($cognitoIdentityId, $user)
-    {
-        $userUpdateUrl = sprintf('/api/v1/auth/user/%s', $user->getId());
-        $birthday = new \DateTime('1980-01-01');
-        static::putRequest(self::$client, $cognitoIdentityId, $userUpdateUrl, [
-            'first_name' => 'foo',
-            'last_name' => 'bar',
-            'mobile_number' => static::generateRandomMobile(),
-            'birthday' => $birthday->format(\DateTime::ATOM),
-        ]);
-        $this->verifyResponse(200);
-
-        $url = sprintf('/api/v1/auth/user/%s/address', $user->getId());
-        $data = [
-            'type' => 'billing',
-            'line1' => 'address line 1',
-            'city' => 'London',
-            'postcode' => 'BX11LT',
-        ];
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
-        $this->verifyResponse(200);
-    }
-
-    protected function payPolicy($user, $policyId, $amount = null, $date = null)
-    {
-        // Reload user to get address
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $userRepo = $dm->getRepository(User::class);
-        $user = $userRepo->find($user->getId());
-
-        $policyRepo = $dm->getRepository(SalvaPhonePolicy::class);
-        $policy = $policyRepo->find($policyId);
-
-        if ($amount) {
-            $judopay = self::$client->getContainer()->get('app.judopay');
-            $payDetails = $judopay->testPayDetails(
-                $user,
-                $policyId,
-                $amount,
-                self::$JUDO_TEST_CARD_NUM,
-                self::$JUDO_TEST_CARD_EXP,
-                self::$JUDO_TEST_CARD_PIN
-            );
-
-            $cognitoIdentityId = $this->getAuthUser($user);
-            $url = sprintf("/api/v1/auth/policy/%s/pay", $policyId);
-            $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['judo' => [
-                'consumer_token' => $payDetails['consumer']['consumerToken'],
-                'card_token' => $payDetails['cardDetails']['cardToken'],
-                'receipt_id' => $payDetails['receiptId'],
-            ]]);
-            $this->verifyResponse(200);
-        } else {
-            $payment = $this->payPolicyMonthly($user, $policy, $date);
-            $dm->persist($payment);
-            $dm->flush();
-            $this->assertNotNull($payment->getId());
-        }
-        
-        $this->assertNotNull($policy->getUser());
-        $this->assertNotNull($policy->getUser()->getBillingAddress());
-        $this->assertNotNull($policy->getUser()->getBillingAddress()->getLine1());
-        /*
-        $url = sprintf("/api/v1/auth/policy/%s/pay", $policyId);
-        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['bank_account' => [
-            'sort_code' => '200000',
-            'account_number' => '55779911',
-            'first_name' => 'foo',
-            'last_name' => 'bar',
-        ]]);
-        $policyData = $this->verifyResponse(200);
-        $this->assertEquals(SalvaPhonePolicy::STATUS_PENDING, $policyData['status']);
-        $this->assertEquals($policyId, $policyData['id']);
-        */
-    }
-
-    protected function payPolicyMonthly($user, $policy, $date = null)
-    {
-        $payment = new JudoPayment();
-        $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
-        $payment->setResult(JudoPayment::RESULT_SUCCESS);
-        $payment->setReceipt(rand(1, 999999));
-        $policy->addPayment($payment);
-        $user->addPolicy($policy);
-
-        static::$policyService->create($policy, $date, true);
-
-        return $payment;
-    }
-
-    private function createMultiPayRequest($payerEmail, $payeeEmail, $real = false)
-    {
-        // Payer
-        $payerUser = self::createUser(
-            self::$userManager,
-            $payerEmail,
-            'foo'
-        );
-        $payerCognitoIdentityId = $this->getAuthUser($payerUser);
-        $crawler = $this->generatePolicy($payerCognitoIdentityId, $payerUser);
-        $createData = $this->verifyResponse(200);
-        $payerPolicyId = $createData['id'];
-
-        $amount = null;
-        if ($real) {
-            $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-            $policyRepo = $dm->getRepository(SalvaPhonePolicy::class);
-            $payerPolicy = $policyRepo->find($payerPolicyId);
-            $amount = $payerPolicy->getPremium()->getMonthlyPremiumPrice();
-        }
-        $this->payPolicy($payerUser, $payerPolicyId, $amount);
-
-        $url = sprintf('/api/v1/auth/user?_method=GET');
-        $crawler = static::postRequest(self::$client, $payerCognitoIdentityId, $url, []);
-        $data = $this->verifyResponse(200);
-        $this->assertEquals(0, count($data['multipay_policies']));
-
-        $url = sprintf('/api/v1/auth/scode');
-        $crawler = static::postRequest(self::$client, $payerCognitoIdentityId, $url, [
-            'type' => SCode::TYPE_MULTIPAY,
-            'policy_id' => $payerPolicyId,
-        ]);
-        $getData = $this->verifyResponse(200);
-        $sCode = $getData['code'];
-        $this->assertEquals(8, mb_strlen($sCode));
-
-        // Payee
-        $payeeUser = self::createUser(
-            self::$userManager,
-            $payeeEmail,
-            'foo'
-        );
-        $payeeCognitoIdentityId = $this->getAuthUser($payeeUser);
-        $crawler = $this->generatePolicy($payeeCognitoIdentityId, $payeeUser);
-        $createData = $this->verifyResponse(200);
-        $payeePolicyId = $createData['id'];
-
-        // Finally scode request
-        $url = sprintf('/api/v1/auth/scode/%s?_method=PUT', $sCode);
-        $crawler = static::postRequest(self::$client, $payeeCognitoIdentityId, $url, [
-            'action' => 'request',
-            'policy_id' => $payeePolicyId,
-        ]);
-        $getData = $this->verifyResponse(200);
-
-        // Verify payee data
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $policyRepo = $dm->getRepository(SalvaPhonePolicy::class);
-        $payeePolicy = $policyRepo->find($payeePolicyId);
-        $this->assertEquals(Policy::STATUS_MULTIPAY_REQUESTED, $payeePolicy->getStatus());
-        $userRepo = $dm->getRepository(User::class);
-        $updatedPayerUser = $userRepo->find($payerUser->getId());
-        $this->assertEquals(1, count($updatedPayerUser->getMultiPays()));
-        $multipay = $updatedPayerUser->getMultiPays()[0];
-        $this->assertEquals(MultiPay::STATUS_REQUESTED, $multipay->getStatus());
-        $this->assertEquals($payerUser->getId(), $multipay->getPayer()->getId());
-        $this->assertEquals($payeeUser->getId(), $multipay->getPayee()->getId());
-
-        // Verify payer data
-        $url = sprintf('/api/v1/auth/user?_method=GET');
-        $crawler = static::postRequest(self::$client, $payerCognitoIdentityId, $url, []);
-        $data = $this->verifyResponse(200);
-        $this->assertEquals(1, count($data['multipay_policies']));
-        $foundPolicy = false;
-        foreach ($data['multipay_policies'] as $policy) {
-            if ($policy['policy_id'] == $payeePolicyId) {
-                $foundPolicy = true;
-            }
-        }
-        $this->assertTrue($foundPolicy);
-
-        return $multipay;
     }
 
     public function testAuthNoActualSecurityInteractiveLoginEvent()

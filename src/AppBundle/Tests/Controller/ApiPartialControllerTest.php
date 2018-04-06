@@ -16,7 +16,7 @@ use AppBundle\Service\SixpackService;
  *
  * AppBundle\\Tests\\Controller\\ApiPartialControllerTest
  */
-class ApiPartialControllerTest extends BaseControllerTest
+class ApiPartialControllerTest extends BaseApiControllerTest
 {
     protected static $endpoint1;
     protected static $endpoint2;

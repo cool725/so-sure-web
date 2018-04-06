@@ -14,7 +14,7 @@ use AppBundle\Service\RateLimitService;
  * @group functional-net
  * AppBundle\\Tests\\Controller\\ApiExternalControllerTest
  */
-class ApiExternalControllerTest extends BaseControllerTest
+class ApiExternalControllerTest extends BaseApiControllerTest
 {
     public static function setUpBeforeClass()
     {

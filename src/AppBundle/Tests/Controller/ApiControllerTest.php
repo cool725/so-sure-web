@@ -14,7 +14,7 @@ use AppBundle\Service\RateLimitService;
 /**
  * @group functional-net
  */
-class ApiControllerTest extends BaseControllerTest
+class ApiControllerTest extends BaseApiControllerTest
 {
     protected static $reward;
 
@@ -43,6 +43,7 @@ class ApiControllerTest extends BaseControllerTest
         self::$reward->setSCode($scode);
         static::$dm->persist(self::$reward);
         static::$dm->persist($scode);
+
         static::$dm->flush();
     }
 

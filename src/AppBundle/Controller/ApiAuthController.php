@@ -1527,9 +1527,10 @@ class ApiAuthController extends BaseController
 
     /**
      * @Route("/policy/{id}/terms", name="api_auth_get_policy_terms")
+     * @Route("/policy/v2/{id}/terms", name="api_auth_get_policy_terms2")
      * @Method({"GET"})
      */
-    public function getPolicyTermsAction($id)
+    public function getPolicyTermsAction(Request $request, $id)
     {
         try {
             $dm = $this->getManager();
@@ -1550,8 +1551,13 @@ class ApiAuthController extends BaseController
                 );
             }
             $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+            if ($request->get('_route') == 'api_auth_get_policy_terms') {
+                $termsRoute = 'policy_terms';
+            } else {
+                $termsRoute = 'policy_terms2';
+            }
             $policyTermsRoute = $this->get('router')->generate(
-                'policy_terms',
+                $termsRoute,
                 [
                     'id' => $policy->getId(),
                     'policy_key' => $this->getParameter('policy_key'),
