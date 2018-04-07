@@ -8,6 +8,8 @@ use AppBundle\Document\Invitation\EmailInvitation;
 
 /**
  * @group functional-net
+ *
+ * AppBundle\\Tests\\Controller\\PhoneInsuranceControllerTest
  */
 class PhoneInsuranceControllerTest extends BaseControllerTest
 {
@@ -56,6 +58,25 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
         $this->assertEquals(302, $data->getStatusCode());
         $this->assertEquals('/purchase/', $data->getTargetUrl());
         $crawler = self::$client->followRedirect();
+    }
+
+    public function testSessionPurchasePhoneHistorical()
+    {
+        $crawler = self::$client->request('GET', '/purchase-phone/Apple+iPhone+7+32GB');
+        $data = self::$client->getResponse();
+
+        // should be redirected to redirect url
+        $this->assertEquals(302, $data->getStatusCode());
+        $this->assertEquals('/purchase/', $data->getTargetUrl());
+        $crawler = self::$client->followRedirect();
+    }
+
+    public function testSessionPurchasePhoneNotFound()
+    {
+        $crawler = self::$client->request('GET', '/purchase-phone/Apple+p+7+32GB');
+        $data = self::$client->getResponse();
+
+        $this->assertEquals(404, $data->getStatusCode());
     }
 
     public function testPhoneSearchLearnMore()
