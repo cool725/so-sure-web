@@ -274,7 +274,10 @@ class MixpanelService
                 $latestAttribution = new Attribution();
                 $dataPresent = false;
                 if (isset($data['Latest Campaign Name'])) {
-                    $latestAttribution->setCampaignName(urldecode($data['Latest Campaign Name']));
+                    $latestAttribution->setCampaignName($this->conformAlphanumericSpaceDotPipe(
+                        urldecode($data['Latest Campaign Name']),
+                        250
+                    ));
                     $dataPresent = true;
                 }
                 if (isset($data['Latest Campaign Source'])) {
