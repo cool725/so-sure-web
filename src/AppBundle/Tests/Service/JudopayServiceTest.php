@@ -179,6 +179,79 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals('Success', $payment->getResult());
     }
 
+    public function testJudoReceiptTooOld()
+    {
+        $user = $this->createValidUser(static::generateEmail('testJudoReceiptTooOld', $this));
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
+
+        $judo = new JudoPaymentMethod();
+        $judo->setCustomerToken('ctoken');
+        $judo->addCardToken('token', null);
+        $user->setPaymentMethod($judo);
+        static::$dm->flush();
+
+        $receiptId = self::$judopay->testPay(
+            $user,
+            $policy->getId(),
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
+        );
+        $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token', Payment::SOURCE_WEB_API);
+        $this->assertEquals($receiptId, $payment->getReceipt());
+        $this->assertEquals($policy->getId(), $payment->getReference());
+        $this->assertEquals('Success', $payment->getResult());
+
+        self::$judopay->getReceipt($receiptId, false, true);
+        $exception = false;
+        try {
+            self::$judopay->getReceipt($receiptId, false, true, new \DateTime('-3 hours'));
+        } catch (\Exception $e) {
+            $exception = true;
+        }
+        $this->assertTrue($exception);
+    }
+
+    public function testJudoReceiptRefunded()
+    {
+        $user = $this->createValidUser(static::generateEmail('testJudoReceiptRefunded', $this));
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
+
+        $judo = new JudoPaymentMethod();
+        $judo->setCustomerToken('ctoken');
+        $judo->addCardToken('token', null);
+        $user->setPaymentMethod($judo);
+        static::$dm->flush();
+
+        $receiptId = self::$judopay->testPay(
+            $user,
+            $policy->getId(),
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
+        );
+        $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token', Payment::SOURCE_WEB_API);
+        $this->assertEquals($receiptId, $payment->getReceipt());
+        $this->assertEquals($policy->getId(), $payment->getReference());
+        $this->assertEquals('Success', $payment->getResult());
+
+        $refund = self::$judopay->refund($payment, 0.01);
+        $this->assertEquals('Success', $refund->getResult());
+
+        self::$judopay->getReceipt($receiptId, false);
+        $exception = false;
+        try {
+            self::$judopay->getReceipt($receiptId, true);
+        } catch (\Exception $e) {
+            $exception = true;
+        }
+        $this->assertTrue($exception);
+    }
+
     public function testJudoReceiptPaymentDiff()
     {
         $user = $this->createValidUser(static::generateEmail('judo-receipt-exception', $this));
