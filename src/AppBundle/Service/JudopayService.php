@@ -33,6 +33,8 @@ class JudopayService
 {
     use CurrencyTrait;
 
+    const MAX_HOUR_DELAY_FOR_RECEIPTS = 2;
+
     /** Standard payment (monthly/yearly; initial payment */
     const WEB_TYPE_STANDARD = 'standard';
 
@@ -466,7 +468,11 @@ class JudopayService
         return $details;
     }
 
-    public function getReceipt($receiptId)
+    /**
+     * TODO: Adjust $enforceFullAmount to true once production has validated its safe to use
+     * TODO: Adjust $enforceDate to true once production has validated its safe to use
+     */
+    public function getReceipt($receiptId, $enforceFullAmount = false, $enforceDate = false, \DateTime $date = null)
     {
         $transaction = $this->apiClient->getModel('Transaction');
 
@@ -480,6 +486,44 @@ class JudopayService
             ));
 
             throw $e;
+        }
+
+        if ($transactionDetails['amount'] != $transactionDetails['netAmount']) {
+            $msg = sprintf(
+                'Judo receipt %s has a refund applied (net %s of %s).',
+                $receiptId,
+                $transactionDetails['netAmount'],
+                $transactionDetails['amount']
+            );
+            if ($enforceFullAmount) {
+                $this->logger->error($msg);
+
+                throw new \Exception($msg);
+            } else {
+                $this->logger->warning($msg);
+            }
+        }
+
+        // "2018-02-22T22:46:10.9625+00:00"
+        $created = \DateTime::createFromFormat("Y-m-d\TH:i:s.uP", $transactionDetails['createdAt']);
+        if (!$date) {
+            $date = new \DateTime();
+        }
+        $diff = $date->diff($created);
+        if ($diff->days > 0 || $diff->h >= self::MAX_HOUR_DELAY_FOR_RECEIPTS) {
+            $msg = sprintf(
+                'Judo receipt %s is older than expected (%d:%d hours).',
+                $receiptId,
+                $diff->days,
+                $diff->h
+            );
+            if ($enforceDate) {
+                $this->logger->error($msg);
+
+                throw new \Exception($msg);
+            } else {
+                $this->logger->warning($msg);
+            }
         }
 
         return $transactionDetails;
