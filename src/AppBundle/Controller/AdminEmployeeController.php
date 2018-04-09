@@ -1864,6 +1864,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      */
     public function kpiAction($now = null)
     {
+        // default 30s for prod is no longer enough
+        // TODO: Refactor method to improve performance
+        set_time_limit(60);
         $dm = $this->getManager();
         $policyRepo = $dm->getRepository(PhonePolicy::class);
         $statsRepo = $dm->getRepository(Stats::class);
