@@ -36,24 +36,28 @@ class Connection
     /**
      * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User")
      * @Gedmo\Versioned
+     * @var User
      */
     protected $linkedUser;
 
     /**
      * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User")
      * @Gedmo\Versioned
+     * @var User
      */
     protected $sourceUser;
 
     /**
      * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy")
      * @Gedmo\Versioned
+     * @var Policy
      */
     protected $sourcePolicy;
 
     /**
      * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Invitation\Invitation", cascade={"persist"})
      * @Gedmo\Versioned
+     * @var Invitation
      */
     protected $invitation;
 
@@ -67,6 +71,7 @@ class Connection
     /**
      * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy", inversedBy="acceptedConnections")
      * @Gedmo\Versioned
+     * @var Policy
      */
     protected $linkedPolicy;
 
@@ -139,6 +144,9 @@ class Connection
         $this->id = $id;
     }
 
+    /**
+     * @return User
+     */
     public function getLinkedUser()
     {
         return $this->linkedUser;
@@ -149,6 +157,9 @@ class Connection
         $this->linkedUser = $user;
     }
 
+    /**
+     * @return Invitation
+     */
     public function getInvitation()
     {
         return $this->invitation;
@@ -169,6 +180,9 @@ class Connection
         $this->initialInvitationDate = $initialInvitationDate;
     }
 
+    /**
+     * @return User
+     */
     public function getSourceUser()
     {
         return $this->sourceUser;
@@ -179,6 +193,9 @@ class Connection
         $this->sourceUser = $user;
     }
 
+    /**
+     * @return Policy
+     */
     public function getSourcePolicy()
     {
         return $this->sourcePolicy;
@@ -191,6 +208,9 @@ class Connection
         $this->sourcePolicy = $policy;
     }
 
+    /**
+     * @return Policy
+     */
     public function getLinkedPolicy()
     {
         return $this->linkedPolicy;

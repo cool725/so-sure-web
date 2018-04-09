@@ -4,6 +4,7 @@
     {{ parent() }}
     {% javascripts
         '@AppBundle/Resources/public/js/Admin/month.js'
+        '@AppBundle/Resources/public/js/Admin/bacs.js'
     %}
     <script src="{{ asset_url }}"></script>
     {% endjavascripts %}
@@ -55,17 +56,26 @@
                 {% else %}
                     <table class="table table-striped">
                         <tr>
-                            <th width="50%">File name</th>
+                            <th width="40%">File name</th>
                             <th width="50%">Details</th>
+                            <th width="10%">Submitted to BACS</th>
                         </tr>
                         {% for file in files %}
                             <tr>
-                                <td width="50%">
+                                <td width="40%">
                                     {{ file.key }}
                                     <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank"><i class="fa fa-download"></i></a>
                                 </td>
                                 <td width="50%">
                                     {{ file.metadata|json_encode }}
+                                </td>
+                                <td width="10%">
+                                    {% if file.isSubmitted %}
+                                        Yes <i class="fa fa-checkbox"></i>
+                                    {% else %}
+                                        <button title="Mark as submitted" type="button" class="btn btn-success bacs-submission" data-token="{{ csrf_token('default') }}"
+                                                data-bacs-submission-url="{{ path('admin_bacs_submission', {'id': file.id}) }}"><i class="fa fa-power-off"></i></button>
+                                    {% endif %}
                                 </td>
                             </tr>
                         {% endfor %}

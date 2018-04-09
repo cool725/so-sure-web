@@ -67,12 +67,14 @@ class Claim
     /**
      * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy", inversedBy="claims")
      * @Gedmo\Versioned
+     * @var Policy
      */
     protected $policy;
 
     /**
      * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy", inversedBy="linkedClaims")
      * @Gedmo\Versioned
+     * @var Policy
      */
     protected $linkedPolicy;
 
@@ -85,6 +87,7 @@ class Claim
     /**
      * @MongoDB\ReferenceOne(targetDocument="Phone")
      * @Gedmo\Versioned
+     * @var Phone
      */
     public $replacementPhone;
 
@@ -381,6 +384,9 @@ class Claim
         return $claimsDate->diff($date)->days < 30;
     }
 
+    /**
+     * @return Policy
+     */
     public function getPolicy()
     {
         return $this->policy;
@@ -397,6 +403,9 @@ class Claim
         $this->policy = $policy;
     }
 
+    /**
+     * @return Policy
+     */
     public function getLinkedPolicy()
     {
         return $this->linkedPolicy;

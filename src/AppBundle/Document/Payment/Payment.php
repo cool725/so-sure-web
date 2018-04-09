@@ -3,6 +3,7 @@
 namespace AppBundle\Document\Payment;
 
 use AppBundle\Classes\Salva;
+use AppBundle\Document\Policy;
 use FOS\UserBundle\Document\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -146,6 +147,7 @@ abstract class Payment
     /**
      * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy", inversedBy="payments")
      * @Gedmo\Versioned
+     * @var Policy
      */
     protected $policy;
 
@@ -415,6 +417,9 @@ abstract class Payment
         $this->policy = $policy;
     }
 
+    /**
+     * @return Policy
+     */
     public function getPolicy()
     {
         return $this->policy;

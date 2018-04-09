@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Form\Type\BacsMandatesType;
 use AppBundle\Form\Type\BacsUploadFileType;
 use AppBundle\Repository\File\S3FileRepository;
@@ -633,6 +634,43 @@ class AdminController extends BaseController
             200,
             array('Content-Type' => 'text/plain')
         );
+    }
+
+    /**
+     * @Route("/bacs/submission/{id}", name="admin_bacs_submission")
+     * @Method({"POST"})
+     */
+    public function bacsSubmissionAction(Request $request, $id)
+    {
+        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
+            throw new \InvalidArgumentException('Invalid csrf token');
+        }
+
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(AccessPayFile::class);
+        /** @var AccessPayFile $file */
+        $file = $repo->find($id);
+        if ($file) {
+            $file->setSubmitted(true);
+
+            $paymentRepo = $dm->getRepository(BacsPayment::class);
+            $payments = $paymentRepo->findBy([
+                'serialNumber' => $file->getSerialNumber(),
+                'status' => BacsPayment::STATUS_GENERATED
+            ]);
+            foreach ($payments as $payment) {
+                $payment->setStatus(BacsPayment::STATUS_TRANSFFER_WAIT_EXCEPTION);
+            }
+
+            $dm->flush();
+            $message = sprintf('Bacs file %s is marked as submitted', $file->getFileName());
+            $this->addFlash(
+                'success',
+                $message
+            );
+        }
+
+        return new RedirectResponse($this->generateUrl('admin_bacs'));
     }
 
     /**

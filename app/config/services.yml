@@ -159,6 +159,7 @@ services:
             - "%kernel.environment%"
             - "@app.mailer"
             - "@snc_redis.default"
+            - "@app.payment"
 
     app.push:
         class: AppBundle\Service\PushService
