@@ -1115,6 +1115,7 @@ class UserController extends BaseController
             'nickwaller@outlook.com',
             'ju.champagne@wanadoo.fr',
             'datkiewicz.marta@gmail.com',
+            'dylan.bourguignon@gmail.com',
         ])) {
             $bacsFeature = true;
         }
