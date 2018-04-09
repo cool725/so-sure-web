@@ -24,7 +24,7 @@
     {% include 'AppBundle::Purchase/purchaseNav.html.twig' %}
 
     <div class="checkout--top">
-        <div class="container">
+        <div class="container-fluid">
             <h1>
                 <span class="title-top">Insurance for your</span>
                 <br class="visible-xs">
@@ -66,9 +66,9 @@
             </h1>
             <div class="row">
                 <div class="col-sm-8 col-sm-offset-2 col-md-8 col-md-offset-2">
-                    <div class="speech-bubble animated fadeInLeft clearfix">Superb service with my first use of so-sure. I couldn't be happier with the way my claim was handled and I got my phone the next day 😁 <br><small>Ben Allssop, London.</small></div>
+                    <div class="speech-bubble animated fadeInLeft clearfix"><mark>Superb service with my first use of so-sure. I couldn't be happier with the way my claim was handled and I got my phone the next day 😁</mark> <br><small>Ben Allssop, London.</small></div>
                     <div class="payment-options">
-                        <h3 class="text-center">1. How would you like to pay?</h3>
+                        <h3 class="text-center">How would you like to pay?</h3>
                         <div class="row">
                             {% if app.user.allowedYearlyPayments %}
                             <div class="{% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %}col-xs-6{% else %}col-xs-12{% endif %}">
@@ -114,100 +114,98 @@
     </div>
 
     {{ form_start(purchase_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'data-client-validation': form_client_validation, 'autocomplete': 'off' }}) }}
-
         <div class="checkout--step checkout--step-payment">
-            {# <div class="container-fluid"> #}
+            <div class="form-group {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
+                {{ form_label(purchase_form.amount, 'Payment Options:', { 'label_attr': {'class': 'sr-only'} }) }}
+                {{ form_widget(purchase_form.amount) }}
+                <div class="help-block with-errors sr-only">{{ form_errors(purchase_form.amount) }}</div>
+            </div>
 
-                <div class="form-group {% if form_errors(purchase_form.amount) %}has-error{% endif %}">
-                    {{ form_label(purchase_form.amount, 'Payment Options:', { 'label_attr': {'class': 'sr-only'} }) }}
-                    {{ form_widget(purchase_form.amount) }}
-                    <div class="help-block with-errors sr-only">{{ form_errors(purchase_form.amount) }}</div>
-                </div>
+            <h3 class="text-center">Your device details</h3>
 
-                <div class="form-group {% if form_errors(purchase_form.imei) %}has-error{% endif %}">
-                    <h3>2. Your device details</h3>
-
-                    {{ form_label(purchase_form.imei, 'IMEI Number:', { 'label_attr': {'class': 'sr-only'} }) }}
-                    {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control imei', 'placeholder':'IMEI Number'}}) }}
-                    <label class="samsung-imei">Numbers only please (no / required)</label>
-                    <div class="help-block with-errors">{{ form_errors(purchase_form.imei) }}</div>
-                    <div class="help-block">
-                        Dial <strong>*#06#</strong> on your phone keypad to display your IMEI number. It doesn’t cost you anything to do so.
-                    </div>
-                </div>
-
-                {% if purchase_form.serialNumber is defined %}
-                    <div class="form-group {% if form_errors(purchase_form.serialNumber) %}has-error{% endif %}">
-                        {{ form_label(purchase_form.serialNumber, 'Serial Number:', { 'label_attr': {'class': 'sr-only'} }) }}
-                        {{ form_widget(purchase_form.serialNumber, {'attr':{'class':'form-control',  'pattern': '[a-zA-Z0-9]{5,32}', 'title': 'Enter a valid serial number', 'placeholder':'Serial Number'}}) }}
-                        <div class="help-block with-errors">{{ form_errors(purchase_form.serialNumber) }}</div>
+            <div class="row">
+                <div class="col-sm-8 col-sm-offset-2 col-md-8 col-md-offset-2">
+                    <div class="form-group {% if form_errors(purchase_form.imei) %}has-error{% endif %} col-sm-6 {% if purchase_form.serialNumber is not defined %}col-sm-offset-3{% endif %}">
+                        {{ form_label(purchase_form.imei, 'IMEI Number:', { 'label_attr': {'class': 'sr-only'} }) }}
+                        {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control imei', 'placeholder':'IMEI Number'}}) }}
+                        <label class="samsung-imei">Numbers only please (no / required)</label>
+                        <div class="help-block with-errors">{{ form_errors(purchase_form.imei) }}</div>
                         <div class="help-block">
-                            To find your IMEI &amp; Serial Numbers open your phone Settings, navigate to General and view About. The Serial Number is listed about halfway down the screen and the IMEI is a few rows below that.
-                        </div>
-                        <div class="help-block">
-                            You can also log into your iTunes account and find the IMEI &amp; Serial Numbers display on the phone information screen.
+                            Dial <strong>*#06#</strong> on your phone keypad to display your IMEI number. It doesn’t cost you anything to do so.
                         </div>
                     </div>
+
+                    {% if purchase_form.serialNumber is defined %}
+                        <div class="form-group {% if form_errors(purchase_form.serialNumber) %}has-error{% endif %} {% if purchase_form.serialNumber is defined %}col-sm-6{% endif %}">
+                            {{ form_label(purchase_form.serialNumber, 'Serial Number:', { 'label_attr': {'class': 'sr-only'} }) }}
+                            {{ form_widget(purchase_form.serialNumber, {'attr':{'class':'form-control',  'pattern': '[a-zA-Z0-9]{5,32}', 'title': 'Enter a valid serial number', 'placeholder':'Serial Number'}}) }}
+                            <div class="help-block with-errors">{{ form_errors(purchase_form.serialNumber) }}</div>
+                            <div class="help-block">
+                                To find your IMEI &amp; Serial Numbers open your phone Settings, navigate to General and view About. The Serial Number is listed about halfway down the screen and the IMEI is a few rows below that.
+                            </div>
+                            <div class="help-block">
+                                You can also log into your iTunes account and find the IMEI &amp; Serial Numbers display on the phone information screen.
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="hidden">
+                {{ form_widget(purchase_form.fileValid) }}
+                {{ form_widget(purchase_form.file, {'attr': {'style':'display:none'}}) }}
+            </div>
+
+            <div class="checkout--step-confirm">
+                <div class="inner">
+                    <h3 class="text-center">Before you continue</h3>
+                    <p class="text-center">Please confirm that the following are correct:</p>
+                    <ol>
+                        <li>My phone is in full working condition and my screen is not cracked.</li>
+                        <li>I am a resident of the United Kingdom.</li>
+                        <li>I have read &amp; understood the <a class="policy-doc-toggle" href="#policy-doc" data-toggle="modal" data-target="#policy-modal" id="policy-modal-trigger">so-sure policy document</a>.</li>
+                    </ol>
+
+                    <small>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</small>
+
+                    <div class="form-group" style="display: none">
+                        {{ form_widget(purchase_form.agreed, {'label': ' I confirm the above is correct', 'value': 'checked'}) }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group form-group--center">
+                {% if app.user.hasValidPaymentMethod %}
+                    {{ form_widget(purchase_form.existing, {'label': 'Pay with card on file', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
+                    {{ form_widget(purchase_form.next, {'label': 'Pay with a new card', 'attr': {'class': 'btn btn-default btn-block btn-pad'}}) }}
+                {% else %}
+                    {{ form_widget(purchase_form.next, {'label': 'I agree, proceed to payment', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
                 {% endif %}
+            </div>
 
-                <div class="hidden">
-                    {{ form_widget(purchase_form.fileValid) }}
-                    {{ form_widget(purchase_form.file, {'attr': {'style':'display:none'}}) }}
-                </div>
+            <div class="form-group form-group--center">
+                {% if app.request.get('_route') == "purchase_step_policy_id" %}
+                <a href="{{ path('user_home') }}"
+                   class="btn btn-blue-hollow btn-block btn-pad">
+                    Back
+                </a>
+                {% else %}
+                <a href="{{ path('purchase_step_personal') }}"
+                   class="btn btn-blue-hollow btn-block btn-pad">
+                    Back
+                </a>
+                {% endif %}
+            </div>
 
-                <div class="checkout--step-confirm">
-                    <div class="inner">
-                        <h3>3. Before you continue</h3>
+            <div class="form-group form-group--center text-center">
+                <small class="text-grey">Powered by</small> <br>
+                <img src="{{ cdn_url }}/images/purchase/judo_pay_logo.svg" alt="Judo Pay" title="Powered by - Judo Pay" width="70px">
+            </div>
 
-                        <p>Please confirm that the following are correct:</p>
-                        <ol>
-                            <li>My phone is in full working condition and my screen is not cracked.</li>
-                            <li>I am a resident of the United Kingdom.</li>
-                            <li>I have read &amp; understood the <a class="policy-doc-toggle" href="#policy-doc" data-toggle="modal" data-target="#policy-modal" id="policy-modal-trigger">so-sure policy document</a>.</li>
-                        </ol>
-
-                        <small>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</small>
-
-                        <div class="form-group" style="display: none">
-                            {{ form_widget(purchase_form.agreed, {'label': ' I confirm the above is correct', 'value': 'checked'}) }}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    {% if app.user.hasValidPaymentMethod %}
-                        {{ form_widget(purchase_form.existing, {'label': 'Pay with card on file', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
-                        {{ form_widget(purchase_form.next, {'label': 'Pay with a new card', 'attr': {'class': 'btn btn-default btn-block btn-pad'}}) }}
-                    {% else %}
-                        {{ form_widget(purchase_form.next, {'label': 'I agree, proceed to payment', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
-                    {% endif %}
-                </div>
-
-                <div class="form-group">
-                    {% if app.request.get('_route') == "purchase_step_policy_id" %}
-                    <a href="{{ path('user_home') }}"
-                       class="btn btn-blue-hollow btn-block btn-pad">
-                        Back
-                    </a>
-                    {% else %}
-                    <a href="{{ path('purchase_step_personal') }}"
-                       class="btn btn-blue-hollow btn-block btn-pad">
-                        Back
-                    </a>
-                    {% endif %}
-                </div>
-
-                <div class="form-group text-center">
-                    <small class="text-grey">Powered by</small> <br>
-                    <img src="{{ cdn_url }}/images/purchase/judo_pay_logo.svg" alt="Judo Pay" title="Powered by - Judo Pay" width="70px">
-                </div>
-
-                <form action="{{ webpay_action }}" method="post" id="webpay-form">
-                    <input id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
-                </form>
-            {# </div> #}
+            <form action="{{ webpay_action }}" method="post" id="webpay-form">
+                <input id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
+            </form>
         </div>
-
     {{ form_end(purchase_form) }}
 
 </section>
