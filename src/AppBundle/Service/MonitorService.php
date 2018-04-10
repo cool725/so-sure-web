@@ -361,4 +361,25 @@ class MonitorService
             ));
         }
     }
+
+    public function bankHolidays(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+        $holidays = DateTrait::getBankHolidays();
+        usort($holidays, function($a, $b) {
+            return $a < $b;
+        });
+        $holiday = $holidays[0];
+        //print_r($holiday);
+        $diff = $holiday->diff($date);
+        //print_r($diff);
+        if ($diff->days < 90) {
+            throw new MonitorException(sprintf(
+                'Last holiday %s is coming up. Add more holidays',
+                $holiday->format('d/m/Y')
+            ));
+        }
+    }
 }
