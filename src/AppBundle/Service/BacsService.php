@@ -7,6 +7,7 @@ use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\BacsReportAddacsFile;
 use AppBundle\Document\File\BacsReportAuddisFile;
 use AppBundle\Document\File\BacsReportInputFile;
+use AppBundle\Document\File\DirectDebitNotificationFile;
 use AppBundle\Document\File\S3File;
 use AppBundle\Document\File\UploadFile;
 use AppBundle\Document\Payment\BacsPayment;
@@ -27,9 +28,13 @@ class BacsService
 {
     use DateTrait;
 
-    const S3_BUCKET = 'admin.so-sure.com';
+    const S3_POLICY_BUCKET = 'policy.so-sure.com';
+    const S3_ADMIN_BUCKET = 'admin.so-sure.com';
     const SUN = '176198';
     const KEY_BACS_CANCEL = 'bacs:cancel';
+    const KEY_BACS_QUEUE = 'bacs:queue';
+
+    const QUEUE_EVENT_CREATED = 'created';
 
     const ADDACS_REASON_BANK = 0;
     const ADDACS_REASON_USER = 1;
@@ -66,6 +71,10 @@ class BacsService
     /** @var PaymentService */
     protected $paymentService;
 
+    protected $snappyPdf;
+
+    protected $templating;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
@@ -75,6 +84,8 @@ class BacsService
      * @param MailerService   $mailerService
      * @param                 $redis
      * @param PaymentService  $paymentService
+     * @param                 $snappyPdf
+     * @param                 $templating
      */
     public function __construct(
         DocumentManager $dm,
@@ -84,7 +95,9 @@ class BacsService
         $environment,
         MailerService $mailerService,
         $redis,
-        PaymentService $paymentService
+        PaymentService $paymentService,
+        $snappyPdf,
+        $templating
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -94,6 +107,8 @@ class BacsService
         $this->mailerService = $mailerService;
         $this->redis = $redis;
         $this->paymentService = $paymentService;
+        $this->snappyPdf = $snappyPdf;
+        $this->templating = $templating;
     }
 
     public function processUpload(UploadedFile $file)
@@ -135,12 +150,12 @@ class BacsService
         $s3Key = sprintf('%s/bacs-report/%s', $this->environment, $filename);
 
         $this->s3->putObject(array(
-            'Bucket' => self::S3_BUCKET,
+            'Bucket' => self::S3_ADMIN_BUCKET,
             'Key' => $s3Key,
             'SourceFile' => $encTempFile,
         ));
 
-        $uploadFile->setBucket(self::S3_BUCKET);
+        $uploadFile->setBucket(self::S3_ADMIN_BUCKET);
         $uploadFile->setKey($s3Key);
         $uploadFile->setDate($date);
 
@@ -170,7 +185,7 @@ class BacsService
         //file_put_contents($tempFile, null);
 
         $this->s3->getObject(array(
-            'Bucket' => self::S3_BUCKET,
+            'Bucket' => self::S3_ADMIN_BUCKET,
             'Key' => $s3File->getKey(),
             'SaveAs' => $encTempFile
         ));
@@ -786,5 +801,144 @@ class BacsService
         }
 
         return $lines;
+    }
+
+    public function queueBacsCreated(Policy $policy, $retryAttempts = 0)
+    {
+        $data = [
+            'action' => self::QUEUE_EVENT_CREATED,
+            'policyId' => $policy->getId(),
+            'retryAttempts' => $retryAttempts,
+        ];
+        $this->redis->rpush(self::KEY_BACS_QUEUE, serialize($data));
+    }
+
+    public function clearQueue()
+    {
+        $this->redis->del(self::KEY_BACS_QUEUE);
+    }
+
+    public function getQueueData($max)
+    {
+        return $this->redis->lrange(self::KEY_BACS_QUEUE, 0, $max);
+    }
+
+    public function process($max)
+    {
+        $requeued = 0;
+        $processed = 0;
+        while ($processed + $requeued < $max) {
+            $user = null;
+            $data = null;
+            try {
+                $queueItem = $this->redis->lpop(self::KEY_BACS_QUEUE);
+                if (!$queueItem) {
+                    return $processed;
+                }
+                $data = unserialize($queueItem);
+
+                $action = null;
+                if (isset($data['action'])) {
+                    $action = $data['action'];
+                }
+
+                if ($action == self::QUEUE_EVENT_CREATED) {
+                    if (!isset($data['policyId'])) {
+                        throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
+                    }
+
+                    $this->generateBacsPdf($this->getPolicy($data['policyId']));
+                } else {
+                    throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
+                }
+                $processed++;
+            } catch (\InvalidArgumentException $e) {
+                $this->logger->error(sprintf(
+                    'Error processing bacs queue message %s. Ex: %s',
+                    json_encode($data),
+                    $e->getMessage()
+                ));
+            } catch (\Exception $e) {
+                if (isset($data['retryAttempts']) && $data['retryAttempts'] < 2) {
+                    $data['retryAttempts'] += 1;
+                    $this->redis->rpush(self::KEY_BACS_QUEUE, serialize($data));
+                } else {
+                    $this->logger->error(sprintf(
+                        'Error (retry exceeded) in bacs processing %s. Ex: %s',
+                        json_encode($data),
+                        $e->getMessage()
+                    ));
+                }
+            }
+        }
+
+        return $processed;
+    }
+
+    public function getPolicy($id)
+    {
+        if (!$id) {
+            throw new \InvalidArgumentException('Missing policyId');
+        }
+        $repo = $this->dm->getRepository(Policy::class);
+        $policy = $repo->find($id);
+        if (!$policy) {
+            throw new \InvalidArgumentException(sprintf('Unable to find policyId: %s', $id));
+        }
+
+        return $policy;
+    }
+
+    public function generateBacsPdf(Policy $policy)
+    {
+        $now = new \DateTime();
+        $bankAccount = $policy->getUser()->getPaymentMethod()->getBankAccount();
+        $filename = sprintf(
+            "%s-%s-%s.pdf",
+            $policy->getId(),
+            $bankAccount->getReference(),
+            $now->format('U')
+        );
+        $tmpFile = sprintf(
+            "%s/%s",
+            sys_get_temp_dir(),
+            $filename
+        );
+        if (file_exists($tmpFile)) {
+            unlink($tmpFile);
+        }
+
+        $this->snappyPdf->setOption('orientation', 'Portrait');
+        $this->snappyPdf->setOption('lowquality', false);
+        $this->snappyPdf->setOption('page-size', 'A4');
+        $this->snappyPdf->setOption('margin-top', '1');
+        $this->snappyPdf->setOption('margin-bottom', '1');
+        $this->snappyPdf->generateFromHtml(
+            $this->templating->render('AppBundle:Email:bacs/notification.html.twig', [
+                'user' => $policy->getUser(),
+                'policy' => $policy
+            ]),
+            $tmpFile
+        );
+
+        $date = new \DateTime();
+        $ddNotificationFile = new DirectDebitNotificationFile();
+        $ddNotificationFile->setBucket(self::S3_POLICY_BUCKET);
+        $ddNotificationFile->setKeyFormat(
+            $this->environment . '/dd-notification/' . $date->format('Y') . '/%s'
+        );
+        $ddNotificationFile->setFileName($filename);
+        $policy->addPolicyFile($ddNotificationFile);
+        $this->dm->flush();
+
+        if ($this->environment != "test") {
+            $result = $this->s3->putObject(array(
+                'Bucket' => self::S3_POLICY_BUCKET,
+                'Key' => $ddNotificationFile->getKey(),
+                'SourceFile' => $tmpFile,
+            ));
+        }
+
+        return $tmpFile;
     }
 }

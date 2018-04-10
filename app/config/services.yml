@@ -99,8 +99,7 @@ services:
             - "%kernel.environment%"
             - "@app.fraud"
             - "@templating"
-            - "@knp_snappy.pdf"
-            - "@aws.s3"
+            - "@event_dispatcher"
 
     app.barclays:
         class: AppBundle\Service\BarclaysService
@@ -160,6 +159,8 @@ services:
             - "@app.mailer"
             - "@snc_redis.default"
             - "@app.payment"
+            - "@knp_snappy.pdf"
+            - "@templating"
 
     app.push:
         class: AppBundle\Service\PushService
@@ -758,6 +759,7 @@ services:
         tags:
             -  { name: kernel.event_listener, event: event.user.name.updated, method: onUserNameChangedEvent }
             -  { name: kernel.event_listener, event: event.bacs.updated, method: onBankAccountChangedEvent }
+            -  { name: kernel.event_listener, event: event.policy.bacs-created, method: onPolicyBacsCreated }
 
     app.listener.debtCollection:
         class:   AppBundle\Listener\DebtCollectionListener

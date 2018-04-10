@@ -9,6 +9,7 @@ use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\User;
 use AppBundle\Event\BacsEvent;
+use AppBundle\Event\PolicyEvent;
 use AppBundle\Event\UserEvent;
 use AppBundle\Event\UserEmailEvent;
 use AppBundle\Service\BacsService;
@@ -80,5 +81,11 @@ class BacsListener
         $bankAccount = $event->getBankAccount();
         $id = $event->getId();
         $this->bacsService->queueCancelBankAccount($bankAccount, $id);
+    }
+
+    public function onPolicyBacsCreated(PolicyEvent $event)
+    {
+        $policy = $event->getPolicy();
+        $this->bacsService->queueBacsCreated($policy);
     }
 }

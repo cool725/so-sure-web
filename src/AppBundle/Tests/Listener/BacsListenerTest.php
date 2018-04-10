@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Listener;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Event\BacsEvent;
+use AppBundle\Event\PolicyEvent;
 use AppBundle\Listener\BacsListener;
 use AppBundle\Service\BacsService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -133,5 +134,27 @@ class BacsListenerTest extends WebTestCase
         $this->assertEquals($bankAccount->getAccountNumber(), $data['accountNumber']);
         $this->assertEquals($bankAccount->getReference(), $data['reference']);
         $this->assertEquals('9', $data['id']);
+    }
+
+    public function testPolicyBacsCreated()
+    {
+        self::$redis->flushdb();
+        $this->assertEquals(0, self::$redis->llen(BacsService::KEY_BACS_QUEUE));
+
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPolicyBacsCreated', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm)
+        );
+
+        self::$bacsListener->onPolicyBacsCreated(new PolicyEvent($policy));
+        $this->assertEquals(1, self::$redis->llen(BacsService::KEY_BACS_QUEUE));
     }
 }
