@@ -149,6 +149,12 @@ class BacsService
         unlink($tmpFile);
         $s3Key = sprintf('%s/bacs-report/%s', $this->environment, $filename);
 
+        $repo = $this->dm->getRepository(UploadFile::class);
+        $existingFile = $repo->findOneBy(['bucket' => self::S3_ADMIN_BUCKET, 'key' => $s3Key]);
+        if ($existingFile) {
+            throw new \Exception(sprintf('File s3://%s/%s already exists', self::S3_ADMIN_BUCKET, $s3Key));
+        }
+
         $this->s3->putObject(array(
             'Bucket' => self::S3_ADMIN_BUCKET,
             'Key' => $s3Key,
