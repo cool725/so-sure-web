@@ -2,6 +2,7 @@
 namespace AppBundle\Service;
 
 use AppBundle\Document\Cashback;
+use AppBundle\Document\File\AccessPayFile;
 use Psr\Log\LoggerInterface;
 use GuzzleHttp\Client;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -346,6 +347,18 @@ class MonitorService
                     $version
                 ));
             }
+        }
+    }
+
+    public function bacsSubmitted()
+    {
+        $repo = $this->dm->getRepository(AccessPayFile::class);
+        $unsubmitted = $repo->findOneBy(['submitted' => ['$ne' => true]]);
+        if ($unsubmitted) {
+            throw new MonitorException(sprintf(
+                'There is a bacs file (%s) that has not been marked as submitted',
+                $unsubmitted->getId()
+            ));
         }
     }
 }
