@@ -298,7 +298,7 @@ class RefundListenerTest extends WebTestCase
         foreach ($policy->getPayments() as $payment) {
             if ($payment instanceof BacsPayment && $payment->getAmount() < 0) {
                 $this->assertEquals($now, $payment->getDate());
-                $this->assertFalse($payment->isManual());
+                $this->assertNull($payment->isManual());
                 $this->assertTrue($payment->isSuccess());
                 $this->assertEquals(BacsPayment::STATUS_PENDING, $payment->getStatus());
                 $foundRefund = true;

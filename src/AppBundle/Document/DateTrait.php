@@ -107,6 +107,16 @@ trait DateTrait
         return !in_array((int) $date->format('w'), [0, 6]);
     }
 
+    public function getCurrentOrNextBusinessDay(\DateTime $date)
+    {
+        $businessDays = clone $date;
+        if ($this->isWeekDay($businessDays) && !$this->isBankHoliday($businessDays)) {
+            return $businessDays;
+        }
+
+        return $this->addBusinessDays($date, 1);
+    }
+
     public function addBusinessDays($date, $days)
     {
         $businessDays = clone $date;

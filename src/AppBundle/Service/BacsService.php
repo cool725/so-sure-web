@@ -731,8 +731,9 @@ class BacsService
             $scheduledPayment->setPayment($payment);
 
             $metadata['debit-amount'] += $scheduledPayment->getAmount();
+            $scheduledDate = $this->getCurrentOrNextBusinessDay($scheduledPayment->getScheduled());
             $lines[] = implode(',', [
-                sprintf('"%s"', $scheduledPayment->getScheduled()->format('d/m/y')),
+                sprintf('"%s"', $scheduledDate->format('d/m/y')),
                 '"Scheduled Payment"',
                 $bankAccount->isFirstPayment() ? '"01"' : '"17"',
                 sprintf('"%s"', $bankAccount->getAccountName()),
