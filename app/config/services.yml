@@ -580,6 +580,7 @@ services:
             - "@logger"
             - "%report_excluded_policy_ids%"
             - "%kernel.environment%"
+            - "@snc_redis.default"
 
     app.mixpanel:
         class: AppBundle\Service\MixpanelService
