@@ -104,7 +104,7 @@ class PhonePolicy extends Policy
     protected $serialNumber;
 
     /**
-     * @AppAssert\Alphanumeric()
+     * @AppAssert\Token()
      * @Assert\Length(min="0", max="50")
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned

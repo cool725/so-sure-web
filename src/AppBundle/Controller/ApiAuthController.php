@@ -621,6 +621,53 @@ class ApiAuthController extends BaseController
     }
 
     /**
+     * @Route("/policy/{id}", name="api_auth_post_policy")
+     * @Method({"POST"})
+     */
+    public function policyAction(Request $request, $id)
+    {
+        try {
+            $data = json_decode($request->getContent(), true)['body'];
+            if (empty($data)) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(Policy::class);
+            $policy = $repo->find($id);
+            if (!$policy) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_NOT_FOUND,
+                    'Unable to find policy',
+                    404
+                );
+            }
+            $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+
+            if (isset($data['phone_policy'])) {
+                if (isset($data['phone_policy']['model_number'])) {
+                    $modelNumber = $this->getDataString($data['phone_policy'], 'model_number');
+                    $policy->setModelNumber($modelNumber);
+                    $dm->persist($policy);
+                    $dm->flush();
+                }
+            }
+
+            return new JsonResponse($policy->toApiArray());
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api billingDayAction.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
      * @Route("/policy/{id}/billing-day", name="api_auth_billing_day")
      * @Method({"POST"})
      */
