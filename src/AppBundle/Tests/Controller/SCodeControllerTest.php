@@ -30,6 +30,7 @@ class SCodeControllerTest extends BaseControllerTest
         $url = sprintf('/scode/%s', $scode->getCode());
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(200);
+        $this->assertContains(sprintf("Insure your phone with %s", $scode->getUser()->getName()), $crawler->html());
         // check if phone forms are pointing to the right location
         self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
 
@@ -64,6 +65,53 @@ class SCodeControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(302);
         $this->assertTrue(self::$client->getResponse()->isRedirect('/user/'));
+    }
+
+    public function testMultibyte()
+    {
+        $email = self::generateEmail('testMultibyte', $this);
+        $password = 'foo';
+        $phone = self::getRandomPhone(self::$dm);
+        $user = self::createUser(
+            self::$userManager,
+            $email,
+            $password,
+            $phone,
+            self::$dm
+        );
+        $user->setFirstName("żbieta");
+        $user->setLastName("Eżbieta");
+
+        $scode = new SCode();
+        $scode->setType(SCode::TYPE_STANDARD);
+        $scode->generateNamedCode($user, 5);
+        $this->assertEquals("żeżb0005", $scode->getCode());
+
+        static::$dm->persist($user);
+        static::$dm->persist($scode);
+
+        $phone = self::getRandomPhone(self::$dm);
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $scode->setPolicy($policy);
+        self::$dm->flush();
+        //print_r($policy->getClaimsWarnings());
+        $this->assertTrue($policy->getUser()->hasActivePolicy());
+
+        $repo = self::$dm->getRepository(SCode::class);
+        $updatedScode = $repo->find($scode->getId());
+        $this->assertNotNull($updatedScode);
+        $url = sprintf('/scode/%s', $updatedScode->getCode());
+        //print_r($url);
+        $crawler = self::$client->request('GET', $url);
+        self::verifyResponse(200);
+        $this->assertContains(sprintf("Insure your phone with %s", $user->getName()), $crawler->html());
+
+        $url = sprintf('/scode/%s', urlencode($scode->getCode()));
+        //print_r($url);
+        $crawler = self::$client->request('GET', $url);
+        self::verifyResponse(200);
+        $this->assertContains(sprintf("Insure your phone with %s", $user->getName()), $crawler->html());
     }
 
     private function createSCode($emailBase)
