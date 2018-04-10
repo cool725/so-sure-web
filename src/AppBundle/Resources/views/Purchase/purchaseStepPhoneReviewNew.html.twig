@@ -168,11 +168,12 @@
                         <li class="h4 h-light">I have read &amp; understood the <a class="policy-doc-toggle" href="#policy-doc" data-toggle="modal" data-target="#policy-modal" id="policy-modal-trigger">so-sure policy document</a>.</li>
                     </ol>
 
-                    <p><small>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</small></p>
-
-                    <div class="form-group" style="display: none">
-                        {{ form_widget(purchase_form.agreed, {'label': ' I confirm the above is correct', 'value': 'checked'}) }}
+                    <div class="form-group">
+                        <p><small>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</small></p>
+                        <div style="display:none;">{{ form_widget(purchase_form.agreed, {'label': ' I confirm the above is correct', 'value': 'checked'}) }}</div>
                     </div>
+
+                    <div class="form-group"><br></div>
 
                     <div class="form-group form-group--center">
                         {% if app.user.hasValidPaymentMethod %}
