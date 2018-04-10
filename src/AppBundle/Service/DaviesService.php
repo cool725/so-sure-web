@@ -22,6 +22,8 @@ class DaviesService extends S3EmailService
     use CurrencyTrait;
     use DateTrait;
 
+    const MIN_LOSS_DESCRIPTION_LENGTH = 5;
+
     /** @var ClaimsService */
     protected $claimsService;
 
@@ -597,6 +599,13 @@ class DaviesService extends S3EmailService
             $this->warnings[$daviesClaim->claimNumber][] = $msg;
         }
 
+        if (mb_strlen($daviesClaim->lossDescription) < self::MIN_LOSS_DESCRIPTION_LENGTH) {
+            $msg = sprintf(
+                'Claim %s does not have a detailed loss description',
+                $daviesClaim->claimNumber
+            );
+            $this->warnings[$daviesClaim->claimNumber][] = $msg;
+        }
     }
 
     public function postValidateClaimDetails(Claim $claim, DaviesClaim $daviesClaim)
