@@ -368,7 +368,7 @@ class MonitorService
             $date = new \DateTime();
         }
         $holidays = DateTrait::getBankHolidays();
-        usort($holidays, function($a, $b) {
+        usort($holidays, function ($a, $b) {
             return $a < $b;
         });
         $holiday = $holidays[0];
