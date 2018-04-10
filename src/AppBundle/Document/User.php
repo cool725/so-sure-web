@@ -196,6 +196,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     /**
      * @MongoDB\EmbedOne(targetDocument="PaymentMethod")
      * @Gedmo\Versioned
+     * @var PaymentMethod
      */
     protected $paymentMethod;
 
@@ -1317,6 +1318,9 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         }
     }
 
+    /**
+     * @return PaymentMethod
+     */
     public function getPaymentMethod()
     {
         return $this->paymentMethod;

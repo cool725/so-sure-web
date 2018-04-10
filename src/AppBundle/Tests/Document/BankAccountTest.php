@@ -77,6 +77,7 @@ class BankAccountTest extends \PHPUnit\Framework\TestCase
         $policy->setPremiumInstallments(12);
         $bacsPayment = new BacsPayment();
         $bacsPayment->setAmount($premium->getMonthlyPremiumPrice());
+        $bacsPayment->setStatus(BacsPayment::STATUS_SUCCESS);
         $bacsPayment->setSuccess(true);
         $bacsPayment->setDate(new \DateTime('2018-03-05'));
         //$policy->addPayment($bacsPayment);
@@ -105,6 +106,7 @@ class BankAccountTest extends \PHPUnit\Framework\TestCase
         $policy->setPremiumInstallments(12);
         $bacsPayment = new BacsPayment();
         $bacsPayment->setAmount($premium->getMonthlyPremiumPrice());
+        $bacsPayment->setStatus(BacsPayment::STATUS_SUCCESS);
         $bacsPayment->setSuccess(true);
         $bacsPayment->setDate(new \DateTime('2018-03-05'));
         $policy->addPayment($bacsPayment);
@@ -137,6 +139,7 @@ class BankAccountTest extends \PHPUnit\Framework\TestCase
         $policy->setPremiumInstallments(12);
         $bacsPayment = new BacsPayment();
         $bacsPayment->setAmount($premium->getMonthlyPremiumPrice());
+        $bacsPayment->setStatus(BacsPayment::STATUS_SUCCESS);
         $bacsPayment->setSuccess(true);
         $bacsPayment->setDate(new \DateTime('2018-03-05'));
         $policy->addPayment($bacsPayment);

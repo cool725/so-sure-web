@@ -1221,6 +1221,7 @@ class PolicyServiceTest extends WebTestCase
 
         $bacs = new BacsPayment();
         $bacs->setManual(true);
+        $bacs->setStatus(BacsPayment::STATUS_SUCCESS);
         $bacs->setSuccess(true);
         $bacs->setAmount($policy->getPhone()->getCurrentPhonePrice()->getYearlyPremiumPrice());
         $policy->addPayment($bacs);

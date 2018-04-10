@@ -131,7 +131,12 @@ class RefundListener
                     $refund->setNotes($notes);
                     $refund->setSource(Payment::SOURCE_SYSTEM);
                     $refund->setRefundTotalCommission($refundCommissionAmount);
-                    $refund->setManual($payment->isManual());
+                    if ($policy->hasManualBacsPayment()) {
+                        $refund->setManual(true);
+                    }
+                    $refund->setStatus(BacsPayment::STATUS_PENDING);
+                    // TODO: we need to have the refund be successful in order to have the correct
+                    // amount for the policy to send to salva. This is not ideal as its not a successful payment
                     $refund->setSuccess(true);
                     $payment->getPolicy()->addPayment($refund);
                     $this->dm->persist($refund);
