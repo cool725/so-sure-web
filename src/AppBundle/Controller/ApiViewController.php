@@ -27,6 +27,7 @@ class ApiViewController extends BaseController
 {
     /**
      * @Route("/policy/terms", name="latest_policy_terms")
+     * @Route("/policy/v2/terms", name="latest_policy_terms2")
      */
     public function policyLatestTermsAction(Request $request)
     {
@@ -65,11 +66,13 @@ class ApiViewController extends BaseController
         );
 
         $html = $this->renderView($template, $data);
-        $noH1 = $request->get('noH1');
-        if (!$noH1) {
-            $html = $this->upgradeHTags($html);
+        if ($request->get('_route') == 'latest_policy_terms') {
+            $html = $this->renderView($template, $data);
+            $noH1 = $request->get('noH1');
+            if (!$noH1) {
+                $html = $this->upgradeHTags($html);
+            }
         }
-
         return new Response($html);
     }
 
