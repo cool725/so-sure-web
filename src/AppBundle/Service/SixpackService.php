@@ -159,7 +159,7 @@ class SixpackService
         } catch (\Exception $e) {
             $this->logger->error(sprintf('Failed exp %s', $experiment), ['exception' => $e]);
         }
-        $this->mixpanel->queueTrack(
+        $this->mixpanel->queueTrackWithUtm(
             MixpanelService::EVENT_SIXPACK,
             ['Experiment' => $experiment, 'Result' => $result]
         );
