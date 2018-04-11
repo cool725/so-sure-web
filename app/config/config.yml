@@ -423,6 +423,8 @@ nelmio_security:
                 - https://platform.twitter.com
                 - https://syndication.twitter.com
                 - https://angel.co
+                - https://intercom-sheets.com
+                - https://js.intercomcdn.com
                 - 'data:'
             connect-src:
                 - 'self'
