@@ -661,7 +661,7 @@ class ApiAuthController extends BaseController
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
-            $this->get('logger')->error('Error in api billingDayAction.', ['exception' => $e]);
+            $this->get('logger')->error('Error in api post policy action.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
