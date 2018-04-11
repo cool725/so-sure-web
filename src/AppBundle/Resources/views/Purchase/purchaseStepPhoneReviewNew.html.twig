@@ -74,7 +74,7 @@
                             <div class="{% if app.user.allowedMonthlyPayments and app.user.allowedYearlyPayments %}col-xs-6{% else %}col-xs-12{% endif %}">
                                 <div class="payment-options--btn
                                      {% if purchase_form.vars.value.amount == phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium) %}
-                                        payment--btn-selected
+                                        payment-options--btn-selected
                                      {% endif %}"
                                      id="payment--yearly"
                                      data-value="{{ phone.currentPhonePrice.yearlyPremiumPrice|number_format(2, '.', ',') }}"
