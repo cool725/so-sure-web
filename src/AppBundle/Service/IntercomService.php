@@ -24,6 +24,15 @@ class IntercomService
     use CurrencyTrait;
 
     const KEY_INTERCOM_QUEUE = 'queue:intercom';
+    const KEY_INTERCOM_RATELIMIT = 'intercom:ratelimit';
+
+    // slow down requests at this theshold
+    const RATE_LIMIT_DELAY = 30;
+    // keep some requests free for app
+    const RATE_LIMIT_RESERVED_APP = 10;
+
+    const MAX_RATE_LIMIT_SLEEP_SECONDS = 15;
+
 
     const TAG_DONT_CONTACT = "Don't Contact (Duplicate)";
 
@@ -116,6 +125,52 @@ class IntercomService
         $this->router = $router;
     }
 
+    private function storeRateLimit()
+    {
+        $rateLimit = $this->client->getRateLimitDetails();
+        $this->redis->set(self::KEY_INTERCOM_RATELIMIT, serialize($rateLimit));
+        $this->logger->debug(sprintf(
+            'Intercom rate limit response: %s',
+            json_encode($rateLimit)
+        ));
+    }
+
+    private function checkRateLimit()
+    {
+        if (!$this->redis->exists(self::KEY_INTERCOM_RATELIMIT)) {
+            return;
+        }
+        $rateLimit = unserialize($this->redis->get(self::KEY_INTERCOM_RATELIMIT));
+        // 83 ops / 10 sec
+        if ($rateLimit['remaining'] > self::RATE_LIMIT_DELAY) {
+            return;
+        } elseif ($rateLimit['remaining'] > self::RATE_LIMIT_RESERVED_APP) {
+            $this->logger->debug(sprintf(
+                'Sleep 0.1s for intercom rate limit %d remaining',
+                $rateLimit['remaining']
+            ));
+            // wait for 0.1 seconds
+            usleep(100000);
+        } elseif ($rateLimit['remaining']) {
+            $reset = $rateLimit['reset_at'];
+            $now = new \DateTime();
+            if ($reset > $now) {
+                $diff = $now->diff($reset);
+                $this->logger->debug(sprintf(
+                    'Sleep %d s until %s (now: %s) for intercom rate limit %d remaining',
+                    $diff->s,
+                    $reset->format(\DateTime::ATOM),
+                    $now->format(\DateTime::ATOM),
+                    $rateLimit['remaining']
+                ));
+                if (!$diff->invert && $diff->s > self::MAX_RATE_LIMIT_SLEEP_SECONDS) {
+                    throw new \Exception('Too long to sleep for intercom');
+                }
+                time_sleep_until($reset->format('U'));
+            }
+        }
+    }
+
     public function update(User $user, $allowSoSure = false, $undelete = false)
     {
         if ($user->hasSoSureEmail() && !$allowSoSure) {
@@ -160,7 +215,10 @@ class IntercomService
         }
 
         try {
+            $this->checkRateLimit();
             $resp = $this->client->leads->getLeads(['email' => $user->getEmail()]);
+            $this->storeRateLimit();
+
             return count($resp->contacts) > 0;
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             throw $e;
@@ -177,7 +235,10 @@ class IntercomService
         }
 
         try {
+            $this->checkRateLimit();
             $resp = $this->client->users->getUser($user->getIntercomId());
+            $this->storeRateLimit();
+
             $this->logger->info(sprintf('getUser %s %s', $user->getEmail(), json_encode($resp)));
 
             return $resp;
@@ -200,7 +261,10 @@ class IntercomService
         }
 
         try {
+            $this->checkRateLimit();
             $resp = $this->client->users->getUser($user->getIntercomId());
+            $this->storeRateLimit();
+
             $this->logger->info(sprintf('getUser %s %s', $user->getEmail(), json_encode($resp)));
 
             return true;
@@ -219,7 +283,10 @@ class IntercomService
         if (!$user->hasEmail()) {
             return $results;
         }
+        $this->checkRateLimit();
         $resp = $this->client->leads->getLeads(['email' => $user->getEmail()]);
+        $this->storeRateLimit();
+
         $results[] = $resp;
         foreach ($resp->contacts as $lead) {
             $data = [
@@ -227,7 +294,10 @@ class IntercomService
               "user" => array("user_id" => $user->getId()),
             ];
 
+            $this->checkRateLimit();
             $resp = $this->client->leads->convertLead($data);
+            $this->storeRateLimit();
+
             $this->logger->debug(sprintf('Intercom convert lead (userid %s) %s', $user->getId(), json_encode($resp)));
             $results[] = $resp;
         }
@@ -340,7 +410,10 @@ class IntercomService
             $data['unsubscribed_from_emails'] = true;
         }
         // $encoded = json_encode($data, JSON_PRESERVE_ZERO_FRACTION);
+        $this->checkRateLimit();
         $resp = $this->client->users->create($data);
+        $this->storeRateLimit();
+
         $this->logger->debug(sprintf(
             'Intercom create user (userid %s) %s',
             $user->getId(),
@@ -372,7 +445,10 @@ class IntercomService
         if ($lead->getIntercomId()) {
             $data['id'] = $lead->getIntercomId();
         }
+        $this->checkRateLimit();
         $resp = $this->client->leads->create($data);
+        $this->storeRateLimit();
+
         $this->logger->debug(sprintf('Intercom create lead (userid %s) %s', $lead->getId(), json_encode($resp)));
 
         $lead->setIntercomId($resp->id);
@@ -483,7 +559,10 @@ class IntercomService
         $data['id'] = $user->getIntercomId();
         $data['user_id'] = $user->getId();
 
+        $this->checkRateLimit();
         $resp = $this->client->events->create($data);
+        $this->storeRateLimit();
+
         $this->logger->debug(sprintf('Intercom create event (%s) %s', $event, json_encode($resp)));
     }
 
@@ -503,7 +582,10 @@ class IntercomService
             $data['from']['user_id'] = $lead->getId();
         }
 
+        $this->checkRateLimit();
         $resp = $this->client->messages->create($data);
+        $this->storeRateLimit();
+
         $this->logger->debug(sprintf('Intercom create event (sendMessage) %s', json_encode($resp)));
     }
 
@@ -520,7 +602,10 @@ class IntercomService
             $data['id'] = $lead->getIntercomId();
         }
 
+        $this->checkRateLimit();
         $resp = $this->client->events->create($data);
+        $this->storeRateLimit();
+
         $this->logger->debug(sprintf('Intercom create event (%s) %s', $event, json_encode($resp)));
     }
 
@@ -687,7 +772,10 @@ class IntercomService
     private function deleteLead($id)
     {
         try {
+            $this->checkRateLimit();
             $this->client->leads->deleteLead($id);
+            $this->storeRateLimit();
+
             $this->logger->info(sprintf('Deleted intercom lead %s', $id));
         } catch (\Exception $e) {
             $this->logger->info(
@@ -730,7 +818,10 @@ class IntercomService
     private function deleteUser($id)
     {
         try {
+            $this->checkRateLimit();
             $this->client->users->deleteUser($id);
+            $this->storeRateLimit();
+
             $this->logger->info(sprintf('Deleted intercom user %s', $id));
         } catch (\Exception $e) {
             $this->logger->info(
@@ -963,7 +1054,10 @@ class IntercomService
         $now = new \DateTime();
         while ($page <= $pages) {
             $output[] = sprintf('Checking Leads - page %d', $page);
+            $this->checkRateLimit();
             $resp = $this->client->leads->getLeads(['page' => $page]);
+            $this->storeRateLimit();
+
             $page++;
             $pages = $resp->pages->total_pages;
             foreach ($resp->contacts as $lead) {
@@ -1018,7 +1112,10 @@ class IntercomService
         $now = new \DateTime();
         while ($page <= $pages) {
             $output[] = sprintf('Checking Users - page %d', $page);
+            $this->checkRateLimit();
             $resp = $this->client->users->getUsers(['page' => $page]);
+            $this->storeRateLimit();
+
             $page++;
             $pages = $resp->pages->total_pages;
             foreach ($resp->users as $user) {
