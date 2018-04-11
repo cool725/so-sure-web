@@ -67,7 +67,6 @@ class ApiViewController extends BaseController
 
         $html = $this->renderView($template, $data);
         if ($request->get('_route') == 'latest_policy_terms') {
-            $html = $this->renderView($template, $data);
             $noH1 = $request->get('noH1');
             if (!$noH1) {
                 $html = $this->upgradeHTags($html);
