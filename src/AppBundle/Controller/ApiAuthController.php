@@ -642,7 +642,7 @@ class ApiAuthController extends BaseController
                     404
                 );
             }
-            $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+            $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
 
             if (isset($data['phone_policy'])) {
                 if (isset($data['phone_policy']['model_number'])) {
