@@ -161,6 +161,12 @@ class BaseApiControllerTest extends BaseControllerTest
         return $payment;
     }
 
+    /**
+     * @param string $payerEmail
+     * @param string $payeeEmail
+     * @param bool   $real
+     * @return MultiPay
+     */
     protected function createMultiPayRequest($payerEmail, $payeeEmail, $real = false)
     {
         // Payer

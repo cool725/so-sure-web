@@ -663,7 +663,8 @@ class PurchaseController extends BaseController
                 $request->get('ReceiptId'),
                 null,
                 $request->get('CardToken'),
-                null
+                null,
+                $policy
             );
 
             $this->addFlash(

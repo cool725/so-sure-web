@@ -103,6 +103,49 @@ class PaymentServiceTest extends WebTestCase
         $this->assertEquals($policy->getBilling(), $bankAcccount->getStandardNotificationDate());
     }
 
+    public function testConfirmBacsDifferentPayer()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testConfirmBacsDifferentPayer-user', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+        $payer = static::createUser(
+            static::$userManager,
+            static::generateEmail('testConfirmBacsDifferentPayer-payer', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-10-01'),
+            true
+        );
+        $policy->setPayer($payer);
+        static::$policyService->create($policy, new \DateTime('2016-10-01'));
+
+        $this->assertTrue($policy->isDifferentPayer());
+
+        $bacs = new BacsPaymentMethod();
+        $bacs->setBankAccount(new BankAccount());
+
+        $dispatcher = $this->createDispatcher($this->once());
+        static::$paymentService->setDispatcher($dispatcher);
+        static::$paymentService->confirmBacs($policy, $bacs);
+
+        $updatedPolicy = $this->assertPolicyExists(static::$container, $policy);
+        $bankAcccount = $updatedPolicy->getUser()->getPaymentMethod()->getBankAccount();
+        $this->assertNotNull($bankAcccount->getInitialNotificationDate());
+        $this->assertEquals($policy->getBilling(), $bankAcccount->getStandardNotificationDate());
+
+        $this->assertFalse($updatedPolicy->isDifferentPayer());
+    }
+
     private function createDispatcher($count)
     {
         $dispatcher = $this->getMockBuilder('EventDispatcherInterface')

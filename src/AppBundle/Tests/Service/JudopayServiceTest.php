@@ -361,6 +361,37 @@ class JudopayServiceTest extends WebTestCase
         $this->assertGreaterThan(5, mb_strlen($updatedPolicy->getPolicyNumber()));
     }
 
+    public function testJudoAddDisassociate()
+    {
+        $user = $this->createValidUser(static::generateEmail('testJudoAddDisassociate-user', $this));
+        $payer = $this->createValidUser(static::generateEmail('testJudoAddDisassociate-payer', $this));
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, false, false);
+
+        $policy->setPayer($payer);
+        static::$dm->flush();
+
+        $this->assertTrue($policy->isDifferentPayer());
+
+        $receiptId = self::$judopay->testPay(
+            $user,
+            $policy->getId(),
+            $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
+        );
+        static::$policyService->setEnvironment('prod');
+        self::$judopay->add($policy, $receiptId, 'ctoken', 'token', Payment::SOURCE_WEB_API);
+        static::$policyService->setEnvironment('test');
+
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $updatedPolicy = $repo->find($policy->getId());
+        $this->assertFalse($updatedPolicy->isDifferentPayer());
+    }
+
     public function testJudoAdditionalUnexpectedPayment()
     {
         $user = $this->createValidUser(static::generateEmail('testJudoAdditionalUnexpectedPayment', $this));

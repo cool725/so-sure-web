@@ -114,6 +114,7 @@ class OpsController extends BaseController
         $claimedPolicy = null;
         $validRenwalPolicyMonthlyWithPot = null;
         $validRenwalPolicyYearlyWithPot = null;
+        $multiPayPolicy = null;
 
         $dm = $this->getManager();
         /** @var SCodeRepository $scodeRepo */
@@ -291,6 +292,14 @@ class OpsController extends BaseController
                 $claimedPolicy = null;
             }
         }
+        foreach ($validPolicies as $multiPayPolicy) {
+            /** @var Policy $multiPayPolicy */
+            if ($multiPayPolicy->isDifferentPayer()) {
+                break;
+            } else {
+                $multiPayPolicy = null;
+            }
+        }
         foreach ($cancelledPolicies as $policyCancelledAndPaymentOwed) {
             /** @var Policy $policyCancelledAndPaymentOwed */
             if ($policyCancelledAndPaymentOwed->isCancelledAndPaymentOwed()) {
@@ -332,6 +341,7 @@ class OpsController extends BaseController
             'valid_remainder_policy' => $validRemainderPolicy,
             'policy_cancelled_payment_owed' => $policyCancelledAndPaymentOwed,
             'claimed_policy' => $claimedPolicy,
+            'multipay_policy' => $multiPayPolicy,
             'expired_policy_nocashback' => $expiredPolicyNoCashback,
             'expired_policy_cashback' => $expiredPolicyCashback,
             'fully_expired_policy_nocashback' => $fullyExpiredPolicyNoCashback,
