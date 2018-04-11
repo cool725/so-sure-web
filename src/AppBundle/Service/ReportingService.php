@@ -66,9 +66,9 @@ class ReportingService
 
     public function report($start, $end, $isKpi = false)
     {
-        $redisKey = sprintf(self::REPORT_KEY_FORMAT, $start->format('ymd'), $end->format('ymd'));
+        $redisKey = sprintf(self::REPORT_KEY_FORMAT, $start->format('ymdhi'), $end->format('ymdhi'));
         if ($this->redis->exists($redisKey)) {
-            return json_decode($this->redis->get($redisKey), true);
+            return unserialize($this->redis->get($redisKey));
         }
 
         $totalEnd = null;
@@ -383,7 +383,7 @@ class ReportingService
             'approvedClaims' => $approvedClaimsTotals,
             'closedClaims' => $closedClaimsTotals,
         ];
-        $this->redis->setex($redisKey, self::REPORT_CACHE_TIME, json_encode($results));
+        $this->redis->setex($redisKey, self::REPORT_CACHE_TIME, serialize($results));
 
         return $results;
     }

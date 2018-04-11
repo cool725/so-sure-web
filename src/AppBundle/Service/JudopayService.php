@@ -331,6 +331,12 @@ class JudopayService
             $this->dm->flush();
         }
 
+        // if a multipay user runs a payment direct on the policy, assume they want to remove multipay
+        if ($policy->isDifferentPayer()) {
+            $policy->setPayer($policy->getUser());
+            $this->dm->flush();
+        }
+
         $this->statsd->endTiming("judopay.add");
 
         return true;
@@ -535,13 +541,15 @@ class JudopayService
      * @param string $consumerToken
      * @param string $cardToken     Can be null if card is declined
      * @param string $deviceDna     Optional device dna data (json encoded) for judoshield
+     * @parma Policy $policy
      */
     public function updatePaymentMethod(
         User $user,
         $receiptId,
         $consumerToken,
         $cardToken,
-        $deviceDna = null
+        $deviceDna = null,
+        Policy $policy = null
     ) {
         $transactionDetails = $this->getReceipt($receiptId);
         if ($transactionDetails["result"] != JudoPayment::RESULT_SUCCESS) {
@@ -565,6 +573,13 @@ class JudopayService
         }
         if ($deviceDna) {
             $judo->setDeviceDna($deviceDna);
+        }
+
+        // if a multipay user runs a payment direct on the policy, assume they want to remove multipay
+        if ($policy && $policy->isDifferentPayer()) {
+            // don't use $user as not validated that policy belongs to user
+            $policy->setPayer($policy->getUser());
+            $this->dm->flush();
         }
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
     }
