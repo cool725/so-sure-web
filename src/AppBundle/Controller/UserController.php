@@ -1062,10 +1062,6 @@ class UserController extends BaseController
             $user->getId()
         );
 
-        $this->get('app.sixpack')->convert(
-            SixpackService::EXPERIMENT_STEP_3
-        );
-
         $countUnprocessedInvitations = count($user->getUnprocessedReceivedInvitations());
         if ($countUnprocessedInvitations > 0) {
             $message = sprintf(
