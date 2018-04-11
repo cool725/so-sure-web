@@ -108,13 +108,13 @@ $(function(){
 
         // Grab data from btn value to input
         var value = $(this).data('value');
-        var help  = $(this).data('help-block');
+        // var help  = $(this).data('help-block');
 
         // Select the radio
         $('input[name="purchase_form[amount]"][value="' + value + '"]').prop('checked', true);
 
         // Modify the help text accordingly
-        $('.payment-options--info').text(help);
+        // $('.payment-options--info').text(help);
     });
 
     $('input[name="purchase_form[amount]').change(function(e) {
