@@ -1,0 +1,312 @@
+// checkout.scss
+
+@import "../common/variables";
+@import "../mixins";
+@import "../common/type";
+@import "../common/palette";
+@import "../common/paletteNew";
+@import "../components/buttonsNew";
+@import "checkoutNav";
+
+.checkout {
+
+    h1 {
+        text-align: center;
+        line-height: 32px;
+
+        .title-top {
+            font-size: 24px;
+        }
+
+        .title-top-all {
+            font-size: 18px;
+        }
+
+        .title-phone {
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        .title-phone.title-phone_renew {
+            cursor: inherit;
+        }
+
+        .memory-dropdown-list {
+            display: inline;
+
+            a {
+                &:hover, &:focus, &:active {
+                    text-decoration: none;
+                }
+            }
+        }
+
+        .title-price {
+            font-size: 22px;
+        }
+
+        @include breakpoint(tablet) {
+            line-height: inherit;
+
+            .title-top,
+            .title-phone {
+                font-size: inherit;
+            }
+
+            .title-top-all {
+                font-size: 24px;
+            }
+
+            .title-price {
+                font-size: 28px;
+            }
+        }
+    }
+
+    &--top {
+        margin-top: 10px;
+    }
+}
+
+.memory-dropdown {
+    font-family: $avenir-book;
+
+    @include breakpoint(mobileishup) {
+        right: 0 !important;
+    }
+}
+
+
+.checkout--step {
+    padding: 20px 0;
+    background-color: $off-white;
+    border-top: 1px solid $pale-grey;
+    border-bottom: 1px solid $pale-grey;
+
+    form,
+    .form {
+        max-width: 345px;
+        margin: 0 auto;
+
+        .form-group-break {
+            margin-top: 30px;
+        }
+    }
+
+    .radio {
+        position: absolute;
+        left: -10000px;
+        top: auto;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+    }
+
+    &-confirm {
+        background: $white;
+        padding: 20px 15px 30px;
+
+        ol {
+            padding-left: 20px;
+
+            li {
+                // padding: 20px 0;
+            }
+        }
+    }
+}
+
+.checkout--step.checkout--step-payment {
+
+    .form-group--center {
+        max-width: 345px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+.step {
+
+    &--hide {
+        display: none;
+    }
+
+}
+
+.speech-bubble {
+    text-align: center;
+    position: relative;
+    font-size: 18px;
+    margin: 50px 0;
+    // @include border-radius(20px);
+
+    @include breakpoint(tablet) {
+        font-size: 24px;
+        margin: 80px 0;
+    }
+
+    &:before, &:after {
+        font-family: serif;
+        font-size: 80px;
+        color: $grey;
+        line-height: 0;
+        position: absolute;
+    }
+
+    &:before {
+        content: open-quote;
+        top: -5px; left: 50%;
+        margin-left: -20px;
+
+        @include breakpoint(tablet) {
+            top: 10px; left: -35px;
+            margin: 0;
+        }
+    }
+
+    &:after {
+        display: none;
+        content: close-quote;
+
+        @include breakpoint(tablet) {
+            display: block;
+            bottom: 10px; right: -35px;
+        }
+    }
+}
+
+.payment-options {
+    margin: 30px 0;
+
+    &--btn {
+        text-align: center;
+        padding: 15px;
+        margin-bottom: 15px;
+        border: 1px solid $primary-blue;
+
+        h4, .h3 {
+            color: $dark-grey;
+        }
+
+        @include border-radius(4px);
+
+        * {
+            margin: 0;
+        }
+
+        &:hover, &:focus {
+            cursor: pointer;
+            background-color: $primary-blue;
+
+            h4, .h3 {
+                color: $white;
+            }
+        }
+
+        &:active {
+            background-color: darken($primary-blue, 15%);
+        }
+
+    }
+
+    &--btn-selected {
+        cursor: pointer;
+        background: $primary-blue url('#{$cdn_url}/images/library_benefits/so-sure_cover-tick.svg') center no-repeat;
+        background-size: 32px;
+
+        h4, .h3 {
+            color: $white;
+        }
+
+        @include breakpoint(tablet) {
+            background-position: 10% center;
+        }
+    }
+
+}
+
+.benefits--review-desktop {
+    padding-bottom: 20px;
+
+    .benefits--inner {
+        width: 700px;
+        margin: 0 auto;
+
+        h4 {
+            margin: 10px 0 5px;
+        }
+
+        img {
+            width: 100px; height: 100px;
+            float: left;
+            margin-right: 15px;
+        }
+
+        .row {
+            margin-bottom: 30px;
+        }
+
+    }
+}
+
+.modal-body__policy-doc {
+    height: 300px;
+    margin: 30px -25px 0;
+    padding: 10px;
+    overflow-y: scroll;
+
+    border: 1px solid $grey;
+    @include border-radius(4px);
+}
+
+.connections {
+    max-width: 345px;
+    margin: 30px auto;
+
+    &__list {
+        max-height: 400px;
+        overflow-y: scroll;
+        border: 1px solid $grey;
+    }
+
+    &__user {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+
+        padding: 15px 10px;
+        border-bottom: 1px solid $grey;
+
+        cursor: pointer;
+
+        > * {
+            margin-left: 15px;
+        }
+
+        input[type='checkbox'] {
+            cursor: pointer;
+        }
+
+        &:last-of-type {
+            border: none;
+        }
+
+        &:hover {
+            background-color: $off-white;
+        }
+
+        &--selected {
+            background-color: $off-white;
+        }
+    }
+}
+
+.policy-pdf {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.samsung-imei {
+    display: none;
+    color: $red;
+}

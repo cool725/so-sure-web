@@ -60,5 +60,8 @@ class SixpackListener
         $this->sixpack->convert(
             SixpackService::EXPERIMENT_CPC_QUOTE_HOMEPAGE
         );
+        $this->sixpack->convert(
+            SixpackService::EXPERIMENT_STEP_3
+        );
     }
 }

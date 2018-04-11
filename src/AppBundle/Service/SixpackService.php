@@ -50,10 +50,10 @@ class SixpackService
     const EXPERIMENT_QUOTE_INTERCOM_PURCHASE = 'quote-intercom-purchase';
     //const EXPERIMENT_MONEY_UNBOUNCE = 'money-unbounce';
     const EXPERIMENT_MOBILE_SEARCH_DROPDOWN = 'mobile-dropdown-search';
+    const EXPERIMENT_STEP_3 = 'step-3-payment-new';
     const EXPERIMENT_CPC_QUOTE_HOMEPAGE = 'cpc-quote-or-homepage';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
-
     const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';
     const ALTERNATIVES_APP_SHARE_METHOD_API = 'api';
 
@@ -68,6 +68,7 @@ class SixpackService
         self::EXPERIMENT_SAVE_QUOTE_24HOURS,
         self::EXPERIMENT_QUOTE_INTERCOM_PURCHASE,
         self::EXPERIMENT_MOBILE_SEARCH_DROPDOWN,
+        self::EXPERIMENT_STEP_3,
         self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
     ];
 
