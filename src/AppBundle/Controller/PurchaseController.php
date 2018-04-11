@@ -516,7 +516,7 @@ class PurchaseController extends BaseController
         $exp = $this->sixpack(
             $request,
             SixpackService::EXPERIMENT_MOBILE_SEARCH_DROPDOWN,
-            ['step-3-payment-new', 'step-3-payment-old']
+            ['step-3-payment-old', 'step-3-payment-new']
         );
 
         $template = 'AppBundle:Purchase:purchaseStepPhoneReview.html.twig';
