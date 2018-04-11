@@ -436,6 +436,7 @@ class ApiController extends BaseController
 
     /**
      * @Route("/policy/terms", name="api_get_policy_terms")
+     * @Route("/policy/v2/terms", name="api_get_policy_terms2")
      * @Method({"GET"})
      */
     public function getLatestTermsAction(Request $request)
@@ -455,8 +456,13 @@ class ApiController extends BaseController
                     404
                 );
             }
+            if ($request->get('_route') == 'api_get_policy_terms') {
+                $termsRoute = 'latest_policy_terms';
+            } else {
+                $termsRoute = 'latest_policy_terms2';
+            }
             $policyTermsRoute = $this->get('router')->generate(
-                'latest_policy_terms',
+                $termsRoute,
                 [
                     'policy_key' => $this->getParameter('policy_key'),
                     'maxPotValue' => $this->getRequestString($request, 'maxPotValue'),
