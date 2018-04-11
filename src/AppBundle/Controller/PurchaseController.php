@@ -515,7 +515,7 @@ class PurchaseController extends BaseController
 
         $exp = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_MOBILE_SEARCH_DROPDOWN,
+            SixpackService::EXPERIMENT_STEP_3,
             ['step-3-payment-old', 'step-3-payment-new']
         );
 
