@@ -180,6 +180,10 @@ class PaymentService
             $bacsPaymentMethod->getBankAccount()->getFirstPaymentDate($policy->getUser())
         );
         $bacsPaymentMethod->getBankAccount()->setStandardNotificationDate($policy->getBilling());
+        // ensure payer is current user for bacs
+        if ($policy->isDifferentPayer()) {
+            $policy->setPayer($policy->getUser());
+        }
         $this->dm->flush();
 
         $this->mailer->sendTemplate(

@@ -88,6 +88,13 @@
                 <a href="{{ url('user_home') }}?_impersonate={{ claimed_policy.user.email }}">User Home - Unable to invite (w/Claimed Policy)</a> <b>(auto impersonate {{ claimed_policy.user.email }})</b>
             </li>
             <li>
+                {%  if multipay_policy %}
+                    <a href="{{ url('user_home') }}?_impersonate={{ multipay_policy.user.email }}">User Home - Multipay</a> <b>(auto impersonate {{ multipay_policy.user.email }})</b>
+                {% else %}
+                    No Mulitpay policy available
+                {% endif %}
+            </li>
+            <li>
                 {% if expired_policy_nocashback %}
                 <a href="{{ url('user_policy', {'policyId': expired_policy_nocashback.id }) }}?_impersonate={{ expired_policy_nocashback.user.email }}">User Home - Expired Policy No Cashback</a> <b>(auto impersonate {{ expired_policy_nocashback.user.email }})</b>
                 {% else %}

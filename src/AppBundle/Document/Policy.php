@@ -811,6 +811,15 @@ abstract class Policy
         return $this->getPayer() ? $this->getPayer() : $this->getUser();
     }
 
+    public function isDifferentPayer()
+    {
+        if ($this->getPayer() && $this->getPayer()->getId() != $this->getUser()->getId()) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function getIssueDate()
     {
         if (!$this->issueDate) {

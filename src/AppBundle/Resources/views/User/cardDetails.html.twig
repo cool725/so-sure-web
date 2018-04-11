@@ -17,13 +17,24 @@
                         Back to Direct Debit
                     {% endif %}
                 </a>
+                {% if policy.isDifferentPayer %}
+                    <p><i class="fa fa-warning"></i> You are using multipay. Changing to direct debit will remove your multipay.</p>
+                {% endif %}
             </div>
         </div>
         {% endif %}
         <div class="row">
             <div class="col-sm-6">
                 <h4>Your card:</h4>
-                <p class="lead">{% if user.paymentMethod and user.paymentMethod.type == "judo" %}{{ user.paymentMethod }}{% else %}Not setup{% endif %}</p>
+                <p class="lead">
+                    {% if policy.isDifferentPayer %}
+                        <i class="fa fa-warning"></i> You are using multipay (via {{ policy.payer.name }}). Updating card details will remove your multipay.
+                    {% elseif user.paymentMethod and user.paymentMethod.type == "judo" %}
+                        {{ user.paymentMethod }}
+                    {% else %}
+                        Not setup
+                    {% endif %}
+                </p>
                 {% if webpay_action and webpay_reference %}
                 <form action="{{ webpay_action }}" method="post" id="webpay-form">
                     <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">

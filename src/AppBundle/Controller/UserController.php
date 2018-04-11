@@ -90,8 +90,6 @@ class UserController extends BaseController
      */
     public function indexAction(Request $request, $policyId = null)
     {
-
-
         $dm = $this->getManager();
         $policyRepo = $dm->getRepository(Policy::class);
         $scodeRepo = $dm->getRepository(SCode::class);
