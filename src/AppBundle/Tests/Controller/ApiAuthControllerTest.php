@@ -2311,6 +2311,60 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals($data['id'], $policyData['id']);
     }
 
+    public function testJudopayMultipayDisassociation()
+    {
+        $multiPay = $this->createMultiPayRequest(
+            self::generateEmail('testJudopayMultipayDisassociation-payer', $this),
+            self::generateEmail('testJudopayMultipayDisassociation-payee', $this),
+            true
+        );
+
+        $payerCognitoIdentityId = $this->getAuthUser($multiPay->getPayer());
+        $url = sprintf('/api/v1/auth/multipay/%s?_method=PUT', $multiPay->getId());
+        $crawler = static::postRequest(self::$client, $payerCognitoIdentityId, $url, [
+            'action' => 'accept',
+            'amount' => $multiPay->getPolicy()->getPremium()->getMonthlyPremiumPrice(),
+        ]);
+        $data = $this->verifyResponse(200);
+
+        $updatedPolicy = $this->assertPolicyExists(self::$client->getContainer(), $multiPay->getPolicy());
+        $this->assertTrue($updatedPolicy->isDifferentPayer());
+        //$this->assertTrue($multiPay->getPolicy()->isDifferentPayer());
+
+        $url = sprintf('/api/v1/auth/user?_method=GET');
+        $crawler = static::postRequest(self::$client, $payerCognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+        //print_r($data);
+
+        $payeeCognitoIdentityId = $this->getAuthUser($multiPay->getPayee());
+        $url = sprintf('/api/v1/auth/user?_method=GET');
+        $crawler = static::postRequest(self::$client, $payeeCognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+        //print_r($data);
+
+        $judopay = self::$client->getContainer()->get('app.judopay');
+        $details = $judopay->testPayDetails(
+            $multiPay->getPayee(),
+            $multiPay->getPolicy()->getId(),
+            $multiPay->getPolicy()->getPremium()->getMonthlyPremiumPrice(),
+            self::$JUDO_TEST_CARD_NUM,
+            self::$JUDO_TEST_CARD_EXP,
+            self::$JUDO_TEST_CARD_PIN
+        );
+
+        $url = sprintf("/api/v1/auth/policy/%s/pay", $multiPay->getPolicy()->getId());
+        $crawler = static::postRequest(self::$client, $payeeCognitoIdentityId, $url, ['judo' => [
+            'consumer_token' => $details['consumer']['consumerToken'],
+            'card_token' => $details['cardDetails']['cardToken'],
+            'receipt_id' => $details['receiptId'],
+        ]]);
+        $policyData1 = $this->verifyResponse(200);
+        $this->assertEquals(SalvaPhonePolicy::STATUS_ACTIVE, $policyData1['status']);
+
+        $updatedPolicy = $this->assertPolicyExists(self::$client->getContainer(), $multiPay->getPolicy());
+        $this->assertFalse($updatedPolicy->isDifferentPayer());
+    }
+
     // policy/{id}/terms
 
     /**
