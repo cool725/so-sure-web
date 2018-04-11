@@ -176,7 +176,7 @@ class DaviesService extends S3EmailService
                 $this->saveClaim($daviesClaim, $skipImeiUpdate);
             } catch (\Exception $e) {
                 //$success = false;
-                $this->errors[$daviesClaim->claimNumber][] = $e->getMessage();
+                $this->errors[$daviesClaim->claimNumber][] = sprintf("%s [Record import failed]", $e->getMessage());
                 // In case any of the db data failed validation, clear the changeset
                 if ($claim = $this->getClaim($daviesClaim)) {
                     $this->dm->refresh($claim);
