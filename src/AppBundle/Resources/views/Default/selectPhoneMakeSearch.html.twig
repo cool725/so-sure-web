@@ -20,7 +20,7 @@
     {% set uid    = '-1' %}
 {% elseif type is defined and type == 'homepage-sticky' %}
     {% set formID = 'search-phone-form-homepage' %}
-    {# {% set uid    = '-1' %} #}
+    {% set uid    = '-1' %}
     {% set stickySearch = true %}
 {% elseif type == 'purchase-select' %}
     {% set basePath = '/select-phone-search/purchase-select/' %}

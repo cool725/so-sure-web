@@ -367,7 +367,7 @@ class PhonePolicy extends Policy
 
     public function addCheckmendCertData($certId, $response, $claim = null)
     {
-        if (!$certId || strlen(trim($certId)) == 0) {
+        if (!$certId || mb_strlen(trim($certId)) == 0) {
             return;
         }
 
@@ -678,7 +678,7 @@ class PhonePolicy extends Policy
             'phone_policy' => [
                 'imei' => $this->getImei(),
                 'phone' => $this->getPhone() ? $this->getPhone()->toApiArray() : null,
-                'name' => $this->getName() && strlen($this->getName()) > 0 ?
+                'name' => $this->getName() && mb_strlen($this->getName()) > 0 ?
                     $this->getName() :
                     $this->getDefaultName(),
                 'picsure_status' => $this->getPicSureStatusForApi(),

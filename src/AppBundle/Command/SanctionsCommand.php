@@ -162,12 +162,12 @@ class SanctionsCommand extends BaseCommand
     {
         $validator = new AlphanumericSpaceDotValidator();
 
-        $firstName = trim($validator->conform(substr($data[1], 0, 100)));
-        $lastName = trim($validator->conform(substr($data[0], 0, 100)));
+        $firstName = trim($validator->conform(mb_substr($data[1], 0, 100)));
+        $lastName = trim($validator->conform(mb_substr($data[0], 0, 100)));
         $birthday = null;
         if (isset($data[7])) {
             $field = trim(str_replace('"', '', $data[7]));
-            if (strlen($field) > 0) {
+            if (mb_strlen($field) > 0) {
                 $birthday = \DateTime::createFromFormat("d/m/Y", str_replace('00', '01', $field));
                 $birthday = $this->startOfDay($birthday);
             }

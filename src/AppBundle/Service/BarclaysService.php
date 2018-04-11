@@ -193,7 +193,7 @@ class BarclaysService
                         // throw new \Exception(print_r($line, true));
                         $transactionTotal = $line['TOTAL'];
                     } elseif ($line['Record'] == 'Statement of Account Details' &&
-                        stripos($line['charge Description'], 'Chargeback') !== false) {
+                        mb_stripos($line['charge Description'], 'Chargeback') !== false) {
                         $ref = trim(str_replace('Chargeback - Ref ', '', $line['charge Description']));
                         $amount = $this->toTwoDp(0 - $line['TOTAL']);
                         $id = null;

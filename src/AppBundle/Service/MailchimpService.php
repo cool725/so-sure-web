@@ -44,7 +44,7 @@ class MailchimpService
         }
 
         // don't send @so-sure.com emails to mailchimp
-        if (stripos($email, "@so-sure.com") !== false) {
+        if (mb_stripos($email, "@so-sure.com") !== false) {
             return;
         }
 

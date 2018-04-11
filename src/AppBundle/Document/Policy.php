@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Document\Payment\BacsPayment;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Doctrine\ODM\MongoDB\PersistentCollection;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -120,6 +121,7 @@ abstract class Policy
     /**
      * @MongoDB\ReferenceOne(targetDocument="User", inversedBy="policies")
      * @Gedmo\Versioned
+     * @var User
      */
     protected $user;
 
@@ -232,6 +234,7 @@ abstract class Policy
     /**
      * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Cashback", cascade={"persist"}, orphanRemoval="true")
      * @Gedmo\Versioned
+     * @var Cashback
      */
     protected $cashback;
 
@@ -373,6 +376,7 @@ abstract class Policy
     /**
      * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\Premium")
      * @Gedmo\Versioned
+     * @var Premium
      */
     protected $premium;
 
@@ -656,6 +660,9 @@ abstract class Policy
         });
     }
 
+    /**
+     * @return Payment|null
+     */
     public function getFirstSuccessfulUserPaymentCredit()
     {
         $payments = $this->getSuccessfulUserPaymentCredits();
@@ -672,6 +679,9 @@ abstract class Policy
         return $payments[0];
     }
 
+    /**
+     * @return Payment|null
+     */
     public function getLastSuccessfulUserPaymentCredit()
     {
         $payments = $this->getSuccessfulUserPaymentCredits();
@@ -698,6 +708,9 @@ abstract class Policy
         });
     }
 
+    /**
+     * @return Cashback
+     */
     public function getCashback()
     {
         return $this->cashback;
@@ -724,6 +737,9 @@ abstract class Policy
         $this->cashback = null;
     }
 
+    /**
+     * @return User
+     */
     public function getUser()
     {
         return $this->user;
@@ -793,6 +809,15 @@ abstract class Policy
     public function getPayerOrUser()
     {
         return $this->getPayer() ? $this->getPayer() : $this->getUser();
+    }
+
+    public function isDifferentPayer()
+    {
+        if ($this->getPayer() && $this->getPayer()->getId() != $this->getUser()->getId()) {
+            return true;
+        }
+
+        return false;
     }
 
     public function getIssueDate()
@@ -1376,6 +1401,9 @@ abstract class Policy
         $this->premium = $premium;
     }
 
+    /**
+     * @return Premium
+     */
     public function getPremium()
     {
         return $this->premium;
@@ -2850,7 +2878,7 @@ abstract class Policy
     {
         $prefix = null;
         if ($environment != 'prod') {
-            $prefix = strtoupper($environment);
+            $prefix = mb_strtoupper($environment);
         } elseif ($this->getUser() && $this->getUser()->hasSoSureEmail()) {
             // any emails with @so-sure.com will generate an invalid policy
             $prefix = self::PREFIX_INVALID;
@@ -2866,7 +2894,7 @@ abstract class Policy
         }
 
         // TODO: Should this be up to / ?
-        return strpos($this->getPolicyNumber(), $prefix) === 0;
+        return mb_strpos($this->getPolicyNumber(), $prefix) === 0;
     }
 
     public function isPrefixInvalidPolicy()
@@ -4220,6 +4248,17 @@ abstract class Policy
         foreach ($this->getUser()->getPolicies() as $policy) {
             // Find any policies that match imei
             if ($policy->getId() != $this->getId() && $this->isSameInsurable($policy) && $policy->getStatus()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function hasManualBacsPayment()
+    {
+        foreach ($this->getPayments() as $payment) {
+            if ($payment instanceof BacsPayment && $payment->isManual()) {
                 return true;
             }
         }

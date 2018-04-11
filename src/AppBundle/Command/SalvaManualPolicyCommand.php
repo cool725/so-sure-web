@@ -128,7 +128,7 @@ class SalvaManualPolicyCommand extends ContainerAwareCommand
         $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(User::class);
 
-        return $repo->findOneBy(['emailCanonical' => strtolower($email)]);
+        return $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
     }
 
     private function getPhone($device, $memory = null)

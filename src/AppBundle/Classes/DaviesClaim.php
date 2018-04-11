@@ -176,9 +176,9 @@ class DaviesClaim extends DaviesExcel
 
     public function hasError()
     {
-        return in_array(strtolower($this->miStatus), [
-            strtolower(self::MISTATUS_ERROR),
-            strtolower(self::MISTATUS_DMS_ERROR),
+        return in_array(mb_strtolower($this->miStatus), [
+            mb_strtolower(self::MISTATUS_ERROR),
+            mb_strtolower(self::MISTATUS_DMS_ERROR),
         ]);
     }
 
@@ -270,16 +270,16 @@ class DaviesClaim extends DaviesExcel
 
     public function getClaimType()
     {
-        $lossType = strtolower($this->lossType);
-        if (stripos($lossType, strtolower(self::TYPE_LOSS)) !== false) {
+        $lossType = mb_strtolower($this->lossType);
+        if (mb_stripos($lossType, mb_strtolower(self::TYPE_LOSS)) !== false) {
             return Claim::TYPE_LOSS;
-        } elseif (stripos($lossType, strtolower(self::TYPE_THEFT)) !== false) {
+        } elseif (mb_stripos($lossType, mb_strtolower(self::TYPE_THEFT)) !== false) {
             return Claim::TYPE_THEFT;
-        } elseif (stripos($lossType, strtolower(self::TYPE_DAMAGE)) !== false) {
+        } elseif (mb_stripos($lossType, mb_strtolower(self::TYPE_DAMAGE)) !== false) {
             return Claim::TYPE_DAMAGE;
-        } elseif (stripos($lossType, strtolower(self::TYPE_EXTENDED_WARRANTY)) !== false) {
+        } elseif (mb_stripos($lossType, mb_strtolower(self::TYPE_EXTENDED_WARRANTY)) !== false) {
             return Claim::TYPE_EXTENDED_WARRANTY;
-        } elseif (stripos($lossType, strtolower(self::TYPE_WARRANTY)) !== false) {
+        } elseif (mb_stripos($lossType, mb_strtolower(self::TYPE_WARRANTY)) !== false) {
             return Claim::TYPE_WARRANTY;
         } else {
             return null;
@@ -299,47 +299,47 @@ class DaviesClaim extends DaviesExcel
     public function isOpen($includeReOpened = false)
     {
         if ($includeReOpened) {
-            return in_array(strtolower($this->status), [
-                strtolower(self::STATUS_OPEN),
-                strtolower(self::STATUS_REOPENED),
-                strtolower(self::STATUS_REOPENED_ALT),
+            return in_array(mb_strtolower($this->status), [
+                mb_strtolower(self::STATUS_OPEN),
+                mb_strtolower(self::STATUS_REOPENED),
+                mb_strtolower(self::STATUS_REOPENED_ALT),
             ]);
         } else {
-            return in_array(strtolower($this->status), [strtolower(self::STATUS_OPEN)]);
+            return in_array(mb_strtolower($this->status), [mb_strtolower(self::STATUS_OPEN)]);
         }
     }
 
     public function isClosed($includeReClosed = false)
     {
         if ($includeReClosed) {
-            return in_array(strtolower($this->status), [
-                strtolower(self::STATUS_CLOSED),
-                strtolower(self::STATUS_RECLOSED),
-                strtolower(self::STATUS_RECLOSED_ALT),
+            return in_array(mb_strtolower($this->status), [
+                mb_strtolower(self::STATUS_CLOSED),
+                mb_strtolower(self::STATUS_RECLOSED),
+                mb_strtolower(self::STATUS_RECLOSED_ALT),
             ]);
         } else {
-            return in_array(strtolower($this->status), [strtolower(self::STATUS_CLOSED)]);
+            return in_array(mb_strtolower($this->status), [mb_strtolower(self::STATUS_CLOSED)]);
         }
     }
 
     public function getDaviesStatus()
     {
-        if (in_array(strtolower($this->status), [
-                strtolower(self::STATUS_OPEN),
+        if (in_array(mb_strtolower($this->status), [
+                mb_strtolower(self::STATUS_OPEN),
             ])) {
             return self::STATUS_OPEN;
-        } elseif (in_array(strtolower($this->status), [
-                strtolower(self::STATUS_CLOSED),
+        } elseif (in_array(mb_strtolower($this->status), [
+                mb_strtolower(self::STATUS_CLOSED),
             ])) {
             return self::STATUS_CLOSED;
-        } elseif (in_array(strtolower($this->status), [
-                strtolower(self::STATUS_REOPENED),
-                strtolower(self::STATUS_REOPENED_ALT),
+        } elseif (in_array(mb_strtolower($this->status), [
+                mb_strtolower(self::STATUS_REOPENED),
+                mb_strtolower(self::STATUS_REOPENED_ALT),
             ])) {
             return self::STATUS_REOPENED;
-        } elseif (in_array(strtolower($this->status), [
-                strtolower(self::STATUS_RECLOSED),
-                strtolower(self::STATUS_RECLOSED_ALT),
+        } elseif (in_array(mb_strtolower($this->status), [
+                mb_strtolower(self::STATUS_RECLOSED),
+                mb_strtolower(self::STATUS_RECLOSED_ALT),
             ])) {
             return self::STATUS_RECLOSED;
         }
@@ -455,33 +455,33 @@ class DaviesClaim extends DaviesExcel
                 $this->finalSuspicion = $this->isSuspicious($data[++$i]);
             }
 
-            if (!in_array(strtolower($this->status), [
-                strtolower(self::STATUS_OPEN),
-                strtolower(self::STATUS_CLOSED),
-                strtolower(self::STATUS_REOPENED),
-                strtolower(self::STATUS_REOPENED_ALT),
-                strtolower(self::STATUS_RECLOSED),
-                strtolower(self::STATUS_RECLOSED_ALT),
+            if (!in_array(mb_strtolower($this->status), [
+                mb_strtolower(self::STATUS_OPEN),
+                mb_strtolower(self::STATUS_CLOSED),
+                mb_strtolower(self::STATUS_REOPENED),
+                mb_strtolower(self::STATUS_REOPENED_ALT),
+                mb_strtolower(self::STATUS_RECLOSED),
+                mb_strtolower(self::STATUS_RECLOSED_ALT),
             ])) {
                 throw new \Exception('Unknown claim status');
             }
 
-            if ($this->miStatus !== null && !in_array(strtolower($this->miStatus), [
-                strtolower(self::MISTATUS_SETTLED),
-                strtolower(self::MISTATUS_WITHDRAWN),
-                strtolower(self::MISTATUS_REPUDIATED),
-                strtolower(self::MISTATUS_ADJUSTER_CORREPONDENCE),
-                strtolower(self::MISTATUS_ADJUSTER_FEE),
-                strtolower(self::MISTATUS_CLAIMANT_CORRESPONDENCE),
-                strtolower(self::MISTATUS_CONTRIBUTION),
-                strtolower(self::MISTATUS_RECOVERY),
-                strtolower(self::MISTATUS_RETURNED_CHEQUE),
-                strtolower(self::MISTATUS_SUPPLIER_CORRESPONDENCE),
-                strtolower(self::MISTATUS_SUPPLIER_FEE),
-                strtolower(self::MISTATUS_ERROR),
-                strtolower(self::MISTATUS_DMS_ERROR),
-                strtolower(self::MISTATUS_COMPLAINT),
-                strtolower(self::MISTATUS_INSURER),
+            if ($this->miStatus !== null && !in_array(mb_strtolower($this->miStatus), [
+                mb_strtolower(self::MISTATUS_SETTLED),
+                mb_strtolower(self::MISTATUS_WITHDRAWN),
+                mb_strtolower(self::MISTATUS_REPUDIATED),
+                mb_strtolower(self::MISTATUS_ADJUSTER_CORREPONDENCE),
+                mb_strtolower(self::MISTATUS_ADJUSTER_FEE),
+                mb_strtolower(self::MISTATUS_CLAIMANT_CORRESPONDENCE),
+                mb_strtolower(self::MISTATUS_CONTRIBUTION),
+                mb_strtolower(self::MISTATUS_RECOVERY),
+                mb_strtolower(self::MISTATUS_RETURNED_CHEQUE),
+                mb_strtolower(self::MISTATUS_SUPPLIER_CORRESPONDENCE),
+                mb_strtolower(self::MISTATUS_SUPPLIER_FEE),
+                mb_strtolower(self::MISTATUS_ERROR),
+                mb_strtolower(self::MISTATUS_DMS_ERROR),
+                mb_strtolower(self::MISTATUS_COMPLAINT),
+                mb_strtolower(self::MISTATUS_INSURER),
             ])) {
                 throw new \Exception('Unknown claim detail status');
             }

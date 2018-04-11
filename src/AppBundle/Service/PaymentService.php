@@ -11,15 +11,17 @@ use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
+use AppBundle\Event\BacsEvent;
+use AppBundle\Event\PolicyEvent;
 use AppBundle\Repository\ScheduledPaymentRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use FOS\UserBundle\Mailer\Mailer;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class PaymentService
 {
-    const S3_BUCKET = 'policy.so-sure.com';
-
     /** @var JudopayService $judopay */
     protected $judopay;
 
@@ -42,21 +44,26 @@ class PaymentService
     protected $fraudService;
 
     protected $templating;
-    protected $snappyPdf;
-    protected $s3;
+
+    /** @var EventDispatcherInterface */
+    protected $dispatcher;
+
+    public function setDispatcher($dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
+    }
 
     /**
      * PaymentService constructor.
-     * @param JudopayService  $judopay
-     * @param LoggerInterface $logger
-     * @param DocumentManager $dm
-     * @param SequenceService $sequenceService
-     * @param MailerService   $mailer
-     * @param string          $environment
-     * @param FraudService    $fraudService
-     * @param                 $templating
-     * @param                 $snappyPdf
-     * @param                 $s3
+     * @param JudopayService           $judopay
+     * @param LoggerInterface          $logger
+     * @param DocumentManager          $dm
+     * @param SequenceService          $sequenceService
+     * @param MailerService            $mailer
+     * @param string                   $environment
+     * @param FraudService             $fraudService
+     * @param                          $templating
+     * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(
         JudopayService $judopay,
@@ -67,8 +74,7 @@ class PaymentService
         $environment,
         FraudService $fraudService,
         $templating,
-        $snappyPdf,
-        $s3
+        EventDispatcherInterface $dispatcher
     ) {
         $this->judopay = $judopay;
         $this->logger = $logger;
@@ -78,8 +84,7 @@ class PaymentService
         $this->environment = $environment;
         $this->fraudService = $fraudService;
         $this->templating = $templating;
-        $this->snappyPdf = $snappyPdf;
-        $this->s3 = $s3;
+        $this->dispatcher = $dispatcher;
     }
 
     public function getAllValidScheduledPaymentsForType($prefix, $type, \DateTime $scheduledDate = null)
@@ -172,9 +177,13 @@ class PaymentService
     {
         $policy->getUser()->setPaymentMethod($bacsPaymentMethod);
         $bacsPaymentMethod->getBankAccount()->setInitialNotificationDate(
-            $bacsPaymentMethod->getBankAccount()->getPaymentDate()
+            $bacsPaymentMethod->getBankAccount()->getFirstPaymentDate($policy->getUser())
         );
         $bacsPaymentMethod->getBankAccount()->setStandardNotificationDate($policy->getBilling());
+        // ensure payer is current user for bacs
+        if ($policy->isDifferentPayer()) {
+            $policy->setPayer($policy->getUser());
+        }
         $this->dm->flush();
 
         $this->mailer->sendTemplate(
@@ -188,8 +197,6 @@ class PaymentService
             'bcc-ddnotifications@so-sure.com'
         );
 
-        $this->generateBacsPdf($policy);
-
         if ($this->fraudService->getDuplicateBankAccounts($policy) > 0) {
             $this->mailer->send(
                 'Duplicate bank account',
@@ -197,65 +204,7 @@ class PaymentService
                 sprintf('Check %s / %s', $policy->getPolicyNumber(), $policy->getId())
             );
         }
-    }
 
-    public function generateBacsPdf(Policy $policy)
-    {
-        $now = new \DateTime();
-        $bankAccount = $policy->getUser()->getPaymentMethod()->getBankAccount();
-        $filename = sprintf(
-            "%s-%s-%s.pdf",
-            $policy->getId(),
-            $bankAccount->getReference(),
-            $now->format('U')
-        );
-        $tmpFile = sprintf(
-            "%s/%s",
-            sys_get_temp_dir(),
-            $filename
-        );
-        if (file_exists($tmpFile)) {
-            unlink($tmpFile);
-        }
-
-        $this->snappyPdf->setOption('orientation', 'Portrait');
-        $this->snappyPdf->setOption('lowquality', false);
-        $this->snappyPdf->setOption('page-size', 'A4');
-        $this->snappyPdf->setOption('margin-top', '1');
-        $this->snappyPdf->setOption('margin-bottom', '1');
-        $this->snappyPdf->generateFromHtml(
-            $this->templating->render('AppBundle:Email:bacs/notification.html.twig', [
-                'user' => $policy->getUser(),
-                'policy' => $policy
-            ]),
-            $tmpFile
-        );
-
-        $date = new \DateTime();
-        $ddNotificationFile = new DirectDebitNotificationFile();
-        $ddNotificationFile->setBucket(self::S3_BUCKET);
-        $ddNotificationFile->setKeyFormat(
-            $this->environment . '/dd-notification/' . $date->format('Y') . '/%s'
-        );
-        $ddNotificationFile->setFileName($filename);
-        $policy->addPolicyFile($ddNotificationFile);
-        $this->dm->flush();
-
-        $this->uploadS3($tmpFile, $ddNotificationFile->getKey());
-
-        return $tmpFile;
-    }
-
-    public function uploadS3($file, $key)
-    {
-        if ($this->environment == "test") {
-            return;
-        }
-
-        $result = $this->s3->putObject(array(
-            'Bucket' => self::S3_BUCKET,
-            'Key'    => $key,
-            'SourceFile' => $file,
-        ));
+        $this->dispatcher->dispatch(PolicyEvent::EVENT_BACS_CREATED, new PolicyEvent($policy));
     }
 }

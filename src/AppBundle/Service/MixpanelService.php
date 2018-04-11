@@ -185,7 +185,7 @@ class MixpanelService
     public function attributionByEmail($email)
     {
         $repo = $this->dm->getRepository(User::class);
-        $user = $repo->findOneBy(['emailCanonical' => strtolower($email)]);
+        $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
 
         return $this->attributionByUser($user);
     }
@@ -194,14 +194,14 @@ class MixpanelService
     {
         $validator = new AlphanumericSpaceDotPipeValidator();
 
-        return $validator->conform(substr($value, 0, $length));
+        return $validator->conform(mb_substr($value, 0, $length));
     }
 
     protected function conformAlphanumericSpaceDot($value, $length)
     {
         $validator = new AlphanumericSpaceDotValidator();
 
-        return $validator->conform(substr($value, 0, $length));
+        return $validator->conform(mb_substr($value, 0, $length));
     }
 
     public function attributionByUser(User $user = null)
@@ -216,7 +216,7 @@ class MixpanelService
         ]);
         foreach ($results['results'] as $result) {
             $data = $result['$properties'];
-            if (strtolower($data['$email']) == $user->getEmailCanonical()) {
+            if (mb_strtolower($data['$email']) == $user->getEmailCanonical()) {
                 $attribution = new Attribution();
                 $dataPresent = false;
                 if (isset($data['Campaign Name'])) {
@@ -262,6 +262,10 @@ class MixpanelService
                     $attribution->setDeviceCategory($data['Device Category']);
                     $dataPresent = true;
                 }
+                if (isset($data['Device OS'])) {
+                    $attribution->setDeviceOS($data['Device OS']);
+                    $dataPresent = true;
+                }
 
                 if ($dataPresent) {
                     $user->setAttribution($attribution);
@@ -270,7 +274,10 @@ class MixpanelService
                 $latestAttribution = new Attribution();
                 $dataPresent = false;
                 if (isset($data['Latest Campaign Name'])) {
-                    $latestAttribution->setCampaignName(urldecode($data['Latest Campaign Name']));
+                    $latestAttribution->setCampaignName($this->conformAlphanumericSpaceDotPipe(
+                        urldecode($data['Latest Campaign Name']),
+                        250
+                    ));
                     $dataPresent = true;
                 }
                 if (isset($data['Latest Campaign Source'])) {
@@ -295,6 +302,10 @@ class MixpanelService
                 }
                 if (isset($data['Latest Device Category'])) {
                     $latestAttribution->setDeviceCategory($data['Latest Device Category']);
+                    $dataPresent = true;
+                }
+                if (isset($data['Latest Device OS'])) {
+                    $latestAttribution->setDeviceOS($data['Latest Device OS']);
                     $dataPresent = true;
                 }
                 if ($dataPresent) {
@@ -815,10 +826,12 @@ class MixpanelService
         $utm = $this->requestService->getUtm();
         $referer = $this->requestService->getReferer();
         $deviceCategory = null;
+        $deviceOS = null;
         if ($userAgent = $this->requestService->getUserAgent()) {
             $parser = Parser::create();
             $userAgentDetails = $parser->parse($userAgent);
             $deviceCategory = $this->requestService->getDeviceCategory();
+            $deviceOS = $this->requestService->getDeviceOS();
         }
 
         $transform = [];
@@ -843,13 +856,17 @@ class MixpanelService
         if ($referer) {
             $refererDomain = parse_url($referer, PHP_URL_HOST);
             $currentDomain = parse_url($this->requestService->getUri(), PHP_URL_HOST);
-            if (strtolower($refererDomain) != strtolower($currentDomain)) {
+            if (mb_strtolower($refererDomain) != mb_strtolower($currentDomain)) {
                 $transform[sprintf('%sReferer', $prefix)] = $referer;
             }
         }
 
         if ($deviceCategory) {
             $transform[sprintf('%sDevice Category', $prefix)] = $deviceCategory;
+        }
+
+        if ($deviceOS) {
+            $transform[sprintf('%sDevice OS', $prefix)] = $deviceOS;
         }
 
         return $transform;

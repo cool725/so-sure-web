@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Classes\SoSure;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -1716,9 +1717,49 @@ class PolicyService
         $this->dm->flush();
 
         $this->pendingRenewalEmail($policy);
+
+        /** @var User $user */
+        $user = $policy->getUser();
+        $isCorporate = $user->getCompany();
+
+        if ($isCorporate !== null) {
+            $this->pendingRenewalSoSureEmployeeInvoiceNotification($policy);
+        }
+
         $this->dispatchEvent(PolicyEvent::EVENT_PENDING_RENEWAL, new PolicyEvent($policy));
 
         return $newPolicy;
+    }
+
+    /**
+     * @param Policy $policy
+     */
+    public function pendingRenewalSoSureEmployeeInvoiceNotification(Policy $policy)
+    {
+        if (!$this->mailer) {
+            return;
+        }
+
+        $baseTemplate = sprintf('AppBundle:Email:policy/pendingRenewalSoSureEmployeeInvoiceNotification');
+        $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
+
+        $subject = sprintf(
+            'Please Invoice For Corporate Policy Renewal.'
+        );
+        $data = [
+            'policy' => $policy,
+            'renew_url' => $this->routerService->generateUrl(
+                'user_renew_policy',
+                ['id' => $policy->getId()]
+            ),
+            'start_date' => $this->endOfDay($policy->getEnd()),
+        ];
+        $this->mailer->sendTemplate(
+            $subject,
+            SoSure::SOSURE_EMPLOYEE_SALES_EMAIL,
+            $htmlTemplate,
+            $data
+        );
     }
 
     public function pendingRenewalEmail(Policy $policy)

@@ -85,9 +85,9 @@ class CognitoIdentityAuthenticator implements SimplePreAuthenticatorInterface, A
         $user = self::ANON_USER_UNAUTH_PATH;
         $cognitoIdentityId = $this->getCognitoIdentityId($request->getContent());
 
-        if (stripos($request->getPathInfo(), self::PARTIAL_AUTH_PATH) !== false) {
+        if (mb_stripos($request->getPathInfo(), self::PARTIAL_AUTH_PATH) !== false) {
             $user = self::ANON_USER_PARTIAL_AUTH_PATH;
-        } elseif (stripos($request->getPathInfo(), self::AUTH_PATH) !== false) {
+        } elseif (mb_stripos($request->getPathInfo(), self::AUTH_PATH) !== false) {
             $user = self::ANON_USER_AUTH_PATH;
         }
 

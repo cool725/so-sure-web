@@ -493,9 +493,15 @@ class UserTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($policyC2->isCancelledAndPaymentOwed());
 
         $bacsA = new BacsPayment();
+        $bacsA->setManual(true);
+        $bacsA->setStatus(BacsPayment::STATUS_SUCCESS);
+        $bacsA->setSuccess(true);
         $bacsA->setAmount($policyA->getPremium()->getMonthlyPremiumPrice() * 12);
         $policyA->addPayment($bacsA);
         $bacsB = new BacsPayment();
+        $bacsB->setManual(true);
+        $bacsB->setStatus(BacsPayment::STATUS_SUCCESS);
+        $bacsB->setSuccess(true);
         $bacsB->setAmount($policyB->getPremium()->getMonthlyPremiumPrice() * 12);
         $policyB->addPayment($bacsB);
 

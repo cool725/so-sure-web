@@ -25,7 +25,7 @@ class ApiResponseSubscriber implements EventSubscriberInterface
     public function onKernelResponse(FilterResponseEvent $event)
     {
         $request = $event->getRequest();
-        if (stripos($request->getPathInfo(), '/api/v1/') === 0) {
+        if (mb_stripos($request->getPathInfo(), '/api/v1/') === 0) {
             if (($errorCode = $this->redis->hget(self::KEY_HASH_PATH, $request->getPathInfo())) !== null) {
                 $event->setResponse($this->generateJsonError($errorCode));
             } elseif (($random = $this->redis->get(self::KEY_RANDOM_FAILURE)) !== null) {

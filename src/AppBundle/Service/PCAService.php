@@ -66,7 +66,7 @@ class PCAService
 
     public function normalizePostcode($postcode)
     {
-        return strtoupper(str_replace(' ', '', trim($postcode)));
+        return mb_strtoupper(str_replace(' ', '', trim($postcode)));
     }
 
     /**
@@ -430,11 +430,11 @@ class PCAService
         $line3 = (string) $row->attributes()->Line3;
         $line4 = (string) $row->attributes()->Line4;
         $line5 = (string) $row->attributes()->Line5;
-        if (strlen($line5) > 0) {
+        if (mb_strlen($line5) > 0) {
             $line1 = sprintf("%s, %s", $line1, $line2);
             $line2 = $line3;
             $line3 = sprintf("%s, %s", $line4, $line5);
-        } elseif (strlen($line4) > 0) {
+        } elseif (mb_strlen($line4) > 0) {
             $line3 = sprintf("%s, %s", $line3, $line4);
         }
         $address->setLine1($line1);

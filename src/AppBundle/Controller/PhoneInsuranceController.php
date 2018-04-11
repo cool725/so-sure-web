@@ -158,6 +158,43 @@ class PhoneInsuranceController extends BaseController
     }
 
     /**
+     * @Route("/purchase-phone/{make}+{model}+{memory}GB", name="purchase_phone_make_model_memory",
+     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
+     */
+    public function purchasePhoneAction(Request $request, $make = null, $model = null, $memory = null)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Phone::class);
+        $phonePolicyRepo = $dm->getRepository(PhonePolicy::class);
+        $phone = null;
+        $decodedModel = Phone::decodeModel($model);
+        $phone = $repo->findOneBy([
+            'active' => true,
+            'makeCanonical' => mb_strtolower($make),
+            'modelCanonical' => mb_strtolower($decodedModel),
+            'memory' => (int) $memory
+        ]);
+        if (!$phone) {
+            throw $this->createNotFoundException('Unable to locate phone');
+        }
+
+        $quoteUrl = $this->setPhoneSession($request, $phone);
+        if (in_array($request->get('_route'), ['purchase_phone_make_model_memory'])) {
+            $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, [
+                'Location' => 'offsite'
+            ]);
+
+            // Multipolicy should skip user details
+            if ($this->getUser() && $this->getUser()->hasPolicy()) {
+                // don't check for partial partial as quote phone may be different from partial policy phone
+                return $this->redirectToRoute('purchase_step_policy');
+            } else {
+                return $this->redirectToRoute('purchase');
+            }
+        }
+    }
+
+    /**
      * Note that any changes to actual path routes need to be reflected in the Google Analytics Goals
      *   as these will impact Adwords
      *
@@ -170,8 +207,6 @@ class PhoneInsuranceController extends BaseController
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
      * @Route("/insure/{make}+{model}", name="insure_make_model",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
-     * @Route("/purchase-phone/{make}+{model}+{memory}GB", name="purchase_phone_make_model_memory",
-     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
      */
     public function quoteAction(Request $request, $id = null, $make = null, $model = null, $memory = null)
     {
@@ -198,16 +233,16 @@ class PhoneInsuranceController extends BaseController
         } elseif ($memory) {
             $phone = $repo->findOneBy([
                 'active' => true,
-                'makeCanonical' => strtolower($make),
-                'modelCanonical' => strtolower($decodedModel),
+                'makeCanonical' => mb_strtolower($make),
+                'modelCanonical' => mb_strtolower($decodedModel),
                 'memory' => (int) $memory
             ]);
             // check for historical urls
-            if (!$phone || stripos($model, ' ') !== false) {
+            if (!$phone || mb_stripos($model, ' ') !== false) {
                 $phone = $repo->findOneBy([
                     'active' => true,
-                    'makeCanonical' => strtolower($make),
-                    'modelCanonical' => strtolower($model),
+                    'makeCanonical' => mb_strtolower($make),
+                    'modelCanonical' => mb_strtolower($model),
                     'memory' => (int) $memory
                 ]);
                 if ($phone) {
@@ -220,18 +255,22 @@ class PhoneInsuranceController extends BaseController
             }
         } else {
             $phones = $repo->findBy(
-                ['active' => true, 'makeCanonical' => strtolower($make), 'modelCanonical' => strtolower($decodedModel)],
+                [
+                    'active' => true,
+                    'makeCanonical' => mb_strtolower($make),
+                    'modelCanonical' => mb_strtolower($decodedModel)
+                ],
                 ['memory' => 'asc'],
                 1
             );
-            if (count($phones) != 0 && stripos($model, ' ') === false) {
+            if (count($phones) != 0 && mb_stripos($model, ' ') === false) {
                 $phone = $phones[0];
             } else {
                 // check for historical urls
                 $phone = $repo->findOneBy([
                     'active' => true,
-                    'makeCanonical' => strtolower($make),
-                    'modelCanonical' => strtolower($model)
+                    'makeCanonical' => mb_strtolower($make),
+                    'modelCanonical' => mb_strtolower($model)
                 ]);
                 if ($phone) {
                     return $this->redirectToRoute('quote_make_model', [
@@ -279,18 +318,6 @@ class PhoneInsuranceController extends BaseController
                 return new RedirectResponse($this->generateUrl('homepage'));
             }
             */
-        } elseif (in_array($request->get('_route'), ['purchase_phone_make_model_memory'])) {
-            $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, [
-                'Location' => 'offsite'
-            ]);
-
-            // Multipolicy should skip user details
-            if ($this->getUser() && $this->getUser()->hasPolicy()) {
-                // don't check for partial partial as quote phone may be different from partial policy phone
-                return $this->redirectToRoute('purchase_step_policy');
-            } else {
-                return $this->redirectToRoute('purchase');
-            }
         }
         /*
         $sliderTest = $this->get('app.sixpack')->participate(
@@ -336,7 +363,7 @@ class PhoneInsuranceController extends BaseController
                         );
 
                         $leadRepo = $dm->getRepository(Lead::class);
-                        $existingLead = $leadRepo->findOneBy(['email' => strtolower($lead->getEmail())]);
+                        $existingLead = $leadRepo->findOneBy(['email' => mb_strtolower($lead->getEmail())]);
                         if (!$existingLead) {
                             $dm->persist($lead);
                             $dm->flush();
@@ -556,7 +583,7 @@ class PhoneInsuranceController extends BaseController
                 ['memory' => 'asc'],
                 1
             );
-            if (count($phones) != 0 && stripos($model, ' ') === false) {
+            if (count($phones) != 0 && mb_stripos($model, ' ') === false) {
                 $phone = $phones[0];
             }
         }

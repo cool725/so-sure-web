@@ -37,7 +37,7 @@ class FilehashCacheBustingWorker extends CacheBustingWorker
         } else {
             $this->hashAsset($asset, $hash);
         }
-        return substr(hash_final($hash), 0, 7);
+        return mb_substr(hash_final($hash), 0, 7);
     }
 
     /**

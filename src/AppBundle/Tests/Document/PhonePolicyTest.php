@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Document;
 
+use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Connection\StandardConnection;
@@ -1136,6 +1137,7 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals(2, count($policyB->getConnections()));
         // All connections to the cancelled policy should be zero; other connections should remain at value
         foreach ($policyB->getConnections() as $networkConnection) {
+            /** @var Connection $networkConnection */
             if ($networkConnection->getLinkedPolicy()->getId() == $policyA->getId()) {
                 $this->assertEquals(0, $networkConnection->getTotalValue());
             } else {
@@ -1233,16 +1235,25 @@ class PhonePolicyTest extends WebTestCase
 
         $this->assertFalse($policyA->isFullyPaid());
         $bacs = new BacsPayment();
+        $bacs->setManual(true);
+        $bacs->setStatus(BacsPayment::STATUS_SUCCESS);
+        $bacs->setSuccess(true);
         $bacs->setAmount($policyA->getPremium()->getMonthlyPremiumPrice());
         $policyA->addPayment($bacs);
         $this->assertFalse($policyA->isFullyPaid());
 
         $bacs = new BacsPayment();
+        $bacs->setManual(true);
+        $bacs->setStatus(BacsPayment::STATUS_SUCCESS);
+        $bacs->setSuccess(true);
         $bacs->setAmount($policyA->getPremium()->getMonthlyPremiumPrice() * 11);
         $policyA->addPayment($bacs);
         $this->assertTrue($policyA->isFullyPaid());
 
         $bacs = new BacsPayment();
+        $bacs->setManual(true);
+        $bacs->setStatus(BacsPayment::STATUS_SUCCESS);
+        $bacs->setSuccess(true);
         $bacs->setAmount($policyA->getPremium()->getMonthlyPremiumPrice());
         $policyA->addPayment($bacs);
         $this->assertTrue($policyA->isFullyPaid());
@@ -1275,12 +1286,21 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($policyC->isCancelledAndPaymentOwed());
 
         $bacsA = new BacsPayment();
+        $bacsA->setManual(true);
+        $bacsA->setStatus(BacsPayment::STATUS_SUCCESS);
+        $bacsA->setSuccess(true);
         $bacsA->setAmount($policyA->getPremium()->getMonthlyPremiumPrice());
         $policyA->addPayment($bacsA);
         $bacsB = new BacsPayment();
+        $bacsB->setManual(true);
+        $bacsB->setStatus(BacsPayment::STATUS_SUCCESS);
+        $bacsB->setSuccess(true);
         $bacsB->setAmount($policyB->getPremium()->getMonthlyPremiumPrice());
         $policyB->addPayment($bacsB);
         $bacsC = new BacsPayment();
+        $bacsC->setManual(true);
+        $bacsC->setStatus(BacsPayment::STATUS_SUCCESS);
+        $bacsC->setSuccess(true);
         $bacsC->setAmount($policyC->getPremium()->getMonthlyPremiumPrice());
         $policyC->addPayment($bacsC);
 
@@ -1302,12 +1322,21 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($policyC->isCancelledAndPaymentOwed());
 
         $bacsA = new BacsPayment();
+        $bacsA->setManual(true);
+        $bacsA->setStatus(BacsPayment::STATUS_SUCCESS);
+        $bacsA->setSuccess(true);
         $bacsA->setAmount($policyA->getPremium()->getMonthlyPremiumPrice() * 11);
         $policyA->addPayment($bacsA);
         $bacsB = new BacsPayment();
+        $bacsB->setManual(true);
+        $bacsB->setStatus(BacsPayment::STATUS_SUCCESS);
+        $bacsB->setSuccess(true);
         $bacsB->setAmount($policyB->getPremium()->getMonthlyPremiumPrice() * 11);
         $policyB->addPayment($bacsB);
         $bacsC = new BacsPayment();
+        $bacsC->setManual(true);
+        $bacsC->setStatus(BacsPayment::STATUS_SUCCESS);
+        $bacsC->setSuccess(true);
         $bacsC->setAmount($policyC->getPremium()->getMonthlyPremiumPrice() * 11);
         $policyC->addPayment($bacsC);
 
@@ -2158,6 +2187,7 @@ class PhonePolicyTest extends WebTestCase
 
         $this->assertEquals(2, count($policy->getActiveSCodes()));
         foreach ($policy->getActiveSCodes() as $scode) {
+            /** @var SCode $scode */
             $this->assertTrue(in_array($scode->getCode(), [$scodeB->getCode(), $scodeC->getCode()]));
         }
     }
@@ -2705,7 +2735,7 @@ class PhonePolicyTest extends WebTestCase
     }
 
     /**
-     * @expectedException AppBundle\Exception\InvalidPremiumException
+     * @expectedException \AppBundle\Exception\InvalidPremiumException
      */
     public function testValidatePremiumException()
     {
@@ -3270,7 +3300,7 @@ class PhonePolicyTest extends WebTestCase
 
         $this->assertFalse($policy->canRenew(new \DateTime("2016-12-10")));
 
-        $renewalPolicy = $this->getRenewalPolicy($policy);
+        $this->getRenewalPolicy($policy);
 
         $this->assertTrue($policy->canRenew(new \DateTime("2016-12-10")));
 
@@ -4635,5 +4665,26 @@ class PhonePolicyTest extends WebTestCase
         $policyB->setId(rand(1, 999999));
         $this->assertTrue($policyB->isSameInsurable($policyA));
         $this->assertTrue($policyB->isRepurchase());
+    }
+
+    public function testHasManualBacsPayment()
+    {
+        $user = new User();
+        $user->setEmail(static::generateEmail('testHasManualBacsPayment', $this));
+        self::$dm->persist($user);
+        self::addAddress($user);
+        $policy = new SalvaPhonePolicy();
+        $policy->init($user, self::getLatestPolicyTerms(static::$dm));
+        $policy->setPhone(self::$phone);
+        $policy->create(rand(1, 999999), null, null, rand(1, 9999));
+        $policy->setImei(rand(1, 999999));
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setId(rand(1, 999999));
+
+        $this->assertFalse($policy->hasManualBacsPayment());
+        $bacsPayment = new BacsPayment();
+        $bacsPayment->setManual(true);
+        $policy->addPayment($bacsPayment);
+        $this->assertTrue($policy->hasManualBacsPayment());
     }
 }

@@ -44,7 +44,7 @@ class ApiExternalController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_NOT_FOUND, 'Invalid key', 404);
             }
             $userToken = $this->getRequestString($request, 'user_token');
-            if (strlen($userToken) == 0) {
+            if (mb_strlen($userToken) == 0) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
 
@@ -159,7 +159,7 @@ class ApiExternalController extends BaseController
             }
 
             $users = $this->getRequestString($request, 'users');
-            if (strlen($users) == 0) {
+            if (mb_strlen($users) == 0) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
 
@@ -270,7 +270,7 @@ class ApiExternalController extends BaseController
         $this->setPhoneSession($request, $phone);
 
         $userRepo = $dm->getRepository(User::class);
-        $user = $userRepo->findOneBy(['emailCanonical' => strtolower($email)]);
+        $user = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
         if ($user) {
             return $this->redirectToRoute('quote_phone', ['id' => $phone->getId()]);
         }

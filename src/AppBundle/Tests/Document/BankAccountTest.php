@@ -2,8 +2,15 @@
 
 namespace AppBundle\Tests\Document;
 
+use AppBundle\Classes\SoSure;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\Claim;
+use AppBundle\Document\Payment\BacsPayment;
+use AppBundle\Document\Phone;
+use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\PhonePremium;
+use AppBundle\Document\Policy;
+use AppBundle\Document\User;
 
 /**
  * @group unit
@@ -53,6 +60,101 @@ class BankAccountTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(
             new \DateTime('2018-04-05'),
             $bankAccount->getPaymentDate(new \DateTime('2018-03-28'))
+        );
+    }
+
+    public function testGetFirstPaymentDateUnpaid()
+    {
+        $user = new User();
+        $policy = new PhonePolicy();
+        $premium = new PhonePremium();
+        $premium->setGwp(5);
+        $premium->setIpt(1);
+        $premium->setIptRate(0.12);
+        $policy->setPremium($premium);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setStart(new \DateTime('2018-03-05'));
+        $policy->setPremiumInstallments(12);
+        $bacsPayment = new BacsPayment();
+        $bacsPayment->setAmount($premium->getMonthlyPremiumPrice());
+        $bacsPayment->setStatus(BacsPayment::STATUS_SUCCESS);
+        $bacsPayment->setSuccess(true);
+        $bacsPayment->setDate(new \DateTime('2018-03-05'));
+        //$policy->addPayment($bacsPayment);
+        $user->addPolicy($policy);
+
+        $this->assertFalse($policy->isPolicyPaidToDate(new \DateTime('2018-03-06')));
+
+        $bankAccount = new BankAccount();
+        $this->assertEquals(
+            new \DateTime('2018-03-12'),
+            $bankAccount->getFirstPaymentDate($user, new \DateTime('2018-03-06'))
+        );
+    }
+
+    public function testGetFirstPaymentDatePaid()
+    {
+        $user = new User();
+        $policy = new PhonePolicy();
+        $premium = new PhonePremium();
+        $premium->setGwp(5);
+        $premium->setIpt(1);
+        $premium->setIptRate(0.12);
+        $policy->setPremium($premium);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setStart(new \DateTime('2018-03-05'));
+        $policy->setPremiumInstallments(12);
+        $bacsPayment = new BacsPayment();
+        $bacsPayment->setAmount($premium->getMonthlyPremiumPrice());
+        $bacsPayment->setStatus(BacsPayment::STATUS_SUCCESS);
+        $bacsPayment->setSuccess(true);
+        $bacsPayment->setDate(new \DateTime('2018-03-05'));
+        $policy->addPayment($bacsPayment);
+        $user->addPolicy($policy);
+
+        $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2018-03-06')));
+        $this->assertEquals(
+            new \DateTime('2018-04-05', new \DateTimeZone(SoSure::TIMEZONE)),
+            $policy->getNextBillingDate(new \DateTime('2018-03-06'))
+        );
+
+        $bankAccount = new BankAccount();
+        $this->assertEquals(
+            new \DateTime('2018-04-05', new \DateTimeZone(SoSure::TIMEZONE)),
+            $bankAccount->getFirstPaymentDate($user, new \DateTime('2018-03-06'))
+        );
+    }
+
+    public function testGetFirstPaymentDateCloseToBacs()
+    {
+        $user = new User();
+        $policy = new PhonePolicy();
+        $premium = new PhonePremium();
+        $premium->setGwp(5);
+        $premium->setIpt(1);
+        $premium->setIptRate(0.12);
+        $policy->setPremium($premium);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setStart(new \DateTime('2018-03-05'));
+        $policy->setPremiumInstallments(12);
+        $bacsPayment = new BacsPayment();
+        $bacsPayment->setAmount($premium->getMonthlyPremiumPrice());
+        $bacsPayment->setStatus(BacsPayment::STATUS_SUCCESS);
+        $bacsPayment->setSuccess(true);
+        $bacsPayment->setDate(new \DateTime('2018-03-05'));
+        $policy->addPayment($bacsPayment);
+        $user->addPolicy($policy);
+
+        $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2018-04-04')));
+        $this->assertEquals(
+            new \DateTime('2018-04-05', new \DateTimeZone(SoSure::TIMEZONE)),
+            $policy->getNextBillingDate(new \DateTime('2018-04-04'))
+        );
+
+        $bankAccount = new BankAccount();
+        $this->assertEquals(
+            new \DateTime('2018-04-10'),
+            $bankAccount->getFirstPaymentDate($user, new \DateTime('2018-04-04'))
         );
     }
 
@@ -144,5 +246,15 @@ class BankAccountTest extends \PHPUnit\Framework\TestCase
         $this->assertFalse(
             $bankAccount->allowedStandardProcessing(new \DateTime('2018-03-06'))
         );
+    }
+
+    public function testAllowedSubmission()
+    {
+        $bankAccount = new BankAccount();
+        $bankAccount->setInitialPaymentSubmissionDate(new \DateTime('2018-02-28 09:00'));
+        $this->assertFalse($bankAccount->allowedSubmission(new \DateTime('2018-02-27 23:00')));
+        $this->assertTrue($bankAccount->allowedSubmission(new \DateTime('2018-02-28 01:00')));
+        $this->assertTrue($bankAccount->allowedSubmission(new \DateTime('2018-02-28 11:00')));
+        $this->assertTrue($bankAccount->allowedSubmission(new \DateTime('2018-02-29 01:00')));
     }
 }

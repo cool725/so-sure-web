@@ -68,7 +68,7 @@ class MailerService
         // base campaign on template name
         // AppBundle:Email:quote/priceGuarentee.html.twig
         $campaign = $htmlTemplate;
-        if (stripos($campaign, ':')) {
+        if (mb_stripos($campaign, ':')) {
             $campaignItems = explode(':', $campaign);
             $campaign = $campaignItems[count($campaignItems) - 1];
         }
@@ -154,7 +154,7 @@ class MailerService
             $headers = $message->getHeaders();
             $headers->addTextHeader(
                 'X-MSYS-API',
-                sprintf('{"campaign_id": "%s"}', substr($campaign, 0, 63))
+                sprintf('{"campaign_id": "%s"}', mb_substr($campaign, 0, 63))
             );
         }
 

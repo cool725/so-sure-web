@@ -40,8 +40,8 @@ class DoctrineUserListener
         $document = $eventArgs->getDocument();
         if ($document instanceof User) {
             if ($eventArgs->hasChangedField('email') &&
-                strlen(trim($eventArgs->getOldValue('email'))) > 0 &&
-                strtolower($eventArgs->getOldValue('email')) != strtolower($eventArgs->getNewValue('email'))) {
+                mb_strlen(trim($eventArgs->getOldValue('email'))) > 0 &&
+                mb_strtolower($eventArgs->getOldValue('email')) != mb_strtolower($eventArgs->getNewValue('email'))) {
                 $event = new UserEmailEvent($document, $eventArgs->getOldValue('email'));
                 $this->dispatcher->dispatch(UserEmailEvent::EVENT_CHANGED, $event);
             }
@@ -64,7 +64,7 @@ class DoctrineUserListener
             }
 
             if ($eventArgs->hasChangedField('password') &&
-                strlen(trim($eventArgs->getOldValue('password'))) > 0 &&
+                mb_strlen(trim($eventArgs->getOldValue('password'))) > 0 &&
                 $eventArgs->getOldValue('password') != $eventArgs->getNewValue('password')) {
                 if ($eventArgs->hasChangedField('salt')) {
                     $document->passwordChange($eventArgs->getOldValue('password'), $eventArgs->getOldValue('salt'));
@@ -87,7 +87,7 @@ class DoctrineUserListener
                 'lastName',
             ];
             foreach ($fields as $field) {
-                if ($eventArgs->hasChangedField($field) && strlen(trim($eventArgs->getOldValue($field))) > 0 &&
+                if ($eventArgs->hasChangedField($field) && mb_strlen(trim($eventArgs->getOldValue($field))) > 0 &&
                     $eventArgs->getOldValue($field) != $eventArgs->getNewValue($field)) {
                     $event = new UserEvent($document);
                     $this->dispatcher->dispatch(UserEvent::EVENT_NAME_UPDATED, $event);

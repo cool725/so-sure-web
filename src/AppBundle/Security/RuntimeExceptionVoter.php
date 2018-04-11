@@ -11,7 +11,7 @@ class RuntimeExceptionVoter implements ReportVoterInterface
         // Don't sent HWI OAuth No resource owner
         // Verify: GET -UsEd https://wearesosure.com/login/LoginForm.jsp
         if ($exception instanceof \RuntimeException &&
-            stripos($exception->getMessage(), "No resource owner") !== false) {
+            mb_stripos($exception->getMessage(), "No resource owner") !== false) {
             return true;
         }
 

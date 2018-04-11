@@ -263,9 +263,9 @@ class Phone
         $this->setModel($model);
         $this->devices = $devices;
         $this->memory = $memory;
-        $this->initialPrice = strlen($initialPrice) > 0 ? $initialPrice : null;
-        $this->replacementPrice = strlen($replacementPrice) > 0 ? $replacementPrice : null;
-        $this->initialPriceUrl = strlen($initialPriceUrl) > 0 ? $initialPriceUrl : null;
+        $this->initialPrice = mb_strlen($initialPrice) > 0 ? $initialPrice : null;
+        $this->replacementPrice = mb_strlen($replacementPrice) > 0 ? $replacementPrice : null;
+        $this->initialPriceUrl = mb_strlen($initialPriceUrl) > 0 ? $initialPriceUrl : null;
 
         if ($premium > 0) {
             $phonePrice = $this->getCurrentPhonePrice();
@@ -293,18 +293,18 @@ class Phone
         $lte,
         $releaseDate
     ) {
-        $this->os = strlen($os) > 0 ? $os : null;
-        $this->initialOsVersion = strlen($initialOsVersion) > 0 ? $initialOsVersion : null;
-        $this->upgradeOsVersion = strlen($upgradeOsVersion) > 0 ? $upgradeOsVersion : null;
-        $this->processorSpeed = strlen($processorSpeed) > 0 ? $processorSpeed : null;
-        $this->processorCores = strlen($processorCores) > 0 ? $processorCores : null;
-        $this->ram = strlen($ram) > 0 ? $ram : null;
-        $this->ssd = strlen($ssd) > 0 ? $ssd : null;
-        $this->screenPhysical = strlen($screenPhysical) > 0 ? $screenPhysical : null;
-        $this->screenResolutionWidth = strlen($screenResolutionWidth) > 0 ? $screenResolutionWidth : null;
-        $this->screenResolutionHeight = strlen($screenResolutionHeight) > 0 ? $screenResolutionHeight : null;
-        $this->camera = strlen($camera) > 0 ? $camera : null;
-        $this->lte = strlen($lte) > 0 ? $lte : null;
+        $this->os = mb_strlen($os) > 0 ? $os : null;
+        $this->initialOsVersion = mb_strlen($initialOsVersion) > 0 ? $initialOsVersion : null;
+        $this->upgradeOsVersion = mb_strlen($upgradeOsVersion) > 0 ? $upgradeOsVersion : null;
+        $this->processorSpeed = mb_strlen($processorSpeed) > 0 ? $processorSpeed : null;
+        $this->processorCores = mb_strlen($processorCores) > 0 ? $processorCores : null;
+        $this->ram = mb_strlen($ram) > 0 ? $ram : null;
+        $this->ssd = mb_strlen($ssd) > 0 ? $ssd : null;
+        $this->screenPhysical = mb_strlen($screenPhysical) > 0 ? $screenPhysical : null;
+        $this->screenResolutionWidth = mb_strlen($screenResolutionWidth) > 0 ? $screenResolutionWidth : null;
+        $this->screenResolutionHeight = mb_strlen($screenResolutionHeight) > 0 ? $screenResolutionHeight : null;
+        $this->camera = mb_strlen($camera) > 0 ? $camera : null;
+        $this->lte = mb_strlen($lte) > 0 ? $lte : null;
         $this->releaseDate = is_object($releaseDate) ? $releaseDate : null;
     }
 
@@ -433,7 +433,7 @@ class Phone
 
     public function setMakeCanonical($make)
     {
-        $this->makeCanonical = strtolower($make);
+        $this->makeCanonical = mb_strtolower($make);
     }
 
     public function getAlternativeMake()
@@ -454,7 +454,7 @@ class Phone
 
     public function setAlternativeMakeCanonical($alternativeMake)
     {
-        $this->alternativeMakeCanonical = strtolower($alternativeMake);
+        $this->alternativeMakeCanonical = mb_strtolower($alternativeMake);
     }
 
     public function getModel()
@@ -502,7 +502,7 @@ class Phone
 
     public function setModel($model)
     {
-        if (stripos($model, '-plus') !== false) {
+        if (mb_stripos($model, '-plus') !== false) {
             throw new \Exception(sprintf('%s contains -Plus which will break encoding rules', $model));
         }
 
@@ -512,11 +512,11 @@ class Phone
 
     public function setModelCanonical($model)
     {
-        if (stripos($model, '-plus') !== false) {
+        if (mb_stripos($model, '-plus') !== false) {
             throw new \Exception(sprintf('%s contains -Plus which will break encoding rules', $model));
         }
 
-        $this->modelCanonical = strtolower($model);
+        $this->modelCanonical = mb_strtolower($model);
     }
 
     public function isSameMakeModelCanonical($make, $model)
@@ -543,7 +543,7 @@ class Phone
     {
         $devices = [];
         foreach ($this->getDevices() as $device) {
-            $devices[] = strtoupper($device);
+            $devices[] = mb_strtoupper($device);
         }
 
         return $devices;
@@ -854,12 +854,12 @@ class Phone
 
     public function isSameMake($make)
     {
-        $make = strtolower($make);
+        $make = mb_strtolower($make);
         if ($make == 'lge') {
             $make = 'lg';
         }
 
-        return strtolower($this->getMake()) == $make || strtolower($this->getAlternativeMake()) == $make;
+        return mb_strtolower($this->getMake()) == $make || mb_strtolower($this->getAlternativeMake()) == $make;
     }
 
     public function isAppAvailable()

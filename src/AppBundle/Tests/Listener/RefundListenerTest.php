@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Listener;
 
+use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\Payment\BacsPayment;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -194,11 +195,11 @@ class RefundListenerTest extends WebTestCase
         $this->assertEquals(5, count($policy->getPayments()));
     }
 
-    public function testRefundListenerBacsCancelledCooloffYearly()
+    public function testRefundListenerBacsCancelledCooloffYearlyManual()
     {
         $user = static::createUser(
             static::$userManager,
-            static::generateEmail('testRefundListenerBacsCancelledCooloffYearly', $this),
+            static::generateEmail('testRefundListenerBacsCancelledCooloffYearlyManual', $this),
             'bar'
         );
         $policy = static::initPolicy(
@@ -241,6 +242,65 @@ class RefundListenerTest extends WebTestCase
         foreach ($policy->getPayments() as $payment) {
             if ($payment instanceof BacsPayment && $payment->getAmount() < 0) {
                 $this->assertEquals($now, $payment->getDate());
+                $this->assertTrue($payment->isManual());
+                $this->assertTrue($payment->isSuccess());
+                $this->assertEquals(BacsPayment::STATUS_PENDING, $payment->getStatus());
+                $foundRefund = true;
+            }
+        }
+        $this->assertTrue($foundRefund);
+    }
+
+    public function testRefundListenerBacsCancelledCooloffYearlyNonManual()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testRefundListenerBacsCancelledCooloffYearlyNonManual', $this),
+            'bar'
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-11-01'),
+            false
+        );
+        static::addBacsPayPayment($policy, new \DateTime('2016-11-01'), false, false);
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-11-01'));
+        static::$policyService->setEnvironment('test');
+
+        $this->assertTrue($policy->isValidPolicy());
+
+        $policy->setCancelledReason(PhonePolicy::CANCELLED_COOLOFF);
+        $policy->setStatus(PhonePolicy::STATUS_CANCELLED);
+        static::$dm->flush();
+
+        $now = new \DateTime();
+        $listener = new RefundListener(static::$dm, static::$judopayService, static::$logger, 'test');
+        $listener->onPolicyCancelledEvent(new PolicyEvent($policy));
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        $policy = $repo->find($policy->getId());
+        $totalBacs = Payment::sumPayments($policy->getPayments(), false, BacsPayment::class);
+        $this->assertTrue($this->areEqualToTwoDp(0, $totalBacs['total']));
+
+        $total = Payment::sumPayments($policy->getPayments(), false);
+        $this->assertTrue($this->areEqualToTwoDp(0, $total['total']));
+
+        // bacs initial, bacs refund for cancellation
+        $this->assertEquals(2, count($policy->getPayments()));
+
+        $foundRefund = false;
+        foreach ($policy->getPayments() as $payment) {
+            if ($payment instanceof BacsPayment && $payment->getAmount() < 0) {
+                $this->assertEquals($now, $payment->getDate());
+                $this->assertNull($payment->isManual());
+                $this->assertTrue($payment->isSuccess());
+                $this->assertEquals(BacsPayment::STATUS_PENDING, $payment->getStatus());
                 $foundRefund = true;
             }
         }

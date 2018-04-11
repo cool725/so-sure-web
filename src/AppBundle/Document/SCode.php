@@ -109,9 +109,9 @@ class SCode
 
         $firstName = str_pad($user->getFirstName(), 1, "0");
         $lastName = str_pad($user->getLastName(), $length, "0");
-        $name = sprintf("%s%s%s", $prefix, substr($firstName, 0, 1), substr($lastName, 0, $length - 1));
+        $name = sprintf("%s%s%s", $prefix, mb_substr($firstName, 0, 1), mb_substr($lastName, 0, $length - 1));
 
-        return trim(strtolower($name));
+        return trim(mb_strtolower($name));
     }
 
     public static function getPrefix($type)
@@ -129,22 +129,22 @@ class SCode
     {
         // getName should be 4 to 6 chars
         $name = self::getNameForCode($user, $this->getType());
-        $code = sprintf("%s%s", $name, str_pad($count, 8 - strlen($name), "0", STR_PAD_LEFT));
+        $code = sprintf("%s%s", $name, str_pad($count, 8 - mb_strlen($name), "0", STR_PAD_LEFT));
 
-        if (strlen($code) > 8) {
-            $code = substr($code, 0, 8);
+        if (mb_strlen($code) > 8) {
+            $code = mb_substr($code, 0, 8);
         }
-        if (strlen($code) != 8) {
+        if (mb_strlen($code) != 8) {
             throw new \Exception(sprintf('SCode %s is not 8 character', $code));
         }
 
-        $this->setCode(strtolower($code));
+        $this->setCode(mb_strtolower($code));
     }
 
     public function generateRandomCode()
     {
         $randBase64 = $this->removeDisallowedBase64Chars(base64_encode(random_bytes(12)));
-        $this->setCode(strtolower(substr($randBase64, 0, 8)));
+        $this->setCode(mb_strtolower(mb_substr($randBase64, 0, 8)));
     }
 
     public function removeDisallowedBase64Chars($string)

@@ -66,13 +66,8 @@ class ApiViewController extends BaseController
 
         $html = $this->renderView($template, $data);
         $noH1 = $request->get('noH1');
-        if ($noH1) {
-            $html = str_replace('<h3', '<h4', $html);
-            $html = str_replace('</h3', '</h4', $html);
-            $html = str_replace('<h2', '<h3', $html);
-            $html = str_replace('</h2', '</h3', $html);
-            $html = str_replace('<h1', '<h2', $html);
-            $html = str_replace('</h1', '</h2', $html);
+        if (!$noH1) {
+            $html = $this->upgradeHTags($html);
         }
 
         return new Response($html);
@@ -80,6 +75,7 @@ class ApiViewController extends BaseController
 
     /**
      * @Route("/policy/{id}/terms", name="policy_terms")
+     * @Route("/policy/v2/{id}/terms", name="policy_terms2")
      */
     public function policyTermsAction(Request $request, $id)
     {
@@ -112,6 +108,22 @@ class ApiViewController extends BaseController
             $policy->getPolicyTerms()->getVersionNumber()
         );
 
-        return $this->render($template, $data);
+        if ($request->get('_route') == 'policy_terms') {
+            $html = $this->renderView($template, $data);
+            return new Response($this->upgradeHTags($html));
+        } else {
+            return $this->render($template, $data);
+        }
+    }
+
+    private function upgradeHTags($html)
+    {
+        $html = str_replace('<h2', '<h1', $html);
+        $html = str_replace('</h2', '</h1', $html);
+        $html = str_replace('<h3', '<h2', $html);
+        $html = str_replace('</h3', '</h2', $html);
+        $html = str_replace('<h4', '<h3', $html);
+        $html = str_replace('</h4', '</h3', $html);
+        return $html;
     }
 }

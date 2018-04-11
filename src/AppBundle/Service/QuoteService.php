@@ -101,7 +101,7 @@ class QuoteService
      */
     private function unknownDevice($device, $memory)
     {
-        $searchDevice = (substr($device, 0, 4) == 'iPad') ? 'iPad' : $device;
+        $searchDevice = (mb_substr($device, 0, 4) == 'iPad') ? 'iPad' : $device;
         if (in_array($searchDevice, [
             "", "generic_x86", "generic_x86_64", "Simulator", "iPad",
         ])) {

@@ -34,7 +34,7 @@ class DefaultControllerTest extends BaseControllerTest
         
         // Not a perfect test, but unable to test js code via symfony client
         // This should at least detect if the custom tag manager code environment was accidental removed
-        $this->assertTrue(stripos($body, $tag) !== false);
+        $this->assertTrue(mb_stripos($body, $tag) !== false);
     }
 
     public function testIndexRedirect()

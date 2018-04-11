@@ -37,7 +37,7 @@ class JudopayCommand extends ContainerAwareCommand
         $pageSize = $input->getOption('pageSize');
         $judopay = $this->getContainer()->get('app.judopay');
         if ($receiptId) {
-            $details = $judopay->getReceipt($receiptId);
+            $details = $judopay->getReceipt($receiptId, false, false);
             $output->writeln(json_encode($details, JSON_PRETTY_PRINT));
         } else {
             $results = $judopay->getTransactions($pageSize);

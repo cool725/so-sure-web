@@ -2,6 +2,12 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Repository\Invitation\EmailInvitationRepository;
+use AppBundle\Repository\Invitation\InvitationRepository;
+use AppBundle\Repository\PhoneRepository;
+use AppBundle\Repository\PolicyRepository;
+use AppBundle\Repository\SCodeRepository;
+use AppBundle\Repository\UserRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -36,6 +42,7 @@ class OpsController extends BaseController
     {
         try {
             $dm = $this->getManager();
+            /** @var UserRepository $repo */
             $repo = $dm->getRepository(User::class);
             $user = $repo->find(1);
 
@@ -95,6 +102,7 @@ class OpsController extends BaseController
         }
         $validPolicy = null;
         $validPolicyMonthly = null;
+        $unpaidValidPolicyMonthly = null;
         $validPolicyYearly = null;
         $validMultiplePolicy = null;
         $validRenwalPolicyMonthlyNoPot = null;
@@ -106,23 +114,29 @@ class OpsController extends BaseController
         $claimedPolicy = null;
         $validRenwalPolicyMonthlyWithPot = null;
         $validRenwalPolicyYearlyWithPot = null;
+        $multiPayPolicy = null;
 
         $dm = $this->getManager();
+        /** @var SCodeRepository $scodeRepo */
         $scodeRepo = $dm->getRepository(SCode::class);
         $scode = $scodeRepo->findOneBy(['active' => true, 'type' => 'standard']);
 
+        /** @var EmailInvitationRepository $invitationRepo */
         $invitationRepo = $dm->getRepository(EmailInvitation::class);
         $invitation = $invitationRepo->findOneBy(['accepted' => null, 'rejected' => null, 'cancelled' => null]);
 
+        /** @var PhoneRepository $phoneRepo */
         $phoneRepo = $dm->getRepository(Phone::class);
         $activePhone = $phoneRepo->findOneBy(['active' => true]);
         $upcomingPhone = $phoneRepo->findOneBy(['active' => true, 'phonePrices' => null]);
 
+        /** @var PolicyRepository $policyRepo */
         $policyRepo = $dm->getRepository(Policy::class);
         $fullyExpiredPolicies = $policyRepo->findBy(['status' => Policy::STATUS_EXPIRED]);
         $fullyExpiredPolicyNoCashback = null;
         $fullyExpiredPolicyCashback = null;
         foreach ($fullyExpiredPolicies as $fullyExpiredPolicy) {
+            /** @var Policy $fullyExpiredPolicy */
             if (!$fullyExpiredPolicy->getCashback()) {
                 $fullyExpiredPolicyNoCashback = $fullyExpiredPolicy;
             } elseif ($fullyExpiredPolicy->getCashback() &&
@@ -135,6 +149,7 @@ class OpsController extends BaseController
         $expiredPolicyNoCashback = null;
         $expiredPolicyCashback = null;
         foreach ($expiredPolicies as $expiredPolicy) {
+            /** @var Policy $expiredPolicy */
             if (!$expiredPolicy->getCashback()) {
                 $expiredPolicyNoCashback = $expiredPolicy;
             } elseif ($expiredPolicy->getCashback() &&
@@ -166,31 +181,54 @@ class OpsController extends BaseController
         $cancelledPolicies = $policyRepo->findBy(['status' => Policy::STATUS_CANCELLED]);
         $position = rand(1, count($validPolicies));
         foreach ($validPolicies as $validPolicy) {
+            /** @var Policy $validPolicy */
             if ($position <= 0 && !$validPolicy->hasMonetaryClaimed()) {
                 break;
             }
             $position--;
         }
         foreach ($validPolicies as $validPolicyMonthly) {
+            /** @var Policy $validPolicyMonthly */
             if (!$validPolicyMonthly->hasMonetaryClaimed() &&
                 $validPolicyMonthly->getPremiumPlan() == Policy::PLAN_MONTHLY &&
-                count($validPolicyMonthly->getUser()->getValidPolicies(true)) == 1) {
+                count($validPolicyMonthly->getUser()->getValidPolicies(true)) == 1 &&
+                $validPolicyMonthly->isPolicyPaidToDate(new \DateTime())) {
                 break;
+            } else {
+                $validPolicyMonthly = null;
+            }
+        }
+        foreach ($validPolicies as $unpaidValidPolicyMonthly) {
+            /** @var Policy $unpaidValidPolicyMonthly */
+            if (!$unpaidValidPolicyMonthly->hasMonetaryClaimed() &&
+                $unpaidValidPolicyMonthly->getPremiumPlan() == Policy::PLAN_MONTHLY &&
+                count($unpaidValidPolicyMonthly->getUser()->getValidPolicies(true)) == 1 &&
+                !$unpaidValidPolicyMonthly->isPolicyPaidToDate(new \DateTime())) {
+                break;
+            } else {
+                $unpaidValidPolicyMonthly = null;
             }
         }
         foreach ($validPolicies as $validPolicyYearly) {
+            /** @var Policy $validPolicyYearly */
             if (!$validPolicyYearly->hasMonetaryClaimed() &&
                 $validPolicyYearly->getPremiumPlan() == Policy::PLAN_YEARLY) {
                 break;
+            } else {
+                $validPolicyYearly = null;
             }
         }
         foreach ($validPolicies as $validMultiplePolicy) {
+            /** @var Policy $validMultiplePolicy */
             $user = $validMultiplePolicy->getUser();
             if (count($user->getValidPolicies(true)) > 1 && $user->hasActivePolicy() && !$user->hasUnpaidPolicy()) {
                 break;
+            } else {
+                $validMultiplePolicy = null;
             }
         }
         foreach ($validPolicies as $validRenwalPolicyMonthlyNoPot) {
+            /** @var Policy $validRenwalPolicyMonthlyNoPot */
             if ($this->policyRenewalStatus($validRenwalPolicyMonthlyNoPot, false, Policy::PLAN_MONTHLY)) {
                 break;
             } else {
@@ -198,6 +236,7 @@ class OpsController extends BaseController
             }
         }
         foreach ($validPolicies as $validRenwalPolicyYearlyNoPot) {
+            /** @var Policy $validRenwalPolicyYearlyNoPot */
             if ($this->policyRenewalStatus($validRenwalPolicyYearlyNoPot, false, Policy::PLAN_YEARLY)) {
                 break;
             } else {
@@ -205,6 +244,7 @@ class OpsController extends BaseController
             }
         }
         foreach ($validPolicies as $validRenwalPolicyYearlyOnlyNoPot) {
+            /** @var Policy $validRenwalPolicyYearlyOnlyNoPot */
             if ($this->policyRenewalStatus($validRenwalPolicyYearlyOnlyNoPot, false, Policy::PLAN_YEARLY, true)) {
                 break;
             } else {
@@ -212,6 +252,7 @@ class OpsController extends BaseController
             }
         }
         foreach ($validPolicies as $validRenwalPolicyMonthlyWithPot) {
+            /** @var Policy $validRenwalPolicyMonthlyWithPot */
             if ($this->policyRenewalStatus($validRenwalPolicyMonthlyWithPot, true, Policy::PLAN_MONTHLY)) {
                 break;
             } else {
@@ -219,6 +260,7 @@ class OpsController extends BaseController
             }
         }
         foreach ($validPolicies as $validRenwalPolicyYearlyWithPot) {
+            /** @var Policy $validRenwalPolicyYearlyWithPot */
             if ($this->policyRenewalStatus($validRenwalPolicyYearlyWithPot, true, Policy::PLAN_YEARLY)) {
                 break;
             } else {
@@ -226,6 +268,7 @@ class OpsController extends BaseController
             }
         }
         foreach ($validPolicies as $validRenwalPolicyYearlyOnlyWithPot) {
+            /** @var Policy $validRenwalPolicyYearlyOnlyWithPot */
             if ($this->policyRenewalStatus($validRenwalPolicyYearlyOnlyWithPot, true, Policy::PLAN_YEARLY, true)) {
                 break;
             } else {
@@ -233,6 +276,7 @@ class OpsController extends BaseController
             }
         }
         foreach ($validPolicies as $validRemainderPolicy) {
+            /** @var Policy $validRemainderPolicy */
             if ($validRemainderPolicy->getPremiumPlan() == Policy::PLAN_MONTHLY &&
                 $validRemainderPolicy->getOutstandingPremiumToDate() > 0) {
                 break;
@@ -241,13 +285,23 @@ class OpsController extends BaseController
             }
         }
         foreach ($validPolicies as $claimedPolicy) {
+            /** @var Policy $claimedPolicy */
             if ($claimedPolicy->hasMonetaryClaimed()) {
                 break;
             } else {
                 $claimedPolicy = null;
             }
         }
+        foreach ($validPolicies as $multiPayPolicy) {
+            /** @var Policy $multiPayPolicy */
+            if ($multiPayPolicy->isDifferentPayer()) {
+                break;
+            } else {
+                $multiPayPolicy = null;
+            }
+        }
         foreach ($cancelledPolicies as $policyCancelledAndPaymentOwed) {
+            /** @var Policy $policyCancelledAndPaymentOwed */
             if ($policyCancelledAndPaymentOwed->isCancelledAndPaymentOwed()) {
                 break;
             } else {
@@ -273,6 +327,7 @@ class OpsController extends BaseController
             'unpaid_policydiscount_policy' => $unpaidPolicyDiscountPolicy,
             'valid_policy' => $validPolicy,
             'valid_policy_monthly' => $validPolicyMonthly,
+            'unpaid_valid_policy_monthly' => $unpaidValidPolicyMonthly,
             'valid_policy_annual' => $validPolicyYearly,
             'cancelled_fraud_policy' => $cancelledFraudPolicy,
             'cancelled_policy' => $cancelledPolicy,
@@ -286,6 +341,7 @@ class OpsController extends BaseController
             'valid_remainder_policy' => $validRemainderPolicy,
             'policy_cancelled_payment_owed' => $policyCancelledAndPaymentOwed,
             'claimed_policy' => $claimedPolicy,
+            'multipay_policy' => $multiPayPolicy,
             'expired_policy_nocashback' => $expiredPolicyNoCashback,
             'expired_policy_cashback' => $expiredPolicyCashback,
             'fully_expired_policy_nocashback' => $fullyExpiredPolicyNoCashback,
@@ -356,7 +412,7 @@ class OpsController extends BaseController
         }
 
         if (isset($violationReport['csp-report']['blocked-uri'])) {
-            $host = strtolower(parse_url($violationReport['csp-report']['blocked-uri'], PHP_URL_HOST));
+            $host = mb_strtolower(parse_url($violationReport['csp-report']['blocked-uri'], PHP_URL_HOST));
             if (in_array($host, [
                 'nikkomsgchannel',
                 'www.bizographics.com',
@@ -387,7 +443,7 @@ class OpsController extends BaseController
                 return new JsonResponse(['details' => 'Ignore Ip'], 204);
             }
 
-            if (in_array(strtolower($violationReport['csp-report']['blocked-uri']), [
+            if (in_array(mb_strtolower($violationReport['csp-report']['blocked-uri']), [
                 'blob'
             ])) {
                 $logger->debug(sprintf(
@@ -398,7 +454,7 @@ class OpsController extends BaseController
                 return new JsonResponse(['details' => 'Ignore url'], 204);
             }
 
-            $scheme = strtolower(parse_url($violationReport['csp-report']['blocked-uri'], PHP_URL_SCHEME));
+            $scheme = mb_strtolower(parse_url($violationReport['csp-report']['blocked-uri'], PHP_URL_SCHEME));
             if (in_array($scheme, [
                 'ms-appx-web',
                 'none',
@@ -413,8 +469,8 @@ class OpsController extends BaseController
 
         // any violation on http are not relivant - should only be https
         if (isset($violationReport['csp-report']['document-uri'])) {
-            $host = strtolower(parse_url($violationReport['csp-report']['document-uri'], PHP_URL_HOST));
-            $scheme = strtolower(parse_url($violationReport['csp-report']['document-uri'], PHP_URL_SCHEME));
+            $host = mb_strtolower(parse_url($violationReport['csp-report']['document-uri'], PHP_URL_HOST));
+            $scheme = mb_strtolower(parse_url($violationReport['csp-report']['document-uri'], PHP_URL_SCHEME));
             if ($scheme == "http" && $host == "wearesosure.com") {
                 $logger->debug(sprintf('Content-Security-Policy called with non-https host: %s', $host));
 
