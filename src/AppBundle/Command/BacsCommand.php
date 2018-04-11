@@ -161,13 +161,6 @@ class BacsCommand extends BaseCommand
             $output->writeln(json_encode($debitPayments, JSON_PRETTY_PRINT));
         }
 
-        $output->writeln('Exporting Credit Payments');
-        $creditPayments = $bacsService->exportPaymentsCredits($prefix, $processingDate, $serialNumber, $data);
-        $data['credits'] = count($creditPayments);
-        if ($debug) {
-            $output->writeln(json_encode($creditPayments, JSON_PRETTY_PRINT));
-        }
-
         $lines = array_merge($mandateCancellations, $mandates, $debitPayments);
         if (count($lines) == 0) {
             $output->writeln('No data present. Skipping upload(s)');
