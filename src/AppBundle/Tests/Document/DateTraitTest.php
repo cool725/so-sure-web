@@ -119,4 +119,22 @@ class DateTraitTest extends \PHPUnit\Framework\TestCase
             $this->subBusinessDays(new \DateTime('2018-01-02 00:00'), 1)
         );
     }
+
+    public function testCurrentOrNextBusinessDay()
+    {
+        $this->assertEquals(
+            new \DateTime('2018-03-29 00:00'),
+            $this->getCurrentOrNextBusinessDay(new \DateTime('2018-03-29 00:00'))
+        );
+
+        $this->assertEquals(
+            new \DateTime('2018-04-03 00:00'),
+            $this->getCurrentOrNextBusinessDay(new \DateTime('2018-03-30 00:00'))
+        );
+
+        $this->assertEquals(
+            new \DateTime('2018-04-16 00:00'),
+            $this->getCurrentOrNextBusinessDay(new \DateTime('2018-04-14 00:00'))
+        );
+    }
 }

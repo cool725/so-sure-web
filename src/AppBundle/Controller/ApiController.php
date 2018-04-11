@@ -83,7 +83,7 @@ class ApiController extends BaseController
             $repo = $dm->getRepository(User::class);
             $user = null;
             if ($emailUserData) {
-                $email = strtolower($this->getDataString($emailUserData, 'email'));
+                $email = mb_strtolower($this->getDataString($emailUserData, 'email'));
                 $user = $repo->findOneBy(['emailCanonical' => $email]);
             } elseif ($facebookUserData) {
                 $facebookId = $this->getDataString($facebookUserData, 'facebook_id');
@@ -293,7 +293,7 @@ class ApiController extends BaseController
 
             $dm = $this->getManager();
             $repo = $dm->getRepository(User::class);
-            $email = strtolower($this->getRequestString($request, 'email'));
+            $email = mb_strtolower($this->getRequestString($request, 'email'));
             $user = $repo->findOneBy(['emailCanonical' => $email]);
             if (!$user) {
                 return $this->getErrorJsonResponse(
@@ -330,7 +330,7 @@ class ApiController extends BaseController
             if (!$this->validateFields($data, ['email', 'referral_code'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
-            $email = strtolower($this->getDataString($data, 'email'));
+            $email = mb_strtolower($this->getDataString($data, 'email'));
             $referralCode = $this->getDataString($data, 'referral_code');
 
             $dm = $this->getManager();
@@ -374,7 +374,7 @@ class ApiController extends BaseController
             if (!$this->validateFields($data, ['email'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
-            $email = strtolower($this->getDataString($data, 'email'));
+            $email = mb_strtolower($this->getDataString($data, 'email'));
 
             $dm = $this->getManager();
             $repo = $dm->getRepository(User::class);
@@ -436,6 +436,7 @@ class ApiController extends BaseController
 
     /**
      * @Route("/policy/terms", name="api_get_policy_terms")
+     * @Route("/policy/v2/terms", name="api_get_policy_terms2")
      * @Method({"GET"})
      */
     public function getLatestTermsAction(Request $request)
@@ -455,8 +456,13 @@ class ApiController extends BaseController
                     404
                 );
             }
+            if ($request->get('_route') == 'api_get_policy_terms') {
+                $termsRoute = 'latest_policy_terms';
+            } else {
+                $termsRoute = 'latest_policy_terms2';
+            }
             $policyTermsRoute = $this->get('router')->generate(
-                'latest_policy_terms',
+                $termsRoute,
                 [
                     'policy_key' => $this->getParameter('policy_key'),
                     'maxPotValue' => $this->getRequestString($request, 'maxPotValue'),
@@ -583,7 +589,7 @@ class ApiController extends BaseController
                 // Special case for prelaunch users - allow them to 'create' an account without
                 // being recreated in account in the db.  This is only allowed once per user
                 // and is only because the prelaunch app didn't do anything other than record email address
-                $user = $repo->findOneBy(['emailCanonical' => strtolower($this->getDataString($data, 'email'))]);
+                $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($this->getDataString($data, 'email'))]);
                 if ($user && $user->isPreLaunch() && !$user->getLastLogin() && count($user->getPolicies()) == 0) {
                     $user->resetToken();
                     $user->setLastLogin(new \DateTime());
@@ -603,12 +609,12 @@ class ApiController extends BaseController
             $user->setEmail($this->getDataString($data, 'email'));
             $user->setFirstName(
                 isset($data['first_name']) ?
-                ucfirst(strtolower($this->conformAlphanumeric($this->getDataString($data, 'first_name'), 50))) :
+                ucfirst(mb_strtolower($this->conformAlphanumeric($this->getDataString($data, 'first_name'), 50))) :
                 null
             );
             $user->setLastName(
                 isset($data['last_name']) ?
-                ucfirst(strtolower($this->conformAlphanumeric($this->getDataString($data, 'last_name'), 50))) :
+                ucfirst(mb_strtolower($this->conformAlphanumeric($this->getDataString($data, 'last_name'), 50))) :
                 null
             );
             $user->setFacebookId($this->getDataString($data, 'facebook_id'));

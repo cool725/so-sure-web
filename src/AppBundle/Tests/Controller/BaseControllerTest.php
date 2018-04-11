@@ -199,7 +199,7 @@ class BaseControllerTest extends WebTestCase
             'search-phone-form-header'
         );
         foreach ($keys as $key) {
-            if (strpos($item, $key) !== false) {
+            if (mb_strpos($item, $key) !== false) {
                 return true;
             }
         }

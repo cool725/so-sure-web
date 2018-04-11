@@ -8,7 +8,7 @@ trait GravatarTrait
     {
         return sprintf(
             'https://www.gravatar.com/avatar/%s?d=404&s=%d',
-            md5(strtolower(trim($email))),
+            md5(mb_strtolower(trim($email))),
             $size
         );
     }
@@ -17,7 +17,7 @@ trait GravatarTrait
     {
         return sprintf(
             'https://www.gravatar.com/avatar/%s?s=%d&d=%s',
-            md5(strtolower(trim($email))),
+            md5(mb_strtolower(trim($email))),
             $size,
             urlencode($fallback)
         );

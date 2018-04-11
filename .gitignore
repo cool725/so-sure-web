@@ -35,3 +35,4 @@ VagrantfileExtra.rb
 /backup
 *.backup
 deploy/*
+.php_cs.cache

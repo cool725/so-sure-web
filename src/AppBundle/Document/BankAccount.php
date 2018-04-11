@@ -3,6 +3,7 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Classes\SoSure;
 use FOS\UserBundle\Document\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -248,7 +249,7 @@ class BankAccount
 
     public function generateReference(User $user, $sequence)
     {
-        $reference = sprintf('%s5%010d', strtoupper(substr($user->getLastName(), 0, 1)), $sequence);
+        $reference = sprintf('%s5%010d', mb_strtoupper(mb_substr($user->getLastName(), 0, 1)), $sequence);
         $this->setReference($reference);
         $this->setFirstPayment(true);
 
@@ -409,7 +410,7 @@ class BankAccount
     public function getPaymentDate(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = new \DateTime('now', new \DateTimeZone(SoSure::TIMEZONE));
         }
 
         $days = 4;
@@ -422,6 +423,40 @@ class BankAccount
         }
 
         return $this->addBusinessDays($date, $days);
+    }
+
+    public function getFirstPaymentDate(User $user, \DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime('now', new \DateTimeZone(SoSure::TIMEZONE));
+        }
+        $useClosestPaymentDate = false;
+        $nextPolicyPaymentDate = null;
+        foreach ($user->getValidPolicies(true) as $policy) {
+            /** @var Policy $policy */
+            if (!$policy->isPolicyPaidToDate($date)) {
+                $useClosestPaymentDate = true;
+            } else {
+                $nextPolicyPaymentDate = $policy->getNextBillingDate($date);
+            }
+        }
+
+        $bacsPaymentDate = $this->getPaymentDate($date);
+        /*
+        print sprintf(
+            'c: %s bacs: %s next: %s',
+            $useClosestPaymentDate ? 'y' : 'n',
+            $bacsPaymentDate->format('y-m-d'),
+            $nextPolicyPaymentDate->format('y-m-d')
+        );
+        */
+        if (!$nextPolicyPaymentDate) {
+            return $bacsPaymentDate;
+        } elseif ($useClosestPaymentDate || $nextPolicyPaymentDate < $bacsPaymentDate) {
+            return $bacsPaymentDate;
+        } else {
+            return $nextPolicyPaymentDate;
+        }
     }
 
     public function __toString()

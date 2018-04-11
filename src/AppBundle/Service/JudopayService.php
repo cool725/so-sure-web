@@ -33,6 +33,8 @@ class JudopayService
 {
     use CurrencyTrait;
 
+    const MAX_HOUR_DELAY_FOR_RECEIPTS = 2;
+
     /** Standard payment (monthly/yearly; initial payment */
     const WEB_TYPE_STANDARD = 'standard';
 
@@ -329,6 +331,12 @@ class JudopayService
             $this->dm->flush();
         }
 
+        // if a multipay user runs a payment direct on the policy, assume they want to remove multipay
+        if ($policy->isDifferentPayer()) {
+            $policy->setPayer($policy->getUser());
+            $this->dm->flush();
+        }
+
         $this->statsd->endTiming("judopay.add");
 
         return true;
@@ -466,7 +474,11 @@ class JudopayService
         return $details;
     }
 
-    public function getReceipt($receiptId)
+    /**
+     * TODO: Adjust $enforceFullAmount to true once production has validated its safe to use
+     * TODO: Adjust $enforceDate to true once production has validated its safe to use
+     */
+    public function getReceipt($receiptId, $enforceFullAmount = false, $enforceDate = false, \DateTime $date = null)
     {
         $transaction = $this->apiClient->getModel('Transaction');
 
@@ -482,6 +494,44 @@ class JudopayService
             throw $e;
         }
 
+        if ($transactionDetails['amount'] != $transactionDetails['netAmount']) {
+            $msg = sprintf(
+                'Judo receipt %s has a refund applied (net %s of %s).',
+                $receiptId,
+                $transactionDetails['netAmount'],
+                $transactionDetails['amount']
+            );
+            if ($enforceFullAmount) {
+                $this->logger->error($msg);
+
+                throw new \Exception($msg);
+            } else {
+                $this->logger->warning($msg);
+            }
+        }
+
+        // "2018-02-22T22:46:10.9625+00:00"
+        $created = \DateTime::createFromFormat("Y-m-d\TH:i:s.uP", $transactionDetails['createdAt']);
+        if (!$date) {
+            $date = new \DateTime();
+        }
+        $diff = $date->diff($created);
+        if ($diff->days > 0 || $diff->h >= self::MAX_HOUR_DELAY_FOR_RECEIPTS) {
+            $msg = sprintf(
+                'Judo receipt %s is older than expected (%d:%d hours).',
+                $receiptId,
+                $diff->days,
+                $diff->h
+            );
+            if ($enforceDate) {
+                $this->logger->error($msg);
+
+                throw new \Exception($msg);
+            } else {
+                $this->logger->warning($msg);
+            }
+        }
+
         return $transactionDetails;
     }
 
@@ -491,13 +541,15 @@ class JudopayService
      * @param string $consumerToken
      * @param string $cardToken     Can be null if card is declined
      * @param string $deviceDna     Optional device dna data (json encoded) for judoshield
+     * @parma Policy $policy
      */
     public function updatePaymentMethod(
         User $user,
         $receiptId,
         $consumerToken,
         $cardToken,
-        $deviceDna = null
+        $deviceDna = null,
+        Policy $policy = null
     ) {
         $transactionDetails = $this->getReceipt($receiptId);
         if ($transactionDetails["result"] != JudoPayment::RESULT_SUCCESS) {
@@ -521,6 +573,13 @@ class JudopayService
         }
         if ($deviceDna) {
             $judo->setDeviceDna($deviceDna);
+        }
+
+        // if a multipay user runs a payment direct on the policy, assume they want to remove multipay
+        if ($policy && $policy->isDifferentPayer()) {
+            // don't use $user as not validated that policy belongs to user
+            $policy->setPayer($policy->getUser());
+            $this->dm->flush();
         }
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
     }

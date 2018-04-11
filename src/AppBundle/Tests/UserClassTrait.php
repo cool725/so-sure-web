@@ -124,7 +124,7 @@ trait UserClassTrait
     public static function generateRandomMobile()
     {
         $mobile = sprintf('+4477009%05d', rand(1, 99999));
-        if (strlen($mobile) != 13) {
+        if (mb_strlen($mobile) != 13) {
             throw new \Exception('Random mobile is not the right length');
         }
 
@@ -244,7 +244,7 @@ trait UserClassTrait
         self::addPayment($policy, $premium, $commission, $receiptId);
     }
 
-    public static function addBacsPayPayment($policy, $date = null, $monthly = true)
+    public static function addBacsPayPayment($policy, $date = null, $monthly = true, $manual = true)
     {
         if ($monthly) {
             $policy->setPremiumInstallments(12);
@@ -256,7 +256,7 @@ trait UserClassTrait
             $commission = Salva::YEARLY_TOTAL_COMMISSION;
         }
 
-        self::addBacsPayment($policy, $premium, $commission, $date);
+        return self::addBacsPayment($policy, $premium, $commission, $date, $manual);
     }
 
     public static function runJudoPayPayment($judopay, User $user, Policy $policy, $amount)
@@ -289,10 +289,11 @@ trait UserClassTrait
         return $payment;
     }
 
-    public static function addBacsPayment($policy, $amount, $commission, $date = null)
+    public static function addBacsPayment($policy, $amount, $commission, $date = null, $manual = true)
     {
         $payment = new BacsPayment();
-        $payment->setManual(true);
+        $payment->setManual($manual);
+        $payment->setStatus(BacsPayment::STATUS_SUCCESS);
         $payment->setSuccess(true);
         $payment->setAmount($amount);
         $payment->setTotalCommission($commission);
@@ -338,6 +339,10 @@ trait UserClassTrait
         $invitationService->accept($invitation, $policyB, $date);
     }
 
+    /**
+     * @param DocumentManager $dm
+     * @return PolicyTerms
+     */
     public static function getLatestPolicyTerms(\Doctrine\ODM\MongoDB\DocumentManager $dm)
     {
         $policyTermsRepo = $dm->getRepository(PolicyTerms::class);

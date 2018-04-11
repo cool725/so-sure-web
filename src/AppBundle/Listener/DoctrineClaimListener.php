@@ -35,7 +35,7 @@ class DoctrineClaimListener
         $document = $eventArgs->getDocument();
         if ($document instanceof Claim) {
             if ($eventArgs->hasChangedField('status') &&
-                strtolower($eventArgs->getOldValue('status')) != strtolower($eventArgs->getNewValue('status'))) {
+                mb_strtolower($eventArgs->getOldValue('status')) != mb_strtolower($eventArgs->getNewValue('status'))) {
                 if ($eventType = $this->getEventType($eventArgs->getNewValue('status'))) {
                     $this->triggerEvent($document, $eventType);
                 }

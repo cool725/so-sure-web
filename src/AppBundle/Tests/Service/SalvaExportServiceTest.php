@@ -105,12 +105,12 @@ class SalvaExportServiceTest extends WebTestCase
 
         $xml = static::$salva->createXml($policy);
         $this->assertTrue(static::$salva->validate($xml, SalvaExportService::SCHEMA_POLICY_IMPORT));
-        $this->assertGreaterThan(0, stripos($xml, $user->getId()));
+        $this->assertGreaterThan(0, mb_stripos($xml, $user->getId()));
 
         $tariff = sprintf('<ns2:tariffDate>%s</ns2:tariffDate>', static::$salva->adjustDate($issueDate));
         $tariff2 = sprintf('<ns2:tariffDate>%s</ns2:tariffDate>', static::$salva->adjustDate($issueDate2));
         $this->assertTrue(
-            stripos($xml, $tariff) !== false || stripos($xml, $tariff2) !== false,
+            mb_stripos($xml, $tariff) !== false || mb_stripos($xml, $tariff2) !== false,
             sprintf('%s or %s not found in %s', $tariff, $tariff2, $xml)
         );
 
@@ -122,7 +122,7 @@ class SalvaExportServiceTest extends WebTestCase
             '<ns2:insurancePeriodStart>%s</ns2:insurancePeriodStart>',
             static::$salva->adjustDate($issueDate2)
         );
-        $this->assertTrue(stripos($xml, $startDate) !== false || stripos($xml, $startDate2) !== false);
+        $this->assertTrue(mb_stripos($xml, $startDate) !== false || mb_stripos($xml, $startDate2) !== false);
     }
 
     public function testCreateXmlRenewal()
@@ -144,11 +144,11 @@ class SalvaExportServiceTest extends WebTestCase
 
         $xml = static::$salva->createXml($policy);
         $this->assertTrue(static::$salva->validate($xml, SalvaExportService::SCHEMA_POLICY_IMPORT));
-        $this->assertGreaterThan(0, stripos($xml, $user->getId()));
+        $this->assertGreaterThan(0, mb_stripos($xml, $user->getId()));
 
         $tariff = sprintf('<ns2:tariffDate>%s</ns2:tariffDate>', static::$salva->adjustDate($issueDate));
         $tariff2 = sprintf('<ns2:tariffDate>%s</ns2:tariffDate>', static::$salva->adjustDate($issueDate2));
-        $this->assertTrue(stripos($xml, $tariff) !== false || stripos($xml, $tariff2) !== false);
+        $this->assertTrue(mb_stripos($xml, $tariff) !== false || mb_stripos($xml, $tariff2) !== false);
 
         $startDate = sprintf(
             '<ns2:insurancePeriodStart>%s</ns2:insurancePeriodStart>',
@@ -175,7 +175,7 @@ class SalvaExportServiceTest extends WebTestCase
 
         $xml = static::$salva->createXml($policy);
         $this->assertTrue(static::$salva->validate($xml, SalvaExportService::SCHEMA_POLICY_IMPORT));
-        $this->assertGreaterThan(0, stripos($xml, $company->getId()));
+        $this->assertGreaterThan(0, mb_stripos($xml, $company->getId()));
     }
 
     public function testNonProdInvalidPolicyQueue()
@@ -678,7 +678,7 @@ class SalvaExportServiceTest extends WebTestCase
         foreach (static::$salva->exportPolicies(null) as $line) {
             $data = explode(",", $line);
             $search = sprintf('"%s', $policyNumber);
-            if (stripos($data[0], $search) === 0) {
+            if (mb_stripos($data[0], $search) === 0) {
                 $lines[] = $line;
             }
         }
@@ -692,7 +692,7 @@ class SalvaExportServiceTest extends WebTestCase
         foreach (static::$salva->exportPayments(null, $date) as $line) {
             $data = explode(",", $line);
             $search = sprintf('"%s', $policyNumber);
-            if (stripos($data[0], $search) === 0) {
+            if (mb_stripos($data[0], $search) === 0) {
                 $lines[] = $line;
             }
         }

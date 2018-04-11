@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Form\Type\BacsMandatesType;
 use AppBundle\Form\Type\BacsUploadFileType;
 use AppBundle\Repository\File\S3FileRepository;
@@ -636,6 +637,43 @@ class AdminController extends BaseController
     }
 
     /**
+     * @Route("/bacs/submission/{id}", name="admin_bacs_submission")
+     * @Method({"POST"})
+     */
+    public function bacsSubmissionAction(Request $request, $id)
+    {
+        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
+            throw new \InvalidArgumentException('Invalid csrf token');
+        }
+
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(AccessPayFile::class);
+        /** @var AccessPayFile $file */
+        $file = $repo->find($id);
+        if ($file) {
+            $file->setSubmitted(true);
+
+            $paymentRepo = $dm->getRepository(BacsPayment::class);
+            $payments = $paymentRepo->findBy([
+                'serialNumber' => $file->getSerialNumber(),
+                'status' => BacsPayment::STATUS_GENERATED
+            ]);
+            foreach ($payments as $payment) {
+                $payment->setStatus(BacsPayment::STATUS_TRANSFFER_WAIT_EXCEPTION);
+            }
+
+            $dm->flush();
+            $message = sprintf('Bacs file %s is marked as submitted', $file->getFileName());
+            $this->addFlash(
+                'success',
+                $message
+            );
+        }
+
+        return new RedirectResponse($this->generateUrl('admin_bacs'));
+    }
+
+    /**
      * @Route("/banking", name="admin_banking")
      * @Route("/banking/{year}/{month}", name="admin_banking_date")
      * @Template
@@ -738,13 +776,13 @@ class AdminController extends BaseController
         $dailyBarclaysProcessing = BarclaysFile::combineDailyProcessing($barclaysFiles);
         $totalTransaction = 0;
         foreach ($dailyTransaction as $key => $value) {
-            if (stripos($key, sprintf('%d%02d', $year, $month)) !== false) {
+            if (mb_stripos($key, sprintf('%d%02d', $year, $month)) !== false) {
                 $totalTransaction += (float) $value;
             }
         }
         $totalBarclaysProcessing = 0;
         foreach ($dailyBarclaysProcessing as $key => $value) {
-            if (stripos($key, sprintf('%d%02d', $year, $month)) !== false) {
+            if (mb_stripos($key, sprintf('%d%02d', $year, $month)) !== false) {
                 $totalBarclaysProcessing += (float) $value;
             }
         }
@@ -754,13 +792,13 @@ class AdminController extends BaseController
         $dailyLloydsProcessing = LloydsFile::combineDailyProcessing($lloydsFiles);
         $totalReceived = 0;
         foreach ($dailyReceived as $key => $value) {
-            if (stripos($key, sprintf('%d%02d', $year, $month)) !== false) {
+            if (mb_stripos($key, sprintf('%d%02d', $year, $month)) !== false) {
                 $totalReceived += (float) $value;
             }
         }
         $totalLloydsProcessing = 0;
         foreach ($dailyLloydsProcessing as $key => $value) {
-            if (stripos($key, sprintf('%d%02d', $year, $month)) !== false) {
+            if (mb_stripos($key, sprintf('%d%02d', $year, $month)) !== false) {
                 $totalLloydsProcessing += (float) $value;
             }
         }

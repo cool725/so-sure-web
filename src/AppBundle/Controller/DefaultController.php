@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Service\RequestService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
@@ -97,13 +98,9 @@ class DefaultController extends BaseController
      */
     public function moneyLanding(Request $request)
     {
-        $exp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_MONEY_UNBOUNCE,
-            ['sosure', 'unbounce'],
-            SixpackService::LOG_MIXPANEL_CONVERSION
-        );
-        if ($exp == 'sosure') {
+        /** @var RequestService $requestService */
+        $requestService = $this->get('app.request');
+        if ($requestService->getDeviceCategory() == RequestService::DEVICE_CATEGORY_MOBILE) {
             return $this->redirectToRoute('homepage');
         } else {
             return new RedirectResponse(sprintf(

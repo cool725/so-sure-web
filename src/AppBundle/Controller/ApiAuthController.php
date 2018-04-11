@@ -136,7 +136,7 @@ class ApiAuthController extends BaseController
 
             $dm = $this->getManager();
             $policyRepo = $dm->getRepository(Policy::class);
-            if ($suggestedImei && strlen($suggestedImei) > 0) {
+            if ($suggestedImei && mb_strlen($suggestedImei) > 0) {
                 $policies = $policyRepo->findBy(['imei' => $suggestedImei]);
             } else {
                 $policies = [];
@@ -848,7 +848,7 @@ class ApiAuthController extends BaseController
                     $invitation = $invitationService->inviteBySms($policy, $mobile, $name, $skipSend);
                 } elseif ($scode && SCode::isValidSCode($scode)) {
                     $invitation = $invitationService->inviteBySCode($policy, $scode);
-                } elseif ($facebookId && strlen($facebookId) > 5 && strlen($facebookId) < 150) {
+                } elseif ($facebookId && mb_strlen($facebookId) > 5 && mb_strlen($facebookId) < 150) {
                     $invitation = $invitationService->inviteByFacebookId($policy, $facebookId);
                 } else {
                     // TODO: General
@@ -1119,7 +1119,7 @@ class ApiAuthController extends BaseController
                 'Key'    => $this->getDataString($data, 'key'),
             ));
 
-            if (!in_array($result['ContentType'], array('image/jpeg', 'image/png'))) {
+            if (!in_array($result['ContentType'], array('image/jpeg', 'image/png', 'binary/octet-stream'))) {
                 $msg = sprintf(
                     'Invalid file s3://%s/%s of type %s',
                     $this->getDataString($data, 'bucket'),
@@ -1527,9 +1527,10 @@ class ApiAuthController extends BaseController
 
     /**
      * @Route("/policy/{id}/terms", name="api_auth_get_policy_terms")
+     * @Route("/policy/v2/{id}/terms", name="api_auth_get_policy_terms2")
      * @Method({"GET"})
      */
-    public function getPolicyTermsAction($id)
+    public function getPolicyTermsAction(Request $request, $id)
     {
         try {
             $dm = $this->getManager();
@@ -1550,8 +1551,13 @@ class ApiAuthController extends BaseController
                 );
             }
             $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+            if ($request->get('_route') == 'api_auth_get_policy_terms') {
+                $termsRoute = 'policy_terms';
+            } else {
+                $termsRoute = 'policy_terms2';
+            }
             $policyTermsRoute = $this->get('router')->generate(
-                'policy_terms',
+                $termsRoute,
                 [
                     'id' => $policy->getId(),
                     'policy_key' => $this->getParameter('policy_key'),
@@ -1699,11 +1705,11 @@ class ApiAuthController extends BaseController
 
             // only need to check for dups for these fields if they have changed
             $emailCheck = null;
-            if (strlen($email) > 0 && $user->getEmailCanonical() != strtolower($email)) {
+            if (mb_strlen($email) > 0 && $user->getEmailCanonical() != mb_strtolower($email)) {
                 $emailCheck = $email;
             }
             $mobileCheck = null;
-            if (strlen($mobileNumber) > 0 && $user->getMobileNumber() != $mobileNumber) {
+            if (mb_strlen($mobileNumber) > 0 && $user->getMobileNumber() != $mobileNumber) {
                 $mobileCheck = $mobileNumber;
             }
             $facebookCheck = null;
@@ -1722,11 +1728,11 @@ class ApiAuthController extends BaseController
             }
 
             $userChanged = false;
-            if (strlen($mobileNumber) > 0 && $user->getMobileNumber() != $mobileNumber) {
+            if (mb_strlen($mobileNumber) > 0 && $user->getMobileNumber() != $mobileNumber) {
                 $user->setMobileNumber($mobileNumber);
                 $userChanged = true;
             }
-            if (strlen($email) > 0 && $user->getEmailCanonical() != strtolower($email)) {
+            if (mb_strlen($email) > 0 && $user->getEmailCanonical() != mb_strtolower($email)) {
                 $user->setEmail($email);
                 $userChanged = true;
             }

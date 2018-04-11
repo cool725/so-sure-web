@@ -37,7 +37,7 @@ class JWTServiceTest extends WebTestCase
     {
         $cognitoId = '1234';
         $token = self::$jwt->create($cognitoId, ['foo' => 'bar']);
-        $this->assertTrue(strlen($token) > 50);
+        $this->assertTrue(mb_strlen($token) > 50);
 
         $data = self::$jwt->validate($cognitoId, $token);
         $this->assertEquals('bar', $data['foo']);
@@ -74,7 +74,7 @@ class JWTServiceTest extends WebTestCase
     {
         $cognitoId = '1234';
         $token = self::$jwt->create($cognitoId, ['foo' => 'bar']);
-        $this->assertTrue(strlen($token) > 50);
+        $this->assertTrue(mb_strlen($token) > 50);
 
         $data = self::$jwt->validate('1', $token);
     }

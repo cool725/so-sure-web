@@ -40,24 +40,28 @@ class MultiPay
     /**
      * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy")
      * @Gedmo\Versioned
+     * @var Policy
      */
     protected $policy;
 
     /**
      * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User")
      * @Gedmo\Versioned
+     * @var User
      */
     protected $payer;
 
     /**
      * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User")
      * @Gedmo\Versioned
+     * @var User
      */
     protected $payee;
 
     /**
      * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\SCode")
      * @Gedmo\Versioned
+     * @var SCode
      */
     protected $scode;
 
@@ -107,6 +111,9 @@ class MultiPay
         }
     }
 
+    /**
+     * @return Policy
+     */
     public function getPolicy()
     {
         return $this->policy;
@@ -117,6 +124,9 @@ class MultiPay
         $this->policy = $policy;
     }
 
+    /**
+     * @return User
+     */
     public function getPayee()
     {
         return $this->payee;
@@ -127,6 +137,9 @@ class MultiPay
         $this->payee = $payee;
     }
 
+    /**
+     * @return User
+     */
     public function getPayer()
     {
         return $this->payer;
@@ -136,7 +149,10 @@ class MultiPay
     {
         $this->payer = $payer;
     }
-    
+
+    /**
+     * @return SCode
+     */
     public function getSCode()
     {
         return $this->scode;

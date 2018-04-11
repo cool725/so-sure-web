@@ -2,6 +2,7 @@
 namespace AppBundle\Service;
 
 use AppBundle\Document\Cashback;
+use AppBundle\Document\File\AccessPayFile;
 use Psr\Log\LoggerInterface;
 use GuzzleHttp\Client;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -346,6 +347,39 @@ class MonitorService
                     $version
                 ));
             }
+        }
+    }
+
+    public function bacsSubmitted()
+    {
+        $repo = $this->dm->getRepository(AccessPayFile::class);
+        $unsubmitted = $repo->findOneBy(['submitted' => ['$ne' => true]]);
+        if ($unsubmitted) {
+            throw new MonitorException(sprintf(
+                'There is a bacs file (%s) that has not been marked as submitted',
+                $unsubmitted->getId()
+            ));
+        }
+    }
+
+    public function bankHolidays(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+        $holidays = DateTrait::getBankHolidays();
+        usort($holidays, function ($a, $b) {
+            return $a < $b;
+        });
+        $holiday = $holidays[0];
+        //print_r($holiday);
+        $diff = $holiday->diff($date);
+        //print_r($diff);
+        if ($diff->days < 90) {
+            throw new MonitorException(sprintf(
+                'Last holiday %s is coming up. Add more holidays',
+                $holiday->format('d/m/Y')
+            ));
         }
     }
 }

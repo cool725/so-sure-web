@@ -16,7 +16,7 @@ use AppBundle\Service\SixpackService;
  *
  * AppBundle\\Tests\\Controller\\ApiPartialControllerTest
  */
-class ApiPartialControllerTest extends BaseControllerTest
+class ApiPartialControllerTest extends BaseApiControllerTest
 {
     protected static $endpoint1;
     protected static $endpoint2;
@@ -129,8 +129,8 @@ class ApiPartialControllerTest extends BaseControllerTest
         $repo = $dm->getRepository(Sns::class);
         $sns = $repo->findOneBy(['endpoint' => self::$endpoint1]);
         $this->assertNotNull($sns, 'If failure, time on system may need to be updated');
-        $this->assertTrue(strlen($sns->getAll()) > 0);
-        $this->assertTrue(strlen($sns->getUnregistered()) > 0);
+        $this->assertTrue(mb_strlen($sns->getAll()) > 0);
+        $this->assertTrue(mb_strlen($sns->getUnregistered()) > 0);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/partial/sns', array(
             'endpoint' => self::$endpoint2,
@@ -144,8 +144,8 @@ class ApiPartialControllerTest extends BaseControllerTest
         $sns2 = $repo->findOneBy(['endpoint' => self::$endpoint2]);
         $this->assertNull($sns1);
         $this->assertNotNull($sns2);
-        $this->assertTrue(strlen($sns2->getAll()) > 0);
-        $this->assertTrue(strlen($sns2->getUnregistered()) > 0);
+        $this->assertTrue(mb_strlen($sns2->getAll()) > 0);
+        $this->assertTrue(mb_strlen($sns2->getUnregistered()) > 0);
     }
 
     public function testSnsMissingEndpoint()

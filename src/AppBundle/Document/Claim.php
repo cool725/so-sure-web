@@ -67,12 +67,14 @@ class Claim
     /**
      * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy", inversedBy="claims")
      * @Gedmo\Versioned
+     * @var Policy
      */
     protected $policy;
 
     /**
      * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy", inversedBy="linkedClaims")
      * @Gedmo\Versioned
+     * @var Policy
      */
     protected $linkedPolicy;
 
@@ -85,6 +87,7 @@ class Claim
     /**
      * @MongoDB\ReferenceOne(targetDocument="Phone")
      * @Gedmo\Versioned
+     * @var Phone
      */
     public $replacementPhone;
 
@@ -381,6 +384,9 @@ class Claim
         return $claimsDate->diff($date)->days < 30;
     }
 
+    /**
+     * @return Policy
+     */
     public function getPolicy()
     {
         return $this->policy;
@@ -397,6 +403,9 @@ class Claim
         $this->policy = $policy;
     }
 
+    /**
+     * @return Policy
+     */
     public function getLinkedPolicy()
     {
         return $this->linkedPolicy;
@@ -519,7 +528,7 @@ class Claim
     {
         $validator = new AlphanumericSpaceDotValidator();
 
-        $this->replacementPhoneDetails = $validator->conform(substr($replacementPhoneDetails, 0, 100));
+        $this->replacementPhoneDetails = $validator->conform(mb_substr($replacementPhoneDetails, 0, 100));
     }
 
     public function getReplacementImei()
@@ -601,7 +610,7 @@ class Claim
     {
         $validator = new AlphanumericSpaceDotValidator();
 
-        $this->notes = $validator->conform(substr($notes, 0, 500));
+        $this->notes = $validator->conform(mb_substr($notes, 0, 500));
     }
 
     public function getDescription()

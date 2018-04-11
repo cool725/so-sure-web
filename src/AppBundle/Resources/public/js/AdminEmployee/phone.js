@@ -78,7 +78,7 @@ $('.phone-active').click(function() {
             type: 'POST',
             data: { token: token },
             success: function(result) {
-                window.location = window.location;
+                window.location.reload(false);
             }
         });
     }
@@ -93,7 +93,7 @@ $('.phone-highlight').click(function() {
             type: 'POST',
             data: { token: token },
             success: function(result) {
-                window.location = window.location;
+                window.location.reload(false);
             }
         });
     }
@@ -108,7 +108,7 @@ $('.phone-newhighdemand').click(function() {
             type: 'POST',
             data: { token: token },
             success: function(result) {
-                window.location = window.location;
+                window.location.reload(false);
             }
         });
     }

@@ -72,6 +72,13 @@
                 <a href="{{ url('user_home') }}?_impersonate={{ valid_policy_monthly.user.email }}">User Home - Monthly</a> <b>(auto impersonate {{ valid_policy_monthly.user.email }})</b>
             </li>
             <li>
+                {%  if unpaid_valid_policy_monthly %}
+                <a href="{{ url('user_home') }}?_impersonate={{ unpaid_valid_policy_monthly.user.email }}">User Home - Monthly (Unpaid)</a> <b>(auto impersonate {{ unpaid_valid_policy_monthly.user.email }})</b>
+                {% else %}
+                    No Monthly unpaid policy available
+                {% endif %}
+            </li>
+            <li>
                 <a href="{{ url('user_home') }}?_impersonate={{ valid_policy_annual.user.email }}">User Home - Annual</a> <b>(auto impersonate {{ valid_policy_annual.user.email }})</b>
             </li>
             <li>
@@ -79,6 +86,13 @@
             </li>
             <li>
                 <a href="{{ url('user_home') }}?_impersonate={{ claimed_policy.user.email }}">User Home - Unable to invite (w/Claimed Policy)</a> <b>(auto impersonate {{ claimed_policy.user.email }})</b>
+            </li>
+            <li>
+                {%  if multipay_policy %}
+                    <a href="{{ url('user_home') }}?_impersonate={{ multipay_policy.user.email }}">User Home - Multipay</a> <b>(auto impersonate {{ multipay_policy.user.email }})</b>
+                {% else %}
+                    No Mulitpay policy available
+                {% endif %}
             </li>
             <li>
                 {% if expired_policy_nocashback %}

@@ -7,7 +7,7 @@ $('.feature-active').click(function() {
             type: 'POST',
             data: { token: token },
             success: function(result) {
-                window.location = window.location;
+                window.location.reload(false);
             }
         });
     }

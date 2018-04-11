@@ -282,6 +282,32 @@ class DaviesServiceTest extends WebTestCase
         $this->insureWarningExists('/finalSuspicion/');
     }
 
+    public function testMissingLossDescription()
+    {
+        $policy = new PhonePolicy();
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setId('1');
+        $policy->setPhone(self::getRandomPhone(self::$dm));
+
+        $claim = new Claim();
+        $claim->setPolicy($policy);
+        $claim->setNumber(time());
+        $claim->setStatus(Claim::STATUS_SETTLED);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = $claim->getNumber();
+        $daviesClaim->status = DaviesClaim::STATUS_CLOSED;
+        $daviesClaim->finalSuspicion = null;
+        $daviesClaim->initialSuspicion = null;
+        $daviesClaim->finalSuspicion = null;
+        $daviesClaim->lossDescription = '1234';
+        self::$daviesService->clearWarnings();
+        $this->assertEquals(0, count(self::$daviesService->getWarnings()));
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->assertEquals(1, count(self::$daviesService->getWarnings()));
+        $this->insureWarningExists('/detailed loss description/');
+    }
+
     public function testUpdateClaimNoInitialFlag()
     {
 
@@ -333,6 +359,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->claimNumber = $claim->getNumber();
         $daviesClaim->status = DaviesClaim::STATUS_OPEN;
         $daviesClaim->insuredName = 'Marko Marulic';
+        $daviesClaim->lossDescription = 'min length';
         $daviesClaim->initialSuspicion = false;
         $daviesClaim->finalSuspicion = null;
 
@@ -362,6 +389,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->claimNumber = $claim->getNumber();
         $daviesClaim->status = DaviesClaim::STATUS_CLOSED;
         $daviesClaim->insuredName = 'Marko Marulic';
+        $daviesClaim->lossDescription = 'min length';
         $daviesClaim->initialSuspicion = false;
         $daviesClaim->finalSuspicion = false;
 
@@ -1593,6 +1621,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->insuredName = 'Mr foo bar';
         $daviesClaim->status = DaviesClaim::STATUS_OPEN;
         $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
+        $daviesClaim->lossDescription = 'min length';
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 4';
         $daviesClaim->replacementImei = '123 Bx11lt';
@@ -1634,6 +1663,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->insuredName = 'Mr foo bar';
         $daviesClaim->status = DaviesClaim::STATUS_OPEN;
         $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
+        $daviesClaim->lossDescription = 'min length';
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 4';
         $daviesClaim->replacementImei = $this->generateRandomImei();
@@ -1785,6 +1815,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->insuredName = 'Mr foo bar';
         $daviesClaim->status = DaviesClaim::STATUS_CLOSED;
         $daviesClaim->miStatus = DaviesClaim::MISTATUS_SETTLED;
+        $daviesClaim->lossDescription = 'min length';
         $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 4';
@@ -1844,6 +1875,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->insuredName = 'Mr foo bar';
         $daviesClaim->status = DaviesClaim::STATUS_CLOSED;
         $daviesClaim->miStatus = DaviesClaim::MISTATUS_SETTLED;
+        $daviesClaim->lossDescription = 'min length';
         $daviesClaim->lossType = DaviesClaim::TYPE_LOSS;
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 4';

@@ -22,6 +22,8 @@ class DaviesService extends S3EmailService
     use CurrencyTrait;
     use DateTrait;
 
+    const MIN_LOSS_DESCRIPTION_LENGTH = 5;
+
     /** @var ClaimsService */
     protected $claimsService;
 
@@ -174,7 +176,7 @@ class DaviesService extends S3EmailService
                 $this->saveClaim($daviesClaim, $skipImeiUpdate);
             } catch (\Exception $e) {
                 //$success = false;
-                $this->errors[$daviesClaim->claimNumber][] = $e->getMessage();
+                $this->errors[$daviesClaim->claimNumber][] = sprintf("%s [Record import failed]", $e->getMessage());
                 // In case any of the db data failed validation, clear the changeset
                 if ($claim = $this->getClaim($daviesClaim)) {
                     $this->dm->refresh($claim);
@@ -194,7 +196,7 @@ class DaviesService extends S3EmailService
         // on our system
         if (!$claim) {
             $repo = $this->dm->getRepository(Claim::class);
-            $claim = $repo->findOneBy(['number' => substr($daviesClaim->claimNumber, 0, -2)]);
+            $claim = $repo->findOneBy(['number' => mb_substr($daviesClaim->claimNumber, 0, -2)]);
             if ($claim) {
                 if ($daviesClaim->getPolicyNumber() != $claim->getPolicy()->getPolicyNumber()) {
                     throw new \Exception(sprintf(
@@ -333,7 +335,7 @@ class DaviesService extends S3EmailService
      */
     public function validateClaimDetails(Claim $claim, DaviesClaim $daviesClaim)
     {
-        if (strtolower($claim->getPolicy()->getPolicyNumber()) != strtolower($daviesClaim->getPolicyNumber())) {
+        if (mb_strtolower($claim->getPolicy()->getPolicyNumber()) != mb_strtolower($daviesClaim->getPolicyNumber())) {
             throw new \Exception(sprintf(
                 'Claim %s does not match policy number %s',
                 $daviesClaim->claimNumber,
@@ -367,11 +369,11 @@ class DaviesService extends S3EmailService
         $now = new \DateTime();
         if ($daviesClaim->isOpen() || ($daviesClaim->dateClosed && $daviesClaim->dateClosed->diff($now)->days < 5)) {
             // lower case & remove title
-            $daviesInsuredName = strtolower($daviesClaim->insuredName);
+            $daviesInsuredName = mb_strtolower($daviesClaim->insuredName);
             foreach (['Mr. ', 'Mr ', 'Mrs. ', 'Mrs ', 'Miss '] as $title) {
                 $daviesInsuredName = str_replace($title, '', $daviesInsuredName);
             }
-            similar_text(strtolower($claim->getPolicy()->getUser()->getName()), $daviesInsuredName, $percent);
+            similar_text(mb_strtolower($claim->getPolicy()->getUser()->getName()), $daviesInsuredName, $percent);
 
             if ($percent < 50 && !$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_DAVIES_NAME_MATCH)) {
                 throw new \Exception(sprintf(
@@ -597,6 +599,13 @@ class DaviesService extends S3EmailService
             $this->warnings[$daviesClaim->claimNumber][] = $msg;
         }
 
+        if (mb_strlen($daviesClaim->lossDescription) < self::MIN_LOSS_DESCRIPTION_LENGTH) {
+            $msg = sprintf(
+                'Claim %s does not have a detailed loss description',
+                $daviesClaim->claimNumber
+            );
+            $this->warnings[$daviesClaim->claimNumber][] = $msg;
+        }
     }
 
     public function postValidateClaimDetails(Claim $claim, DaviesClaim $daviesClaim)

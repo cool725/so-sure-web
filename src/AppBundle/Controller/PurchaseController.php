@@ -675,7 +675,8 @@ class PurchaseController extends BaseController
                 $request->get('ReceiptId'),
                 null,
                 $request->get('CardToken'),
-                null
+                null,
+                $policy
             );
 
             $this->addFlash(
@@ -807,8 +808,8 @@ class PurchaseController extends BaseController
         $dm = $this->getManager();
         $userRepo = $dm->getRepository(User::class);
         $leadRepo = $dm->getRepository(Lead::class);
-        $existingLead = $leadRepo->findOneBy(['email' => strtolower($email)]);
-        $existingUser = $userRepo->findOneBy(['emailCanonical' => strtolower($email)]);
+        $existingLead = $leadRepo->findOneBy(['email' => mb_strtolower($email)]);
+        $existingUser = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
 
         if (!$existingLead && !$existingUser) {
             $lead = new Lead();

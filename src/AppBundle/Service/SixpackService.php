@@ -48,7 +48,7 @@ class SixpackService
     const EXPERIMENT_SAVE_QUOTE_24HOURS = 'save-quote-24-hours';
     const EXPERIMENT_USER_WELCOME_MODAL = 'welcome-modal';
     const EXPERIMENT_QUOTE_INTERCOM_PURCHASE = 'quote-intercom-purchase';
-    const EXPERIMENT_MONEY_UNBOUNCE = 'money-unbounce';
+    //const EXPERIMENT_MONEY_UNBOUNCE = 'money-unbounce';
     const EXPERIMENT_MOBILE_SEARCH_DROPDOWN = 'mobile-dropdown-search';
     const EXPERIMENT_STEP_3 = 'step-3-payment-new';
     const EXPERIMENT_CPC_QUOTE_HOMEPAGE = 'cpc-quote-or-homepage';
@@ -67,7 +67,6 @@ class SixpackService
         self::EXPERIMENT_HOMEPAGE_AA_V2,
         self::EXPERIMENT_SAVE_QUOTE_24HOURS,
         self::EXPERIMENT_QUOTE_INTERCOM_PURCHASE,
-        self::EXPERIMENT_MONEY_UNBOUNCE,
         self::EXPERIMENT_MOBILE_SEARCH_DROPDOWN,
         self::EXPERIMENT_STEP_3,
         self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
@@ -160,7 +159,7 @@ class SixpackService
         } catch (\Exception $e) {
             $this->logger->error(sprintf('Failed exp %s', $experiment), ['exception' => $e]);
         }
-        $this->mixpanel->queueTrack(
+        $this->mixpanel->queueTrackWithUtm(
             MixpanelService::EVENT_SIXPACK,
             ['Experiment' => $experiment, 'Result' => $result]
         );
@@ -213,7 +212,7 @@ class SixpackService
 
     public function convertByClientId($clientId, $experiment, $kpi = null)
     {
-        if (!$clientId || strlen($clientId) == 0) {
+        if (!$clientId || mb_strlen($clientId) == 0) {
             $this->logger->info(sprintf('Missing clientId for experiment %s', $experiment));
 
             return;
@@ -248,8 +247,8 @@ class SixpackService
             // There appears to be an error with sixpack in use that is returning experiment does not exist
             // rather than this client was not participating
             // {"status": "failed", "message": "experiment does not exist"}
-            if (stripos($data['message'], 'not participating') !== false ||
-                stripos($data['message'], 'experiment does not exist') !== false) {
+            if (mb_stripos($data['message'], 'not participating') !== false ||
+                mb_stripos($data['message'], 'experiment does not exist') !== false) {
                 return null;
             } else {
                 $this->logger->error(sprintf('Failed converting exp %s', $experiment), ['exception' => $e]);

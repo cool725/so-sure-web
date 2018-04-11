@@ -96,12 +96,12 @@ class Lead
 
     public function setEmail($email)
     {
-        $this->email = strtolower($email);
+        $this->email = mb_strtolower($email);
     }
 
     public function hasEmail()
     {
-        return strlen(trim($this->getEmail())) > 0;
+        return mb_strlen(trim($this->getEmail())) > 0;
     }
 
     public function getName()

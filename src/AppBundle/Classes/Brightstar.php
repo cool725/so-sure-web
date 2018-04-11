@@ -85,9 +85,9 @@ class Brightstar extends DaviesExcel
 
     public function getServiceType()
     {
-        if (stripos(strtolower($this->service), strtolower(self::SERVICE_TYPE_DELIVER)) !== false) {
+        if (mb_stripos(mb_strtolower($this->service), mb_strtolower(self::SERVICE_TYPE_DELIVER)) !== false) {
             return self::SERVICE_TYPE_DELIVER;
-        } elseif (stripos(strtolower($this->service), strtolower(self::SERVICE_TYPE_SWAP)) !== false) {
+        } elseif (mb_stripos(mb_strtolower($this->service), mb_strtolower(self::SERVICE_TYPE_SWAP)) !== false) {
             return self::SERVICE_TYPE_SWAP;
         } else {
             return null;

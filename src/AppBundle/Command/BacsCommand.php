@@ -6,7 +6,9 @@ use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\AccessPayFile;
+use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\ScheduledPayment;
+use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\UserRepository;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\PaymentService;
@@ -75,11 +77,9 @@ class BacsCommand extends BaseCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $debug = $input->getOption('debug');
         $date = $input->getOption('date');
-        $skipSftp = true === $input->getOption('skip-sftp');
-        $skipS3 = true === $input->getOption('skip-s3');
         $skipEmail = true === $input->getOption('skip-email');
+        $debug = $input->getOption('debug');
         $prefix = $input->getArgument('prefix');
         $processingDate = null;
         if ($date) {
@@ -89,68 +89,33 @@ class BacsCommand extends BaseCommand
             $processingDate = $this->addBusinessDays($processingDate, 1);
         }
         $output->writeln(sprintf('Using processing date %s', $processingDate->format('d/M/Y')));
-
-        $sequenceService = $this->getContainer()->get('app.sequence');
-        $serialNumber = $sequenceService->getSequenceId(SequenceService::SEQUENCE_BACS_SERIAL_NUMBER);
-        $serialNumber = sprintf("S-%06d", $serialNumber);
-        $output->writeln(sprintf('Using serial number %s', $serialNumber));
+        $bacsService = $this->getContainer()->get('app.bacs');
 
         if ($debug) {
-            $output->writeln($this->getHeader());
-        }
-        $data = [];
-
-        $output->writeln('Exporting Mandate Cancellations');
-        $mandateCancellations = $this->exportMandateCancellations($processingDate, $serialNumber);
-        $data['ddi-cancellations'] = count($mandateCancellations);
-        if ($debug) {
-            $output->writeln(json_encode($mandateCancellations, JSON_PRETTY_PRINT));
+            $output->writeln($bacsService->getHeader());
         }
 
-        $output->writeln('Exporting Mandates');
-        $mandates = $this->exportMandates($processingDate, $serialNumber);
-        $data['ddi'] = count($mandates);
-        if ($debug) {
-            $output->writeln(json_encode($mandates, JSON_PRETTY_PRINT));
+        $lines = [];
+        $creditPayments = [];
+        if ($bacsService->hasMandateOrPaymentDebit($prefix, $processingDate)) {
+            $lines = $this->runMandatePaymentDebit($input, $output, $processingDate);
+        }
+        if ($bacsService->hasPaymentCredit()) {
+            $creditPayments = $this->runPaymentCredits($input, $output, $processingDate);
         }
 
-        $output->writeln('Exporting Payments');
-        $payments = $this->exportPayments($prefix, $processingDate);
-        if ($debug) {
-            $output->writeln(json_encode($payments, JSON_PRETTY_PRINT));
-        }
-
-        $lines = array_merge($mandateCancellations, $mandates, $payments);
-        if (count($lines) == 0) {
-            $output->writeln('No data present. Skipping upload(s)');
-            $skipSftp = true;
-            $skipS3 = true;
+        if (count($lines) == 0 && count($creditPayments) == 0) {
             $skipEmail = true;
         }
-
-        $now = new \DateTime();
-        $filename = sprintf('%s-%s.csv', $processingDate->format('Ymd'), $now->format('U'));
-        if (!$skipSftp) {
-            $files = $this->uploadSftp(implode(PHP_EOL, $lines), $filename);
-            if ($debug) {
-                $output->writeln(json_encode($files));
-            }
-            $output->writeln(sprintf('Uploaded sftp file %s', $filename));
-        }
-        if (!$skipS3) {
-            $this->uploadS3(implode(PHP_EOL, $lines), $filename, $processingDate, $data);
-            $output->writeln(sprintf('Uploaded s3 file %s', $filename));
-        }
-
-        $this->getManager()->flush();
-        $output->writeln('Saved changes to db.');
 
         if (!$skipEmail) {
             $mailer = $this->getContainer()->get('app.mailer');
             $mailer->send(
-                'Bacs File Ready to Process',
+                'Bacs File(s) Ready to Process',
                 'bacs@so-sure.com',
-                sprintf('File %s is ready to process. Data: %s', $filename, json_encode($data))
+                sprintf(
+                    'File(s) are ready to process.'
+                )
             );
             $output->writeln('Confirmation email sent');
         }
@@ -158,187 +123,131 @@ class BacsCommand extends BaseCommand
         $output->writeln('Finished');
     }
 
-    private function getHeader()
+    private function runMandatePaymentDebit(InputInterface $input, OutputInterface $output, \DateTime $processingDate)
     {
-        return implode(',', [
-            '"Processing Date"',
-            '"Action"',
-            '"BACS Transaction Code"',
-            '"Name"',
-            '"Sort Code"',
-            '"Account"',
-            '"Amount"',
-            '"DDI Reference"',
-            '"UserId"',
-            '"PolicyId"',
-            '"PaymentId"',
-        ]);
-    }
+        $skipSftp = true === $input->getOption('skip-sftp');
+        $skipS3 = true === $input->getOption('skip-s3');
+        $debug = $input->getOption('debug');
+        $prefix = $input->getArgument('prefix');
 
-    private function exportMandates(\DateTime $date, $serialNumber, $includeHeader = false)
-    {
-        /** @var UserRepository $repo */
-        $repo = $this->getManager()->getRepository(User::class);
-        $users = $repo->findBy(['paymentMethod.bankAccount.mandateStatus' => BankAccount::MANDATE_PENDING_INIT]);
-        $lines = [];
-        if ($includeHeader) {
-            $lines[] = $this->getHeader();
-        }
-        foreach ($users as $user) {
-            /** @var User $user */
-            /** @var BacsPaymentMethod $paymentMethod */
-            $paymentMethod = $user->getPaymentMethod();
-            $lines[] = implode(',', [
-                sprintf('"%s"', $date->format('d/m/y')),
-                '"Initial Mandate"',
-                '"0N"', // new Auddis
-                sprintf('"%s"', $paymentMethod->getBankAccount()->getAccountName()),
-                sprintf('"%s"', $paymentMethod->getBankAccount()->getSortCode()),
-                sprintf('"%s"', $paymentMethod->getBankAccount()->getAccountNumber()),
-                '"0"', // £0 for Addis setup
-                sprintf('"%s"', $paymentMethod->getBankAccount()->getReference()),
-                sprintf('"%s"', $user->getId()),
-                '""',
-                '""',
-            ]);
-            $paymentMethod->getBankAccount()->setMandateStatus(BankAccount::MANDATE_PENDING_APPROVAL);
-            $paymentMethod->getBankAccount()->setMandateSerialNumber($serialNumber);
-
-            // do not attempt to take payment until 2 business days after to allow for mandate
-            $initialPaymentSubmissionDate = new \DateTime();
-            $initialPaymentSubmissionDate = $this->addBusinessDays($initialPaymentSubmissionDate, 2);
-            $paymentMethod->getBankAccount()->setInitialPaymentSubmissionDate($initialPaymentSubmissionDate);
-        }
-
-        return $lines;
-    }
-
-    private function exportMandateCancellations(\DateTime $date, $serialNumber, $includeHeader = false)
-    {
-        /** @var BacsService $bacsService */
         $bacsService = $this->getContainer()->get('app.bacs');
-        $cancellations = $bacsService->getBacsCancellations();
-        $lines = [];
-        if ($includeHeader) {
-            $lines[] = $this->getHeader();
-        }
-        foreach ($cancellations as $cancellation) {
-            $lines[] = implode(',', [
-                sprintf('"%s"', $date->format('d/m/y')),
-                '"Cancel Mandate"',
-                '"0C"', // new Auddis
-                sprintf('"%s"', $cancellation['accountName']),
-                sprintf('"%s"', $cancellation['sortCode']),
-                sprintf('"%s"', $cancellation['accountNumber']),
-                '"0"', // £0 for Addis setup
-                sprintf('"%s"', $cancellation['reference']),
-                sprintf('"%s"', $cancellation['id']),
-                '""',
-                '""',
-            ]);
+        $sequenceService = $this->getContainer()->get('app.sequence');
+        $serialNumber = $sequenceService->getSequenceId(SequenceService::SEQUENCE_BACS_SERIAL_NUMBER);
+        $serialNumber = sprintf("S-%06d", $serialNumber);
+        $output->writeln(sprintf('Using serial number %s', $serialNumber));
+
+        $data = [
+            'serial-number' => $serialNumber,
+        ];
+
+        $output->writeln('Exporting Mandate Cancellations');
+        $mandateCancellations = $bacsService->exportMandateCancellations($processingDate);
+        $data['ddi-cancellations'] = count($mandateCancellations);
+        if ($debug) {
+            $output->writeln(json_encode($mandateCancellations, JSON_PRETTY_PRINT));
         }
 
-        return $lines;
-    }
+        $output->writeln('Exporting Mandates');
+        $mandates = $bacsService->exportMandates($processingDate, $serialNumber);
+        $data['ddi'] = count($mandates);
+        if ($debug) {
+            $output->writeln(json_encode($mandates, JSON_PRETTY_PRINT));
+        }
 
-    private function exportPayments($prefix, \DateTime $date, $includeHeader = false)
-    {
+        $output->writeln('Exporting Debit Payments');
+        $debitPayments = $bacsService->exportPaymentsDebits($prefix, $processingDate, $serialNumber, $data);
+        $data['debits'] = count($debitPayments);
+        if ($debug) {
+            $output->writeln(json_encode($debitPayments, JSON_PRETTY_PRINT));
+        }
+
+        $lines = array_merge($mandateCancellations, $mandates, $debitPayments);
+        if (count($lines) == 0) {
+            $output->writeln('No data present. Skipping upload(s)');
+            $skipSftp = true;
+            $skipS3 = true;
+        }
+
         $now = new \DateTime();
-        $lines = [];
-        if ($includeHeader) {
-            $lines[] = $this->getHeader();
+        $filename = sprintf('%s-%s.csv', $processingDate->format('Ymd'), $now->format('U'));
+        if (!$skipSftp) {
+            $files = $this->uploadSftp(implode(PHP_EOL, $lines), $filename, true);
+            if ($debug) {
+                $output->writeln(json_encode($files));
+            }
+            $output->writeln(sprintf('Uploaded sftp file %s', $filename));
         }
-        /** @var PaymentService $paymentService */
-        $paymentService = $this->getContainer()->get('app.payment');
-
-        /** @var BacsService $bacsService */
-        $bacsService = $this->getContainer()->get('app.bacs');
-
-        // get all scheduled payments for bacs that should occur within the next 3 business days in order to allow
-        // time for the bacs cycle
-        $advanceDate = clone $date;
-        $advanceDate = $this->addBusinessDays($advanceDate, 3);
-
-        $scheduledPayments = $paymentService->getAllValidScheduledPaymentsForType(
-            $prefix,
-            BacsPaymentMethod::class,
-            $advanceDate
-        );
-        foreach ($scheduledPayments as $scheduledPayment) {
-            /** @var ScheduledPayment $scheduledPayment */
-            /** @var BacsPaymentMethod $bacs */
-            $bacs = $scheduledPayment->getPolicy()->getUser()->getPaymentMethod();
-            if (!$bacs || !$bacs->getBankAccount()) {
-                $msg = sprintf(
-                    'Skipping scheduled payment %s as unable to determine payment method or missing bank account',
-                    $scheduledPayment->getId()
-                );
-                $this->getContainer()->get('logger')->warning($msg);
-                continue;
-            }
-
-            $bankAccount = $bacs->getBankAccount();
-            if ($bankAccount->getMandateStatus() != BankAccount::MANDATE_SUCCESS) {
-                $msg = sprintf(
-                    'Skipping scheduled payment %s as mandate is not enabled (%s)',
-                    $scheduledPayment->getId(),
-                    $bankAccount->getMandateStatus()
-                );
-                // for first payment, would expected that mandate may not yet be setup
-                if ($bankAccount->isFirstPayment()) {
-                    $this->getContainer()->get('logger')->info($msg);
-                } else {
-                    $this->getContainer()->get('logger')->warning($msg);
-                }
-                continue;
-            }
-            if (!$bankAccount->allowedSubmission()) {
-                $msg = sprintf(
-                    'Skipping payment %s as submission is not yet allowed (must be at least %s)',
-                    $scheduledPayment->getId(),
-                    $bankAccount->getInitialPaymentSubmissionDate()->format('d/m/y')
-                );
-                $this->getContainer()->get('logger')->error($msg);
-                continue;
-            }
-            if (!$bankAccount->allowedProcessing($scheduledPayment->getScheduled())) {
-                $msg = sprintf(
-                    'Skipping scheduled payment %s as processing date is not allowed (%s / initial: %s)',
-                    $scheduledPayment->getId(),
-                    $scheduledPayment->getScheduled()->format('d/m/y'),
-                    $bankAccount->isFirstPayment() ? 'yes' : 'no'
-                );
-                $this->getContainer()->get('logger')->error($msg);
-                continue;
-            }
-
-            $payment = $bacsService->bacsPayment(
-                $scheduledPayment->getPolicy(),
-                'Scheduled Payment',
-                $scheduledPayment->getAmount()
+        if (!$skipS3) {
+            $this->uploadS3(
+                implode(PHP_EOL, $lines),
+                $filename,
+                $serialNumber,
+                $processingDate,
+                $data
             );
-            $scheduledPayment->setPayment($payment);
-
-            $lines[] = implode(',', [
-                sprintf('"%s"', $scheduledPayment->getScheduled()->format('d/m/y')),
-                '"Scheduled Payment"',
-                $bankAccount->isFirstPayment() ? '"01"' : '"17"',
-                sprintf('"%s"', $bankAccount->getAccountName()),
-                sprintf('"%s"', $bankAccount->getSortCode()),
-                sprintf('"%s"', $bankAccount->getAccountNumber()),
-                sprintf('"%0.2f"', $scheduledPayment->getAmount()),
-                sprintf('"%s"', $bankAccount->getReference()),
-                sprintf('"%s"', $scheduledPayment->getPolicy()->getUser()->getId()),
-                sprintf('"%s"', $scheduledPayment->getPolicy()->getId()),
-                sprintf('"SP-%s"', $scheduledPayment->getId()),
-            ]);
-            $scheduledPayment->setStatus(ScheduledPayment::STATUS_PENDING);
-            if ($bankAccount->isFirstPayment()) {
-                $bankAccount->setFirstPayment(false);
-            }
+            $output->writeln(sprintf('Uploaded s3 file %s', $filename));
         }
+
+        $this->getManager()->flush();
+        $output->writeln('Saved changes to db.');
 
         return $lines;
+    }
+
+    private function runPaymentCredits(InputInterface $input, OutputInterface $output, \DateTime $processingDate)
+    {
+        $skipSftp = true === $input->getOption('skip-sftp');
+        $skipS3 = true === $input->getOption('skip-s3');
+        $debug = $input->getOption('debug');
+        $prefix = $input->getArgument('prefix');
+
+        $bacsService = $this->getContainer()->get('app.bacs');
+        $sequenceService = $this->getContainer()->get('app.sequence');
+        $serialNumber = $sequenceService->getSequenceId(SequenceService::SEQUENCE_BACS_SERIAL_NUMBER);
+        $serialNumber = sprintf("S-%06d", $serialNumber);
+        $output->writeln(sprintf('Using serial number %s', $serialNumber));
+
+        $data = [
+            'serial-number' => $serialNumber,
+        ];
+
+        $output->writeln('Exporting Credit Payments');
+        $creditPayments = $bacsService->exportPaymentsCredits($processingDate, $serialNumber, $data);
+        $data['credits'] = count($creditPayments);
+        if ($debug) {
+            $output->writeln(json_encode($creditPayments, JSON_PRETTY_PRINT));
+        }
+
+        if (count($creditPayments) == 0) {
+            $output->writeln('No data present. Skipping upload(s)');
+            $skipSftp = true;
+            $skipS3 = true;
+        }
+
+        $now = new \DateTime();
+        $creditFilename = sprintf('credits-%s-%s.csv', $processingDate->format('Ymd'), $now->format('U'));
+        if (!$skipSftp) {
+            $files = $this->uploadSftp(implode(PHP_EOL, $creditPayments), $creditFilename, false);
+            if ($debug) {
+                $output->writeln(json_encode($files));
+            }
+            $output->writeln(sprintf('Uploaded sftp file %s', $creditFilename));
+        }
+        if (!$skipS3) {
+            $this->uploadS3(
+                implode(PHP_EOL, $creditPayments),
+                $creditFilename,
+                $serialNumber,
+                $processingDate,
+                $data
+            );
+            $output->writeln(sprintf('Uploaded s3 file %s', $creditFilename));
+        }
+
+        $this->getManager()->flush();
+        $output->writeln('Saved changes to db.');
+
+        return $creditPayments;
     }
 
     /**
@@ -347,7 +256,7 @@ class BacsCommand extends BaseCommand
      * @return mixed
      * @throws \Exception
      */
-    public function uploadSftp($data, $filename)
+    public function uploadSftp($data, $filename, $debit = true)
     {
         $server = $this->getContainer()->getParameter('accesspay_server');
         $username = $this->getContainer()->getParameter('accesspay_username');
@@ -364,14 +273,18 @@ class BacsCommand extends BaseCommand
             throw new \Exception('Login Failed');
         }
 
-        $sftp->chdir('Inbound/DD_Collections');
+        if ($debit) {
+            $sftp->chdir('Inbound/DD_Collections');
+        } else {
+            $sftp->chdir('Inbound/DC_Refunds');
+        }
         $sftp->put($filename, $tmpFile, SFTP::SOURCE_LOCAL_FILE);
         $files = $sftp->nlist('.', false);
 
         return $files;
     }
 
-    public function uploadS3($data, $filename, \DateTime $date, $metadata = null)
+    public function uploadS3($data, $filename, $serialNumber, \DateTime $date, $metadata = null)
     {
         $password = $this->getContainer()->getParameter('accesspay_s3file_password');
         $tmpFile = sprintf('%s/%s', sys_get_temp_dir(), $filename);
@@ -391,6 +304,7 @@ class BacsCommand extends BaseCommand
         $file->setBucket(self::S3_BUCKET);
         $file->setKey($s3Key);
         $file->setDate($date);
+        $file->setSerialNumber($serialNumber);
 
         foreach ($metadata as $key => $value) {
             $file->addMetadata($key, $value);

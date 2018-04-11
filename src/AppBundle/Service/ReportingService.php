@@ -30,6 +30,9 @@ use AppBundle\Document\User;
 
 class ReportingService
 {
+    const REPORT_KEY_FORMAT = 'Report:%s:%s';
+    const REPORT_CACHE_TIME = 3600;
+
     use DateTrait;
     use CurrencyTrait;
 
@@ -43,22 +46,31 @@ class ReportingService
 
     protected $environment;
 
+    protected $redis;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
      * @param string          $excludedPolicyIds
-     * @parma strign          $environment
+     * @parma string          $environment
+     * @param                 $redis
      */
-    public function __construct(DocumentManager $dm, LoggerInterface $logger, $excludedPolicyIds, $environment)
+    public function __construct(DocumentManager $dm, LoggerInterface $logger, $excludedPolicyIds, $environment, $redis)
     {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->excludedPolicyIds = $excludedPolicyIds;
         $this->environment = $environment;
+        $this->redis = $redis;
     }
 
     public function report($start, $end, $isKpi = false)
     {
+        $redisKey = sprintf(self::REPORT_KEY_FORMAT, $start->format('ymdhi'), $end->format('ymdhi'));
+        if ($this->redis->exists($redisKey)) {
+            return unserialize($this->redis->get($redisKey));
+        }
+
         $totalEnd = null;
         if ($isKpi) {
             $totalEnd = $end;
@@ -362,7 +374,7 @@ class ReportingService
         $rolling12MonthClaimsTotals = Claim::sumClaims($rolling12MonthClaims);
         $data['rolling-yearly-claims-totals'] = $rolling12MonthClaimsTotals['approved-settled'];
 
-        return [
+        $results = [
             'start' => $start,
             'end' => $end,
             'data' => $data,
@@ -371,6 +383,9 @@ class ReportingService
             'approvedClaims' => $approvedClaimsTotals,
             'closedClaims' => $closedClaimsTotals,
         ];
+        $this->redis->setex($redisKey, self::REPORT_CACHE_TIME, serialize($results));
+
+        return $results;
     }
 
     public function getCancelledAndPaymentOwed()

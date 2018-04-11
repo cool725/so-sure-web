@@ -90,8 +90,6 @@ class UserController extends BaseController
      */
     public function indexAction(Request $request, $policyId = null)
     {
-
-
         $dm = $this->getManager();
         $policyRepo = $dm->getRepository(Policy::class);
         $scodeRepo = $dm->getRepository(SCode::class);
@@ -1115,6 +1113,8 @@ class UserController extends BaseController
             'nickwaller@outlook.com',
             'ju.champagne@wanadoo.fr',
             'datkiewicz.marta@gmail.com',
+            'dylan.bourguignon@gmail.com',
+            'sluscombe.91@gmail.com',
         ])) {
             $bacsFeature = true;
         }
@@ -1248,7 +1248,7 @@ class UserController extends BaseController
                 $userEmailForm->handleRequest($request);
                 if ($userEmailForm->isValid()) {
                     $userRepo = $this->getManager()->getRepository(User::class);
-                    $existingUser = $userRepo->findOneBy(['emailCanonical' => strtolower($user->getEmail())]);
+                    $existingUser = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($user->getEmail())]);
                     if ($existingUser) {
                         // @codingStandardsIgnoreStart
                         $this->addFlash(
