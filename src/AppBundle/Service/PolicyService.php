@@ -269,7 +269,8 @@ class PolicyService
         $imei,
         $serialNumber,
         IdentityLog $identityLog = null,
-        $phoneData = null
+        $phoneData = null,
+        $modelNumber = null
     ) {
         try {
             $this->validateUser($user);
@@ -292,6 +293,7 @@ class PolicyService
             $policy->setPhone($phone);
             $policy->setImei($imei);
             $policy->setSerialNumber($serialNumber);
+            $policy->setModelNumber($modelNumber);
             $policy->setIdentityLog($identityLog);
             $policy->setPhoneData($phoneData);
 

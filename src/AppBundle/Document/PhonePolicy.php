@@ -104,6 +104,14 @@ class PhonePolicy extends Policy
     protected $serialNumber;
 
     /**
+     * @AppAssert\Token()
+     * @Assert\Length(min="0", max="50")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $modelNumber;
+
+    /**
      * @MongoDB\Field(type="hash")
      * @Gedmo\Versioned
      */
@@ -259,6 +267,16 @@ class PhonePolicy extends Policy
     public function setSerialNumber($serialNumber)
     {
         $this->serialNumber = $serialNumber;
+    }
+
+    public function getModelNumber()
+    {
+        return $this->modelNumber;
+    }
+
+    public function setModelNumber($modelNumber)
+    {
+        $this->modelNumber = $modelNumber;
     }
 
     public function isValidAppleSerialNumber()

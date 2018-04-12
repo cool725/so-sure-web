@@ -1144,6 +1144,49 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_INVALID_VALIDATION);
     }
 
+    public function testNewPolicyWithModelNumber()
+    {
+        $this->clearRateLimit();
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testNewPolicyWithModelNumber', $this),
+            'foo',
+            true
+        );
+        self::addAddress($user);
+        self::$dm->flush();
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $imei = self::generateRandomImei();
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy', ['phone_policy' => [
+            'imei' => $imei,
+            'serial_number' => '23423423342',
+            'model_number' => 'foo',
+            'make' => 'HTC',
+            'device' => 'A0001',
+            'memory' => 64,
+            'rooted' => false,
+            'validation_data' => $this->getValidationData(
+                $cognitoIdentityId,
+                [
+                    'imei' => $imei,
+                    'device' => 'A0001',
+                    'memory' => 64,
+                    'rooted' => false,
+                    'serial_number' => '23423423342'
+                ]
+            ),
+        ]]);
+        $data = $this->verifyResponse(200);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $userRepo = $dm->getRepository(User::class);
+        $user = $userRepo->find($user->getId());
+        $policies = $user->getPolicies();
+        $this->assertEquals(1, count($policies));
+        $this->assertEquals('foo', $policies[0]->getModelNumber());
+    }
+
     public function testNewPolicyDisabledUser()
     {
         $this->clearRateLimit();
@@ -1600,6 +1643,73 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $cognitoIdentityId = $this->getUnauthIdentity();
         $url = sprintf('/api/v1/auth/user/%s?_method=GET', $user->getId());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(403);
+    }
+
+    /**
+     *
+     */
+    public function testPostPolicy()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testPostPolicy', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+        $url = sprintf("/api/v1/auth/policy/%s", $policyData['id']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['phone_policy' => [
+            'model_number' => '20$00[00]',
+        ]]);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['phone_policy' => []]);
+        $data = $this->verifyResponse(200);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['phone_policy' => [
+            'model_number' => 'MLLN2B/A',
+        ]]);
+        $data = $this->verifyResponse(200);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $userRepo = $dm->getRepository(User::class);
+        $user = $userRepo->find($user->getId());
+        $policies = $user->getPolicies();
+        $this->assertEquals(1, count($policies));
+        $this->assertEquals('MLLN2B/A', $policies[0]->getModelNumber());
+    }
+
+    public function testPostPolicyUnknownId()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $url = sprintf('/api/v1/auth/policy/1');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['phone_policy' => []]);
+        $data = $this->verifyResponse(404);
+    }
+
+    public function testPostPolicyUnAuthUser()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testPostPolicyUnAuthUser', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $user = static::createUser(self::$userManager, 'postpolicy-unauth@auth-api.so-sure.com', 'foo');
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $url = sprintf('/api/v1/auth/policy/%s', $policyData['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['phone_policy' => []]);
         $data = $this->verifyResponse(403);
     }
 
