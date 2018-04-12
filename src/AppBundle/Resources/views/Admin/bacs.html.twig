@@ -47,6 +47,7 @@
         <ul class="nav nav-tabs nav-justified">
             <li role="presentation" class="active"><a href="#dddc">Debits/Credits</a></li>
             <li role="presentation"><a href="#reports">Bacs Reports</a></li>
+            <li role="presentation"><a href="#payments">Payments</a></li>
         </ul>
         <div class="tab-content">
             <div role="tabpanel" class="tab-pane active" id="dddc">
@@ -158,6 +159,51 @@
                         {% endfor %}
                     </table>
                 {% endif %}
+            </div>
+            <div role="tabpanel" class="tab-pane" id="payments">
+                <h2>Payments</h2>
+                {% if payments|length == 0 %}
+                    <p>No payments present</p>
+                {% else %}
+                    <table class="table table-striped">
+                        <tr>
+                            <th width="20%">Serial</th>
+                            <th width="20%">Date</th>
+                            <th width="20%">Bacs Status</th>
+                            <th width="20%">Amount</th>
+                            <th width="20%">Success</th>
+                        </tr>
+                        {% for payment in payments %}
+                            <tr>
+                                <td width="20%">
+                                    {{ payment.serialNumber }}
+                                    {% for file in files %}
+                                        {% if file.serialNumber == payment.serialNumber %}
+                                        ({{  file.date|date('d M Y H:i', 'Europe/London')  }})
+                                        {% endif %}
+                                    {% endfor %}
+                                </td>
+                                <td width="20%">
+                                    {{ payment.date|date('d M Y H:i', 'Europe/London') }}
+                                </td>
+                                <td width="20%">
+                                    {{ payment.status }}
+                                </td>
+                                <td width="20%">
+                                    £{{ payment.amount|number_format(2, '.', ',') }}
+                                </td>
+                                <td width="20%">
+                                    {% if payment.success %}
+                                        Yes
+                                    {% else %}
+                                        No
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                {% endif %}
+
             </div>
         </div>
     </div>
