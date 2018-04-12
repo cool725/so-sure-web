@@ -543,6 +543,7 @@ class AdminController extends BaseController
 
         $dm = $this->getManager();
         $s3FileRepo = $dm->getRepository(S3File::class);
+        $paymentsRepo = $dm->getRepository(BacsPayment::class);
 
         /** @var BacsService $bacs */
         $bacs = $this->get('app.bacs');
@@ -605,6 +606,7 @@ class AdminController extends BaseController
             'addacs' => $s3FileRepo->getAllFiles($date, 'bacsReportAddacs'),
             'auddis' => $s3FileRepo->getAllFiles($date, 'bacsReportAuddis'),
             'input' => $s3FileRepo->getAllFiles($date, 'bacsReportInput'),
+            'payments' => $paymentsRepo->findPayments($date),
             'uploadForm' => $uploadForm->createView(),
             'mandatesForm' => $mandatesForm->createView(),
         ];
