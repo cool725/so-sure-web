@@ -34,5 +34,13 @@ $(function(){
                 window.location = url;
             }
         });
-    })
+    });
+
+    $('.sosure-track-intercom').on('click', function(event) {
+        event.preventDefault();
+        var name = $(this).data('event');
+        if (typeof Intercom !== 'undefined') {
+            Intercom('trackEvent', name);
+        }
+    });
 });
