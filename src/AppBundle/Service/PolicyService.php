@@ -268,9 +268,9 @@ class PolicyService
         Phone $phone,
         $imei,
         $serialNumber,
-        $modelNumber = null,
         IdentityLog $identityLog = null,
-        $phoneData = null
+        $phoneData = null,
+        $modelNumber = null
     ) {
         try {
             $this->validateUser($user);

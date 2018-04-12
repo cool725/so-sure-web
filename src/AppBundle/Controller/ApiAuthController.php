@@ -515,13 +515,13 @@ class ApiAuthController extends BaseController
                 $phone,
                 $imei,
                 $serialNumber,
-                $modelNumber,
                 $this->getIdentityLog($request),
                 json_encode([
                     'make' => $this->getDataString($phonePolicyData, 'make'),
                     'device' => $this->getDataString($phonePolicyData, 'device'),
                     'memory' => $this->getDataString($phonePolicyData, 'memory'),
-                ])
+                ]),
+                $modelNumber
             );
             $policy->setName($this->conformAlphanumericSpaceDot($this->getDataString($phonePolicyData, 'name'), 100));
 
@@ -644,13 +644,23 @@ class ApiAuthController extends BaseController
             }
             $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
 
+            $needUpdate = false;
             if (isset($data['phone_policy'])) {
                 if (isset($data['phone_policy']['model_number'])) {
                     $modelNumber = $this->getDataString($data['phone_policy'], 'model_number');
                     $policy->setModelNumber($modelNumber);
-                    $dm->persist($policy);
-                    $dm->flush();
+                    $needUpdate = true;
                 }
+            }
+
+            if ($needUpdate) {
+                $dm->flush();
+            } else {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_MISSING_PARAM,
+                    'No parameters to update',
+                    400
+                );
             }
 
             return new JsonResponse($policy->toApiArray());
