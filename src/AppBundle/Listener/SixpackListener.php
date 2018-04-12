@@ -52,11 +52,16 @@ class SixpackListener
             SixpackService::EXPERIMENT_MOBILE_SEARCH_DROPDOWN,
             SixpackService::KPI_POLICY_PURCHASE
         );
+        /*
         $this->sixpack->convert(
             SixpackService::EXPERIMENT_MONEY_UNBOUNCE
         );
+        */
         $this->sixpack->convert(
             SixpackService::EXPERIMENT_CPC_QUOTE_HOMEPAGE
+        );
+        $this->sixpack->convert(
+            SixpackService::EXPERIMENT_STEP_3
         );
     }
 }

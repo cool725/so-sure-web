@@ -514,6 +514,18 @@ class PurchaseController extends BaseController
             }
         }
 
+        $exp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_STEP_3,
+            ['step-3-payment-old', 'step-3-payment-new']
+        );
+
+        $template = 'AppBundle:Purchase:purchaseStepPhoneReview.html.twig';
+
+        if ($exp == 'step-3-payment-new') {
+            $template = 'AppBundle:Purchase:purchaseStepPhoneReviewNew.html.twig';
+        }
+
         $now = new \DateTime();
         $billingDate = $this->adjustDayForBilling($now);
 
@@ -533,7 +545,7 @@ class PurchaseController extends BaseController
             'billing_date' => $billingDate,
         );
 
-        return $this->render('AppBundle:Purchase:purchaseStepPhoneReview.html.twig', $data);
+        return $this->render($template, $data);
     }
 
     /**

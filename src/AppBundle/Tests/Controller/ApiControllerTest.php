@@ -333,6 +333,31 @@ class ApiControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
     }
 
+    /**
+     *
+     */
+    public function testGetPolicyTerms2()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $url = '/api/v1/policy/v2/terms?maxPotValue=62.8&_method=GET';
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $getData = $this->verifyResponse(200);
+        $policyTermsUrl = self::$router->generate('latest_policy_terms2');
+        $this->assertTrue(mb_stripos($getData["view_url"], $policyTermsUrl) >= 0);
+        $this->assertTrue(mb_stripos($getData["view_url"], 'http') >= 0);
+        $this->assertTrue(mb_stripos($getData["view_url"], 'Version') >= 0);
+    }
+
+    public function testGetPolicyTerms2Validation()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $url = '/api/v1/policy/v2/terms?maxPotValue[$ne]=1&_method=GET';
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+    }
+
     // quote
 
     /**

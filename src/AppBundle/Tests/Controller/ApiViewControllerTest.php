@@ -222,7 +222,7 @@ class ApiViewControllerTest extends BaseApiControllerTest
     /**
      *
      */
-    public function testGetPolicyTermsHtmlH1()
+    public function testGetLatestPolicyTermsHtmlH1()
     {
         $url = sprintf('/view/policy/terms?policy_key=%s&maxPotValue=62.8&noH1=0', static::$policyKey);
         $crawler = self::$client->request('GET', $url);
@@ -236,9 +236,23 @@ class ApiViewControllerTest extends BaseApiControllerTest
     /**
      *
      */
-    public function testGetPolicyTermsHtmlNoH1()
+    public function testGetLatestPolicyTermsHtmlNoH1()
     {
         $url = sprintf('/view/policy/terms?policy_key=%s&maxPotValue=62.8&noH1=1', static::$policyKey);
+        $crawler = self::$client->request('GET', $url);
+        self::verifyResponse(200);
+        $body = self::$client->getResponse()->getContent();
+
+        $this->assertFalse(mb_stripos($body, 'h1'));
+        $this->assertTrue(mb_stripos($body, 'h4') >= 0);
+    }
+
+    /**
+     *
+     */
+    public function testGetLatestPolicyTerms2Html()
+    {
+        $url = sprintf('/view/policy/v2/terms?policy_key=%s&maxPotValue=62.8', static::$policyKey);
         $crawler = self::$client->request('GET', $url);
         self::verifyResponse(200);
         $body = self::$client->getResponse()->getContent();
