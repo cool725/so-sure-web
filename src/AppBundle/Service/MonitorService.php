@@ -3,6 +3,7 @@ namespace AppBundle\Service;
 
 use AppBundle\Document\Cashback;
 use AppBundle\Document\File\AccessPayFile;
+use AppBundle\Document\User;
 use Psr\Log\LoggerInterface;
 use GuzzleHttp\Client;
 use Doctrine\ODM\MongoDB\DocumentManager;
