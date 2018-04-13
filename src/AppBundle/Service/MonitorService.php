@@ -382,4 +382,16 @@ class MonitorService
             ));
         }
     }
+
+    public function bacsMandates()
+    {
+        $repo = $this->dm->getRepository(User::class);
+        $users = $repo->findPendingMandates()->getQuery()->execute();
+        if (count($users) > 0) {
+            throw new MonitorException(sprintf(
+                'There are %d bacs mandates waiting approval',
+                count($users)
+            ));
+        }
+    }
 }
