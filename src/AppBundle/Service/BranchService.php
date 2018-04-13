@@ -246,7 +246,13 @@ class BranchService
             '$android_url' => $this->downloadGoogleLink($source, $medium, $campaign),
         ];
 
-        return $this->send($data, $source, $medium, $campaign, $code);
+        return $this->send($data, $source, $medium, $campaign, $this->getDiacriticsSafeText($code));
+    }
+
+    public function getDiacriticsSafeText($text)
+    {
+        setlocale(LC_CTYPE, 'en_GB.utf8');
+        return iconv("UTF-8", 'US-ASCII//TRANSLIT', $text);
     }
 
     /**
