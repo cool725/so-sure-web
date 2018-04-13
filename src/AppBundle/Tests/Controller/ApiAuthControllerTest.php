@@ -5082,4 +5082,68 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertFalse(isset($listeners['security.interactive_login.actual.AppBundle\Listener\SecurityListener::onActualSecurityInteractiveLogin']));
         // @codingStandardsIgnoreEnd
     }
+
+    // user/{id}/tracklocation
+
+    /**
+     *
+     */
+    public function testUserTrackLocation()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $url = sprintf('/api/v1/auth/user/%s/tracklocation', self::$testUser->getId());
+        $data = [
+            'latitude' => '51.524490',
+            'longitude' => '-0.087658',
+        ];
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $result = $this->verifyResponse(200);
+        $this->assertEquals(self::$testUser->getEmailCanonical(), $result['email']);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $userRepo = $dm->getRepository(User::class);
+        $user = $userRepo->find(self::$testUser->getId());
+        $location = $user->getLocation();
+        $this->assertEquals('51.524490', $location->getLatitude());
+        $this->assertEquals('-0.087658', $location->getLongitude());
+    }
+
+    public function testUserTrackLocationValidation()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $url = sprintf('/api/v1/auth/user/%s/tracklocation', self::$testUser->getId());
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+
+        $data = [
+            'latitude' => '51.524490',
+        ];
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+
+        $data = [
+            'longitude' => '51.524490',
+        ];
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+
+        $data = [
+            'latitude' => '151.524490',
+            'longitude' => '-200.087658',
+        ];
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+    }
+
+    public function testUserTrackLocationDifferentUser()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $url = sprintf('/api/v1/auth/user/%s/tracklocation', self::$testUser2->getId());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'latitude' => '51.524490',
+            'longitude' => '-0.087658',
+        ]);
+        $data = $this->verifyResponse(403);
+    }
 }

@@ -343,6 +343,12 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     protected $previousPasswords = array();
 
     /**
+     * @MongoDB\EmbedOne(targetDocument="Location")
+     * @Gedmo\Versioned
+     */
+    protected $location;
+
+    /**
      */
     protected $previousPasswordCheck;
 
@@ -691,6 +697,16 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $diff = $date->diff($this->getLastPasswordChange());
 
         return $diff->days >= 90;
+    }
+
+    public function getLocation()
+    {
+        return $this->location;
+    }
+
+    public function setLocation(Location $location)
+    {
+        $this->location = $location;
     }
 
     public function hasEmployeeRole()

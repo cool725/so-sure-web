@@ -27,6 +27,7 @@ use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Document\File\PicSureFile;
 use AppBundle\Document\Connection\Connection;
+use AppBundle\Document\Location;
 
 use AppBundle\Document\PhoneTrait;
 
@@ -2091,6 +2092,48 @@ class ApiAuthController extends BaseController
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api quoteAction.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
+     * @Route("/user/{id}/tracklocation", name="api_auth_track_user_location")
+     * @Method({"POST"})
+     */
+    public function trackUserLocationAction(Request $request, $id)
+    {
+        try {
+            $data = json_decode($request->getContent(), true)['body'];
+            if (!$this->validateFields($data, ['latitude', 'longitude'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(User::class);
+            $user = $repo->find($id);
+
+            $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);
+
+            $location = new Location();
+            $location->setLatitude($this->getDataString($data, 'latitude'));
+            $location->setLongitude($this->getDataString($data, 'longitude'));
+            $user->setLocation($location);
+
+            $this->validateObject($location);
+
+            $dm->persist($location);
+            $dm->flush();
+
+            return new JsonResponse($user->toApiArray());
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api trackUserLocationAction.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
