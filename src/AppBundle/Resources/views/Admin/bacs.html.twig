@@ -165,43 +165,78 @@
                 {% if payments|length == 0 %}
                     <p>No payments present</p>
                 {% else %}
-                    <table class="table table-striped">
-                        <tr>
-                            <th width="20%">Serial</th>
-                            <th width="20%">Date</th>
-                            <th width="20%">Bacs Status</th>
-                            <th width="20%">Amount</th>
-                            <th width="20%">Success</th>
-                        </tr>
-                        {% for payment in payments %}
+                    {% set serial = '' %}
+                    {% for payment in payments %}
+                        {% if serial != payment.serialNumber %}
+                            {% if serial != '' %}</table>{% endif %}
+                            <h4>
+                            {{ payment.serialNumber }}
+                            {% for file in files %}
+                                {% if file.serialNumber == payment.serialNumber %}
+                                    (Generated: {{  file.date|date('d M Y H:i', 'Europe/London')  }})
+                                {% endif %}
+                            {% endfor %}
+                            </h4>
+                            <table class="table table-striped">
+                                <tr>
+                                    <th width="15%">Status</th>
+                                    <th width="10%">Amount</th>
+                                    <th width="15%">Submitted Date</th>
+                                    <th width="15%">Bacs Credit Date</th>
+                                    <th width="15%">Bacs Reversed Date</th>
+                                    <th width="30%">Actions</th>
+                                </tr>
+                        {% endif %}
                             <tr>
-                                <td width="20%">
-                                    {{ payment.serialNumber }}
-                                    {% for file in files %}
-                                        {% if file.serialNumber == payment.serialNumber %}
-                                        ({{  file.date|date('d M Y H:i', 'Europe/London')  }})
-                                        {% endif %}
-                                    {% endfor %}
-                                </td>
-                                <td width="20%">
-                                    {{ payment.date|date('d M Y H:i', 'Europe/London') }}
-                                </td>
-                                <td width="20%">
+                                <td width="15%">
                                     {{ payment.status }}
+                                    {% if payment.success %}
+                                        <i class="fa fa-check text-success"></i>
+                                    {% elseif payment.success is null %}
+                                        <i class="fa fa-question"></i>
+                                    {% else %}
+                                        <i class="fa fa-minus text-danger"></i>
+                                    {% endif %}
                                 </td>
-                                <td width="20%">
+                                <td width="10%">
                                     £{{ payment.amount|number_format(2, '.', ',') }}
                                 </td>
-                                <td width="20%">
-                                    {% if payment.success %}
-                                        Yes
+                                <td width="15%">
+                                    {% if payment.submittedDate %}
+                                        {{ payment.submittedDate|date('d M Y', 'Europe/London') }}
                                     {% else %}
-                                        No
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td width="15%">
+                                    {% if payment.bacsCreditDate %}
+                                        {{ payment.bacsCreditDate|date('d M Y', 'Europe/London') }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td width="15%">
+                                    {% if payment.bacsReversedDate %}
+                                        {{ payment.bacsReversedDate|date('d M Y', 'Europe/London') }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td width="30%">
+                                    {% if payment.canAction %}
+                                        <button title="Mark as approved" type="button" class="btn btn-success bacs-approve" data-token="{{ csrf_token('default') }}"
+                                                data-bacs-approve-url="{{ path('admin_bacs_approve', {'id': payment.id}) }}">Approve</button>
+                                        <button title="Mark as rejected" type="button" class="btn btn-danger bacs-reject" data-token="{{ csrf_token('default') }}"
+                                                data-bacs-reject-url="{{ path('admin_bacs_reject', {'id': payment.id}) }}">Reject</button>
+                                    {% elseif payment.status == 'success' or payment.status == 'failure' %}
+                                        Already actioned
+                                    {% else %}
+                                        Wait
                                     {% endif %}
                                 </td>
                             </tr>
-                        {% endfor %}
-                    </table>
+                        {% set serial = payment.serialNumber %}
+                    {% endfor %}
                 {% endif %}
 
             </div>

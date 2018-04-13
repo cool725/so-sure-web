@@ -18,6 +18,7 @@ class BacsPaymentRepository extends PaymentRepository
         return $this->createQueryBuilder()
             ->field('date')->gte($startDay)
             ->field('date')->lt($nextDay)
+            ->sort('date', 'desc')
             ->getQuery()
             ->execute();
     }

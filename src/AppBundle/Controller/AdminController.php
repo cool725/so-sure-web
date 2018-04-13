@@ -661,11 +661,46 @@ class AdminController extends BaseController
                 'status' => BacsPayment::STATUS_GENERATED
             ]);
             foreach ($payments as $payment) {
-                $payment->setStatus(BacsPayment::STATUS_TRANSFFER_WAIT_EXCEPTION);
+                $payment->setStatus(BacsPayment::STATUS_SUBMITTED);
+                $payment->submit();
             }
 
             $dm->flush();
             $message = sprintf('Bacs file %s is marked as submitted', $file->getFileName());
+            $this->addFlash(
+                'success',
+                $message
+            );
+        }
+
+        return new RedirectResponse($this->generateUrl('admin_bacs'));
+    }
+
+    /**
+     * @Route("/bacs/approve/{id}", name="admin_bacs_approve")
+     * @Route("/bacs/reject/{id}", name="admin_bacs_reject")
+     * @Method({"POST"})
+     */
+    public function bacsPaymentAction(Request $request, $id)
+    {
+        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
+            throw new \InvalidArgumentException('Invalid csrf token');
+        }
+
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(BacsPayment::class);
+        /** @var BacsPayment $payment */
+        $payment = $repo->find($id);
+        if ($payment) {
+            $message = 'Unknown';
+            if ($request->get('_route') == 'admin_bacs_approve') {
+                $payment->approve();
+                $message = 'Payment is approved';
+            } elseif ($request->get('_route') == 'admin_bacs_reject') {
+                $payment->reject();
+                $message = 'Payment is rejected';
+            }
+            $dm->flush();
             $this->addFlash(
                 'success',
                 $message
