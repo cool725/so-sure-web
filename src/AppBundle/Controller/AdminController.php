@@ -615,7 +615,7 @@ class AdminController extends BaseController
     /**
      * @Route("/bacs/file/{id}", name="admin_bacs_file")
      */
-    public function bacsFileAction($id)
+    public function bacsDownloadFileAction($id)
     {
         $dm = $this->getManager();
         /** @var S3FileRepository $repo */
@@ -640,9 +640,10 @@ class AdminController extends BaseController
 
     /**
      * @Route("/bacs/submission/{id}", name="admin_bacs_submission")
+     * @Route("/bacs/serial-number/{id}", name="admin_bacs_serial_number")
      * @Method({"POST"})
      */
-    public function bacsSubmissionAction(Request $request, $id)
+    public function bacsFileAction(Request $request, $id)
     {
         if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
             throw new \InvalidArgumentException('Invalid csrf token');
@@ -653,20 +654,41 @@ class AdminController extends BaseController
         /** @var AccessPayFile $file */
         $file = $repo->find($id);
         if ($file) {
-            $file->setSubmitted(true);
+            $message = 'Unknown';
+            if ($request->get('_route') == 'admin_bacs_submission') {
+                $file->setSubmitted(true);
 
-            $paymentRepo = $dm->getRepository(BacsPayment::class);
-            $payments = $paymentRepo->findBy([
-                'serialNumber' => $file->getSerialNumber(),
-                'status' => BacsPayment::STATUS_GENERATED
-            ]);
-            foreach ($payments as $payment) {
-                $payment->setStatus(BacsPayment::STATUS_SUBMITTED);
-                $payment->submit();
+                $paymentRepo = $dm->getRepository(BacsPayment::class);
+                $payments = $paymentRepo->findBy([
+                    'serialNumber' => $file->getSerialNumber(),
+                    'status' => BacsPayment::STATUS_GENERATED
+                ]);
+                foreach ($payments as $payment) {
+                    $payment->setStatus(BacsPayment::STATUS_SUBMITTED);
+                    $payment->submit();
+                }
+
+                $message = sprintf('Bacs file %s is marked as submitted', $file->getFileName());
+            } elseif ($request->get('_route') == 'admin_bacs_serial_number') {
+                $paymentRepo = $dm->getRepository(BacsPayment::class);
+                $payments = $paymentRepo->findBy([
+                    'serialNumber' => $file->getSerialNumber(),
+                    'status' => BacsPayment::STATUS_GENERATED
+                ]);
+                foreach ($payments as $payment) {
+                    $payment->setSerialNumber($request->get('serialNumber'));
+                }
+
+                $file->setSerialNumber($request->get('serialNumber'));
+                $metadata = $file->getMetadata();
+                $metadata['serial-number'] = $file->getSerialNumber();
+                $file->setMetadata($metadata);
+                $message = sprintf('Bacs file %s serial number updated', $file->getFileName());
+            } else {
+                throw new \Exception('Unknown route');
             }
 
             $dm->flush();
-            $message = sprintf('Bacs file %s is marked as submitted', $file->getFileName());
             $this->addFlash(
                 'success',
                 $message

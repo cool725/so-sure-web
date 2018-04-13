@@ -135,6 +135,11 @@ class S3File
         $this->metadata[$key] = $value;
     }
 
+    public function setMetadata($metadata)
+    {
+        $this->metadata = $metadata;
+    }
+
     public function getFileType()
     {
         $names = explode('\\', get_class($this));
