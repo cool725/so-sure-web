@@ -654,6 +654,7 @@ class AdminController extends BaseController
         /** @var AccessPayFile $file */
         $file = $repo->find($id);
         if ($file) {
+            $message = 'Unknown';
             if ($request->get('_route') == 'admin_bacs_submission') {
                 $file->setSubmitted(true);
 
@@ -683,6 +684,8 @@ class AdminController extends BaseController
                 $metadata['serial-number'] = $file->getSerialNumber();
                 $file->setMetadata($metadata);
                 $message = sprintf('Bacs file %s serial number updated', $file->getFileName());
+            } else {
+                throw new \Exception('Unknown route');
             }
 
             $dm->flush();
