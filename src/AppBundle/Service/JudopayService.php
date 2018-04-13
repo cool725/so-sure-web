@@ -474,11 +474,7 @@ class JudopayService
         return $details;
     }
 
-    /**
-     * TODO: Adjust $enforceFullAmount to true once production has validated its safe to use
-     * TODO: Adjust $enforceDate to true once production has validated its safe to use
-     */
-    public function getReceipt($receiptId, $enforceFullAmount = false, $enforceDate = false, \DateTime $date = null)
+    public function getReceipt($receiptId, $enforceFullAmount = true, $enforceDate = true, \DateTime $date = null)
     {
         $transaction = $this->apiClient->getModel('Transaction');
 
