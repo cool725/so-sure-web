@@ -43,3 +43,11 @@ $('.bacs-reject').click(function() {
     }
 });
 
+$('#editSerialNumberModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget) // Button that triggered the modal
+    var url = button.data('serial-number-url');
+    var serialNumber = button.data('serial-number');
+    var modal = $(this);
+    $('#editSerialNumberForm').attr('action', url);
+    $('#editSerialNumber').val(serialNumber);
+});
