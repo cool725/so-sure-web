@@ -3,6 +3,7 @@ namespace AppBundle\Service;
 
 use AppBundle\Document\Cashback;
 use AppBundle\Document\File\AccessPayFile;
+use AppBundle\Document\User;
 use Psr\Log\LoggerInterface;
 use GuzzleHttp\Client;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -379,6 +380,18 @@ class MonitorService
             throw new MonitorException(sprintf(
                 'Last holiday %s is coming up. Add more holidays',
                 $holiday->format('d/m/Y')
+            ));
+        }
+    }
+
+    public function bacsMandates()
+    {
+        $repo = $this->dm->getRepository(User::class);
+        $users = $repo->findPendingMandates()->getQuery()->execute();
+        if (count($users) > 0) {
+            throw new MonitorException(sprintf(
+                'There are %d bacs mandates waiting approval',
+                count($users)
             ));
         }
     }
