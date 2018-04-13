@@ -49,9 +49,14 @@
                     {% endif %}
                     {# End Phone Search #}
                 </div>
+              {% elseif app.user.canPurchasePolicy(false) %}
+                  <div class="col-md-12">
+                      <h2>You've reached the maximum number of allowed policies.</h2>
+                      <p class="lead">Contact us for more details.</p>
+                  </div>
               {% else %}
                 <div class="col-md-12">
-                    <h2>You've reached the maximum number of allowed policies.</h2>
+                    <h2>Sorry, but you are not able to purchase a policy.</h2>
                     <p class="lead">Contact us for more details.</p>
                 </div>
               {% endif %}
