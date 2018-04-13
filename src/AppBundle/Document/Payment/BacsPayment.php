@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document\Payment;
 
+use AppBundle\Document\DateTrait;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -13,13 +14,11 @@ use AppBundle\Validator\Constraints as AppAssert;
  */
 class BacsPayment extends Payment
 {
+    use DateTrait;
+
     const STATUS_PENDING = 'pending';
     const STATUS_GENERATED = 'generated';
     const STATUS_SUBMITTED = 'submitted';
-    /**
-     * Money has been transfered, however, there may be an exception in next day or 2
-     */
-    const STATUS_TRANSFFER_WAIT_EXCEPTION = 'transfer-wait-exception';
     const STATUS_SUCCESS = 'success';
     const STATUS_FAILURE = 'failure';
 
@@ -53,6 +52,30 @@ class BacsPayment extends Payment
      */
     protected $serialNumber;
 
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     * @Gedmo\Versioned
+     * @var \DateTime
+     */
+    protected $submittedDate;
+
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     * @Gedmo\Versioned
+     * @var \DateTime
+     */
+    protected $bacsCreditDate;
+
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     * @Gedmo\Versioned
+     * @var \DateTime
+     */
+    protected $bacsReversedDate;
+
     public function isManual()
     {
         return $this->manual;
@@ -81,6 +104,92 @@ class BacsPayment extends Payment
     public function setSerialNumber($serialNumber)
     {
         $this->serialNumber = $serialNumber;
+    }
+
+    public function getSubmittedDate()
+    {
+        return $this->submittedDate;
+    }
+
+    public function setSubmittedDate(\DateTime $submittedDate)
+    {
+        $this->submittedDate = $submittedDate;
+    }
+
+    public function getBacsCreditDate()
+    {
+        return $this->bacsCreditDate;
+    }
+
+    public function setBacsCreditDate(\DateTime $bacsCreditDate)
+    {
+        $this->bacsCreditDate = $bacsCreditDate;
+    }
+
+    public function getBacsReversedDate()
+    {
+        return $this->bacsReversedDate;
+    }
+
+    public function setBacsReversedDate(\DateTime $bacsReversedDate)
+    {
+        $this->bacsReversedDate = $bacsReversedDate;
+    }
+
+    public function submit(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+        $this->setSubmittedDate($date);
+        $this->setBacsCreditDate($this->addBusinessDays($date, 2));
+        $this->setBacsReversedDate($this->addBusinessDays($date, 5));
+    }
+
+    public function canAction(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        // already actioned
+        if (in_array($this->getStatus(), [self::STATUS_SUCCESS, self::STATUS_FAILURE])) {
+            return false;
+        }
+
+        $reversedDate = $this->startOfDay($this->getBacsReversedDate());
+        $diff = $reversedDate->diff($this->startOfDay($date));
+        if ($diff->d == 0 || (!$diff->invert && $diff->d > 0)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function approve(\DateTime $date = null)
+    {
+        if (!$this->canAction($date)) {
+            throw new \Exception(sprintf(
+                'Attempting to action before reveral date (%s) is past',
+                $this->getBacsReversedDate()->format('d m Y')
+            ));
+        }
+
+        $this->setStatus(self::STATUS_SUCCESS);
+        $this->setSuccess(true);
+    }
+
+    public function reject(\DateTime $date = null)
+    {
+        if (!$this->canAction($date)) {
+            throw new \Exception(sprintf(
+                'Attempting to action before reveral date (%s) is past',
+                $this->getBacsReversedDate()->format('d m Y')
+            ));
+        }
+
+        $this->setStatus(self::STATUS_FAILURE);
+        $this->setSuccess(false);
     }
 
     public function isSuccess()
