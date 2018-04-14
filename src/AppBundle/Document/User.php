@@ -1022,6 +1022,34 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return false;
     }
 
+    public function hasPolicyBacsPaymentInProgress()
+    {
+        foreach ($this->getValidPolicies(true) as $policy) {
+            /** @var Policy $policy */
+            if ($policy->hasBacsPaymentInProgress()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function canUpdateBacsDetails()
+    {
+        /** @var BacsPaymentMethod $bacsPaymentMethod */
+        $bacsPaymentMethod = $this->getPaymentMethod();
+        if ($bacsPaymentMethod instanceof BacsPaymentMethod &&
+            $bacsPaymentMethod->getBankAccount()->isMandateInProgress()) {
+                return false;
+        }
+
+        if ($this->hasPolicyBacsPaymentInProgress()) {
+            return false;
+        }
+
+        return true;
+    }
+
     public function getAnalytics()
     {
         $data = [];

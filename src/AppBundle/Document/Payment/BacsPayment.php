@@ -146,14 +146,23 @@ class BacsPayment extends Payment
         $this->setBacsReversedDate($this->addBusinessDays($date, 5));
     }
 
+    public function inProgress()
+    {
+        if (in_array($this->getStatus(), [self::STATUS_SUCCESS, self::STATUS_FAILURE])) {
+            return false;
+        }
+
+        return true;
+    }
+
     public function canAction(\DateTime $date = null)
     {
         if (!$date) {
             $date = new \DateTime();
         }
 
-        // already actioned
-        if (in_array($this->getStatus(), [self::STATUS_SUCCESS, self::STATUS_FAILURE])) {
+        // already completed
+        if (!$this->inProgress()) {
             return false;
         }
 
