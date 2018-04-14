@@ -4266,6 +4266,17 @@ abstract class Policy
         return false;
     }
 
+    public function hasBacsPaymentInProgress()
+    {
+        foreach ($this->getPayments() as $payment) {
+            if ($payment instanceof BacsPayment && $payment->inProgress()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     protected function toApiArray()
     {
         if ($this->isPolicy() && !$this->getPolicyTerms() && in_array($this->getStatus(), [

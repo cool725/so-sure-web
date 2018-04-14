@@ -326,6 +326,15 @@ class BankAccount
         $this->firstPayment = $firstPayment;
     }
 
+    public function isMandateInProgress()
+    {
+        return !in_array($this->getMandateStatus(), [
+            self::MANDATE_SUCCESS,
+            self::MANDATE_FAILURE,
+            self::MANDATE_CANCELLED
+        ]);
+    }
+
     public function allowedSubmission(\DateTime $now = null)
     {
         if (!$now) {
