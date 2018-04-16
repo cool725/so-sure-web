@@ -1701,7 +1701,8 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
                 'Please update your card',
             'payment_method' => $this->getPaymentMethod() ?
                 $this->getPaymentMethod()->getType() :
-                null
+                null,
+            'has_mobile_number_verified' => $this->getMobileNumberVerified()
         ];
     }
 }

@@ -2152,4 +2152,135 @@ class ApiAuthController extends BaseController
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
     }
+
+    /**
+     * @Route("/user/{id}/verify/mobilenumber", name="api_auth_user_request_verification_mobilenumber")
+     * @Method({"GET"})
+     */
+    public function userRequestVerificationMobileNumberAction($id)
+    {
+        try {
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(User::class);
+            $user = $repo->find($id);
+            if (!$user) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_NOT_FOUND,
+                    'Unable to find user',
+                    404
+                );
+            }
+            $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);
+
+            $mobileNumber = $user->getMobileNumber();
+            if (!$this->isValidUkMobile($mobileNumber)) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_INVALD_DATA_FORMAT,
+                    'Invalid UK mobile number',
+                    422
+                );
+            }
+
+            $characters = '0123456789';
+            $code = '';
+            for ($i = 0; $i < 6; $i++) {
+                $code .= $characters[rand(0, 9)];
+            }
+
+            $redis = $this->get('snc_redis.default');
+            $redis->rpush('MOBILE-NUMBER-VALIDATION-CODES', serialize(['userid' => $user->getId(), 'code' => $code]));
+
+            $sms = $this->get('app.sms');
+            $message = $this->get('templating')->render(
+                'AppBundle:Sms:validation-code.txt.twig',
+                ['code' => $code]
+            );
+            if ($sms->send($mobileNumber, $message)) {
+                return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'OK', 200);
+            } else {
+                $this->get('logger')->error('Error sending SMS.', ['mobile' => $mobileNumber]);
+
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_SEND_SMS, 'Error sending SMS', 422);
+            }
+        } catch (AccessDeniedException $e) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api requestVerificationMobileNumberAction.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
+     * @Route("/user/{id}/verify/mobilenumber", name="api_auth_user_verify_mobilenumber")
+     * @Method({"POST"})
+     */
+    public function userVerifyMobileNumberAction(Request $request, $id)
+    {
+        try {
+            $data = json_decode($request->getContent(), true)['body'];
+            if (empty($data)) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            $dm = $this->getManager();
+            $repo = $dm->getRepository(User::class);
+            $user = $repo->find($id);
+            if (!$user) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_NOT_FOUND,
+                    'Unable to find user',
+                    404
+                );
+            }
+            $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);
+
+            $code = '';
+            if (isset($data['code'])) {
+                $code = $this->getDataString($data, 'code');
+            } else {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            if (mb_strlen($code) != 6) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_VERIFY_CODE, 'Invalid code', 422);
+            }
+
+            $redis = $this->get('snc_redis.default');
+            $foundCode = null;
+            for ($i=0; $i < $redis->llen('MOBILE-NUMBER-VALIDATION-CODES'); $i++) {
+                $storedCodeData = $redis->lindex('MOBILE-NUMBER-VALIDATION-CODES', $i);
+                if ($storedCodeData !== false) {
+                    $storedCode = unserialize($storedCodeData);
+                    if (isset($storedCode['userid']) && $storedCode['userid'] == $id) {
+                        $foundCode = $storedCode;
+                        break;
+                    }
+                }
+            }
+
+            if ($foundCode !== null && isset($foundCode['code']) && $code === $foundCode['code']) {
+                $redis->lrem('MOBILE-NUMBER-VALIDATION-CODES', 1, serialize($foundCode));
+                $user->setMobileNumberVerified(true);
+                $dm->flush();
+                return new JsonResponse($user->toApiArray());
+            } else {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_VERIFY_CODE, 'No matching code', 422);
+            }
+        } catch (AccessDeniedException $e) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (ValidationException $ex) {
+            $this->get('logger')->warning('Failed validation.', ['exception' => $ex]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api verifyMobileNumberAction.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
 }
