@@ -2112,7 +2112,13 @@ class ApiAuthController extends BaseController
             $dm = $this->getManager();
             $repo = $dm->getRepository(User::class);
             $user = $repo->find($id);
-
+            if (!$user) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_NOT_FOUND,
+                    'Unable to find user',
+                    404
+                );
+            }
             $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);
 
             $location = new Location();

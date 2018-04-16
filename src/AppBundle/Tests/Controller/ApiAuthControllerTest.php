@@ -5108,6 +5108,18 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals('-0.087658', $location->getLongitude());
     }
 
+    public function testUserTrackLocationUnknownId()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $url = sprintf('/api/v1/auth/user/1/tracklocation');
+        $data = [
+            'latitude' => '51.524490',
+            'longitude' => '-0.087658',
+        ];
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $data = $this->verifyResponse(404);
+    }
+
     public function testUserTrackLocationValidation()
     {
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
