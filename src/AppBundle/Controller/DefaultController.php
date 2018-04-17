@@ -90,7 +90,6 @@ class DefaultController extends BaseController
             $request,
             SixpackService::EXPERIMENT_DEFACTO,
             ['no-defacto', 'defacto'],
-            SixpackService::LOG_MIXPANEL_CONVERSION
         );
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
