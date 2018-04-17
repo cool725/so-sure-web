@@ -35,13 +35,15 @@ class TestCommand extends BaseCommand
                 if (($user->getBirthday()->format('H') == 0 && $user->getBirthday()->format('P') == "+01:00") ||
                     $user->getBirthday()->format('H') == 23 && $user->getBirthday()->format('P') == "+00:00") {
                     if (count($user->getValidPolicies(true)) > 0) {
-                        print sprintf("%s %s 1%s",
+                        print sprintf(
+                            "%s %s 1%s",
                             $user->getId(),
                             $user->getBirthday()->format(\DateTime::ATOM),
                             PHP_EOL
                         );
                     } else {
-                        print sprintf("%s %s 0%s",
+                        print sprintf(
+                            "%s %s 0%s",
                             $user->getId(),
                             $user->getBirthday()->format(\DateTime::ATOM),
                             PHP_EOL
