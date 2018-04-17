@@ -63,5 +63,8 @@ class SixpackListener
         $this->sixpack->convert(
             SixpackService::EXPERIMENT_STEP_3
         );
+        $this->sixpack->convert(
+            SixpackService::EXPERIMENT_DEFACTO
+        );
     }
 }
