@@ -257,4 +257,22 @@ class BankAccountTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($bankAccount->allowedSubmission(new \DateTime('2018-02-28 11:00')));
         $this->assertTrue($bankAccount->allowedSubmission(new \DateTime('2018-02-29 01:00')));
     }
+
+    public function testReference()
+    {
+        $bankAccount = new BankAccount();
+        $bankAccount->setReference('ddic');
+        $bankAccount->setReference('1DDIC');
+        $bankAccount->setReference('Ok');
+        $this->assertTrue(true);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testReferenceDDIC()
+    {
+        $bankAccount = new BankAccount();
+        $bankAccount->setReference('DDIC0043242fa');
+    }
 }
