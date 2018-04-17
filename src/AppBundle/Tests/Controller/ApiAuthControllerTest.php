@@ -1672,7 +1672,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['phone_policy' => []]);
-        $data = $this->verifyResponse(200);
+        $data = $this->verifyResponse(400);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['phone_policy' => [
             'model_number' => 'MLLN2B/A',
