@@ -3,7 +3,9 @@ namespace AppBundle\Service;
 
 use AppBundle\Document\Cashback;
 use AppBundle\Document\File\AccessPayFile;
+use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\User;
+use AppBundle\Repository\BacsPaymentRepository;
 use Psr\Log\LoggerInterface;
 use GuzzleHttp\Client;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -393,6 +395,18 @@ class MonitorService
                 'There are %d bacs mandates waiting approval',
                 count($users)
             ));
+        }
+    }
+
+    public function bacsPayments()
+    {
+        /** @var BacsPaymentRepository $paymentsRepo */
+        $paymentsRepo = $this->dm->getRepository(BacsPayment::class);
+        foreach ($paymentsRepo->findPayments(new \DateTime()) as $payment) {
+            /** @var BacsPayment $payment */
+            if ($payment->canAction(new \DateTime())) {
+                throw new MonitorException('There are bacs payments waiting actioning');
+            }
         }
     }
 }
