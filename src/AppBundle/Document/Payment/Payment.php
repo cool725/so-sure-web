@@ -456,6 +456,40 @@ abstract class Payment
         $this->scheduledPayments[] = $scheduledPayment;
     }
 
+    public function setCommission()
+    {
+        if (!$this->getPolicy()) {
+            throw new \Exception(sprintf(
+                'Attempting to set commission for %f (payment %s) without a policy',
+                $this->getAmount(),
+                $this->getId()
+            ));
+        }
+
+        $salva = new Salva();
+        $premium = $this->getPolicy()->getPremium();
+
+        // Only set broker fees if we know the amount
+        if ($this->areEqualToFourDp($this->getAmount(), $this->getPolicy()->getPremium()->getYearlyPremiumPrice())) {
+            $commission = $salva->sumBrokerFee(12, true);
+            $this->setTotalCommission($commission);
+        } elseif ($premium->isEvenlyDivisible($this->getAmount()) ||
+            $premium->isEvenlyDivisible($this->getAmount(), true)) {
+            // payment should already be credited at this point
+            $includeFinal = $this->areEqualToTwoDp(0, $this->getPolicy()->getOutstandingPremium());
+
+            $numPayments = $premium->getNumberOfMonthlyPayments($this->getAmount());
+            $commission = $salva->sumBrokerFee($numPayments, $includeFinal);
+            $this->setTotalCommission($commission);
+        } else {
+            throw new \Exception(sprintf(
+                'Failed set correct commission for %f (policy %s)',
+                $this->getAmount(),
+                $this->getPolicy()->getId()
+            ));
+        }
+    }
+
     public function toApiArray()
     {
         return [

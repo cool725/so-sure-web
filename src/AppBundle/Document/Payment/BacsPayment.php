@@ -186,6 +186,8 @@ class BacsPayment extends Payment
 
         $this->setStatus(self::STATUS_SUCCESS);
         $this->setSuccess(true);
+
+        $this->setCommission();
     }
 
     public function reject(\DateTime $date = null)
