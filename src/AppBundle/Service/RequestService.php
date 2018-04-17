@@ -17,6 +17,8 @@ class RequestService
     const DEVICE_CATEGORY_TABLET = 'Tablet';
     const DEVICE_CATEGORY_DESKTOP = 'Desktop';
 
+    const DEVICE_OS_ANDROID = 'Android';
+
     /** @var RequestStack */
     protected $requestStack;
 
