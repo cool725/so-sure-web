@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Service\JudopayService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
@@ -27,6 +28,7 @@ class JudopayServiceTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
+    /** @var JudopayService */
     protected static $judopay;
     protected static $userRepo;
 
@@ -1217,7 +1219,7 @@ class JudopayServiceTest extends WebTestCase
             $payment->setAmount($scheduledPayment->getAmount());
             $policy->addPayment($payment);
 
-            self::$judopay->setCommission($policy, $payment);
+            self::$judopay->setCommission($payment);
 
             self::$judopay->processScheduledPaymentResult(
                 $scheduledPayment,
@@ -1241,7 +1243,7 @@ class JudopayServiceTest extends WebTestCase
         $payment->setAmount($scheduledPayment->getAmount());
         $policy->addPayment($payment);
 
-        self::$judopay->setCommission($policy, $payment);
+        self::$judopay->setCommission($payment);
 
         self::$judopay->processScheduledPaymentResult(
             $scheduledPayment,
@@ -1367,7 +1369,8 @@ class JudopayServiceTest extends WebTestCase
         $policy = static::initPolicy($user, static::$dm, $phone, null, false, true);
         $payment = new JudoPayment();
         $payment->setAmount($policy->getPremium()->getYearlyPremiumPrice());
-        self::$judopay->setCommission($policy, $payment);
+        $policy->addPayment($payment);
+        self::$judopay->setCommission($payment);
         $this->assertEquals(
             Salva::YEARLY_TOTAL_COMMISSION,
             $payment->getTotalCommission()
@@ -1375,7 +1378,8 @@ class JudopayServiceTest extends WebTestCase
 
         $payment = new JudoPayment();
         $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice());
-        self::$judopay->setCommission($policy, $payment);
+        $policy->addPayment($payment);
+        self::$judopay->setCommission($payment);
         $this->assertEquals(
             Salva::MONTHLY_TOTAL_COMMISSION,
             $payment->getTotalCommission()
@@ -1383,7 +1387,8 @@ class JudopayServiceTest extends WebTestCase
 
         $payment = new JudoPayment();
         $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice() * 3);
-        self::$judopay->setCommission($policy, $payment);
+        $policy->addPayment($payment);
+        self::$judopay->setCommission($payment);
         $this->assertEquals(
             Salva::MONTHLY_TOTAL_COMMISSION * 3,
             $payment->getTotalCommission()
@@ -1391,7 +1396,8 @@ class JudopayServiceTest extends WebTestCase
 
         $payment = new JudoPayment();
         $payment->setAmount($policy->getPremium()->getMonthlyPremiumPrice() * 1.5);
-        self::$judopay->setCommission($policy, $payment);
+        $policy->addPayment($payment);
+        self::$judopay->setCommission($payment);
         $this->assertNull($payment->getTotalCommission());
     }
 
@@ -1409,7 +1415,8 @@ class JudopayServiceTest extends WebTestCase
 
         $payment = new JudoPayment();
         $payment->setAmount($policy->getPremium()->getAdjustedYearlyPremiumPrice());
-        self::$judopay->setCommission($policy, $payment);
+        $policy->addPayment($payment);
+        self::$judopay->setCommission($payment);
         $this->assertEquals(
             Salva::YEARLY_TOTAL_COMMISSION,
             $payment->getTotalCommission()
@@ -1417,7 +1424,8 @@ class JudopayServiceTest extends WebTestCase
 
         $payment = new JudoPayment();
         $payment->setAmount($policy->getPremium()->getAdjustedStandardMonthlyPremiumPrice());
-        self::$judopay->setCommission($policy, $payment);
+        $policy->addPayment($payment);
+        self::$judopay->setCommission($payment);
         $this->assertEquals(
             Salva::MONTHLY_TOTAL_COMMISSION,
             $payment->getTotalCommission()
@@ -1425,7 +1433,8 @@ class JudopayServiceTest extends WebTestCase
 
         $payment = new JudoPayment();
         $payment->setAmount($policy->getPremium()->getAdjustedStandardMonthlyPremiumPrice() * 3);
-        self::$judopay->setCommission($policy, $payment);
+        $policy->addPayment($payment);
+        self::$judopay->setCommission($payment);
         $this->assertEquals(
             Salva::MONTHLY_TOTAL_COMMISSION * 3,
             $payment->getTotalCommission()
@@ -1433,14 +1442,15 @@ class JudopayServiceTest extends WebTestCase
 
         $payment = new JudoPayment();
         $payment->setAmount($policy->getPremium()->getAdjustedStandardMonthlyPremiumPrice() * 1.5);
-        self::$judopay->setCommission($policy, $payment);
+        $policy->addPayment($payment);
+        self::$judopay->setCommission($payment);
         $this->assertNull($payment->getTotalCommission());
 
         $payment = new JudoPayment();
         $payment->setSuccess(true);
         $payment->setAmount($policy->getPremium()->getAdjustedStandardMonthlyPremiumPrice() * 11);
         $policy->addPayment($payment);
-        self::$judopay->setCommission($policy, $payment);
+        self::$judopay->setCommission($payment);
 
         $payment = new JudoPayment();
         $payment->setSuccess(true);
@@ -1448,7 +1458,7 @@ class JudopayServiceTest extends WebTestCase
         $policy->addPayment($payment);
         $this->assertEquals(0, $policy->getOutstandingPremium());
 
-        self::$judopay->setCommission($policy, $payment);
+        self::$judopay->setCommission($payment);
         $this->assertEquals(
             Salva::FINAL_MONTHLY_TOTAL_COMMISSION,
             $payment->getTotalCommission()
