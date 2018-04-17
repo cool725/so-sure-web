@@ -116,10 +116,6 @@ $(function(){
         // $('.payment-options--info').text(help);
     });
 
-    $('input[name="purchase_form[amount]').change(function() {
-        //console.log('Yes');
-    });
-
     if ($.trim($('#Reference').val()).length > 0) {
         // Show loading overlay
         $('.so-sure-loading').show();
