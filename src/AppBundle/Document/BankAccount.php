@@ -239,6 +239,10 @@ class BankAccount
 
     public function setReference($reference)
     {
+        if (mb_strpos($reference, "DDIC") === 0) {
+            throw new \Exception(sprintf('Mandate reference is unable to start with DDIC (%s)', $reference));
+        }
+
         $this->reference = $reference;
     }
 
