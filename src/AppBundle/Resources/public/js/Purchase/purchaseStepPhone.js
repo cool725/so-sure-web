@@ -6,7 +6,8 @@ sosure.purchaseStepPhone = (function() {
 
     self.init = function() {
         self.form = $('.validate-form');
-        if (self.form.data('client-validation')) {
+        self.isIE = !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g);
+        if (self.form.data('client-validation') && !self.isIE) {
             self.addValidation();
         }
     }
