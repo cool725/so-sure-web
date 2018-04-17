@@ -21,7 +21,7 @@
 {% block body %}
 
     {# Hero #}
-    <section class="homepage--hero">
+    <section class="homepage--hero {% if defacto is defined and defacto == 'defacto' %}homepage--hero-background-defacto{% else %}homepage--hero-background{% endif %}">
 
         <h1 class="homepage--hero-h1">
             {% if main is defined and main %}
