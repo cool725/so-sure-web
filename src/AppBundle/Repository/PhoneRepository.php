@@ -43,6 +43,7 @@ class PhoneRepository extends DocumentRepository
         foreach ($items as $make) {
             $makes[$make] = $make;
         }
+        ksort($makes);
 
         return $makes;
     }
