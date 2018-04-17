@@ -1440,6 +1440,10 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     public function getBirthday()
     {
+        if ($this->birthday) {
+            $this->birthday->setTimezone(new \DateTimeZone(SoSure::TIMEZONE));
+        }
+
         return $this->birthday;
     }
 
