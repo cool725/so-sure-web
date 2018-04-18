@@ -5231,11 +5231,6 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $url = sprintf('/api/v1/auth/user/%s/verify/mobilenumber?_method=GET', $user->getId());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(200);
-        $redis = self::$client->getContainer()->get('snc_redis.default');
-        $storedCode = unserialize($redis->lpop('MOBILE-NUMBER-VALIDATION-CODES'));
-        $this->assertEquals($storedCode['userid'], $user->getId());
-        $this->assertFalse(empty($storedCode['code']));
-        $this->assertTrue(mb_strlen($storedCode['code']) == 6);
     }
 
     public function testUserRequestVerificationMobileNumberUnknownId()
@@ -5277,7 +5272,8 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         );
 
         $redis = self::$client->getContainer()->get('snc_redis.default');
-        $redis->rpush('MOBILE-NUMBER-VALIDATION-CODES', serialize(['userid' => $user->getId(), 'code' => '123456']));
+        $key = sprintf('Mobile:Validation:%s:%s', $user->getId(), '123456');
+        $redis->setEx($key, 600000, '123456');
         $cognitoIdentityId = $this->getAuthUser($user);
         $url = sprintf('/api/v1/auth/user/%s/verify/mobilenumber', $user->getId());
         $data = [
@@ -5311,7 +5307,8 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         );
 
         $redis = self::$client->getContainer()->get('snc_redis.default');
-        $redis->rpush('MOBILE-NUMBER-VALIDATION-CODES', serialize(['userid' => $user->getId(), 'code' => '123456']));
+        $key = sprintf('Mobile:Validation:%s:%s', $user->getId(), '123456');
+        $redis->setEx($key, 600000, '123456');
 
         $cognitoIdentityId = $this->getAuthUser($user);
         $url = sprintf('/api/v1/auth/user/%s/verify/mobilenumber', $user->getId());

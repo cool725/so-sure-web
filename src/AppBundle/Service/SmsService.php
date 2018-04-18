@@ -11,6 +11,9 @@ use AppBundle\Document\Policy;
 
 class SmsService
 {
+
+    const VALIDATION_TIMEOUT = 600; // 10 minutes
+
     /** @var DocumentManager */
     protected $dm;
 
@@ -26,6 +29,8 @@ class SmsService
     protected $router;
 
     protected $templating;
+
+    protected $redis;
 
     /**
      * @param DocumentManager $dm
@@ -43,7 +48,8 @@ class SmsService
         $auth_id,
         $auth_token,
         $sending_number,
-        $templating
+        $templating,
+        $redis
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -51,6 +57,7 @@ class SmsService
         $this->client = new RestAPI($auth_id, $auth_token);
         $this->sending_number = $sending_number;
         $this->templating = $templating;
+        $this->redis = $redis;
     }
 
     /**
@@ -100,5 +107,36 @@ class SmsService
 
         $this->dm->persist($charge);
         $this->dm->flush();
+    }
+
+    public function setValidationCodeForUser($userId)
+    {
+        $characters = '0123456789';
+        $code = '';
+        for ($i = 0; $i < 6; $i++) {
+            $code .= $characters[rand(0, 9)];
+        }
+
+        $key = sprintf('Mobile:Validation:%s:%s', $userId, $code);
+        $this->redis->setEx($key, self::VALIDATION_TIMEOUT, $code);
+
+        return $code;
+    }
+
+    public function checkValidationCodeForUser($userId, $code)
+    {
+        if (mb_strlen($code) != 6) {
+            return false;
+        }
+
+        $key = sprintf('Mobile:Validation:%s:%s', $userId, $code);
+        $foundCode = $this->redis->get($key);
+
+        if ($foundCode === $code) {
+            $this->redis->del($key);
+            return true;
+        }
+
+        return false;
     }
 }

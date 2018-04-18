@@ -2181,21 +2181,9 @@ class ApiAuthController extends BaseController
                 );
             }
 
-            $characters = '0123456789';
-            $code = '';
-            for ($i = 0; $i < 6; $i++) {
-                $code .= $characters[rand(0, 9)];
-            }
-
-            $redis = $this->get('snc_redis.default');
-            $redis->rpush('MOBILE-NUMBER-VALIDATION-CODES', serialize(['userid' => $user->getId(), 'code' => $code]));
-
             $sms = $this->get('app.sms');
-            $message = $this->get('templating')->render(
-                'AppBundle:Sms:validation-code.txt.twig',
-                ['code' => $code]
-            );
-            if ($sms->send($mobileNumber, $message)) {
+            $code = $sms->setValidationCodeForUser($user->getId());
+            if ($sms->sendTemplate($mobileNumber, 'AppBundle:Sms:validation-code.txt.twig', ['code' => $code])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'OK', 200);
             } else {
                 $this->get('logger')->error('Error sending SMS.', ['mobile' => $mobileNumber]);
@@ -2246,25 +2234,8 @@ class ApiAuthController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
 
-            if (mb_strlen($code) != 6) {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_VERIFY_CODE, 'Invalid code', 422);
-            }
-
-            $redis = $this->get('snc_redis.default');
-            $foundCode = null;
-            for ($i=0; $i < $redis->llen('MOBILE-NUMBER-VALIDATION-CODES'); $i++) {
-                $storedCodeData = $redis->lindex('MOBILE-NUMBER-VALIDATION-CODES', $i);
-                if ($storedCodeData !== false) {
-                    $storedCode = unserialize($storedCodeData);
-                    if (isset($storedCode['userid']) && $storedCode['userid'] == $id) {
-                        $foundCode = $storedCode;
-                        break;
-                    }
-                }
-            }
-
-            if ($foundCode !== null && isset($foundCode['code']) && $code === $foundCode['code']) {
-                $redis->lrem('MOBILE-NUMBER-VALIDATION-CODES', 1, serialize($foundCode));
+            $sms = $this->get('app.sms');
+            if ($sms->checkValidationCodeForUser($user->getId(), $code)) {
                 $user->setMobileNumberVerified(true);
                 $dm->flush();
                 return new JsonResponse($user->toApiArray());
