@@ -119,6 +119,14 @@ class BankAccount
      * @Gedmo\Versioned
      * @var \DateTime
      */
+    protected $created;
+
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     * @Gedmo\Versioned
+     * @var \DateTime
+     */
     protected $initialNotificationDate;
 
     /**
@@ -147,9 +155,18 @@ class BankAccount
      */
     protected $firstPayment;
 
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     * @Gedmo\Versioned
+     * @var \DateTime
+     */
+    protected $lastSuccessfulPaymentDate;
+
     public function __construct()
     {
         $this->setMandateStatus(self::MANDATE_PENDING_INIT);
+        $this->created = new \DateTime();
     }
 
     public function setAccountName($accountName)
@@ -320,6 +337,16 @@ class BankAccount
         $this->standardNotificationDate = $standardNotificationDate;
     }
 
+    public function getLastSuccessfulPaymentDate()
+    {
+        return $this->lastSuccessfulPaymentDate;
+    }
+
+    public function setLastSuccessfulPaymentDate($lastSuccessfulPaymentDate)
+    {
+        $this->lastSuccessfulPaymentDate = $lastSuccessfulPaymentDate;
+    }
+
     public function isFirstPayment()
     {
         return $this->firstPayment;
@@ -358,6 +385,11 @@ class BankAccount
 
     public function allowedProcessing(\DateTime $processingDate = null)
     {
+        // make sure we don't continue processing where we shouldn't
+        if ($this->shouldCancelMandate($processingDate)) {
+            return false;
+        }
+
         if ($this->isFirstPayment()) {
             return $this->allowedInitialProcessing($processingDate);
         } else {
@@ -417,6 +449,37 @@ class BankAccount
             } else {
                 return false;
             }
+        }
+    }
+
+    public function shouldCancelMandate(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime('now', new \DateTimeZone(SoSure::TIMEZONE));
+        }
+
+        // Mandate was never setup or already cancelled
+        if (in_array($this->getMandateStatus(), [self::MANDATE_CANCELLED, self::MANDATE_FAILURE])) {
+            return null;
+        }
+
+        $lastSuccessfulPaymentDate = $this->getLastSuccessfulPaymentDate();
+        if (!$lastSuccessfulPaymentDate) {
+            if ($this->getInitialPaymentSubmissionDate()) {
+                $lastSuccessfulPaymentDate = $this->getInitialPaymentSubmissionDate();
+            } else {
+                $lastSuccessfulPaymentDate = $this->created;
+            }
+        }
+
+        $diff = $lastSuccessfulPaymentDate->diff($date);
+        // 13 months is absolute max. we can take a conserviate view on this number (min possible) as do not
+        // expect to reach this at all
+        $thirteenMonthsInDays = 365 + 28;
+        if ($diff->days >= $thirteenMonthsInDays && !$diff->invert) {
+            return true;
+        } else {
+            return false;
         }
     }
 
