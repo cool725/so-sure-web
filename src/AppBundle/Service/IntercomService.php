@@ -295,7 +295,26 @@ class IntercomService
             ];
 
             $this->checkRateLimit();
-            $resp = $this->client->leads->convertLead($data);
+            try {
+                $resp = $this->client->leads->convertLead($data);
+            } catch (\GuzzleHttp\Exception\GuzzleException $e) {
+                if ($e->getCode() == 404) {
+                    $this->logger->debug(sprintf(
+                        'Unable to convert Intercom lead (userid %s) %s (404)',
+                        $user->getId(),
+                        json_encode($resp)
+                    ));
+                } else {
+                    $this->logger->error(sprintf(
+                        'Unable to convert Intercom lead (userid %s) %s (%s)',
+                        $user->getId(),
+                        json_encode($resp),
+                        $e->getCode()
+                    ));
+
+                    throw $e;
+                }
+            }
             $this->storeRateLimit();
 
             $this->logger->debug(sprintf('Intercom convert lead (userid %s) %s', $user->getId(), json_encode($resp)));
