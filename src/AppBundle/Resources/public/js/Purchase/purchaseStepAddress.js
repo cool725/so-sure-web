@@ -10,11 +10,13 @@ sosure.purchaseStepAddress = (function() {
     self.bloodhound = null;
     self.maxAddresses = 50; // more than 50 causes the find api to returns an error 'unrecognised country code'
     self.key = null;
+    self.isIE = null;
 
     self.init = function() {
         self.form = $('.validate-form');
         self.dobMask();
-        if (self.form.data('client-validation')) {
+        self.isIE = !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g);
+        if (self.form.data('client-validation') && !self.isIE) {
             self.addValidation();
         }
         self.url = window.location.href;

@@ -3,10 +3,12 @@ var sosure = sosure || {};
 sosure.purchaseStepPhone = (function() {
     var self = {};
     self.form = null;
+    self.isIE = null;
 
     self.init = function() {
         self.form = $('.validate-form');
-        if (self.form.data('client-validation')) {
+        self.isIE = !!navigator.userAgent.match(/Trident/g) || !!navigator.userAgent.match(/MSIE/g);
+        if (self.form.data('client-validation') && !self.isIE) {
             self.addValidation();
         }
     };
