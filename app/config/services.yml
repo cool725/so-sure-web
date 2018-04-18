@@ -760,6 +760,7 @@ services:
             -  { name: kernel.event_listener, event: event.user.name.updated, method: onUserNameChangedEvent }
             -  { name: kernel.event_listener, event: event.bacs.updated, method: onBankAccountChangedEvent }
             -  { name: kernel.event_listener, event: event.policy.bacs-created, method: onPolicyBacsCreated }
+            -  { name: kernel.event_listener, event: event.policy.updated-premium, method: onPolicyUpdatedPremium }
 
     app.listener.debtCollection:
         class:   AppBundle\Listener\DebtCollectionListener

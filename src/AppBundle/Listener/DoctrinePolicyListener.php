@@ -2,6 +2,7 @@
 
 namespace AppBundle\Listener;
 
+use AppBundle\Document\CurrencyTrait;
 use Doctrine\ODM\MongoDB\Event\PreUpdateEventArgs;
 use Doctrine\ODM\MongoDB\Event\LifecycleEventArgs;
 use AppBundle\Document\Policy;
@@ -10,6 +11,8 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class DoctrinePolicyListener
 {
+    use CurrencyTrait;
+
     /** @var EventDispatcher */
     protected $dispatcher;
 
@@ -20,6 +23,7 @@ class DoctrinePolicyListener
 
     public function preUpdate(PreUpdateEventArgs $eventArgs)
     {
+        $dispatched = [];
         $document = $eventArgs->getDocument();
         if ($document instanceof Policy) {
             if (!$document->isValidPolicy()) {
@@ -32,7 +36,36 @@ class DoctrinePolicyListener
             ];
             foreach ($fields as $field) {
                 if ($eventArgs->hasChangedField($field)) {
-                    return $this->triggerEvent($document, PolicyEvent::EVENT_UPDATED_POT);
+                    if (!in_array($document->getId(), $dispatched)) {
+                        $this->triggerEvent($document, PolicyEvent::EVENT_UPDATED_POT);
+                        $dispatched[] = $document->getId();
+                    }
+                }
+            }
+
+            $fields = [
+                'premium',
+            ];
+            foreach ($fields as $field) {
+                $changed = false;
+
+                if ($eventArgs->hasChangedField($field)) {
+                    if ($field == 'premium') {
+                        $oldPremium = $eventArgs->getOldValue('premium');
+                        $newPremium = $eventArgs->getNewValue('premium');
+                        if (!$oldPremium && !$newPremium) {
+                            $changed = false;
+                        } elseif ((!$oldPremium && $newPremium)
+                            || !$this->areEqualToTwoDp($oldPremium->getGwp(), $newPremium->getGwp())
+                            || !$this->areEqualToTwoDp($oldPremium->getIpt(), $newPremium->getIpt())
+                            || !$this->areEqualToTwoDp($oldPremium->getIptRate(), $newPremium->getIptRate())) {
+                            $changed = true;
+                        }
+                    }
+                }
+
+                if ($changed) {
+                    $this->triggerEvent($document, PolicyEvent::EVENT_UPDATED_PREMIUM);
                 }
             }
         }

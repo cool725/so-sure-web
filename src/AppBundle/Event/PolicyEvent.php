@@ -19,6 +19,7 @@ class PolicyEvent extends Event
     const EVENT_UNPAID = 'event.policy.unpaid';
     const EVENT_REACTIVATED = 'event.policy.reactived';
     const EVENT_BACS_CREATED = 'event.policy.bacs-created';
+    const EVENT_UPDATED_PREMIUM = 'event.policy.updated-premium';
 
     // Certain changes to a policy (user) should trigger a new salva version
     const EVENT_SALVA_INCREMENT = 'event.policy.salva_increment';

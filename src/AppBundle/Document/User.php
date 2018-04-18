@@ -1034,6 +1034,11 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return false;
     }
 
+    public function hasBacsPaymentMethod()
+    {
+        return $this->getPaymentMethod() instanceof BacsPaymentMethod;
+    }
+
     public function canUpdateBacsDetails()
     {
         /** @var BacsPaymentMethod $bacsPaymentMethod */
