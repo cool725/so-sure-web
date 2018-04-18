@@ -1015,7 +1015,7 @@
                             {% else %}
                                 <i class="fa fa-minus text-danger"></i>
                             {% endif %}
-                            {%  if payment.status is defined %}
+                            {%  if payment.status is defined and payment.status %}
                                 ({{  payment.status }})
                             {% endif %}
                         </td>
