@@ -64,7 +64,8 @@ class SixpackListener
             SixpackService::EXPERIMENT_STEP_3
         );
         $this->sixpack->convert(
-            SixpackService::EXPERIMENT_DEFACTO
+            SixpackService::EXPERIMENT_DEFACTO,
+            SixpackService::KPI_POLICY_PURCHASE
         );
     }
 }
