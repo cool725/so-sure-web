@@ -88,4 +88,26 @@ class BacsListener
         $policy = $event->getPolicy();
         $this->bacsService->queueBacsCreated($policy);
     }
+
+    public function onPolicyUpdatedPremium(PolicyEvent $event)
+    {
+        $policy = $event->getPolicy();
+        if ($policy->getUser()->hasBacsPaymentMethod()) {
+            $this->logger->error(sprintf(
+                'Unexpected premium change for policy %s with Bacs Payment method. Mandate should be invalidated?',
+                $policy->getId()
+            ));
+        }
+    }
+
+    public function onPolicyUpdatedBilling(PolicyEvent $event)
+    {
+        $policy = $event->getPolicy();
+        if ($policy->getUser()->hasBacsPaymentMethod()) {
+            $this->logger->error(sprintf(
+                'Unexpected billing date change for policy %s with Bacs Payment method. Currently not allowed',
+                $policy->getId()
+            ));
+        }
+    }
 }

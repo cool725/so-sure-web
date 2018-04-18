@@ -666,12 +666,14 @@ class ReceperioService extends BaseImeiService
         $this->identityLog = $identityLog;
 
         try {
-            return $this->runCheckSerial($phone, $serialNumber, $user, $warnMismatch);
+            $result = $this->runCheckSerial($phone, $serialNumber, $user, $warnMismatch);
+            return $result;
         } catch (ReciperoManualProcessException $e) {
             // If apple serial number doesn't work, try imei to get a non-memory match
             if ($phone->getMake() == 'Apple' && $imei) {
                 try {
-                    return $this->runCheckSerial($phone, $imei, $user, $warnMismatch);
+                    $result = $this->runCheckSerial($phone, $imei, $user, $warnMismatch);
+                    return $result;
                 } catch (ReciperoManualProcessException $e) {
                     if (!in_array($e->getCode(), [
                         ReciperoManualProcessException::EMPTY_MAKES,
@@ -736,9 +738,9 @@ class ReceperioService extends BaseImeiService
             return false;
         }
         try {
-            $this->setMakeModelValidatedStatus(
-                $this->validateSamePhone($phone, $serialNumber, $this->responseData, $warnMismatch)
-            );
+            $status = $this->validateSamePhone($phone, $serialNumber, $this->responseData, $warnMismatch);
+            $this->setMakeModelValidatedStatus($status);
+
             return true;
         } catch (ReciperoManualProcessException $ex) {
             $this->setMakeModelValidatedStatus($this->getMakeModelValidationStatusFromProcessCode($ex->getCode()));

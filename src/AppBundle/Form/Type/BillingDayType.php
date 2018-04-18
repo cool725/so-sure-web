@@ -2,6 +2,9 @@
 
 namespace AppBundle\Form\Type;
 
+use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\PaymentMethod;
+use AppBundle\Document\Policy;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -21,8 +24,14 @@ class BillingDayType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        /** @var Policy $policy */
         $policy = $builder->getData()->getPolicy();
-        $enabled = $policy->isPolicyPaidToDate() && !$policy->isWithinCooloffPeriod();
+        if ($policy->getUser()->hasBacsPaymentMethod()) {
+            $enabled = false;
+        } else {
+            $enabled = $policy->isPolicyPaidToDate() &&
+                !$policy->isWithinCooloffPeriod();
+        }
 
         $days = [];
         for ($i = 1; $i <= 28; $i++) {
@@ -35,7 +44,10 @@ class BillingDayType extends AbstractType
             ])
             ->add('update', SubmitType::class, [
                 'disabled' => !$enabled,
-                'attr' => ['title' => $enabled ? null : 'Policy must be paid to date & not within cooloff period']
+                'attr' => ['title' => $enabled ?
+                    null :
+                    'Policy must be paid to date, not within cooloff period, and user does not have bacs enabled'
+                ]
             ])
         ;
     }

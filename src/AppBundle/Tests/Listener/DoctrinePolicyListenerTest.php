@@ -2,6 +2,8 @@
 
 namespace AppBundle\Tests\Listener;
 
+use AppBundle\Classes\Premium;
+use AppBundle\Document\PhonePremium;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\Container;
@@ -65,6 +67,29 @@ class DoctrinePolicyListenerTest extends WebTestCase
         // policy updated
         $this->runPreUpdate($policy, $this->once(), ['potValue' => 20]);
         $this->runPreUpdate($policy, $this->once(), ['promoPotValue' => 20]);
+
+        $premium = new PhonePremium();
+        $premium->setGwp(5);
+        $premium->setIpt(1);
+        $premium->setIptRate(0.12);
+        $premiumChanged = new PhonePremium();
+        $premium->setGwp(6);
+        $premium->setIpt(1);
+        $premium->setIptRate(0.12);
+        $this->runPreUpdatePremium($policy, $this->once(), ['premium' => [$premium, $premiumChanged]]);
+        $this->runPreUpdatePremium($policy, $this->never(), ['premium' => [$premium, $premium]]);
+
+        $this->runPreUpdateBilling(
+            $policy,
+            $this->once(),
+            ['billing' => [new \DateTime('2018-01-01'), new \DateTime('2018-01-02')]]
+        );
+
+        $this->runPreUpdateBilling(
+            $policy,
+            $this->never(),
+            ['billing' => [new \DateTime('2018-01-01'), new \DateTime('2018-01-01')]]
+        );
     }
 
     public function testPolicyPreRemove()
@@ -114,6 +139,20 @@ class DoctrinePolicyListenerTest extends WebTestCase
     private function runPreUpdate($policy, $count, $changeSet)
     {
         $listener = $this->createListener($policy, $count, PolicyEvent::EVENT_UPDATED_POT);
+        $events = new PreUpdateEventArgs($policy, self::$dm, $changeSet);
+        $listener->preUpdate($events);
+    }
+
+    private function runPreUpdatePremium($policy, $count, $changeSet)
+    {
+        $listener = $this->createListener($policy, $count, PolicyEvent::EVENT_UPDATED_PREMIUM);
+        $events = new PreUpdateEventArgs($policy, self::$dm, $changeSet);
+        $listener->preUpdate($events);
+    }
+
+    private function runPreUpdateBilling($policy, $count, $changeSet)
+    {
+        $listener = $this->createListener($policy, $count, PolicyEvent::EVENT_UPDATED_BILLING);
         $events = new PreUpdateEventArgs($policy, self::$dm, $changeSet);
         $listener->preUpdate($events);
     }
