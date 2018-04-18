@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Document\User;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -22,49 +23,36 @@ class TestCommand extends BaseCommand
         $this
             ->setName('sosure:test')
             ->setDescription('Test')
-            ->addOption(
-                'id',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'id'
-            )
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $id = $input->getOption('id');
-        $policyRepo = $this->getManager()->getRepository(Policy::class);
-
-        if ($id) {
-            $policy = $policyRepo->find($id);
-            if (!$policy) {
-                throw new \Exception(sprintf('Unable to find policy for %s', $id));
+        $repo = $this->getManager()->getRepository(User::class);
+        foreach ($repo->findAll() as $user) {
+            /** @var User $user */
+            if ($user->getBirthday()) {
+                if (($user->getBirthday()->format('H') == 0 && $user->getBirthday()->format('P') == "+01:00") ||
+                    $user->getBirthday()->format('H') == 23 && $user->getBirthday()->format('P') == "+00:00") {
+                    if (count($user->getValidPolicies(true)) > 0) {
+                        print sprintf(
+                            "%s %s 1%s",
+                            $user->getId(),
+                            $user->getBirthday()->format(\DateTime::ATOM),
+                            PHP_EOL
+                        );
+                    } else {
+                        print sprintf(
+                            "%s %s 0%s",
+                            $user->getId(),
+                            $user->getBirthday()->format(\DateTime::ATOM),
+                            PHP_EOL
+                        );
+                    }
+                }
             }
-            /*
-            print_r($policy->getStart());
-            print_r($policy->getEnd());
-            $start = clone $policy->getStart();
-            $start = $this->startOfDay($start);
-            $endDate = clone $policy->getEnd();
-            $endDate = $this->endOfDay($endDate);
-            $diff = $start->diff($endDate);
-            print_r($diff);
-
-            $start = clone $policy->getStart();
-            $start->setTimezone(new \DateTimeZone('Europe/London'));
-            $start = $this->startOfDay($start);
-            $endDate = clone $policy->getEnd();
-            $endDate->setTimezone(new \DateTimeZone('Europe/London'));
-            $endDate = $this->endOfDay($endDate);
-            $diff = $start->diff($endDate);
-            print_r($diff);
-            */
-            $policy->getSalvaProrataMultiplier(0);
-            $policy->getSalvaProrataMultiplier(1);
-            $policy->getSalvaProrataMultiplier(2);
-            $policy->getSalvaProrataMultiplier(3);
         }
+
 
         $output->writeln('Finished');
     }

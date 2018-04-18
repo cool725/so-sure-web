@@ -454,6 +454,7 @@ nelmio_security:
                 - https://www.youtube.com
                 - https://*.fastly.net
                 - https://*.iubenda.com
+                - https://*.google.co.uk
                 - https://*.google.ie # necessary?
                 - https://*.googletagmanager.com
                 - https://*.googlesyndication.com
@@ -488,6 +489,7 @@ nelmio_security:
                 - https://*.iubenda.com
                 - https://*.googlesyndication.com
                 - https://*.google.com/
+                - https://twitter.com
                 - https://platform.twitter.com
                 - https://syndication.twitter.com
                 - https://share.intercom.io
@@ -514,6 +516,7 @@ nelmio_security:
                 - http://*.facebook.com
                 - https://cdn.optimizely.com
                 - http://cdn.optimizely.com
+                - https://*.intercom.io
                 - https://app.intercom.io
                 - https://widget.intercom.io
                 - https://js.intercomcdn.com
