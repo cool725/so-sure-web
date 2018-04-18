@@ -3,6 +3,7 @@ var sosure = sosure || {};
 sosure.purchaseStepPhone = (function() {
     var self = {};
     self.form = null;
+    self.isIE = null;
 
     self.init = function() {
         self.form = $('.validate-form');
