@@ -30,6 +30,15 @@
   @else if $point == midtablet {
     @media (min-width: 600px)  { @content ; }
   }
+  @else if $point == mobS {
+    @media (min-width: 320px)  { @content ; }
+  }
+  @else if $point == mobM {
+    @media (min-width: 375px)  { @content ; }
+  }
+  @else if $point == mobL {
+    @media (min-width: 425px)  { @content ; }
+  }
 }
 
 // Border Radius
