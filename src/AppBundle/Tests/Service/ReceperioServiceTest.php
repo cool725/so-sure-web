@@ -311,6 +311,16 @@ class ReceperioServiceTest extends WebTestCase
         $this->assertEquals('serial', self::$imei->getResponseData());
     }
 
+    public function testAppleManualProcessModelMisMatch()
+    {
+        $this->runCheckSerial(
+            static::$phoneA,
+            self::TEST_IPHONE_SERIAL_VALID,
+            $this->generateRandomImei()
+        );
+        $this->assertContains(PhonePolicy::MAKEMODEL_MODEL_MISMATCH, self::$imei->getMakeModelValidatedStatus());
+    }
+
     public function testAppleInvalidSerialNoRetry()
     {
         $this->assertFalse(self::$imei->runMakeModelCheck(ReceperioService::TEST_INVALID_SERIAL));

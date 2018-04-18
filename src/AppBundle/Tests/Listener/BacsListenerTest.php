@@ -179,4 +179,26 @@ class BacsListenerTest extends WebTestCase
         // TODO: check logger
         $this->assertTrue(true);
     }
+
+    public function testPolicyUpdatedBilling()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPolicyUpdatedBilling', $this),
+            'bar',
+            null,
+            static::$dm
+        );
+        $bacs = new BacsPaymentMethod();
+        $user->setPaymentMethod($bacs);
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm)
+        );
+
+        self::$bacsListener->onPolicyUpdatedBilling(new PolicyEvent($policy));
+        // TODO: check logger
+        $this->assertTrue(true);
+    }
 }

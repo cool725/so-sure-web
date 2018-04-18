@@ -99,4 +99,15 @@ class BacsListener
             ));
         }
     }
+
+    public function onPolicyUpdatedBilling(PolicyEvent $event)
+    {
+        $policy = $event->getPolicy();
+        if ($policy->getUser()->hasBacsPaymentMethod()) {
+            $this->logger->error(sprintf(
+                'Unexpected billing date change for policy %s with Bacs Payment method. Currently not allowed',
+                $policy->getId()
+            ));
+        }
+    }
 }
