@@ -44,14 +44,14 @@ class DoctrinePolicyListener
             }
 
             if ($eventArgs->hasChangedField('premium')) {
-                    $oldPremium = $eventArgs->getOldValue('premium');
-                    $newPremium = $eventArgs->getNewValue('premium');
-                    if ((!$oldPremium && $newPremium)
-                        || !$this->areEqualToTwoDp($oldPremium->getGwp(), $newPremium->getGwp())
-                        || !$this->areEqualToTwoDp($oldPremium->getIpt(), $newPremium->getIpt())
-                        || !$this->areEqualToTwoDp($oldPremium->getIptRate(), $newPremium->getIptRate())) {
-                        $this->triggerEvent($document, PolicyEvent::EVENT_UPDATED_PREMIUM);
-                    }
+                $oldPremium = $eventArgs->getOldValue('premium');
+                $newPremium = $eventArgs->getNewValue('premium');
+                if ((!$oldPremium && $newPremium)
+                    || !$this->areEqualToTwoDp($oldPremium->getGwp(), $newPremium->getGwp())
+                    || !$this->areEqualToTwoDp($oldPremium->getIpt(), $newPremium->getIpt())
+                    || !$this->areEqualToTwoDp($oldPremium->getIptRate(), $newPremium->getIptRate())) {
+                    $this->triggerEvent($document, PolicyEvent::EVENT_UPDATED_PREMIUM);
+                }
             }
 
             if ($eventArgs->hasChangedField('billing')) {
