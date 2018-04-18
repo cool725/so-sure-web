@@ -9,14 +9,14 @@ sosure.purchaseStepPhone = (function() {
         if (self.form.data('client-validation')) {
             self.addValidation();
         }
-    }
+    };
 
     self.valid_credit_card = function(value) {
         // accept only digits, dashes or spaces
         if (/[^0-9-\s]+/.test(value)) return false;
 
         // The Luhn Algorithm. It's so pretty.
-        var nCheck = 0, nDigit = 0, bEven = false;
+        var nCheck = 0, bEven = false;
         value = value.replace(/\D/g, "");
 
         for (var n = value.length - 1; n >= 0; n--) {
@@ -31,10 +31,10 @@ sosure.purchaseStepPhone = (function() {
             bEven = !bEven;
         }
 
-        return (nCheck % 10) == 0;
-    }
+        return (nCheck % 10) === 0;
+    };
 
-    self.addValidation = function(value) {
+    self.addValidation = function() {
         $.validator.addMethod(
             "imei",
             function(value, element) {
@@ -43,8 +43,7 @@ sosure.purchaseStepPhone = (function() {
                 imei = imei.replace('-', '');
                 imei = imei.replace(' ', '');
                 imei = imei.substring(0, 15);
-                var valid = sosure.purchaseStepPhone.valid_credit_card(imei);
-                return valid;
+                return sosure.purchaseStepPhone.valid_credit_card(imei);
             }
         );
         self.form.validate({
@@ -73,12 +72,12 @@ sosure.purchaseStepPhone = (function() {
                 },
                 "purchase_form[serialNumber]" : {
                     required: 'Please enter a valid serial number',
-                    alphanumeric: 'Please enter a valid serial number',
+                    alphanumeric: 'Please enter a valid serial number'
                 }
             },
 
             errorPlacement: function(error, element) {
-                if (element.attr('name') == 'purchase_form[amount]') {
+                if (element.attr('name') === "purchase_form[amount]") {
                     $('.payment--step h4 small').addClass('error');
                 } else {
                     error.insertAfter(element);
@@ -91,13 +90,13 @@ sosure.purchaseStepPhone = (function() {
                 form.submit();
             }
         });
-    }
+    };
 
     self.step_continue = function() {
-        if (self.form.valid() == true){
+        if (self.form.valid() === true){
             $('#reviewModal').modal();
         }
-    }
+    };
 
     return self;
 })();
@@ -109,7 +108,7 @@ $(function(){
 $(function(){
 
     // Payment buttons action radio buttons
-    $('.payment--btn').click(function(event) {
+    $('.payment--btn').click(function() {
 
         $(this).toggleClass('payment--btn-selected')
         .siblings()
@@ -139,11 +138,11 @@ $(function(){
     });
 
     // Trim as you type
-    $('.imei').on('keyup paste', function(event) {
+    $('.imei').on('keyup paste', function() {
         var simei  = $(this).val();
 
         if (simei.indexOf('/') > 1) {
-            var newtxt = simei.replace('/', '');;
+            var newtxt = simei.replace('/', '');
             $(this).val(newtxt);
             $('.samsung-imei').show();
         }
@@ -154,12 +153,12 @@ $(function(){
     });
 
     // Hide/Show policy doc
-    $('.policy-doc-toggle').click(function(e) {
+    $('.policy-doc-toggle').click(function() {
         // e.preventDefault();
         $('.modal-body__policy-doc').toggle();
     });
 
-    $('#policy-modal, .modal-policy').on('hide.bs.modal', function (event) {
+    $('#policy-modal, .modal-policy').on('hide.bs.modal', function () {
         $('.modal-body__policy-doc').hide();
     });
 
@@ -181,11 +180,11 @@ $(function(){
         var url   = $('.modal-policy-embedded').data('url');
 
         function loadDoc() {
-            $('.modal-policy-embedded').load(url, function(responseTxt, statusTxt, xhr) {
-                if (statusTxt == 'success') {
+            $('.modal-policy-embedded').load(url, function(responseTxt, statusTxt) {
+                if (statusTxt === 'success') {
                     sosure.globals.policyTerms();
                 }
-                if (statusTxt == 'error') {
+                if (statusTxt === 'error') {
                     $('#reload-policy').show();
                 }
             });
@@ -203,7 +202,7 @@ $(function(){
         });
 
         // Try and reload
-        $('#reload-policy').click(function(event) {
+        $('#reload-policy').click(function() {
 
             $('#reload-policy').hide();
 
