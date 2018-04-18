@@ -4,6 +4,8 @@ namespace AppBundle\Tests\Document;
 
 use AppBundle\Classes\Premium;
 use AppBundle\Classes\Salva;
+use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\BankAccount;
 use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\PhonePolicy;
@@ -12,6 +14,7 @@ use AppBundle\Document\PhonePrice;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\CurrencyTrait;
+use AppBundle\Document\User;
 
 /**
  * @group unit
@@ -71,12 +74,18 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
 
     public function testApprove()
     {
+        $bankAccount = new BankAccount();
+        $bacs = new BacsPaymentMethod();
+        $bacs->setBankAccount($bankAccount);
+        $user = new User();
+        $user->setPaymentMethod($bacs);
+        $policy = new PhonePolicy();
+        $user->addPolicy($policy);
+
         $bacs = new BacsPayment();
         $bacs->setAmount(6);
         $bacs->submit(new \DateTime('2018-01-01'));
         $bacs->setStatus(BacsPayment::STATUS_GENERATED);
-
-        $policy = new PhonePolicy();
 
         $premium = new PhonePremium();
         $premium->setIptRate(0.12);
@@ -85,10 +94,13 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
         $policy->setPremium($premium);
 
         $policy->addPayment($bacs);
+        $now = new \DateTime();
         $bacs->approve();
 
         $this->assertEquals(Bacs::MANDATE_SUCCESS, $bacs->getStatus());
         $this->assertTrue($bacs->isSuccess());
+
+        $this->assertEquals($now, $bankAccount->getLastSuccessfulPaymentDate());
     }
 
     /**

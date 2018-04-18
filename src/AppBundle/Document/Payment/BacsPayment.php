@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document\Payment;
 
+use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\DateTrait;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -177,6 +178,10 @@ class BacsPayment extends Payment
 
     public function approve(\DateTime $date = null)
     {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
         if (!$this->canAction($date)) {
             throw new \Exception(sprintf(
                 'Attempting to action before reveral date (%s) is past',
@@ -188,6 +193,10 @@ class BacsPayment extends Payment
         $this->setSuccess(true);
 
         $this->setCommission();
+
+        /** @var BacsPaymentMethod $bacsPaymentMethod */
+        $bacsPaymentMethod = $this->getPolicy()->getUser()->getPaymentMethod();
+        $bacsPaymentMethod->getBankAccount()->setLastSuccessfulPaymentDate($date);
     }
 
     public function reject(\DateTime $date = null)
