@@ -3,6 +3,8 @@
 namespace AppBundle\Tests\Document;
 
 use AppBundle\Classes\Salva;
+use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\PhonePremium;
 use AppBundle\Document\PhonePrice;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Payment\JudoPayment;
@@ -76,5 +78,77 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
         $payment->setSuccess(true);
         $this->assertTrue($payment->hasSuccess());
         $payment->setSuccess(false);
+    }
+
+    public function testSetCommissionMonthly()
+    {
+        $policy = new PhonePolicy();
+
+        $premium = new PhonePremium();
+        $premium->setIptRate(0.12);
+        $premium->setGwp(5);
+        $premium->setIpt(1);
+        $policy->setPremium($premium);
+
+        for ($i = 0; $i < 11; $i++) {
+            $payment = new JudoPayment();
+            $payment->setAmount(6);
+            $policy->addPayment($payment);
+            $payment->setCommission();
+
+            // monthly
+            $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
+            $this->assertEquals(Salva::MONTHLY_COVERHOLDER_COMMISSION, $payment->getCoverholderCommission());
+            $this->assertEquals(Salva::MONTHLY_BROKER_COMMISSION, $payment->getBrokerCommission());
+        }
+
+        $payment = new JudoPayment();
+        $payment->setAmount(6);
+        $policy->addPayment($payment);
+        $payment->setCommission();
+
+        // final month
+        $payment->setTotalCommission(Salva::FINAL_MONTHLY_TOTAL_COMMISSION);
+        $this->assertEquals(Salva::FINAL_MONTHLY_COVERHOLDER_COMMISSION, $payment->getCoverholderCommission());
+        $this->assertEquals(Salva::FINAL_MONTHLY_BROKER_COMMISSION, $payment->getBrokerCommission());
+    }
+
+    public function testSetCommissionYearly()
+    {
+        $policy = new PhonePolicy();
+
+        $premium = new PhonePremium();
+        $premium->setIptRate(0.12);
+        $premium->setGwp(5);
+        $premium->setIpt(1);
+        $policy->setPremium($premium);
+
+        $payment = new JudoPayment();
+        $payment->setAmount(6 * 12);
+        $policy->addPayment($payment);
+        $payment->setCommission();
+
+        // yearly
+        $this->assertEquals(Salva::YEARLY_COVERHOLDER_COMMISSION, $payment->getCoverholderCommission());
+        $this->assertEquals(Salva::YEARLY_BROKER_COMMISSION, $payment->getBrokerCommission());
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testSetCommissionUnknown()
+    {
+        $policy = new PhonePolicy();
+
+        $premium = new PhonePremium();
+        $premium->setIptRate(0.12);
+        $premium->setGwp(5);
+        $premium->setIpt(1);
+        $policy->setPremium($premium);
+
+        $payment = new JudoPayment();
+        $payment->setAmount(2);
+        $policy->addPayment($payment);
+        $payment->setCommission();
     }
 }
