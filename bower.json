@@ -118,6 +118,11 @@
       ],
       "moment": [
         "bower_components/moment/min/moment.min.js"
+      ],
+      "bootstrap-sass": [
+        "bower_components/bootstrap-saas/assetts/javascripts/bootstrap.js",
+        "bower_components/bootstrap-sass/assets/javascripts/bootstrap/tab.js",
+        "bower_components/bootstrap-saas/assets/javascripts/bootstrap/tooltip.js"
       ]
     }
   }

@@ -1010,8 +1010,13 @@
                         <td>
                             {% if payment.isSuccess %}
                                 <i class="fa fa-check text-success"></i>
+                            {% elseif payment.isSuccess is null %}
+                                <i class="fa clock-o text-warning" title="Pending payment result"></i>
                             {% else %}
                                 <i class="fa fa-minus text-danger"></i>
+                            {% endif %}
+                            {%  if payment.status is defined and payment.status %}
+                                ({{  payment.status }})
                             {% endif %}
                         </td>
                     </tr>
