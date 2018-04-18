@@ -11,14 +11,14 @@ sosure.purchaseStepPhone = (function() {
         if (self.form.data('client-validation') && !self.isIE) {
             self.addValidation();
         }
-    }
+    };
 
     self.valid_credit_card = function(value) {
         // accept only digits, dashes or spaces
         if (/[^0-9-\s]+/.test(value)) return false;
 
         // The Luhn Algorithm. It's so pretty.
-        var nCheck = 0, nDigit = 0, bEven = false;
+        var nCheck = 0, bEven = false;
         value = value.replace(/\D/g, "");
 
         for (var n = value.length - 1; n >= 0; n--) {
@@ -33,10 +33,10 @@ sosure.purchaseStepPhone = (function() {
             bEven = !bEven;
         }
 
-        return (nCheck % 10) == 0;
-    }
+        return (nCheck % 10) === 0;
+    };
 
-    self.addValidation = function(value) {
+    self.addValidation = function() {
         $.validator.addMethod(
             "imei",
             function(value, element) {
@@ -45,8 +45,7 @@ sosure.purchaseStepPhone = (function() {
                 imei = imei.replace('-', '');
                 imei = imei.replace(' ', '');
                 imei = imei.substring(0, 15);
-                var valid = sosure.purchaseStepPhone.valid_credit_card(imei);
-                return valid;
+                return sosure.purchaseStepPhone.valid_credit_card(imei);
             }
         );
         self.form.validate({
@@ -75,12 +74,12 @@ sosure.purchaseStepPhone = (function() {
                 },
                 "purchase_form[serialNumber]" : {
                     required: 'Please enter a valid serial number',
-                    alphanumeric: 'Please enter a valid serial number',
+                    alphanumeric: 'Please enter a valid serial number'
                 }
             },
 
             errorPlacement: function(error, element) {
-                if (element.attr('name') == 'purchase_form[amount]') {
+                if (element.attr('name') === "purchase_form[amount]") {
                     $('.payment-options h4').addClass('error');
                 } else {
                     error.insertAfter(element);
@@ -91,7 +90,7 @@ sosure.purchaseStepPhone = (function() {
                 form.submit();
             }
         });
-    }
+    };
 
     return self;
 })();
@@ -103,7 +102,7 @@ $(function(){
 $(function(){
 
     // Payment buttons action radio buttons
-    $('.payment-options--btn').click(function(event) {
+    $('.payment-options--btn').click(function() {
         // Toggle Class on Btns
         $('.payment-options--btn').removeClass('payment-options--btn-selected animated pulse');
         $(this).addClass('payment-options--btn-selected animated pulse');
@@ -117,10 +116,6 @@ $(function(){
 
         // Modify the help text accordingly
         // $('.payment-options--info').text(help);
-    });
-
-    $('input[name="purchase_form[amount]').change(function(e) {
-        console.log('Yes');
     });
 
     if ($.trim($('#Reference').val()).length > 0) {
@@ -137,11 +132,11 @@ $(function(){
     });
 
     // Trim as you type
-    $('.imei').on('keyup paste', function(event) {
+    $('.imei').on('keyup paste', function() {
         var simei  = $(this).val();
 
         if (simei.indexOf('/') > 1) {
-            var newtxt = simei.replace('/', '');;
+            var newtxt = simei.replace('/', '');
             $(this).val(newtxt);
             $('.samsung-imei').show();
         }

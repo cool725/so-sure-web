@@ -86,10 +86,17 @@ class DefaultController extends BaseController
             );
         }
 
+        $defacto = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_DEFACTO,
+            ['no-defacto', 'defacto']
+        );
+
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         $data = array(
             // Make sure to check homepage landing below too
+            'defacto'             => $defacto,
             'exp_dropdown_search' => $exp,
             'referral'            => $referral,
             'phone'               => $this->getQuerystringPhone($request),

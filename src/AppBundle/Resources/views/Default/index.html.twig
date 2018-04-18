@@ -21,7 +21,7 @@
 {% block body %}
 
     {# Hero #}
-    <section class="homepage--hero">
+    <section class="homepage--hero {% if defacto is defined and defacto == 'defacto' %}homepage--hero-background-defacto{% else %}homepage--hero-background{% endif %}">
 
         <h1 class="homepage--hero-h1">
             {% if main is defined and main %}
@@ -296,26 +296,25 @@
     {# Claims procss #}
     <section class="section--pad homepage--claims-process">
         <div class="container">
-            <h2 class="h1">Our Claims Process is as <span class="text-nowrap">Easy as 1, 2, 3</span></h2>
+            <h2 class="h1 text-blue">Our hassle-free claims process</h2>
             <p class="lead">When something bad happens to your phone:</p>
             <div class="row">
                 <div class="col-md-4">
                     <span class="large-no large-no--arrow">1</span>
-                    <h4 class="h3 h-light text-blue">Contact Claims Team</h4>
-                    <p>These helpful people are here in the UK, available to answer your call 24-hrs a day, 7 days a week, 365 days a year when you have an issue with your phone. And if you need to start a claim, <a href="{{ path('claim') }}" class="text-nowrap">fill in the form here</a>.</p>
+                    <h4 class="h3 text-blue">Contact Claims Team</h4>
+                    <p class="text-left">Let us know what happened. You can do this by <a href="{{ path('claim') }}" class="text-nowrap">filling in this form</a>, or calling our claims team on 0344 856 0852 <small>(local rates apply)</small></p>
                 </div>
                 <div class="col-md-4">
                     <span class="large-no large-no--arrow">2</span>
-                    <h4 class="h3 h-light text-blue">Review Claim</h4>
-                    <p>Our goal is for the claims to be handled almost instantly. Approving a claim takes on average less than one hour to process during normal business hours.*</p>
+                    <h4 class="h3 text-blue">Review Claim</h4>
+                    <p class="text-left">Our UK based claims team will review your claim and reach out with a request for any further details or documents (if necessary). We aim to do this within a matter of hours during UK business hours.</p>
                 </div>
                 <div class="col-md-4">
                     <span class="large-no">3</span>
-                    <h4 class="h3 h-light text-blue">Approve Claim</h4>
-                    <p>Once your claim is approved, we aim to have a replacement mobile phone delivered to you in the UK by the next working day.</p>
+                    <h4 class="h3 text-blue">Approve Claim</h4>
+                    <p class="text-left">Once your claim is approved, we take your excess payment over the phone and aim to get a replacement phone in the next working day. If you prefer to have your phone repaired, it may take more time.</p>
                 </div>
             </div>
-            <p><small>* However in some cases, like theft, we may require additional information and documentation to fully review the incident and approve the claim. With your help, we aim to do this as soon as possible.</small></p>
         </div>
     </section>
 

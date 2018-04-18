@@ -688,7 +688,7 @@ class JudopayService
             throw new PaymentDeclinedException();
         }
 
-        $this->setCommission($policy, $payment);
+        $this->setCommission($payment);
 
         return $payment;
     }
@@ -1135,36 +1135,19 @@ class JudopayService
         
         // TODO: Validate receipt does not set commission on failed payments, but token does
         // make consistent
-        $this->setCommission($policy, $payment);
+        $this->setCommission($payment);
 
         $this->triggerPaymentEvent($payment);
 
         return $payment;
     }
 
-    public function setCommission($policy, $payment)
+    public function setCommission($payment)
     {
-        $salva = new Salva();
-        $premium = $policy->getPremium();
-
-        // Only set broker fees if we know the amount
-        if ($this->areEqualToFourDp($payment->getAmount(), $policy->getPremium()->getYearlyPremiumPrice())) {
-            $commission = $salva->sumBrokerFee(12, true);
-            $payment->setTotalCommission($commission);
-        } elseif ($premium->isEvenlyDivisible($payment->getAmount()) ||
-            $premium->isEvenlyDivisible($payment->getAmount(), true)) {
-            // payment should already be credited at this point
-            $includeFinal = $this->areEqualToTwoDp(0, $policy->getOutstandingPremium());
-
-            $numPayments = $premium->getNumberOfMonthlyPayments($payment->getAmount());
-            $commission = $salva->sumBrokerFee($numPayments, $includeFinal);
-            $payment->setTotalCommission($commission);
-        } else {
-            $this->logger->error(sprintf(
-                'Failed set correct commission for %f (policy %s)',
-                $payment->getAmount(),
-                $policy->getId()
-            ));
+        try {
+            $payment->setCommission();
+        } catch (\Exception $e) {
+            $this->logger->error($e->getMessage());
         }
     }
 

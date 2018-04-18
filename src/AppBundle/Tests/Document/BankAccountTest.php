@@ -257,4 +257,68 @@ class BankAccountTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($bankAccount->allowedSubmission(new \DateTime('2018-02-28 11:00')));
         $this->assertTrue($bankAccount->allowedSubmission(new \DateTime('2018-02-29 01:00')));
     }
+
+    public function testReference()
+    {
+        $bankAccount = new BankAccount();
+        $bankAccount->setReference('ddic');
+        $bankAccount->setReference('1DDIC');
+        $bankAccount->setReference('Ok');
+        $this->assertTrue(true);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testReferenceDDIC()
+    {
+        $bankAccount = new BankAccount();
+        $bankAccount->setReference('DDIC0043242fa');
+    }
+
+    public function testShouldCancelMandate()
+    {
+        $date = new \DateTime();
+        $thirteenMonths = new \DateTime();
+        $thirteenMonths = $thirteenMonths->add(new \DateInterval('P13M'));
+
+        $bankAccount = new BankAccount();
+
+        // created
+        $this->assertFalse($bankAccount->shouldCancelMandate());
+        $this->assertFalse($bankAccount->shouldCancelMandate(new \DateTime('2016-01-01')));
+        $this->assertTrue($bankAccount->shouldCancelMandate($thirteenMonths));
+
+        // initialPaymentSubmissionDate
+        $date = $date->add(new \DateInterval('P1M'));
+        $bankAccount->setInitialPaymentSubmissionDate($date);
+        $this->assertFalse($bankAccount->shouldCancelMandate());
+        $this->assertFalse($bankAccount->shouldCancelMandate(new \DateTime('2016-01-01')));
+        $this->assertFalse($bankAccount->shouldCancelMandate($thirteenMonths));
+        $thirteenMonths = $thirteenMonths->add(new \DateInterval('P1M'));
+        $this->assertTrue($bankAccount->shouldCancelMandate($thirteenMonths));
+
+        // lastSuccessfulPaymentDate
+        $date = $date->add(new \DateInterval('P1M'));
+        $bankAccount->getLastSuccessfulPaymentDate($date);
+        $this->assertFalse($bankAccount->shouldCancelMandate());
+        $this->assertFalse($bankAccount->shouldCancelMandate(new \DateTime('2016-01-01')));
+        $this->assertFalse($bankAccount->shouldCancelMandate($thirteenMonths));
+        $thirteenMonths = $thirteenMonths->add(new \DateInterval('P1M'));
+        $this->assertTrue($bankAccount->shouldCancelMandate($thirteenMonths));
+    }
+
+    public function testAllowedProcessingAllowed()
+    {
+        $bankAccount = new BankAccount();
+        $bankAccount->setFirstPayment(true);
+        $bankAccount->setInitialNotificationDate(new \DateTime('2018-03-05'));
+        $this->assertTrue(
+            $bankAccount->allowedProcessing(new \DateTime('2018-03-08'))
+        );
+
+        $thirteenMonths = new \DateTime();
+        $thirteenMonths = $thirteenMonths->add(new \DateInterval('P13M'));
+        $this->assertFalse($bankAccount->allowedProcessing($thirteenMonths));
+    }
 }
