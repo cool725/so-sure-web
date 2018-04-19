@@ -82,24 +82,9 @@
                                     <h4 class="h-light">Yearly</h4>
                                     <span class="h3">&pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</span>
                                 </div>
-                                <div class="panel panel-default">
-                                    <div class="panel-heading"
-                                         id="moreMonthly"
-                                         role="button"
-                                         data-toggle="collapse"
-                                         href="#collapseMonthly"
-                                         aria-expanded="true"
-                                         aria-controls="collapseMonthly">
-                                        <p>
-                                            <i class="fa fa-info-circle"></i> Further details
-                                        </p>
-                                    </div>
-                                    <div id="collapseMonthly" class="panel-collapse collapse" role="tabpanel" aria-labelledby="moreMonthly">
-                                        <div class="panel-body">
-                                            <p><small>You will be billed on the {{ billing_date|date('jS') }}</strong> of each month. If that’s inconvenient, you will be able to change your monthly billing day after purchase in your payment settings.</small></p>
-                                        </div>
-                                    </div>
-                                </div>
+                                {% if device_category() != 'Mobile' %}
+                                    <p><small>You will be billed the full amount on your date of purchase.</small></p>
+                                {% endif %}
                             </div>
                             {% endif %}
                             {% if app.user.allowedMonthlyPayments %}
@@ -114,24 +99,9 @@
                                     <h4 class="h-light">Monthly</h4>
                                     <span class="h3">&pound;{{ phone.currentPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</span>
                                 </div>
-                                <div class="panel panel-default">
-                                    <div class="panel-heading"
-                                         id="moreYearly"
-                                         role="button"
-                                         data-toggle="collapse"
-                                         href="#collapseYearly"
-                                         aria-expanded="true"
-                                         aria-controls="collapseYearly">
-                                        <p>
-                                            <i class="fa fa-info-circle"></i> Further details
-                                        </p>
-                                    </div>
-                                    <div id="collapseYearly" class="panel-collapse collapse" role="tabpanel" aria-labelledby="moreYearly">
-                                        <div class="panel-body">
-                                            <p><small>You will be billed the full amount on your date of purchase.</small></p>
-                                        </div>
-                                    </div>
-                                </div>
+                                {% if device_category() != 'Mobile' %}
+                                    <p><small>You will be billed on the {{ billing_date|date('jS') }}</strong> of each month. If that’s inconvenient, you will be able to change your monthly billing day after purchase in your payment settings.</small></p>
+                                {% endif %}
                             </div>
                             {% endif %}
                         </div>
