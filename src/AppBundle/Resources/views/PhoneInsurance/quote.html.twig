@@ -18,7 +18,7 @@
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets output='css/*.css'
-    '@AppBundle//Resources/public/sass/page/quote.scss'
+    '@AppBundle/Resources/public/sass/page/quote.scss'
     %}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
