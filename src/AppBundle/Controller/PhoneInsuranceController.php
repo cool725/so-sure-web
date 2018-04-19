@@ -544,7 +544,11 @@ class PhoneInsuranceController extends BaseController
             'buy_form' => $buyForm->createView(),
             'buy_form_banner' => $buyBannerForm->createView(),
             'phones' => $repo->findBy(
-                ['active' => true, 'make' => $make, 'model' => $decodedModel],
+                [
+                    'active' => true,
+                    'makeCanonical' => mb_strtolower($make),
+                    'modelCanonical' => mb_strtolower($decodedModel)
+                ],
                 ['memory' => 'asc']
             ),
             'comparision' => $phone->getComparisions(),
