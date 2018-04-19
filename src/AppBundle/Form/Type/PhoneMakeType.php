@@ -2,6 +2,7 @@
 
 namespace AppBundle\Form\Type;
 
+use AppBundle\Service\RequestService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -22,18 +23,24 @@ class PhoneMakeType extends AbstractType
 
     protected $dm;
 
+    /** @var RequestService */
+    protected $requestService;
+
     /**
      * @param DocumentManager $dm
      * @param boolean         $required
+     * @param RequestService  $requestService
      */
-    public function __construct(DocumentManager $dm, $required)
+    public function __construct(DocumentManager $dm, $required, RequestService $requestService)
     {
         $this->dm = $dm;
         $this->required = $required;
+        $this->requestService = $requestService;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $isAndroid = $this->requestService->getDeviceOS() == RequestService::DEVICE_OS_ANDROID;
         $make = $builder->getData()->getMake();
         $models = [];
         $phonePlaceholder = 'Select your phone make first';
@@ -46,20 +53,24 @@ class PhoneMakeType extends AbstractType
         }
         $models[''] = $phonePlaceholder;
         $memory[''] = $phonePlaceholder;
+        $makeChoiceOptions = [
+            'placeholder' => 'Select phone make',
+            'choices' => $this->dm->getRepository(Phone::class)->findActiveMakes(),
+            'required' => $this->required,
+        ];
+        if (!$isAndroid) {
+            $makeChoiceOptions['preferred_choices'] = ['Apple', 'Samsung'];
+            $makeChoiceOptions['group_by'] = function ($value) {
+                if ($value === 'Apple' or $value === 'Samsung') {
+                    return 'Top Makes:';
+                } else {
+                    return 'Other Makes:';
+                }
+            };
+        }
+
         $builder
-            ->add('make', ChoiceType::class, [
-                    'placeholder' => 'Select phone make to get a quote',
-                    'choices' => $this->dm->getRepository(Phone::class)->findActiveMakes(),
-                    'required' => $this->required,
-                    'preferred_choices' => array('Apple', 'Samsung'),
-                    'group_by' => function ($value) {
-                        if ($value === 'Apple' or $value === 'Samsung') {
-                            return 'Top Makes:';
-                        } else {
-                            return 'Other Makes:';
-                        }
-                    }
-            ])
+            ->add('make', ChoiceType::class, $makeChoiceOptions)
             ->add('model', ChoiceType::class, [
                 'choices' => $models,
                 'required' => $this->required

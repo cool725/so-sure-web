@@ -43,6 +43,11 @@ class PhoneRepository extends DocumentRepository
         foreach ($items as $make) {
             $makes[$make] = $make;
         }
+        ksort($makes);
+
+        // move samsung & apple to top of the list
+        $makes = ['Samsung' => $makes['Samsung']] + $makes;
+        $makes = ['Apple' => $makes['Apple']] + $makes;
 
         return $makes;
     }
