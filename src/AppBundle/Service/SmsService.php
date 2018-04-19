@@ -12,6 +12,7 @@ use AppBundle\Document\Policy;
 class SmsService
 {
 
+    const VALIDATION_KEY = 'Mobile:Validation:%s:%s';
     const VALIDATION_TIMEOUT = 600; // 10 minutes
 
     /** @var DocumentManager */
@@ -32,6 +33,9 @@ class SmsService
 
     protected $redis;
 
+    /** @var string */
+    protected $environment;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
@@ -40,6 +44,8 @@ class SmsService
      * @param string          $auth_token
      * @param string          $sending_number
      * @param                 $templating
+     * @param                 $redis
+     * @param                 $environment
      */
     public function __construct(
         DocumentManager $dm,
@@ -49,7 +55,8 @@ class SmsService
         $auth_token,
         $sending_number,
         $templating,
-        $redis
+        $redis,
+        $environment
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -58,6 +65,18 @@ class SmsService
         $this->sending_number = $sending_number;
         $this->templating = $templating;
         $this->redis = $redis;
+        $this->environment = $environment;
+    }
+
+    /**
+     * Environment is injected into constructed and should only
+     * be overwriten for a few test cases.
+     *
+     * @param string $environment
+     */
+    public function setEnvironment($environment)
+    {
+        $this->environment = $environment;
     }
 
     /**
@@ -68,6 +87,9 @@ class SmsService
      */
     public function send($number, $message)
     {
+        if ($this->environment == "test") {
+            return true;
+        }
         try {
             $params = array(
                 'src' => $this->sending_number, // Sender's phone number with country code
@@ -109,7 +131,7 @@ class SmsService
         $this->dm->flush();
     }
 
-    public function setValidationCodeForUser($userId)
+    public function setValidationCodeForUser($user)
     {
         $characters = '0123456789';
         $code = '';
@@ -117,19 +139,19 @@ class SmsService
             $code .= $characters[rand(0, 9)];
         }
 
-        $key = sprintf('Mobile:Validation:%s:%s', $userId, $code);
+        $key = sprintf(self::VALIDATION_KEY, $user->getId(), $code);
         $this->redis->setEx($key, self::VALIDATION_TIMEOUT, $code);
 
         return $code;
     }
 
-    public function checkValidationCodeForUser($userId, $code)
+    public function checkValidationCodeForUser($user, $code)
     {
         if (mb_strlen($code) != 6) {
             return false;
         }
 
-        $key = sprintf('Mobile:Validation:%s:%s', $userId, $code);
+        $key = sprintf(self::VALIDATION_KEY, $user->getId(), $code);
         $foundCode = $this->redis->get($key);
 
         if ($foundCode === $code) {

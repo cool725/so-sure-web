@@ -2182,7 +2182,7 @@ class ApiAuthController extends BaseController
             }
 
             $sms = $this->get('app.sms');
-            $code = $sms->setValidationCodeForUser($user->getId());
+            $code = $sms->setValidationCodeForUser($user);
             if ($sms->sendTemplate($mobileNumber, 'AppBundle:Sms:validation-code.txt.twig', ['code' => $code])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::SUCCESS, 'OK', 200);
             } else {
@@ -2211,7 +2211,7 @@ class ApiAuthController extends BaseController
     {
         try {
             $data = json_decode($request->getContent(), true)['body'];
-            if (empty($data)) {
+            if (empty($data) || !isset($data['code'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
 
@@ -2227,15 +2227,9 @@ class ApiAuthController extends BaseController
             }
             $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);
 
-            $code = '';
-            if (isset($data['code'])) {
-                $code = $this->getDataString($data, 'code');
-            } else {
-                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
-            }
-
+            $code = $this->getDataString($data, 'code');
             $sms = $this->get('app.sms');
-            if ($sms->checkValidationCodeForUser($user->getId(), $code)) {
+            if ($sms->checkValidationCodeForUser($user, $code)) {
                 $user->setMobileNumberVerified(true);
                 $dm->flush();
                 return new JsonResponse($user->toApiArray());

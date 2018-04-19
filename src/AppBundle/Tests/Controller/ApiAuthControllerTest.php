@@ -4281,6 +4281,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(200);
         $this->assertEquals(self::$testUser->getEmailCanonical(), $data['email']);
+        $this->assertNull($data['has_mobile_number_verified']);
     }
 
     public function testGetUserDifferentUser()
