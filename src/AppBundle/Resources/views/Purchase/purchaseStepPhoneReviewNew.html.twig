@@ -82,7 +82,24 @@
                                     <h4 class="h-light">Yearly</h4>
                                     <span class="h3">&pound;{{ phone.currentPhonePrice.yearlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</span>
                                 </div>
-                                <p><small>You will be billed on the {{ billing_date|date('jS') }}</strong> of each month. If that’s inconvenient, you will be able to change your monthly billing day after purchase in your payment settings.</small></p>
+                                <div class="panel panel-default">
+                                    <div class="panel-heading"
+                                         id="moreMonthly"
+                                         role="button"
+                                         data-toggle="collapse"
+                                         href="#collapseMonthly"
+                                         aria-expanded="true"
+                                         aria-controls="collapseMonthly">
+                                        <p>
+                                            <i class="fa fa-info-circle"></i> Further details
+                                        </p>
+                                    </div>
+                                    <div id="collapseMonthly" class="panel-collapse collapse" role="tabpanel" aria-labelledby="moreMonthly">
+                                        <div class="panel-body">
+                                            <p><small>You will be billed on the {{ billing_date|date('jS') }}</strong> of each month. If that’s inconvenient, you will be able to change your monthly billing day after purchase in your payment settings.</small></p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             {% endif %}
                             {% if app.user.allowedMonthlyPayments %}
@@ -97,7 +114,24 @@
                                     <h4 class="h-light">Monthly</h4>
                                     <span class="h3">&pound;{{ phone.currentPhonePrice.monthlyPremiumPrice(app.user.additionalPremium)|number_format(2, '.', ',') }}</span>
                                 </div>
-                                <p><small>You will be billed the full amount on your date of purchase.</small></p>
+                                <div class="panel panel-default">
+                                    <div class="panel-heading"
+                                         id="moreYearly"
+                                         role="button"
+                                         data-toggle="collapse"
+                                         href="#collapseYearly"
+                                         aria-expanded="true"
+                                         aria-controls="collapseYearly">
+                                        <p>
+                                            <i class="fa fa-info-circle"></i> Further details
+                                        </p>
+                                    </div>
+                                    <div id="collapseYearly" class="panel-collapse collapse" role="tabpanel" aria-labelledby="moreYearly">
+                                        <div class="panel-body">
+                                            <p><small>You will be billed the full amount on your date of purchase.</small></p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             {% endif %}
                         </div>
@@ -126,7 +160,7 @@
                         <label class="samsung-imei">Numbers only please (no / required)</label>
                         <div class="help-block with-errors">{{ form_errors(purchase_form.imei) }}</div>
                         <div class="help-block">
-                            Dial <strong>*#06#</strong> on your phone keypad to display your IMEI number. It doesn’t cost you anything to do so.
+                            Dial <strong>*#06#</strong> on your phone keypad to display your IMEI number.
                         </div>
                     </div>
 
@@ -135,11 +169,28 @@
                             {{ form_label(purchase_form.serialNumber, 'Serial Number:', { 'label_attr': {'class': 'sr-only'} }) }}
                             {{ form_widget(purchase_form.serialNumber, {'attr':{'class':'form-control',  'pattern': '[a-zA-Z0-9]{5,32}', 'title': 'Enter a valid serial number', 'placeholder':'Serial Number'}}) }}
                             <div class="help-block with-errors">{{ form_errors(purchase_form.serialNumber) }}</div>
-                            <div class="help-block">
-                                To find your IMEI &amp; Serial Numbers open your phone Settings, navigate to General and view About. The Serial Number is listed about halfway down the screen and the IMEI is a few rows below that.
-                            </div>
-                            <div class="help-block">
-                                You can also log into your iTunes account and find the IMEI &amp; Serial Numbers display on the phone information screen.
+                            <div class="panel panel-default">
+                                <div class="panel-heading"
+                                     id="moreSerial"
+                                     role="button"
+                                     data-toggle="collapse"
+                                     href="#collapseSerial"
+                                     aria-expanded="true"
+                                     aria-controls="collapseSerial">
+                                    <p class="panel-title">
+                                        <i class="fa fa-question-circle"></i> Need help?
+                                    </p>
+                                </div>
+                                <div id="collapseSerial" class="panel-collapse collapse" role="tabpanel" aria-labelledby="moreSerial">
+                                    <div class="panel-body">
+                                        <div class="help-block">
+                                            To find your IMEI &amp; Serial Numbers open your phone Settings, navigate to General and view About. The Serial Number is listed about halfway down the screen and the IMEI is a few rows below that.
+                                        </div>
+                                        <div class="help-block">
+                                            You can also log into your iTunes account and find the IMEI &amp; Serial Numbers display on the phone information screen.
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     {% endif %}
