@@ -1669,10 +1669,10 @@ class ApiAuthController extends BaseController
 
             if ($this->getDataString($data, 'type') === "picsure") {
                 $coordinates = new Coordinates();
-                $coordinates->coordinates = [
+                $coordinates->setCoordinates(
                     $this->getDataString($data, 'longitude'),
                     $this->getDataString($data, 'latitude')
-                ];
+                );
                 $policy->addPicsureLocation($coordinates);
                 $this->validateObject($coordinates);
                 $dm->persist($coordinates);

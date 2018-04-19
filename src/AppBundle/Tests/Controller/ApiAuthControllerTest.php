@@ -847,7 +847,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertTrue($policy !== null);
         $this->assertEquals('62.253.24.189', $policy->getIdentityLog()->getIp());
         $this->assertEquals('GB', $policy->getIdentityLog()->getCountry());
-        $this->assertEquals([-0.13,51.5], $policy->getIdentityLog()->getLoc()->coordinates);
+        $this->assertEquals([-0.13,51.5], $policy->getIdentityLog()->getLoc()->getCoordinates());
 
         $this->assertTrue(mb_strlen($data['id']) > 5);
         $this->assertTrue(in_array('A0001', $data['phone_policy']['phone']['devices']));
@@ -5114,8 +5114,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $policy = $policyRepo->find($policyId);
         $locations = $policy->getPicsureLocations();
         $this->assertEquals(1, count($locations));
-        $this->assertEquals('-0.087658', $locations[0]->coordinates[0]);
-        $this->assertEquals('51.524490', $locations[0]->coordinates[1]);
+        $this->assertEquals([-0.087658, 51.524490], $locations[0]->getCoordinates());
     }
 
     public function testPolicyTrackLocationUnknownId()
@@ -5172,6 +5171,22 @@ class ApiAuthControllerTest extends BaseApiControllerTest
             'type' => 'bla',
             'latitude' => '51.524490',
             'longitude' => '-0.087658',
+        ];
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+
+        $data = [
+            'type' => 'picsure',
+            'latitude' => '151.524490',
+            'longitude' => '-0.087658',
+        ];
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+
+        $data = [
+            'type' => 'picsure',
+            'latitude' => '51.524490',
+            'longitude' => '-200.087658',
         ];
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
