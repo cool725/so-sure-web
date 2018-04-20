@@ -126,7 +126,7 @@ class PhonePolicy extends Policy
     protected $name;
 
     /**
-     * @Assert\Choice({"preapproved", "approved", "invalid", "rejected", "manual"}, strict=true)
+     * @Assert\Choice({"preapproved", "approved", "invalid", "rejected", "manual", "disabled"}, strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
