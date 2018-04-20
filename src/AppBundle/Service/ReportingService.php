@@ -376,7 +376,8 @@ class ReportingService
             $data['activatedEndingRenewalPoliciesTotal'];
         $data['activatedPoliciesActivatedAdjUpgradeRenewalsPercent'] =
             $data['activatedPoliciesTotalAdjUpgradeRenewals'] != 0 ?
-            100 * $data['activatedPoliciesActivatedAdjUpgradeRenewals'] / $data['activatedPoliciesTotalAdjUpgradeRenewals'] :
+            100 * $data['activatedPoliciesActivatedAdjUpgradeRenewals'] /
+                $data['activatedPoliciesTotalAdjUpgradeRenewals'] :
             null;
 
         $data['hardActivatedPoliciesAdjUpgradeRenewals'] = $data['hardActivatedPoliciesActivated'] -
@@ -387,7 +388,8 @@ class ReportingService
             $data['hardActivatedEndingRenewalPoliciesTotal'];
         $data['hardActivatedPoliciesAdjUpgradeRenewalsPercent'] =
             $data['hardActivatedPoliciesTotalAdjUpgradeRenewals'] != 0 ?
-            100 * $data['hardActivatedPoliciesAdjUpgradeRenewals'] / $data['hardActivatedPoliciesTotalAdjUpgradeRenewals'] :
+            100 * $data['hardActivatedPoliciesAdjUpgradeRenewals'] /
+                $data['hardActivatedPoliciesTotalAdjUpgradeRenewals'] :
             null;
 
         $activePolicyHolders = [];
