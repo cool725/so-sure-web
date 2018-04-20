@@ -96,6 +96,10 @@ abstract class Policy
 
     const DEBT_COLLECTOR_WISE = 'wise';
 
+    const METRIC_ACTIVATION = 'activation';
+    const METRIC_HARD_ACTIVATION = 'hard-activation';
+    const METRIC_RENEWAL = 'renewal';
+
     public static $riskLevels = [
         self::RISK_CONNECTED_POT_ZERO => self::RISK_LEVEL_HIGH,
         self::RISK_CONNECTED_SELF_CLAIM => self::RISK_LEVEL_HIGH,
@@ -459,6 +463,13 @@ abstract class Policy
      * @Gedmo\Versioned
      */
     protected $visitedWelcomePage;
+
+    /**
+     * @MongoDB\Field(type="collection")
+     * @MongoDB\Index(unique=false)
+     * @Gedmo\Versioned
+     */
+    protected $metrics;
 
     public function __construct()
     {
@@ -1068,6 +1079,21 @@ abstract class Policy
         }
 
         return $ids;
+    }
+
+    public function getMetrics()
+    {
+        return $this->metrics;
+    }
+
+    public function setMetrics($metrics)
+    {
+        $this->metrics = $metrics;
+    }
+
+    public function addMetric($metric)
+    {
+        $this->metrics[] = $metric;
     }
 
     public function getStandardConnections()

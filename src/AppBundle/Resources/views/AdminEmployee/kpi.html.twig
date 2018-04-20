@@ -45,7 +45,8 @@
                     <th></th>
                     {% for week in weeks %}
                         <td>Ending <b>{{ week.end_date_disp|date('d M Y') }}</b><br>
-                            <small>{{ week.start_date|date('d M Y') }} - {{ week.end_date_disp|date('d M Y') }}</small>
+                            <small>{{ week.start_date|date('d M Y') }} - {{ week.end_date_disp|date('d M Y') }}</small><br>
+                            <small>{{ week.start_date|date('H:i') }} - {{ week.end_date_disp|date('H:i') }}</small>
                         </td>
                     {% endfor %}
                     </tr>
@@ -187,6 +188,38 @@
                                 <td>{{ week['kpi-cancelled-payment-paid'] }}</td>
                             {% endfor %}
                         </tr>
+
+                        <tr>
+                            <td>Activation Policies [KPI??] (excludes upgrades & renewals)<br>
+                            <span title="Initial data population was run on 20/4/18 and populated based on policies that were still activated as of that date">
+                                <i class="fa fa-warning"></i>
+                                before 31/3/18 data is suspect!
+                            </span>
+                            </td>
+                            {% for week in weeks %}
+                                <td>{{ week.period.data['activatedPoliciesActivatedAdjUpgradeRenewals'] }} / {{ week.period.data['activatedPoliciesTotalAdjUpgradeRenewals'] }}
+                                    ({{ week.period.data['activatedPoliciesActivatedAdjUpgradeRenewalsPercent']|number_format(1, '.', ',') }}%)
+                                    <br><small>{{ week.period.startActivation|date('d M Y ') }} - {{ week.period.endActivationDisp|date('d M Y') }}</small>
+                                    <br><small>{{ week.period.startActivation|date('H:i') }} - {{ week.period.endActivationDisp|date('H:i') }}</small>
+                                </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td>Hard Activation Policies [KPI??] (excludes upgrades & renewals)
+                                <span title="Initial data population was run on 20/4/18 and populated based on policies that were still activated as of that date">
+                                <i class="fa fa-warning"></i>
+                                before 15/1/18 data is suspect!
+                            </span>
+                            </td>
+                            {% for week in weeks %}
+                                <td>{{ week.period.data['hardActivatedPoliciesAdjUpgradeRenewals'] }} / {{ week.period.data['hardActivatedPoliciesTotalAdjUpgradeRenewals'] }}
+                                    ({{ week.period.data['hardActivatedPoliciesAdjUpgradeRenewalsPercent']|number_format(1, '.', ',') }}%)
+                                    <br><small>{{ week.period.startHardActivation|date('d M Y') }} - {{ week.period.endHardActivationDisp|date('d M Y') }}</small>
+                                    <br><small>{{ week.period.startHardActivation|date('H:i') }} - {{ week.period.endHardActivationDisp|date('H:i') }}</small>
+                                </td>
+                            {% endfor %}
+                        </tr>
+
                         <tr>
                             <td>Number of active Policyholders [KPI: 110]</td>
                             {% for week in weeks %}

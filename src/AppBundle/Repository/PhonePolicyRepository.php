@@ -127,7 +127,7 @@ class PhonePolicyRepository extends PolicyRepository
     /**
      * All policies that are new (excluding so-sure test ones)
      */
-    public function countAllNewPolicies(\DateTime $endDate = null, \DateTime $startDate = null)
+    public function countAllNewPolicies(\DateTime $endDate = null, \DateTime $startDate = null, $metric = null)
     {
         if (!$endDate) {
             $endDate = new \DateTime();
@@ -144,6 +144,9 @@ class PhonePolicyRepository extends PolicyRepository
         }
         if ($this->excludedPolicyIds) {
             $this->addExcludedPolicyQuery($qb, 'id');
+        }
+        if ($metric) {
+            $qb->field('metrics')->equals($metric);
         }
 
         return $qb->getQuery()
@@ -153,29 +156,47 @@ class PhonePolicyRepository extends PolicyRepository
 
     /**
      * All policies that are active (excluding so-sure test ones)
+     *
+     * @param \DateTime|null $startDate
+     * @param \DateTime|null $endDate
+     * @param string|null    $prefix
+     * @param string|null    $excludeMetric
+     * @return mixed
+     * @throws \Doctrine\ODM\MongoDB\MongoDBException
      */
-    public function findAllActiveUnpaidPolicies(\DateTime $startDate = null, \DateTime $endDate = null)
-    {
+    public function findAllActiveUnpaidPolicies(
+        \DateTime $startDate = null,
+        \DateTime $endDate = null,
+        $prefix = null,
+        $excludeMetric = null
+    ) {
         if (!$endDate) {
             $endDate = new \DateTime();
         }
-
-        $policy = new PhonePolicy();
+        if (!$prefix) {
+            $policy = new PhonePolicy();
+            $prefix = $policy->getPolicyNumberPrefix();
+        }
 
         $qb = $this->createQueryBuilder()
             ->field('status')->in([
                 Policy::STATUS_ACTIVE,
                 Policy::STATUS_UNPAID,
             ])
-            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
+            ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $prefix)));
 
         $qb->field('start')->lt($endDate);
         if ($startDate) {
             $qb->field('start')->gte($startDate);
         }
+        if ($excludeMetric) {
+            $qb->field('metrics')->notEqual($excludeMetric);
+        }
         if ($this->excludedPolicyIds) {
             $this->addExcludedPolicyQuery($qb, 'id');
         }
+
+        // print_r($qb->getQuery()->getQuery());
 
         return $qb->getQuery()
             ->execute();
@@ -274,7 +295,8 @@ class PhonePolicyRepository extends PolicyRepository
         $cancellationReason,
         \DateTime $startDate = null,
         \DateTime $endDate = null,
-        $emptyCancellation = true
+        $emptyCancellation = true,
+        $metric = null
     ) {
         return $this->findAllEndingPolicies(
             $cancellationReason,
@@ -282,7 +304,8 @@ class PhonePolicyRepository extends PolicyRepository
             $startDate,
             $endDate,
             false,
-            $emptyCancellation
+            $emptyCancellation,
+            $metric
         )->count();
     }
 
@@ -295,7 +318,8 @@ class PhonePolicyRepository extends PolicyRepository
         \DateTime $startDate = null,
         \DateTime $endDate = null,
         $requestedCancellation = false,
-        $emptyCancellation = true
+        $emptyCancellation = true,
+        $metric = null
     ) {
         if (!$endDate) {
             $endDate = new \DateTime();
@@ -322,6 +346,10 @@ class PhonePolicyRepository extends PolicyRepository
 
         if ($this->excludedPolicyIds) {
             $this->addExcludedPolicyQuery($qb, 'id');
+        }
+
+        if ($metric) {
+            $qb->field('metrics')->equals($metric);
         }
 
         if (!$onlyWithFNOL) {
