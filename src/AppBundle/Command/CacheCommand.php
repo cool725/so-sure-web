@@ -45,6 +45,9 @@ class CacheCommand extends BaseCommand
         if (!in_array($action, ['list', 'clear'])) {
             throw new \Exception('Unknown action');
         }
+        if (mb_strlen($prefix) < 2) {
+            throw new \Exception('Prefix must be at least 2 chars. Use redis:flushdb to clear database');
+        }
 
         foreach ($redis->keys(sprintf('%s*', $prefix)) as $key) {
             if ($action == 'clear') {
