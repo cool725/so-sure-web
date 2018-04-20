@@ -306,7 +306,6 @@ class ReportingService
             $startActivation,
             $endActivation,
             false,
-            true,
             Policy::METRIC_ACTIVATION
         );
         $data['activatedEndingUpgradePoliciesTotal'] = $policyRepo->countAllEndingPolicies(
@@ -319,7 +318,6 @@ class ReportingService
             null,
             $startActivation,
             $endActivation,
-            false,
             true,
             Policy::METRIC_RENEWAL
         );
@@ -327,7 +325,7 @@ class ReportingService
             null,
             $startActivation,
             $endActivation,
-            false
+            true
         );
 
         $data['hardActivatedPoliciesActivated'] = $policyRepo->countAllNewPolicies(
@@ -344,7 +342,6 @@ class ReportingService
             $startHardActivation,
             $endHardActivation,
             false,
-            true,
             Policy::METRIC_HARD_ACTIVATION
         );
         $data['hardActivatedEndingUpgradePoliciesTotal'] = $policyRepo->countAllEndingPolicies(
@@ -357,7 +354,6 @@ class ReportingService
             null,
             $startHardActivation,
             $endHardActivation,
-            false,
             true,
             Policy::METRIC_RENEWAL
         );
@@ -365,7 +361,7 @@ class ReportingService
             null,
             $startHardActivation,
             $endHardActivation,
-            false
+            true
         );
 
         $data['activatedPoliciesActivatedAdjUpgradeRenewals'] = $data['activatedPoliciesActivated'] -
