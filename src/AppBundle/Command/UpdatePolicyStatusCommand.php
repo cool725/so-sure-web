@@ -222,7 +222,6 @@ class UpdatePolicyStatusCommand extends BaseCommand
         $lines[] = '';
         $ignoreLineCount++;
 
-        $this->getManager()->flush();
         $output->writeln(join(PHP_EOL, $lines));
 
         # 5 lines for each section output

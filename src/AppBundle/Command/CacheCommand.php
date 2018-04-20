@@ -29,16 +29,30 @@ class CacheCommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 'Redis key prefix to clear'
             )
+            ->addArgument(
+                'action',
+                InputArgument::REQUIRED,
+                'list|clear'
+            )
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $action = $input->getArgument('action');
         $prefix = $input->getOption('prefix');
         $redis = $this->getContainer()->get('snc_redis.default');
+        if (!in_array($action, ['list', 'clear'])) {
+            throw new \Exception('Unknown action');
+        }
+
         foreach ($redis->keys(sprintf('%s*', $prefix)) as $key) {
-            $output->writeln(sprintf('Clearing %s', $key));
-            $redis->del($key);
+            if ($action == 'clear') {
+                $output->writeln(sprintf('Clearing %s', $key));
+                $redis->del($key);
+            } elseif ($action == 'list') {
+                $output->writeln(sprintf('%s', $key));
+            }
         }
 
         $output->writeln('Finished');
