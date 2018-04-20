@@ -30,4 +30,14 @@ class SoSure
     // PE21 7TB added 16/8/17 due to explainable but odd situation from customer triggering manual fraud suspicion
     // OL11 1QA added 21/3/18 due to suspecion of fraud
     public static $yearlyOnlyPostcodes = ['TN15 7LY', 'PE21 7TB', 'OL11 1QA'];
+
+    public static function getActivationInterval()
+    {
+        return new \DateInterval('P15D');
+    }
+
+    public static function getHardActivationInterval()
+    {
+        return new \DateInterval('P90D');
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Document\PhonePolicy;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -68,9 +69,24 @@ class UpdatePolicyStatusCommand extends BaseCommand
 
         $policyService = $this->getContainer()->get('app.policy');
         $featureService = $this->getContainer()->get('app.feature');
+        $repo = $this->getManager()->getRepository(Policy::class);
         if ($skipEmail) {
             $policyService->setMailer(null);
         }
+
+        // Metrics
+        $copy = 'Metrics set Policy';
+        if ($dryRun) {
+            $copy = 'Dry Run - Should set Metrics for Policy';
+        }
+        $metrics = $policyService->runMetrics($prefix, $dryRun);
+        foreach ($metrics as $id => $number) {
+            $lines[] = sprintf('%s %s / %s', $copy, $number, $id);
+        }
+        $lines[] = sprintf('%s metrics policies processed', count($metrics));
+        $ignoreLineCount++;
+        $lines[] = '';
+        $ignoreLineCount++;
 
         // Unpaid Policies - Cancel
         $cancelled = $policyService->cancelUnpaidPolicies($prefix, $dryRun, $skipUnpaidMinTimeframeCheck);
@@ -101,7 +117,6 @@ class UpdatePolicyStatusCommand extends BaseCommand
         $ignoreLineCount++;
 
         if ($policyId) {
-            $repo = $this->getManager()->getRepository(Policy::class);
             $policy = $repo->find($policyId);
             if (!$policy) {
                 throw new \Exception('Unable to find policy');

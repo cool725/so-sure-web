@@ -2,6 +2,7 @@
 namespace AppBundle\Service;
 
 use AppBundle\Classes\SoSure;
+use AppBundle\Repository\PhoneRepository;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -1463,6 +1464,42 @@ class PolicyService
         return $fullyExpired;
     }
 
+    public function runMetrics($prefix, $dryRun)
+    {
+        $lines = [];
+        /** @var PhoneRepository $phonePolicyRepo */
+        $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
+
+        $activationDate = new \DateTime();
+        $activationDate = $activationDate->sub(SoSure::getActivationInterval());
+        $hardActivationDate = new \DateTime();
+        $hardActivationDate = $hardActivationDate->sub(SoSure::getHardActivationInterval());
+
+        $metrics = [
+            Policy::METRIC_ACTIVATION => $activationDate,
+            Policy::METRIC_HARD_ACTIVATION => $hardActivationDate,
+        ];
+
+        foreach ($metrics as $metric => $date) {
+            $policies = $phonePolicyRepo->findAllActiveUnpaidPolicies(null, $date, $prefix, $metric);
+            foreach ($policies as $policy) {
+                if (isset($lines[$policy->getId()])) {
+                    $lines[$policy->getId()] = sprintf("%s, %s", $lines[$policy->getId()], $metric);
+                } else {
+                    $lines[$policy->getId()] = sprintf("%s: %s", $policy->getPolicyNumber(), $metric);
+                }
+                if (!$dryRun) {
+                    $policy->addMetric($metric);
+                }
+            }
+        }
+        if (!$dryRun) {
+            $this->dm->flush();
+        }
+
+        return $lines;
+    }
+
     public function cashbackReminder($dryRun)
     {
         $now = new \DateTime();
@@ -1859,6 +1896,7 @@ class PolicyService
         $this->create($newPolicy, $startDate, false, $numPayments);
         $newPolicy->renew($discount, $autoRenew, $date);
         $this->generateScheduledPayments($newPolicy, $startDate, $numPayments);
+        $policy->addMetric(Policy::METRIC_RENEWAL);
 
         $this->dm->flush();
 

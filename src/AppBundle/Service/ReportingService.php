@@ -75,6 +75,20 @@ class ReportingService
         if ($isKpi) {
             $totalEnd = $end;
         }
+        $endActivation = clone $start;
+        $endActivation = $endActivation->sub(SoSure::getActivationInterval());
+//       $endActivation = $this->endOfDay($endActivation);
+        $startActivation = clone $endActivation;
+        $startActivation = $startActivation->sub(new \DateInterval('P7D'));
+//        $startActivation = $this->startOfDay($startActivation);
+
+        $endHardActivation = clone $start;
+        $endHardActivation = $endHardActivation->sub(SoSure::getHardActivationInterval());
+//        $endHardActivation = $this->endOfDay($endHardActivation);
+        $startHardActivation = clone $endHardActivation;
+        $startHardActivation = $startHardActivation->sub(new \DateInterval('P7D'));
+//        $startHardActivation = $this->startOfDay($startHardActivation);
+
         $rolling12Months = clone $end;
         $rolling12Months = $rolling12Months->sub(new \DateInterval('P1Y'));
         $rolling3Months = clone $start;
@@ -278,6 +292,106 @@ class ReportingService
             $data['newPoliciesAvgPremium'] = null;
         }
 
+        $data['activatedPoliciesActivated'] = $policyRepo->countAllNewPolicies(
+            $endActivation,
+            $startActivation,
+            Policy::METRIC_ACTIVATION
+        );
+        $data['activatedPoliciesTotal'] = $policyRepo->countAllNewPolicies(
+            $endActivation,
+            $startActivation
+        );
+        $data['activatedEndingUpgradePoliciesActivated'] = $policyRepo->countAllEndingPolicies(
+            Policy::CANCELLED_UPGRADE,
+            $startActivation,
+            $endActivation,
+            false,
+            true,
+            Policy::METRIC_ACTIVATION
+        );
+        $data['activatedEndingUpgradePoliciesTotal'] = $policyRepo->countAllEndingPolicies(
+            Policy::CANCELLED_UPGRADE,
+            $startActivation,
+            $endActivation,
+            false
+        );
+        $data['activatedEndingRenewalPoliciesActivated'] = $policyRepo->countAllEndingPolicies(
+            null,
+            $startActivation,
+            $endActivation,
+            false,
+            true,
+            Policy::METRIC_RENEWAL
+        );
+        $data['activatedEndingRenewalPoliciesTotal'] = $policyRepo->countAllEndingPolicies(
+            null,
+            $startActivation,
+            $endActivation,
+            false
+        );
+
+        $data['hardActivatedPoliciesActivated'] = $policyRepo->countAllNewPolicies(
+            $endHardActivation,
+            $startHardActivation,
+            Policy::METRIC_HARD_ACTIVATION
+        );
+        $data['hardActivatedPoliciesTotal'] = $policyRepo->countAllNewPolicies(
+            $endHardActivation,
+            $startHardActivation
+        );
+        $data['hardActivatedEndingUpgradePoliciesActivated'] = $policyRepo->countAllEndingPolicies(
+            Policy::CANCELLED_UPGRADE,
+            $startHardActivation,
+            $endHardActivation,
+            false,
+            true,
+            Policy::METRIC_HARD_ACTIVATION
+        );
+        $data['hardActivatedEndingUpgradePoliciesTotal'] = $policyRepo->countAllEndingPolicies(
+            Policy::CANCELLED_UPGRADE,
+            $startHardActivation,
+            $endHardActivation,
+            false
+        );
+        $data['hardActivatedEndingRenewalPoliciesActivated'] = $policyRepo->countAllEndingPolicies(
+            null,
+            $startHardActivation,
+            $endHardActivation,
+            false,
+            true,
+            Policy::METRIC_RENEWAL
+        );
+        $data['hardActivatedEndingRenewalPoliciesTotal'] = $policyRepo->countAllEndingPolicies(
+            null,
+            $startHardActivation,
+            $endHardActivation,
+            false
+        );
+
+        $data['activatedPoliciesActivatedAdjUpgradeRenewals'] = $data['activatedPoliciesActivated'] -
+            $data['hardActivatedEndingUpgradePoliciesActivated'] -
+            $data['activatedEndingRenewalPoliciesActivated'];
+        $data['activatedPoliciesTotalAdjUpgradeRenewals'] = $data['activatedPoliciesTotal'] -
+            $data['hardActivatedEndingUpgradePoliciesTotal'] -
+            $data['activatedEndingRenewalPoliciesTotal'];
+        $data['activatedPoliciesActivatedAdjUpgradeRenewalsPercent'] =
+            $data['activatedPoliciesTotalAdjUpgradeRenewals'] != 0 ?
+            100 * $data['activatedPoliciesActivatedAdjUpgradeRenewals'] /
+                $data['activatedPoliciesTotalAdjUpgradeRenewals'] :
+            null;
+
+        $data['hardActivatedPoliciesAdjUpgradeRenewals'] = $data['hardActivatedPoliciesActivated'] -
+            $data['hardActivatedEndingUpgradePoliciesActivated'] -
+            $data['hardActivatedEndingRenewalPoliciesActivated'];
+        $data['hardActivatedPoliciesTotalAdjUpgradeRenewals'] = $data['hardActivatedPoliciesTotal'] -
+            $data['hardActivatedEndingUpgradePoliciesTotal'] -
+            $data['hardActivatedEndingRenewalPoliciesTotal'];
+        $data['hardActivatedPoliciesAdjUpgradeRenewalsPercent'] =
+            $data['hardActivatedPoliciesTotalAdjUpgradeRenewals'] != 0 ?
+            100 * $data['hardActivatedPoliciesAdjUpgradeRenewals'] /
+                $data['hardActivatedPoliciesTotalAdjUpgradeRenewals'] :
+            null;
+
         $activePolicyHolders = [];
         $activePolicies = $policyRepo->findAllActivePoliciesByInstallments(null, $end);
         foreach ($activePolicies as $activePolicy) {
@@ -377,6 +491,12 @@ class ReportingService
         $results = [
             'start' => $start,
             'end' => $end,
+            'startActivation' => $startActivation,
+            'endActivation' => $endActivation,
+            'endActivationDisp' => (clone $endActivation)->sub(new \DateInterval('PT1S')),
+            'startHardActivation' => $startHardActivation,
+            'endHardActivation' => $endHardActivation,
+            'endHardActivationDisp' => (clone $endHardActivation)->sub(new \DateInterval('PT1S')),
             'data' => $data,
             'excluded_policies' => $excludedPolicies,
             'claims' => $claimsTotals,
