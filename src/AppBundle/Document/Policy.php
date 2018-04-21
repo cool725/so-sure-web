@@ -4114,7 +4114,7 @@ abstract class Policy
      * This is different than if a user is allowed to purchase an additional policy
      * although lines get blurred if a policy expires and then user wants to re-purchase
      */
-    public function canRenew(\DateTime $date = null)
+    public function canRenew(\DateTime $date = null, $checkTimeframe = true)
     {
         // partial renewal policy wasn't created - never allow renewal in this case
         // not checking if already renewed deliberately as using canRenew to display
@@ -4129,7 +4129,7 @@ abstract class Policy
         }
 
         // In case the policy is now expired
-        if (!$this->isInRenewalTimeframe($date)) {
+        if ($checkTimeframe && !$this->isInRenewalTimeframe($date)) {
             return false;
         }
 
