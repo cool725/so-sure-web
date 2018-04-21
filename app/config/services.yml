@@ -262,6 +262,8 @@ services:
             - "%plivo_authtoken%"
             - "%plivo_sendingnumber%"
             - "@templating"
+            - "@snc_redis.default"
+            - "%kernel.environment%"
 
     app.branch:
         class: AppBundle\Service\BranchService

@@ -11,6 +11,10 @@ use AppBundle\Document\Policy;
 
 class SmsService
 {
+
+    const VALIDATION_KEY = 'Mobile:Validation:%s:%s';
+    const VALIDATION_TIMEOUT = 600; // 10 minutes
+
     /** @var DocumentManager */
     protected $dm;
 
@@ -27,6 +31,11 @@ class SmsService
 
     protected $templating;
 
+    protected $redis;
+
+    /** @var string */
+    protected $environment;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
@@ -35,6 +44,8 @@ class SmsService
      * @param string          $auth_token
      * @param string          $sending_number
      * @param                 $templating
+     * @param                 $redis
+     * @param                 $environment
      */
     public function __construct(
         DocumentManager $dm,
@@ -43,7 +54,9 @@ class SmsService
         $auth_id,
         $auth_token,
         $sending_number,
-        $templating
+        $templating,
+        $redis,
+        $environment
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -51,6 +64,19 @@ class SmsService
         $this->client = new RestAPI($auth_id, $auth_token);
         $this->sending_number = $sending_number;
         $this->templating = $templating;
+        $this->redis = $redis;
+        $this->environment = $environment;
+    }
+
+    /**
+     * Environment is injected into constructed and should only
+     * be overwriten for a few test cases.
+     *
+     * @param string $environment
+     */
+    public function setEnvironment($environment)
+    {
+        $this->environment = $environment;
     }
 
     /**
@@ -61,6 +87,9 @@ class SmsService
      */
     public function send($number, $message)
     {
+        if ($this->environment == "test") {
+            return true;
+        }
         try {
             $params = array(
                 'src' => $this->sending_number, // Sender's phone number with country code
@@ -100,5 +129,36 @@ class SmsService
 
         $this->dm->persist($charge);
         $this->dm->flush();
+    }
+
+    public function setValidationCodeForUser($user)
+    {
+        $characters = '0123456789';
+        $code = '';
+        for ($i = 0; $i < 6; $i++) {
+            $code .= $characters[rand(0, 9)];
+        }
+
+        $key = sprintf(self::VALIDATION_KEY, $user->getId(), $code);
+        $this->redis->setEx($key, self::VALIDATION_TIMEOUT, $code);
+
+        return $code;
+    }
+
+    public function checkValidationCodeForUser($user, $code)
+    {
+        if (mb_strlen($code) != 6) {
+            return false;
+        }
+
+        $key = sprintf(self::VALIDATION_KEY, $user->getId(), $code);
+        $foundCode = $this->redis->get($key);
+
+        if ($foundCode === $code) {
+            $this->redis->del($key);
+            return true;
+        }
+
+        return false;
     }
 }

@@ -1672,7 +1672,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['phone_policy' => []]);
-        $data = $this->verifyResponse(400);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['phone_policy' => [
             'model_number' => 'MLLN2B/A',
@@ -4281,6 +4281,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(200);
         $this->assertEquals(self::$testUser->getEmailCanonical(), $data['email']);
+        $this->assertNull($data['has_mobile_number_verified']);
     }
 
     public function testGetUserDifferentUser()
@@ -5082,7 +5083,6 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertFalse(isset($listeners['security.interactive_login.actual.AppBundle\Listener\SecurityListener::onActualSecurityInteractiveLogin']));
         // @codingStandardsIgnoreEnd
     }
-
     // policy/{id}/track/location
 
     /**
@@ -5210,6 +5210,134 @@ class ApiAuthControllerTest extends BaseApiControllerTest
             'type' => 'picsure',
             'latitude' => '51.524490',
             'longitude' => '-0.087658',
+        ]);
+        $data = $this->verifyResponse(403);
+    }
+
+    // GET user/{id}/verify/mobilenumber
+
+    /**
+     *
+     */
+    public function testUserRequestVerificationMobileNumber()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testUserRequestVerificationMobileNumber', $this),
+            'foo',
+            true
+        );
+
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $url = sprintf('/api/v1/auth/user/%s/verify/mobilenumber?_method=GET', $user->getId());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(200);
+    }
+
+    public function testUserRequestVerificationMobileNumberUnknownId()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $url = sprintf('/api/v1/auth/user/1/verify/mobilenumber?_method=GET');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(404);
+    }
+
+    public function testUserRequestVerificationMobileNumberValidation()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $url = sprintf('/api/v1/auth/user/%s/verify/mobilenumber?_method=GET', self::$testUser->getId());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+    }
+
+    public function testUserRequestVerificationMobileNumberDifferentUser()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $url = sprintf('/api/v1/auth/user/%s/verify/mobilenumber?_method=GET', self::$testUser2->getId());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(403);
+    }
+
+    // POST user/{id}/verify/mobilenumber
+
+    /**
+     *
+     */
+    public function testUserVerifyMobileNumber()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testUserVerifyMobileNumber', $this),
+            'foo',
+            true
+        );
+
+        $redis = self::$client->getContainer()->get('snc_redis.default');
+        $key = sprintf('Mobile:Validation:%s:%s', $user->getId(), '123456');
+        $redis->setEx($key, 600000, '123456');
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $url = sprintf('/api/v1/auth/user/%s/verify/mobilenumber', $user->getId());
+        $data = [
+            'code' => '123456',
+        ];
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $result = $this->verifyResponse(200);
+        $this->assertEquals($user->getEmailCanonical(), $result['email']);
+        $this->assertTrue($result['has_mobile_number_verified']);
+        $this->assertTrue($user->getMobileNumberVerified());
+    }
+
+    public function testUserVerifyMobileNumberUnknownId()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $url = sprintf('/api/v1/auth/user/1/verify/mobilenumber');
+        $data = [
+            'code' => '123456',
+        ];
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $data = $this->verifyResponse(404);
+    }
+
+    public function testUserVerifyMobileNumberValidation()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testUserVerifyMobileNumberValidation', $this),
+            'foo',
+            true
+        );
+
+        $redis = self::$client->getContainer()->get('snc_redis.default');
+        $key = sprintf('Mobile:Validation:%s:%s', $user->getId(), '123456');
+        $redis->setEx($key, 600000, '123456');
+
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $url = sprintf('/api/v1/auth/user/%s/verify/mobilenumber', $user->getId());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+        $data = [
+            'foo' => '123456',
+        ];
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+        $data = [
+            'code' => '123',
+        ];
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_USER_VERIFY_CODE);
+        $data = [
+            'code' => '654321',
+        ];
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_USER_VERIFY_CODE);
+    }
+
+    public function testUserVerifyMobileNumberDifferentUser()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $url = sprintf('/api/v1/auth/user/%s/verify/mobilenumber', self::$testUser2->getId());
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'code' => '123456',
         ]);
         $data = $this->verifyResponse(403);
     }
