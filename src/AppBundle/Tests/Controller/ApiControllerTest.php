@@ -1008,7 +1008,7 @@ class ApiControllerTest extends BaseApiControllerTest
         $this->assertTrue($fooUser !== null);
         $this->assertEquals('62.253.24.189', $fooUser->getIdentityLog()->getIp());
         $this->assertEquals('GB', $fooUser->getIdentityLog()->getCountry());
-        $this->assertEquals([-0.13,51.5], $fooUser->getIdentityLog()->getLoc()->coordinates);
+        $this->assertEquals([-0.13,51.5], $fooUser->getIdentityLog()->getLoc()->getCoordinates());
     }
 
     public function testUserCreateCampaign()

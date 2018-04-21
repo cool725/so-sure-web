@@ -847,7 +847,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertTrue($policy !== null);
         $this->assertEquals('62.253.24.189', $policy->getIdentityLog()->getIp());
         $this->assertEquals('GB', $policy->getIdentityLog()->getCountry());
-        $this->assertEquals([-0.13,51.5], $policy->getIdentityLog()->getLoc()->coordinates);
+        $this->assertEquals([-0.13,51.5], $policy->getIdentityLog()->getLoc()->getCoordinates());
 
         $this->assertTrue(mb_strlen($data['id']) > 5);
         $this->assertTrue(in_array('A0001', $data['phone_policy']['phone']['devices']));
@@ -5081,5 +5081,136 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertTrue(isset($listeners['security.interactive_login.AppBundle\Listener\SecurityListener::onSecurityInteractiveLogin']));
         $this->assertFalse(isset($listeners['security.interactive_login.actual.AppBundle\Listener\SecurityListener::onActualSecurityInteractiveLogin']));
         // @codingStandardsIgnoreEnd
+    }
+
+    // policy/{id}/track/location
+
+    /**
+     *
+     */
+    public function testPolicyTrackLocation()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testPolicyTrackLocation', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $createData = $this->verifyResponse(200);
+        $policyId = $createData['id'];
+
+        $url = sprintf('/api/v1/auth/policy/%s/track/location', $policyId);
+        $data = [
+            'type' => 'picsure',
+            'latitude' => '51.524490',
+            'longitude' => '-0.087658',
+        ];
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $result = $this->verifyResponse(200);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $policyRepo = $dm->getRepository(PhonePolicy::class);
+        $policy = $policyRepo->find($policyId);
+        $locations = $policy->getPicsureLocations();
+        $this->assertEquals(1, count($locations));
+        $this->assertEquals([-0.087658, 51.524490], $locations[0]->getCoordinates());
+    }
+
+    public function testPolicyTrackLocationUnknownId()
+    {
+        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
+        $url = sprintf('/api/v1/auth/policy/1/track/location');
+        $data = [
+            'type' => 'picsure',
+            'latitude' => '51.524490',
+            'longitude' => '-0.087658',
+        ];
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $data = $this->verifyResponse(404);
+    }
+
+    public function testPolicyTrackLocationValidation()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testPolicyrTrackLocationValidation', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $createData = $this->verifyResponse(200);
+        $policyId = $createData['id'];
+
+        $url = sprintf('/api/v1/auth/policy/%s/track/location', $policyId);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+
+        $data = [
+            'type' => 'picsure',
+        ];
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+
+        $data = [
+            'type' => 'picsure',
+            'latitude' => '51.524490',
+        ];
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+
+        $data = [
+            'type' => 'picsure',
+            'longitude' => '51.524490',
+        ];
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+
+        $data = [
+            'type' => 'bla',
+            'latitude' => '51.524490',
+            'longitude' => '-0.087658',
+        ];
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+
+        $data = [
+            'type' => 'picsure',
+            'latitude' => '151.524490',
+            'longitude' => '-0.087658',
+        ];
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+
+        $data = [
+            'type' => 'picsure',
+            'latitude' => '51.524490',
+            'longitude' => '-200.087658',
+        ];
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, $data);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
+    }
+
+    public function testPolicyTrackLocationDifferentUser()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testPolicyTrackLocationDifferentUser', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $user = static::createUser(self::$userManager, 'policytracklocation-unauth@auth-api.so-sure.com', 'foo');
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $url = sprintf('/api/v1/auth/policy/%s/track/location', $policyData['id']);
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'type' => 'picsure',
+            'latitude' => '51.524490',
+            'longitude' => '-0.087658',
+        ]);
+        $data = $this->verifyResponse(403);
     }
 }

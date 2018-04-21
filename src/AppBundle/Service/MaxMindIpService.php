@@ -104,7 +104,7 @@ class MaxMindIpService
         }
 
         $coordinates = new Coordinates();
-        $coordinates->coordinates = [$this->data->location->longitude, $this->data->location->latitude];
+        $coordinates->setCoordinates($this->data->location->longitude, $this->data->location->latitude);
 
         return $coordinates;
     }

@@ -241,6 +241,18 @@
                                 {% endif %}
                             </td>
                         </tr>
+                        {% if policy.policyTerms.isPicSureEnabled %}
+                        <tr>
+                            <td>
+                                pic-sure Locations
+                            </td>
+                            <td>
+                                {% for location in policy.picsureLocations %}
+                                    [{{ location.coordinates[1]}},{{ postcode.location.coordinates[0]}}] 
+                                {% endfor %}
+                            </td>
+                        </tr>
+                        {% endif %}
                     </table>
                 </div>
                 <div class="col-md-5">

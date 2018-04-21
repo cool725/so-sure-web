@@ -148,6 +148,11 @@ class PhonePolicy extends Policy
      */
     protected $picSureApprovedDate;
 
+    /**
+     * @MongoDB\EmbedMany(targetDocument="Coordinates")
+     */
+    protected $picsureLocations;
+
     public function getPhone()
     {
         return $this->phone;
@@ -653,6 +658,21 @@ class PhonePolicy extends Policy
     public function getPolicyPicSureFiles()
     {
         return $this->getPolicyFilesByType(PicSureFile::class);
+    }
+
+    public function getPicsureLocations()
+    {
+        return $this->picsureLocations;
+    }
+
+    public function setPicsureLocations($picsureLocations)
+    {
+        $this->picsureLocations = $picsureLocations;
+    }
+
+    public function addPicsureLocation(Coordinates $picsureLocation)
+    {
+        $this->picsureLocations[] = $picsureLocation;
     }
 
     public function isSameInsurable(Policy $policy)
