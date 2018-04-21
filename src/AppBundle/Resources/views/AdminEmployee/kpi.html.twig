@@ -115,17 +115,24 @@
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Policy Expired [KPI: 82]
+                            <td>Policy Expired [KPI: 86]
                             </td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['endingExpiredPolicies'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
-                            <td>Policy Renewed [KPI: 83]
+                            <td>Policy Renewed [KPI: 87]
                             </td>
                             {% for week in weeks %}
                                 <td>{{ week.period.data['endingPoliciesRenewed'] }}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td>Policy unable to renew (so-sure declined) [KPI: 88]
+                            </td>
+                            {% for week in weeks %}
+                                <td>{{ week.period.data['endingPoliciesRenewedDeclined'] }}</td>
                             {% endfor %}
                         </tr>
                         <tr>
