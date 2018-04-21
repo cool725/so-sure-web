@@ -274,9 +274,13 @@ class ReportingService
             false
         );
         $data['endingPoliciesRenewed'] = 0;
+        $data['endingPoliciesRenewedDeclined'] = 0;
         foreach ($renewalPolicies as $renewalPolicy) {
             if ($renewalPolicy->isRenewed()) {
                 $data['endingPoliciesRenewed']++;
+            }
+            if (!$renewalPolicy->canRenew()) {
+                $data['endingPoliciesRenewedDeclined']++;
             }
         }
 
