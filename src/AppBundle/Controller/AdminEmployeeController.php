@@ -887,9 +887,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 if ($picsureForm->isValid()) {
                     if ($policy->getPolicyTerms()->isPicSureEnabled() && !$policy->isPicSureValidated()) {
                         if ($picsureForm->get('approve')->isClicked()) {
-                            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+                            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED, $this->getUser());
                         } elseif ($picsureForm->get('preapprove')->isClicked()) {
-                            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_PREAPPROVED);
+                            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_PREAPPROVED, $this->getUser());
                         } else {
                             throw new \Exception('Unknown button click');
                         }
@@ -2087,7 +2087,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $picSureSearchForm->handleRequest($request);
 
         if ($request->get('_route') == "admin_picsure_approve") {
-            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED, $this->getUser());
             $dm->flush();
             $mailer = $this->get('app.mailer');
             $mailer->sendTemplate(
@@ -2118,7 +2118,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
             return new RedirectResponse($this->generateUrl('admin_picsure'));
         } elseif ($request->get('_route') == "admin_picsure_reject") {
-            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_REJECTED);
+            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_REJECTED, $this->getUser());
             $dm->flush();
             $mailer = $this->get('app.mailer');
             $mailer->sendTemplate(
@@ -2148,7 +2148,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
             return new RedirectResponse($this->generateUrl('admin_picsure'));
         } elseif ($request->get('_route') == "admin_picsure_invalid") {
-            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_INVALID);
+            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_INVALID, $this->getUser());
             $dm->flush();
             $mailer = $this->get('app.mailer');
             $mailer->sendTemplate(
