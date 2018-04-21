@@ -558,6 +558,34 @@ class PurchaseController extends BaseController
     }
 
     /**
+     * Note that any changes to actual path routes need to be reflected in the Google Analytics Goals
+     *   as these will impact Adwords
+     *
+     * @Route("/step-payment", name="purchase_step_payment")
+     * @Route("/step-payment/{id}", name="purchase_step_payment_id")
+     * @Template
+     */
+    public function purchaseStepPaymentAction(Request $request, $id = null)
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('purchase');
+        } elseif (!$user->canPurchasePolicy()) {
+            $this->addFlash(
+                'error',
+                "Sorry, but you've reached the maximum number of allowed policies. Contact us for more details."
+            );
+
+            return $this->redirectToRoute('user_home');
+        }
+
+        $this->denyAccessUnlessGranted(UserVoter::EDIT, $user);
+        if (!$user->hasValidBillingDetails()) {
+            return $this->redirectToRoute('purchase_step_personal');
+        }
+    }
+
+        /**
      * @Route("/sample-policy-terms", name="sample_policy_terms")
      * @Template()
      */
