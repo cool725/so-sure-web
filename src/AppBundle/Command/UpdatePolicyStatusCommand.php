@@ -82,6 +82,7 @@ class UpdatePolicyStatusCommand extends BaseCommand
         $metrics = $policyService->runMetrics($prefix, $dryRun);
         foreach ($metrics as $id => $number) {
             $lines[] = sprintf('%s %s / %s', $copy, $number, $id);
+            $ignoreLineCount++;
         }
         $lines[] = sprintf('%s metrics policies processed', count($metrics));
         $ignoreLineCount++;
