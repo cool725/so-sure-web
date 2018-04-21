@@ -74,6 +74,16 @@
                 <a class="btn btn-primary" href="{{ path('admin_picsure_ml_predict', {'id': file.getId()}) }}"><i class="fa fa-refresh"></i> Re-run</a>
             {% endif %}
             </p>
+            {% if 'picsure-status' in file.getMetadata()|keys %}
+                File Status: {{ file.getMetadata()['picsure-status'] }}
+                {% if 'picsure-status-date' in file.getMetadata()|keys %}
+                    on {{ file.getMetadata()['picsure-status-date'] }}
+                {%  endif %}
+                {% if 'picsure-status-user-name' in file.getMetadata()|keys %}
+                    by {{ file.getMetadata()['picsure-status-user-name'] }}
+                {% endif %}
+                <br/>
+            {% endif %}
             <a href="{{ s3DownloadLink(file.bucket, file.key) }}" target="_blank">
                 <i class="fa fa-external-link"></i> {{ file.key }}
                 {% if policy.picSureStatus == 'manual' %}

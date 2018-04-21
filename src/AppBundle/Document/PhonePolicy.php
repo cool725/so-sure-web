@@ -634,7 +634,7 @@ class PhonePolicy extends Policy
         return $status;
     }
     
-    public function setPicSureStatus($picSureStatus)
+    public function setPicSureStatus($picSureStatus, User $user = null)
     {
         $this->picSureStatus = $picSureStatus;
         if ($picSureStatus == self::PICSURE_STATUS_APPROVED && !$this->getPicSureApprovedDate()) {
@@ -644,6 +644,12 @@ class PhonePolicy extends Policy
         $picsureFiles = $this->getPolicyFilesByType(PicSureFile::class);
         if (count($picsureFiles) > 0) {
             $picsureFiles[0]->addMetadata('picsure-status', $picSureStatus);
+            $now = new \DateTime();
+            $picsureFiles[0]->addMetadata('picsure-status-date', $now->format(\DateTime::ATOM));
+            if ($user) {
+                $picsureFiles[0]->addMetadata('picsure-status-user-name', $user->getName());
+                $picsureFiles[0]->addMetadata('picsure-status-user-id', $user->getId());
+            }
         }
     }
 
