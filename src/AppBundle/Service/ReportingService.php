@@ -279,7 +279,11 @@ class ReportingService
             if ($renewalPolicy->isRenewed()) {
                 $data['endingPoliciesRenewed']++;
             }
-            if (!$renewalPolicy->canRenew()) {
+            if (!$renewalPolicy->canRenew(null, false) && in_array($renewalPolicy->getStatus(), [
+                Policy::STATUS_EXPIRED,
+                Policy::STATUS_EXPIRED_CLAIMABLE,
+                Policy::STATUS_EXPIRED_WAIT_CLAIM,
+             ])) {
                 $data['endingPoliciesRenewedDeclined']++;
             }
         }
