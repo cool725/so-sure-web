@@ -1672,7 +1672,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['phone_policy' => []]);
-        $data = $this->verifyResponse(400);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, ['phone_policy' => [
             'model_number' => 'MLLN2B/A',
