@@ -74,8 +74,12 @@
                         {% else %}
                             {% set ymd = year ~ month ~ day %}
                         {% endif %}
-                        {% set sosureTotal = sosureTotal + sosure['dailyTransaction'][day] %}
-                        {% set judoTotal = judoTotal + judo['dailyTransaction'][ymd] %}
+                        {% if sosure['dailyTransaction'][day] is defined %}
+                            {% set sosureTotal = sosureTotal + sosure['dailyTransaction'][day] %}
+                        {% endif %}
+                        {% if judo['dailyTransaction'][ymd] is defined %}
+                            {% set judoTotal = judoTotal + judo['dailyTransaction'][ymd] %}
+                        {% endif %}
                     {% endfor %}
                     <table class="table table-striped">
                         <tr>
@@ -236,8 +240,12 @@
                         {% else %}
                             {% set ymd = year ~ month ~ day %}
                         {% endif %}
-                        {% set sosureTotal = sosureTotal + sosure['dailyShiftedTransaction'][day] %}
-                        {% set barclaysTotal = barclaysTotal + barclays['dailyTransaction'][ymd] %}
+                        {% if sosure['dailyShiftedTransaction'][day] is defined %}
+                            {% set sosureTotal = sosureTotal + sosure['dailyShiftedTransaction'][day] %}
+                        {% endif %}
+                        {% if barclays['dailyTransaction'][ymd] is defined %}
+                            {% set barclaysTotal = barclaysTotal + barclays['dailyTransaction'][ymd] %}
+                        {% endif %}
                     {% endfor %}
                     <table class="table table-striped">
                         <tr>
