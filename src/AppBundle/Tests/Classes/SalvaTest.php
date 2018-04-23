@@ -60,6 +60,10 @@ class SalvaTest extends \PHPUnit\Framework\TestCase
         // middle
         $this->assertEquals(4.78, $salva->getProrataSplit(5.12)['coverholder']);
         $this->assertEquals(0.34, $salva->getProrataSplit(5.12)['broker']);
+
+        // exception
+        $this->assertEquals(0.62, $salva->getProrataSplit(0.67)['coverholder']);
+        $this->assertEquals(0.05, $salva->getProrataSplit(0.67)['broker']);
     }
 
     /**
