@@ -22,54 +22,55 @@
     {% include 'AppBundle::Purchase/purchaseNav.html.twig' %}
 
     <div class="checkout--top">
-        <div class="container">
-            <h1>Setup a Direct Debit with SO-SURE
-                <span class="sr-only">Setup a Direct Debit with SO-SURE </span><img src="{{ cdn_url }}/images/direct-debit-logo.svg" alt="Direct Debit">
-            </h1>
+        <div class="container text-center">
+            <h1>Setup a Direct Debit with SO-SURE <br> <small> for your {{ policy.phone.make }} {{ policy.phone.model }}  {{ policy.phone.memory }}GB </small></h1>
+            {# <p><a href="#">Prefer to pay by card?</a></p> #}
+            <p><img src="{{ cdn_url }}/images/direct-debit-logo.svg" alt="Direct Debit" width="180px" class="img-center"></p>
+            <p><small>Please enter your bank details you wish to use for your Direct Debit each month.</small></p>
+
         </div>
     </div>
 
-    <div class="payment--step">
-        <div class="payment--step-inner clearfix">
+    <div class="checkout--step">
+        <div class="container">
 
             {{ form_start(bacs_form, {'attr': {'class': 'form','autocomplete': 'off'}}) }}
-            <p>Please enter your bank details you wish to use for your Direct Debit each month.</p>
-            <div class="form-group {% if form_errors(bacs_form.accountName) %}has-error{% endif %}">
-                {{ form_widget(bacs_form.accountName, {'attr': {'placeholder': 'Name on account', 'class': 'form-control'}}) }}
-                {% if form_errors(bacs_form.accountName) %}
-                    <div class="help-block with-errors">{{ form_errors(bacs_form.accountName) }}</div>
-                {% else %}
-                    <span class="help-block">The bank account must be in the policy holder's name "{{ app.user.name }}"</span>
-                {% endif %}
-            </div>
-            <div class="form-group {% if form_errors(bacs_form.sortCode) %}has-error{% endif %}">
-                {{ form_widget(bacs_form.sortCode, {'attr': {'placeholder': 'Sort code', 'class': 'form-control sort-code', 'maxlength': 6}}) }}
-                <div class="help-block with-errors">{{ form_errors(bacs_form.sortCode) }}</div>
-            </div>
-            <div class="form-group {% if form_errors(bacs_form.accountNumber) %}has-error{% endif %}">
-                {{ form_widget(bacs_form.accountNumber, {'attr': {'placeholder': 'Account number', 'class': 'form-control', 'maxlength': 8}}) }}
-                <div class="help-block with-errors">{{ form_errors(bacs_form.accountNumber) }}</div>
-            </div>
-            <div class="form-group {% if form_errors(bacs_form.soleSignature) %}has-error{% endif %}">
-                {{ form_widget(bacs_form.soleSignature, {'attr': {'class': ''}}) }}
-                {{ form_label(bacs_form.soleSignature) }}
-                <div class="help-block with-errors">{{ form_errors(bacs_form.soleSignature) }}</div>
-            </div>
-            <div class="form-group">
-                {{ form_widget(bacs_form.save, {'label': 'Continue', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
-            </div>
-            <div class="form-group">
-                <a href="{{ path('purchase_step_policy_id', {'id': policy.id}) }}" class="btn btn-blue-hollow btn-block btn-pad" data-toggle="tab">
-                    Back
-                </a>
-            </div>
-            <p><small>Your payments are protected by the <a href="#" data-toggle="modal" data-target="#modal-dd" class="text-nowrap">Direct Debit Guarantee</a></small>.</p>
-            <address>
-                <strong>SO-SURE Limited</strong><br>
-                10 Finsbury Square, London EC2A 1AF, GB<br>
-                +44 330 223 4948, <a href="mailto:hello@wearesosure.com">hello@wearesosure.com</a>
-            </address>
-            <img src="{{ cdn_url }}/images/direct-debit-logo.svg" alt="Direct Debit" width="100px">
+                <div class="form-group {% if form_errors(bacs_form.accountName) %}has-error{% endif %}">
+                    {{ form_widget(bacs_form.accountName, {'attr': {'placeholder': 'Name on account', 'class': 'form-control'}}) }}
+                    {% if form_errors(bacs_form.accountName) %}
+                        <div class="help-block with-errors">{{ form_errors(bacs_form.accountName) }}</div>
+                    {% else %}
+                        <span class="help-block">The bank account must be in the policy holder's name "{{ app.user.name }}"</span>
+                    {% endif %}
+                </div>
+                <div class="form-group {% if form_errors(bacs_form.sortCode) %}has-error{% endif %}">
+                    {{ form_widget(bacs_form.sortCode, {'attr': {'placeholder': 'Sort code', 'class': 'form-control sort-code', 'maxlength': 6}}) }}
+                    <div class="help-block with-errors">{{ form_errors(bacs_form.sortCode) }}</div>
+                </div>
+                <div class="form-group {% if form_errors(bacs_form.accountNumber) %}has-error{% endif %}">
+                    {{ form_widget(bacs_form.accountNumber, {'attr': {'placeholder': 'Account number', 'class': 'form-control', 'maxlength': 8}}) }}
+                    <div class="help-block with-errors">{{ form_errors(bacs_form.accountNumber) }}</div>
+                </div>
+                <div class="form-group {% if form_errors(bacs_form.soleSignature) %}has-error{% endif %}">
+                    {{ form_widget(bacs_form.soleSignature, {'attr': {'class': ''}}) }}
+                    {{ form_label(bacs_form.soleSignature) }}
+                    <div class="help-block with-errors">{{ form_errors(bacs_form.soleSignature) }}</div>
+                </div>
+                <div class="form-group">
+                    {{ form_widget(bacs_form.save, {'label': 'Continue', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
+                </div>
+                <div class="form-group">
+                    <a href="{{ path('purchase_step_policy_id', {'id': policy.id}) }}" class="btn btn-blue-hollow btn-block btn-pad" data-toggle="tab">
+                        Back
+                    </a>
+                </div>
+                <p><small>Your payments are protected by the <a href="#" data-toggle="modal" data-target="#modal-dd" class="text-nowrap">Direct Debit Guarantee</a></small>.</p>
+                <address>
+                    <strong>SO-SURE Limited</strong><br>
+                    10 Finsbury Square, London EC2A 1AF, GB<br>
+                    +44 330 223 4948, <a href="mailto:hello@wearesosure.com">hello@wearesosure.com</a>
+                </address>
+                <img src="{{ cdn_url }}/images/direct-debit-logo.svg" alt="Direct Debit" width="100px">
             {{ form_end(bacs_form) }}
         </div>
     </div>
