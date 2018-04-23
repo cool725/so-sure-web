@@ -51,6 +51,7 @@ class SixpackService
     //const EXPERIMENT_MONEY_UNBOUNCE = 'money-unbounce';
     const EXPERIMENT_MOBILE_SEARCH_DROPDOWN = 'mobile-dropdown-search';
     const EXPERIMENT_STEP_3 = 'step-3-payment-new';
+    const EXPERIMENT_PURCHASE_FLOW_BACS = 'purchase-flow-bacs';
     const EXPERIMENT_CPC_QUOTE_HOMEPAGE = 'cpc-quote-or-homepage';
     const EXPERIMENT_DEFACTO = 'defacto';
 
@@ -70,6 +71,7 @@ class SixpackService
         self::EXPERIMENT_QUOTE_INTERCOM_PURCHASE,
         self::EXPERIMENT_MOBILE_SEARCH_DROPDOWN,
         self::EXPERIMENT_STEP_3,
+        self::EXPERIMENT_PURCHASE_FLOW_BACS,
         self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
         self::EXPERIMENT_DEFACTO,
     ];

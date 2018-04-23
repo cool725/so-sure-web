@@ -1868,13 +1868,13 @@ abstract class Policy
         return $this->getPremiumInstallments();
     }
 
-    public function getPremiumInstallmentPrice($useAdjustedPrice = false)
+    public function getPremiumInstallmentPrice($useAdjustedPrice = false, $estimate = false)
     {
-        if (!$this->isPolicy()) {
+        if (!$this->isPolicy() && !$estimate) {
             return null;
         }
 
-        if (!$this->getPremiumInstallmentCount()) {
+        if (!$this->getPremiumInstallmentCount() && !$estimate) {
             return null;
         } elseif ($this->getPremiumPlan() == self::PLAN_YEARLY) {
             if ($useAdjustedPrice) {

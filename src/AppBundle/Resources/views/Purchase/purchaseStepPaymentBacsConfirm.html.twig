@@ -1,0 +1,136 @@
+{% extends 'base.html.twig' %}
+
+{# Set vars #}
+{% set new_stylesheet = 1 %}
+{% set distraction_free = 1 %}
+{% set new_footer = 1 %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets output='css/*.css'
+        '@AppBundle/Resources/public/sass/page/checkout.scss'
+    %}
+        <link rel="stylesheet" href="{{ asset_url }}">
+    {% endstylesheets %}
+{% endblock %}
+
+{% block body %}
+
+{% include 'AppBundle::Default/loadingWidget.html.twig' with { 'class': ''} %}
+<section id="purchase-step-payment" class="checkout">
+
+    {% include 'AppBundle::Purchase/purchaseNav.html.twig' %}
+
+    <div class="checkout--top">
+        <div class="container">
+            <h1>Setup a Direct Debit with SO-SURE
+                <span class="sr-only">Setup a Direct Debit with SO-SURE </span><img src="{{ cdn_url }}/images/direct-debit-logo.svg" alt="Direct Debit">
+            </h1>
+            <p class="lead">Please <u>DOUBLE CHECK</u> your details before confirming!</p>
+        </div>
+    </div>
+
+    <div class="payment--step">
+        <div class="payment--step-inner clearfix">
+
+            <div class="row">
+                <div class="col-sm-6 col-md-4">
+                    <ul class="list-unstyled bacs-list">
+                        <li>
+                            <small class="text-dark-grey">Name of account holder</small><br>
+                            <span class="h4">{{ bacs.accountName }}</span>
+                        </li>
+                        <li>
+                            <small class="text-dark-grey">Sort code</small><br>
+                            <span class="h4">{{ bacs.getDisplayableSortCode }}</span>
+                        </li>
+                        <li>
+                            <small class="text-dark-grey">Account number</small><br>
+                            <span class="h4">{{ bacs.getAccountNumber }}</span>
+                        </li>
+                        <li>
+                            <small class="text-dark-grey">Bank/Building society</small><br>
+                            <span class="h4">{{ bacs.bankName }}</span>
+                        </li>
+                        <li>
+                            <small class="text-dark-grey">Bank/Building society address</small><br>
+                            <span class="h4">
+                            {% if bacs.bankAddress %}
+                                {{ bacs.bankAddress.stringImplode('<br>')|raw }}
+                            {% endif %}
+                        </span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-sm-6 col-md-4">
+                    <ul class="list-unstyled bacs-list">
+                        <li>
+                            <small class="text-dark-grey">Email</small><br>
+                            <span class="h4">{{  policy.user.email }}</span>
+                        </li>
+                        <li>
+                            <small class="text-dark-grey">Reference Number</small><br>
+                            <span class="h4">{{  bacs.reference }}</span>
+                        </li>
+                        <li>
+                            <small class="text-dark-grey">Collection frequency</small><br>
+                            <span class="h4">First collection: {{ bacs.getFirstPaymentDate(policy.user)|date('d F','Europe/London') }}</span><br>
+                            <small class="text-dark-grey">(Collected on the {{ policy.billing|date('jS','Europe/London') }} of each month thereafter)</small><br>
+                        </li>
+                        <li>
+                            <small class="text-dark-grey">Payment amount</small><br>
+                            <span class="h4">£{{ policy.getPremiumInstallmentPrice(true, true)|number_format(2, '.', ',') }}</span>
+                        </li>
+                    </ul>
+                    <p>
+                        I confirm that the above details are correct and payment to SO-SURE LIMITED will be first
+                        collected on {{ bacs.getFirstPaymentDate(policy.user)|date('d F','Europe/London') }}. You will receive confirmation of this direct debit along
+                        with any future notices via <strong>email</strong>.
+                    </p>
+                </div>
+            </div>
+            {{ form_start(bacs_confirm_form) }}
+            <div class="row">
+                <div class="col-sm-6 col-md-4">
+                    <div class="form-group">
+                        {{ form_widget(bacs_confirm_form.save, {'label': 'Confirm', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
+                    </div>
+                    <div class="form-group">
+                        <a href="#tab-bacs-setup" class="btn btn-blue-hollow btn-block btn-pad" data-toggle="tab">Back</a>
+                    </div>
+                    <p><small>Your payments are protected by the <a href="#" data-toggle="modal" data-target="#modal-dd" class="text-nowrap">Direct Debit Guarantee</a></small>.</p>
+                    <address>
+                        <strong>SO-SURE Limited</strong><br>
+                        10 Finsbury Square, London EC2A 1AF, GB<br>
+                        +44 330 223 4948, <a href="mailto:hello@wearesosure.com">hello@wearesosure.com</a>
+                    </address>
+                    <img src="{{ cdn_url }}/images/direct-debit-logo.svg" alt="Direct Debit" width="100px">
+                </div>
+            </div>
+            {{ form_end(bacs_confirm_form) }}
+
+
+        </div>
+    </div>
+
+
+</section>
+
+{% include 'AppBundle::Default/directDebitGuaranteeModal.html.twig' %}
+
+
+{# End Page Modals #}
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    'components/owl.carousel/owl.carousel.min.js'
+    'components/jquery-mask-plugin/jquery.mask.min.js'
+    'components/jquery-validation/jquery.validate.min.js'
+    '@AppBundle/Resources/public/js/Default/jqueryValidatorMethods.js'
+    '@AppBundle/Resources/public/js/Purchase/purchaseStep.js'
+    '@AppBundle/Resources/public/js/Purchase/purchaseStepPayment.js' %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}
