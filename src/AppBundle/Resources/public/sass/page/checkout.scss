@@ -376,3 +376,23 @@
     display: none;
     color: $red;
 }
+
+.bacs--confirm {
+    background-color: $white;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.12);
+    max-width: 800px;
+    margin: 25px auto;
+    padding: 15px;
+    @include border-radius(6px);
+    @include breakpoint(laptop) {
+        padding: 30px;
+    }
+}
+
+.bacs-list {
+    margin-bottom: 25px;
+
+    li {
+        margin-bottom: 15px;
+    }
+}
