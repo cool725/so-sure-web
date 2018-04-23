@@ -29,7 +29,8 @@ class SoSure
     // TN15 7LY add Jan 2017 due to suspecion of fraud in those postcodes based on claims we receieved
     // PE21 7TB added 16/8/17 due to explainable but odd situation from customer triggering manual fraud suspicion
     // OL11 1QA added 21/3/18 due to suspecion of fraud
-    public static $yearlyOnlyPostcodes = ['TN15 7LY', 'PE21 7TB', 'OL11 1QA'];
+    // WN1 2XD added 23/4/18 due to suspected fraud for Mob/2018/5503304
+    public static $yearlyOnlyPostcodes = ['TN15 7LY', 'PE21 7TB', 'OL11 1QA', 'WN1 2XD'];
 
     public static function getActivationInterval()
     {
