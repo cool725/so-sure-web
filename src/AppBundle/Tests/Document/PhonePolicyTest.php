@@ -2511,14 +2511,27 @@ class PhonePolicyTest extends WebTestCase
 
     public function testSetPicSureStatus()
     {
-        $policy = new PhonePolicy();
+        $policy = static::createUserPolicy(true, new \DateTime('2018-01-01'));
+        $policy->setStatus(SalvaPhonePolicy::STATUS_ACTIVE);
         $this->assertNull($policy->getPicSureApprovedDate());
+        $this->assertNull($policy->getPicSureStatus());
+        $this->assertTrue($policy->getUser()->getAnalytics()['hasOutstandingPicSurePolicy']);
 
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_MANUAL);
         $this->assertNull($policy->getPicSureApprovedDate());
+        $this->assertTrue($policy->getUser()->getAnalytics()['hasOutstandingPicSurePolicy']);
+
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_INVALID);
+        $this->assertNull($policy->getPicSureApprovedDate());
+        $this->assertTrue($policy->getUser()->getAnalytics()['hasOutstandingPicSurePolicy']);
+
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_REJECTED);
+        $this->assertNull($policy->getPicSureApprovedDate());
+        $this->assertFalse($policy->getUser()->getAnalytics()['hasOutstandingPicSurePolicy']);
 
         $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
         $this->assertEquals(new \DateTime(), $policy->getPicSureApprovedDate());
+        $this->assertFalse($policy->getUser()->getAnalytics()['hasOutstandingPicSurePolicy']);
     }
 
     public function testPolicyDispossessionRefund()
@@ -3530,6 +3543,7 @@ class PhonePolicyTest extends WebTestCase
 
         $this->assertFalse($policy->isRenewed());
         $this->assertNull($policy->getPicSureStatus());
+        $this->assertTrue($policy->getUser()->getAnalytics()['hasOutstandingPicSurePolicy']);
 
         $renewalPolicy = $this->getRenewalPolicy($policy);
 

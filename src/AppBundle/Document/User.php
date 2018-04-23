@@ -1073,9 +1073,18 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $data['accountPaidToDate'] = true;
         $data['renewalMonthlyPremiumNoPot'] = 0;
         $data['renewalMonthlyPremiumWithPot'] = 0;
+        $data['hasOutstandingPicSurePolicy'] = false;
         foreach ($this->getValidPolicies(true) as $policy) {
+            /** @var PhonePolicy $policy */
             if (!$policy->isActive()) {
                 continue;
+            }
+            if ($policy->getPolicyTerms()->isPicSureEnabled() && in_array($policy->getPicSureStatus(), [
+                PhonePolicy::PICSURE_STATUS_INVALID,
+                PhonePolicy::PICSURE_STATUS_MANUAL,
+                null,
+            ])) {
+                $data['hasOutstandingPicSurePolicy'] = true;
             }
             $data['connections'] += count($policy->getConnections());
             $data['rewardPot'] += $policy->getPotValue();
