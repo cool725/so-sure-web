@@ -53,8 +53,13 @@ class Salva
         // In order to avoid errors in calculation due to rounding, only round on 1 element and substract
         // Validate that the expected value is not much than 1p difference
         $coverholderActual = $commission - $broker;
-        if (abs($coverholderExpected - $coverholderActual) > 0.01) {
-            throw new \Exception(sprintf('Failed to accurately split total commission %f', $commission));
+        if ($this->toTwoDp(($coverholderExpected - $coverholderActual)) > 0.01) {
+            throw new \Exception(sprintf(
+                'Failed to accurately split total commission %f (%f != %f)',
+                $commission,
+                $coverholderActual,
+                $coverholderExpected
+            ));
         }
 
         return [
