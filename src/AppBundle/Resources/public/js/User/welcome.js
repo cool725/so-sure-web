@@ -13,7 +13,7 @@ $(function(){
     });
 
     clipboard.on('success', function(event) {
-        console.log(event);
+        // console.log(event);
         $('.btn-copy').tooltip('show');
         setTimeout(function() { $('.btn-copy').tooltip('hide'); }, 1500);
     });
