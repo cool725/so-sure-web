@@ -2,6 +2,8 @@
 
 namespace AppBundle\Form\Type;
 
+use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
+use Doctrine\ODM\MongoDB\DocumentRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -82,6 +84,14 @@ class PolicySearchType extends AbstractType
             ->add('serial', TextType::class, ['required' => false])
             ->add('id', TextType::class, ['required' => false])
             ->add('invalid', CheckboxType::class, ['required' => false])
+            ->add('phone', DocumentType::class, [
+                'placeholder' => 'Select your device',
+                'class' => 'AppBundle:Phone',
+                'required' => false,
+                'query_builder' => function (DocumentRepository $dr) {
+                    return $dr->findActiveInactive();
+                }
+            ])
             ->add('search', SubmitType::class)
         ;
 
@@ -98,6 +108,7 @@ class PolicySearchType extends AbstractType
             $form->get('facebookId')->setData($currentRequest->query->get('facebookId'));
             $form->get('serial')->setData($currentRequest->query->get('serial'));
             $form->get('id')->setData($currentRequest->query->get('id'));
+            $form->get('phone')->setData($currentRequest->query->get('phone'));
             if ($currentRequest->query->get('invalid') !== null) {
                 $form->get('invalid')->setData((bool) $currentRequest->query->get('invalid'));
             } else {
