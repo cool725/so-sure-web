@@ -562,7 +562,8 @@ class ReportingService
         $data['picsureInvalidActive'] = $policyRepo->countPicSurePolicies(
             PhonePolicy::PICSURE_STATUS_INVALID,
             $allTerms,
-            true);
+            true
+        );
         $data['picsurePreApprovedTotal'] = $policyRepo->countPicSurePolicies(
             PhonePolicy::PICSURE_STATUS_PREAPPROVED,
             $allTerms
