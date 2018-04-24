@@ -64,11 +64,23 @@
                     padding: 30px 30px 40px;
                 }
             }
+
+            &--share {
+                background: $lightest-blue;
+                padding: 15px 30px;
+                margin: 15px 0 40px;
+
+                @include border-radius(8px);
+
+                * {
+                    margin: 5px 0;
+                }
+            }
         }
 
         @include breakpoint(tablet) {
             // margin-bottom: 400px;
-            padding-bottom: 250px;
+            padding-bottom: 450px;
         }
     }
 

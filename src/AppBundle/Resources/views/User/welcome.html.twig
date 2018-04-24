@@ -81,7 +81,23 @@
                             </ul>
                         </div>
                     </div>
-                    <h4 class="text-center h-light">Here’s a few links to help you get started:</h4>
+                    {# <h4 class="text-center h-light">Here’s a few links to help you get started:</h4> #}
+                    <div class="policy-roundup--share">
+                        <h2 class="text-blue">Sharing is... rewarding</h2>
+                        <p class="lead">Get &pound;{{ policy.connectionValue }} in your Reward Pot for every friend you connect with. <a href="#" class="scroll-to text-nowrap" data-scroll-to-anchor="#how-to-get-cashback">See how it works</a>.</p>
+                        <label for="scode" class="sr-only">Share this link:</label>
+                        <div class="input-group">
+                            <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ policy.standardSCode.shareLink }}">
+                            <span class="input-group-btn">
+                                <button class="btn btn-blue btn-pad btn-copy sosure-track"
+                                        data-clipboard-target="#scode"
+                                        data-toggle="tooltip"
+                                        data-placement="bottom"
+                                        data-event="user-welcome-copy-scode"
+                                        >Copy</button>
+                            </span>
+                        </div>
+                    </div>
                     <div class="row text-center">
                         <div class="col-sm-4">
                             <a data-toggle="modal"
@@ -301,6 +317,7 @@
     'components/dot/doT.min.js'
     'components/corejs-typeahead/typeahead.bundle.min.js'
     'components/fuse.js/fuse.min.js'
+    'components/clipboard/clipboard.min.js'
     'components/rangeslider.js/rangeslider.min.js'
     '@AppBundle/Resources/public/js/Default/animations.js'
     '@AppBundle/Resources/public/js/Default/sliderNew.js'
