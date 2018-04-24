@@ -482,7 +482,7 @@ class PhonePolicyRepository extends PolicyRepository
      * @param string $picSureStatus
      * @param array  $allTerms
      */
-    public function countPicSurePolicies($picSureStatus, array $allTerms)
+    public function countPicSurePolicies($picSureStatus, array $allTerms, $activeUnpaidOnly = false)
     {
         $policy = new PhonePolicy();
         $picsureTermsIds = [];
@@ -496,6 +496,10 @@ class PhonePolicyRepository extends PolicyRepository
             ->field('picSureStatus')->equals($picSureStatus)
             ->field('policyTerms.$id')->in($picsureTermsIds)
             ->field('policyNumber')->equals(new \MongoRegex(sprintf('/^%s\//', $policy->getPolicyNumberPrefix())));
+
+        if ($activeUnpaidOnly) {
+            $qb = $qb->field('status')->equals([Policy::STATUS_ACTIVE, Policy::STATUS_UNPAID]);
+        }
 
         return $qb
             ->getQuery()

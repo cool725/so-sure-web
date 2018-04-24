@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Repository\PhonePolicyRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Psr\Log\LoggerInterface;
 use AppBundle\Classes\SoSure;
@@ -532,17 +533,48 @@ class ReportingService
     {
         $data = [];
 
+        /** @var PhonePolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(PhonePolicy::class);
         $termsRepo = $this->dm->getRepository(PolicyTerms::class);
         $allTerms = $termsRepo->findAll();
-        $data['picsureApproved'] = $policyRepo->countPicSurePolicies(PhonePolicy::PICSURE_STATUS_APPROVED, $allTerms);
-        $data['picsureRejected'] = $policyRepo->countPicSurePolicies(PhonePolicy::PICSURE_STATUS_REJECTED, $allTerms);
-        $data['picsureInvalid'] = $policyRepo->countPicSurePolicies(PhonePolicy::PICSURE_STATUS_INVALID, $allTerms);
-        $data['picsurePreApproved'] = $policyRepo->countPicSurePolicies(
+        $data['picsureApprovedTotal'] = $policyRepo->countPicSurePolicies(
+            PhonePolicy::PICSURE_STATUS_APPROVED,
+            $allTerms
+        );
+        $data['picsureApprovedActive'] = $policyRepo->countPicSurePolicies(
+            PhonePolicy::PICSURE_STATUS_APPROVED,
+            $allTerms,
+            true
+        );
+        $data['picsureRejectedTotal'] = $policyRepo->countPicSurePolicies(
+            PhonePolicy::PICSURE_STATUS_REJECTED,
+            $allTerms
+        );
+        $data['picsureRejectedActive'] = $policyRepo->countPicSurePolicies(
+            PhonePolicy::PICSURE_STATUS_REJECTED,
+            $allTerms,
+            true
+        );
+        $data['picsureInvalidTotal'] = $policyRepo->countPicSurePolicies(
+            PhonePolicy::PICSURE_STATUS_INVALID,
+            $allTerms
+        );
+        $data['picsureInvalidActive'] = $policyRepo->countPicSurePolicies(
+            PhonePolicy::PICSURE_STATUS_INVALID,
+            $allTerms,
+            true
+        );
+        $data['picsurePreApprovedTotal'] = $policyRepo->countPicSurePolicies(
             PhonePolicy::PICSURE_STATUS_PREAPPROVED,
             $allTerms
         );
-        $data['picsureUnstarted'] = $policyRepo->countPicSurePolicies(null, $allTerms);
+        $data['picsurePreApprovedActive'] = $policyRepo->countPicSurePolicies(
+            PhonePolicy::PICSURE_STATUS_PREAPPROVED,
+            $allTerms,
+            true
+        );
+        $data['picsureUnstartedTotal'] = $policyRepo->countPicSurePolicies(null, $allTerms);
+        $data['picsureUnstartedActive'] = $policyRepo->countPicSurePolicies(null, $allTerms, true);
 
         return $data;
     }

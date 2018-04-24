@@ -190,6 +190,7 @@ class BICommand extends BaseCommand
             '"pic-sure Status"',
             '"Lead Source"',
             '"First Payment Source"',
+            '"Make/Model/Memory"',
         ]);
         foreach ($policies as $policy) {
             $user = $policy->getUser();
@@ -234,6 +235,7 @@ class BICommand extends BaseCommand
                 // @codingStandardsIgnoreStart
                 sprintf('"%s"', $policy->getFirstSuccessfulUserPaymentCredit() ? $policy->getFirstSuccessfulUserPaymentCredit()->getSource() : ''),
                 // @codingStandardsIgnoreEnd
+                sprintf('"%s"', $policy->getPhone()->__toString()),
             ]);
         }
         $this->uploadS3(implode(PHP_EOL, $lines), 'policies.csv');

@@ -164,11 +164,21 @@ class ClaimsController extends BaseController
                         $this->addFlash('error', sprintf('Duplicate claim number %s', $claim->getNumber()));
                     }
                 } else {
-                    $this->get('logger')->error(sprintf(
-                        'Error adding claim for policy %s. %s',
-                        $policy->getId(),
-                        (string) $formClaim->getErrors(true, false)
-                    ));
+                    $errors = (string) $formClaim->getErrors(true, false);
+                    if (mb_stripos($errors, "The CSRF token is invalid") !== false) {
+                        $this->get('logger')->info(sprintf(
+                            'Error adding claim for policy %s. %s',
+                            $policy->getId(),
+                            $errors
+                        ));
+                    } else {
+                        $this->get('logger')->error(sprintf(
+                            'Error adding claim for policy %s. %s',
+                            $policy->getId(),
+                            $errors
+                        ));
+                    }
+                    $this->addFlash('error', sprintf('Failed to add claim. Please try again'));
                 }
             } elseif ($request->request->has('claimscheck')) {
                 $formClaimsCheck->handleRequest($request);

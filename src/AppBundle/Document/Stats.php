@@ -30,11 +30,17 @@ class Stats
     const MIXPANEL_VIEW_INVITATION_SMS = 'mixpanel-view-invitation-sms';
     const MIXPANEL_PURCHASE_POLICY_APP_ATTRIB = 'mixpanel-purchase-policy-app-attrib';
 
-    const KPI_PICSURE_UNSTARTED_POLICIES = 'kpi-picsure-unstarted-policies';
-    const KPI_PICSURE_APPROVED_POLICIES = 'kpi-picsure-approved-policies';
-    const KPI_PICSURE_REJECTED_POLICIES = 'kpi-picsure-rejected-policies';
-    const KPI_PICSURE_PREAPPROVED_POLICIES = 'kpi-picsure-preapproved-policies';
-    const KPI_PICSURE_INVALID_POLICIES = 'kpi-picsure-invalid-policies';
+    const KPI_PICSURE_TOTAL_UNSTARTED_POLICIES = 'kpi-picsure-unstarted-policies';
+    const KPI_PICSURE_TOTAL_APPROVED_POLICIES = 'kpi-picsure-approved-policies';
+    const KPI_PICSURE_TOTAL_REJECTED_POLICIES = 'kpi-picsure-rejected-policies';
+    const KPI_PICSURE_TOTAL_PREAPPROVED_POLICIES = 'kpi-picsure-preapproved-policies';
+    const KPI_PICSURE_TOTAL_INVALID_POLICIES = 'kpi-picsure-invalid-policies';
+
+    const KPI_PICSURE_ACTIVE_UNSTARTED_POLICIES = 'kpi-picsure-active-unstarted-policies';
+    const KPI_PICSURE_ACTIVE_APPROVED_POLICIES = 'kpi-picsure-active-approved-policies';
+    const KPI_PICSURE_ACTIVE_REJECTED_POLICIES = 'kpi-picsure-active-rejected-policies';
+    const KPI_PICSURE_ACTIVE_PREAPPROVED_POLICIES = 'kpi-picsure-active-preapproved-policies';
+    const KPI_PICSURE_ACTIVE_INVALID_POLICIES = 'kpi-picsure-active-invalid-policies';
 
     const KPI_CANCELLED_AND_PAYMENT_OWED = 'kpi-cancelled-payment-owed';
     const KPI_CANCELLED_AND_PAYMENT_PAID = 'kpi-cancelled-payment-paid';
@@ -48,10 +54,10 @@ class Stats
         Stats::MIXPANEL_CPC_QUOTES_UK,
         Stats::MIXPANEL_CPC_MANUFACTURER_UK,
         Stats::MIXPANEL_CPC_COMPETITORS_UK,
-        Stats::KPI_PICSURE_UNSTARTED_POLICIES,
-        Stats::KPI_PICSURE_APPROVED_POLICIES,
-        Stats::KPI_PICSURE_PREAPPROVED_POLICIES,
-        Stats::KPI_PICSURE_REJECTED_POLICIES,
+        Stats::KPI_PICSURE_TOTAL_UNSTARTED_POLICIES,
+        Stats::KPI_PICSURE_TOTAL_APPROVED_POLICIES,
+        Stats::KPI_PICSURE_TOTAL_PREAPPROVED_POLICIES,
+        Stats::KPI_PICSURE_TOTAL_REJECTED_POLICIES,
         Stats::KPI_CANCELLED_AND_PAYMENT_OWED,
         Stats::KPI_CANCELLED_AND_PAYMENT_PAID,
     ];
@@ -123,10 +129,10 @@ class Stats
     {
         if (in_array($this->getName(), [
             self::KPI_CANCELLED_AND_PAYMENT_OWED,
-            self::KPI_PICSURE_UNSTARTED_POLICIES,
-            self::KPI_PICSURE_APPROVED_POLICIES,
-            self::KPI_PICSURE_PREAPPROVED_POLICIES,
-            self::KPI_PICSURE_REJECTED_POLICIES,
+            self::KPI_PICSURE_TOTAL_UNSTARTED_POLICIES,
+            self::KPI_PICSURE_TOTAL_APPROVED_POLICIES,
+            self::KPI_PICSURE_TOTAL_PREAPPROVED_POLICIES,
+            self::KPI_PICSURE_TOTAL_REJECTED_POLICIES,
         ])) {
             return true;
         }

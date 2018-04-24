@@ -232,6 +232,7 @@ abstract class Policy
     /**
      * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\PolicyTerms")
      * @Gedmo\Versioned
+     * @var PolicyTerms
      */
     protected $policyTerms;
 
@@ -1387,6 +1388,9 @@ abstract class Policy
         return $this->toTwoDp($this->getPotValue() - $this->getPromoPotValue());
     }
 
+    /**
+     * @return PolicyTerms
+     */
     public function getPolicyTerms()
     {
         return $this->policyTerms;
