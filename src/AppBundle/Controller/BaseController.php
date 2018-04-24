@@ -45,10 +45,6 @@ abstract class BaseController extends Controller
     use PhoneTrait;
     use ControllerTrait;
 
-    const DATA_TYPE_EXACT = 'exact';
-    const DATA_TYPE_REGEX = 'regex';
-    const DATA_TYPE_MONGOID = 'mongoid';
-
     public function isDataStringPresent($data, $field)
     {
         return mb_strlen($this->getDataString($data, $field)) > 0;
@@ -390,31 +386,14 @@ abstract class BaseController extends Controller
         return null;
     }
 
-    protected function formToMongoSearch(
-        $form,
-        $qb,
-        $formField,
-        $mongoField,
-        $run = false,
-        $dataType = self::DATA_TYPE_EXACT,
-        $dataMethod = null
-    ) {
-        if ($dataMethod) {
-            $obj = $form->get($formField)->getData();
-            if (is_object($obj)) {
-                $data = call_user_func([$obj, $dataMethod]);
-            } else {
-                // fallback for null case
-                $data = (string) $form->get($formField)->getData();
-            }
-        } else {
-            $data = (string) $form->get($formField)->getData();
-        }
+    protected function formToMongoSearch($form, $qb, $formField, $mongoField, $run = false, $exact = false)
+    {
+        $data = (string) $form->get($formField)->getData();
 
-        return $this->dataToMongoSearch($qb, $data, $mongoField, $run, $dataType);
+        return $this->dataToMongoSearch($qb, $data, $mongoField, $run, $exact);
     }
 
-    protected function dataToMongoSearch($qb, $data, $mongoField, $run = false, $dataType = self::DATA_TYPE_EXACT)
+    protected function dataToMongoSearch($qb, $data, $mongoField, $run = false, $exact = false)
     {
         if (mb_strlen($data) == 0) {
             return null;
@@ -422,16 +401,11 @@ abstract class BaseController extends Controller
 
         // Escape special chars
         $data = preg_quote($data, '/');
-        if ($dataType == self::DATA_TYPE_EXACT) {
+        if ($exact) {
             $qb = $qb->addAnd($qb->expr()->field($mongoField)->equals($data));
-        } elseif ($dataType == self::DATA_TYPE_REGEX) {
-            $qb = $qb->addAnd($qb->expr()->field($mongoField)->equals(new MongoRegex(sprintf("/.*%s.*/i", $data))));
-        } elseif ($dataType == self::DATA_TYPE_MONGOID) {
-            $qb = $qb->addAnd($qb->expr()->field($mongoField)->equals(new \MongoId($data)));
         } else {
-            throw new \Exception(sprintf('Unknown data type %s', $dataType));
+            $qb = $qb->addAnd($qb->expr()->field($mongoField)->equals(new MongoRegex(sprintf("/.*%s.*/i", $data))));
         }
-
         if ($run) {
             return $qb->getQuery()->execute();
         }
@@ -820,14 +794,13 @@ abstract class BaseController extends Controller
                 $policiesQb->expr()->field('status')->in([Policy::STATUS_PENDING_RENEWAL])
             );
         } else {
-            $this->formToMongoSearch($form, $policiesQb, 'status', 'status', false, self::DATA_TYPE_REGEX);
+            $this->formToMongoSearch($form, $policiesQb, 'status', 'status', false, true);
         }
 
         $this->formToMongoSearch($form, $policiesQb, 'policy', 'policyNumber');
         $this->formToMongoSearch($form, $policiesQb, 'imei', 'imei');
-        $this->formToMongoSearch($form, $policiesQb, 'id', '_id', false, self::DATA_TYPE_REGEX);
+        $this->formToMongoSearch($form, $policiesQb, 'id', '_id', false, true);
         $this->formToMongoSearch($form, $policiesQb, 'serial', 'serialNumber');
-        //$this->formToMongoSearch($form, $policiesQb, 'phone', 'phone.$id', false, self::DATA_TYPE_MONGOID, 'getId');
         if (!$includeInvalidPolicies) {
             $policy = new PhonePolicy();
             $search = sprintf('%s/', $policy->getPolicyNumberPrefix());
