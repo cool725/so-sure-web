@@ -178,6 +178,7 @@ class ClaimsController extends BaseController
                             $errors
                         ));
                     }
+                    $this->addFlash('error', sprintf('Failed to add claim. Please try again'));
                 }
             } elseif ($request->request->has('claimscheck')) {
                 $formClaimsCheck->handleRequest($request);
