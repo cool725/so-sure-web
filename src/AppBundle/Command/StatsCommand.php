@@ -33,11 +33,21 @@ class StatsCommand extends ContainerAwareCommand
         }
 
         $data = $this->getReporting()->getPicSureData();
-        $this->getStats()->set(Stats::KPI_PICSURE_APPROVED_POLICIES, $date, $data['picsureApproved']);
-        $this->getStats()->set(Stats::KPI_PICSURE_REJECTED_POLICIES, $date, $data['picsureRejected']);
-        $this->getStats()->set(Stats::KPI_PICSURE_UNSTARTED_POLICIES, $date, $data['picsureUnstarted']);
-        $this->getStats()->set(Stats::KPI_PICSURE_PREAPPROVED_POLICIES, $date, $data['picsurePreApproved']);
-        $this->getStats()->set(Stats::KPI_PICSURE_INVALID_POLICIES, $date, $data['picsureInvalid']);
+        $this->getStats()->set(Stats::KPI_PICSURE_TOTAL_APPROVED_POLICIES, $date, $data['picsureApprovedTotal']);
+        $this->getStats()->set(Stats::KPI_PICSURE_TOTAL_REJECTED_POLICIES, $date, $data['picsureRejectedTotal']);
+        $this->getStats()->set(Stats::KPI_PICSURE_TOTAL_UNSTARTED_POLICIES, $date, $data['picsureUnstartedTotal']);
+        $this->getStats()->set(Stats::KPI_PICSURE_TOTAL_PREAPPROVED_POLICIES, $date, $data['picsurePreApprovedTotal']);
+        $this->getStats()->set(Stats::KPI_PICSURE_TOTAL_INVALID_POLICIES, $date, $data['picsureInvalidTotal']);
+
+        $this->getStats()->set(Stats::KPI_PICSURE_ACTIVE_APPROVED_POLICIES, $date, $data['picsureApprovedActive']);
+        $this->getStats()->set(Stats::KPI_PICSURE_ACTIVE_REJECTED_POLICIES, $date, $data['picsureRejectedActive']);
+        $this->getStats()->set(Stats::KPI_PICSURE_ACTIVE_UNSTARTED_POLICIES, $date, $data['picsureUnstartedActive']);
+        $this->getStats()->set(
+            Stats::KPI_PICSURE_ACTIVE_PREAPPROVED_POLICIES,
+            $date,
+            $data['picsurePreApprovedActive']
+        );
+        $this->getStats()->set(Stats::KPI_PICSURE_ACTIVE_INVALID_POLICIES, $date, $data['picsureInvalidActive']);
     }
 
     private function cancelledAndPaymentOwed($date = null)
