@@ -20,6 +20,12 @@ class Coordinates
      */
     protected $coordinates; // [longitude, latitude]
  
+     /**
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     */
+    protected $created;
+
     /**
      * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="0", max="50")
@@ -35,10 +41,21 @@ class Coordinates
         } else {
             throw new ValidationException("Invalid coordinates");
         }
+        $this->created = new \DateTime();
     }
 
     public function getCoordinates()
     {
         return $this->coordinates;
+    }
+
+    public function getCreated()
+    {
+        return $this->created;
+    }
+
+    public function setCreated($created)
+    {
+        $this->created = $created;
     }
 }
