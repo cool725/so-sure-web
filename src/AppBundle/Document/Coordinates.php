@@ -34,6 +34,11 @@ class Coordinates
      */
     public $type = "Point";
 
+    public function __construct()
+    {
+        $this->created = new \DateTime();
+    }
+
     public function setCoordinates(float $longitude, float $latitude)
     {
         if ($longitude >= -180 && $longitude <= 180 && $latitude >= -90 && $latitude <= 90) {
@@ -41,7 +46,6 @@ class Coordinates
         } else {
             throw new ValidationException("Invalid coordinates");
         }
-        $this->created = new \DateTime();
     }
 
     public function getCoordinates()
