@@ -454,6 +454,8 @@ nelmio_security:
                 - https://www.youtube.com
                 - https://*.fastly.net
                 - https://*.iubenda.com
+                - https://*.google.com
+                - https://*.google.co.in
                 - https://*.google.co.uk
                 - https://*.google.ie # necessary?
                 - https://*.googletagmanager.com
