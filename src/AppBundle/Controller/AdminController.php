@@ -3,10 +3,13 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Document\File\AccessPayFile;
+use AppBundle\Document\Sequence;
 use AppBundle\Form\Type\BacsMandatesType;
 use AppBundle\Form\Type\BacsUploadFileType;
+use AppBundle\Form\Type\SequenceType;
 use AppBundle\Repository\File\S3FileRepository;
 use AppBundle\Service\BacsService;
+use AppBundle\Service\SequenceService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -544,6 +547,9 @@ class AdminController extends BaseController
         $dm = $this->getManager();
         $s3FileRepo = $dm->getRepository(S3File::class);
         $paymentsRepo = $dm->getRepository(BacsPayment::class);
+        $sequenceRepo = $dm->getRepository(Sequence::class);
+        /** @var Sequence $currentSequence */
+        $currentSequence = $sequenceRepo->findOneBy(['name' => SequenceService::SEQUENCE_BACS_SERIAL_NUMBER]);
 
         /** @var BacsService $bacs */
         $bacs = $this->get('app.bacs');
@@ -552,6 +558,11 @@ class AdminController extends BaseController
             ->getForm();
         $mandatesForm = $this->get('form.factory')
             ->createNamedBuilder('mandates', BacsMandatesType::class)
+            ->getForm();
+        $sequenceData = new \AppBundle\Document\Form\Sequence();
+        $sequenceData->setSeq($currentSequence->getSeq());
+        $sequenceForm = $this->get('form.factory')
+            ->createNamedBuilder('sequence', SequenceType::class, $sequenceData)
             ->getForm();
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('upload')) {
@@ -596,6 +607,21 @@ class AdminController extends BaseController
                         'month' => $month
                     ]));
                 }
+            } elseif ($request->request->has('sequence')) {
+                $sequenceForm->handleRequest($request);
+                if ($sequenceForm->isSubmitted() && $sequenceForm->isValid()) {
+                    $currentSequence->resetSeq($sequenceData->getSeq());
+                    $this->getManager()->flush();
+                    $this->addFlash(
+                        'success',
+                        'Updated sequence file'
+                    );
+
+                    return new RedirectResponse($this->generateUrl('admin_bacs_date', [
+                        'year' => $year,
+                        'month' => $month
+                    ]));
+                }
             }
         }
 
@@ -609,6 +635,8 @@ class AdminController extends BaseController
             'payments' => $paymentsRepo->findPayments($date),
             'uploadForm' => $uploadForm->createView(),
             'mandatesForm' => $mandatesForm->createView(),
+            'sequenceForm' => $sequenceForm->createView(),
+            'currentSequence' => $currentSequence,
         ];
     }
 

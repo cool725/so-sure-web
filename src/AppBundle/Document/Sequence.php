@@ -22,4 +22,19 @@ class Sequence
      * @MongoDB\Field(type="int")
      */
     protected $seq;
+
+    public function getSeq()
+    {
+        return $this->seq;
+    }
+
+    /**
+     * You should be using the SequenceService to increment
+     *
+     * @param $seq
+     */
+    public function resetSeq($seq)
+    {
+        $this->seq = $seq;
+    }
 }
