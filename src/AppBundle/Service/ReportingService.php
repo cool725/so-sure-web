@@ -537,12 +537,32 @@ class ReportingService
         $policyRepo = $this->dm->getRepository(PhonePolicy::class);
         $termsRepo = $this->dm->getRepository(PolicyTerms::class);
         $allTerms = $termsRepo->findAll();
-        $data['picsureApprovedTotal'] = $policyRepo->countPicSurePolicies(PhonePolicy::PICSURE_STATUS_APPROVED, $allTerms);
-        $data['picsureApprovedActive'] = $policyRepo->countPicSurePolicies(PhonePolicy::PICSURE_STATUS_APPROVED, $allTerms, true);
-        $data['picsureRejectedTotal'] = $policyRepo->countPicSurePolicies(PhonePolicy::PICSURE_STATUS_REJECTED, $allTerms);
-        $data['picsureRejectedActive'] = $policyRepo->countPicSurePolicies(PhonePolicy::PICSURE_STATUS_REJECTED, $allTerms, true);
-        $data['picsureInvalidTotal'] = $policyRepo->countPicSurePolicies(PhonePolicy::PICSURE_STATUS_INVALID, $allTerms);
-        $data['picsureInvalidActive'] = $policyRepo->countPicSurePolicies(PhonePolicy::PICSURE_STATUS_INVALID, $allTerms, true);
+        $data['picsureApprovedTotal'] = $policyRepo->countPicSurePolicies(
+            PhonePolicy::PICSURE_STATUS_APPROVED,
+            $allTerms
+        );
+        $data['picsureApprovedActive'] = $policyRepo->countPicSurePolicies(
+            PhonePolicy::PICSURE_STATUS_APPROVED,
+            $allTerms,
+            true
+        );
+        $data['picsureRejectedTotal'] = $policyRepo->countPicSurePolicies(
+            PhonePolicy::PICSURE_STATUS_REJECTED,
+            $allTerms
+        );
+        $data['picsureRejectedActive'] = $policyRepo->countPicSurePolicies(
+            PhonePolicy::PICSURE_STATUS_REJECTED,
+            $allTerms,
+            true
+        );
+        $data['picsureInvalidTotal'] = $policyRepo->countPicSurePolicies(
+            PhonePolicy::PICSURE_STATUS_INVALID,
+            $allTerms
+        );
+        $data['picsureInvalidActive'] = $policyRepo->countPicSurePolicies(
+            PhonePolicy::PICSURE_STATUS_INVALID,
+            $allTerms,
+            true);
         $data['picsurePreApprovedTotal'] = $policyRepo->countPicSurePolicies(
             PhonePolicy::PICSURE_STATUS_PREAPPROVED,
             $allTerms
