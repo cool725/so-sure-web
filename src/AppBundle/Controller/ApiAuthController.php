@@ -363,7 +363,7 @@ class ApiAuthController extends BaseController
             $this->denyAccessUnlessGranted(MultiPayVoter::PAY, $multiPay);
 
             if ($action == 'accept') {
-                /** @var $judopay JudopayService */
+                /** @var JudopayService $judopay */
                 $judopay = $this->get('app.judopay');
                 if (!$judopay->multiPay($multiPay, $amount)) {
                     // TODO: Change to payment declined

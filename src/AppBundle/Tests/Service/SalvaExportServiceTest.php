@@ -3,6 +3,9 @@
 namespace AppBundle\Tests\Service;
 
 use AppBundle\Repository\PaymentRepository;
+use AppBundle\Repository\PhoneRepository;
+use AppBundle\Repository\PolicyRepository;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\SalvaPhonePolicy;
@@ -27,8 +30,11 @@ class SalvaExportServiceTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
+    /** @var DocumentManager */
+    protected static $dm;
     protected static $salva;
     protected static $xmlFile;
+    /** @var PolicyRepository */
     protected static $policyRepo;
     protected static $dispatcher;
     protected static $judopay;
@@ -55,6 +61,7 @@ class SalvaExportServiceTest extends WebTestCase
             "%s/../src/AppBundle/Tests/Resources/salva-example-boat.xml",
             self::$container->getParameter('kernel.root_dir')
         );
+        /** @var PhoneRepository $phoneRepo */
         $phoneRepo = self::$dm->getRepository(Phone::class);
         self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
 
@@ -64,9 +71,11 @@ class SalvaExportServiceTest extends WebTestCase
         // one of the other tests seems to creating a payment that doesn't have a related policy (or deleting the policy)
         // easiest to just delete all data prior to running
         // @codingStandardsIgnoreEnd
+        /** @var PaymentRepository $paymentRepo */
         $paymentRepo = self::$dm->getRepository(Payment::class);
         $payments = $paymentRepo->findAll();
         foreach ($payments as $payment) {
+            /** @var Payment $payment */
             self::$dm->remove($payment);
         }
         self::$dm->flush();

@@ -1369,9 +1369,9 @@ class UserController extends BaseController
     }
 
     /**
-     * @param Facebook $fb
-     * @param string   $requiredPermission
-     * @param array    $allPermissions
+     * @param FacebookService $fb
+     * @param string          $requiredPermission
+     * @param array           $allPermissions
      *
      * @return null|RedirectResponse
      */

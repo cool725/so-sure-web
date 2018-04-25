@@ -3,6 +3,7 @@
 namespace AppBundle\Tests\Service;
 
 use AppBundle\Document\Policy;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Document\Claim;
@@ -43,6 +44,7 @@ class DaviesServiceTest extends WebTestCase
          //each test method, do this in setUp() instead
          self::$daviesService = self::$container->get('app.davies');
 
+        /** @var DocumentManager dm */
         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $phoneRepo = self::$dm->getRepository(Phone::class);
         self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 6', 'memory' => 64]);
@@ -602,7 +604,7 @@ class DaviesServiceTest extends WebTestCase
     {
         $address = new Address();
         $address->setType(Address::TYPE_BILLING);
-        $address->setPostCode('BX11LT');
+        $address->setPostcode('BX11LT');
         $user = new User();
         $user->setBillingAddress($address);
         $user->setFirstName('foo');
@@ -631,7 +633,7 @@ class DaviesServiceTest extends WebTestCase
     {
         $address = new Address();
         $address->setType(Address::TYPE_BILLING);
-        $address->setPostCode('BX11LT');
+        $address->setPostcode('BX11LT');
         $user = new User();
         $user->setBillingAddress($address);
         $user->setFirstName('foo');
@@ -684,7 +686,7 @@ class DaviesServiceTest extends WebTestCase
     {
         $address = new Address();
         $address->setType(Address::TYPE_BILLING);
-        $address->setPostCode('se152sz');
+        $address->setPostcode('se152sz');
         $user = new User();
         $user->setBillingAddress($address);
         $user->setFirstName('foo');
@@ -1582,7 +1584,7 @@ class DaviesServiceTest extends WebTestCase
     {
         $address = new Address();
         $address->setType(Address::TYPE_BILLING);
-        $address->setPostCode('BX11LT');
+        $address->setPostcode('BX11LT');
         $user = new User();
         $user->setBillingAddress($address);
         $user->setFirstName('foo');

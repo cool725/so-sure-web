@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Document\User;
 use FOS\UserBundle\Controller\ResettingController;
 
 use Symfony\Component\DependencyInjection\ContainerAware;
@@ -32,13 +33,14 @@ class FOSUserController extends ResettingController
     {
         \AppBundle\Classes\NoOp::ignore([$request]);
 
-        /** @var $formFactory \FOS\UserBundle\Form\Factory\FactoryInterface */
+        /** @var \FOS\UserBundle\Form\Factory\FactoryInterface $formFactory */
         $formFactory = $this->get('fos_user.resetting.form.factory');
-        /** @var $userManager \FOS\UserBundle\Model\UserManagerInterface */
+        /** @var \FOS\UserBundle\Model\UserManagerInterface $userManager */
         $userManager = $this->get('fos_user.user_manager');
-        /** @var $dispatcher \Symfony\Component\EventDispatcher\EventDispatcherInterface */
+        /** @var \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher */
         $dispatcher = $this->get('event_dispatcher');
 
+        /** @var User $user */
         $user = $userManager->findUserByConfirmationToken($token);
 
         if (null === $user) {

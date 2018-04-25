@@ -35,6 +35,7 @@ class ClaimsServiceTest extends WebTestCase
 
          //now we can instantiate our service (if you want a fresh one for
          //each test method, do this in setUp() instead
+        /** @var DocumentManager dm */
          self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
          self::$policyRepo = self::$dm->getRepository(Policy::class);
          self::$lostPhoneRepo = self::$dm->getRepository(LostPhone::class);

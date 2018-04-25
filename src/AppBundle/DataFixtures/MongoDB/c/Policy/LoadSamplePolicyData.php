@@ -2,6 +2,8 @@
 
 namespace AppBundle\DataFixtures\MongoDB\c\Policy;
 
+use AppBundle\Repository\PolicyRepository;
+use AppBundle\Service\PolicyService;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use AppBundle\Document\SalvaPhonePolicy;
@@ -21,10 +23,12 @@ use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Classes\Salva;
 use AppBundle\Classes\SoSure;
+use Stubs\DocumentManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Faker;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 // @codingStandardsIgnoreFile
 class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
@@ -335,6 +339,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
 
         $manager->flush();
+        /** @var PolicyService $policyService */
         $policyService = $this->container->get('app.policy');
 
         $policyRepo = $manager->getRepository(Policy::class);
@@ -351,6 +356,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $policy->setStatus(Policy::STATUS_UNPAID);
         $policyService->cancel($policy, Policy::CANCELLED_UNPAID, true, null, true);
 
+        /** @var PolicyRepository $policyRepo */
         $policyRepo = $manager->getRepository(Policy::class);
         $fraud = null;
         $unpaid = null;
@@ -535,6 +541,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         if (!$phone) {
             $phone = $this->getRandomPhone($manager);
         }
+        /** @var \Doctrine\ODM\MongoDB\DocumentManager $dm */
         $dm = $this->container->get('doctrine_mongodb.odm.default_document_manager');
         $policyTermsRepo = $dm->getRepository(PolicyTerms::class);
         $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
@@ -563,6 +570,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $scode->setType(SCode::TYPE_STANDARD);
             $policy->addSCode($scode);
         }
+        /** @var RouterInterface $router */
         $router = $this->container->get('app.router');
         $shareUrl = $router->generateUrl(
             'scode',
@@ -653,6 +661,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $policy->setPicSureStatus($picSureStatus);
         }
 
+        /** @var PolicyService $policyService */
         $policyService = $this->container->get('app.policy');
         $policyService->generateScheduledPayments($policy, $startDate);
 

@@ -2,7 +2,9 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Service\FeatureService;
 use AppBundle\Service\JudopayService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
@@ -43,11 +45,13 @@ class JudopayServiceTest extends WebTestCase
 
         //now we can instantiate our service (if you want a fresh one for
         //each test method, do this in setUp() instead
+        /** @var DocumentManager dm */
         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         self::$userRepo = self::$dm->getRepository(User::class);
         self::$userManager = self::$container->get('fos_user.user_manager');
         self::$policyService = self::$container->get('app.policy');
         self::$judopay = self::$container->get('app.judopay');
+        /** @var FeatureService $feature */
         $feature = self::$container->get('app.feature');
         $feature->setEnabled(Feature::FEATURE_PAYMENT_PROBLEM_INTERCOM, true);
     }

@@ -228,6 +228,7 @@ abstract class Policy
      *  mappedBy="policy",
      *  cascade={"persist"}
      * )
+     * @var ArrayCollection
      */
     protected $invitations;
 
@@ -498,6 +499,8 @@ abstract class Policy
 
     /**
      * Although rare, payments can include refunds
+     *
+     * @return array
      */
     public function getPayments()
     {
@@ -1416,6 +1419,9 @@ abstract class Policy
         $this->promoCode = $promoCode;
     }
 
+    /**
+     * @return ArrayCollection
+     */
     public function getInvitations()
     {
         return $this->invitations;

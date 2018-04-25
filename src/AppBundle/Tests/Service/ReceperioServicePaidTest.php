@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Repository\PhoneRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
@@ -31,6 +32,7 @@ class ReceperioServicePaidTest extends WebTestCase
         //each test method, do this in setUp() instead
         self::$imei = self::$container->get('app.imei');
         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        /** @var PhoneRepository phoneRepo */
         self::$phoneRepo = self::$dm->getRepository(Phone::class);
     }
 

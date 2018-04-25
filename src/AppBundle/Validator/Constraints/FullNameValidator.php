@@ -9,7 +9,7 @@ class FullNameValidator extends ConstraintValidator
 {
     public function validate($value, Constraint $constraint)
     {
-        /** @var FullNameValidator $fullNameConstraint */
+        /** @var FullName $fullNameConstraint */
         $fullNameConstraint = $constraint;
 
         // allow blank string - different validations should be used for null/not null

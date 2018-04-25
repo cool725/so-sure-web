@@ -2,6 +2,8 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Repository\UserRepository;
+use FOS\UserBundle\Model\UserManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
@@ -43,7 +45,10 @@ class InvitationServiceNetTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
+    /** @var DocumentManager */
+    protected static $dm;
     protected static $gocardless;
+    /** @var UserRepository */
     protected static $userRepo;
     protected static $invitationService;
     protected static $phone2;
@@ -71,6 +76,7 @@ class InvitationServiceNetTest extends WebTestCase
             'foo@foo.com',
             'bar'
         );
+        /** @var InvitationService invitationService */
         self::$invitationService = self::$container->get('app.invitation');
         self::$invitationService->setMailer($mailer);
         self::$invitationService->setDebug(true);

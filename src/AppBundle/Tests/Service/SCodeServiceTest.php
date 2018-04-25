@@ -2,6 +2,8 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Repository\PhoneRepository;
+use AppBundle\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
@@ -44,8 +46,12 @@ class SCodeServiceTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
+    /** @var DocumentManager */
+    protected static $dm;
     protected static $gocardless;
+    /** @var UserRepository */
     protected static $userRepo;
+    /** @var InvitationService */
     protected static $invitationService;
     protected static $phone2;
     protected static $scodeService;
@@ -70,6 +76,7 @@ class SCodeServiceTest extends WebTestCase
 
         self::$policyService = self::$container->get('app.policy');
 
+        /** @var PhoneRepository $phoneRepo */
         $phoneRepo = self::$dm->getRepository(Phone::class);
         self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
         self::$phone2 = $phoneRepo->findOneBy(['devices' => 'iPhone8,1', 'memory' => 64]);

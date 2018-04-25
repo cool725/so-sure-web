@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Repository\PhoneRepository;
+use Doctrine\ORM\QueryBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -258,13 +259,13 @@ abstract class BaseController extends Controller
     /**
      * Page results
      *
-     * @param Request $request
-     * @param         $qb
+     * @param Request      $request
+     * @param QueryBuilder $qb
      * @param integer $maxPerPage
      *
      * @return Pagerfanta
      */
-    protected function pager(Request $request, $qb, $maxPerPage = 50)
+    protected function pager(Request $request, QueryBuilder $qb, $maxPerPage = 50)
     {
         $adapter = new DoctrineODMMongoDBAdapter($qb);
         $pagerfanta = new Pagerfanta($adapter);
@@ -278,7 +279,7 @@ abstract class BaseController extends Controller
      * Page results
      *
      * @param Request $request
-     * @param         $qb
+     * @param array   $array
      * @param integer $maxPerPage
      *
      * @return Pagerfanta

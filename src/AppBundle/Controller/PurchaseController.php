@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Exception\InvalidEmailException;
 use AppBundle\Exception\InvalidFullNameException;
 use AppBundle\Repository\PaymentRepository;
@@ -11,6 +12,9 @@ use AppBundle\Security\FOSUBUserProvider;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\DomCrawler\Field\FormField;
+use Symfony\Component\Form\Button;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -335,8 +339,12 @@ class PurchaseController extends BaseController
 
                 // as we may recreate the form, make sure to get everything we need from the form first
                 $purchaseFormValid = $purchaseForm->isValid();
-                $purchaseFormExistingClicked = $purchaseForm->has('existing') &&
-                    $purchaseForm->get('existing')->isClicked();
+                $purchaseFormExistingClicked = false;
+                if ($purchaseForm->has('existing')) {
+                    /** @var ButtonType $existingButton */
+                    $existingButton = $purchaseForm->get('existing');
+                    $purchaseFormExistingClicked = $existingButton->isClicked();
+                }
 
                 // If there's a file upload, the form submit event bind should have already run the ocr
                 // and data object has the imei/serial
@@ -396,6 +404,7 @@ class PurchaseController extends BaseController
                             );
                             throw $this->createNotFoundException('Unable to see policy');
                         } catch (DuplicateImeiException $e) {
+                            /** @var Policy $partialPolicy */
                             $partialPolicy = $policyRepo->findOneBy(['imei' => $purchase->getImei()]);
                             if ($partialPolicy && !$partialPolicy->getStatus() &&
                                 $partialPolicy->getUser()->getId() == $user->getId()) {
@@ -595,6 +604,7 @@ class PurchaseController extends BaseController
         $judo = $this->get('app.judopay');
         /** @var PaymentRepository $repo */
         $repo = $dm->getRepository(Payment::class);
+        /** @var JudoPayment $payment */
         $payment = $repo->findOneBy(['reference' => $request->get('Reference')]);
         if (!$payment) {
             throw new \Exception('Unable to locate payment');

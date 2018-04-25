@@ -121,7 +121,7 @@ class FOSUBUserProvider extends BaseClass
                 if ($request = $this->requestStack->getCurrentRequest()) {
                     if ($session = $request->getSession()) {
                         if ($session->isStarted()) {
-                            $session->getFlashBag()->add('error', $msg);
+                            $session-getFlashBag()->add('error', $msg);
                         }
                     }
                 }
@@ -144,6 +144,7 @@ class FOSUBUserProvider extends BaseClass
             }
 
             // create new user here
+            /** @var User $user */
             $user = $this->userManager->createUser();
 
             if ($service != self::SERVICE_ACCOUNTKIT) {

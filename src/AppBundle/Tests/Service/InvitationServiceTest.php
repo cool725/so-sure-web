@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
+use FOS\UserBundle\Model\UserManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
@@ -61,8 +62,10 @@ class InvitationServiceTest extends WebTestCase
 
         //now we can instantiate our service (if you want a fresh one for
         //each test method, do this in setUp() instead
+        /** @var DocumentManager dm */
         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         self::$userRepo = self::$dm->getRepository(User::class);
+        /** @var UserManagerInterface userManager */
         self::$userManager = self::$container->get('fos_user.user_manager');
         $transport = new \Swift_Transport_NullTransport(new \Swift_Events_SimpleEventDispatcher);
         $mailer = new MailerService(
@@ -73,6 +76,7 @@ class InvitationServiceTest extends WebTestCase
             'foo@foo.com',
             'bar'
         );
+        /** @var InvitationService invitationService */
         self::$invitationService = self::$container->get('app.invitation');
         self::$invitationService->setMailer($mailer);
         self::$invitationService->setDebug(true);
