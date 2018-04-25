@@ -191,7 +191,7 @@
                     <div class="form-group"><br></div>
 
                     <div class="form-group form-group--center">
-                        {% if app.user.hasValidPaymentMethod %}
+                        {% if app.user.hasValidPaymentMethod and app.user.hasJudoPaymentMethod %}
                             {{ form_widget(purchase_form.existing, {'label': 'Pay with card on file', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
                             {{ form_widget(purchase_form.next, {'label': 'Pay with a new card', 'attr': {'class': 'btn btn-default btn-block btn-pad'}}) }}
                         {% else %}
@@ -212,11 +212,12 @@
                         </a>
                         {% endif %}
                     </div>
-
+                    {% if payment_provider == 'judo' %}
                     <div class="form-group form-group--center text-center">
                         <small class="text-grey">Powered by</small> <br>
                         <img src="{{ cdn_url }}/images/purchase/judo_pay_logo.svg" alt="Judo Pay" title="Powered by - Judo Pay" width="70px">
                     </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

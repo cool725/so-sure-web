@@ -339,6 +339,23 @@ class PurchaseController extends BaseController
         $webpay = null;
         $allowPayment = true;
 
+        $paymentProviderTest = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_PURCHASE_FLOW_BACS,
+            ['judo', 'bacs'],
+            SixpackService::LOG_MIXPANEL_CONVERSION,
+            null,
+            0.1
+        );
+        $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
+        // For now, only allow 1 policy with bacs
+        if ($bacsFeature && count($user->getValidPolicies(true)) > 1) {
+            $bacsFeature = false;
+        }
+        if (!$bacsFeature) {
+            $paymentProviderTest = 'judo';
+        }
+
         //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_POSTCODE);
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('purchase_form')) {
@@ -486,24 +503,7 @@ class PurchaseController extends BaseController
                                 'Policy Id' => $policy->getId(),
                             ]);
 
-                            $bacsTest = $this->sixpack(
-                                $request,
-                                SixpackService::EXPERIMENT_PURCHASE_FLOW_BACS,
-                                ['judo', 'bacs'],
-                                SixpackService::LOG_MIXPANEL_CONVERSION,
-                                null,
-                                0.1
-                            );
-                            $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
-                            // For now, only allow 1 policy with bacs
-                            if ($bacsFeature && count($user->getValidPolicies(true)) > 1) {
-                                $bacsFeature = false;
-                            }
-                            if (!$bacsFeature) {
-                                $bacsTest = 'judo';
-                            }
-
-                            if ($bacsTest == 'bacs') {
+                            if ($paymentProviderTest == 'bacs') {
                                 return new RedirectResponse(
                                     $this->generateUrl('purchase_step_payment_id', [
                                         'id' => $policy->getId(),
@@ -584,6 +584,7 @@ class PurchaseController extends BaseController
                 ['memory' => 'asc']
             ) : null,
             'billing_date' => $billingDate,
+            'payment_provider' => $paymentProviderTest,
         );
 
         return $this->render($template, $data);
@@ -631,12 +632,13 @@ class PurchaseController extends BaseController
         } elseif ($freq == Policy::PLAN_YEARLY) {
             $policy->setPremiumInstallments(1);
             $this->getManager()->flush();
-            $amount = $policy->getPremium()->getYearlPremiumPrice();
+            $amount = $policy->getPremium()->getYearlyPremiumPrice();
         } else {
             throw new NotFoundHttpException(sprintf('Unknown frequency %s', $freq));
         }
 
         $paymentService = $this->get('app.payment');
+        $policyService = $this->get('app.policy');
         $bacs = new Bacs();
         /** @var FormInterface $bacsForm */
         $bacsForm = $this->get('form.factory')
@@ -666,11 +668,18 @@ class PurchaseController extends BaseController
                 }
             } elseif ($request->request->has('bacs_confirm_form')) {
                 $bacsConfirmForm->handleRequest($request);
-                if ($bacsConfirmForm->isValid()) {
+                if ($bacsConfirmForm->get('back')->isClicked()) {
+                    $bacs = clone $bacsConfirm;
+                    $bacsForm = $this->get('form.factory')
+                        ->createNamedBuilder('bacs_form', BacsType::class, $bacs)
+                        ->getForm();
+                    $template = 'AppBundle:Purchase:purchaseStepPaymentBacs.html.twig';
+                } elseif ($bacsConfirmForm->isValid()) {
                     $paymentService->confirmBacs(
                         $policy,
                         $bacsConfirm->transformBacsPaymentMethod($this->getIdentityLogWeb($request))
                     );
+                    $policyService->create($policy, null, true);
 
                     $this->addFlash(
                         'success',

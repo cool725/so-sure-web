@@ -48,6 +48,7 @@ class BacsConfirmType extends AbstractType
             ->add('accountNumber', HiddenType::class, ['required' => true])
             ->add('reference', HiddenType::class, ['required' => true])
             ->add('save', SubmitType::class)
+            ->add('back', SubmitType::class)
         ;
         $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
             /** @var Bacs $bacs */

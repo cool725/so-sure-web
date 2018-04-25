@@ -872,7 +872,7 @@ class PolicyService
         for ($i = 1; $i <= $numScheduledPayments; $i++) {
             $scheduledDate = clone $date;
             // initial purchase should start at 1 month from initial purchase
-            $scheduledDate->add(new \DateInterval(sprintf('P%dM', $isInitialPurchase ? $i : $i - 1)));
+            $scheduledDate->add(new \DateInterval(sprintf('P%dM', $numPaidPayments > 0 ? $i : $i - 1)));
 
             $scheduledPayment = new ScheduledPayment();
             $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
