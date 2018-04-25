@@ -2,6 +2,8 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Repository\UserRepository;
+use AppBundle\Service\SanctionsService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -92,7 +94,9 @@ class SanctionsCommand extends BaseCommand
     protected function checkUsers($userId = null)
     {
         $dm = $this->getManager();
+        /** @var SanctionsService $sanctions */
         $sanctions = $this->getContainer()->get('app.sanctions');
+        /** @var UserRepository $userRepo */
         $userRepo = $dm->getRepository(User::class);
         if ($userId) {
             $users = [];
@@ -117,6 +121,7 @@ class SanctionsCommand extends BaseCommand
     protected function checkCompanies($companyId = null)
     {
         $dm = $this->getManager();
+        /** @var SanctionsService $sanctions */
         $sanctions = $this->getContainer()->get('app.sanctions');
         $companyRepo = $dm->getRepository(Company::class);
         if ($companyId) {
@@ -126,6 +131,7 @@ class SanctionsCommand extends BaseCommand
             $companies = $companyRepo->findAll();
         }
         foreach ($companies as $company) {
+            /** @var Company $company */
             $matches = $sanctions->checkCompany($company, true);
             if ($matches) {
                 print sprintf('%s %s', $company->getName(), json_encode($matches)) . PHP_EOL;

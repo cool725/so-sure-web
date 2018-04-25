@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Service\FacebookService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -35,6 +36,7 @@ class FacebookCommand extends ContainerAwareCommand
         $id = $input->getArgument('id');
         $token = $input->getArgument('token');
 
+        /** @var FacebookService $fb */
         $fb = $this->getContainer()->get('app.facebook');
         $result = $fb->validateTokenId($id, $token);
 

@@ -2,6 +2,10 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Repository\ClaimRepository;
+use AppBundle\Repository\PhonePolicyRepository;
+use AppBundle\Service\BaseImeiService;
+use AppBundle\Service\ReceperioService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,7 +16,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Claim;
 
-class PolicyClaimCommand extends ContainerAwareCommand
+class PolicyClaimCommand extends BaseCommand
 {
     protected function configure()
     {
@@ -43,6 +47,7 @@ class PolicyClaimCommand extends ContainerAwareCommand
         $policyId = $input->getArgument('policy-id');
         $claimId = $input->getArgument('claim-id');
         $imei = $input->getOption('imei');
+        /** @var ReceperioService $imeiService */
         $imeiService = $this->getContainer()->get('app.imei');
 
         $policy = $this->getPolicy($policyId);
@@ -63,8 +68,8 @@ class PolicyClaimCommand extends ContainerAwareCommand
 
     private function getPolicy($id)
     {
-        $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicyRepository $repo */
+        $repo = $this->getManager()->getRepository(PhonePolicy::class);
         $policy = $repo->find($id);
 
         return $policy;
@@ -72,8 +77,8 @@ class PolicyClaimCommand extends ContainerAwareCommand
 
     private function getClaim($id)
     {
-        $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(Claim::class);
+        /** @var ClaimRepository $repo */
+        $repo = $this->getManager()->getRepository(Claim::class);
         $claim = $repo->find($id);
 
         return $claim;

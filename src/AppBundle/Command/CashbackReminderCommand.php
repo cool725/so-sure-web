@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Service\PolicyService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -33,6 +34,7 @@ class CashbackReminderCommand extends BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $dryRun = true === $input->getOption('dry-run');
+        /** @var PolicyService $policyService */
         $policyService = $this->getContainer()->get('app.policy');
         $lines = $policyService->cashbackReminder($dryRun);
         $output->writeln(json_encode($lines, JSON_PRETTY_PRINT));

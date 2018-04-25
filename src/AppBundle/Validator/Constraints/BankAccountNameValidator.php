@@ -29,12 +29,15 @@ class BankAccountNameValidator extends ConstraintValidator
 
     public function validate($value, Constraint $constraint)
     {
+        /** @var BankAccountName $bankAccountNameConstraint */
+        $bankAccountNameConstraint = $constraint;
+
         $user = $this->requestService->getUser();
         if ($this->isAccountName($value, $user) !== false) {
             return;
         }
 
-        $this->context->buildViolation($constraint->message)
+        $this->context->buildViolation($bankAccountNameConstraint->message)
             ->setParameter('%string%', $value)
             ->setParameter('%name%', $user ? $user->getName() : 'Unknown')
             ->addViolation();

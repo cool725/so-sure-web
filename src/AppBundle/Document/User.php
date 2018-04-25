@@ -76,6 +76,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     /**
      * @MongoDB\EmbedOne(targetDocument="Address")
      * @Gedmo\Versioned
+     * @var Address
      */
     protected $billingAddress;
 
@@ -473,6 +474,9 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $this->leadSource;
     }
 
+    /**
+     * @return Address
+     */
     public function getBillingAddress()
     {
         return $this->billingAddress;

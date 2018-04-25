@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Service\InvoiceService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,7 +16,7 @@ use AppBundle\Document\InvoiceItem;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
 
-class DaviesInvoiceCommand extends ContainerAwareCommand
+class DaviesInvoiceCommand extends BaseCommand
 {
     use DateTrait;
     use CurrencyTrait;
@@ -70,6 +71,7 @@ class DaviesInvoiceCommand extends ContainerAwareCommand
             $dm->persist($invoice);
             $dm->flush();
 
+            /** @var InvoiceService $invoiceService */
             $invoiceService = $this->getContainer()->get('app.invoice');
             $invoiceService->generateInvoice($invoice, $emailAddress);
             if ($emailAddress) {
@@ -86,11 +88,6 @@ class DaviesInvoiceCommand extends ContainerAwareCommand
         // add all claimcheck items to invoice (invoiceitems + set charge invoice)
         // generate invoice + email
         $output->writeln('Finished');
-    }
-
-    private function getManager()
-    {
-        return $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
     }
 
     private function getCharges($date)

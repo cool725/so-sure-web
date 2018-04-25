@@ -147,7 +147,7 @@ class SmsService
         }
 
         $key = sprintf(self::VALIDATION_KEY, $user->getId(), $code);
-        $this->redis->setEx($key, self::VALIDATION_TIMEOUT, $code);
+        $this->redis->setex($key, self::VALIDATION_TIMEOUT, $code);
 
         return $code;
     }

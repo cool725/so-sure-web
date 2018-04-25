@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Service\PolicyService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -36,6 +37,7 @@ class DaviesNotifyPolicyPendingCancellationCommand extends ContainerAwareCommand
     {
         $prefix = $input->getOption('prefix');
         $days = $input->getOption('days');
+        /** @var PolicyService $policyService */
         $policyService = $this->getContainer()->get('app.policy');
         $count = $policyService->notifyPendingCancellations($prefix, $days);
         $output->writeln(sprintf('%d policies with open claims will be cancelled. Email report sent.', $count));

@@ -8,6 +8,7 @@ use AppBundle\Event\CompanyEvent;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\SanctionsService;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Predis\Client;
 use Snc\RedisBundle;
 use Psr\Log\LoggerInterface;
 
@@ -22,18 +23,20 @@ class SanctionsListener
     /** @var MailerService */
     protected $mailer;
 
+    /** @var SanctionsService  */
     protected $sanctions;
 
+    /** @var Client */
     protected $redis;
 
     const SANCTIONS_LISTENER_REDIS_KEY = 'queue:sanctions';
     /**
      * @param SanctionsService $sanctions
-     * @param                  $redis
+     * @param Client           $redis
      */
     public function __construct(
         SanctionsService $sanctions,
-        $redis
+        Client $redis
     ) {
         $this->sanctions = $sanctions;
         $this->redis = $redis;

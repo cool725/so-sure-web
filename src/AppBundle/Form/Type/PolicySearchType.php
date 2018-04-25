@@ -2,6 +2,7 @@
 
 namespace AppBundle\Form\Type;
 
+use AppBundle\Repository\PhoneRepository;
 use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use Symfony\Component\Form\AbstractType;
@@ -88,7 +89,7 @@ class PolicySearchType extends AbstractType
                 'placeholder' => 'Select your device',
                 'class' => 'AppBundle:Phone',
                 'required' => false,
-                'query_builder' => function (DocumentRepository $dr) {
+                'query_builder' => function (PhoneRepository $dr) {
                     return $dr->findActiveInactive();
                 }
             ])

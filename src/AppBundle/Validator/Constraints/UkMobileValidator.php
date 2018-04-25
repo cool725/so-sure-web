@@ -9,6 +9,9 @@ class UkMobileValidator extends ConstraintValidator
 {
     public function validate($value, Constraint $constraint)
     {
+        /** @var UkMobile $ukMobileConstraint */
+        $ukMobileConstraint = $constraint;
+
         if (is_object($value)) {
             throw new \Exception(sprintf('Expected string %s', json_encode($value)));
         }
@@ -19,7 +22,7 @@ class UkMobileValidator extends ConstraintValidator
 
         $value = str_replace(' ', '', $value);
         if (!preg_match($this->getRegex(), $value, $matches)) {
-            $this->context->buildViolation($constraint->message)
+            $this->context->buildViolation($ukMobileConstraint->message)
                 ->setParameter('%string%', $value)
                 ->addViolation();
         }

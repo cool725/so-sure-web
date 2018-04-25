@@ -2,6 +2,7 @@
 
 namespace AppBundle\Listener;
 
+use AppBundle\Document\User;
 use Symfony\Component\Security\Http\Event\InteractiveLoginEvent;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
@@ -127,7 +128,9 @@ class KernelListener
             // authChecker doesn't seem to be working :(
             // WARNING - this means that we needs to directly check the assigned role instead of using role inheritance
             // TODO: Fixme
-            $employee = $token->getUser()->hasEmployeeRole();
+            /** @var User $user */
+            $user = $token->getUser();
+            $employee = $user->hasEmployeeRole();
             if (!$employee) {
                 return;
             }

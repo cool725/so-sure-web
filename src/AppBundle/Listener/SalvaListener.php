@@ -2,6 +2,7 @@
 
 namespace AppBundle\Listener;
 
+use AppBundle\Classes\Salva;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
@@ -13,12 +14,14 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 
 class SalvaListener
 {
+    /** @var SalvaExportService */
     protected $salvaService;
 
     /**
-     * @param $redis
+     * SalvaListener constructor.
+     * @param SalvaExportService $salvaService
      */
-    public function __construct($salvaService)
+    public function __construct(SalvaExportService $salvaService)
     {
         $this->salvaService = $salvaService;
     }

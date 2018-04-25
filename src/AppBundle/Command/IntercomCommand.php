@@ -12,7 +12,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Service\IntercomService;
 
-class IntercomCommand extends ContainerAwareCommand
+class IntercomCommand extends BaseCommand
 {
     protected function configure()
     {
@@ -89,6 +89,7 @@ class IntercomCommand extends ContainerAwareCommand
         $maintenance = true === $input->getOption('maintenance');
         $pendingInvites = true === $input->getOption('pending-invites');
 
+        /** @var IntercomService $intercom */
         $intercom = $this->getContainer()->get('app.intercom');
 
         if ($email) {
@@ -164,16 +165,14 @@ class IntercomCommand extends ContainerAwareCommand
 
     private function getUserRepository()
     {
-        $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
-        $repo = $dm->getRepository(User::class);
+        $repo = $this->getManager()->getRepository(User::class);
 
         return $repo;
     }
 
     private function getEmailInvitationRepository()
     {
-        $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
-        $repo = $dm->getRepository(EmailInvitation::class);
+        $repo = $this->getManager()->getRepository(EmailInvitation::class);
 
         return $repo;
     }

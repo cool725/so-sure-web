@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Service\MaxMindIpService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -36,6 +37,7 @@ class GeoIpCommand extends ContainerAwareCommand
         $ip = $input->getArgument('ip');
         $queryType = $input->getOption('query-type');
 
+        /** @var MaxMindIpService $geoip */
         $geoip = $this->getContainer()->get('app.geoip');
         $output->writeln(json_encode($geoip->find($ip, $queryType)));
     }

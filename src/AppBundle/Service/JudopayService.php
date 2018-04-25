@@ -2,6 +2,7 @@
 namespace AppBundle\Service;
 
 use AppBundle\Repository\JudoPaymentRepository;
+use AppBundle\Repository\ScheduledPaymentRepository;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
@@ -330,6 +331,7 @@ class JudopayService
             );
             if (!$this->policyService->adjustScheduledPayments($policy, true)) {
                 // Reload object from db
+                /** @var Policy $policy */
                 $policy = $this->dm->merge($policy);
             }
 
@@ -561,7 +563,9 @@ class JudopayService
         if ($transactionDetails["result"] != JudoPayment::RESULT_SUCCESS) {
             throw new PaymentDeclinedException();
         }
+        /** @var JudoPaymentRepository $repo */
         $repo = $this->dm->getRepository(JudoPayment::class);
+        /** @var JudoPayment $payment */
         $payment = $repo->findOneBy(['receipt' => $receiptId]);
         if ($payment) {
             $payment->setResult($transactionDetails["result"]);
@@ -614,16 +618,19 @@ class JudopayService
         // Try to find payment via policy object, so that there isn't any inconsistencies
         // Uncertain if this is doing anything productive or not, but there was an error
         // that seems like it could only be causes by loading an unflush db record - ch4972
+        /** @var JudoPayment $payment */
         $payment = null;
         foreach ($policy->getPayments() as $payment) {
             if ($payment->getId() == $transactionDetails["yourPaymentReference"]) {
                 break;
             }
 
+            /** @var JudoPayment $payment */
             $payment = null;
         }
         // Fallback to db query if unable to find
         if (!$payment) {
+            /** @var JudoPayment $payment */
             $payment = $repo->find($transactionDetails["yourPaymentReference"]);
         }
 
@@ -663,6 +670,7 @@ class JudopayService
             $payment->setDate($date);
         }
 
+        /** @var JudoPaymentMethod $judoPaymentMethod */
         $judoPaymentMethod = $policy->getUser()->getPaymentMethod();
         if ($cardToken) {
             $tokens = $judoPaymentMethod->getCardTokens();
@@ -870,6 +878,7 @@ class JudopayService
             $this->dm->flush(null, array('w' => 'majority', 'j' => true));
             $this->triggerPolicyEvent($policy, PolicyEvent::EVENT_UNPAID);
 
+            /** @var ScheduledPaymentRepository $repo */
             $repo = $this->dm->getRepository(ScheduledPayment::class);
 
             // Only allow up to 4 failed payment attempts

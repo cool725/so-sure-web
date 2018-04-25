@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Service\JudopayService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -35,6 +36,7 @@ class JudopayCommand extends ContainerAwareCommand
     {
         $receiptId = $input->getOption('receiptId');
         $pageSize = $input->getOption('pageSize');
+        /** @var JudopayService $judopay */
         $judopay = $this->getContainer()->get('app.judopay');
         if ($receiptId) {
             $details = $judopay->getReceipt($receiptId, false, false);

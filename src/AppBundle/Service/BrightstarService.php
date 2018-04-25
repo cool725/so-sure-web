@@ -109,7 +109,7 @@ class BrightstarService extends S3EmailService
         }
 
         if ($brightstar->postcode && !$this->postcodeCompare(
-            $user->getBillingAddress()->getPostCode(),
+            $user->getBillingAddress()->getPostcode(),
             $brightstar->postcode
         ) && !$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_BRIGHTSTAR_POSTCODE)) {
             $msg = sprintf(
@@ -117,7 +117,7 @@ class BrightstarService extends S3EmailService
                 $brightstar->claimNumber,
                 $brightstar->postcode,
                 $brightstar->getAddress()->__toString(),
-                $user->getBillingAddress()->getPostCode(),
+                $user->getBillingAddress()->getPostcode(),
                 $user->getBillingAddress()->__toString()
             );
             if ($warningDate > $now) {

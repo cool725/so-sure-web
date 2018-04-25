@@ -11,7 +11,7 @@ use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
 
-class MixpanelCommand extends ContainerAwareCommand
+class MixpanelCommand extends BaseCommand
 {
     protected function configure()
     {
@@ -147,16 +147,14 @@ class MixpanelCommand extends ContainerAwareCommand
 
     private function getUserRepository()
     {
-        $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
-        $repo = $dm->getRepository(User::class);
+        $repo = $this->getManager()->getRepository(User::class);
 
         return $repo;
     }
 
     private function getPhonePolicyRepository()
     {
-        $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
-        $repo = $dm->getRepository(PhonePolicy::class);
+        $repo = $this->getManager()->getRepository(PhonePolicy::class);
 
         return $repo;
     }

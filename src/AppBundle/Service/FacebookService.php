@@ -8,6 +8,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use GuzzleHttp\Client;
 use AppBundle\Document\PhoneTrait;
+use Symfony\Component\Routing\RouterInterface;
 
 class FacebookService
 {
@@ -16,6 +17,7 @@ class FacebookService
     /** @var LoggerInterface */
     protected $logger;
 
+    /** @var RouterInterface */
     protected $router;
 
     /** @var string */
@@ -32,13 +34,18 @@ class FacebookService
 
     /**
      * @param LoggerInterface $logger
-     * @param                 $router
+     * @param RouterInterface $router
      * @param string          $appId
      * @param string          $secret
      * @param string          $accountKitSecret
      */
-    public function __construct(LoggerInterface $logger, $router, $appId, $secret, $accountKitSecret)
-    {
+    public function __construct(
+        LoggerInterface $logger,
+        RouterInterface $router,
+        $appId,
+        $secret,
+        $accountKitSecret
+    ) {
         $this->logger = $logger;
         $this->router = $router;
         $this->appId = $appId;

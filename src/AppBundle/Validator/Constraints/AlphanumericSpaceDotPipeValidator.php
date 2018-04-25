@@ -9,12 +9,15 @@ class AlphanumericSpaceDotPipeValidator extends ConstraintValidator
 {
     public function validate($value, Constraint $constraint)
     {
+        /** @var AlphanumericSpaceDotPipe $alphanumericSpaceDotPipeContraint */
+        $alphanumericSpaceDotPipeContraint = $constraint;
+
         if (is_object($value)) {
             throw new \Exception(sprintf('Excpected string %s', json_encode($value)));
         }
 
         if (!preg_match($this->getRegex(), $value, $matches)) {
-            $this->context->buildViolation($constraint->message)
+            $this->context->buildViolation($alphanumericSpaceDotPipeContraint->message)
                 ->setParameter('%string%', $value)
                 ->addViolation();
         }

@@ -108,10 +108,12 @@ class DoctrineUserListener
                 if ($oldBankAccount && $newBankAccount) {
                     $bankAccountUpdated = false;
 
-                    $accountName = $document->getPaymentMethod()->getBankAccount()->getAccountName();
-                    $accountNumber = $document->getPaymentMethod()->getBankAccount()->getAccountNumber();
-                    $sortCode = $document->getPaymentMethod()->getBankAccount()->getSortCode();
-                    $reference = $document->getPaymentMethod()->getBankAccount()->getReference();
+                    /** @var BacsPaymentMethod $paymentMethod */
+                    $paymentMethod = $document->getPaymentMethod();
+                    $accountName = $paymentMethod->getBankAccount()->getAccountName();
+                    $accountNumber = $paymentMethod->getBankAccount()->getAccountNumber();
+                    $sortCode = $paymentMethod->getBankAccount()->getSortCode();
+                    $reference = $paymentMethod->getBankAccount()->getReference();
                     if ($oldBankAccount->getAccountNumber() != $newBankAccount->getAccountNumber()) {
                         $accountNumber = $oldBankAccount->getAccountNumber();
                         $bankAccountUpdated = true;

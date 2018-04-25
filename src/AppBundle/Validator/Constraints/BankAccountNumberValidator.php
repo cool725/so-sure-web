@@ -12,12 +12,15 @@ class BankAccountNumberValidator extends ConstraintValidator
 
     public function validate($value, Constraint $constraint)
     {
+        /** @var BankAccountNumber $bankAccountNumberConstraint */
+        $bankAccountNumberConstraint = $constraint;
+
         if (mb_strlen($value) == 0) {
             return;
         }
 
         if (!$this->validateAccountNumber($value)) {
-            $this->context->buildViolation($constraint->message)
+            $this->context->buildViolation($bankAccountNumberConstraint->message)
                 ->setParameter('%string%', $value)
                 ->addViolation();
         }
