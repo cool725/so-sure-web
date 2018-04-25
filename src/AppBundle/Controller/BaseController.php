@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Repository\PhoneRepository;
+use Doctrine\ODM\MongoDB\Query\Builder;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -259,13 +260,13 @@ abstract class BaseController extends Controller
     /**
      * Page results
      *
-     * @param Request      $request
-     * @param QueryBuilder $qb
+     * @param Request $request
+     * @param Builder $qb
      * @param integer $maxPerPage
      *
      * @return Pagerfanta
      */
-    protected function pager(Request $request, QueryBuilder $qb, $maxPerPage = 50)
+    protected function pager(Request $request, Builder $qb, $maxPerPage = 50)
     {
         $adapter = new DoctrineODMMongoDBAdapter($qb);
         $pagerfanta = new Pagerfanta($adapter);

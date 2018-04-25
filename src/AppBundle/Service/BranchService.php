@@ -38,15 +38,15 @@ class BranchService
     protected $appleAppDownload;
 
     /**
-     * @param LoggerInterface   $logger
-     * @param RouterService     $routerService
-     * @param \Predis\Client    $redis
-     * @param string            $environment
-     * @param string            $branchKey
-     * @param string            $branchSecret
-     * @param string            $branchDomain
-     * @param string            $googleAppDownload
-     * @param string            $appleAppDownload
+     * @param LoggerInterface $logger
+     * @param RouterService   $routerService
+     * @param \Predis\Client  $redis
+     * @param string          $environment
+     * @param string          $branchKey
+     * @param string          $branchSecret
+     * @param string          $branchDomain
+     * @param string          $googleAppDownload
+     * @param string          $appleAppDownload
      */
     public function __construct(
         LoggerInterface $logger,

@@ -226,7 +226,7 @@ class DaviesService extends S3EmailService
 
     /**
      * @param DaviesClaim $daviesClaim
-     * @param boolean $skipImeiUpdate
+     * @param boolean     $skipImeiUpdate
      * @return bool
      * @throws \Exception
      */
