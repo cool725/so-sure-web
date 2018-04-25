@@ -64,7 +64,7 @@ class ReportingService
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
      * @param string          $excludedPolicyIds
-     * @parma string          $environment
+     * @param string          $environment
      * @param Client          $redis
      */
     public function __construct(
