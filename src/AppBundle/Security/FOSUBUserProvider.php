@@ -121,7 +121,7 @@ class FOSUBUserProvider extends BaseClass
                 if ($request = $this->requestStack->getCurrentRequest()) {
                     if ($session = $request->getSession()) {
                         if ($session->isStarted()) {
-                            $session-getFlashBag()->add('error', $msg);
+                            $session->getFlashBag()->add('error', $msg);
                         }
                     }
                 }
