@@ -113,6 +113,26 @@ class ApiPartialControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
     }
 
+    public function testABAll()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testABAll', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $phone = self::getRandomPhone(self::$dm);
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        self::$dm->flush();
+
+        $url = sprintf('/api/v1/partial/ab?_method=GET');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, array());
+        $data = $this->verifyResponse(200);
+        $this->assertTrue(isset($data['tests']));
+        $this->assertEquals(count($data['tests']), count(SixpackService::$appExperiments));
+    }
+
     // feature flags
 
     /**
