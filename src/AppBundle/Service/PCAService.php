@@ -53,10 +53,15 @@ class PCAService
      * @param LoggerInterface $logger
      * @param string          $apiKey
      * @param string          $environment
-     * @param                 $redis
+     * @param \Predis\Client  $redis
      */
-    public function __construct(DocumentManager $dm, LoggerInterface $logger, $apiKey, $environment, $redis)
-    {
+    public function __construct(
+        DocumentManager $dm,
+        LoggerInterface $logger,
+        $apiKey,
+        $environment,
+        \Predis\Client $redis
+    ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->apiKey = $apiKey;
@@ -447,11 +452,11 @@ class PCAService
     }
 
     /**
-     * @param $file
-     * @param null $postcode
+     * @param \SimpleXMLElement $file
+     * @param string|null       $postcode
      * @throws \Exception
      */
-    private function checkError($file, $postcode = null)
+    private function checkError(\SimpleXMLElement $file, $postcode = null)
     {
         //Check for an error, if there is one then throw an exception
         if (isset($file->Columns) && $file->Columns->Column->attributes()->Name == "Error") {

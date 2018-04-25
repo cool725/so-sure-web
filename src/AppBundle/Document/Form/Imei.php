@@ -34,6 +34,7 @@ class Imei
 
     public function setPolicy(Policy $policy)
     {
+        /** @var PhonePolicy $policy */
         $this->policy = $policy;
         $this->setImei($policy->getImei());
     }

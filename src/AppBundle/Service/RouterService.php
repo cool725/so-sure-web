@@ -2,20 +2,22 @@
 namespace AppBundle\Service;
 
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 class RouterService
 {
+    /** @var RouterInterface */
     protected $router;
 
     /** @var string */
     protected $baseUrl;
 
     /**
-     * @param        $router
-     * @param string $baseUrl
+     * @param RouterInterface $router
+     * @param string          $baseUrl
      */
     public function __construct(
-        $router,
+        RouterInterface $router,
         $baseUrl
     ) {
         $this->router = $router;

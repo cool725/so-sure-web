@@ -1,12 +1,14 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Repository\PhoneRepository;
 use Dpn\XmlSitemapBundle\Sitemap\Entry;
 use Dpn\XmlSitemapBundle\Sitemap\GeneratorInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\Phone;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 class PhoneSitemapGenerator implements GeneratorInterface
 {
@@ -16,12 +18,13 @@ class PhoneSitemapGenerator implements GeneratorInterface
     /** @var LoggerInterface */
     protected $logger;
 
+    /** @var RouterInterface  */
     protected $router;
 
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
-     * @param                 $router
+     * @param RouterInterface $router
      */
     public function __construct(
         DocumentManager  $dm,
@@ -37,6 +40,7 @@ class PhoneSitemapGenerator implements GeneratorInterface
     {
         $entries = array();
 
+        /** @var PhoneRepository $repo */
         $repo = $this->dm->getRepository(Phone::class);
         $phones = $repo->findActive()->getQuery()->execute();
         $makeModelUrls = [];

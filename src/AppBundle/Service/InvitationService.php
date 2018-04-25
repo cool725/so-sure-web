@@ -1,6 +1,15 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Repository\ConnectionRepository;
+use AppBundle\Repository\Invitation\EmailInvitationRepository;
+use AppBundle\Repository\Invitation\FacebookInvitationRepository;
+use AppBundle\Repository\Invitation\SCodeInvitationRepository;
+use AppBundle\Repository\Invitation\SmsInvitationRepository;
+use AppBundle\Repository\OptOut\EmailOptOutRepository;
+use AppBundle\Repository\OptOut\SmsOptOutRepository;
+use AppBundle\Repository\SCodeRepository;
+use AppBundle\Repository\UserRepository;
 use Psr\Log\LoggerInterface;
 
 use AppBundle\Classes\SoSure;
@@ -35,6 +44,7 @@ use AppBundle\Exception\InvalidPolicyException;
 use AppBundle\Exception\SelfInviteException;
 use AppBundle\Exception\ConnectedInvitationException;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -83,6 +93,8 @@ class InvitationService
     protected $debug;
 
     protected $environment;
+
+    /** @var EventDispatcherInterface */
     protected $dispatcher;
 
     /** @var MixpanelService */
@@ -94,17 +106,17 @@ class InvitationService
     }
 
     /**
-     * @param DocumentManager  $dm
-     * @param LoggerInterface  $logger
-     * @param MailerService    $mailer
-     * @param RouterService    $routerService
-     * @param ShortLinkService $shortLink
-     * @param SmsService       $sms
-     * @param RateLimitService $rateLimit
-     * @param PushService      $push
-     * @param string           $environment
-     * @param                  $dispatcher
-     * @param MixpanelService  $mixpanel
+     * @param DocumentManager          $dm
+     * @param LoggerInterface          $logger
+     * @param MailerService            $mailer
+     * @param RouterService            $routerService
+     * @param ShortLinkService         $shortLink
+     * @param SmsService               $sms
+     * @param RateLimitService         $rateLimit
+     * @param PushService              $push
+     * @param string                   $environment
+     * @param EventDispatcherInterface $dispatcher
+     * @param MixpanelService          $mixpanel
      */
     public function __construct(
         DocumentManager $dm,
@@ -116,7 +128,7 @@ class InvitationService
         RateLimitService $rateLimit,
         PushService $push,
         $environment,
-        $dispatcher,
+        EventDispatcherInterface $dispatcher,
         MixpanelService $mixpanel
     ) {
         $this->dm = $dm;
@@ -174,14 +186,17 @@ class InvitationService
 
     public function setInvitee(Invitation $invitation, $user = null)
     {
+        /** @var UserRepository $userRepo */
         $userRepo = $this->dm->getRepository(User::class);
         if ($invitation instanceof EmailInvitation) {
+            /** @var User $user */
             $user = $userRepo->findOneBy(['emailCanonical' => $invitation->getEmail()]);
             if ($user && $invitation->getInviter()->getId() != $user->getId()) {
                 $user->addReceivedInvitation($invitation);
                 $this->sendEvent($invitation, InvitationEvent::EVENT_RECEIVED);
             }
         } elseif ($invitation instanceof SmsInvitation) {
+            /** @var User $user */
             $user = $userRepo->findOneBy(['mobileNumber' => $invitation->getMobile()]);
             if ($user && $invitation->getInviter()->getId() != $user->getId()) {
                 $user->addReceivedInvitation($invitation);
@@ -224,6 +239,7 @@ class InvitationService
 
     public function validateNotConnectedByUser(Policy $policy, $user)
     {
+        /** @var ConnectionRepository $connectionRepo */
         $connectionRepo = $this->dm->getRepository(StandardConnection::class);
         $count = $connectionRepo->getConnectedByUserCount($policy, $user);
         if ($count > 0 && $count >= count($user->getValidPolicies(true))) {
@@ -231,6 +247,7 @@ class InvitationService
         }
 
         // only 1 reward per user
+        /** @var ConnectionRepository $connectionRepo */
         $connectionRepo = $this->dm->getRepository(RewardConnection::class);
         $count = $connectionRepo->getConnectedByUserCount($policy, $user);
         if ($count > 0) {
@@ -244,16 +261,19 @@ class InvitationService
 
     public function validateNotConnectedByEmail(Policy $policy, $email)
     {
+        /** @var ConnectionRepository $connectionRepo */
         $connectionRepo = $this->dm->getRepository(StandardConnection::class);
         if ($connectionRepo->isConnectedByEmail($policy, $email)) {
             throw new ConnectedInvitationException('You are already connected');
         }
 
+        /** @var ConnectionRepository $connectionRepo */
         $connectionRepo = $this->dm->getRepository(RewardConnection::class);
         if ($connectionRepo->isConnectedByEmail($policy, $email)) {
             throw new ConnectedInvitationException('You are already connected');
         }
 
+        /** @var EmailOptOutRepository $optOutRepo */
         $optOutRepo = $this->dm->getRepository(EmailOptOut::class);
         if ($optOutRepo->isOptedOut($email, EmailOptOut::OPTOUT_CAT_INVITATIONS)) {
             throw new OptOutException(sprintf('Email %s has opted out', $email));
@@ -266,11 +286,13 @@ class InvitationService
 
     public function validateNotConnectedByPolicy(Policy $sourcePolicy, Policy $linkedPolicy)
     {
+        /** @var ConnectionRepository $connectionRepo */
         $connectionRepo = $this->dm->getRepository(StandardConnection::class);
         if ($connectionRepo->isConnectedByPolicy($sourcePolicy, $linkedPolicy)) {
             throw new ConnectedInvitationException('You are already connected');
         }
 
+        /** @var ConnectionRepository $connectionRepo */
         $connectionRepo = $this->dm->getRepository(RewardConnection::class);
         if ($connectionRepo->isConnectedByPolicy($sourcePolicy, $linkedPolicy)) {
             throw new ConnectedInvitationException('You are already connected');
@@ -293,7 +315,9 @@ class InvitationService
         $this->validatePolicy($policy);
         $this->validateSoSurePolicyEmail($policy, $email);
 
+        /** @var UserRepository $userRepo */
         $userRepo = $this->dm->getRepository(User::class);
+        /** @var User $invitee */
         $invitee = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
         $inviteePolicies = 0;
         if ($invitee) {
@@ -309,6 +333,7 @@ class InvitationService
 
         $invitation = null;
         $isReinvite = false;
+        /** @var EmailInvitationRepository $invitationRepo */
         $invitationRepo = $this->dm->getRepository(EmailInvitation::class);
         $prevInvitations = $invitationRepo->findDuplicate($policy, $email);
         $singleInvitationCount = 0;
@@ -384,11 +409,13 @@ class InvitationService
         $mobile = $this->normalizeUkMobile($mobile);
         $this->validatePolicy($policy);
 
+        /** @var ConnectionRepository $connectionRepo */
         $connectionRepo = $this->dm->getRepository(StandardConnection::class);
         if ($connectionRepo->isConnectedBySms($policy, $mobile)) {
             throw new ConnectedInvitationException('You are already connected');
         }
 
+        /** @var SmsOptOutRepository $optOutRepo */
         $optOutRepo = $this->dm->getRepository(SmsOptOut::class);
         if ($optOutRepo->isOptedOut($mobile, SmsOptOut::OPTOUT_CAT_INVITATIONS)) {
             return null;
@@ -399,6 +426,7 @@ class InvitationService
         }
 
         $invitation = null;
+        /** @var SmsInvitationRepository $invitationRepo */
         $invitationRepo = $this->dm->getRepository(SmsInvitation::class);
         $prevInvitations = $invitationRepo->findDuplicate($policy, $mobile);
         foreach ($prevInvitations as $prevInvitation) {
@@ -453,7 +481,9 @@ class InvitationService
         // check scode for url and resolve
         $code = $this->resolveSCode($code);
 
+        /** @var SCodeRepository $repo */
         $repo = $this->dm->getRepository(SCode::class);
+        /** @var SCode $scode */
         $scode = $repo->findOneBy(['code' => $code]);
         if (!$scode) {
             throw new NotFoundHttpException();
@@ -489,6 +519,7 @@ class InvitationService
 
         $invitation = null;
         $isReinvite = false;
+        /** @var SCodeInvitationRepository $invitationRepo */
         $invitationRepo = $this->dm->getRepository(SCodeInvitation::class);
         $prevInvitations = $invitationRepo->findDuplicate($policy, $scode);
         $singleInvitationCount = 0;
@@ -586,7 +617,9 @@ class InvitationService
 
     public function inviteByFacebookId(Policy $policy, $facebookId)
     {
+        /** @var UserRepository $repo */
         $repo = $this->dm->getRepository(User::class);
+        /** @var User $user */
         $user = $repo->findOneBy(['facebookId' => (string) $facebookId]);
         if (!$user) {
             throw new NotFoundHttpException();
@@ -600,6 +633,7 @@ class InvitationService
 
         $invitation = null;
         $isReinvite = false;
+        /** @var FacebookInvitationRepository $invitationRepo */
         $invitationRepo = $this->dm->getRepository(FacebookInvitation::class);
         $prevInvitations = $invitationRepo->findDuplicate($policy, $facebookId);
         $singleInvitationCount = 0;
@@ -809,6 +843,7 @@ class InvitationService
             throw new \InvalidArgumentException(sprintf('Unknown type %s', $type));
         }
 
+        /** @var EmailOptOutRepository $optOutRepo */
         $optOutRepo = $this->dm->getRepository(EmailOptOut::class);
         if ($optOutRepo->isOptedOut($to, EmailOptOut::OPTOUT_CAT_INVITATIONS)) {
             $invitation->setStatus(EmailInvitation::STATUS_SKIPPED);
@@ -838,7 +873,7 @@ class InvitationService
             $invitation->setStatus(EmailInvitation::STATUS_FAILED);
             $this->logger->error(sprintf(
                 'Failed sending invite to %s Ex: %s',
-                $invitation->getEmail(),
+                $to,
                 $e->getMessage()
             ));
         }
@@ -851,6 +886,7 @@ class InvitationService
      */
     protected function sendSms(SmsInvitation $invitation, $type)
     {
+        /** @var SmsOptOutRepository $optOutRepo */
         $optOutRepo = $this->dm->getRepository(SmsOptOut::class);
         $optouts = $optOutRepo->findOptOut($invitation->getMobile(), SmsOptOut::OPTOUT_CAT_INVITATIONS);
         if (count($optouts) > 0) {
@@ -936,6 +972,7 @@ class InvitationService
 
         // The invitation should never be sent in the first place, but in case
         // there was perhaps an email update in the meantime
+        /** @var ConnectionRepository $connectionRepo */
         $connectionRepo = $this->dm->getRepository(StandardConnection::class);
         if ($connectionRepo->isConnectedByPolicy($inviterPolicy, $inviteePolicy) ||
             $connectionRepo->isConnectedByPolicy($inviteePolicy, $inviterPolicy)) {
@@ -1154,6 +1191,7 @@ class InvitationService
             $category = EmailOptOut::OPTOUT_CAT_ALL;
         }
 
+        /** @var EmailOptOutRepository $optOutRepo */
         $optOutRepo = $this->dm->getRepository(EmailOptOut::class);
         $optouts = $optOutRepo->findOptOut($email, $category);
         return count($optouts) > 0;
@@ -1165,6 +1203,7 @@ class InvitationService
             $category = EmailOptOut::OPTOUT_CAT_ALL;
         }
 
+        /** @var EmailOptOutRepository $optoutRepo */
         $optoutRepo = $this->dm->getRepository(EmailOptOut::class);
         if (!$optoutRepo->isOptedOut($email, $category)) {
             $optout = new EmailOptOut();
@@ -1182,6 +1221,7 @@ class InvitationService
             $category = EmailOptOut::OPTOUT_CAT_ALL;
         }
 
+        /** @var EmailOptOutRepository $optoutRepo */
         $optoutRepo = $this->dm->getRepository(EmailOptOut::class);
         $optOuts = $optoutRepo->findOptOut($email, $category);
         foreach ($optOuts as $optOut) {
@@ -1192,6 +1232,7 @@ class InvitationService
 
     public function rejectAllInvitations($email)
     {
+        /** @var EmailInvitationRepository $inviteRepo */
         $inviteRepo = $this->dm->getRepository(EmailInvitation::class);
         $invitations = $inviteRepo->findBy(['email' => mb_strtolower($email)]);
         foreach ($invitations as $invitation) {

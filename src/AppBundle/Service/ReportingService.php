@@ -1,8 +1,17 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Repository\CashbackRepository;
+use AppBundle\Repository\ClaimRepository;
+use AppBundle\Repository\ConnectionRepository;
+use AppBundle\Repository\Invitation\InvitationRepository;
+use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PhonePolicyRepository;
+use AppBundle\Repository\PhoneRepository;
+use AppBundle\Repository\ScheduledPaymentRepository;
+use AppBundle\Repository\UserRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Predis\Client;
 use Psr\Log\LoggerInterface;
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\Policy;
@@ -45,8 +54,10 @@ class ReportingService
 
     protected $excludedPolicyIds;
 
+    /** @var string */
     protected $environment;
 
+    /** @var Client */
     protected $redis;
 
     /**
@@ -54,10 +65,15 @@ class ReportingService
      * @param LoggerInterface $logger
      * @param string          $excludedPolicyIds
      * @parma string          $environment
-     * @param                 $redis
+     * @param Client          $redis
      */
-    public function __construct(DocumentManager $dm, LoggerInterface $logger, $excludedPolicyIds, $environment, $redis)
-    {
+    public function __construct(
+        DocumentManager $dm,
+        LoggerInterface $logger,
+        $excludedPolicyIds,
+        $environment,
+        Client $redis
+    ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->excludedPolicyIds = $excludedPolicyIds;
@@ -95,11 +111,17 @@ class ReportingService
         $rolling3Months = clone $start;
         $rolling3Months = $rolling3Months->sub(new \DateInterval('P3M'));
 
+        /** @var UserRepository $userRepo */
         $userRepo = $this->dm->getRepository(User::class);
+        /** @var PhonePolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(PhonePolicy::class);
+        /** @var ConnectionRepository $connectionRepo */
         $connectionRepo = $this->dm->getRepository(StandardConnection::class);
+        /** @var InvitationRepository $invitationRepo */
         $invitationRepo = $this->dm->getRepository(Invitation::class);
+        /** @var ScheduledPaymentRepository $scheduledPaymentRepo */
         $scheduledPaymentRepo = $this->dm->getRepository(ScheduledPayment::class);
+        /** @var ClaimRepository $claimsRepo */
         $claimsRepo = $this->dm->getRepository(Claim::class);
         $claims = $claimsRepo->findFNOLClaims($start, $end);
         $claimsTotals = Claim::sumClaims($claims);
@@ -581,6 +603,7 @@ class ReportingService
 
     private function getTotalRunRateByDate($date)
     {
+        /** @var PhonePolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(PhonePolicy::class);
         $newToDateDirectPolicies = $policyRepo->findAllNewPolicies(null, null, $date);
         $newToDateInvitationPolicies = $policyRepo->findAllNewPolicies(Lead::LEAD_SOURCE_INVITATION, null, $date);
@@ -602,6 +625,7 @@ class ReportingService
 
     private function getExcludedPolicies($isKpi)
     {
+        /** @var PhonePolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(PhonePolicy::class);
         $excludedPolicies = [];
         if (!$isKpi) {
@@ -629,7 +653,9 @@ class ReportingService
 
     public function connectionReport()
     {
+        /** @var PhonePolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(PhonePolicy::class);
+        /** @var ConnectionRepository $connectionRepo */
         $connectionRepo = $this->dm->getRepository(StandardConnection::class);
         $totalEnd = null;
 
@@ -698,6 +724,7 @@ class ReportingService
 
     public function sumTotalPoliciesPerWeek(\DateTime $end = null)
     {
+        /** @var PhonePolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(PhonePolicy::class);
 
         $start = new \DateTime('2016-09-12');
@@ -716,6 +743,7 @@ class ReportingService
 
     public function payments(\DateTime $date)
     {
+        /** @var PaymentRepository $repo */
         $repo = $this->dm->getRepository(Payment::class);
         $payments = $repo->getAllPaymentsForReport($date);
         $sources = [
@@ -805,6 +833,7 @@ class ReportingService
 
     public function getActivePoliciesCount($date)
     {
+        /** @var PhonePolicyRepository $phonePolicyRepo */
         $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
 
         return $phonePolicyRepo->countAllActivePoliciesToEndOfMonth($date);
@@ -812,6 +841,7 @@ class ReportingService
 
     public function getActivePoliciesWithPolicyDiscountCount($date)
     {
+        /** @var PhonePolicyRepository $phonePolicyRepo */
         $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
 
         return $phonePolicyRepo->countAllActivePoliciesWithPolicyDiscountToEndOfMonth($date);
@@ -819,6 +849,7 @@ class ReportingService
 
     public function getRewardPotLiability($date, $promoOnly = false)
     {
+        /** @var PhonePolicyRepository $phonePolicyRepo */
         $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
         $policies = $phonePolicyRepo->findPoliciesForRewardPotLiability($this->endOfMonth($date));
         $rewardPotLiability = 0;
@@ -868,7 +899,8 @@ class ReportingService
     }
 
     /**
-     * @param $date Current date - will run report for previous year quarter
+     * @param \DateTime      $date Current date - will run report for previous year quarter
+     * @param \DateTime|null $now  Optional - when is now
      */
     public function getQuarterlyPL(\DateTime $date, \DateTime $now = null)
     {
@@ -1004,6 +1036,7 @@ class ReportingService
 
     private function getQuarterlyPolicies(\DateTime $startDate, \DateTime $endDate)
     {
+        /** @var PhonePolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(PhonePolicy::class);
         $policies = $policyRepo->findAllStartedPolicies(null, $startDate, $endDate);
 
@@ -1012,6 +1045,7 @@ class ReportingService
 
     private function getCashback(\DateTime $date)
     {
+        /** @var CashbackRepository $cashbackRepo */
         $cashbackRepo = $this->dm->getRepository(Cashback::class);
         $cashback = $cashbackRepo->getPaidCashback($date);
 
@@ -1020,6 +1054,7 @@ class ReportingService
 
     private function getPayments(\DateTime $date, $type = null, $cashback = null)
     {
+        /** @var PaymentRepository $paymentRepo */
         $paymentRepo = $this->dm->getRepository(Payment::class);
         $payments = $paymentRepo->getAllPayments($date, $type);
         if ($cashback !== null) {

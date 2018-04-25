@@ -2,6 +2,7 @@
 namespace AppBundle\Service;
 
 use AppBundle\Document\User;
+use Aws\Sns\SnsClient;
 use Psr\Log\LoggerInterface;
 use AppBundle\Classes\ClientUrl;
 use AppBundle\Document\Policy;
@@ -30,15 +31,16 @@ class PushService
     /** @var LoggerInterface */
     protected $logger;
 
+    /** @var SnsClient  */
     protected $sns;
 
     /**
      * @param LoggerInterface $logger
-     * @param                 $sns
+     * @param SnsClient       $sns
      */
     public function __construct(
         LoggerInterface $logger,
-        $sns
+        SnsClient $sns
     ) {
         $this->logger = $logger;
         $this->sns = $sns;

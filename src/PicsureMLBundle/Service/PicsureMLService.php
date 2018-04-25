@@ -3,6 +3,9 @@
 namespace PicsureMLBundle\Service;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
+use League\Flysystem\MountManager;
+use PicsureMLBundle\Repository\TrainingDataRepository;
+use PicsureMLBundle\Repository\TrainingVersionsInfoRepository;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -26,7 +29,7 @@ class PicsureMLService
     /** @var DocumentManager */
     protected $picsureMLDm;
 
-    /** @var Filesystem */
+    /** @var MountManager */
     protected $mountManager;
 
     /** @var S3Client */
@@ -35,13 +38,13 @@ class PicsureMLService
     /**
      * @param DocumentManager $appDm
      * @param DocumentManager $picsureMLDm
-     * @param Filesystem      $mountManager
+     * @param MountManager    $mountManager
      * @param S3Client        $s3
      */
     public function __construct(
         DocumentManager $appDm,
         DocumentManager $picsureMLDm,
-        $mountManager,
+        MountManager $mountManager,
         S3Client $s3
     ) {
         $this->appDm = $appDm;
@@ -52,6 +55,7 @@ class PicsureMLService
 
     public function addFileForTraining($file, $status)
     {
+        /** @var TrainingDataRepository $repo */
         $repo = $this->picsureMLDm->getRepository(TrainingData::class);
         if ($file->getFileType() == 'PicSureFile' && !$repo->imageExists($file->getKey())) {
             $image = new TrainingData();
@@ -65,6 +69,7 @@ class PicsureMLService
 
     public function createNewTrainingVersion($version)
     {
+        /** @var TrainingVersionsInfoRepository $repo */
         $repo = $this->picsureMLDm->getRepository(TrainingVersionsInfo::class);
         $versionInfo = $repo->findAll();
 
@@ -90,6 +95,7 @@ class PicsureMLService
 
     public function getTrainingVersions()
     {
+        /** @var TrainingVersionsInfoRepository $repo */
         $repo = $this->picsureMLDm->getRepository(TrainingVersionsInfo::class);
         $versionInfo = $repo->findAll();
 
@@ -210,6 +216,7 @@ class PicsureMLService
     {
         $filesystem = $this->mountManager->getFilesystem('s3picsure_fs');
 
+        /** @var TrainingDataRepository $repo */
         $repo = $this->picsureMLDm->getRepository(TrainingData::class);
         $qb = $repo->createQueryBuilder();
         $qb->field('versions')->equals($version);

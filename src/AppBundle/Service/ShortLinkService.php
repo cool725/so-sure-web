@@ -14,16 +14,21 @@ class ShortLinkService
     /** @var string */
     protected $googleApiKey;
 
+    /** @var \Domnikl\Statsd\Client */
     protected $statsd;
 
     /**
-     * @param LoggerInterface $logger
-     * @param string          $googleAppName
-     * @param string          $googleApiKey
-     * @param                 $statsd
+     * @param LoggerInterface        $logger
+     * @param string                 $googleAppName
+     * @param string                 $googleApiKey
+     * @param \Domnikl\Statsd\Client $statsd
      */
-    public function __construct(LoggerInterface $logger, $googleAppName, $googleApiKey, $statsd)
-    {
+    public function __construct(
+        LoggerInterface $logger,
+        $googleAppName,
+        $googleApiKey,
+        \Domnikl\Statsd\Client $statsd
+    ) {
         $this->logger = $logger;
         $this->googleAppName = $googleAppName;
         $this->googleApiKey = $googleApiKey;

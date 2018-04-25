@@ -1,22 +1,24 @@
 <?php
 namespace AppBundle\Service;
 
+use HWI\Bundle\OAuthBundle\OAuth\ResourceOwner\AccountkitResourceOwner;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Psr\Log\LoggerInterface;
 
 class AccountkitTwigExtension extends \Twig_Extension
 {
+    /** @var AccountkitResourceOwner */
     protected $oauth;
 
     /** @var LoggerInterface */
     protected $logger;
 
     /**
-     * @param                 $oauth
-     * @param LoggerInterface $logger
+     * @param AccountkitResourceOwner $oauth
+     * @param LoggerInterface         $logger
      */
     public function __construct(
-        $oauth,
+        AccountkitResourceOwner $oauth,
         LoggerInterface $logger
     ) {
         $this->oauth = $oauth;

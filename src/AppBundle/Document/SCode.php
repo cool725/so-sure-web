@@ -56,6 +56,7 @@ class SCode
     /**
      * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy")
      * @Gedmo\Versioned
+     * @var Policy
      */
     protected $policy;
 
@@ -205,6 +206,9 @@ class SCode
         $this->code = $code;
     }
 
+    /**
+     * @return Policy
+     */
     public function getPolicy()
     {
         return $this->policy;

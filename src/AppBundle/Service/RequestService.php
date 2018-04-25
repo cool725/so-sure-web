@@ -8,6 +8,7 @@ use AppBundle\Document\User;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpFoundation\IpUtils;
 use Mobile_Detect;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use UAParser\Parser;
 
 class RequestService
@@ -25,6 +26,7 @@ class RequestService
     /** @var LoggerInterface */
     protected $logger;
 
+    /** @var TokenStorage  */
     protected $tokenStorage;
     protected $adminCookieValue;
     protected $mobileDetect;
@@ -38,14 +40,14 @@ class RequestService
     /**
      * @param RequestStack    $requestStack
      * @param LoggerInterface $logger
-     * @param                 $tokenStorage
+     * @param TokenStorage    $tokenStorage
      * @param string          $adminCookieValue
      * @param string          $environment
      */
     public function __construct(
         RequestStack $requestStack,
         LoggerInterface $logger,
-        $tokenStorage,
+        TokenStorage $tokenStorage,
         $adminCookieValue,
         $environment
     ) {

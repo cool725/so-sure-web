@@ -111,4 +111,10 @@ class GocardlessPaymentMethod extends PaymentMethod
     {
         return $this->hasSubscription();
     }
+
+    public function __toString()
+    {
+        // TODO: Implement __toString() method.
+        return '';
+    }
 }

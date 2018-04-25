@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use Predis\Client;
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
@@ -70,16 +71,17 @@ class RateLimitService
     /** @var LoggerInterface */
     protected $logger;
 
+    /** @var Client */
     protected $redis;
 
     protected $environment;
 
     /**
-     * @param                 $redis
+     * @param Client          $redis
      * @param LoggerInterface $logger
      * @param string          $environment
      */
-    public function __construct($redis, LoggerInterface $logger, $environment)
+    public function __construct(Client $redis, LoggerInterface $logger, $environment)
     {
         $this->redis = $redis;
         $this->logger = $logger;
@@ -191,11 +193,11 @@ class RateLimitService
     /**
      * Is the call allowed - special case for user login
      *
-     * @param string $user
+     * @param User $user
      *
      * @return boolean
      */
-    public function allowedByUser($user)
+    public function allowedByUser(User $user)
     {
         $type = self::DEVICE_TYPE_USER_LOGIN;
         $userKey = sprintf(self::KEY_FORMAT, $type, $user->getId());

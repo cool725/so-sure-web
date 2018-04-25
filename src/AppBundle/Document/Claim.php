@@ -1076,11 +1076,13 @@ class Claim
 
     public function toModalArray()
     {
+        /** @var PhonePolicy $phonePolicy */
+        $phonePolicy = $this->getPolicy();
         return [
             'number' => $this->getNumber(),
             'notes' => $this->getNotes(),
             'id' => $this->getId(),
-            'policyPhone' => $this->getPolicy()->getPhone()->__toString(),
+            'policyPhone' => $phonePolicy->getPhone()->__toString(),
             'policyId' => $this->getPolicy()->getId(),
             'policyNumber' => $this->getPolicy()->getPolicyNumber(),
             'handler' => $this->getHandler() ? $this->getHandler()->getName() : 'unknown',

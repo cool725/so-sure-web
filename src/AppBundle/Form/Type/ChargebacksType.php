@@ -2,6 +2,7 @@
 
 namespace AppBundle\Form\Type;
 
+use AppBundle\Repository\ChargebackPaymentRepository;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -50,7 +51,7 @@ class ChargebacksType extends AbstractType
             $form->add('chargeback', DocumentType::class, [
                     'placeholder' => 'Select a chargeback',
                     'class' => 'AppBundle:Payment\ChargebackPayment',
-                    'query_builder' => function (DocumentRepository $dr) use ($amount) {
+                    'query_builder' => function (ChargebackPaymentRepository $dr) use ($amount) {
                         return $dr->findUnassigned($amount);
                     },
                     'choice_value' => 'id',

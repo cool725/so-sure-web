@@ -1,6 +1,8 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Repository\ChargebackPaymentRepository;
+use AppBundle\Repository\JudoPaymentRepository;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Document\DateTrait;
@@ -100,6 +102,7 @@ class BarclaysService
 
         // Attempt to match barclay card transaction against JudoPayment record
         $matchedTransactions = 0;
+        /** @var JudoPaymentRepository $paymentRepo */
         $paymentRepo = $this->dm->getRepository(JudoPayment::class);
         foreach ($lines as $line) {
             $transactionDate = new \DateTime($line['Transaction date']);
@@ -159,6 +162,7 @@ class BarclaysService
 
     public function processStatementCsv($barclaysStatementFile)
     {
+        /** @var ChargebackPaymentRepository $repo */
         $repo = $this->dm->getRepository(ChargebackPayment::class);
 
         $filename = $barclaysStatementFile->getFile();
@@ -198,6 +202,7 @@ class BarclaysService
                         $amount = $this->toTwoDp(0 - $line['TOTAL']);
                         $id = null;
                         $data = ['reference' => $ref, 'amount' => $amount, 'date' => $date];
+                        /** @var ChargebackPayment $chargeback */
                         $chargeback = $repo->findOneBy($data);
                         if (!$chargeback) {
                             $chargeback = new ChargebackPayment();
@@ -230,6 +235,7 @@ class BarclaysService
 
     public function processStatementNewCsv($barclaysStatementFile)
     {
+        /** @var ChargebackPaymentRepository $repo */
         $repo = $this->dm->getRepository(ChargebackPayment::class);
 
         $filename = $barclaysStatementFile->getFile();
@@ -282,6 +288,7 @@ class BarclaysService
                         $ref = str_replace('/', '', $ref);
                         $amount = $this->toTwoDp(0 - $line['CHARGE TOTAL']);
                         $id = null;
+                        /** @var ChargebackPayment $chargeback */
                         $chargeback = $repo->findOneBy(['reference' => $ref]);
                         if (!$chargeback) {
                             $chargeback = new ChargebackPayment();

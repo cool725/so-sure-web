@@ -1,6 +1,9 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Repository\PhonePolicyRepository;
+use League\Flysystem\AwsS3v3\AwsS3Adapter;
+use League\Flysystem\Filesystem;
 use Psr\Log\LoggerInterface;
 use GuzzleHttp\Client;
 use AppBundle\Document\Phone;
@@ -36,7 +39,7 @@ class BaseImeiService
     /**
      * @param MountManager $oneUpFlySystemMountManager
      */
-    public function setMountManager($oneUpFlySystemMountManager)
+    public function setMountManager(MountManager $oneUpFlySystemMountManager)
     {
         $this->filesystem = $oneUpFlySystemMountManager;
     }
@@ -86,10 +89,12 @@ class BaseImeiService
      */
     public function isDuplicatePolicyImei($imei)
     {
+        /** @var PhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(PhonePolicy::class);
         $policies = $repo->findDuplicateImei($imei);
 
         foreach ($policies as $policy) {
+            /** @var Policy $policy */
             // Expired policies can be paid for again
             if ($policy->isExpired()) {
                 continue;
@@ -313,9 +318,12 @@ class BaseImeiService
 
     public function saveFailedOcr($filename, $userId, $extension = 'png')
     {
+        /** @var Filesystem $fs */
         $fs = $this->filesystem->getFilesystem('s3policy_fs');
-        $bucket = $fs->getAdapter()->getBucket();
-        $pathPrefix = $fs->getAdapter()->getPathPrefix();
+        /** @var AwsS3Adapter $s3Adapater */
+        $s3Adapater = $fs->getAdapter();
+        $bucket = $s3Adapater->getBucket();
+        $pathPrefix = $s3Adapater->getPathPrefix();
         $path = pathinfo($filename);
         $key = sprintf(
             '%s/%s/%s.%s',

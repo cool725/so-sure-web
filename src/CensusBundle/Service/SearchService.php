@@ -4,22 +4,28 @@ namespace CensusBundle\Service;
 use CensusBundle\Document\Postcode;
 use CensusBundle\Document\OutputArea;
 use CensusBundle\Document\Income;
+use CensusBundle\Repository\IncomeRepository;
+use CensusBundle\Repository\OutputAreaRepository;
+use CensusBundle\Repository\PostCodeRepository;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use GeoJson\Geometry\Point;
 
 class SearchService
 {
+    /** @var DocumentManager */
     protected $dm;
 
     /**
-     * @param $router
+     * @param DocumentManager $dm
      */
-    public function __construct($dm)
+    public function __construct(DocumentManager $dm)
     {
         $this->dm = $dm;
     }
 
     public function getPostcode($code)
     {
+        /** @var PostCodeRepository $postcodeRepo */
         $postcodeRepo = $this->dm->getRepository(PostCode::class);
 
         return $postcodeRepo->findOneBy(['Postcode' => $code]);
@@ -66,6 +72,7 @@ class SearchService
 
     public function findOutputArea($code)
     {
+        /** @var OutputAreaRepository $outputAreaRepo */
         $outputAreaRepo = $this->dm->getRepository(OutputArea::class);
 
         return $outputAreaRepo->findOneBy(['Postcode' => $code]);
@@ -87,6 +94,7 @@ class SearchService
             return null;
         }
 
+        /** @var IncomeRepository $incomeRepo */
         $incomeRepo = $this->dm->getRepository(Income::class);
 
         return $incomeRepo->findOneBy(['MSOA' => $outputArea->getMSOA()]);

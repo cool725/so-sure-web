@@ -28,7 +28,7 @@ class SearchType extends AbstractType
     private $picsureMLService;
 
     /**
-     * @param requestStack     $requestStack
+     * @param RequestStack     $requestStack
      * @param PicsureMLService $picsureMLService
      */
     public function __construct(RequestStack $requestStack, PicsureMLService $picsureMLService)

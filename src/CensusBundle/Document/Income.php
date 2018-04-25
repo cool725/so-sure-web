@@ -6,7 +6,7 @@ use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @MongoDB\Document(collection="Income2014")
+ * @MongoDB\Document(collection="Income2014", repositoryClass="CensusBundle\Repository\IncomeRepository")
  */
 class Income
 {

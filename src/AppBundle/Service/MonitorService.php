@@ -6,6 +6,12 @@ use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\User;
 use AppBundle\Repository\BacsPaymentRepository;
+use AppBundle\Repository\CashbackRepository;
+use AppBundle\Repository\ClaimRepository;
+use AppBundle\Repository\File\S3FileRepository;
+use AppBundle\Repository\PhonePolicyRepository;
+use AppBundle\Repository\PolicyRepository;
+use AppBundle\Repository\UserRepository;
 use Psr\Log\LoggerInterface;
 use GuzzleHttp\Client;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -28,6 +34,7 @@ class MonitorService
     /** @var LoggerInterface */
     protected $logger;
 
+    /** @var \Predis\Client */
     protected $redis;
 
     /** @var IntercomService */
@@ -42,7 +49,7 @@ class MonitorService
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
-     * @param                 $redis
+     * @param \Predis\Client  $redis
      * @param IntercomService $intercom
      * @param MixpanelService $mixpanel
      * @param JudopayService  $judopay
@@ -50,10 +57,10 @@ class MonitorService
     public function __construct(
         DocumentManager  $dm,
         LoggerInterface $logger,
-        $redis,
-        $intercom,
-        $mixpanel,
-        $judopay
+        \Predis\Client $redis,
+        IntercomService $intercom,
+        MixpanelService $mixpanel,
+        JudopayService $judopay
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -74,9 +81,11 @@ class MonitorService
 
     public function multipay()
     {
+        /** @var PolicyRepository $repo */
         $repo = $this->dm->getRepository(Policy::class);
         $policies = $repo->findBy(['status' => Policy::STATUS_MULTIPAY_REQUESTED]);
         foreach ($policies as $policy) {
+            /** @var Policy $policy */
             $multipays = $policy->getUser()->getMultiPays();
             foreach ($multipays as $multipay) {
                 if ($multipay->getPolicy()->getId() == $policy->getId()
@@ -94,10 +103,12 @@ class MonitorService
 
     public function claimsReplacementPhone()
     {
+        /** @var ClaimRepository $repo */
         $repo = $this->dm->getRepository(Claim::class);
         $claims = $repo->findMissingReceivedDate();
         $now = new \DateTime();
         foreach ($claims as $claim) {
+            /** @var Claim $claim */
             $replacementDate = $claim->getPolicy()->getImeiReplacementDate();
             if ($replacementDate &&
                 $now->getTimestamp() - $replacementDate->getTimestamp() > 3600) {
@@ -112,9 +123,11 @@ class MonitorService
 
     public function claimsSettledUnprocessed()
     {
+        /** @var ClaimRepository $repo */
         $repo = $this->dm->getRepository(Claim::class);
         $claims = $repo->findSettledUnprocessed();
         foreach ($claims as $claim) {
+            /** @var Claim $claim */
             throw new MonitorException(sprintf(
                 'Claim %s is settled, but has not been processed (e.g. pot updated)',
                 $claim->getNumber()
@@ -124,9 +137,11 @@ class MonitorService
 
     public function cashbackPastDue()
     {
+        /** @var CashbackRepository $repo */
         $repo = $this->dm->getRepository(Cashback::class);
         $cashbacks = $repo->getLateCashback();
         foreach ($cashbacks as $cashback) {
+            /** @var Cashback $cashback */
             throw new MonitorException(sprintf(
                 'Cashback for policy id:%s (%s) is late (%s)',
                 $cashback->getPolicy()->getId(),
@@ -138,9 +153,11 @@ class MonitorService
 
     public function cashbackIncorrectStatus()
     {
+        /** @var CashbackRepository $repo */
         $repo = $this->dm->getRepository(Cashback::class);
         $cashbacks = $repo->findBy(['status' => Cashback::STATUS_PENDING_CLAIMABLE]);
         foreach ($cashbacks as $cashback) {
+            /** @var Cashback $cashback */
             if ($cashback->getPolicy()->getStatus() != Policy::STATUS_EXPIRED_CLAIMABLE) {
                 throw new MonitorException(sprintf(
                     'Cashback status (claimable) for policy id:%s (%s) is incorrect. Policy status %s',
@@ -193,6 +210,7 @@ class MonitorService
      */
     public function intercomPolicyPremium()
     {
+        /** @var PhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(PhonePolicy::class);
         $twoDays = new \DateTime();
         $twoDays = $twoDays->sub(new \DateInterval('P2D'));
@@ -356,6 +374,7 @@ class MonitorService
     public function bacsSubmitted()
     {
         $repo = $this->dm->getRepository(AccessPayFile::class);
+        /** @var AccessPayFile $unsubmitted */
         $unsubmitted = $repo->findOneBy(['submitted' => ['$ne' => true]]);
         if ($unsubmitted) {
             throw new MonitorException(sprintf(
@@ -388,6 +407,7 @@ class MonitorService
 
     public function bacsMandates()
     {
+        /** @var UserRepository $repo */
         $repo = $this->dm->getRepository(User::class);
         $users = $repo->findPendingMandates()->getQuery()->execute();
         if (count($users) > 0) {

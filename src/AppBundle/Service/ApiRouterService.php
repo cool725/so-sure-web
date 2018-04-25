@@ -8,9 +8,6 @@ class ApiRouterService
     protected $httpPort;
     protected $httpsPort;
 
-    /**
-     * @param $router
-     */
     public function __construct($router, $listenPort, $httpPort, $httpsPort)
     {
         $this->router = $router;

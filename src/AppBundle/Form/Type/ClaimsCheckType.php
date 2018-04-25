@@ -2,6 +2,7 @@
 
 namespace AppBundle\Form\Type;
 
+use AppBundle\Repository\ClaimRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -64,7 +65,7 @@ class ClaimsCheckType extends AbstractType
                     'placeholder' => 'Select a claim',
                     'class' => 'AppBundle:Claim',
                     'choice_label' => 'number',
-                    'query_builder' => function (DocumentRepository $dr) use ($claimsCheck) {
+                    'query_builder' => function (ClaimRepository $dr) use ($claimsCheck) {
                         return $dr->findByPolicy($claimsCheck->getPolicy());
                     }
             ]);

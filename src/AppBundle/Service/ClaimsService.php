@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Repository\PhonePolicyRepository;
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
@@ -106,9 +107,11 @@ class ClaimsService
         if ($claim->getStatus() == Claim::STATUS_APPROVED &&
             $claim->getApprovedDate() &&
             $claim->getApprovedDate()->diff(new \DateTime())->days < 2) {
-            if ($claim->getPolicy()->getPicSureStatus() == PhonePolicy::PICSURE_STATUS_APPROVED
-                && $claim->getPolicy()->getPicSureApprovedDate()) {
-                $picSureApprovedDate = $claim->getPolicy()->getPicSureApprovedDate();
+            /** @var PhonePolicy $policy */
+            $policy = $claim->getPolicy();
+            if ($policy->getPicSureStatus() == PhonePolicy::PICSURE_STATUS_APPROVED
+                && $policy->getPicSureApprovedDate()) {
+                $picSureApprovedDate = $policy->getPicSureApprovedDate();
                 $diff = $picSureApprovedDate->diff(new \DateTime());
                 if ($diff->days < 30) {
                     try {
@@ -137,13 +140,17 @@ class ClaimsService
             return;
         }
 
+        /** @var PhonePolicy $phonePolicy */
+        $phonePolicy = $policy;
+
         // Check if phone has been 'lost' multiple times
         $repo = $this->dm->getRepository(LostPhone::class);
-        $lost = $repo->findOneBy(['imei' => $policy->getImei()]);
+        /** @var LostPhone $lost */
+        $lost = $repo->findOneBy(['imei' => $phonePolicy->getImei()]);
         if ($lost) {
             $this->logger->error(sprintf(
                 'Imei (%s) that was previously reported as lost is being reported as lost again.',
-                $policy->getImei()
+                $phonePolicy->getImei()
             ));
         }
 

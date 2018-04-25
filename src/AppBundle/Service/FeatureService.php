@@ -29,6 +29,7 @@ class FeatureService
     {
         try {
             $repo = $this->dm->getRepository(Feature::class);
+            /** @var Feature $feature */
             $feature = $repo->findOneBy(['name' => $featureName]);
             if (!$feature) {
                 return false;
@@ -43,6 +44,7 @@ class FeatureService
     public function setEnabled($featureName, $enabled)
     {
         $repo = $this->dm->getRepository(Feature::class);
+        /** @var Feature $feature */
         $feature = $repo->findOneBy(['name' => $featureName]);
         $feature->setEnabled($enabled);
         $this->dm->flush();

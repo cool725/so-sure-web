@@ -18,11 +18,15 @@ use AppBundle\Document\User;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\UserRepository;
 use Aws\S3\S3Client;
+use Knp\Snappy\AbstractGenerator;
+use Knp\Snappy\GeneratorInterface;
+use Predis\Client;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use DOMDocument;
 use DOMXPath;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Templating\EngineInterface;
 
 class BacsService
 {
@@ -66,26 +70,29 @@ class BacsService
     /** @var MailerService */
     protected $mailerService;
 
+    /** @var Client */
     protected $redis;
 
     /** @var PaymentService */
     protected $paymentService;
 
+    /** @var AbstractGenerator */
     protected $snappyPdf;
 
+    /** @var EngineInterface */
     protected $templating;
 
     /**
-     * @param DocumentManager $dm
-     * @param LoggerInterface $logger
-     * @param S3Client        $s3
-     * @param string          $fileEncryptionPassword
-     * @param string          $environment
-     * @param MailerService   $mailerService
-     * @param                 $redis
-     * @param PaymentService  $paymentService
-     * @param                 $snappyPdf
-     * @param                 $templating
+     * @param DocumentManager    $dm
+     * @param LoggerInterface    $logger
+     * @param S3Client           $s3
+     * @param string             $fileEncryptionPassword
+     * @param string             $environment
+     * @param MailerService      $mailerService
+     * @param Client             $redis
+     * @param PaymentService     $paymentService
+     * @param GeneratorInterface $snappyPdf
+     * @param EngineInterface    $templating
      */
     public function __construct(
         DocumentManager $dm,
@@ -94,10 +101,10 @@ class BacsService
         $fileEncryptionPassword,
         $environment,
         MailerService $mailerService,
-        $redis,
+        Client $redis,
         PaymentService $paymentService,
-        $snappyPdf,
-        $templating
+        GeneratorInterface $snappyPdf,
+        EngineInterface $templating
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -231,6 +238,7 @@ class BacsService
             $results['instructions']++;
             $reason = $element->attributes->getNamedItem('reason-code')->nodeValue;
             $reference = $element->attributes->getNamedItem('reference')->nodeValue;
+            /** @var User $user */
             $user = $repo->findOneBy(['paymentMethod.bankAccount.reference' => $reference]);
             if (!$user) {
                 $results['success'] = false;
@@ -899,7 +907,9 @@ class BacsService
     public function generateBacsPdf(Policy $policy)
     {
         $now = new \DateTime();
-        $bankAccount = $policy->getUser()->getPaymentMethod()->getBankAccount();
+        /** @var BacsPaymentMethod $paymentMethod */
+        $paymentMethod = $policy->getUser()->getPaymentMethod();
+        $bankAccount = $paymentMethod->getBankAccount();
         $filename = sprintf(
             "%s-%s-%s.pdf",
             $policy->getId(),

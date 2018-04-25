@@ -55,6 +55,7 @@ class Cashback
      * @Assert\NotNull(message="Policy is required")
      * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy")
      * @Gedmo\Versioned
+     * @var Policy
      */
     protected $policy;
 
@@ -134,6 +135,9 @@ class Cashback
         $this->date = $date;
     }
 
+    /**
+     * @return Policy
+     */
     public function getPolicy()
     {
         return $this->policy;
