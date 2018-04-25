@@ -58,7 +58,7 @@ class SixpackService
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';
     const ALTERNATIVES_APP_SHARE_METHOD_API = 'api';
-    const ALTERNATIVES_APP_PICSURE_REQUEST_LOCATION = 'request-locatiom';
+    const ALTERNATIVES_APP_PICSURE_REQUEST_LOCATION = 'request-location';
     const ALTERNATIVES_APP_PICSURE_NO_LOCATION = 'no-location';
 
     const KPI_RECEIVE_DETAILS = 'receive-details';
