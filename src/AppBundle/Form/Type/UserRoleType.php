@@ -18,9 +18,6 @@ use Symfony\Component\Form\FormEvent;
 
 class UserRoleType extends AbstractType
 {
-    /**
-     * @param              $roles
-     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('roles', ChoiceType::class, array(
@@ -28,7 +25,7 @@ class UserRoleType extends AbstractType
                                  'ROLE_CLAIM' => 'ROLE_CLAIM',
                                  'ROLE_EMPLOYEE' => 'ROLE_EMPLOYEE'),
             'required'  => true,
-            'multiple'=>true
+            'multiple'  => true
         ))
         ->add('save', SubmitType::class) ;
 

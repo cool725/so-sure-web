@@ -1,10 +1,12 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Repository\UserRepository;
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\User;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Symfony\Component\Templating\EngineInterface;
 
 class LaunchUserService
 {
@@ -19,7 +21,11 @@ class LaunchUserService
 
     /** @var MailerService */
     protected $mailer;
+
+    /** @var EngineInterface */
     protected $templating;
+
+    /** @var RouterService */
     protected $router;
 
     /** @var ShortLinkService */
@@ -30,8 +36,8 @@ class LaunchUserService
      * @param LoggerInterface  $logger
      * @param MailchimpService $mailchimp
      * @param MailerService    $mailer
-     * @param                  $templating
-     * @param                  $router
+     * @param EngineInterface  $templating
+     * @param RouterService    $router
      * @param ShortLinkService $shortLink
      */
     public function __construct(
@@ -39,8 +45,8 @@ class LaunchUserService
         LoggerInterface $logger,
         MailchimpService $mailchimp,
         MailerService $mailer,
-        $templating,
-        $router,
+        EngineInterface $templating,
+        RouterService $router,
         ShortLinkService $shortLink
     ) {
         $this->dm = $dm;
@@ -60,10 +66,12 @@ class LaunchUserService
      */
     public function addUser(User $user, $resend = false)
     {
+        /** @var UserRepository $repo */
         $repo = $this->dm->getRepository(User::class);
         $userCreated = true;
         try {
             if ($user->getReferralId() && !$user->getReferred()) {
+                /** @var User $referred */
                 $referred = $repo->find($user->getReferralId());
                 $referred->addReferral($user);
             }

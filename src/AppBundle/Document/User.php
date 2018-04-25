@@ -3,6 +3,7 @@
 
 namespace AppBundle\Document;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use FOS\UserBundle\Model\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use GeoJson\Geometry\Point;
@@ -89,6 +90,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @MongoDB\ReferenceMany(
      *  targetDocument="AppBundle\Document\Invitation\Invitation",
      *  mappedBy="invitee")
+     * @var ArrayCollection
      */
     protected $receivedInvitations;
 
@@ -1170,6 +1172,9 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         }
     }
 
+    /**
+     * @return ArrayCollection
+     */
     public function getReceivedInvitations()
     {
         return $this->receivedInvitations;

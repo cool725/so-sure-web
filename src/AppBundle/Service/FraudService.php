@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Repository\UserRepository;
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\User;
 use AppBundle\Document\Gocardless;
@@ -51,6 +52,7 @@ class FraudService
     public function getDuplicatePostcode(Policy $policy)
     {
         $user = $policy->getUser();
+        /** @var UserRepository $userRepo */
         $userRepo = $this->dm->getRepository(User::class);
 
         return $userRepo->getDuplicatePostcodeCount($user);
@@ -60,6 +62,7 @@ class FraudService
     {
         try {
             $user = $policy->getUser();
+            /** @var UserRepository $userRepo */
             $userRepo = $this->dm->getRepository(User::class);
 
             return count($userRepo->findBankAccount($user));
@@ -74,6 +77,7 @@ class FraudService
         if (!$user->getIdentityLog()) {
             return null;
         }
+        /** @var UserRepository $userRepo */
         $userRepo = $this->dm->getRepository(User::class);
         $users = $userRepo->findIp($user);
 

@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use Predis\Client;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\Common\Persistence\ManagerRegistry;
@@ -8,6 +9,9 @@ use Plivo\RestAPI;
 use AppBundle\Document\User;
 use AppBundle\Document\Charge;
 use AppBundle\Document\Policy;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Templating\EngineInterface;
+use Twig\Template;
 
 class SmsService
 {
@@ -27,10 +31,13 @@ class SmsService
     /** @var string */
     protected $sending_number;
 
+    /** @var RouterInterface */
     protected $router;
 
+    /** @var EngineInterface */
     protected $templating;
 
+    /** @var Client */
     protected $redis;
 
     /** @var string */
@@ -39,22 +46,22 @@ class SmsService
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
-     * @param                 $router
+     * @param RouterInterface $router
      * @param string          $auth_id
      * @param string          $auth_token
      * @param string          $sending_number
-     * @param                 $templating
-     * @param                 $redis
-     * @param                 $environment
+     * @param EngineInterface $templating
+     * @param Client          $redis
+     * @param string          $environment
      */
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
-        $router,
+        RouterInterface $router,
         $auth_id,
         $auth_token,
         $sending_number,
-        $templating,
+        EngineInterface $templating,
         $redis,
         $environment
     ) {

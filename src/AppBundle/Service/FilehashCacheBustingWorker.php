@@ -44,7 +44,7 @@ class FilehashCacheBustingWorker extends CacheBustingWorker
      * Update a given hash with the sha1 hash of an individual asset
      *
      * @param AssetInterface $asset
-     * @param $hash
+     * @param mixed          $hash
      */
     protected function hashAsset(AssetInterface $asset, $hash)
     {

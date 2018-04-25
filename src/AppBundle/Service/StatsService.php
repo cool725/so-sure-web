@@ -2,6 +2,7 @@
 namespace AppBundle\Service;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Predis\Client;
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\Stats;
 use AppBundle\Document\DateTrait;
@@ -21,14 +22,15 @@ class StatsService
     /** @var LoggerInterface */
     protected $logger;
 
+    /** @var Client  */
     protected $redis;
 
     /**
      * @param DocumentManager $dm
-     * @param                 $redis
+     * @param Client          $redis
      * @param LoggerInterface $logger
      */
-    public function __construct(DocumentManager $dm, $redis, LoggerInterface $logger)
+    public function __construct(DocumentManager $dm, Client $redis, LoggerInterface $logger)
     {
         $this->dm = $dm;
         $this->redis = $redis;
@@ -72,6 +74,7 @@ class StatsService
     public function set($name, $date, $value, $overwrite = true)
     {
         $repo = $this->dm->getRepository(Stats::class);
+        /** @var Stats $stat */
         $stat = $repo->findOneBy(['name' => $name, 'date' => $this->startOfDay($date)]);
         if (!$stat) {
             $stat = new Stats();
@@ -93,6 +96,7 @@ class StatsService
         }
 
         $repo = $this->dm->getRepository(Stats::class);
+        /** @var Stats $stat */
         $stat = $repo->findOneBy(['name' => $name, 'date' => $this->startOfDay($date)]);
         if (!$stat) {
             $stat = new Stats();
@@ -110,6 +114,7 @@ class StatsService
     public function decrement($name, $date, $overwrite = false)
     {
         $repo = $this->dm->getRepository(Stats::class);
+        /** @var Stats $stat */
         $stat = $repo->findOneBy(['name' => $name, 'date' => $this->startOfDay($date)]);
         if (!$stat) {
             $stat = new Stats();

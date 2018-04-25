@@ -551,6 +551,7 @@ class PhonePolicy extends Policy
 
     public function setPolicyDetailsForPendingRenewal(Policy $policy, \DateTime $startDate, PolicyTerms $terms)
     {
+        /** @var PhonePolicy $policy */
         $policy->setPhone($this->getPhone());
         $policy->setImei($this->getImei());
         $policy->setSerialNumber($this->getSerialNumber());
@@ -564,6 +565,7 @@ class PhonePolicy extends Policy
 
     public function setPolicyDetailsForRepurchase(Policy $policy, \DateTime $startDate)
     {
+        /** @var PhonePolicy $policy */
         $policy->setPhone($this->getPhone());
         $policy->setImei($this->getImei());
         $policy->setSerialNumber($this->getSerialNumber());

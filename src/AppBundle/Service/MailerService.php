@@ -3,6 +3,7 @@ namespace AppBundle\Service;
 
 use AppBundle\Document\OptOut\OptOut;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Templating\EngineInterface;
 
 class MailerService
 {
@@ -10,7 +11,13 @@ class MailerService
 
     /** @var \Swift_Mailer */
     protected $mailer;
+
+    /**
+     * @var \Swift_Transport
+     */
     protected $smtp;
+
+    /** @var EngineInterface */
     protected $templating;
 
     /** @var RouterService */
@@ -28,17 +35,17 @@ class MailerService
     }
 
     /**
-     * @param \Swift_Mailer $mailer
-     * @param               $smtp
-     * @param               $templating
-     * @param RouterService $routerService
-     * @param string        $defaultSenderAddress
-     * @param string        $defaultSenderName
+     * @param \Swift_Mailer    $mailer
+     * @param \Swift_Transport $smtp
+     * @param EngineInterface  $templating
+     * @param RouterService    $routerService
+     * @param string           $defaultSenderAddress
+     * @param string           $defaultSenderName
      */
     public function __construct(
         \Swift_Mailer $mailer,
-        $smtp,
-        $templating,
+        \Swift_Transport $smtp,
+        EngineInterface $templating,
         RouterService $routerService,
         $defaultSenderAddress,
         $defaultSenderName

@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Repository\JudoPaymentRepository;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
@@ -28,6 +29,7 @@ use AppBundle\Exception\InvalidPremiumException;
 use AppBundle\Exception\PaymentDeclinedException;
 use AppBundle\Exception\ProcessedException;
 use AppBundle\Exception\SameDayPaymentException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class JudopayService
 {
@@ -68,11 +70,13 @@ class JudopayService
     /** @var MailerService */
     protected $mailer;
 
+    /** @var \Domnikl\Statsd\Client */
     protected $statsd;
 
     /** @var string */
     protected $environment;
 
+    /** @var EventDispatcherInterface */
     protected $dispatcher;
 
     /** @var SmsService */
@@ -87,20 +91,20 @@ class JudopayService
     }
 
     /**
-     * @param DocumentManager $dm
-     * @param LoggerInterface $logger
-     * @param PolicyService   $policyService
-     * @param MailerService   $mailer
-     * @param string          $apiToken
-     * @param string          $apiSecret
-     * @param string          $judoId
-     * @param string          $environment
-     * @param                 $statsd
-     * @param string          $webToken
-     * @param string          $webSecret
-     * @param                 $dispatcher
-     * @param SmsService      $sms
-     * @param FeatureService  $featureService
+     * @param DocumentManager          $dm
+     * @param LoggerInterface          $logger
+     * @param PolicyService            $policyService
+     * @param MailerService            $mailer
+     * @param string                   $apiToken
+     * @param string                   $apiSecret
+     * @param string                   $judoId
+     * @param string                   $environment
+     * @param \Domnikl\Statsd\Client   $statsd
+     * @param string                   $webToken
+     * @param string                   $webSecret
+     * @param EventDispatcherInterface $dispatcher
+     * @param SmsService               $sms
+     * @param FeatureService           $featureService
      */
     public function __construct(
         DocumentManager $dm,
@@ -111,10 +115,10 @@ class JudopayService
         $apiSecret,
         $judoId,
         $environment,
-        $statsd,
+        \Domnikl\Statsd\Client $statsd,
         $webToken,
         $webSecret,
-        $dispatcher,
+        EventDispatcherInterface $dispatcher,
         SmsService $sms,
         FeatureService $featureService
     ) {
@@ -150,6 +154,7 @@ class JudopayService
 
     public function getTransaction($receiptId)
     {
+        /** @var Judopay\Model $transaction */
         $transaction = $this->apiClient->getModel('Transaction');
         $data = array(
             'judoId' => $this->judoId,
@@ -181,6 +186,7 @@ class JudopayService
     {
         $policies = [];
         $repo = $this->dm->getRepository(JudoPayment::class);
+        /** @var Judopay\Model $transactions */
         $transactions = $this->apiClient->getModel('Transaction');
         $data = array(
             'judoId' => $this->judoId,
@@ -436,6 +442,7 @@ class JudopayService
         }
 
         try {
+            /** @var Judopay\Model $payment */
             $payment = $this->apiClient->getModel('CardPayment');
             $payment->setAttributeValues($data);
             $details = $payment->create();
@@ -446,6 +453,7 @@ class JudopayService
             );
 
             // retry
+            /** @var Judopay\Model $payment */
             $payment = $this->apiClient->getModel('CardPayment');
             $payment->setAttributeValues($dataCopy);
             $details = $payment->create();
@@ -456,6 +464,7 @@ class JudopayService
 
     public function testRegisterDetails(User $user, $ref, $cardNumber, $expiryDate, $cv2)
     {
+        /** @var Judopay\Model $register */
         $register = $this->apiClient->getModel('RegisterCard');
         $data = array(
             'judoId' => $this->judoId,
@@ -476,6 +485,7 @@ class JudopayService
 
     public function getReceipt($receiptId, $enforceFullAmount = true, $enforceDate = true, \DateTime $date = null)
     {
+        /** @var Judopay\Model $transaction */
         $transaction = $this->apiClient->getModel('Transaction');
 
         try {
@@ -1004,6 +1014,7 @@ class JudopayService
 
     public function runTokenPayment(User $user, $amount, $paymentRef, $policyId, $customerRef = null)
     {
+        /** @var JudoPaymentMethod $paymentMethod */
         $paymentMethod = $user->getPaymentMethod();
         if (!$paymentMethod) {
             throw new \Exception(sprintf('Unknown payment method for user %s', $user->getId()));
@@ -1013,6 +1024,7 @@ class JudopayService
         }
 
         // add payment
+        /** @var Judopay\Model $tokenPayment */
         $tokenPayment = $this->apiClient->getModel('TokenPayment');
 
         $data = array(
@@ -1173,6 +1185,7 @@ class JudopayService
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
         // add payment
+        /** @var Judopay\Model $webPayment */
         $webPayment = $this->webClient->getModel('WebPayments\Payment');
 
         // populate the required data fields.
@@ -1215,6 +1228,7 @@ class JudopayService
         $this->dm->persist($payment);
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
+        /** @var Judopay\Model $webPreAuth */
         $webPreAuth = $this->webClient->getModel('WebPayments\Preauth');
         $date = new \DateTime();
         $paymentRef = sprintf('%s-%s', $user->getId(), $date->format('Ym'));
@@ -1275,6 +1289,7 @@ class JudopayService
         $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
         // add refund
+        /** @var Judopay\Model $refundModel */
         $refundModel = $this->apiClient->getModel('Refund');
 
         $data = array(
@@ -1397,7 +1412,7 @@ class JudopayService
 
     /**
      * @param MultiPay  $multiPay
-     * @param           $amount
+     * @param float     $amount
      * @param \DateTime $date
      */
     public function multiPay(MultiPay $multiPay, $amount, \DateTime $date = null)

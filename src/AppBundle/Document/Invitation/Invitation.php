@@ -82,13 +82,22 @@ abstract class Invitation
      */
     protected $status;
 
-    /** @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User", inversedBy="sentInvitations") */
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User", inversedBy="sentInvitations")
+     * @var User
+     */
     protected $inviter;
 
-    /** @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User", inversedBy="receivedInvitations") */
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User", inversedBy="receivedInvitations")
+     * @var User
+     */
     protected $invitee;
 
-    /** @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy", inversedBy="invitations") */
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Policy", inversedBy="invitations")
+     * @var Policy
+     */
     protected $policy;
 
     /**
@@ -201,6 +210,9 @@ abstract class Invitation
         $this->link = $link;
     }
 
+    /**
+     * @return User
+     */
     public function getInviter()
     {
         return $this->inviter;
@@ -211,6 +223,9 @@ abstract class Invitation
         $this->inviter = $inviter;
     }
 
+    /**
+     * @return User
+     */
     public function getInvitee()
     {
         return $this->invitee;
@@ -221,6 +236,9 @@ abstract class Invitation
         $this->invitee = $invitee;
     }
 
+    /**
+     * @return Policy
+     */
     public function getPolicy()
     {
         return $this->policy;

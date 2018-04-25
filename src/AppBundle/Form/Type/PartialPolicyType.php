@@ -2,6 +2,7 @@
 
 namespace AppBundle\Form\Type;
 
+use AppBundle\Repository\PhoneRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -18,7 +19,7 @@ class PartialPolicyType extends AbstractType
             ->add('phone', DocumentType::class, [
                     'placeholder' => 'Select your device',
                     'class' => 'AppBundle:Phone',
-                    'query_builder' => function (DocumentRepository $dr) {
+                    'query_builder' => function (PhoneRepository $dr) {
                         return $dr->findActive();
                     }
             ])

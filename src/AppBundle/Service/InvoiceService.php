@@ -1,6 +1,10 @@
 <?php
 namespace AppBundle\Service;
 
+use Aws\S3\S3Client;
+use Knp\Snappy\AbstractGenerator;
+use Knp\Snappy\GeneratorInterface;
+use Knp\Snappy\Pdf;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -8,6 +12,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use AppBundle\Document\Invoice;
 use AppBundle\Document\File\InvoiceFile;
 use AppBundle\Document\CurrencyTrait;
+use Symfony\Component\Templating\EngineInterface;
 
 class InvoiceService
 {
@@ -26,9 +31,17 @@ class InvoiceService
 
     /** @var MailerService */
     protected $mailer;
+
+    /** @var \Swift_Transport */
     protected $smtp;
+
+    /** @var EngineInterface */
     protected $templating;
+
+    /** @var AbstractGenerator */
     protected $snappyPdf;
+
+    /** @var S3Client */
     protected $s3;
 
     /** @var string */
@@ -55,26 +68,26 @@ class InvoiceService
     }
 
     /**
-     * @param DocumentManager $dm
-     * @param LoggerInterface $logger
-     * @param SequenceService $sequence
-     * @param MailerService   $mailer
-     * @param                 $smtp
-     * @param                 $templating
-     * @param                 $environment
-     * @param                 $snappyPdf
-     * @param                 $s3
+     * @param DocumentManager    $dm
+     * @param LoggerInterface    $logger
+     * @param SequenceService    $sequence
+     * @param MailerService      $mailer
+     * @param \Swift_Transport   $smtp
+     * @param EngineInterface    $templating
+     * @param string             $environment
+     * @param GeneratorInterface $snappyPdf
+     * @param S3Client           $s3
      */
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
         SequenceService $sequence,
         MailerService $mailer,
-        $smtp,
-        $templating,
+        \Swift_Transport $smtp,
+        EngineInterface $templating,
         $environment,
-        $snappyPdf,
-        $s3
+        GeneratorInterface $snappyPdf,
+        S3Client $s3
     ) {
         $this->dm = $dm;
         $this->logger = $logger;

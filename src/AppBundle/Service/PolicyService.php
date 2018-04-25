@@ -2,9 +2,19 @@
 namespace AppBundle\Service;
 
 use AppBundle\Classes\SoSure;
+use AppBundle\Repository\CashbackRepository;
+use AppBundle\Repository\OptOut\EmailOptOutRepository;
+use AppBundle\Repository\PhonePolicyRepository;
 use AppBundle\Repository\PhoneRepository;
+use AppBundle\Repository\PolicyRepository;
+use Aws\S3\S3Client;
+use Gedmo\Loggable\Entity\Repository\LogEntryRepository;
+use Knp\Snappy\AbstractGenerator;
+use Knp\Snappy\GeneratorInterface;
+use Predis\Client;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 use AppBundle\Document\Cashback;
@@ -45,6 +55,7 @@ use AppBundle\Exception\ImeiPhoneMismatchException;
 use AppBundle\Exception\RateLimitException;
 
 use Gedmo\Loggable\Document\LogEntry;
+use Symfony\Component\Templating\EngineInterface;
 
 class PolicyService
 {
@@ -65,13 +76,23 @@ class PolicyService
 
     /** @var MailerService */
     protected $mailer;
+
+    /** @var \Swift_Transport */
     protected $smtp;
+
+    /** @var EngineInterface */
     protected $templating;
 
     /** @var RouterService */
     protected $routerService;
+
+    /** @var AbstractGenerator */
     protected $snappyPdf;
+
+    /** @var EventDispatcherInterface */
     protected $dispatcher;
+
+    /** @var S3Client */
     protected $s3;
 
     /** @var string */
@@ -86,10 +107,13 @@ class PolicyService
     /** @var JudopayService */
     protected $judopay;
 
+    /** @var \Domnikl\Statsd\Client */
     protected $statsd;
 
+    /** @var Client */
     protected $redis;
 
+    /** @var BranchService */
     protected $branch;
 
     protected $address;
@@ -144,49 +168,49 @@ class PolicyService
     }
 
     /**
-     * @param DocumentManager  $dm
-     * @param LoggerInterface  $logger
-     * @param SequenceService  $sequence
-     * @param MailerService    $mailer
-     * @param                  $smtp
-     * @param                  $templating
-     * @param RouterService    $routerService
-     * @param                  $environment
-     * @param                  $snappyPdf
-     * @param                  $dispatcher
-     * @param                  $s3
-     * @param ShortLinkService $shortLink
-     * @param                  $statsd
-     * @param                  $redis
-     * @param                  $branch
-     * @param                  $address
-     * @param                  $imeiValidator
-     * @param                  $rateLimit
-     * @param                  $intercom
-     * @param SmsService       $sms
-     * @param SCodeService     $scodeService
-     * @param SixpackService   $sixpackService
+     * @param DocumentManager          $dm
+     * @param LoggerInterface          $logger
+     * @param SequenceService          $sequence
+     * @param MailerService            $mailer
+     * @param \Swift_Transport         $smtp
+     * @param EngineInterface          $templating
+     * @param RouterService            $routerService
+     * @param string                   $environment
+     * @param GeneratorInterface       $snappyPdf
+     * @param EventDispatcherInterface $dispatcher
+     * @param S3Client                 $s3
+     * @param ShortLinkService         $shortLink
+     * @param \Domnikl\Statsd\Client   $statsd
+     * @param Client                   $redis
+     * @param BranchService            $branch
+     * @param PCAService               $address
+     * @param ReceperioService         $imeiValidator
+     * @param RateLimitService         $rateLimit
+     * @param IntercomService          $intercom
+     * @param SmsService               $sms
+     * @param SCodeService             $scodeService
+     * @param SixpackService           $sixpackService
      */
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
         SequenceService $sequence,
         MailerService $mailer,
-        $smtp,
-        $templating,
+        \Swift_Transport $smtp,
+        EngineInterface $templating,
         RouterService $routerService,
         $environment,
-        $snappyPdf,
-        $dispatcher,
-        $s3,
+        GeneratorInterface $snappyPdf,
+        EventDispatcherInterface $dispatcher,
+        S3Client $s3,
         ShortLinkService $shortLink,
-        $statsd,
-        $redis,
-        $branch,
-        $address,
-        $imeiValidator,
-        $rateLimit,
-        $intercom,
+        \Domnikl\Statsd\Client $statsd,
+        Client $redis,
+        BranchService $branch,
+        PCAService $address,
+        ReceperioService $imeiValidator,
+        RateLimitService $rateLimit,
+        IntercomService $intercom,
         SmsService $sms,
         SCodeService $scodeService,
         SixpackService $sixpackService
@@ -477,6 +501,7 @@ class PolicyService
         // And manually added on request
         $isPreLaunchPolicy = false;
         if ($policy instanceof PhonePolicy) {
+            /** @var PhonePolicyRepository $repo */
             $repo = $this->dm->getRepository(PhonePolicy::class);
             $isPreLaunchPolicy = $repo->isPromoLaunch($policy->getPolicyNumberPrefix());
         }
@@ -878,7 +903,9 @@ class PolicyService
         $skipUnpaidMinTimeframeCheck = false
     ) {
         if ($reason == Policy::CANCELLED_UNPAID && !$skipUnpaidMinTimeframeCheck) {
+            /** @var LogEntryRepository $logRepo */
             $logRepo = $this->dm->getRepository(LogEntry::class);
+            /** @var LogEntry $history */
             $history = $logRepo->findOneBy([
                 'objectId' => $policy->getId(),
                 'data.status' => Policy::STATUS_UNPAID,
@@ -1019,6 +1046,7 @@ class PolicyService
             return;
         }
 
+        /** @var EmailOptOutRepository $repo */
         $repo = $this->dm->getRepository(EmailOptOut::class);
         if ($repo->isOptedOut($policy->getUser()->getEmail(), EmailOptOut::OPTOUT_CAT_WEEKLY)) {
             return;
@@ -1188,6 +1216,7 @@ class PolicyService
 
     public function getBreakdownData()
     {
+        /** @var PhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(PhonePolicy::class);
         $policies = $repo->findAllActiveUnpaidPolicies();
         $phones = [];
@@ -1249,6 +1278,7 @@ class PolicyService
                 $prefix = $policy->getPolicyNumberPrefix();
             }
         }
+        /** @var PolicyRepository $repo */
         $repo = $this->dm->getRepository(Policy::class);
 
         return $repo->findPoliciesForPendingCancellation($prefix, $includeFuture, $date);
@@ -1256,6 +1286,7 @@ class PolicyService
 
     public function getPoliciesForUnRenew(\DateTime $date = null)
     {
+        /** @var PolicyRepository $repo */
         $repo = $this->dm->getRepository(Policy::class);
 
         return $repo->findDeclinedRenewalPoliciesForUnRenewed($date);
@@ -1263,6 +1294,7 @@ class PolicyService
 
     public function getPoliciesForRenew(\DateTime $date = null)
     {
+        /** @var PolicyRepository $repo */
         $repo = $this->dm->getRepository(Policy::class);
 
         return $repo->findPendingRenewalPoliciesForRenewed($date);
@@ -1371,9 +1403,11 @@ class PolicyService
     public function activateRenewalPolicies($prefix, $dryRun = false, \DateTime $date = null)
     {
         $renewals = [];
+        /** @var PolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(Policy::class);
         $policies = $policyRepo->findRenewalPoliciesForActivation($prefix);
         foreach ($policies as $policy) {
+            /** @var Policy $policy */
             $renewals[$policy->getId()] = $policy->getPolicyNumber();
             if (!$dryRun) {
                 try {
@@ -1395,9 +1429,11 @@ class PolicyService
     public function expireEndingPolicies($prefix, $dryRun = false, \DateTime $date = null)
     {
         $expired = [];
+        /** @var PolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(Policy::class);
         $policies = $policyRepo->findPoliciesForExpiration($prefix, $date);
         foreach ($policies as $policy) {
+            /** @var Policy $policy */
             $expired[$policy->getId()] = $policy->getPolicyNumber();
             if (!$dryRun) {
                 try {
@@ -1422,9 +1458,11 @@ class PolicyService
             $date = new \DateTime();
         }
         $fullyExpired = [];
+        /** @var PolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(Policy::class);
         $policies = $policyRepo->findPoliciesForFullExpiration($prefix);
         foreach ($policies as $policy) {
+            /** @var Policy $policy */
             $fullyExpired[$policy->getId()] = $policy->getPolicyNumber();
             if (!$dryRun) {
                 try {
@@ -1467,7 +1505,7 @@ class PolicyService
     public function runMetrics($prefix, $dryRun)
     {
         $lines = [];
-        /** @var PhoneRepository $phonePolicyRepo */
+        /** @var PhonePolicyRepository $phonePolicyRepo */
         $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
 
         $activationDate = new \DateTime();
@@ -1483,6 +1521,7 @@ class PolicyService
         foreach ($metrics as $metric => $date) {
             $policies = $phonePolicyRepo->findAllActiveUnpaidPolicies(null, $date, $prefix, $metric);
             foreach ($policies as $policy) {
+                /** @var Policy $policy */
                 if (isset($lines[$policy->getId()])) {
                     $lines[$policy->getId()] = sprintf("%s, %s", $lines[$policy->getId()], $metric);
                 } else {
@@ -1504,9 +1543,11 @@ class PolicyService
     {
         $now = new \DateTime();
         $cashback = [];
+        /** @var CashbackRepository $cashbackRepo */
         $cashbackRepo = $this->dm->getRepository(Cashback::class);
         $cashbackItems = $cashbackRepo->findBy(['status' => Cashback::STATUS_MISSING]);
         foreach ($cashbackItems as $cashbackItem) {
+            /** @var Cashback $cashbackItem */
             $cashback[$cashbackItem->getId()] = $cashbackItem->getPolicy()->getPolicyNumber();
             if (!$dryRun) {
                 try {
@@ -1667,6 +1708,7 @@ class PolicyService
     public function createPendingRenewalPolicies($prefix, $dryRun = false, \DateTime $date = null)
     {
         $pendingRenewal = [];
+        /** @var PolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(Policy::class);
         $policies = $policyRepo->findPoliciesForPendingRenewal($prefix, $date);
         foreach ($policies as $policy) {
@@ -1687,12 +1729,14 @@ class PolicyService
         if (!$days) {
             $days = 5;
         }
+        /** @var PolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(Policy::class);
         $date = new \DateTime();
         $date = $date->add(new \DateInterval(sprintf('P%dD', $days)));
 
         $pendingCancellationPolicies = $policyRepo->findPoliciesForPendingCancellation($prefix, false, $date);
         foreach ($pendingCancellationPolicies as $policy) {
+            /** @var Policy $policy */
             if ($policy->hasOpenClaim()) {
                 foreach ($policy->getClaims() as $claim) {
                     if ($claim->isOpen()) {
@@ -1707,6 +1751,7 @@ class PolicyService
         foreach ($policies as $policy) {
             if ($policy->shouldCancelPolicy($prefix, $date) && $policy->hasOpenClaim()) {
                 foreach ($policy->getClaims() as $claim) {
+                    /** @var Policy $policy */
                     if ($claim->isOpen()) {
                         $this->pendingCancellationEmail($claim, $policy->getPolicyExpirationDate());
                         $count++;
@@ -1946,9 +1991,13 @@ class PolicyService
             ));
         }
 
+        /** @var PhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(PhonePolicy::class);
-        $policies = $repo->findDuplicateImei($policy->getImei());
+        /** @var PhonePolicy $phonePolicy */
+        $phonePolicy = $policy;
+        $policies = $repo->findDuplicateImei($phonePolicy->getImei());
         foreach ($policies as $checkPolicy) {
+            /** @var Policy $checkPolicy */
             if (!$checkPolicy->getStatus() &&
                 $checkPolicy->getUser()->getId() == $policy->getUser()->getId()) {
                 return $checkPolicy;

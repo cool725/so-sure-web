@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Repository\SCodeRepository;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
@@ -70,6 +71,7 @@ class SCodeService
 
         $scode = new SCode();
         $scode->setType($type);
+        /** @var SCodeRepository $scodeRepo */
         $scodeRepo = $this->dm->getRepository(SCode::class);
         //print SCode::getNameForCode($user, $type) . PHP_EOL;
         $existingCount = $scodeRepo->getCountForName(

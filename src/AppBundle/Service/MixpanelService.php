@@ -3,6 +3,7 @@ namespace AppBundle\Service;
 
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotPipeValidator;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
+use Predis\Client;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -104,6 +105,7 @@ class MixpanelService
     /** @var LoggerInterface */
     protected $logger;
 
+    /** @var Client  */
     protected $redis;
 
     /** @var Mixpanel */
@@ -123,7 +125,7 @@ class MixpanelService
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
-     * @param                 $redis
+     * @param Client          $redis
      * @param Mixpanel        $mixpanel
      * @param RequestService  $requestService
      * @param string          $apiSecret
@@ -133,7 +135,7 @@ class MixpanelService
     public function __construct(
         DocumentManager  $dm,
         LoggerInterface $logger,
-        $redis,
+        Client $redis,
         Mixpanel $mixpanel,
         RequestService $requestService,
         $apiSecret,
@@ -584,7 +586,10 @@ class MixpanelService
 
         //$this->mixpanel->identify($userId);
         // null ip, ignore time
-        $this->mixpanel->people->increment($userId, $field, $incrementBy, null, true);
+
+        /** @var \Producers_MixpanelPeople $people */
+        $people = $this->mixpanel->people;
+        $people->increment($userId, $field, $incrementBy, null, true);
     }
 
     private function setPersonProperties($userId, array $personProperties, $ip = null)
@@ -594,7 +599,9 @@ class MixpanelService
         }
 
         //$this->mixpanel->identify($userId);
-        $this->mixpanel->people->set($userId, $personProperties, $ip);
+        /** @var \Producers_MixpanelPeople $people */
+        $people = $this->mixpanel->people;
+        $people->set($userId, $personProperties, $ip);
     }
 
     private function setPersonPropertiesOnce($userId, array $personProperties, $ip = null)
@@ -604,7 +611,9 @@ class MixpanelService
         }
 
         //$this->mixpanel->identify($userId);
-        $this->mixpanel->people->setOnce($userId, $personProperties, $ip);
+        /** @var \Producers_MixpanelPeople $people */
+        $people = $this->mixpanel->people;
+        $people->setOnce($userId, $personProperties, $ip);
     }
 
     private function unionPersonProperties($userId, array $personProperties, $ip = null)
@@ -619,7 +628,9 @@ class MixpanelService
             if (gettype($value) != "array") {
                 $value = [$value];
             }
-            $this->mixpanel->people->append($userId, $key, $value, $ip);
+            /** @var \Producers_MixpanelPeople $people */
+            $people = $this->mixpanel->people;
+            $people->append($userId, $key, $value, $ip);
         }
     }
 
@@ -814,7 +825,9 @@ class MixpanelService
 
     public function delete($id)
     {
-        $this->mixpanel->people->deleteUser($id);
+        /** @var \Producers_MixpanelPeople $people */
+        $people = $this->mixpanel->people;
+        $people->deleteUser($id);
     }
 
     private function transformUtm($setOnce = true)

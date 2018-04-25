@@ -19,6 +19,7 @@ use FOS\UserBundle\Mailer\Mailer;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Templating\EngineInterface;
 
 class PaymentService
 {
@@ -43,6 +44,7 @@ class PaymentService
     /** @var FraudService */
     protected $fraudService;
 
+    /** @var EngineInterface */
     protected $templating;
 
     /** @var EventDispatcherInterface */
@@ -62,7 +64,7 @@ class PaymentService
      * @param MailerService            $mailer
      * @param string                   $environment
      * @param FraudService             $fraudService
-     * @param                          $templating
+     * @param EngineInterface          $templating
      * @param EventDispatcherInterface $dispatcher
      */
     public function __construct(
@@ -73,7 +75,7 @@ class PaymentService
         MailerService $mailer,
         $environment,
         FraudService $fraudService,
-        $templating,
+        EngineInterface $templating,
         EventDispatcherInterface $dispatcher
     ) {
         $this->judopay = $judopay;

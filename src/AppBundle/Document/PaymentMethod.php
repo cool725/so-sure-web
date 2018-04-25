@@ -19,6 +19,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 abstract class PaymentMethod
 {
     abstract public function isValid();
+    abstract public function __toString();
 
     /**
      * @Assert\DateTime()

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Security;
 
+use AppBundle\Document\User;
 use AppBundle\Security\FOSUBUserProvider;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\PhonePolicy;
@@ -95,6 +96,7 @@ class FOSUBUserProviderTest extends WebTestCase
             ->method('getLastName')
             ->will($this->returnValue('Foo Bar'));
 
+        /** @var User $user */
         $user = self::$userService->loadUserByOAuthUserResponse($mock);
         $this->assertEquals($email, $user->getEmail());
         $this->assertEquals('A', $user->getFirstName());
@@ -122,6 +124,7 @@ class FOSUBUserProviderTest extends WebTestCase
             ->method('getResponse')
             ->will($this->returnValue(['phone' => '07775740400', 'dateOfBirth' => '1980-06-01']));
 
+        /** @var User $user */
         $user = self::$userService->loadUserByOAuthUserResponse($mock);
         $this->assertEquals($email, $user->getEmail());
         $this->assertEquals('A', $user->getFirstName());
@@ -151,6 +154,7 @@ class FOSUBUserProviderTest extends WebTestCase
             ->method('getResponse')
             ->will($this->returnValue([]));
 
+        /** @var User $user */
         $user = self::$userService->loadUserByOAuthUserResponse($mock);
         $this->assertEquals($email, $user->getEmail());
         $this->assertEquals('A', $user->getFirstName());

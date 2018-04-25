@@ -187,7 +187,7 @@ trait UserClassTrait
                 $policy->setPremiumInstallments(12);
                 self::addPayment(
                     $policy,
-                    $policy->getPremium($date)->getMonthlyPremiumPrice(),
+                    $policy->getPremium()->getMonthlyPremiumPrice(),
                     Salva::MONTHLY_TOTAL_COMMISSION,
                     null,
                     $newDate
@@ -196,7 +196,7 @@ trait UserClassTrait
                 $policy->setPremiumInstallments(1);
                 self::addPayment(
                     $policy,
-                    $policy->getPremium($date)->getYearlyPremiumPrice(),
+                    $policy->getPremium()->getYearlyPremiumPrice(),
                     Salva::YEARLY_TOTAL_COMMISSION,
                     null,
                     $newDate

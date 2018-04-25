@@ -1,6 +1,9 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Repository\PhoneRepository;
+use Doctrine\ODM\MongoDB\DocumentRepository;
+use Predis\Client;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,6 +20,7 @@ class DeviceAtlasService
     /** @var DocumentManager */
     protected $dm;
 
+    /** @var Client */
     protected $redis;
 
     /** @var MailerService */
@@ -25,14 +29,14 @@ class DeviceAtlasService
     /**
      * @param LoggerInterface $logger
      * @param DocumentManager $dm
-     * @param                 $redis
+     * @param Client          $redis
      * @param MailerService   $mailerService
      */
     public function __construct(
         LoggerInterface $logger,
         DocumentManager $dm,
-        $redis,
-        $mailerService
+        Client $redis,
+        MailerService $mailerService
     ) {
         $this->logger = $logger;
         $this->dm = $dm;
@@ -89,7 +93,9 @@ class DeviceAtlasService
      */
     protected function getPhoneFromDetails($manufacturer, $marketingName, $model, $osVersion)
     {
+        /** @var DocumentRepository $playRepo */
         $playRepo = $this->dm->getRepository(PlayDevice::class);
+        /** @var PhoneRepository $phoneRepo */
         $phoneRepo = $this->dm->getRepository(Phone::class);
 
         if ($marketingName && mb_strlen($marketingName) > 0) {

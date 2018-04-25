@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Repository\PhonePolicyRepository;
 use Psr\Log\LoggerInterface;
 use GuzzleHttp\Client;
 use AppBundle\Document\Phone;
@@ -247,14 +248,16 @@ class ReceperioService extends BaseImeiService
      * @param Phone  $phone
      * @param string $imei
      * @param User   $user
-     * @param        $data
+     * @param mixed  $data
      *
      * @return boolean|null null if unable to find policy, otherwise, checkImei result
      */
     public function reprocessImei(Phone $phone, $imei, User $user = null, $data = null)
     {
+        /** @var PhonePolicyRepository $phonePolicyRepo */
         $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
         // TODO: check policy status
+        /** @var PhonePolicy $policy */
         $policy = $phonePolicyRepo->findOneBy(['imei' => $imei]);
         if (!$policy) {
             $this->logger->warning(sprintf(
@@ -286,14 +289,16 @@ class ReceperioService extends BaseImeiService
      * @param Phone  $phone
      * @param string $serialNumber
      * @param User   $user
-     * @param        $data
+     * @param mixed  $data
      *
      * @return boolean|null null if unable to find policy, otherwise, checkSerial result
      */
     public function reprocessSerial(Phone $phone, $serialNumber, User $user = null, $data = null)
     {
+        /** @var PhonePolicyRepository $phonePolicyRepo */
         $phonePolicyRepo = $this->dm->getRepository(PhonePolicy::class);
         // TODO: check policy status
+        /** @var PhonePolicy $policy */
         $policy = $phonePolicyRepo->findOneBy(['serialNumber' => $serialNumber]);
         if (!$policy) {
             $this->logger->warning(sprintf(
@@ -723,10 +728,10 @@ class ReceperioService extends BaseImeiService
 
     /**
      * Validate phone with recipero by serial number or IMEI
-     * @param $phone        Phone
-     * @param $serialNumber string
-     * @param $user         User
-     * @param $warnMismatch boolean
+     * @param Phone   $phone
+     * @param string  $serialNumber
+     * @param User    $user
+     * @param boolean $warnMismatch
      */
     private function runCheckSerial(
         Phone $phone,
@@ -763,8 +768,8 @@ class ReceperioService extends BaseImeiService
 
     /**
      *
-     * @param $data      string
-     * @param $isTestRun bool
+     * @param string  $data
+     * @param boolean $isTestRun
      *
      * Sets response data for test cases to mimic recipero service response
      *

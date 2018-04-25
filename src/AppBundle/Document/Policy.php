@@ -3,6 +3,7 @@
 namespace AppBundle\Document;
 
 use AppBundle\Document\Payment\BacsPayment;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Doctrine\ODM\MongoDB\PersistentCollection;
 use Gedmo\Mapping\Annotation as Gedmo;
@@ -119,6 +120,7 @@ abstract class Policy
     /**
      * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Payment\Payment",
      *     mappedBy="policy", cascade={"persist"})
+     * @var ArrayCollection
      */
     protected $payments;
 
@@ -509,6 +511,9 @@ abstract class Policy
         return $payments;
     }
 
+    /**
+     * @return ArrayCollection
+     */
     public function getAllPayments()
     {
         return $this->payments;
@@ -3024,7 +3029,8 @@ abstract class Policy
     }
 
     /**
-     * @param $autoRenew Autorenewal needs a bit of leeway in terms of timing in case of process failure
+     * @param boolean   $autoRenew Autorenewal needs a bit of leeway in terms of timing in case of process failure
+     * @param \DateTime $date
      */
     public function isRenewalAllowed($autoRenew = false, \DateTime $date = null)
     {
