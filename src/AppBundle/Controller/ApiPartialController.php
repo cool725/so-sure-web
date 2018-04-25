@@ -75,7 +75,7 @@ class ApiPartialController extends BaseController
                     'option' => SixpackService::ALTERNATIVES_SHARE_MESSAGE_SIMPLE,
                     'text' => $text
                 ]);
-            } elseif ($name == SixpackService::EXPERIMENT_APP_SHARE_METHOD) {
+            } elseif (in_array($name, array_keys(SixpackService::$appExperiments))) {
                 $user = $this->getUser();
                 if (!$user || !$user instanceof User || !$user->hasActivePolicy()) {
                     throw new NotFoundHttpException();
@@ -92,15 +92,19 @@ class ApiPartialController extends BaseController
                     throw new NotFoundHttpException();
                 }
 
+                $clienId = null;
+                if ($name == SixpackService::EXPERIMENT_APP_SHARE_METHOD) {
+                    $clientId = $scode->getCode();
+                } elseif ($name == SixpackService::EXPERIMENT_APP_PICSURE_LOCATION) {
+                    $clientId = $user->getId();
+                }
+
                 $experiment = $sixpack->participate(
-                    SixpackService::EXPERIMENT_APP_SHARE_METHOD,
-                    [
-                        SixpackService::ALTERNATIVES_APP_SHARE_METHOD_NATIVE,
-                        SixpackService::ALTERNATIVES_APP_SHARE_METHOD_API
-                    ],
-                    SixpackService::LOG_MIXPANEL_NONE,
+                    $name,
+                    SixpackService::$appExperiments[$name],
+                    SixpackService::LOG_MIXPANEL_ALL,
                     1,
-                    $scode->getCode()
+                    $clientId
                 );
 
                 return new JsonResponse([
