@@ -703,7 +703,7 @@ abstract class BaseController extends Controller
 
     /**
      * @param Request $request
-     * @return null|Phone
+     * @return Phone|null
      */
     protected function getSessionQuotePhone(Request $request)
     {
@@ -712,8 +712,10 @@ abstract class BaseController extends Controller
         /** @var PhoneRepository $phoneRepo */
         $phoneRepo = $dm->getRepository(Phone::class);
 
+        /** @var Phone $phone */
         $phone = null;
         if ($session->get('quote')) {
+            /** @var Phone $phone */
             $phone = $phoneRepo->find($session->get('quote'));
         }
 

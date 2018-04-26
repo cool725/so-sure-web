@@ -42,7 +42,9 @@ class ClaimsServiceTest extends WebTestCase
          /** @var DocumentManager */
          $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
          self::$dm = $dm;
-         self::$policyRepo = self::$dm->getRepository(Policy::class);
+         /** @var PolicyRepository policyRepo */
+         $policyRepo = self::$dm->getRepository(Policy::class);
+         self::$policyRepo = $policyRepo;
          self::$lostPhoneRepo = self::$dm->getRepository(LostPhone::class);
          self::$userManager = self::$container->get('fos_user.user_manager');
          self::$policyService = self::$container->get('app.policy');

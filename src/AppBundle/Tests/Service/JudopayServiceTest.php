@@ -54,7 +54,9 @@ class JudopayServiceTest extends WebTestCase
         self::$userRepo = self::$dm->getRepository(User::class);
         self::$userManager = self::$container->get('fos_user.user_manager');
         self::$policyService = self::$container->get('app.policy');
-        self::$judopay = self::$container->get('app.judopay');
+        /** @var JudopayService $judopay */
+        $judopay = self::$container->get('app.judopay');
+        self::$judopay = $judopay;
         /** @var FeatureService $feature */
         $feature = self::$container->get('app.feature');
         $feature->setEnabled(Feature::FEATURE_PAYMENT_PROBLEM_INTERCOM, true);

@@ -39,10 +39,13 @@ class FOSUBUserProviderTest extends WebTestCase
         self::$userProvider = self::$container->get('app.user.cognitoidentity');
         self::$cognito = self::$container->get('app.cognito.identity');
         self::$userManager = self::$container->get('fos_user.user_manager');
-        self::$userService = self::$container->get('app.user');
+        /** @var FOSUBUserProvider $userService */
+        $userService = self::$container->get('app.user');
+        self::$userService = $userService;
         /** @var DocumentManager */
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         self::$dm = $dm;
+
         self::$policyService = self::$container->get('app.policy');
     }
 

@@ -242,7 +242,7 @@ abstract class Policy
     /**
      * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Cashback", cascade={"persist"}, orphanRemoval="true")
      * @Gedmo\Versioned
-     * @var Cashback
+     * @var Cashback|null
      */
     protected $cashback;
 

@@ -86,7 +86,9 @@ class FOSUBUserProvider extends BaseClass
     }
 
     /**
-     * {@inheritdoc}
+     * @param UserResponseInterface $response
+     * @return User|\FOS\UserBundle\Model\UserInterface|UserInterface|null
+     * @throws \Exception
      */
     public function loadUserByOAuthUserResponse(UserResponseInterface $response)
     {

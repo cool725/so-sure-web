@@ -38,7 +38,9 @@ class BaseControllerTest extends WebTestCase
         self::$userManager = self::$container->get('fos_user.user_manager');
         self::$router = self::$container->get('router');
         self::$jwt = self::$container->get('app.jwt');
-        self::$redis = self::$container->get('snc_redis.default');
+        /** @var Client $redis */
+        $redis = self::$container->get('snc_redis.default');
+        self::$redis = $redis;
         self::$policyService = self::$container->get('app.policy');
         self::$invitationService = self::$container->get('app.invitation');
     }
