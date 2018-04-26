@@ -2,6 +2,8 @@
 
 namespace AppBundle\Tests\Controller;
 
+use AppBundle\Repository\UserRepository;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Reward;
@@ -122,8 +124,11 @@ class ApiControllerTest extends BaseApiControllerTest
 
         // For some reason, querying with the same client/dm is not updating getting the latest record
         $client = static::createClient();
+        /** @var DocumentManager $dm */
         $dm = $client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        /** @var UserRepository $repo */
         $repo = $dm->getRepository(User::class);
+        /** @var User $user */
         $user = $repo->findOneBy(['emailCanonical' => mb_strtolower(static::generateEmail('rate-limit-login', $this))]);
         $this->assertTrue($user->isLocked());
     }
@@ -150,8 +155,10 @@ class ApiControllerTest extends BaseApiControllerTest
 
         // For some reason, querying with the same client/dm is not updating getting the latest record
         $client = static::createClient();
+        /** @var DocumentManager $dm */
         $dm = $client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(User::class);
+        /** @var User $user */
         $user = $repo->findOneBy([
             'emailCanonical' => mb_strtolower(static::generateEmail('rate-limit-login-ok', $this))
         ]);
@@ -606,8 +613,10 @@ class ApiControllerTest extends BaseApiControllerTest
 
         // For some reason, querying with the same client/dm is not updating getting the latest record
         $client = static::createClient();
+        /** @var DocumentManager $dm */
         $dm = $client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(User::class);
+        /** @var User $fooUser */
         $fooUser = $repo->findOneBy(['email' => 'referred@api.bar.com']);
         $this->assertTrue($fooUser->getReferred()->getId() === $user->getId());
     }
@@ -1004,6 +1013,7 @@ class ApiControllerTest extends BaseApiControllerTest
         $this->assertEquals('api-ip-user@api.bar.com', $data['email']);
 
         $repo = self::$dm->getRepository(User::class);
+        /** @var User $fooUser */
         $fooUser = $repo->findOneBy(['email' => 'api-ip-user@api.bar.com']);
         $this->assertTrue($fooUser !== null);
         $this->assertEquals('62.253.24.189', $fooUser->getIdentityLog()->getIp());
@@ -1023,6 +1033,7 @@ class ApiControllerTest extends BaseApiControllerTest
         $this->assertEquals(mb_strtolower(static::generateEmail('create-campaign', $this)), $data['email']);
 
         $repo = self::$dm->getRepository(User::class);
+        /** @var User $fooUser */
         $fooUser = $repo->findOneBy([
             'emailCanonical' => mb_strtolower(static::generateEmail('create-campaign', $this))
         ]);
@@ -1042,6 +1053,7 @@ class ApiControllerTest extends BaseApiControllerTest
         $token = $data['user_token']['token'];
 
         $repo = self::$dm->getRepository(User::class);
+        /** @var User $user */
         $user = $repo->findOneBy([
             'emailCanonical' => mb_strtolower(static::generateEmail('create-prelaunch', $this))
         ]);
@@ -1084,6 +1096,7 @@ class ApiControllerTest extends BaseApiControllerTest
         $token = $data['user_token']['token'];
 
         $repo = self::$dm->getRepository(User::class);
+        /** @var User $user */
         $user = $repo->findOneBy([
             'emailCanonical' => mb_strtolower(static::generateEmail('create-prelaunch-loggedin', $this))
         ]);

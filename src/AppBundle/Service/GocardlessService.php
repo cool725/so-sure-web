@@ -111,6 +111,7 @@ class GocardlessService
             $headers['Idempotency-Key'] = sprintf('create-%s', $user->getId());
         }
 
+        /** @var mixed $customer */
         $customer = $this->client->customers()->create([
             'params' => $data,
             'headers' => $headers,
@@ -172,6 +173,7 @@ class GocardlessService
             $headers['Idempotency-Key'] = sprintf('account-%s', $user->getId());
         }
 
+        /** @var mixed $bankAccount */
         $bankAccount = $this->client->customerBankAccounts()->create([
             'params' => $data,
             'headers' => $headers,
@@ -227,6 +229,7 @@ class GocardlessService
             $headers['Idempotency-Key'] = sprintf('mandate-%s', $policy->getId());
         }
 
+        /** @var mixed $mandate */
         $mandate = $this->client->mandates()->create([
             'params' => $data,
             'headers' => $headers,
@@ -258,8 +261,10 @@ class GocardlessService
             ));
         }
 
+        /** @var GocardlessPaymentMethod $gocardless */
+        $gocardless = $user->getPaymentMethod();
         // For now, only allow 1 subscription
-        if ($user->getPaymentMethod()->hasSubscription()) {
+        if ($gocardless->hasSubscription()) {
             return;
         }
 
@@ -283,6 +288,7 @@ class GocardlessService
             $headers['Idempotency-Key'] = sprintf('subscription-%s', $policy->getId());
         }
 
+        /** @var mixed $subscription */
         $subscription = $this->client->subscriptions()->create([
             'params' => $data,
             'headers' => $headers,

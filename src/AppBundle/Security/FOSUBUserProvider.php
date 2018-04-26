@@ -5,6 +5,8 @@ use AppBundle\Document\PhoneTrait;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface;
 use HWI\Bundle\OAuthBundle\Security\Core\User\FOSUBUserProvider as BaseClass;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\User\UserInterface;
 use AppBundle\Service\FacebookService;
 use AppBundle\Document\User;
@@ -121,7 +123,11 @@ class FOSUBUserProvider extends BaseClass
                 if ($request = $this->requestStack->getCurrentRequest()) {
                     if ($session = $request->getSession()) {
                         if ($session->isStarted()) {
-                            $session->getFlashBag()->add('error', $msg);
+                            /** @var Session $actualSession */
+                            $actualSession = $session;
+                            /** @var FlashBag $flashbag */
+                            $flashbag = $actualSession->getFlashBag();
+                            $flashbag->add('error', $msg);
                         }
                     }
                 }
@@ -135,7 +141,11 @@ class FOSUBUserProvider extends BaseClass
                 if ($request = $this->requestStack->getCurrentRequest()) {
                     if ($session = $request->getSession()) {
                         if ($session->isStarted()) {
-                            $session->getFlashBag()->add('error', $msg);
+                            /** @var Session $actualSession */
+                            $actualSession = $session;
+                            /** @var FlashBag $flashbag */
+                            $flashbag = $actualSession->getFlashBag();
+                            $flashbag->add('error', $msg);
                         }
                     }
                 }
@@ -272,7 +282,7 @@ class FOSUBUserProvider extends BaseClass
         $oldPasswords = $user->getPreviousPasswords();
 
         if (!is_array($oldPasswords)) {
-            $oldPasswords = $user->getPreviousPasswords->getValues();
+            $oldPasswords = $user->getPreviousPasswords()->getValues();
         }
         if (count($oldPasswords) == 0) {
             return false;

@@ -117,6 +117,7 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
     {
         //make sure phone is
         $phoneRepo = self::$dm->getRepository(Phone::class);
+        /** @var Phone $phone */
         $phone = $phoneRepo->findOneBy(['make' => 'Samsung', 'active' => true]);
         $phone->setHighlight(true);
         self::$dm->flush();

@@ -64,7 +64,9 @@ class DoctrineUserListenerTest extends WebTestCase
         $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
         $listener->preUpdate($events);
 
-        $this->assertTrue($events->getDocument()->getEmailVerified());
+        /** @var User $userListener */
+        $userListener = $events->getDocument();
+        $this->assertTrue($userListener->getEmailVerified());
     }
 
     public function testPreUpdatePassword()
@@ -78,7 +80,9 @@ class DoctrineUserListenerTest extends WebTestCase
         $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
         $listener->preUpdate($events);
 
-        $this->assertTrue(count($events->getDocument()->getPreviousPasswords()) > 0);
+        /** @var User $userListener */
+        $userListener = $events->getDocument();
+        $this->assertTrue(count($userListener->getPreviousPasswords()) > 0);
     }
 
     public function testPreUpdateName()
@@ -368,6 +372,7 @@ class DoctrineUserListenerTest extends WebTestCase
         $listener->expects($this->once())
                      ->method('onUserEmailChangedEvent');
 
+        /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = static::$container->get('event_dispatcher');
         $dispatcher->addListener(UserEmailEvent::EVENT_CHANGED, array($listener, 'onUserEmailChangedEvent'));
 
@@ -388,6 +393,7 @@ class DoctrineUserListenerTest extends WebTestCase
         $listener->expects($this->never())
                      ->method('onUserEmailChangedEvent');
 
+        /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = static::$container->get('event_dispatcher');
         $dispatcher->addListener(UserEmailEvent::EVENT_CHANGED, array($listener, 'onUserEmailChangedEvent'));
 

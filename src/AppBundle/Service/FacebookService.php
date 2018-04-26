@@ -174,18 +174,6 @@ class FacebookService
     }
 
     /**
-     * get 60 day token
-     *
-     * @return string access token
-     */
-    public function getExtendedAccessToken()
-    {
-        //long-live access_token 60 days
-        $this->fb->setExtendedAccessToken();
-        return $this->fb->getAccessToken();
-    }
-
-    /**
      * @param string $requiredPermission
      *
      * @return boolean

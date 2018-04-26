@@ -234,6 +234,11 @@ class IntercomService
         }
     }
 
+    /**
+     * @param User $user
+     * @return mixed|null
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     public function getIntercomUser(User $user)
     {
         if (!$user->getIntercomId()) {

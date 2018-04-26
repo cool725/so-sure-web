@@ -165,8 +165,8 @@ class PicsureMLService
     public function sync()
     {
         /** @var TrainingDataRepository $repo */
-        $imageRepo = $this->picsureMLDm->getRepository(TrainingData::class);
-        $images = $imageRepo->createQueryBuilder()
+        $repo = $this->picsureMLDm->getRepository(TrainingData::class);
+        $images = $repo->createQueryBuilder()
                         ->select('imagePath')
                         ->getQuery()->execute();
         $paths = [];

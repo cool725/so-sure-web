@@ -697,6 +697,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         // set policy to max pot value
         $policyRepo = self::$dm->getRepository(Policy::class);
+        /** @var Policy $policy */
         $policy = $policyRepo->find($inviteePolicyData['id']);
         $policy->setPotValue($policy->getMaxPot());
         self::$dm->flush();
@@ -915,6 +916,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $data = $this->verifyResponse(200);
         $repo = self::$dm->getRepository(Policy::class);
+        /** @var Policy $policy */
         $policy = $repo->find($data['id']);
 
         $discount = new PolicyDiscountPayment();
@@ -1266,6 +1268,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $imei = $data['phone_policy']['imei'];
         
         $repo = static::$dm->getRepository(Policy::class);
+        /** @var Policy $policy */
         $policy = $repo->find($policyId);
         $policy->setStatus(Policy::STATUS_EXPIRED);
         static::$dm->flush();
@@ -2407,6 +2410,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
 
         $repo = static::$dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $policy */
         $policy = $repo->find($data['id']);
         $policy->setStatus(PhonePolicy::STATUS_MULTIPAY_REJECTED);
         static::$dm->flush();
