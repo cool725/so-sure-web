@@ -5259,6 +5259,15 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
     public function testUserRequestVerificationMobileNumberValidation()
     {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testUserRequestVerificationMobileNumberValidation', $this),
+            'foo',
+            true
+        );
+
+        $user->setMobileNumber("08946573");
+
         $cognitoIdentityId = $this->getAuthUser(self::$testUser);
         $url = sprintf('/api/v1/auth/user/%s/verify/mobilenumber?_method=GET', self::$testUser->getId());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
@@ -5299,7 +5308,8 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $result = $this->verifyResponse(200);
         $this->assertEquals($user->getEmailCanonical(), $result['email']);
         $this->assertTrue($result['has_mobile_number_verified']);
-        $this->assertTrue($user->getMobileNumberVerified());
+        $updatedUser = $this->assertUserExists(self::$container, $user);
+        $this->assertTrue($updatedUser->getMobileNumberVerified());
     }
 
     public function testUserVerifyMobileNumberUnknownId()
