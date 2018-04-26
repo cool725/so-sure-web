@@ -72,7 +72,7 @@ class FOSUBUserProvider extends BaseClass
         $setter_token = $setter.'AccessToken';
 
         //we "disconnect" previously connected users
-        if (null !== $previousUser = $this->userManager->findUserBy(array($property => $username))) {
+        if (null != $previousUser = $this->userManager->findUserBy(array($property => $username))) {
             $previousUser->$setter_id(null);
             $previousUser->$setter_token(null);
             $this->userManager->updateUser($previousUser);
@@ -113,7 +113,7 @@ class FOSUBUserProvider extends BaseClass
         }
         $user = $this->userManager->findUserBy(array($search => $username));
         //when the user is registrating
-        if (null === $user) {
+        if (null == $user) {
             // Not guarenteed an email address
             if (!$response->getEmail()) {
                 if ($service != self::SERVICE_ACCOUNTKIT) {

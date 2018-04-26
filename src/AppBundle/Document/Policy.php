@@ -738,7 +738,7 @@ abstract class Policy
 
     public function hasCashback()
     {
-        return $this->getCashback() !== null;
+        return $this->getCashback() != null;
     }
 
     public function setCashback($cashback)
@@ -2896,7 +2896,7 @@ abstract class Policy
 
     public function isPolicy()
     {
-        return $this->getStatus() !== null && $this->getPremium() !== null;
+        return $this->getStatus() != null && $this->getPremium() != null;
     }
 
     public function age()

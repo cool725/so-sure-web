@@ -1394,7 +1394,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     public function hasPaymentMethod()
     {
-        return $this->getPaymentMethod() !== null;
+        return $this->getPaymentMethod() != null;
     }
 
     public function hasValidPaymentMethod()

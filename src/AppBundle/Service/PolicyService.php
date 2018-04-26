@@ -87,7 +87,7 @@ class PolicyService
     /** @var RouterService */
     protected $routerService;
 
-    /** @var AbstractGenerator */
+    /** @var LoggableGenerator */
     protected $snappyPdf;
 
     /** @var EventDispatcherInterface */

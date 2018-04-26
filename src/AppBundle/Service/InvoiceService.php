@@ -39,7 +39,7 @@ class InvoiceService
     /** @var EngineInterface */
     protected $templating;
 
-    /** @var AbstractGenerator */
+    /** @var LoggableGenerator */
     protected $snappyPdf;
 
     /** @var S3Client */

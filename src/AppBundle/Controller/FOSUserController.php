@@ -43,7 +43,7 @@ class FOSUserController extends ResettingController
         /** @var User $user */
         $user = $userManager->findUserByConfirmationToken($token);
 
-        if (null === $user) {
+        if (null == $user) {
             throw new NotFoundHttpException(sprintf(
                 'The user with "confirmation token" does not exist for value "%s"',
                 $token

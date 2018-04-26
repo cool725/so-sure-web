@@ -84,7 +84,7 @@ class SCodeService
         }
         $count = 1;
 
-        while ($scodeRepo->findOneBy(['code' => $scode->getCode()]) !== null) {
+        while ($scodeRepo->findOneBy(['code' => $scode->getCode()]) != null) {
             if ($rand) {
                 $scode->generateNamedCode($user, rand(1, 9999));
             } else {
