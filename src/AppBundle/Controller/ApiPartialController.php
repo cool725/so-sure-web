@@ -110,6 +110,7 @@ class ApiPartialController extends BaseController
             );
 
             return array(
+                'name' => $name,
                 'option' => SixpackService::ALTERNATIVES_SHARE_MESSAGE_SIMPLE,
                 'text' => $text
             );
@@ -135,6 +136,7 @@ class ApiPartialController extends BaseController
             );
 
             return array(
+                'name' => $name,
                 'option' => $experiment,
                 'text' => null,
             );
