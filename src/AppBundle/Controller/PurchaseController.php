@@ -350,7 +350,7 @@ class PurchaseController extends BaseController
         );
         $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
         // For now, only allow 1 policy with bacs
-        if ($bacsFeature && count($user->getValidPolicies(true)) > 1) {
+        if ($bacsFeature && count($user->getValidPolicies(true)) >= 1) {
             $bacsFeature = false;
         }
         if (!$bacsFeature) {
@@ -651,6 +651,14 @@ class PurchaseController extends BaseController
             ->createNamedBuilder('bacs_confirm_form', BacsConfirmType::class, $bacsConfirm)
             ->getForm();
 
+        $webpay = $this->get('app.judopay')->webpay(
+            $policy,
+            $amount,
+            $request->getClientIp(),
+            $request->headers->get('User-Agent'),
+            JudopayService::WEB_TYPE_STANDARD
+        );
+
         $template = null;
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('bacs_form')) {
@@ -705,6 +713,8 @@ class PurchaseController extends BaseController
             'bacs_form' => $bacsForm->createView(),
             'bacs_confirm_form' => $bacsConfirmForm->createView(),
             'bacs' => $bacs,
+            'webpay_action' => $webpay ? $webpay['post_url'] : null,
+            'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
         );
 
 

@@ -195,6 +195,9 @@
                             {{ form_widget(purchase_form.existing, {'label': 'Pay with card on file', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
                             {{ form_widget(purchase_form.next, {'label': 'Pay with a new card', 'attr': {'class': 'btn btn-default btn-block btn-pad'}}) }}
                         {% else %}
+                            {% if purchase_form.existing is defined %}
+                                {% do purchase_form.existing.setRendered %}
+                            {% endif %}
                             {{ form_widget(purchase_form.next, {'label': 'I agree, proceed to payment', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
                         {% endif %}
                     </div>

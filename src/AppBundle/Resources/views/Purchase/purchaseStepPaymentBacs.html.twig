@@ -23,16 +23,16 @@
 
     <div class="checkout--top">
         <div class="container text-center">
-            <h1>Setup a Direct Debit with SO-SURE <br> <small> for your {{ policy.phone.make }} {{ policy.phone.model }}  ({{ policy.phone.memory }}GB) </small></h1>
-            {# <p><a href="#">Prefer to pay by card?</a></p> #}
+            <h1>Setup a Direct Debit with SO-SURE <br> <small> for your {{ policy.phone.make }} {{ policy.phone.model }}  ({{ policy.phone.memory }}GB) Insurance</small></h1>
             <p><img src="{{ cdn_url }}/images/direct-debit-logo.svg" alt="Direct Debit" width="180px" class="img-center"></p>
-            <p><small>Please enter your bank details you wish to use for your Direct Debit each month.</small></p>
+            <p><a href="#" class="web-pay-submit">Prefer to pay by card?</a></p>
 
         </div>
     </div>
 
     <div class="checkout--step">
         <div class="container">
+            <p><small>Please enter your bank details you wish to use for your Direct Debit each month.</small></p>
 
             {{ form_start(bacs_form, {'attr': {'class': 'form','autocomplete': 'off'}}) }}
                 <div class="form-group {% if form_errors(bacs_form.accountName) %}has-error{% endif %}">
@@ -72,6 +72,10 @@
                 </address>
                 <img src="{{ cdn_url }}/images/direct-debit-logo.svg" alt="Direct Debit" width="100px">
             {{ form_end(bacs_form) }}
+
+            <form action="{{ webpay_action }}" method="post" id="webpay-form">
+                <input id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
+            </form>
         </div>
     </div>
 
