@@ -227,7 +227,7 @@ class MonitorService
             if (is_object($intercomUser)) {
                 /** @var mixed $intercomUser */
                 /** @var mixed $attributes */
-                $attributes = $intercomUser['custom_attributes'];
+                $attributes = $intercomUser->{'custom_attributes'};
                 // only active/unpaid policies and definitely not cancelled
                 if ($policy->isActive(true) && $attributes->Premium <= 0) {
                     $this->intercom->queue($policy->getUser());

@@ -18,6 +18,7 @@ use AppBundle\Document\User;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\UserRepository;
 use Aws\S3\S3Client;
+use Knp\Bundle\SnappyBundle\Snappy\LoggableGenerator;
 use Knp\Snappy\AbstractGenerator;
 use Knp\Snappy\GeneratorInterface;
 use Predis\Client;
@@ -91,7 +92,7 @@ class BacsService
      * @param MailerService      $mailerService
      * @param Client             $redis
      * @param PaymentService     $paymentService
-     * @param AbstractGenerator  $snappyPdf
+     * @param LoggableGenerator  $snappyPdf
      * @param EngineInterface    $templating
      */
     public function __construct(
@@ -103,7 +104,7 @@ class BacsService
         MailerService $mailerService,
         Client $redis,
         PaymentService $paymentService,
-        AbstractGenerator $snappyPdf,
+        LoggableGenerator $snappyPdf,
         EngineInterface $templating
     ) {
         $this->dm = $dm;

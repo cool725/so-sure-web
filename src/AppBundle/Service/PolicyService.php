@@ -9,6 +9,7 @@ use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\PolicyRepository;
 use Aws\S3\S3Client;
 use Gedmo\Loggable\Entity\Repository\LogEntryRepository;
+use Knp\Bundle\SnappyBundle\Snappy\LoggableGenerator;
 use Knp\Snappy\AbstractGenerator;
 use Knp\Snappy\GeneratorInterface;
 use Predis\Client;
@@ -176,7 +177,7 @@ class PolicyService
      * @param EngineInterface          $templating
      * @param RouterService            $routerService
      * @param string                   $environment
-     * @param AbstractGenerator        $snappyPdf
+     * @param LoggableGenerator        $snappyPdf
      * @param EventDispatcherInterface $dispatcher
      * @param S3Client                 $s3
      * @param ShortLinkService         $shortLink
@@ -200,7 +201,7 @@ class PolicyService
         EngineInterface $templating,
         RouterService $routerService,
         $environment,
-        AbstractGenerator $snappyPdf,
+        LoggableGenerator $snappyPdf,
         EventDispatcherInterface $dispatcher,
         S3Client $s3,
         ShortLinkService $shortLink,

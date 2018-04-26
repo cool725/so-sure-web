@@ -2,6 +2,7 @@
 namespace AppBundle\Service;
 
 use Aws\S3\S3Client;
+use Knp\Bundle\SnappyBundle\Snappy\LoggableGenerator;
 use Knp\Snappy\AbstractGenerator;
 use Knp\Snappy\GeneratorInterface;
 use Knp\Snappy\Pdf;
@@ -75,7 +76,7 @@ class InvoiceService
      * @param \Swift_Transport   $smtp
      * @param EngineInterface    $templating
      * @param string             $environment
-     * @param AbstractGenerator  $snappyPdf
+     * @param LoggableGenerator  $snappyPdf
      * @param S3Client           $s3
      */
     public function __construct(
@@ -86,7 +87,7 @@ class InvoiceService
         \Swift_Transport $smtp,
         EngineInterface $templating,
         $environment,
-        AbstractGenerator $snappyPdf,
+        LoggableGenerator $snappyPdf,
         S3Client $s3
     ) {
         $this->dm = $dm;
