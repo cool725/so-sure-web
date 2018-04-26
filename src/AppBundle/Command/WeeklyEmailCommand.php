@@ -2,6 +2,8 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Service\PolicyService;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -10,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\Policy;
 
-class WeeklyEmailCommand extends ContainerAwareCommand
+class WeeklyEmailCommand extends BaseCommand
 {
     protected function configure()
     {
@@ -30,10 +32,11 @@ class WeeklyEmailCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $limit = $input->getOption('limit');
+        /** @var LoggerInterface $logger */
         $logger = $this->getContainer()->get('logger');
+        /** @var PolicyService $policyService */
         $policyService = $this->getContainer()->get('app.policy');
-        $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
-        $repo = $dm->getRepository(Policy::class);
+        $repo = $this->getManager()->getRepository(Policy::class);
         $policies = $repo->getWeeklyEmail($this->getContainer()->getParameter('kernel.environment'));
 
         $count = 0;
@@ -49,7 +52,7 @@ class WeeklyEmailCommand extends ContainerAwareCommand
             } catch (\Exception $e) {
                 $logger->error($e->getMessage());
             }
-            $dm->flush();
+            $this->getManager()->flush();
             $count++;
         }
         $output->writeln(sprintf('%d emails sent', $count));

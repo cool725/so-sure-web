@@ -9,12 +9,15 @@ class TokenValidator extends ConstraintValidator
 {
     public function validate($value, Constraint $constraint)
     {
+        /** @var Token $tokenConstraint */
+        $tokenConstraint = $constraint;
+
         if (is_object($value)) {
             throw new \Exception(sprintf('Expected string %s', json_encode($value)));
         }
 
         if (!preg_match($this->getRegex(), $value, $matches)) {
-            $this->context->buildViolation($constraint->message)
+            $this->context->buildViolation($tokenConstraint->message)
                 ->setParameter('%string%', $value)
                 ->addViolation();
         }

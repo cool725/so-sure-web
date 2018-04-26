@@ -551,27 +551,29 @@ class PhonePolicy extends Policy
 
     public function setPolicyDetailsForPendingRenewal(Policy $policy, \DateTime $startDate, PolicyTerms $terms)
     {
-        /** @var PhonePolicy $policy */
-        $policy->setPhone($this->getPhone());
-        $policy->setImei($this->getImei());
-        $policy->setSerialNumber($this->getSerialNumber());
+        /** @var PhonePolicy $phonePolicy */
+        $phonePolicy = $policy;
+        $phonePolicy->setPhone($this->getPhone());
+        $phonePolicy->setImei($this->getImei());
+        $phonePolicy->setSerialNumber($this->getSerialNumber());
 
         // make sure ipt rate is set to ipt rate at the start of the policy
-        $policy->validatePremium(true, $startDate);
+        $phonePolicy->validatePremium(true, $startDate);
         if ($terms->isPicSureEnabled()) {
-            $policy->setPicSureStatus(self::PICSURE_STATUS_PREAPPROVED);
+            $phonePolicy->setPicSureStatus(self::PICSURE_STATUS_PREAPPROVED);
         }
     }
 
     public function setPolicyDetailsForRepurchase(Policy $policy, \DateTime $startDate)
     {
-        /** @var PhonePolicy $policy */
-        $policy->setPhone($this->getPhone());
-        $policy->setImei($this->getImei());
-        $policy->setSerialNumber($this->getSerialNumber());
+        /** @var PhonePolicy $phonePolicy */
+        $phonePolicy = $policy;
+        $phonePolicy->setPhone($this->getPhone());
+        $phonePolicy->setImei($this->getImei());
+        $phonePolicy->setSerialNumber($this->getSerialNumber());
 
         // make sure ipt rate is set to ipt rate at the start of the policy
-        $policy->validatePremium(true, $startDate);
+        $phonePolicy->validatePremium(true, $startDate);
     }
 
     /**

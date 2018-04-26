@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Service\PushService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -10,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\User;
 
-class PushCommand extends ContainerAwareCommand
+class PushCommand extends BaseCommand
 {
     protected function configure()
     {
@@ -51,6 +52,7 @@ class PushCommand extends ContainerAwareCommand
         $arn = $input->getOption('arn');
         $email = $input->getOption('email');
 
+        /** @var PushService $push */
         $push = $this->getContainer()->get('app.push');
         // @codingStandardsIgnoreStart
         // 'arn:aws:sns:eu-west-1:812402538357:endpoint/APNS_SANDBOX/so-sure_ios_dev/86a504df-8470-3c9e-a60e-7611df452f08',
@@ -76,8 +78,7 @@ class PushCommand extends ContainerAwareCommand
 
     private function getUser($email)
     {
-        $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(User::class);
+        $repo = $this->getManager()->getRepository(User::class);
 
         return $repo->findOneBy(['emailCanonical' => $email]);
     }

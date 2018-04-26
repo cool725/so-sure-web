@@ -10,6 +10,8 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Cashback;
 use AppBundle\Document\User;
+use AppBundle\Service\InvitationService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Reward;
@@ -38,6 +40,8 @@ class PhonePolicyTest extends WebTestCase
 
     protected static $container;
     protected static $invitationService;
+    /** @var DocumentManager */
+    protected static $dm;
 
     public static function setUpBeforeClass()
     {
@@ -50,18 +54,24 @@ class PhonePolicyTest extends WebTestCase
 
         //now we can instantiate our service (if you want a fresh one for
         //each test method, do this in setUp() instead
-        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        /** @var DocumentManager */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$dm = $dm;
         $phoneRepo = self::$dm->getRepository(Phone::class);
         self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 6s', 'memory' => 64]);
-        self::$invitationService = self::$container->get('app.invitation');
-        self::$invitationService->setDebug(true);
+        /** @var InvitationService invitationService */
+        $invitationService = self::$container->get('app.invitation');
+        $invitationService->setDebug(true);
+        self::$invitationService = $invitationService;
         self::$userManager = self::$container->get('fos_user.user_manager');
         self::$policyService = self::$container->get('app.policy');
     }
 
     public function setUp()
     {
-        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        /** @var DocumentManager */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$dm = $dm;
         $phoneRepo = self::$dm->getRepository(Phone::class);
         self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
     }
@@ -4268,6 +4278,7 @@ class PhonePolicyTest extends WebTestCase
 
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $repo = self::$dm->getRepository(Policy::class);
+        /** @var Policy $updatedPolicyA */
         $updatedPolicyA = $repo->find($policyA->getId());
 
         $foundSoSure = false;
@@ -4319,6 +4330,7 @@ class PhonePolicyTest extends WebTestCase
 
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $repo = self::$dm->getRepository(Policy::class);
+        /** @var Policy $updatedPolicyA */
         $updatedPolicyA = $repo->find($policyA->getId());
 
         $foundSoSure = false;
@@ -4382,6 +4394,7 @@ class PhonePolicyTest extends WebTestCase
 
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $repo = self::$dm->getRepository(Policy::class);
+        /** @var Policy $updatedPolicyA */
         $updatedPolicyA = $repo->find($policyA->getId());
 
         $foundSoSure = false;
@@ -4476,6 +4489,7 @@ class PhonePolicyTest extends WebTestCase
 
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $repo = self::$dm->getRepository(Policy::class);
+        /** @var Policy $updatedPolicyA */
         $updatedPolicyA = $repo->find($policyA->getId());
 
         $foundSoSure = false;
@@ -4522,6 +4536,7 @@ class PhonePolicyTest extends WebTestCase
 
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $repo = self::$dm->getRepository(Policy::class);
+        /** @var Policy $updatedPolicyA */
         $updatedPolicyA = $repo->find($policyA->getId());
 
         $foundSoSure = false;
@@ -4575,6 +4590,7 @@ class PhonePolicyTest extends WebTestCase
 
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         $repo = self::$dm->getRepository(Policy::class);
+        /** @var Policy $updatedPolicyA */
         $updatedPolicyA = $repo->find($policyA->getId());
 
         $foundSoSure = false;
@@ -4649,7 +4665,7 @@ class PhonePolicyTest extends WebTestCase
         $issueDate2->add(new \DateInterval('PT1S'));
 
         $this->assertEquals($date, $policy->getStart());
-        $this->assertTrue($policy->getIssueDate() == $issueDate || $policy->getIssueDate == $issueDate2);
+        $this->assertTrue($policy->getIssueDate() == $issueDate || $policy->getIssueDate() == $issueDate2);
 
         return $policy;
     }

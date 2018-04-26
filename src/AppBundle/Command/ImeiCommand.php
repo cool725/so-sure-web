@@ -2,6 +2,10 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Repository\ClaimRepository;
+use AppBundle\Repository\PhonePolicyRepository;
+use AppBundle\Repository\PhoneRepository;
+use AppBundle\Service\ReceperioService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,7 +16,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Claim;
 
-class ImeiCommand extends ContainerAwareCommand
+class ImeiCommand extends BaseCommand
 {
     protected function configure()
     {
@@ -98,6 +102,7 @@ class ImeiCommand extends ContainerAwareCommand
         }
         $save = true === $input->getOption('save');
         $phone = $this->getPhone($device, $memory);
+        /** @var ReceperioService $imeiService */
         $imeiService = $this->getContainer()->get('app.imei');
 
         $policy = null;
@@ -120,7 +125,7 @@ class ImeiCommand extends ContainerAwareCommand
                 print sprintf("Register claim for imei %s failed\n", $imei);
             }
         } elseif ($claimscheck) {
-            if ($imeiService->checkClaims($policy, $claim, $imei, null, false)) {
+            if ($imeiService->checkClaims($policy, $claim, $imei, null)) {
                 print sprintf("Claimscheck for imei %s is good\n", $imei);
             } else {
                 print sprintf("Claimscheck for imei %s failed validation\n", $imei);
@@ -160,8 +165,8 @@ class ImeiCommand extends ContainerAwareCommand
 
     private function getPolicyByImei($imei)
     {
-        $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicyRepository $repo */
+        $repo = $this->getManager()->getRepository(PhonePolicy::class);
         $policy = $repo->findOneBy(['imei' => $imei]);
         if (!$policy) {
             throw new \Exception('Unable to find policy');
@@ -172,8 +177,8 @@ class ImeiCommand extends ContainerAwareCommand
 
     private function getPolicy($policyId)
     {
-        $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicyRepository $repo */
+        $repo = $this->getManager()->getRepository(PhonePolicy::class);
         $policy = $repo->find($policyId);
         if (!$policy) {
             throw new \Exception('Unable to find policy');
@@ -184,8 +189,8 @@ class ImeiCommand extends ContainerAwareCommand
 
     private function getClaim($claimId)
     {
-        $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(Claim::class);
+        /** @var ClaimRepository $repo */
+        $repo = $this->getManager()->getRepository(Claim::class);
         $claim = $repo->find($claimId);
         if (!$claim) {
             throw new \Exception('Unable to find claim');
@@ -196,8 +201,8 @@ class ImeiCommand extends ContainerAwareCommand
 
     private function getClaimByNumber($claimNumber)
     {
-        $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(Claim::class);
+        /** @var ClaimRepository $repo */
+        $repo = $this->getManager()->getRepository(Claim::class);
         $claim = $repo->findOneBy(['number' => $claimNumber]);
         if (!$claim) {
             throw new \Exception('Unable to find claim');
@@ -209,8 +214,8 @@ class ImeiCommand extends ContainerAwareCommand
     private function getPhone($device, $memory)
     {
         $phone = null;
-        $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $phoneRepo = $dm->getRepository(Phone::class);
+        /** @var PhoneRepository $phoneRepo */
+        $phoneRepo = $this->getManager()->getRepository(Phone::class);
         if ($device && $memory) {
             $phone = $phoneRepo->findOneBy(['devices' => $device, 'memory' => (int)$memory]);
         } elseif ($device) {

@@ -27,6 +27,8 @@ class DoctrineUserListenerTest extends WebTestCase
     use \AppBundle\Tests\UserClassTrait;
     /** @var Container */
     protected static $container;
+    /** @var DocumentManager */
+    protected static $dm;
     protected static $testUser;
 
     public static function setUpBeforeClass()
@@ -40,7 +42,9 @@ class DoctrineUserListenerTest extends WebTestCase
 
         //now we can instantiate our service (if you want a fresh one for
         //each test method, do this in setUp() instead
-        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        /** @var DocumentManager */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$dm = $dm;
         self::$userManager = self::$container->get('fos_user.user_manager');
         self::$policyService = self::$container->get('app.policy');
     }
@@ -60,7 +64,9 @@ class DoctrineUserListenerTest extends WebTestCase
         $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
         $listener->preUpdate($events);
 
-        $this->assertTrue($events->getDocument()->getEmailVerified());
+        /** @var User $userListener */
+        $userListener = $events->getDocument();
+        $this->assertTrue($userListener->getEmailVerified());
     }
 
     public function testPreUpdatePassword()
@@ -74,7 +80,9 @@ class DoctrineUserListenerTest extends WebTestCase
         $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
         $listener->preUpdate($events);
 
-        $this->assertTrue(count($events->getDocument()->getPreviousPasswords()) > 0);
+        /** @var User $userListener */
+        $userListener = $events->getDocument();
+        $this->assertTrue(count($userListener->getPreviousPasswords()) > 0);
     }
 
     public function testPreUpdateName()
@@ -364,6 +372,7 @@ class DoctrineUserListenerTest extends WebTestCase
         $listener->expects($this->once())
                      ->method('onUserEmailChangedEvent');
 
+        /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = static::$container->get('event_dispatcher');
         $dispatcher->addListener(UserEmailEvent::EVENT_CHANGED, array($listener, 'onUserEmailChangedEvent'));
 
@@ -384,6 +393,7 @@ class DoctrineUserListenerTest extends WebTestCase
         $listener->expects($this->never())
                      ->method('onUserEmailChangedEvent');
 
+        /** @var EventDispatcherInterface $dispatcher */
         $dispatcher = static::$container->get('event_dispatcher');
         $dispatcher->addListener(UserEmailEvent::EVENT_CHANGED, array($listener, 'onUserEmailChangedEvent'));
 

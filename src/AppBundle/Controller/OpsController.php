@@ -119,6 +119,7 @@ class OpsController extends BaseController
         $dm = $this->getManager();
         /** @var SCodeRepository $scodeRepo */
         $scodeRepo = $dm->getRepository(SCode::class);
+        /** @var SCode $scode */
         $scode = $scodeRepo->findOneBy(['active' => true, 'type' => 'standard']);
 
         /** @var EmailInvitationRepository $invitationRepo */
@@ -162,6 +163,7 @@ class OpsController extends BaseController
             'status' => Policy::STATUS_ACTIVE,
             'picSureStatus' => PhonePolicy::PICSURE_STATUS_APPROVED,
         ]);
+        /** @var Policy $picSureRejectedPolicy */
         $picSureRejectedPolicy = $policyRepo->findOneBy([
             'status' => Policy::STATUS_ACTIVE,
             'picSureStatus' => PhonePolicy::PICSURE_STATUS_REJECTED,

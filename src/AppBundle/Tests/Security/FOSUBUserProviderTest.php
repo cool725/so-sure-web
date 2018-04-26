@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Security;
 
 use AppBundle\Document\User;
 use AppBundle\Security\FOSUBUserProvider;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\PhonePolicy;
 
@@ -17,6 +18,8 @@ class FOSUBUserProviderTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
+    /** @var DocumentManager */
+    protected static $dm;
     protected static $cognito;
     protected static $userProvider;
     /** @var FOSUBUserProvider */
@@ -37,7 +40,9 @@ class FOSUBUserProviderTest extends WebTestCase
         self::$cognito = self::$container->get('app.cognito.identity');
         self::$userManager = self::$container->get('fos_user.user_manager');
         self::$userService = self::$container->get('app.user');
-        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        /** @var DocumentManager */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$dm = $dm;
         self::$policyService = self::$container->get('app.policy');
     }
 
@@ -49,7 +54,9 @@ class FOSUBUserProviderTest extends WebTestCase
     public function setUp()
     {
         parent::setUp();
-        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        /** @var DocumentManager */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$dm = $dm;
     }
 
     public function testLoadUserByOAuthUserResponsePhone()

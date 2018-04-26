@@ -9,6 +9,9 @@ class FullNameValidator extends ConstraintValidator
 {
     public function validate($value, Constraint $constraint)
     {
+        /** @var FullName $fullNameConstraint */
+        $fullNameConstraint = $constraint;
+
         // allow blank string - different validations should be used for null/not null
         if (mb_strlen(trim($value)) == 0) {
             return;
@@ -17,7 +20,7 @@ class FullNameValidator extends ConstraintValidator
         // Expected 1 space
         $parts = explode(" ", trim($value));
         if (!preg_match($this->getRegex(), $value, $matches) || count($parts) != 2) {
-            $this->context->buildViolation($constraint->message)
+            $this->context->buildViolation($fullNameConstraint->message)
                 ->setParameter('%string%', $value)
                 ->addViolation();
         }

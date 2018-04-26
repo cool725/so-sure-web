@@ -2,6 +2,11 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Repository\ClaimRepository;
+use AppBundle\Repository\PhonePolicyRepository;
+use AppBundle\Repository\UserRepository;
+use CensusBundle\Service\SearchService;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -70,7 +75,9 @@ class BICommand extends BaseCommand
 
     private function exportClaims()
     {
+        /** @var SearchService $search */
         $search = $this->getContainer()->get('census.search');
+        /** @var ClaimRepository $repo */
         $repo = $this->getManager()->getRepository(Claim::class);
         $claims = $repo->findAll();
         $lines = [];
@@ -101,10 +108,13 @@ class BICommand extends BaseCommand
             '"Claim Final Suspicion"',
         ]);
         foreach ($claims as $claim) {
+            /** @var Claim $claim */
             $policy = $claim->getPolicy();
             // mainly for dev use
             if (!$policy) {
-                $this->getContainer()->get('logger')->error(sprintf('Missing policy for claim %s', $claim->getId()));
+                /** @var LoggerInterface $logger */
+                $logger = $this->getContainer()->get('logger');
+                $logger->error(sprintf('Missing policy for claim %s', $claim->getId()));
                 continue;
             }
             $user = $policy->getUser();
@@ -155,7 +165,9 @@ class BICommand extends BaseCommand
 
     private function exportPolicies($prefix)
     {
+        /** @var SearchService $search */
         $search = $this->getContainer()->get('census.search');
+        /** @var PhonePolicyRepository $repo */
         $repo = $this->getManager()->getRepository(PhonePolicy::class);
         $policies = $repo->findAllStartedPolicies($prefix);
         $lines = [];
@@ -193,6 +205,7 @@ class BICommand extends BaseCommand
             '"Make/Model/Memory"',
         ]);
         foreach ($policies as $policy) {
+            /** @var Policy $policy */
             $user = $policy->getUser();
             $census = $search->findNearest($user->getBillingAddress()->getPostcode());
             $income = $search->findIncome($user->getBillingAddress()->getPostcode());
@@ -245,7 +258,9 @@ class BICommand extends BaseCommand
 
     private function exportUsers()
     {
+        /** @var SearchService $search */
         $search = $this->getContainer()->get('census.search');
+        /** @var UserRepository $repo */
         $repo = $this->getManager()->getRepository(User::class);
         $users = $repo->findAll();
         $lines = [];

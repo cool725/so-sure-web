@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use Domnikl\Statsd\Client;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -29,6 +30,7 @@ class StatsdCommand extends ContainerAwareCommand
     {
         $name = $input->getArgument('name');
 
+        /** @var Client $statsd */
         $statsd = $this->getContainer()->get('statsd');
         $statsd->increment($name);
     }

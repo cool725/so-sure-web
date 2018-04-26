@@ -188,6 +188,7 @@ class DaviesService extends S3EmailService
 
     private function getClaim($daviesClaim)
     {
+        /** @var ClaimRepository $repo */
         $repo = $this->dm->getRepository(Claim::class);
         $claim = $repo->findOneBy(['number' => $daviesClaim->claimNumber]);
         // Davies swapped to a new claim numbering format
@@ -195,7 +196,7 @@ class DaviesService extends S3EmailService
         // sometimes they are leaving off the last 2 digits when entering the claim
         // on our system
         if (!$claim) {
-            $repo = $this->dm->getRepository(Claim::class);
+            /** @var Claim $claim */
             $claim = $repo->findOneBy(['number' => mb_substr($daviesClaim->claimNumber, 0, -2)]);
             if ($claim) {
                 if ($daviesClaim->getPolicyNumber() != $claim->getPolicy()->getPolicyNumber()) {
@@ -224,12 +225,12 @@ class DaviesService extends S3EmailService
     }
 
     /**
-     * @param $daviesClaim
-     * @param $skipImeiUpdate
+     * @param DaviesClaim $daviesClaim
+     * @param boolean     $skipImeiUpdate
      * @return bool
      * @throws \Exception
      */
-    public function saveClaim($daviesClaim, $skipImeiUpdate)
+    public function saveClaim(DaviesClaim $daviesClaim, $skipImeiUpdate)
     {
         if ($daviesClaim->hasError()) {
             throw new \Exception(sprintf(
@@ -291,7 +292,7 @@ class DaviesService extends S3EmailService
         $claim->setReplacementPhoneDetails($daviesClaim->getReplacementPhoneDetails());
 
         $validator = new AlphanumericSpaceDotValidator();
-        $claim->setDescription($validator->conform($daviesClaim->lossDescription, 0, 5000));
+        $claim->setDescription($validator->conform($daviesClaim->lossDescription));
         $claim->setLocation($daviesClaim->location);
 
         $claim->setClosedDate($daviesClaim->dateClosed);
@@ -395,21 +396,23 @@ class DaviesService extends S3EmailService
             }
 
             if ($daviesClaim->riskPostCode && !$this->postcodeCompare(
-                $claim->getPolicy()->getUser()->getBillingAddress()->getPostCode(),
+                $claim->getPolicy()->getUser()->getBillingAddress()->getPostcode(),
                 $daviesClaim->riskPostCode
             ) && !$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_DAVIES_POSTCODE)) {
                 $msg = sprintf(
                     'Claim %s: %s does not match expected postcode %s',
                     $daviesClaim->claimNumber,
                     $daviesClaim->riskPostCode,
-                    $claim->getPolicy()->getUser()->getBillingAddress()->getPostCode()
+                    $claim->getPolicy()->getUser()->getBillingAddress()->getPostcode()
                 );
                 $this->warnings[$daviesClaim->claimNumber][] = $msg;
             }
         }
 
+        /** @var PhonePolicy $phonePolicy */
+        $phonePolicy = $claim->getPolicy();
         if (!$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_DAVIES_REPLACEMENT_COST_HIGHER) &&
-            $daviesClaim->phoneReplacementCost > $claim->getPolicy()->getPhone()->getInitialPrice()) {
+            $daviesClaim->phoneReplacementCost > $phonePolicy->getPhone()->getInitialPrice()) {
             $msg = sprintf(
                 'Device replacement cost for claim %s is greater than initial price of the device',
                 $daviesClaim->claimNumber

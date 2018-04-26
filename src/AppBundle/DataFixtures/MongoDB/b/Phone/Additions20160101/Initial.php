@@ -19,6 +19,7 @@ class Initial extends LoadPhoneData implements FixtureInterface
 
         // For non-prod, we want the sii available as its a test device
         $repo = $manager->getRepository(Phone::class);
+        /** @var Phone $sii */
         $sii = $repo->findOneBy(['devices' => 'GT-I9100', 'memory' => 16]);
         $sii->setActive(true);
         $manager->flush();

@@ -2,6 +2,8 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Repository\PhoneRepository;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
@@ -15,6 +17,8 @@ class ReceperioServicePaidTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
+    /** @var DocumentManager */
+    protected static $dm;
     protected static $imei;
     protected static $phoneRepo;
 
@@ -30,7 +34,10 @@ class ReceperioServicePaidTest extends WebTestCase
         //now we can instantiate our service (if you want a fresh one for
         //each test method, do this in setUp() instead
         self::$imei = self::$container->get('app.imei');
-        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        /** @var DocumentManager */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$dm = $dm;
+        /** @var PhoneRepository phoneRepo */
         self::$phoneRepo = self::$dm->getRepository(Phone::class);
     }
 

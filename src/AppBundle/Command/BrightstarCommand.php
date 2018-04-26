@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Service\BrightstarService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -46,6 +47,7 @@ class BrightstarCommand extends ContainerAwareCommand
             ));
         }
 
+        /** @var BrightstarService $davies */
         $davies = $this->getContainer()->get('app.brightstar');
         if ($file) {
             $lines = $davies->importFile($file, $sheetName);

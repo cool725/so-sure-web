@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Service\RateLimitService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -38,6 +39,7 @@ class RateLimitCommand extends ContainerAwareCommand
         $type = $input->getArgument('type');
         $clear = true === $input->getOption('clear');
 
+        /** @var RateLimitService $rateLimit */
         $rateLimit = $this->getContainer()->get('app.ratelimit');
         $output->writeln(json_encode($rateLimit->show($type), JSON_PRETTY_PRINT));
         if ($clear) {

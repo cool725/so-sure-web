@@ -12,13 +12,16 @@ class ImeiValidator extends ConstraintValidator
 
     public function validate($value, Constraint $constraint)
     {
+        /** @var Imei $imeiConstraint */
+        $imeiConstraint = $constraint;
+
         // allow empty string in validation
         if (mb_strlen($value) == 0) {
             return;
         }
 
         if (!$this->isImei($value)) {
-            $this->context->buildViolation($constraint->message)
+            $this->context->buildViolation($imeiConstraint->message)
                 ->setParameter('%string%', $value)
                 ->addViolation();
         }

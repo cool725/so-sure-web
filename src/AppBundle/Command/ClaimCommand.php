@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Service\ClaimsService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -34,6 +35,7 @@ class ClaimCommand extends ContainerAwareCommand
         if (!$claim) {
             throw new \Exception(sprintf('Unable to find claim %s', $claimNumber));
         }
+        /** @var ClaimsService $claimsService */
         $claimsService = $this->getContainer()->get('app.claims');
         if ($claimsService->processClaim($claim)) {
             $output->writeln(sprintf('Successfully processed claim %s', $claimNumber));

@@ -2,6 +2,8 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Service\JudopayService;
+use AppBundle\Service\PolicyService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,7 +16,7 @@ use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\User;
 
-class SalvaManualPolicyCommand extends ContainerAwareCommand
+class SalvaManualPolicyCommand extends BaseCommand
 {
     protected function configure()
     {
@@ -73,9 +75,10 @@ class SalvaManualPolicyCommand extends ContainerAwareCommand
 
         $phone = $this->getPhone($device, $memory);
 
+        /** @var PolicyService $policyService */
         $policyService = $this->getContainer()->get('app.policy');
+        /** @var JudopayService $judopay */
         $judopay = $this->getContainer()->get('app.judopay');
-        $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
 
         $user = $this->getUser($email);
         if (!$user->getBirthday()) {
@@ -88,8 +91,8 @@ class SalvaManualPolicyCommand extends ContainerAwareCommand
         $policy->setPhone($phone, $date);
         $policy->setImei($imei);
 
-        $dm->persist($policy);
-        $dm->flush();
+        $this->getManager()->persist($policy);
+        $this->getManager()->flush();
 
         if ($payments == 12) {
             $amount = $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice($date);
@@ -125,16 +128,14 @@ class SalvaManualPolicyCommand extends ContainerAwareCommand
 
     private function getUser($email)
     {
-        $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(User::class);
+        $repo = $this->getManager()->getRepository(User::class);
 
         return $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
     }
 
     private function getPhone($device, $memory = null)
     {
-        $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $phoneRepo = $dm->getRepository(Phone::class);
+        $phoneRepo = $this->getManager()->getRepository(Phone::class);
 
         if ($memory) {
             return $phoneRepo->findOneBy(['devices' => $device, 'memory' => (int)$memory]);

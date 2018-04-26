@@ -15,6 +15,8 @@ class BranchService
 
     /** @var RouterService */
     protected $routerService;
+
+    /** @var \Predis\Client */
     protected $redis;
 
     /** @var string */
@@ -36,20 +38,20 @@ class BranchService
     protected $appleAppDownload;
 
     /**
-     * @param LoggerInterface   $logger
-     * @param RouterService     $routerService
-     * @param                   $redis
-     * @param                   $environment
-     * @param                   $branchKey
-     * @param                   $branchSecret
-     * @param                   $branchDomain
-     * @param                   $googleAppDownload
-     * @param                   $appleAppDownload
+     * @param LoggerInterface $logger
+     * @param RouterService   $routerService
+     * @param \Predis\Client  $redis
+     * @param string          $environment
+     * @param string          $branchKey
+     * @param string          $branchSecret
+     * @param string          $branchDomain
+     * @param string          $googleAppDownload
+     * @param string          $appleAppDownload
      */
     public function __construct(
         LoggerInterface $logger,
         RouterService $routerService,
-        $redis,
+        \Predis\Client $redis,
         $environment,
         $branchKey,
         $branchSecret,
@@ -162,9 +164,9 @@ class BranchService
     */
 
     /**
-     * @param $source
-     * @param $medium
-     * @param $campaign
+     * @param string $source
+     * @param string $medium
+     * @param string $campaign
      */
     public function downloadAppleLink($source, $medium, $campaign)
     {

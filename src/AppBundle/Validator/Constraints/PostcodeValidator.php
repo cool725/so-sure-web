@@ -16,12 +16,15 @@ class PostcodeValidator extends ConstraintValidator
 
     public function validate($value, Constraint $constraint)
     {
+        /** @var Postcode $postcodeConstraint */
+        $postcodeConstraint = $constraint;
+
         if (mb_strlen($value) == 0) {
             return;
         }
 
         if (!$this->address->validatePostcode($value)) {
-            $this->context->buildViolation($constraint->message)
+            $this->context->buildViolation($postcodeConstraint->message)
                 ->setParameter('%string%', $value)
                 ->addViolation();
         }

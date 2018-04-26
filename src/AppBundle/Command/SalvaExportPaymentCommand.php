@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Service\SalvaExportService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -45,6 +46,7 @@ class SalvaExportPaymentCommand extends ContainerAwareCommand
             $date = $this->startOfPreviousMonth();
             $output->writeln(sprintf('Using last month %s', $date->format('Y-m')));
         }
+        /** @var SalvaExportService $salva */
         $salva = $this->getContainer()->get('app.salva');
         $data = $salva->exportPayments($s3, $date);
         $output->write(implode(PHP_EOL, $data));

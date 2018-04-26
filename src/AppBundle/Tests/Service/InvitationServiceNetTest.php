@@ -2,6 +2,8 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Repository\UserRepository;
+use FOS\UserBundle\Model\UserManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
@@ -43,7 +45,10 @@ class InvitationServiceNetTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
+    /** @var DocumentManager */
+    protected static $dm;
     protected static $gocardless;
+    /** @var UserRepository */
     protected static $userRepo;
     protected static $invitationService;
     protected static $phone2;
@@ -59,7 +64,9 @@ class InvitationServiceNetTest extends WebTestCase
 
         //now we can instantiate our service (if you want a fresh one for
         //each test method, do this in setUp() instead
-        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        /** @var DocumentManager */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$dm = $dm;
         self::$userRepo = self::$dm->getRepository(User::class);
         self::$userManager = self::$container->get('fos_user.user_manager');
         $transport = new \Swift_Transport_NullTransport(new \Swift_Events_SimpleEventDispatcher);
@@ -71,9 +78,11 @@ class InvitationServiceNetTest extends WebTestCase
             'foo@foo.com',
             'bar'
         );
-        self::$invitationService = self::$container->get('app.invitation');
-        self::$invitationService->setMailer($mailer);
-        self::$invitationService->setDebug(true);
+        /** @var InvitationService invitationService */
+        $invitationService = self::$container->get('app.invitation');
+        $invitationService->setMailer($mailer);
+        $invitationService->setDebug(true);
+        self::$invitationService = $invitationService;
 
         self::$policyService = self::$container->get('app.policy');
 

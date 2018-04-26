@@ -245,6 +245,7 @@ class PurchaseControllerTest extends BaseControllerTest
     public function testPurchasePhoneImeiSpaceNineSixtyEightNew()
     {
         $phoneRepo = static::$dm->getRepository(Phone::class);
+        /** @var Phone $phone */
         $phone = $phoneRepo->findOneBy(['devices' => 'zeroflte', 'memory' => 128]);
         //$phone = self::getRandomPhone(static::$dm);
 

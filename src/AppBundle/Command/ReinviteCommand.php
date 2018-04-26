@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Service\InvitationService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -10,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\Invitation\EmailInvitation;
 
-class ReinviteCommand extends ContainerAwareCommand
+class ReinviteCommand extends BaseCommand
 {
     protected function configure()
     {
@@ -35,9 +36,9 @@ class ReinviteCommand extends ContainerAwareCommand
             $date = new \DateTime($date);
         }
 
+        /** @var InvitationService $invitationService */
         $invitationService = $this->getContainer()->get('app.invitation');
-        $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
-        $repo = $dm->getRepository(EmailInvitation::class);
+        $repo = $this->getManager()->getRepository(EmailInvitation::class);
         $invitations = $repo->findSystemReinvitations($date);
 
         foreach ($invitations as $invitation) {

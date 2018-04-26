@@ -1,6 +1,9 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Repository\OptOut\EmailOptOutRepository;
+use AppBundle\Repository\UserRepository;
+use Predis\Client;
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\Claim;
 use AppBundle\Document\User;
@@ -18,6 +21,7 @@ use AppBundle\Document\CurrencyTrait;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Intercom\IntercomClient;
+use Symfony\Component\Routing\RouterInterface;
 
 class IntercomService
 {
@@ -84,35 +88,40 @@ class IntercomService
     /** @var IntercomClient */
     protected $client;
 
+    /** @var Client */
     protected $redis;
 
     protected $secure;
     protected $secureAndroid;
     protected $secureIOS;
+
+    /** @var \Swift_Mailer */
     protected $mailer;
+
+    /** @var RouterInterface */
     protected $router;
 
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
      * @param string          $token
-     * @param                 $redis
+     * @param Client          $redis
      * @param string          $secure
      * @param string          $secureAndroid
      * @param string          $secureIOS
-     * @param                 $mailer
-     * @param                 $router
+     * @param \Swift_Mailer   $mailer
+     * @param RouterInterface $router
      */
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
         $token,
-        $redis,
+        Client $redis,
         $secure,
         $secureAndroid,
         $secureIOS,
-        $mailer,
-        $router
+        \Swift_Mailer $mailer,
+        RouterInterface $router
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -225,6 +234,11 @@ class IntercomService
         }
     }
 
+    /**
+     * @param User $user
+     * @return mixed|null
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     public function getIntercomUser(User $user)
     {
         if (!$user->getIntercomId()) {
@@ -422,6 +436,7 @@ class IntercomService
         }
 
         // optout
+        /** @var EmailOptOutRepository $emailOptOutRepo */
         $emailOptOutRepo = $this->dm->getRepository(EmailOptOut::class);
         $optedOut = $emailOptOutRepo->isOptedOut($user->getEmail(), EmailOptOut::OPTOUT_CAT_AQUIRE) ||
             $emailOptOutRepo->isOptedOut($user->getEmail(), EmailOptOut::OPTOUT_CAT_RETAIN);
@@ -1066,6 +1081,7 @@ class IntercomService
 
     private function leadsMaintenance()
     {
+        /** @var EmailOptOutRepository $emailOptOutRepo */
         $emailOptOutRepo = $this->dm->getRepository(EmailOptOut::class);
         $output = [];
         $page = 1;
@@ -1122,7 +1138,9 @@ class IntercomService
 
     private function usersMaintenance()
     {
+        /** @var UserRepository $userRepo */
         $userRepo = $this->dm->getRepository(User::class);
+        /** @var EmailOptOutRepository $emailOptOutRepo */
         $emailOptOutRepo = $this->dm->getRepository(EmailOptOut::class);
         $emails = [];
         $output = [];

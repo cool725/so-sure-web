@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Service\MailchimpService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -26,6 +27,7 @@ class MailchimpCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $email = $input->getArgument('email');
+        /** @var MailchimpService $mailchimp */
         $mailchimp = $this->getContainer()->get('app.mailchimp.prelaunch');
         if ($mailchimp->subscribe($email)) {
             $output->writeln('Added');

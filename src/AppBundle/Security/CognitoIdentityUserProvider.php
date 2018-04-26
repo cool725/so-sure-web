@@ -142,7 +142,9 @@ class CognitoIdentityUserProvider implements UserProviderInterface
     {
         // Compatibility with FOSUserBundle < 2.0
         if (class_exists('FOS\UserBundle\Form\Handler\RegistrationFormHandler')) {
-            return $this->userManager->loadUserByUsername($username);
+            /** @var mixed $oldUserManager */
+            $oldUserManager = $this->userManager;
+            return $oldUserManager->loadUserByUsername($username);
         }
 
         return $this->userManager->findUserByUsername($username);

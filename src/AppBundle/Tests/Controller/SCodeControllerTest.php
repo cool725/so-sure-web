@@ -25,6 +25,7 @@ class SCodeControllerTest extends BaseControllerTest
         $this->createSCode('testSCodeNonUser-code');
 
         $repo = self::$dm->getRepository(SCode::class);
+        /** @var SCode $scode */
         $scode = $repo->findOneBy(['active' => true]);
         $this->assertNotNull($scode);
         $url = sprintf('/scode/%s', $scode->getCode());
@@ -59,6 +60,7 @@ class SCodeControllerTest extends BaseControllerTest
         $this->login($email, $password, 'user/');
 
         $repo = self::$dm->getRepository(SCode::class);
+        /** @var SCode $scode */
         $scode = $repo->findOneBy(['active' => true]);
         $this->assertNotNull($scode);
         $url = sprintf('/scode/%s', $scode->getCode());
@@ -99,6 +101,7 @@ class SCodeControllerTest extends BaseControllerTest
         $this->assertTrue($policy->getUser()->hasActivePolicy());
 
         $repo = self::$dm->getRepository(SCode::class);
+        /** @var SCode $updatedScode */
         $updatedScode = $repo->find($scode->getId());
         $this->assertNotNull($updatedScode);
         $url = sprintf('/scode/%s', $updatedScode->getCode());

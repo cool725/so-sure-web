@@ -3,6 +3,8 @@
 namespace AppBundle\Command;
 
 use AppBundle\Document\Phone;
+use AppBundle\Repository\PhoneRepository;
+use AppBundle\Service\MailerService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,7 +14,7 @@ use Symfony\Component\Console\Helper\Table;
 use AppBundle\Classes\Premium;
 use Symfony\Component\HttpFoundation\Request;
 
-class RetirePhoneReportCommand extends ContainerAwareCommand
+class RetirePhoneReportCommand extends BaseCommand
 {
     protected function configure()
     {
@@ -31,11 +33,13 @@ class RetirePhoneReportCommand extends ContainerAwareCommand
     {
         $retire = [];
         $debug = $input->getOption('debug');
+        /** @var MailerService $mailer */
         $mailer = $this->getContainer()->get('app.mailer');
-        $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
-        $repoPhone = $dm->getRepository(Phone::class);
+        /** @var PhoneRepository $repoPhone */
+        $repoPhone = $this->getManager()->getRepository(Phone::class);
         $phones = $repoPhone->findActive()->getQuery()->execute();
         foreach ($phones as $phone) {
+            /** @var Phone $phone */
             if ($phone->shouldBeRetired()) {
                 $retire[] = sprintf(
                     '%s %s (%s MB) Released: %s (%s months ago)',

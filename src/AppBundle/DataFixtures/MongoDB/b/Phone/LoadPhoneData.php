@@ -2,11 +2,13 @@
 
 namespace AppBundle\DataFixtures\MongoDB\b\Phone;
 
+use AppBundle\Service\MailerService;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use AppBundle\Document\Phone;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 // @codingStandardsIgnoreFile
 abstract class LoadPhoneData implements ContainerAwareInterface
@@ -81,6 +83,7 @@ abstract class LoadPhoneData implements ContainerAwareInterface
             'Please add the following modelreferences to the make/model checks<br><br>%s',
             implode('<br>', $lines)
         );
+        /** @var MailerService $mailer */
         $mailer = $this->container->get('app.mailer');
         $mailer->send(
             'New Model References',
@@ -117,6 +120,7 @@ abstract class LoadPhoneData implements ContainerAwareInterface
 
         $phoneRepo = $manager->getRepository(Phone::class);
         $replacementQuery = ['make' => trim($data[24]), 'model' => trim($data[25]), 'memory' => (int)trim($data[26])];
+        /** @var Phone $replacement */
         $replacement = $phoneRepo->findOneBy($replacementQuery);
         if ($replacement) {
             $phone = $phoneRepo->findOneBy(['make' => $data[0], 'model' => $data[1], 'memory' => (float)$data[3]]);
@@ -237,16 +241,18 @@ abstract class LoadPhoneData implements ContainerAwareInterface
 
     protected function newPhone($manager, $make, $model, $policyPrice, $memory = null, $devices = null)
     {
+        /** @var RouterInterface $router */
+        $router = $this->container->get('router');
         // Validate that the regex for quote make model is working for all the data
         if ($make != "ALL") {
             if ($memory) {
-                $this->container->get('router')->generate('quote_make_model_memory', [
+                $router->generate('quote_make_model_memory', [
                     'make' => mb_strtolower($make),
                     'model' => mb_strtolower($model),
                     'memory' => $memory,
                 ]);
             } else {
-                $this->container->get('router')->generate('quote_make_model', [
+                $router->generate('quote_make_model', [
                     'make' => mb_strtolower($make),
                     'model' => mb_strtolower($model),
                 ]);

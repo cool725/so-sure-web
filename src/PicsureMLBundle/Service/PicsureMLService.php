@@ -79,6 +79,7 @@ class PicsureMLService
         $this->picsureMLDm->persist($versionInfo);
 
         if ($version !== null) {
+            /** @var TrainingDataRepository $repo */
             $repo = $this->picsureMLDm->getRepository(TrainingData::class);
             $qb = $repo->createQueryBuilder();
             $qb->field('versions')->equals($version);
@@ -163,8 +164,9 @@ class PicsureMLService
 
     public function sync()
     {
-        $imageRepo = $this->picsureMLDm->getRepository(TrainingData::class);
-        $images = $imageRepo->createQueryBuilder()
+        /** @var TrainingDataRepository $repo */
+        $repo = $this->picsureMLDm->getRepository(TrainingData::class);
+        $images = $repo->createQueryBuilder()
                         ->select('imagePath')
                         ->getQuery()->execute();
         $paths = [];

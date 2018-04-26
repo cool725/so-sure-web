@@ -123,6 +123,7 @@ class DefaultControllerTest extends BaseControllerTest
     public function testQuotePhone()
     {
         $repo = self::$dm->getRepository(Phone::class);
+        /** @var Phone $phone */
         $phone = $repo->findOneBy(['devices' => 'iPhone 6', 'memory' => 64]);
 
         $crawler = self::$client->request('GET', self::$router->generate('quote_phone', [
