@@ -114,7 +114,7 @@ class ApiPartialController extends BaseController
                 'text' => $text
             );
         } elseif (in_array($name, array_keys(SixpackService::$appExperiments))) {
-            $clienId = null;
+            $clientId = null;
             if ($name == SixpackService::EXPERIMENT_APP_SHARE_METHOD) {
                 $scode = $user->getStandardSCode();
                 if (!$scode) {
