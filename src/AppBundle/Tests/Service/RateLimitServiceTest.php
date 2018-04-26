@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Service\RateLimitService;
 use AppBundle\Document\User;
@@ -14,6 +15,8 @@ class RateLimitServiceTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
+    /** @var DocumentManager */
+    protected static $dm;
     protected static $rateLimit;
     protected static $redis;
 
@@ -30,7 +33,9 @@ class RateLimitServiceTest extends WebTestCase
          //each test method, do this in setUp() instead
          self::$rateLimit = self::$container->get('app.ratelimit');
          self::$redis = self::$container->get('snc_redis.default');
-         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+         /** @var DocumentManager */
+         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+         self::$dm = $dm;
     }
 
     public function tearDown()

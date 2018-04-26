@@ -5,6 +5,7 @@ namespace AppBundle\DataFixtures\MongoDB\b\User;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use AppBundle\Document\User;
+use Stubs\DocumentManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -40,6 +41,7 @@ class LoadUserData implements FixtureInterface, ContainerAwareInterface
 
     private function valdiateGedmoLogging($manager)
     {
+        /** @var \Doctrine\ODM\MongoDB\DocumentManager $dm */
         $dm = $this->container->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(User::class);
         $user = $repo->findOneBy(['email' => 'patrick@so-sure.com']);

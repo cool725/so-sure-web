@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Document;
 
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\PhonePolicy;
@@ -19,6 +20,8 @@ class InvitationTest extends WebTestCase
     use \AppBundle\Tests\UserClassTrait;
     use \AppBundle\Tests\PhingKernelClassTrait;
     protected static $container;
+    /** @var DocumentManager */
+    protected static $dm;
 
     public static function setUpBeforeClass()
     {
@@ -31,7 +34,9 @@ class InvitationTest extends WebTestCase
 
          //now we can instantiate our service (if you want a fresh one for
          //each test method, do this in setUp() instead
-         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+         /** @var DocumentManager */
+         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+         self::$dm = $dm;
     }
 
     public function tearDown()

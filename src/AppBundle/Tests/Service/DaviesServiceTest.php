@@ -27,6 +27,8 @@ class DaviesServiceTest extends WebTestCase
     use DateTrait;
 
     protected static $container;
+    /** @var DocumentManager */
+    protected static $dm;
     protected static $daviesService;
     protected static $phoneA;
     protected static $phoneB;
@@ -44,8 +46,9 @@ class DaviesServiceTest extends WebTestCase
          //each test method, do this in setUp() instead
          self::$daviesService = self::$container->get('app.davies');
 
-        /** @var DocumentManager dm */
-        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        /** @var DocumentManager */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$dm = $dm;
         $phoneRepo = self::$dm->getRepository(Phone::class);
         self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 6', 'memory' => 64]);
         self::$phoneA = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
@@ -57,7 +60,9 @@ class DaviesServiceTest extends WebTestCase
         self::$daviesService->clearErrors();
         self::$daviesService->clearWarnings();
         self::$daviesService->clearFees();
-        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        /** @var DocumentManager */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$dm = $dm;
         $phoneRepo = self::$dm->getRepository(Phone::class);
         self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 6', 'memory' => 64]);
         self::$phoneA = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
@@ -551,7 +556,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesOpen1->reserved = 1;
         $daviesOpen1->riskPostCode = 'BX1 1LT';
         $daviesOpen1->insuredName = 'Foo Bar';
-        $daviesOpen1->type = DaviesClaim::TYPE_LOSS;
+        //$daviesOpen1->type = DaviesClaim::TYPE_LOSS;
 
         $daviesOpen2 = new DaviesClaim();
         $daviesOpen2->claimNumber = '2';
@@ -561,7 +566,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesOpen2->reserved = 2;
         $daviesOpen2->riskPostCode = 'BX1 1LT';
         $daviesOpen2->insuredName = 'Foo Bar';
-        $daviesOpen2->type = DaviesClaim::TYPE_LOSS;
+        //$daviesOpen2->type = DaviesClaim::TYPE_LOSS;
 
         self::$daviesService->clearErrors();
 
@@ -705,7 +710,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->insuredName = 'Mr foo bar';
         $daviesClaim->riskPostCode = 'se152sz';
         $daviesClaim->status = DaviesClaim::STATUS_OPEN;
-        $daviesClaim->type = DaviesClaim::TYPE_LOSS;
+        //$daviesClaim->type = DaviesClaim::TYPE_LOSS;
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
         $this->assertEquals(0, count(self::$daviesService->getErrors()));

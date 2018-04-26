@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Service;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\User;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 /**
@@ -17,6 +18,8 @@ class BacsServiceTest extends WebTestCase
     use \AppBundle\Tests\UserClassTrait;
 
     protected static $container;
+    /** @var DocumentManager */
+    protected static $dm;
     protected static $xmlFile;
     protected static $bacsService;
 
@@ -35,7 +38,9 @@ class BacsServiceTest extends WebTestCase
             "%s/../src/AppBundle/Tests/Resources/bacs/ADDACS.xml",
             self::$container->getParameter('kernel.root_dir')
         );
-        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        /** @var DocumentManager */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$dm = $dm;
         self::$bacsService = self::$container->get('app.bacs');
         self::$userManager = self::$container->get('fos_user.user_manager');
     }

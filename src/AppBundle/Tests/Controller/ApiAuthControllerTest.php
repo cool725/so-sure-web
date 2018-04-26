@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Controller;
 
+use AppBundle\Repository\Invitation\EmailInvitationRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
@@ -24,6 +25,8 @@ use AppBundle\Service\ReceperioService;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
+use Symfony\Component\HttpKernel\DataCollector\EventDataCollector;
+use Predis\Client;
 
 /**
  * @group functional-net
@@ -420,6 +423,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $invitationData = $this->verifyResponse(200);
 
         $emailRepo = self::$dm->getRepository(EmailInvitation::class);
+        /** @var EmailInvitation $invitation */
         $invitation = $emailRepo->find($invitationData['id']);
         $this->assertFalse($invitation->canReinvite());
 
@@ -449,6 +453,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $invitationData = $this->verifyResponse(200);
 
         $emailRepo = self::$dm->getRepository(EmailInvitation::class);
+        /** @var EmailInvitation $invitation */
         $invitation = $emailRepo->find($invitationData['id']);
         $invitation->setNextReinvited(new \DateTime('2016-01-01'));
         self::$dm->flush();
@@ -480,10 +485,12 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $invitationData = $this->verifyResponse(200);
 
         $emailRepo = self::$dm->getRepository(EmailInvitation::class);
+        /** @var EmailInvitation $invitation */
         $invitation = $emailRepo->find($invitationData['id']);
         $invitation->setNextReinvited(new \DateTime('2016-01-01'));
 
         $policyRepo = self::$dm->getRepository(Policy::class);
+        /** @var Policy $policy */
         $policy = $policyRepo->find($policyData['id']);
         $policy->setPotValue($policy->getMaxPot());
         self::$dm->flush();
@@ -515,10 +522,12 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $invitationData = $this->verifyResponse(200);
 
         $emailRepo = self::$dm->getRepository(EmailInvitation::class);
+        /** @var EmailInvitation $invitation */
         $invitation = $emailRepo->find($invitationData['id']);
         $invitation->setNextReinvited(new \DateTime('2016-01-01'));
 
         $policyRepo = self::$dm->getRepository(Policy::class);
+        /** @var Policy $policy */
         $policy = $policyRepo->find($policyData['id']);
         $claim = new Claim();
         $claim->setType(Claim::TYPE_LOSS);
@@ -640,6 +649,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         // Add claim to policy
         $policyRepo = self::$dm->getRepository(Policy::class);
+        /** @var Policy $policy */
         $policy = $policyRepo->find($policyData['id']);
         $claim = new Claim();
         $claim->setType(Claim::TYPE_THEFT);
@@ -843,6 +853,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $data = $this->verifyResponse(200);
         $repo = self::$dm->getRepository(Policy::class);
+        /** @var Policy $policy */
         $policy = $repo->find($data['id']);
         $this->assertTrue($policy !== null);
         $this->assertEquals('62.253.24.189', $policy->getIdentityLog()->getIp());

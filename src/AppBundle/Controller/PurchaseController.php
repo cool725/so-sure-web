@@ -16,6 +16,7 @@ use Symfony\Component\DomCrawler\Field\FormField;
 use Symfony\Component\Form\Button;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -341,7 +342,7 @@ class PurchaseController extends BaseController
                 $purchaseFormValid = $purchaseForm->isValid();
                 $purchaseFormExistingClicked = false;
                 if ($purchaseForm->has('existing')) {
-                    /** @var ButtonType $existingButton */
+                    /** @var SubmitButton $existingButton */
                     $existingButton = $purchaseForm->get('existing');
                     $purchaseFormExistingClicked = $existingButton->isClicked();
                 }

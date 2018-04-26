@@ -3,6 +3,7 @@
 namespace AppBundle\Tests\Service;
 
 use AppBundle\Service\QuoteService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\Phone;
 
@@ -16,6 +17,8 @@ class QuoteServiceTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
+    /** @var DocumentManager */
+    protected static $dm;
     protected static $quoteService;
     protected static $rootDir;
     protected static $redis;
@@ -28,7 +31,9 @@ class QuoteServiceTest extends WebTestCase
 
         //get the DI container
         self::$container = $kernel->getContainer();
-        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        /** @var DocumentManager */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$dm = $dm;
         self::$redis = self::$container->get('snc_redis.default');
 
         //now we can instantiate our service (if you want a fresh one for

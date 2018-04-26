@@ -3,6 +3,7 @@
 namespace AppBundle\Tests\Service;
 
 use AppBundle\Service\BaseImeiService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\LostPhone;
 use AppBundle\Document\Phone;
@@ -20,6 +21,8 @@ class BaseImeiServiceTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
+    /** @var DocumentManager */
+    protected static $dm;
     protected static $imei;
     protected static $rootDir;
     protected static $filesystem;
@@ -33,7 +36,9 @@ class BaseImeiServiceTest extends WebTestCase
         //get the DI container
         self::$container = $kernel->getContainer();
 
-        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        /** @var DocumentManager */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$dm = $dm;
 
         //now we can instantiate our service (if you want a fresh one for
         //each test method, do this in setUp() instead

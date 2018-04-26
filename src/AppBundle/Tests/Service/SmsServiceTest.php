@@ -16,6 +16,8 @@ class SmsServiceTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
+    /** @var DocumentManager */
+    protected static $dm;
     protected static $sms;
     protected static $userRepo;
 
@@ -31,8 +33,9 @@ class SmsServiceTest extends WebTestCase
          //now we can instantiate our service (if you want a fresh one for
          //each test method, do this in setUp() instead
          self::$sms = self::$container->get('app.sms');
-         /** @var DocumentManager dm */
-         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+         /** @var DocumentManager */
+         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+         self::$dm = $dm;
          self::$userRepo = self::$dm->getRepository(User::class);
          self::$userManager = self::$container->get('fos_user.user_manager');
     }

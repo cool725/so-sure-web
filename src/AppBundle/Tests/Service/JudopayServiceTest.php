@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Repository\ScheduledPaymentRepository;
 use AppBundle\Service\FeatureService;
 use AppBundle\Service\JudopayService;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -30,6 +31,8 @@ class JudopayServiceTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
+    /** @var DocumentManager */
+    protected static $dm;
     /** @var JudopayService */
     protected static $judopay;
     protected static $userRepo;
@@ -45,8 +48,9 @@ class JudopayServiceTest extends WebTestCase
 
         //now we can instantiate our service (if you want a fresh one for
         //each test method, do this in setUp() instead
-        /** @var DocumentManager dm */
-        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        /** @var DocumentManager */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$dm = $dm;
         self::$userRepo = self::$dm->getRepository(User::class);
         self::$userManager = self::$container->get('fos_user.user_manager');
         self::$policyService = self::$container->get('app.policy');
@@ -306,7 +310,7 @@ class JudopayServiceTest extends WebTestCase
             self::$JUDO_TEST_CARD_PIN
         );
         try {
-            $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token');
+            $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token', JudoPayment::SOURCE_SYSTEM);
         } catch (\Exception $e) {
             // expected exception - ignore
             $this->assertNotNull($e);
@@ -612,7 +616,9 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice() * 2 + 1, $policy->getPremiumPaid());
 
         static::$dm->clear();
+        /** @var ScheduledPaymentRepository $repo */
         $repo = static::$dm->getRepository(ScheduledPayment::class);
+        /** @var ScheduledPayment $updatedScheduledPayment */
         $updatedScheduledPayment = $repo->find($scheduledPayment->getId());
         $this->assertEquals(ScheduledPayment::STATUS_SUCCESS, $updatedScheduledPayment->getStatus());
         $this->assertTrue($updatedScheduledPayment->getPayment()->isSuccess());

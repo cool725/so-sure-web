@@ -64,7 +64,9 @@ class InvitationServiceNetTest extends WebTestCase
 
         //now we can instantiate our service (if you want a fresh one for
         //each test method, do this in setUp() instead
-        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        /** @var DocumentManager */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$dm = $dm;
         self::$userRepo = self::$dm->getRepository(User::class);
         self::$userManager = self::$container->get('fos_user.user_manager');
         $transport = new \Swift_Transport_NullTransport(new \Swift_Events_SimpleEventDispatcher);
@@ -77,9 +79,10 @@ class InvitationServiceNetTest extends WebTestCase
             'bar'
         );
         /** @var InvitationService invitationService */
-        self::$invitationService = self::$container->get('app.invitation');
-        self::$invitationService->setMailer($mailer);
-        self::$invitationService->setDebug(true);
+        $invitationService = self::$container->get('app.invitation');
+        $invitationService->setMailer($mailer);
+        $invitationService->setDebug(true);
+        self::$invitationService = $invitationService;
 
         self::$policyService = self::$container->get('app.policy');
 

@@ -123,7 +123,9 @@ class GocardlessService
             $user->setPaymentMethod($gocardless);
             $this->dm->persist($gocardless);
         }
-        $user->getPaymentMethod()->setCustomerId($customer->id);
+        /** @var GocardlessPaymentMethod $gocardless */
+        $gocardless = $user->getPaymentMethod();
+        $gocardless->setCustomerId($customer->id);
         $this->dm->flush();
         /*
         try {
@@ -177,7 +179,9 @@ class GocardlessService
 
         // TODO: If $idempotent and 409 idempotent_creation_conflict occurs, query customer bank accounts
 
-        $user->getPaymentMethod()->addAccount($bankAccount->id, json_encode([
+        /** @var GocardlessPaymentMethod $gocardless */
+        $gocardless = $user->getPaymentMethod();
+        $gocardless->addAccount($bankAccount->id, json_encode([
             'id' => $bankAccount->id,
             'account_holder_name' => $bankAccount->account_holder_name,
             'account_number_ending' => $bankAccount->account_number_ending,
@@ -230,7 +234,9 @@ class GocardlessService
 
         // TODO: If $idempotent and 409 idempotent_creation_conflict occurs, query customer
 
-        $user->getPaymentMethod()->addMandate($mandate->id, json_encode([
+        /** @var GocardlessPaymentMethod $gocardless */
+        $gocardless = $user->getPaymentMethod();
+        $gocardless->addMandate($mandate->id, json_encode([
             'id' => $mandate->id,
             'customer_bank_account' => $mandate->links->customer_bank_account,
             'policy' => $policy->getId(),
@@ -284,7 +290,9 @@ class GocardlessService
 
         // TODO: If $idempotent and 409 idempotent_creation_conflict occurs, query customer
 
-        $user->getPaymentMethod()->addSubscription($subscription->id, json_encode([
+        /** @var GocardlessPaymentMethod $gocardless */
+        $gocardless = $user->getPaymentMethod();
+        $gocardless->addSubscription($subscription->id, json_encode([
             'id' => $subscription->id,
             'mandate' => $subscription->links->mandate,
             'policy' => $policy->getId(),

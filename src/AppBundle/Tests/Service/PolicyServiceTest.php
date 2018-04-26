@@ -43,6 +43,8 @@ class PolicyServiceTest extends WebTestCase
     use \AppBundle\Document\DateTrait;
 
     protected static $container;
+    /** @var DocumentManager */
+    protected static $dm;
     protected static $policyRepo;
     protected static $judopay;
 
@@ -57,7 +59,9 @@ class PolicyServiceTest extends WebTestCase
 
         //now we can instantiate our service (if you want a fresh one for
         //each test method, do this in setUp() instead
-        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        /** @var DocumentManager */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$dm = $dm;
         self::$policyRepo = self::$dm->getRepository(Policy::class);
         self::$userManager = self::$container->get('fos_user.user_manager');
         self::$policyService = self::$container->get('app.policy');
@@ -2218,7 +2222,7 @@ class PolicyServiceTest extends WebTestCase
         $newPolicyA->setPremiumInstallments(12);
         self::addPayment(
             $newPolicyA,
-            $newPolicyA->getPremium(new \DateTime('2017-01-01'))->getMonthlyPremiumPrice(),
+            $newPolicyA->getPremium()->getMonthlyPremiumPrice(),
             Salva::MONTHLY_TOTAL_COMMISSION,
             null,
             new \DateTime('2017-01-01')
@@ -4524,10 +4528,12 @@ class PolicyServiceTest extends WebTestCase
         static::$dm->flush();
 
         $policyRepo = static::$dm->getRepository(Policy::class);
+        /** @var Policy $updatedPolicyA */
         $updatedPolicyA = $policyRepo->find($policyA->getId());
         static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
         $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $updatedPolicyA->getStatus());
 
+        /** @var Policy $updatedRenewalPolicyA */
         $updatedRenewalPolicyA = $policyRepo->find($policyA->getNextPolicy()->getId());
         $this->assertNotNull($policyB->getConnections()[0]->getLinkedPolicyRenewal());
         $this->assertTrue(count($updatedRenewalPolicyA->getAcceptedConnectionsRenewal()) > 0);
@@ -4570,10 +4576,12 @@ class PolicyServiceTest extends WebTestCase
         static::$dm->flush();
 
         $policyRepo = static::$dm->getRepository(Policy::class);
+        /** @var Policy $updatedPolicyA */
         $updatedPolicyA = $policyRepo->find($policyA->getId());
         static::$policyService->expire($policyA, new \DateTime('2017-01-01'));
         $this->assertEquals(Policy::STATUS_EXPIRED_CLAIMABLE, $updatedPolicyA->getStatus());
 
+        /** @var Policy $updatedRenewalPolicyA */
         $updatedRenewalPolicyA = $policyRepo->find($policyA->getNextPolicy()->getId());
         $this->assertNotNull($policyB->getConnections()[0]->getLinkedPolicyRenewal());
         $this->assertTrue(count($updatedRenewalPolicyA->getAcceptedConnectionsRenewal()) > 0);

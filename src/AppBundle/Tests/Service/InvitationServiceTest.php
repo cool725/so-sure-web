@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Repository\PolicyRepository;
 use FOS\UserBundle\Model\UserManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -45,6 +46,8 @@ class InvitationServiceTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
+    /** @var DocumentManager */
+    protected static $dm;
     protected static $gocardless;
     protected static $userRepo;
     protected static $invitationService;
@@ -62,8 +65,9 @@ class InvitationServiceTest extends WebTestCase
 
         //now we can instantiate our service (if you want a fresh one for
         //each test method, do this in setUp() instead
-        /** @var DocumentManager dm */
-        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        /** @var DocumentManager */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$dm = $dm;
         self::$userRepo = self::$dm->getRepository(User::class);
         /** @var UserManagerInterface userManager */
         self::$userManager = self::$container->get('fos_user.user_manager');
@@ -77,9 +81,10 @@ class InvitationServiceTest extends WebTestCase
             'bar'
         );
         /** @var InvitationService invitationService */
-        self::$invitationService = self::$container->get('app.invitation');
-        self::$invitationService->setMailer($mailer);
-        self::$invitationService->setDebug(true);
+        $invitationService = self::$container->get('app.invitation');
+        $invitationService->setMailer($mailer);
+        $invitationService->setDebug(true);
+        self::$invitationService = $invitationService;
 
         self::$policyService = self::$container->get('app.policy');
         self::$scodeService = self::$container->get('app.scode');
@@ -95,7 +100,9 @@ class InvitationServiceTest extends WebTestCase
         self::$invitationService->setEnvironment('test');
         self::$policyService->setEnvironment('test');
 
-        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        /** @var DocumentManager */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$dm = $dm;
         $phoneRepo = self::$dm->getRepository(Phone::class);
         self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
         self::$phone2 = $phoneRepo->findOneBy(['devices' => 'iPhone8,1', 'memory' => 64]);
@@ -1604,7 +1611,9 @@ class InvitationServiceTest extends WebTestCase
 
         self::$invitationService->accept($invitation, $policyInvitee, new \DateTime('2016-05-01'));
 
+        /** @var PolicyRepository $repo */
         $repo = static::$dm->getRepository(Policy::class);
+        /** @var Policy $inviterPolicy */
         $inviterPolicy = $repo->find($policy->getId());
         $connectionFound = false;
         foreach ($inviterPolicy->getConnections() as $connection) {
@@ -1618,6 +1627,7 @@ class InvitationServiceTest extends WebTestCase
         }
         $this->assertTrue($connectionFound);
 
+        /** @var Policy $inviteePolicy */
         $inviteePolicy = $repo->find($policyInvitee->getId());
         // user created before invitation, so shouldn't be set
         $this->assertNull($inviteePolicy->getUser()->getLeadSource());
@@ -1753,6 +1763,7 @@ class InvitationServiceTest extends WebTestCase
         ));
 
         $repo = static::$dm->getRepository(User::class);
+        /** @var User $userInviteeUpdated */
         $userInviteeUpdated = $repo->find($userInvitee->getId());
         $this->assertEquals('invitation', $userInviteeUpdated->getLeadSource());
     }
@@ -1854,6 +1865,7 @@ class InvitationServiceTest extends WebTestCase
         self::$invitationService->accept($invitationAfter, $policyInviteeAfter, new \DateTime('2016-04-10'));
 
         $repo = static::$dm->getRepository(Policy::class);
+        /** @var Policy $inviterPolicy */
         $inviterPolicy = $repo->find($policy->getId());
         $connectionFoundBefore = false;
         $connectionFoundAfter = false;
@@ -1962,6 +1974,7 @@ class InvitationServiceTest extends WebTestCase
         }
 
         $repo = static::$dm->getRepository(Policy::class);
+        /** @var Policy $checkPolicy */
         $checkPolicy = $repo->find($policy->getId());
         $connectionFound = false;
         foreach ($checkPolicy->getConnections() as $connection) {
@@ -1978,6 +1991,7 @@ class InvitationServiceTest extends WebTestCase
         );
 
         $repo = static::$dm->getRepository(Policy::class);
+        /** @var Policy $checkPolicy */
         $checkPolicy = $repo->find($policy->getId());
         $connectionFound = false;
         foreach ($checkPolicy->getConnections() as $connection) {
@@ -2007,6 +2021,7 @@ class InvitationServiceTest extends WebTestCase
         }
 
         $repo = static::$dm->getRepository(Policy::class);
+        /** @var Policy $checkPolicy */
         $checkPolicy = $repo->find($policy->getId());
         $connectionFound = false;
         foreach ($checkPolicy->getConnections() as $connection) {
@@ -2023,6 +2038,7 @@ class InvitationServiceTest extends WebTestCase
         );
 
         $repo = static::$dm->getRepository(Policy::class);
+        /** @var Policy $checkPolicy */
         $checkPolicy = $repo->find($policy->getId());
         $connectionFound = false;
         // 83.88 - 15 * 5 = 8.88
@@ -2061,6 +2077,7 @@ class InvitationServiceTest extends WebTestCase
         }
 
         $repo = static::$dm->getRepository(Policy::class);
+        /** @var Policy $checkPolicy */
         $checkPolicy = $repo->find($policy->getId());
         $connectionFound = false;
         foreach ($checkPolicy->getConnections() as $connection) {
@@ -2077,6 +2094,7 @@ class InvitationServiceTest extends WebTestCase
         );
 
         $repo = static::$dm->getRepository(Policy::class);
+        /** @var Policy $checkPolicy */
         $checkPolicy = $repo->find($policy->getId());
         $connectionFound = false;
         // 103.68 - 15 * 6 = 13.68
@@ -2175,6 +2193,15 @@ class InvitationServiceTest extends WebTestCase
         $this->assertEquals(2, count($policy->getConnections()));
     }
 
+    /**
+     * @param string      $email
+     * @param \DateTime   $date
+     * @param string|null $inviteeEmail
+     * @param Policy|null $policy
+     * @param Phone|null  $phone
+     * @return \AppBundle\Document\SalvaPhonePolicy
+     * @throws \Exception
+     */
     private function createAndLink($email, $date, $inviteeEmail = null, $policy = null, $phone = null)
     {
         if ($phone == null) {

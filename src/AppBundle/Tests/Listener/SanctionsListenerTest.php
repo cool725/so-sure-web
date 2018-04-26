@@ -7,6 +7,7 @@ use AppBundle\Document\Sanctions;
 use AppBundle\Document\User;
 use AppBundle\Event\CompanyEvent;
 use AppBundle\Event\UserEvent;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use AppBundle\Listener\DoctrineConnectionListener;
@@ -27,6 +28,8 @@ class SanctionsListenerTest extends WebTestCase
     use \AppBundle\Tests\UserClassTrait;
 
     protected static $container;
+    /** @var DocumentManager */
+    protected static $dm;
     protected static $redis;
     protected static $sanctionsService;
 
@@ -40,7 +43,9 @@ class SanctionsListenerTest extends WebTestCase
         self::$container = $kernel->getContainer();
         //now we can instantiate our service (if you want a fresh one for
         //each test method, do this in setUp() instead
-        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        /** @var DocumentManager */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$dm = $dm;
         self::$redis = self::$container->get('snc_redis.default');
         self::$sanctionsService = self::$container->get('app.sanctions');
     }

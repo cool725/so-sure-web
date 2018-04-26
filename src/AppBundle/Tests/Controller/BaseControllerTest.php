@@ -2,6 +2,8 @@
 
 namespace AppBundle\Tests\Controller;
 
+use Doctrine\ODM\MongoDB\DocumentManager;
+use Predis\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Listener\UserListener;
 use AppBundle\Event\UserEmailEvent;
@@ -12,9 +14,12 @@ class BaseControllerTest extends WebTestCase
     use \AppBundle\Tests\UserClassTrait;
     protected static $client;
     protected static $container;
+    /** @var DocumentManager */
+    protected static $dm;
     protected static $identity;
     protected static $jwt;
     protected static $router;
+    /** @var Client */
     protected static $redis;
     protected static $invitationService;
 
@@ -27,7 +32,9 @@ class BaseControllerTest extends WebTestCase
         self::$client = self::createClient();
         self::$container = self::$client->getContainer();
         self::$identity = self::$container->get('app.cognito.identity');
-        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        /** @var DocumentManager */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$dm = $dm;
         self::$userManager = self::$container->get('fos_user.user_manager');
         self::$router = self::$container->get('router');
         self::$jwt = self::$container->get('app.jwt');
@@ -186,7 +193,7 @@ class BaseControllerTest extends WebTestCase
 
     /**
      *
-     * @param $item string
+     * @param string $item
      *
      * check if id is one of the search form ID's
      */
@@ -207,7 +214,6 @@ class BaseControllerTest extends WebTestCase
     }
 
     /**
-     * @param $forms array
      *
      * Returns list of all phone search forms, extracts data-base-path and data-path suffix
      */

@@ -4,6 +4,7 @@ namespace AppBundle\DataFixtures\MongoDB\c\Policy;
 
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Service\PolicyService;
+use AppBundle\Service\RouterService;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use AppBundle\Document\SalvaPhonePolicy;
@@ -570,7 +571,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $scode->setType(SCode::TYPE_STANDARD);
             $policy->addSCode($scode);
         }
-        /** @var RouterInterface $router */
+        /** @var RouterService $router */
         $router = $this->container->get('app.router');
         $shareUrl = $router->generateUrl(
             'scode',

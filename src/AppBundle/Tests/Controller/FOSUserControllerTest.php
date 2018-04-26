@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
+use Symfony\Component\HttpKernel\DataCollector\EventDataCollector;
 
 /**
  * @group functional-net
