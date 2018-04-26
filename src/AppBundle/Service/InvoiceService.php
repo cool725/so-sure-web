@@ -69,15 +69,15 @@ class InvoiceService
     }
 
     /**
-     * @param DocumentManager    $dm
-     * @param LoggerInterface    $logger
-     * @param SequenceService    $sequence
-     * @param MailerService      $mailer
-     * @param \Swift_Transport   $smtp
-     * @param EngineInterface    $templating
-     * @param string             $environment
-     * @param LoggableGenerator  $snappyPdf
-     * @param S3Client           $s3
+     * @param DocumentManager   $dm
+     * @param LoggerInterface   $logger
+     * @param SequenceService   $sequence
+     * @param MailerService     $mailer
+     * @param \Swift_Transport  $smtp
+     * @param EngineInterface   $templating
+     * @param string            $environment
+     * @param LoggableGenerator $snappyPdf
+     * @param S3Client          $s3
      */
     public function __construct(
         DocumentManager $dm,

@@ -84,16 +84,16 @@ class BacsService
     protected $templating;
 
     /**
-     * @param DocumentManager    $dm
-     * @param LoggerInterface    $logger
-     * @param S3Client           $s3
-     * @param string             $fileEncryptionPassword
-     * @param string             $environment
-     * @param MailerService      $mailerService
-     * @param Client             $redis
-     * @param PaymentService     $paymentService
-     * @param LoggableGenerator  $snappyPdf
-     * @param EngineInterface    $templating
+     * @param DocumentManager   $dm
+     * @param LoggerInterface   $logger
+     * @param S3Client          $s3
+     * @param string            $fileEncryptionPassword
+     * @param string            $environment
+     * @param MailerService     $mailerService
+     * @param Client            $redis
+     * @param PaymentService    $paymentService
+     * @param LoggableGenerator $snappyPdf
+     * @param EngineInterface   $templating
      */
     public function __construct(
         DocumentManager $dm,
