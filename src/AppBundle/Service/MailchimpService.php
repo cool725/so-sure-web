@@ -35,17 +35,17 @@ class MailchimpService
     /**
      * @param string $email
      *
-     * @return boolean
+     * @return boolean|null
      */
     public function subscribe($email)
     {
         if ($this->environment != 'prod') {
-            return;
+            return null;
         }
 
         // don't send @so-sure.com emails to mailchimp
         if (mb_stripos($email, "@so-sure.com") !== false) {
-            return;
+            return null;
         }
 
         $url = sprintf("lists/%s/members", $this->list);

@@ -176,7 +176,7 @@ class PolicyService
      * @param EngineInterface          $templating
      * @param RouterService            $routerService
      * @param string                   $environment
-     * @param GeneratorInterface       $snappyPdf
+     * @param AbstractGenerator        $snappyPdf
      * @param EventDispatcherInterface $dispatcher
      * @param S3Client                 $s3
      * @param ShortLinkService         $shortLink
@@ -200,7 +200,7 @@ class PolicyService
         EngineInterface $templating,
         RouterService $routerService,
         $environment,
-        GeneratorInterface $snappyPdf,
+        AbstractGenerator $snappyPdf,
         EventDispatcherInterface $dispatcher,
         S3Client $s3,
         ShortLinkService $shortLink,

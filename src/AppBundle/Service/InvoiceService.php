@@ -75,7 +75,7 @@ class InvoiceService
      * @param \Swift_Transport   $smtp
      * @param EngineInterface    $templating
      * @param string             $environment
-     * @param GeneratorInterface $snappyPdf
+     * @param AbstractGenerator  $snappyPdf
      * @param S3Client           $s3
      */
     public function __construct(
@@ -86,7 +86,7 @@ class InvoiceService
         \Swift_Transport $smtp,
         EngineInterface $templating,
         $environment,
-        GeneratorInterface $snappyPdf,
+        AbstractGenerator $snappyPdf,
         S3Client $s3
     ) {
         $this->dm = $dm;

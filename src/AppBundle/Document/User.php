@@ -76,7 +76,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     /**
      * @MongoDB\EmbedOne(targetDocument="Address")
      * @Gedmo\Versioned
-     * @var Address
+     * @var Address|null
      */
     protected $billingAddress;
 

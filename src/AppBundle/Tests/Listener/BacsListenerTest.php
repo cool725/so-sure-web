@@ -56,9 +56,13 @@ class BacsListenerTest extends WebTestCase
         self::$dm = $dm;
         self::$userRepo = self::$dm->getRepository(User::class);
         self::$userManager = self::$container->get('fos_user.user_manager');
-        self::$bacsListener = self::$container->get('app.listener.bacs');
+        /** @var BacsListener $bacsListener */
+        $bacsListener = self::$container->get('app.listener.bacs');
+        self::$bacsListener = $bacsListener;
         self::$redis = self::$container->get('snc_redis.default');
-        self::$bacsService = self::$container->get('app.bacs');
+        /** @var BacsService $bacsService */
+        $bacsService = self::$container->get('app.bacs');
+        self::$bacsService = $bacsService;
     }
 
     public function tearDown()

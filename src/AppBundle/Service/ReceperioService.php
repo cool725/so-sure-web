@@ -43,13 +43,13 @@ class ReceperioService extends BaseImeiService
     /** @var string */
     protected $storeId;
 
-    /** @var string */
+    /** @var string|null */
     protected $certId;
 
     /** @var string */
     protected $environment;
 
-    /** @var string */
+    /** @var string|null */
     protected $responseData;
 
     protected $isTestRun;

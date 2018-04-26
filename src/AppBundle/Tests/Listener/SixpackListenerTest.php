@@ -47,8 +47,12 @@ class SixpackListenerTest extends WebTestCase
         self::$dm = $dm;
         self::$userRepo = self::$dm->getRepository(User::class);
         self::$userManager = self::$container->get('fos_user.user_manager');
-        self::$sixpackService = self::$container->get('app.sixpack');
-        self::$policyService = self::$container->get('app.policy');
+        /** @var SixpackService $sixpackService */
+        $sixpackService = self::$container->get('app.sixpack');
+        self::$sixpackService = $sixpackService;
+        /** @var PolicyService $policyService */
+        $policyService = self::$container->get('app.policy');
+        self::$policyService = $policyService;
     }
 
     public function tearDown()

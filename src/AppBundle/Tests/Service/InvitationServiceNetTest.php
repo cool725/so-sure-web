@@ -67,7 +67,9 @@ class InvitationServiceNetTest extends WebTestCase
         /** @var DocumentManager */
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
         self::$dm = $dm;
-        self::$userRepo = self::$dm->getRepository(User::class);
+        /** @var UserRepository $userRepo */
+        $userRepo = self::$dm->getRepository(User::class);
+        self::$userRepo = $userRepo;
         self::$userManager = self::$container->get('fos_user.user_manager');
         $transport = new \Swift_Transport_NullTransport(new \Swift_Events_SimpleEventDispatcher);
         $mailer = new MailerService(

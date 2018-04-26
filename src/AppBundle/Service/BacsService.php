@@ -91,7 +91,7 @@ class BacsService
      * @param MailerService      $mailerService
      * @param Client             $redis
      * @param PaymentService     $paymentService
-     * @param GeneratorInterface $snappyPdf
+     * @param AbstractGenerator  $snappyPdf
      * @param EngineInterface    $templating
      */
     public function __construct(
@@ -103,7 +103,7 @@ class BacsService
         MailerService $mailerService,
         Client $redis,
         PaymentService $paymentService,
-        GeneratorInterface $snappyPdf,
+        AbstractGenerator $snappyPdf,
         EngineInterface $templating
     ) {
         $this->dm = $dm;

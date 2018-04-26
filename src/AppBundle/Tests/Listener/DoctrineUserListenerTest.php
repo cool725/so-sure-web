@@ -38,7 +38,9 @@ class DoctrineUserListenerTest extends WebTestCase
         $kernel->boot();
 
         //get the DI container
-        self::$container = $kernel->getContainer();
+        /** @var Container $container */
+        $container = $kernel->getContainer();
+        self::$container = $container;
 
         //now we can instantiate our service (if you want a fresh one for
         //each test method, do this in setUp() instead
