@@ -23,7 +23,7 @@
 
     <div class="checkout--top">
         <div class="container text-center">
-            <h1>Setup a Direct Debit with SO-SURE <br> <small> for your {{ policy.phone.make }} {{ policy.phone.model }}  ({{ policy.phone.memory }}GB) Insurance</small></h1>
+            <h1>Setup a Direct Debit with SO-SURE <br> <small> for your {{ policy.phone.make }} {{ policy.phone.model }}  ({{ policy.phone.memory }}GB) insurance</small></h1>
             <p><img src="{{ cdn_url }}/images/direct-debit-logo.svg" alt="Direct Debit" width="180px" class="img-center"></p>
             <p><a href="#" class="web-pay-submit">Prefer to pay by card?</a></p>
 
@@ -32,7 +32,7 @@
 
     <div class="checkout--step">
         <div class="container">
-            <p><small>Please enter your bank details you wish to use for your Direct Debit each month.</small></p>
+            <p class="text-center"><small>Please enter your bank details you wish to use for your Direct Debit each month.</small></p>
 
             {{ form_start(bacs_form, {'attr': {'class': 'form','autocomplete': 'off'}}) }}
                 <div class="form-group {% if form_errors(bacs_form.accountName) %}has-error{% endif %}">
