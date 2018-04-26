@@ -669,7 +669,9 @@ class PurchaseController extends BaseController
                 }
             } elseif ($request->request->has('bacs_confirm_form')) {
                 $bacsConfirmForm->handleRequest($request);
-                if ($bacsConfirmForm->get('back')->isClicked()) {
+                /** @var SubmitButton $backButton */
+                $backButton = $bacsConfirmForm->get('back');
+                if ($backButton->isClicked()) {
                     $bacs = clone $bacsConfirm;
                     $bacsForm = $this->get('form.factory')
                         ->createNamedBuilder('bacs_form', BacsType::class, $bacs)
