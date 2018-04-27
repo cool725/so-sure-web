@@ -93,7 +93,7 @@ class BankAccount
     /**
      * @MongoDB\EmbedOne(targetDocument="Address")
      * @Gedmo\Versioned
-     * @var Address
+     * @var Address|null
      */
     protected $bankAddress;
 
@@ -125,7 +125,7 @@ class BankAccount
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
-     * @var \DateTime
+     * @var \DateTime|null
      */
     protected $initialNotificationDate;
 
@@ -143,7 +143,7 @@ class BankAccount
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
-     * @var \DateTime
+     * @var \DateTime|null
      */
     protected $standardNotificationDate;
 

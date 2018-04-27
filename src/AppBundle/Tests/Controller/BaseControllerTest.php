@@ -31,6 +31,9 @@ class BaseControllerTest extends WebTestCase
     {
         self::$client = self::createClient();
         self::$container = self::$client->getContainer();
+        if (!self::$container) {
+            throw new \Exception('unable to find container');
+        }
         self::$identity = self::$container->get('app.cognito.identity');
         /** @var DocumentManager */
         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
@@ -69,6 +72,9 @@ class BaseControllerTest extends WebTestCase
     protected function getNewDocumentManager()
     {
         $client = self::createClient();
+        if (!$client->getContainer()) {
+            throw new \Exception("missing container");
+        }
         return $client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
     }
 

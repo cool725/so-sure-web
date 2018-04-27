@@ -71,7 +71,7 @@ class ApiExternalController extends BaseController
             if ($request->get('debug')) {
                 $zendeskIps[] = '127.0.0.1';
             }
-            if (!IpUtils::checkIp($clientIp, $zendeskIps)) {
+            if (!$clientIp || !IpUtils::checkIp($clientIp, $zendeskIps)) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Unauthorized', 401);
             }
 

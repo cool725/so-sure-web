@@ -576,6 +576,10 @@ class BacsService
             return true;
         }
 
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
         $advanceDate = clone $date;
         $advanceDate = $this->addBusinessDays($advanceDate, 3);
 

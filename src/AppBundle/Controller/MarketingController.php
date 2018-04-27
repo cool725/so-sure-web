@@ -52,7 +52,7 @@ class MarketingController extends BaseController
     {
         //$this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
         $session = $request->getSession();
-        if ($session->isStarted()) {
+        if ($session && $session->isStarted()) {
             $session->set('partner', 'starling');
         }
 

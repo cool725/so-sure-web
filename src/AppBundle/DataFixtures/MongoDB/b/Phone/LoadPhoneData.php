@@ -14,7 +14,7 @@ use Symfony\Component\Routing\RouterInterface;
 abstract class LoadPhoneData implements ContainerAwareInterface
 {
     /**
-     * @var ContainerInterface
+     * @var ContainerInterface|null
      */
     protected $container;
 
@@ -25,6 +25,10 @@ abstract class LoadPhoneData implements ContainerAwareInterface
 
     protected function loadCsv(ObjectManager $manager, $filename, $date = null)
     {
+        if (!$this->container) {
+            throw new \Exception('missing container');
+        }
+
         if (!$date) {
             $date = new \DateTime('2016-01-01');
         }
@@ -70,6 +74,10 @@ abstract class LoadPhoneData implements ContainerAwareInterface
 
     private function notifyNewPhones($newPhones)
     {
+        if (!$this->container) {
+            throw new \Exception('missing container');
+        }
+
         $env = $this->container->getParameter('kernel.environment');
         if ($env != 'prod') {
             return;
@@ -241,6 +249,9 @@ abstract class LoadPhoneData implements ContainerAwareInterface
 
     protected function newPhone($manager, $make, $model, $policyPrice, $memory = null, $devices = null)
     {
+        if (!$this->container) {
+            throw new \Exception('missing container');
+        }
         /** @var RouterInterface $router */
         $router = $this->container->get('router');
         // Validate that the regex for quote make model is working for all the data

@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 
-class UserSearchType extends AbstractType
+class UserSearchType extends BaseType
 {
     /**
      * @var RequestStack
@@ -59,13 +59,13 @@ class UserSearchType extends AbstractType
         $currentRequest = $this->requestStack->getCurrentRequest();
         $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) use ($currentRequest) {
             $form = $event->getForm();
-            $form->get('email')->setData($currentRequest->query->get('email'));
-            $form->get('mobile')->setData($currentRequest->query->get('mobile'));
-            $form->get('postcode')->setData($currentRequest->query->get('postcode'));
-            $form->get('lastname')->setData($currentRequest->query->get('lastname'));
-            $form->get('facebookId')->setData($currentRequest->query->get('facebookId'));
-            $form->get('waitingSanctions')->setData($currentRequest->query->get('waitingSanctions'));
-            $form->get('allSanctions')->setData($currentRequest->query->get('allSanctions'));
+            $this->formQuerystring($form, $currentRequest, 'email');
+            $this->formQuerystring($form, $currentRequest, 'mobile');
+            $this->formQuerystring($form, $currentRequest, 'postcode');
+            $this->formQuerystring($form, $currentRequest, 'lastname');
+            $this->formQuerystring($form, $currentRequest, 'facebookId');
+            $this->formQuerystring($form, $currentRequest, 'waitingSanctions');
+            $this->formQuerystring($form, $currentRequest, 'allSanctions');
         });
     }
 

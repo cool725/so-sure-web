@@ -69,8 +69,9 @@ class KernelListener
         $refererDomain = parse_url($referer, PHP_URL_HOST);
         $currentDomain = parse_url($request->getUri(), PHP_URL_HOST);
         if (mb_strtolower($refererDomain) != mb_strtolower($currentDomain)) {
-            $session = $request->getSession();
-            $session->set('referer', $referer);
+            if ($session = $request->getSession()) {
+                $session->set('referer', $referer);
+            }
         }
 
         // In case a session that was started in-app, is re-used in the main webbrowser

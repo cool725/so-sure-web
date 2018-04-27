@@ -108,7 +108,7 @@ class BrightstarService extends S3EmailService
             $this->errors[$brightstar->claimNumber][] = $msg;
         }
 
-        if ($brightstar->postcode && !$this->postcodeCompare(
+        if ($brightstar->postcode && $user->getBillingAddress() && !$this->postcodeCompare(
             $user->getBillingAddress()->getPostcode(),
             $brightstar->postcode
         ) && !$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_BRIGHTSTAR_POSTCODE)) {

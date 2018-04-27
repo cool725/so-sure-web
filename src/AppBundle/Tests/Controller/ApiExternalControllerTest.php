@@ -457,9 +457,16 @@ class ApiExternalControllerTest extends BaseApiControllerTest
             $data
         );
 
+        if (!$client->getContainer()) {
+            throw new \Exception("missing container");
+        }
+        $container = $client->getContainer();
+        $utm = [];
         /** @var SessionInterface $session */
-        $session = $client->getContainer()->get('session');
-        $utm = unserialize($session->get('utm'));
+        $session = $container->get('session');
+        if ($session) {
+            $utm = unserialize($session->get('utm'));
+        }
         $this->assertEquals('foo', $utm['source']);
     }
 

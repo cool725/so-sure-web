@@ -63,7 +63,7 @@ class ReceperioService extends BaseImeiService
 
     protected $makeModelValidatedStatus;
 
-    /** @var IdentityLog */
+    /** @var IdentityLog|null */
     private $identityLog;
 
     public function setMakeModelValidatedStatus($makeModelValidatedStatus)
@@ -643,12 +643,12 @@ class ReceperioService extends BaseImeiService
     /**
      * Validate that the serial number matches the expected phone details
      *
-     * @param Phone       $phone
-     * @param string      $serialNumber
-     * @param string|null $imei
-     * @param User        $user
-     * @param IdentityLog $identityLog
-     * @param boolean     $warnMismatch For web, we don't need to warn on mismatch as probably user issue
+     * @param Phone            $phone
+     * @param string           $serialNumber
+     * @param string|null      $imei
+     * @param User             $user
+     * @param IdentityLog|null $identityLog
+     * @param boolean          $warnMismatch For web, we don't need to warn on mismatch as probably user issue
      *
      * @return boolean True if imei is ok
      */

@@ -1872,7 +1872,10 @@ class PhonePolicyTest extends WebTestCase
         $policy->addPayment($payment);
 
         $date = new \DateTime('2016-01-01');
-        $this->assertEquals($date, $policy->getLastSuccessfulUserPaymentCredit()->getDate());
+        $this->assertNotNull($policy->getLastSuccessfulUserPaymentCredit());
+        if ($policy->getLastSuccessfulUserPaymentCredit()) {
+            $this->assertEquals($date, $policy->getLastSuccessfulUserPaymentCredit()->getDate());
+        }
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
@@ -1883,7 +1886,10 @@ class PhonePolicyTest extends WebTestCase
         $policy->addPayment($payment);
 
         $date = new \DateTime('2016-01-01');
-        $this->assertEquals($date, $policy->getLastSuccessfulUserPaymentCredit()->getDate());
+        $this->assertNotNull($policy->getLastSuccessfulUserPaymentCredit());
+        if ($policy->getLastSuccessfulUserPaymentCredit()) {
+            $this->assertEquals($date, $policy->getLastSuccessfulUserPaymentCredit()->getDate());
+        }
 
         $payment = new JudoPayment();
         $payment->setAmount(static::$phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
@@ -1894,7 +1900,10 @@ class PhonePolicyTest extends WebTestCase
         $policy->addPayment($payment);
 
         $date = new \DateTime('2016-02-15');
-        $this->assertEquals($date, $policy->getLastSuccessfulUserPaymentCredit()->getDate());
+        $this->assertNotNull($policy->getLastSuccessfulUserPaymentCredit());
+        if ($policy->getLastSuccessfulUserPaymentCredit()) {
+            $this->assertEquals($date, $policy->getLastSuccessfulUserPaymentCredit()->getDate());
+        }
 
         // Neg payment (debit/refund) should be ignored
         $payment = new JudoPayment();
@@ -1905,7 +1914,10 @@ class PhonePolicyTest extends WebTestCase
         $policy->addPayment($payment);
 
         $date = new \DateTime('2016-02-15');
-        $this->assertEquals($date, $policy->getLastSuccessfulUserPaymentCredit()->getDate());
+        $this->assertNotNull($policy->getLastSuccessfulUserPaymentCredit());
+        if ($policy->getLastSuccessfulUserPaymentCredit()) {
+            $this->assertEquals($date, $policy->getLastSuccessfulUserPaymentCredit()->getDate());
+        }
     }
 
     /**
@@ -4300,8 +4312,10 @@ class PhonePolicyTest extends WebTestCase
         $this->assertTrue($foundSoSure);
         $this->assertTrue($foundPot);
         $this->assertNotNull($updatedPolicyA->getCashback());
-        $this->assertEquals(15, $updatedPolicyA->getCashback()->getAmount());
-        $this->assertEquals(Cashback::STATUS_MISSING, $updatedPolicyA->getCashback()->getStatus());
+        if ($updatedPolicyA->getCashback()) {
+            $this->assertEquals(15, $updatedPolicyA->getCashback()->getAmount());
+            $this->assertEquals(Cashback::STATUS_MISSING, $updatedPolicyA->getCashback()->getStatus());
+        }
     }
 
     public function testExpireWithPromoNoCashbackClaimed()
@@ -4364,8 +4378,10 @@ class PhonePolicyTest extends WebTestCase
         $this->assertTrue($foundPot);
         $this->assertTrue($foundPotRefund);
         $this->assertNotNull($updatedPolicyA->getCashback());
-        $this->assertEquals(0, $updatedPolicyA->getCashback()->getAmount());
-        $this->assertEquals(Cashback::STATUS_MISSING, $updatedPolicyA->getCashback()->getStatus());
+        if ($updatedPolicyA->getCashback()) {
+            $this->assertEquals(0, $updatedPolicyA->getCashback()->getAmount());
+            $this->assertEquals(Cashback::STATUS_MISSING, $updatedPolicyA->getCashback()->getStatus());
+        }
     }
 
     public function testExpireNoPromoWithCashback()
@@ -4415,8 +4431,10 @@ class PhonePolicyTest extends WebTestCase
         $this->assertFalse($foundSoSure);
         $this->assertTrue($foundPot);
         $this->assertNotNull($updatedPolicyA->getCashback());
-        $this->assertEquals(10, $updatedPolicyA->getCashback()->getAmount());
-        $this->assertEquals(Cashback::STATUS_PENDING_CLAIMABLE, $updatedPolicyA->getCashback()->getStatus());
+        if ($updatedPolicyA->getCashback()) {
+            $this->assertEquals(10, $updatedPolicyA->getCashback()->getAmount());
+            $this->assertEquals(Cashback::STATUS_PENDING_CLAIMABLE, $updatedPolicyA->getCashback()->getStatus());
+        }
     }
 
     public function testRenewalIpt()

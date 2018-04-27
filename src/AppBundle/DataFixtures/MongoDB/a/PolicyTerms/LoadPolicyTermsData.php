@@ -22,7 +22,7 @@ use Faker;
 class LoadPolicyTermsData implements FixtureInterface, ContainerAwareInterface
 {
      /**
-     * @var ContainerInterface
+     * @var ContainerInterface|null
      */
     private $container;
 

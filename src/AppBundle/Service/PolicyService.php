@@ -1610,7 +1610,7 @@ class PolicyService
             return null;
         }
 
-        if ($policy->hasCashback() && !in_array($policy->getCashback()->getStatus(), [
+        if ($policy->hasCashback() && $policy->getCashback() && !in_array($policy->getCashback()->getStatus(), [
                 Cashback::STATUS_MISSING,
                 Cashback::STATUS_FAILED,
                 Cashback::STATUS_PAID,

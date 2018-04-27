@@ -48,7 +48,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     const PICSURE_NON_POLICY = 'n/a';
 
     /**
-     * @var ContainerInterface
+     * @var ContainerInterface|null
      */
     private $container;
 
@@ -346,6 +346,10 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
 
         $manager->flush();
+
+        if (!$this->container) {
+            throw new \Exception('missing container');
+        }
         /** @var PolicyService $policyService */
         $policyService = $this->container->get('app.policy');
 
@@ -565,6 +569,9 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         if (!$phone) {
             $phone = $this->getRandomPhone($manager);
         }
+        if (!$this->container) {
+            throw new \Exception('missing container');
+        }
         /** @var DocumentManager $dm */
         $dm = $this->container->get('doctrine_mongodb.odm.default_document_manager');
         $policyTermsRepo = $dm->getRepository(PolicyTerms::class);
@@ -595,6 +602,9 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $scode->setCode($code);
             $scode->setType(SCode::TYPE_STANDARD);
             $policy->addSCode($scode);
+        }
+        if (!$this->container) {
+            throw new \Exception('missing container');
         }
         /** @var RouterService $router */
         $router = $this->container->get('app.router');
@@ -668,6 +678,9 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             }
         }
         $manager->persist($policy);
+        if (!$this->container) {
+            throw new \Exception('missing container');
+        }
         $env = $this->container->getParameter('kernel.environment');
         $policy->create(-5000 + $count, mb_strtoupper($env), $startDate);
         $now = new \DateTime();
