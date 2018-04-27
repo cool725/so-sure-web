@@ -11,7 +11,10 @@ class GocardlessPaymentMethod extends PaymentMethod
     protected $customerId;
 
     // TODO: Add ordering
-    /** @MongoDB\Field(type="hash") */
+    /**
+     * @MongoDB\Field(type="hash")
+     * @var array
+     */
     protected $accounts = array();
 
     /** @MongoDB\Field(type="hash") */
@@ -42,6 +45,9 @@ class GocardlessPaymentMethod extends PaymentMethod
         }
     }
 
+    /**
+     * @return array
+     */
     public function getAccounts()
     {
         return $this->accounts;
@@ -62,7 +68,7 @@ class GocardlessPaymentMethod extends PaymentMethod
      */
     public function getPrimaryAccount()
     {
-        if (count($this->getAccounts() > 0)) {
+        if (count($this->getAccounts()) > 0) {
             $accounts = $this->getAccounts();
             if ($account = reset($accounts)) {
                 return json_decode($account);

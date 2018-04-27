@@ -123,8 +123,9 @@ class BarclaysService
                 }
             } else {
                 // we many have manually added the transaction
+                /** @var Payment $existingRef */
                 $existingRef = $paymentRepo->findOneBy(['barclaysReference' => $ref]);
-                if (count($existingRef) == 0) {
+                if (!$existingRef) {
                     $this->logger->debug(sprintf(
                         'Unable to find matching transaction for %s',
                         $line['Acquirer reference number']
