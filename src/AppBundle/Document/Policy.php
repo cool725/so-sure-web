@@ -3356,7 +3356,7 @@ abstract class Policy
 
             if ($this->hasCashback() && $this->getCashback()) {
                 // TODO: Should we be checking cashback status?
-                $this->getCashback()->setDate(clone $date);
+                $this->getCashback()->setDate(clone $dateNotNull);
                 $this->getCashback()->setStatus(Cashback::STATUS_PENDING_CLAIMABLE);
                 $this->getCashback()->setAmount($this->getPotValue());
             } elseif ($this->isRenewalPending() || $this->isRenewed()) {
@@ -3365,7 +3365,7 @@ abstract class Policy
                 if ($this->getNextPolicy()->getStart()) {
                     $discount->setDate($this->getNextPolicy()->getStart());
                 } else {
-                    $discount->setDate(clone $date);
+                    $discount->setDate(clone $dateNotNull);
                 }
                 $discount->setNotes(sprintf(
                     '%0.2f salva / %0.2f so-sure marketing from pot reward (%s)',
