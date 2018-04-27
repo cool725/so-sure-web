@@ -5,6 +5,15 @@ parameters:
     mongo.session.options:
         database: sosure-test
 
+snc_redis:
+    clients:
+        default:
+            dsn: "%redis_dsn%/4"
+        session:
+            dsn: "%redis_dsn%/5"
+        mailer:
+            dsn: "%redis_dsn%/6"
+
 framework:
     trusted_hosts: ['127.0.0.1', 'localhost', 'dev.so-sure.net', '10\.\d+\.\d+\.\d+']
     test: ~
