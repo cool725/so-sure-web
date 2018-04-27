@@ -113,11 +113,11 @@ class ApiPartialControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
     }
 
-    public function testABAll()
+    public function testABAllNone()
     {
         $user = self::createUser(
             self::$userManager,
-            self::generateEmail('testABAll', $this),
+            self::generateEmail('testABAllNone', $this),
             'foo'
         );
         $cognitoIdentityId = $this->getAuthUser($user);
@@ -126,11 +126,77 @@ class ApiPartialControllerTest extends BaseApiControllerTest
         $policy->setStatus(Policy::STATUS_ACTIVE);
         self::$dm->flush();
 
-        $url = sprintf('/api/v1/partial/ab?_method=GET');
+        $url = sprintf('/api/v1/partial/ab/v2?_method=GET');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, array());
+        $data = $this->verifyResponse(404);
+    }
+
+    public function testABAllOne()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testABAllOne', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $phone = self::getRandomPhone(self::$dm);
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        self::$dm->flush();
+
+        $url = sprintf('/api/v1/partial/ab/v2/%s?_method=GET', SixpackService::EXPERIMENT_APP_PICSURE_LOCATION);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, array());
         $data = $this->verifyResponse(200);
         $this->assertTrue(isset($data['tests']));
-        $this->assertEquals(count($data['tests']), count(SixpackService::$appExperiments));
+        $this->assertEquals(count($data['tests']), 1);
+    }
+
+    public function testABAllTwo()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testABAllTwo', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $phone = self::getRandomPhone(self::$dm);
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        self::$dm->flush();
+
+        $url = sprintf(
+            '/api/v1/partial/ab/v2/%s,%s?_method=GET',
+            SixpackService::EXPERIMENT_APP_SHARE_METHOD,
+            SixpackService::EXPERIMENT_APP_PICSURE_LOCATION
+        );
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, array());
+        $data = $this->verifyResponse(200);
+        $this->assertTrue(isset($data['tests']));
+        $this->assertEquals(count($data['tests']), 2);
+    }
+
+    public function testABAllMissing()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testABAllMissing', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $phone = self::getRandomPhone(self::$dm);
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        self::$dm->flush();
+
+        $url = sprintf(
+            '/api/v1/partial/ab/v2/%s,%s,app-test-foo?_method=GET',
+            SixpackService::EXPERIMENT_APP_SHARE_METHOD,
+            SixpackService::EXPERIMENT_APP_PICSURE_LOCATION
+        );
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, array());
+        $data = $this->verifyResponse(200);
+        $this->assertTrue(isset($data['tests']));
+        $this->assertEquals(count($data['tests']), 2);
     }
 
     // feature flags

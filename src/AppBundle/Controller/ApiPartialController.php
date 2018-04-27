@@ -40,25 +40,34 @@ class ApiPartialController extends BaseController
     use ArrayToApiArrayTrait;
 
     /**
-     * @Route("/ab", name="api_ab_partipate_all")
+     * @Route("/ab/v2/{names}", name="api_ab_partipate_all")
      * @Method({"GET"})
      */
-    public function abParticipateAllAction()
+    public function abParticipateAllAction($names)
     {
         try {
+            $experiments = explode(',', $names);
+            if ($experiments === false || empty($experiments)) {
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_NOT_FOUND,
+                    'Unable to find experiments',
+                    404
+                );
+            }
             $tests = array();
-            foreach (array_keys(SixpackService::$appExperiments) as $experiment) {
-                $tests[] = $this->abParticipate($experiment);
+            foreach ($experiments as $experiment) {
+                try {
+                    $tests[] = $this->abParticipate($experiment);
+                } catch (NotFoundHttpException $e) {
+                    $this->get('logger')->error(
+                        'Error finding experiment in api abParticipateAllAction.',
+                        ['exception' => $e]
+                    );
+                }
             }
             return new JsonResponse([
                 'tests' => $tests,
             ]);
-        } catch (NotFoundHttpException $e) {
-            return $this->getErrorJsonResponse(
-                ApiErrorCode::ERROR_NOT_FOUND,
-                'Unable to find experiment',
-                404
-            );
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api abParticipateAllAction.', ['exception' => $e]);
 
