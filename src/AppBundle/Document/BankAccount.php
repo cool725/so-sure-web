@@ -163,10 +163,19 @@ class BankAccount
      */
     protected $lastSuccessfulPaymentDate;
 
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     * @var boolean
+     */
+    protected $annual;
+
     public function __construct()
     {
         $this->setMandateStatus(self::MANDATE_PENDING_INIT);
         $this->created = new \DateTime();
+        $this->annual = false;
     }
 
     public function setAccountName($accountName)
@@ -355,6 +364,16 @@ class BankAccount
     public function setFirstPayment($firstPayment)
     {
         $this->firstPayment = $firstPayment;
+    }
+
+    public function isAnnual()
+    {
+        return $this->annual;
+    }
+
+    public function setAnnual($annual)
+    {
+        $this->annual = $annual;
     }
 
     public function isMandateInProgress()

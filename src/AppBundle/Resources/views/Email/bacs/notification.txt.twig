@@ -16,7 +16,11 @@ Bank/Building society address:
 Reference number: {{ user.paymentMethod.bankAccount.reference }}
 Collection frequency:
   First Collection: {{  user.paymentMethod.bankAccount.getFirstPaymentDate(user)|date('d F','Europe/London') }}
+  {% if user.paymentMethod.bankAccount.isAnnual %}
+  (Collected on the {{ policy.billing|date('jS M','Europe/London') }} of each year thereafter)
+  {% else %}
   (Collected on the {{ policy.billing|date('jS','Europe/London') }} of each month thereafter)
+  {% endif %}
 Payment amount: £{{ policy.getPremiumInstallmentPrice(true)|number_format(2, '.', ',') }}
 
 If any of the above details are incorrect please update them online.  Alternatively, you can call us on +44 330 223 4948. You have the right to cancel your Direct Debit at any time. A copy of the Direct Debit Guarantee is below.

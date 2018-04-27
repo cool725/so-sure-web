@@ -14,6 +14,8 @@ use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Security\PolicyVoter;
+use AppBundle\Service\PaymentService;
+use AppBundle\Service\PolicyService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -626,6 +628,8 @@ class PurchaseController extends BaseController
         }
         $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
         $amount = null;
+        $bacs = new Bacs();
+        $bacsConfirm = new Bacs();
         if ($freq == Policy::PLAN_MONTHLY) {
             $policy->setPremiumInstallments(12);
             $this->getManager()->flush();
@@ -634,18 +638,20 @@ class PurchaseController extends BaseController
             $policy->setPremiumInstallments(1);
             $this->getManager()->flush();
             $amount = $policy->getPremium()->getYearlyPremiumPrice();
+            $bacs->setAnnual(true);
+            $bacsConfirm->setAnnual(true);
         } else {
             throw new NotFoundHttpException(sprintf('Unknown frequency %s', $freq));
         }
 
+        /** @var PaymentService $paymentService */
         $paymentService = $this->get('app.payment');
+        /** @var PolicyService $policyService */
         $policyService = $this->get('app.policy');
-        $bacs = new Bacs();
         /** @var FormInterface $bacsForm */
         $bacsForm = $this->get('form.factory')
             ->createNamedBuilder('bacs_form', BacsType::class, $bacs)
             ->getForm();
-        $bacsConfirm = new Bacs();
         /** @var FormInterface $bacsConfirmForm */
         $bacsConfirmForm = $this->get('form.factory')
             ->createNamedBuilder('bacs_confirm_form', BacsConfirmType::class, $bacsConfirm)
@@ -686,11 +692,11 @@ class PurchaseController extends BaseController
                         ->getForm();
                     $template = 'AppBundle:Purchase:purchaseStepPaymentBacs.html.twig';
                 } elseif ($bacsConfirmForm->isValid()) {
+                    $policyService->create($policy, null, true);
                     $paymentService->confirmBacs(
                         $policy,
                         $bacsConfirm->transformBacsPaymentMethod($this->getIdentityLogWeb($request))
                     );
-                    $policyService->create($policy, null, true);
 
                     $this->addFlash(
                         'success',

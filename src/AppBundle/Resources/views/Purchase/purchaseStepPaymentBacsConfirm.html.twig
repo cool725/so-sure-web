@@ -75,7 +75,11 @@
                             <li>
                                 <small class="text-dark-grey">Collection frequency</small><br>
                                 <span class="h4">First collection: {{ bacs.getFirstPaymentDate(policy.user)|date('d F','Europe/London') }}</span><br>
-                                <small class="text-dark-grey">(Collected on the {{ policy.billing|date('jS','Europe/London') }} of each month thereafter)</small><br>
+                                {% if bacs.annual %}
+                                    <small class="text-dark-grey">(Collected on the {{ policy.billing|date('jS M','Europe/London') }} of each year thereafter)</small><br>
+                                {% else %}
+                                    <small class="text-dark-grey">(Collected on the {{ policy.billing|date('jS','Europe/London') }} of each month thereafter)</small><br>
+                                {% endif %}
                             </li>
                             <li>
                                 <small class="text-dark-grey">Payment amount</small><br>
