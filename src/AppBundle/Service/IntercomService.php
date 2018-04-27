@@ -28,6 +28,8 @@ class IntercomService
 {
     use CurrencyTrait;
 
+    const MAX_SCROLL_RECORDS = 50000;
+
     const KEY_INTERCOM_QUEUE = 'queue:intercom';
     const KEY_INTERCOM_RATELIMIT = 'intercom:ratelimit';
 
@@ -1086,13 +1088,13 @@ class IntercomService
         $emailOptOutRepo = $this->dm->getRepository(EmailOptOut::class);
         $output = [];
         $count = 0;
-        $scroll = 'init';
+        $scroll = null;
         $now = new \DateTime();
-        while ($scroll) {
+        while ($count < self::MAX_SCROLL_RECORDS) {
             $output[] = sprintf('Checking Leads - Scroll: %s / Count: %d', $scroll, $count);
             //print sprintf('Checking Leads - %s', $scroll) . PHP_EOL;
             $options = [];
-            if ($scroll != 'init') {
+            if ($scroll) {
                 $options['scroll_param'] = $scroll;
             }
             $this->checkRateLimit();
@@ -1109,10 +1111,9 @@ class IntercomService
             }
             $this->storeRateLimit();
 
-            if ($scroll != $resp->scroll_param) {
-                $scroll = $resp->scroll_param;
-            } else {
-                $scroll = null;
+            $scroll = $resp->scroll_param;
+            if (count($resp->contacts) == 0) {
+                break;
             }
 
             foreach ($resp->contacts as $lead) {
@@ -1164,16 +1165,17 @@ class IntercomService
         $userRepo = $this->dm->getRepository(User::class);
         /** @var EmailOptOutRepository $emailOptOutRepo */
         $emailOptOutRepo = $this->dm->getRepository(EmailOptOut::class);
+
         $emails = [];
         $output = [];
-        $scroll = 'init';
-        $now = new \DateTime();
         $count = 0;
-        while ($scroll) {
+        $scroll = null;
+        $now = new \DateTime();
+        while ($count < self::MAX_SCROLL_RECORDS) {
             $output[] = sprintf('Checking Users - Scroll: %s / Count: %d', $scroll, $count);
             // print sprintf('Checking Users - %s', $scroll) . PHP_EOL;
             $options = [];
-            if ($scroll != 'init') {
+            if ($scroll) {
                 $options['scroll_param'] = $scroll;
             }
             $this->checkRateLimit();
@@ -1190,10 +1192,9 @@ class IntercomService
             }
             $this->storeRateLimit();
 
-            if ($scroll != $resp->scroll_param) {
-                $scroll = $resp->scroll_param;
-            } else {
-                $scroll = null;
+            $scroll = $resp->scroll_param;
+            if (count($resp->users) == 0) {
+                break;
             }
 
             foreach ($resp->users as $user) {
