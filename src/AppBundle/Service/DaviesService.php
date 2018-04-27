@@ -398,10 +398,9 @@ class DaviesService extends S3EmailService
             if ($daviesClaim->riskPostCode && $claim->getPolicy()->getUser()->getBillingAddress() &&
                 !$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_DAVIES_POSTCODE)) {
                 if (!$this->postcodeCompare(
-                        $claim->getPolicy()->getUser()->getBillingAddress()->getPostcode(),
-                        $daviesClaim->riskPostCode
-                    )
-                ) {
+                    $claim->getPolicy()->getUser()->getBillingAddress()->getPostcode(),
+                    $daviesClaim->riskPostCode
+                )) {
                     $msg = sprintf(
                         'Claim %s: %s does not match expected postcode %s',
                         $daviesClaim->claimNumber,
