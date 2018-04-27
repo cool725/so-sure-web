@@ -171,10 +171,19 @@ class OpsController extends BaseController
         $nonPicSurePolicy = $policyRepo->findOneBy([
             'policyTerms.$id' => ['$ne' => new \MongoId($picSureRejectedPolicy->getPolicyTerms()->getId())],
         ]);
-        $unpaidPolicy = $policyRepo->findOneBy([
+        $unpaidPolicies = $policyRepo->findBy([
             'status' => Policy::STATUS_UNPAID,
-            'policyDiscountPresent' => ['$ne' => true],
         ]);
+        $unpaidPolicy = null;
+        foreach ($unpaidPolicies as $unpaidPolicy) {
+            /** @var Policy $unpaidPolicy */
+            if (!$unpaidPolicy->isPolicyPaidToDate() && !$unpaidPolicy->hasPolicyDiscountPresent() &&
+                count($unpaidPolicy->getUser()->getValidPolicies(true)) == 1) {
+                break;
+            } else {
+                $unpaidPolicy = null;
+            }
+        }
         $unpaidPolicyDiscountPolicy = $policyRepo->findOneBy([
             'status' => Policy::STATUS_UNPAID,
             'policyDiscountPresent' => true,
