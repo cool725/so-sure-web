@@ -21,21 +21,43 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-12">
-                    <h1 class="text-center">Unpaid Policy</h1>
-                    {% if webpay_action and webpay_reference and amount > 0 %}
+                    {% if app.user.hasBacsPaymentMethod %}
+                        <h1 class="text-center">Pending Direct Debit Setup</h1>
+                        <p class="lead text-center">We're curently setting up your direct debit. Please come back in a few days.</p>
+                    {% elseif webpay_action and webpay_reference and amount > 0 %}
+                        <h1 class="text-center">Unpaid Policy</h1>
                         <p class="lead text-center">Your policy is not up to date on your payments. Click below to pay the outstanding due of £{{ amount|number_format(2, '.', ',') }}.</p>
-                        <form action="{{ webpay_action }}" method="post" id="webpay-form">
-                            <div class="row">
-                                <div class="col-sm-4 col-sm-offset-4">
+                        {% if bacs_feature %}
+                        <div class="row">
+                            <div class="col-sm-4 col-sm-offset-4">
+                                {% if not app.user.hasBacsPaymentMethod %}
+                                    <a href="{{ path('user_payment_details_bacs') }}" class="btn btn-green btn-block btn-pad ">Change to direct debit</a>
+                                {% else %}
+                                    <a href="{{ path('user_payment_details_bacs') }}" class="btn btn-green btn-block btn-pad ">Update direct debit details</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-4 col-sm-offset-4">&nbsp;</div>
+                        </div>
+                        {% endif %}
+                        <div class="row">
+                            <div class="col-sm-4 col-sm-offset-4">
+                                <form action="{{ webpay_action }}" method="post" id="webpay-form">
                                     <div class="form-group">
                                         <input  id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
-                                        <input type="submit" class="btn btn-green btn-block btn-pad " value="Proceed to payment">
+                                        <input type="submit" class="btn {% if bacs_feature %}btn-default{% else %}btn-green{% endif %} btn-block btn-pad " value="Proceed to card payment">
                                     </div>
-                                </div>
+                                </form>
                             </div>
-                        </form>
+                        </div>
                   {% elseif amount == 0 %}
-                        <p class="lead text-center">Your policy is paid to date.</p>
+                      <h1 class="text-center">Policy Payment</h1>
+                      <p class="lead text-center">Your policy is paid to date.</p>
+                      <p class="lead text-center">Return to your <a href="{{ path('user_home') }}">user homepage</a>.</p>
+                  {% else %}
+                      <h1 class="text-center">Unpaid Policy</h1>
+                      <p class="lead text-center">Sorry, we're having technical issues. Please <a href="#" class="open-intercom">contact us</a></p>
                   {% endif %}
                 </div>
             </div>

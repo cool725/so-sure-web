@@ -24,7 +24,7 @@ use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Classes\Salva;
 use AppBundle\Classes\SoSure;
-use Stubs\DocumentManager;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Faker;
@@ -66,6 +66,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $this->faker = Faker\Factory::create('en_GB');
 
         $users = $this->newUsers($manager, 150);
+        $unpaid = $this->newUsers($manager, 10);
         $unpaidDiscount = $this->newUsers($manager, 10);
         $iosPreExpireUsers = $this->newUsers($manager, 40);
         $androidPreExpireUsers = $this->newUsers($manager, 40);
@@ -92,8 +93,13 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $this->addConnections($manager, $user, $users);
         }
 
+        foreach ($unpaid as $user) {
+            $this->newPolicy($manager, $user, $count, self::CLAIM_NONE, null, null, null, false, true, 200, null, 1);
+            $count++;
+        }
+
         foreach ($unpaidDiscount as $user) {
-            $this->newPolicy($manager, $user, $count, self::CLAIM_NONE, null, null, null, false, true, null, rand(2, 50));
+            $this->newPolicy($manager, $user, $count, self::CLAIM_NONE, null, null, null, false, true, 200, rand(2, 50), 1);
             $count++;
         }
 
@@ -524,9 +530,26 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         return $phone;
     }
 
+    /**
+     * @param DocumentManager $manager
+     * @param User            $user
+     * @param integer         $count
+     * @param string          $claim
+     * @param string|null     $promo
+     * @param string|null     $code
+     * @param Phone|null      $phone
+     * @param boolean|null    $paid
+     * @param bool            $sendInvitation
+     * @param integer|null    $days
+     * @param float|null      $policyDiscount
+     * @param integer|null    $paidMonths
+     * @param string          $picSure
+     * @return SalvaPhonePolicy
+     * @throws \AppBundle\Exception\InvalidPremiumException
+     */
     private function newPolicy(
-        $manager,
-        $user,
+        DocumentManager $manager,
+        User $user,
         $count,
         $claim = self::CLAIM_RANDOM,
         $promo = null,
@@ -542,7 +565,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         if (!$phone) {
             $phone = $this->getRandomPhone($manager);
         }
-        /** @var \Doctrine\ODM\MongoDB\DocumentManager $dm */
+        /** @var DocumentManager $dm */
         $dm = $this->container->get('doctrine_mongodb.odm.default_document_manager');
         $policyTermsRepo = $dm->getRepository(PolicyTerms::class);
         $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
