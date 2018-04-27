@@ -1708,7 +1708,7 @@ abstract class Policy
         return $nextDate;
     }
 
-    public function init(User $user, PolicyDocument $terms)
+    public function init(User $user, PolicyTerms $terms)
     {
         $user->addPolicy($this);
         if ($company = $user->getCompany()) {

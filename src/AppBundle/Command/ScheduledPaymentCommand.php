@@ -90,6 +90,7 @@ class ScheduledPaymentCommand extends BaseCommand
         /** @var ScheduledPaymentRepository $repo */
         $repo = $this->getManager()->getRepository(ScheduledPayment::class);
         if ($id) {
+            /** @var ScheduledPayment $scheduledPayment */
             $scheduledPayment = $repo->find($id);
             $scheduledPayment = $paymentService->scheduledPayment(
                 $scheduledPayment,

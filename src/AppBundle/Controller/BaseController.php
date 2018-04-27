@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Repository\PhoneRepository;
+use AppBundle\Service\QuoteService;
 use Doctrine\ODM\MongoDB\Query\Builder;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -224,14 +225,15 @@ abstract class BaseController extends Controller
      * Get the best matching phone.
      * Assuming that memory will be a bit less than actual advertised size, but find the closest matching
      *
-     * @param string $make
-     * @param string $device see googe play device list (or apple phone list)
-     * @param float  $memory in gb
+     * @param string|null $make
+     * @param string      $device see googe play device list (or apple phone list)
+     * @param float       $memory in gb
      *
      * @return Phone|null
      */
     protected function getPhone($make, $device, $memory, $ignoreMake = false)
     {
+        /** @var QuoteService $quoteService */
         $quoteService = $this->get('app.quote');
         $quotes = $quoteService->getQuotes($make, $device, null, null, $ignoreMake);
         $phones = $quotes['phones'];
@@ -347,7 +349,7 @@ abstract class BaseController extends Controller
     /**
      * Return a standard json error message
      *
-     * @param string  $errorCode
+     * @param integer $errorCode
      * @param string  $description
      * @param integer $httpCode
      *

@@ -63,8 +63,8 @@ class ApiResponseCommand extends ContainerAwareCommand
         }
         
         if ($clear) {
-            $redis->del(ApiResponseSubscriber::KEY_RANDOM_FAILURE);
-            $redis->del(ApiResponseSubscriber::KEY_HASH_PATH);
+            $redis->del([ApiResponseSubscriber::KEY_RANDOM_FAILURE]);
+            $redis->del([ApiResponseSubscriber::KEY_HASH_PATH]);
             $output->writeln('Cleared');
         } else {
             $output->writeln(sprintf("Response %s%%", $redis->get(ApiResponseSubscriber::KEY_RANDOM_FAILURE)));

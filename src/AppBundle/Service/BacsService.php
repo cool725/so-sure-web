@@ -511,7 +511,7 @@ class BacsService
         foreach ($this->redis->hgetall(self::KEY_BACS_CANCEL) as $key => $data) {
             $cancellations[] = json_decode($data, true);
         }
-        $this->redis->del(self::KEY_BACS_CANCEL);
+        $this->redis->del([self::KEY_BACS_CANCEL]);
 
         return $cancellations;
     }
@@ -831,7 +831,7 @@ class BacsService
 
     public function clearQueue()
     {
-        $this->redis->del(self::KEY_BACS_QUEUE);
+        $this->redis->del([self::KEY_BACS_QUEUE]);
     }
 
     public function getQueueData($max)

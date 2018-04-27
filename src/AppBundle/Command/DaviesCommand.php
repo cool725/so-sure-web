@@ -46,7 +46,7 @@ class DaviesCommand extends ContainerAwareCommand
                 'max-parse-errors',
                 null,
                 InputOption::VALUE_REQUIRED,
-                0
+                'Max number of errrors'
             )
         ;
     }

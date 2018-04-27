@@ -163,7 +163,7 @@ class MixpanelService
 
     public function clearQueue()
     {
-        $this->redis->del(self::KEY_MIXPANEL_QUEUE);
+        $this->redis->del([self::KEY_MIXPANEL_QUEUE]);
     }
 
     public function getQueueData($max)
@@ -179,6 +179,7 @@ class MixpanelService
     public function attribution($userId)
     {
         $repo = $this->dm->getRepository(User::class);
+        /** @var User $user */
         $user = $repo->find($userId);
 
         return $this->attributionByUser($user);
@@ -187,6 +188,7 @@ class MixpanelService
     public function attributionByEmail($email)
     {
         $repo = $this->dm->getRepository(User::class);
+        /** @var User $user */
         $user = $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
 
         return $this->attributionByUser($user);

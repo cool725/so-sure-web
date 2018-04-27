@@ -324,6 +324,7 @@ class PolicyService
             $policy->setPhoneData($phoneData);
 
             $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
+            /** @var PolicyTerms $latestTerms */
             $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
             $policy->init($user, $latestTerms);
 
@@ -527,7 +528,7 @@ class PolicyService
     public function clearQueue($max = null)
     {
         if (!$max) {
-            $this->redis->del(self::KEY_POLICY_QUEUE);
+            $this->redis->del([self::KEY_POLICY_QUEUE]);
         } else {
             for ($i = 0; $i < $max; $i++) {
                 $this->redis->lpop(self::KEY_POLICY_QUEUE);
@@ -1793,6 +1794,7 @@ class PolicyService
     public function createPendingRenewal(Policy $policy, \DateTime $date = null)
     {
         $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
+        /** @var PolicyTerms $latestTerms */
         $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
         $newPolicy = $policy->createPendingRenewal($latestTerms, $date);
 
@@ -2006,6 +2008,7 @@ class PolicyService
         }
 
         $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
+        /** @var PolicyTerms $latestTerms */
         $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
         $newPolicy = $policy->createRepurchase($latestTerms, $date);
 

@@ -667,7 +667,9 @@ class SalvaExportService
     {
         // If exception thrown in the middle of an update, log and avoid re-queueing policy actions
         try {
-            $this->incrementPolicyNumber($policy);
+            /** @var SalvaPhonePolicy $salvaPhonePolicy */
+            $salvaPhonePolicy = $policy;
+            $this->incrementPolicyNumber($salvaPhonePolicy);
 
             $this->queueMessage($policy->getId(), self::QUEUE_CANCELLED, 0, self::CANCELLED_REPLACE);
             $this->queueMessage($policy->getId(), self::QUEUE_CREATED, 0);
@@ -792,7 +794,7 @@ class SalvaExportService
 
     public function clearQueue()
     {
-        $this->redis->del(self::KEY_POLICY_ACTION);
+        $this->redis->del([self::KEY_POLICY_ACTION]);
     }
 
     public function getQueueData($max)

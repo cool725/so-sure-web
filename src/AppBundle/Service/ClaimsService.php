@@ -155,7 +155,7 @@ class ClaimsService
         }
 
         $lost = new LostPhone();
-        $lost->populate($policy);
+        $lost->populate($phonePolicy);
         $this->dm->persist($lost);
         $this->dm->flush();
 
