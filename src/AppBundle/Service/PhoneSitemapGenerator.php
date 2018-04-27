@@ -52,7 +52,7 @@ class PhoneSitemapGenerator implements GeneratorInterface
             ], UrlGeneratorInterface::ABSOLUTE_URL);
             if (!in_array($url, $makeModelUrls)) {
                 $makeModelUrls[] = $url;
-                $entries[] = new Entry($url, null, 'weekly', '0.7');
+                $entries[] = new Entry($url, null, 'weekly', 0.7);
             }
 
             $url = $this->router->generate('quote_make_model_memory', [
@@ -60,7 +60,7 @@ class PhoneSitemapGenerator implements GeneratorInterface
                 'model' => $phone->getEncodedModelCanonical(),
                 'memory' => $phone->getMemory()
             ], UrlGeneratorInterface::ABSOLUTE_URL);
-            $entries[] = new Entry($url, null, 'weekly', '0.7');
+            $entries[] = new Entry($url, null, 'weekly', 0.7);
         }
 
         $makes = [];
@@ -77,7 +77,7 @@ class PhoneSitemapGenerator implements GeneratorInterface
             $url = $this->router->generate('quote_make', [
                 'make' => $make,
             ], UrlGeneratorInterface::ABSOLUTE_URL);
-            $entries[] = new Entry($url, null, 'weekly', '0.7');
+            $entries[] = new Entry($url, null, 'weekly', 0.7);
         }
 
         return $entries;

@@ -5,8 +5,10 @@ namespace AppBundle\Tests\Validator;
 use AppBundle\Document\User;
 use AppBundle\Validator\Constraints\BankAccountName;
 use AppBundle\Validator\Constraints\BankAccountNameValidator;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * @group unit
@@ -103,24 +105,27 @@ class BankAccountNameValidatorTest extends WebTestCase
         ;
 
         // mock the validator context
+        /** @var ExecutionContextInterface $context */
         $context = $this->getMockBuilder('Symfony\Component\Validator\Context\ExecutionContext')
             ->disableOriginalConstructor()
             ->setMethods(array('buildViolation'))
             ->getMock()
         ;
+        /** @var MockObject $mockContext */
+        $mockContext = $context;
 
         if ($expectedMessage) {
             $builder->expects($this->once())
                 ->method('addViolation')
             ;
 
-            $context->expects($this->once())
+            $mockContext->expects($this->once())
                 ->method('buildViolation')
                 ->with($this->equalTo($expectedMessage))
                 ->will($this->returnValue($builder))
             ;
         } else {
-            $context->expects($this->never())
+            $mockContext->expects($this->never())
                 ->method('buildViolation')
             ;
         }

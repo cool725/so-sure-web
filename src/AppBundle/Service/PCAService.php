@@ -285,8 +285,8 @@ class PCAService
 
     /**
      * Call pca find to get list of addresses that match criteria
-     * @param string $postcode
-     * @param string $number
+     * @param string      $postcode
+     * @param string|null $number
      * @return array|null
      */
     public function find($postcode, $number)

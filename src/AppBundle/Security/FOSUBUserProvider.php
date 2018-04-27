@@ -82,7 +82,9 @@ class FOSUBUserProvider extends BaseClass
         $user->$setter_id($username);
         $user->$setter_token($this->getLongLivedAccessToken($response));
 
-        $this->userManager->updateUser($user);
+        /** @var \FOS\UserBundle\Model\UserInterface $fosUser */
+        $fosUser = $user;
+        $this->userManager->updateUser($fosUser);
     }
 
     /**

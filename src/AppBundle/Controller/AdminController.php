@@ -648,6 +648,7 @@ class AdminController extends BaseController
         $dm = $this->getManager();
         /** @var S3FileRepository $repo */
         $repo = $dm->getRepository(S3File::class);
+        /** @var S3File $s3File */
         $s3File = $repo->find($id);
         if (!$s3File) {
             throw new NotFoundHttpException();

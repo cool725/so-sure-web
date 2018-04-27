@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Validator;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
@@ -10,6 +11,7 @@ use AppBundle\Document\PhonePremium;
 use AppBundle\Document\Connection\RenewalConnection;
 use AppBundle\Validator\Constraints\RenewalConnectionsAmount;
 use AppBundle\Validator\Constraints\RenewalConnectionsAmountValidator;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * @group unit
@@ -89,24 +91,27 @@ class RenewalConnectionsAmountValidatorTest extends \PHPUnit\Framework\TestCase
         ;
 
         // mock the validator context
+        /** @var ExecutionContextInterface $context */
         $context = $this->getMockBuilder('Symfony\Component\Validator\Context\ExecutionContext')
             ->disableOriginalConstructor()
             ->setMethods(array('buildViolation'))
             ->getMock()
         ;
+        /** @var MockObject $mockContext */
+        $mockContext = $context;
 
         if ($expectedMessage) {
             $builder->expects($this->once())
                 ->method('addViolation')
             ;
 
-            $context->expects($this->once())
+            $mockContext->expects($this->once())
                 ->method('buildViolation')
                 ->with($this->equalTo($expectedMessage))
                 ->will($this->returnValue($builder))
             ;
         } else {
-            $context->expects($this->never())
+            $mockContext->expects($this->never())
                 ->method('buildViolation')
             ;
         }

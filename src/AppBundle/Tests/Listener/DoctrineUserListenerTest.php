@@ -6,6 +6,7 @@ use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Event\BacsEvent;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,6 +31,8 @@ class DoctrineUserListenerTest extends WebTestCase
     /** @var DocumentManager */
     protected static $dm;
     protected static $testUser;
+    /** @var LoggerInterface */
+    protected static $logger;
 
     public static function setUpBeforeClass()
     {
@@ -49,6 +52,9 @@ class DoctrineUserListenerTest extends WebTestCase
         self::$dm = $dm;
         self::$userManager = self::$container->get('fos_user.user_manager');
         self::$policyService = self::$container->get('app.policy');
+        /** @var LoggerInterface $logger */
+        $logger = self::$container->get('logger');
+        self::$logger = $logger;
     }
 
     public function tearDown()
@@ -60,7 +66,7 @@ class DoctrineUserListenerTest extends WebTestCase
         $user = new User();
         $user->setEmail(static::generateEmail('pre', $this));
         static::$dm->persist($user);
-        $listener = new DoctrineUserListener(null, self::$container->get('logger'));
+        $listener = new DoctrineUserListener(null, static::$logger);
 
         $changeSet = ['confirmationToken' => ['123', null], 'passwordRequestedAt' => [new \DateTime(), null]];
         $events = new PreUpdateEventArgs($user, self::$dm, $changeSet);
@@ -329,7 +335,7 @@ class DoctrineUserListenerTest extends WebTestCase
                      ->method('dispatch')
                      ->with($eventType, $event);
 
-        $listener = new DoctrineUserListener($dispatcher, self::$container->get('logger'));
+        $listener = new DoctrineUserListener($dispatcher, static::$logger);
 
         return $listener;
     }
@@ -345,7 +351,7 @@ class DoctrineUserListenerTest extends WebTestCase
             ->method('dispatch')
             ->with($eventType, $event);
 
-        $listener = new DoctrineUserListener($dispatcher, self::$container->get('logger'));
+        $listener = new DoctrineUserListener($dispatcher, static::$logger);
 
         return $listener;
     }
@@ -361,7 +367,7 @@ class DoctrineUserListenerTest extends WebTestCase
                      ->method('dispatch')
                      ->with($eventType, $event);
 
-        $listener = new DoctrineUserListener($dispatcher, self::$container->get('logger'));
+        $listener = new DoctrineUserListener($dispatcher, static::$logger);
 
         return $listener;
     }

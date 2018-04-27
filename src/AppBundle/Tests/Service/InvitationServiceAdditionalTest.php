@@ -3,6 +3,7 @@
 namespace AppBundle\Tests\Service;
 
 use AppBundle\Repository\Invitation\EmailInvitationRepository;
+use AppBundle\Service\RouterService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
@@ -30,6 +31,7 @@ use AppBundle\Exception\FullPotException;
 use AppBundle\Exception\ClaimException;
 use AppBundle\Exception\OptOutException;
 use AppBundle\Exception\ConnectedInvitationException;
+use Symfony\Component\Templating\EngineInterface;
 
 /**
  * @group functional-nonet
@@ -63,11 +65,15 @@ class InvitationServiceAdditionalTest extends WebTestCase
         self::$userRepo = self::$dm->getRepository(User::class);
         self::$userManager = self::$container->get('fos_user.user_manager');
         $transport = new \Swift_Transport_NullTransport(new \Swift_Events_SimpleEventDispatcher);
+        /** @var EngineInterface $templating */
+        $templating = self::$container->get('templating');
+        /** @var RouterService $router */
+        $router = self::$container->get('app.router');
         $mailer = new MailerService(
             \Swift_Mailer::newInstance($transport),
             $transport,
-            self::$container->get('templating'),
-            self::$container->get('app.router'),
+            $templating,
+            $router,
             'foo@foo.com',
             'bar'
         );

@@ -2,9 +2,12 @@
 
 namespace AppBundle\Tests\Validator;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotPipe;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotPipeValidator;
+use Symfony\Component\Validator\Context\ExecutionContext;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * @group unit
@@ -59,24 +62,27 @@ class AlphanumericSpaceDotPipeValidatorTest extends \PHPUnit\Framework\TestCase
         ;
 
         // mock the validator context
+        /** @var ExecutionContextInterface $context */
         $context = $this->getMockBuilder('Symfony\Component\Validator\Context\ExecutionContext')
             ->disableOriginalConstructor()
             ->setMethods(array('buildViolation'))
             ->getMock()
         ;
+        /** @var MockObject $mockContext */
+        $mockContext = $context;
 
         if ($expectedMessage) {
             $builder->expects($this->once())
                 ->method('addViolation')
             ;
 
-            $context->expects($this->once())
+            $mockContext->expects($this->once())
                 ->method('buildViolation')
                 ->with($this->equalTo($expectedMessage))
                 ->will($this->returnValue($builder))
             ;
         } else {
-            $context->expects($this->never())
+            $mockContext->expects($this->never())
                 ->method('buildViolation')
             ;
         }

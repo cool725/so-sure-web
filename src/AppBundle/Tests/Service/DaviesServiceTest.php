@@ -89,7 +89,7 @@ class DaviesServiceTest extends WebTestCase
         $davies = new DaviesClaim();
 
         self::$daviesService->updatePolicy($claim, $davies, false);
-        $this->assertEquals($imeiOld, $policy->getImei(), false);
+        $this->assertEquals($imeiOld, $policy->getImei());
         $this->assertEquals(self::$phoneA->getId(), $policy->getPhone()->getId());
 
         $claimB = new Claim();

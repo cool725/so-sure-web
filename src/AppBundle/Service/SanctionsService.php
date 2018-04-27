@@ -83,8 +83,10 @@ class SanctionsService
 
                 if ($distance <= self::MATCH_THRESHOLD) {
                     $matches[] = array_merge($data, ['distance' => $distance]);
+                    /** @var Sanctions $sanctions */
+                    $sanctions = $sanctionsRepo->find($data['id']);
                     $sanctionsMatch = new SanctionsMatch();
-                    $sanctionsMatch->setSanctions($sanctionsRepo->find($data['id']));
+                    $sanctionsMatch->setSanctions($sanctions);
                     $sanctionsMatch->setDistance($distance);
                     $user->addSanctionsMatch($sanctionsMatch);
                 }
@@ -123,8 +125,10 @@ class SanctionsService
 
             if ($distance <= self::MATCH_THRESHOLD) {
                 $matches[] = array_merge($data, ['distance' => $distance]);
+                /** @var Sanctions $sanctions */
+                $sanctions = $sanctionsRepo->find($data['id']);
                 $sanctionsMatch = new SanctionsMatch();
-                $sanctionsMatch->setSanctions($sanctionsRepo->find($data['id']));
+                $sanctionsMatch->setSanctions($sanctions);
                 $sanctionsMatch->setDistance($distance);
                 $company->addSanctionsMatch($sanctionsMatch);
             }

@@ -212,7 +212,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             false,
             true,
             null,
-            true,
+            rand(2, 50),
             3,
             self::PICSURE_NON_POLICY
         );
@@ -409,7 +409,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             false,
             true,
             null,
-            true,
+            rand(2, 50),
             3
         );
 
@@ -428,7 +428,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             false,
             true,
             null,
-            true,
+            rand(2, 50),
             3
         );
         $policy->setStatus(Policy::STATUS_UNPAID);
@@ -531,24 +531,24 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     }
 
     /**
-     * @param DocumentManager $manager
-     * @param User            $user
-     * @param integer         $count
-     * @param string          $claim
-     * @param string|null     $promo
-     * @param string|null     $code
-     * @param Phone|null      $phone
-     * @param boolean|null    $paid
-     * @param bool            $sendInvitation
-     * @param integer|null    $days
-     * @param float|null      $policyDiscount
-     * @param integer|null    $paidMonths
-     * @param string          $picSure
+     * @param ObjectManager $manager
+     * @param User          $user
+     * @param integer       $count
+     * @param string        $claim
+     * @param string|null   $promo
+     * @param string|null   $code
+     * @param Phone|null    $phone
+     * @param boolean|null  $paid
+     * @param bool          $sendInvitation
+     * @param integer|null  $days
+     * @param float|null    $policyDiscount
+     * @param integer|null  $paidMonths
+     * @param string        $picSure
      * @return SalvaPhonePolicy
      * @throws \AppBundle\Exception\InvalidPremiumException
      */
     private function newPolicy(
-        DocumentManager $manager,
+        ObjectManager $manager,
         User $user,
         $count,
         $claim = self::CLAIM_RANDOM,
@@ -568,7 +568,9 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         /** @var DocumentManager $dm */
         $dm = $this->container->get('doctrine_mongodb.odm.default_document_manager');
         $policyTermsRepo = $dm->getRepository(PolicyTerms::class);
+        /** @var PolicyTerms $latestTerms */
         $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
+        /** @var PolicyTerms $nonPicSureTerms */
         $nonPicSureTerms = $policyTermsRepo->findOneBy(['version' => 'Version 1 June 2016']);
 
         $startDate = new \DateTime();

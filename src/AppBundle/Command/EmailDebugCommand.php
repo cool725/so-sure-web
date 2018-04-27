@@ -205,6 +205,7 @@ class EmailDebugCommand extends BaseCommand
             $dm = $this->getManager();
             /** @var ConnectionRepository $repo */
             $repo = $dm->getRepository(StandardConnection::class);
+            /** @var StandardConnection $connection */
             $connection = $repo->findOneBy(['value' => ['$gt' => 0]]);
             /** @var PolicyService $policyService */
             $policyService = $this->getContainer()->get('app.policy');

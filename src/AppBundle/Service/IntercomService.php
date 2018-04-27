@@ -126,7 +126,7 @@ class IntercomService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
-        $this->client = new IntercomClient($token, null);
+        $this->client = new IntercomClient($token, '');
         $this->redis = $redis;
         $this->secure = $secure;
         $this->secureAndroid = $secureAndroid;
@@ -1016,7 +1016,7 @@ class IntercomService
 
     public function clearQueue()
     {
-        $this->redis->del(self::KEY_INTERCOM_QUEUE);
+        $this->redis->del([self::KEY_INTERCOM_QUEUE]);
     }
 
     public function getQueueData($max)
@@ -1225,6 +1225,7 @@ class IntercomService
                         $output[] = sprintf("Added optout for %s", $user->email);
                     } elseif (!$user->unsubscribed_from_emails && $optedOut) {
                         // sosure user listener -> queue -> intercom update issue
+                        /** @var User $sosureUser */
                         $sosureUser = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($user->email)]);
                         if ($sosureUser) {
                             $this->updateUser($sosureUser);
