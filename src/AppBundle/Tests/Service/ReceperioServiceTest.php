@@ -24,6 +24,7 @@ class ReceperioServiceTest extends WebTestCase
     protected static $container;
     /** @var DocumentManager */
     protected static $dm;
+    /** @var ReceperioService */
     protected static $imei;
     protected static $phoneRepo;
     protected static $phoneA;
@@ -328,12 +329,21 @@ class ReceperioServiceTest extends WebTestCase
 
     public function testAppleInvalidSerialNoRetry()
     {
-        $this->assertFalse(self::$imei->runMakeModelCheck(ReceperioService::TEST_INVALID_SERIAL));
-        $this->assertFalse(self::$imei->checkSerial(
-            static::$phoneA,
-            ReceperioService::TEST_INVALID_SERIAL,
-            null
-        ));
+        $this->assertFalse(
+            self::$imei->runMakeModelCheck(ReceperioService::TEST_INVALID_SERIAL),
+            'MakeModel'
+        );
+
+        static::$imei->setResponseData(null, false);
+
+        $this->assertFalse(
+            self::$imei->checkSerial(
+                static::$phoneA,
+                ReceperioService::TEST_INVALID_SERIAL,
+                null
+            ),
+            'checkSerial'
+        );
         $this->assertNotEquals('serial', self::$imei->getResponseData());
     }
 

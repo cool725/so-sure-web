@@ -71,6 +71,8 @@ class SCodeControllerTest extends BaseControllerTest
 
     public function testMultibyte()
     {
+        $this->logout();
+
         $email = self::generateEmail('testMultibyte', $this);
         $password = 'foo';
         $phone = self::getRandomPhone(self::$dm);
@@ -107,13 +109,13 @@ class SCodeControllerTest extends BaseControllerTest
         $url = sprintf('/scode/%s', $updatedScode->getCode());
         //print_r($url);
         $crawler = self::$client->request('GET', $url);
-        self::verifyResponse(200);
+        self::verifyResponse(200, null, $crawler);
         $this->assertContains(sprintf("Insure your phone with %s", $user->getName()), $crawler->html());
 
         $url = sprintf('/scode/%s', urlencode($scode->getCode()));
         //print_r($url);
         $crawler = self::$client->request('GET', $url);
-        self::verifyResponse(200);
+        self::verifyResponse(200, null, $crawler);
         $this->assertContains(sprintf("Insure your phone with %s", $user->getName()), $crawler->html());
     }
 
