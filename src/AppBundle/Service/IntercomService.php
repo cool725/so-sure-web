@@ -1085,10 +1085,11 @@ class IntercomService
         /** @var EmailOptOutRepository $emailOptOutRepo */
         $emailOptOutRepo = $this->dm->getRepository(EmailOptOut::class);
         $output = [];
+        $count = 0;
         $scroll = 'init';
         $now = new \DateTime();
         while ($scroll) {
-            $output[] = sprintf('Checking Leads - Scroll: %s', $scroll);
+            $output[] = sprintf('Checking Leads - Scroll: %s / Count: %d', $scroll, $count);
             //print sprintf('Checking Leads - %s', $scroll) . PHP_EOL;
             $options = [];
             if ($scroll != 'init') {
@@ -1148,9 +1149,11 @@ class IntercomService
                         $this->deleteLead($lead->id);
                     }
                 }
+                $count++;
             }
             $this->dm->flush();
         }
+        $output[] = sprintf('Total Leads Checked: %d', $count);
 
         return $output;
     }
@@ -1165,8 +1168,9 @@ class IntercomService
         $output = [];
         $scroll = 'init';
         $now = new \DateTime();
+        $count = 0;
         while ($scroll) {
-            $output[] = sprintf('Checking Users - Scroll: %s', $scroll);
+            $output[] = sprintf('Checking Users - Scroll: %s / Count: %d', $scroll, $count);
             // print sprintf('Checking Users - %s', $scroll) . PHP_EOL;
             $options = [];
             if ($scroll != 'init') {
@@ -1251,9 +1255,11 @@ class IntercomService
                     }
                     // TODO: User cancelled, archive messages and clear out after 2 weeks not seen
                 }
+                $count++;
             }
             $this->dm->flush();
         }
+        $output[] = sprintf('Total Users Checked: %d', $count);
 
         return $output;
     }
