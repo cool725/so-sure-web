@@ -3,6 +3,7 @@ namespace AppBundle\Service;
 
 use AppBundle\Repository\OptOut\EmailOptOutRepository;
 use AppBundle\Repository\UserRepository;
+use GuzzleHttp\Exception\ClientException;
 use Predis\Client;
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\Claim;
@@ -1084,17 +1085,35 @@ class IntercomService
         /** @var EmailOptOutRepository $emailOptOutRepo */
         $emailOptOutRepo = $this->dm->getRepository(EmailOptOut::class);
         $output = [];
-        $page = 1;
-        $pages = 1;
+        $scroll = 'init';
         $now = new \DateTime();
-        while ($page <= $pages) {
-            $output[] = sprintf('Checking Leads - page %d', $page);
+        while ($scroll) {
+            $output[] = sprintf('Checking Leads - Scroll: %s', $scroll);
+            //print sprintf('Checking Leads - %s', $scroll) . PHP_EOL;
+            $options = [];
+            if ($scroll != 'init') {
+                $options['scroll_param'] = $scroll;
+            }
             $this->checkRateLimit();
-            $resp = $this->client->leads->getLeads(['page' => $page]);
+            try {
+                $resp = $this->client->leads->scrollLeads($options);
+            } catch (ClientException $e) {
+                if ($e->getCode() == 404) {
+                    $resp = new \stdClass();
+                    $resp->scroll_param = $scroll;
+                    $resp->contacts = [];
+                } else {
+                    throw $e;
+                }
+            }
             $this->storeRateLimit();
 
-            $page++;
-            $pages = $resp->pages->total_pages;
+            if ($scroll != $resp->scroll_param) {
+                $scroll = $resp->scroll_param;
+            } else {
+                $scroll = null;
+            }
+
             foreach ($resp->contacts as $lead) {
                 if (mb_strlen(trim($lead->email)) > 0) {
                     $optedOut = $emailOptOutRepo->isOptedOut($lead->email, EmailOptOut::OPTOUT_CAT_AQUIRE) ||
@@ -1144,17 +1163,35 @@ class IntercomService
         $emailOptOutRepo = $this->dm->getRepository(EmailOptOut::class);
         $emails = [];
         $output = [];
-        $page = 1;
-        $pages = 1;
+        $scroll = 'init';
         $now = new \DateTime();
-        while ($page <= $pages) {
-            $output[] = sprintf('Checking Users - page %d', $page);
+        while ($scroll) {
+            $output[] = sprintf('Checking Users - Scroll: %s', $scroll);
+            // print sprintf('Checking Users - %s', $scroll) . PHP_EOL;
+            $options = [];
+            if ($scroll != 'init') {
+                $options['scroll_param'] = $scroll;
+            }
             $this->checkRateLimit();
-            $resp = $this->client->users->getUsers(['page' => $page]);
+            try {
+                $resp = $this->client->users->scrollUsers($options);
+            } catch (ClientException $e) {
+                if ($e->getCode() == 404) {
+                    $resp = new \stdClass();
+                    $resp->scroll_param = $scroll;
+                    $resp->users = [];
+                } else {
+                    throw $e;
+                }
+            }
             $this->storeRateLimit();
 
-            $page++;
-            $pages = $resp->pages->total_pages;
+            if ($scroll != $resp->scroll_param) {
+                $scroll = $resp->scroll_param;
+            } else {
+                $scroll = null;
+            }
+
             foreach ($resp->users as $user) {
                 if (mb_strlen(trim($user->email)) > 0) {
                     $doNotContact = false;
