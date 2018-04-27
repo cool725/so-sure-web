@@ -69,6 +69,18 @@ class IntercomCommand extends BaseCommand
                 'Check for unsubscriptions & clear out old lead/users'
             )
             ->addOption(
+                'lead-maintenance',
+                null,
+                InputOption::VALUE_NONE,
+                'Check for unsubscriptions & clear out old leads'
+            )
+            ->addOption(
+                'user-maintenance',
+                null,
+                InputOption::VALUE_NONE,
+                'Check for unsubscriptions & clear out old users'
+            )
+            ->addOption(
                 'pending-invites',
                 null,
                 InputOption::VALUE_NONE,
@@ -87,6 +99,8 @@ class IntercomCommand extends BaseCommand
         $convertLead = $input->getOption('convert-lead');
         $undelete = true === $input->getOption('undelete');
         $maintenance = true === $input->getOption('maintenance');
+        $leadMaintenance = true === $input->getOption('lead-maintenance');
+        $userMaintenance = true === $input->getOption('user-maintenance');
         $pendingInvites = true === $input->getOption('pending-invites');
 
         /** @var IntercomService $intercom */
@@ -125,6 +139,12 @@ class IntercomCommand extends BaseCommand
         } elseif ($maintenance) {
             $output->writeln(implode(PHP_EOL, $intercom->maintenance()));
             $output->writeln(sprintf("Finished running maintenance"));
+        } elseif ($leadMaintenance) {
+            $output->writeln(implode(PHP_EOL, $intercom->leadsMaintenance()));
+            $output->writeln(sprintf("Finished running lead maintenance"));
+        } elseif ($userMaintenance) {
+            $output->writeln(implode(PHP_EOL, $intercom->usersMaintenance()));
+            $output->writeln(sprintf("Finished running user maintenance"));
         } elseif ($pendingInvites) {
             $count = 0;
             foreach ($this->getPendingInvites() as $invitation) {
