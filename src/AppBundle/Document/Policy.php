@@ -738,7 +738,7 @@ abstract class Policy
 
     public function hasCashback()
     {
-        return $this->getCashback() !== null;
+        return $this->getCashback() != null;
     }
 
     public function setCashback($cashback)
@@ -1868,13 +1868,13 @@ abstract class Policy
         return $this->getPremiumInstallments();
     }
 
-    public function getPremiumInstallmentPrice($useAdjustedPrice = false)
+    public function getPremiumInstallmentPrice($useAdjustedPrice = false, $estimate = false)
     {
-        if (!$this->isPolicy()) {
+        if (!$this->isPolicy() && !$estimate) {
             return null;
         }
 
-        if (!$this->getPremiumInstallmentCount()) {
+        if (!$this->getPremiumInstallmentCount() && !$estimate) {
             return null;
         } elseif ($this->getPremiumPlan() == self::PLAN_YEARLY) {
             if ($useAdjustedPrice) {
@@ -2896,7 +2896,7 @@ abstract class Policy
 
     public function isPolicy()
     {
-        return $this->getStatus() !== null && $this->getPremium() !== null;
+        return $this->getStatus() != null && $this->getPremium() != null;
     }
 
     public function age()

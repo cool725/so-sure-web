@@ -77,7 +77,7 @@ class BacsService
     /** @var PaymentService */
     protected $paymentService;
 
-    /** @var AbstractGenerator */
+    /** @var LoggableGenerator */
     protected $snappyPdf;
 
     /** @var EngineInterface */

@@ -2,13 +2,20 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Document\Feature;
+use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Exception\InvalidEmailException;
 use AppBundle\Exception\InvalidFullNameException;
+use AppBundle\Form\Type\BacsConfirmType;
+use AppBundle\Form\Type\BacsType;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Security\FOSUBUserProvider;
+use AppBundle\Security\PolicyVoter;
+use AppBundle\Service\PaymentService;
+use AppBundle\Service\PolicyService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -16,10 +23,12 @@ use Symfony\Component\DomCrawler\Field\FormField;
 use Symfony\Component\Form\Button;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\SubmitButton;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -333,6 +342,23 @@ class PurchaseController extends BaseController
         $webpay = null;
         $allowPayment = true;
 
+        $paymentProviderTest = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_PURCHASE_FLOW_BACS,
+            ['judo', 'bacs'],
+            SixpackService::LOG_MIXPANEL_CONVERSION,
+            null,
+            0.1
+        );
+        $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
+        // For now, only allow 1 policy with bacs
+        if ($bacsFeature && count($user->getValidPolicies(true)) >= 1) {
+            $bacsFeature = false;
+        }
+        if (!$bacsFeature) {
+            $paymentProviderTest = 'judo';
+        }
+
         //$this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_POSTCODE);
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('purchase_form')) {
@@ -480,37 +506,46 @@ class PurchaseController extends BaseController
                                 'Policy Id' => $policy->getId(),
                             ]);
 
-                            // There was an odd case of next not being detected as clicked
-                            // perhaps a brower issue with multiple buttons
-                            // just in case, assume judo pay if we don't detect existing
-                            if ($purchaseFormExistingClicked) {
-                                // TODO: Try/catch
-                                if ($this->get('app.judopay')->existing(
-                                    $policy,
-                                    $purchase->getAmount()
-                                )) {
-                                    $purchase->setAgreed(true);
-                                    return $this->redirectToRoute(
-                                        'user_welcome_policy_id',
-                                        ['id' => $policy->getId()]
-                                    );
-                                } else {
-                                    // @codingStandardsIgnoreStart
-                                    $this->addFlash(
-                                        'warning',
-                                        "Sorry, there was a problem with your existing payment method. Try again, or use the Pay with new card option."
-                                    );
-                                    // @codingStandardsIgnoreEnd
-                                }
-                            } else {
-                                $webpay = $this->get('app.judopay')->webpay(
-                                    $policy,
-                                    $purchase->getAmount(),
-                                    $request->getClientIp(),
-                                    $request->headers->get('User-Agent'),
-                                    JudopayService::WEB_TYPE_STANDARD
+                            if ($paymentProviderTest == 'bacs') {
+                                return new RedirectResponse(
+                                    $this->generateUrl('purchase_step_payment_id', [
+                                        'id' => $policy->getId(),
+                                        'freq' => $monthly ? Policy::PLAN_MONTHLY : Policy::PLAN_YEARLY,
+                                    ])
                                 );
-                                $purchase->setAgreed(true);
+                            } else {
+                                // There was an odd case of next not being detected as clicked
+                                // perhaps a brower issue with multiple buttons
+                                // just in case, assume judo pay if we don't detect existing
+                                if ($purchaseFormExistingClicked) {
+                                    // TODO: Try/catch
+                                    if ($this->get('app.judopay')->existing(
+                                        $policy,
+                                        $purchase->getAmount()
+                                    )) {
+                                        $purchase->setAgreed(true);
+                                        return $this->redirectToRoute(
+                                            'user_welcome_policy_id',
+                                            ['id' => $policy->getId()]
+                                        );
+                                    } else {
+                                        // @codingStandardsIgnoreStart
+                                        $this->addFlash(
+                                            'warning',
+                                            "Sorry, there was a problem with your existing payment method. Try again, or use the Pay with new card option."
+                                        );
+                                        // @codingStandardsIgnoreEnd
+                                    }
+                                } else {
+                                    $webpay = $this->get('app.judopay')->webpay(
+                                        $policy,
+                                        $purchase->getAmount(),
+                                        $request->getClientIp(),
+                                        $request->headers->get('User-Agent'),
+                                        JudopayService::WEB_TYPE_STANDARD
+                                    );
+                                    $purchase->setAgreed(true);
+                                }
                             }
                         } else {
                             $this->addFlash(
@@ -552,12 +587,147 @@ class PurchaseController extends BaseController
                 ['memory' => 'asc']
             ) : null,
             'billing_date' => $billingDate,
+            'payment_provider' => $paymentProviderTest,
         );
 
         return $this->render($template, $data);
     }
 
     /**
+     * Note that any changes to actual path routes need to be reflected in the Google Analytics Goals
+     *   as these will impact Adwords
+     *
+     * @Route("/step-payment/{id}/{freq}", name="purchase_step_payment_id")
+     */
+    public function purchaseStepPaymentAction(Request $request, $id, $freq)
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('purchase');
+        } elseif (!$user->canPurchasePolicy()) {
+            $this->addFlash(
+                'error',
+                "Sorry, but you've reached the maximum number of allowed policies. Contact us for more details."
+            );
+
+            return $this->redirectToRoute('user_home');
+        }
+
+        if (!$user->hasValidBillingDetails()) {
+            return $this->redirectToRoute('purchase_step_personal');
+        }
+
+        $dm = $this->getManager();
+        /** @var PolicyRepository $policyRepo */
+        $policyRepo = $dm->getRepository(Policy::class);
+
+        /** @var PhonePolicy $policy */
+        $policy = $policyRepo->find($id);
+        if (!$policy) {
+            return $this->redirectToRoute('purchase_step_personal');
+        }
+        $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
+        $amount = null;
+        $bacs = new Bacs();
+        $bacsConfirm = new Bacs();
+        if ($freq == Policy::PLAN_MONTHLY) {
+            $policy->setPremiumInstallments(12);
+            $this->getManager()->flush();
+            $amount = $policy->getPremium()->getMonthlyPremiumPrice();
+        } elseif ($freq == Policy::PLAN_YEARLY) {
+            $policy->setPremiumInstallments(1);
+            $this->getManager()->flush();
+            $amount = $policy->getPremium()->getYearlyPremiumPrice();
+            $bacs->setAnnual(true);
+            $bacsConfirm->setAnnual(true);
+        } else {
+            throw new NotFoundHttpException(sprintf('Unknown frequency %s', $freq));
+        }
+
+        /** @var PaymentService $paymentService */
+        $paymentService = $this->get('app.payment');
+        /** @var PolicyService $policyService */
+        $policyService = $this->get('app.policy');
+        /** @var FormInterface $bacsForm */
+        $bacsForm = $this->get('form.factory')
+            ->createNamedBuilder('bacs_form', BacsType::class, $bacs)
+            ->getForm();
+        /** @var FormInterface $bacsConfirmForm */
+        $bacsConfirmForm = $this->get('form.factory')
+            ->createNamedBuilder('bacs_confirm_form', BacsConfirmType::class, $bacsConfirm)
+            ->getForm();
+
+        $webpay = $this->get('app.judopay')->webpay(
+            $policy,
+            $amount,
+            $request->getClientIp(),
+            $request->headers->get('User-Agent'),
+            JudopayService::WEB_TYPE_STANDARD
+        );
+
+        $template = null;
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('bacs_form')) {
+                $bacsForm->handleRequest($request);
+                if ($bacsForm->isValid()) {
+                    if (!$bacs->isValid()) {
+                        $this->addFlash('error', 'Sorry, but this bank account is not valid');
+                    } else {
+                        $paymentService->generateBacsReference($bacs, $user);
+                        $bacsConfirm = clone $bacs;
+                        $bacsConfirmForm = $this->get('form.factory')
+                            ->createNamedBuilder('bacs_confirm_form', BacsConfirmType::class, $bacsConfirm)
+                            ->getForm();
+                        $template = 'AppBundle:Purchase:purchaseStepPaymentBacsConfirm.html.twig';
+                    }
+                }
+            } elseif ($request->request->has('bacs_confirm_form')) {
+                $bacsConfirmForm->handleRequest($request);
+                /** @var SubmitButton $backButton */
+                $backButton = $bacsConfirmForm->get('back');
+                if ($backButton->isClicked()) {
+                    $bacs = clone $bacsConfirm;
+                    $bacsForm = $this->get('form.factory')
+                        ->createNamedBuilder('bacs_form', BacsType::class, $bacs)
+                        ->getForm();
+                    $template = 'AppBundle:Purchase:purchaseStepPaymentBacs.html.twig';
+                } elseif ($bacsConfirmForm->isValid()) {
+                    $policyService->create($policy, null, true);
+                    $paymentService->confirmBacs(
+                        $policy,
+                        $bacsConfirm->transformBacsPaymentMethod($this->getIdentityLogWeb($request))
+                    );
+
+                    $this->addFlash(
+                        'success',
+                        'Your direct debit is now setup. You will receive an email confirmation shortly.'
+                    );
+
+                    return $this->redirectToRoute('user_welcome', ['id' => $policy->getId()]);
+                }
+            }
+        }
+
+        if (!$template) {
+            $template = 'AppBundle:Purchase:purchaseStepPaymentBacs.html.twig';
+        }
+
+        $data = array(
+            'policy' => $policy,
+            'is_postback' => 'POST' === $request->getMethod(),
+            'step' => 3,
+            'bacs_form' => $bacsForm->createView(),
+            'bacs_confirm_form' => $bacsConfirmForm->createView(),
+            'bacs' => $bacs,
+            'webpay_action' => $webpay ? $webpay['post_url'] : null,
+            'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
+        );
+
+
+        return $this->render($template, $data);
+    }
+
+        /**
      * @Route("/sample-policy-terms", name="sample_policy_terms")
      * @Template()
      */

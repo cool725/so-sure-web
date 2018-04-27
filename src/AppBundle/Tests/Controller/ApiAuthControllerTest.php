@@ -856,7 +856,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $repo = self::$dm->getRepository(Policy::class);
         /** @var Policy $policy */
         $policy = $repo->find($data['id']);
-        $this->assertTrue($policy !== null);
+        $this->assertTrue($policy != null);
         $this->assertEquals('62.253.24.189', $policy->getIdentityLog()->getIp());
         $this->assertEquals('GB', $policy->getIdentityLog()->getCountry());
         $this->assertEquals([-0.13,51.5], $policy->getIdentityLog()->getLoc()->getCoordinates());

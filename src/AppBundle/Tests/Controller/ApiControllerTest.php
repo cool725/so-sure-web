@@ -1015,7 +1015,7 @@ class ApiControllerTest extends BaseApiControllerTest
         $repo = self::$dm->getRepository(User::class);
         /** @var User $fooUser */
         $fooUser = $repo->findOneBy(['email' => 'api-ip-user@api.bar.com']);
-        $this->assertTrue($fooUser !== null);
+        $this->assertTrue($fooUser != null);
         $this->assertEquals('62.253.24.189', $fooUser->getIdentityLog()->getIp());
         $this->assertEquals('GB', $fooUser->getIdentityLog()->getCountry());
         $this->assertEquals([-0.13,51.5], $fooUser->getIdentityLog()->getLoc()->getCoordinates());
@@ -1037,7 +1037,7 @@ class ApiControllerTest extends BaseApiControllerTest
         $fooUser = $repo->findOneBy([
             'emailCanonical' => mb_strtolower(static::generateEmail('create-campaign', $this))
         ]);
-        $this->assertTrue($fooUser !== null);
+        $this->assertTrue($fooUser != null);
         $this->assertEquals('foo', $fooUser->getReferer());
     }
 
@@ -1057,7 +1057,7 @@ class ApiControllerTest extends BaseApiControllerTest
         $user = $repo->findOneBy([
             'emailCanonical' => mb_strtolower(static::generateEmail('create-prelaunch', $this))
         ]);
-        $this->assertTrue($user !== null);
+        $this->assertTrue($user != null);
         $this->assertNull($user->getLastLogin());
 
         $user->setPreLaunch(true);
@@ -1079,7 +1079,7 @@ class ApiControllerTest extends BaseApiControllerTest
         $userUpdated = $repo->findOneBy([
             'emailCanonical' => mb_strtolower(static::generateEmail('create-prelaunch', $this))
         ]);
-        $this->assertTrue($userUpdated !== null);
+        $this->assertTrue($userUpdated != null);
         $this->assertNotNull($userUpdated->getLastLogin());
         $this->assertEquals($mobile, $userUpdated->getMobileNumber());
     }
@@ -1100,7 +1100,7 @@ class ApiControllerTest extends BaseApiControllerTest
         $user = $repo->findOneBy([
             'emailCanonical' => mb_strtolower(static::generateEmail('create-prelaunch-loggedin', $this))
         ]);
-        $this->assertTrue($user !== null);
+        $this->assertTrue($user != null);
         $this->assertNull($user->getLastLogin());
 
         $user->setLastLogin(new \DateTime());
