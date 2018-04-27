@@ -396,17 +396,20 @@ class DaviesService extends S3EmailService
             }
 
             if ($daviesClaim->riskPostCode && $claim->getPolicy()->getUser()->getBillingAddress() &&
-                !$this->postcodeCompare(
-                $claim->getPolicy()->getUser()->getBillingAddress()->getPostcode(),
-                $daviesClaim->riskPostCode
-            ) && !$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_DAVIES_POSTCODE)) {
-                $msg = sprintf(
-                    'Claim %s: %s does not match expected postcode %s',
-                    $daviesClaim->claimNumber,
-                    $daviesClaim->riskPostCode,
-                    $claim->getPolicy()->getUser()->getBillingAddress()->getPostcode()
-                );
-                $this->warnings[$daviesClaim->claimNumber][] = $msg;
+                !$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_DAVIES_POSTCODE)) {
+                if (!$this->postcodeCompare(
+                        $claim->getPolicy()->getUser()->getBillingAddress()->getPostcode(),
+                        $daviesClaim->riskPostCode
+                    )
+                ) {
+                    $msg = sprintf(
+                        'Claim %s: %s does not match expected postcode %s',
+                        $daviesClaim->claimNumber,
+                        $daviesClaim->riskPostCode,
+                        $claim->getPolicy()->getUser()->getBillingAddress()->getPostcode()
+                    );
+                    $this->warnings[$daviesClaim->claimNumber][] = $msg;
+                }
             }
         }
 
