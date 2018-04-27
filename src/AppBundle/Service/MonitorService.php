@@ -212,13 +212,13 @@ class MonitorService
     {
         /** @var PhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(PhonePolicy::class);
-        $twoDays = new \DateTime();
-        $twoDays = $twoDays->sub(new \DateInterval('P2D'));
+        $oneDay = new \DateTime();
+        $oneDay = $oneDay->sub(new \DateInterval('P1D'));
 
         // delay 10 minutes to allow time to sync
         $tenMinutes = new \DateTime();
         $tenMinutes = $tenMinutes->sub(new \DateInterval('PT10M'));
-        $updatedPolicies = $repo->findAllStatusUpdatedPolicies($twoDays, $tenMinutes);
+        $updatedPolicies = $repo->findAllStatusUpdatedPolicies($oneDay, $tenMinutes);
         $errors = [];
         foreach ($updatedPolicies as $policy) {
             /** @var Policy $policy */
