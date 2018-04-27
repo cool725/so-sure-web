@@ -32,7 +32,7 @@ class SixpackListener
             $this->sixpack->convert($experiment);
         }
         foreach (SixpackService::$purchaseConversionKpi as $experiment) {
-            $this->sixpack->convert($experiment,SixpackService::KPI_POLICY_PURCHASE);
+            $this->sixpack->convert($experiment, SixpackService::KPI_POLICY_PURCHASE);
         }
     }
 }
