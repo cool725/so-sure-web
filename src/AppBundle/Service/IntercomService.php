@@ -1080,7 +1080,7 @@ class IntercomService
 
     }
 
-    private function leadsMaintenance()
+    public function leadsMaintenance()
     {
         /** @var EmailOptOutRepository $emailOptOutRepo */
         $emailOptOutRepo = $this->dm->getRepository(EmailOptOut::class);
@@ -1155,7 +1155,7 @@ class IntercomService
         return $output;
     }
 
-    private function usersMaintenance()
+    public function usersMaintenance()
     {
         /** @var UserRepository $userRepo */
         $userRepo = $this->dm->getRepository(User::class);
