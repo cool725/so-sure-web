@@ -13,7 +13,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class LoadPlayDeviceData implements FixtureInterface, ContainerAwareInterface
 {
     /**
-     * @var ContainerInterface
+     * @var ContainerInterface|null
      */
     private $container;
 
@@ -24,6 +24,9 @@ class LoadPlayDeviceData implements FixtureInterface, ContainerAwareInterface
 
     public function load(ObjectManager $manager)
     {
+        if (!$this->container) {
+            throw new \Exception('missing container');
+        }
         $row = 0;
         $file = sprintf(
             "%s/../src/AppBundle/DataFixtures/supported_devices.csv",

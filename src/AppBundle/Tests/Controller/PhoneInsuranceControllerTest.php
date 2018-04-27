@@ -83,7 +83,7 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
 
     public function testPhoneSearchLearnMore()
     {
-        $alternate = null;
+        $alternate = [];
         $crawler = self::$client->request('GET', '/phone-insurance/Apple+iPhone+7+256GB/learn-more');
         $data = self::$client->getResponse();
         $this->assertEquals(200, $data->getStatusCode());

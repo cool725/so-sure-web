@@ -126,7 +126,7 @@ class PurchaseController extends BaseController
         $purchase = new PurchaseStepPersonalAddress();
         if ($user) {
             $purchase->populateFromUser($user);
-        } elseif ($session->get('email')) {
+        } elseif ($session && $session->get('email')) {
             $purchase->setEmail($session->get('email'));
         }
         /** @var Form $purchaseForm */
@@ -836,7 +836,7 @@ class PurchaseController extends BaseController
                 return $this->getRouteForPostCC($policy, $webType);
             } elseif ($policy->isInitialPayment()) {
                 return $this->getRouteForPostCC($policy, $webType);
-            } else {
+            } elseif ($policy->getLastSuccessfulUserPaymentCredit()) {
                 // unpaid policy - outstanding payment
                 $this->addFlash(
                     'success',
@@ -845,6 +845,9 @@ class PurchaseController extends BaseController
                         $policy->getLastSuccessfulUserPaymentCredit()->getAmount()
                     )
                 );
+                return $this->getRouteForPostCC($policy, $webType);
+            } else {
+                // should never occur - but assume success
                 return $this->getRouteForPostCC($policy, $webType);
             }
         } elseif ($webType == JudopayService::WEB_TYPE_CARD_DETAILS) {

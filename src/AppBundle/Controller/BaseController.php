@@ -709,14 +709,14 @@ abstract class BaseController extends Controller
      */
     protected function getSessionQuotePhone(Request $request)
     {
-        $session = $request->getSession();
         $dm = $this->getManager();
         /** @var PhoneRepository $phoneRepo */
         $phoneRepo = $dm->getRepository(Phone::class);
 
         /** @var Phone $phone */
         $phone = null;
-        if ($session->get('quote')) {
+        $session = $request->getSession();
+        if ($session && $session->get('quote')) {
             /** @var Phone $phone */
             $phone = $phoneRepo->find($session->get('quote'));
         }
@@ -726,13 +726,19 @@ abstract class BaseController extends Controller
 
     protected function getSessionSixpackTest(Request $request, $experiment, $alternatives)
     {
-        $session = $request->getSession();
-
+        $alternative = null;
         $sessionName = sprintf('sixpack:%s', $experiment);
-        $alternative = $session->get($sessionName);
+
+        $session = $request->getSession();
+        if ($session) {
+            $alternative = $session->get($sessionName);
+        }
+
         if (!$alternative) {
             $alternative = $this->get('app.sixpack')->participate($experiment, $alternatives, true);
-            $session->set($sessionName, $alternative);
+            if ($session) {
+                $session->set($sessionName, $alternative);
+            }
         }
 
         return $alternative;
@@ -982,8 +988,6 @@ abstract class BaseController extends Controller
 
     protected function setPhoneSession(Request $request, Phone $phone)
     {
-        $session = $request->getSession();
-        $session->set('quote', $phone->getId());
         if ($phone->getMemory()) {
             $url = $this->generateUrl('quote_make_model_memory', [
                 'make' => $phone->getMakeCanonical(),
@@ -996,7 +1000,12 @@ abstract class BaseController extends Controller
                 'model' => $phone->getEncodedModelCanonical(),
             ], UrlGeneratorInterface::ABSOLUTE_URL);
         }
-        $session->set('quote_url', $url);
+
+        $session = $request->getSession();
+        if ($session) {
+            $session->set('quote', $phone->getId());
+            $session->set('quote_url', $url);
+        }
 
         return $url;
     }

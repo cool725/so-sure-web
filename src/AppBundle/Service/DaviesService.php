@@ -395,7 +395,8 @@ class DaviesService extends S3EmailService
                 $this->warnings[$daviesClaim->claimNumber][] = $msg;
             }
 
-            if ($daviesClaim->riskPostCode && !$this->postcodeCompare(
+            if ($daviesClaim->riskPostCode && $claim->getPolicy()->getUser()->getBillingAddress() &&
+                !$this->postcodeCompare(
                 $claim->getPolicy()->getUser()->getBillingAddress()->getPostcode(),
                 $daviesClaim->riskPostCode
             ) && !$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_DAVIES_POSTCODE)) {

@@ -1030,7 +1030,9 @@ class ReportingService
                 new \DateTimeZone(SoSure::TIMEZONE)
             );
         }
-        $end = $end->sub(new \DateInterval('PT1S'));
+        if ($end) {
+            $end = $end->sub(new \DateInterval('PT1S'));
+        }
 
         return [$start, $end];
     }

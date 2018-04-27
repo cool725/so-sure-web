@@ -475,7 +475,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     }
 
     /**
-     * @return Address
+     * @return Address|null
      */
     public function getBillingAddress()
     {

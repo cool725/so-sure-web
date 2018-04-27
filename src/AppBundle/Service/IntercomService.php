@@ -260,7 +260,7 @@ class IntercomService
 
             return $resp;
         } catch (\GuzzleHttp\Exception\ClientException $e) {
-            if ($e->getResponse()->getStatusCode() == "404") {
+            if ($e->getResponse() && $e->getResponse()->getStatusCode() == "404") {
                 return null;
             }
 
@@ -286,7 +286,7 @@ class IntercomService
 
             return true;
         } catch (\GuzzleHttp\Exception\ClientException $e) {
-            if ($e->getResponse()->getStatusCode() == "404") {
+            if ($e->getResponse() && $e->getResponse()->getStatusCode() == "404") {
                 return false;
             }
 

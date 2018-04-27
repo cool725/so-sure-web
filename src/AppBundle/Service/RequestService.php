@@ -57,7 +57,7 @@ class RequestService
         $this->adminCookieValue = $adminCookieValue;
         $this->environment = $environment;
         if ($request = $this->requestStack->getCurrentRequest()) {
-            $this->mobileDetect = new Mobile_Detect($this->requestStack->getCurrentRequest()->server->all());
+            $this->mobileDetect = new Mobile_Detect($request->server->all());
         }
     }
 
@@ -83,13 +83,14 @@ class RequestService
 
     public function getSession($var = null)
     {
-        $request = $this->requestStack->getCurrentRequest();
-        $session = $request->getSession();
-        if ($session->isStarted()) {
-            if ($var) {
-                return $session->get($var);
-            } else {
-                return $session;
+        if ($request = $this->requestStack->getCurrentRequest()) {
+            $session = $request->getSession();
+            if ($session && $session->isStarted()) {
+                if ($var) {
+                    return $session->get($var);
+                } else {
+                    return $session;
+                }
             }
         }
 

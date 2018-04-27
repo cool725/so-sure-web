@@ -124,6 +124,9 @@ class ApiControllerTest extends BaseApiControllerTest
 
         // For some reason, querying with the same client/dm is not updating getting the latest record
         $client = static::createClient();
+        if (!$client->getContainer()) {
+            throw new \Exception('unable to find container');
+        }
         /** @var DocumentManager $dm */
         $dm = $client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         /** @var UserRepository $repo */
@@ -155,6 +158,9 @@ class ApiControllerTest extends BaseApiControllerTest
 
         // For some reason, querying with the same client/dm is not updating getting the latest record
         $client = static::createClient();
+        if (!$client->getContainer()) {
+            throw new \Exception('unable to find container');
+        }
         /** @var DocumentManager $dm */
         $dm = $client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(User::class);
@@ -613,6 +619,9 @@ class ApiControllerTest extends BaseApiControllerTest
 
         // For some reason, querying with the same client/dm is not updating getting the latest record
         $client = static::createClient();
+        if (!$client->getContainer()) {
+            throw new \Exception('unable to find container');
+        }
         /** @var DocumentManager $dm */
         $dm = $client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(User::class);

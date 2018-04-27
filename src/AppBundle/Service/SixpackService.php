@@ -155,7 +155,9 @@ class SixpackService
                 if (in_array($experiment, self::$unauthExperiments)) {
                     $clientId = $this->requestService->getTrackingId();
                 } elseif (in_array($experiment, self::$authExperiments)) {
-                    $clientId = $this->requestService->getUser()->getId();
+                    if ($this->requestService->getUser()) {
+                        $clientId = $this->requestService->getUser()->getId();
+                    }
                 } else {
                     throw new \Exception(sprintf('Exp %s is not in auth or unauth array', $experiment));
                 }
@@ -214,7 +216,9 @@ class SixpackService
         if (in_array($experiment, self::$unauthExperiments)) {
             $converted = $this->convertByClientId($this->requestService->getTrackingId(), $experiment, $kpi);
         } elseif (in_array($experiment, self::$authExperiments)) {
-            $converted = $this->convertByClientId($this->requestService->getUser()->getId(), $experiment, $kpi);
+            if ($this->requestService->getUser()) {
+                $converted = $this->convertByClientId($this->requestService->getUser()->getId(), $experiment, $kpi);
+            }
         } else {
             throw new \Exception(sprintf('Exp %s is not in auth or unauth array', $experiment));
         }
@@ -266,6 +270,10 @@ class SixpackService
             return true;
         } catch (ClientException $e) {
             $res = $e->getResponse();
+            if (!$res) {
+                $this->logger->error(sprintf('Failed converting exp %s', $experiment), ['exception' => $e]);
+                return false;
+            }
             $body = (string) $res->getBody();
             $data = json_decode($body, true);
             // {"status": "failed", "message": "this client was not participating"}

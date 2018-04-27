@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 
-class PicSureSearchType extends AbstractType
+class PicSureSearchType extends BaseType
 {
     /**
      * @var RequestStack
@@ -51,8 +51,8 @@ class PicSureSearchType extends AbstractType
         $currentRequest = $this->requestStack->getCurrentRequest();
         $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) use ($currentRequest) {
             $form = $event->getForm();
-            if ($currentRequest->query->get('status')) {
-                $form->get('status')->setData($currentRequest->query->get('status'));
+            if ($currentRequest && $currentRequest->query->get('status')) {
+                $this->formQuerystring($form, $currentRequest, 'status');
             } else {
                 $form->get('status')->setData(PhonePolicy::PICSURE_STATUS_MANUAL);
             }

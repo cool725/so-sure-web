@@ -17,7 +17,7 @@ use Symfony\Component\Form\FormEvent;
 use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-class ClaimSearchType extends AbstractType
+class ClaimSearchType extends BaseType
 {
     /**
      * @var RequestStack
@@ -56,7 +56,7 @@ class ClaimSearchType extends AbstractType
         $currentRequest = $this->requestStack->getCurrentRequest();
         $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) use ($currentRequest) {
             $form = $event->getForm();
-            $form->get('status')->setData($currentRequest->query->get('status'));
+            $this->formQuerystring($form, $currentRequest, 'status');
         });
     }
 

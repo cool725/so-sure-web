@@ -1334,10 +1334,13 @@ class UserController extends BaseController
             return $redirect;
         }
 
+        $friends = null;
         $session = $request->getSession();
-        if (!$friends = $session->get('friends')) {
-            $friends = $facebook->getAllFriends();
-            $session->set('friends', $friends);
+        if ($session) {
+            if (!$friends = $session->get('friends')) {
+                $friends = $facebook->getAllFriends();
+                $session->set('friends', $friends);
+            }
         }
 
         return array(

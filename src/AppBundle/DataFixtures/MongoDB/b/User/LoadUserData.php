@@ -16,7 +16,7 @@ class LoadUserData implements FixtureInterface, ContainerAwareInterface
     const DEFAULT_PASSWORD = 'w3ares0sure!';
 
     /**
-     * @var ContainerInterface
+     * @var ContainerInterface|null
      */
     private $container;
 
@@ -42,6 +42,9 @@ class LoadUserData implements FixtureInterface, ContainerAwareInterface
 
     private function valdiateGedmoLogging($manager)
     {
+        if (!$this->container) {
+            throw new \Exception('missing container');
+        }
         /** @var \Doctrine\ODM\MongoDB\DocumentManager $dm */
         $dm = $this->container->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(User::class);
@@ -53,6 +56,9 @@ class LoadUserData implements FixtureInterface, ContainerAwareInterface
 
     private function newUser($email, $password, $firstName, $lastName, $roles)
     {
+        if (!$this->container) {
+            throw new \Exception('missing container');
+        }
         /** @var UserManagerInterface $userManager */
         $userManager = $this->container->get('fos_user.user_manager');
         /** @var User $user */

@@ -131,7 +131,7 @@ class DefaultController extends BaseController
      */
     public function homepageLanding(Request $request)
     {
-        $data = null;
+        $data = [];
         if ($request->get('_route') == "reimagined") {
             $data = array(
                 'main'              => 'Mobile Insurance',
@@ -176,14 +176,16 @@ class DefaultController extends BaseController
         // throw new \Exception($id);
 
         if ($phone && in_array($type, ['purchase-select', 'purchase-change'])) {
-            $session = $request->getSession();
-            $session->set('quote', $phone->getId());
+            if ($session = $request->getSession()) {
+                $session->set('quote', $phone->getId());
+            }
 
             // don't check for partial partial as selected phone may be different from partial policy phone
             return $this->redirectToRoute('purchase_step_policy');
         } elseif ($phone && in_array($type, ['learn-more'])) {
-            $session = $request->getSession();
-            $session->set('quote', $phone->getId());
+            if ($session = $request->getSession()) {
+                $session->set('quote', $phone->getId());
+            }
         }
 
         $formPhone = $this->get('form.factory')
@@ -241,15 +243,16 @@ class DefaultController extends BaseController
         }
 
         if ($phone && in_array($type, ['purchase-select', 'purchase-change'])) {
-            $session = $request->getSession();
-            $session->set('quote', $phone->getId());
+            if ($session = $request->getSession()) {
+                $session->set('quote', $phone->getId());
+            }
 
             // don't check for partial partial as selected phone may be different from partial policy phone
             return $this->redirectToRoute('purchase_step_policy');
         } elseif ($phone && in_array($type, ['learn-more'])) {
-            $session = $request->getSession();
-            $session->set('quote', $phone->getId());
-
+            if ($session = $request->getSession()) {
+                $session->set('quote', $phone->getId());
+            }
            // return $this->redirectToRoute('learn_more_phone', ['id' => $id]);
         }
 
