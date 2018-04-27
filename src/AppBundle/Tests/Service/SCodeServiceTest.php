@@ -145,8 +145,9 @@ class SCodeServiceTest extends WebTestCase
         $user->setFirstName("żbieta");
         $user->setLastName("Eżbieta");
 
+        /** @var SCode $scode */
         $scode = static::$scodeService->generateUniqueSCode($user, SCode::TYPE_STANDARD);
         $this->assertEquals(SCode::TYPE_STANDARD, $scode->getType());
-        $this->assertEquals('żeżb0001', $scode->getCode());
+        $this->assertTrue(in_array($scode->getCode(), ['żeżb0001', 'żeżb0002', 'żeżb0003', 'żeżb0004']));
     }
 }
