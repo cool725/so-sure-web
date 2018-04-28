@@ -669,7 +669,7 @@ class DaviesService extends S3EmailService
                 }
                 $this->mailer->sendTemplate(
                     sprintf('Verify Policy %s IMEI Update', $policy->getPolicyNumber()),
-                    'tech+ops@so-sure.com',
+                    ['tech+ops@so-sure.com', 'marketing@so-sure.com'],
                     'AppBundle:Email:davies/checkPhone.html.twig',
                     ['policy' => $policy, 'daviesClaim' => $daviesClaim, 'skipImeiUpdate' => $skipImeiUpdate]
                 );
