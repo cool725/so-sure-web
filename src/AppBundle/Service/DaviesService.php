@@ -536,7 +536,8 @@ class DaviesService extends S3EmailService
             if (!$daviesClaim->replacementReceivedDate) {
                 $items[] = 'received date';
             }
-            if (!$daviesClaim->replacementImei && !in_array('replacementImei', $daviesClaim->unobtainableFields)) {
+            if (!$daviesClaim->replacementImei && !$daviesClaim->isReplacementRepaired() &&
+                !in_array('replacementImei', $daviesClaim->unobtainableFields)) {
                 $items[] = 'imei';
             }
             if (!$daviesClaim->replacementMake || !$daviesClaim->replacementModel) {
@@ -553,7 +554,8 @@ class DaviesService extends S3EmailService
             }
         }
 
-        if (!$daviesClaim->replacementImei && in_array('replacementImei', $daviesClaim->unobtainableFields)) {
+        if (!$daviesClaim->replacementImei && !$daviesClaim->isReplacementRepaired() &&
+            in_array('replacementImei', $daviesClaim->unobtainableFields)) {
             $msg = sprintf(
                 'Claim %s does not have a replacement IMEI - unobtainable. Contact customer if possible.',
                 $daviesClaim->claimNumber
@@ -561,7 +563,8 @@ class DaviesService extends S3EmailService
             $this->warnings[$daviesClaim->claimNumber][] = $msg;
         }
 
-        if (!$daviesClaim->replacementImei && $daviesClaim->getClaimStatus() == Claim::STATUS_SETTLED) {
+        if (!$daviesClaim->replacementImei && !$daviesClaim->isReplacementRepaired() &&
+            $daviesClaim->getClaimStatus() == Claim::STATUS_SETTLED) {
             $msg = sprintf(
                 'Claim %s is settled without a replacement imei.',
                 $daviesClaim->claimNumber
@@ -569,7 +572,8 @@ class DaviesService extends S3EmailService
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
-        if (!$claim->getReplacementPhone() && $daviesClaim->getClaimStatus() == Claim::STATUS_SETTLED) {
+        if (!$claim->getReplacementPhone() && $daviesClaim->replacementMake && $daviesClaim->replacementModel &&
+            $daviesClaim->getClaimStatus() == Claim::STATUS_SETTLED) {
             $msg = sprintf(
                 'Claim %s is settled without a replacement phone being set. SO-SURE to set replacement phone.',
                 $daviesClaim->claimNumber
