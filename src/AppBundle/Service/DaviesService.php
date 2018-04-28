@@ -674,6 +674,18 @@ class DaviesService extends S3EmailService
                     ['policy' => $policy, 'daviesClaim' => $daviesClaim, 'skipImeiUpdate' => $skipImeiUpdate]
                 );
             }
+        } elseif (count($policy->getClaims()) == 1) {
+            // Davies may be closing the claim before reporting the imei properly (not following process)
+            // , so if there's only 1 claim on the policy without an imei number, report it properly
+            if ($claim->getReplacementImei() &&
+                $claim->getReplacementImei() != $policy->getImei()) {
+                $this->mailer->sendTemplate(
+                    sprintf('Verify Policy %s IMEI Update', $policy->getPolicyNumber()),
+                    ['tech+ops@so-sure.com', 'marketing@so-sure.com'],
+                    'AppBundle:Email:davies/checkPhone.html.twig',
+                    ['policy' => $policy, 'daviesClaim' => $daviesClaim, 'skipImeiUpdate' => true]
+                );
+            }
         }
 
         if ($claim->getReplacementImei() && !$claim->getReplacementReceivedDate()) {
