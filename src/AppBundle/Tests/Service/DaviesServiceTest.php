@@ -1337,6 +1337,13 @@ class DaviesServiceTest extends WebTestCase
         $this->insureErrorDoesNotExist('/received date/');
         $this->insureErrorDoesNotExist('/imei/');
         $this->insureErrorDoesNotExist('/; phone/');
+
+        $daviesClaim->replacementImei = 'NA - repaired';
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->insureErrorDoesNotExist('/the replacement data not recorded/');
+        $this->insureErrorDoesNotExist('/received date/');
+        $this->insureErrorDoesNotExist('/imei/');
+        $this->insureErrorDoesNotExist('/; phone/');
     }
 
     public function testPostValidateClaimDetailsReceivedDate()

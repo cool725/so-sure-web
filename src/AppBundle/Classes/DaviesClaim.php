@@ -151,6 +151,8 @@ class DaviesClaim extends DaviesExcel
 
     public $unobtainableFields;
 
+    public $isReplacementRepair = null;
+
     public function __construct()
     {
         $this->unobtainableFields = [];
@@ -490,7 +492,7 @@ class DaviesClaim extends DaviesExcel
                 throw new \Exception('Unknown or missing claim type');
             }
 
-            if ($this->replacementImei && !$this->isImei($this->replacementImei)) {
+            if ($this->replacementImei && !$this->isImei($this->replacementImei) && !$this->isReplacementRepaired()) {
                 throw new \Exception(sprintf('Invalid replacement imei %s', $this->replacementImei));
             }
         } catch (\Exception $e) {
@@ -498,6 +500,19 @@ class DaviesClaim extends DaviesExcel
         }
 
         return true;
+    }
+
+    public function isReplacementRepaired()
+    {
+        if ($this->isReplacementRepair == null) {
+            $this->isReplacementRepair = mb_stripos($this->replacementImei, 'repair') != false;
+        }
+
+        if ($this->isReplacementRepair) {
+            $this->replacementImei = null;
+        }
+
+        return $this->isReplacementRepair;
     }
 
     public static function create($data, $columns)
