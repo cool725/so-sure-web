@@ -440,6 +440,7 @@ nelmio_security:
                 - wss://nexus-websocket-b.intercom.io
                 - https://uploads.intercomcdn.com
                 - https://uploads.intercomusercontent.com
+                - https://js.intercomcdn.com
                 - https://app.getsentry.com
                 - https://*.optimizely.com
                 - https://player.vimeo.com
