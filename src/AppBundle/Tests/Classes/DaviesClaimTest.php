@@ -775,23 +775,38 @@ class DaviesClaimTest extends \PHPUnit\Framework\TestCase
         $davies = new DaviesClaim();
         $davies->lossType = "Loss - From Pocket";
         $this->assertEquals(Claim::TYPE_LOSS, $davies->getClaimType());
-        $this->assertEquals(70, $davies->getExpectedExcess());
+        $this->assertEquals(70, $davies->getExpectedExcess(false, false));
+        $this->assertEquals(70, $davies->getExpectedExcess(true, false));
+        $this->assertEquals(70, $davies->getExpectedExcess(true, true));
+        $this->assertEquals(150, $davies->getExpectedExcess(false, true));
 
         $davies->lossType = "Warranty - Audio Fault";
         $this->assertEquals(Claim::TYPE_WARRANTY, $davies->getClaimType());
-        $this->assertEquals(50, $davies->getExpectedExcess());
+        $this->assertEquals(50, $davies->getExpectedExcess(false, false));
+        $this->assertEquals(50, $davies->getExpectedExcess(true, false));
+        $this->assertEquals(50, $davies->getExpectedExcess(true, true));
+        $this->assertEquals(150, $davies->getExpectedExcess(false, true));
 
         $davies->lossType = "Accidental Damage - Dropped (Away From Home)   ";
         $this->assertEquals(Claim::TYPE_DAMAGE, $davies->getClaimType());
-        $this->assertEquals(50, $davies->getExpectedExcess());
+        $this->assertEquals(50, $davies->getExpectedExcess(false, false));
+        $this->assertEquals(50, $davies->getExpectedExcess(true, false));
+        $this->assertEquals(50, $davies->getExpectedExcess(true, true));
+        $this->assertEquals(150, $davies->getExpectedExcess(false, true));
 
         $davies->lossType = "Theft - From Pocket";
         $this->assertEquals(Claim::TYPE_THEFT, $davies->getClaimType());
-        $this->assertEquals(70, $davies->getExpectedExcess());
+        $this->assertEquals(70, $davies->getExpectedExcess(false, false));
+        $this->assertEquals(70, $davies->getExpectedExcess(true, false));
+        $this->assertEquals(70, $davies->getExpectedExcess(true, true));
+        $this->assertEquals(150, $davies->getExpectedExcess(false, true));
 
         $davies->lossType = "Extended Warranty - Audio Fault";
         $this->assertEquals(Claim::TYPE_EXTENDED_WARRANTY, $davies->getClaimType());
-        $this->assertEquals(50, $davies->getExpectedExcess());
+        $this->assertEquals(50, $davies->getExpectedExcess(false, false));
+        $this->assertEquals(50, $davies->getExpectedExcess(true, false));
+        $this->assertEquals(50, $davies->getExpectedExcess(true, true));
+        $this->assertEquals(150, $davies->getExpectedExcess(false, true));
     }
 
     /**
