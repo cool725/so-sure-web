@@ -55,15 +55,6 @@ services:
             - "%mailchimp_prelaunch_list%"
             - "%kernel.environment%"
 
-    app.gocardless:
-        class: AppBundle\Service\GocardlessService
-        arguments:
-            - "@doctrine_mongodb.odm.default_document_manager"
-            - "@logger"
-            - "@app.policy"
-            - "%gocardless_apikey%"
-            - "%gocardless_prod%"
-
     app.fraud:
         class: AppBundle\Service\FraudService
         arguments:

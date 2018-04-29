@@ -8,7 +8,6 @@ use AppBundle\Document\BankAccount;
 use AppBundle\Document\User;
 use AppBundle\Document\PhoneTrait;
 use Doctrine\ODM\MongoDB\DocumentRepository;
-use AppBundle\Document\GocardlessPaymentMethod;
 use AppBundle\Document\JudoPaymentMethod;
 
 class UserRepository extends DocumentRepository
@@ -111,9 +110,6 @@ class UserRepository extends DocumentRepository
         if ($user->getPaymentMethod() instanceof JudoPaymentMethod) {
             $accountHash = $user->getPaymentMethod() ? $user->getPaymentMethod()->getCardTokenHash() : ['NotAHash'];
             $qb->field('paymentMethod.cardTokenHash')->equals($accountHash);
-        } elseif ($user->getPaymentMethod() instanceof GocardlessPaymentMethod) {
-            $accountHashes = $user->getPaymentMethod() ? $user->getPaymentMethod()->getAccountHashes() : ['NotAHash'];
-            $qb->field('paymentMethod.accountHashes')->in($accountHashes);
         } elseif ($user->getPaymentMethod() instanceof BacsPaymentMethod) {
             $accountHash = $user->getPaymentMethod()->getBankAccount() ?
                 $user->getPaymentMethod()->getBankAccount()->getHashedAccount() : 'NotAHash';

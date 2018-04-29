@@ -8,7 +8,6 @@ use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Address;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PolicyTerms;
-use AppBundle\Document\Payment\GocardlessPayment;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Payment\SoSurePayment;
 use AppBundle\Document\Payment\BacsPayment;

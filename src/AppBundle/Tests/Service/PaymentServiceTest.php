@@ -16,7 +16,6 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PolicyTerms;
-use AppBundle\Document\Payment\GocardlessPayment;
 use AppBundle\Document\SCode;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\Phone;
