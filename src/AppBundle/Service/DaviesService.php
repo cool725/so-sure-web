@@ -430,12 +430,23 @@ class DaviesService extends S3EmailService
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
+        // assume validated prices for pre-picsure policies
         $validated = true;
-        if ($daviesClaim->isExcessValueCorrect($validated) === false) {
+        if ($phonePolicy->isPicSurePolicy()) {
+            $validated = $phonePolicy->isPicSureValidated();
+        }
+
+        // many of davies excess figures are incorrect if withdrawn and no actual need to validate in those cases
+        if ($daviesClaim->isExcessValueCorrect($validated, $phonePolicy->isPicSurePolicy()) === false &&
+            !in_array($daviesClaim->getClaimStatus(), [
+                Claim::STATUS_DECLINED,
+                Claim::STATUS_WITHDRAWN
+            ])
+        ) {
             $msg = sprintf(
                 'Claim %s does not have the correct excess value. Expected %0.2f Actual %0.2f for %s/%s',
                 $daviesClaim->claimNumber,
-                $daviesClaim->getExpectedExcess($validated),
+                $daviesClaim->getExpectedExcess($validated, $phonePolicy->isPicSurePolicy()),
                 $daviesClaim->excess,
                 $daviesClaim->getClaimType(),
                 $daviesClaim->getClaimStatus()

@@ -871,6 +871,69 @@ class DaviesServiceTest extends WebTestCase
         $this->insureErrorExists('/does not have the correct excess value/');
     }
 
+    public function testValidateClaimDetailsCorrectExcessPicsure()
+    {
+        $policy = static::createUserPolicy(true);
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+        $claim = new Claim();
+        $policy->addClaim($claim);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = 1;
+        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->lossType = "Loss - From Pocket";
+        $daviesClaim->excess = 70;
+        $daviesClaim->incurred = 0;
+        $daviesClaim->reserved = 0;
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->insureErrorDoesNotExist('/does not have the correct excess value/');
+    }
+
+    public function testValidateClaimDetailsIncorrectExcessPicsureHigh()
+    {
+        $policy = static::createUserPolicy(true);
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+        $claim = new Claim();
+        $policy->addClaim($claim);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = 1;
+        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->lossType = "Loss - From Pocket";
+        $daviesClaim->excess = 150;
+        $daviesClaim->incurred = 0;
+        $daviesClaim->reserved = 0;
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->insureErrorExists('/does not have the correct excess value/');
+    }
+
+    public function testValidateClaimDetailsIncorrectExcessPicsureLow()
+    {
+        $policy = static::createUserPolicy(true);
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_REJECTED);
+        $claim = new Claim();
+        $policy->addClaim($claim);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = 1;
+        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->lossType = "Loss - From Pocket";
+        $daviesClaim->excess = 70;
+        $daviesClaim->incurred = 0;
+        $daviesClaim->reserved = 500;
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->insureErrorExists('/does not have the correct excess value/');
+    }
+
     public function testValidateClaimDetailsClosedWithReserve()
     {
         $policy = static::createUserPolicy(true);
@@ -1820,9 +1883,9 @@ class DaviesServiceTest extends WebTestCase
 
         $daviesClaim = new DaviesClaim();
         $daviesClaim->claimNumber = $claim->getNumber();
-        $daviesClaim->incurred = 70;
+        $daviesClaim->incurred = 150;
         $daviesClaim->reserved = 0;
-        $daviesClaim->excess = 70;
+        $daviesClaim->excess = 150;
         $daviesClaim->initialSuspicion = false;
         $daviesClaim->finalSuspicion = false;
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
@@ -1880,9 +1943,9 @@ class DaviesServiceTest extends WebTestCase
 
         $daviesClaim = new DaviesClaim();
         $daviesClaim->claimNumber = $claim->getNumber();
-        $daviesClaim->incurred = 70;
+        $daviesClaim->incurred = 150;
         $daviesClaim->reserved = 0;
-        $daviesClaim->excess = 70;
+        $daviesClaim->excess = 150;
         $daviesClaim->initialSuspicion = false;
         $daviesClaim->finalSuspicion = false;
         $daviesClaim->policyNumber = $policy->getPolicyNumber();
