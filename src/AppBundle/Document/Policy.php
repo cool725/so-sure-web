@@ -213,16 +213,6 @@ abstract class Policy
     protected $paymentType;
 
     /**
-     * @MongoDB\Field(type="string")
-     */
-    protected $gocardlessMandate;
-
-    /**
-     * @MongoDB\Field(type="string")
-     */
-    protected $gocardlessSubscription;
-
-    /**
      * @MongoDB\ReferenceMany(
      *  targetDocument="AppBundle\Document\Invitation\Invitation",
      *  mappedBy="policy",
@@ -1026,26 +1016,6 @@ abstract class Policy
     public function setPaymentType($paymentType)
     {
         $this->paymentType = $paymentType;
-    }
-
-    public function getGocardlessMandate()
-    {
-        return $this->gocardlessMandate;
-    }
-
-    public function setGocardlessMandate($gocardlessMandate)
-    {
-        $this->gocardlessMandate = $gocardlessMandate;
-    }
-
-    public function getGocardlessSubscription()
-    {
-        return $this->gocardlessSubscription;
-    }
-
-    public function setGocardlessSubscription($gocardlessSubscription)
-    {
-        $this->gocardlessSubscription = $gocardlessSubscription;
     }
 
     public function addConnection(Connection $connection)

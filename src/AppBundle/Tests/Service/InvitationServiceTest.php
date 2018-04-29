@@ -50,7 +50,6 @@ class InvitationServiceTest extends WebTestCase
     protected static $container;
     /** @var DocumentManager */
     protected static $dm;
-    protected static $gocardless;
     protected static $userRepo;
     protected static $invitationService;
     protected static $phone2;

@@ -49,7 +49,6 @@ class InvitationServiceNetTest extends WebTestCase
     protected static $container;
     /** @var DocumentManager */
     protected static $dm;
-    protected static $gocardless;
     /** @var UserRepository */
     protected static $userRepo;
     protected static $invitationService;

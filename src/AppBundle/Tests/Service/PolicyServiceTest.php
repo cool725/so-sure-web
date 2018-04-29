@@ -13,7 +13,6 @@ use AppBundle\Document\Policy;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PolicyTerms;
-use AppBundle\Document\Payment\GocardlessPayment;
 use AppBundle\Document\SCode;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\Phone;
@@ -311,7 +310,7 @@ class PolicyServiceTest extends WebTestCase
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm));
 
-        $payment = new GocardlessPayment();
+        $payment = new JudoPayment();
         $payment->setAmount(0.01);
         $policy->addPayment($payment);
         static::$policyService->create($policy);
@@ -328,7 +327,7 @@ class PolicyServiceTest extends WebTestCase
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm));
 
-        $payment = new GocardlessPayment();
+        $payment = new JudoPayment();
         $payment->setAmount($policy->getPhone()->getCurrentPhonePrice()->getMonthlyPremiumPrice());
         $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
         $policy->addPayment($payment);
@@ -358,7 +357,7 @@ class PolicyServiceTest extends WebTestCase
             $date = new \DateTime(sprintf('2016-01-%d', $actualDay));
             $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), $date);
 
-            $payment = new GocardlessPayment();
+            $payment = new JudoPayment();
             $payment->setAmount($policy->getPhone()->getCurrentPhonePrice($date)->getMonthlyPremiumPrice(null, $date));
             $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
             $payment->setDate($date);
@@ -408,7 +407,7 @@ class PolicyServiceTest extends WebTestCase
         );
         $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm));
 
-        $payment = new GocardlessPayment();
+        $payment = new JudoPayment();
         $payment->setAmount($policy->getPhone()->getCurrentPhonePrice()->getYearlyPremiumPrice());
         $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
         $policy->addPayment($payment);

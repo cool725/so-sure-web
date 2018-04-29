@@ -1001,16 +1001,7 @@ class ApiAuthController extends BaseController
             $this->get('statsd')->startTiming("api.payPolicy");
             $data = json_decode($request->getContent(), true)['body'];
             if (isset($data['bank_account'])) {
-                // Not doing anymore, but too many tests currently expect gocardless, so allow for non-prod
-                if ($this->isProduction()) {
-                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
-                }
-                if (!$this->validateFields(
-                    $data['bank_account'],
-                    ['sort_code', 'account_number', 'first_name', 'last_name']
-                )) {
-                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
-                }
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
             } elseif (isset($data['braintree'])) {
                 // Not allow braintree
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
@@ -1050,14 +1041,7 @@ class ApiAuthController extends BaseController
             $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
 
             if (isset($data['bank_account'])) {
-                $gocardless = $this->get('app.gocardless');
-                $gocardless->add(
-                    $policy,
-                    $data['bank_account']['first_name'],
-                    $data['bank_account']['last_name'],
-                    $data['bank_account']['sort_code'],
-                    $data['bank_account']['account_number']
-                );
+                throw new \Exception('gocardless is no longer supported');
             } elseif (isset($data['braintree'])) {
                 throw new \Exception('Braintree is no longer supported');
             } elseif ($judoData) {
@@ -2004,7 +1988,7 @@ class ApiAuthController extends BaseController
             $data = json_decode($request->getContent(), true)['body'];
             $judoData = null;
             if (isset($data['bank_account'])) {
-                // Not doing anymore, but too many tests currently expect gocardless, so allow for non-prod
+                // Not doing anymore
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
             } elseif (isset($data['judo'])) {
                 if (!$this->validateFields($data['judo'], ['consumer_token', 'receipt_id'])) {
