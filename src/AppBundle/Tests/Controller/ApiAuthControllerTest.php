@@ -5260,21 +5260,16 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
     public function testUserRequestVerificationMobileNumberValidation()
     {
-        /**
         $user = self::createUser(
             self::$userManager,
             self::generateEmail('testUserRequestVerificationMobileNumberValidation', $this),
-            'foo',
-            true
+            'foo'
         );
 
-        $user->setMobileNumber("08946573");
-
-        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $url = sprintf('/api/v1/auth/user/%s/verify/mobilenumber?_method=GET', self::$testUser->getId());
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $url = sprintf('/api/v1/auth/user/%s/verify/mobilenumber?_method=GET', $user->getId());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
-         */
     }
 
     public function testUserRequestVerificationMobileNumberDifferentUser()
@@ -5311,7 +5306,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $result = $this->verifyResponse(200);
         $this->assertEquals($user->getEmailCanonical(), $result['email']);
         $this->assertTrue($result['has_mobile_number_verified']);
-        $updatedUser = $this->assertUserExists(self::$container, $user);
+        $updatedUser = $this->assertUserExists(self::$client->getContainer(), $user);
         $this->assertTrue($updatedUser->getMobileNumberVerified());
     }
 
