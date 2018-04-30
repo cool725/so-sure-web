@@ -3267,7 +3267,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
             'bucket' => 'policy.so-sure.com',
-            'key' => 'testing/picsure-test.png',
+            'key' => 'test/picsure-test.png',
         ]);
         $data = $this->verifyResponse(200);
 
