@@ -203,6 +203,7 @@ class BICommand extends BaseCommand
             '"Lead Source"',
             '"First Payment Source"',
             '"Make/Model/Memory"',
+            '"Reward Pot"',
         ]);
         foreach ($policies as $policy) {
             /** @var Policy $policy */
@@ -249,6 +250,7 @@ class BICommand extends BaseCommand
                 sprintf('"%s"', $policy->getFirstSuccessfulUserPaymentCredit() ? $policy->getFirstSuccessfulUserPaymentCredit()->getSource() : ''),
                 // @codingStandardsIgnoreEnd
                 sprintf('"%s"', $policy->getPhone()->__toString()),
+                sprintf('"%0.2f"', $policy->getPotValue()),
             ]);
         }
         $this->uploadS3(implode(PHP_EOL, $lines), 'policies.csv');
