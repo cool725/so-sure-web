@@ -128,7 +128,25 @@ class ApiPartialControllerTest extends BaseApiControllerTest
 
         $url = sprintf('/api/v1/partial/ab/v2?_method=GET');
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, array());
-        $data = $this->verifyResponse(404);
+        $data = $this->verifyResponse(400);
+    }
+
+    public function testABAllEmpty()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testABAllEmpty', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $phone = self::getRandomPhone(self::$dm);
+        $policy = self::initPolicy($user, self::$dm, $phone, null, true, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        self::$dm->flush();
+
+        $url = sprintf('/api/v1/partial/ab/v2?names=&_method=GET');
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, array());
+        $data = $this->verifyResponse(400);
     }
 
     public function testABAllOne()
@@ -144,7 +162,7 @@ class ApiPartialControllerTest extends BaseApiControllerTest
         $policy->setStatus(Policy::STATUS_ACTIVE);
         self::$dm->flush();
 
-        $url = sprintf('/api/v1/partial/ab/v2/%s?_method=GET', SixpackService::EXPERIMENT_APP_PICSURE_LOCATION);
+        $url = sprintf('/api/v1/partial/ab/v2?names=%s&_method=GET', SixpackService::EXPERIMENT_APP_PICSURE_LOCATION);
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, array());
         $data = $this->verifyResponse(200);
         $this->assertTrue(isset($data['tests']));
@@ -165,7 +183,7 @@ class ApiPartialControllerTest extends BaseApiControllerTest
         self::$dm->flush();
 
         $url = sprintf(
-            '/api/v1/partial/ab/v2/%s,%s?_method=GET',
+            '/api/v1/partial/ab/v2?names=%s,%s&_method=GET',
             SixpackService::EXPERIMENT_APP_SHARE_METHOD,
             SixpackService::EXPERIMENT_APP_PICSURE_LOCATION
         );
@@ -189,7 +207,7 @@ class ApiPartialControllerTest extends BaseApiControllerTest
         self::$dm->flush();
 
         $url = sprintf(
-            '/api/v1/partial/ab/v2/%s,%s,app-test-foo?_method=GET',
+            '/api/v1/partial/ab/v2?names=%s,%s,app-test-foo&_method=GET',
             SixpackService::EXPERIMENT_APP_SHARE_METHOD,
             SixpackService::EXPERIMENT_APP_PICSURE_LOCATION
         );

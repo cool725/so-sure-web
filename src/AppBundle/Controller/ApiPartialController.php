@@ -40,20 +40,19 @@ class ApiPartialController extends BaseController
     use ArrayToApiArrayTrait;
 
     /**
-     * @Route("/ab/v2/{names}", name="api_ab_partipate_all")
+     * @Route("/ab/v2", name="api_ab_partipate_all")
      * @Method({"GET"})
      */
-    public function abParticipateAllAction($names)
+    public function abParticipateAllAction(Request $request)
     {
         try {
-            $experiments = explode(',', $names);
-            if ($experiments === false || empty($experiments)) {
-                return $this->getErrorJsonResponse(
-                    ApiErrorCode::ERROR_NOT_FOUND,
-                    'Unable to find experiments',
-                    404
-                );
+            if (!$this->validateQueryFields($request, ['names'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
+
+            $names = $this->getRequestString($request, 'names');
+            
+            $experiments = explode(',', $names);
             $tests = array();
             foreach ($experiments as $experiment) {
                 try {
