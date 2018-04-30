@@ -38,11 +38,13 @@ use AppBundle\Exception\DuplicateInvitationException;
 use Symfony\Component\Templating\EngineInterface;
 
 /**
- * @group functional-net
+ * Not a paid test, but unable to easily get to run on the build server (and often fails regardless)
+ *
+ * @group functional-paid
  *
  * AppBundle\\Tests\\Service\\InvitationServiceTest
  */
-class InvitationServiceNetTest extends WebTestCase
+class InvitationServicePaidTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
