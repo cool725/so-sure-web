@@ -8,6 +8,15 @@ class AppKernel extends Kernel
     public function getCacheDir()
     {
         if (in_array($this->getEnvironment(), array('test', 'vagrant'), true)) {
+            // if '/sys/hypervisor/uuid' exists and starts with ec2, then running under aws
+            // https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/identify_ec2_instances.html
+            // in which case don't use /dev/shm
+            if (file_exists('/sys/hypervisor/uuid') ) {
+                $uuid = file_get_contents('/sys/hypervisor/uuid');
+                if (mb_stripos($uuid, 'ec2') == 0) {
+                    return parent::getCacheDir();
+                }
+            }
             return '/dev/shm/cache/'.$this->environment.'/cache';
         } else {
             return parent::getCacheDir();

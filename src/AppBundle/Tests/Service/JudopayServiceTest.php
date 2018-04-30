@@ -1501,9 +1501,7 @@ class JudopayServiceTest extends WebTestCase
         );
         static::$policyService->setEnvironment('test');
 
-        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(Policy::class);
-        $updatedPolicy = $repo->find($policy->getId());
+        $updatedPolicy = $this->assertPolicyExists(self::$container, $policy);
 
         $amount = $updatedPolicy->getPremium()->getMonthlyPremiumPrice() * 11;
         $this->assertEquals($updatedPolicy->getOutstandingPremium(), $amount);
@@ -1526,7 +1524,8 @@ class JudopayServiceTest extends WebTestCase
         );
         static::$policyService->setEnvironment('test');
 
-        $payment = $updatedPolicy->getLastSuccessfulUserPaymentCredit();
+        $updatedPolicy2 = $this->assertPolicyExists(self::$container, $policy);
+        $payment = $updatedPolicy2->getLastSuccessfulUserPaymentCredit();
         $this->assertEquals(
             Salva::MONTHLY_TOTAL_COMMISSION * 10 + Salva::FINAL_MONTHLY_TOTAL_COMMISSION,
             $payment->getTotalCommission()
