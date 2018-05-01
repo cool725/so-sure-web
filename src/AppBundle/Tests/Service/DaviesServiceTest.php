@@ -871,6 +871,30 @@ class DaviesServiceTest extends WebTestCase
         $this->insureErrorExists('/does not have the correct excess value/');
     }
 
+    public function testValidateClaimDetailsNegativeExcess()
+    {
+        $policy = static::createUserPolicy(true);
+        $claim = new Claim();
+        $policy->addClaim($claim);
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = 1;
+        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->lossType = "Loss - From Pocket";
+        $daviesClaim->excess = -150;
+        $daviesClaim->incurred = 0;
+        $daviesClaim->reserved = 0;
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->insureErrorDoesNotExist('/does not have the correct excess value/');
+
+        $daviesClaim->replacementImei = $this->generateRandomImei();
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->insureErrorExists('/does not have the correct excess value/');
+    }
+
     public function testValidateClaimDetailsCorrectExcessPicsure()
     {
         $policy = static::createUserPolicy(true);

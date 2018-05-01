@@ -436,13 +436,21 @@ class DaviesService extends S3EmailService
             $validated = $phonePolicy->isPicSureValidated();
         }
 
+        // negative excess indicates that the excess was paid by the policy holder
+        // davies business process is to update this value once the invoice is recevied by the supplier
+        // which should be at the same time the replacement imei is provided
+        $negativeExcessAllowed = mb_strlen($daviesClaim->replacementImei) == 0;
+        $isExcessValueCorrect = $daviesClaim->isExcessValueCorrect(
+            $validated,
+            $phonePolicy->isPicSurePolicy(),
+            $negativeExcessAllowed
+        );
+
         // many of davies excess figures are incorrect if withdrawn and no actual need to validate in those cases
-        if ($daviesClaim->isExcessValueCorrect($validated, $phonePolicy->isPicSurePolicy()) === false &&
-            !in_array($daviesClaim->getClaimStatus(), [
+        if (!$isExcessValueCorrect && !in_array($daviesClaim->getClaimStatus(), [
                 Claim::STATUS_DECLINED,
                 Claim::STATUS_WITHDRAWN
-            ])
-        ) {
+        ])) {
             $msg = sprintf(
                 'Claim %s does not have the correct excess value. Expected %0.2f Actual %0.2f for %s/%s',
                 $daviesClaim->claimNumber,

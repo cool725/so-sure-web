@@ -193,10 +193,19 @@ class DaviesClaim extends DaviesExcel
         }
     }
 
-    public function isExcessValueCorrect($validated = true, $picSureEnabled = false)
+    public function isExcessValueCorrect($validated = true, $picSureEnabled = false, $negativeExcessAllowed = false)
     {
         if ($this->excess > 0) {
             return $this->areEqualToTwoDp($this->excess, $this->getExpectedExcess($validated, $picSureEnabled));
+        } elseif ($this->excess < 0) {
+            if ($negativeExcessAllowed) {
+                return $this->areEqualToTwoDp(
+                    abs($this->excess),
+                    $this->getExpectedExcess($validated, $picSureEnabled)
+                );
+            } else {
+                return false;
+            }
         }
 
         // Settled claims should always have excess
