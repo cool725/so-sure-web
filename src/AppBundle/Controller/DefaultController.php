@@ -92,10 +92,17 @@ class DefaultController extends BaseController
             ['no-defacto', 'defacto']
         );
 
+        $picsure = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_PICSURE_SECTION,
+            ['homepage-no-picsure', 'homepage-picsure']
+        );
+
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         $data = array(
             // Make sure to check homepage landing below too
+            'picsure'             => $picsure,
             'defacto'             => $defacto,
             'exp_dropdown_search' => $exp,
             'referral'            => $referral,
