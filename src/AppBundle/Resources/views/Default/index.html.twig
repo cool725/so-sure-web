@@ -256,20 +256,24 @@
         </div>
     </section>
 
-    {# What we don't cover #}
-    <section class="homepage--what-we-dont-cover">
-        <div class="container">
-            <h2 class="text-center h1">What We Don't Cover</h2>
-            <ol class="ol--blue-counter">
-                <li class="h4 h-light">Excess<br>
-                    • pic-sure validated <i class="fa fa-question-circle" title="pic-sure is our free app-based process to prove your phone is in good working condition and your screen is not cracked"></i>: £70 for Theft/Loss and £50 for Accidental Damage/Breakdown.<br>
-                    • otherwise: £150 for Theft/Loss/Accidental Damage/Breakdown
-                </li>
-                <li class="h4 h-light">Theft, Loss, Accidental Damage or Breakdown where you have knowingly put your phone at risk</li>
-                <li class="h4 h-light">3+ claims for Loss and/or Theft in any policy year</li>
-            </ol>
-        </div>
-    </section>
+    {% if picsure is defined and picsure == 'homepage-picsure' %}
+        picsure
+    {% else %}
+        {# What we don't cover #}
+        <section class="homepage--what-we-dont-cover">
+            <div class="container">
+                <h2 class="text-center h1">What We Don't Cover</h2>
+                <ol class="ol--blue-counter">
+                    <li class="h4 h-light">Excess<br>
+                        • pic-sure validated <i class="fa fa-question-circle" title="pic-sure is our free app-based process to prove your phone is in good working condition and your screen is not cracked"></i>: £70 for Theft/Loss and £50 for Accidental Damage/Breakdown.<br>
+                        • otherwise: £150 for Theft/Loss/Accidental Damage/Breakdown
+                    </li>
+                    <li class="h4 h-light">Theft, Loss, Accidental Damage or Breakdown where you have knowingly put your phone at risk</li>
+                    <li class="h4 h-light">3+ claims for Loss and/or Theft in any policy year</li>
+                </ol>
+            </div>
+        </section>
+    {% endif %}
 
     <div class="curved-background curved-background__bg-blue hidden-xs">
         <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 2000 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">

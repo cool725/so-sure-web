@@ -86,6 +86,11 @@ class DefaultController extends BaseController
             $request,
             SixpackService::EXPERIMENT_72_REPLACEMENT,
             ['next-working-day', 'seventytwo-hours']
+
+        $picsure = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_PICSURE_SECTION,
+            ['homepage-no-picsure', 'homepage-picsure']
         );
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
@@ -93,6 +98,7 @@ class DefaultController extends BaseController
         $data = array(
             // Make sure to check homepage landing below too
             'replacement'         => $replacement,
+            'picsure'             => $picsure,
             'defacto'             => $defacto,
             'referral'            => $referral,
             'phone'               => $this->getQuerystringPhone($request),

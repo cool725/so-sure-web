@@ -58,6 +58,7 @@ class SixpackService
     const EXPERIMENT_DOB = 'purchase-funnel-dob-dropdown';
     const EXPERIMENT_72_REPLACEMENT = 'seventytwo-hours';
     const EXPERIMENT_MONEY_LANDING = 'money-landing';
+    const EXPERIMENT_PICSURE_SECTION = 'homepage-picsure';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';
@@ -82,6 +83,7 @@ class SixpackService
         self::EXPERIMENT_DOB,
         self::EXPERIMENT_72_REPLACEMENT,
         self::EXPERIMENT_MONEY_LANDING,
+        self::EXPERIMENT_PICSURE_SECTION,
     ];
 
     public static $authExperiments = [
