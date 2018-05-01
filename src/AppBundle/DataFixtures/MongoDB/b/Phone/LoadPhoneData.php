@@ -207,7 +207,7 @@ abstract class LoadPhoneData implements ContainerAwareInterface
             if (mb_strlen($releaseDateText) > 0) {
                 $releaseDate = \DateTime::createFromFormat('m/y', $releaseDateText);
                 if (!$releaseDate) {
-                    throw new \Exception('Unknown date format');
+                    throw new \Exception(sprintf('Unknown date format %s', $releaseDateText));
                 }
                 $releaseDate->setTime(0, 0);
                 // otherwise is current day
