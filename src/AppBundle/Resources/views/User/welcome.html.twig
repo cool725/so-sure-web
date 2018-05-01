@@ -308,6 +308,10 @@
     {% endif %}
     {# End Page Modals #}
 
+    {% if environment == 'prod' %}
+        <img src="https://pubads.g.doubleclick.net/activity;xsp=4375795;ord={{ random(999999999) }}?" width=1 height=1 border=0/>
+    {% endif %}
+
 {% endblock %}
 
 {% block javascripts %}
