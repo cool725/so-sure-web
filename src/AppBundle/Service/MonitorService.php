@@ -258,8 +258,8 @@ class MonitorService
 
     public function mixpanelUserCount()
     {
-        // acutal 50,000 for plan
-        $maxUsers = 48000;
+        // acutal 100,000 for plan
+        $maxUsers = 90000;
         $total = 0;
         $count = 0;
         while ($total == 0) {
