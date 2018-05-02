@@ -55,7 +55,7 @@ class SixpackService
     const EXPERIMENT_PURCHASE_FLOW_BACS = 'purchase-flow-bacs';
     const EXPERIMENT_CPC_QUOTE_HOMEPAGE = 'cpc-quote-or-homepage';
     const EXPERIMENT_DEFACTO = 'defacto';
-    const EXPERIMENT_72_REPLACEMENT = '72-hours';
+    const EXPERIMENT_72_REPLACEMENT = 'seventytwo-hours';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';
