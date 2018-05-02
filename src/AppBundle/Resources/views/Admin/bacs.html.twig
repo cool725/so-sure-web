@@ -1,8 +1,18 @@
 {% extends 'admin_claims_base.html.twig' %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets output='css/*.css'
+        'components/datatables.net-bs/dataTables.bootstrap.min.css'
+        '@AppBundle/Resources/public/sass/page/admin.scss'
+    %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
 {% block javascripts %}
     {{ parent() }}
     {% javascripts
+        'components/datatables.net/jquery.dataTables.min.js'
+        'components/datatables.net-bs/dataTables.bootstrap.min.js'
         '@AppBundle/Resources/public/js/Admin/month.js'
         '@AppBundle/Resources/public/js/Admin/bacs.js'
     %}
@@ -76,7 +86,11 @@
                                 <td width="40%">
                                     {{ file.key }}
                                     <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank"><i class="fa fa-download"></i></a>
-                                    <br>{{  file.serialNumber }}
+                                    <br>
+                                    <a href="#" data-toggle="modal" data-target="#serialNumberModal" data-serial="{{ file.serialNumber }}"
+                                       data-details-url="{{ path('admin_bacs_serial_number_details', {'serial': file.serialNumber} ) }}">
+                                        {{ file.serialNumber }}
+                                    </a>
                                 </td>
                                 <td width="50%">
                                     {{ file.metadata|json_encode }}
@@ -91,7 +105,7 @@
                                 </td>
                                 <td width="10%">
                                     <button class="btn btn-success bacs-serial-edit" data-serial-number="{{ file.serialNumber }}"
-                                            data-serial-number-url="{{ path('admin_bacs_serial_number', {'id': file.id }) }}"
+                                            data-serial-number-url="{{ path('admin_bacs_update_serial_number', {'id': file.id }) }}"
                                             data-toggle="modal" data-target="#editSerialNumberModal">
                                         <i class="fa fa-edit"></i>
                                     </button>
@@ -197,16 +211,17 @@
                             </h4>
                             <table class="table table-striped">
                                 <tr>
-                                    <th width="15%">Status</th>
-                                    <th width="10%">Amount</th>
+                                    <th width="10%">Status</th>
+                                    <th width="20%">Policy</th>
+                                    <th width="5%">Amount</th>
                                     <th width="15%">Submitted Date</th>
                                     <th width="15%">Bacs Credit Date</th>
                                     <th width="15%">Bacs Reversed Date</th>
-                                    <th width="30%">Actions</th>
+                                    <th width="20%">Actions</th>
                                 </tr>
                         {% endif %}
                             <tr>
-                                <td width="15%">
+                                <td width="10%">
                                     {{ payment.status }}
                                     {% if payment.success %}
                                         <i class="fa fa-check text-success"></i>
@@ -216,7 +231,10 @@
                                         <i class="fa fa-minus text-danger"></i>
                                     {% endif %}
                                 </td>
-                                <td width="10%">
+                                <td width="20%">
+                                    <a href="{{ path('admin_policy', {'id': payment.policy.id}) }}">{{ payment.policy.policyNumber }}</a>
+                                </td>
+                                <td width="5%">
                                     £{{ payment.amount|number_format(2, '.', ',') }}
                                 </td>
                                 <td width="15%">
@@ -240,7 +258,7 @@
                                         -
                                     {% endif %}
                                 </td>
-                                <td width="30%">
+                                <td width="20%">
                                     {% if payment.canAction %}
                                         <button title="Mark as approved" type="button" class="btn btn-success bacs-approve" data-token="{{ csrf_token('default') }}"
                                                 data-bacs-approve-url="{{ path('admin_bacs_approve', {'id': payment.id}) }}">Approve</button>
@@ -343,4 +361,25 @@
             </div>
         </div>
     </div>
+
+
+    <div class="modal fade" id="serialNumberModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document" style="width: 60%;">
+            <div class="modal-content">
+                <form id="phone-update-form" class="form-horizontal" method="post">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="exampleModalLabel">Loading</h4>
+                    </div>
+                    <div class="modal-body">
+                        <table id="serial-details" width="100%" cellspacing="0" class="table-striped"></table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 {% endblock %}
