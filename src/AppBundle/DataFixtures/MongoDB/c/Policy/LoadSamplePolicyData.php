@@ -691,7 +691,9 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 $payment = new BacsPayment();
                 $payment->setStatus(BacsPayment::STATUS_SUCCESS);
                 $payment->setSuccess(true);
-                $payment->setSerialNumber($user->getPaymentMethod()->getBankAccount()->getMandateSerialNumber());
+                /** @var BacsPaymentMethod $bacs */
+                $bacs = $user->getPaymentMethod();
+                $payment->setSerialNumber($bacs->getBankAccount()->getMandateSerialNumber());
             } else {
                 $payment = new JudoPayment();
                 $payment->setResult(JudoPayment::RESULT_SUCCESS);
@@ -717,7 +719,9 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                     $payment = new BacsPayment();
                     $payment->setStatus(BacsPayment::STATUS_SUCCESS);
                     $payment->setSuccess(true);
-                    $payment->setSerialNumber($user->getPaymentMethod()->getBankAccount()->getMandateSerialNumber());
+                    /** @var BacsPaymentMethod $bacs */
+                    $bacs = $user->getPaymentMethod();
+                    $payment->setSerialNumber($bacs->getBankAccount()->getMandateSerialNumber());
                 } else {
                     $payment = new JudoPayment();
                     $payment->setResult(JudoPayment::RESULT_SUCCESS);
