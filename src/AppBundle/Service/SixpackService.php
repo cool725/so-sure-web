@@ -55,6 +55,7 @@ class SixpackService
     const EXPERIMENT_PURCHASE_FLOW_BACS = 'purchase-flow-bacs';
     const EXPERIMENT_CPC_QUOTE_HOMEPAGE = 'cpc-quote-or-homepage';
     const EXPERIMENT_DEFACTO = 'defacto';
+    const EXPERIMENT_72_REPLACEMENT = '72-hours';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';
@@ -77,6 +78,7 @@ class SixpackService
         self::EXPERIMENT_PURCHASE_FLOW_BACS,
         self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
         self::EXPERIMENT_DEFACTO,
+        self::EXPERIMENT_72_REPLACEMENT,
     ];
 
     public static $authExperiments = [
@@ -103,6 +105,7 @@ class SixpackService
         self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
         self::EXPERIMENT_STEP_3,
         self::EXPERIMENT_PURCHASE_FLOW_BACS,
+        self::EXPERIMENT_72_REPLACEMENT,
     ];
 
     /**

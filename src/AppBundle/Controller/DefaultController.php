@@ -92,10 +92,17 @@ class DefaultController extends BaseController
             ['no-defacto', 'defacto']
         );
 
+        $replacement = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_72_REPLACEMENT,
+            ['next-working-day', '72-hours']
+        );
+
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         $data = array(
             // Make sure to check homepage landing below too
+            'replacement'         => $replacement,
             'defacto'             => $defacto,
             'exp_dropdown_search' => $exp,
             'referral'            => $referral,
