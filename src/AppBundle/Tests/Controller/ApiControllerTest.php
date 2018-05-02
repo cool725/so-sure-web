@@ -235,6 +235,62 @@ class ApiControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(403, ApiErrorCode::ERROR_USER_EXISTS);
     }
 
+    public function testLoginGoogleMissingParam()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $user = static::createUser(
+            self::$userManager,
+            static::generateEmail('google-missing', $this),
+            'bar'
+        );
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('google_user' => [
+            'google_id' => 'foo',
+        ]));
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('google_user' => [
+            'google_access_token' => 'foo',
+        ]));
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+    }
+
+    public function testLoginGoogleInvalidId()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $user = static::createUser(
+            self::$userManager,
+            static::generateEmail('google-invalid-id', $this),
+            'bar'
+        );
+        $user->setGoogleId(rand(1, 999999));
+        self::$dm->flush();
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('google_user' => [
+            'google_id' => '1',
+            'google_access_token' => 'foo',
+        ]));
+        $data = $this->verifyResponse(403, ApiErrorCode::ERROR_USER_ABSENT);
+    }
+
+    public function testLoginGoogleInvalidToken()
+    {
+        $cognitoIdentityId = $this->getUnauthIdentity();
+        $user = static::createUser(
+            self::$userManager,
+            static::generateEmail('google-invalid-token', $this),
+            'bar'
+        );
+        $user->setGoogleId(rand(1, 999999));
+        self::$dm->flush();
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/login', array('google_user' => [
+            'google_id' => $user->getGoogleId(),
+            'google_access_token' => 'foo',
+        ]));
+        $data = $this->verifyResponse(403, ApiErrorCode::ERROR_USER_EXISTS);
+    }
+
     public function testLoginOkUserDisabled()
     {
         $cognitoIdentityId = $this->getUnauthIdentity();
