@@ -564,6 +564,43 @@ class BankAccount
         );
     }
 
+    public function toApiArray()
+    {
+        $data = [
+            'bank_name' => $this->getBankName(),
+            'account_name' => $this->getAccountName(),
+            'displayable_sort_code' => $this->getDisplayableSortCode(),
+            'displayable_account_number' => $this->getDisplayableAccountNumber(),
+            'bank_address' => $this->getBankAddress() ? $this->getBankAddress()->toApiArray() : null,
+            'mandate' => $this->getReference(),
+            'mandate_status' => $this->getMandateStatus(),
+        ];
+
+        return $data;
+    }
+
+    public function toDetailsArray()
+    {
+        $data = [
+            'bank_name' => $this->getBankName(),
+            'account_name' => $this->getAccountName(),
+            'displayable_sort_code' => $this->getDisplayableSortCode(),
+            'displayable_account_number' => $this->getDisplayableAccountNumber(),
+            'bank_address' => $this->getBankAddress() ? $this->getBankAddress()->toApiArray() : null,
+            'mandate' => $this->getReference(),
+            'mandate_status' => $this->getMandateStatus(),
+            'mandate_serial_number' => $this->getMandateSerialNumber(),
+            'initial_date' => $this->getInitialPaymentSubmissionDate() ?
+                $this->getInitialPaymentSubmissionDate()->format(\DateTime::ATOM) :
+                null,
+            'monthly_day' => $this->getStandardNotificationDate() ?
+                $this->getStandardNotificationDate()->format('jS') :
+                null,
+        ];
+
+        return $data;
+    }
+
     public static function create($accountName, $sortCode, $accountNumber, $reference)
     {
         $bankAccount = new BankAccount();

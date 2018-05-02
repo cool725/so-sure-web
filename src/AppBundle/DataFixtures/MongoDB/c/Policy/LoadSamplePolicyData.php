@@ -2,6 +2,10 @@
 
 namespace AppBundle\DataFixtures\MongoDB\c\Policy;
 
+use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\BankAccount;
+use AppBundle\Document\File\AccessPayFile;
+use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Service\PolicyService;
 use AppBundle\Service\RouterService;
@@ -47,6 +51,8 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     const PICSURE_RANDOM = 'random';
     const PICSURE_NON_POLICY = 'n/a';
 
+    const BACS_SERIAL_NUMBERS = 20;
+
     /**
      * @var ContainerInterface|null
      */
@@ -64,6 +70,8 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     public function load(ObjectManager $manager)
     {
         $this->faker = Faker\Factory::create('en_GB');
+
+        $this->createBacsFiles($manager);
 
         $users = $this->newUsers($manager, 150);
         $unpaid = $this->newUsers($manager, 10);
@@ -440,6 +448,21 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $manager->flush();
     }
 
+    private function createBacsFiles(ObjectManager $manager)
+    {
+        $now = new \DateTime();
+        for ($i = 0; $i < self::BACS_SERIAL_NUMBERS; $i++) {
+            $date = clone $now;
+            $date = $date->sub(new \DateInterval(sprintf('P%dD', $i)));
+            $file = new AccessPayFile();
+            $file->setDate($date);
+            $file->setSerialNumber($i);
+            $manager->persist($file);
+        }
+
+        $manager->flush();
+    }
+
     private function newUsers($manager, $number, $yearlyOnlyPostcode = false)
     {
         $userRepo = $manager->getRepository(User::class);
@@ -498,7 +521,35 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
 
         $user->setBillingAddress($address);
-        $user->setPaymentMethod(new JudoPaymentMethod());
+        $bacs = rand(0, 1) == 0;
+        if ($bacs) {
+            $bankAccount = new BankAccount();
+            $bankAccount->setMandateStatus(BankAccount::MANDATE_SUCCESS);
+            $reference = sprintf('SOSURE%d', rand(1, 999999));
+            $bankAccount->setReference($reference);
+            $bankAccount->setSortCode('000099');
+            $bankAccount->setAccountNumber('87654321');
+            $bankAccount->setAccountName($user->getName());
+            $bankAccount->setMandateSerialNumber(rand(1, self::BACS_SERIAL_NUMBERS));
+            $status = rand(0, 4);
+            if ($status == 0) {
+                $bankAccount->setMandateStatus(BankAccount::MANDATE_CANCELLED);
+            } elseif ($status == 1) {
+                $bankAccount->setMandateStatus(BankAccount::MANDATE_FAILURE);
+            } elseif ($status == 2) {
+                $bankAccount->setMandateStatus(BankAccount::MANDATE_PENDING_APPROVAL);
+            } elseif ($status == 3) {
+                $bankAccount->setMandateStatus(BankAccount::MANDATE_PENDING_INIT);
+            } elseif ($status == 4) {
+                $bankAccount->setMandateStatus(BankAccount::MANDATE_SUCCESS);
+            }
+            $paymentMethod = new BacsPaymentMethod();
+            $paymentMethod->setBankAccount($bankAccount);
+        } else {
+            $paymentMethod = new JudoPaymentMethod();
+        }
+
+        $user->setPaymentMethod($paymentMethod);
 
         return $user;
     }
@@ -632,19 +683,30 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $policy->setPromoCode(Policy::PROMO_LAUNCH);
         }
 
+        $bacs = $user->hasBacsPaymentMethod();
+
         $paymentDate = clone $startDate;
         if ($paid === true || ($paid === null && rand(0, 1) == 0)) {
-            $payment = new JudoPayment();
+            if ($bacs) {
+                $payment = new BacsPayment();
+                $payment->setStatus(BacsPayment::STATUS_SUCCESS);
+                $payment->setSuccess(true);
+                /** @var BacsPaymentMethod $bacs */
+                $bacs = $user->getPaymentMethod();
+                $payment->setSerialNumber($bacs->getBankAccount()->getMandateSerialNumber());
+            } else {
+                $payment = new JudoPayment();
+                $payment->setResult(JudoPayment::RESULT_SUCCESS);
+                $receiptId = rand(1, 9999999);
+                while (in_array($receiptId, $this->receiptIds)) {
+                    $receiptId = rand(1, 9999999);
+                }
+                $this->receiptIds[] = $receiptId;
+                $payment->setReceipt($receiptId);
+            }
             $payment->setDate($paymentDate);
             $payment->setAmount($phone->getCurrentPhonePrice()->getYearlyPremiumPrice(null, clone $startDate));
             $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
-            $payment->setResult(JudoPayment::RESULT_SUCCESS);
-            $receiptId = rand(1, 9999999);
-            while (in_array($receiptId, $this->receiptIds)) {
-                $receiptId = rand(1, 9999999);
-            }
-            $this->receiptIds[] = $receiptId;
-            $payment->setReceipt($receiptId);
             $payment->setNotes('LoadSamplePolicyData');
             $policy->addPayment($payment);
         } else {
@@ -653,20 +715,29 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 $months = rand(1, 11);
             }
             for ($i = 1; $i <= $months; $i++) {
-                $payment = new JudoPayment();
+                if ($bacs) {
+                    $payment = new BacsPayment();
+                    $payment->setStatus(BacsPayment::STATUS_SUCCESS);
+                    $payment->setSuccess(true);
+                    /** @var BacsPaymentMethod $bacs */
+                    $bacs = $user->getPaymentMethod();
+                    $payment->setSerialNumber($bacs->getBankAccount()->getMandateSerialNumber());
+                } else {
+                    $payment = new JudoPayment();
+                    $payment->setResult(JudoPayment::RESULT_SUCCESS);
+                    $receiptId = rand(1, 9999999);
+                    while (in_array($receiptId, $this->receiptIds)) {
+                        $receiptId = rand(1, 9999999);
+                    }
+                    $this->receiptIds[] = $receiptId;
+                    $payment->setReceipt($receiptId);
+                }
                 $payment->setDate(clone $paymentDate);
                 $payment->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(null, clone $startDate));
                 $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
                 if ($months == 12) {
                     $payment->setTotalCommission(Salva::FINAL_MONTHLY_TOTAL_COMMISSION);
                 }
-                $payment->setResult(JudoPayment::RESULT_SUCCESS);
-                $receiptId = rand(1, 9999999);
-                while (in_array($receiptId, $this->receiptIds)) {
-                    $receiptId = rand(1, 9999999);
-                }
-                $this->receiptIds[] = $receiptId;
-                $payment->setReceipt($receiptId);
                 $payment->setNotes('LoadSamplePolicyData');
                 $policy->addPayment($payment);
                 $paymentDate->add(new \DateInterval('P1M'));
