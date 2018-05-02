@@ -683,7 +683,7 @@ class AdminController extends BaseController
      * @Route("/bacs/serial-number-details/{serial}", name="admin_bacs_serial_number_details")
      * @Method({"GET"})
      */
-    public function bacsFileAction(Request $request, $serial)
+    public function bacsFileAction($serial)
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(User::class);
