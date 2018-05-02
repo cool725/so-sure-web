@@ -51,14 +51,19 @@ class PurchaseStepPersonalAddressType extends AbstractType
         $builder
             ->add('firstName', HiddenType::class, ['required' => false])
             ->add('lastName', HiddenType::class, ['required' => false])
+            // ->add('birthday', BirthdayType::class, [
+            //       'required' => $this->required,
+            //       'format'   => 'dd/MM/yyyy',
+            //       'widget' => 'choice',
+            //       'placeholder' => array(
+            //           'year' => 'YYYY', 'month' => 'MM', 'day' => 'DD',
+            //       ),
+            //       'years' => $years,
+            // ])
             ->add('birthday', BirthdayType::class, [
-                  'required' => $this->required,
-                  'format'   => 'dd/MM/yyyy',
-                  'widget' => 'single_text',
-                  'placeholder' => array(
-                      'year' => 'YYYY', 'month' => 'MM', 'day' => 'DD',
-                  ),
-                  'years' => $years,
+                'required' => $this->required,
+                'format'   => 'dd/MM/yyyy',
+                'widget'   => 'choice',
             ])
             ->add('mobileNumber', TelType::class, ['required' => $this->required])
             ->add('addressLine1', TextType::class, ['required' => $this->required])
