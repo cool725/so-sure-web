@@ -29,7 +29,7 @@ class GoogleService
     /**
      * @param string $token
      *
-     * @return string
+     * @return string|null
      */
     public function getUserIdFromToken($token)
     {

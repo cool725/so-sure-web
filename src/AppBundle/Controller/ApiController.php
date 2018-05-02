@@ -622,7 +622,7 @@ class ApiController extends BaseController
                     $facebookService = $this->get('app.facebook');
                     if (!$facebookService->validateTokenId(
                         $facebookId,
-                        $this->getDataString($facebookUserData, 'facebook_access_token')
+                        $this->getDataString($data, 'facebook_access_token')
                     )) {
                         return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_EXISTS, 'Invalid token', 403);
                     }
@@ -630,7 +630,7 @@ class ApiController extends BaseController
                     $googleService = $this->get('app.google');
                     if (!$googleService->validateTokenId(
                         $googleId,
-                        $this->getDataString($googleUserData, 'google_access_token')
+                        $this->getDataString($data, 'google_access_token')
                     )) {
                         return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_EXISTS, 'Invalid token', 403);
                     }
