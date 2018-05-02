@@ -90,6 +90,7 @@ class SixpackService
         self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
         self::EXPERIMENT_STEP_3,
         self::EXPERIMENT_PURCHASE_FLOW_BACS,
+        self::EXPERIMENT_72_REPLACEMENT,
     ];
 
     /**
