@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Service\FeatureService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -41,6 +42,7 @@ class FeatureCommand extends ContainerAwareCommand
             $enabled = filter_var($input->getArgument('enabled'), FILTER_VALIDATE_BOOLEAN);
         }
 
+        /** @var FeatureService $feature */
         $feature = $this->getContainer()->get('app.feature');
         $feature->setEnabled($name, $enabled);
         $output->writeln('Finished');

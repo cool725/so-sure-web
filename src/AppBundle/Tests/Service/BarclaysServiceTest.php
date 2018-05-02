@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\File\File;
 
 /**
  * @group functional-net
+ * AppBundle\\Tests\\Service\\BarclaysServiceTest
  */
 class BarclaysServiceTest extends WebTestCase
 {

@@ -3,6 +3,10 @@
 namespace AppBundle\Command;
 
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Repository\PolicyRepository;
+use AppBundle\Service\FeatureService;
+use AppBundle\Service\MailerService;
+use AppBundle\Service\PolicyService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -67,8 +71,11 @@ class UpdatePolicyStatusCommand extends BaseCommand
         $policyId = $input->getOption('id');
         $skipUnpaidMinTimeframeCheck = $input->getOption('skip-unpaid-timecheck');
 
+        /** @var PolicyService $policyService */
         $policyService = $this->getContainer()->get('app.policy');
+        /** @var FeatureService $featureService */
         $featureService = $this->getContainer()->get('app.feature');
+        /** @var PolicyRepository $repo */
         $repo = $this->getManager()->getRepository(Policy::class);
         if ($skipEmail) {
             $policyService->setMailer(null);
@@ -118,6 +125,7 @@ class UpdatePolicyStatusCommand extends BaseCommand
         $ignoreLineCount++;
 
         if ($policyId) {
+            /** @var Policy $policy */
             $policy = $repo->find($policyId);
             if (!$policy) {
                 throw new \Exception('Unable to find policy');
@@ -227,6 +235,7 @@ class UpdatePolicyStatusCommand extends BaseCommand
 
         # 5 lines for each section output
         if (count($lines) > $ignoreLineCount) {
+            /** @var MailerService $mailer */
             $mailer = $this->getContainer()->get('app.mailer');
             $mailer->send(
                 'Updated Policy Status',

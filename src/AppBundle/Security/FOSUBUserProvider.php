@@ -5,6 +5,8 @@ use AppBundle\Document\PhoneTrait;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface;
 use HWI\Bundle\OAuthBundle\Security\Core\User\FOSUBUserProvider as BaseClass;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\User\UserInterface;
 use AppBundle\Service\FacebookService;
 use AppBundle\Document\User;
@@ -70,7 +72,7 @@ class FOSUBUserProvider extends BaseClass
         $setter_token = $setter.'AccessToken';
 
         //we "disconnect" previously connected users
-        if (null !== $previousUser = $this->userManager->findUserBy(array($property => $username))) {
+        if (null != $previousUser = $this->userManager->findUserBy(array($property => $username))) {
             $previousUser->$setter_id(null);
             $previousUser->$setter_token(null);
             $this->userManager->updateUser($previousUser);
@@ -80,11 +82,15 @@ class FOSUBUserProvider extends BaseClass
         $user->$setter_id($username);
         $user->$setter_token($this->getLongLivedAccessToken($response));
 
-        $this->userManager->updateUser($user);
+        /** @var \FOS\UserBundle\Model\UserInterface $fosUser */
+        $fosUser = $user;
+        $this->userManager->updateUser($fosUser);
     }
 
     /**
-     * {@inheritdoc}
+     * @param UserResponseInterface $response
+     * @return User|\FOS\UserBundle\Model\UserInterface|UserInterface|null
+     * @throws \Exception
      */
     public function loadUserByOAuthUserResponse(UserResponseInterface $response)
     {
@@ -109,7 +115,7 @@ class FOSUBUserProvider extends BaseClass
         }
         $user = $this->userManager->findUserBy(array($search => $username));
         //when the user is registrating
-        if (null === $user) {
+        if (null == $user) {
             // Not guarenteed an email address
             if (!$response->getEmail()) {
                 if ($service != self::SERVICE_ACCOUNTKIT) {
@@ -121,7 +127,11 @@ class FOSUBUserProvider extends BaseClass
                 if ($request = $this->requestStack->getCurrentRequest()) {
                     if ($session = $request->getSession()) {
                         if ($session->isStarted()) {
-                            $session->getFlashBag()->add('error', $msg);
+                            /** @var Session $actualSession */
+                            $actualSession = $session;
+                            /** @var FlashBag $flashbag */
+                            $flashbag = $actualSession->getFlashBag();
+                            $flashbag->add('error', $msg);
                         }
                     }
                 }
@@ -135,7 +145,11 @@ class FOSUBUserProvider extends BaseClass
                 if ($request = $this->requestStack->getCurrentRequest()) {
                     if ($session = $request->getSession()) {
                         if ($session->isStarted()) {
-                            $session->getFlashBag()->add('error', $msg);
+                            /** @var Session $actualSession */
+                            $actualSession = $session;
+                            /** @var FlashBag $flashbag */
+                            $flashbag = $actualSession->getFlashBag();
+                            $flashbag->add('error', $msg);
                         }
                     }
                 }
@@ -144,6 +158,7 @@ class FOSUBUserProvider extends BaseClass
             }
 
             // create new user here
+            /** @var User $user */
             $user = $this->userManager->createUser();
 
             if ($service != self::SERVICE_ACCOUNTKIT) {
@@ -271,7 +286,7 @@ class FOSUBUserProvider extends BaseClass
         $oldPasswords = $user->getPreviousPasswords();
 
         if (!is_array($oldPasswords)) {
-            $oldPasswords = $user->getPreviousPasswords->getValues();
+            $oldPasswords = $user->getPreviousPasswords()->getValues();
         }
         if (count($oldPasswords) == 0) {
             return false;

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Service\SalvaExportService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -36,6 +37,7 @@ class SalvaExportRenewalsCommand extends ContainerAwareCommand
     {
         $s3 = true === $input->getOption('s3');
         $date = new \DateTime($input->getOption('date'));
+        /** @var SalvaExportService $salva */
         $salva = $this->getContainer()->get('app.salva');
         $data = $salva->exportRenewals($s3, $date);
         $output->write(implode(PHP_EOL, $data));

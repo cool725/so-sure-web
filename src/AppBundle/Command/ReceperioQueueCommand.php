@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Service\ReceperioService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -41,6 +42,7 @@ class ReceperioQueueCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        /** @var ReceperioService $receperio */
         $receperio = $this->getContainer()->get('app.imei');
         $clear = true === $input->getOption('clear');
         $show = true === $input->getOption('show');

@@ -60,6 +60,7 @@ class Bacs extends BankAccount
         $bankAccount->setBankAddress($this->getBankAddress());
         $bankAccount->setReference($this->getReference());
         $bankAccount->setIdentityLog($identityLog);
+        $bankAccount->setAnnual($this->isAnnual());
 
         return $bankAccount;
     }

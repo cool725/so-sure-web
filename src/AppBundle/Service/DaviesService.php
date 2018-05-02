@@ -188,6 +188,7 @@ class DaviesService extends S3EmailService
 
     private function getClaim($daviesClaim)
     {
+        /** @var ClaimRepository $repo */
         $repo = $this->dm->getRepository(Claim::class);
         $claim = $repo->findOneBy(['number' => $daviesClaim->claimNumber]);
         // Davies swapped to a new claim numbering format
@@ -195,7 +196,7 @@ class DaviesService extends S3EmailService
         // sometimes they are leaving off the last 2 digits when entering the claim
         // on our system
         if (!$claim) {
-            $repo = $this->dm->getRepository(Claim::class);
+            /** @var Claim $claim */
             $claim = $repo->findOneBy(['number' => mb_substr($daviesClaim->claimNumber, 0, -2)]);
             if ($claim) {
                 if ($daviesClaim->getPolicyNumber() != $claim->getPolicy()->getPolicyNumber()) {
@@ -224,12 +225,12 @@ class DaviesService extends S3EmailService
     }
 
     /**
-     * @param $daviesClaim
-     * @param $skipImeiUpdate
+     * @param DaviesClaim $daviesClaim
+     * @param boolean     $skipImeiUpdate
      * @return bool
      * @throws \Exception
      */
-    public function saveClaim($daviesClaim, $skipImeiUpdate)
+    public function saveClaim(DaviesClaim $daviesClaim, $skipImeiUpdate)
     {
         if ($daviesClaim->hasError()) {
             throw new \Exception(sprintf(
@@ -291,7 +292,7 @@ class DaviesService extends S3EmailService
         $claim->setReplacementPhoneDetails($daviesClaim->getReplacementPhoneDetails());
 
         $validator = new AlphanumericSpaceDotValidator();
-        $claim->setDescription($validator->conform($daviesClaim->lossDescription, 0, 5000));
+        $claim->setDescription($validator->conform($daviesClaim->lossDescription));
         $claim->setLocation($daviesClaim->location);
 
         $claim->setClosedDate($daviesClaim->dateClosed);
@@ -394,22 +395,27 @@ class DaviesService extends S3EmailService
                 $this->warnings[$daviesClaim->claimNumber][] = $msg;
             }
 
-            if ($daviesClaim->riskPostCode && !$this->postcodeCompare(
-                $claim->getPolicy()->getUser()->getBillingAddress()->getPostCode(),
-                $daviesClaim->riskPostCode
-            ) && !$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_DAVIES_POSTCODE)) {
-                $msg = sprintf(
-                    'Claim %s: %s does not match expected postcode %s',
-                    $daviesClaim->claimNumber,
-                    $daviesClaim->riskPostCode,
-                    $claim->getPolicy()->getUser()->getBillingAddress()->getPostCode()
-                );
-                $this->warnings[$daviesClaim->claimNumber][] = $msg;
+            if ($daviesClaim->riskPostCode && $claim->getPolicy()->getUser()->getBillingAddress() &&
+                !$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_DAVIES_POSTCODE)) {
+                if (!$this->postcodeCompare(
+                    $claim->getPolicy()->getUser()->getBillingAddress()->getPostcode(),
+                    $daviesClaim->riskPostCode
+                )) {
+                    $msg = sprintf(
+                        'Claim %s: %s does not match expected postcode %s',
+                        $daviesClaim->claimNumber,
+                        $daviesClaim->riskPostCode,
+                        $claim->getPolicy()->getUser()->getBillingAddress()->getPostcode()
+                    );
+                    $this->warnings[$daviesClaim->claimNumber][] = $msg;
+                }
             }
         }
 
+        /** @var PhonePolicy $phonePolicy */
+        $phonePolicy = $claim->getPolicy();
         if (!$claim->isIgnoreWarningFlagSet(Claim::WARNING_FLAG_DAVIES_REPLACEMENT_COST_HIGHER) &&
-            $daviesClaim->phoneReplacementCost > $claim->getPolicy()->getPhone()->getInitialPrice()) {
+            $daviesClaim->phoneReplacementCost > $phonePolicy->getPhone()->getInitialPrice()) {
             $msg = sprintf(
                 'Device replacement cost for claim %s is greater than initial price of the device',
                 $daviesClaim->claimNumber
@@ -424,12 +430,31 @@ class DaviesService extends S3EmailService
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
+        // assume validated prices for pre-picsure policies
         $validated = true;
-        if ($daviesClaim->isExcessValueCorrect($validated) === false) {
+        if ($phonePolicy->isPicSurePolicy()) {
+            $validated = $phonePolicy->isPicSureValidated();
+        }
+
+        // negative excess indicates that the excess was paid by the policy holder
+        // davies business process is to update this value once the invoice is recevied by the supplier
+        // which should be at the same time the replacement imei is provided
+        $negativeExcessAllowed = mb_strlen($daviesClaim->replacementImei) == 0;
+        $isExcessValueCorrect = $daviesClaim->isExcessValueCorrect(
+            $validated,
+            $phonePolicy->isPicSurePolicy(),
+            $negativeExcessAllowed
+        );
+
+        // many of davies excess figures are incorrect if withdrawn and no actual need to validate in those cases
+        if (!$isExcessValueCorrect && !in_array($daviesClaim->getClaimStatus(), [
+                Claim::STATUS_DECLINED,
+                Claim::STATUS_WITHDRAWN
+        ])) {
             $msg = sprintf(
                 'Claim %s does not have the correct excess value. Expected %0.2f Actual %0.2f for %s/%s',
                 $daviesClaim->claimNumber,
-                $daviesClaim->getExpectedExcess($validated),
+                $daviesClaim->getExpectedExcess($validated, $phonePolicy->isPicSurePolicy()),
                 $daviesClaim->excess,
                 $daviesClaim->getClaimType(),
                 $daviesClaim->getClaimStatus()
@@ -530,7 +555,8 @@ class DaviesService extends S3EmailService
             if (!$daviesClaim->replacementReceivedDate) {
                 $items[] = 'received date';
             }
-            if (!$daviesClaim->replacementImei && !in_array('replacementImei', $daviesClaim->unobtainableFields)) {
+            if (!$daviesClaim->replacementImei && !$daviesClaim->isReplacementRepaired() &&
+                !in_array('replacementImei', $daviesClaim->unobtainableFields)) {
                 $items[] = 'imei';
             }
             if (!$daviesClaim->replacementMake || !$daviesClaim->replacementModel) {
@@ -547,7 +573,8 @@ class DaviesService extends S3EmailService
             }
         }
 
-        if (!$daviesClaim->replacementImei && in_array('replacementImei', $daviesClaim->unobtainableFields)) {
+        if (!$daviesClaim->replacementImei && !$daviesClaim->isReplacementRepaired() &&
+            in_array('replacementImei', $daviesClaim->unobtainableFields)) {
             $msg = sprintf(
                 'Claim %s does not have a replacement IMEI - unobtainable. Contact customer if possible.',
                 $daviesClaim->claimNumber
@@ -555,7 +582,8 @@ class DaviesService extends S3EmailService
             $this->warnings[$daviesClaim->claimNumber][] = $msg;
         }
 
-        if (!$daviesClaim->replacementImei && $daviesClaim->getClaimStatus() == Claim::STATUS_SETTLED) {
+        if (!$daviesClaim->replacementImei && !$daviesClaim->isReplacementRepaired() &&
+            $daviesClaim->getClaimStatus() == Claim::STATUS_SETTLED) {
             $msg = sprintf(
                 'Claim %s is settled without a replacement imei.',
                 $daviesClaim->claimNumber
@@ -563,7 +591,8 @@ class DaviesService extends S3EmailService
             $this->errors[$daviesClaim->claimNumber][] = $msg;
         }
 
-        if (!$claim->getReplacementPhone() && $daviesClaim->getClaimStatus() == Claim::STATUS_SETTLED) {
+        if (!$claim->getReplacementPhone() && $daviesClaim->replacementMake && $daviesClaim->replacementModel &&
+            $daviesClaim->getClaimStatus() == Claim::STATUS_SETTLED) {
             $msg = sprintf(
                 'Claim %s is settled without a replacement phone being set. SO-SURE to set replacement phone.',
                 $daviesClaim->claimNumber
@@ -663,9 +692,21 @@ class DaviesService extends S3EmailService
                 }
                 $this->mailer->sendTemplate(
                     sprintf('Verify Policy %s IMEI Update', $policy->getPolicyNumber()),
-                    'tech+ops@so-sure.com',
+                    ['tech+ops@so-sure.com', 'marketing@so-sure.com'],
                     'AppBundle:Email:davies/checkPhone.html.twig',
                     ['policy' => $policy, 'daviesClaim' => $daviesClaim, 'skipImeiUpdate' => $skipImeiUpdate]
+                );
+            }
+        } elseif (count($policy->getClaims()) == 1) {
+            // Davies may be closing the claim before reporting the imei properly (not following process)
+            // , so if there's only 1 claim on the policy without an imei number, report it properly
+            if ($claim->getReplacementImei() &&
+                $claim->getReplacementImei() != $policy->getImei()) {
+                $this->mailer->sendTemplate(
+                    sprintf('Verify Policy %s IMEI Update', $policy->getPolicyNumber()),
+                    ['tech+ops@so-sure.com', 'marketing@so-sure.com'],
+                    'AppBundle:Email:davies/checkPhone.html.twig',
+                    ['policy' => $policy, 'daviesClaim' => $daviesClaim, 'skipImeiUpdate' => true]
                 );
             }
         }

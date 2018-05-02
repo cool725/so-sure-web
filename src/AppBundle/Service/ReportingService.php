@@ -558,6 +558,7 @@ class ReportingService
         /** @var PhonePolicyRepository $policyRepo */
         $policyRepo = $this->dm->getRepository(PhonePolicy::class);
         $termsRepo = $this->dm->getRepository(PolicyTerms::class);
+        /** @var array $allTerms */
         $allTerms = $termsRepo->findAll();
         $data['picsureApprovedTotal'] = $policyRepo->countPicSurePolicies(
             PhonePolicy::PICSURE_STATUS_APPROVED,
@@ -1029,7 +1030,9 @@ class ReportingService
                 new \DateTimeZone(SoSure::TIMEZONE)
             );
         }
-        $end = $end->sub(new \DateInterval('PT1S'));
+        if ($end) {
+            $end = $end->sub(new \DateInterval('PT1S'));
+        }
 
         return [$start, $end];
     }

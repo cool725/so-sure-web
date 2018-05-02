@@ -151,6 +151,8 @@ class DaviesClaim extends DaviesExcel
 
     public $unobtainableFields;
 
+    public $isReplacementRepair = null;
+
     public function __construct()
     {
         $this->unobtainableFields = [];
@@ -182,19 +184,28 @@ class DaviesClaim extends DaviesExcel
         ]);
     }
 
-    public function getExpectedExcess($validated = true)
+    public function getExpectedExcess($validated = true, $picSureEnabled = false)
     {
         try {
-            return Claim::getExcessValue($this->getClaimType(), $validated);
+            return Claim::getExcessValue($this->getClaimType(), $validated, $picSureEnabled);
         } catch (\Exception $e) {
             return null;
         }
     }
 
-    public function isExcessValueCorrect($validated = true)
+    public function isExcessValueCorrect($validated = true, $picSureEnabled = false, $negativeExcessAllowed = false)
     {
         if ($this->excess > 0) {
-            return $this->excess == $this->getExpectedExcess($validated);
+            return $this->areEqualToTwoDp($this->excess, $this->getExpectedExcess($validated, $picSureEnabled));
+        } elseif ($this->excess < 0) {
+            if ($negativeExcessAllowed) {
+                return $this->areEqualToTwoDp(
+                    abs($this->excess),
+                    $this->getExpectedExcess($validated, $picSureEnabled)
+                );
+            } else {
+                return false;
+            }
         }
 
         // Settled claims should always have excess
@@ -490,7 +501,7 @@ class DaviesClaim extends DaviesExcel
                 throw new \Exception('Unknown or missing claim type');
             }
 
-            if ($this->replacementImei && !$this->isImei($this->replacementImei)) {
+            if ($this->replacementImei && !$this->isImei($this->replacementImei) && !$this->isReplacementRepaired()) {
                 throw new \Exception(sprintf('Invalid replacement imei %s', $this->replacementImei));
             }
         } catch (\Exception $e) {
@@ -498,6 +509,19 @@ class DaviesClaim extends DaviesExcel
         }
 
         return true;
+    }
+
+    public function isReplacementRepaired()
+    {
+        if ($this->isReplacementRepair == null) {
+            $this->isReplacementRepair = mb_stripos($this->replacementImei, 'repair') != false;
+        }
+
+        if ($this->isReplacementRepair) {
+            $this->replacementImei = null;
+        }
+
+        return $this->isReplacementRepair;
     }
 
     public static function create($data, $columns)

@@ -25,6 +25,7 @@ class SCodeControllerTest extends BaseControllerTest
         $this->createSCode('testSCodeNonUser-code');
 
         $repo = self::$dm->getRepository(SCode::class);
+        /** @var SCode $scode */
         $scode = $repo->findOneBy(['active' => true]);
         $this->assertNotNull($scode);
         $url = sprintf('/scode/%s', $scode->getCode());
@@ -59,6 +60,7 @@ class SCodeControllerTest extends BaseControllerTest
         $this->login($email, $password, 'user/');
 
         $repo = self::$dm->getRepository(SCode::class);
+        /** @var SCode $scode */
         $scode = $repo->findOneBy(['active' => true]);
         $this->assertNotNull($scode);
         $url = sprintf('/scode/%s', $scode->getCode());
@@ -69,6 +71,8 @@ class SCodeControllerTest extends BaseControllerTest
 
     public function testMultibyte()
     {
+        $this->logout();
+
         $email = self::generateEmail('testMultibyte', $this);
         $password = 'foo';
         $phone = self::getRandomPhone(self::$dm);
@@ -99,18 +103,19 @@ class SCodeControllerTest extends BaseControllerTest
         $this->assertTrue($policy->getUser()->hasActivePolicy());
 
         $repo = self::$dm->getRepository(SCode::class);
+        /** @var SCode $updatedScode */
         $updatedScode = $repo->find($scode->getId());
         $this->assertNotNull($updatedScode);
         $url = sprintf('/scode/%s', $updatedScode->getCode());
         //print_r($url);
         $crawler = self::$client->request('GET', $url);
-        self::verifyResponse(200);
+        self::verifyResponse(200, null, $crawler);
         $this->assertContains(sprintf("Insure your phone with %s", $user->getName()), $crawler->html());
 
         $url = sprintf('/scode/%s', urlencode($scode->getCode()));
         //print_r($url);
         $crawler = self::$client->request('GET', $url);
-        self::verifyResponse(200);
+        self::verifyResponse(200, null, $crawler);
         $this->assertContains(sprintf("Insure your phone with %s", $user->getName()), $crawler->html());
     }
 

@@ -88,8 +88,11 @@ class SecurityListener
             return;
         }
 
+        $request = $this->requestStack->getCurrentRequest();
         $identityLog = new IdentityLog();
-        $identityLog->setIp($this->requestStack->getCurrentRequest()->getClientIp());
+        if ($request) {
+            $identityLog->setIp($request->getClientIp());
+        }
         $user = $event->getAuthenticationToken()->getUser();
         $user->setLatestWebIdentityLog($identityLog);
 

@@ -52,6 +52,7 @@ class SixpackService
     //const EXPERIMENT_MONEY_UNBOUNCE = 'money-unbounce';
     const EXPERIMENT_MOBILE_SEARCH_DROPDOWN = 'mobile-dropdown-search';
     const EXPERIMENT_STEP_3 = 'step-3-payment-new';
+    const EXPERIMENT_PURCHASE_FLOW_BACS = 'purchase-flow-bacs';
     const EXPERIMENT_CPC_QUOTE_HOMEPAGE = 'cpc-quote-or-homepage';
     const EXPERIMENT_DEFACTO = 'defacto';
 
@@ -73,6 +74,7 @@ class SixpackService
         self::EXPERIMENT_QUOTE_INTERCOM_PURCHASE,
         self::EXPERIMENT_MOBILE_SEARCH_DROPDOWN,
         self::EXPERIMENT_STEP_3,
+        self::EXPERIMENT_PURCHASE_FLOW_BACS,
         self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
         self::EXPERIMENT_DEFACTO,
     ];
@@ -91,6 +93,27 @@ class SixpackService
             self::ALTERNATIVES_APP_PICSURE_NO_LOCATION,
             self::ALTERNATIVES_APP_PICSURE_REQUEST_LOCATION,
         ],
+    ];
+
+    /**
+     * For cases where there is only one conversion point (purchase)
+     * @var array
+     */
+    public static $purchaseConversionSimple = [
+        self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
+        self::EXPERIMENT_STEP_3,
+        self::EXPERIMENT_PURCHASE_FLOW_BACS,
+    ];
+
+    /**
+     * For cases where there are multiple conversion points (e.g. convert on progress and later convert on purchase)
+     * @var array
+     */
+    public static $purchaseConversionKpi = [
+        self::EXPERIMENT_QUOTE_INTERCOM_PURCHASE,
+        self::EXPERIMENT_HOMEPAGE_AA_V2,
+        self::EXPERIMENT_MOBILE_SEARCH_DROPDOWN,
+        self::EXPERIMENT_DEFACTO,
     ];
 
     /** @var LoggerInterface */
@@ -147,7 +170,9 @@ class SixpackService
                 if (in_array($experiment, self::$unauthExperiments)) {
                     $clientId = $this->requestService->getTrackingId();
                 } elseif (in_array($experiment, self::$authExperiments)) {
-                    $clientId = $this->requestService->getUser()->getId();
+                    if ($this->requestService->getUser()) {
+                        $clientId = $this->requestService->getUser()->getId();
+                    }
                 } else {
                     throw new \Exception(sprintf('Exp %s is not in auth or unauth array', $experiment));
                 }
@@ -213,7 +238,9 @@ class SixpackService
         if (in_array($experiment, self::$unauthExperiments)) {
             $converted = $this->convertByClientId($this->requestService->getTrackingId(), $experiment, $kpi);
         } elseif (in_array($experiment, self::$authExperiments)) {
-            $converted = $this->convertByClientId($this->requestService->getUser()->getId(), $experiment, $kpi);
+            if ($this->requestService->getUser()) {
+                $converted = $this->convertByClientId($this->requestService->getUser()->getId(), $experiment, $kpi);
+            }
         } else {
             throw new \Exception(sprintf('Exp %s is not in auth or unauth array', $experiment));
         }
@@ -265,6 +292,10 @@ class SixpackService
             return true;
         } catch (ClientException $e) {
             $res = $e->getResponse();
+            if (!$res) {
+                $this->logger->error(sprintf('Failed converting exp %s', $experiment), ['exception' => $e]);
+                return false;
+            }
             $body = (string) $res->getBody();
             $data = json_decode($body, true);
             // {"status": "failed", "message": "this client was not participating"}

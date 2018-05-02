@@ -2,6 +2,13 @@
 
 namespace AppBundle\DataFixtures\MongoDB\c\Policy;
 
+use AppBundle\Document\BacsPaymentMethod;
+use AppBundle\Document\BankAccount;
+use AppBundle\Document\File\AccessPayFile;
+use AppBundle\Document\Payment\BacsPayment;
+use AppBundle\Repository\PolicyRepository;
+use AppBundle\Service\PolicyService;
+use AppBundle\Service\RouterService;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use AppBundle\Document\SalvaPhonePolicy;
@@ -21,10 +28,12 @@ use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Classes\Salva;
 use AppBundle\Classes\SoSure;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Faker;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 // @codingStandardsIgnoreFile
 class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
@@ -42,8 +51,10 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     const PICSURE_RANDOM = 'random';
     const PICSURE_NON_POLICY = 'n/a';
 
+    const BACS_SERIAL_NUMBERS = 20;
+
     /**
-     * @var ContainerInterface
+     * @var ContainerInterface|null
      */
     private $container;
 
@@ -60,7 +71,10 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
     {
         $this->faker = Faker\Factory::create('en_GB');
 
+        $this->createBacsFiles($manager);
+
         $users = $this->newUsers($manager, 150);
+        $unpaid = $this->newUsers($manager, 10);
         $unpaidDiscount = $this->newUsers($manager, 10);
         $iosPreExpireUsers = $this->newUsers($manager, 40);
         $androidPreExpireUsers = $this->newUsers($manager, 40);
@@ -87,8 +101,13 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $this->addConnections($manager, $user, $users);
         }
 
+        foreach ($unpaid as $user) {
+            $this->newPolicy($manager, $user, $count, self::CLAIM_NONE, null, null, null, false, true, 200, null, 1);
+            $count++;
+        }
+
         foreach ($unpaidDiscount as $user) {
-            $this->newPolicy($manager, $user, $count, self::CLAIM_NONE, null, null, null, false, true, null, rand(2, 50));
+            $this->newPolicy($manager, $user, $count, self::CLAIM_NONE, null, null, null, false, true, 200, rand(2, 50), 1);
             $count++;
         }
 
@@ -201,7 +220,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             false,
             true,
             null,
-            true,
+            rand(2, 50),
             3,
             self::PICSURE_NON_POLICY
         );
@@ -335,6 +354,11 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
 
         $manager->flush();
+
+        if (!$this->container) {
+            throw new \Exception('missing container');
+        }
+        /** @var PolicyService $policyService */
         $policyService = $this->container->get('app.policy');
 
         $policyRepo = $manager->getRepository(Policy::class);
@@ -351,6 +375,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         $policy->setStatus(Policy::STATUS_UNPAID);
         $policyService->cancel($policy, Policy::CANCELLED_UNPAID, true, null, true);
 
+        /** @var PolicyRepository $policyRepo */
         $policyRepo = $manager->getRepository(Policy::class);
         $fraud = null;
         $unpaid = null;
@@ -396,7 +421,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             false,
             true,
             null,
-            true,
+            rand(2, 50),
             3
         );
 
@@ -415,10 +440,25 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             false,
             true,
             null,
-            true,
+            rand(2, 50),
             3
         );
         $policy->setStatus(Policy::STATUS_UNPAID);
+
+        $manager->flush();
+    }
+
+    private function createBacsFiles(ObjectManager $manager)
+    {
+        $now = new \DateTime();
+        for ($i = 0; $i < self::BACS_SERIAL_NUMBERS; $i++) {
+            $date = clone $now;
+            $date = $date->sub(new \DateInterval(sprintf('P%dD', $i)));
+            $file = new AccessPayFile();
+            $file->setDate($date);
+            $file->setSerialNumber($i);
+            $manager->persist($file);
+        }
 
         $manager->flush();
     }
@@ -481,7 +521,35 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
 
         $user->setBillingAddress($address);
-        $user->setPaymentMethod(new JudoPaymentMethod());
+        $bacs = rand(0, 1) == 0;
+        if ($bacs) {
+            $bankAccount = new BankAccount();
+            $bankAccount->setMandateStatus(BankAccount::MANDATE_SUCCESS);
+            $reference = sprintf('SOSURE%d', rand(1, 999999));
+            $bankAccount->setReference($reference);
+            $bankAccount->setSortCode('000099');
+            $bankAccount->setAccountNumber('87654321');
+            $bankAccount->setAccountName($user->getName());
+            $bankAccount->setMandateSerialNumber(rand(1, self::BACS_SERIAL_NUMBERS));
+            $status = rand(0, 4);
+            if ($status == 0) {
+                $bankAccount->setMandateStatus(BankAccount::MANDATE_CANCELLED);
+            } elseif ($status == 1) {
+                $bankAccount->setMandateStatus(BankAccount::MANDATE_FAILURE);
+            } elseif ($status == 2) {
+                $bankAccount->setMandateStatus(BankAccount::MANDATE_PENDING_APPROVAL);
+            } elseif ($status == 3) {
+                $bankAccount->setMandateStatus(BankAccount::MANDATE_PENDING_INIT);
+            } elseif ($status == 4) {
+                $bankAccount->setMandateStatus(BankAccount::MANDATE_SUCCESS);
+            }
+            $paymentMethod = new BacsPaymentMethod();
+            $paymentMethod->setBankAccount($bankAccount);
+        } else {
+            $paymentMethod = new JudoPaymentMethod();
+        }
+
+        $user->setPaymentMethod($paymentMethod);
 
         return $user;
     }
@@ -517,9 +585,26 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         return $phone;
     }
 
+    /**
+     * @param ObjectManager $manager
+     * @param User          $user
+     * @param integer       $count
+     * @param string        $claim
+     * @param string|null   $promo
+     * @param string|null   $code
+     * @param Phone|null    $phone
+     * @param boolean|null  $paid
+     * @param bool          $sendInvitation
+     * @param integer|null  $days
+     * @param float|null    $policyDiscount
+     * @param integer|null  $paidMonths
+     * @param string        $picSure
+     * @return SalvaPhonePolicy
+     * @throws \AppBundle\Exception\InvalidPremiumException
+     */
     private function newPolicy(
-        $manager,
-        $user,
+        ObjectManager $manager,
+        User $user,
         $count,
         $claim = self::CLAIM_RANDOM,
         $promo = null,
@@ -535,9 +620,15 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         if (!$phone) {
             $phone = $this->getRandomPhone($manager);
         }
+        if (!$this->container) {
+            throw new \Exception('missing container');
+        }
+        /** @var DocumentManager $dm */
         $dm = $this->container->get('doctrine_mongodb.odm.default_document_manager');
         $policyTermsRepo = $dm->getRepository(PolicyTerms::class);
+        /** @var PolicyTerms $latestTerms */
         $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
+        /** @var PolicyTerms $nonPicSureTerms */
         $nonPicSureTerms = $policyTermsRepo->findOneBy(['version' => 'Version 1 June 2016']);
 
         $startDate = new \DateTime();
@@ -563,6 +654,10 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $scode->setType(SCode::TYPE_STANDARD);
             $policy->addSCode($scode);
         }
+        if (!$this->container) {
+            throw new \Exception('missing container');
+        }
+        /** @var RouterService $router */
         $router = $this->container->get('app.router');
         $shareUrl = $router->generateUrl(
             'scode',
@@ -588,19 +683,30 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $policy->setPromoCode(Policy::PROMO_LAUNCH);
         }
 
+        $bacs = $user->hasBacsPaymentMethod();
+
         $paymentDate = clone $startDate;
         if ($paid === true || ($paid === null && rand(0, 1) == 0)) {
-            $payment = new JudoPayment();
+            if ($bacs) {
+                $payment = new BacsPayment();
+                $payment->setStatus(BacsPayment::STATUS_SUCCESS);
+                $payment->setSuccess(true);
+                /** @var BacsPaymentMethod $bacs */
+                $bacs = $user->getPaymentMethod();
+                $payment->setSerialNumber($bacs->getBankAccount()->getMandateSerialNumber());
+            } else {
+                $payment = new JudoPayment();
+                $payment->setResult(JudoPayment::RESULT_SUCCESS);
+                $receiptId = rand(1, 9999999);
+                while (in_array($receiptId, $this->receiptIds)) {
+                    $receiptId = rand(1, 9999999);
+                }
+                $this->receiptIds[] = $receiptId;
+                $payment->setReceipt($receiptId);
+            }
             $payment->setDate($paymentDate);
             $payment->setAmount($phone->getCurrentPhonePrice()->getYearlyPremiumPrice(null, clone $startDate));
             $payment->setTotalCommission(Salva::YEARLY_TOTAL_COMMISSION);
-            $payment->setResult(JudoPayment::RESULT_SUCCESS);
-            $receiptId = rand(1, 9999999);
-            while (in_array($receiptId, $this->receiptIds)) {
-                $receiptId = rand(1, 9999999);
-            }
-            $this->receiptIds[] = $receiptId;
-            $payment->setReceipt($receiptId);
             $payment->setNotes('LoadSamplePolicyData');
             $policy->addPayment($payment);
         } else {
@@ -609,20 +715,29 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 $months = rand(1, 11);
             }
             for ($i = 1; $i <= $months; $i++) {
-                $payment = new JudoPayment();
+                if ($bacs) {
+                    $payment = new BacsPayment();
+                    $payment->setStatus(BacsPayment::STATUS_SUCCESS);
+                    $payment->setSuccess(true);
+                    /** @var BacsPaymentMethod $bacs */
+                    $bacs = $user->getPaymentMethod();
+                    $payment->setSerialNumber($bacs->getBankAccount()->getMandateSerialNumber());
+                } else {
+                    $payment = new JudoPayment();
+                    $payment->setResult(JudoPayment::RESULT_SUCCESS);
+                    $receiptId = rand(1, 9999999);
+                    while (in_array($receiptId, $this->receiptIds)) {
+                        $receiptId = rand(1, 9999999);
+                    }
+                    $this->receiptIds[] = $receiptId;
+                    $payment->setReceipt($receiptId);
+                }
                 $payment->setDate(clone $paymentDate);
                 $payment->setAmount($phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(null, clone $startDate));
                 $payment->setTotalCommission(Salva::MONTHLY_TOTAL_COMMISSION);
                 if ($months == 12) {
                     $payment->setTotalCommission(Salva::FINAL_MONTHLY_TOTAL_COMMISSION);
                 }
-                $payment->setResult(JudoPayment::RESULT_SUCCESS);
-                $receiptId = rand(1, 9999999);
-                while (in_array($receiptId, $this->receiptIds)) {
-                    $receiptId = rand(1, 9999999);
-                }
-                $this->receiptIds[] = $receiptId;
-                $payment->setReceipt($receiptId);
                 $payment->setNotes('LoadSamplePolicyData');
                 $policy->addPayment($payment);
                 $paymentDate->add(new \DateInterval('P1M'));
@@ -634,6 +749,9 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             }
         }
         $manager->persist($policy);
+        if (!$this->container) {
+            throw new \Exception('missing container');
+        }
         $env = $this->container->getParameter('kernel.environment');
         $policy->create(-5000 + $count, mb_strtoupper($env), $startDate);
         $now = new \DateTime();
@@ -653,6 +771,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             $policy->setPicSureStatus($picSureStatus);
         }
 
+        /** @var PolicyService $policyService */
         $policyService = $this->container->get('app.policy');
         $policyService->generateScheduledPayments($policy, $startDate);
 

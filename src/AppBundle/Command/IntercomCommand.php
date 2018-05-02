@@ -12,7 +12,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Service\IntercomService;
 
-class IntercomCommand extends ContainerAwareCommand
+class IntercomCommand extends BaseCommand
 {
     protected function configure()
     {
@@ -69,6 +69,18 @@ class IntercomCommand extends ContainerAwareCommand
                 'Check for unsubscriptions & clear out old lead/users'
             )
             ->addOption(
+                'lead-maintenance',
+                null,
+                InputOption::VALUE_NONE,
+                'Check for unsubscriptions & clear out old leads'
+            )
+            ->addOption(
+                'user-maintenance',
+                null,
+                InputOption::VALUE_NONE,
+                'Check for unsubscriptions & clear out old users'
+            )
+            ->addOption(
                 'pending-invites',
                 null,
                 InputOption::VALUE_NONE,
@@ -87,8 +99,11 @@ class IntercomCommand extends ContainerAwareCommand
         $convertLead = $input->getOption('convert-lead');
         $undelete = true === $input->getOption('undelete');
         $maintenance = true === $input->getOption('maintenance');
+        $leadMaintenance = true === $input->getOption('lead-maintenance');
+        $userMaintenance = true === $input->getOption('user-maintenance');
         $pendingInvites = true === $input->getOption('pending-invites');
 
+        /** @var IntercomService $intercom */
         $intercom = $this->getContainer()->get('app.intercom');
 
         if ($email) {
@@ -124,6 +139,12 @@ class IntercomCommand extends ContainerAwareCommand
         } elseif ($maintenance) {
             $output->writeln(implode(PHP_EOL, $intercom->maintenance()));
             $output->writeln(sprintf("Finished running maintenance"));
+        } elseif ($leadMaintenance) {
+            $output->writeln(implode(PHP_EOL, $intercom->leadsMaintenance()));
+            $output->writeln(sprintf("Finished running lead maintenance"));
+        } elseif ($userMaintenance) {
+            $output->writeln(implode(PHP_EOL, $intercom->usersMaintenance()));
+            $output->writeln(sprintf("Finished running user maintenance"));
         } elseif ($pendingInvites) {
             $count = 0;
             foreach ($this->getPendingInvites() as $invitation) {
@@ -164,16 +185,14 @@ class IntercomCommand extends ContainerAwareCommand
 
     private function getUserRepository()
     {
-        $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
-        $repo = $dm->getRepository(User::class);
+        $repo = $this->getManager()->getRepository(User::class);
 
         return $repo;
     }
 
     private function getEmailInvitationRepository()
     {
-        $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
-        $repo = $dm->getRepository(EmailInvitation::class);
+        $repo = $this->getManager()->getRepository(EmailInvitation::class);
 
         return $repo;
     }

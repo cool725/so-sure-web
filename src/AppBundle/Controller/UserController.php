@@ -984,6 +984,7 @@ class UserController extends BaseController
         $amount = 0;
         $webpay = null;
 
+        /** @var User $user */
         $user = $this->getUser();
         $policy = $user->getUnpaidPolicy();
         if ($policy) {
@@ -1000,7 +1001,28 @@ class UserController extends BaseController
                         JudopayService::WEB_TYPE_UNPAID
                     );
                 }
+            } else {
+                $this->get('logger')->warning(sprintf(
+                    'Unpaid policy %s has unpaid status, yet is paid to date.',
+                    $policy->getId()
+                ));
             }
+        } else {
+            $this->get('logger')->warning(sprintf(
+                'Unable to locate unpaid policy for user %s. Policy may be in incorrect state.',
+                $user->getId()
+            ));
+        }
+
+        $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
+
+        // For now, only allow 1 policy with bacs
+        if ($bacsFeature && count($user->getValidPolicies(true)) > 1) {
+            $bacsFeature = false;
+        }
+        // For now, only allow monthly policies with bacs
+        if ($bacsFeature && $policy->getPremiumPlan() != Policy::PLAN_MONTHLY) {
+            $bacsFeature = false;
         }
 
         $data = [
@@ -1009,6 +1031,7 @@ class UserController extends BaseController
             'webpay_reference' => $webpay ? $webpay['payment']->getReference() : null,
             'amount' => $amount,
             'policy' => $policy,
+            'bacs_feature' => $bacsFeature,
         ];
 
         return $data;
@@ -1083,6 +1106,7 @@ class UserController extends BaseController
     }
     /**
      * @Route("/payment-details", name="user_payment_details")
+     * @Route("/payment-details/bacs", name="user_payment_details_bacs")
      * @Route("/payment-details/{policyId}", name="user_payment_details_policy",
      *      requirements={"policyId":"[0-9a-f]{24,24}"})
      * @Template
@@ -1101,23 +1125,11 @@ class UserController extends BaseController
 
         // If a user has an unpaid policy, then avoid updating card details (email directing to here)
         // as its then in a very odd state - card correct, but unpaid. better to take the payment immediately
-        if ($user->hasUnpaidPolicy()) {
+        if ($user->hasUnpaidPolicy() && $request->get('_route') != 'user_payment_details_bacs') {
             return new RedirectResponse($this->generateUrl('user_unpaid_policy'));
         }
 
         $bacsFeature = $this->get('app.feature')->isEnabled(Feature::FEATURE_BACS);
-
-        // for initial testing, allow selected so-sure users to access bacs
-        if (!$bacsFeature && in_array($user->getEmailCanonical(), [
-            'patrick@urg.name',
-            'nickwaller@outlook.com',
-            'ju.champagne@wanadoo.fr',
-            'datkiewicz.marta@gmail.com',
-            'dylan.bourguignon@gmail.com',
-            'sluscombe.91@gmail.com',
-        ])) {
-            $bacsFeature = true;
-        }
 
         // For now, only allow 1 policy with bacs
         if ($bacsFeature && count($user->getValidPolicies(true)) > 1) {
@@ -1322,10 +1334,13 @@ class UserController extends BaseController
             return $redirect;
         }
 
+        $friends = null;
         $session = $request->getSession();
-        if (!$friends = $session->get('friends')) {
-            $friends = $facebook->getAllFriends();
-            $session->set('friends', $friends);
+        if ($session) {
+            if (!$friends = $session->get('friends')) {
+                $friends = $facebook->getAllFriends();
+                $session->set('friends', $friends);
+            }
         }
 
         return array(
@@ -1369,9 +1384,9 @@ class UserController extends BaseController
     }
 
     /**
-     * @param Facebook $fb
-     * @param string   $requiredPermission
-     * @param array    $allPermissions
+     * @param FacebookService $fb
+     * @param string          $requiredPermission
+     * @param array           $allPermissions
      *
      * @return null|RedirectResponse
      */

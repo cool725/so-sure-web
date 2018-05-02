@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Controller;
 
+use AppBundle\Repository\Invitation\EmailInvitationRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
@@ -24,6 +25,8 @@ use AppBundle\Service\ReceperioService;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Classes\SoSure;
 use AppBundle\Document\Payment\PolicyDiscountPayment;
+use Symfony\Component\HttpKernel\DataCollector\EventDataCollector;
+use Predis\Client;
 
 /**
  * @group functional-net
@@ -420,6 +423,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $invitationData = $this->verifyResponse(200);
 
         $emailRepo = self::$dm->getRepository(EmailInvitation::class);
+        /** @var EmailInvitation $invitation */
         $invitation = $emailRepo->find($invitationData['id']);
         $this->assertFalse($invitation->canReinvite());
 
@@ -449,6 +453,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $invitationData = $this->verifyResponse(200);
 
         $emailRepo = self::$dm->getRepository(EmailInvitation::class);
+        /** @var EmailInvitation $invitation */
         $invitation = $emailRepo->find($invitationData['id']);
         $invitation->setNextReinvited(new \DateTime('2016-01-01'));
         self::$dm->flush();
@@ -480,10 +485,12 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $invitationData = $this->verifyResponse(200);
 
         $emailRepo = self::$dm->getRepository(EmailInvitation::class);
+        /** @var EmailInvitation $invitation */
         $invitation = $emailRepo->find($invitationData['id']);
         $invitation->setNextReinvited(new \DateTime('2016-01-01'));
 
         $policyRepo = self::$dm->getRepository(Policy::class);
+        /** @var Policy $policy */
         $policy = $policyRepo->find($policyData['id']);
         $policy->setPotValue($policy->getMaxPot());
         self::$dm->flush();
@@ -515,10 +522,12 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $invitationData = $this->verifyResponse(200);
 
         $emailRepo = self::$dm->getRepository(EmailInvitation::class);
+        /** @var EmailInvitation $invitation */
         $invitation = $emailRepo->find($invitationData['id']);
         $invitation->setNextReinvited(new \DateTime('2016-01-01'));
 
         $policyRepo = self::$dm->getRepository(Policy::class);
+        /** @var Policy $policy */
         $policy = $policyRepo->find($policyData['id']);
         $claim = new Claim();
         $claim->setType(Claim::TYPE_LOSS);
@@ -640,6 +649,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         // Add claim to policy
         $policyRepo = self::$dm->getRepository(Policy::class);
+        /** @var Policy $policy */
         $policy = $policyRepo->find($policyData['id']);
         $claim = new Claim();
         $claim->setType(Claim::TYPE_THEFT);
@@ -687,6 +697,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         // set policy to max pot value
         $policyRepo = self::$dm->getRepository(Policy::class);
+        /** @var Policy $policy */
         $policy = $policyRepo->find($inviteePolicyData['id']);
         $policy->setPotValue($policy->getMaxPot());
         self::$dm->flush();
@@ -843,8 +854,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $data = $this->verifyResponse(200);
         $repo = self::$dm->getRepository(Policy::class);
+        /** @var Policy $policy */
         $policy = $repo->find($data['id']);
-        $this->assertTrue($policy !== null);
+        $this->assertTrue($policy != null);
         $this->assertEquals('62.253.24.189', $policy->getIdentityLog()->getIp());
         $this->assertEquals('GB', $policy->getIdentityLog()->getCountry());
         $this->assertEquals([-0.13,51.5], $policy->getIdentityLog()->getLoc()->getCoordinates());
@@ -904,6 +916,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $data = $this->verifyResponse(200);
         $repo = self::$dm->getRepository(Policy::class);
+        /** @var Policy $policy */
         $policy = $repo->find($data['id']);
 
         $discount = new PolicyDiscountPayment();
@@ -1255,6 +1268,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $imei = $data['phone_policy']['imei'];
         
         $repo = static::$dm->getRepository(Policy::class);
+        /** @var Policy $policy */
         $policy = $repo->find($policyId);
         $policy->setStatus(Policy::STATUS_EXPIRED);
         static::$dm->flush();
@@ -1808,7 +1822,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
                 'account_number' => '12345678',
             ]
         ]);
-        $data = $this->verifyResponse(400);
+        $data = $this->verifyResponse(403);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy/1/pay', [
             'bank_account' => [
@@ -1817,7 +1831,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
                 'last_name' => 'bar',
             ]
         ]);
-        $data = $this->verifyResponse(400);
+        $data = $this->verifyResponse(403);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy/1/pay', [
             'bank_account' => [
@@ -1826,7 +1840,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
                 'last_name' => 'bar',
             ]
         ]);
-        $data = $this->verifyResponse(400);
+        $data = $this->verifyResponse(403);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy/1/pay', [
             'bank_account' => [
@@ -1835,7 +1849,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
                 'first_name' => 'foo',
             ]
         ]);
-        $data = $this->verifyResponse(400);
+        $data = $this->verifyResponse(403);
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, '/api/v1/auth/policy/1/pay', [
             'bank_account' => [
@@ -1844,7 +1858,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
                 'last_name' => 'bar',
             ]
         ]);
-        $data = $this->verifyResponse(400);
+        $data = $this->verifyResponse(403);
     }
 
     public function testNewPolicyDdUnknownPolicy()
@@ -1858,7 +1872,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
                 'last_name' => 'bar',
             ]
         ]);
-        $data = $this->verifyResponse(404);
+        $data = $this->verifyResponse(403);
     }
 
     public function testNewPolicyPayNotRegulated()
@@ -1891,7 +1905,8 @@ class ApiAuthControllerTest extends BaseApiControllerTest
             'first_name' => 'foo',
             'last_name' => 'bar',
         ]]);
-        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_NOT_YET_REGULATED);
+        $data = $this->verifyResponse(403);
+        //$data = $this->verifyResponse(422, ApiErrorCode::ERROR_NOT_YET_REGULATED);
 
         $redis->del('ERROR_NOT_YET_REGULATED');
     }
@@ -2396,6 +2411,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
 
         $repo = static::$dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $policy */
         $policy = $repo->find($data['id']);
         $policy->setStatus(PhonePolicy::STATUS_MULTIPAY_REJECTED);
         static::$dm->flush();
@@ -3251,7 +3267,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
             'bucket' => 'policy.so-sure.com',
-            'key' => 'testing/picsure-test.png',
+            'key' => 'test/picsure-test.png',
         ]);
         $data = $this->verifyResponse(200);
 
@@ -5244,8 +5260,14 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
     public function testUserRequestVerificationMobileNumberValidation()
     {
-        $cognitoIdentityId = $this->getAuthUser(self::$testUser);
-        $url = sprintf('/api/v1/auth/user/%s/verify/mobilenumber?_method=GET', self::$testUser->getId());
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testUserRequestVerificationMobileNumberValidation', $this),
+            'foo'
+        );
+
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $url = sprintf('/api/v1/auth/user/%s/verify/mobilenumber?_method=GET', $user->getId());
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, []);
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVALD_DATA_FORMAT);
     }
@@ -5284,7 +5306,8 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $result = $this->verifyResponse(200);
         $this->assertEquals($user->getEmailCanonical(), $result['email']);
         $this->assertTrue($result['has_mobile_number_verified']);
-        $this->assertTrue($user->getMobileNumberVerified());
+        $updatedUser = $this->assertUserExists(self::$client->getContainer(), $user);
+        $this->assertTrue($updatedUser->getMobileNumberVerified());
     }
 
     public function testUserVerifyMobileNumberUnknownId()

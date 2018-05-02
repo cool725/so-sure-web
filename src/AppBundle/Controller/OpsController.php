@@ -119,6 +119,7 @@ class OpsController extends BaseController
         $dm = $this->getManager();
         /** @var SCodeRepository $scodeRepo */
         $scodeRepo = $dm->getRepository(SCode::class);
+        /** @var SCode $scode */
         $scode = $scodeRepo->findOneBy(['active' => true, 'type' => 'standard']);
 
         /** @var EmailInvitationRepository $invitationRepo */
@@ -162,6 +163,7 @@ class OpsController extends BaseController
             'status' => Policy::STATUS_ACTIVE,
             'picSureStatus' => PhonePolicy::PICSURE_STATUS_APPROVED,
         ]);
+        /** @var Policy $picSureRejectedPolicy */
         $picSureRejectedPolicy = $policyRepo->findOneBy([
             'status' => Policy::STATUS_ACTIVE,
             'picSureStatus' => PhonePolicy::PICSURE_STATUS_REJECTED,
@@ -169,10 +171,19 @@ class OpsController extends BaseController
         $nonPicSurePolicy = $policyRepo->findOneBy([
             'policyTerms.$id' => ['$ne' => new \MongoId($picSureRejectedPolicy->getPolicyTerms()->getId())],
         ]);
-        $unpaidPolicy = $policyRepo->findOneBy([
+        $unpaidPolicies = $policyRepo->findBy([
             'status' => Policy::STATUS_UNPAID,
-            'policyDiscountPresent' => ['$ne' => true],
         ]);
+        $unpaidPolicy = null;
+        foreach ($unpaidPolicies as $unpaidPolicy) {
+            /** @var Policy $unpaidPolicy */
+            if (!$unpaidPolicy->isPolicyPaidToDate() && !$unpaidPolicy->hasPolicyDiscountPresent() &&
+                count($unpaidPolicy->getUser()->getValidPolicies(true)) == 1) {
+                break;
+            } else {
+                $unpaidPolicy = null;
+            }
+        }
         $unpaidPolicyDiscountPolicy = $policyRepo->findOneBy([
             'status' => Policy::STATUS_UNPAID,
             'policyDiscountPresent' => true,

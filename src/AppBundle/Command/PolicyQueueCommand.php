@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Service\PolicyService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -10,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\Policy;
 
-class PolicyQueueCommand extends ContainerAwareCommand
+class PolicyQueueCommand extends BaseCommand
 {
     protected function configure()
     {
@@ -53,6 +54,7 @@ class PolicyQueueCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        /** @var PolicyService $policyService */
         $policyService = $this->getContainer()->get('app.policy');
         $clear = true === $input->getOption('clear');
         $show = true === $input->getOption('show');
@@ -96,16 +98,14 @@ class PolicyQueueCommand extends ContainerAwareCommand
 
     private function getPolicy($policyId)
     {
-        $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(Policy::class);
+        $repo = $this->getManager()->getRepository(Policy::class);
 
         return $repo->find($policyId);
     }
 
     private function getPolicyByNumber($policyNumber)
     {
-        $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(Policy::class);
+        $repo = $this->getManager()->getRepository(Policy::class);
 
         return $repo->findOneBy(['policyNumber' => $policyNumber]);
     }

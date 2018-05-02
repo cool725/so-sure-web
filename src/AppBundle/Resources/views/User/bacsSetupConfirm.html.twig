@@ -68,6 +68,7 @@
                 </div>
                 <div class="form-group">
                     <a href="#tab-bacs-setup" class="btn btn-blue-hollow btn-block btn-pad" data-toggle="tab">Back</a>
+                    {% do bacs_confirm_form.back.setRendered %}
                 </div>
                 <p><small>Your payments are protected by the <a href="#" data-toggle="modal" data-target="#modal-dd" class="text-nowrap">Direct Debit Guarantee</a></small>.</p>
                 <address>

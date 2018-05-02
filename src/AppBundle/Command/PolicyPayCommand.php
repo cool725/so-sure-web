@@ -2,6 +2,8 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Service\JudopayService;
+use AppBundle\Service\PolicyService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,7 +17,7 @@ use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\User;
 
-class PolicyPayCommand extends ContainerAwareCommand
+class PolicyPayCommand extends BaseCommand
 {
     protected function configure()
     {
@@ -57,7 +59,9 @@ class PolicyPayCommand extends ContainerAwareCommand
         $policyId = $input->getOption('id');
         $date = new \DateTime();
 
+        /** @var PolicyService $policyService */
         $policyService = $this->getContainer()->get('app.policy');
+        /** @var JudopayService $judopay */
         $judopay = $this->getContainer()->get('app.judopay');
         $policy = null;
         $user = null;
@@ -120,16 +124,14 @@ class PolicyPayCommand extends ContainerAwareCommand
 
     private function getUser($email)
     {
-        $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(User::class);
+        $repo = $this->getManager()->getRepository(User::class);
 
         return $repo->findOneBy(['emailCanonical' => mb_strtolower($email)]);
     }
 
     private function getPolicy($id)
     {
-        $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(Policy::class);
+        $repo = $this->getManager()->getRepository(Policy::class);
 
         return $repo->find($id);
     }

@@ -34,7 +34,7 @@ class CognitoIdentityAuthenticator implements SimplePreAuthenticatorInterface, A
     }
 
     /**
-     * @param string $requestContent
+     * @param resource|string $requestContent
      *
      * @return string|null
      */

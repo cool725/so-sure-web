@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class UpdatePlayDeviceData implements FixtureInterface, ContainerAwareInterface
 {
     /**
-     * @var ContainerInterface
+     * @var ContainerInterface|null
      */
     private $container;
 
@@ -23,6 +23,9 @@ class UpdatePlayDeviceData implements FixtureInterface, ContainerAwareInterface
 
     public function load(ObjectManager $manager)
     {
+        if (!$this->container) {
+            throw new \Exception('missing container');
+        }
         $repo = $manager->getRepository(PlayDevice::class);
         $row = 0;
         $file = sprintf(

@@ -3,6 +3,9 @@
 namespace AppBundle\Tests\Service;
 
 use AppBundle\Repository\PaymentRepository;
+use AppBundle\Repository\PhoneRepository;
+use AppBundle\Repository\PolicyRepository;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\SalvaPhonePolicy;
@@ -27,8 +30,11 @@ class SalvaExportServiceTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
+    /** @var DocumentManager */
+    protected static $dm;
     protected static $salva;
     protected static $xmlFile;
+    /** @var PolicyRepository */
     protected static $policyRepo;
     protected static $dispatcher;
     protected static $judopay;
@@ -46,8 +52,12 @@ class SalvaExportServiceTest extends WebTestCase
         //each test method, do this in setUp() instead
         self::$salva = self::$container->get('app.salva');
         self::$dispatcher = self::$container->get('event_dispatcher');
-        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
-        self::$policyRepo = self::$dm->getRepository(Policy::class);
+        /** @var DocumentManager */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$dm = $dm;
+        /** @var PolicyRepository $policyRepo */
+        $policyRepo = self::$dm->getRepository(Policy::class);
+        self::$policyRepo = $policyRepo;
         self::$userManager = self::$container->get('fos_user.user_manager');
         self::$policyService = self::$container->get('app.policy');
         self::$judopay = self::$container->get('app.judopay');
@@ -55,6 +65,7 @@ class SalvaExportServiceTest extends WebTestCase
             "%s/../src/AppBundle/Tests/Resources/salva-example-boat.xml",
             self::$container->getParameter('kernel.root_dir')
         );
+        /** @var PhoneRepository $phoneRepo */
         $phoneRepo = self::$dm->getRepository(Phone::class);
         self::$phone = $phoneRepo->findOneBy(['devices' => 'iPhone 5', 'memory' => 64]);
 
@@ -64,9 +75,11 @@ class SalvaExportServiceTest extends WebTestCase
         // one of the other tests seems to creating a payment that doesn't have a related policy (or deleting the policy)
         // easiest to just delete all data prior to running
         // @codingStandardsIgnoreEnd
+        /** @var PaymentRepository $paymentRepo */
         $paymentRepo = self::$dm->getRepository(Payment::class);
         $payments = $paymentRepo->findAll();
         foreach ($payments as $payment) {
+            /** @var Payment $payment */
             self::$dm->remove($payment);
         }
         self::$dm->flush();
@@ -203,6 +216,7 @@ class SalvaExportServiceTest extends WebTestCase
         static::$policyService->create($policy);
         static::$policyService->setEnvironment('test');
 
+        /** @var SalvaPhonePolicy $updatedPolicy */
         $updatedPolicy = static::$policyRepo->find($policy->getId());
         $this->assertTrue($updatedPolicy->isValidPolicy());
         $this->assertTrue(static::$salva->queue($updatedPolicy, SalvaExportService::QUEUE_CREATED));
@@ -223,6 +237,7 @@ class SalvaExportServiceTest extends WebTestCase
         static::$policyService->create($policy);
         static::$policyService->setEnvironment('test');
 
+        /** @var SalvaPhonePolicy $updatedPolicy */
         $updatedPolicy = static::$policyRepo->find($policy->getId());
         $this->assertTrue($updatedPolicy->isValidPolicy());
         $this->assertTrue(static::$salva->queue($updatedPolicy, SalvaExportService::QUEUE_UPDATED));
@@ -246,6 +261,7 @@ class SalvaExportServiceTest extends WebTestCase
         static::$policyService->create($policy);
         static::$policyService->setEnvironment('test');
 
+        /** @var SalvaPhonePolicy $updatedPolicy */
         $updatedPolicy = static::$policyRepo->find($policy->getId());
         $this->assertTrue($updatedPolicy->isPrefixInvalidPolicy());
         $this->assertEquals(
@@ -274,6 +290,7 @@ class SalvaExportServiceTest extends WebTestCase
         // we no longer throw an exception, so just expect same status
         static::$policyService->cancel($policy, SalvaPhonePolicy::CANCELLED_COOLOFF);
 
+        /** @var SalvaPhonePolicy $updatedPolicy */
         $updatedPolicy = static::$policyRepo->find($policy->getId());
         // cancellation above should set to wait cancelled
         $this->assertEquals(SalvaPhonePolicy::SALVA_STATUS_WAIT_CANCELLED, $updatedPolicy->getSalvaStatus());
@@ -357,6 +374,7 @@ class SalvaExportServiceTest extends WebTestCase
         $this->assertEquals(1, count($lines));
         $this->assertEquals('"-10.00"', explode(',', $lines[0])[2]);
 
+        /** @var Policy $updatedPolicyA */
         $updatedPolicyA = $dm->getRepository(Policy::class)->find($policyA->getId());
         $this->assertEquals(1, count($updatedPolicyA->getPayments()));
         $foundSoSurePotReward = false;
@@ -397,6 +415,7 @@ class SalvaExportServiceTest extends WebTestCase
         // we no longer throw an exception, so just expect same status
         static::$policyService->cancel($policy, SalvaPhonePolicy::CANCELLED_COOLOFF);
 
+        /** @var SalvaPhonePolicy $updatedPolicy */
         $updatedPolicy = static::$policyRepo->find($policy->getId());
         // cancellation above should set to wait cancelled
         $this->assertEquals(SalvaPhonePolicy::SALVA_STATUS_PENDING_CANCELLED, $updatedPolicy->getSalvaStatus());
@@ -414,6 +433,7 @@ class SalvaExportServiceTest extends WebTestCase
     {
         $policy = $this->createPolicy('basic-export', new \DateTime('2016-01-01'));
 
+        /** @var Policy $updatedPolicy */
         $updatedPolicy = static::$policyRepo->find($policy->getId());
 
         $lines = $this->exportPolicies($updatedPolicy->getPolicyNumber());
@@ -431,6 +451,7 @@ class SalvaExportServiceTest extends WebTestCase
         $policy = $this->createPolicy('testQuoteExportPolicies', new \DateTime('2016-01-01'), true, 'foo"bar');
         static::$dm->flush();
 
+        /** @var Policy $updatedPolicy */
         $updatedPolicy = static::$policyRepo->find($policy->getId());
 
         $lines = $this->exportPolicies($updatedPolicy->getPolicyNumber());
@@ -444,6 +465,7 @@ class SalvaExportServiceTest extends WebTestCase
     {
         $policy = $this->createPolicy('testBasicExportCompanyPolicies', new \DateTime('2016-01-01'), true, 'foo');
 
+        /** @var Policy $updatedPolicy */
         $updatedPolicy = static::$policyRepo->find($policy->getId());
 
         $lines = $this->exportPolicies($updatedPolicy->getPolicyNumber());
@@ -614,6 +636,7 @@ class SalvaExportServiceTest extends WebTestCase
         static::$salva->setEnvironment('prod');
         static::$salva->incrementPolicyNumber($policy, new \DateTime('2016-01-31 01:00'));
 
+        /** @var SalvaPhonePolicy $updatedPolicy */
         $updatedPolicy = static::$policyRepo->find($policy->getId());
 
         $lines = $this->exportPolicies($updatedPolicy->getPolicyNumber());
@@ -647,6 +670,7 @@ class SalvaExportServiceTest extends WebTestCase
         static::$salva->setEnvironment('prod');
         static::$salva->incrementPolicyNumber($policy, new \DateTime('2017-05-24T14:39:00'));
 
+        /** @var SalvaPhonePolicy $updatedPolicy */
         $updatedPolicy = static::$policyRepo->find($policy->getId());
 
         $lines = $this->exportPolicies($updatedPolicy->getPolicyNumber());
@@ -739,6 +763,7 @@ class SalvaExportServiceTest extends WebTestCase
 
         $this->cancelPolicy($policy, Policy::CANCELLED_COOLOFF, new \DateTime('2016-01-02'));
 
+        /** @var Policy $updatedPolicy */
         $updatedPolicy = static::$policyRepo->find($policy->getId());
 
         $lines = $this->exportPolicies($updatedPolicy->getPolicyNumber());
@@ -767,6 +792,7 @@ class SalvaExportServiceTest extends WebTestCase
 
         $this->cancelPolicy($policy, Policy::CANCELLED_COOLOFF, new \DateTime('2016-01-02'));
 
+        /** @var Policy $updatedPolicy */
         $updatedPolicy = static::$policyRepo->find($policy->getId());
 
         $lines = $this->exportPolicies($updatedPolicy->getPolicyNumber());
@@ -811,6 +837,7 @@ class SalvaExportServiceTest extends WebTestCase
 
         $this->cancelPolicy($policyCooloff, Policy::CANCELLED_COOLOFF, new \DateTime('2016-01-02'));
 
+        /** @var Policy $updatedPolicyCooloff */
         $updatedPolicyCooloff = static::$policyRepo->find($policyCooloff->getId());
 
         $lines = $this->exportPolicies($updatedPolicyCooloff->getPolicyNumber());
@@ -829,6 +856,7 @@ class SalvaExportServiceTest extends WebTestCase
         // 31 + 29 + 31 + 30 + 31 + 1
         $this->cancelPolicy($policy, Policy::CANCELLED_WRECKAGE, new \DateTime('2016-06-01'));
 
+        /** @var Policy $updatedPolicy */
         $updatedPolicy = static::$policyRepo->find($policy->getId());
 
         $lines = $this->exportPolicies($updatedPolicy->getPolicyNumber());
@@ -849,6 +877,7 @@ class SalvaExportServiceTest extends WebTestCase
 
         $this->cancelPolicy($policy, Policy::CANCELLED_WRECKAGE, new \DateTime('2016-10-05 17:00'));
 
+        /** @var SalvaPhonePolicy $updatedPolicy */
         $updatedPolicy = static::$policyRepo->find($policy->getId());
 
         $lines = $this->exportPolicies($updatedPolicy->getPolicyNumber());

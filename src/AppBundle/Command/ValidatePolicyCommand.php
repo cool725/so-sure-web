@@ -2,6 +2,9 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Repository\PolicyRepository;
+use AppBundle\Service\MailerService;
+use AppBundle\Service\PolicyService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -105,15 +108,20 @@ class ValidatePolicyCommand extends BaseCommand
         if ($resyncPicsure) {
             $this->resyncPicsureStatus();
         } else {
+            /** @var PolicyService $policyService */
             $policyService = $this->getContainer()->get('app.policy');
             $dm = $this->getManager();
+            /** @var PolicyRepository $policyRepo */
             $policyRepo = $dm->getRepository(Policy::class);
 
             if ($policyNumber || $policyId) {
+                /** @var Policy $policy */
                 $policy = null;
                 if ($policyNumber) {
+                    /** @var Policy $policy */
                     $policy = $policyRepo->findOneBy(['policyNumber' => $policyNumber]);
                 } elseif ($policyId) {
+                    /** @var Policy $policy */
                     $policy = $policyRepo->find($policyId);
                 }
                 if (!$policy) {
@@ -177,6 +185,7 @@ class ValidatePolicyCommand extends BaseCommand
                 $lines[] = 'Pending Cancellations';
                 $lines[] = '-------------';
                 $lines[] = '';
+                /** @var PolicyService $policyService */
                 $policyService = $this->getContainer()->get('app.policy');
                 $pending = $policyService->getPoliciesPendingCancellation(true, $prefix);
                 foreach ($pending as $policy) {
@@ -218,6 +227,7 @@ class ValidatePolicyCommand extends BaseCommand
             }
 
             if (!$skipEmail) {
+                /** @var MailerService $mailer */
                 $mailer = $this->getContainer()->get('app.mailer');
                 $mailer->send(
                     'Policy Validation & Pending Cancellations',
@@ -285,6 +295,7 @@ class ValidatePolicyCommand extends BaseCommand
             $this->header($policy, $policies, $lines);
             $data['warnClaim'] = true;
             if ($data['adjustScheduledPayments']) {
+                /** @var PolicyService $policyService */
                 $policyService = $this->getContainer()->get('app.policy');
                 if ($policyService->adjustScheduledPayments($policy)) {
                     $lines[] = sprintf(
@@ -411,8 +422,7 @@ class ValidatePolicyCommand extends BaseCommand
 
     private function resyncPicsureStatus()
     {
-        $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
-        $policyRepo = $dm->getRepository(PhonePolicy::class);
+        $policyRepo = $this->getManager()->getRepository(PhonePolicy::class);
 
         $picsurePolicies = $policyRepo->findBy(
             ['picSureStatus' => ['$in' => [PhonePolicy::PICSURE_STATUS_APPROVED,
@@ -429,6 +439,6 @@ class ValidatePolicyCommand extends BaseCommand
                 }
             }
         }
-        $dm->flush();
+        $this->getManager()->flush();
     }
 }

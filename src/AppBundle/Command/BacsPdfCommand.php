@@ -71,6 +71,7 @@ class BacsPdfCommand extends BaseCommand
         $process = $input->getOption('process');
         $requeue = $input->getOption('requeue');
 
+        /** @var BacsService $bacsService */
         $bacsService = $this->getContainer()->get('app.bacs');
 
         if ($clear) {

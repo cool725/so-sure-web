@@ -257,16 +257,21 @@
                                     <p>Please be advised that if you confirm that the above is true and we later discover that it isn’t, your claim might get denied.</p>
                                     <p class="text-center" style="display: none">{{ form_widget(purchase_form.agreed, {'label': ' I confirm the above is correct', 'value': 'checked'}) }}</p>
                                     <div class="form-group">
-                                        {% if app.user.hasValidPaymentMethod %}
+                                        {% if app.user.hasValidPaymentMethod and app.user.hasJudoPaymentMethod %}
                                             {{ form_widget(purchase_form.existing, {'label': 'Pay with card on file', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
                                             {{ form_widget(purchase_form.next, {'label': 'Pay with a new card', 'attr': {'class': 'btn btn-default btn-block btn-pad'}}) }}
                                         {% else %}
+                                            {% if purchase_form.existing is defined %}
+                                              {% do purchase_form.existing.setRendered %}
+                                            {% endif %}
                                             {{ form_widget(purchase_form.next, {'label': 'Continue to payment', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
                                         {% endif %}
                                     </div>
+                                    {% if payment_provider == 'judo' %}
                                     <div class="form-group">
                                         <p class="help-block text-center"><small>You will be taken to our payment service provider Judo Pay</small></p>
                                     </div>
+                                    {% endif %}
                                 </div>
                                 <div class="modal-policy-embedded" data-url="{{ url('latest_policy_terms', {'policy_key': policy_key, 'maxPotValue':  phone.getCurrentPhonePrice.maxPot, 'include': true, 'noH1': true }) }}" style="display: none;">
                                     <div class="text-center" style="margin-bottom: 20px;">

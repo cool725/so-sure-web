@@ -12,12 +12,15 @@ class SortCodeValidator extends ConstraintValidator
 
     public function validate($value, Constraint $constraint)
     {
+        /** @var SortCode $sortCodeConstraint */
+        $sortCodeConstraint = $constraint;
+
         if (mb_strlen($value) == 0) {
             return;
         }
 
         if (!$this->validateSortCode($value)) {
-            $this->context->buildViolation($constraint->message)
+            $this->context->buildViolation($sortCodeConstraint->message)
                 ->setParameter('%string%', $value)
                 ->addViolation();
         }

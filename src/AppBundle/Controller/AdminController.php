@@ -2,6 +2,8 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Document\ArrayToApiArrayTrait;
+use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Document\Sequence;
 use AppBundle\Form\Type\BacsMandatesType;
@@ -92,6 +94,7 @@ class AdminController extends BaseController
 {
     use DateTrait;
     use CurrencyTrait;
+    use ArrayToApiArrayTrait;
 
     /**
      * @Route("/phone", name="admin_phone_add")
@@ -550,6 +553,15 @@ class AdminController extends BaseController
         $sequenceRepo = $dm->getRepository(Sequence::class);
         /** @var Sequence $currentSequence */
         $currentSequence = $sequenceRepo->findOneBy(['name' => SequenceService::SEQUENCE_BACS_SERIAL_NUMBER]);
+        // just in case its not present (dev)
+        if (!$currentSequence) {
+            /** @var SequenceService $seqService */
+            $seqService = $this->get('app.sequence');
+            $sequence = $seqService->getSequenceId(SequenceService::SEQUENCE_BACS_SERIAL_NUMBER);
+
+            /** @var Sequence $currentSequence */
+            $currentSequence = $sequenceRepo->findOneBy(['name' => SequenceService::SEQUENCE_BACS_SERIAL_NUMBER]);
+        }
 
         /** @var BacsService $bacs */
         $bacs = $this->get('app.bacs');
@@ -648,6 +660,7 @@ class AdminController extends BaseController
         $dm = $this->getManager();
         /** @var S3FileRepository $repo */
         $repo = $dm->getRepository(S3File::class);
+        /** @var S3File $s3File */
         $s3File = $repo->find($id);
         if (!$s3File) {
             throw new NotFoundHttpException();
@@ -667,11 +680,33 @@ class AdminController extends BaseController
     }
 
     /**
+     * @Route("/bacs/serial-number-details/{serial}", name="admin_bacs_serial_number_details")
+     * @Method({"GET"})
+     */
+    public function bacsFileAction($serial)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(User::class);
+        $users = $repo->findBy(['paymentMethod.bankAccount.mandateSerialNumber' => (string) $serial]);
+        $paymentMethods = [];
+        foreach ($users as $user) {
+            /** @var User $user */
+            /** @var BacsPaymentMethod $bacs */
+            $bacs = $user->getPaymentMethod();
+            if ($bacs->getBankAccount()) {
+                $paymentMethods[] = $bacs->getBankAccount()->toDetailsArray();
+            }
+        }
+
+        return new JsonResponse($paymentMethods);
+    }
+
+    /**
      * @Route("/bacs/submission/{id}", name="admin_bacs_submission")
-     * @Route("/bacs/serial-number/{id}", name="admin_bacs_serial_number")
+     * @Route("/bacs/serial-number/{id}", name="admin_bacs_update_serial_number")
      * @Method({"POST"})
      */
-    public function bacsFileAction(Request $request, $id)
+    public function bacsEditFileAction(Request $request, $id)
     {
         if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
             throw new \InvalidArgumentException('Invalid csrf token');
@@ -697,7 +732,7 @@ class AdminController extends BaseController
                 }
 
                 $message = sprintf('Bacs file %s is marked as submitted', $file->getFileName());
-            } elseif ($request->get('_route') == 'admin_bacs_serial_number') {
+            } elseif ($request->get('_route') == 'admin_bacs_update_serial_number') {
                 $paymentRepo = $dm->getRepository(BacsPayment::class);
                 $payments = $paymentRepo->findBy([
                     'serialNumber' => $file->getSerialNumber(),

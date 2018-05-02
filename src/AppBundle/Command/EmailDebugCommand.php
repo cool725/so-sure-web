@@ -2,7 +2,14 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Repository\CashbackRepository;
+use AppBundle\Repository\ConnectionRepository;
+use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\UserRepository;
+use AppBundle\Service\MailerService;
+use AppBundle\Service\PolicyService;
+use AppBundle\Service\RouterService;
+use Predis\Client;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -53,6 +60,7 @@ class EmailDebugCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        /** @var Client $redis */
         $redis = $this->getContainer()->get('snc_redis.mailer');
         $output->writeln(sprintf('%d emails in queue (prior to this)', $redis->llen('swiftmailer')));
         $env = $this->getContainer()->getParameter('kernel.environment');
@@ -151,6 +159,7 @@ class EmailDebugCommand extends BaseCommand
             $dm = $this->getManager();
             /** @var UserRepository $repo */
             $repo = $dm->getRepository(User::class);
+            /** @var User $user */
             $user = $repo->findOneBy(['paymentMethod.type' => 'bacs']);
             $data = [
                 'user' => $user,
@@ -159,16 +168,22 @@ class EmailDebugCommand extends BaseCommand
             ];
         } elseif (in_array($template, $templates['cashback'])) {
             $dm = $this->getManager();
+            /** @var CashbackRepository $repo */
             $repo = $dm->getRepository(Cashback::class);
+            /** @var Cashback $cashback */
+            $cashback = $repo->findOneBy([]);
+            /** @var RouterService $router */
+            $router = $this->getContainer()->get('app.router');
             $data = [
-                'cashback' => $repo->findOneBy([]),
-                'withdraw_url' => $this->getContainer()->get('app.router')->generateUrl(
+                'cashback' => $cashback,
+                'withdraw_url' => $router->generateUrl(
                     'homepage',
                     []
                 ),
             ];
         } elseif (in_array($template, $templates['potReward'])) {
             $dm = $this->getManager();
+            /** @var PolicyRepository $repo */
             $repo = $dm->getRepository(Policy::class);
             $policies = $repo->findBy(['nextPolicy' => ['$ne' => null]]);
             $policy = null;
@@ -188,13 +203,17 @@ class EmailDebugCommand extends BaseCommand
             ];
         } elseif (in_array($template, $templates['policyConnection'])) {
             $dm = $this->getManager();
+            /** @var ConnectionRepository $repo */
             $repo = $dm->getRepository(StandardConnection::class);
+            /** @var StandardConnection $connection */
             $connection = $repo->findOneBy(['value' => ['$gt' => 0]]);
+            /** @var PolicyService $policyService */
             $policyService = $this->getContainer()->get('app.policy');
 
             return $policyService->connectionReduced($connection);
         } elseif (in_array($template, $templates['policy'])) {
             $dm = $this->getManager();
+            /** @var PolicyRepository $repo */
             $repo = $dm->getRepository(Policy::class);
             $policies = $repo->findBy(['status' => Policy::STATUS_ACTIVE]);
             $policy = null;
@@ -204,11 +223,13 @@ class EmailDebugCommand extends BaseCommand
             if (!$policy) {
                 throw new \Exception('Unable to find matching policy');
             }
+            /** @var PolicyService $policyService */
             $policyService = $this->getContainer()->get('app.policy');
 
             return $policyService->resendPolicyEmail($policy);
         } elseif (in_array($template, $templates['policyCancellation'])) {
             $dm = $this->getManager();
+            /** @var PolicyRepository $repo */
             $repo = $dm->getRepository(Policy::class);
             $policies = $repo->findBy(['status' => Policy::STATUS_ACTIVE]);
             $policy = null;
@@ -218,16 +239,19 @@ class EmailDebugCommand extends BaseCommand
             if (!$policy) {
                 throw new \Exception('Unable to find matching policy');
             }
+            /** @var PolicyService $policyService */
             $policyService = $this->getContainer()->get('app.policy');
             $baseTemplate = sprintf('AppBundle:Email:%s', $template);
 
             return $policyService->cancelledPolicyEmail($policy, $baseTemplate);
         } elseif (in_array($template, $templates['policyRenewal'])) {
             $dm = $this->getManager();
+            /** @var PolicyRepository $repo */
             $repo = $dm->getRepository(Policy::class);
             $policies = $repo->findBy(['status' => Policy::STATUS_PENDING_RENEWAL]);
             $policy = null;
             foreach ($policies as $pendingRenewal) {
+                /** @var Policy $pendingRenewal */
                 $prevPolicy = $pendingRenewal->getPreviousPolicy();
                 if (!$prevPolicy || !$prevPolicy->getPremium() || !$prevPolicy->getNextPolicy() ||
                     !$prevPolicy->getNextPolicy()->getPremium()) {
@@ -259,10 +283,12 @@ class EmailDebugCommand extends BaseCommand
                 !$policy->getNextPolicy()->getPremium()) {
                 throw new \Exception('Unable to find matching policy');
             }
+            /** @var PolicyService $policyService */
             $policyService = $this->getContainer()->get('app.policy');
             return $policyService->pendingRenewalEmail($policy);
         } elseif (in_array($template, $templates['picsure'])) {
             $dm = $this->getManager();
+            /** @var PolicyRepository $repo */
             $repo = $dm->getRepository(Policy::class);
             $policy = $repo->findOneBy(['status' => Policy::STATUS_ACTIVE]);
             $data = [
@@ -272,6 +298,7 @@ class EmailDebugCommand extends BaseCommand
             throw new \Exception(sprintf('Unsupported template %s for email debug. Add data', $template));
         }
 
+        /** @var MailerService $mailer */
         $mailer = $this->getContainer()->get('app.mailer');
         $mailer->sendTemplate(
             sprintf('sosure:email:debug %s', $template),

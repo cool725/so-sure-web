@@ -2,6 +2,10 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Repository\PolicyRepository;
+use AppBundle\Repository\SCodeRepository;
+use AppBundle\Service\BranchService;
+use AppBundle\Service\RouterService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -61,10 +65,13 @@ class SCodeCommand extends BaseCommand
         $updateDate = $this->startOfDay($updateDate);
 
         $dm = $this->getManager();
+        /** @var PolicyRepository $policyRepo */
         $policyRepo = $dm->getRepository(Policy::class);
+        /** @var SCodeRepository $scodeRepo */
         $scodeRepo = $dm->getRepository(SCode::class);
 
         if ($policyNumber) {
+            /** @var Policy $policy */
             $policy = $policyRepo->findOneBy(['policyNumber' => $policyNumber]);
             if (!$policy) {
                 throw new \Exception(sprintf('Unable to find policy for %s', $policyNumber));
@@ -105,7 +112,9 @@ class SCodeCommand extends BaseCommand
         if (!$scode) {
             throw new \Exception(sprintf('Unable to find scode for policy %s', $policyNumber));
         }
+        /** @var BranchService $branch */
         $branch = $this->getContainer()->get('app.branch');
+        /** @var RouterService $routerService */
         $routerService = $this->getContainer()->get('app.router');
         if ($updateType == 'db') {
             $shareLink = $branch->generateSCode($scode->getCode());

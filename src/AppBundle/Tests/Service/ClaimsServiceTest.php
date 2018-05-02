@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Repository\PolicyRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
@@ -19,6 +20,9 @@ class ClaimsServiceTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
+    /** @var DocumentManager */
+    protected static $dm;
+    /** @var PolicyRepository */
     protected static $policyRepo;
     protected static $lostPhoneRepo;
     protected static $claimsService;
@@ -35,8 +39,12 @@ class ClaimsServiceTest extends WebTestCase
 
          //now we can instantiate our service (if you want a fresh one for
          //each test method, do this in setUp() instead
-         self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
-         self::$policyRepo = self::$dm->getRepository(Policy::class);
+         /** @var DocumentManager */
+         $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+         self::$dm = $dm;
+         /** @var PolicyRepository policyRepo */
+         $policyRepo = self::$dm->getRepository(Policy::class);
+         self::$policyRepo = $policyRepo;
          self::$lostPhoneRepo = self::$dm->getRepository(LostPhone::class);
          self::$userManager = self::$container->get('fos_user.user_manager');
          self::$policyService = self::$container->get('app.policy');

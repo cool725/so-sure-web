@@ -4,7 +4,6 @@ namespace AppBundle\Service;
 use AppBundle\Repository\UserRepository;
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\User;
-use AppBundle\Document\Gocardless;
 use AppBundle\Document\Policy;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\Common\Persistence\ManagerRegistry;

@@ -18,6 +18,7 @@ use AppBundle\Document\User;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\UserRepository;
 use Aws\S3\S3Client;
+use Knp\Bundle\SnappyBundle\Snappy\LoggableGenerator;
 use Knp\Snappy\AbstractGenerator;
 use Knp\Snappy\GeneratorInterface;
 use Predis\Client;
@@ -76,23 +77,23 @@ class BacsService
     /** @var PaymentService */
     protected $paymentService;
 
-    /** @var AbstractGenerator */
+    /** @var LoggableGenerator */
     protected $snappyPdf;
 
     /** @var EngineInterface */
     protected $templating;
 
     /**
-     * @param DocumentManager    $dm
-     * @param LoggerInterface    $logger
-     * @param S3Client           $s3
-     * @param string             $fileEncryptionPassword
-     * @param string             $environment
-     * @param MailerService      $mailerService
-     * @param Client             $redis
-     * @param PaymentService     $paymentService
-     * @param GeneratorInterface $snappyPdf
-     * @param EngineInterface    $templating
+     * @param DocumentManager   $dm
+     * @param LoggerInterface   $logger
+     * @param S3Client          $s3
+     * @param string            $fileEncryptionPassword
+     * @param string            $environment
+     * @param MailerService     $mailerService
+     * @param Client            $redis
+     * @param PaymentService    $paymentService
+     * @param LoggableGenerator $snappyPdf
+     * @param EngineInterface   $templating
      */
     public function __construct(
         DocumentManager $dm,
@@ -103,7 +104,7 @@ class BacsService
         MailerService $mailerService,
         Client $redis,
         PaymentService $paymentService,
-        GeneratorInterface $snappyPdf,
+        LoggableGenerator $snappyPdf,
         EngineInterface $templating
     ) {
         $this->dm = $dm;
@@ -510,7 +511,7 @@ class BacsService
         foreach ($this->redis->hgetall(self::KEY_BACS_CANCEL) as $key => $data) {
             $cancellations[] = json_decode($data, true);
         }
-        $this->redis->del(self::KEY_BACS_CANCEL);
+        $this->redis->del([self::KEY_BACS_CANCEL]);
 
         return $cancellations;
     }
@@ -573,6 +574,10 @@ class BacsService
         }
         if ($this->redis->hlen(self::KEY_BACS_CANCEL) > 0) {
             return true;
+        }
+
+        if (!$date) {
+            $date = new \DateTime();
         }
 
         $advanceDate = clone $date;
@@ -830,7 +835,7 @@ class BacsService
 
     public function clearQueue()
     {
-        $this->redis->del(self::KEY_BACS_QUEUE);
+        $this->redis->del([self::KEY_BACS_QUEUE]);
     }
 
     public function getQueueData($max)

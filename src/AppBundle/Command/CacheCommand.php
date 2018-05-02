@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use Predis\Client;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -41,6 +42,7 @@ class CacheCommand extends BaseCommand
     {
         $action = $input->getArgument('action');
         $prefix = $input->getOption('prefix');
+        /** @var Client $redis */
         $redis = $this->getContainer()->get('snc_redis.default');
         if (!in_array($action, ['list', 'clear'])) {
             throw new \Exception('Unknown action');

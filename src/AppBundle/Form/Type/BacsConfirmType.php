@@ -2,6 +2,7 @@
 
 namespace AppBundle\Form\Type;
 
+use AppBundle\Document\Form\Bacs;
 use AppBundle\Service\PCAService;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -47,6 +48,7 @@ class BacsConfirmType extends AbstractType
             ->add('accountNumber', HiddenType::class, ['required' => true])
             ->add('reference', HiddenType::class, ['required' => true])
             ->add('save', SubmitType::class)
+            ->add('back', SubmitType::class)
         ;
         $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
             /** @var Bacs $bacs */

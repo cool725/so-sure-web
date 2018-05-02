@@ -52,9 +52,6 @@ parameters:
     google_analytics:
     ga_tag_manager_env: '&gtm_auth=&gtm_preview=env-4&gtm_cookies_win=x'
 
-    gocardless_apikey:
-    gocardless_prod: false
-
     rollbar_access_token:
 
     heap_id:
@@ -74,6 +71,7 @@ parameters:
     census_mongodb_url: mongodb://root:root@localhost
     picsure_mongodb_url: mongodb://root:root@localhost
 
+    redis_dsn: redis://localhost
     redis_default_dsn: redis://localhost/0
     redis_session_dsn: redis://localhost/1
     redis_mailer_dsn: redis://localhost/2

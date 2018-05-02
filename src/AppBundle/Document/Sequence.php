@@ -31,7 +31,7 @@ class Sequence
     /**
      * You should be using the SequenceService to increment
      *
-     * @param $seq
+     * @param string $seq
      */
     public function resetSeq($seq)
     {

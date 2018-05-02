@@ -151,11 +151,12 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->add('model', TextType::class)
             ->add('add', SubmitType::class)
             ->getForm();
+        $rootDir = $this->getParameter('kernel.root_dir');
         $additionalPhonesForm = $this->get('form.factory')
             ->createNamedBuilder('additional_phones_form')
             ->add('file', ChoiceType::class, [
                 'required' => true,
-                'choices' => $phoneService->getAdditionalPhones($this->container->getParameter('kernel.root_dir')),
+                'choices' => $phoneService->getAdditionalPhones($rootDir),
             ])
             ->add('load', SubmitType::class)
             ->getForm();
@@ -1073,7 +1074,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 $resetForm->handleRequest($request);
                 if ($resetForm->isValid()) {
                     if (null === $user->getConfirmationToken()) {
-                        /** @var $tokenGenerator \FOS\UserBundle\Util\TokenGeneratorInterface */
+                        /** @var \FOS\UserBundle\Util\TokenGeneratorInterface $tokenGenerator */
                         $tokenGenerator = $this->get('fos_user.util.token_generator');
                         $user->setConfirmationToken($tokenGenerator->generateToken());
                     }

@@ -85,6 +85,7 @@ class ExcelService
             if (!$fileType) {
                 throw new \Exception('Unknown file type');
             }
+            /** @var \PHPExcel_Reader_Abstract $reader */
             $reader = \PHPExcel_IOFactory::createReader($fileType);
             $reader->setReadDataOnly(true);
 

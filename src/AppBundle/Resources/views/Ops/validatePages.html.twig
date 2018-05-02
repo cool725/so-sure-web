@@ -60,32 +60,60 @@
         <h4>Admin login required</h4>
         <ul>
             <li>
-                <a href="{{ url('user_invalid_policy') }}?_impersonate={{ cancelled_policy.user.email }}">User Policy Invalid</a> <b>(auto impersonate {{ cancelled_policy.user.email }}</b>
+                {% if cancelled_policy %}
+                    <a href="{{ url('user_invalid_policy') }}?_impersonate={{ cancelled_policy.user.email }}">User Policy Invalid</a> <b>(auto impersonate {{ cancelled_policy.user.email }}</b>
+                {% else %}
+                    No User Invalid Policy
+                {% endif %}
             </li>
             <li>
-                <a href="{{ url('user_invalid_policy') }}?_impersonate={{ cancelled_fraud_policy.user.email }}">User Policy Invalid (Fraud) - no additonal purchase</a> <b>(auto impersonate {{ cancelled_fraud_policy.user.email }}</b>
+                {% if cancelled_fraud_policy %}
+                    <a href="{{ url('user_invalid_policy') }}?_impersonate={{ cancelled_fraud_policy.user.email }}">User Policy Invalid (Fraud) - no additonal purchase</a> <b>(auto impersonate {{ cancelled_fraud_policy.user.email }}</b>
+                {% else %}
+                    No User Invalid Policy (fraud)
+                {% endif %}
             </li>
             <li>
-                <a href="{{ url('user_home') }}?_impersonate={{ valid_multiple_policy.user.email }}">User Home - Multiple Policy</a> <b>(auto impersonate {{ valid_multiple_policy.user.email }})</b>
+                {% if valid_multiple_policy %}
+                    <a href="{{ url('user_home') }}?_impersonate={{ valid_multiple_policy.user.email }}">User Home - Multiple Policy</a> <b>(auto impersonate {{ valid_multiple_policy.user.email }})</b>
+                {% else %}
+                    No User Home - Multiple Policy
+                {% endif %}
             </li>
             <li>
-                <a href="{{ url('user_home') }}?_impersonate={{ valid_policy_monthly.user.email }}">User Home - Monthly</a> <b>(auto impersonate {{ valid_policy_monthly.user.email }})</b>
+                {% if valid_policy_monthly %}
+                    <a href="{{ url('user_home') }}?_impersonate={{ valid_policy_monthly.user.email }}">User Home - Monthly</a> <b>(auto impersonate {{ valid_policy_monthly.user.email }})</b>
+                {% else %}
+                    No User Home - Monthly
+                {% endif %}
             </li>
             <li>
                 {%  if unpaid_valid_policy_monthly %}
-                <a href="{{ url('user_home') }}?_impersonate={{ unpaid_valid_policy_monthly.user.email }}">User Home - Monthly (Unpaid)</a> <b>(auto impersonate {{ unpaid_valid_policy_monthly.user.email }})</b>
+                    <a href="{{ url('user_home') }}?_impersonate={{ unpaid_valid_policy_monthly.user.email }}">User Home - Monthly (Unpaid)</a> <b>(auto impersonate {{ unpaid_valid_policy_monthly.user.email }})</b>
                 {% else %}
                     No Monthly unpaid policy available
                 {% endif %}
             </li>
             <li>
-                <a href="{{ url('user_home') }}?_impersonate={{ valid_policy_annual.user.email }}">User Home - Annual</a> <b>(auto impersonate {{ valid_policy_annual.user.email }})</b>
+                {% if valid_policy_annual %}
+                    <a href="{{ url('user_home') }}?_impersonate={{ valid_policy_annual.user.email }}">User Home - Annual</a> <b>(auto impersonate {{ valid_policy_annual.user.email }})</b>
+                {% else %}
+                    No user home - annual
+                {% endif %}
             </li>
             <li>
-                <a href="{{ url('user_home') }}?_impersonate={{ invitation.inviter.email }}">User Home - Sent Invitation</a> <b>(auto impersonate {{ invitation.inviter.email }})</b>
+                {% if invitation %}
+                    <a href="{{ url('user_home') }}?_impersonate={{ invitation.inviter.email }}">User Home - Sent Invitation</a> <b>(auto impersonate {{ invitation.inviter.email }})</b>
+                {% else %}
+                    No user home - send invitations
+                {% endif %}
             </li>
             <li>
-                <a href="{{ url('user_home') }}?_impersonate={{ claimed_policy.user.email }}">User Home - Unable to invite (w/Claimed Policy)</a> <b>(auto impersonate {{ claimed_policy.user.email }})</b>
+                {% if claimed_policy %}
+                    <a href="{{ url('user_home') }}?_impersonate={{ claimed_policy.user.email }}">User Home - Unable to invite (w/Claimed Policy)</a> <b>(auto impersonate {{ claimed_policy.user.email }})</b>
+                {% else %}
+                    No user home - unable to invite
+                {% endif %}
             </li>
             <li>
                 {%  if multipay_policy %}
@@ -126,7 +154,11 @@
                 <a href="{{ url('user_welcome') }}?_impersonate={{ valid_policy.user.email }}">User Welcome</a> <b>(auto impersonate {{ valid_policy.user.email }})</b>
             </li>
             <li>
-                <a href="{{ url('user_home') }}?_impersonate={{ unpaid_policy.user.email }}">User Unpaid Page</a> <b>(auto impersonate {{ unpaid_policy.user.email }})</b>
+                {% if unpaid_policy %}
+                    <a href="{{ url('user_home') }}?_impersonate={{ unpaid_policy.user.email }}">User Unpaid Page</a> <b>(auto impersonate {{ unpaid_policy.user.email }})</b>
+                {% else %}
+                    No policy unpaid available
+                {% endif %}
             </li>
             <li>
                 {% if unpaid_policydiscount_policy %}
@@ -150,13 +182,25 @@
                 {% endif %}
             </li>
             <li>
+                {% if picsure_approved_policy %}
                 <a href="{{ url('user_policy_list') }}?_impersonate={{ picsure_approved_policy.user.email }}">User Policy List pic-sure Approved</a> <b>(auto impersonate {{ picsure_approved_policy.user.email }})</b>
+                {% else %}
+                    No pic-sure approved policy available
+                {% endif %}
             </li>
             <li>
+                {% if picsure_rejected_policy %}
                 <a href="{{ url('user_policy_list') }}?_impersonate={{ picsure_rejected_policy.user.email }}">User Policy List pic-sure Rejected</a> <b>(auto impersonate {{ picsure_rejected_policy.user.email }})</b>
+                {% else %}
+                    No pic-sure rejected policy available
+                {% endif %}
             </li>
             <li>
-                <a href="{{ url('user_policy_list') }}?_impersonate={{ non_picsure_policy.user.email }}">User Policy List non-pic-sure policy</a> <b>(auto impersonate {{ non_picsure_policy.user.email }})</b>
+                {% if non_picsure_policy %}
+                    <a href="{{ url('user_policy_list') }}?_impersonate={{ non_picsure_policy.user.email }}">User Policy List non-pic-sure policy</a> <b>(auto impersonate {{ non_picsure_policy.user.email }})</b>
+                {% else %}
+                    No non-picsure policy
+                {% endif %}
             </li>
         </ul>
 

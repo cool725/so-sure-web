@@ -6,6 +6,8 @@ use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
+use AppBundle\Service\PaymentService;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,7 +17,7 @@ use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\Policy;
 
-class ScheduledPaymentCommand extends ContainerAwareCommand
+class ScheduledPaymentCommand extends BaseCommand
 {
     protected function configure()
     {
@@ -81,12 +83,14 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
             $scheduledDate = new \DateTime($date);
         }
 
-        $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
+        /** @var LoggerInterface $logger */
         $logger = $this->getContainer()->get('logger');
+        /** @var PaymentService $paymentService */
         $paymentService = $this->getContainer()->get('app.payment');
         /** @var ScheduledPaymentRepository $repo */
-        $repo = $dm->getRepository(ScheduledPayment::class);
+        $repo = $this->getManager()->getRepository(ScheduledPayment::class);
         if ($id) {
+            /** @var ScheduledPayment $scheduledPayment */
             $scheduledPayment = $repo->find($id);
             $scheduledPayment = $paymentService->scheduledPayment(
                 $scheduledPayment,
@@ -98,12 +102,14 @@ class ScheduledPaymentCommand extends ContainerAwareCommand
             //\Doctrine\Common\Util\Debug::dump($scheduledPayment);
         } elseif ($policyNumber) {
             /** @var PolicyRepository $policyRepo */
-            $policyRepo = $dm->getRepository(Policy::class);
+            $policyRepo = $this->getManager()->getRepository(Policy::class);
+            /** @var Policy $policy */
             $policy = $policyRepo->findOneBy(['policyNumber' => $policyNumber]);
             if (!$policy) {
                 throw new \Exception(sprintf('Unable to find policy for %s', $policyNumber));
             }
             foreach ($policy->getScheduledPayments() as $scheduledPayment) {
+                /** @var ScheduledPayment $scheduledPayment */
                 $this->displayScheduledPayment($scheduledPayment, $output);
             }
         } else {

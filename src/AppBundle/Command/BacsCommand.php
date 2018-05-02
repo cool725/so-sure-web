@@ -11,6 +11,7 @@ use AppBundle\Document\ScheduledPayment;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\UserRepository;
 use AppBundle\Service\BacsService;
+use AppBundle\Service\MailerService;
 use AppBundle\Service\PaymentService;
 use AppBundle\Service\SequenceService;
 use Symfony\Component\Console\Input\InputInterface;
@@ -89,6 +90,7 @@ class BacsCommand extends BaseCommand
             $processingDate = $this->addBusinessDays($processingDate, 1);
         }
         $output->writeln(sprintf('Using processing date %s', $processingDate->format('d/M/Y')));
+        /** @var BacsService $bacsService */
         $bacsService = $this->getContainer()->get('app.bacs');
 
         if ($debug) {
@@ -109,6 +111,7 @@ class BacsCommand extends BaseCommand
         }
 
         if (!$skipEmail) {
+            /** @var MailerService $mailer */
             $mailer = $this->getContainer()->get('app.mailer');
             $mailer->send(
                 'Bacs File(s) Ready to Process',
@@ -130,7 +133,9 @@ class BacsCommand extends BaseCommand
         $debug = $input->getOption('debug');
         $prefix = $input->getArgument('prefix');
 
+        /** @var BacsService $bacsService */
         $bacsService = $this->getContainer()->get('app.bacs');
+        /** @var SequenceService $sequenceService */
         $sequenceService = $this->getContainer()->get('app.sequence');
         $serialNumber = $sequenceService->getSequenceId(SequenceService::SEQUENCE_BACS_SERIAL_NUMBER);
         $serialNumber = sprintf("S-%06d", $serialNumber);
@@ -201,7 +206,9 @@ class BacsCommand extends BaseCommand
         $debug = $input->getOption('debug');
         $prefix = $input->getArgument('prefix');
 
+        /** @var BacsService $bacsService */
         $bacsService = $this->getContainer()->get('app.bacs');
+        /** @var SequenceService $sequenceService */
         $sequenceService = $this->getContainer()->get('app.sequence');
         $serialNumber = $sequenceService->getSequenceId(SequenceService::SEQUENCE_BACS_SERIAL_NUMBER);
         $serialNumber = sprintf("S-%06d", $serialNumber);
@@ -251,8 +258,9 @@ class BacsCommand extends BaseCommand
     }
 
     /**
-     * @param $data
-     * @param $filename
+     * @param mixed   $data
+     * @param string  $filename
+     * @param boolean $debit
      * @return mixed
      * @throws \Exception
      */

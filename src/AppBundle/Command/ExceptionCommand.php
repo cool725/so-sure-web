@@ -23,6 +23,7 @@ class ExceptionCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        /** @var mixed $user */
         $user = new User();
         $user->email;
         // new \Exception('Test Exception');

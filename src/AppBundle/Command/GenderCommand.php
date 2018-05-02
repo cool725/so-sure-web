@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Service\GenderizeService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -42,6 +43,7 @@ class GenderCommand extends ContainerAwareCommand
     {
         $process = $input->getOption('process');
         $threshold = $input->getOption('threshold');
+        /** @var GenderizeService $gender */
         $gender = $this->getContainer()->get('app.gender');
         $data = $gender->run($process, $threshold);
         $output->write(json_encode($data, JSON_PRETTY_PRINT));

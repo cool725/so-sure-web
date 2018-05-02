@@ -43,13 +43,13 @@ class ReceperioService extends BaseImeiService
     /** @var string */
     protected $storeId;
 
-    /** @var string */
+    /** @var string|null */
     protected $certId;
 
     /** @var string */
     protected $environment;
 
-    /** @var string */
+    /** @var string|null */
     protected $responseData;
 
     protected $isTestRun;
@@ -63,7 +63,7 @@ class ReceperioService extends BaseImeiService
 
     protected $makeModelValidatedStatus;
 
-    /** @var IdentityLog */
+    /** @var IdentityLog|null */
     private $identityLog;
 
     public function setMakeModelValidatedStatus($makeModelValidatedStatus)
@@ -202,9 +202,11 @@ class ReceperioService extends BaseImeiService
                 $user = null;
                 $userRepo = $this->dm->getRepository(User::class);
                 if (isset($data['userId'])) {
+                    /** @var User $user */
                     $user = $userRepo->find($data['userId']);
                 }
                 $phoneRepo = $this->dm->getRepository(Phone::class);
+                /** @var Phone $phone */
                 $phone = $phoneRepo->find($data['phoneId']);
                 if (!$phone) {
                     throw new \Exception(sprintf('Unknown phone from queue %s', json_encode($data)));
@@ -641,12 +643,12 @@ class ReceperioService extends BaseImeiService
     /**
      * Validate that the serial number matches the expected phone details
      *
-     * @param Phone       $phone
-     * @param string      $serialNumber
-     * @param string      $imei
-     * @param User        $user
-     * @param IdentityLog $identityLog
-     * @param boolean     $warnMismatch For web, we don't need to warn on mismatch as probably user issue
+     * @param Phone            $phone
+     * @param string           $serialNumber
+     * @param string|null      $imei
+     * @param User             $user
+     * @param IdentityLog|null $identityLog
+     * @param boolean          $warnMismatch For web, we don't need to warn on mismatch as probably user issue
      *
      * @return boolean True if imei is ok
      */
@@ -768,8 +770,8 @@ class ReceperioService extends BaseImeiService
 
     /**
      *
-     * @param string  $data
-     * @param boolean $isTestRun
+     * @param string|null $data
+     * @param boolean     $isTestRun
      *
      * Sets response data for test cases to mimic recipero service response
      *

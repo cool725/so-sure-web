@@ -9,8 +9,11 @@ class AlphanumericValidator extends ConstraintValidator
 {
     public function validate($value, Constraint $constraint)
     {
+        /** @var Alphanumeric $alphanumericContraint */
+        $alphanumericContraint = $constraint;
+
         if (!preg_match($this->getRegex(), $value, $matches)) {
-            $this->context->buildViolation($constraint->message)
+            $this->context->buildViolation($alphanumericContraint->message)
                 ->setParameter('%string%', $value)
                 ->addViolation();
         }

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Service\DaviesService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -45,7 +46,7 @@ class DaviesCommand extends ContainerAwareCommand
                 'max-parse-errors',
                 null,
                 InputOption::VALUE_REQUIRED,
-                0
+                'Max number of errrors'
             )
         ;
     }
@@ -66,6 +67,7 @@ class DaviesCommand extends ContainerAwareCommand
                 json_encode(DaviesClaim::$sheetNames)
             ));
         }
+        /** @var DaviesService $davies */
         $davies = $this->getContainer()->get('app.davies');
         if ($isDaily) {
             $count = $davies->claimsDailyEmail();

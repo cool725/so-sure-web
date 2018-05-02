@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 
-class PhoneSearchType extends AbstractType
+class PhoneSearchType extends BaseType
 {
     /**
      * @var RequestStack
@@ -65,9 +65,9 @@ class PhoneSearchType extends AbstractType
         $currentRequest = $this->requestStack->getCurrentRequest();
         $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) use ($currentRequest) {
             $form = $event->getForm();
-            $form->get('os')->setData($currentRequest->query->get('os'));
-            $form->get('active')->setData($currentRequest->query->get('active'));
-            $form->get('rules')->setData($currentRequest->query->get('rules'));
+            $this->formQuerystring($form, $currentRequest, 'os');
+            $this->formQuerystring($form, $currentRequest, 'active');
+            $this->formQuerystring($form, $currentRequest, 'rules');
         });
     }
 

@@ -13,7 +13,7 @@ use Faker;
 class LoadTrainingVersionsInfoData implements FixtureInterface, ContainerAwareInterface
 {
      /**
-     * @var ContainerInterface
+     * @var ContainerInterface|null
      */
     private $container;
 

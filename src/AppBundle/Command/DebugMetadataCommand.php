@@ -9,6 +9,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Classes\Premium;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class DebugMetadataCommand extends ContainerAwareCommand
 {
@@ -28,7 +29,9 @@ class DebugMetadataCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $name = $input->getArgument('name');
-        $metadata = $this->getContainer()->get('validator')->getMetadataFor($name);
+        /** @var ValidatorInterface $validator */
+        $validator = $this->getContainer()->get('validator');
+        $metadata = $validator->getMetadataFor($name);
         print_r($metadata);
     }
 }

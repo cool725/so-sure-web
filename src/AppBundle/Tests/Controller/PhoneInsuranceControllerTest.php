@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Controller;
 use AppBundle\Document\Phone;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\Invitation\EmailInvitation;
+use Doctrine\ODM\MongoDB\DocumentManager;
 
 /**
  * @group functional-net
@@ -30,6 +31,7 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
     public function testPhoneSearchPhoneInsuranceByPhoneId()
     {
         $phoneRepo = self::$dm->getRepository(Phone::class);
+        /** @var Phone $phone */
         $phone =  $phoneRepo->findOneBy(['make' => 'Apple', 'model' => 'iPhone 7']);
         $url = sprintf('/phone-insurance/%s', $phone->getId());
         $redirectUrl = sprintf(
@@ -81,7 +83,7 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
 
     public function testPhoneSearchLearnMore()
     {
-        $alternate = null;
+        $alternate = [];
         $crawler = self::$client->request('GET', '/phone-insurance/Apple+iPhone+7+256GB/learn-more');
         $data = self::$client->getResponse();
         $this->assertEquals(200, $data->getStatusCode());
@@ -101,6 +103,7 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
     {
         //make sure phone is highlighted
         $phoneRepo = self::$dm->getRepository(Phone::class);
+        /** @var Phone $phone */
         $phone = $phoneRepo->findOneBy(['make' => 'Samsung', 'active' => true]);
         $phone->setHighlight(true);
         self::$dm->flush();
@@ -114,6 +117,7 @@ class PhoneInsuranceControllerTest extends BaseControllerTest
     {
         //make sure phone is
         $phoneRepo = self::$dm->getRepository(Phone::class);
+        /** @var Phone $phone */
         $phone = $phoneRepo->findOneBy(['make' => 'Samsung', 'active' => true]);
         $phone->setHighlight(true);
         self::$dm->flush();

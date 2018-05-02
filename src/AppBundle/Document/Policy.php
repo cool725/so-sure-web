@@ -213,21 +213,12 @@ abstract class Policy
     protected $paymentType;
 
     /**
-     * @MongoDB\Field(type="string")
-     */
-    protected $gocardlessMandate;
-
-    /**
-     * @MongoDB\Field(type="string")
-     */
-    protected $gocardlessSubscription;
-
-    /**
      * @MongoDB\ReferenceMany(
      *  targetDocument="AppBundle\Document\Invitation\Invitation",
      *  mappedBy="policy",
      *  cascade={"persist"}
      * )
+     * @var ArrayCollection
      */
     protected $invitations;
 
@@ -241,7 +232,7 @@ abstract class Policy
     /**
      * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\Cashback", cascade={"persist"}, orphanRemoval="true")
      * @Gedmo\Versioned
-     * @var Cashback
+     * @var Cashback|null
      */
     protected $cashback;
 
@@ -498,6 +489,8 @@ abstract class Policy
 
     /**
      * Although rare, payments can include refunds
+     *
+     * @return array
      */
     public function getPayments()
     {
@@ -726,7 +719,7 @@ abstract class Policy
     }
 
     /**
-     * @return Cashback
+     * @return Cashback|null
      */
     public function getCashback()
     {
@@ -735,7 +728,7 @@ abstract class Policy
 
     public function hasCashback()
     {
-        return $this->getCashback() !== null;
+        return $this->getCashback() != null;
     }
 
     public function setCashback($cashback)
@@ -923,7 +916,7 @@ abstract class Policy
         return $this->end;
     }
 
-    public function setEnd(\DateTime $end)
+    public function setEnd(\DateTime $end = null)
     {
         $this->end = $end;
     }
@@ -1023,26 +1016,6 @@ abstract class Policy
     public function setPaymentType($paymentType)
     {
         $this->paymentType = $paymentType;
-    }
-
-    public function getGocardlessMandate()
-    {
-        return $this->gocardlessMandate;
-    }
-
-    public function setGocardlessMandate($gocardlessMandate)
-    {
-        $this->gocardlessMandate = $gocardlessMandate;
-    }
-
-    public function getGocardlessSubscription()
-    {
-        return $this->gocardlessSubscription;
-    }
-
-    public function setGocardlessSubscription($gocardlessSubscription)
-    {
-        $this->gocardlessSubscription = $gocardlessSubscription;
     }
 
     public function addConnection(Connection $connection)
@@ -1416,6 +1389,9 @@ abstract class Policy
         $this->promoCode = $promoCode;
     }
 
+    /**
+     * @return ArrayCollection
+     */
     public function getInvitations()
     {
         return $this->invitations;
@@ -1702,7 +1678,7 @@ abstract class Policy
         return $nextDate;
     }
 
-    public function init(User $user, PolicyDocument $terms)
+    public function init(User $user, PolicyTerms $terms)
     {
         $user->addPolicy($this);
         if ($company = $user->getCompany()) {
@@ -1862,13 +1838,13 @@ abstract class Policy
         return $this->getPremiumInstallments();
     }
 
-    public function getPremiumInstallmentPrice($useAdjustedPrice = false)
+    public function getPremiumInstallmentPrice($useAdjustedPrice = false, $estimate = false)
     {
-        if (!$this->isPolicy()) {
+        if (!$this->isPolicy() && !$estimate) {
             return null;
         }
 
-        if (!$this->getPremiumInstallmentCount()) {
+        if (!$this->getPremiumInstallmentCount() && !$estimate) {
             return null;
         } elseif ($this->getPremiumPlan() == self::PLAN_YEARLY) {
             if ($useAdjustedPrice) {
@@ -2890,7 +2866,7 @@ abstract class Policy
 
     public function isPolicy()
     {
-        return $this->getStatus() !== null && $this->getPremium() !== null;
+        return $this->getStatus() != null && $this->getPremium() != null;
     }
 
     public function age()
@@ -3283,6 +3259,8 @@ abstract class Policy
         if ($date == null) {
             $date = new \DateTime();
         }
+        /** @var \DateTime $dateNotNull */
+        $dateNotNull = $date;
 
         if ($date < $this->getEnd()) {
             throw new \Exception('Unable to expire a policy prior to its end date');
@@ -3309,7 +3287,7 @@ abstract class Policy
             // Promo pot reward
             if ($this->greaterThanZero($this->getPromoPotValue())) {
                 $reward = new SoSurePotRewardPayment();
-                $reward->setDate(clone $date);
+                $reward->setDate(clone $dateNotNull);
                 $reward->setAmount($this->toTwoDp(0 - $this->getPromoPotValue()));
                 if ($this->isRenewalPending() || $this->isRenewed()) {
                     $reward->setNotes(sprintf(
@@ -3324,7 +3302,7 @@ abstract class Policy
 
             // Normal pot reward
             $reward = new PotRewardPayment();
-            $reward->setDate(clone $date);
+            $reward->setDate(clone $dateNotNull);
             $reward->setAmount($this->toTwoDp(0 - ($this->getStandardPotValue())));
             if ($this->isRenewalPending() || $this->isRenewed()) {
                 $reward->setNotes(sprintf(
@@ -3346,9 +3324,9 @@ abstract class Policy
                 ));
             }
 
-            if ($this->hasCashback()) {
+            if ($this->hasCashback() && $this->getCashback()) {
                 // TODO: Should we be checking cashback status?
-                $this->getCashback()->setDate(clone $date);
+                $this->getCashback()->setDate(clone $dateNotNull);
                 $this->getCashback()->setStatus(Cashback::STATUS_PENDING_CLAIMABLE);
                 $this->getCashback()->setAmount($this->getPotValue());
             } elseif ($this->isRenewalPending() || $this->isRenewed()) {
@@ -3357,7 +3335,7 @@ abstract class Policy
                 if ($this->getNextPolicy()->getStart()) {
                     $discount->setDate($this->getNextPolicy()->getStart());
                 } else {
-                    $discount->setDate(clone $date);
+                    $discount->setDate(clone $dateNotNull);
                 }
                 $discount->setNotes(sprintf(
                     '%0.2f salva / %0.2f so-sure marketing from pot reward (%s)',
@@ -3371,17 +3349,17 @@ abstract class Policy
                 // so money was in the pot but user has completely ignored
                 // create a cashback entry and try to find the user
                 $cashback = new Cashback();
-                $cashback->setDate(clone $date);
+                $cashback->setDate(clone $dateNotNull);
                 $cashback->setStatus(Cashback::STATUS_MISSING);
                 $cashback->setAmount($this->getPotValue());
                 $this->setCashback($cashback);
             }
         } else {
             // 0 pot value
-            if ($this->hasCashback()) {
+            if ($this->hasCashback() && $this->getCashback()) {
                 // If there's no money in the pot, then someone has claimed - so cashback is rejected
                 $this->getCashback()->setStatus(Cashback::STATUS_CLAIMED);
-                $this->getCashback()->setDate(clone $date);
+                $this->getCashback()->setDate(clone $dateNotNull);
             }
         }
 
@@ -3418,6 +3396,8 @@ abstract class Policy
         if ($date == null) {
             $date = new \DateTime();
         }
+        /** @var \DateTime $dateNotNull */
+        $dateNotNull = $date;
 
         if ($date < $this->getEnd()) {
             throw new \Exception('Unable to expire a policy prior to its end date');
@@ -3438,9 +3418,9 @@ abstract class Policy
 
             // we want the pot value up to date for email about delay
             $this->updatePotValue();
-            if ($this->hasCashback()) {
+            if ($this->hasCashback() && $this->getCashback()) {
                 $this->getCashback()->setAmount($this->getPotValue());
-                $this->getCashback()->setDate(clone $date);
+                $this->getCashback()->setDate(clone $dateNotNull);
             }
 
             return;
@@ -3458,7 +3438,7 @@ abstract class Policy
         if ($promoPotReward && !$this->areEqualToTwoDp($promoPotReward->getAmount(), $promoPotValue)) {
             // pot changed (due to claim) - issue refund if applicable
             $reward = new SoSurePotRewardPayment();
-            $reward->setDate(clone $date);
+            $reward->setDate(clone $dateNotNull);
             $reward->setAmount($this->toTwoDp($promoPotValue - $promoPotReward->getAmount()));
             $this->addPayment($reward);
         }
@@ -3468,15 +3448,15 @@ abstract class Policy
         if ($potReward && !$this->areEqualToTwoDp($potReward->getAmount(), $standardPotValue)) {
             // pot changed (due to claim) - issue refund if applicable
             $reward = new PotRewardPayment();
-            $reward->setDate(clone $date);
+            $reward->setDate(clone $dateNotNull);
             $reward->setAmount($this->toTwoDp($standardPotValue - $potReward->getAmount()));
             $this->addPayment($reward);
         }
 
         // Ensure cashback has the correct amount
-        if ($this->hasCashback()) {
+        if ($this->hasCashback() && $this->getCashback()) {
             $this->getCashback()->setAmount($this->getPotValue());
-            $this->getCashback()->setDate(clone $date);
+            $this->getCashback()->setDate(clone $dateNotNull);
         }
 
         if ($this->getNextPolicy()) {
@@ -3484,7 +3464,7 @@ abstract class Policy
             if ($discount && !$this->areEqualToTwoDp($discount->getAmount(), $this->getPotValue())) {
                 // pot changed (due to claim) - issue refund if applicable
                 $adjustedDiscount = new PolicyDiscountPayment();
-                $adjustedDiscount->setDate(clone $date);
+                $adjustedDiscount->setDate(clone $dateNotNull);
                 $adjustedDiscount->setAmount($this->toTwoDp($this->getPotValue() - $discount->getAmount()));
                 // @codingStandardsIgnoreStart
                 $adjustedDiscount->setNotes(sprintf(

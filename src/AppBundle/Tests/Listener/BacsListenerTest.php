@@ -8,6 +8,7 @@ use AppBundle\Event\BacsEvent;
 use AppBundle\Event\PolicyEvent;
 use AppBundle\Listener\BacsListener;
 use AppBundle\Service\BacsService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,6 +30,8 @@ class BacsListenerTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
+    /** @var DocumentManager */
+    protected static $dm;
     protected static $userRepo;
     protected static $redis;
     /** @var BacsService */
@@ -48,12 +51,18 @@ class BacsListenerTest extends WebTestCase
 
         //now we can instantiate our service (if you want a fresh one for
         //each test method, do this in setUp() instead
-        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        /** @var DocumentManager */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$dm = $dm;
         self::$userRepo = self::$dm->getRepository(User::class);
         self::$userManager = self::$container->get('fos_user.user_manager');
-        self::$bacsListener = self::$container->get('app.listener.bacs');
+        /** @var BacsListener $bacsListener */
+        $bacsListener = self::$container->get('app.listener.bacs');
+        self::$bacsListener = $bacsListener;
         self::$redis = self::$container->get('snc_redis.default');
-        self::$bacsService = self::$container->get('app.bacs');
+        /** @var BacsService $bacsService */
+        $bacsService = self::$container->get('app.bacs');
+        self::$bacsService = $bacsService;
     }
 
     public function tearDown()

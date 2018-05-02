@@ -93,7 +93,7 @@ class BankAccount
     /**
      * @MongoDB\EmbedOne(targetDocument="Address")
      * @Gedmo\Versioned
-     * @var Address
+     * @var Address|null
      */
     protected $bankAddress;
 
@@ -125,7 +125,7 @@ class BankAccount
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
-     * @var \DateTime
+     * @var \DateTime|null
      */
     protected $initialNotificationDate;
 
@@ -143,7 +143,7 @@ class BankAccount
      * @Assert\DateTime()
      * @MongoDB\Field(type="date")
      * @Gedmo\Versioned
-     * @var \DateTime
+     * @var \DateTime|null
      */
     protected $standardNotificationDate;
 
@@ -163,10 +163,19 @@ class BankAccount
      */
     protected $lastSuccessfulPaymentDate;
 
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     * @var boolean
+     */
+    protected $annual;
+
     public function __construct()
     {
         $this->setMandateStatus(self::MANDATE_PENDING_INIT);
         $this->created = new \DateTime();
+        $this->annual = false;
     }
 
     public function setAccountName($accountName)
@@ -357,6 +366,16 @@ class BankAccount
         $this->firstPayment = $firstPayment;
     }
 
+    public function isAnnual()
+    {
+        return $this->annual;
+    }
+
+    public function setAnnual($annual)
+    {
+        $this->annual = $annual;
+    }
+
     public function isMandateInProgress()
     {
         return !in_array($this->getMandateStatus(), [
@@ -543,6 +562,43 @@ class BankAccount
             $this->getDisplayableSortCode(),
             $this->getDisplayableAccountNumber()
         );
+    }
+
+    public function toApiArray()
+    {
+        $data = [
+            'bank_name' => $this->getBankName(),
+            'account_name' => $this->getAccountName(),
+            'displayable_sort_code' => $this->getDisplayableSortCode(),
+            'displayable_account_number' => $this->getDisplayableAccountNumber(),
+            'bank_address' => $this->getBankAddress() ? $this->getBankAddress()->toApiArray() : null,
+            'mandate' => $this->getReference(),
+            'mandate_status' => $this->getMandateStatus(),
+        ];
+
+        return $data;
+    }
+
+    public function toDetailsArray()
+    {
+        $data = [
+            'bank_name' => $this->getBankName(),
+            'account_name' => $this->getAccountName(),
+            'displayable_sort_code' => $this->getDisplayableSortCode(),
+            'displayable_account_number' => $this->getDisplayableAccountNumber(),
+            'bank_address' => $this->getBankAddress() ? $this->getBankAddress()->toApiArray() : null,
+            'mandate' => $this->getReference(),
+            'mandate_status' => $this->getMandateStatus(),
+            'mandate_serial_number' => $this->getMandateSerialNumber(),
+            'initial_date' => $this->getInitialPaymentSubmissionDate() ?
+                $this->getInitialPaymentSubmissionDate()->format(\DateTime::ATOM) :
+                null,
+            'monthly_day' => $this->getStandardNotificationDate() ?
+                $this->getStandardNotificationDate()->format('jS') :
+                null,
+        ];
+
+        return $data;
     }
 
     public static function create($accountName, $sortCode, $accountNumber, $reference)

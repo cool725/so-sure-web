@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use Predis\Client;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -52,6 +53,7 @@ class ApiResponseCommand extends ContainerAwareCommand
         $clear = true === $input->getOption('clear');
         $random = $input->getOption('random');
 
+        /** @var Client $redis */
         $redis = $this->getContainer()->get('snc_redis.default');
         if ($random) {
             $redis->set(ApiResponseSubscriber::KEY_RANDOM_FAILURE, $random);
@@ -61,8 +63,8 @@ class ApiResponseCommand extends ContainerAwareCommand
         }
         
         if ($clear) {
-            $redis->del(ApiResponseSubscriber::KEY_RANDOM_FAILURE);
-            $redis->del(ApiResponseSubscriber::KEY_HASH_PATH);
+            $redis->del([ApiResponseSubscriber::KEY_RANDOM_FAILURE]);
+            $redis->del([ApiResponseSubscriber::KEY_HASH_PATH]);
             $output->writeln('Cleared');
         } else {
             $output->writeln(sprintf("Response %s%%", $redis->get(ApiResponseSubscriber::KEY_RANDOM_FAILURE)));

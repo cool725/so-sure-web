@@ -9,6 +9,7 @@ use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\PolicyRepository;
 use Aws\S3\S3Client;
 use Gedmo\Loggable\Entity\Repository\LogEntryRepository;
+use Knp\Bundle\SnappyBundle\Snappy\LoggableGenerator;
 use Knp\Snappy\AbstractGenerator;
 use Knp\Snappy\GeneratorInterface;
 use Predis\Client;
@@ -86,7 +87,7 @@ class PolicyService
     /** @var RouterService */
     protected $routerService;
 
-    /** @var AbstractGenerator */
+    /** @var LoggableGenerator */
     protected $snappyPdf;
 
     /** @var EventDispatcherInterface */
@@ -176,7 +177,7 @@ class PolicyService
      * @param EngineInterface          $templating
      * @param RouterService            $routerService
      * @param string                   $environment
-     * @param GeneratorInterface       $snappyPdf
+     * @param LoggableGenerator        $snappyPdf
      * @param EventDispatcherInterface $dispatcher
      * @param S3Client                 $s3
      * @param ShortLinkService         $shortLink
@@ -200,7 +201,7 @@ class PolicyService
         EngineInterface $templating,
         RouterService $routerService,
         $environment,
-        GeneratorInterface $snappyPdf,
+        LoggableGenerator $snappyPdf,
         EventDispatcherInterface $dispatcher,
         S3Client $s3,
         ShortLinkService $shortLink,
@@ -323,6 +324,7 @@ class PolicyService
             $policy->setPhoneData($phoneData);
 
             $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
+            /** @var PolicyTerms $latestTerms */
             $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
             $policy->init($user, $latestTerms);
 
@@ -526,7 +528,7 @@ class PolicyService
     public function clearQueue($max = null)
     {
         if (!$max) {
-            $this->redis->del(self::KEY_POLICY_QUEUE);
+            $this->redis->del([self::KEY_POLICY_QUEUE]);
         } else {
             for ($i = 0; $i < $max; $i++) {
                 $this->redis->lpop(self::KEY_POLICY_QUEUE);
@@ -871,7 +873,7 @@ class PolicyService
         for ($i = 1; $i <= $numScheduledPayments; $i++) {
             $scheduledDate = clone $date;
             // initial purchase should start at 1 month from initial purchase
-            $scheduledDate->add(new \DateInterval(sprintf('P%dM', $isInitialPurchase ? $i : $i - 1)));
+            $scheduledDate->add(new \DateInterval(sprintf('P%dM', $numPaidPayments > 0 ? $i : $i - 1)));
 
             $scheduledPayment = new ScheduledPayment();
             $scheduledPayment->setStatus(ScheduledPayment::STATUS_SCHEDULED);
@@ -1608,7 +1610,7 @@ class PolicyService
             return null;
         }
 
-        if ($policy->hasCashback() && !in_array($policy->getCashback()->getStatus(), [
+        if ($policy->hasCashback() && $policy->getCashback() && !in_array($policy->getCashback()->getStatus(), [
                 Cashback::STATUS_MISSING,
                 Cashback::STATUS_FAILED,
                 Cashback::STATUS_PAID,
@@ -1792,6 +1794,7 @@ class PolicyService
     public function createPendingRenewal(Policy $policy, \DateTime $date = null)
     {
         $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
+        /** @var PolicyTerms $latestTerms */
         $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
         $newPolicy = $policy->createPendingRenewal($latestTerms, $date);
 
@@ -2005,6 +2008,7 @@ class PolicyService
         }
 
         $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
+        /** @var PolicyTerms $latestTerms */
         $latestTerms = $policyTermsRepo->findOneBy(['latest' => true]);
         $newPolicy = $policy->createRepurchase($latestTerms, $date);
 

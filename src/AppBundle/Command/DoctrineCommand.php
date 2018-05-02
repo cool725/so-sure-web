@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -10,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Classes\Premium;
 
-class DoctrineCommand extends ContainerAwareCommand
+class DoctrineCommand extends BaseCommand
 {
     protected function configure()
     {
@@ -22,9 +23,9 @@ class DoctrineCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
-        $dm->getSchemaManager()->ensureIndexes();
+        $this->getManager()->getSchemaManager()->ensureIndexes();
 
+        /** @var DocumentManager $censusDm */
         $censusDm = $this->getContainer()->get('doctrine_mongodb.odm.census_document_manager');
         $censusDm->getSchemaManager()->ensureIndexes();
     }

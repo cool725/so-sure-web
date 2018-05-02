@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Service\PCAService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -50,13 +51,15 @@ class AddressCommand extends ContainerAwareCommand
         $number = $input->getArgument('number');
         $useAddress = true === $input->getOption('address');
         $id = $input->getOption('id');
+        /** @var PCAService $address */
         $address = $this->getContainer()->get('app.address');
         if ($id) {
             $addressData = $address->retreive($id);
             $output->writeln(json_encode($addressData));
         } elseif ($useAddress) {
-            $addresses = $address->getAddress($postcode, $number);
-            $output->writeln(json_encode($addresses->toApiArray()));
+            if ($addresses = $address->getAddress($postcode, $number)) {
+                $output->writeln(json_encode($addresses->toApiArray()));
+            }
         } else {
             $addresses = $address->find($postcode, $number);
             $output->writeln(json_encode($addresses));

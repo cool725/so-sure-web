@@ -2,6 +2,9 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Repository\PhonePolicyRepository;
+use AppBundle\Service\RouterService;
+use Maknz\Slack\Client;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -10,8 +13,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
+use Symfony\Component\Routing\RouterInterface;
 
-class SlackCommand extends ContainerAwareCommand
+class SlackCommand extends BaseCommand
 {
     protected function configure()
     {
@@ -88,9 +92,10 @@ class SlackCommand extends ContainerAwareCommand
 
     private function cancelledAndPaymentOwed($channel, $skipSlack)
     {
+        /** @var RouterService $router */
         $router = $this->getContainer()->get('app.router');
-        $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
-        $repo = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicyRepository $repo */
+        $repo = $this->getManager()->getRepository(PhonePolicy::class);
         $policies = $repo->findAll();
 
         $lines = [];
@@ -122,14 +127,16 @@ class SlackCommand extends ContainerAwareCommand
 
     private function unpaid($channel, $skipSlack)
     {
+        /** @var RouterService $router */
         $router = $this->getContainer()->get('app.router');
-        $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
-        $repo = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicyRepository $repo */
+        $repo = $this->getManager()->getRepository(PhonePolicy::class);
         $policies = $repo->getUnpaidPolicies();
 
         $lines = [];
         $now = new \DateTime();
         foreach ($policies as $policy) {
+            /** @var Policy $policy */
             $diff = $now->diff($policy->getPolicyExpirationDate());
             if (!in_array($diff->days, [7, 14])) {
                 continue;
@@ -166,9 +173,10 @@ class SlackCommand extends ContainerAwareCommand
 
     private function renewals($channel, $skipSlack)
     {
+        /** @var RouterService $router */
         $router = $this->getContainer()->get('app.router');
-        $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
-        $repo = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicyRepository $repo */
+        $repo = $this->getManager()->getRepository(PhonePolicy::class);
         $policies = $repo->findBy(['status' => Policy::STATUS_DECLINED_RENEWAL]);
 
         $lines = [];
@@ -202,8 +210,7 @@ class SlackCommand extends ContainerAwareCommand
 
     private function policies($channel, $weeks, $skipSlack)
     {
-        $dm = $this->getContainer()->get('doctrine.odm.mongodb.document_manager');
-        $repo = $dm->getRepository(PhonePolicy::class);
+        $repo = $this->getManager()->getRepository(PhonePolicy::class);
 
         $weekText = '';
         $start = new \DateTime('2016-12-05');
@@ -264,6 +271,7 @@ class SlackCommand extends ContainerAwareCommand
 
     private function send($text, $channel)
     {
+        /** @var Client $slack */
         $slack = $this->getContainer()->get('nexy_slack.client');
         $message = $slack->createMessage();
         $message

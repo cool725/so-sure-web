@@ -1,0 +1,102 @@
+{% extends 'base.html.twig' %}
+
+{# Set vars #}
+{% set new_stylesheet = 1 %}
+{% set distraction_free = 1 %}
+{% set new_footer = 1 %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets output='css/*.css'
+        '@AppBundle/Resources/public/sass/page/checkout.scss'
+    %}
+        <link rel="stylesheet" href="{{ asset_url }}">
+    {% endstylesheets %}
+{% endblock %}
+
+{% block body %}
+
+{% include 'AppBundle::Default/loadingWidget.html.twig' with { 'class': ''} %}
+<section id="purchase-step-payment" class="checkout">
+
+    {% include 'AppBundle::Purchase/purchaseNav.html.twig' %}
+
+    <div class="checkout--top">
+        <div class="container text-center">
+            <h1>Setup a Direct Debit with SO-SURE <br> <small> for your {{ policy.phone.make }} {{ policy.phone.model }}  ({{ policy.phone.memory }}GB) insurance</small></h1>
+            <p><img src="{{ cdn_url }}/images/direct-debit-logo.svg" alt="Direct Debit" width="180px" class="img-center"></p>
+            <p><a href="#" class="web-pay-submit">Prefer to pay by card?</a></p>
+
+        </div>
+    </div>
+
+    <div class="checkout--step">
+        <div class="container">
+            <p class="text-center"><small>Please enter your bank details you wish to use for your Direct Debit each month.</small></p>
+
+            {{ form_start(bacs_form, {'attr': {'class': 'form','autocomplete': 'off'}}) }}
+                <div class="form-group {% if form_errors(bacs_form.accountName) %}has-error{% endif %}">
+                    {{ form_widget(bacs_form.accountName, {'attr': {'placeholder': 'Name on account', 'class': 'form-control'}}) }}
+                    {% if form_errors(bacs_form.accountName) %}
+                        <div class="help-block with-errors">{{ form_errors(bacs_form.accountName) }}</div>
+                    {% else %}
+                        <span class="help-block">The bank account must be in the policy holder's name "{{ app.user.name }}"</span>
+                    {% endif %}
+                </div>
+                <div class="form-group {% if form_errors(bacs_form.sortCode) %}has-error{% endif %}">
+                    {{ form_widget(bacs_form.sortCode, {'attr': {'placeholder': 'Sort code', 'class': 'form-control sort-code', 'maxlength': 6}}) }}
+                    <div class="help-block with-errors">{{ form_errors(bacs_form.sortCode) }}</div>
+                </div>
+                <div class="form-group {% if form_errors(bacs_form.accountNumber) %}has-error{% endif %}">
+                    {{ form_widget(bacs_form.accountNumber, {'attr': {'placeholder': 'Account number', 'class': 'form-control', 'maxlength': 8}}) }}
+                    <div class="help-block with-errors">{{ form_errors(bacs_form.accountNumber) }}</div>
+                </div>
+                <div class="form-group {% if form_errors(bacs_form.soleSignature) %}has-error{% endif %}">
+                    {{ form_widget(bacs_form.soleSignature, {'attr': {'class': ''}}) }}
+                    {{ form_label(bacs_form.soleSignature) }}
+                    <div class="help-block with-errors">{{ form_errors(bacs_form.soleSignature) }}</div>
+                </div>
+                <div class="form-group">
+                    {{ form_widget(bacs_form.save, {'label': 'Continue', 'attr': {'class': 'btn btn-green btn-block btn-pad'}}) }}
+                </div>
+                <div class="form-group">
+                    <a href="{{ path('purchase_step_policy_id', {'id': policy.id}) }}" class="btn btn-blue-hollow btn-block btn-pad">
+                        Back
+                    </a>
+                </div>
+                <p><small>Your payments are protected by the <a href="#" data-toggle="modal" data-target="#modal-dd" class="text-nowrap">Direct Debit Guarantee</a></small>.</p>
+                <address>
+                    <strong>SO-SURE Limited</strong><br>
+                    10 Finsbury Square, London EC2A 1AF, GB<br>
+                    +44 330 223 4948, <a href="mailto:hello@wearesosure.com">hello@wearesosure.com</a>
+                </address>
+                <img src="{{ cdn_url }}/images/direct-debit-logo.svg" alt="Direct Debit" width="100px">
+            {{ form_end(bacs_form) }}
+
+            <form action="{{ webpay_action }}" method="post" id="webpay-form">
+                <input id="Reference" name="Reference" type="hidden" value="{{ webpay_reference }}">
+            </form>
+        </div>
+    </div>
+
+
+</section>
+
+{% include 'AppBundle::Default/directDebitGuaranteeModal.html.twig' %}
+
+
+{# End Page Modals #}
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    'components/owl.carousel/owl.carousel.min.js'
+    'components/jquery-mask-plugin/jquery.mask.min.js'
+    'components/jquery-validation/jquery.validate.min.js'
+    '@AppBundle/Resources/public/js/Default/jqueryValidatorMethods.js'
+    '@AppBundle/Resources/public/js/Purchase/purchaseStep.js'
+    '@AppBundle/Resources/public/js/Purchase/purchaseStepPayment.js' %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}

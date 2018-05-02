@@ -520,6 +520,79 @@ class DaviesClaimTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V6));
     }
 
+    public function testRepairedImei()
+    {
+        // @codingStandardsIgnoreStart
+        $data = [
+            'So-Sure -Mobile',
+            '320170109000912',
+            'Mr Steve Morrison',
+            'TR11 2HR',
+            '21/12/2016',
+            '03/11/2016',
+            '02/11/2017',
+            'Accidental Damage - Dropped In Water',
+            'The insured went out for lunch and fell off his motorbike. The insureds phone was in his pocket and this got damage. The screen has got lines across and the back of the phone has completely shattered.',
+            'In Street',
+            'Open',
+            '',
+            'TBC',
+            'Samsung',
+            'NA - repaired',
+            'NA - repaired',
+            'TBC',
+            '£0.01',
+            '£700.00',
+            '£0.02',
+            '£0.03',
+            '£0.04',
+            '£0.05',
+            '£1.08',
+            '£0.06',
+            '£0.26',
+            '£700.26',
+            '-£35.00',
+            '£15.00',
+            '£50.00',
+            'Mob/2016/5500048',
+            '09/01/2017',
+            '09/01/2017',
+            'TBC',
+            'Discount Tyres Redruth Ltd, School Lane, TR15 2DU',
+            '£700.26',
+            'red',
+            '10',
+            'Ok',
+            'Suspicious'
+        ];
+        // @codingStandardsIgnoreEnd
+
+        $davies = new DaviesClaim();
+        $davies->fromArray($data, DaviesClaim::COLUMN_COUNT_V8);
+        $this->assertEquals(new \DateTime('2017-11-02'), $davies->endDate);
+        $this->assertEquals(new \DateTime('2016-11-03'), $davies->startDate);
+
+        $this->assertEquals(1.08, $davies->reciperoFee);
+        $this->assertEquals(700.26, $davies->reserved);
+        $this->assertEquals(50, $davies->excess);
+        $this->assertEquals(15, $davies->handlingFees);
+        $this->assertEquals(0.06, $davies->transactionFees);
+        $this->assertEquals(0.01, $davies->phoneReplacementCost);
+        $this->assertEquals(0.02, $davies->accessories);
+        $this->assertEquals(0.04, $davies->unauthorizedCalls);
+        $this->assertEquals(-35, $davies->incurred);
+
+        $this->assertNull($davies->replacementImei);
+        $this->assertEquals(0, count($davies->unobtainableFields));
+        $this->assertTrue($davies->isReplacementRepaired());
+        $this->assertNull($davies->replacementImei);
+        $this->assertEquals('Samsung', $davies->replacementMake);
+        $this->assertEquals('NA - repaired', $davies->replacementModel);
+        $this->assertEquals('red', $davies->risk);
+        $this->assertFalse($davies->initialSuspicion);
+        $this->assertTrue($davies->finalSuspicion);
+    }
+
     /**
      * @expectedException \Exception
      */
@@ -702,23 +775,107 @@ class DaviesClaimTest extends \PHPUnit\Framework\TestCase
         $davies = new DaviesClaim();
         $davies->lossType = "Loss - From Pocket";
         $this->assertEquals(Claim::TYPE_LOSS, $davies->getClaimType());
-        $this->assertEquals(70, $davies->getExpectedExcess());
+        $this->assertEquals(70, $davies->getExpectedExcess(false, false));
+        $this->assertEquals(70, $davies->getExpectedExcess(true, false));
+        $this->assertEquals(70, $davies->getExpectedExcess(true, true));
+        $this->assertEquals(150, $davies->getExpectedExcess(false, true));
 
         $davies->lossType = "Warranty - Audio Fault";
         $this->assertEquals(Claim::TYPE_WARRANTY, $davies->getClaimType());
-        $this->assertEquals(50, $davies->getExpectedExcess());
+        $this->assertEquals(50, $davies->getExpectedExcess(false, false));
+        $this->assertEquals(50, $davies->getExpectedExcess(true, false));
+        $this->assertEquals(50, $davies->getExpectedExcess(true, true));
+        $this->assertEquals(150, $davies->getExpectedExcess(false, true));
 
         $davies->lossType = "Accidental Damage - Dropped (Away From Home)   ";
         $this->assertEquals(Claim::TYPE_DAMAGE, $davies->getClaimType());
-        $this->assertEquals(50, $davies->getExpectedExcess());
+        $this->assertEquals(50, $davies->getExpectedExcess(false, false));
+        $this->assertEquals(50, $davies->getExpectedExcess(true, false));
+        $this->assertEquals(50, $davies->getExpectedExcess(true, true));
+        $this->assertEquals(150, $davies->getExpectedExcess(false, true));
 
         $davies->lossType = "Theft - From Pocket";
         $this->assertEquals(Claim::TYPE_THEFT, $davies->getClaimType());
-        $this->assertEquals(70, $davies->getExpectedExcess());
+        $this->assertEquals(70, $davies->getExpectedExcess(false, false));
+        $this->assertEquals(70, $davies->getExpectedExcess(true, false));
+        $this->assertEquals(70, $davies->getExpectedExcess(true, true));
+        $this->assertEquals(150, $davies->getExpectedExcess(false, true));
 
         $davies->lossType = "Extended Warranty - Audio Fault";
         $this->assertEquals(Claim::TYPE_EXTENDED_WARRANTY, $davies->getClaimType());
-        $this->assertEquals(50, $davies->getExpectedExcess());
+        $this->assertEquals(50, $davies->getExpectedExcess(false, false));
+        $this->assertEquals(50, $davies->getExpectedExcess(true, false));
+        $this->assertEquals(50, $davies->getExpectedExcess(true, true));
+        $this->assertEquals(150, $davies->getExpectedExcess(false, true));
+    }
+
+    public function testClaimsExcess()
+    {
+        $davies = new DaviesClaim();
+        $davies->lossType = "Loss - From Pocket";
+        $davies->excess = 70;
+        $this->assertEquals(Claim::TYPE_LOSS, $davies->getClaimType());
+        $this->assertTrue($davies->isExcessValueCorrect(false, false));
+        $this->assertTrue($davies->isExcessValueCorrect(true, false));
+        $this->assertTrue($davies->isExcessValueCorrect(true, true));
+        $this->assertFalse($davies->isExcessValueCorrect(false, true));
+        $davies->excess = 150;
+        $this->assertTrue($davies->isExcessValueCorrect(false, true));
+        $davies->excess = -150;
+        $this->assertTrue($davies->isExcessValueCorrect(false, true, true));
+        $this->assertFalse($davies->isExcessValueCorrect(false, true, false));
+
+        $davies->lossType = "Warranty - Audio Fault";
+        $davies->excess = 50;
+        $this->assertEquals(Claim::TYPE_WARRANTY, $davies->getClaimType());
+        $this->assertTrue($davies->isExcessValueCorrect(false, false));
+        $this->assertTrue($davies->isExcessValueCorrect(true, false));
+        $this->assertTrue($davies->isExcessValueCorrect(true, true));
+        $this->assertFalse($davies->isExcessValueCorrect(false, true));
+        $davies->excess = 150;
+        $this->assertTrue($davies->isExcessValueCorrect(false, true));
+        $davies->excess = -150;
+        $this->assertTrue($davies->isExcessValueCorrect(false, true, true));
+        $this->assertFalse($davies->isExcessValueCorrect(false, true, false));
+
+        $davies->lossType = "Accidental Damage - Dropped (Away From Home)   ";
+        $davies->excess = 50;
+        $this->assertEquals(Claim::TYPE_DAMAGE, $davies->getClaimType());
+        $this->assertTrue($davies->isExcessValueCorrect(false, false));
+        $this->assertTrue($davies->isExcessValueCorrect(true, false));
+        $this->assertTrue($davies->isExcessValueCorrect(true, true));
+        $this->assertFalse($davies->isExcessValueCorrect(false, true));
+        $davies->excess = 150;
+        $this->assertTrue($davies->isExcessValueCorrect(false, true));
+        $davies->excess = -150;
+        $this->assertTrue($davies->isExcessValueCorrect(false, true, true));
+        $this->assertFalse($davies->isExcessValueCorrect(false, true, false));
+
+        $davies->lossType = "Theft - From Pocket";
+        $davies->excess = 70;
+        $this->assertEquals(Claim::TYPE_THEFT, $davies->getClaimType());
+        $this->assertTrue($davies->isExcessValueCorrect(false, false));
+        $this->assertTrue($davies->isExcessValueCorrect(true, false));
+        $this->assertTrue($davies->isExcessValueCorrect(true, true));
+        $this->assertFalse($davies->isExcessValueCorrect(false, true));
+        $davies->excess = 150;
+        $this->assertTrue($davies->isExcessValueCorrect(false, true));
+        $davies->excess = -150;
+        $this->assertTrue($davies->isExcessValueCorrect(false, true, true));
+        $this->assertFalse($davies->isExcessValueCorrect(false, true, false));
+
+        $davies->lossType = "Extended Warranty - Audio Fault";
+        $davies->excess = 50;
+        $this->assertEquals(Claim::TYPE_EXTENDED_WARRANTY, $davies->getClaimType());
+        $this->assertTrue($davies->isExcessValueCorrect(false, false));
+        $this->assertTrue($davies->isExcessValueCorrect(true, false));
+        $this->assertTrue($davies->isExcessValueCorrect(true, true));
+        $this->assertFalse($davies->isExcessValueCorrect(false, true));
+        $davies->excess = 150;
+        $this->assertTrue($davies->isExcessValueCorrect(false, true));
+        $davies->excess = -150;
+        $this->assertTrue($davies->isExcessValueCorrect(false, true, true));
+        $this->assertFalse($davies->isExcessValueCorrect(false, true, false));
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Controller;
 
+use AppBundle\Document\LostPhone;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
@@ -11,6 +12,7 @@ use AppBundle\Document\Lead;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\CurrencyTrait;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 use AppBundle\Classes\Salva;
 use AppBundle\Classes\ApiErrorCode;
@@ -30,6 +32,7 @@ class PurchaseControllerTest extends BaseControllerTest
 
     const SEARCH_URL1_TEMPLATE = '/phone-insurance/%s';
     const SEARCH_URL2_TEMPLATE = '/phone-insurance/%s+%sGB';
+    const LOSTSTOLEN_IMEI = '351451208401216';
 
 
     public function tearDown()
@@ -245,6 +248,7 @@ class PurchaseControllerTest extends BaseControllerTest
     public function testPurchasePhoneImeiSpaceNineSixtyEightNew()
     {
         $phoneRepo = static::$dm->getRepository(Phone::class);
+        /** @var Phone $phone */
         $phone = $phoneRepo->findOneBy(['devices' => 'zeroflte', 'memory' => 128]);
         //$phone = self::getRandomPhone(static::$dm);
 
@@ -289,6 +293,31 @@ class PurchaseControllerTest extends BaseControllerTest
 
         self::verifyResponse(200);
         $this->verifyPurchaseReady($crawler);
+    }
+
+    public function testPurchasePhoneLostImei()
+    {
+        $lostPhone = new LostPhone();
+        $lostPhone->setImei(self::LOSTSTOLEN_IMEI);
+        self::$dm->persist($lostPhone);
+        self::$dm->flush();
+
+        $phone = $this->setRandomPhone();
+
+        $crawler = $this->createPurchaseNew(
+            self::generateEmail('testPurchasePhoneLostImei', $this),
+            'foo bar',
+            new \DateTime('1980-01-01')
+        );
+
+        self::verifyResponse(302);
+        $this->assertTrue(self::$client->getResponse()->isRedirect('/purchase/step-policy'));
+
+        $crawler = $this->setPhoneNew($phone, self::LOSTSTOLEN_IMEI);
+
+        self::verifyResponse(200);
+        $this->expectFlashError($crawler, 'Sorry, it looks this phone is already insured');
+        $this->verifyPurchaseNotReady($crawler);
     }
 
     public function testPurchaseChangePhone()
@@ -808,6 +837,12 @@ class PurchaseControllerTest extends BaseControllerTest
     {
         $form = $crawler->filterXPath('//form[@id="webpay-form"]')->form();
         $this->assertContains('judopay', $form->getUri());
+    }
+
+    private function verifyPurchaseNotReady($crawler)
+    {
+        $form = $crawler->filterXPath('//form[@id="webpay-form"]')->form();
+        $this->assertNotContains('judopay', $form->getUri());
     }
 
     private function setPhone($phone, $imei = null, $agreed = 1)

@@ -2,6 +2,8 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Service\MailerService;
+use AppBundle\Service\PolicyService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -41,9 +43,11 @@ class DaviesBreakdownCommand extends ContainerAwareCommand
             unlink($tmpFile);
         }
 
+        /** @var PolicyService $policyService */
         $policyService = $this->getContainer()->get('app.policy');
         $policyService->getBreakdownPdf($tmpFile);
 
+        /** @var MailerService $mailer */
         $mailer = $this->getContainer()->get('app.mailer');
         $mailer->sendTemplate(
             sprintf('so-sure Policy Breakdown Report'),

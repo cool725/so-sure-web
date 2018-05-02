@@ -8,7 +8,7 @@ use Swift_Events_SendListener;
 
 class MailerListener implements Swift_Events_SendListener
 {
-    /** @var LoggerInterface */
+    /** @var LoggerInterface|null */
     protected $logger;
     protected $spoolPath;
     

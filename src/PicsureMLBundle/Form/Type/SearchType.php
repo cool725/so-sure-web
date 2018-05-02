@@ -2,6 +2,7 @@
 
 namespace PicsureMLBundle\Form\Type;
 
+use AppBundle\Form\Type\BaseType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -15,7 +16,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 
-class SearchType extends AbstractType
+class SearchType extends BaseType
 {
     /**
      * @var RequestStack
@@ -77,21 +78,9 @@ class SearchType extends AbstractType
         $currentRequest = $this->requestStack->getCurrentRequest();
         $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) use ($currentRequest) {
             $form = $event->getForm();
-            if ($currentRequest->query->get('version')) {
-                $form->get('version')->setData($currentRequest->query->get('version'));
-            } else {
-                $form->get('version')->setData(null);
-            }
-            if ($currentRequest->query->get('label')) {
-                $form->get('label')->setData($currentRequest->query->get('label'));
-            } else {
-                $form->get('label')->setData(null);
-            }
-            if ($currentRequest->query->get('images_per_page')) {
-                $form->get('images_per_page')->setData($currentRequest->query->get('images_per_page'));
-            } else {
-                $form->get('images_per_page')->setData(32);
-            }
+            $this->formQuerystring($form, $currentRequest, 'version', true);
+            $this->formQuerystring($form, $currentRequest, 'label', true);
+            $this->formQuerystring($form, $currentRequest, 'images_per_page', true, 32);
         });
     }
 

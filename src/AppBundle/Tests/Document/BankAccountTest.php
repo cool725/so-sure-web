@@ -300,7 +300,7 @@ class BankAccountTest extends \PHPUnit\Framework\TestCase
 
         // lastSuccessfulPaymentDate
         $date = $date->add(new \DateInterval('P1M'));
-        $bankAccount->getLastSuccessfulPaymentDate($date);
+        $bankAccount->getLastSuccessfulPaymentDate();
         $this->assertFalse($bankAccount->shouldCancelMandate());
         $this->assertFalse($bankAccount->shouldCancelMandate(new \DateTime('2016-01-01')));
         $this->assertFalse($bankAccount->shouldCancelMandate($thirteenMonths));

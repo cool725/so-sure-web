@@ -3,6 +3,9 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Repository\PhoneRepository;
+use AppBundle\Service\QuoteService;
+use Doctrine\ODM\MongoDB\Query\Builder;
+use Doctrine\ORM\QueryBuilder;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -222,14 +225,15 @@ abstract class BaseController extends Controller
      * Get the best matching phone.
      * Assuming that memory will be a bit less than actual advertised size, but find the closest matching
      *
-     * @param string $make
-     * @param string $device see googe play device list (or apple phone list)
-     * @param float  $memory in gb
+     * @param string|null $make
+     * @param string      $device see googe play device list (or apple phone list)
+     * @param float       $memory in gb
      *
      * @return Phone|null
      */
     protected function getPhone($make, $device, $memory, $ignoreMake = false)
     {
+        /** @var QuoteService $quoteService */
         $quoteService = $this->get('app.quote');
         $quotes = $quoteService->getQuotes($make, $device, null, null, $ignoreMake);
         $phones = $quotes['phones'];
@@ -259,12 +263,12 @@ abstract class BaseController extends Controller
      * Page results
      *
      * @param Request $request
-     * @param         $qb
+     * @param Builder $qb
      * @param integer $maxPerPage
      *
      * @return Pagerfanta
      */
-    protected function pager(Request $request, $qb, $maxPerPage = 50)
+    protected function pager(Request $request, Builder $qb, $maxPerPage = 50)
     {
         $adapter = new DoctrineODMMongoDBAdapter($qb);
         $pagerfanta = new Pagerfanta($adapter);
@@ -278,7 +282,7 @@ abstract class BaseController extends Controller
      * Page results
      *
      * @param Request $request
-     * @param         $qb
+     * @param array   $array
      * @param integer $maxPerPage
      *
      * @return Pagerfanta
@@ -345,7 +349,7 @@ abstract class BaseController extends Controller
     /**
      * Return a standard json error message
      *
-     * @param string  $errorCode
+     * @param integer $errorCode
      * @param string  $description
      * @param integer $httpCode
      *
@@ -701,17 +705,19 @@ abstract class BaseController extends Controller
 
     /**
      * @param Request $request
-     * @return null|Phone
+     * @return Phone|null
      */
     protected function getSessionQuotePhone(Request $request)
     {
-        $session = $request->getSession();
         $dm = $this->getManager();
         /** @var PhoneRepository $phoneRepo */
         $phoneRepo = $dm->getRepository(Phone::class);
 
+        /** @var Phone $phone */
         $phone = null;
-        if ($session->get('quote')) {
+        $session = $request->getSession();
+        if ($session && $session->get('quote')) {
+            /** @var Phone $phone */
             $phone = $phoneRepo->find($session->get('quote'));
         }
 
@@ -720,13 +726,19 @@ abstract class BaseController extends Controller
 
     protected function getSessionSixpackTest(Request $request, $experiment, $alternatives)
     {
-        $session = $request->getSession();
-
+        $alternative = null;
         $sessionName = sprintf('sixpack:%s', $experiment);
-        $alternative = $session->get($sessionName);
+
+        $session = $request->getSession();
+        if ($session) {
+            $alternative = $session->get($sessionName);
+        }
+
         if (!$alternative) {
             $alternative = $this->get('app.sixpack')->participate($experiment, $alternatives, true);
-            $session->set($sessionName, $alternative);
+            if ($session) {
+                $session->set($sessionName, $alternative);
+            }
         }
 
         return $alternative;
@@ -928,9 +940,10 @@ abstract class BaseController extends Controller
         $name,
         $options,
         $logMixpanel = SixpackService::LOG_MIXPANEL_CONVERSION,
-        $clientId = null
+        $clientId = null,
+        $trafficFraction = 1
     ) {
-        $exp = $this->get('app.sixpack')->participate($name, $options, $logMixpanel, 1, $clientId);
+        $exp = $this->get('app.sixpack')->participate($name, $options, $logMixpanel, $trafficFraction, $clientId);
         if ($request->get('force')) {
             $exp = $request->get('force');
         }
@@ -975,8 +988,6 @@ abstract class BaseController extends Controller
 
     protected function setPhoneSession(Request $request, Phone $phone)
     {
-        $session = $request->getSession();
-        $session->set('quote', $phone->getId());
         if ($phone->getMemory()) {
             $url = $this->generateUrl('quote_make_model_memory', [
                 'make' => $phone->getMakeCanonical(),
@@ -989,7 +1000,12 @@ abstract class BaseController extends Controller
                 'model' => $phone->getEncodedModelCanonical(),
             ], UrlGeneratorInterface::ABSOLUTE_URL);
         }
-        $session->set('quote_url', $url);
+
+        $session = $request->getSession();
+        if ($session) {
+            $session->set('quote', $phone->getId());
+            $session->set('quote_url', $url);
+        }
 
         return $url;
     }

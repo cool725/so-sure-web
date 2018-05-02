@@ -2,6 +2,7 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Service\InvoiceService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -10,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\Invoice;
 
-class InvoiceCommand extends ContainerAwareCommand
+class InvoiceCommand extends BaseCommand
 {
     protected function configure()
     {
@@ -43,6 +44,7 @@ class InvoiceCommand extends ContainerAwareCommand
         $regenerate = true === $input->getOption('regenerate');
         $email = $input->getOption('email');
         if ($id) {
+            /** @var InvoiceService $invoiceService */
             $invoiceService = $this->getContainer()->get('app.invoice');
             $invoice = $this->getInvoice($id);
             if (!$invoice) {
@@ -55,8 +57,7 @@ class InvoiceCommand extends ContainerAwareCommand
 
     private function getInvoice($id)
     {
-        $dm = $this->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(Invoice::class);
+        $repo = $this->getManager()->getRepository(Invoice::class);
 
         return $repo->find($id);
     }

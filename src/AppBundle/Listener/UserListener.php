@@ -8,8 +8,10 @@ use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\User;
 use AppBundle\Event\UserEvent;
 use AppBundle\Event\UserEmailEvent;
+use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Service\MailerService;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Predis\Client;
 use Psr\Log\LoggerInterface;
 use FOS\UserBundle\Event\FilterUserResponseEvent;
 use FOS\UserBundle\FOSUserEvents;
@@ -27,22 +29,25 @@ class UserListener
     /** @var MailerService */
     protected $mailer;
 
+    /** @var Client */
     protected $redis;
 
+    /** @var FOSUBUserProvider */
     protected $userService;
 
     /**
-     * @param DocumentManager $dm
-     * @param LoggerInterface $logger
-     * @param MailerService   $mailer
-     * @param                 $redis
+     * @param DocumentManager   $dm
+     * @param LoggerInterface   $logger
+     * @param MailerService     $mailer
+     * @param Client            $redis
+     * @param FOSUBUserProvider $userService
      */
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
         MailerService $mailer,
-        $redis,
-        $userService
+        Client $redis,
+        FOSUBUserProvider $userService
     ) {
         $this->dm = $dm;
         $this->logger = $logger;

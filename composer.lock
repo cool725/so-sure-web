@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "72d803bb5356851afb31548485a4d106",
-    "content-hash": "bbfa078064ed2e9c07319bf141bf913a",
+    "hash": "0e7c0bfedbffa9e55f7b88c8d273ded1",
+    "content-hash": "6afb5c5b86f451b69c4321fa0e7d0479",
     "packages": [
         {
             "name": "alcaeus/mongo-php-adapter",
@@ -1933,58 +1933,6 @@
                 "maxmind"
             ],
             "time": "2016-10-11 21:58:42"
-        },
-        {
-            "name": "gocardless/gocardless-pro",
-            "version": "0.9.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/gocardless/gocardless-pro-php.git",
-                "reference": "324830ce2ae502558aeec6bb74e6f5f3d56dbfe0"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/gocardless/gocardless-pro-php/zipball/324830ce2ae502558aeec6bb74e6f5f3d56dbfe0",
-                "reference": "324830ce2ae502558aeec6bb74e6f5f3d56dbfe0",
-                "shasum": ""
-            },
-            "require": {
-                "ext-curl": "*",
-                "ext-json": "*",
-                "ext-mbstring": "*",
-                "guzzlehttp/guzzle": "^6.0",
-                "php": ">=5.5"
-            },
-            "require-dev": {
-                "phpdocumentor/phpdocumentor": "2.*",
-                "phpunit/phpunit": "~4.8",
-                "satooshi/php-coveralls": "~0.6.1",
-                "squizlabs/php_codesniffer": "~2.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "GoCardlessPro\\": "lib/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "GoCardless and contributors",
-                    "homepage": "https://github.com/gocardless/gocardless-pro-php/contributors"
-                }
-            ],
-            "description": "GoCardless Pro PHP Client Library",
-            "homepage": "https://gocardless.com/",
-            "keywords": [
-                "api",
-                "direct debit",
-                "gocardless"
-            ],
-            "time": "2016-08-02 11:32:07"
         },
         {
             "name": "google/apiclient",

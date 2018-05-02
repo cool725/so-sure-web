@@ -14,6 +14,7 @@ use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\User;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use AppBundle\Tests\Controller\BaseControllerTest;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * @group functional-net
@@ -26,7 +27,11 @@ class KernelListenerTest extends BaseControllerTest
     public function testUtmCampaign()
     {
         $client = self::createClient();
+        if (!$client->getContainer()) {
+            throw new \Exception('unable to find container');
+        }
         $crawler = $client->request('GET', '/?utm_campaign=foo');
+        /** @var SessionInterface $session */
         $session = $client->getContainer()->get('session');
         $utm = unserialize($session->get('utm'));
         $this->assertEquals('foo', $utm['campaign']);
@@ -35,7 +40,11 @@ class KernelListenerTest extends BaseControllerTest
     public function testUtmSource()
     {
         $client = self::createClient();
+        if (!$client->getContainer()) {
+            throw new \Exception('missing container');
+        }
         $crawler = $client->request('GET', '/?utm_source=foo');
+        /** @var SessionInterface $session */
         $session = $client->getContainer()->get('session');
         $utm = unserialize($session->get('utm'));
         $this->assertEquals('foo', $utm['source']);
@@ -44,7 +53,11 @@ class KernelListenerTest extends BaseControllerTest
     public function testUtmSourcePost()
     {
         $client = self::createClient();
+        if (!$client->getContainer()) {
+            throw new \Exception('missing container');
+        }
         $crawler = $client->request('POST', '/?utm_source=foo');
+        /** @var SessionInterface $session */
         $session = $client->getContainer()->get('session');
         $utm = unserialize($session->get('utm'));
         $this->assertEquals('foo', $utm['source']);
@@ -53,7 +66,11 @@ class KernelListenerTest extends BaseControllerTest
     public function testUtmMedium()
     {
         $client = self::createClient();
+        if (!$client->getContainer()) {
+            throw new \Exception('missing container');
+        }
         $crawler = $client->request('GET', '/?utm_medium=foo');
+        /** @var SessionInterface $session */
         $session = $client->getContainer()->get('session');
         $utm = unserialize($session->get('utm'));
         $this->assertEquals('foo', $utm['medium']);
@@ -62,7 +79,11 @@ class KernelListenerTest extends BaseControllerTest
     public function testUtmOverride()
     {
         $client = self::createClient();
+        if (!$client->getContainer()) {
+            throw new \Exception('missing container');
+        }
         $crawler = $client->request('GET', '/?utm_nooverride=1&utm_source=foo');
+        /** @var SessionInterface $session */
         $session = $client->getContainer()->get('session');
         $this->assertNull($session->get('utm'));
     }

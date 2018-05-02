@@ -20,7 +20,6 @@ use AppBundle\Document\ScheduledPayment;
  * make sure to update getType() if adding
  * @MongoDB\DiscriminatorMap({
  *      "judo"="JudoPayment",
- *      "gocardless"="GocardlessPayment",
  *      "sosure"="SoSurePayment",
  *      "bacs"="BacsPayment",
  *      "chargeback"="ChargebackPayment",

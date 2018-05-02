@@ -1,6 +1,10 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Repository\OptOut\EmailOptOutRepository;
+use AppBundle\Repository\UserRepository;
+use GuzzleHttp\Exception\ClientException;
+use Predis\Client;
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\Claim;
 use AppBundle\Document\User;
@@ -18,10 +22,13 @@ use AppBundle\Document\CurrencyTrait;
 
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Intercom\IntercomClient;
+use Symfony\Component\Routing\RouterInterface;
 
 class IntercomService
 {
     use CurrencyTrait;
+
+    const MAX_SCROLL_RECORDS = 50000;
 
     const KEY_INTERCOM_QUEUE = 'queue:intercom';
     const KEY_INTERCOM_RATELIMIT = 'intercom:ratelimit';
@@ -84,39 +91,44 @@ class IntercomService
     /** @var IntercomClient */
     protected $client;
 
+    /** @var Client */
     protected $redis;
 
     protected $secure;
     protected $secureAndroid;
     protected $secureIOS;
+
+    /** @var \Swift_Mailer */
     protected $mailer;
+
+    /** @var RouterInterface */
     protected $router;
 
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
      * @param string          $token
-     * @param                 $redis
+     * @param Client          $redis
      * @param string          $secure
      * @param string          $secureAndroid
      * @param string          $secureIOS
-     * @param                 $mailer
-     * @param                 $router
+     * @param \Swift_Mailer   $mailer
+     * @param RouterInterface $router
      */
     public function __construct(
         DocumentManager $dm,
         LoggerInterface $logger,
         $token,
-        $redis,
+        Client $redis,
         $secure,
         $secureAndroid,
         $secureIOS,
-        $mailer,
-        $router
+        \Swift_Mailer $mailer,
+        RouterInterface $router
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
-        $this->client = new IntercomClient($token, null);
+        $this->client = new IntercomClient($token, '');
         $this->redis = $redis;
         $this->secure = $secure;
         $this->secureAndroid = $secureAndroid;
@@ -225,6 +237,11 @@ class IntercomService
         }
     }
 
+    /**
+     * @param User $user
+     * @return mixed|null
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     public function getIntercomUser(User $user)
     {
         if (!$user->getIntercomId()) {
@@ -243,7 +260,7 @@ class IntercomService
 
             return $resp;
         } catch (\GuzzleHttp\Exception\ClientException $e) {
-            if ($e->getResponse()->getStatusCode() == "404") {
+            if ($e->getResponse() && $e->getResponse()->getStatusCode() == "404") {
                 return null;
             }
 
@@ -269,7 +286,7 @@ class IntercomService
 
             return true;
         } catch (\GuzzleHttp\Exception\ClientException $e) {
-            if ($e->getResponse()->getStatusCode() == "404") {
+            if ($e->getResponse() && $e->getResponse()->getStatusCode() == "404") {
                 return false;
             }
 
@@ -422,6 +439,7 @@ class IntercomService
         }
 
         // optout
+        /** @var EmailOptOutRepository $emailOptOutRepo */
         $emailOptOutRepo = $this->dm->getRepository(EmailOptOut::class);
         $optedOut = $emailOptOutRepo->isOptedOut($user->getEmail(), EmailOptOut::OPTOUT_CAT_AQUIRE) ||
             $emailOptOutRepo->isOptedOut($user->getEmail(), EmailOptOut::OPTOUT_CAT_RETAIN);
@@ -1000,7 +1018,7 @@ class IntercomService
 
     public function clearQueue()
     {
-        $this->redis->del(self::KEY_INTERCOM_QUEUE);
+        $this->redis->del([self::KEY_INTERCOM_QUEUE]);
     }
 
     public function getQueueData($max)
@@ -1064,21 +1082,40 @@ class IntercomService
 
     }
 
-    private function leadsMaintenance()
+    public function leadsMaintenance()
     {
+        /** @var EmailOptOutRepository $emailOptOutRepo */
         $emailOptOutRepo = $this->dm->getRepository(EmailOptOut::class);
         $output = [];
-        $page = 1;
-        $pages = 1;
+        $count = 0;
+        $scroll = null;
         $now = new \DateTime();
-        while ($page <= $pages) {
-            $output[] = sprintf('Checking Leads - page %d', $page);
+        while ($count < self::MAX_SCROLL_RECORDS) {
+            $output[] = sprintf('Checking Leads - Scroll: %s / Count: %d', $scroll, $count);
+            //print sprintf('Checking Leads - %s', $scroll) . PHP_EOL;
+            $options = [];
+            if ($scroll) {
+                $options['scroll_param'] = $scroll;
+            }
             $this->checkRateLimit();
-            $resp = $this->client->leads->getLeads(['page' => $page]);
+            try {
+                $resp = $this->client->leads->scrollLeads($options);
+            } catch (ClientException $e) {
+                if ($e->getCode() == 404) {
+                    $resp = new \stdClass();
+                    $resp->scroll_param = $scroll;
+                    $resp->contacts = [];
+                } else {
+                    throw $e;
+                }
+            }
             $this->storeRateLimit();
 
-            $page++;
-            $pages = $resp->pages->total_pages;
+            $scroll = $resp->scroll_param;
+            if (count($resp->contacts) == 0) {
+                break;
+            }
+
             foreach ($resp->contacts as $lead) {
                 if (mb_strlen(trim($lead->email)) > 0) {
                     $optedOut = $emailOptOutRepo->isOptedOut($lead->email, EmailOptOut::OPTOUT_CAT_AQUIRE) ||
@@ -1113,30 +1150,53 @@ class IntercomService
                         $this->deleteLead($lead->id);
                     }
                 }
+                $count++;
             }
             $this->dm->flush();
         }
+        $output[] = sprintf('Total Leads Checked: %d', $count);
 
         return $output;
     }
 
-    private function usersMaintenance()
+    public function usersMaintenance()
     {
+        /** @var UserRepository $userRepo */
         $userRepo = $this->dm->getRepository(User::class);
+        /** @var EmailOptOutRepository $emailOptOutRepo */
         $emailOptOutRepo = $this->dm->getRepository(EmailOptOut::class);
+
         $emails = [];
         $output = [];
-        $page = 1;
-        $pages = 1;
+        $count = 0;
+        $scroll = null;
         $now = new \DateTime();
-        while ($page <= $pages) {
-            $output[] = sprintf('Checking Users - page %d', $page);
+        while ($count < self::MAX_SCROLL_RECORDS) {
+            $output[] = sprintf('Checking Users - Scroll: %s / Count: %d', $scroll, $count);
+            // print sprintf('Checking Users - %s', $scroll) . PHP_EOL;
+            $options = [];
+            if ($scroll) {
+                $options['scroll_param'] = $scroll;
+            }
             $this->checkRateLimit();
-            $resp = $this->client->users->getUsers(['page' => $page]);
+            try {
+                $resp = $this->client->users->scrollUsers($options);
+            } catch (ClientException $e) {
+                if ($e->getCode() == 404) {
+                    $resp = new \stdClass();
+                    $resp->scroll_param = $scroll;
+                    $resp->users = [];
+                } else {
+                    throw $e;
+                }
+            }
             $this->storeRateLimit();
 
-            $page++;
-            $pages = $resp->pages->total_pages;
+            $scroll = $resp->scroll_param;
+            if (count($resp->users) == 0) {
+                break;
+            }
+
             foreach ($resp->users as $user) {
                 if (mb_strlen(trim($user->email)) > 0) {
                     $doNotContact = false;
@@ -1166,6 +1226,7 @@ class IntercomService
                         $output[] = sprintf("Added optout for %s", $user->email);
                     } elseif (!$user->unsubscribed_from_emails && $optedOut) {
                         // sosure user listener -> queue -> intercom update issue
+                        /** @var User $sosureUser */
                         $sosureUser = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($user->email)]);
                         if ($sosureUser) {
                             $this->updateUser($sosureUser);
@@ -1196,9 +1257,11 @@ class IntercomService
                     }
                     // TODO: User cancelled, archive messages and clear out after 2 weeks not seen
                 }
+                $count++;
             }
             $this->dm->flush();
         }
+        $output[] = sprintf('Total Users Checked: %d', $count);
 
         return $output;
     }

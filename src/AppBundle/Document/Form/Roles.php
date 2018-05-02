@@ -8,10 +8,6 @@ use AppBundle\Validator\Constraints as AppAssert;
 
 class Roles
 {
-    /**
-     * @var string
-     * @Assert\NotBlank()
-     */
     protected $roles;
     protected $rolesConfig;
 

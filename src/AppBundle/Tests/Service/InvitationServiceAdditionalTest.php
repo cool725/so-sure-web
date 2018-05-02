@@ -2,6 +2,8 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Repository\Invitation\EmailInvitationRepository;
+use AppBundle\Service\RouterService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
@@ -29,6 +31,7 @@ use AppBundle\Exception\FullPotException;
 use AppBundle\Exception\ClaimException;
 use AppBundle\Exception\OptOutException;
 use AppBundle\Exception\ConnectedInvitationException;
+use Symfony\Component\Templating\EngineInterface;
 
 /**
  * @group functional-nonet
@@ -38,7 +41,8 @@ class InvitationServiceAdditionalTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
-    protected static $gocardless;
+    /** @var DocumentManager */
+    protected static $dm;
     protected static $userRepo;
     protected static $invitationService;
     protected static $phone2;
@@ -54,21 +58,29 @@ class InvitationServiceAdditionalTest extends WebTestCase
 
         //now we can instantiate our service (if you want a fresh one for
         //each test method, do this in setUp() instead
-        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        /** @var DocumentManager */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$dm = $dm;
         self::$userRepo = self::$dm->getRepository(User::class);
         self::$userManager = self::$container->get('fos_user.user_manager');
         $transport = new \Swift_Transport_NullTransport(new \Swift_Events_SimpleEventDispatcher);
+        /** @var EngineInterface $templating */
+        $templating = self::$container->get('templating');
+        /** @var RouterService $router */
+        $router = self::$container->get('app.router');
         $mailer = new MailerService(
             \Swift_Mailer::newInstance($transport),
             $transport,
-            self::$container->get('templating'),
-            self::$container->get('app.router'),
+            $templating,
+            $router,
             'foo@foo.com',
             'bar'
         );
-        self::$invitationService = self::$container->get('app.invitation');
-        self::$invitationService->setMailer($mailer);
-        self::$invitationService->setDebug(true);
+        /** @var InvitationService invitationService */
+        $invitationService = self::$container->get('app.invitation');
+        $invitationService->setMailer($mailer);
+        $invitationService->setDebug(true);
+        self::$invitationService = $invitationService;
 
         self::$policyService = self::$container->get('app.policy');
 
@@ -106,7 +118,8 @@ class InvitationServiceAdditionalTest extends WebTestCase
         );
         $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('invite5', $this));
         $this->assertTrue($invitation instanceof EmailInvitation);
-        
+
+        /** @var EmailInvitationRepository $emailInvitationRepo */
         $emailInvitationRepo = static::$dm->getRepository(EmailInvitation::class);
         $count = count($emailInvitationRepo->findSystemReinvitations());
         $future = new \DateTime();
@@ -145,6 +158,7 @@ class InvitationServiceAdditionalTest extends WebTestCase
         );
         $this->assertTrue($invitation instanceof EmailInvitation);
 
+        /** @var EmailInvitationRepository $emailInvitationRepo */
         $emailInvitationRepo = static::$dm->getRepository(EmailInvitation::class);
         $count = count($emailInvitationRepo->findSystemReinvitations());
         $future = new \DateTime();
@@ -199,6 +213,7 @@ class InvitationServiceAdditionalTest extends WebTestCase
         );
         $this->assertTrue($invitation instanceof EmailInvitation);
 
+        /** @var EmailInvitationRepository $emailInvitationRepo */
         $emailInvitationRepo = static::$dm->getRepository(EmailInvitation::class);
         $count = count($emailInvitationRepo->findSystemReinvitations());
         $future = new \DateTime();
@@ -227,6 +242,7 @@ class InvitationServiceAdditionalTest extends WebTestCase
         $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('invite6', $this));
         $this->assertTrue($invitation instanceof EmailInvitation);
 
+        /** @var EmailInvitationRepository $emailInvitationRepo */
         $emailInvitationRepo = static::$dm->getRepository(EmailInvitation::class);
         $count = count($emailInvitationRepo->findSystemReinvitations());
         $future = new \DateTime();
@@ -254,6 +270,7 @@ class InvitationServiceAdditionalTest extends WebTestCase
         $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('invite7', $this));
         $this->assertTrue($invitation instanceof EmailInvitation);
 
+        /** @var EmailInvitationRepository $emailInvitationRepo */
         $emailInvitationRepo = static::$dm->getRepository(EmailInvitation::class);
         $count = count($emailInvitationRepo->findSystemReinvitations());
         $future = new \DateTime();

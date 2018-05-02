@@ -405,7 +405,7 @@ class ApiController extends BaseController
             }
 
             if (null === $user->getConfirmationToken()) {
-                /** @var $tokenGenerator \FOS\UserBundle\Util\TokenGeneratorInterface */
+                /** @var \FOS\UserBundle\Util\TokenGeneratorInterface $tokenGenerator */
                 $tokenGenerator = $this->get('fos_user.util.token_generator');
                 $user->setConfirmationToken($tokenGenerator->generateToken());
             }

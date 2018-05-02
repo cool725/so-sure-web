@@ -20,6 +20,12 @@ class Coordinates
      */
     protected $coordinates; // [longitude, latitude]
  
+     /**
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     */
+    protected $created;
+
     /**
      * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="0", max="50")
@@ -27,6 +33,11 @@ class Coordinates
      * @Gedmo\Versioned
      */
     public $type = "Point";
+
+    public function __construct()
+    {
+        $this->created = new \DateTime();
+    }
 
     public function setCoordinates(float $longitude, float $latitude)
     {
@@ -40,5 +51,15 @@ class Coordinates
     public function getCoordinates()
     {
         return $this->coordinates;
+    }
+
+    public function getCreated()
+    {
+        return $this->created;
+    }
+
+    public function setCreated($created)
+    {
+        $this->created = $created;
     }
 }

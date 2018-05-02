@@ -9,6 +9,7 @@ use AppBundle\Document\OptOut\EmailOptOut;
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Classes\GoCompare;
 use AppBundle\Service\RateLimitService;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 /**
  * @group functional-net
@@ -456,8 +457,16 @@ class ApiExternalControllerTest extends BaseApiControllerTest
             $data
         );
 
-        $session = $client->getContainer()->get('session');
-        $utm = unserialize($session->get('utm'));
+        if (!$client->getContainer()) {
+            throw new \Exception("missing container");
+        }
+        $container = $client->getContainer();
+        $utm = [];
+        /** @var SessionInterface $session */
+        $session = $container->get('session');
+        if ($session) {
+            $utm = unserialize($session->get('utm'));
+        }
         $this->assertEquals('foo', $utm['source']);
     }
 

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Form\Type;
 
+use AppBundle\Repository\PhoneRepository;
 use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use Symfony\Component\Form\AbstractType;
@@ -18,7 +19,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 
-class PolicySearchType extends AbstractType
+class PolicySearchType extends BaseType
 {
     /**
      * @var RequestStack
@@ -88,7 +89,7 @@ class PolicySearchType extends AbstractType
                 'placeholder' => 'Select your device',
                 'class' => 'AppBundle:Phone',
                 'required' => false,
-                'query_builder' => function (DocumentRepository $dr) {
+                'query_builder' => function (PhoneRepository $dr) {
                     return $dr->findActiveInactive();
                 }
             ])
@@ -98,18 +99,18 @@ class PolicySearchType extends AbstractType
         $currentRequest = $this->requestStack->getCurrentRequest();
         $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) use ($currentRequest) {
             $form = $event->getForm();
-            $form->get('email')->setData($currentRequest->query->get('email'));
-            $form->get('mobile')->setData($currentRequest->query->get('mobile'));
-            $form->get('postcode')->setData($currentRequest->query->get('postcode'));
-            $form->get('lastname')->setData($currentRequest->query->get('lastname'));
-            $form->get('policy')->setData($currentRequest->query->get('policy'));
-            $form->get('status')->setData($currentRequest->query->get('status'));
-            $form->get('imei')->setData($currentRequest->query->get('imei'));
-            $form->get('facebookId')->setData($currentRequest->query->get('facebookId'));
-            $form->get('serial')->setData($currentRequest->query->get('serial'));
-            $form->get('id')->setData($currentRequest->query->get('id'));
-            $form->get('phone')->setData($currentRequest->query->get('phone'));
-            if ($currentRequest->query->get('invalid') !== null) {
+            $this->formQuerystring($form, $currentRequest, 'email');
+            $this->formQuerystring($form, $currentRequest, 'mobile');
+            $this->formQuerystring($form, $currentRequest, 'postcode');
+            $this->formQuerystring($form, $currentRequest, 'lastname');
+            $this->formQuerystring($form, $currentRequest, 'policy');
+            $this->formQuerystring($form, $currentRequest, 'status');
+            $this->formQuerystring($form, $currentRequest, 'imei');
+            $this->formQuerystring($form, $currentRequest, 'facebookId');
+            $this->formQuerystring($form, $currentRequest, 'serial');
+            $this->formQuerystring($form, $currentRequest, 'id');
+            $this->formQuerystring($form, $currentRequest, 'phone');
+            if ($currentRequest && $currentRequest->query->get('invalid') !== null) {
                 $form->get('invalid')->setData((bool) $currentRequest->query->get('invalid'));
             } else {
                 $form->get('invalid')->setData($this->environment != 'prod');

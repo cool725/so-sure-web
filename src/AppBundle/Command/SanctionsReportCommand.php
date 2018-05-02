@@ -3,6 +3,7 @@
 namespace AppBundle\Command;
 
 use AppBundle\Listener\SanctionsListener;
+use AppBundle\Service\MailerService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,6 +16,7 @@ use AppBundle\Document\Company;
 use AppBundle\Document\DateTrait;
 use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 use GuzzleHttp\Client;
+use Symfony\Component\Templating\EngineInterface;
 
 class SanctionsReportCommand extends ContainerAwareCommand
 {
@@ -36,7 +38,9 @@ class SanctionsReportCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        /** @var \Predis\Client $redis */
         $redis = $this->getContainer()->get('snc_redis.default');
+        /** @var MailerService $mailer */
         $mailer = $this->getContainer()->get('app.mailer');
         $debug = $input->getOption('debug');
         $users = [];
@@ -64,6 +68,7 @@ class SanctionsReportCommand extends ContainerAwareCommand
         );
 
         if ($debug) {
+            /** @var EngineInterface $templating */
             $templating = $this->getContainer()->get('templating');
             $email = $templating->render(
                 'AppBundle:Email:user/admin_sanctions.html.twig',

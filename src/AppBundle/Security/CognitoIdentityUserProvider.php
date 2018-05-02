@@ -64,7 +64,7 @@ class CognitoIdentityUserProvider implements UserProviderInterface
     /**
      * @param string $cognitoIdentityId
      *
-     * @return User
+     * @return User|null
      */
     public function loadUserByCognitoIdentityId($cognitoIdentityId)
     {
@@ -75,7 +75,10 @@ class CognitoIdentityUserProvider implements UserProviderInterface
         try {
             $repo = $this->dm->getRepository(User::class);
             if ($this->environment == "test") {
-                return $repo->find($cognitoIdentityId);
+                /** @var User $user */
+                $user = $repo->find($cognitoIdentityId);
+
+                return $user;
             }
             $identities = $this->cognito->describeIdentity([
                 'IdentityId' => $cognitoIdentityId
@@ -85,6 +88,7 @@ class CognitoIdentityUserProvider implements UserProviderInterface
                 return null;
             }
 
+            /** @var User $user */
             $user = null;
             if (in_array($this->developerLogin, $logins)) {
                 $result = $this->cognito->lookupDeveloperIdentity(array(
@@ -95,12 +99,14 @@ class CognitoIdentityUserProvider implements UserProviderInterface
                 ));
                 if (isset($result['DeveloperUserIdentifierList'])) {
                     $userId = $result['DeveloperUserIdentifierList'][0];
+                    /** @var User $user */
                     $user = $repo->find($userId);
                 }
             } elseif (in_array("graph.facebook.com", $logins)) {
                 $this->logger->error(sprintf('Logins map %s', json_encode($logins)));
                 $this->fb->initToken($logins['graph.facebook.com']);
                 $facebookId = $this->fb->getUserId();
+                /** @var User $user */
                 $user = $repo->findOneBy(['facebookId' => $facebookId]);
             }
     
@@ -115,7 +121,7 @@ class CognitoIdentityUserProvider implements UserProviderInterface
     /**
      * @param string $userToken
      *
-     * @return User
+     * @return User|null
      */
     public function loadUserByUserToken($userToken)
     {
@@ -125,6 +131,7 @@ class CognitoIdentityUserProvider implements UserProviderInterface
 
         try {
             $repo = $this->dm->getRepository(User::class);
+            /** @var User $user */
             $user = $repo->findOneBy(['token' => $userToken]);
     
             return $user;
@@ -142,7 +149,9 @@ class CognitoIdentityUserProvider implements UserProviderInterface
     {
         // Compatibility with FOSUserBundle < 2.0
         if (class_exists('FOS\UserBundle\Form\Handler\RegistrationFormHandler')) {
-            return $this->userManager->loadUserByUsername($username);
+            /** @var mixed $oldUserManager */
+            $oldUserManager = $this->userManager;
+            return $oldUserManager->loadUserByUsername($username);
         }
 
         return $this->userManager->findUserByUsername($username);

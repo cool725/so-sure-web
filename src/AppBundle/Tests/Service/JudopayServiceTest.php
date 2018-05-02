@@ -2,7 +2,10 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Repository\ScheduledPaymentRepository;
+use AppBundle\Service\FeatureService;
 use AppBundle\Service\JudopayService;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Address;
@@ -28,6 +31,8 @@ class JudopayServiceTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
+    /** @var DocumentManager */
+    protected static $dm;
     /** @var JudopayService */
     protected static $judopay;
     protected static $userRepo;
@@ -43,11 +48,16 @@ class JudopayServiceTest extends WebTestCase
 
         //now we can instantiate our service (if you want a fresh one for
         //each test method, do this in setUp() instead
-        self::$dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        /** @var DocumentManager */
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        self::$dm = $dm;
         self::$userRepo = self::$dm->getRepository(User::class);
         self::$userManager = self::$container->get('fos_user.user_manager');
         self::$policyService = self::$container->get('app.policy');
-        self::$judopay = self::$container->get('app.judopay');
+        /** @var JudopayService $judopay */
+        $judopay = self::$container->get('app.judopay');
+        self::$judopay = $judopay;
+        /** @var FeatureService $feature */
         $feature = self::$container->get('app.feature');
         $feature->setEnabled(Feature::FEATURE_PAYMENT_PROBLEM_INTERCOM, true);
     }
@@ -302,7 +312,7 @@ class JudopayServiceTest extends WebTestCase
             self::$JUDO_TEST_CARD_PIN
         );
         try {
-            $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token');
+            $payment = self::$judopay->validateReceipt($policy, $receiptId, 'token', JudoPayment::SOURCE_SYSTEM);
         } catch (\Exception $e) {
             // expected exception - ignore
             $this->assertNotNull($e);
@@ -608,7 +618,9 @@ class JudopayServiceTest extends WebTestCase
         $this->assertEquals($policy->getPremium()->getMonthlyPremiumPrice() * 2 + 1, $policy->getPremiumPaid());
 
         static::$dm->clear();
+        /** @var ScheduledPaymentRepository $repo */
         $repo = static::$dm->getRepository(ScheduledPayment::class);
+        /** @var ScheduledPayment $updatedScheduledPayment */
         $updatedScheduledPayment = $repo->find($scheduledPayment->getId());
         $this->assertEquals(ScheduledPayment::STATUS_SUCCESS, $updatedScheduledPayment->getStatus());
         $this->assertTrue($updatedScheduledPayment->getPayment()->isSuccess());
@@ -1489,9 +1501,7 @@ class JudopayServiceTest extends WebTestCase
         );
         static::$policyService->setEnvironment('test');
 
-        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(Policy::class);
-        $updatedPolicy = $repo->find($policy->getId());
+        $updatedPolicy = $this->assertPolicyExists(self::$container, $policy);
 
         $amount = $updatedPolicy->getPremium()->getMonthlyPremiumPrice() * 11;
         $this->assertEquals($updatedPolicy->getOutstandingPremium(), $amount);
@@ -1514,7 +1524,8 @@ class JudopayServiceTest extends WebTestCase
         );
         static::$policyService->setEnvironment('test');
 
-        $payment = $updatedPolicy->getLastSuccessfulUserPaymentCredit();
+        $updatedPolicy2 = $this->assertPolicyExists(self::$container, $policy);
+        $payment = $updatedPolicy2->getLastSuccessfulUserPaymentCredit();
         $this->assertEquals(
             Salva::MONTHLY_TOTAL_COMMISSION * 10 + Salva::FINAL_MONTHLY_TOTAL_COMMISSION,
             $payment->getTotalCommission()

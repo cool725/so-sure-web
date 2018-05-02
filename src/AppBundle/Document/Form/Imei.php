@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document\Form;
 
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\DateTrait;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -34,8 +35,9 @@ class Imei
 
     public function setPolicy(Policy $policy)
     {
-        /** @var PhonePolicy $policy */
-        $this->policy = $policy;
-        $this->setImei($policy->getImei());
+        /** @var PhonePolicy $phonePolicy */
+        $phonePolicy = $policy;
+        $this->policy = $phonePolicy;
+        $this->setImei($phonePolicy->getImei());
     }
 }

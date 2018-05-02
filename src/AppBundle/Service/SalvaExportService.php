@@ -1,6 +1,10 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Repository\ClaimRepository;
+use AppBundle\Repository\PaymentRepository;
+use AppBundle\Repository\PhonePolicyRepository;
+use Aws\S3\S3Client;
 use Psr\Log\LoggerInterface;
 use GuzzleHttp\Client;
 use DOMDocument;
@@ -64,9 +68,16 @@ class SalvaExportService
     /** @var string */
     protected $rootDir;
 
+    /** @var \Predis\Client */
     protected $redis;
+
+    /** @var S3Client */
     protected $s3;
+
+    /** @var string */
     protected $environment;
+
+    /** @var FeatureService */
     protected $featureService;
 
     public function setEnvironment($environment)
@@ -86,9 +97,9 @@ class SalvaExportService
      * @param string          $username
      * @param string          $password
      * @param string          $rootDir
-     * @param                 $redis
-     * @param                 $s3
-     * @param                 $environment
+     * @param \Predis\Client  $redis
+     * @param S3Client        $s3
+     * @param string          $environment
      * @param FeatureService  $featureService
      */
     public function __construct(
@@ -98,8 +109,8 @@ class SalvaExportService
         $username,
         $password,
         $rootDir,
-        $redis,
-        $s3,
+        \Predis\Client $redis,
+        S3Client $s3,
         $environment,
         FeatureService $featureService
     ) {
@@ -214,9 +225,11 @@ class SalvaExportService
         $lines = [];
         $paidPremium = 0;
         $paidBrokerFee = 0;
+        /** @var PhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(SalvaPhonePolicy::class);
         $lines[] = sprintf("%s", $this->formatLine($this->transformPolicy(null)));
         foreach ($repo->getAllPoliciesForExport($date, $this->environment) as $policy) {
+            /** @var SalvaPhonePolicy $policy */
             foreach ($policy->getSalvaPolicyNumbers() as $version => $versionDate) {
                 $data = $this->transformPolicy($policy, $version);
                 $paidPremium += $data[16];
@@ -261,6 +274,7 @@ class SalvaExportService
         $lines = [];
         $total = 0;
         $numPayments = 0;
+        /** @var PaymentRepository $repo */
         $repo = $this->dm->getRepository(Payment::class);
         $lines[] = sprintf("%s", $this->formatLine($this->transformPayment(null)));
         $payments = $repo->getAllPaymentsForExport($date);
@@ -305,6 +319,7 @@ class SalvaExportService
         }
 
         $lines = [];
+        /** @var ClaimRepository $repo */
         $repo = $this->dm->getRepository(Claim::class);
         $lines[] =  sprintf("%s", $this->formatLine($this->transformClaim(null)));
         foreach ($repo->getAllClaimsForExport($date, $days) as $claim) {
@@ -338,6 +353,7 @@ class SalvaExportService
         }
 
         $lines = [];
+        /** @var PhonePolicyRepository $repo */
         $repo = $this->dm->getRepository(PhonePolicy::class);
         $lines[] =  sprintf("%s", $this->formatLine($this->transformRenewal(null)));
         foreach ($repo->getAllExpiredPoliciesForExport($date, $this->environment) as $policy) {
@@ -390,6 +406,7 @@ class SalvaExportService
             if (!$payment->isSuccess()) {
                 throw new \Exception('Invalid payment');
             }
+            /** @var SalvaPhonePolicy $policy */
             $policy = $payment->getPolicy();
             if (!$policy) {
                 throw new \Exception('Invalid policy');
@@ -417,6 +434,7 @@ class SalvaExportService
     public function transformClaim(Claim $claim = null)
     {
         if ($claim) {
+            /** @var SalvaPhonePolicy $policy */
             $policy = $claim->getPolicy();
             $data = [
                 $policy->getSalvaPolicyNumberByDate($claim->getRecordedDate()),
@@ -649,7 +667,9 @@ class SalvaExportService
     {
         // If exception thrown in the middle of an update, log and avoid re-queueing policy actions
         try {
-            $this->incrementPolicyNumber($policy);
+            /** @var SalvaPhonePolicy $salvaPhonePolicy */
+            $salvaPhonePolicy = $policy;
+            $this->incrementPolicyNumber($salvaPhonePolicy);
 
             $this->queueMessage($policy->getId(), self::QUEUE_CANCELLED, 0, self::CANCELLED_REPLACE);
             $this->queueMessage($policy->getId(), self::QUEUE_CREATED, 0);
@@ -665,6 +685,7 @@ class SalvaExportService
     {
         $count = 0;
         while ($count < $max) {
+            /** @var Policy $policy */
             $policy = null;
             $action = null;
             $cancelReason = null;
@@ -678,7 +699,9 @@ class SalvaExportService
                 if (!isset($data['policyId']) || !$data['policyId'] || !isset($data['action']) || !$data['action']) {
                     throw new \Exception(sprintf('Unknown message in queue %s', json_encode($data)));
                 }
+                /** @var PhonePolicyRepository $repo */
                 $repo = $this->dm->getRepository(SalvaPhonePolicy::class);
+                /** @var SalvaPhonePolicy $policy */
                 $policy = $repo->find($data['policyId']);
                 $action = $data['action'];
                 if (isset($data['cancel_reason'])) {
@@ -771,7 +794,7 @@ class SalvaExportService
 
     public function clearQueue()
     {
-        $this->redis->del(self::KEY_POLICY_ACTION);
+        $this->redis->del([self::KEY_POLICY_ACTION]);
     }
 
     public function getQueueData($max)
