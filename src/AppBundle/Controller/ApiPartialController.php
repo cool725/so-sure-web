@@ -40,76 +40,48 @@ class ApiPartialController extends BaseController
     use ArrayToApiArrayTrait;
 
     /**
+     * @Route("/ab/v2", name="api_ab_partipate_all")
+     * @Method({"GET"})
+     */
+    public function abParticipateAllAction(Request $request)
+    {
+        try {
+            if (!$this->validateQueryFields($request, ['names'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            $names = $this->getRequestString($request, 'names');
+            
+            $experiments = explode(',', $names);
+            $tests = array();
+            foreach ($experiments as $experiment) {
+                try {
+                    $tests[] = $this->abParticipate($experiment);
+                } catch (NotFoundHttpException $e) {
+                    $this->get('logger')->error(
+                        'Error finding experiment in api abParticipateAllAction.',
+                        ['exception' => $e]
+                    );
+                }
+            }
+            return new JsonResponse([
+                'tests' => $tests,
+            ]);
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api abParticipateAllAction.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
      * @Route("/ab/{name}", name="api_ab_partipate")
      * @Method({"GET"})
      */
     public function abParticipateAction($name)
     {
         try {
-            $sixpack = $this->get('app.sixpack');
-
-            if ($name == SixpackService::EXPIRED_EXPERIMENT_SHARE_MESSAGE) {
-                $user = $this->getUser();
-                if (!$user || !$user instanceof User || !$user->hasActivePolicy()) {
-                    throw new NotFoundHttpException();
-                }
-                // all policies should have the same scode
-                $scode = null;
-                foreach ($user->getPolicies() as $policy) {
-                    if ($scode = $policy->getStandardSCode()) {
-                        break;
-                    }
-                }
-                if (!$scode) {
-                    $this->get('logger')->warning(sprintf('Unable to find scode for user %s', $user->getId()));
-                    throw new NotFoundHttpException();
-                }
-
-                $text = $sixpack->getText(
-                    SixpackService::EXPIRED_EXPERIMENT_SHARE_MESSAGE,
-                    SixpackService::ALTERNATIVES_SHARE_MESSAGE_SIMPLE,
-                    [$scode->getShareLink(), $scode->getCode()]
-                );
-
-                return new JsonResponse([
-                    'option' => SixpackService::ALTERNATIVES_SHARE_MESSAGE_SIMPLE,
-                    'text' => $text
-                ]);
-            } elseif ($name == SixpackService::EXPERIMENT_APP_SHARE_METHOD) {
-                $user = $this->getUser();
-                if (!$user || !$user instanceof User || !$user->hasActivePolicy()) {
-                    throw new NotFoundHttpException();
-                }
-                // all policies should have the same scode
-                $scode = null;
-                foreach ($user->getPolicies() as $policy) {
-                    if ($scode = $policy->getStandardSCode()) {
-                        break;
-                    }
-                }
-                if (!$scode) {
-                    $this->get('logger')->warning(sprintf('Unable to find scode for user %s', $user->getId()));
-                    throw new NotFoundHttpException();
-                }
-
-                $experiment = $sixpack->participate(
-                    SixpackService::EXPERIMENT_APP_SHARE_METHOD,
-                    [
-                        SixpackService::ALTERNATIVES_APP_SHARE_METHOD_NATIVE,
-                        SixpackService::ALTERNATIVES_APP_SHARE_METHOD_API
-                    ],
-                    SixpackService::LOG_MIXPANEL_NONE,
-                    1,
-                    $scode->getCode()
-                );
-
-                return new JsonResponse([
-                    'option' => $experiment,
-                    'text' => null,
-                ]);
-            } else {
-                throw new NotFoundHttpException();
-            }
+            return new JsonResponse($this->abParticipate($name));
         } catch (NotFoundHttpException $e) {
             return $this->getErrorJsonResponse(
                 ApiErrorCode::ERROR_NOT_FOUND,
@@ -120,6 +92,64 @@ class ApiPartialController extends BaseController
             $this->get('logger')->error('Error in api abParticipateAction.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    protected function abParticipate($name)
+    {
+        $user = $this->getUser();
+        if (!$user || !$user instanceof User || !$user->hasActivePolicy()) {
+            throw new NotFoundHttpException();
+        }
+
+        $sixpack = $this->get('app.sixpack');
+
+        if ($name == SixpackService::EXPIRED_EXPERIMENT_SHARE_MESSAGE) {
+            $scode = $user->getStandardSCode();
+            if (!$scode) {
+                $this->get('logger')->warning(sprintf('Unable to find scode for user %s', $user->getId()));
+                throw new NotFoundHttpException();
+            }
+
+            $text = $sixpack->getText(
+                SixpackService::EXPIRED_EXPERIMENT_SHARE_MESSAGE,
+                SixpackService::ALTERNATIVES_SHARE_MESSAGE_SIMPLE,
+                [$scode->getShareLink(), $scode->getCode()]
+            );
+
+            return array(
+                'name' => $name,
+                'option' => SixpackService::ALTERNATIVES_SHARE_MESSAGE_SIMPLE,
+                'text' => $text
+            );
+        } elseif (in_array($name, array_keys(SixpackService::$appExperiments))) {
+            $clientId = null;
+            if ($name == SixpackService::EXPERIMENT_APP_SHARE_METHOD) {
+                $scode = $user->getStandardSCode();
+                if (!$scode) {
+                    $this->get('logger')->warning(sprintf('Unable to find scode for user %s', $user->getId()));
+                    throw new NotFoundHttpException();
+                }
+                $clientId = $scode->getCode();
+            } elseif ($name == SixpackService::EXPERIMENT_APP_PICSURE_LOCATION) {
+                $clientId = $user->getId();
+            }
+
+            $experiment = $sixpack->participate(
+                $name,
+                SixpackService::$appExperiments[$name],
+                SixpackService::LOG_MIXPANEL_ALL,
+                1,
+                $clientId
+            );
+
+            return array(
+                'name' => $name,
+                'option' => $experiment,
+                'text' => null,
+            );
+        } else {
+            throw new NotFoundHttpException();
         }
     }
 

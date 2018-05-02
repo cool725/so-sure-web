@@ -51,3 +51,36 @@ $('#editSerialNumberModal').on('show.bs.modal', function (event) {
     $('#editSerialNumberForm').attr('action', url);
     $('#editSerialNumber').val(serialNumber);
 });
+
+$('#serialNumberModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget) // Button that triggered the modal
+    var url = button.data('details-url');
+    var serial = button.data('serial');
+    var modal = $(this);
+    modal.find('.modal-title').text('Loading Serial Number ' + serial);
+    modal.find('#serial-details tr').remove();
+    $.ajax({
+        url: url,
+        type: 'GET',
+        success: function(result) {
+            console.log(result);
+            modal.find('#serial-details').DataTable({
+                destroy: true,
+                paging: false,
+                searching: false,
+                data: result,
+                columns: [
+                    { title: 'Bank', data: 'bank_name' },
+                    { title: 'Account', data: 'account_name' },
+                    { title: 'Sort Code', data: 'displayable_sort_code' },
+                    { title: 'Accout Number', data: 'displayable_account_number' },
+                    { title: 'Mandate', data: 'mandate' },
+                    { title: 'Mandate Status', data: 'mandate_status' },
+                    { title: 'First Payment', data: 'initial_date' },
+                    { title: 'Monthly Payment', data: 'monthly_day' }
+                ]
+            });
+            modal.find('.modal-title').text('Serial Number ' + serial);
+        }
+    });
+});
