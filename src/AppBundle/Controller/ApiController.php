@@ -56,6 +56,7 @@ class ApiController extends BaseController
             $data = json_decode($request->getContent(), true)['body'];
             $emailUserData = null;
             $facebookUserData = null;
+            $googleUserData = null;
             $oauthEchoUserData = null;
             $accountKitUserData = null;
             if (isset($data['email_user'])) {
