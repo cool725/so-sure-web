@@ -68,6 +68,11 @@ class ApiController extends BaseController
                 if (!$this->validateFields($facebookUserData, ['facebook_id', 'facebook_access_token'])) {
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
                 }
+            } elseif (isset($data['google_user'])) {
+                $googleUserData = $data['google_user'];
+                if (!$this->validateFields($googleUserData, ['google_id', 'google_access_token'])) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+                }
             } elseif (isset($data['oauth_echo_user'])) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UPGRADE_APP, 'Digits is not available', 422);
             } elseif (isset($data['account_kit_user'])) {
@@ -88,6 +93,9 @@ class ApiController extends BaseController
             } elseif ($facebookUserData) {
                 $facebookId = $this->getDataString($facebookUserData, 'facebook_id');
                 $user = $repo->findOneBy(['facebookId' => $facebookId]);
+            } elseif ($googleUserData) {
+                $googleId = $this->getDataString($googleUserData, 'google_id');
+                $user = $repo->findOneBy(['googleId' => $googleId]);
             } elseif ($accountKitUserData) {
                 $authorizationCode = $this->getDataString($accountKitUserData, 'authorization_code');
 
@@ -161,6 +169,14 @@ class ApiController extends BaseController
                 }
                 // TODO: Here we would either add a session linking a facebook_id to a cognito session
                 // or on the client side, the cognito id returned, could be linked to the login
+            } elseif ($googleUserData) {
+                $googleService = $this->get('app.google');
+                if (!$googleService->validateToken(
+                    $user,
+                    $this->getDataString($googleUserData, 'google_access_token')
+                )) {
+                    return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_EXISTS, 'Invalid token', 403);
+                }
             }
             list($identityId, $token) = $this->getCognitoIdToken($user, $request);
 
@@ -583,6 +599,7 @@ class ApiController extends BaseController
             $dm = $this->getManager();
             $repo = $dm->getRepository(User::class);
             $facebookId = $this->getDataString($data, 'facebook_id');
+            $googleId = $this->getDataString($data, 'google_id');
             $mobileNumber = $this->getDataString($data, 'mobile_number');
             $userExists = $repo->existsUser($this->getDataString($data, 'email'), $facebookId, $mobileNumber);
             if ($userExists) {
@@ -601,6 +618,24 @@ class ApiController extends BaseController
                     );
                 }
             } else {
+                if ($facebookId !== null) {
+                    $facebookService = $this->get('app.facebook');
+                    if (!$facebookService->validateTokenId(
+                        $facebookId,
+                        $this->getDataString($facebookUserData, 'facebook_access_token')
+                    )) {
+                        return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_EXISTS, 'Invalid token', 403);
+                    }
+                } elseif ($googleId !== null) {
+                    $googleService = $this->get('app.google');
+                    if (!$googleService->validateTokenId(
+                        $googleId,
+                        $this->getDataString($googleUserData, 'google_access_token')
+                    )) {
+                        return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_EXISTS, 'Invalid token', 403);
+                    }
+                }
+
                 $userManager = $this->get('fos_user.user_manager');
                 $user = $userManager->createUser();
             }
@@ -619,6 +654,8 @@ class ApiController extends BaseController
             );
             $user->setFacebookId($this->getDataString($data, 'facebook_id'));
             $user->setFacebookAccessToken($this->getDataString($data, 'facebook_access_token'));
+            $user->setGoogleId($this->getDataString($data, 'google_id'));
+            $user->setGoogleAccessToken($this->getDataString($data, 'google_access_token'));
             $user->setSnsEndpoint($this->getDataString($data, 'sns_endpoint'));
             $user->setMobileNumber($mobileNumber);
             $user->setReferer($this->conformAlphanumericSpaceDot($this->getDataString($data, 'referer'), 500));
