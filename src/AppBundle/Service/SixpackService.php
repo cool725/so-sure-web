@@ -45,6 +45,7 @@ class SixpackService
 
     const EXPERIMENT_HOMEPAGE_AA_V2 = 'homepage-aa-v2';
     const EXPERIMENT_APP_SHARE_METHOD = 'app-share-method';
+    const EXPERIMENT_APP_PICSURE_LOCATION = 'app-picsure-location';
     const EXPERIMENT_SAVE_QUOTE_24HOURS = 'save-quote-24-hours';
     const EXPERIMENT_USER_WELCOME_MODAL = 'welcome-modal';
     const EXPERIMENT_QUOTE_INTERCOM_PURCHASE = 'quote-intercom-purchase';
@@ -58,6 +59,8 @@ class SixpackService
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';
     const ALTERNATIVES_APP_SHARE_METHOD_API = 'api';
+    const ALTERNATIVES_APP_PICSURE_REQUEST_LOCATION = 'request-location';
+    const ALTERNATIVES_APP_PICSURE_NO_LOCATION = 'no-location';
 
     const KPI_RECEIVE_DETAILS = 'receive-details';
     const KPI_QUOTE = 'quote';
@@ -78,6 +81,18 @@ class SixpackService
 
     public static $authExperiments = [
         self::EXPERIMENT_APP_SHARE_METHOD,
+        self::EXPERIMENT_APP_PICSURE_LOCATION,
+    ];
+
+    public static $appExperiments = [
+        self::EXPERIMENT_APP_SHARE_METHOD => [
+            self::ALTERNATIVES_APP_SHARE_METHOD_NATIVE,
+            self::ALTERNATIVES_APP_SHARE_METHOD_API,
+        ],
+        self::EXPERIMENT_APP_PICSURE_LOCATION => [
+            self::ALTERNATIVES_APP_PICSURE_NO_LOCATION,
+            self::ALTERNATIVES_APP_PICSURE_REQUEST_LOCATION,
+        ],
     ];
 
     /**
@@ -197,6 +212,13 @@ class SixpackService
                 self::EXPERIMENT_APP_SHARE_METHOD,
             ])) {
                 $this->mixpanel->queuePersonProperties([sprintf('Sixpack: %s', $experiment) => $result], true);
+            } elseif (in_array($experiment, self::$authExperiments)) {
+                $this->mixpanel->queuePersonProperties(
+                    ['Sixpack' => sprintf('%s=%s', $experiment, $result)],
+                    false,
+                    $this->requestService->getUser(),
+                    true
+                );
             } else {
                 $this->mixpanel->queuePersonProperties(
                     ['Sixpack' => sprintf('%s=%s', $experiment, $result)],

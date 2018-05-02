@@ -1683,6 +1683,17 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return true;
     }
 
+    public function getStandardSCode()
+    {
+        $scode = null;
+        foreach ($this->getPolicies() as $policy) {
+            if ($scode = $policy->getStandardSCode()) {
+                break;
+            }
+        }
+        return $scode;
+    }
+
     public function toApiArray($intercomHash = null, $identityId = null, $token = null, $debug = false)
     {
         $addresses = [];
