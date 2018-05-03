@@ -122,12 +122,18 @@ class DefaultController extends BaseController
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
         if ($requestService->getDeviceCategory() == RequestService::DEVICE_CATEGORY_MOBILE) {
-            return $this->redirectToRoute('homepage');
+            $exp = $this->sixpack(
+                $request,
+                SixpackService::EXPERIMENT_MONEY_LANDING,
+                ['homepage', 'money']
+            );
+            if ($exp == 'money') {
+                return $this->render('AppBundle:Default:indexMoney.html.twig');
+            } else {
+                return $this->redirectToRoute('homepage');
+            }
         } else {
-            return new RedirectResponse(sprintf(
-                'https://campaign.wearesosure.com/money_comparisons/?%s',
-                $request->getQueryString()
-            ));
+            return $this->render('AppBundle:Default:indexMoney.html.twig');
         }
     }
 
