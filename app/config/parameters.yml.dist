@@ -37,7 +37,7 @@ parameters:
     fb_og_namespace: 'wearesosure-dev'
     account_kit_secret: changeme
 
-    google_staging_clientid: ''
+    google_android_clientid: ''
 
     starling_client_id:      'changeme'
     starling_client_secret:  'changeme'
