@@ -58,12 +58,12 @@ $('#serialNumberModal').on('show.bs.modal', function (event) {
     var serial = button.data('serial');
     var modal = $(this);
     modal.find('.modal-title').text('Loading Serial Number ' + serial);
-    modal.find('#serial-details tr').remove();
+    modal.find('#serial-details-wrapper div').remove();
+    modal.find('#serial-details-wrapper').append('<table id="serial-details" width="100%" cellspacing="0" class="table-striped"></table>');
     $.ajax({
         url: url,
         type: 'GET',
         success: function(result) {
-            console.log(result);
             modal.find('#serial-details').DataTable({
                 destroy: true,
                 paging: false,
