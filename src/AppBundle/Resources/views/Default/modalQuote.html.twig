@@ -13,7 +13,11 @@
             <div class="modal-body">
 
                 {# Phone Search #}
-                {% set select_template = 'AppBundle:Default:selectPhoneMakeSearch' %}
+                {% if useDropdownSearch is defined and useDropdownSearch and device_category() == 'Mobile' %}
+                    {% set select_template = 'AppBundle:Default:selectPhoneMakeDropdown' %}
+                {% else %}
+                    {% set select_template = 'AppBundle:Default:selectPhoneMakeSearch' %}
+                {% endif %}
 
                 {% if selectPhoneMakeType is defined and selectPhoneMakeType and phoneId is defined and phoneId %}
                     {{ render(controller(select_template, {
