@@ -16,6 +16,7 @@ use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Security\PolicyVoter;
 use AppBundle\Service\PaymentService;
 use AppBundle\Service\PolicyService;
+use AppBundle\Service\RequestService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -61,6 +62,7 @@ use AppBundle\Form\Type\ImeiUploadFileType;
 use AppBundle\Form\Type\BasicUserType;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\PurchaseStepPersonalAddressType;
+use AppBundle\Form\Type\PurchaseStepPersonalAddressDropdownType;
 use AppBundle\Form\Type\PurchaseStepPersonalType;
 use AppBundle\Form\Type\PurchaseStepAddressType;
 use AppBundle\Form\Type\PurchaseStepPhoneType;
@@ -129,10 +131,25 @@ class PurchaseController extends BaseController
         } elseif ($session && $session->get('email')) {
             $purchase->setEmail($session->get('email'));
         }
+
+        // DOB Test
+        $dobExp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_DOB,
+            ['single', 'dropdowns']
+        );
+
+        // DOB Sixpack Test
         /** @var Form $purchaseForm */
-        $purchaseForm = $this->get('form.factory')
-            ->createNamedBuilder('purchase_form', PurchaseStepPersonalAddressType::class, $purchase)
-            ->getForm();
+        if ($dobExp == 'dropdowns') {
+            $purchaseForm = $this->get('form.factory')
+                ->createNamedBuilder('purchase_form', PurchaseStepPersonalAddressDropdownType::class, $purchase)
+                ->getForm();
+        } else {
+            $purchaseForm = $this->get('form.factory')
+                ->createNamedBuilder('purchase_form', PurchaseStepPersonalAddressType::class, $purchase)
+                ->getForm();
+        }
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('purchase_form')) {
@@ -237,29 +254,6 @@ class PurchaseController extends BaseController
             }
         }
 
-        // DOB Test
-        $showDropdown = null;
-
-        /** @var RequestService $requestService */
-        $requestService = $this->get('app.request');
-        if ($requestService->getDeviceCategory() == RequestService::DEVICE_CATEGORY_MOBILE) {
-
-            $dobExp = $this->sixpack(
-                $request,
-                SixpackService::EXPERIMENT_DOB,
-                ['single', 'dropdowns']
-            );
-
-            if ($dobExp == 'dropdowns') {
-                $showDropdown == true;
-            } else {
-                $showDropdown == false;
-            }
-
-        } else {
-            $showDropdown == false;
-        }
-
         /** @var \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface $csrf */
         $csrf = $this->get('security.csrf.token_manager');
 
@@ -276,7 +270,7 @@ class PurchaseController extends BaseController
             ) : null,
             // 'postcode' => $this->sixpack($request, SixpackService::EXPERIMENT_POSTCODE, ['comma', 'split', 'type']),
             'postcode' => 'comma',
-            'showDropdown' => $showDropdown,
+            'showDropdown' => $dobExp,
         );
 
         return $this->render('AppBundle:Purchase:purchaseStepPersonalAddress.html.twig', $data);

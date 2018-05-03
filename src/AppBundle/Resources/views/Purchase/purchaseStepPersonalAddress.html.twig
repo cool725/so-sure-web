@@ -1,4 +1,3 @@
-{% form_theme purchase_form 'AppBundle:Form:fields.html.twig' %}
 {% set use_pca = true %}
 
 {% extends 'base.html.twig' %}
@@ -183,7 +182,7 @@
                     </div>
 
                     <div class="form-step {% if not showDOB %}step--hide{% endif %}">
-                        {% if showDropdown is defined and showDropdown == true  %}
+                        {% if showDropdown is defined and showDropdown == 'dropdowns'  %}
                             <div class="form-group {% if form_errors(purchase_form.birthday) %}has-error{% endif %}">
                                 {{ form_label(purchase_form.birthday, 'Date of Birth:', {'label_attr': {'class': 'text-muted'} }) }}
                                 <div class="row">

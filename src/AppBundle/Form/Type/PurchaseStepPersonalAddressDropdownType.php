@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 
-class PurchaseStepPersonalAddressType extends AbstractType
+class PurchaseStepPersonalAddressDropdownType extends AbstractType
 {
     /**
      * @var boolean
