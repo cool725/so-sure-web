@@ -237,6 +237,34 @@ class PurchaseController extends BaseController
             }
         }
 
+        $showDropdown = null;
+
+        $dobExp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_DOB,
+            ['single', 'dropdowns']
+        );
+
+        /** @var RequestService $requestService */
+        $requestService = $this->get('app.request');
+        if ($requestService->getDeviceCategory() == RequestService::DEVICE_CATEGORY_MOBILE) {
+
+            $dobExp = $this->sixpack(
+                $request,
+                SixpackService::EXPERIMENT_DOB,
+                ['single', 'dropdowns']
+            );
+
+            if ($dobExp == 'dropdowns') {
+                $showDropdown == true;
+            } else {
+                $showDropdown == false;
+            }
+
+        } else {
+            $showDropdown == false;
+        }
+
         /** @var \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface $csrf */
         $csrf = $this->get('security.csrf.token_manager');
 
@@ -253,6 +281,7 @@ class PurchaseController extends BaseController
             ) : null,
             // 'postcode' => $this->sixpack($request, SixpackService::EXPERIMENT_POSTCODE, ['comma', 'split', 'type']),
             'postcode' => 'comma',
+            'showDropdown' => $showDropdown,
         );
 
         return $this->render('AppBundle:Purchase:purchaseStepPersonalAddress.html.twig', $data);
