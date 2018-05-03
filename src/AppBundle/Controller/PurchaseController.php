@@ -237,13 +237,8 @@ class PurchaseController extends BaseController
             }
         }
 
+        // DOB Test
         $showDropdown = null;
-
-        $dobExp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_DOB,
-            ['single', 'dropdowns']
-        );
 
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
