@@ -119,18 +119,21 @@ class DefaultController extends BaseController
      */
     public function moneyLanding(Request $request)
     {
-        $exp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_MONEY_LANDING,
-            ['money-index', 'money-landing']
-        );
-
-        $template = 'AppBundle:Default:index.html.twig';
-
-        if ($exp == 'money-landing') {
-            return $this->render('AppBundle:Default:indexMoney.html.twig');
+        /** @var RequestService $requestService */
+        $requestService = $this->get('app.request');
+        if ($requestService->getDeviceCategory() == RequestService::DEVICE_CATEGORY_MOBILE) {
+            $exp = $this->sixpack(
+                $request,
+                SixpackService::EXPERIMENT_MONEY_LANDING,
+                ['homepage', 'money']
+            );
+            if ($exp == 'money') {
+                return $this->render('AppBundle:Default:indexMoney.html.twig');
+            } else {
+                return $this->redirectToRoute('homepage');
+            }
         } else {
-            return $this->redirectToRoute('homepage');
+            return $this->render('AppBundle:Default:indexMoney.html.twig');
         }
     }
 
