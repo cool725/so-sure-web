@@ -2,8 +2,10 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Document\Phone;
 use AppBundle\Repository\ClaimRepository;
 use AppBundle\Repository\PhonePolicyRepository;
+use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\UserRepository;
 use CensusBundle\Service\SearchService;
 use Psr\Log\LoggerInterface;
@@ -40,6 +42,18 @@ class BICommand extends BaseCommand
                 InputOption::VALUE_REQUIRED,
                 'Policy prefix'
             )
+            ->addOption(
+                'only',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'only run 1 export [policies, claims, users, invitations, connections, phones]'
+            )
+            ->addOption(
+                'skip-s3',
+                null,
+                InputOption::VALUE_NONE,
+                'Skip s3 upload'
+            )
         ;
     }
 
@@ -47,33 +61,81 @@ class BICommand extends BaseCommand
     {
         $debug = $input->getOption('debug');
         $prefix = $input->getOption('prefix');
-        $lines = $this->exportPolicies($prefix);
-        if ($debug) {
-            $output->write(json_encode($lines, JSON_PRETTY_PRINT));
+        $only = $input->getOption('only');
+        $skipS3 = true === $input->getOption('skip-s3');
+
+        if (!$only || $only == 'policies') {
+            $lines = $this->exportPolicies($prefix, $skipS3);
+            if ($debug) {
+                $output->write(json_encode($lines, JSON_PRETTY_PRINT));
+            }
         }
 
-        $lines = $this->exportClaims();
-        if ($debug) {
-            $output->write(json_encode($lines, JSON_PRETTY_PRINT));
+        if (!$only || $only == 'claims') {
+            $lines = $this->exportClaims($skipS3);
+            if ($debug) {
+                $output->write(json_encode($lines, JSON_PRETTY_PRINT));
+            }
         }
 
-        $lines = $this->exportUsers();
-        if ($debug) {
-            $output->write(json_encode($lines, JSON_PRETTY_PRINT));
+        if (!$only || $only == 'users') {
+            $lines = $this->exportUsers($skipS3);
+            if ($debug) {
+                $output->write(json_encode($lines, JSON_PRETTY_PRINT));
+            }
         }
 
-        $lines = $this->exportInvitations();
-        if ($debug) {
-            $output->write(json_encode($lines, JSON_PRETTY_PRINT));
+        if (!$only || $only == 'invitations') {
+            $lines = $this->exportInvitations($skipS3);
+            if ($debug) {
+                $output->write(json_encode($lines, JSON_PRETTY_PRINT));
+            }
         }
 
-        $lines = $this->exportConnections();
-        if ($debug) {
-            $output->write(json_encode($lines, JSON_PRETTY_PRINT));
+        if (!$only || $only == 'connections') {
+            $lines = $this->exportConnections($skipS3);
+            if ($debug) {
+                $output->write(json_encode($lines, JSON_PRETTY_PRINT));
+            }
+        }
+
+        if (!$only || $only == 'phones') {
+            $lines = $this->exportPhones($skipS3);
+            if ($debug) {
+                $output->write(json_encode($lines, JSON_PRETTY_PRINT));
+            }
         }
     }
 
-    private function exportClaims()
+    private function exportPhones($skipS3)
+    {
+        /** @var PhoneRepository $repo */
+        $repo = $this->getManager()->getRepository(Phone::class);
+        $phones = $repo->findActive()->getQuery()->execute();
+        $lines = [];
+        $lines[] = implode(',', [
+            '"Make"',
+            '"Model"',
+            '"Memory"',
+            '"Current Monthly Cost"',
+        ]);
+        foreach ($phones as $phone) {
+            /** @var Phone $phone */
+            $lines[] = implode(',', [
+                sprintf('"%s"', $phone->getMake()),
+                sprintf('"%s"', $phone->getModel()),
+                sprintf('"%s"', $phone->getMemory()),
+                sprintf('"%0.2f"', $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice()),
+            ]);
+        }
+        if (!$skipS3) {
+            $this->uploadS3(implode(PHP_EOL, $lines), 'phones.csv');
+        }
+
+        return $lines;
+    }
+
+    private function exportClaims($skipS3)
     {
         /** @var SearchService $search */
         $search = $this->getContainer()->get('census.search');
@@ -158,12 +220,14 @@ class BICommand extends BaseCommand
                 sprintf('"%s"', $claim->getFinalSuspicion() ? 'yes' : 'no'),
             ]);
         }
-        $this->uploadS3(implode(PHP_EOL, $lines), 'claims.csv');
+        if (!$skipS3) {
+            $this->uploadS3(implode(PHP_EOL, $lines), 'claims.csv');
+        }
 
         return $lines;
     }
 
-    private function exportPolicies($prefix)
+    private function exportPolicies($prefix, $skipS3)
     {
         /** @var SearchService $search */
         $search = $this->getContainer()->get('census.search');
@@ -253,12 +317,14 @@ class BICommand extends BaseCommand
                 sprintf('"%0.2f"', $policy->getPotValue()),
             ]);
         }
-        $this->uploadS3(implode(PHP_EOL, $lines), 'policies.csv');
+        if (!$skipS3) {
+            $this->uploadS3(implode(PHP_EOL, $lines), 'policies.csv');
+        }
 
         return $lines;
     }
 
-    private function exportUsers()
+    private function exportUsers($skipS3)
     {
         /** @var SearchService $search */
         $search = $this->getContainer()->get('census.search');
@@ -297,12 +363,14 @@ class BICommand extends BaseCommand
                 sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getCampaignSource() : ''),
             ]);
         }
-        $this->uploadS3(implode(PHP_EOL, $lines), 'users.csv');
+        if (!$skipS3) {
+            $this->uploadS3(implode(PHP_EOL, $lines), 'users.csv');
+        }
 
         return $lines;
     }
 
-    private function exportInvitations()
+    private function exportInvitations($skipS3)
     {
         $repo = $this->getManager()->getRepository(Invitation::class);
         $invitations = $repo->findAll();
@@ -321,12 +389,14 @@ class BICommand extends BaseCommand
                 sprintf('"%s"', $invitation->getAccepted() ? $invitation->getAccepted()->format('Y-m-d H:i:s') : ''),
             ]);
         }
-        $this->uploadS3(implode(PHP_EOL, $lines), 'invitations.csv');
+        if (!$skipS3) {
+            $this->uploadS3(implode(PHP_EOL, $lines), 'invitations.csv');
+        }
 
         return $lines;
     }
 
-    private function exportConnections()
+    private function exportConnections($skipS3)
     {
         $repo = $this->getManager()->getRepository(StandardConnection::class);
         $connections = $repo->findAll();
@@ -349,7 +419,9 @@ class BICommand extends BaseCommand
             ]);
             // @codingStandardsIgnoreEnd
         }
-        $this->uploadS3(implode(PHP_EOL, $lines), 'connections.csv');
+        if (!$skipS3) {
+            $this->uploadS3(implode(PHP_EOL, $lines), 'connections.csv');
+        }
 
         return $lines;
     }

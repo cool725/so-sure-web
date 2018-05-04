@@ -779,6 +779,10 @@ class Phone
         return $this->toTopTwoDp($profit);
     }
 
+    /**
+     * @param \DateTime|null $date
+     * @return PhonePrice|null
+     */
     public function getCurrentPhonePrice(\DateTime $date = null)
     {
         if (!$date) {
@@ -786,6 +790,7 @@ class Phone
         }
 
         foreach ($this->getPhonePrices() as $phonePrice) {
+            /** @var PhonePrice $phonePrice */
             if ($phonePrice->getValidFrom() <= $date &&
                 (!$phonePrice->getValidTo() || $phonePrice->getValidTo() > $date)) {
                 return $phonePrice;
