@@ -114,7 +114,9 @@ class AdminController extends BaseController
         $phone->setModel($request->get('model'));
         $phone->setDevices($devices);
         $phone->setMemory($request->get('memory'));
-        $phone->getCurrentPhonePrice()->setGwp($request->get('gwp'));
+        /** @var PhonePrice $price */
+        $price = $phone->getCurrentPhonePrice();
+        $price->setGwp($request->get('gwp'));
         $dm->persist($phone);
         $dm->flush();
         $this->addFlash(
