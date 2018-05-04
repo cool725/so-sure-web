@@ -1506,6 +1506,9 @@ class JudopayServiceTest extends WebTestCase
         $amount = $updatedPolicy->getPremium()->getMonthlyPremiumPrice() * 11;
         $this->assertEquals($updatedPolicy->getOutstandingPremium(), $amount);
 
+        // build server is too fast and appears to be adding both payments at the same time
+        sleep(1);
+
         $details = self::$judopay->testPayDetails(
             $user,
             sprintf('%sR', $policy->getId()),
