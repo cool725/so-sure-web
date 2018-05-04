@@ -3271,16 +3271,12 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         ]);
         $data = $this->verifyResponse(200);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(Policy::class);
-        $updatedPolicy = $repo->find($policyData['id']);
-        $this->assertEquals(PhonePolicy::PICSURE_STATUS_MANUAL, $updatedPolicy->getPicSureStatus());
+        /** @var PhonePolicy $updatedPolicy */
+        $updatedPolicy = $this->assertPolicyByIdExists(self::$container, $policyData['id']);
 
-        $repo = $dm->getRepository(PhonePolicy::class);
-        $updatedPolicy = $repo->find($policyData['id']);
+        $this->assertEquals(PhonePolicy::PICSURE_STATUS_MANUAL, $updatedPolicy->getPicSureStatus());
         $files = $updatedPolicy->getPolicyPicSureFiles();
         $metadata = $files[0]->getMetadata();
-
         $this->assertTrue(isset($metadata['picsure-ml-score']));
     }
 
