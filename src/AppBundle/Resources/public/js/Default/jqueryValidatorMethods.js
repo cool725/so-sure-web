@@ -75,6 +75,34 @@ $(function(){
         return true;
     }, 'Sorry, only persons over the age of 18 can be covered');
 
+    // Over 18 Check
+    jQuery.validator.addMethod("checkDateOfBirthDropdown", function (value, element, params) {
+
+        if (this.optional(element)) {
+            return true;
+        }
+
+        var day = params[0];
+        var month = params[1];
+        var year = params[2];
+
+        day = parseInt($(day).val(), 10);
+        month = parseInt($(month).val(), 10);
+        year = parseInt($(year).val(), 10);
+
+        var birthdate = new Date();
+        birthdate.setFullYear(year, month - 1, day);
+
+        var minAge = new Date();
+        minAge.setYear(minAge.getFullYear() - 18);
+
+        if (minAge < birthdate) {
+            return false;
+        }
+
+        return true;
+    }, 'Sorry, only persons over the age of 18 can be covered');
+
     jQuery.validator.addMethod("checkDateIsValid", function (value, element) {
 
         if (this.optional(element)) {

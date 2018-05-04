@@ -53,8 +53,8 @@ class PurchaseStepPersonalAddressDropdownType extends AbstractType
             ->add('lastName', HiddenType::class, ['required' => false])
             ->add('birthday', BirthdayType::class, [
                   'required' => $this->required,
-                  'format'   => 'dd/MM/yyyy',
-                  'widget' => 'single_text',
+                  'format' => 'dd/MMMM/yyyy',
+                  'widget' => 'choice',
                   'placeholder' => array(
                       'year' => 'YYYY', 'month' => 'MM', 'day' => 'DD',
                   ),
