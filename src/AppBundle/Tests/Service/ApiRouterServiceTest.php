@@ -32,10 +32,13 @@ class ApiRouterServiceTest extends WebTestCase
 
          //now we can instantiate our service (if you want a fresh one for
          //each test method, do this in setUp() instead
-        /** @var RouterService apiRouter */
-         self::$apiRouter = self::$container->get('api.router');
-         /** @var RouterInterface router */
-         self::$router = self::$container->get('router');
+        /** @var RouterService $apiRouter */
+         $apiRouter = self::$container->get('api.router');
+         self::$apiRouter = $apiRouter;
+
+         /** @var RouterInterface $router */
+         $router = self::$container->get('router');
+         self::$router = $router;
     }
 
     public function tearDown()
