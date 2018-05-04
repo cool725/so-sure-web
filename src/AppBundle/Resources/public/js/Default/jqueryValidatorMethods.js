@@ -75,7 +75,32 @@ $(function(){
         return true;
     }, 'Sorry, only persons over the age of 18 can be covered');
 
-    // Over 18 Check
+    jQuery.validator.addMethod("checkDateIsValid", function (value, element) {
+
+        if (this.optional(element)) {
+            return true;
+        }
+
+        var dateOfBirth = value;
+        var arr_dateText = dateOfBirth.split("/");
+        day = arr_dateText[0];
+        month = arr_dateText[1];
+        year = arr_dateText[2];
+
+        var birthdate = new Date();
+        birthdate.setFullYear(year, month - 1, day);
+
+        var maxAge = new Date();
+        maxAge.setFullYear(maxAge.getFullYear() - 150);
+
+        if (maxAge > birthdate) {
+            return false;
+        }
+
+        return true;
+    }, 'Please enter a valid date of birth');
+
+    // Over 18 Check Dropdown
     jQuery.validator.addMethod("checkDateOfBirthDropdown", function (value, element, params) {
 
         if (this.optional(element)) {
@@ -102,31 +127,6 @@ $(function(){
 
         return true;
     }, 'Sorry, only persons over the age of 18 can be covered');
-
-    jQuery.validator.addMethod("checkDateIsValid", function (value, element) {
-
-        if (this.optional(element)) {
-            return true;
-        }
-
-        var dateOfBirth = value;
-        var arr_dateText = dateOfBirth.split("/");
-        day = arr_dateText[0];
-        month = arr_dateText[1];
-        year = arr_dateText[2];
-
-        var birthdate = new Date();
-        birthdate.setFullYear(year, month - 1, day);
-
-        var maxAge = new Date();
-        maxAge.setFullYear(maxAge.getFullYear() - 150);
-
-        if (maxAge > birthdate) {
-            return false;
-        }
-
-        return true;
-    }, 'Please enter a valid date of birth');
 
     jQuery.validator.addMethod("isOverFive", function (value, element) {
         if (value == 'less than 5') {

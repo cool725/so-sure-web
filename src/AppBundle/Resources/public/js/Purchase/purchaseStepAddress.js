@@ -67,7 +67,8 @@ sosure.purchaseStepAddress = (function() {
                 },
                 "purchase_form[birthday][year]" : {
                     required: true,
-                    checkDateOfBirthDropdown: ["#purchase_form_birthday_day", "#purchase_form_birthday_month", "#purchase_form_birthday_year"]
+                    checkDateOfBirthDropdown: ["#purchase_form_birthday_day", "#purchase_form_birthday_month", "#purchase_form_birthday_year"],
+                    checkDateIsValidDropdown: ["#purchase_form_birthday_day", "#purchase_form_birthday_month", "#purchase_form_birthday_year"]
                 },
                 birthday : {
                     checkDateOfBirth: true
