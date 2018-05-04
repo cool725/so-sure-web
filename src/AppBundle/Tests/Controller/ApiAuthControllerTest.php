@@ -3271,6 +3271,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         ]);
         $data = $this->verifyResponse(200);
 
+        // allow time for event listener to trigger and update db
+        sleep(1);
+
         /** @var PhonePolicy $updatedPolicy */
         $updatedPolicy = $this->assertPolicyByIdExists(self::$container, $policyData['id']);
 

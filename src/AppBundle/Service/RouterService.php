@@ -24,6 +24,14 @@ class RouterService
         $this->baseUrl = $baseUrl;
     }
 
+    /**
+     * @return RouterInterface
+     */
+    public function getRouter()
+    {
+        return $this->router;
+    }
+
     public function generate($route, $params)
     {
         return sprintf(
