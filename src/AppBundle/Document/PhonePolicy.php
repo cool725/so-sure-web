@@ -181,6 +181,7 @@ class PhonePolicy extends Policy
             if ($this->getUser()) {
                 $additionalPremium = $this->getUser()->getAdditionalPremium();
             }
+            /** @var PhonePrice $price */
             $price = $phone->getCurrentPhonePrice($date);
             $this->setPremium($price->createPremium($additionalPremium, $date));
         }
