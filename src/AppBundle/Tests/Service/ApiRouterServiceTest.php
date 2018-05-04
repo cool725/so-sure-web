@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Service\RouterService;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Routing\RouterInterface;
@@ -13,6 +14,8 @@ class ApiRouterServiceTest extends WebTestCase
 {
     use \AppBundle\Tests\PhingKernelClassTrait;
     protected static $container;
+
+    /** @var RouterService */
     protected static $apiRouter;
 
     /** @var RouterInterface */
@@ -29,7 +32,9 @@ class ApiRouterServiceTest extends WebTestCase
 
          //now we can instantiate our service (if you want a fresh one for
          //each test method, do this in setUp() instead
+        /** @var RouterService apiRouter */
          self::$apiRouter = self::$container->get('api.router');
+         /** @var RouterInterface router */
          self::$router = self::$container->get('router');
     }
 
