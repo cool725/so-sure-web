@@ -243,8 +243,8 @@ class BacsService
             $this->validateRecordType($element, "A");
 
             $results['instructions']++;
-            $reason = $this->getReason();
-            $reference = $this->getReference();
+            $reason = $this->getReason($element);
+            $reference = $this->getReference($element);
             /** @var User $user */
             $user = $repo->findOneBy(['paymentMethod.bankAccount.reference' => $reference]);
             if (!$user) {
@@ -443,7 +443,7 @@ class BacsService
     /**
      * @param \DOMElement $element
      * @param string      $name
-     * @param string      $missingValue
+     * @param mixed       $missingValue
      * @return string|null
      */
     private function getNodeValue(\DOMElement $element, $name, $missingValue = null)
