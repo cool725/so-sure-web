@@ -660,10 +660,15 @@ trait UserClassTrait
 
     protected function assertPolicyExists($container, Policy $policy)
     {
+        return $this->assertPolicyByIdExists($container, $policy->getId());
+    }
+
+    protected function assertPolicyByIdExists($container, $id)
+    {
         /** @var DocumentManager $dm */
         $dm = $container->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(Policy::class);
-        $updatedPolicy = $repo->find($policy->getId());
+        $updatedPolicy = $repo->find($id);
         $this->assertNotNull($updatedPolicy);
 
         return $updatedPolicy;
