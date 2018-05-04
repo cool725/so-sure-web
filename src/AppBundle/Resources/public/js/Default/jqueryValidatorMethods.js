@@ -66,7 +66,7 @@ $(function(){
         birthdate.setFullYear(year, month - 1, day);
 
         var minAge = new Date();
-        minAge.setYear(minAge.getFullYear() - 18);
+        minAge.setFullYear(minAge.getFullYear() - 18);
 
         if (minAge < birthdate) {
             return false;
@@ -119,7 +119,7 @@ $(function(){
         birthdate.setFullYear(year, month - 1, day);
 
         var minAge = new Date();
-        minAge.setYear(minAge.getFullYear() - 18);
+        minAge.setFullYear(minAge.getFullYear() - 18);
 
         if (minAge < birthdate) {
             return false;
