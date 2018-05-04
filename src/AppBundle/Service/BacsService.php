@@ -430,11 +430,11 @@ class BacsService
             } else {
                 throw new \Exception(sprintf('Unknown record type %s', $recordType));
             }
-            $results['serial-number'] = $this->getNodeValue($element,'vol-serial-number');
-            $results['file-numbers'][] = $this->getNodeValue($element,'originator-file-number');
+            $results['serial-number'] = $this->getNodeValue($element, 'vol-serial-number');
+            $results['file-numbers'][] = $this->getNodeValue($element, 'originator-file-number');
             $results['records']++;
-            $results['accepted-ddi'] += $this->getNodeValue($element,'accepted-ddi', 0);
-            $results['rejected-ddi'] += $this->getNodeValue($element,'rejected-ddi', 0);
+            $results['accepted-ddi'] += $this->getNodeValue($element, 'accepted-ddi', 0);
+            $results['rejected-ddi'] += $this->getNodeValue($element, 'rejected-ddi', 0);
         }
 
         return $results;
