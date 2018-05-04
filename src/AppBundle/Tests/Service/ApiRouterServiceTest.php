@@ -4,6 +4,7 @@ namespace AppBundle\Tests\Service;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * @group functional-nonet
@@ -13,6 +14,8 @@ class ApiRouterServiceTest extends WebTestCase
     use \AppBundle\Tests\PhingKernelClassTrait;
     protected static $container;
     protected static $apiRouter;
+
+    /** @var RouterInterface */
     protected static $router;
 
     public static function setUpBeforeClass()
@@ -37,6 +40,7 @@ class ApiRouterServiceTest extends WebTestCase
     public function testNoPort()
     {
         self::$router->getContext()->setHttpPort(8080);
+        self::$router->getContext()->setHttpsPort(8080);
         $url = self::$router->generate('homepage', [], UrlGeneratorInterface::ABSOLUTE_URL);
         $this->assertContains(':8080', $url);
     }
@@ -44,6 +48,7 @@ class ApiRouterServiceTest extends WebTestCase
     public function testPort()
     {
         self::$apiRouter->getRouter()->getContext()->setHttpPort(8080);
+        self::$apiRouter->getRouter()->getContext()->setHttpsPort(8080);
         $url = self::$apiRouter->getRouter()->generate('homepage', [], UrlGeneratorInterface::ABSOLUTE_URL);
         $this->assertNotContains(':8080', $url);
     }
