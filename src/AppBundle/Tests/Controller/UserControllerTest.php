@@ -864,7 +864,7 @@ class UserControllerTest extends BaseControllerTest
         $now = new \DateTime();
         $keyUsername = sprintf("PeerJUserSecurityBundle::%s::username::%s", 'login_failed', $email);
         for ($i = 1; $i < 25; $i++) {
-            self::$redis->zadd($key, $now->getTimestamp(), serialize(array($email, $now->getTimestamp())));
+            self::$redis->zadd($key, [serialize(array($email, $now->getTimestamp())) => $now->getTimestamp()]);
             $now = $now->sub(new \DateInterval(('PT1S')));
         }
 
