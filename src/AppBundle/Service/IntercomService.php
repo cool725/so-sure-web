@@ -406,6 +406,7 @@ class IntercomService
         $data['custom_attributes']['Connections'] = $analytics['connections'];
         $data['custom_attributes']['Approved Claims'] = $analytics['approvedClaims'];
         $data['custom_attributes']['Approved Network Claims'] = $analytics['approvedNetworkClaims'];
+        $data['custom_attributes']['Payment Method'] = $analytics['paymentMethod'];
         $data['custom_attributes']['Promo Code'] = $analytics['firstPolicy']['promoCode'];
         $data['custom_attributes']['Pending Invites'] = count($user->getUnprocessedReceivedInvitations());
         $data['custom_attributes']['Number of Policies'] = $analytics['numberPolicies'];
