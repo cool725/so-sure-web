@@ -35,6 +35,7 @@ class Claim
     const WARNING_FLAG_BRIGHTSTAR_NAME_MATCH = 'brightstar-name-match';
     const WARNING_FLAG_BRIGHTSTAR_POSTCODE = 'brighstar-postcode';
     const WARNING_FLAG_DAVIES_REPLACEMENT_COST_HIGHER = 'davies-replacement-cost-higher';
+    const WARNING_FLAG_DAVIES_INCORRECT_EXCESS = 'davies-incorrect-excess';
 
     // technically not a warning flag, but fits nicely under that for UI with little change required
     // and very little usage envisioned
@@ -48,7 +49,8 @@ class Claim
         self::WARNING_FLAG_BRIGHTSTAR_POSTCODE => self::WARNING_FLAG_BRIGHTSTAR_POSTCODE,
         self::WARNING_FLAG_IGNORE_USER_DECLINED => self::WARNING_FLAG_IGNORE_USER_DECLINED,
         self::WARNING_FLAG_IGNORE_POLICY_EXPIRE_CLAIM_WAIT => self::WARNING_FLAG_IGNORE_POLICY_EXPIRE_CLAIM_WAIT,
-        self::WARNING_FLAG_DAVIES_REPLACEMENT_COST_HIGHER => self::WARNING_FLAG_DAVIES_REPLACEMENT_COST_HIGHER
+        self::WARNING_FLAG_DAVIES_REPLACEMENT_COST_HIGHER => self::WARNING_FLAG_DAVIES_REPLACEMENT_COST_HIGHER,
+        self::WARNING_FLAG_DAVIES_INCORRECT_EXCESS => self::WARNING_FLAG_DAVIES_INCORRECT_EXCESS,
     ];
 
     public static $claimTypes = [
