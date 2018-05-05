@@ -856,9 +856,16 @@ class UserControllerTest extends BaseControllerTest
         self::$dm->flush();
         //print_r($policy->getClaimsWarnings());
         $this->assertTrue($policy->getUser()->hasActivePolicy());
+        $key = "PeerJUserSecurityBundle::login_failed::ip::127.0.0.1";
+        $this->assertFalse(self::$redis->exists($key) == 1);
+        $this->login($email, 'bar', 'login');
+        $this->assertTrue(self::$redis->exists($key) == 1);
 
+        $now = new \DateTime();
+        $keyUsername = sprintf("PeerJUserSecurityBundle::%s::username::%s", 'login_failed', $email);
         for ($i = 1; $i < 25; $i++) {
-            $this->login($email, 'bar', 'login');
+            self::$redis->zadd($key, $now->getTimestamp(), serialize(array($email, $now->getTimestamp())));
+            $now = $now->sub(new \DateInterval(('PT1S')));
         }
 
         $this->login($email, 'bar', 'login', null, null);
@@ -866,6 +873,7 @@ class UserControllerTest extends BaseControllerTest
         // expect a locked account
         $this->login($email, 'bar', 'login', null, 503);
     }
+
     public function testUserWelcomePage()
     {
         $email = self::generateEmail('testUserWelcomePage', $this);
