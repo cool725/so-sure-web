@@ -174,7 +174,7 @@ class BacsService
         $key = new RSA();
         $key->loadKey(file_get_contents($this->accessPayKeyFile));
         if (!$sftp->login($this->accessPayUsername, $this->accessPayKeyFile) &&
-            !$sftp->login($this->accessPayUsername, $this->accessPayKeyFile)) {
+            !$sftp->login($this->accessPayUsername, $this->accessPayPassword)) {
             throw new \Exception('Login Failed');
         }
 
