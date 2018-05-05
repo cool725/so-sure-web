@@ -35,6 +35,9 @@ sosure.purchaseStepAddress = (function() {
             onkeyup: false,
             focusCleanup: true,
             validClass: 'has-success',
+            groups: {
+                birthday: 'purchase_form_birthday_day purchase_form_birthday_month purchase_form_birthday_year',
+            },
             rules: {
                 "purchase_form[name]" : {
                     required: true,
@@ -55,6 +58,20 @@ sosure.purchaseStepAddress = (function() {
                     validDate: true,
                     checkDateOfBirth: true,
                     checkDateIsValid: true
+                },
+                "purchase_form[birthday][day]" : {
+                    required: true
+                },
+                "purchase_form[birthday][month]" : {
+                    required: true
+                },
+                "purchase_form[birthday][year]" : {
+                    required: true,
+                    checkDateOfBirthDropdown: ["#purchase_form_birthday_day", "#purchase_form_birthday_month", "#purchase_form_birthday_year"],
+                    checkDateIsValidDropdown: ["#purchase_form_birthday_day", "#purchase_form_birthday_month", "#purchase_form_birthday_year"]
+                },
+                birthday : {
+                    checkDateOfBirth: true
                 },
                 "purchase_form[mobileNumber]" : {
                     required: {
@@ -100,7 +117,15 @@ sosure.purchaseStepAddress = (function() {
                 },
                 "purchase_form[birthday]" : {
                     required: 'Please enter a valid date in the format DD/MM/YYYY',
-                    check_date_of_birth: 'Sorry, only persons over the age of 18 can be covered',
+                },
+                "purchase_form[birthday][day]" : {
+                    required: 'Please enter your day of birth.'
+                },
+                "purchase_form[birthday][month]" : {
+                    required: 'Please enter your month of birth.'
+                },
+                "purchase_form[birthday][year]" : {
+                    required: 'Please enter your year of birth.'
                 },
                 "purchase_form[mobileNumber]" : 'Valid UK Mobile Number (Sorry for those outside the UK, but for now, we can only insure UK residents)',
                 "purchase_form[addressLine1]" : 'Please enter the first line of your address',
@@ -110,6 +135,14 @@ sosure.purchaseStepAddress = (function() {
 
             submitHandler: function(form) {
                 form.submit();
+            },
+
+            errorPlacement: function(error, element) {
+                if (element.attr('name') == 'purchase_form[birthday][day]' || element.attr('name') == 'purchase_form[birthday][month]' || element.attr('name') == 'purchase_form[birthday][year]') {
+                    error.insertAfter('#dob-field');
+                } else {
+                    error.insertAfter(element);
+                }
             },
 
             showErrors: function(errorMap, errorList) {

@@ -996,6 +996,12 @@ services:
         tags:
             - { name: form.type }
 
+    app.form.type.purchasesteppersonaladdressdropdown:
+        class: AppBundle\Form\Type\PurchaseStepPersonalAddressDropdownType
+        arguments: ["@request_stack", "%form_required%"]
+        tags:
+            - { name: form.type }
+
     app.form.type.purchasestepaddress:
         class: AppBundle\Form\Type\PurchaseStepAddressType
         arguments: ["%form_required%"]
@@ -1121,7 +1127,7 @@ services:
             - "@router"
         tags:
             - { name: dpn_xml_sitemap.generator }
-    
+
     two_factor.persister:
         class: AppBundle\Service\DoctrinePersister
         arguments:
