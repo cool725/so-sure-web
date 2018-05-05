@@ -238,7 +238,7 @@ class BacsService
             'credits' => 0,
         ];
         foreach ($fileDataArray as $line) {
-            if (!$line || strlen($line) == 0) {
+            if (!$line || mb_strlen($line) == 0) {
                 continue;
             }
             $lineData = str_getcsv($line, ",", '"');
