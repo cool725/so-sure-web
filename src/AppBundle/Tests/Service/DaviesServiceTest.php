@@ -869,6 +869,12 @@ class DaviesServiceTest extends WebTestCase
 
         self::$daviesService->validateClaimDetails($claim, $daviesClaim);
         $this->insureErrorExists('/does not have the correct excess value/');
+
+        self::$daviesService->clearErrors();
+
+        $claim->setIgnoreWarningFlags(Claim::WARNING_FLAG_DAVIES_INCORRECT_EXCESS);
+        self::$daviesService->validateClaimDetails($claim, $daviesClaim);
+        $this->insureErrorDoesNotExist('/does not have the correct excess value/');
     }
 
     public function testValidateClaimDetailsNegativeExcess()
