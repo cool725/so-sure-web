@@ -522,42 +522,44 @@ class PhoneInsuranceController extends BaseController
             $this->get('app.sixpack')->convert(
                 SixpackService::EXPERIMENT_HOMEPAGE_AA_V2
             );
-
-            $this->get('app.sixpack')->convert(
-                SixpackService::EXPERIMENT_MOBILE_SEARCH_DROPDOWN
-            );
-
+            
             $this->get('app.sixpack')->convert(
                 SixpackService::EXPERIMENT_DEFACTO
             );
         }
 
+        $replacement = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_72_REPLACEMENT,
+            ['next-working-day', 'seventytwo-hours']
+        );
+
         $data = array(
-            'phone' => $phone,
-            'phone_price' => $phone->getCurrentPhonePrice(),
-            'policy_key' => $this->getParameter('policy_key'),
+            'phone'            => $phone,
+            'phone_price'      => $phone->getCurrentPhonePrice(),
+            'policy_key'       => $this->getParameter('policy_key'),
             'connection_value' => PhonePolicy::STANDARD_VALUE,
-            'annual_premium' => $annualPremium,
-            'max_connections' => $maxConnections,
-            'max_pot' => $maxPot,
-            'lead_form' => $leadForm->createView(),
-            'buy_form' => $buyForm->createView(),
-            'buy_form_banner' => $buyBannerForm->createView(),
-            'phones' => $repo->findBy(
+            'annual_premium'   => $annualPremium,
+            'max_connections'  => $maxConnections,
+            'max_pot'          => $maxPot,
+            'lead_form'        => $leadForm->createView(),
+            'buy_form'         => $buyForm->createView(),
+            'buy_form_banner'  => $buyBannerForm->createView(),
+            'phones'           => $repo->findBy(
                 [
-                    'active' => true,
-                    'makeCanonical' => mb_strtolower($make),
+                    'active'         => true,
+                    'makeCanonical'  => mb_strtolower($make),
                     'modelCanonical' => mb_strtolower($decodedModel)
                 ],
                 ['memory' => 'asc']
             ),
-            'comparision' => $phone->getComparisions(),
+            'comparision'     => $phone->getComparisions(),
             'comparision_max' => $maxComparision,
-            'coming_soon' => $phone->getCurrentPhonePrice() ? false : true,
-            'days_test' => $daysTest,
-            //'slider_test' => $sliderTest,
-            'slider_test' => 'slide-me',
-            'intercom_test' => $expIntercom,
+            'coming_soon'     => $phone->getCurrentPhonePrice() ? false : true,
+            'days_test'       => $daysTest,
+            'slider_test'     => 'slide-me',
+            'intercom_test'   => $expIntercom,
+            'replacement'     => $replacement,
         );
 
         $template = 'AppBundle:PhoneInsurance:quote.html.twig';

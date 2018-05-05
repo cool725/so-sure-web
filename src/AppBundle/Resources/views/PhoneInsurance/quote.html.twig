@@ -155,7 +155,14 @@
                             <div class="col-sm-6 col-md-12">
                                 <h3>What we offer</h3>
                                 <ul class="list-unstyled fa-list-bullet">
-                                    <li><i class="fa fa-check text-blue" aria-hidden="true"></i> Next working day replacement or repair</li>
+                                    <li>
+                                        <i class="fa fa-check text-blue" aria-hidden="true"></i>
+                                        {% if replacement is defined and replacement == 'seventytwo-hours' %}
+                                            Replacement within 24 to 72 hours
+                                        {% else %}
+                                            Next working day replacement or repair
+                                        {% endif %}
+                                    </li>
                                     <li><i class="fa fa-check text-blue" aria-hidden="true"></i> 24/7 live support</li>
                                     <li><i class="fa fa-check text-blue" aria-hidden="true"></i> Insure used phones</li>
                                     <li><i class="fa fa-check text-blue" aria-hidden="true"></i> Instant cover when you purchase your policy</li>

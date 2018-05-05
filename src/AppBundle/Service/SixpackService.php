@@ -50,12 +50,14 @@ class SixpackService
     const EXPERIMENT_USER_WELCOME_MODAL = 'welcome-modal';
     const EXPERIMENT_QUOTE_INTERCOM_PURCHASE = 'quote-intercom-purchase';
     //const EXPERIMENT_MONEY_UNBOUNCE = 'money-unbounce';
-    const EXPERIMENT_MOBILE_SEARCH_DROPDOWN = 'mobile-dropdown-search';
+    //const EXPERIMENT_MOBILE_SEARCH_DROPDOWN = 'mobile-dropdown-search';
     const EXPERIMENT_STEP_3 = 'step-3-payment-new';
     const EXPERIMENT_PURCHASE_FLOW_BACS = 'purchase-flow-bacs';
     const EXPERIMENT_CPC_QUOTE_HOMEPAGE = 'cpc-quote-or-homepage';
     const EXPERIMENT_DEFACTO = 'defacto';
     const EXPERIMENT_DOB = 'purchase-funnel-dob-dropdown';
+    const EXPERIMENT_72_REPLACEMENT = 'seventytwo-hours';
+    const EXPERIMENT_MONEY_LANDING = 'money-landing';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';
@@ -73,12 +75,13 @@ class SixpackService
         self::EXPERIMENT_HOMEPAGE_AA_V2,
         self::EXPERIMENT_SAVE_QUOTE_24HOURS,
         self::EXPERIMENT_QUOTE_INTERCOM_PURCHASE,
-        self::EXPERIMENT_MOBILE_SEARCH_DROPDOWN,
         self::EXPERIMENT_STEP_3,
         self::EXPERIMENT_PURCHASE_FLOW_BACS,
         self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
         self::EXPERIMENT_DEFACTO,
         self::EXPERIMENT_DOB,
+        self::EXPERIMENT_72_REPLACEMENT,
+        self::EXPERIMENT_MONEY_LANDING,
     ];
 
     public static $authExperiments = [
@@ -105,6 +108,8 @@ class SixpackService
         self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
         self::EXPERIMENT_STEP_3,
         self::EXPERIMENT_PURCHASE_FLOW_BACS,
+        self::EXPERIMENT_72_REPLACEMENT,
+        self::EXPERIMENT_MONEY_LANDING,
     ];
 
     /**
@@ -114,7 +119,6 @@ class SixpackService
     public static $purchaseConversionKpi = [
         self::EXPERIMENT_QUOTE_INTERCOM_PURCHASE,
         self::EXPERIMENT_HOMEPAGE_AA_V2,
-        self::EXPERIMENT_MOBILE_SEARCH_DROPDOWN,
         self::EXPERIMENT_DEFACTO,
         self::EXPERIMENT_DOB,
     ];

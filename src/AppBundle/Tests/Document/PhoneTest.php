@@ -51,7 +51,9 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
     {
         $phone = new Phone();
         $phone->init('Apple', 'iPhone 6', 6.990001, 1.5);
-        $this->assertEquals(6.99, $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice());
+        /** @var PhonePrice $price */
+        $price = $phone->getCurrentPhonePrice();
+        $this->assertEquals(6.99, $price->getMonthlyPremiumPrice());
     }
     
     public function testGetCurrentPhonePrice()
@@ -61,7 +63,9 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $phonePrice->setValidFrom(new \DateTime('2016-01-01'));
         $phone->addPhonePrice($phonePrice);
 
-        $this->assertEquals(new \DateTime('2016-01-01'), $phone->getCurrentPhonePrice()->getValidFrom());
+        /** @var PhonePrice $price */
+        $price = $phone->getCurrentPhonePrice();
+        $this->assertEquals(new \DateTime('2016-01-01'), $price->getValidFrom());
     }
 
     public function testMultipleGetCurrentPhonePrice()
@@ -75,7 +79,9 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $phonePriceB->setValidFrom(new \DateTime('2016-01-03'));
         $phone->addPhonePrice($phonePriceB);
 
-        $this->assertEquals(new \DateTime('2016-01-03'), $phone->getCurrentPhonePrice()->getValidFrom());
+        /** @var PhonePrice $price */
+        $price = $phone->getCurrentPhonePrice();
+        $this->assertEquals(new \DateTime('2016-01-03'), $price->getValidFrom());
     }
 
     public function testIsSameMake()

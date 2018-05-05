@@ -17,7 +17,9 @@
                     <div class="col-md-6">
                         <ul class="list-unstyled">
                             <li class="h3 text-blue text-underline">Up to 40% cheaper than traditional insurers</li>
-                            <li class="h3 text-blue text-underline">Next working day replacement or repair</li>
+                            <li class="h3 text-blue text-underline">
+                                {% if replacement is defined and replacement == 'seventytwo-hours' %}Replacement or repair within 24 to 72 hours{% else %}Next working day replacement or repair{% endif %}
+                            </li>
                         </ul>
                     </div>
                     <div class="col-md-6">

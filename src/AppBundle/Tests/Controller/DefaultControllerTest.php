@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Controller;
 
+use AppBundle\Document\PhonePrice;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
@@ -132,8 +133,10 @@ class DefaultControllerTest extends BaseControllerTest
         self::verifyResponse(301);
         $crawler = self::$client->followRedirect();
         self::verifyResponse(200);
+        /** @var PhonePrice $price */
+        $price = $phone->getCurrentPhonePrice();
         $this->assertContains(
-            sprintf("£%.2f", $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice()),
+            sprintf("£%.2f", $price->getMonthlyPremiumPrice()),
             self::$client->getResponse()->getContent()
         );
     }
@@ -201,7 +204,7 @@ class DefaultControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', '/');
         $data = self::$client->getResponse();
         $this->assertEquals(200, $data->getStatusCode());
-        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 2);
+        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
     }
 
     public function areLinksValid($name, $key, $allKeys, $phoneLinks)

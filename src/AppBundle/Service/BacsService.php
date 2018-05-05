@@ -52,6 +52,12 @@ class BacsService
     const AUDDIS_REASON_NO_ACCOUNT = 5;
     const AUDDIS_REASON_NO_INSTRUCTION = 6;
     const AUDDIS_REASON_NON_ZERO = 7;
+    const AUDDIS_REASON_CLOSED = 'B';
+    const AUDDIS_REASON_TRANSFER_BRANCH = 'C';
+    const AUDDIS_REASON_INVALID_ACCOUNT_TYPE = 'F';
+    const AUDDIS_REASON_DD_NOT_ALLOWED = 'G';
+    const AUDDIS_REASON_EXPIRED = 'H';
+    const AUDDIS_REASON_DUPLICATE_REFERENCE = 'I';
 
     /** @var LoggerInterface */
     protected $logger;
@@ -237,8 +243,8 @@ class BacsService
             $this->validateRecordType($element, "A");
 
             $results['instructions']++;
-            $reason = $element->attributes->getNamedItem('reason-code')->nodeValue;
-            $reference = $element->attributes->getNamedItem('reference')->nodeValue;
+            $reason = $this->getReason($element);
+            $reference = $this->getReference($element);
             /** @var User $user */
             $user = $repo->findOneBy(['paymentMethod.bankAccount.reference' => $reference]);
             if (!$user) {
@@ -334,6 +340,16 @@ class BacsService
         return $element->attributes->getNamedItem('record-type')->nodeValue;
     }
 
+    private function getReference(\DOMElement $element)
+    {
+        return $element->attributes->getNamedItem('reference')->nodeValue;
+    }
+
+    private function getReason(\DOMElement $element)
+    {
+        return $element->attributes->getNamedItem('reason-code')->nodeValue;
+    }
+
     private function validateRecordType(\DOMElement $element, $expectedRecordType)
     {
         $recordType = $this->getRecordType($element);
@@ -356,6 +372,7 @@ class BacsService
             'records' => 0,
             'accepted-ddi' => 0,
             'rejected-ddi' => 0,
+            'cancelled-ddi' => 0,
         ];
 
         $xml = file_get_contents($file);
@@ -369,27 +386,73 @@ class BacsService
         /** @var \DOMElement $element */
         foreach ($elementList as $element) {
             $this->validateSun($element);
-            $this->validateFileType($element);
             $recordType = $this->getRecordType($element);
             if ($recordType == "V") {
-                // successful record
-                \AppBundle\Classes\NoOp::ignore([]);
+                $this->validateFileType($element);
             } elseif ($recordType == "R") {
+                $this->validateFileType($element);
                 $errorsList = $xpath->query('//BACSDocument/Data/MessagingAdvices/MessagingError');
                 foreach ($errorsList as $error) {
                     $results['errors'][] = $error->attributes->getNamedItem('line1')->nodeValue;
                 }
+            } elseif ($recordType == "N") {
+                $reference = $this->getReference($element);
+                $repo = $this->dm->getRepository(User::class);
+                /** @var User $user */
+                $user = $repo->findOneBy(['paymentMethod.bankAccount.reference' => $reference]);
+                if (!$user) {
+                    throw new \Exception(sprintf('Unable to find user with reference %s', $reference));
+                }
+
+                $reason = $this->getReason($element);
+                if (in_array($reason, [
+                    self::AUDDIS_REASON_USER,
+                    self::AUDDIS_REASON_DECEASED,
+                    self::AUDDIS_REASON_TRANSFER,
+                    self::AUDDIS_REASON_NO_ACCOUNT,
+                    self::AUDDIS_REASON_NO_INSTRUCTION,
+                    self::AUDDIS_REASON_NON_ZERO,
+                    self::AUDDIS_REASON_CLOSED,
+                    self::AUDDIS_REASON_TRANSFER_BRANCH,
+                    self::AUDDIS_REASON_INVALID_ACCOUNT_TYPE,
+                    self::AUDDIS_REASON_DD_NOT_ALLOWED,
+                    self::AUDDIS_REASON_EXPIRED,
+                    self::AUDDIS_REASON_DUPLICATE_REFERENCE,
+                ])) {
+                    /** @var BacsPaymentMethod $bacs */
+                    $bacs = $user->getPaymentMethod();
+                    $bacs->getBankAccount()->setMandateStatus(BankAccount::MANDATE_CANCELLED);
+                    $this->dm->flush();
+                    $results['cancelled-ddi']++;
+                } else {
+                    throw new \Exception(sprintf('Unknown auddis reason %s', $reason));
+                }
             } else {
                 throw new \Exception(sprintf('Unknown record type %s', $recordType));
             }
-            $results['serial-number'] = $element->attributes->getNamedItem('vol-serial-number')->nodeValue;
-            $results['file-numbers'][] = $element->attributes->getNamedItem('originator-file-number')->nodeValue;
+            $results['serial-number'] = $this->getNodeValue($element, 'vol-serial-number');
+            $results['file-numbers'][] = $this->getNodeValue($element, 'originator-file-number');
             $results['records']++;
-            $results['accepted-ddi'] += $element->attributes->getNamedItem('accepted-ddi')->nodeValue;
-            $results['rejected-ddi'] += $element->attributes->getNamedItem('rejected-ddi')->nodeValue;
+            $results['accepted-ddi'] += $this->getNodeValue($element, 'accepted-ddi', 0);
+            $results['rejected-ddi'] += $this->getNodeValue($element, 'rejected-ddi', 0);
         }
 
         return $results;
+    }
+
+    /**
+     * @param \DOMElement $element
+     * @param string      $name
+     * @param mixed       $missingValue
+     * @return string|null
+     */
+    private function getNodeValue(\DOMElement $element, $name, $missingValue = null)
+    {
+        if ($element->attributes->getNamedItem($name)) {
+            return $element->attributes->getNamedItem($name)->nodeValue;
+        }
+
+        return $missingValue;
     }
 
     public function input($file)

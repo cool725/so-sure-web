@@ -76,28 +76,24 @@ class DefaultController extends BaseController
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
 
-        // only run experiment if we're on mobile
-        $exp = 'mobile-search';
-        if ($requestService->getDeviceCategory() == RequestService::DEVICE_CATEGORY_MOBILE) {
-            $exp = $this->sixpack(
-                $request,
-                SixpackService::EXPERIMENT_MOBILE_SEARCH_DROPDOWN,
-                ['mobile-search', 'mobile-dropdown-search']
-            );
-        }
-
         $defacto = $this->sixpack(
             $request,
             SixpackService::EXPERIMENT_DEFACTO,
             ['no-defacto', 'defacto']
         );
 
+        $replacement = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_72_REPLACEMENT,
+            ['next-working-day', 'seventytwo-hours']
+        );
+
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         $data = array(
             // Make sure to check homepage landing below too
+            'replacement'         => $replacement,
             'defacto'             => $defacto,
-            'exp_dropdown_search' => $exp,
             'referral'            => $referral,
             'phone'               => $this->getQuerystringPhone($request),
         );
@@ -115,12 +111,18 @@ class DefaultController extends BaseController
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
         if ($requestService->getDeviceCategory() == RequestService::DEVICE_CATEGORY_MOBILE) {
-            return $this->redirectToRoute('homepage');
+            $exp = $this->sixpack(
+                $request,
+                SixpackService::EXPERIMENT_MONEY_LANDING,
+                ['homepage', 'money']
+            );
+            if ($exp == 'money') {
+                return $this->render('AppBundle:Default:indexMoney.html.twig');
+            } else {
+                return $this->redirectToRoute('homepage');
+            }
         } else {
-            return new RedirectResponse(sprintf(
-                'https://campaign.wearesosure.com/money_comparisons/?%s',
-                $request->getQueryString()
-            ));
+            return $this->render('AppBundle:Default:indexMoney.html.twig');
         }
     }
 

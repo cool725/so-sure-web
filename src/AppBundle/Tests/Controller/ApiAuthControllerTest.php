@@ -3271,17 +3271,16 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         ]);
         $data = $this->verifyResponse(200);
 
-        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
-        $repo = $dm->getRepository(Policy::class);
-        $updatedPolicy = $repo->find($policyData['id']);
-        $this->assertEquals(PhonePolicy::PICSURE_STATUS_MANUAL, $updatedPolicy->getPicSureStatus());
+        // allow time for event listener to trigger and update db
+        sleep(1);
 
-        $repo = $dm->getRepository(PhonePolicy::class);
-        $updatedPolicy = $repo->find($policyData['id']);
+        /** @var PhonePolicy $updatedPolicy */
+        $updatedPolicy = $this->assertPolicyByIdExists(self::$container, $policyData['id']);
+
+        $this->assertEquals(PhonePolicy::PICSURE_STATUS_MANUAL, $updatedPolicy->getPicSureStatus());
         $files = $updatedPolicy->getPolicyPicSureFiles();
         $metadata = $files[0]->getMetadata();
-
-        $this->assertTrue(isset($metadata['picsure-ml-score']));
+        $this->assertTrue(isset($metadata['picsure-ml-score']), 'Check picsure ml can be run on server');
     }
 
     // policy/{id}/reconnect

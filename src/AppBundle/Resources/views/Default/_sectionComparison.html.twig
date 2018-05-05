@@ -17,7 +17,7 @@
             <tbody>
                 <tr>
                     <td class="contrast">4-18 days wait on average</td>
-                    <td class="sosure">Next working day replacement</td>
+                    <td class="sosure">{% if replacement is defined and replacement == 'seventytwo-hours' %}Replacement within 24-72 hours{% else %}Next working day replacement{% endif %}</td>
                 </tr>
                 <tr>
                     <td class="contrast">Cover starts after 14 days</td>

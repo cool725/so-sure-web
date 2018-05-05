@@ -770,7 +770,9 @@ class Phone
         // Avg Excess + Expected Recycling - Claims handling fee - Claims Check fee - replacement phone price
         $netCostOfClaims = 56 + 19 - 14 - 1 - $price;
 
-        $uwReceived = $this->getCurrentPhonePrice()->getYearlyGwp() - Salva::YEARLY_COVERHOLDER_COMMISSION;
+        /** @var PhonePrice $price */
+        $price = $this->getCurrentPhonePrice();
+        $uwReceived = $price->getYearlyGwp() - Salva::YEARLY_COVERHOLDER_COMMISSION;
         $nwp = $uwReceived - $consumerPayout;
         $uwPrefReturn = ($nwp * 0.08);
 
@@ -779,6 +781,10 @@ class Phone
         return $this->toTopTwoDp($profit);
     }
 
+    /**
+     * @param \DateTime|null $date
+     * @return PhonePrice|null
+     */
     public function getCurrentPhonePrice(\DateTime $date = null)
     {
         if (!$date) {
@@ -786,6 +792,7 @@ class Phone
         }
 
         foreach ($this->getPhonePrices() as $phonePrice) {
+            /** @var PhonePrice $phonePrice */
             if ($phonePrice->getValidFrom() <= $date &&
                 (!$phonePrice->getValidTo() || $phonePrice->getValidTo() > $date)) {
                 return $phonePrice;

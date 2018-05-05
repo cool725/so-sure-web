@@ -11,7 +11,7 @@
             <tbody class="lead">
                 <tr>
                     <td><i class="fa fa-times text-red fa-lg" aria-hidden="true"></i> Claims speed: 4-18 days on average*</td>
-                    <td><i class="fa fa-check text-green fa-lg" aria-hidden="true"></i> Claims speed: Next working day</td>
+                    <td><i class="fa fa-check text-green fa-lg" aria-hidden="true"></i> Claims speed: {% if replacement is defined and replacement == 'seventytwo-hours' %}24 to 72 hours{% else %}Next working day{% endif %}</td>
                 </tr>
                 <tr>
                     <td><i class="fa fa-times text-red fa-lg" aria-hidden="true"></i> 14 days before cover starts</td>
