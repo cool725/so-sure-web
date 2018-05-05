@@ -522,11 +522,7 @@ class PhoneInsuranceController extends BaseController
             $this->get('app.sixpack')->convert(
                 SixpackService::EXPERIMENT_HOMEPAGE_AA_V2
             );
-
-            $this->get('app.sixpack')->convert(
-                SixpackService::EXPERIMENT_MOBILE_SEARCH_DROPDOWN
-            );
-
+            
             $this->get('app.sixpack')->convert(
                 SixpackService::EXPERIMENT_DEFACTO
             );
