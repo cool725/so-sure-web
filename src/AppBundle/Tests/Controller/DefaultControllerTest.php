@@ -204,7 +204,7 @@ class DefaultControllerTest extends BaseControllerTest
         $crawler = self::$client->request('GET', '/');
         $data = self::$client->getResponse();
         $this->assertEquals(200, $data->getStatusCode());
-        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 2);
+        self::verifySearchFormData($crawler->filter('form'), '/phone-insurance/', 1);
     }
 
     public function areLinksValid($name, $key, $allKeys, $phoneLinks)

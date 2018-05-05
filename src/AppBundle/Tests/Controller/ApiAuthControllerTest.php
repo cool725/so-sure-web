@@ -3280,7 +3280,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->assertEquals(PhonePolicy::PICSURE_STATUS_MANUAL, $updatedPolicy->getPicSureStatus());
         $files = $updatedPolicy->getPolicyPicSureFiles();
         $metadata = $files[0]->getMetadata();
-        $this->assertTrue(isset($metadata['picsure-ml-score']));
+        $this->assertTrue(isset($metadata['picsure-ml-score']), 'Check picsure ml can be run on server');
     }
 
     // policy/{id}/reconnect
