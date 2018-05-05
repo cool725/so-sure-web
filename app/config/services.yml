@@ -152,6 +152,8 @@ services:
             - "@app.payment"
             - "@knp_snappy.pdf"
             - "@templating"
+            - "@app.sequence"
+            - ["%accesspay_server%", "%accesspay_username%", "%accesspay_password%", "%accesspay_keyfile%"]
 
     app.push:
         class: AppBundle\Service\PushService

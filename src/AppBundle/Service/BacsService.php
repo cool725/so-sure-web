@@ -4,6 +4,7 @@ namespace AppBundle\Service;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
 use AppBundle\Document\DateTrait;
+use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Document\File\BacsReportAddacsFile;
 use AppBundle\Document\File\BacsReportAuddisFile;
 use AppBundle\Document\File\BacsReportInputFile;
@@ -21,6 +22,8 @@ use Aws\S3\S3Client;
 use Knp\Bundle\SnappyBundle\Snappy\LoggableGenerator;
 use Knp\Snappy\AbstractGenerator;
 use Knp\Snappy\GeneratorInterface;
+use phpseclib\Crypt\RSA;
+use phpseclib\Net\SFTP;
 use Predis\Client;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -40,6 +43,12 @@ class BacsService
     const KEY_BACS_QUEUE = 'bacs:queue';
 
     const QUEUE_EVENT_CREATED = 'created';
+
+    const BACS_COMMAND_CREATE_MANDATE = '0N';
+    const BACS_COMMAND_CANCEL_MANDATE = '0C';
+    const BACS_COMMAND_FIRST_DIRECT_DEBIT = '01';
+    const BACS_COMMAND_DIRECT_DEBIT = '17';
+    const BACS_COMMAND_DIRECT_CREDIT = '99';
 
     const ADDACS_REASON_BANK = 0;
     const ADDACS_REASON_USER = 1;
@@ -89,6 +98,21 @@ class BacsService
     /** @var EngineInterface */
     protected $templating;
 
+    /** @var SequenceService */
+    protected $sequenceService;
+
+    /** @var string */
+    protected $accessPayServer;
+
+    /** @var string */
+    protected $accessPayUsername;
+
+    /** @var string */
+    protected $accessPayPassword;
+
+    /** @var string */
+    protected $accessPayKeyFile;
+
     /**
      * @param DocumentManager   $dm
      * @param LoggerInterface   $logger
@@ -100,6 +124,8 @@ class BacsService
      * @param PaymentService    $paymentService
      * @param LoggableGenerator $snappyPdf
      * @param EngineInterface   $templating
+     * @param SequenceService   $sequenceService
+     * @param array             $accessPay
      */
     public function __construct(
         DocumentManager $dm,
@@ -111,7 +137,9 @@ class BacsService
         Client $redis,
         PaymentService $paymentService,
         LoggableGenerator $snappyPdf,
-        EngineInterface $templating
+        EngineInterface $templating,
+        SequenceService $sequenceService,
+        array $accessPay
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -123,6 +151,42 @@ class BacsService
         $this->paymentService = $paymentService;
         $this->snappyPdf = $snappyPdf;
         $this->templating = $templating;
+        $this->sequenceService = $sequenceService;
+        $this->accessPayServer = $accessPay[0];
+        $this->accessPayUsername = $accessPay[1];
+        $this->accessPayPassword = $accessPay[2];
+        $this->accessPayKeyFile = $accessPay[3];
+    }
+
+    /**
+     * @param mixed   $data
+     * @param string  $filename
+     * @param boolean $debit
+     * @return mixed
+     * @throws \Exception
+     */
+    public function uploadSftp($data, $filename, $debit = true)
+    {
+        $tmpFile = sprintf('%s/%s', sys_get_temp_dir(), $filename);
+        file_put_contents($tmpFile, $data);
+
+        $sftp = new SFTP($this->accessPayServer);
+        $key = new RSA();
+        $key->loadKey(file_get_contents($this->accessPayKeyFile));
+        if (!$sftp->login($this->accessPayUsername, $this->accessPayKeyFile) &&
+            !$sftp->login($this->accessPayUsername, $this->accessPayKeyFile)) {
+            throw new \Exception('Login Failed');
+        }
+
+        if ($debit) {
+            $sftp->chdir('Inbound/DD_Collections');
+        } else {
+            $sftp->chdir('Inbound/DC_Refunds');
+        }
+        $sftp->put($filename, $tmpFile, SFTP::SOURCE_LOCAL_FILE);
+        $files = $sftp->nlist('.', false);
+
+        return $files;
     }
 
     public function processUpload(UploadedFile $file)
@@ -152,8 +216,66 @@ class BacsService
         return true;
     }
 
-    public function uploadS3($tmpFile, $filename, UploadFile $uploadFile, \DateTime $date = null, $metadata = null)
+    public function processSubmissionUpload(UploadedFile $file, $debit = true)
     {
+        $tmpFile = $file->move(sys_get_temp_dir());
+
+        $now = new \DateTime();
+        $sftpFilename = sprintf('%s-%s.csv', $now->format('Ymd'), $now->format('U'));
+
+        $fileData = file_get_contents($tmpFile);
+        $fileDataArray = explode(PHP_EOL, $fileData);
+
+        $this->uploadSftp($fileData, $sftpFilename, $debit);
+
+        $metadata = [
+            'lines' => 0,
+            'ddi' => 0,
+            'ddi-cancellations' => 0,
+            'debit-amount' => 0,
+            'debits' => 0,
+            'credit-amount' => 0,
+            'credits' => 0,
+        ];
+        foreach ($fileDataArray as $line) {
+            if (!$line || mb_strlen($line) == 0) {
+                continue;
+            }
+            $lineData = str_getcsv($line, ",", '"');
+            if (in_array($lineData[2], [self::BACS_COMMAND_FIRST_DIRECT_DEBIT, self::BACS_COMMAND_DIRECT_DEBIT])) {
+                $metadata['debits']++;
+                $metadata['debit-amount'] += $lineData[6];
+            } elseif ($lineData[2] == self::BACS_COMMAND_CANCEL_MANDATE) {
+                $metadata['ddi-cancellations']++;
+            } elseif ($lineData[2] == self::BACS_COMMAND_CREATE_MANDATE) {
+                $metadata['ddi']++;
+            } elseif ($lineData[2] == self::BACS_COMMAND_DIRECT_CREDIT) {
+                $metadata['credits']++;
+                $metadata['credit-amount'] += $lineData[6];
+            }
+            $metadata['lines']++;
+        }
+
+        $serialNumber = $this->sequenceService->getSequenceId(SequenceService::SEQUENCE_BACS_SERIAL_NUMBER);
+        $serialNumber = sprintf("S-%06d", $serialNumber);
+        $metadata['serial-number'] = $serialNumber;
+
+        $uploadFile = new AccessPayFile();
+        $uploadFile->setSerialNumber($serialNumber);
+
+        $s3Key = $this->uploadS3($tmpFile, $file->getClientOriginalName(), $uploadFile, null, $metadata, 'bacs');
+
+        return $s3Key;
+    }
+
+    public function uploadS3(
+        $tmpFile,
+        $filename,
+        UploadFile $uploadFile,
+        \DateTime $date = null,
+        $metadata = null,
+        $folder = 'bacs-report'
+    ) {
         if (!$date) {
             $date = new \DateTime();
         }
@@ -161,7 +283,7 @@ class BacsService
         $encTempFile = sprintf('%s/enc-%s', sys_get_temp_dir(), $filename);
         \Defuse\Crypto\File::encryptFileWithPassword($tmpFile, $encTempFile, $this->fileEncryptionPassword);
         unlink($tmpFile);
-        $s3Key = sprintf('%s/bacs-report/%s', $this->environment, $filename);
+        $s3Key = sprintf('%s/%s/%s', $this->environment, $folder, $filename);
 
         $repo = $this->dm->getRepository(UploadFile::class);
         $existingFile = $repo->findOneBy(['bucket' => self::S3_ADMIN_BUCKET, 'key' => $s3Key]);
@@ -691,7 +813,7 @@ class BacsService
             $lines[] = implode(',', [
                 sprintf('"%s"', $date->format('d/m/y')),
                 '"Initial Mandate"',
-                '"0N"', // new Auddis
+                sprintf('"%s"', self::BACS_COMMAND_CREATE_MANDATE), // new Auddis
                 sprintf('"%s"', $paymentMethod->getBankAccount()->getAccountName()),
                 sprintf('"%s"', $paymentMethod->getBankAccount()->getSortCode()),
                 sprintf('"%s"', $paymentMethod->getBankAccount()->getAccountNumber()),
@@ -724,7 +846,7 @@ class BacsService
             $lines[] = implode(',', [
                 sprintf('"%s"', $date->format('d/m/y')),
                 '"Cancel Mandate"',
-                '"0C"', // new Auddis
+                sprintf('"%s"', self::BACS_COMMAND_CANCEL_MANDATE), // cancel Auddis
                 sprintf('"%s"', $cancellation['accountName']),
                 sprintf('"%s"', $cancellation['sortCode']),
                 sprintf('"%s"', $cancellation['accountNumber']),
@@ -817,7 +939,9 @@ class BacsService
             $lines[] = implode(',', [
                 sprintf('"%s"', $scheduledDate->format('d/m/y')),
                 '"Scheduled Payment"',
-                $bankAccount->isFirstPayment() ? '"01"' : '"17"',
+                $bankAccount->isFirstPayment() ?
+                    sprintf('"%s"', self::BACS_COMMAND_FIRST_DIRECT_DEBIT) :
+                    sprintf('"%s"', self::BACS_COMMAND_DIRECT_DEBIT),
                 sprintf('"%s"', $bankAccount->getAccountName()),
                 sprintf('"%s"', $bankAccount->getSortCode()),
                 sprintf('"%s"', $bankAccount->getAccountNumber()),
@@ -869,7 +993,7 @@ class BacsService
             $lines[] = implode(',', [
                 sprintf('"%s"', $date->format('d/m/y')),
                 '"Credit"',
-                '"99"',
+                sprintf('"%s"', self::BACS_COMMAND_DIRECT_CREDIT),
                 sprintf('"%s"', $bankAccount->getAccountName()),
                 sprintf('"%s"', $bankAccount->getSortCode()),
                 sprintf('"%s"', $bankAccount->getAccountNumber()),

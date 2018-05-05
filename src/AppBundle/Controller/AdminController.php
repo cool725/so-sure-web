@@ -570,6 +570,9 @@ class AdminController extends BaseController
         $uploadForm = $this->get('form.factory')
             ->createNamedBuilder('upload', BacsUploadFileType::class)
             ->getForm();
+        $uploadSubmissionForm = $this->get('form.factory')
+            ->createNamedBuilder('uploadSubmission', BacsUploadFileType::class)
+            ->getForm();
         $mandatesForm = $this->get('form.factory')
             ->createNamedBuilder('mandates', BacsMandatesType::class)
             ->getForm();
@@ -587,6 +590,27 @@ class AdminController extends BaseController
                         $this->addFlash(
                             'success',
                             'Successfully uploaded & processed file'
+                        );
+                    } else {
+                        $this->addFlash(
+                            'error',
+                            'Unable to process file - see rollbar error message'
+                        );
+                    }
+
+                    return new RedirectResponse($this->generateUrl('admin_bacs_date', [
+                        'year' => $year,
+                        'month' => $month
+                    ]));
+                }
+            } elseif ($request->request->has('uploadSubmission')) {
+                $uploadSubmissionForm->handleRequest($request);
+                if ($uploadSubmissionForm->isSubmitted() && $uploadSubmissionForm->isValid()) {
+                    $file = $uploadSubmissionForm->getData()['file'];
+                    if ($bacs->processSubmissionUpload($file)) {
+                        $this->addFlash(
+                            'success',
+                            'Successfully uploaded & submitted bacs submission file'
                         );
                     } else {
                         $this->addFlash(
@@ -648,6 +672,7 @@ class AdminController extends BaseController
             'input' => $s3FileRepo->getAllFiles($date, 'bacsReportInput'),
             'payments' => $paymentsRepo->findPayments($date),
             'uploadForm' => $uploadForm->createView(),
+            'uploadSubmissionForm' => $uploadSubmissionForm->createView(),
             'mandatesForm' => $mandatesForm->createView(),
             'sequenceForm' => $sequenceForm->createView(),
             'currentSequence' => $currentSequence,
