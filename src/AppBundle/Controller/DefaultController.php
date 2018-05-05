@@ -76,16 +76,6 @@ class DefaultController extends BaseController
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
 
-        // only run experiment if we're on mobile
-        $exp = 'mobile-search';
-        if ($requestService->getDeviceCategory() == RequestService::DEVICE_CATEGORY_MOBILE) {
-            $exp = $this->sixpack(
-                $request,
-                SixpackService::EXPERIMENT_MOBILE_SEARCH_DROPDOWN,
-                ['mobile-search', 'mobile-dropdown-search']
-            );
-        }
-
         $defacto = $this->sixpack(
             $request,
             SixpackService::EXPERIMENT_DEFACTO,
@@ -104,7 +94,7 @@ class DefaultController extends BaseController
             // Make sure to check homepage landing below too
             'replacement'         => $replacement,
             'defacto'             => $defacto,
-            'exp_dropdown_search' => $exp,
+            'exp_dropdown_search' => 'mobile-dropdown-search',
             'referral'            => $referral,
             'phone'               => $this->getQuerystringPhone($request),
         );
