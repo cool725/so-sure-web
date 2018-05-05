@@ -865,12 +865,12 @@ class UserControllerTest extends BaseControllerTest
 
         $now = new \DateTime();
         $now = $now->sub(new \DateInterval(('PT1S')));
-        for ($i = 1; $i < 25; $i++) {
+        for ($i = 1; $i <= 25; $i++) {
             self::$redis->zadd($key, [serialize(array($email, $now->getTimestamp())) => $now->getTimestamp()]);
             $now = $now->sub(new \DateInterval(('PT1S')));
         }
 
-        $this->login($email, 'bar', 'login', null, null);
+        //$this->login($email, 'bar', 'login', null, null);
 
         // expect a locked account
         $this->login($email, 'bar', 'login', null, 503);

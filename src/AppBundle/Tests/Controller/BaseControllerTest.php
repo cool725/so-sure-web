@@ -7,6 +7,7 @@ use Predis\Client;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Listener\UserListener;
 use AppBundle\Event\UserEmailEvent;
+use Symfony\Component\BrowserKit\Tests\TestClient;
 
 class BaseControllerTest extends WebTestCase
 {
@@ -180,6 +181,7 @@ class BaseControllerTest extends WebTestCase
             self::$client->getHistory()->current()->getUri()
         );
 
+        $this->assertNotNull($crawler->selectButton('_submit'));
         $form = $crawler->selectButton('_submit')->form();
         $form['_username'] = $username;
         $form['_password'] = $password;

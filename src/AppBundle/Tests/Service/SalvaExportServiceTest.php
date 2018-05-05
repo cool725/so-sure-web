@@ -415,6 +415,8 @@ class SalvaExportServiceTest extends WebTestCase
         // we no longer throw an exception, so just expect same status
         static::$policyService->cancel($policy, SalvaPhonePolicy::CANCELLED_COOLOFF);
 
+        sleep(1);
+
         /** @var SalvaPhonePolicy $updatedPolicy */
         $updatedPolicy = $this->assertPolicyExists(self::$container, $policy);
         // cancellation above should set to wait cancelled
