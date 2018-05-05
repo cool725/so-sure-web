@@ -34,11 +34,11 @@ class BacsMandatesType extends AbstractType
         $mandates = [];
         foreach ($users as $user) {
             $serialNumber = $user->getPaymentMethod()->getBankAccount()->getMandateSerialNumber();
-            $mandates[$serialNumber] = $serialNumber;
+            $mandates[$serialNumber][$user->getName()] = $user->getId();
         }
         $builder
             ->add('serialNumber', ChoiceType::class, [
-                'placeholder' => 'Select a serial number',
+                'placeholder' => 'Select a name (will approval all name for that serial number)',
                 'choices' => $mandates,
             ])
             ->add('approve', SubmitType::class)
