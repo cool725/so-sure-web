@@ -729,7 +729,8 @@ class AdminController extends BaseController
     }
 
     /**
-     * @Route("/bacs/submission/{id}", name="admin_bacs_submission")
+     * @Route("/bacs/submit/{id}", name="admin_bacs_submit")
+     * @Route("/bacs/cancel/{id}", name="admin_bacs_cancel")
      * @Route("/bacs/serial-number/{id}", name="admin_bacs_update_serial_number")
      * @Method({"POST"})
      */
@@ -745,10 +746,10 @@ class AdminController extends BaseController
         $file = $repo->find($id);
         if ($file) {
             $message = 'Unknown';
-            if ($request->get('_route') == 'admin_bacs_submission') {
-                $file->setSubmitted(true);
-
+            if ($request->get('_route') == 'admin_bacs_submit') {
+                $file->setStatus(AccessPayFile::STATUS_SUBMITTED);
                 $paymentRepo = $dm->getRepository(BacsPayment::class);
+
                 $payments = $paymentRepo->findBy([
                     'serialNumber' => $file->getSerialNumber(),
                     'status' => BacsPayment::STATUS_GENERATED
@@ -759,6 +760,11 @@ class AdminController extends BaseController
                 }
 
                 $message = sprintf('Bacs file %s is marked as submitted', $file->getFileName());
+            } elseif ($request->get('_route') == 'admin_bacs_cancel') {
+                $file->setStatus(AccessPayFile::STATUS_CANCELLED);
+                $paymentRepo = $dm->getRepository(BacsPayment::class);
+
+                $message = sprintf('Bacs file %s is marked as cancelled', $file->getFileName());
             } elseif ($request->get('_route') == 'admin_bacs_update_serial_number') {
                 $paymentRepo = $dm->getRepository(BacsPayment::class);
                 $payments = $paymentRepo->findBy([

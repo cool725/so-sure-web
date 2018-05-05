@@ -18,6 +18,10 @@ class AccessPayFile extends UploadFile
 {
     use CurrencyTrait;
 
+    const STATUS_PENDING = 'pending';
+    const STATUS_SUBMITTED = 'submitted';
+    const STATUS_CANCELLED = 'cancelled';
+
     /**
      * NOTE: This is not a mapped field of entity metadata, just a simple property.
      *
@@ -37,11 +41,17 @@ class AccessPayFile extends UploadFile
     protected $serialNumber;
 
     /**
-     * @Assert\Type("bool")
-     * @MongoDB\Field(type="boolean")
+     * @Assert\Choice({"pending", "submitted", "cancelled"}, strict=true)
+     * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
-    protected $submitted;
+    protected $status;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->setStatus(self::STATUS_PENDING);
+    }
 
     public function getSerialNumber()
     {
@@ -53,14 +63,19 @@ class AccessPayFile extends UploadFile
         $this->serialNumber = $serialNumber;
     }
 
-    public function isSubmitted()
+    public function isActioned()
     {
-        return $this->submitted;
+        return in_array($this->getStatus(), [self::STATUS_SUBMITTED, self::STATUS_CANCELLED]);
     }
 
-    public function setSubmitted($submitted)
+    public function getStatus()
     {
-        $this->submitted = $submitted;
+        return $this->status;
+    }
+
+    public function setStatus($status)
+    {
+        $this->status = $status;
     }
 
     /**

@@ -380,10 +380,10 @@ class MonitorService
     {
         $repo = $this->dm->getRepository(AccessPayFile::class);
         /** @var AccessPayFile $unsubmitted */
-        $unsubmitted = $repo->findOneBy(['submitted' => ['$ne' => true]]);
+        $unsubmitted = $repo->findOneBy(['status' => AccessPayFile::STATUS_PENDING]);
         if ($unsubmitted) {
             throw new MonitorException(sprintf(
-                'There is a bacs file (%s) that has not been marked as submitted',
+                'There is a bacs file (%s) that is pending',
                 $unsubmitted->getId()
             ));
         }
