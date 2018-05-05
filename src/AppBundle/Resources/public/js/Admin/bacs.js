@@ -1,6 +1,6 @@
-$('.bacs-submission').click(function() {
+$('.bacs-submit').click(function() {
     if (confirm('Have you manually submitted this file to bacs?')) {
-        var url = $(this).data('bacs-submission-url');
+        var url = $(this).data('bacs-action-url');
         var token = $(this).data('token');
         $.ajax({
             url: url,
@@ -8,6 +8,21 @@ $('.bacs-submission').click(function() {
             data: { token: token },
             success: function(result) {
                window.location.reload(false);
+            }
+        });
+    }
+});
+
+$('.bacs-cancel').click(function() {
+    if (confirm('Are you sure you wish to cancel this bacs file submission?')) {
+        var url = $(this).data('bacs-action-url');
+        var token = $(this).data('token');
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: { token: token },
+            success: function(result) {
+                window.location.reload(false);
             }
         });
     }

@@ -29,7 +29,7 @@
             <br>
             <form>
             <h4>Current File: {{ currentSequence.seq }}
-                <button class="btn btn-success bacs-serial-edit"
+                <button class="btn btn-success bacs-serial-edit" type="button"
                         data-toggle="modal" data-target="#editSequenceSerialNumberModal">
                     <i class="fa fa-edit"></i>
                 </button>
@@ -102,11 +102,18 @@
                                     {{ file.metadata|json_encode }}
                                 </td>
                                 <td width="10%">
-                                    {% if file.isSubmitted %}
-                                        Yes <i class="fa fa-checkbox"></i>
+                                    {% if file.isActioned %}
+                                        {{ file.status }}
+                                        {% if file.status == 'submitted' %}
+                                            <i class="fa fa-check text-success"></i>
+                                        {% elseif file.status == 'cancelled' %}
+                                            <i class="fa fa-minus text-danger"></i>
+                                        {% endif %}
                                     {% else %}
-                                        <button title="Mark as submitted" type="button" class="btn btn-success bacs-submission" data-token="{{ csrf_token('default') }}"
-                                                data-bacs-submission-url="{{ path('admin_bacs_submission', {'id': file.id}) }}"><i class="fa fa-power-off"></i></button>
+                                        <button title="Mark as submitted" type="button" class="btn btn-success bacs-submit" data-token="{{ csrf_token('default') }}"
+                                                data-bacs-action-url="{{ path('admin_bacs_submit', {'id': file.id}) }}"><i class="fa fa-check"></i></button>
+                                        <button title="Mark as cancelled" type="button" class="btn btn-danger bacs-cancel" data-token="{{ csrf_token('default') }}"
+                                                data-bacs-action-url="{{ path('admin_bacs_cancel', {'id': file.id}) }}"><i class="fa fa-power-off"></i></button>
                                     {% endif %}
                                 </td>
                                 <td width="10%">
