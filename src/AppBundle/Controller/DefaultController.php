@@ -94,7 +94,6 @@ class DefaultController extends BaseController
             // Make sure to check homepage landing below too
             'replacement'         => $replacement,
             'defacto'             => $defacto,
-            'exp_dropdown_search' => 'mobile-dropdown-search',
             'referral'            => $referral,
             'phone'               => $this->getQuerystringPhone($request),
         );
