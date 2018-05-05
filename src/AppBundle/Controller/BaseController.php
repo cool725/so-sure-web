@@ -530,6 +530,16 @@ abstract class BaseController extends Controller
                 $data['token'] = "**Redacted**";
                 $item->setData($data);
             }
+
+            if (isset($data['paymentMethod'])) {
+                if (isset($data['paymentMethod']['bankAccount']['sortCode'])) {
+                    $data['paymentMethod']['bankAccount']['sortCode'] = "**Redacted**";
+                }
+                if (isset($data['paymentMethod']['bankAccount']['accountNumber'])) {
+                    $data['paymentMethod']['bankAccount']['accountNumber'] = "**Redacted**";
+                }
+                $item->setData($data);
+            }
         }
 
         return $userHistory;
