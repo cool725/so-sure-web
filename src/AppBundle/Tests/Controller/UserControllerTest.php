@@ -857,12 +857,14 @@ class UserControllerTest extends BaseControllerTest
         //print_r($policy->getClaimsWarnings());
         $this->assertTrue($policy->getUser()->hasActivePolicy());
         $key = "PeerJUserSecurityBundle::login_failed::ip::127.0.0.1";
+        $keyUsername = sprintf("PeerJUserSecurityBundle::%s::username::%s", 'login_failed', $email);
+
         $this->assertFalse(self::$redis->exists($key) == 1);
         $this->login($email, 'bar', 'login');
         $this->assertTrue(self::$redis->exists($key) == 1);
 
         $now = new \DateTime();
-        $keyUsername = sprintf("PeerJUserSecurityBundle::%s::username::%s", 'login_failed', $email);
+        $now = $now->sub(new \DateInterval(('PT1S')));
         for ($i = 1; $i < 25; $i++) {
             self::$redis->zadd($key, [serialize(array($email, $now->getTimestamp())) => $now->getTimestamp()]);
             $now = $now->sub(new \DateInterval(('PT1S')));
