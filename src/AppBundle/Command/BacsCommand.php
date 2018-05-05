@@ -266,61 +266,22 @@ class BacsCommand extends BaseCommand
      */
     public function uploadSftp($data, $filename, $debit = true)
     {
-        $server = $this->getContainer()->getParameter('accesspay_server');
-        $username = $this->getContainer()->getParameter('accesspay_username');
-        $password = $this->getContainer()->getParameter('accesspay_password');
-        $keyfile = $this->getContainer()->getParameter('accesspay_keyfile');
-
-        $tmpFile = sprintf('%s/%s', sys_get_temp_dir(), $filename);
-        file_put_contents($tmpFile, $data);
-
-        $sftp = new SFTP($server);
-        $key = new RSA();
-        $key->loadKey(file_get_contents($keyfile));
-        if (!$sftp->login($username, $key) && !$sftp->login($username, $password)) {
-            throw new \Exception('Login Failed');
-        }
-
-        if ($debit) {
-            $sftp->chdir('Inbound/DD_Collections');
-        } else {
-            $sftp->chdir('Inbound/DC_Refunds');
-        }
-        $sftp->put($filename, $tmpFile, SFTP::SOURCE_LOCAL_FILE);
-        $files = $sftp->nlist('.', false);
-
-        return $files;
+        /** @var BacsService $bacs */
+        $bacs =  $this->getContainer()->get('app.bacs');
+        return $bacs->uploadSftp($data, $filename, $debit);
     }
 
     public function uploadS3($data, $filename, $serialNumber, \DateTime $date, $metadata = null)
     {
-        $password = $this->getContainer()->getParameter('accesspay_s3file_password');
         $tmpFile = sprintf('%s/%s', sys_get_temp_dir(), $filename);
-        $encTempFile = sprintf('%s/enc-%s', sys_get_temp_dir(), $filename);
         file_put_contents($tmpFile, $data);
-        \Defuse\Crypto\File::encryptFileWithPassword($tmpFile, $encTempFile, $password);
-        unlink($tmpFile);
-        $s3Key = sprintf('%s/bacs/%s', $this->getEnvironment(), $filename);
 
-        $this->getS3()->putObject(array(
-            'Bucket' => self::S3_BUCKET,
-            'Key'    => $s3Key,
-            'SourceFile' => $encTempFile,
-        ));
+        $uploadFile = new AccessPayFile();
+        $uploadFile->setSerialNumber($serialNumber);
 
-        $file = new AccessPayFile();
-        $file->setBucket(self::S3_BUCKET);
-        $file->setKey($s3Key);
-        $file->setDate($date);
-        $file->setSerialNumber($serialNumber);
-
-        foreach ($metadata as $key => $value) {
-            $file->addMetadata($key, $value);
-        }
-
-        $this->getManager()->persist($file);
-
-        unlink($encTempFile);
+        /** @var BacsService $bacs */
+        $bacs =  $this->getContainer()->get('app.bacs');
+        $s3Key = $bacs->uploadS3($tmpFile, $filename, $uploadFile, $date, $metadata, 'bacs');
 
         return $s3Key;
     }
