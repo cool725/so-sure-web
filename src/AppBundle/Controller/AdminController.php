@@ -631,7 +631,7 @@ class AdminController extends BaseController
                     $userRepo = $this->getManager()->getRepository(User::class);
                     /** @var User $user */
                     $user = $userRepo->find($userId);
-                    /** @var BacsPaymentMethod $bacs */
+                    /** @var BacsPaymentMethod $bacsPaymentMethod */
                     $bacsPaymentMethod = $user->getPaymentMethod();
                     $serialNumber = $bacsPaymentMethod->getBankAccount()->getMandateSerialNumber();
                     if ($bacs->approveMandates($serialNumber)) {
