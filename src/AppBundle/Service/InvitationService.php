@@ -979,21 +979,30 @@ class InvitationService
                 throw new ConnectedInvitationException('You  are already connected');
         }
 
+        /** @var User $inviter */
+        $inviter = $invitation->getInviter();
+        /** @var User $invitee */
+        $invitee = $invitation->getInvitee();
+
         // If there was a concellation in the network, new connection should replace the cancelled connection
-        $inviteeConnection = $this->addConnection(
-            $inviteePolicy,
-            $invitation->getInviter(),
-            $inviterPolicy,
-            $invitation,
-            $date
-        );
-        $inviterConnection = $this->addConnection(
-            $inviterPolicy,
-            $invitation->getInvitee(),
-            $inviteePolicy,
-            $invitation,
-            $date
-        );
+        if ($inviter) {
+            $inviteeConnection = $this->addConnection(
+                $inviteePolicy,
+                $inviter,
+                $inviterPolicy,
+                $invitation,
+                $date
+            );
+        }
+        if ($invitee) {
+            $inviterConnection = $this->addConnection(
+                $inviterPolicy,
+                $invitee,
+                $inviteePolicy,
+                $invitation,
+                $date
+            );
+        }
 
         $invitation->setAccepted($date);
 

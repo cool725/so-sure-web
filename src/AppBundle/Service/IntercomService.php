@@ -556,15 +556,23 @@ class IntercomService
 
         $user = null;
         $data = [];
-        if ($useInviter && !$this->isDeleted($invitation->getInviter())) {
-            $user = $invitation->getInviter();
-            $data['metadata']['Invitee Name'] = $invitation->getInvitee()->getName();
-        } elseif (!$useInviter && !$this->isDeleted($invitation->getInvitee())) {
-            $user = $invitation->getInvitee();
-            $data['metadata']['Inviter Name'] = $invitation->getInviter()->getName();
-        } else {
-            $this->logger->debug(sprintf('Skipping Intercom create event (%s) as user deleted', $event));
-            return;
+        /** @var User $inviter */
+        $inviter = $invitation->getInviter();
+        /** @var User $invitee */
+        $invitee = $invitation->getInvitee();
+        if ($inviter && $invitee) {
+            if ($useInviter && !$this->isDeleted($inviter)) {
+                /** @var User $user */
+                $user = $inviter;
+                $data['metadata']['Invitee Name'] = $invitee->getName();
+            } elseif (!$useInviter && !$this->isDeleted($invitee)) {
+                /** @var User $user */
+                $user = $invitee;
+                $data['metadata']['Inviter Name'] = $inviter->getName();
+            } else {
+                $this->logger->debug(sprintf('Skipping Intercom create event (%s) as user deleted', $event));
+                return;
+            }
         }
 
         $this->sendEvent($user, $event, $data);
