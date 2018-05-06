@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Security\UserVoter;
 use AppBundle\Service\PCAService;
 use AppBundle\Service\SequenceService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -49,6 +50,7 @@ use AppBundle\Service\JudopayService;
 
 use AppBundle\Security\PolicyVoter;
 
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Facebook\Facebook;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -462,6 +464,61 @@ class UserController extends BaseController
             'unconnected_user_policy_form' => $unconnectedUserPolicyForm->createView(),
             'share_experiment_text' => $shareExperimentText,
         );
+    }
+
+    /**
+     * @Route("/data-portability", name="user_data_portability")
+     */
+    public function dataPortabliityAction()
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        $this->denyAccessUnlessGranted(UserVoter::VIEW, $user);
+
+        $lines[] = [
+            'Name',
+            'DOB',
+            'Address',
+            'Mobile Number',
+            'Policy Number',
+            'Policy Start Date',
+            'Policy End Date',
+            'Phone',
+            'IMEI',
+        ];
+
+        foreach ($user->getPolicies() as $policy) {
+            /** @var PhonePolicy $policy */
+            $lines[] = [
+                sprintf('"%s"', $user->getName()),
+                sprintf('"%s"', $user->getBirthday()->format('d/m/Y')),
+                sprintf('"%s"', $user->getBillingAddress()),
+                sprintf('"%s"', $user->getMobileNumber()),
+                sprintf('"%s"', $policy->getPolicyNumber()),
+                sprintf('"%s"', $policy->getStart()->format('d/m/Y')),
+                sprintf('"%s"', $policy->getEnd() ? $policy->getEnd()->format('d/m/Y') : null),
+                sprintf('"%s"', $policy->getPhone()->__toString()),
+                sprintf('"%s"', $policy->getImei()),
+            ];
+        }
+
+        $response = new StreamedResponse();
+        $response->setCallback(function () use ($lines) {
+            $handle = fopen('php://output', 'w+');
+            foreach ($lines as $line) {
+                fputcsv(
+                    $handle, // The file pointer
+                    $line
+                );
+            }
+            fclose($handle);
+        });
+
+        $response->setStatusCode(200);
+        $response->headers->set('Content-Type', 'text/csv; charset=utf-8');
+        $response->headers->set('Content-Disposition', 'attachment; filename="so-sure-data-portability.csv"');
+
+        return $response;
     }
 
     /**
