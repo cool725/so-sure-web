@@ -90,7 +90,7 @@ abstract class Invitation
 
     /**
      * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User", inversedBy="receivedInvitations")
-     * @var User
+     * @var User|null
      */
     protected $invitee;
 
