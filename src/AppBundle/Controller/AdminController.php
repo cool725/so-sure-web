@@ -627,7 +627,13 @@ class AdminController extends BaseController
             } elseif ($request->request->has('mandates')) {
                 $mandatesForm->handleRequest($request);
                 if ($mandatesForm->isSubmitted() && $mandatesForm->isValid()) {
-                    $serialNumber = $mandatesForm->getData()['serialNumber'];
+                    $userId = $mandatesForm->getData()['serialNumber'];
+                    $userRepo = $this->getManager()->getRepository(User::class);
+                    /** @var User $user */
+                    $user = $userRepo->find($userId);
+                    /** @var BacsPaymentMethod $bacsPaymentMethod */
+                    $bacsPaymentMethod = $user->getPaymentMethod();
+                    $serialNumber = $bacsPaymentMethod->getBankAccount()->getMandateSerialNumber();
                     if ($bacs->approveMandates($serialNumber)) {
                         $this->addFlash(
                             'success',
