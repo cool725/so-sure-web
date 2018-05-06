@@ -231,7 +231,7 @@ abstract class Invitation
         return $this->invitee;
     }
 
-    public function setInvitee(User $invitee)
+    public function setInvitee(User $invitee = null)
     {
         $this->invitee = $invitee;
     }

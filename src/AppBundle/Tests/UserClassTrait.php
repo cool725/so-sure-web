@@ -83,6 +83,15 @@ trait UserClassTrait
         return $policy;
     }
 
+    /**
+     * @param UserManagerInterface $userManager
+     * @param string               $email
+     * @param string               $password
+     * @param mixed                $phone
+     * @param DocumentManager|null $dm
+     * @return User
+     * @throws \Exception
+     */
     public static function createUser(
         $userManager,
         $email,

@@ -1191,6 +1191,11 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $this->receivedInvitations;
     }
 
+    public function setReceivedInvitations($receivedInvitations)
+    {
+        $this->receivedInvitations = $receivedInvitations;
+    }
+
     public function getReceivedInvitationsAsArray()
     {
         // TODO: should be instanceof \Doctrine\Common\Collections\ArrayCollection, but not working
