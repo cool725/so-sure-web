@@ -979,21 +979,32 @@ class InvitationService
                 throw new ConnectedInvitationException('You  are already connected');
         }
 
+        /** @var User $inviter */
+        $inviter = $invitation->getInviter();
+        /** @var User $invitee */
+        $invitee = $invitation->getInvitee();
+
         // If there was a concellation in the network, new connection should replace the cancelled connection
-        $inviteeConnection = $this->addConnection(
-            $inviteePolicy,
-            $invitation->getInviter(),
-            $inviterPolicy,
-            $invitation,
-            $date
-        );
-        $inviterConnection = $this->addConnection(
-            $inviterPolicy,
-            $invitation->getInvitee(),
-            $inviteePolicy,
-            $invitation,
-            $date
-        );
+        $inviteeConnection = null;
+        if ($inviter) {
+            $inviteeConnection = $this->addConnection(
+                $inviteePolicy,
+                $inviter,
+                $inviterPolicy,
+                $invitation,
+                $date
+            );
+        }
+        $inviterConnection = null;
+        if ($invitee) {
+            $inviterConnection = $this->addConnection(
+                $inviterPolicy,
+                $invitee,
+                $inviteePolicy,
+                $invitation,
+                $date
+            );
+        }
 
         $invitation->setAccepted($date);
 
@@ -1020,10 +1031,12 @@ class InvitationService
             'Last connection complete' => $now->format(\DateTime::ATOM),
         ], false, $invitation->getInviter());
 
-        $this->mixpanel->queueTrackWithUser($invitation->getInvitee(), MixpanelService::EVENT_CONNECTION_COMPLETE, [
-            'Connection Value' => $inviteeConnection->getTotalValue(),
-            'Policy Id' => $inviteePolicy->getId(),
-        ]);
+        if ($inviteeConnection) {
+            $this->mixpanel->queueTrackWithUser($invitation->getInvitee(), MixpanelService::EVENT_CONNECTION_COMPLETE, [
+                'Connection Value' => $inviteeConnection->getTotalValue(),
+                'Policy Id' => $inviteePolicy->getId(),
+            ]);
+        }
         $this->mixpanel->queuePersonProperties([
             'Last connection complete' => $now->format(\DateTime::ATOM),
         ], false, $invitation->getInvitee());

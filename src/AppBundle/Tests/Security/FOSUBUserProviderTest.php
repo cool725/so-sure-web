@@ -2,6 +2,8 @@
 
 namespace AppBundle\Tests\Security;
 
+use AppBundle\Document\Invitation\EmailInvitation;
+use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\User;
 use AppBundle\Security\FOSUBUserProvider;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -272,6 +274,44 @@ class FOSUBUserProviderTest extends WebTestCase
         $this->assertTrue(static::$userService->resolveDuplicateUsers(null, $email, null, null));
         $this->assertUserDoesNotExist(self::$container, $user);
         $this->assertPolicyDoesNotExist(self::$container, $policy);
+    }
+
+    public function testResolveDuplicateUsersEmailWithInvitation()
+    {
+        $inviter = static::createUser(
+            static::$userManager,
+            static::generateEmail('testResolveDuplicateUsersEmailWithInvitation-inviter', $this),
+            'bar',
+            static::$dm
+        );
+
+        $email = static::generateEmail('testResolveDuplicateUsersEmailWithInvitation', $this);
+        $user = static::createUser(
+            static::$userManager,
+            $email,
+            'bar',
+            static::$dm
+        );
+
+        $invitation = new EmailInvitation();
+        $inviter->addSentInvitation($invitation);
+        $user->addReceivedInvitation($invitation);
+        static::$dm->persist($invitation);
+
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+
+        $this->assertTrue(static::$userService->resolveDuplicateUsers(null, $email, null, null));
+        $this->assertUserDoesNotExist(self::$container, $user);
+        $this->assertPolicyDoesNotExist(self::$container, $policy);
+
+        $updatedInviter = $this->assertUserExists(self::$container, $inviter);
+        $foundInvitation = false;
+        foreach ($updatedInviter->getSentInvitations() as $invitation) {
+            /** @var Invitation $invitation */
+            $this->assertNull($invitation->getInvitee());
+            $foundInvitation = true;
+        }
+        $this->assertTrue($foundInvitation);
     }
 
     public function testResolveDuplicateUsersMobile()

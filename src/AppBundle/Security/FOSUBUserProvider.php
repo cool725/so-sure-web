@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Security;
 
+use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\PhoneTrait;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface;
@@ -362,6 +363,13 @@ class FOSUBUserProvider extends BaseClass
                     foreach ($duplicate->getPartialPolicies() as $partialPolicy) {
                         $this->dm->remove($partialPolicy);
                     }
+                }
+                if ($duplicate->getReceivedInvitations() && count($duplicate->getReceivedInvitations()) > 0) {
+                    foreach ($duplicate->getReceivedInvitations() as $invitation) {
+                        /** @var Invitation $invitation */
+                        $invitation->setInvitee(null);
+                    }
+                    $duplicate->setReceivedInvitations(null);
                 }
                 $this->dm->remove($duplicate);
             }
