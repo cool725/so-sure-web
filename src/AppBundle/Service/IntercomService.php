@@ -575,7 +575,9 @@ class IntercomService
             }
         }
 
-        $this->sendEvent($user, $event, $data);
+        if ($user) {
+            $this->sendEvent($user, $event, $data);
+        }
     }
 
     private function sendConnectionCreatedEvent(Connection $connection, $event)

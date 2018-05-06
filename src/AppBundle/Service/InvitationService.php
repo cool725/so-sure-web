@@ -985,6 +985,7 @@ class InvitationService
         $invitee = $invitation->getInvitee();
 
         // If there was a concellation in the network, new connection should replace the cancelled connection
+        $inviteeConnection = null;
         if ($inviter) {
             $inviteeConnection = $this->addConnection(
                 $inviteePolicy,
@@ -994,6 +995,7 @@ class InvitationService
                 $date
             );
         }
+        $inviterConnection = null;
         if ($invitee) {
             $inviterConnection = $this->addConnection(
                 $inviterPolicy,
@@ -1029,10 +1031,12 @@ class InvitationService
             'Last connection complete' => $now->format(\DateTime::ATOM),
         ], false, $invitation->getInviter());
 
-        $this->mixpanel->queueTrackWithUser($invitation->getInvitee(), MixpanelService::EVENT_CONNECTION_COMPLETE, [
-            'Connection Value' => $inviteeConnection->getTotalValue(),
-            'Policy Id' => $inviteePolicy->getId(),
-        ]);
+        if ($inviteeConnection) {
+            $this->mixpanel->queueTrackWithUser($invitation->getInvitee(), MixpanelService::EVENT_CONNECTION_COMPLETE, [
+                'Connection Value' => $inviteeConnection->getTotalValue(),
+                'Policy Id' => $inviteePolicy->getId(),
+            ]);
+        }
         $this->mixpanel->queuePersonProperties([
             'Last connection complete' => $now->format(\DateTime::ATOM),
         ], false, $invitation->getInvitee());
