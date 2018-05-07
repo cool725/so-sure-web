@@ -9,7 +9,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use AppBundle\Document\CurrencyTrait;
 
 /**
- * @MongoDB\Document(repositoryClass="AppBundle\Repository\File\BarclaysFileRepository")
+ * @MongoDB\Document(repositoryClass="AppBundle\Repository\File\BarclaysStatementFileRepository")
  * @Vich\Uploadable
  */
 class BarclaysStatementFile extends UploadFile

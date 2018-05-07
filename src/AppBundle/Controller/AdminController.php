@@ -10,6 +10,7 @@ use AppBundle\Form\Type\BacsMandatesType;
 use AppBundle\Form\Type\BacsUploadFileType;
 use AppBundle\Form\Type\SequenceType;
 use AppBundle\Repository\File\BarclaysFileRepository;
+use AppBundle\Repository\File\BarclaysStatementFileRepository;
 use AppBundle\Repository\File\LloydsFileRepository;
 use AppBundle\Repository\File\S3FileRepository;
 use AppBundle\Repository\PaymentRepository;
@@ -844,6 +845,9 @@ class AdminController extends BaseController
      */
     public function adminBankingAction(Request $request, $year = null, $month = null)
     {
+        // default 30s for prod is no longer enough
+        set_time_limit(60);
+
         $now = new \DateTime();
         if (!$year) {
             $year = $now->format('Y');
@@ -856,6 +860,7 @@ class AdminController extends BaseController
         $dm = $this->getManager();
         /** @var PaymentRepository $paymentRepo */
         $paymentRepo = $dm->getRepository(Payment::class);
+        /** @var BarclaysStatementFileRepository $barclaysStatementFileRepo */
         $barclaysStatementFileRepo = $dm->getRepository(BarclaysStatementFile::class);
         /** @var BarclaysFileRepository $barclaysFileRepo */
         $barclaysFileRepo = $dm->getRepository(BarclaysFile::class);
@@ -940,6 +945,8 @@ class AdminController extends BaseController
             'monthlyTransaction' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
         ];
 
+        $monthlyBarclaysStatementFiles = $barclaysStatementFileRepo->getMonthBarclaysStatementFiles($date);
+
         $monthlyBarclaysFiles = $barclaysFileRepo->getMonthBarclaysFiles($date);
         $monthlyPerDayBarclaysTransaction = BarclaysFile::combineDailyTransactions($monthlyBarclaysFiles);
         $monthlyPerDayBarclaysProcessing = BarclaysFile::combineDailyProcessing($monthlyBarclaysFiles);
@@ -997,7 +1004,7 @@ class AdminController extends BaseController
             'barclays' => $barclays,
             'judo' => $judo,
             'barclaysFiles' => $monthlyBarclaysFiles,
-            'barclaysStatementFiles' => [],
+            'barclaysStatementFiles' => $monthlyBarclaysStatementFiles,
             'lloydsFiles' => $monthlyLloydsFiles,
         ];
     }
