@@ -250,7 +250,7 @@
     </div>
 </div>
 
-    <div class="modal fade" id="barclaysModal" tabindex="-1" role="dialog">
+    <div class="modal modal-middle modal-phone fade" id="barclaysModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -258,9 +258,6 @@
             <h4 class="modal-title">Barclays Transaction Upload</h4>
           </div>
           <div class="modal-body">
-                {% for barclaysFile in barclaysFiles %}
-                    <p>{{ barclaysFile.fileName }}</p>
-                {% endfor %}
             {{ form_start(barclaysForm) }}
                 <div class="form-group">
                     {{ form_label(barclaysForm.file, 'File') }}
@@ -271,12 +268,22 @@
                     {{ form_widget(barclaysForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-success'}}) }}
                 </div>
             {{ form_end(barclaysForm) }}
+              <hr>
+              <h2>Files</h2>
+              <table width="100%" class="table table-striped">
+                  {% for barclaysFile in barclaysFiles %}
+                      <tr>
+                          <td>{{ barclaysFile.fileName }}</td>
+                          <td style="word-break:break-all;">{{ barclaysFile.metadata|json_encode }}</td>
+                      </tr>
+                  {% endfor %}
+              </table>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="modal fade" id="barclaysStatementModal" tabindex="-1" role="dialog">
+    <div class="modal modal-middle modal-phone fade" id="barclaysStatementModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -284,9 +291,6 @@
             <h4 class="modal-title">Barclays Statement Upload</h4>
           </div>
           <div class="modal-body">
-                {% for barclaysStatementFile in barclaysStatementFiles %}
-                    <p>{{ barclaysStatementFile.fileName }}</p>
-                {% endfor %}
             {{ form_start(barclaysStatementForm) }}
                 <div class="form-group">
                     {{ form_label(barclaysStatementForm.file, 'File') }}
@@ -297,12 +301,22 @@
                     {{ form_widget(barclaysStatementForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-success'}}) }}
                 </div>
             {{ form_end(barclaysStatementForm) }}
+              <hr>
+              <h2>Files</h2>
+              <table width="100%" class="table table-striped">
+                  {% for barclaysStatementFile in barclaysStatementFiles %}
+                      <tr>
+                          <td>{{ barclaysStatementFile.fileName }}</td>
+                          <td style="word-break:break-all;">{{ barclaysStatementFile.metadata|json_encode }}</td>
+                      </tr>
+                  {% endfor %}
+              </table>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="modal fade" id="lloydsModal" tabindex="-1" role="dialog">
+    <div class="modal modal-middle modal-phone fade" id="lloydsModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -310,9 +324,6 @@
             <h4 class="modal-title">Lloyds Upload</h4>
           </div>
           <div class="modal-body">
-                {% for lloydsFile in lloydsFiles %}
-                    <p>{{ lloydsFile.fileName }}</p>
-                {% endfor %}
             {{ form_start(lloydsForm) }}
                 <div class="form-group">
                     {{ form_label(lloydsForm.file, 'File') }}
@@ -323,6 +334,16 @@
                     {{ form_widget(lloydsForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-success'}}) }}
                 </div>
             {{ form_end(lloydsForm) }}
+              <hr>
+              <h2>Files</h2>
+              <table width="100%" class="table table-striped">
+                  {% for lloydsFile in lloydsFiles %}
+                  <tr>
+                      <td>{{ lloydsFile.fileName }}</td>
+                      <td style="word-break:break-all;">{{ lloydsFile.metadata|json_encode }}</td>
+                  </tr>
+                  {% endfor %}
+              </table>
           </div>
         </div>
       </div>
