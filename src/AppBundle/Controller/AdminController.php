@@ -941,35 +941,49 @@ class AdminController extends BaseController
         ];
 
         $monthlyBarclaysFiles = $barclaysFileRepo->getMonthBarclaysFiles($date);
-        $yearlyBarclaysFiles = $barclaysFileRepo->getYearBarclaysFilesToDate($date);
-        $allBarclaysFiles = $barclaysFileRepo->getAllBarclaysFilesToDate($date);
         $monthlyPerDayBarclaysTransaction = BarclaysFile::combineDailyTransactions($monthlyBarclaysFiles);
         $monthlyPerDayBarclaysProcessing = BarclaysFile::combineDailyProcessing($monthlyBarclaysFiles);
+
+        $yearlyBarclaysFiles = $barclaysFileRepo->getYearBarclaysFilesToDate($date);
+        $yearlyBarclaysTransaction = BarclaysFile::combineDailyTransactions($yearlyBarclaysFiles);
+        $yearlyBarclaysProcessing = BarclaysFile::combineDailyProcessing($yearlyBarclaysFiles);
+
+        $allBarclaysFiles = $barclaysFileRepo->getAllBarclaysFilesToDate($date);
+        $allBarclaysTransaction = BarclaysFile::combineDailyTransactions($allBarclaysFiles);
+        $allBarclaysProcessing = BarclaysFile::combineDailyProcessing($allBarclaysFiles);
+
         $barclays = [
             'dailyTransaction' => $monthlyPerDayBarclaysTransaction,
             'dailyProcessed' => $monthlyPerDayBarclaysProcessing,
             'monthlyTransaction' => BarclaysFile::totalCombinedFiles($monthlyPerDayBarclaysTransaction, $year, $month),
             'monthlyProcessed' => BarclaysFile::totalCombinedFiles($monthlyPerDayBarclaysProcessing, $year, $month),
-            'yearlyTransaction' => BarclaysFile::totalCombinedFiles($yearlyBarclaysFiles),
-            'yearlyProcessed' => BarclaysFile::totalCombinedFiles($yearlyBarclaysFiles),
-            'allTransaction' => BarclaysFile::totalCombinedFiles($allBarclaysFiles),
-            'allProcessed' => BarclaysFile::totalCombinedFiles($allBarclaysFiles),
+            'yearlyTransaction' => BarclaysFile::totalCombinedFiles($yearlyBarclaysTransaction),
+            'yearlyProcessed' => BarclaysFile::totalCombinedFiles($yearlyBarclaysProcessing),
+            'allTransaction' => BarclaysFile::totalCombinedFiles($allBarclaysTransaction),
+            'allProcessed' => BarclaysFile::totalCombinedFiles($allBarclaysProcessing),
         ];
 
         $monthlyLloydsFiles = $lloydsFileRepo->getMonthLloydsFiles($date);
-        $yearlyLloydsFiles = $lloydsFileRepo->getYearLloydsFilesToDate($date);
-        $allLloydsFiles = $lloydsFileRepo->getAllLloydsFilesToDate($date);
         $monthlyPerDayLloydsReceived = LloydsFile::combineDailyReceived($monthlyLloydsFiles);
         $monthlyPerDayLloydsProcessing = LloydsFile::combineDailyProcessing($monthlyLloydsFiles);
+
+        $yearlyLloydsFiles = $lloydsFileRepo->getYearLloydsFilesToDate($date);
+        $yearlyPerDayLloydsReceived = LloydsFile::combineDailyReceived($yearlyLloydsFiles);
+        $yearlyPerDayLloydsProcessing = LloydsFile::combineDailyProcessing($yearlyLloydsFiles);
+
+        $allLloydsFiles = $lloydsFileRepo->getAllLloydsFilesToDate($date);
+        $allLloydsReceived = LloydsFile::combineDailyReceived($allLloydsFiles);
+        $allLloydsProcessing = LloydsFile::combineDailyProcessing($allLloydsFiles);
+
         $lloyds = [
             'dailyReceived' => $monthlyPerDayLloydsReceived,
             'dailyProcessed' => $monthlyPerDayLloydsProcessing,
             'monthlyReceived' => LloydsFile::totalCombinedFiles($monthlyPerDayLloydsReceived, $year, $month),
             'monthlyProcessed' => LloydsFile::totalCombinedFiles($monthlyPerDayLloydsProcessing, $year, $month),
-            'yearlyReceived' => LloydsFile::totalCombinedFiles($yearlyLloydsFiles),
-            'yearlyProcessed' => LloydsFile::totalCombinedFiles($yearlyLloydsFiles),
-            'allReceived' => LloydsFile::totalCombinedFiles($allLloydsFiles),
-            'allProcessed' => LloydsFile::totalCombinedFiles($allLloydsFiles),
+            'yearlyReceived' => LloydsFile::totalCombinedFiles($yearlyPerDayLloydsReceived),
+            'yearlyProcessed' => LloydsFile::totalCombinedFiles($yearlyPerDayLloydsProcessing),
+            'allReceived' => LloydsFile::totalCombinedFiles($allLloydsReceived),
+            'allProcessed' => LloydsFile::totalCombinedFiles($allLloydsProcessing),
         ];
 
         return [
