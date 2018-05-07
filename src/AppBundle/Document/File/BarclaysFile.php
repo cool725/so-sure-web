@@ -36,8 +36,8 @@ class BarclaysFile extends UploadFile
      * @Gedmo\Versioned
      */
     protected $dailyProcessing = array();
-    
-   /**
+
+    /**
      * @return string
      */
     public function getS3FileName()
@@ -74,29 +74,11 @@ class BarclaysFile extends UploadFile
     
     public static function combineDailyTransactions($barclayFiles)
     {
-        $dailyTransactions = [];
-        foreach ($barclayFiles as $barclayFile) {
-            foreach ($barclayFile->getDailyTransaction() as $key => $value) {
-                if (!isset($dailyTransactions[$key]) || $dailyTransactions[$key] < $value) {
-                    $dailyTransactions[$key] = CurrencyTrait::staticToTwoDp($value);
-                }
-            }
-        }
-
-        return $dailyTransactions;
+        return self::combineFiles($barclayFiles, 'getDailyTransaction');
     }
 
     public static function combineDailyProcessing($barclayFiles)
     {
-        $dailyProcessing = [];
-        foreach ($barclayFiles as $barclayFile) {
-            foreach ($barclayFile->getDailyProcessing() as $key => $value) {
-                if (!isset($dailyProcessing[$key]) || $dailyProcessing[$key] < $value) {
-                    $dailyProcessing[$key] = CurrencyTrait::staticToTwoDp($value);
-                }
-            }
-        }
-
-        return $dailyProcessing;
+        return self::combineFiles($barclayFiles, 'getDailyProcessing');
     }
 }

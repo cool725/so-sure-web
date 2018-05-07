@@ -9,7 +9,10 @@ use AppBundle\Document\Sequence;
 use AppBundle\Form\Type\BacsMandatesType;
 use AppBundle\Form\Type\BacsUploadFileType;
 use AppBundle\Form\Type\SequenceType;
+use AppBundle\Repository\File\BarclaysFileRepository;
+use AppBundle\Repository\File\LloydsFileRepository;
 use AppBundle\Repository\File\S3FileRepository;
+use AppBundle\Repository\PaymentRepository;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\SequenceService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -851,15 +854,13 @@ class AdminController extends BaseController
         $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
 
         $dm = $this->getManager();
+        /** @var PaymentRepository $paymentRepo */
         $paymentRepo = $dm->getRepository(Payment::class);
         $barclaysStatementFileRepo = $dm->getRepository(BarclaysStatementFile::class);
+        /** @var BarclaysFileRepository $barclaysFileRepo */
         $barclaysFileRepo = $dm->getRepository(BarclaysFile::class);
+        /** @var LloydsFileRepository $lloydsFileRepo */
         $lloydsFileRepo = $dm->getRepository(LloydsFile::class);
-
-        $payments = $paymentRepo->getAllPaymentsForExport($date);
-        $isProd = $this->isProduction();
-        $paymentTotals = Payment::sumPayments($payments, $isProd, JudoPayment::class);
-        $paymentDailys = Payment::dailyPayments($payments, $isProd, JudoPayment::class);
 
         $lloydsFile = new LloydsFile();
         $lloydsForm = $this->get('form.factory')
@@ -932,37 +933,44 @@ class AdminController extends BaseController
             }
         }
 
-        $barclaysFiles = $barclaysFileRepo->getBarclaysFiles($date);
-        $dailyTransaction = BarclaysFile::combineDailyTransactions($barclaysFiles);
-        $dailyBarclaysProcessing = BarclaysFile::combineDailyProcessing($barclaysFiles);
-        $totalTransaction = 0;
-        foreach ($dailyTransaction as $key => $value) {
-            if (mb_stripos($key, sprintf('%d%02d', $year, $month)) !== false) {
-                $totalTransaction += (float) $value;
-            }
-        }
-        $totalBarclaysProcessing = 0;
-        foreach ($dailyBarclaysProcessing as $key => $value) {
-            if (mb_stripos($key, sprintf('%d%02d', $year, $month)) !== false) {
-                $totalBarclaysProcessing += (float) $value;
-            }
-        }
+        $payments = $paymentRepo->getAllPaymentsForExport($date);
+        $isProd = $this->isProduction();
+        $judo = [
+            'dailyTransaction' => Payment::dailyPayments($payments, $isProd, JudoPayment::class),
+            'monthlyTransaction' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
+        ];
 
-        $lloydsFiles = $lloydsFileRepo->getLloydsFiles($date);
-        $dailyReceived = LloydsFile::combineDailyReceived($lloydsFiles);
-        $dailyLloydsProcessing = LloydsFile::combineDailyProcessing($lloydsFiles);
-        $totalReceived = 0;
-        foreach ($dailyReceived as $key => $value) {
-            if (mb_stripos($key, sprintf('%d%02d', $year, $month)) !== false) {
-                $totalReceived += (float) $value;
-            }
-        }
-        $totalLloydsProcessing = 0;
-        foreach ($dailyLloydsProcessing as $key => $value) {
-            if (mb_stripos($key, sprintf('%d%02d', $year, $month)) !== false) {
-                $totalLloydsProcessing += (float) $value;
-            }
-        }
+        $monthlyBarclaysFiles = $barclaysFileRepo->getMonthBarclaysFiles($date);
+        $yearlyBarclaysFiles = $barclaysFileRepo->getYearBarclaysFilesToDate($date);
+        $allBarclaysFiles = $barclaysFileRepo->getAllBarclaysFilesToDate($date);
+        $monthlyPerDayBarclaysTransaction = BarclaysFile::combineDailyTransactions($monthlyBarclaysFiles);
+        $monthlyPerDayBarclaysProcessing = BarclaysFile::combineDailyProcessing($monthlyBarclaysFiles);
+        $barclays = [
+            'dailyTransaction' => $monthlyPerDayBarclaysTransaction,
+            'dailyProcessed' => $monthlyPerDayBarclaysProcessing,
+            'monthlyTransaction' => BarclaysFile::totalCombinedFiles($monthlyPerDayBarclaysTransaction, $year, $month),
+            'monthlyProcessed' => BarclaysFile::totalCombinedFiles($monthlyPerDayBarclaysProcessing, $year, $month),
+            'yearlyTransaction' => BarclaysFile::totalCombinedFiles($yearlyBarclaysFiles),
+            'yearlyProcessed' => BarclaysFile::totalCombinedFiles($yearlyBarclaysFiles),
+            'allTransaction' => BarclaysFile::totalCombinedFiles($allBarclaysFiles),
+            'allProcessed' => BarclaysFile::totalCombinedFiles($allBarclaysFiles),
+        ];
+
+        $monthlyLloydsFiles = $lloydsFileRepo->getMonthLloydsFiles($date);
+        $yearlyLloydsFiles = $lloydsFileRepo->getYearLloydsFilesToDate($date);
+        $allLloydsFiles = $lloydsFileRepo->getAllLloydsFilesToDate($date);
+        $monthlyPerDayLloydsReceived = LloydsFile::combineDailyReceived($monthlyLloydsFiles);
+        $monthlyPerDayLloydsProcessing = LloydsFile::combineDailyProcessing($monthlyLloydsFiles);
+        $lloyds = [
+            'dailyReceived' => $monthlyPerDayLloydsReceived,
+            'dailyProcessed' => $monthlyPerDayLloydsProcessing,
+            'monthlyReceived' => LloydsFile::totalCombinedFiles($monthlyPerDayLloydsReceived, $year, $month),
+            'monthlyProcessed' => LloydsFile::totalCombinedFiles($monthlyPerDayLloydsProcessing, $year, $month),
+            'yearlyReceived' => LloydsFile::totalCombinedFiles($yearlyLloydsFiles),
+            'yearlyProcessed' => LloydsFile::totalCombinedFiles($yearlyLloydsFiles),
+            'allReceived' => LloydsFile::totalCombinedFiles($allLloydsFiles),
+            'allProcessed' => LloydsFile::totalCombinedFiles($allLloydsFiles),
+        ];
 
         return [
             'lloydsForm' => $lloydsForm->createView(),
@@ -971,19 +979,12 @@ class AdminController extends BaseController
             'year' => $year,
             'month' => $month,
             'days_in_month' => cal_days_in_month(CAL_GREGORIAN, $month, $year),
-            'paymentTotals' => $paymentTotals,
-            'totalTransaction' => $totalTransaction,
-            'totalBarclaysProcessing' => $totalBarclaysProcessing,
-            'totalLloydsProcessing' => $totalLloydsProcessing,
-            'totalReceived' => $totalReceived,
-            'paymentDailys' => $paymentDailys,
-            'dailyTransaction' => $dailyTransaction,
-            'dailyBarclaysProcessing' => $dailyBarclaysProcessing,
-            'dailyLloydsProcessing' => $dailyLloydsProcessing,
-            'dailyReceived' => $dailyReceived,
-            'barclaysFiles' => $barclaysFiles,
+            'lloyds' => $lloyds,
+            'barclays' => $barclays,
+            'judo' => $judo,
+            'barclaysFiles' => $monthlyBarclaysFiles,
             'barclaysStatementFiles' => [],
-            'lloydsFiles' => $lloydsFiles,
+            'lloydsFiles' => $monthlyLloydsFiles,
         ];
     }
 

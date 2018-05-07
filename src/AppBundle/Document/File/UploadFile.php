@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document\File;
 
+use AppBundle\Document\CurrencyTrait;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
@@ -88,4 +89,35 @@ abstract class UploadFile extends S3File
      * @return string
      */
     abstract public function getS3FileName();
+
+    public static function combineFiles($files, $method)
+    {
+        $daily = [];
+        foreach ($files as $file) {
+            foreach (call_user_func([$file, $method]) as $key => $value) {
+                if (!isset($dailyProcessing[$key]) || $daily[$key] < $value) {
+                    $daily[$key] = CurrencyTrait::staticToTwoDp($value);
+                }
+            }
+        }
+
+        return $daily;
+    }
+
+    public static function totalCombinedFiles($daily, $year = null, $month = null)
+    {
+        $total = 0;
+        foreach ($daily as $key => $value) {
+            $include = true;
+            if ($year && $month && mb_stripos($key, sprintf('%d%02d', $year, $month)) === false) {
+                $include = false;
+            }
+
+            if ($include) {
+                $total += (float) $value;
+            }
+        }
+
+        return $total;
+    }
 }

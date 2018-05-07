@@ -52,12 +52,24 @@
         <h3>Transaction Date</h3>
         <table class="table table-striped">
             <tr>
-                <td>so-sure/Judo Total for month</td>
-                <td>£{{ paymentTotals.total|number_format(2, '.', ',') }}</td>
+                <th></th>
+                <th>so-sure/Judo</th>
+                <th>Barclays</th>
             </tr>
             <tr>
-                <td>Barclays Total for month</td>
-                <td>£{{ totalTransaction|number_format(2, '.', ',') }}</td>
+                <td>Month</td>
+                <td>£{{ judo['monthlyTransaction'].total|number_format(2, '.', ',') }}</td>
+                <td>£{{ barclays['monthlyTransaction']|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td>Year</td>
+                <td></td>
+                <td>£{{ barclays['yearlyTransaction']|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td>All time</td>
+                <td></td>
+                <td>£{{ barclays['allTransaction']|number_format(2, '.', ',') }}</td>
             </tr>
         </table>
     </div>
@@ -65,12 +77,24 @@
         <h3>Processing Date</h3>
         <table class="table table-striped">
             <tr>
-                <td>Barclays Total for month (processing date)</td>
-                <td>£{{ totalBarclaysProcessing|number_format(2, '.', ',') }}</td>
+                <th></th>
+                <th>Barclays</th>
+                <th>Lloyds</th>
             </tr>
             <tr>
-                <td>Lloyds Total for month (processing date)</td>
-                <td>£{{ totalLloydsProcessing|number_format(2, '.', ',') }}</td>
+                <td>Month</td>
+                <td>£{{ barclays['monthlyProcessed']|number_format(2, '.', ',') }}</td>
+                <td>£{{ lloyds['monthlyProcessed']|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td>Year</td>
+                <td>£{{ barclays['yearlyProcessed']|number_format(2, '.', ',') }}</td>
+                <td>£{{ lloyds['yearlyProcessed']|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td>All time</td>
+                <td>£{{ barclays['allProcessed']|number_format(2, '.', ',') }}</td>
+                <td>£{{ lloyds['allProcessed']|number_format(2, '.', ',') }}</td>
             </tr>
         </table>
     </div>
@@ -78,8 +102,20 @@
         <h3>Received Date</h3>
         <table class="table table-striped">
             <tr>
-                <td>Lloyds Total for month (received date)</td>
-                <td>£{{ totalReceived|number_format(2, '.', ',') }}</td>
+                <th></th>
+                <th>Lloyds</th>
+            </tr>
+            <tr>
+                <td>Month)</td>
+                <td>£{{ lloyds['monthlyReceived']|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td>Year</td>
+                <td>£{{ lloyds['yearlyReceived']|number_format(2, '.', ',') }}</td>
+            </tr>
+            <tr>
+                <td>All time</td>
+                <td>£{{ lloyds['allReceived']|number_format(2, '.', ',') }}</td>
             </tr>
         </table>
     </div>
@@ -104,8 +140,8 @@
                     {% set ymd = year ~ month ~ day %}
                 {% endif %}
                 {% set color = '' %}
-                {% if paymentDailys[day] is defined and dailyTransaction[ymd] is defined  %}
-                    {% if equal_to_two_dp(paymentDailys[day], dailyTransaction[ymd]) %}
+                {% if judo['dailyTransaction'][day] is defined and barclays['dailyTransaction'][ymd] is defined  %}
+                    {% if equal_to_two_dp(judo['dailyTransaction'][day], barclays['dailyTransaction'][ymd]) %}
                         {% set color = 'success' %}
                     {% else %}
                         {% set color = 'danger' %}
@@ -113,8 +149,8 @@
                 {% endif %}
                 <tr class='{{ color }}'>
                     <td>{{ day }}</td>
-                    <td>{% if paymentDailys[day] is defined %}£{{ paymentDailys[day]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
-                    <td>{% if dailyTransaction[ymd] is defined %}£{{ dailyTransaction[ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                    <td>{% if judo['dailyTransaction'][day] is defined %}£{{ judo['dailyTransaction'][day]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                    <td>{% if barclays['dailyTransaction'][ymd] is defined %}£{{ barclays['dailyTransaction'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
                 </tr>
             {% endfor %}
         </table>
@@ -138,8 +174,8 @@
                     {% set ymd = year ~ month ~ day %}
                 {% endif %}
                 {% set color = '' %}
-                {% if dailyBarclaysProcessing[ymd] is defined and dailyLloydsProcessing[ymd] is defined  %}
-                    {% if equal_to_two_dp(dailyBarclaysProcessing[ymd], dailyLloydsProcessing[ymd]) %}
+                {% if barclays['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined  %}
+                    {% if equal_to_two_dp(barclays['dailyProcessed'][ymd], lloyds['dailyProcessed'][ymd]) %}
                         {% set color = 'success' %}
                     {% else %}
                         {% set color = 'danger' %}
@@ -147,8 +183,8 @@
                 {% endif %}
                 <tr class='{{ color }}'>
                     <td>{{ day }}</td>
-                    <td>{% if dailyBarclaysProcessing[ymd] is defined %}£{{ dailyBarclaysProcessing[ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
-                    <td>{% if dailyLloydsProcessing[ymd] is defined %}£{{ dailyLloydsProcessing[ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                    <td>{% if barclays['dailyProcessed'][ymd] is defined %}£{{ barclays['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                    <td>{% if lloyds['dailyProcessed'][ymd] is defined %}£{{ lloyds['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
                 </tr>
             {% endfor %}
             {% for next_month_day in 1..3 %}
@@ -160,8 +196,8 @@
                     {% set ymd = year ~ "0" ~  (month + 1) ~ "0" ~ next_month_day %}
                 {% endif %}
                 {% set color = '' %}
-                {% if dailyBarclaysProcessing[ymd] is defined and dailyLloydsProcessing[ymd] is defined  %}
-                    {% if equal_to_two_dp(dailyBarclaysProcessing[ymd], dailyLloydsProcessing[ymd]) %}
+                {% if barclays['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined  %}
+                    {% if equal_to_two_dp(barclays['dailyProcessed'][ymd], lloyds['dailyProcessed'][ymd]) %}
                         {% set color = 'success' %}
                     {% else %}
                         {% set color = 'danger' %}
@@ -169,8 +205,8 @@
                 {% endif %}
                 <tr class='{{ color }}'>
                     <td>{{ next_month_day }}</td>
-                    <td>{% if dailyBarclaysProcessing[ymd] is defined %}£{{ dailyBarclaysProcessing[ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
-                    <td>{% if dailyLloydsProcessing[ymd] is defined %}£{{ dailyLloydsProcessing[ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                    <td>{% if barclays['dailyProcessed'][ymd] is defined %}£{{ barclays['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                    <td>{% if lloyds['dailyProcessed'][ymd] is defined %}£{{ lloyds['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
                 </tr>
             {% endfor %}
         </table>
@@ -194,7 +230,7 @@
                 {% endif %}
                 <tr>
                     <td>{{ day }}</td>
-                    <td>{% if dailyReceived[ymd] is defined %}£{{ dailyReceived[ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                    <td>{% if lloyds['dailyReceived'][ymd] is defined %}£{{ lloyds['dailyReceived'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
                 </tr>
             {% endfor %}
             {% for next_month_day in 1..5 %}
@@ -205,17 +241,9 @@
                 {% else %}
                     {% set ymd = year ~ "0" ~  (month + 1) ~ "0" ~ next_month_day %}
                 {% endif %}
-                {% set color = '' %}
-                {% if dailyBarclaysProcessing[ymd] is defined and dailyLloydsProcessing[ymd] is defined  %}
-                    {% if equal_to_two_dp(dailyBarclaysProcessing[ymd], dailyLloydsProcessing[ymd]) %}
-                        {% set color = 'success' %}
-                    {% else %}
-                        {% set color = 'danger' %}
-                    {% endif %}
-                {% endif %}
                 <tr>
                     <td>{{ next_month_day }}</td>
-                    <td>{% if dailyReceived[ymd] is defined %}£{{ dailyReceived[ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                    <td>{% if lloyds['dailyReceived'][ymd] is defined %}£{{ lloyds['dailyReceived'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
                 </tr>
             {% endfor %}
         </table>

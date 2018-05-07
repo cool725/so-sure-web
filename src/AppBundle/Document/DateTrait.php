@@ -57,6 +57,16 @@ trait DateTrait
         return $startMonth;
     }
 
+    public function startOfYear(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+        $startYear = new \DateTime(sprintf('%d-01-01 00:00:00', $date->format('Y')));
+
+        return $startYear;
+    }
+
     public function endOfMonth(\DateTime $date = null)
     {
         if (!$date) {
