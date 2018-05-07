@@ -35,7 +35,7 @@ class LloydsFile extends UploadFile
      */
     protected $dailyProcessing = array();
     
-   /**
+    /**
      * @return string
      */
     public function getS3FileName()
@@ -72,29 +72,11 @@ class LloydsFile extends UploadFile
 
     public static function combineDailyReceived($lloydsFiles)
     {
-        $dailyReceived = [];
-        foreach ($lloydsFiles as $lloydsFile) {
-            foreach ($lloydsFile->getDailyReceived() as $key => $value) {
-                if (!isset($dailyReceived[$key]) || $dailyReceived[$key] < $value) {
-                    $dailyReceived[$key] = CurrencyTrait::staticToTwoDp($value);
-                }
-            }
-        }
-
-        return $dailyReceived;
+        return self::combineFiles($lloydsFiles, 'getDailyReceived');
     }
 
     public static function combineDailyProcessing($lloydsFiles)
     {
-        $dailyProcessing = [];
-        foreach ($lloydsFiles as $lloydsFile) {
-            foreach ($lloydsFile->getDailyProcessing() as $key => $value) {
-                if (!isset($dailyProcessing[$key]) || $dailyProcessing[$key] < $value) {
-                    $dailyProcessing[$key] = CurrencyTrait::staticToTwoDp($value);
-                }
-            }
-        }
-
-        return $dailyProcessing;
+        return self::combineFiles($lloydsFiles, 'getDailyProcessing');
     }
 }
