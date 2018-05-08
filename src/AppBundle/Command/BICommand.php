@@ -118,6 +118,7 @@ class BICommand extends BaseCommand
             '"Model"',
             '"Memory"',
             '"Current Monthly Cost"',
+            '"Original Retail Price"',
         ]);
         foreach ($phones as $phone) {
             /** @var Phone $phone */
@@ -126,6 +127,7 @@ class BICommand extends BaseCommand
                 sprintf('"%s"', $phone->getModel()),
                 sprintf('"%s"', $phone->getMemory()),
                 sprintf('"%0.2f"', $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice()),
+                sprintf('"%0.2f"', $phone->getInitialPrice()),
             ]);
         }
         if (!$skipS3) {
