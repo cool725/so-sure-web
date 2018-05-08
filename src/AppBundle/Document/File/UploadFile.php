@@ -95,7 +95,7 @@ abstract class UploadFile extends S3File
         $daily = [];
         foreach ($files as $file) {
             foreach (call_user_func([$file, $method]) as $key => $value) {
-                if (!isset($dailyProcessing[$key]) || $daily[$key] < $value) {
+                if (!isset($daily[$key]) || $daily[$key] < $value) {
                     $daily[$key] = CurrencyTrait::staticToTwoDp($value);
                 }
             }

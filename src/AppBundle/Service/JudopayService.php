@@ -1,6 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Document\File\JudoFile;
 use AppBundle\Repository\JudoPaymentRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
 use Psr\Log\LoggerInterface;
@@ -1336,11 +1337,13 @@ class JudopayService
         return $refund;
     }
 
-    public function processCsv($judoFile)
+    public function processCsv(JudoFile $judoFile)
     {
         $filename = $judoFile->getFile();
         $header = null;
         $lines = array();
+        $dailyTransaction = array();
+
         $payments = 0;
         $numPayments = 0;
         $refunds = 0;
@@ -1358,15 +1361,22 @@ class JudopayService
                 } else {
                     $line = array_combine($header, $row);
                     $lines[] = $line;
+                    $transactionDate = new \DateTime($line['Date']);
+                    if (!isset($dailyTransaction[$transactionDate->format('Ymd')])) {
+                        $dailyTransaction[$transactionDate->format('Ymd')] = 0;
+                    }
+
                     if ($line['TransactionResult'] == "Transaction Successful") {
                         if ($line['TransactionType'] == "Payment") {
                             $total += $line['Net'];
                             $payments += $line['Net'];
                             $numPayments++;
+                            $dailyTransaction[$transactionDate->format('Ymd')] += $line['Net'];
                         } elseif ($line['TransactionType'] == "Refund") {
                             $total -= $line['Net'];
                             $refunds += $line['Net'];
                             $numRefunds++;
+                            $dailyTransaction[$transactionDate->format('Ymd')] -= $line['Net'];
                         }
                     } elseif ($line['TransactionResult'] == "Card Declined") {
                         $declined += $line['Net'];
@@ -1402,6 +1412,7 @@ class JudopayService
             'numDeclined' => $numDeclined,
             'failed' => $this->toTwoDp($failed),
             'numFailed' => $numFailed,
+            'dailyTransaction' => $dailyTransaction,
             'data' => $lines,
         ];
 
@@ -1414,6 +1425,7 @@ class JudopayService
         $judoFile->addMetadata('numDeclined', $data['numDeclined']);
         $judoFile->addMetadata('failed', $data['failed']);
         $judoFile->addMetadata('numFailed', $data['numFailed']);
+        $judoFile->setDailyTransaction($data['dailyTransaction']);
         $judoFile->setDate($data['date']);
 
         return $data;

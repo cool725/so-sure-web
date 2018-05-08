@@ -11,6 +11,7 @@ use AppBundle\Form\Type\BacsUploadFileType;
 use AppBundle\Form\Type\SequenceType;
 use AppBundle\Repository\File\BarclaysFileRepository;
 use AppBundle\Repository\File\BarclaysStatementFileRepository;
+use AppBundle\Repository\File\JudoFileRepository;
 use AppBundle\Repository\File\LloydsFileRepository;
 use AppBundle\Repository\File\S3FileRepository;
 use AppBundle\Repository\PaymentRepository;
@@ -483,7 +484,7 @@ class AdminController extends BaseController
      * @Route("/accounts/{year}/{month}", name="admin_accounts_date")
      * @Template
      */
-    public function adminAccountsAction(Request $request, $year = null, $month = null)
+    public function adminAccountsAction($year = null, $month = null)
     {
         $now = new \DateTime();
         if (!$year) {
@@ -496,36 +497,9 @@ class AdminController extends BaseController
 
         $dm = $this->getManager();
         $s3FileRepo = $dm->getRepository(S3File::class);
-        $judoFile = new JudoFile();
-        $judoForm = $this->get('form.factory')
-            ->createNamedBuilder('judo', JudoFileType::class, $judoFile)
-            ->getForm();
-
-        if ('POST' === $request->getMethod()) {
-            if ($request->request->has('judo')) {
-                $judoForm->handleRequest($request);
-                if ($judoForm->isSubmitted() && $judoForm->isValid()) {
-                    $dm = $this->getManager();
-                    $judoFile->setBucket('admin.so-sure.com');
-                    $judoFile->setKeyFormat($this->getParameter('kernel.environment') . '/upload/%s');
-
-                    $judoService = $this->get('app.judopay');
-                    $data = $judoService->processCsv($judoFile);
-
-                    $dm->persist($judoFile);
-                    $dm->flush();
-
-                    return $this->redirectToRoute('admin_accounts_date', [
-                        'year' => $date->format('Y'),
-                        'month' => $date->format('m'),
-                    ]);
-                }
-            }
-        }
         $reportingService = $this->get('app.reporting');
 
         return [
-            'judoForm' => $judoForm->createView(),
             'year' => $year,
             'month' => $month,
             'paymentTotals' => $reportingService->getAllPaymentTotals($this->isProduction(), $date),
@@ -860,6 +834,8 @@ class AdminController extends BaseController
         $dm = $this->getManager();
         /** @var PaymentRepository $paymentRepo */
         $paymentRepo = $dm->getRepository(Payment::class);
+        /** @var JudoFileRepository $judoFileRepo */
+        $judoFileRepo = $dm->getRepository(JudoFile::class);
         /** @var BarclaysStatementFileRepository $barclaysStatementFileRepo */
         $barclaysStatementFileRepo = $dm->getRepository(BarclaysStatementFile::class);
         /** @var BarclaysFileRepository $barclaysFileRepo */
@@ -867,9 +843,9 @@ class AdminController extends BaseController
         /** @var LloydsFileRepository $lloydsFileRepo */
         $lloydsFileRepo = $dm->getRepository(LloydsFile::class);
 
-        $lloydsFile = new LloydsFile();
-        $lloydsForm = $this->get('form.factory')
-            ->createNamedBuilder('lloyds', LloydsFileType::class, $lloydsFile)
+        $judoFile = new JudoFile();
+        $judoForm = $this->get('form.factory')
+            ->createNamedBuilder('judo', JudoFileType::class, $judoFile)
             ->getForm();
         $barclaysFile = new BarclaysFile();
         $barclaysForm = $this->get('form.factory')
@@ -879,19 +855,23 @@ class AdminController extends BaseController
         $barclaysStatementForm = $this->get('form.factory')
             ->createNamedBuilder('barclays_statement', BarclaysStatementFileType::class, $barclaysStatementFile)
             ->getForm();
+        $lloydsFile = new LloydsFile();
+        $lloydsForm = $this->get('form.factory')
+            ->createNamedBuilder('lloyds', LloydsFileType::class, $lloydsFile)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
-            if ($request->request->has('lloyds')) {
-                $lloydsForm->handleRequest($request);
-                if ($lloydsForm->isSubmitted() && $lloydsForm->isValid()) {
+            if ($request->request->has('judo')) {
+                $judoForm->handleRequest($request);
+                if ($judoForm->isSubmitted() && $judoForm->isValid()) {
                     $dm = $this->getManager();
-                    $lloydsFile->setBucket('admin.so-sure.com');
-                    $lloydsFile->setKeyFormat($this->getParameter('kernel.environment') . '/upload/%s');
+                    $judoFile->setBucket('admin.so-sure.com');
+                    $judoFile->setKeyFormat($this->getParameter('kernel.environment') . '/upload/%s');
 
-                    $lloydsService = $this->get('app.lloyds');
-                    $data = $lloydsService->processCsv($lloydsFile);
+                    $judoService = $this->get('app.judopay');
+                    $data = $judoService->processCsv($judoFile);
 
-                    $dm->persist($lloydsFile);
+                    $dm->persist($judoFile);
                     $dm->flush();
 
                     return $this->redirectToRoute('admin_banking_date', [
@@ -935,17 +915,49 @@ class AdminController extends BaseController
                         'month' => $date->format('n'),
                     ]);
                 }
+            } elseif ($request->request->has('lloyds')) {
+                $lloydsForm->handleRequest($request);
+                if ($lloydsForm->isSubmitted() && $lloydsForm->isValid()) {
+                    $dm = $this->getManager();
+                    $lloydsFile->setBucket('admin.so-sure.com');
+                    $lloydsFile->setKeyFormat($this->getParameter('kernel.environment') . '/upload/%s');
+
+                    $lloydsService = $this->get('app.lloyds');
+                    $data = $lloydsService->processCsv($lloydsFile);
+
+                    $dm->persist($lloydsFile);
+                    $dm->flush();
+
+                    return $this->redirectToRoute('admin_banking_date', [
+                        'year' => $date->format('Y'),
+                        'month' => $date->format('n'),
+                    ]);
+                }
             }
         }
 
         $payments = $paymentRepo->getAllPaymentsForExport($date);
         $isProd = $this->isProduction();
-        $judo = [
+        $sosure = [
             'dailyTransaction' => Payment::dailyPayments($payments, $isProd, JudoPayment::class),
             'monthlyTransaction' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
         ];
 
-        $monthlyBarclaysStatementFiles = $barclaysStatementFileRepo->getMonthBarclaysStatementFiles($date);
+        $monthlyJudoFiles = $judoFileRepo->getMonthJudoFiles($date);
+        $monthlyPerDayJudoTransaction = JudoFile::combineDailyTransactions($monthlyJudoFiles);
+
+        $yearlyJudoFiles = $judoFileRepo->getYearJudoFilesToDate($date);
+        $yearlyPerDayJudoTransaction = JudoFile::combineDailyTransactions($yearlyJudoFiles);
+
+        $allJudoFiles = $judoFileRepo->getAllJudoFilesToDate($date);
+        $allJudoTransaction = JudoFile::combineDailyTransactions($allJudoFiles);
+
+        $judo = [
+            'dailyTransaction' => $monthlyPerDayJudoTransaction,
+            'monthlyTransaction' => JudoFile::totalCombinedFiles($monthlyPerDayJudoTransaction, $year, $month),
+            'yearlyTransaction' => JudoFile::totalCombinedFiles($yearlyPerDayJudoTransaction),
+            'allTransaction' => JudoFile::totalCombinedFiles($allJudoTransaction),
+        ];
 
         $monthlyBarclaysFiles = $barclaysFileRepo->getMonthBarclaysFiles($date);
         $monthlyPerDayBarclaysTransaction = BarclaysFile::combineDailyTransactions($monthlyBarclaysFiles);
@@ -994,17 +1006,20 @@ class AdminController extends BaseController
         ];
 
         return [
-            'lloydsForm' => $lloydsForm->createView(),
+            'judoForm' => $judoForm->createView(),
             'barclaysForm' => $barclaysForm->createView(),
             'barclaysStatementForm' => $barclaysStatementForm->createView(),
+            'lloydsForm' => $lloydsForm->createView(),
             'year' => $year,
             'month' => $month,
             'days_in_month' => cal_days_in_month(CAL_GREGORIAN, $month, $year),
             'lloyds' => $lloyds,
             'barclays' => $barclays,
+            'sosure' => $sosure,
             'judo' => $judo,
+            'judoFiles' => $monthlyJudoFiles,
             'barclaysFiles' => $monthlyBarclaysFiles,
-            'barclaysStatementFiles' => $monthlyBarclaysStatementFiles,
+            'barclaysStatementFiles' => $barclaysStatementFileRepo->getMonthBarclaysStatementFiles($date),
             'lloydsFiles' => $monthlyLloydsFiles,
         ];
     }
