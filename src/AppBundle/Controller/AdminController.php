@@ -971,13 +971,21 @@ class AdminController extends BaseController
             }
         }
 
+        $monthlyReconcilationFiles = $reconcilationFileRepo->getMonthlyFiles($date);
+        $yearlyReconcilationFiles = $reconcilationFileRepo->getYearlyFilesToDate($date);
+        $allReconcilationFiles = $reconcilationFileRepo->getAllFilesToDate($date);
+
+        $reconciliation['monthlyTransaction'] = ReconciliationFile::combineMonthlyTotal($monthlyReconcilationFiles);
+        $reconciliation['yearlyTransaction'] = ReconciliationFile::combineMonthlyTotal($yearlyReconcilationFiles);
+        $reconciliation['allTransaction'] = ReconciliationFile::combineMonthlyTotal($allReconcilationFiles);
+
         $monthlyJudoFiles = $judoFileRepo->getMonthlyFiles($date);
         $monthlyPerDayJudoTransaction = JudoFile::combineDailyTransactions($monthlyJudoFiles);
 
         $yearlyJudoFiles = $judoFileRepo->getYearlyFilesToDate($date);
         $yearlyPerDayJudoTransaction = JudoFile::combineDailyTransactions($yearlyJudoFiles);
 
-        $allJudoFiles = $judoFileRepo->getAllFiles($date);
+        $allJudoFiles = $judoFileRepo->getAllFilesToDate($date);
         $allJudoTransaction = JudoFile::combineDailyTransactions($allJudoFiles);
 
         $judo = [
@@ -995,7 +1003,7 @@ class AdminController extends BaseController
         $yearlyBarclaysTransaction = BarclaysFile::combineDailyTransactions($yearlyBarclaysFiles);
         $yearlyBarclaysProcessing = BarclaysFile::combineDailyProcessing($yearlyBarclaysFiles);
 
-        $allBarclaysFiles = $barclaysFileRepo->getAllFiles($date);
+        $allBarclaysFiles = $barclaysFileRepo->getAllFilesToDate($date);
         $allBarclaysTransaction = BarclaysFile::combineDailyTransactions($allBarclaysFiles);
         $allBarclaysProcessing = BarclaysFile::combineDailyProcessing($allBarclaysFiles);
 
@@ -1018,7 +1026,7 @@ class AdminController extends BaseController
         $yearlyPerDayLloydsReceived = LloydsFile::combineDailyReceived($yearlyLloydsFiles);
         $yearlyPerDayLloydsProcessing = LloydsFile::combineDailyProcessing($yearlyLloydsFiles);
 
-        $allLloydsFiles = $lloydsFileRepo->getAllFiles($date);
+        $allLloydsFiles = $lloydsFileRepo->getAllFilesToDate($date);
         $allLloydsReceived = LloydsFile::combineDailyReceived($allLloydsFiles);
         $allLloydsProcessing = LloydsFile::combineDailyProcessing($allLloydsFiles);
 
@@ -1045,6 +1053,7 @@ class AdminController extends BaseController
             'lloyds' => $lloyds,
             'barclays' => $barclays,
             'sosure' => $sosure,
+            'reconciliation' => $reconciliation,
             'judo' => $judo,
             'judoFiles' => $monthlyJudoFiles,
             'barclaysFiles' => $monthlyBarclaysFiles,

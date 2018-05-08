@@ -74,4 +74,14 @@ class ReconciliationFile extends UploadFile
     {
         return $this->monthlyTotal;
     }
+
+    public static function combineMonthlyTotal($reconciliationFiles)
+    {
+        $total = 0;
+        foreach ($reconciliationFiles as $reconciliationFile) {
+            $total += $reconciliationFile->getMonthlyTotal();
+        }
+
+        return $total;
+    }
 }
