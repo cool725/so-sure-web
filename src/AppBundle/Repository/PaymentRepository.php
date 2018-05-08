@@ -29,6 +29,7 @@ class PaymentRepository extends DocumentRepository
                 'debtCollection',
                 'policyDiscountRefund',
             ])
+            ->sort('date')
             ->getQuery()
             ->execute();
     }
