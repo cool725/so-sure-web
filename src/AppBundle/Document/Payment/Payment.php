@@ -229,9 +229,6 @@ abstract class Payment
 
     public function getDate()
     {
-        if ($this->date) {
-            //$this->date->setTimezone(new \DateTimeZone(SoSure::TIMEZONE));
-        }
         return $this->date;
     }
 
