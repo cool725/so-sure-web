@@ -3,6 +3,8 @@
 namespace AppBundle\Document\Payment;
 
 use AppBundle\Classes\Salva;
+use AppBundle\Classes\SoSure;
+use AppBundle\Document\DateTrait;
 use AppBundle\Document\Policy;
 use FOS\UserBundle\Document\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
@@ -34,6 +36,7 @@ use AppBundle\Document\ScheduledPayment;
 abstract class Payment
 {
     use CurrencyTrait;
+    use DateTrait;
 
     // make sure to add to source below for new entries
     const SOURCE_TOKEN = 'token';
@@ -520,6 +523,7 @@ abstract class Payment
             'avgPayment' => null,
         ];
         foreach ($payments as $payment) {
+            /** @var Payment $payment */
             // For prod, skip invalid policies
             if ($requireValidPolicy && (!$payment->getPolicy() || !$payment->getPolicy()->isValidPolicy())) {
                 continue;
@@ -558,11 +562,13 @@ abstract class Payment
         return $data;
     }
 
-    public static function dailyPayments($payments, $requireValidPolicy, $class = null)
+    public static function dailyPayments($payments, $requireValidPolicy, $class = null, \DateTimeZone $timezone = null)
     {
         $month = null;
         $data = [];
+        $months = [];
         foreach ($payments as $payment) {
+            /** @var Payment $payment */
             // For prod, skip invalid policies
             if ($requireValidPolicy && (!$payment->getPolicy() || !$payment->getPolicy()->isValidPolicy())) {
                 continue;
@@ -571,20 +577,26 @@ abstract class Payment
                 continue;
             }
 
-            if (!$month) {
-                $month = $payment->getDate()->format('m');
-            } elseif ($month != $payment->getDate()->format('m')) {
-                throw new \Exception('Payment list contains multiple months');
+            /** @var \DateTime $date */
+            $date = $payment->getDate();
+            if ($timezone) {
+                $date = self::convertTimezone($date, $timezone);
             }
 
-            $day = (int) $payment->getDate()->format('d');
+            $month = $date->format('m');
 
-            if (!isset($data[$day])) {
-                $data[$day] = 0;
+            $day = (int) $date->format('d');
+
+            if (!isset($data[$month][$day])) {
+                $data[$month][$day] = 0;
             }
-            $data[$day] += CurrencyTrait::staticToTwoDp($payment->getAmount());
+            $data[$month][$day] += CurrencyTrait::staticToTwoDp($payment->getAmount());
+            $months[$month] = count($data[$month]);
         }
 
-        return $data;
+        arsort($months);
+        reset($months);
+
+        return $data[key($months)];
     }
 }

@@ -218,4 +218,13 @@ trait DateTrait
     {
         return $date->setTime(0, 0);
     }
+
+    public static function convertTimezone(\DateTime $date, \DateTimeZone $timezone)
+    {
+        $adjustedDate = clone $date;
+        $adjustedDate = \DateTime::createFromFormat('U', $adjustedDate->getTimestamp());
+        $adjustedDate->setTimezone($timezone);
+
+        return $adjustedDate;
+    }
 }
