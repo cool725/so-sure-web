@@ -1021,6 +1021,7 @@ class AdminController extends BaseController
             'barclaysFiles' => $monthlyBarclaysFiles,
             'barclaysStatementFiles' => $barclaysStatementFileRepo->getMonthBarclaysStatementFiles($date),
             'lloydsFiles' => $monthlyLloydsFiles,
+            'payments' => $payments,
         ];
     }
 
