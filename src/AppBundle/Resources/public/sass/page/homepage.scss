@@ -39,6 +39,7 @@
     list-style: none;
     padding-bottom: 30px;
     padding-left: 60px;
+    position: relative;
 
     li {
         counter-increment: item;
@@ -60,6 +61,18 @@
             background-color: $primary-blue;
             @include border-radius(100%);
         }
+    }
+}
+
+.ol--blue-counter__line {
+
+    &:before {
+        width: 5px; height: 100%;
+        content: '';
+        display: block;
+        position: absolute;
+        left: 22px; top: 0;
+        background: $off-white;
     }
 }
 
@@ -520,6 +533,18 @@
     }
 
     &--pic-sure {
+
+        ol {
+            li {
+                img {
+                    display:block;
+
+                    @include breakpoint(tablet) {
+                        float: left;
+                    }
+                }
+            }
+        }
         // background-color: $lightest-blue;
 
         // p {
