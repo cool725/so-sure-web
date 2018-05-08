@@ -3,6 +3,7 @@
 namespace AppBundle\Tests\Document;
 
 use AppBundle\Classes\Salva;
+use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\PhonePremium;
 use AppBundle\Document\PhonePrice;
@@ -150,5 +151,25 @@ class PaymentTest extends \PHPUnit\Framework\TestCase
         $payment->setAmount(2);
         $policy->addPayment($payment);
         $payment->setCommission();
+    }
+
+    public function testTimezone()
+    {
+        $payments = [];
+        $payment1 = new JudoPayment();
+        $payment1->setDate(new \DateTime('2018-04-01 00:00', new \DateTimeZone('UTC')));
+        $payment1->setAmount(1);
+        $payments[] = $payment1;
+
+        $payment2 = new JudoPayment();
+        $payment2->setDate(new \DateTime('2018-04-01 00:00', new \DateTimeZone('Europe/London')));
+        $payment2->setAmount(2);
+        $payments[] = $payment2;
+
+        $daily = Payment::dailyPayments($payments, false, JudoPayment::class, new \DateTimeZone('UTC'));
+        $this->assertEquals(1, $daily[1]);
+
+        $daily = Payment::dailyPayments($payments, false, JudoPayment::class);
+        $this->assertEquals(3, $daily[1]);
     }
 }

@@ -3,6 +3,7 @@
 namespace AppBundle\Document\Payment;
 
 use AppBundle\Classes\Salva;
+use AppBundle\Classes\SoSure;
 use AppBundle\Document\Policy;
 use FOS\UserBundle\Document\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
@@ -228,6 +229,9 @@ abstract class Payment
 
     public function getDate()
     {
+        if ($this->date) {
+            //$this->date->setTimezone(new \DateTimeZone(SoSure::TIMEZONE));
+        }
         return $this->date;
     }
 
@@ -558,10 +562,11 @@ abstract class Payment
         return $data;
     }
 
-    public static function dailyPayments($payments, $requireValidPolicy, $class = null)
+    public static function dailyPayments($payments, $requireValidPolicy, $class = null, \DateTimeZone $timezone = null)
     {
         $month = null;
         $data = [];
+        $months = [];
         foreach ($payments as $payment) {
             // For prod, skip invalid policies
             if ($requireValidPolicy && (!$payment->getPolicy() || !$payment->getPolicy()->isValidPolicy())) {
@@ -571,20 +576,26 @@ abstract class Payment
                 continue;
             }
 
-            if (!$month) {
-                $month = $payment->getDate()->format('m');
-            } elseif ($month != $payment->getDate()->format('m')) {
-                throw new \Exception('Payment list contains multiple months');
+            /** @var \DateTime $date */
+            $date = $payment->getDate();
+            if ($timezone) {
+                $date = \DateTime::createFromFormat('U', $date->getTimestamp(), $timezone);
             }
 
-            $day = (int) $payment->getDate()->format('d');
+            $month = $date->format('m');
 
-            if (!isset($data[$day])) {
-                $data[$day] = 0;
+            $day = (int) $date->format('d');
+
+            if (!isset($data[$month][$day])) {
+                $data[$month][$day] = 0;
             }
-            $data[$day] += CurrencyTrait::staticToTwoDp($payment->getAmount());
+            $data[$month][$day] += CurrencyTrait::staticToTwoDp($payment->getAmount());
+            $months[$month] = count($data[$month]);
         }
 
-        return $data;
+        arsort($months);
+        reset($months);
+
+        return $data[key($months)];
     }
 }
