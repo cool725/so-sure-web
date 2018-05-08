@@ -576,12 +576,20 @@
                 <div class="modal-body">
                     <div class="panel-group" id="payments-accordion" role="tablist" aria-multiselectable="true">
                         {% set day = 0 %}
+                        {% set firstDay = true %}
                         {% for payment in payments %}
+                            {% set newDay = false  %}
                             {% if payment.date|date('d') != day %}
                                 {% set newDay = true  %}
                             {% endif %}
                             {% set day = payment.date|date('d') %}
                             {% if newDay %}
+                                {% if not firstDay %}
+                                        </table>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% set firstDay = false %}
                                 <div class="panel panel-default">
                                     <div class="panel-heading"
                                          id="payment{{ day }}"
@@ -596,23 +604,24 @@
                                         </h4>
                                     </div>
                                     <div id="collapse{{ day }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="payment{{ day }}">
-                                    <table>
+                                    <table class="table table-striped">
                                         <tr>
                                             <th>Date</th>
                                             <th>Amount</th>
                                         </tr>
-                             {% endif %}
+                            {% endif %}
                                 <tr>
                                     <td>{{ payment.date|date }}</td>
                                     <td>{{ payment.amount|number_format(2, '.', ',') }}</td>
                                 </tr>
-                            {% if newDay %}
-                                </table>
-                                    </div>
-                                </div>
-                            {% endif %}
                         {% endfor %}
+                            </table>
+                            </div>
+                        </div>
                     </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" data-dismiss="modal" aria-label="Close">Close</button>
                 </div>
             </div>
         </div>
