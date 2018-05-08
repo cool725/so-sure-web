@@ -4,6 +4,7 @@ namespace AppBundle\Document\Payment;
 
 use AppBundle\Classes\Salva;
 use AppBundle\Classes\SoSure;
+use AppBundle\Document\DateTrait;
 use AppBundle\Document\Policy;
 use FOS\UserBundle\Document\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
@@ -35,6 +36,7 @@ use AppBundle\Document\ScheduledPayment;
 abstract class Payment
 {
     use CurrencyTrait;
+    use DateTrait;
 
     // make sure to add to source below for new entries
     const SOURCE_TOKEN = 'token';
@@ -521,6 +523,7 @@ abstract class Payment
             'avgPayment' => null,
         ];
         foreach ($payments as $payment) {
+            /** @var Payment $payment */
             // For prod, skip invalid policies
             if ($requireValidPolicy && (!$payment->getPolicy() || !$payment->getPolicy()->isValidPolicy())) {
                 continue;
@@ -565,6 +568,7 @@ abstract class Payment
         $data = [];
         $months = [];
         foreach ($payments as $payment) {
+            /** @var Payment $payment */
             // For prod, skip invalid policies
             if ($requireValidPolicy && (!$payment->getPolicy() || !$payment->getPolicy()->isValidPolicy())) {
                 continue;
@@ -576,7 +580,7 @@ abstract class Payment
             /** @var \DateTime $date */
             $date = $payment->getDate();
             if ($timezone) {
-                $date = \DateTime::createFromFormat('U', $date->getTimestamp(), $timezone);
+                $date = self::convertTimezone($date, $timezone);
             }
 
             $month = $date->format('m');

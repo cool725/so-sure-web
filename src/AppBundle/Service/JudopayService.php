@@ -1,6 +1,8 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Classes\SoSure;
+use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\JudoFile;
 use AppBundle\Repository\JudoPaymentRepository;
 use AppBundle\Repository\ScheduledPaymentRepository;
@@ -36,6 +38,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class JudopayService
 {
     use CurrencyTrait;
+    use DateTrait;
 
     const MAX_HOUR_DELAY_FOR_RECEIPTS = 2;
 
@@ -1361,7 +1364,16 @@ class JudopayService
                 } else {
                     $line = array_combine($header, $row);
                     $lines[] = $line;
-                    $transactionDate = new \DateTime($line['Date']);
+                    $transactionDate = \DateTime::createFromFormat(
+                        'd F Y H:i',
+                        $line['Date'],
+                        new \DateTimeZone('UTC')
+                    );
+                    if (!$transactionDate) {
+                        throw new \Exception(sprintf('Unable to parse date %s', $line['Date']));
+                    }
+                    $transactionDate = self::convertTimezone($transactionDate, new \DateTimeZone(SoSure::TIMEZONE));
+
                     if (!isset($dailyTransaction[$transactionDate->format('Ymd')])) {
                         $dailyTransaction[$transactionDate->format('Ymd')] = 0;
                     }

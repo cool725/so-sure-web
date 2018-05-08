@@ -939,7 +939,7 @@ class AdminController extends BaseController
         $payments = $paymentRepo->getAllPaymentsForExport($date);
         $isProd = $this->isProduction();
         $sosure = [
-            'dailyTransaction' => Payment::dailyPayments($payments, $isProd, JudoPayment::class, null, 'UTC'),
+            'dailyTransaction' => Payment::dailyPayments($payments, $isProd, JudoPayment::class),
             'monthlyTransaction' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
         ];
 
