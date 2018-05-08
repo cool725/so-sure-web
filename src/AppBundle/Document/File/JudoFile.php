@@ -28,7 +28,7 @@ class JudoFile extends UploadFile
      */
     protected $dailyTransaction = array();
 
-   /**
+    /**
      * @return string
      */
     public function getS3FileName()

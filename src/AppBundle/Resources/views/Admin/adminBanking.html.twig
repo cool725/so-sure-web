@@ -74,21 +74,40 @@
                             <td>£{{ judo['monthlyTransaction']|number_format(2, '.', ',') }}</td>
                             <td>£{{ (sosure['monthlyTransaction'].total - judo['monthlyTransaction'])|number_format(2, '.', ',') }}</td>
                         </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h3>Reconciliation</h3>
+                    <table class="table table-striped">
+                        <tr>
+                            <th></th>
+                            <th>Reconciliation</th>
+                            <th>Judo</th>
+                            <th>Diff</th>
+                        </tr>
+                        <tr>
+                            <td>Month</td>
+                            <td>£{{ reconciliation['monthlyTransaction']|number_format(2, '.', ',') }}</td>
+                            <td>£{{ judo['monthlyTransaction']|number_format(2, '.', ',') }}</td>
+                            <td>£{{ (sosure['monthlyTransaction'].total - judo['monthlyTransaction'])|number_format(2, '.', ',') }}</td>
+                        </tr>
                         <tr>
                             <td>Year</td>
-                            <td></td>
+                            <td>£{{ reconciliation['yearlyTransaction']|number_format(2, '.', ',') }}</td>
                             <td>£{{ judo['yearlyTransaction']|number_format(2, '.', ',') }}</td>
+                            <td>£{{ (reconciliation['yearlyTransaction'] - judo['yearlyTransaction'])|number_format(2, '.', ',') }}</td>
                         </tr>
                         <tr>
                             <td>All time</td>
-                            <td></td>
+                            <td>£{{ reconciliation['allTransaction']|number_format(2, '.', ',') }}</td>
                             <td>£{{ judo['allTransaction']|number_format(2, '.', ',') }}</td>
+                            <td>£{{ (reconciliation['allTransaction'] - judo['allTransaction'])|number_format(2, '.', ',') }}</td>
                         </tr>
                     </table>
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-8">
+                <div class="col-md-6">
                     <h2>Transaction Date
 
                         <button type="button" class="btn btn-info" data-toggle="modal" data-target="#paymentsModal"
@@ -360,7 +379,7 @@
                             <td>Month</td>
                             <td>£{{ barclays['monthlyProcessed']|number_format(2, '.', ',') }}</td>
                             <td>£{{ lloyds['monthlyProcessed']|number_format(2, '.', ',') }}</td>
-                            <td>£{{ (barclays['monthlyTransaction'] - lloyds['monthlyProcessed'])|number_format(2, '.', ',') }}</td>
+                            <td>£{{ (barclays['monthlyProcessed'] - lloyds['monthlyProcessed'])|number_format(2, '.', ',') }}</td>
                         </tr>
                         <tr>
                             <td>Year</td>
