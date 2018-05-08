@@ -1367,12 +1367,12 @@ class JudopayService
                     $transactionDate = \DateTime::createFromFormat(
                         'd F Y H:i',
                         $line['Date'],
-                        new \DateTimeZone('UTC')
+                        new \DateTimeZone(SoSure::TIMEZONE)
                     );
                     if (!$transactionDate) {
                         throw new \Exception(sprintf('Unable to parse date %s', $line['Date']));
                     }
-                    $transactionDate = self::convertTimezone($transactionDate, new \DateTimeZone(SoSure::TIMEZONE));
+                    $transactionDate = self::convertTimezone($transactionDate, new \DateTimeZone('UTC'));
 
                     if (!isset($dailyTransaction[$transactionDate->format('Ymd')])) {
                         $dailyTransaction[$transactionDate->format('Ymd')] = 0;
