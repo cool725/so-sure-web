@@ -84,14 +84,21 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-6">
-                    <h2>Transaction Date</h2>
+                <div class="col-md-8">
+                    <h2>Transaction Date
+
+                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#paymentsModal"
+                        > Payment Details</button>
+                    </h2>
                     <table class="table table-striped">
                         <tr>
                             <th>Day of Month</th>
                             <th>so-sure</th>
                             <th>Judo</th>
+                            <th>Diff</th>
+                            <th>Cumulative Diff</th>
                         </tr>
+                        {% set cumulative = 0 %}
                         {% for day in 1..days_in_month %}
                             {% if month < 10 and day < 10 %}
                                 {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
@@ -114,6 +121,20 @@
                                 <td>{{ day }}</td>
                                 <td>{% if sosure['dailyTransaction'][day] is defined %}£{{ sosure['dailyTransaction'][day]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
                                 <td>{% if judo['dailyTransaction'][ymd] is defined %}£{{ judo['dailyTransaction'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                                <td>{% if sosure['dailyTransaction'][day] is defined and judo['dailyTransaction'][ymd] is defined %}
+                                        {% set diff = sosure['dailyTransaction'][day] - judo['dailyTransaction'][ymd] %}
+                                        {% set cumulative = cumulative + diff %}
+                                        £{{ diff|number_format(2, '.', ',') }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                                <td>{% if sosure['dailyTransaction'][day] is defined and judo['dailyTransaction'][ymd] is defined %}
+                                    £{{ cumulative|number_format(2, '.', ',') }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
                             </tr>
                         {% endfor %}
                     </table>
@@ -543,6 +564,58 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <div class="modal modal-middle modal-phone fade" id="paymentsModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Payments</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="panel-group" id="payments-accordion" role="tablist" aria-multiselectable="true">
+                        {% set day = 0 %}
+                        {% for payment in payments %}
+                            {% if payment.date|date('d') != day %}
+                                {% set newDay = true  %}
+                            {% endif %}
+                            {% set day = payment.date|date('d') %}
+                            {% if newDay %}
+                                <div class="panel panel-default">
+                                    <div class="panel-heading"
+                                         id="payment{{ day }}"
+                                         role="button"
+                                         data-toggle="collapse"
+                                         data-parent="#faq-accordion"
+                                         href="#collapse{{ day }}"
+                                         aria-expanded="true"
+                                         aria-controls="collapse{{ day }}">
+                                        <h4 class="panel-title">
+                                            {{ day }}
+                                        </h4>
+                                    </div>
+                                    <div id="collapse{{ day }}" class="panel-collapse collapse" role="tabpanel" aria-labelledby="payment{{ day }}">
+                                    <table>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Amount</th>
+                                        </tr>
+                             {% endif %}
+                                <tr>
+                                    <td>{{ payment.date|date }}</td>
+                                    <td>{{ payment.amount|number_format(2, '.', ',') }}</td>
+                                </tr>
+                            {% if newDay %}
+                                </table>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
