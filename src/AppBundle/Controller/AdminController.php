@@ -5,9 +5,11 @@ namespace AppBundle\Controller;
 use AppBundle\Document\ArrayToApiArrayTrait;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\File\AccessPayFile;
+use AppBundle\Document\File\ReconciliationFile;
 use AppBundle\Document\Sequence;
 use AppBundle\Form\Type\BacsMandatesType;
 use AppBundle\Form\Type\BacsUploadFileType;
+use AppBundle\Form\Type\ReconciliationFileType;
 use AppBundle\Form\Type\SequenceType;
 use AppBundle\Repository\File\BarclaysFileRepository;
 use AppBundle\Repository\File\BarclaysStatementFileRepository;
@@ -16,6 +18,7 @@ use AppBundle\Repository\File\LloydsFileRepository;
 use AppBundle\Repository\File\S3FileRepository;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Service\BacsService;
+use AppBundle\Service\LloydsService;
 use AppBundle\Service\SequenceService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -859,6 +862,10 @@ class AdminController extends BaseController
         $lloydsForm = $this->get('form.factory')
             ->createNamedBuilder('lloyds', LloydsFileType::class, $lloydsFile)
             ->getForm();
+        $reconciliationFile = new ReconciliationFile();
+        $reconciliationForm = $this->get('form.factory')
+            ->createNamedBuilder('reconciliation', ReconciliationFileType::class, $reconciliationFile)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('judo')) {
@@ -922,10 +929,27 @@ class AdminController extends BaseController
                     $lloydsFile->setBucket('admin.so-sure.com');
                     $lloydsFile->setKeyFormat($this->getParameter('kernel.environment') . '/upload/%s');
 
+                    /** @var LloydsService $lloydsService */
                     $lloydsService = $this->get('app.lloyds');
                     $data = $lloydsService->processCsv($lloydsFile);
 
                     $dm->persist($lloydsFile);
+                    $dm->flush();
+
+                    return $this->redirectToRoute('admin_banking_date', [
+                        'year' => $date->format('Y'),
+                        'month' => $date->format('n'),
+                    ]);
+                }
+            } elseif ($request->request->has('reconciliation')) {
+                $reconciliationForm->handleRequest($request);
+                if ($reconciliationForm->isSubmitted() && $reconciliationForm->isValid()) {
+                    $dm = $this->getManager();
+                    $reconciliationFile->setBucket('admin.so-sure.com');
+                    $reconciliationFile->setKeyFormat($this->getParameter('kernel.environment') . '/upload/%s');
+                    $reconciliationFile->setDate($date);
+
+                    $dm->persist($reconciliationFile);
                     $dm->flush();
 
                     return $this->redirectToRoute('admin_banking_date', [
@@ -1010,6 +1034,7 @@ class AdminController extends BaseController
             'barclaysForm' => $barclaysForm->createView(),
             'barclaysStatementForm' => $barclaysStatementForm->createView(),
             'lloydsForm' => $lloydsForm->createView(),
+            'reconciliationForm' => $reconciliationForm->createView(),
             'year' => $year,
             'month' => $month,
             'days_in_month' => cal_days_in_month(CAL_GREGORIAN, $month, $year),

@@ -43,6 +43,8 @@
                         > B Stmt</button>
                     <button type="button" class="btn btn-info" data-toggle="modal" data-target="#lloydsModal"
                         > Lloyds</button>
+                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#reconciliationModal"
+                        > Reconciliation</button>
                 </div>
             </div>
         </div>
@@ -643,6 +645,31 @@
           </div>
         </div>
       </div>
+    </div>
+
+    <div class="modal modal-middle modal-phone fade" id="reconciliationModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Reconciliation</h4>
+                </div>
+                <div class="modal-body">
+                    {{ form_start(reconciliationForm) }}
+                    <div class="form-group">
+                        {{ form_label(reconciliationForm.file, 'File') }}
+                        {{ form_errors(reconciliationForm.file) }}
+                        {{ form_widget(reconciliationForm.file) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_widget(reconciliationForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-success'}}) }}
+                    </div>
+                    {{ form_end(reconciliationForm) }}
+                    <hr>
+
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="modal modal-middle modal-phone fade" id="paymentsModal" tabindex="-1" role="dialog">
