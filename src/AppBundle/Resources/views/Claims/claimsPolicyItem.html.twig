@@ -858,6 +858,8 @@
                     <td>
                         {% if not policy.user.paymentMethod %}
                             Missing payment method
+                        {% elseif policy.user.paymentMethod.type != 'judo' %}
+                            Non-Judo payment method
                         {% elseif not policy.user.hasValidDetails %}
                             Invalid user details (missing mobile number, address, or birthday)
                         {% elseif policy.status != null %}
