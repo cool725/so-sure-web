@@ -3,6 +3,7 @@
 namespace AppBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -17,7 +18,8 @@ class ReconciliationFileType extends AbstractType
     {
         $builder
             ->add('file', FileType::class)
-            ->add('notes', TextType::class)
+            ->add('notes', TextareaType::class)
+            ->add('monthlyTotal', TextType::class)
             ->add('upload', SubmitType::class)
         ;
     }

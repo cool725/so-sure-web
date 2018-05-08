@@ -15,6 +15,7 @@ use AppBundle\Repository\File\BarclaysFileRepository;
 use AppBundle\Repository\File\BarclaysStatementFileRepository;
 use AppBundle\Repository\File\JudoFileRepository;
 use AppBundle\Repository\File\LloydsFileRepository;
+use AppBundle\Repository\File\ReconcilationFileRepository;
 use AppBundle\Repository\File\S3FileRepository;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Service\BacsService;
@@ -845,6 +846,15 @@ class AdminController extends BaseController
         $barclaysFileRepo = $dm->getRepository(BarclaysFile::class);
         /** @var LloydsFileRepository $lloydsFileRepo */
         $lloydsFileRepo = $dm->getRepository(LloydsFile::class);
+        /** @var ReconcilationFileRepository $reconcilationFileRepo */
+        $reconcilationFileRepo = $dm->getRepository(ReconciliationFile::class);
+
+        $payments = $paymentRepo->getAllPaymentsForExport($date);
+        $isProd = $this->isProduction();
+        $sosure = [
+            'dailyTransaction' => Payment::dailyPayments($payments, $isProd, JudoPayment::class),
+            'monthlyTransaction' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
+        ];
 
         $judoFile = new JudoFile();
         $judoForm = $this->get('form.factory')
@@ -863,6 +873,7 @@ class AdminController extends BaseController
             ->createNamedBuilder('lloyds', LloydsFileType::class, $lloydsFile)
             ->getForm();
         $reconciliationFile = new ReconciliationFile();
+        $reconciliationFile->setMonthlyTotal($sosure['monthlyTransaction']['total']);
         $reconciliationForm = $this->get('form.factory')
             ->createNamedBuilder('reconciliation', ReconciliationFileType::class, $reconciliationFile)
             ->getForm();
@@ -873,7 +884,7 @@ class AdminController extends BaseController
                 if ($judoForm->isSubmitted() && $judoForm->isValid()) {
                     $dm = $this->getManager();
                     $judoFile->setBucket('admin.so-sure.com');
-                    $judoFile->setKeyFormat($this->getParameter('kernel.environment') . '/upload/%s');
+                    $judoFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
 
                     $judoService = $this->get('app.judopay');
                     $data = $judoService->processCsv($judoFile);
@@ -891,7 +902,7 @@ class AdminController extends BaseController
                 if ($barclaysForm->isSubmitted() && $barclaysForm->isValid()) {
                     $dm = $this->getManager();
                     $barclaysFile->setBucket('admin.so-sure.com');
-                    $barclaysFile->setKeyFormat($this->getParameter('kernel.environment') . '/upload/%s');
+                    $barclaysFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
 
                     $barclaysService = $this->get('app.barclays');
                     $data = $barclaysService->processCsv($barclaysFile);
@@ -909,7 +920,7 @@ class AdminController extends BaseController
                 if ($barclaysStatementForm->isSubmitted() && $barclaysStatementForm->isValid()) {
                     $dm = $this->getManager();
                     $barclaysStatementFile->setBucket('admin.so-sure.com');
-                    $barclaysStatementFile->setKeyFormat($this->getParameter('kernel.environment') . '/upload/%s');
+                    $barclaysStatementFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
 
                     $barclaysService = $this->get('app.barclays');
                     $data = $barclaysService->processStatementNewCsv($barclaysStatementFile);
@@ -927,7 +938,7 @@ class AdminController extends BaseController
                 if ($lloydsForm->isSubmitted() && $lloydsForm->isValid()) {
                     $dm = $this->getManager();
                     $lloydsFile->setBucket('admin.so-sure.com');
-                    $lloydsFile->setKeyFormat($this->getParameter('kernel.environment') . '/upload/%s');
+                    $lloydsFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
 
                     /** @var LloydsService $lloydsService */
                     $lloydsService = $this->get('app.lloyds');
@@ -946,7 +957,7 @@ class AdminController extends BaseController
                 if ($reconciliationForm->isSubmitted() && $reconciliationForm->isValid()) {
                     $dm = $this->getManager();
                     $reconciliationFile->setBucket('admin.so-sure.com');
-                    $reconciliationFile->setKeyFormat($this->getParameter('kernel.environment') . '/upload/%s');
+                    $reconciliationFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
                     $reconciliationFile->setDate($date);
 
                     $dm->persist($reconciliationFile);
@@ -960,20 +971,13 @@ class AdminController extends BaseController
             }
         }
 
-        $payments = $paymentRepo->getAllPaymentsForExport($date);
-        $isProd = $this->isProduction();
-        $sosure = [
-            'dailyTransaction' => Payment::dailyPayments($payments, $isProd, JudoPayment::class),
-            'monthlyTransaction' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
-        ];
-
-        $monthlyJudoFiles = $judoFileRepo->getMonthJudoFiles($date);
+        $monthlyJudoFiles = $judoFileRepo->getMonthlyFiles($date);
         $monthlyPerDayJudoTransaction = JudoFile::combineDailyTransactions($monthlyJudoFiles);
 
-        $yearlyJudoFiles = $judoFileRepo->getYearJudoFilesToDate($date);
+        $yearlyJudoFiles = $judoFileRepo->getYearlyFilesToDate($date);
         $yearlyPerDayJudoTransaction = JudoFile::combineDailyTransactions($yearlyJudoFiles);
 
-        $allJudoFiles = $judoFileRepo->getAllJudoFilesToDate($date);
+        $allJudoFiles = $judoFileRepo->getAllFiles($date);
         $allJudoTransaction = JudoFile::combineDailyTransactions($allJudoFiles);
 
         $judo = [
@@ -983,15 +987,15 @@ class AdminController extends BaseController
             'allTransaction' => JudoFile::totalCombinedFiles($allJudoTransaction),
         ];
 
-        $monthlyBarclaysFiles = $barclaysFileRepo->getMonthBarclaysFiles($date);
+        $monthlyBarclaysFiles = $barclaysFileRepo->getMonthlyFiles($date);
         $monthlyPerDayBarclaysTransaction = BarclaysFile::combineDailyTransactions($monthlyBarclaysFiles);
         $monthlyPerDayBarclaysProcessing = BarclaysFile::combineDailyProcessing($monthlyBarclaysFiles);
 
-        $yearlyBarclaysFiles = $barclaysFileRepo->getYearBarclaysFilesToDate($date);
+        $yearlyBarclaysFiles = $barclaysFileRepo->getYearlyFilesToDate($date);
         $yearlyBarclaysTransaction = BarclaysFile::combineDailyTransactions($yearlyBarclaysFiles);
         $yearlyBarclaysProcessing = BarclaysFile::combineDailyProcessing($yearlyBarclaysFiles);
 
-        $allBarclaysFiles = $barclaysFileRepo->getAllBarclaysFilesToDate($date);
+        $allBarclaysFiles = $barclaysFileRepo->getAllFiles($date);
         $allBarclaysTransaction = BarclaysFile::combineDailyTransactions($allBarclaysFiles);
         $allBarclaysProcessing = BarclaysFile::combineDailyProcessing($allBarclaysFiles);
 
@@ -1006,15 +1010,15 @@ class AdminController extends BaseController
             'allProcessed' => BarclaysFile::totalCombinedFiles($allBarclaysProcessing),
         ];
 
-        $monthlyLloydsFiles = $lloydsFileRepo->getMonthLloydsFiles($date);
+        $monthlyLloydsFiles = $lloydsFileRepo->getMonthlyFiles($date);
         $monthlyPerDayLloydsReceived = LloydsFile::combineDailyReceived($monthlyLloydsFiles);
         $monthlyPerDayLloydsProcessing = LloydsFile::combineDailyProcessing($monthlyLloydsFiles);
 
-        $yearlyLloydsFiles = $lloydsFileRepo->getYearLloydsFilesToDate($date);
+        $yearlyLloydsFiles = $lloydsFileRepo->getYearlyFilesToDate($date);
         $yearlyPerDayLloydsReceived = LloydsFile::combineDailyReceived($yearlyLloydsFiles);
         $yearlyPerDayLloydsProcessing = LloydsFile::combineDailyProcessing($yearlyLloydsFiles);
 
-        $allLloydsFiles = $lloydsFileRepo->getAllLloydsFilesToDate($date);
+        $allLloydsFiles = $lloydsFileRepo->getAllFiles($date);
         $allLloydsReceived = LloydsFile::combineDailyReceived($allLloydsFiles);
         $allLloydsProcessing = LloydsFile::combineDailyProcessing($allLloydsFiles);
 
@@ -1044,8 +1048,9 @@ class AdminController extends BaseController
             'judo' => $judo,
             'judoFiles' => $monthlyJudoFiles,
             'barclaysFiles' => $monthlyBarclaysFiles,
-            'barclaysStatementFiles' => $barclaysStatementFileRepo->getMonthBarclaysStatementFiles($date),
+            'barclaysStatementFiles' => $barclaysStatementFileRepo->getMonthlyFiles($date),
             'lloydsFiles' => $monthlyLloydsFiles,
+            'reconcilationFiles' => $reconcilationFileRepo->getMonthlyFiles($date),
             'payments' => $payments,
         ];
     }

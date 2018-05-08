@@ -43,7 +43,7 @@ class LloydsFile extends UploadFile
         $now = new \DateTime();
 
         return sprintf(
-            'lloyds-%d-%02d-%s',
+            'banking/lloyds-%d-%02d-%s',
             $this->getDate()->format('Y'),
             $this->getDate()->format('m'),
             $now->format('U')

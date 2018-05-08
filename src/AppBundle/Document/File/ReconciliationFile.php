@@ -11,7 +11,7 @@ use AppBundle\Validator\Constraints as AppAssert;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * @MongoDB\Document()
+ * @MongoDB\Document(repositoryClass="AppBundle\Repository\File\ReconcilationFileRepository")
  * @Vich\Uploadable
  */
 class ReconciliationFile extends UploadFile
@@ -24,21 +24,6 @@ class ReconciliationFile extends UploadFile
      * @var File
      */
     protected $file;
-    
-    /**
-     * @return string
-     */
-    public function getS3FileName()
-    {
-        $now = new \DateTime();
-
-        return sprintf(
-            'reconciliation-%d-%02d-%s',
-            $this->getDate()->format('Y'),
-            $this->getDate()->format('m'),
-            $now->format('U')
-        );
-    }
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
@@ -48,6 +33,28 @@ class ReconciliationFile extends UploadFile
      */
     protected $notes;
 
+    /**
+     * @MongoDB\Field(type="float")
+     * @Gedmo\Versioned
+     */
+    protected $monthlyTotal;
+
+
+    /**
+     * @return string
+     */
+    public function getS3FileName()
+    {
+        $now = new \DateTime();
+
+        return sprintf(
+            'banking/reconciliation-%d-%02d-%s',
+            $this->getDate()->format('Y'),
+            $this->getDate()->format('m'),
+            $now->format('U')
+        );
+    }
+
     public function setNotes($notes)
     {
         $this->notes = $notes;
@@ -56,5 +63,15 @@ class ReconciliationFile extends UploadFile
     public function getNotes()
     {
         return $this->notes;
+    }
+
+    public function setMonthlyTotal($monthlyTotal)
+    {
+        $this->monthlyTotal = $monthlyTotal;
+    }
+
+    public function getMonthlyTotal()
+    {
+        return $this->monthlyTotal;
     }
 }

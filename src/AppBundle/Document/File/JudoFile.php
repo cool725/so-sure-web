@@ -36,7 +36,7 @@ class JudoFile extends UploadFile
         $now = new \DateTime();
 
         return sprintf(
-            'judo-%d-%02d-%s',
+            'banking/judo-%d-%02d-%s',
             $this->getDate()->format('Y'),
             $this->getDate()->format('m'),
             $now->format('U')

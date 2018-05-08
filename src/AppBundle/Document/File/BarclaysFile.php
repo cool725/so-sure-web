@@ -45,7 +45,7 @@ class BarclaysFile extends UploadFile
         $now = new \DateTime();
 
         return sprintf(
-            'barclays-%d-%02d-%s',
+            'banking/barclays-%d-%02d-%s',
             $this->getDate()->format('Y'),
             $this->getDate()->format('m'),
             $now->format('U')
