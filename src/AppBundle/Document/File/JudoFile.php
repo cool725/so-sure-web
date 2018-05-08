@@ -5,9 +5,10 @@ namespace AppBundle\Document\File;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
- * @MongoDB\Document()
+ * @MongoDB\Document(repositoryClass="AppBundle\Repository\File\JudoFileRepository")
  * @Vich\Uploadable
  */
 class JudoFile extends UploadFile
@@ -20,6 +21,12 @@ class JudoFile extends UploadFile
      * @var File
      */
     protected $file;
+
+    /**
+     * @MongoDB\Field(type="hash")
+     * @Gedmo\Versioned
+     */
+    protected $dailyTransaction = array();
 
    /**
      * @return string
@@ -34,5 +41,20 @@ class JudoFile extends UploadFile
             $this->getDate()->format('m'),
             $now->format('U')
         );
+    }
+
+    public function getDailyTransaction()
+    {
+        return $this->dailyTransaction;
+    }
+
+    public function setDailyTransaction($dailyTransaction)
+    {
+        $this->dailyTransaction = $dailyTransaction;
+    }
+
+    public static function combineDailyTransactions($judoFiles)
+    {
+        return self::combineFiles($judoFiles, 'getDailyTransaction');
     }
 }

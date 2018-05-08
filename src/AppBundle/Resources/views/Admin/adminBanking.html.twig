@@ -12,243 +12,439 @@
 {% block body %}
 <div class="container" style="margin-bottom: 50px">
 
-<div class="row">
-    <div class="col-md-5">
-        <h1>Banking for {{ month }} / {{ year }}</h1>
-    </div>
-    <form class="month-form form-inline" method="POST" autocomplete="off">
-    <div class="col-md-3">
-        <div class="form-group" style="padding-top: 15px;">
-            <div class="input-group date month" data-url="{{ path('admin_banking') }}">
-                <input name="banking" type='text' class="form-control" value="{{month}}-{{year}}" />
-                <span class="input-group-addon">
-                    <span class="fa fa-calendar"></span>
-                </span>
+    <div class="row">
+        <div class="col-md-5">
+            <h1>Banking for {{ month }} / {{ year }}</h1>
+        </div>
+        <form class="month-form form-inline" method="POST" autocomplete="off">
+        <div class="col-md-3">
+            <div class="form-group" style="padding-top: 15px;">
+                <div class="input-group date month" data-url="{{ path('admin_banking') }}">
+                    <input name="banking" type='text' class="form-control" value="{{month}}-{{year}}" />
+                    <span class="input-group-addon">
+                        <span class="fa fa-calendar"></span>
+                    </span>
+                </div>
+                <div class="input-group">
+                    <div class="input-group-btn">
+                        <button class="btn btn-success"><i class="fa fa-arrow-right"></i></button>
+                    </div>
+                </div>
             </div>
-            <div class="input-group">
-                <div class="input-group-btn">
-                    <button class="btn btn-success"><i class="fa fa-arrow-right"></i></button>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group" style="padding-top: 15px;">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#judoModal"
+                    > Judo</button>
+                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#barclaysModal"
+                        > Barclays</button>
+                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#barclaysStatementModal"
+                        > B Stmt</button>
+                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#lloydsModal"
+                        > Lloyds</button>
+                </div>
+            </div>
+        </div>
+        </form>
+    </div>
+
+    <ul class="nav nav-tabs nav-justified">
+        <li role="presentation" class="active"><a data-toggle="tab" href="#judo">Judo</a></li>
+        <li role="presentation"><a data-toggle="tab" href="#barclays">Barclays</a></li>
+        <li role="presentation"><a data-toggle="tab" href="#lloyds">Lloyds</a></li>
+    </ul>
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="judo">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>Transaction Date</h3>
+                    <table class="table table-striped">
+                        <tr>
+                            <th></th>
+                            <th>so-sure</th>
+                            <th>Judo</th>
+                        </tr>
+                        <tr>
+                            <td>Month</td>
+                            <td>£{{ sosure['monthlyTransaction'].total|number_format(2, '.', ',') }}</td>
+                            <td>£{{ judo['monthlyTransaction']|number_format(2, '.', ',') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Year</td>
+                            <td></td>
+                            <td>£{{ judo['yearlyTransaction']|number_format(2, '.', ',') }}</td>
+                        </tr>
+                        <tr>
+                            <td>All time</td>
+                            <td></td>
+                            <td>£{{ judo['allTransaction']|number_format(2, '.', ',') }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <h2>Transaction Date</h2>
+                    <table class="table table-striped">
+                        <tr>
+                            <th>Day of Month</th>
+                            <th>so-sure</th>
+                            <th>Judo</th>
+                        </tr>
+                        {% for day in 1..days_in_month %}
+                            {% if month < 10 and day < 10 %}
+                                {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
+                            {% elseif day < 10 %}
+                                {% set ymd = year ~ month ~ "0" ~ day %}
+                            {% elseif month < 10 %}
+                                {% set ymd = year ~ "0" ~ month ~ day %}
+                            {% else %}
+                                {% set ymd = year ~ month ~ day %}
+                            {% endif %}
+                            {% set color = '' %}
+                            {% if sosure['dailyTransaction'][day] is defined and judo['dailyTransaction'][ymd] is defined  %}
+                                {% if equal_to_two_dp(sosure['dailyTransaction'][day], judo['dailyTransaction'][ymd]) %}
+                                    {% set color = 'success' %}
+                                {% else %}
+                                    {% set color = 'danger' %}
+                                {% endif %}
+                            {% endif %}
+                            <tr class='{{ color }}'>
+                                <td>{{ day }}</td>
+                                <td>{% if sosure['dailyTransaction'][day] is defined %}£{{ sosure['dailyTransaction'][day]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                                <td>{% if judo['dailyTransaction'][ymd] is defined %}£{{ judo['dailyTransaction'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="barclays">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>Transaction Date</h3>
+                    <table class="table table-striped">
+                        <tr>
+                            <th></th>
+                            <th>so-sure</th>
+                            <th>Barclays</th>
+                        </tr>
+                        <tr>
+                            <td>Month</td>
+                            <td>£{{ sosure['monthlyTransaction'].total|number_format(2, '.', ',') }}</td>
+                            <td>£{{ barclays['monthlyTransaction']|number_format(2, '.', ',') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Year</td>
+                            <td></td>
+                            <td>£{{ barclays['yearlyTransaction']|number_format(2, '.', ',') }}</td>
+                        </tr>
+                        <tr>
+                            <td>All time</td>
+                            <td></td>
+                            <td>£{{ barclays['allTransaction']|number_format(2, '.', ',') }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h3>Processing Date</h3>
+                    <table class="table table-striped">
+                        <tr>
+                            <th></th>
+                            <th>Barclays</th>
+                            <th>Lloyds</th>
+                        </tr>
+                        <tr>
+                            <td>Month</td>
+                            <td>£{{ barclays['monthlyProcessed']|number_format(2, '.', ',') }}</td>
+                            <td>£{{ lloyds['monthlyProcessed']|number_format(2, '.', ',') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Year</td>
+                            <td>£{{ barclays['yearlyProcessed']|number_format(2, '.', ',') }}</td>
+                            <td>£{{ lloyds['yearlyProcessed']|number_format(2, '.', ',') }}</td>
+                        </tr>
+                        <tr>
+                            <td>All time</td>
+                            <td>£{{ barclays['allProcessed']|number_format(2, '.', ',') }}</td>
+                            <td>£{{ lloyds['allProcessed']|number_format(2, '.', ',') }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <h2>Transaction Date</h2>
+                    <table class="table table-striped">
+                        <tr>
+                            <th>Day of Month</th>
+                            <th>so-sure</th>
+                            <th>Barclays</th>
+                        </tr>
+                        {% for day in 1..days_in_month %}
+                            {% if month < 10 and day < 10 %}
+                                {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
+                            {% elseif day < 10 %}
+                                {% set ymd = year ~ month ~ "0" ~ day %}
+                            {% elseif month < 10 %}
+                                {% set ymd = year ~ "0" ~ month ~ day %}
+                            {% else %}
+                                {% set ymd = year ~ month ~ day %}
+                            {% endif %}
+                            {% set color = '' %}
+                            {% if sosure['dailyTransaction'][day] is defined and barclays['dailyTransaction'][ymd] is defined  %}
+                                {% if equal_to_two_dp(sosure['dailyTransaction'][day], barclays['dailyTransaction'][ymd]) %}
+                                    {% set color = 'success' %}
+                                {% else %}
+                                    {% set color = 'danger' %}
+                                {% endif %}
+                            {% endif %}
+                            <tr class='{{ color }}'>
+                                <td>{{ day }}</td>
+                                <td>{% if sosure['dailyTransaction'][day] is defined %}£{{ sosure['dailyTransaction'][day]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                                <td>{% if barclays['dailyTransaction'][ymd] is defined %}£{{ barclays['dailyTransaction'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h2>Processing Date</h2>
+                    <table class="table table-striped">
+                        <tr>
+                            <th>Day of Month</th>
+                            <th>Barclays</th>
+                            <th>Lloyds</th>
+                        </tr>
+                        {% for day in 1..days_in_month %}
+                            {% if month < 10 and day < 10 %}
+                                {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
+                            {% elseif day < 10 %}
+                                {% set ymd = year ~ month ~ "0" ~ day %}
+                            {% elseif month < 10 %}
+                                {% set ymd = year ~ "0" ~ month ~ day %}
+                            {% else %}
+                                {% set ymd = year ~ month ~ day %}
+                            {% endif %}
+                            {% set color = '' %}
+                            {% if barclays['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined  %}
+                                {% if equal_to_two_dp(barclays['dailyProcessed'][ymd], lloyds['dailyProcessed'][ymd]) %}
+                                    {% set color = 'success' %}
+                                {% else %}
+                                    {% set color = 'danger' %}
+                                {% endif %}
+                            {% endif %}
+                            <tr class='{{ color }}'>
+                                <td>{{ day }}</td>
+                                <td>{% if barclays['dailyProcessed'][ymd] is defined %}£{{ barclays['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                                <td>{% if lloyds['dailyProcessed'][ymd] is defined %}£{{ lloyds['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                        {% for next_month_day in 1..3 %}
+                            {% if month == 12 %}
+                                {% set ymd = (year + 1) ~ "01" ~ "0" ~ next_month_day %}
+                            {% elseif month >= 9 %}
+                                {% set ymd = year ~ (month + 1) ~ "0" ~ next_month_day %}
+                            {% else %}
+                                {% set ymd = year ~ "0" ~  (month + 1) ~ "0" ~ next_month_day %}
+                            {% endif %}
+                            {% set color = '' %}
+                            {% if barclays['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined  %}
+                                {% if equal_to_two_dp(barclays['dailyProcessed'][ymd], lloyds['dailyProcessed'][ymd]) %}
+                                    {% set color = 'success' %}
+                                {% else %}
+                                    {% set color = 'danger' %}
+                                {% endif %}
+                            {% endif %}
+                            <tr class='{{ color }}'>
+                                <td>{{ next_month_day }}</td>
+                                <td>{% if barclays['dailyProcessed'][ymd] is defined %}£{{ barclays['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                                <td>{% if lloyds['dailyProcessed'][ymd] is defined %}£{{ lloyds['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="lloyds">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>Processing Date</h3>
+                    <table class="table table-striped">
+                        <tr>
+                            <th></th>
+                            <th>Barclays</th>
+                            <th>Lloyds</th>
+                        </tr>
+                        <tr>
+                            <td>Month</td>
+                            <td>£{{ barclays['monthlyProcessed']|number_format(2, '.', ',') }}</td>
+                            <td>£{{ lloyds['monthlyProcessed']|number_format(2, '.', ',') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Year</td>
+                            <td>£{{ barclays['yearlyProcessed']|number_format(2, '.', ',') }}</td>
+                            <td>£{{ lloyds['yearlyProcessed']|number_format(2, '.', ',') }}</td>
+                        </tr>
+                        <tr>
+                            <td>All time</td>
+                            <td>£{{ barclays['allProcessed']|number_format(2, '.', ',') }}</td>
+                            <td>£{{ lloyds['allProcessed']|number_format(2, '.', ',') }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h3>Received Date</h3>
+                    <table class="table table-striped">
+                        <tr>
+                            <th></th>
+                            <th>Lloyds</th>
+                        </tr>
+                        <tr>
+                            <td>Month)</td>
+                            <td>£{{ lloyds['monthlyReceived']|number_format(2, '.', ',') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Year</td>
+                            <td>£{{ lloyds['yearlyReceived']|number_format(2, '.', ',') }}</td>
+                        </tr>
+                        <tr>
+                            <td>All time</td>
+                            <td>£{{ lloyds['allReceived']|number_format(2, '.', ',') }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <h2>Processing Date</h2>
+                    <table class="table table-striped">
+                        <tr>
+                            <th>Day of Month</th>
+                            <th>Barclays</th>
+                            <th>Lloyds</th>
+                        </tr>
+                        {% for day in 1..days_in_month %}
+                            {% if month < 10 and day < 10 %}
+                                {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
+                            {% elseif day < 10 %}
+                                {% set ymd = year ~ month ~ "0" ~ day %}
+                            {% elseif month < 10 %}
+                                {% set ymd = year ~ "0" ~ month ~ day %}
+                            {% else %}
+                                {% set ymd = year ~ month ~ day %}
+                            {% endif %}
+                            {% set color = '' %}
+                            {% if barclays['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined  %}
+                                {% if equal_to_two_dp(barclays['dailyProcessed'][ymd], lloyds['dailyProcessed'][ymd]) %}
+                                    {% set color = 'success' %}
+                                {% else %}
+                                    {% set color = 'danger' %}
+                                {% endif %}
+                            {% endif %}
+                            <tr class='{{ color }}'>
+                                <td>{{ day }}</td>
+                                <td>{% if barclays['dailyProcessed'][ymd] is defined %}£{{ barclays['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                                <td>{% if lloyds['dailyProcessed'][ymd] is defined %}£{{ lloyds['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                        {% for next_month_day in 1..3 %}
+                            {% if month == 12 %}
+                                {% set ymd = (year + 1) ~ "01" ~ "0" ~ next_month_day %}
+                            {% elseif month >= 9 %}
+                                {% set ymd = year ~ (month + 1) ~ "0" ~ next_month_day %}
+                            {% else %}
+                                {% set ymd = year ~ "0" ~  (month + 1) ~ "0" ~ next_month_day %}
+                            {% endif %}
+                            {% set color = '' %}
+                            {% if barclays['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined  %}
+                                {% if equal_to_two_dp(barclays['dailyProcessed'][ymd], lloyds['dailyProcessed'][ymd]) %}
+                                    {% set color = 'success' %}
+                                {% else %}
+                                    {% set color = 'danger' %}
+                                {% endif %}
+                            {% endif %}
+                            <tr class='{{ color }}'>
+                                <td>{{ next_month_day }}</td>
+                                <td>{% if barclays['dailyProcessed'][ymd] is defined %}£{{ barclays['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                                <td>{% if lloyds['dailyProcessed'][ymd] is defined %}£{{ lloyds['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h2>Received Date</h2>
+                    <table class="table table-striped">
+                        <tr>
+                            <th>Day of Month</th>
+                            <th>Lloyds</th>
+                        </tr>
+                        {% for day in 1..days_in_month %}
+                            {% if month < 10 and day < 10 %}
+                                {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
+                            {% elseif day < 10 %}
+                                {% set ymd = year ~ month ~ "0" ~ day %}
+                            {% elseif month < 10 %}
+                                {% set ymd = year ~ "0" ~ month ~ day %}
+                            {% else %}
+                                {% set ymd = year ~ month ~ day %}
+                            {% endif %}
+                            <tr>
+                                <td>{{ day }}</td>
+                                <td>{% if lloyds['dailyReceived'][ymd] is defined %}£{{ lloyds['dailyReceived'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                        {% for next_month_day in 1..5 %}
+                            {% if month == 12 %}
+                                {% set ymd = (year + 1) ~ "01" ~ "0" ~ next_month_day %}
+                            {% elseif month >= 9 %}
+                                {% set ymd = year ~ (month + 1) ~ "0" ~ next_month_day %}
+                            {% else %}
+                                {% set ymd = year ~ "0" ~  (month + 1) ~ "0" ~ next_month_day %}
+                            {% endif %}
+                            <tr>
+                                <td>{{ next_month_day }}</td>
+                                <td>{% if lloyds['dailyReceived'][ymd] is defined %}£{{ lloyds['dailyReceived'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="form-group" style="padding-top: 15px;">
-            <div class="btn-group">
-                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#barclaysModal"
-                    > B Transaction</button>
-                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#barclaysStatementModal"
-                    > B Statement</button>
-                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#lloydsModal"
-                    > Lloyds</button>
+
+    <div class="modal modal-middle modal-phone fade" id="judoModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Judo Upload</h4>
+                </div>
+                <div class="modal-body">
+                    {{ form_start(judoForm) }}
+                    <div class="form-group">
+                        {{ form_label(judoForm.file, 'File') }}
+                        {{ form_errors(judoForm.file) }}
+                        {{ form_widget(judoForm.file) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_widget(judoForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-success'}}) }}
+                    </div>
+                    {{ form_end(judoForm) }}
+                    <hr>
+                    <h2>Files</h2>
+                    <table width="100%" class="table table-striped">
+                        {% for judoFile in judoFiles %}
+                            <tr>
+                                <td>{{ judoFile.fileName }}</td>
+                                <td style="word-break:break-all;">{{ judoFile.metadata|json_encode }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-    </form>
-</div>
-
-<div class="row">
-    <div class="col-md-4">
-        <h3>Transaction Date</h3>
-        <table class="table table-striped">
-            <tr>
-                <th></th>
-                <th>so-sure/Judo</th>
-                <th>Barclays</th>
-            </tr>
-            <tr>
-                <td>Month</td>
-                <td>£{{ judo['monthlyTransaction'].total|number_format(2, '.', ',') }}</td>
-                <td>£{{ barclays['monthlyTransaction']|number_format(2, '.', ',') }}</td>
-            </tr>
-            <tr>
-                <td>Year</td>
-                <td></td>
-                <td>£{{ barclays['yearlyTransaction']|number_format(2, '.', ',') }}</td>
-            </tr>
-            <tr>
-                <td>All time</td>
-                <td></td>
-                <td>£{{ barclays['allTransaction']|number_format(2, '.', ',') }}</td>
-            </tr>
-        </table>
-    </div>
-    <div class="col-md-4">
-        <h3>Processing Date</h3>
-        <table class="table table-striped">
-            <tr>
-                <th></th>
-                <th>Barclays</th>
-                <th>Lloyds</th>
-            </tr>
-            <tr>
-                <td>Month</td>
-                <td>£{{ barclays['monthlyProcessed']|number_format(2, '.', ',') }}</td>
-                <td>£{{ lloyds['monthlyProcessed']|number_format(2, '.', ',') }}</td>
-            </tr>
-            <tr>
-                <td>Year</td>
-                <td>£{{ barclays['yearlyProcessed']|number_format(2, '.', ',') }}</td>
-                <td>£{{ lloyds['yearlyProcessed']|number_format(2, '.', ',') }}</td>
-            </tr>
-            <tr>
-                <td>All time</td>
-                <td>£{{ barclays['allProcessed']|number_format(2, '.', ',') }}</td>
-                <td>£{{ lloyds['allProcessed']|number_format(2, '.', ',') }}</td>
-            </tr>
-        </table>
-    </div>
-    <div class="col-md-4">
-        <h3>Received Date</h3>
-        <table class="table table-striped">
-            <tr>
-                <th></th>
-                <th>Lloyds</th>
-            </tr>
-            <tr>
-                <td>Month)</td>
-                <td>£{{ lloyds['monthlyReceived']|number_format(2, '.', ',') }}</td>
-            </tr>
-            <tr>
-                <td>Year</td>
-                <td>£{{ lloyds['yearlyReceived']|number_format(2, '.', ',') }}</td>
-            </tr>
-            <tr>
-                <td>All time</td>
-                <td>£{{ lloyds['allReceived']|number_format(2, '.', ',') }}</td>
-            </tr>
-        </table>
-    </div>
-</div>
-<div class="row">
-    <div class="col-md-4">
-        <h2>Transaction Date</h2>
-        <table class="table table-striped">
-            <tr>
-                <th>Day of Month</th>
-                <th>so-sure/Judo</th>
-                <th>Barclays</th>
-            </tr>
-            {% for day in 1..days_in_month %}
-                {% if month < 10 and day < 10 %}
-                    {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
-                {% elseif day < 10 %}
-                    {% set ymd = year ~ month ~ "0" ~ day %}
-                {% elseif month < 10 %}
-                    {% set ymd = year ~ "0" ~ month ~ day %}
-                {% else %}
-                    {% set ymd = year ~ month ~ day %}
-                {% endif %}
-                {% set color = '' %}
-                {% if judo['dailyTransaction'][day] is defined and barclays['dailyTransaction'][ymd] is defined  %}
-                    {% if equal_to_two_dp(judo['dailyTransaction'][day], barclays['dailyTransaction'][ymd]) %}
-                        {% set color = 'success' %}
-                    {% else %}
-                        {% set color = 'danger' %}
-                    {% endif %}
-                {% endif %}
-                <tr class='{{ color }}'>
-                    <td>{{ day }}</td>
-                    <td>{% if judo['dailyTransaction'][day] is defined %}£{{ judo['dailyTransaction'][day]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
-                    <td>{% if barclays['dailyTransaction'][ymd] is defined %}£{{ barclays['dailyTransaction'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
-                </tr>
-            {% endfor %}
-        </table>
-    </div>
-    <div class="col-md-4">
-        <h2>Processing Date</h2>
-        <table class="table table-striped">
-            <tr>
-                <th>Day of Month</th>
-                <th>Barclays</th>
-                <th>Lloyds</th>
-            </tr>
-            {% for day in 1..days_in_month %}
-                {% if month < 10 and day < 10 %}
-                    {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
-                {% elseif day < 10 %}
-                    {% set ymd = year ~ month ~ "0" ~ day %}
-                {% elseif month < 10 %}
-                    {% set ymd = year ~ "0" ~ month ~ day %}
-                {% else %}
-                    {% set ymd = year ~ month ~ day %}
-                {% endif %}
-                {% set color = '' %}
-                {% if barclays['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined  %}
-                    {% if equal_to_two_dp(barclays['dailyProcessed'][ymd], lloyds['dailyProcessed'][ymd]) %}
-                        {% set color = 'success' %}
-                    {% else %}
-                        {% set color = 'danger' %}
-                    {% endif %}
-                {% endif %}
-                <tr class='{{ color }}'>
-                    <td>{{ day }}</td>
-                    <td>{% if barclays['dailyProcessed'][ymd] is defined %}£{{ barclays['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
-                    <td>{% if lloyds['dailyProcessed'][ymd] is defined %}£{{ lloyds['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
-                </tr>
-            {% endfor %}
-            {% for next_month_day in 1..3 %}
-                {% if month == 12 %}
-                    {% set ymd = (year + 1) ~ "01" ~ "0" ~ next_month_day %}
-                {% elseif month >= 9 %}
-                    {% set ymd = year ~ (month + 1) ~ "0" ~ next_month_day %}
-                {% else %}
-                    {% set ymd = year ~ "0" ~  (month + 1) ~ "0" ~ next_month_day %}
-                {% endif %}
-                {% set color = '' %}
-                {% if barclays['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined  %}
-                    {% if equal_to_two_dp(barclays['dailyProcessed'][ymd], lloyds['dailyProcessed'][ymd]) %}
-                        {% set color = 'success' %}
-                    {% else %}
-                        {% set color = 'danger' %}
-                    {% endif %}
-                {% endif %}
-                <tr class='{{ color }}'>
-                    <td>{{ next_month_day }}</td>
-                    <td>{% if barclays['dailyProcessed'][ymd] is defined %}£{{ barclays['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
-                    <td>{% if lloyds['dailyProcessed'][ymd] is defined %}£{{ lloyds['dailyProcessed'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
-                </tr>
-            {% endfor %}
-        </table>
-    </div>
-    <div class="col-md-4">
-        <h2>Received Date</h2>
-        <table class="table table-striped">
-            <tr>
-                <th>Day of Month</th>
-                <th>Lloyds</th>
-            </tr>
-            {% for day in 1..days_in_month %}
-                {% if month < 10 and day < 10 %}
-                    {% set ymd = year ~ "0" ~ month ~ "0" ~ day %}
-                {% elseif day < 10 %}
-                    {% set ymd = year ~ month ~ "0" ~ day %}
-                {% elseif month < 10 %}
-                    {% set ymd = year ~ "0" ~ month ~ day %}
-                {% else %}
-                    {% set ymd = year ~ month ~ day %}
-                {% endif %}
-                <tr>
-                    <td>{{ day }}</td>
-                    <td>{% if lloyds['dailyReceived'][ymd] is defined %}£{{ lloyds['dailyReceived'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
-                </tr>
-            {% endfor %}
-            {% for next_month_day in 1..5 %}
-                {% if month == 12 %}
-                    {% set ymd = (year + 1) ~ "01" ~ "0" ~ next_month_day %}
-                {% elseif month >= 9 %}
-                    {% set ymd = year ~ (month + 1) ~ "0" ~ next_month_day %}
-                {% else %}
-                    {% set ymd = year ~ "0" ~  (month + 1) ~ "0" ~ next_month_day %}
-                {% endif %}
-                <tr>
-                    <td>{{ next_month_day }}</td>
-                    <td>{% if lloyds['dailyReceived'][ymd] is defined %}£{{ lloyds['dailyReceived'][ymd]|number_format(2, '.', ',') }}{% else %}-{% endif %}</td>
-                </tr>
-            {% endfor %}
-        </table>
-    </div>
-</div>
 
     <div class="modal modal-middle modal-phone fade" id="barclaysModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document">

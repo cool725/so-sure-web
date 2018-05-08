@@ -44,28 +44,8 @@
 
 {% include 'AppBundle:Admin:adminAccountsData.html.twig' %}
 
-{{ form_start(judoForm) }}
-<div class="row">
-    <div class="col-md-7">
-        <h2>Reconciliation Data</h2>
-    </div>
-    <div class="col-md-3">
-        <div class="form-group">
-            {{ form_label(judoForm.file, 'File') }}
-            {{ form_errors(judoForm.file) }}
-            {{ form_widget(judoForm.file) }}
-        </div>
-    </div>
-    <div class="col-md-1">
-        <div class="form-group">
-            {{ form_widget(judoForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-success'}}) }}
-        </div>
-    </div>
-</div>
-{{ form_end(judoForm) }}
-
     {% for file in files %}
-        {% if file.fileType == 'SalvaPaymentFile' or file.fileType == 'SalvaPolicyFile' or file.fileType == 'JudoFile' %}
+        {% if file.fileType == 'SalvaPaymentFile' or file.fileType == 'SalvaPolicyFile' %}
         {% set filename = file.filename|split('.') %}
         {% set file_dates = filename[0]|split('-') %}
         {% set file_date = file_dates[file_dates|length - 1] %}
