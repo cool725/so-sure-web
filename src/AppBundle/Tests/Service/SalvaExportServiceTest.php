@@ -302,6 +302,9 @@ class SalvaExportServiceTest extends WebTestCase
 
     public function testPaymentsCashback()
     {
+        $ago = new \DateTime();
+        $ago = $ago->sub(new \DateInterval('P1D'));
+
         $user = static::createUser(
             static::$userManager,
             static::generateEmail('testPaymentsCashback', $this),
@@ -319,7 +322,7 @@ class SalvaExportServiceTest extends WebTestCase
 
         $policy->setStatus(Policy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');
-        static::$policyService->create($policy, new \DateTime(), true);
+        static::$policyService->create($policy, $ago, true);
         static::$policyService->setEnvironment('test');
         static::$dm->flush();
 
