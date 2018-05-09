@@ -15,6 +15,9 @@ $('#claimsModal').on('show.bs.modal', function (event) {
     modal.find('#claims-detail-notes').text(claim.notes);
     modal.find('#claims-detail-description').text(claim.description);
     modal.find('#claims-detail-replacement-imei').text(claim.replacementImei);
+    if (!claim.validReplacementImei) {
+        modal.find('#claims-detail-replacement-imei').html('<s>' + claim.replacementImei + '</s> <i class="fa fa-warning" title="Invalid IMEI Number (Luhn Failure)"></i>');
+    }
     modal.find('#claims-detail-replacement-phone-details').text(claim.replacementPhoneDetails);
     modal.find('#claims-detail-replacement-phone').val(claim.replacementPhoneId);
     modal.find('#claims-detail-policy-phone').text(claim.policyPhone);
