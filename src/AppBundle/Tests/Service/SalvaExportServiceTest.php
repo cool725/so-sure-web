@@ -343,11 +343,13 @@ class SalvaExportServiceTest extends WebTestCase
         $this->assertEquals(2, count($lines));
         $this->assertEquals(
             sprintf('"%0.2f"', $policy->getPremiumInstallmentPrice()),
-            explode(',', $lines[0])[2]
+            explode(',', $lines[0])[2],
+            json_encode($lines)
         );
         $this->assertEquals(
             sprintf('"%0.2f"', 0 - $policy->getPremiumInstallmentPrice()),
-            explode(',', $lines[1])[2]
+            explode(',', $lines[1])[2],
+            json_encode($lines)
         );
     }
 
