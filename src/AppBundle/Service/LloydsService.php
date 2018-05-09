@@ -34,11 +34,7 @@ class LloydsService
         $this->logger = $logger;
     }
 
-    /**
-     * @param UploadFile $lloydsFile
-     * @return array
-     */
-    public function processCsv(UploadFile $lloydsFile)
+    public function processCsv($lloydsFile)
     {
         /** @var LloydsFile $lloydsFile */
         $filename = $lloydsFile->getFile();
