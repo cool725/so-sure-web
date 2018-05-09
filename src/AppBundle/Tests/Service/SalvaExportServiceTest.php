@@ -328,6 +328,8 @@ class SalvaExportServiceTest extends WebTestCase
 
         $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
 
+        // build server delay
+        sleep(1);
         
         $now = new \DateTime();
         $now = $now->sub(new \DateInterval('PT1S'));
