@@ -46,6 +46,9 @@ class LloydsService
         $lloydsFile->setDailyReceived($data['dailyBarclaysReceived']);
         $lloydsFile->setDailyProcessing($data['dailyBarclaysProcessing']);
         $lloydsFile->setDailyBacs($data['dailyBacs']);
+        $lloydsFile->setSalvaPayment($data['salvaPayment']);
+        $lloydsFile->setSoSurePayment($data['soSurePayment']);
+        $lloydsFile->setAflPayment($data['aflPayment']);
 
         return $data;
     }
@@ -60,6 +63,9 @@ class LloydsService
 
         $total = 0;
         $maxDate = null;
+        $salvaPayment = 0;
+        $soSurePayment = 0;
+        $aflPayment = 0;
 
         if (($handle = fopen($filename, 'r')) !== false) {
             while (($row = fgetcsv($handle, 1000)) !== false) {
@@ -76,9 +82,9 @@ class LloydsService
                     // 09/11/2016,CHG,'XX-XX-XX,XXXXXXXX,RETURNED D/D ,35.00,,39.08
                     // 11/10/2016,TFR,'XX-XX-XX,XXXXXXXX,FORGN PYT293483577 ,164.10,,460.51
                     // 20/10/2017,FPO,'XX-XX-XX,XXXXXXXX, NAME XXXXX SO-SURE REWARD POT,45.00,,4996.16
-                    if (in_array($line['Transaction Type'], ['TFR', 'PAY', 'BP', 'CHG', '', 'FPO'])) {
+                    if (in_array($line['Transaction Type'], ['PAY', 'BP', 'CHG', '', 'FPO'])) {
                         $this->logger->info(sprintf(
-                            'Skipping line as transfer/payment/interest. %s',
+                            'Skipping line as payment/interest. %s',
                             implode($line)
                         ));
                         continue;
@@ -86,8 +92,29 @@ class LloydsService
 
                     $paymentType = self::PAYMENT_TYPE_UNKNOWN;
                     $processedDate = null;
+                    $amount = 0;
+                    if (is_numeric($line['Credit Amount'])) {
+                        $amount = $line['Credit Amount'];
+                    } elseif (is_numeric($line['Debit Amount'])) {
+                        $amount = 0 - $line['Debit Amount'];
+                    }
 
-                    if (in_array($line['Transaction Type'], ['FPI'])) {
+                    if (in_array($line['Transaction Type'], ['TFR'])) {
+                        if (mb_stripos($line['Transaction Description'], 'AFL') !== false) {
+                            $aflPayment += $amount;
+                        } elseif (mb_stripos($line['Transaction Description'], 'SO-SURE') !== false) {
+                            $soSurePayment += $amount;
+                        } elseif (mb_stripos($line['Transaction Description'], 'FORGN') !== false) {
+                            $salvaPayment += $amount;
+                        } else {
+                            $this->logger->warning(sprintf(
+                                'Skipping line as unknown transfer recipient. %s',
+                                implode($line)
+                            ));
+                        }
+                        // transfers should just update their corresponding field and nothing else below
+                        continue;
+                    } elseif (in_array($line['Transaction Type'], ['FPI'])) {
                         // Incoming faster payments
                         // 28/04/2017,FPI,'30-65-41,36346160,XXX...XXX ,,425.53,2733.96
                         $processedDate = \DateTime::createFromFormat("d/m/Y", $line['Transaction Date']);
@@ -131,12 +158,6 @@ class LloydsService
                         $processedDate = $processedDate->sub(new \DateInterval('P1Y'));
                     }
 
-                    $amount = 0;
-                    if (is_numeric($line['Credit Amount'])) {
-                        $amount = $line['Credit Amount'];
-                    } elseif (is_numeric($line['Debit Amount'])) {
-                        $amount = 0 - $line['Debit Amount'];
-                    }
                     $total += $amount;
                     $receivedDate = \DateTime::createFromFormat("d/m/Y", $line['Transaction Date']);
                     if (!$maxDate || $maxDate > $receivedDate) {
@@ -176,6 +197,9 @@ class LloydsService
             'dailyBarclaysReceived' => $dailyBarclaysReceived,
             'dailyBarclaysProcessing' => $dailyBarclaysProcessing,
             'dailyBacs' => $dailyBacs,
+            'salvaPayment' => $salvaPayment,
+            'soSurePayment' => $soSurePayment,
+            'aflPayment' => $aflPayment,
         ];
 
         return $data;
