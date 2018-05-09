@@ -37,7 +37,7 @@
                             {% else %}
                                 <span>Insurance for your</span>
                             {% endif %}
-                            <span class="text-nowrap">{{ phone }}</span><br>
+                            <span class="text-nowrap">{{ phone.make }} {{ phone.model }}</span> ({{ phone.memory }}GB)<br>
                             {% if coming_soon %}
                                 <span class="text-nowrap h3">is coming soon!</span>
                                 <p><a href="mailto:hello@wearesosure.com" class="open-intercom">Tell me when</a> it's available.</p>
