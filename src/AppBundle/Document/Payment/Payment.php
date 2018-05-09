@@ -562,8 +562,19 @@ abstract class Payment
         return $data;
     }
 
+    /**
+     * @param mixed              $payments
+     * @param boolean            $requireValidPolicy
+     * @param string|null        $class
+     * @param \DateTimeZone|null $timezone
+     * @return array|null
+     */
     public static function dailyPayments($payments, $requireValidPolicy, $class = null, \DateTimeZone $timezone = null)
     {
+        if (count($payments) == 0) {
+            return null;
+        }
+
         $month = null;
         $data = [];
         $months = [];

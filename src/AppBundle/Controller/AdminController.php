@@ -854,6 +854,8 @@ class AdminController extends BaseController
         $sosure = [
             'dailyTransaction' => Payment::dailyPayments($payments, $isProd, JudoPayment::class),
             'monthlyTransaction' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
+            'dailyShiftedTransaction' => Payment::dailyPayments($payments, $isProd, JudoPayment::class, new \DateTimeZone(SoSure::TIMEZONE)),
+            'monthlyShiftedTransaction' => Payment::sumPayments($payments, $isProd, JudoPayment::class, new \DateTimeZone(SoSure::TIMEZONE)),
             'dailyBacsTransaction' => Payment::dailyPayments($payments, $isProd, BacsPayment::class),
             'monthlyBacsTransaction' => Payment::sumPayments($payments, $isProd, BacsPayment::class),
         ];
