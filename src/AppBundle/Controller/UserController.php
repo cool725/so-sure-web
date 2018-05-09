@@ -203,6 +203,11 @@ class UserController extends BaseController
                         'success',
                         sprintf('%s was invited', $emailInvitiation->getEmail())
                     );
+                } catch (ClaimException $e) {
+                    $this->addFlash(
+                        'warning',
+                        sprintf("You or your friend has a claim.")
+                    );
                 } catch (SelfInviteException $e) {
                     $this->addFlash('error', 'Sorry, you are not able to invite yourself');
                 } catch (\Exception $e) {
