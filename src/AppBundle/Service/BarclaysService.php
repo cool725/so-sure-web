@@ -16,6 +16,8 @@ class BarclaysService
     use DateTrait;
     use CurrencyTrait;
 
+    const MID = '8008566';
+
     /** @var LoggerInterface */
     protected $logger;
 

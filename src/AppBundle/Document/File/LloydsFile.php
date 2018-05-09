@@ -34,7 +34,13 @@ class LloydsFile extends UploadFile
      * @Gedmo\Versioned
      */
     protected $dailyProcessing = array();
-    
+
+    /**
+     * @MongoDB\Field(type="hash")
+     * @Gedmo\Versioned
+     */
+    protected $dailyBacs = array();
+
     /**
      * @return string
      */
@@ -70,6 +76,16 @@ class LloydsFile extends UploadFile
         $this->dailyProcessing = $dailyProcessing;
     }
 
+    public function getDailyBacs()
+    {
+        return $this->dailyBacs;
+    }
+
+    public function setDailyBacs($dailyBacs)
+    {
+        $this->dailyBacs = $dailyBacs;
+    }
+
     public static function combineDailyReceived($lloydsFiles)
     {
         return self::combineFiles($lloydsFiles, 'getDailyReceived');
@@ -78,5 +94,10 @@ class LloydsFile extends UploadFile
     public static function combineDailyProcessing($lloydsFiles)
     {
         return self::combineFiles($lloydsFiles, 'getDailyProcessing');
+    }
+
+    public static function combineDailyBacs($lloydsFiles)
+    {
+        return self::combineFiles($lloydsFiles, 'getDailyBacs');
     }
 }
