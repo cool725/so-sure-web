@@ -81,7 +81,7 @@ class SixpackService
         self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
         self::EXPERIMENT_DEFACTO,
         self::EXPERIMENT_DOB,
-        self::EXPERIMENT_72_REPLACEMENT,
+        self::EXPERIMENT_72_REPLACEMENTgs,
         self::EXPERIMENT_MONEY_LANDING,
         self::EXPERIMENT_PICSURE_SECTION,
     ];
