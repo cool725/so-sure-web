@@ -254,13 +254,13 @@ class JudopayService
                 } elseif (!$payment->isSuccess()) {
                     if ($logMissing) {
                         $this->logger->error(sprintf(
-                            'INVESTIGATE!! Missing db judo payment for received payment. receipt %s on %s [%s]',
+                            'INVESTIGATE!! Judo payment status in db does not match judo. receipt %s on %s [%s]',
                             $receiptId,
                             $receipt['createdAt'],
                             json_encode($receipt)
                         ));
                     }
-                    $data['missing'][$receiptId] = isset($receipt['yourPaymentReference']) ?
+                    $data['invalid'][$receiptId] = isset($receipt['yourPaymentReference']) ?
                         $receipt['yourPaymentReference'] :
                         $receiptId;
                 } else {
