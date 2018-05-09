@@ -42,6 +42,10 @@ class LloydsService
         $data = $this->processActualCsv($filename);
 
         $lloydsFile->addMetadata('total', $data['total']);
+        $lloydsFile->addMetadata('salvaPayment', $data['salvaPayment']);
+        $lloydsFile->addMetadata('soSurePayment', $data['soSurePayment']);
+        $lloydsFile->addMetadata('aflPayment', $data['aflPayment']);
+
         $lloydsFile->setDate($data['date']);
         $lloydsFile->setDailyReceived($data['dailyBarclaysReceived']);
         $lloydsFile->setDailyProcessing($data['dailyBarclaysProcessing']);
