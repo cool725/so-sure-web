@@ -851,9 +851,12 @@ class AdminController extends BaseController
 
         $payments = $paymentRepo->getAllPaymentsForExport($date);
         $isProd = $this->isProduction();
+        $tz = new \DateTimeZone(SoSure::TIMEZONE);
         $sosure = [
             'dailyTransaction' => Payment::dailyPayments($payments, $isProd, JudoPayment::class),
             'monthlyTransaction' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
+            'dailyShiftedTransaction' => Payment::dailyPayments($payments, $isProd, JudoPayment::class, $tz),
+            'monthlyShiftedTransaction' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
             'dailyBacsTransaction' => Payment::dailyPayments($payments, $isProd, BacsPayment::class),
             'monthlyBacsTransaction' => Payment::sumPayments($payments, $isProd, BacsPayment::class),
         ];
