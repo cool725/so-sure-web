@@ -419,6 +419,20 @@ class SalvaExportServiceTest extends WebTestCase
 
         /** @var SalvaPhonePolicy $updatedPolicy */
         $updatedPolicy = $this->assertPolicyExists(self::$container, $policy);
+
+        /** @var Payment $lastPaymentCredit */
+        $lastPaymentCredit = $updatedPolicy->getLastSuccessfulUserPaymentCredit();
+        $this->assertNotNull($lastPaymentCredit, 'Missing last payment credit');
+        $this->assertTrue($this->areEqualToTwoDp(
+            $lastPaymentCredit->getAmount(),
+            $updatedPolicy->getRefundAmount()
+        ), sprintf("%0.2f != %0.2f", $lastPaymentCredit->getAmount(), $updatedPolicy->getRefundAmount()));
+
+        /** @var JudoPayment $refund */
+        $refund = $updatedPolicy->getLastPaymentDebit();
+        $this->assertNotNull($refund, 'Missing last payment debit');
+        $this->assertNotNull($refund->getResult(), 'Missing result on last payment debit');
+
         // cancellation above should set to wait cancelled
         $this->assertEquals(SalvaPhonePolicy::SALVA_STATUS_PENDING_CANCELLED, $updatedPolicy->getSalvaStatus());
         $exceptionThrown = false;
