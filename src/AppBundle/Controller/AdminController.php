@@ -854,6 +854,8 @@ class AdminController extends BaseController
         $sosure = [
             'dailyTransaction' => Payment::dailyPayments($payments, $isProd, JudoPayment::class),
             'monthlyTransaction' => Payment::sumPayments($payments, $isProd, JudoPayment::class),
+            'dailyBacsTransaction' => Payment::dailyPayments($payments, $isProd, BacsPayment::class),
+            'monthlyBacsTransaction' => Payment::sumPayments($payments, $isProd, BacsPayment::class),
         ];
 
         $judoFile = new JudoFile();
@@ -1021,24 +1023,31 @@ class AdminController extends BaseController
         $monthlyLloydsFiles = $lloydsFileRepo->getMonthlyFiles($date);
         $monthlyPerDayLloydsReceived = LloydsFile::combineDailyReceived($monthlyLloydsFiles);
         $monthlyPerDayLloydsProcessing = LloydsFile::combineDailyProcessing($monthlyLloydsFiles);
+        $monthlyPerDayLloydsBacs = LloydsFile::combineDailyBacs($monthlyLloydsFiles);
 
         $yearlyLloydsFiles = $lloydsFileRepo->getYearlyFilesToDate($date);
         $yearlyPerDayLloydsReceived = LloydsFile::combineDailyReceived($yearlyLloydsFiles);
         $yearlyPerDayLloydsProcessing = LloydsFile::combineDailyProcessing($yearlyLloydsFiles);
+        $yearlyPerDayLloydsBacs = LloydsFile::combineDailyBacs($monthlyLloydsFiles);
 
         $allLloydsFiles = $lloydsFileRepo->getAllFilesToDate($date);
         $allLloydsReceived = LloydsFile::combineDailyReceived($allLloydsFiles);
         $allLloydsProcessing = LloydsFile::combineDailyProcessing($allLloydsFiles);
+        $allLloydsBacs = LloydsFile::combineDailyBacs($allLloydsFiles);
 
         $lloyds = [
             'dailyReceived' => $monthlyPerDayLloydsReceived,
             'dailyProcessed' => $monthlyPerDayLloydsProcessing,
+            'dailyBacs' => $monthlyPerDayLloydsBacs,
             'monthlyReceived' => LloydsFile::totalCombinedFiles($monthlyPerDayLloydsReceived, $year, $month),
             'monthlyProcessed' => LloydsFile::totalCombinedFiles($monthlyPerDayLloydsProcessing, $year, $month),
+            'monthlyBacs' => LloydsFile::totalCombinedFiles($monthlyPerDayLloydsBacs, $year, $month),
             'yearlyReceived' => LloydsFile::totalCombinedFiles($yearlyPerDayLloydsReceived),
             'yearlyProcessed' => LloydsFile::totalCombinedFiles($yearlyPerDayLloydsProcessing),
+            'yearlyBacs' => LloydsFile::totalCombinedFiles($yearlyPerDayLloydsBacs),
             'allReceived' => LloydsFile::totalCombinedFiles($allLloydsReceived),
             'allProcessed' => LloydsFile::totalCombinedFiles($allLloydsProcessing),
+            'allBacs' => LloydsFile::totalCombinedFiles($allLloydsBacs),
         ];
 
         return [

@@ -1,6 +1,8 @@
 <?php
 namespace AppBundle\Service;
 
+use AppBundle\Document\File\LloydsFile;
+use AppBundle\Document\File\UploadFile;
 use Psr\Log\LoggerInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Document\CurrencyTrait;
@@ -8,6 +10,11 @@ use AppBundle\Document\CurrencyTrait;
 class LloydsService
 {
     use CurrencyTrait;
+
+    const PAYMENT_TYPE_UNKNOWN = 'unknown';
+    const PAYMENT_TYPE_BARCLAYS_STANDARD = 'barclays';
+    const PAYMENT_TYPE_BARCLAYS_FPI = 'barclays-fpi';
+    const PAYMENT_TYPE_BACS = 'bacs';
 
     /** @var LoggerInterface */
     protected $logger;
@@ -27,16 +34,22 @@ class LloydsService
         $this->logger = $logger;
     }
 
-    public function processCsv($lloydsFile)
+    /**
+     * @param UploadFile $lloydsFile
+     * @return array
+     */
+    public function processCsv(UploadFile $lloydsFile)
     {
+        /** @var LloydsFile $lloydsFile */
         $filename = $lloydsFile->getFile();
 
         $data = $this->processActualCsv($filename);
 
         $lloydsFile->addMetadata('total', $data['total']);
         $lloydsFile->setDate($data['date']);
-        $lloydsFile->setDailyReceived($data['dailyReceived']);
-        $lloydsFile->setDailyProcessing($data['dailyProcessing']);
+        $lloydsFile->setDailyReceived($data['dailyBarclaysReceived']);
+        $lloydsFile->setDailyProcessing($data['dailyBarclaysProcessing']);
+        $lloydsFile->setDailyBacs($data['dailyBacs']);
 
         return $data;
     }
@@ -45,8 +58,9 @@ class LloydsService
     {
         $header = null;
         $lines = array();
-        $dailyReceived = array();
-        $dailyProcessing = array();
+        $dailyBarclaysReceived = array();
+        $dailyBarclaysProcessing = array();
+        $dailyBacs = array();
 
         $total = 0;
         $maxDate = null;
@@ -74,25 +88,43 @@ class LloydsService
                         continue;
                     }
 
-                    $processedDates = explode('8008566', $line['Transaction Description']);
+                    $paymentType = self::PAYMENT_TYPE_UNKNOWN;
+                    $processedDate = null;
 
-                    // For now incoming payments appear to be FPI.
-                    // May need to base detection of just MDIR in description in the future though
                     if (in_array($line['Transaction Type'], ['FPI'])) {
                         // Incoming faster payments
                         // 28/04/2017,FPI,'30-65-41,36346160,XXX...XXX ,,425.53,2733.96
                         $processedDate = \DateTime::createFromFormat("d/m/Y", $line['Transaction Date']);
-                    } elseif (mb_stripos($line['Transaction Description'], 'MDIR') === false ||
-                        count($processedDates) < 2) {
+                        $identifier = sprintf('BCARD%s', BarclaysService::MID);
+                        if (mb_stripos($line['Transaction Description'], $identifier) !== false) {
+                            $paymentType = self::PAYMENT_TYPE_BARCLAYS_FPI;
+                        }
+                    } elseif (in_array($line['Transaction Type'], ['BGC'])) {
+                        // Standard incoming from barclays
+                        // 13/04/2017,BGC,'30-65-41,36346160,MDIR  8008566APR11 8008566 ,,32.37,1219.18
+                        $processedDates = explode(BarclaysService::MID, $line['Transaction Description']);
+                        if (mb_stripos($line['Transaction Description'], 'MDIR') !== false) {
+                            if (count($processedDates) != 2) {
+                                $this->logger->warning(sprintf(
+                                    'Skipping line as unable to parse barclays description. %s',
+                                    implode($line)
+                                ));
+                                continue;
+                            }
+                            $processedDate = new \DateTime($processedDates[1]);
+                            $paymentType = self::PAYMENT_TYPE_BARCLAYS_STANDARD;
+                        } elseif (trim($line['Transaction Description']) == 'BACS') {
+                            $processedDate = \DateTime::createFromFormat("d/m/Y", $line['Transaction Date']);
+                            $paymentType = self::PAYMENT_TYPE_BACS;
+                        }
+                    }
+
+                    if ($paymentType == self::PAYMENT_TYPE_UNKNOWN) {
                         $this->logger->warning(sprintf(
                             'Skipping line as unable to parse description. %s',
                             implode($line)
                         ));
                         continue;
-                    } else {
-                        // Standard incoming from barclays
-                        // 13/04/2017,BGC,'30-65-41,36346160,MDIR  8008566APR11 8008566 ,,32.37,1219.18
-                        $processedDate = new \DateTime($processedDates[1]);
                     }
 
                     $this->logger->info(sprintf('Processing line. %s', implode($line)));
@@ -110,21 +142,31 @@ class LloydsService
                         $amount = 0 - $line['Debit Amount'];
                     }
                     $total += $amount;
-
                     $receivedDate = \DateTime::createFromFormat("d/m/Y", $line['Transaction Date']);
-                    if (!isset($dailyReceived[$receivedDate->format('Ymd')])) {
-                        $dailyReceived[$receivedDate->format('Ymd')] = 0;
-                    }
-                    $dailyReceived[$receivedDate->format('Ymd')] += $amount;
-
-                    if (!isset($dailyProcessing[$processedDate->format('Ymd')])) {
-                        $dailyProcessing[$processedDate->format('Ymd')] = 0;
-                    }
-                    $dailyProcessing[$processedDate->format('Ymd')] += $amount;
-
                     if (!$maxDate || $maxDate > $receivedDate) {
                         $maxDate = $receivedDate;
                     }
+
+                    if (in_array($paymentType, [
+                        self::PAYMENT_TYPE_BARCLAYS_STANDARD,
+                        self::PAYMENT_TYPE_BARCLAYS_FPI
+                    ])) {
+                        if (!isset($dailyBarclaysReceived[$receivedDate->format('Ymd')])) {
+                            $dailyBarclaysReceived[$receivedDate->format('Ymd')] = 0;
+                        }
+                        $dailyBarclaysReceived[$receivedDate->format('Ymd')] += $amount;
+
+                        if (!isset($dailyBarclaysProcessing[$processedDate->format('Ymd')])) {
+                            $dailyBarclaysProcessing[$processedDate->format('Ymd')] = 0;
+                        }
+                        $dailyBarclaysProcessing[$processedDate->format('Ymd')] += $amount;
+                    } elseif ($paymentType == self::PAYMENT_TYPE_BACS) {
+                        if (!isset($dailyBacs[$receivedDate->format('Ymd')])) {
+                            $dailyBacs[$receivedDate->format('Ymd')] = 0;
+                        }
+                        $dailyBacs[$receivedDate->format('Ymd')] += $amount;
+                    }
+
                     $lines[] = $line;
                 }
             }
@@ -135,8 +177,9 @@ class LloydsService
             'total' => $this->toTwoDp($total),
             'date' => $maxDate,
             'data' => $lines,
-            'dailyReceived' => $dailyReceived,
-            'dailyProcessing' => $dailyProcessing,
+            'dailyBarclaysReceived' => $dailyBarclaysReceived,
+            'dailyBarclaysProcessing' => $dailyBarclaysProcessing,
+            'dailyBacs' => $dailyBacs,
         ];
 
         return $data;
