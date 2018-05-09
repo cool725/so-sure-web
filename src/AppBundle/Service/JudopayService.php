@@ -199,16 +199,17 @@ class JudopayService
 
         $transactions->setAttributeValues($data);
         $details = $transactions->all(0, $pageSize);
-        $result = [
+        $data = [
             'validated' => 0,
             'missing' => [],
+            'invalid' => [],
             'non-payment' => 0,
-            'skipped' => 0,
+            'skipped-too-soon' => 0,
             'additional-payments' => []
         ];
         foreach ($details['results'] as $receipt) {
             $policyId = null;
-            $result = isset($reciept['result']) ? $reciept['result'] : null;
+            $result = isset($reciept['result']) ? $receipt['result'] : null;
             if (isset($receipt['yourPaymentMetaData']) && isset($receipt['yourPaymentMetaData']['policy_id'])) {
                 // Non-token payments (eg. user) may be tried several times in a row
                 // Ideally would seperate out the user/token payments, but for now
@@ -218,47 +219,75 @@ class JudopayService
                     if (!isset($policies[$policyId])) {
                         $policies[$policyId] = true;
                     } else {
-                        if (!isset($result['additional-payments'][$policyId])) {
-                            $result['additional-payments'][$policyId] = 0;
+                        if (!isset($data['additional-payments'][$policyId])) {
+                            $data['additional-payments'][$policyId] = 0;
                         }
-                        //$result['additional-payments'][$policyId]++;
-                        $result['additional-payments'][$policyId] = json_encode($receipt);
+                        //$data['additional-payments'][$policyId]++;
+                        $data['additional-payments'][$policyId] = json_encode($receipt);
                     }
                 }
             }
+
+            $receiptId = $receipt['receiptId'];
+            /** @var JudoPayment $payment */
+            $payment = $repo->findOneBy(['receipt' => $receiptId]);
+
             $created = new \DateTime($receipt['createdAt']);
             $now = new \DateTime();
             $diff = $now->getTimestamp() - $created->getTimestamp();
             // allow a few (5) minutes before warning if missing receipt
             if ($diff < 300) {
-                $result['skipped']++;
-            } elseif ($receipt['type'] == 'Payment') {
-                $receiptId = $receipt['receiptId'];
-                $payment = $repo->findOneBy(['receipt' => $receiptId]);
+                $data['skipped-too-soon']++;
+            } elseif ($receipt['type'] == 'Payment' && $receipt['result'] == JudoPayment::RESULT_SUCCESS) {
                 if (!$payment) {
-                    // Only need to be concerned about successful payments
-                    if ($receipt['result'] == JudoPayment::RESULT_SUCCESS) {
-                        if ($logMissing) {
-                            $this->logger->error(sprintf(
-                                'INVESTIGATE!! Missing db judo payment for received payment. receipt %s on %s [%s]',
-                                $receiptId,
-                                $receipt['createdAt'],
-                                json_encode($receipt)
-                            ));
-                        }
-                        $result['missing'][$receiptId] = isset($receipt['yourPaymentReference']) ?
-                            $receipt['yourPaymentReference'] :
-                            $receiptId;
+                    if ($logMissing) {
+                        $this->logger->error(sprintf(
+                            'INVESTIGATE!! Missing db judo payment for received payment. receipt %s on %s [%s]',
+                            $receiptId,
+                            $receipt['createdAt'],
+                            json_encode($receipt)
+                        ));
                     }
+                    $data['missing'][$receiptId] = isset($receipt['yourPaymentReference']) ?
+                        $receipt['yourPaymentReference'] :
+                        $receiptId;
+                } elseif (!$payment->isSuccess()) {
+                    if ($logMissing) {
+                        $this->logger->error(sprintf(
+                            'INVESTIGATE!! Judo payment status in db does not match judo. receipt %s on %s [%s]',
+                            $receiptId,
+                            $receipt['createdAt'],
+                            json_encode($receipt)
+                        ));
+                    }
+                    $data['invalid'][$receiptId] = isset($receipt['yourPaymentReference']) ?
+                        $receipt['yourPaymentReference'] :
+                        $receiptId;
                 } else {
-                    $result['validated']++;
+                    $data['validated']++;
+                }
+            } elseif ($receipt['type'] == 'Payment' && $receipt['result'] != JudoPayment::RESULT_SUCCESS) {
+                // can ignore failed missing payments
+                // however if our db thinks it successful and judo says its not, that's problematic
+                if ($payment && $payment->isSuccess()) {
+                    if ($logMissing) {
+                        $this->logger->error(sprintf(
+                            'INVESTIGATE!! Judo payment status in db does not match judo. receipt %s on %s [%s]',
+                            $receiptId,
+                            $receipt['createdAt'],
+                            json_encode($receipt)
+                        ));
+                    }
+                    $data['invalid'][$receiptId] = isset($receipt['yourPaymentReference']) ?
+                        $receipt['yourPaymentReference'] :
+                        $receiptId;
                 }
             } else {
-                $result['non-payment']++;
+                $data['non-payment']++;
             }
         }
 
-        return $result;
+        return $data;
     }
 
     /**
