@@ -302,6 +302,9 @@ class SalvaExportServiceTest extends WebTestCase
 
     public function testPaymentsCashback()
     {
+        $ago = new \DateTime();
+        $ago = $ago->sub(new \DateInterval('P1D'));
+
         $user = static::createUser(
             static::$userManager,
             static::generateEmail('testPaymentsCashback', $this),
@@ -319,12 +322,14 @@ class SalvaExportServiceTest extends WebTestCase
 
         $policy->setStatus(Policy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');
-        static::$policyService->create($policy, new \DateTime(), true);
+        static::$policyService->create($policy, $ago, true);
         static::$policyService->setEnvironment('test');
         static::$dm->flush();
 
         $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
 
+        // build server delay
+        sleep(1);
         
         $now = new \DateTime();
         $now = $now->sub(new \DateInterval('PT1S'));
@@ -343,11 +348,13 @@ class SalvaExportServiceTest extends WebTestCase
         $this->assertEquals(2, count($lines));
         $this->assertEquals(
             sprintf('"%0.2f"', $policy->getPremiumInstallmentPrice()),
-            explode(',', $lines[0])[2]
+            explode(',', $lines[0])[2],
+            json_encode($lines)
         );
         $this->assertEquals(
             sprintf('"%0.2f"', 0 - $policy->getPremiumInstallmentPrice()),
-            explode(',', $lines[1])[2]
+            explode(',', $lines[1])[2],
+            json_encode($lines)
         );
     }
 
