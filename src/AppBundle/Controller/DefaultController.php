@@ -86,6 +86,7 @@ class DefaultController extends BaseController
             $request,
             SixpackService::EXPERIMENT_72_REPLACEMENT,
             ['next-working-day', 'seventytwo-hours']
+        );
 
         $picsure = $this->sixpack(
             $request,
