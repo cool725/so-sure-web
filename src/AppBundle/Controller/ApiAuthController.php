@@ -747,6 +747,7 @@ class ApiAuthController extends BaseController
                 // due to validate object call later
                 $cashback->setPolicy($policy);
                 $cashback->setStatus(Cashback::STATUS_PENDING_CLAIMABLE);
+                $cashback->setDate(new \DateTime());
             }
             $cashback->setAccountName($this->getDataString($data, 'account_name'));
             $cashback->setSortcode($this->getDataString($data, 'sort_code'));
