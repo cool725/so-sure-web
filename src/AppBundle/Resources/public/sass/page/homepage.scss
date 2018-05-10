@@ -65,14 +65,21 @@
 }
 
 .ol--blue-counter__line {
+    margin-bottom: 50px;
 
     &:before {
-        width: 5px; height: 100%;
+        width: 5px; height: calc(100% - 100px);
         content: '';
         display: block;
         position: absolute;
-        left: 22px; top: 0;
+        left: 22px; top: 30px;
         background: $off-white;
+    }
+
+    li {
+        &:before {
+            top: 30px;
+        }
     }
 }
 
@@ -536,15 +543,35 @@
 
         ol {
             li {
-                img {
-                    display:block;
 
-                    @include breakpoint(tablet) {
-                        float: left;
+                span {
+                    display: block;
+                }
+
+                @include breakpoint(laptop) {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    span {
+                        display: inline;
                     }
                 }
             }
         }
+
+
+        // ol {
+        //     li {
+        //         img {
+        //             display:block;
+
+        //             @include breakpoint(tablet) {
+        //                 float: left;
+        //             }
+        //         }
+        //     }
+        // }
         // background-color: $lightest-blue;
 
         // p {
