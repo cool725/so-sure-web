@@ -989,7 +989,6 @@ class JudopayService
             $nextMonth = clone $date;
         }
         $nextMonth->add(new \DateInterval('P1M'));
-
         if (!$policy->getPayerOrUser()->getPaymentMethod()->isCardExpired($nextMonth)) {
             return false;
         }
