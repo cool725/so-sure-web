@@ -126,12 +126,12 @@ class LloydsService
                         if (mb_stripos($line['Transaction Description'], $identifier) !== false) {
                             $paymentType = self::PAYMENT_TYPE_BARCLAYS_FPI;
                         }
-                    } elseif (in_array($line['Transaction Type'], ['BGC'])) {
+                    } elseif (in_array($line['Transaction Type'], ['BGC', 'DD'])) {
                         // Standard incoming from barclays
                         // 13/04/2017,BGC,'30-65-41,36346160,MDIR  8008566APR11 8008566 ,,32.37,1219.18
                         $processedDates = explode(BarclaysService::MID, $line['Transaction Description']);
                         if (mb_stripos($line['Transaction Description'], 'MDIR') !== false) {
-                            if (count($processedDates) != 2) {
+                            if (count($processedDates) < 2) {
                                 $this->logger->warning(sprintf(
                                     'Skipping line as unable to parse barclays description. %s',
                                     implode($line)
@@ -148,7 +148,7 @@ class LloydsService
 
                     if ($paymentType == self::PAYMENT_TYPE_UNKNOWN) {
                         $this->logger->warning(sprintf(
-                            'Skipping line as unable to parse description. %s',
+                            'Skipping line as unable to parse type and/or description. %s',
                             implode($line)
                         ));
                         continue;
