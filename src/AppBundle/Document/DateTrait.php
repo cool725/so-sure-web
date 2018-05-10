@@ -101,7 +101,7 @@ trait DateTrait
 
         if ($date->format('m') == 12) {
             $nextMonth = new \DateTime(
-                sprintf('%d-%d-01 00:00:00', $date->format('Y') + 1, $date->format('m')),
+                sprintf('%d-01-01 00:00:00', $date->format('Y') + 1),
                 new \DateTimeZone($tz)
             );
         } else {
