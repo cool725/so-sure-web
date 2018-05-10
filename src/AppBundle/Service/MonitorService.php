@@ -317,7 +317,7 @@ class MonitorService
 
     public function judopayReceipts()
     {
-        $results = $this->judopay->getTransactions(20, false);
+        $results = $this->judopay->getTransactions(50, false);
         if (isset($results['additional-payments']) && count($results['additional-payments']) > 0) {
             // @codingStandardsIgnoreStart
             throw new MonitorException(sprintf(
