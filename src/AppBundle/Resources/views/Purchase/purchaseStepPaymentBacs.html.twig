@@ -36,7 +36,7 @@
 
             {{ form_start(bacs_form, {'attr': {'class': 'form','autocomplete': 'off'}}) }}
                 <div class="form-group {% if form_errors(bacs_form.accountName) %}has-error{% endif %}">
-                    {{ form_widget(bacs_form.accountName, {'attr': {'placeholder': 'Name on account', 'class': 'form-control'}}) }}
+                    {{ form_widget(bacs_form.accountName, {'attr': {'placeholder': 'Name on account', 'class': 'form-control', 'data-hj-suppress': ''}}) }}
                     {% if form_errors(bacs_form.accountName) %}
                         <div class="help-block with-errors">{{ form_errors(bacs_form.accountName) }}</div>
                     {% else %}
@@ -44,11 +44,11 @@
                     {% endif %}
                 </div>
                 <div class="form-group {% if form_errors(bacs_form.sortCode) %}has-error{% endif %}">
-                    {{ form_widget(bacs_form.sortCode, {'attr': {'placeholder': 'Sort code', 'class': 'form-control sort-code', 'maxlength': 6}}) }}
+                    {{ form_widget(bacs_form.sortCode, {'attr': {'placeholder': 'Sort code', 'class': 'form-control sort-code', 'maxlength': 6, 'data-hj-suppress': ''}}) }}
                     <div class="help-block with-errors">{{ form_errors(bacs_form.sortCode) }}</div>
                 </div>
                 <div class="form-group {% if form_errors(bacs_form.accountNumber) %}has-error{% endif %}">
-                    {{ form_widget(bacs_form.accountNumber, {'attr': {'placeholder': 'Account number', 'class': 'form-control', 'maxlength': 8}}) }}
+                    {{ form_widget(bacs_form.accountNumber, {'attr': {'placeholder': 'Account number', 'class': 'form-control', 'maxlength': 8, 'data-hj-suppress': ''}}) }}
                     <div class="help-block with-errors">{{ form_errors(bacs_form.accountNumber) }}</div>
                 </div>
                 <div class="form-group {% if form_errors(bacs_form.soleSignature) %}has-error{% endif %}">
