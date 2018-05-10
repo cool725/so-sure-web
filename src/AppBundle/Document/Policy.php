@@ -719,6 +719,34 @@ abstract class Policy
     }
 
     /**
+     * @return Payment|null
+     */
+    public function getLastPaymentDebit()
+    {
+        $payments = $this->getPaymentDebits();
+        if (count($payments) == 0) {
+            return null;
+        }
+
+        // sort more recent to older
+        usort($payments, function ($a, $b) {
+            return $a->getDate() < $b->getDate();
+        });
+        //\Doctrine\Common\Util\Debug::dump($payments, 3);
+
+        return $payments[0];
+    }
+
+    public function getPaymentDebits()
+    {
+        $payments = array_filter($this->getAllPayments()->toArray(), function ($payment) {
+                return $payment->getAmount() <= 0 && !$payment instanceof SoSurePayment;
+        });
+
+        return $payments;
+    }
+
+    /**
      * @return Cashback|null
      */
     public function getCashback()

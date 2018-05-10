@@ -2,6 +2,8 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Classes\SoSure;
+
 trait DateTrait
 {
     public static function getBankHolidays()
@@ -50,9 +52,26 @@ trait DateTrait
     public function startOfMonth(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = new \DateTime('now', new \DateTimeZone(SoSure::TIMEZONE));
         }
-        $startMonth = new \DateTime(sprintf('%d-%d-01 00:00:00', $date->format('Y'), $date->format('m')));
+
+        // We want to change reporting to use Europe/London rather than UTC
+        // in order to keep historic data accurate, only adjust data going forwards from Apr 2018
+        $tz = 'UTC';
+        if ($date >= new \DateTime('2018-04-01 00:00:00', new \DateTimeZone(SoSure::TIMEZONE))) {
+            $tz = SoSure::TIMEZONE;
+        }
+
+        $startMonth = new \DateTime(
+            sprintf('%d-%d-01 00:00:00', $date->format('Y'), $date->format('m')),
+            new \DateTimeZone($tz)
+        );
+
+        // due to change from UTC to Europe/London reporting in Apr 2018, we have an overlap for this particular month
+        // avoid double counting by incrementing 1 hour
+        if ($startMonth == new \DateTime('2018-04-01 00:00:00', new \DateTimeZone(SoSure::TIMEZONE))) {
+            $startMonth = new \DateTime('2018-04-01 01:00:00', new \DateTimeZone(SoSure::TIMEZONE));
+        }
 
         return $startMonth;
     }
@@ -70,12 +89,27 @@ trait DateTrait
     public function endOfMonth(\DateTime $date = null)
     {
         if (!$date) {
-            $date = new \DateTime();
+            $date = new \DateTime('now', new \DateTimeZone(SoSure::TIMEZONE));
         }
-        $startMonth = $this->startOfMonth($date);
-        $nextMonth = clone $startMonth;
-        $nextMonth->add(new \DateInterval('P1M'));
 
+        // We want to change reporting to use Europe/London rather than UTC
+        // in order to keep historic data accurate, only adjust data going forwards from Apr 2018
+        $tz = 'UTC';
+        if ($date >= new \DateTime('2018-04-01 00:00:00', new \DateTimeZone(SoSure::TIMEZONE))) {
+            $tz = SoSure::TIMEZONE;
+        }
+
+        if ($date->format('m') == 12) {
+            $nextMonth = new \DateTime(
+                sprintf('%d-01-01 00:00:00', $date->format('Y') + 1),
+                new \DateTimeZone($tz)
+            );
+        } else {
+            $nextMonth = new \DateTime(
+                sprintf('%d-%d-01 00:00:00', $date->format('Y'), $date->format('m') + 1),
+                new \DateTimeZone($tz)
+            );
+        }
         return $nextMonth;
     }
 
@@ -217,5 +251,14 @@ trait DateTrait
     public function clearTime($date)
     {
         return $date->setTime(0, 0);
+    }
+
+    public static function convertTimezone(\DateTime $date, \DateTimeZone $timezone)
+    {
+        $adjustedDate = clone $date;
+        $adjustedDate = \DateTime::createFromFormat('U', $adjustedDate->getTimestamp());
+        $adjustedDate->setTimezone($timezone);
+
+        return $adjustedDate;
     }
 }

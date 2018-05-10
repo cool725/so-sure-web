@@ -6,6 +6,6 @@ use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Policy;
 use AppBundle\Document\DateTrait;
 
-class JudoFileRepository extends S3FileRepository
+class ReconcilationFileRepository extends S3FileRepository
 {
 }

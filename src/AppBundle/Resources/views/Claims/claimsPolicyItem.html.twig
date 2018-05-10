@@ -159,7 +159,14 @@
                             policy.payerOrUser.paymentMethod.getType == "bacs" %}
                             <tr>
                                 <td>Bacs</td>
-                                <td class="">{{ policy.payerOrUser.paymentMethod }}</td>
+                                <td class="">
+                                    {% if policy.payerOrUser.paymentMethod.bankAccount.isMandateInvalid %}
+                                        <s>{{ policy.payerOrUser.paymentMethod }}</s>
+                                    {% else %}
+                                        {{ policy.payerOrUser.paymentMethod }}
+                                    {% endif %}
+                                    (Mandate: {{ policy.payerOrUser.paymentMethod.bankAccount.mandateStatus }})
+                                </td>
                             </tr>
                         {% endif %}
                         {% if policy.payerOrUser.id != policy.user.id %}
@@ -858,6 +865,8 @@
                     <td>
                         {% if not policy.user.paymentMethod %}
                             Missing payment method
+                        {% elseif policy.user.paymentMethod.type != 'judo' %}
+                            Non-Judo payment method
                         {% elseif not policy.user.hasValidDetails %}
                             Invalid user details (missing mobile number, address, or birthday)
                         {% elseif policy.status != null %}

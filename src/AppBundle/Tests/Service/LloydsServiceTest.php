@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Service\LloydsService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\File\BarclaysFile;
@@ -18,6 +19,7 @@ class LloydsServiceTest extends WebTestCase
     protected static $container;
     /** @var DocumentManager */
     protected static $dm;
+    /** @var LloydsService $lloyds */
     protected static $lloyds;
     protected static $rootDir;
 
@@ -32,7 +34,10 @@ class LloydsServiceTest extends WebTestCase
 
          //now we can instantiate our service (if you want a fresh one for
          //each test method, do this in setUp() instead
-         self::$lloyds = self::$container->get('app.lloyds');
+         /** @var LloydsService $lloyds */
+         $lloyds = self::$container->get('app.lloyds');
+         self::$lloyds = $lloyds;
+
          /** @var DocumentManager */
          $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
          self::$dm = $dm;
@@ -43,12 +48,12 @@ class LloydsServiceTest extends WebTestCase
     {
     }
 
-    public function testProcessCsv()
+    public function testLloydsProcessCsv()
     {
         $csv = sprintf("%s/../src/AppBundle/Tests/Resources/lloyds.csv", self::$rootDir);
 
         $data = self::$lloyds->processActualCsv($csv);
-        $this->assertEquals(3, count($data['data']));
-        $this->assertEquals(519.94, $data['total']);
+        $this->assertEquals(2, count($data['data']), json_encode($data));
+        $this->assertEquals(94.41, $data['total']);
     }
 }

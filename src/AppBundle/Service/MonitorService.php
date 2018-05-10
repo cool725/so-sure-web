@@ -332,6 +332,13 @@ class MonitorService
                 json_encode($results['missing'])
             ));
             // @codingStandardsIgnoreEnd
+        } elseif (isset($results['invalid']) && count($results['invalid']) > 0) {
+            // @codingStandardsIgnoreStart
+            throw new MonitorException(sprintf(
+                'Judopay has invalid database payment records. %s',
+                json_encode($results['invalid'])
+            ));
+            // @codingStandardsIgnoreEnd
         }
     }
 

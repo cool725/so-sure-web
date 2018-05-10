@@ -34,7 +34,31 @@ class LloydsFile extends UploadFile
      * @Gedmo\Versioned
      */
     protected $dailyProcessing = array();
-    
+
+    /**
+     * @MongoDB\Field(type="hash")
+     * @Gedmo\Versioned
+     */
+    protected $dailyBacs = array();
+
+    /**
+     * @MongoDB\Field(type="float")
+     * @Gedmo\Versioned
+     */
+    protected $soSurePayment;
+
+    /**
+     * @MongoDB\Field(type="float")
+     * @Gedmo\Versioned
+     */
+    protected $aflPayment;
+
+    /**
+     * @MongoDB\Field(type="float")
+     * @Gedmo\Versioned
+     */
+    protected $salvaPayment;
+
     /**
      * @return string
      */
@@ -43,7 +67,7 @@ class LloydsFile extends UploadFile
         $now = new \DateTime();
 
         return sprintf(
-            'lloyds-%d-%02d-%s',
+            'banking/lloyds-%d-%02d-%s',
             $this->getDate()->format('Y'),
             $this->getDate()->format('m'),
             $now->format('U')
@@ -70,6 +94,46 @@ class LloydsFile extends UploadFile
         $this->dailyProcessing = $dailyProcessing;
     }
 
+    public function getDailyBacs()
+    {
+        return $this->dailyBacs;
+    }
+
+    public function setDailyBacs($dailyBacs)
+    {
+        $this->dailyBacs = $dailyBacs;
+    }
+
+    public function getSoSurePayment()
+    {
+        return $this->soSurePayment;
+    }
+
+    public function setSoSurePayment($soSurePayment)
+    {
+        $this->soSurePayment = $soSurePayment;
+    }
+
+    public function getAflPayment()
+    {
+        return $this->aflPayment;
+    }
+
+    public function setAflPayment($aflPayment)
+    {
+        $this->aflPayment = $aflPayment;
+    }
+
+    public function getSalvaPayment()
+    {
+        return $this->salvaPayment;
+    }
+
+    public function setSalvaPayment($salvaPayment)
+    {
+        $this->salvaPayment = $salvaPayment;
+    }
+
     public static function combineDailyReceived($lloydsFiles)
     {
         return self::combineFiles($lloydsFiles, 'getDailyReceived');
@@ -78,5 +142,10 @@ class LloydsFile extends UploadFile
     public static function combineDailyProcessing($lloydsFiles)
     {
         return self::combineFiles($lloydsFiles, 'getDailyProcessing');
+    }
+
+    public static function combineDailyBacs($lloydsFiles)
+    {
+        return self::combineFiles($lloydsFiles, 'getDailyBacs');
     }
 }

@@ -100,6 +100,7 @@ class RefundListener
 
                 // and convert to cashback
                 $cashback = new Cashback();
+                $cashback->setDate(new \DateTime());
                 $cashback->setStatus(Cashback::STATUS_MISSING);
                 $cashback->setAmount($total);
                 $policy->setCashback($cashback);

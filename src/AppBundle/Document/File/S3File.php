@@ -16,6 +16,7 @@ use AppBundle\Validator\Constraints as AppAssert;
  *      "salvaPolicy"="SalvaPolicyFile",
  *      "judo"="JudoFile",
  *      "lloyds"="LloydsFile",
+ *      "reconciliation"="ReconciliationFile",
  *      "barclays"="BarclaysFile",
  *      "barclaysStatement"="BarclaysStatementFile",
  *      "policySchedule"="PolicyScheduleFile",
