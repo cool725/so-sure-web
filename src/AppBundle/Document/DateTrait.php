@@ -99,11 +99,17 @@ trait DateTrait
             $tz = SoSure::TIMEZONE;
         }
 
-        $nextMonth = new \DateTime(
-            sprintf('%d-%d-01 00:00:00', $date->format('Y'), $date->format('m') + 1),
-            new \DateTimeZone($tz)
-        );
-
+        if ($date->format('m') == 12) {
+            $nextMonth = new \DateTime(
+                sprintf('%d-%d-01 00:00:00', $date->format('Y') + 1, $date->format('m')),
+                new \DateTimeZone($tz)
+            );
+        } else {
+            $nextMonth = new \DateTime(
+                sprintf('%d-%d-01 00:00:00', $date->format('Y'), $date->format('m') + 1),
+                new \DateTimeZone($tz)
+            );
+        }
         return $nextMonth;
     }
 
