@@ -385,6 +385,14 @@ class BankAccount
         ]);
     }
 
+    public function isMandateInvalid()
+    {
+        return in_array($this->getMandateStatus(), [
+            self::MANDATE_FAILURE,
+            self::MANDATE_CANCELLED
+        ]);
+    }
+
     public function allowedSubmission(\DateTime $now = null)
     {
         if (!$now) {

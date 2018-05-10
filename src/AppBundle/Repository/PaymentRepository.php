@@ -2,6 +2,7 @@
 
 namespace AppBundle\Repository;
 
+use AppBundle\Classes\SoSure;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\DateTrait;
@@ -15,7 +16,7 @@ class PaymentRepository extends DocumentRepository
         $startMonth = $this->startOfMonth($date);
         $nextMonth = $this->endOfMonth($date);
 
-        return $this->createQueryBuilder()
+        $qb = $this->createQueryBuilder()
             ->field('success')->equals(true)
             ->field('date')->gte($startMonth)
             ->field('date')->lt($nextMonth)
@@ -30,8 +31,12 @@ class PaymentRepository extends DocumentRepository
                 'policyDiscountRefund',
             ])
             ->sort('date')
-            ->getQuery()
-            ->execute();
+            ->sort('id')
+            ->getQuery();
+
+        //print_r($qb->getQuery());
+
+        return $qb->execute();
     }
 
     public function getAllPaymentsForReport(\DateTime $date)
