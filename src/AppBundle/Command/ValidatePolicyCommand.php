@@ -454,6 +454,7 @@ class ValidatePolicyCommand extends BaseCommand
 
     private function resyncPicsureMetadata()
     {
+        /** @var \Aws\S3\S3Client */
         $s3 = $this->getContainer()->get('aws.s3');
         $policyRepo = $this->getManager()->getRepository(PhonePolicy::class);
         $filesRepo = $this->getManager()->getRepository(PicSureFile::class);
