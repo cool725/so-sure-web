@@ -231,12 +231,12 @@
     text-align: center;
     position: relative;
     font-size: 18px;
-    margin: 50px 0;
+    margin: 50px 0 15px;
     // @include border-radius(20px);
 
     @include breakpoint(tablet) {
         font-size: 24px;
-        margin: 30px;
+        margin: 30px 30px 10px;
     }
 
     &:before, &:after {
