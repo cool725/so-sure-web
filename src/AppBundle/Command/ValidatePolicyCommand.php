@@ -481,7 +481,7 @@ class ValidatePolicyCommand extends BaseCommand
                             $file->addMetadata('picsure-attempts', $result['Metadata']['attemps']);
                         }
                         if (isset($result['Metadata']['attempts']) && !isset($metadata['picsure-attempts'])) {
-                            $file->addMetadata('picsure-attempts', $result['Metadata']['attemps']);
+                            $file->addMetadata('picsure-attempts', $result['Metadata']['attempts']);
                         }
                         if (isset($result['Metadata']['suspected-fraud']) &&
                             !isset($metadata['picsure-suspected-fraud'])

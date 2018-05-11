@@ -1191,7 +1191,7 @@ class ApiAuthController extends BaseController
                 $picsure->addMetadata('picsure-attempts', $result['Metadata']['attemps']);
             }
             if (isset($result['Metadata']['attempts'])) {
-                $picsure->addMetadata('picsure-attempts', $result['Metadata']['attemps']);
+                $picsure->addMetadata('picsure-attempts', $result['Metadata']['attempts']);
             }
             if (isset($result['Metadata']['suspected-fraud'])) {
                 $picsure->addMetadata('picsure-suspected-fraud', $result['Metadata']['suspected-fraud']);
