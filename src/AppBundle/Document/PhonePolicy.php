@@ -153,6 +153,13 @@ class PhonePolicy extends Policy
      */
     protected $picsureLocations;
 
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
+    protected $picsureCircumvention;
+
     public function getPhone()
     {
         return $this->phone;
@@ -684,6 +691,16 @@ class PhonePolicy extends Policy
     public function addPicsureLocation(Coordinates $picsureLocation)
     {
         $this->picsureLocations[] = $picsureLocation;
+    }
+
+    public function getPicsureCircumvention()
+    {
+        return $this->picsureCircumvention;
+    }
+
+    public function setPicsureCircumvention($picsureCircumvention)
+    {
+        $this->picsureCircumvention = $picsureCircumvention;
     }
 
     public function isSameInsurable(Policy $policy)

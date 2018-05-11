@@ -1186,6 +1186,22 @@ class ApiAuthController extends BaseController
             $picsure->setKey($this->getDataString($data, 'key'));
             $policy->addPolicyFile($picsure);
             $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_MANUAL);
+            // for typo in the app: to be removed eventually
+            if (isset($result['Metadata']['attemps'])) {
+                $picsure->addMetadata('picsure-attempts', $result['Metadata']['attemps']);
+            }
+            if (isset($result['Metadata']['attempts'])) {
+                $picsure->addMetadata('picsure-attempts', $result['Metadata']['attemps']);
+            }
+            if (isset($result['Metadata']['suspected-fraud'])) {
+                $picsure->addMetadata('picsure-suspected-fraud', $result['Metadata']['suspected-fraud']);
+                if ($result['Metadata']['suspected-fraud'] === "1") {
+                    $policy->setPicsureCircumvention(true);
+                } else {
+                    $policy->setPicsureCircumvention(false);
+                }
+            }
+
             $dm->flush();
 
             $this->get('event_dispatcher')->dispatch(
