@@ -91,7 +91,7 @@ class DefaultController extends BaseController
         $picsure = $this->sixpack(
             $request,
             SixpackService::EXPERIMENT_PICSURE_SECTION,
-            ['homepage-no-picsure', 'homepage-picsure']
+            ['simple-picsure', 'picsure-redesign']
         );
 
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
