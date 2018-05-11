@@ -254,7 +254,46 @@
         </div>
     </div>
 
-    {% if user_modal_welcome is defined and user_modal_welcome == 'welcome-modal' %}
+    {% if user_modal_welcome is defined and user_modal_welcome == 'new-welcome-modal' %}
+        <div class="modal modal-new fade"
+             id="welcome-modal"
+             tabindex="-1"
+             role="dialog"
+             aria-labelledby="welcome-modal"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h3 class="h2 text-blue text-center">Welcome to the so-sure family</h3>
+                    </div>
+                    <div class="modal-body">
+                        <p class="lead text-center">You've just joined thousands of customers who trust so-sure with their phones.</p>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <img src="{{ cdn_url }}/images/homepage/pic-sure_steps_homepage_1.svg" class="img-center">
+                                <p>Your policy covers you immediatly for Loss, Theft, Accidental Damage, Out of Warranty Breakdown, Accessories and Global Travel.</p>
+                            </div>
+                            <div class="col-md-4">
+                                <img src="{{ cdn_url }}/images/homepage/pic-sure_steps_homepage_4.svg" class="img-center">
+                                <p>Plus our claims process is simple and hassle free. Once your claim is approved we provide you with a replacement phone the very next working day, or we can even do a speedy repair at your home of office.</p>
+                            </div>
+                            <div class="col-md-4">
+                                <img src="{{ cdn_url }}/images/homepage/pic-sure_steps_homepage_2.svg" class="img-center">
+                                <p>And, with our anti-fraud app you can reduce your excess to just &pound;50. Oh and did we mention you can get up to 80% of your money back too?</p>
+                            </div>
+                        </div>
+                        <div class="speech-bubble animated fadeInLeft clearfix"><mark>Reported a broken screen on a Sunday night via form. Monday morning received call. Tuesday morning received replacement phone. <br> What more can you ask for</mark> <br><small>Stephen Miller, London</small></div>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="#" class="btn btn-green btn-pad" data-dismiss="modal" aria-label="Close">Find out more</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
         <div class="modal modal-new fade"
              id="welcome-modal"
              tabindex="-1"
@@ -307,6 +346,7 @@
         </div>
     {% endif %}
     {# End Page Modals #}
+
 
     {% if environment == 'prod' %}
         <img src="https://pubads.g.doubleclick.net/activity;xsp=4375795;ord={{ random(999999999) }}?" width=1 height=1 border=0/>

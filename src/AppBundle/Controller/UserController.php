@@ -1077,8 +1077,8 @@ class UserController extends BaseController
 
         $exp = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_USER_WELCOME_MODAL,
-            ['no-modal', 'welcome-modal'],
+            SixpackService::EXPERIMENT_NEW_WELCOME_MODAL,
+            ['current-welcome-modal', 'new-welcome-modal'],
             SixpackService::LOG_MIXPANEL_CONVERSION,
             $user->getId()
         );

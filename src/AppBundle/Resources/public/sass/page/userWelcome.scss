@@ -226,3 +226,45 @@
         }
     }
 }
+
+.speech-bubble {
+    text-align: center;
+    position: relative;
+    font-size: 18px;
+    margin: 50px 0;
+    // @include border-radius(20px);
+
+    @include breakpoint(tablet) {
+        font-size: 24px;
+        margin: 30px;
+    }
+
+    &:before, &:after {
+        font-family: serif;
+        font-size: 80px;
+        color: $grey;
+        line-height: 0;
+        position: absolute;
+    }
+
+    &:before {
+        content: open-quote;
+        top: -5px; left: 50%;
+        margin-left: -20px;
+
+        @include breakpoint(tablet) {
+            top: 10px; left: -35px;
+            margin: 0;
+        }
+    }
+
+    &:after {
+        display: none;
+        content: close-quote;
+
+        @include breakpoint(tablet) {
+            display: block;
+            bottom: 10px; right: -35px;
+        }
+    }
+}
