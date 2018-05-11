@@ -256,20 +256,75 @@
         </div>
     </section>
 
-    {# What we don't cover #}
-    <section class="homepage--what-we-dont-cover">
-        <div class="container">
-            <h2 class="text-center h1">What We Don't Cover</h2>
-            <ol class="ol--blue-counter">
-                <li class="h4 h-light">Excess<br>
-                    • pic-sure validated <i class="fa fa-question-circle" title="pic-sure is our free app-based process to prove your phone is in good working condition and your screen is not cracked"></i>: £70 for Theft/Loss and £50 for Accidental Damage/Breakdown.<br>
-                    • otherwise: £150 for Theft/Loss/Accidental Damage/Breakdown
-                </li>
-                <li class="h4 h-light">Theft, Loss, Accidental Damage or Breakdown where you have knowingly put your phone at risk</li>
-                <li class="h4 h-light">3+ claims for Loss and/or Theft in any policy year</li>
-            </ol>
-        </div>
-    </section>
+    {% if picsure is defined and picsure == 'picsure-redesign' %}
+        {# pic-sure #}
+        <section class="homepage--pic-sure section--pad">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2">
+                        <h2 class="h1 h-nom">Our Anti-Fraud App</h2>
+                        <p class="lead">At so-sure we want the very best for honest customers. Our goal is to make the process of buying and claiming simpler, quicker and less stressful.</p>
+                        <p>By validating your phone with pic-sure technology, not only does your excess greatly reduce from our standard &pound;150 to just &pound;50 accidental damage/breakdown, &pound;70 for loss and theft, but should you need to make a claim it becomes easy and hassle-free.</p>
+
+                        <h3>Here’s How it Works</h3>
+                        <ol class="ol--blue-counter ol--blue-counter__line">
+                            <li class="h3 h-light clearfix">
+                                <img src="{{ cdn_url }}/images/homepage/pic-sure_steps_homepage_1.svg" alt="Get covered in less than 2 minutes through our app or website">
+                                <span>Get covered in less than 2 minutes through our app or website</span>
+                            </li>
+                            <li class="h3 h-light clearfix">
+                                <img src="{{ cdn_url }}/images/homepage/pic-sure_steps_homepage_2.svg" alt="Login and validate your phone with pic-sure in seconds">
+                                <span>Login and validate your phone with pic-sure in seconds</span>
+                            </li>
+                            <li class="h3 h-light clearfix">
+                                <img src="{{ cdn_url }}/images/homepage/pic-sure_steps_homepage_3.svg" alt="Hooray, your excess is reduced and we know you're honest :)">
+                                <span>Hooray, your excess is reduced and we know you're honest :)</span>
+                            </li>
+                        </ol>
+
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <img src="{{ cdn_url }}/images/homepage/iphone_x_so-sure_app.svg" alt="" width="150px;" class="img-center">
+                            </div>
+                            <div class="col-sm-9">
+                                <ul class="list-inline">
+                                    <li class="h3 h-light h-nom">Download our app <br> available for both iOS and Android users</li>
+                                    <br>
+                                    <li>
+                                        <a class="ga-outbound-click" data-clicklabel="iTunes" href="{{ apple_download('homepage-picsure') }}" target="_blank" rel="noopener">
+                                            <img src="{{ cdn_url }}/images/icons/app-store-original.svg" alt="Download so-sure on the App Store" /><span class="sr-only">so-sure app - Apple App Store</span>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="ga-outbound-click" data-clicklabel="PlayStore" href="{{ google_download('homepage-picsure') }}" target="_blank" rel="noopener">
+                                            <img src="{{ cdn_url }}/images/icons/google-play-original.svg" alt="Get so-sure on Google Play" /><span class="sr-only">so-sure app - Google Play</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% else %}
+        {# What we don't cover #}
+        <section class="homepage--what-we-dont-cover">
+            <div class="container">
+                <h2 class="text-center h1">What We Don't Cover</h2>
+                <ol class="ol--blue-counter">
+                    <li class="h4 h-light">Excess<br>
+                        • pic-sure validated <i class="fa fa-question-circle" title="pic-sure is our free app-based process to prove your phone is in good working condition and your screen is not cracked"></i>: £70 for Theft/Loss and £50 for Accidental Damage/Breakdown.<br>
+                        • otherwise: £150 for Theft/Loss/Accidental Damage/Breakdown
+                    </li>
+                    <li class="h4 h-light">Theft, Loss, Accidental Damage or Breakdown where you have knowingly put your phone at risk</li>
+                    <li class="h4 h-light">3+ claims for Loss and/or Theft in any policy year</li>
+                </ol>
+            </div>
+        </section>
+    {% endif %}
 
     <div class="curved-background curved-background__bg-blue hidden-xs">
         <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 2000 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
