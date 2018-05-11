@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Classes\SoSure;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\PolicyRepository;
@@ -302,6 +303,9 @@ class SalvaExportServiceTest extends WebTestCase
 
     public function testPaymentsCashback()
     {
+        $ago = new \DateTime();
+        $ago = $ago->sub(new \DateInterval('P1D'));
+
         $user = static::createUser(
             static::$userManager,
             static::generateEmail('testPaymentsCashback', $this),
@@ -319,12 +323,14 @@ class SalvaExportServiceTest extends WebTestCase
 
         $policy->setStatus(Policy::STATUS_PENDING);
         static::$policyService->setEnvironment('prod');
-        static::$policyService->create($policy, new \DateTime(), true);
+        static::$policyService->create($policy, $ago, true);
         static::$policyService->setEnvironment('test');
         static::$dm->flush();
 
         $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
 
+        // build server delay
+        sleep(1);
         
         $now = new \DateTime();
         $now = $now->sub(new \DateInterval('PT1S'));
@@ -343,11 +349,13 @@ class SalvaExportServiceTest extends WebTestCase
         $this->assertEquals(2, count($lines));
         $this->assertEquals(
             sprintf('"%0.2f"', $policy->getPremiumInstallmentPrice()),
-            explode(',', $lines[0])[2]
+            explode(',', $lines[0])[2],
+            json_encode($lines)
         );
         $this->assertEquals(
             sprintf('"%0.2f"', 0 - $policy->getPremiumInstallmentPrice()),
-            explode(',', $lines[1])[2]
+            explode(',', $lines[1])[2],
+            json_encode($lines)
         );
     }
 
@@ -486,6 +494,66 @@ class SalvaExportServiceTest extends WebTestCase
         $this->validatePolicyPayments($data, $updatedPolicy, 1);
         $this->validateFullYearPolicyAmounts($data, $updatedPolicy);
         $this->validateStaticPolicyData($data, $updatedPolicy);
+    }
+
+    public function testExportPaymentMonthEdge()
+    {
+        $date = new \DateTime('2018-04-01 00:00', new \DateTimeZone(SoSure::TIMEZONE));
+        $policy = $this->createPolicy('testExportPaymentMonthEdge', $date);
+        //print $date->format(\DateTime::ATOM) . PHP_EOL;
+
+        $oneMonthBefore = clone $date;
+        $oneMonthBefore = $oneMonthBefore->sub(new \DateInterval('P1M'));
+        //print $oneMonthBefore->format(\DateTime::ATOM) . PHP_EOL;
+
+        $oneMonth = clone $date;
+        $oneMonth = $oneMonth->add(new \DateInterval('P1M'));
+        //print $oneMonth->format(\DateTime::ATOM) . PHP_EOL;
+        $payment = self::addPayment(
+            $policy,
+            $policy->getPremium($oneMonth)->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            $oneMonth
+        );
+
+        $twoMonths = clone $date;
+        $twoMonths = $twoMonths->add(new \DateInterval('P2M'));
+        //print $twoMonths->format(\DateTime::ATOM) . PHP_EOL;
+        $payment = self::addPayment(
+            $policy,
+            $policy->getPremium($twoMonths)->getMonthlyPremiumPrice(),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            null,
+            $twoMonths
+        );
+        static::$dm->flush();
+
+        /** @var Policy $updatedPolicy */
+        $updatedPolicy = static::$policyRepo->find($policy->getId());
+
+        $dm = self::$container->get('doctrine_mongodb.odm.default_document_manager');
+        static::$salva->setDm($dm);
+
+        $lines = $this->exportPayments($updatedPolicy->getPolicyNumber(), $oneMonthBefore);
+        // Historical logic - 1/4 appears in March
+        $this->assertEquals(1, count($lines));
+        //print_r($lines);
+
+        $lines = $this->exportPayments($updatedPolicy->getPolicyNumber(), $date);
+        // Historical logic - nothing for april as appears in march
+        //$this->assertEquals(0, count($lines));
+        //print_r($lines);
+
+        $lines = $this->exportPayments($updatedPolicy->getPolicyNumber(), $oneMonth);
+        // New logic - dates are correct
+        $this->assertEquals(1, count($lines));
+        //print_r($lines);
+
+        $lines = $this->exportPayments($updatedPolicy->getPolicyNumber(), $twoMonths);
+        // New logic - dates are correct
+        $this->assertEquals(1, count($lines));
+        //print_r($lines);
     }
 
     public function testQuoteExportPolicies()

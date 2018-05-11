@@ -15,6 +15,7 @@ use AppBundle\Validator\Constraints\AlphanumericSpaceDotValidator;
 class Claim
 {
     use CurrencyTrait;
+    use ImeiTrait;
 
     const TYPE_LOSS = 'loss';
     const TYPE_THEFT = 'theft';
@@ -1092,6 +1093,7 @@ class Claim
             'replacementPhoneDetails' => $this->getReplacementPhoneDetails(),
             'replacementPhoneId' => $this->getReplacementPhone() ? $this->getReplacementPhone()->getId() : null,
             'replacementImei' => $this->getReplacementImei(),
+            'validReplacementImei' => $this->isImei($this->getReplacementImei()),
             'recordedDate' => $this->getRecordedDate() ? $this->getRecordedDate()->format(\DateTime::ATOM) : null,
             'approvedDate' => $this->getApprovedDate() ? $this->getApprovedDate()->format(\DateTime::ATOM) : null,
             'lossDate' => $this->getLossDate() ? $this->getLossDate()->format(\DateTime::ATOM) : null,

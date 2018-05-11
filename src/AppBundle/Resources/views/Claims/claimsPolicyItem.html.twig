@@ -159,7 +159,14 @@
                             policy.payerOrUser.paymentMethod.getType == "bacs" %}
                             <tr>
                                 <td>Bacs</td>
-                                <td class="">{{ policy.payerOrUser.paymentMethod }}</td>
+                                <td class="">
+                                    {% if policy.payerOrUser.paymentMethod.bankAccount.isMandateInvalid %}
+                                        <s>{{ policy.payerOrUser.paymentMethod }}</s>
+                                    {% else %}
+                                        {{ policy.payerOrUser.paymentMethod }}
+                                    {% endif %}
+                                    (Mandate: {{ policy.payerOrUser.paymentMethod.bankAccount.mandateStatus }})
+                                </td>
                             </tr>
                         {% endif %}
                         {% if policy.payerOrUser.id != policy.user.id %}

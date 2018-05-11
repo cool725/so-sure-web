@@ -39,6 +39,7 @@
     list-style: none;
     padding-bottom: 30px;
     padding-left: 60px;
+    position: relative;
 
     li {
         counter-increment: item;
@@ -59,6 +60,25 @@
 
             background-color: $primary-blue;
             @include border-radius(100%);
+        }
+    }
+}
+
+.ol--blue-counter__line {
+    margin-bottom: 50px;
+
+    &:before {
+        width: 5px; height: calc(100% - 100px);
+        content: '';
+        display: block;
+        position: absolute;
+        left: 22px; top: 30px;
+        background: $off-white;
+    }
+
+    li {
+        &:before {
+            top: 30px;
         }
     }
 }
@@ -520,67 +540,99 @@
     }
 
     &--pic-sure {
-        background-color: $lightest-blue;
 
-        p {
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-        }
+        ol {
+            li {
 
-        .p-arrow {
-            position: relative;
+                span {
+                    display: block;
+                }
 
-            @include breakpoint(laptop) {
-                &:after {
-                    width: 100px; height: 120px;
-                    content: '';
-                    background: transparent url('#{$cdn_url}/images/homepage/pic-sure_p_arrow.svg') no-repeat;
-                    position: absolute;
-                    top: 100%; right: -20px;
+                @include breakpoint(laptop) {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+
+                    span {
+                        display: inline;
+                    }
                 }
             }
         }
 
-        table { //TODO - Move to tables scss
-            max-width: 600px;
-            margin: 30px auto 0;
 
-            @include breakpoint(laptop) {
-                margin-bottom: 30px;
-            }
+        // ol {
+        //     li {
+        //         img {
+        //             display:block;
 
-            thead {
-                td {
-                    padding: 30px 15px;
-                    text-align: center;
-                    vertical-align: middle;
-                }
-            }
+        //             @include breakpoint(tablet) {
+        //                 float: left;
+        //             }
+        //         }
+        //     }
+        // }
+        // background-color: $lightest-blue;
 
-            tr {
-                td.sosure {
-                    background-color: $white;
-                }
+        // p {
+        //     max-width: 800px;
+        //     margin-left: auto;
+        //     margin-right: auto;
+        // }
 
-                td.contrast {
-                    background-color: lighten($lightest-blue, 6%);
-                    opacity: 0.7;
-                }
-            }
+        // .p-arrow {
+        //     position: relative;
 
-            tbody {
-                td {
-                    padding: 15px;
-                    border-color: darken($lightest-blue, 6%);
-                    vertical-align: middle;
-                }
-            }
-        }
+        //     @include breakpoint(laptop) {
+        //         &:after {
+        //             width: 100px; height: 120px;
+        //             content: '';
+        //             background: transparent url('#{$cdn_url}/images/homepage/pic-sure_p_arrow.svg') no-repeat;
+        //             position: absolute;
+        //             top: 100%; right: -20px;
+        //         }
+        //     }
+        // }
 
-        .app-link {
-            margin-top: 40px;
-        }
+        // table { //TODO - Move to tables scss
+        //     max-width: 600px;
+        //     margin: 30px auto 0;
+
+        //     @include breakpoint(laptop) {
+        //         margin-bottom: 30px;
+        //     }
+
+        //     thead {
+        //         td {
+        //             padding: 30px 15px;
+        //             text-align: center;
+        //             vertical-align: middle;
+        //         }
+        //     }
+
+        //     tr {
+        //         td.sosure {
+        //             background-color: $white;
+        //         }
+
+        //         td.contrast {
+        //             background-color: lighten($lightest-blue, 6%);
+        //             opacity: 0.7;
+        //         }
+        //     }
+
+        //     tbody {
+        //         td {
+        //             padding: 15px;
+        //             border-color: darken($lightest-blue, 6%);
+        //             vertical-align: middle;
+        //         }
+        //     }
+        // }
+
+        // .app-link {
+        //     margin-top: 40px;
+        // }
     }
 
 

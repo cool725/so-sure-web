@@ -20,6 +20,7 @@ use AppBundle\Repository\File\S3FileRepository;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\LloydsService;
+use AppBundle\Service\ReportingService;
 use AppBundle\Service\SequenceService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -462,6 +463,7 @@ class AdminController extends BaseController
         $snappyPdf = $this->get('knp_snappy.pdf');
         $snappyPdf->setOption('orientation', 'Portrait');
         $snappyPdf->setOption('page-size', 'A4');
+        /** @var ReportingService $reportingService */
         $reportingService = $this->get('app.reporting');
         $html = $templating->render('AppBundle:Pdf:adminAccounts.html.twig', [
             'year' => $year,
