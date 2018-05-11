@@ -85,7 +85,6 @@ class SixpackService
         self::EXPERIMENT_72_REPLACEMENT,
         self::EXPERIMENT_MONEY_LANDING,
         self::EXPERIMENT_PICSURE_SECTION,
-        self::EXPERIMENT_NEW_WELCOME_MODAL,
     ];
 
     public static $authExperiments = [
@@ -126,7 +125,6 @@ class SixpackService
         self::EXPERIMENT_HOMEPAGE_AA_V2,
         self::EXPERIMENT_DEFACTO,
         self::EXPERIMENT_DOB,
-        self::EXPERIMENT_NEW_WELCOME_MODAL,
     ];
 
     /** @var LoggerInterface */
