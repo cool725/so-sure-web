@@ -608,6 +608,11 @@ abstract class Payment
         arsort($months);
         reset($months);
 
-        return $data[key($months)];
+        $key = key($months);
+        if (isset($data[$key])) {
+            return $data[$key];
+        } else {
+            return null;
+        }
     }
 }

@@ -39,7 +39,7 @@ class BarclaysServiceTest extends WebTestCase
     {
     }
 
-    public function testProcessCsv()
+    public function testBarclaysProcessCsv()
     {
         $payment = new JudoPayment();
         $payment->setAmount(8.64);

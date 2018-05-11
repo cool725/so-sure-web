@@ -43,6 +43,14 @@ class DateTraitTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testEndOfMonthDec()
+    {
+        $this->assertEquals(
+            new \DateTime('2017-01-01 00:00'),
+            $this->endOfMonth(new \DateTime('2016-12-12 15:00'))
+        );
+    }
+
     public function testStartOfDay()
     {
         $this->assertEquals(

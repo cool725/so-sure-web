@@ -2,6 +2,7 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Classes\SoSure;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
@@ -163,9 +164,14 @@ class JudoPaymentMethod extends PaymentMethod
             return null;
         }
 
-        $date = new \DateTime(sprintf('%s-%s-01', mb_substr($end, 2, 2), mb_substr($end, 0, 2)));
+        $date = new \DateTime(
+            sprintf('20%s-%s-01', mb_substr($end, 2, 2), mb_substr($end, 0, 2)),
+            new \DateTimeZone(SoSure::TIMEZONE)
+        );
 
-        return $this->endOfMonth($date);
+        $date = $this->endOfMonth($date);
+
+        return $date;
     }
 
     public function isValid()
@@ -184,7 +190,7 @@ class JudoPaymentMethod extends PaymentMethod
             return true;
         }
 
-        return $date > $end;
+        return $date >= $end;
     }
 
     public function __toString()

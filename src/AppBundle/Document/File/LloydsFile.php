@@ -42,6 +42,24 @@ class LloydsFile extends UploadFile
     protected $dailyBacs = array();
 
     /**
+     * @MongoDB\Field(type="float")
+     * @Gedmo\Versioned
+     */
+    protected $soSurePayment;
+
+    /**
+     * @MongoDB\Field(type="float")
+     * @Gedmo\Versioned
+     */
+    protected $aflPayment;
+
+    /**
+     * @MongoDB\Field(type="float")
+     * @Gedmo\Versioned
+     */
+    protected $salvaPayment;
+
+    /**
      * @return string
      */
     public function getS3FileName()
@@ -84,6 +102,36 @@ class LloydsFile extends UploadFile
     public function setDailyBacs($dailyBacs)
     {
         $this->dailyBacs = $dailyBacs;
+    }
+
+    public function getSoSurePayment()
+    {
+        return $this->soSurePayment;
+    }
+
+    public function setSoSurePayment($soSurePayment)
+    {
+        $this->soSurePayment = $soSurePayment;
+    }
+
+    public function getAflPayment()
+    {
+        return $this->aflPayment;
+    }
+
+    public function setAflPayment($aflPayment)
+    {
+        $this->aflPayment = $aflPayment;
+    }
+
+    public function getSalvaPayment()
+    {
+        return $this->salvaPayment;
+    }
+
+    public function setSalvaPayment($salvaPayment)
+    {
+        $this->salvaPayment = $salvaPayment;
     }
 
     public static function combineDailyReceived($lloydsFiles)

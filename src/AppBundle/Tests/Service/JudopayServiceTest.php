@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Service;
 
+use AppBundle\Classes\SoSure;
 use AppBundle\Repository\ScheduledPaymentRepository;
 use AppBundle\Service\FeatureService;
 use AppBundle\Service\JudopayService;
@@ -1301,6 +1302,11 @@ class JudopayServiceTest extends WebTestCase
         // @codingStandardsIgnoreEnd
 
         $this->assertEquals(PhonePolicy::STATUS_ACTIVE, $policy->getStatus());
+
+        $this->assertEquals(
+            new \DateTime('2021-01-01 00:00:00', new \DateTimeZone(SoSure::TIMEZONE)),
+            $policy->getUser()->getPaymentMethod()->getCardEndDateAsDate()
+        );
         $this->assertFalse(self::$judopay->cardExpiringEmail($policy));
         $this->assertTrue(self::$judopay->cardExpiringEmail($policy, new \DateTime('2020-12-15')));
     }

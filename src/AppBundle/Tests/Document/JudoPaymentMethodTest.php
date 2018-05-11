@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Document;
 
+use AppBundle\Classes\SoSure;
 use AppBundle\Document\JudoPaymentMethod;
 
 /**
@@ -50,5 +51,29 @@ class JudoPaymentMethodTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals("7954", $judoPaymentMethod->getCardLastFour());
         $this->assertEquals("0518", $judoPaymentMethod->getCardEndDate());
         $this->assertEquals("Visa Debit", $judoPaymentMethod->getCardType());
+    }
+
+    public function testIsCardExpiredPreApr18()
+    {
+        $judoPaymentMethod = new JudoPaymentMethod();
+        $judoPaymentMethod->addCardToken('a', "{\"cardLastfour\":\"7954\",\"endDate\":\"0118\",\"cardType\":11}");
+        $this->assertEquals(
+            new \DateTime('2018-02-01 00:00:00'),
+            $judoPaymentMethod->getCardEndDateAsDate()
+        );
+        $this->assertFalse($judoPaymentMethod->isCardExpired(new \DateTime('2018-01-31 00:00:00')));
+        $this->assertTrue($judoPaymentMethod->isCardExpired(new \DateTime('2018-02-01 00:00:00')));
+    }
+
+    public function testIsCardExpiredPostApr18()
+    {
+        $judoPaymentMethod = new JudoPaymentMethod();
+        $judoPaymentMethod->addCardToken('a', "{\"cardLastfour\":\"7954\",\"endDate\":\"0518\",\"cardType\":11}");
+        $this->assertEquals(
+            new \DateTime('2018-06-01 00:00:00', new \DateTimeZone(SoSure::TIMEZONE)),
+            $judoPaymentMethod->getCardEndDateAsDate()
+        );
+        $this->assertFalse($judoPaymentMethod->isCardExpired(new \DateTime('2018-05-30 00:00:00')));
+        $this->assertTrue($judoPaymentMethod->isCardExpired(new \DateTime('2018-06-01 00:00:00')));
     }
 }
