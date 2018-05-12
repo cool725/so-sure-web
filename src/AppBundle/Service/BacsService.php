@@ -439,10 +439,11 @@ class BacsService
 
         $submittedPayments = $paymentRepo->findBy(['status' => BacsPayment::STATUS_SUBMITTED]);
 
-        $elementList = $xpath->query('//BACSDocument/Data/ARUDD/Advice/OriginatingAccountRecords/OriginatingAccountRecord/ReturnedDebitItem');
+        $elementList = $xpath->query(
+            '//BACSDocument/Data/ARUDD/Advice/OriginatingAccountRecords/OriginatingAccountRecord/ReturnedDebitItem'
+        );
         /** @var \DOMElement $element */
         foreach ($elementList as $element) {
-
             $results['records']++;
             $returnCode = $this->getReturnCode($element);
             $reference = $this->getReference($element, 'ref');
@@ -477,7 +478,10 @@ class BacsService
             }
 
             if ($foundPayments == 0) {
-                $this->logger->error(sprintf('Failed to find any pending(submitted) payments for user %s', $user->getId()));
+                $this->logger->error(sprintf(
+                    'Failed to find any pending(submitted) payments for user %s',
+                    $user->getId()
+                ));
             } elseif ($foundPayments > 1) {
                 $this->logger->error(sprintf('Failed %d payments for user %s', $foundPayments, $user->getId()));
             }
