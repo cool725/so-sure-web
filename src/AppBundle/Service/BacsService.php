@@ -116,6 +116,9 @@ class BacsService
     /** @var string */
     protected $accessPayKeyFile;
 
+    /** @var MailerService */
+    protected $mailer;
+
     /**
      * @param DocumentManager   $dm
      * @param LoggerInterface   $logger
@@ -129,6 +132,7 @@ class BacsService
      * @param EngineInterface   $templating
      * @param SequenceService   $sequenceService
      * @param array             $accessPay
+     * @param MailerService     $mailer
      */
     public function __construct(
         DocumentManager $dm,
@@ -142,7 +146,8 @@ class BacsService
         LoggableGenerator $snappyPdf,
         EngineInterface $templating,
         SequenceService $sequenceService,
-        array $accessPay
+        array $accessPay,
+        MailerService $mailer
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -159,6 +164,7 @@ class BacsService
         $this->accessPayUsername = $accessPay[1];
         $this->accessPayPassword = $accessPay[2];
         $this->accessPayKeyFile = $accessPay[3];
+        $this->mailer = $mailer;
     }
 
     /**
@@ -457,7 +463,7 @@ class BacsService
                     $foundPayments++;
                     $submittedPayment->setStatus(BacsPayment::STATUS_FAILURE);
                     $results['failed-payments']++;
-                    $days = $submittedPayment->getSubmittedDate()->diff($originalProcessingDate);
+                    $days = $submittedPayment->getDate()->diff($originalProcessingDate);
                     $results['details'][$reference] = [$submittedPayment->getId() => $days->days];
                     if ($days->days > 5) {
                         $this->logger->warning(sprintf(
@@ -475,9 +481,36 @@ class BacsService
             } elseif ($foundPayments > 1) {
                 $this->logger->error(sprintf('Failed %d payments for user %s', $foundPayments, $user->getId()));
             }
+
+            if ($foundPayments > 0) {
+                // TODO: move mandate from user to policy
+                $policy = $user->getLatestPolicy();
+                $this->failedPaymentEmail($policy);
+            }
         }
 
         return $results;
+    }
+
+    /**
+     * @param Policy $policy
+     */
+    private function failedPaymentEmail(Policy $policy)
+    {
+        $subject = sprintf('Payment failure for your so-sure policy %s', $policy->getPolicyNumber());
+        $baseTemplate = sprintf('AppBundle:Email:bacs/failedPayment');
+
+        $htmlTemplate = sprintf("%s.html.twig", $baseTemplate);
+        $textTemplate = sprintf("%s.txt.twig", $baseTemplate);
+
+        $this->mailer->sendTemplate(
+            $subject,
+            $policy->getUser()->getEmail(),
+            $htmlTemplate,
+            ['policy' => $policy],
+            $textTemplate,
+            ['policy' => $policy]
+        );
     }
 
     private function notifyMandateCancelled(User $user)

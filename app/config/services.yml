@@ -154,6 +154,7 @@ services:
             - "@templating"
             - "@app.sequence"
             - ["%accesspay_server%", "%accesspay_username%", "%accesspay_password%", "%accesspay_keyfile%"]
+            - "@app.mailer"
 
     app.push:
         class: AppBundle\Service\PushService
