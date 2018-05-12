@@ -26,15 +26,6 @@
     <div class="row">
         <div class="col-md-5">
             <h1>so-sure Bacs for {{ month }} / {{ year }}</h1>
-            <br>
-            <form>
-            <h4>Current File: {{ currentSequence.seq }}
-                <button class="btn btn-success bacs-serial-edit" type="button"
-                        data-toggle="modal" data-target="#editSequenceSerialNumberModal">
-                    <i class="fa fa-edit"></i>
-                </button>
-            </h4>
-            </form>
         </div>
         <form class="month-form form-inline" method="POST" autocomplete="off">
             <div class="col-md-3">
@@ -60,19 +51,42 @@
                     </div>
                 </div>
                 <div class="form-group" style="padding-top: 15px;">
+                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#mandatesModal"
+                    > Approve Mandates <span class="badge" title="Actionable Mandates">{{ outstandingMandates }}</span></button>
+                </div>
+                <div class="form-group" style="padding-top: 15px;">
                     <div class="btn-group">
                         <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#uploadSubmissionModal"
                         > Upload Bacs File</button>
                     </div>
                 </div>
+                <div class="form-group" style="padding-top: 15px;">
+                    <button class="btn btn-success bacs-serial-edit" type="button"
+                            data-toggle="modal" data-target="#editSequenceSerialNumberModal">
+                        <span title="Current Sequence File">{{ currentSequence.seq }}</span> <i class="fa fa-edit"></i>
+                    </button>
+                </div>
             </div>
         </form>
     </div>
-    <div id="claimPolicyItem">
+    <div id="claimPolicyItem" style="margin-top: 20px">
         <ul class="nav nav-tabs nav-justified">
-            <li role="presentation" class="active"><a href="#dddc">Debits/Credits</a></li>
+            {% set dailyCount = 0 %}
+            {% for file in files %}
+                {% if not file.isActioned %}
+                    {% set dailyCount = dailyCount + 1 %}
+                {% endif %}
+            {% endfor %}
+            {% set paymentsCount = 0 %}
+            {% for payment in payments %}
+                {% if payment.canAction %}
+                    {% set paymentsCount = paymentsCount + 1 %}
+                {% endif %}
+            {% endfor %}
+
+            <li role="presentation" class="active"><a href="#dddc">Debits/Credits <span class="badge" title="Actionable Files">{{ dailyCount }}</span></a></li>
+            <li role="presentation"><a href="#payments">Payments <span class="badge" title="Actionable Payments">{{ paymentsCount }}</span></a></li>
             <li role="presentation"><a href="#reports">Bacs Reports</a></li>
-            <li role="presentation"><a href="#payments">Payments</a></li>
         </ul>
         <div class="tab-content">
             <div role="tabpanel" class="tab-pane active" id="dddc">
@@ -151,16 +165,7 @@
                         {% endfor %}
                     </table>
                 {% endif %}
-                <div class="row" style="margin-top: 40px;">
-                    <div class="col-md-8">
-                        <h2>Auddis <span class="small">(Direct debit setups)</span></h2>
-                    </div>
-                    <div class="col-md-4">
-
-                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#mandatesModal"
-                        > Approve Mandates</button>
-                    </div>
-                </div>
+                <h2>Auddis <span class="small">(Direct debit setups)</span></h2>
                 {% if auddis|length == 0 %}
                     <p>No files present</p>
                 {% else %}
@@ -192,6 +197,28 @@
                             <th width="50%">Details</th>
                         </tr>
                         {% for file in addacs %}
+                            <tr>
+                                <td width="50%">
+                                    {{ file.key }}
+                                    <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank"><i class="fa fa-download"></i></a>
+                                </td>
+                                <td width="50%">
+                                    {{ file.metadata|json_encode }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                {% endif %}
+                <h2>Arudd <span class="small">(Direct debit failures)</span></h2>
+                {% if arudds|length == 0 %}
+                    <p>No files present</p>
+                {% else %}
+                    <table class="table table-striped">
+                        <tr>
+                            <th width="50%">File name</th>
+                            <th width="50%">Details</th>
+                        </tr>
+                        {% for file in arudds %}
                             <tr>
                                 <td width="50%">
                                     {{ file.key }}
