@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Service\JudopayService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -919,6 +920,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         'Payment Plan has been swapped. For now, please manually adjust final scheduled payment to current date.'
                     );
                     // @codingStandardsIgnoreEnd
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
             } elseif ($request->request->has('pay_policy_form')) {
                 $payPolicyForm->handleRequest($request);
@@ -933,6 +936,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         throw new \Exception('1 or 12 payments only');
                     }
 
+                    /** @var JudopayService $judopay */
                     $judopay = $this->get('app.judopay');
                     $details = $judopay->runTokenPayment(
                         $policy->getUser(),
@@ -951,8 +955,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                     );
                     $this->addFlash(
                         'success',
-                        'Policy is paid for'
+                        'Policy is now paid for. Pdf generation may take a few minutes. Refresh the page to verify.'
                     );
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
             }
         }
