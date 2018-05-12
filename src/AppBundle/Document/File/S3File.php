@@ -30,6 +30,7 @@ use AppBundle\Validator\Constraints as AppAssert;
  *      "accesspay"="AccessPayFile",
  *      "bacsReportAddacs"="BacsReportAddacsFile",
  *      "bacsReportAuddis"="BacsReportAuddisFile",
+ *      "bacsReportArudd"="BacsReportAruddFile",
  *      "bacsReportInput"="BacsReportInputFile",
  *      "ddNotification"="DirectDebitNotificationFile"
  * })

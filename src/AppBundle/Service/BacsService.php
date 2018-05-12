@@ -6,6 +6,7 @@ use AppBundle\Document\BankAccount;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Document\File\BacsReportAddacsFile;
+use AppBundle\Document\File\BacsReportAruddFile;
 use AppBundle\Document\File\BacsReportAuddisFile;
 use AppBundle\Document\File\BacsReportInputFile;
 use AppBundle\Document\File\DirectDebitNotificationFile;
@@ -67,6 +68,8 @@ class BacsService
     const AUDDIS_REASON_DD_NOT_ALLOWED = 'G';
     const AUDDIS_REASON_EXPIRED = 'H';
     const AUDDIS_REASON_DUPLICATE_REFERENCE = 'I';
+
+    const ARUDD_RETURN_CODE_PAYER = '0128';
 
     /** @var LoggerInterface */
     protected $logger;
@@ -203,6 +206,9 @@ class BacsService
         } elseif (mb_stripos($file->getClientOriginalName(), "INPUT") !== false) {
             $metadata = $this->input($tmpFile);
             $uploadFile = new BacsReportInputFile();
+        } elseif (mb_stripos($file->getClientOriginalName(), "ARUDD") !== false) {
+            $metadata = $this->arudd($tmpFile);
+            $uploadFile = new BacsReportAruddFile();
         } else {
             $this->logger->error(sprintf('Unknown bacs report file %s', $file->getClientOriginalName()));
 
@@ -403,6 +409,77 @@ class BacsService
         return $results;
     }
 
+    public function arudd($file)
+    {
+        $results = [
+            'records' => 0,
+            'success' => true,
+            'failed-payments' => 0,
+            'details' => [],
+        ];
+
+        /** @var UserRepository $repo */
+        $repo = $this->dm->getRepository(User::class);
+
+        /** @var BacsPayment $paymentRepo */
+        $paymentRepo = $this->dm->getRepository(BacsPayment::class);
+
+        $xml = file_get_contents($file);
+        $dom = new DOMDocument();
+        $dom->loadXML($xml, LIBXML_NOBLANKS);
+        $xpath = new DOMXPath($dom);
+
+        $this->validateServiceLicenseInformation($xpath);
+
+        $submittedPayments = $paymentRepo->findBy(['status' => BacsPayment::STATUS_SUBMITTED]);
+
+        $elementList = $xpath->query('//BACSDocument/Data/ARUDD/Advice/OriginatingAccountRecords/OriginatingAccountRecord/ReturnedDebitItem');
+        /** @var \DOMElement $element */
+        foreach ($elementList as $element) {
+
+            $results['records']++;
+            $returnCode = $this->getReturnCode($element);
+            $reference = $this->getReference($element, 'ref');
+            $originalProcessingDate = $this->getOriginalProcessingDate($element);
+            /** @var User $user */
+            $user = $repo->findOneBy(['paymentMethod.bankAccount.reference' => $reference]);
+            if (!$user) {
+                $results['success'] = false;
+                $this->logger->error(sprintf('Unable to locate bacs reference %s', $reference));
+
+                continue;
+            }
+
+            $foundPayments = 0;
+            foreach ($submittedPayments as $submittedPayment) {
+                /** @var BacsPayment $submittedPayment */
+                if ($submittedPayment->getPolicy()->getUser()->getId() == $user->getId()) {
+                    $foundPayments++;
+                    $submittedPayment->setStatus(BacsPayment::STATUS_FAILURE);
+                    $results['failed-payments']++;
+                    $days = $submittedPayment->getSubmittedDate()->diff($originalProcessingDate);
+                    $results['details'][$reference] = [$submittedPayment->getId() => $days->days];
+                    if ($days->days > 5) {
+                        $this->logger->warning(sprintf(
+                            'Failed Payment %s for user %s was %d days off from processing date',
+                            $submittedPayment->getId(),
+                            $user->getId(),
+                            $days->days
+                        ));
+                    }
+                }
+            }
+
+            if ($foundPayments == 0) {
+                $this->logger->error(sprintf('Failed to find any pending(submitted) payments for user %s', $user->getId()));
+            } elseif ($foundPayments > 1) {
+                $this->logger->error(sprintf('Failed %d payments for user %s', $foundPayments, $user->getId()));
+            }
+        }
+
+        return $results;
+    }
+
     private function notifyMandateCancelled(User $user)
     {
         $baseTemplate = 'AppBundle:Email:bacs/mandateCancelled';
@@ -449,6 +526,15 @@ class BacsService
         }
     }
 
+    private function validateServiceLicenseInformation($xpath)
+    {
+        $elementList = $xpath->query('//BACSDocument/Data/ARUDD/ServiceLicenseInformation');
+        /** @var \DOMElement $element */
+        foreach ($elementList as $element) {
+            $this->validateSun($element, 'userNumber');
+        }
+    }
+
     private function validateSun(\DOMElement $element, $userNumberAttribute = 'user-number')
     {
         $sun = $element->attributes->getNamedItem($userNumberAttribute)->nodeValue;
@@ -462,14 +548,28 @@ class BacsService
         return $element->attributes->getNamedItem('record-type')->nodeValue;
     }
 
-    private function getReference(\DOMElement $element)
+    private function getReference(\DOMElement $element, $referenceName = 'reference')
     {
-        return $element->attributes->getNamedItem('reference')->nodeValue;
+        return trim($element->attributes->getNamedItem($referenceName)->nodeValue);
     }
 
     private function getReason(\DOMElement $element)
     {
         return $element->attributes->getNamedItem('reason-code')->nodeValue;
+    }
+
+    private function getReturnCode(\DOMElement $element)
+    {
+        return $element->attributes->getNamedItem('returnCode')->nodeValue;
+    }
+
+    private function getOriginalProcessingDate(\DOMElement $element)
+    {
+        $originalProcessingDate = $element->attributes->getNamedItem('originalProcessingDate')->nodeValue;
+
+        $originalProcessingDate = \DateTime::createFromFormat('Y-m-d', $originalProcessingDate);
+
+        return $originalProcessingDate;
     }
 
     private function validateRecordType(\DOMElement $element, $expectedRecordType)
