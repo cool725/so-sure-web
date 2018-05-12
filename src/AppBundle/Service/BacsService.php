@@ -17,6 +17,7 @@ use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Policy;
 use AppBundle\Document\ScheduledPayment;
 use AppBundle\Document\User;
+use AppBundle\Repository\BacsPaymentRepository;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\UserRepository;
 use Aws\S3\S3Client;
@@ -427,7 +428,7 @@ class BacsService
         /** @var UserRepository $repo */
         $repo = $this->dm->getRepository(User::class);
 
-        /** @var BacsPayment $paymentRepo */
+        /** @var BacsPaymentRepository $paymentRepo */
         $paymentRepo = $this->dm->getRepository(BacsPayment::class);
 
         $xml = file_get_contents($file);
