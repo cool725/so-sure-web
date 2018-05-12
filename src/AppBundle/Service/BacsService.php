@@ -490,7 +490,14 @@ class BacsService
             if ($foundPayments > 0) {
                 // TODO: move mandate from user to policy
                 $policy = $user->getLatestPolicy();
-                $this->failedPaymentEmail($policy);
+                if ($policy) {
+                    $this->failedPaymentEmail($policy);
+                } else {
+                    $this->logger->warning(sprintf(
+                        'User %s does not have a latest policy (cancelled?). Skipping failed payment email',
+                        $user->getId()
+                    ));
+                }
             }
         }
 
