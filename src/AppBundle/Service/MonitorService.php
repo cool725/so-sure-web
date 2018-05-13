@@ -354,7 +354,7 @@ class MonitorService
     public function checkMixpanelQueue()
     {
         $count = $this->mixpanel->countQueue();
-        if ($count > 50) {
+        if ($count > 150) {
             throw new MonitorException(sprintf('There are %d outstanding messages in the queue', $count));
         }
     }
