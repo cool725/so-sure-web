@@ -67,6 +67,7 @@ class ClaimTypeTest extends FormTypeTest
         $view = $form->createView();
         $children = $view->children;
         $foundDamage = false;
+        $foundLoss = false;
         foreach ($children as $key => $value) {
             if ($key == 'type') {
                 foreach ($value->vars['choices'] as $item) {
@@ -103,6 +104,7 @@ class ClaimTypeTest extends FormTypeTest
         $view = $form->createView();
         $children = $view->children;
         $foundDamage = false;
+        $foundLoss = false;
         foreach ($children as $key => $value) {
             if ($key == 'type') {
                 foreach ($value->vars['choices'] as $item) {

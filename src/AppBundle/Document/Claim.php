@@ -1136,8 +1136,10 @@ class Claim
         ])) {
             return 0;
         }
-        $picSureEnabled = $this->getPolicy()->isPicSurePolicy();
-        $picSureValidated = $this->getPolicy()->isPicSureValidated();
+        /** @var PhonePolicy $phonePolicy */
+        $phonePolicy = $this->getPolicy();
+        $picSureEnabled = $phonePolicy->isPicSurePolicy();
+        $picSureValidated = $phonePolicy->isPicSureValidated();
 
         return self::getExcessValue($this->getType(), $picSureValidated, $picSureEnabled);
     }
