@@ -64,7 +64,8 @@ class ClaimType extends AbstractType
             $choices = array_merge($choices, [
                 $this->getClaimTypeCopy(Claim::TYPE_DAMAGE, $validated, $picSureEnabled) => Claim::TYPE_DAMAGE,
                 $this->getClaimTypeCopy(Claim::TYPE_WARRANTY, $validated, $picSureEnabled) => Claim::TYPE_WARRANTY,
-                $this->getClaimTypeCopy(Claim::TYPE_EXTENDED_WARRANTY, $validated, $picSureEnabled) => Claim::TYPE_EXTENDED_WARRANTY,
+                $this->getClaimTypeCopy(Claim::TYPE_EXTENDED_WARRANTY, $validated, $picSureEnabled) =>
+                    Claim::TYPE_EXTENDED_WARRANTY,
             ]);
             $form->add('type', ChoiceType::class, ['choices' => $choices]);
         });

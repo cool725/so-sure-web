@@ -23,6 +23,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * @group functional-net
+ * AppBundle\\Tests\\Form\\Type\\ClaimTypeTest
  */
 class ClaimTypeTest extends FormTypeTest
 {
@@ -31,7 +32,7 @@ class ClaimTypeTest extends FormTypeTest
 
     private $reciperoService;
 
-    protected  function setUp()
+    protected function setUp()
     {
         $this->reciperoService = $this->createMock(ReceperioService::class);
         parent::setUp();
@@ -69,11 +70,11 @@ class ClaimTypeTest extends FormTypeTest
         foreach ($children as $key => $value) {
             if ($key == 'type') {
                 foreach ($value->vars['choices'] as $item) {
-                    if (mb_stripos('damage', $item->label) >= 0) {
+                    if (mb_stripos($item->label, 'damage') !== false) {
                         $this->assertContains('£50', $item->label);
                         $foundDamage = true;
                     }
-                    if (mb_stripos('loss', $item->label) >= 0) {
+                    if (mb_stripos($item->label, 'loss') !== false) {
                         $this->assertContains('£70', $item->label);
                         $foundLoss = true;
                     }
@@ -105,11 +106,11 @@ class ClaimTypeTest extends FormTypeTest
         foreach ($children as $key => $value) {
             if ($key == 'type') {
                 foreach ($value->vars['choices'] as $item) {
-                    if (mb_stripos('damage', $item->label) >= 0) {
+                    if (mb_stripos($item->label, 'damage') !== false) {
                         $this->assertContains('£50', $item->label);
                         $foundDamage = true;
                     }
-                    if (mb_stripos('loss', $item->label) >= 0) {
+                    if (mb_stripos($item->label, 'loss') !== false) {
                         $this->assertContains('£70', $item->label);
                         $foundLoss = true;
                     }
@@ -142,11 +143,11 @@ class ClaimTypeTest extends FormTypeTest
         foreach ($children as $key => $value) {
             if ($key == 'type') {
                 foreach ($value->vars['choices'] as $item) {
-                    if (mb_stripos('damage', $item->label) >= 0) {
+                    if (mb_stripos($item->label, 'damage') !== false) {
                         $this->assertContains('£150', $item->label);
                         $foundDamage = true;
                     }
-                    if (mb_stripos('loss', $item->label) >= 0) {
+                    if (mb_stripos($item->label, 'loss') !== false) {
                         $this->assertContains('£150', $item->label);
                         $foundLoss = true;
                     }
