@@ -38,8 +38,8 @@
                 <ul class="list-inline footer-new--list">
                     <li>&copy; {{ 'now'|date('Y') }} <a href="/">so-sure</a> Limited</li>
                     <li><a href="{{ path('terms') }}">Terms</a></li>
-                    <li>{{ macros.iubenda() }}</li>
-                    <li><a href="https://www.iubenda.com/privacy-policy/7805295/cookie-policy" target="_blank">Cookie Policy</a></li>
+                    <li><a href="{{ path('privacy') }}">Privacy</a></li>
+                    <li><a href="{{ cookie_url }}" target="_blank">Cookie Policy</a></li>
                     <li><a href="{{ path('sitemap') }}">Sitemap</a></li>
                 </ul>
                 <p><small>We are a company registered in England &amp; Wales (No. 09365669) and our registered address is: <address class="text-white"><strong>so-sure Limited</strong>, 10 Finsbury Square, London EC2A 1AF, GB</address></small></p>
