@@ -18,6 +18,7 @@ use AppBundle\Repository\File\LloydsFileRepository;
 use AppBundle\Repository\File\ReconcilationFileRepository;
 use AppBundle\Repository\File\S3FileRepository;
 use AppBundle\Repository\PaymentRepository;
+use AppBundle\Repository\UserRepository;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\LloydsService;
 use AppBundle\Service\ReportingService;
@@ -534,6 +535,8 @@ class AdminController extends BaseController
         $date = \DateTime::createFromFormat("Y-m-d", sprintf('%d-%d-01', $year, $month));
 
         $dm = $this->getManager();
+        /** @var UserRepository $userRepo */
+        $userRepo = $dm->getRepository(User::class);
         $s3FileRepo = $dm->getRepository(S3File::class);
         $paymentsRepo = $dm->getRepository(BacsPayment::class);
         $sequenceRepo = $dm->getRepository(Sequence::class);
@@ -659,6 +662,7 @@ class AdminController extends BaseController
             'files' => $s3FileRepo->getAllFiles($date, 'accesspay'),
             'addacs' => $s3FileRepo->getAllFiles($date, 'bacsReportAddacs'),
             'auddis' => $s3FileRepo->getAllFiles($date, 'bacsReportAuddis'),
+            'arudds' => $s3FileRepo->getAllFiles($date, 'bacsReportArudd'),
             'input' => $s3FileRepo->getAllFiles($date, 'bacsReportInput'),
             'payments' => $paymentsRepo->findPayments($date),
             'uploadForm' => $uploadForm->createView(),
@@ -666,6 +670,7 @@ class AdminController extends BaseController
             'mandatesForm' => $mandatesForm->createView(),
             'sequenceForm' => $sequenceForm->createView(),
             'currentSequence' => $currentSequence,
+            'outstandingMandates' => $userRepo->findPendingMandates()->getQuery()->execute()->count(),
         ];
     }
 

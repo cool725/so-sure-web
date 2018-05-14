@@ -317,7 +317,7 @@ class MonitorService
 
     public function judopayReceipts()
     {
-        $results = $this->judopay->getTransactions(20, false);
+        $results = $this->judopay->getTransactions(50, false);
         if (isset($results['additional-payments']) && count($results['additional-payments']) > 0) {
             // @codingStandardsIgnoreStart
             throw new MonitorException(sprintf(
@@ -354,7 +354,7 @@ class MonitorService
     public function checkMixpanelQueue()
     {
         $count = $this->mixpanel->countQueue();
-        if ($count > 50) {
+        if ($count > 150) {
             throw new MonitorException(sprintf('There are %d outstanding messages in the queue', $count));
         }
     }
