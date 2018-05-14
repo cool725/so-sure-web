@@ -602,7 +602,7 @@ class ApiController extends BaseController
             $facebookId = $this->getDataString($data, 'facebook_id');
             $googleId = $this->getDataString($data, 'google_id');
             $mobileNumber = $this->getDataString($data, 'mobile_number');
-            $userExists = $repo->existsUser($this->getDataString($data, 'email'), $facebookId, $mobileNumber);
+            $userExists = $repo->existsUser($this->getDataString($data, 'email'), $facebookId, $mobileNumber, $googleId);
             if ($userExists) {
                 // Special case for prelaunch users - allow them to 'create' an account without
                 // being recreated in account in the db.  This is only allowed once per user
@@ -628,6 +628,7 @@ class ApiController extends BaseController
                         return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_EXISTS, 'Invalid token', 403);
                     }
                 } elseif ($googleId !== null) {
+                    /*
                     $googleService = $this->get('app.google');
                     if (!$googleService->validateTokenId(
                         $googleId,
@@ -635,6 +636,7 @@ class ApiController extends BaseController
                     )) {
                         return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_EXISTS, 'Invalid token', 403);
                     }
+                    */
                 }
 
                 $userManager = $this->get('fos_user.user_manager');
