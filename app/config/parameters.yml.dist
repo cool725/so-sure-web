@@ -37,8 +37,6 @@ parameters:
     fb_og_namespace: 'wearesosure-dev'
     account_kit_secret: changeme
 
-    google_android_clientid: ''
-
     starling_client_id:      'changeme'
     starling_client_secret:  'changeme'
     starling_auth_url:       'http://localhost'
@@ -53,6 +51,7 @@ parameters:
     google_apikey:
     google_analytics:
     ga_tag_manager_env: '&gtm_auth=&gtm_preview=env-4&gtm_cookies_win=x'
+    google_android_clientid:
 
     rollbar_access_token:
 

@@ -12,17 +12,29 @@ class GoogleService
     protected $logger;
 
     /** @var string */
+    protected $googleAppName;
+
+    /** @var string */
+    protected $googleApiKey;
+
+    /** @var string */
     protected $clientId;
 
     /**
      * @param LoggerInterface $logger
+     * @param string          $googleAppName
+     * @param string          $googleApiKey
      * @param string          $clientId
      */
     public function __construct(
         LoggerInterface $logger,
+        $googleAppName,
+        $googleApiKey,
         $clientId
     ) {
         $this->logger = $logger;
+        $this->googleAppName = $googleAppName;
+        $this->googleApiKey = $googleApiKey;
         $this->clientId = $clientId;
     }
 
@@ -34,6 +46,9 @@ class GoogleService
     public function getUserIdFromToken($token)
     {
         $client = new \Google_Client(['client_id' => $this->clientId]);
+        $client->setApplicationName($this->googleAppName);
+        $client->setDeveloperKey($this->googleApiKey);
+
         $payload = $client->verifyIdToken($token);
         if ($payload) {
             $userid = $payload['sub'];
