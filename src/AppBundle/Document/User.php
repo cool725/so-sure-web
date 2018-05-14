@@ -1758,6 +1758,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             'first_name' => $this->getFirstName(),
             'last_name' => $this->getLastName(),
             'facebook_id' => $this->getFacebookId(),
+            'google_id' => $this->getGoogleId(),
             'cognito_token' => [ 'id' => $identityId, 'token' => $token ],
             'user_token' => ['token' => $this->getToken()],
             'addresses' => $addresses,
