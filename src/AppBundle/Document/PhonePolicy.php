@@ -23,12 +23,40 @@ class PhonePolicy extends Policy
     const NETWORK_CLAIM_VALUE = 2;
     const PROMO_LAUNCH_VALUE = 5;
 
+    /**
+     * non-pic-sure policy was renewed and so no need to pic-sure the phone, but should reduce the excess
+     */
     const PICSURE_STATUS_PREAPPROVED = 'preapproved';
+
+    /**
+     * pic-sure is approved
+     */
     const PICSURE_STATUS_APPROVED = 'approved';
+
+    /**
+     * pic-sure is not valid - screen broken
+     */
     const PICSURE_STATUS_REJECTED = 'rejected';
+
+    /**
+     * Needs manual processing
+     */
     const PICSURE_STATUS_MANUAL = 'manual';
+
+    /**
+     * photo checked, but uncertain
+     */
     const PICSURE_STATUS_INVALID = 'invalid';
+
+    /**
+     * pic-sure does not apply to this policy
+     */
     const PICSURE_STATUS_DISABLED = 'disabled';
+
+    /**
+     * if phone replaced due to claim, then new phone doesn't neeed pic-sure
+     */
+    const PICSURE_STATUS_CLAIM_APPROVED = 'claim-approved';
 
     const MAKEMODEL_VALID_SERIAL = 'valid-serial';
     const MAKEMODEL_VALID_IMEI = 'valid-imei';
@@ -126,7 +154,8 @@ class PhonePolicy extends Policy
     protected $name;
 
     /**
-     * @Assert\Choice({"preapproved", "approved", "invalid", "rejected", "manual", "disabled"}, strict=true)
+     * @Assert\Choice({"preapproved", "approved", "invalid", "rejected", "manual", "disabled", "claim-approved"},
+     *     strict=true)
      * @MongoDB\Field(type="string")
      * @Gedmo\Versioned
      */
@@ -662,8 +691,23 @@ class PhonePolicy extends Policy
     {
         return in_array($this->getPicSureStatus(), [
             self::PICSURE_STATUS_APPROVED,
-            self::PICSURE_STATUS_PREAPPROVED
+            self::PICSURE_STATUS_PREAPPROVED,
+            self::PICSURE_STATUS_CLAIM_APPROVED,
         ]);
+    }
+
+    public function canAdjustPicSureStatusForClaim()
+    {
+        if (in_array($this->getPicSureStatus(), [
+            PhonePolicy::PICSURE_STATUS_REJECTED,
+            PhonePolicy::PICSURE_STATUS_INVALID,
+            PhonePolicy::PICSURE_STATUS_MANUAL,
+            null,
+        ])) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public function getPolicyPicSureFiles()
@@ -702,7 +746,7 @@ class PhonePolicy extends Policy
 
     public function toApiArray()
     {
-        $picSureEnabled = $this->getPolicyTerms() && $this->getPolicyTerms()->isPicSureEnabled();
+        $picSureEnabled = $this->isPicSurePolicy();
         $picSureValidated = $this->isPicSureValidated();
 
         return array_merge(parent::toApiArray(), [

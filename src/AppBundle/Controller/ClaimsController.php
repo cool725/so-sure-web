@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Service\ClaimsService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -151,6 +152,7 @@ class ClaimsController extends BaseController
                 $formClaim->handleRequest($request);
                 if ($formClaim->isValid()) {
                     $claim->setHandler($this->getUser());
+                    /** @var ClaimsService $claimsService */
                     $claimsService = $this->get('app.claims');
                     if ($claimsService->addClaim($policy, $claim)) {
                         $this->addFlash('success', sprintf(
