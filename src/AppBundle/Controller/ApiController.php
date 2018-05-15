@@ -53,7 +53,12 @@ class ApiController extends BaseController
                 throw new \Exception('Debug Exception Test');
             }
 
+            $this->get('logger')->error('loginAction');
+
             $data = json_decode($request->getContent(), true)['body'];
+
+            $this->get('logger')->error('loginAction body', ['body' => $data]);
+
             $emailUserData = null;
             $facebookUserData = null;
             $googleUserData = null;
@@ -85,6 +90,8 @@ class ApiController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
 
+            $this->get('logger')->error('loginAction google', ['googleUserData' => $googleUserData]);
+
             $dm = $this->getManager();
             $repo = $dm->getRepository(User::class);
             $user = null;
@@ -104,6 +111,8 @@ class ApiController extends BaseController
                 $mobileNumber = $facebook->getAccountKitMobileNumber($authorizationCode);
                 $user = $repo->findOneBy(['mobileNumber' => $mobileNumber]);
             }
+
+            $this->get('logger')->error('loginAction user', ['user' => $user]);
 
             if (!$user) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'User not found', 403);
