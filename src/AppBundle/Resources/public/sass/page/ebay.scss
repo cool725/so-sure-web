@@ -282,12 +282,14 @@ $gadgetcover: #E8C955;
 .ebay {
 
     &__hero {
+        position: relative;
+        z-index: 10;
         h1 {
             font-size: 30px;
             margin-top: 30px;
 
             @include breakpoint(tablet) {
-                font-size: 36px;
+                font-size: 46px;
             }
         }
 
@@ -298,6 +300,8 @@ $gadgetcover: #E8C955;
 
     &__press {
         background: $off-white;
+        position: relative;
+        z-index: 1;
     }
 
     &__cover {
@@ -323,7 +327,7 @@ $gadgetcover: #E8C955;
 
             li {
                 font-size: 18px;
-                font-weight: bold;
+                // font-weight: bold;
                 padding-left: 42px;
                 padding-bottom: 10px;
                 margin: 15px 0 20px;
@@ -398,7 +402,7 @@ $gadgetcover: #E8C955;
     padding: 0;
     position: relative;
     margin: 0 auto;
-    z-index: 5;
+    z-index: 15;
 
     // Hide the form on load
     .select-phone-form {
