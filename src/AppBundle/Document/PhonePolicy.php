@@ -702,7 +702,7 @@ class PhonePolicy extends Policy
 
     public function toApiArray()
     {
-        $picSureEnabled = $this->getPolicyTerms() && $this->getPolicyTerms()->isPicSureEnabled();
+        $picSureEnabled = $this->isPicSurePolicy();
         $picSureValidated = $this->isPicSureValidated();
 
         return array_merge(parent::toApiArray(), [
