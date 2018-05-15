@@ -4051,7 +4051,7 @@ class PolicyServiceTest extends WebTestCase
         //\Doctrine\Common\Util\Debug::dump($paymentA);
 
         $this->assertEquals(
-            10 + $paymentA->getAmount(),
+            $this->toTwoDp(10/12) + $paymentA->getAmount(),
             $policyA->getNextPolicy()->getTotalSuccessfulPayments(new \DateTime('2017-01-02'))
         );
 
@@ -4069,7 +4069,7 @@ class PolicyServiceTest extends WebTestCase
             $policyB->getNextPolicy()->getPremium()->getAdjustedStandardMonthlyPremiumPrice()
         );
         $this->assertEquals(
-            10 + $paymentB->getAmount(),
+            $this->toTwoDp(10/12) + $paymentB->getAmount(),
             $policyB->getNextPolicy()->getTotalSuccessfulPayments(new \DateTime('2017-01-01'))
         );
 
