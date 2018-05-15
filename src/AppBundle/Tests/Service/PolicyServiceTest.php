@@ -1898,6 +1898,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyRenewCashback()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyRenewCashbackA', $this),
             static::generateEmail('testPolicyRenewCashbackB', $this)
@@ -1960,6 +1962,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyCashbackThenRenew()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyCashbackThenRenewA', $this),
             static::generateEmail('testPolicyCashbackThenRenewB', $this)
@@ -1991,6 +1995,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyCashbackThenRenewWithCashback()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyCashbackThenRenewWithCashbackA', $this),
             static::generateEmail('testPolicyCashbackThenRenewWithCashbackB', $this)
@@ -2026,6 +2032,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyCashbackThenRenewWithDiscount()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyCashbackThenRenewWithDiscountA', $this),
             static::generateEmail('testPolicyCashbackThenRenewWithDiscountB', $this)
@@ -2058,6 +2066,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyCashbackUnrenew()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyCashbackUnrenewA', $this),
             static::generateEmail('testPolicyCashbackUnrenewB', $this)
@@ -2177,6 +2187,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyUnrenew()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyUnrenewA', $this),
             static::generateEmail('testPolicyUnrenewB', $this)
@@ -2199,6 +2211,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyPurchaseAgain()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyPurchaseAgainA', $this),
             static::generateEmail('testPolicyPurchaseAgainB', $this)
@@ -2246,6 +2260,8 @@ class PolicyServiceTest extends WebTestCase
         $startDate = new \DateTime('-1 year', new \DateTimeZone('Europe/London'));
         $startDate = $startDate->add(new \DateInterval('P10D'));
 
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyRenewStartDateA', $this),
             static::generateEmail('testPolicyRenewStartDateB', $this),
@@ -2265,6 +2281,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyRenewalConnections()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyRenewalConnectionsA', $this),
             static::generateEmail('testPolicyRenewalConnectionsB', $this),
@@ -2312,6 +2330,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyRenewalConnectionsSingleReconnect()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyRenewalConnectionsNoReconnectA', $this),
             static::generateEmail('testPolicyRenewalConnectionsNoReconnectB', $this),
@@ -2373,6 +2393,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyRenewalConnectionsSingleReconnectReverseUnder15()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyRenewalConnectionsSingleReconnectReverseA', $this),
             static::generateEmail('testPolicyRenewalConnectionsSingleReconnectReverseB', $this),
@@ -2437,6 +2459,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyRenewalConnectionsSingleReconnectReverseOver15()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyRenewalConnectionsSingleReconnectReverseOver15A', $this),
             static::generateEmail('testPolicyRenewalConnectionsSingleReconnectReverseOver15B', $this),
@@ -2501,6 +2525,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyRenewalConnectionsUnder60()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyRenewalConnectionsUnder60A', $this),
             static::generateEmail('testPolicyRenewalConnectionsUnder60B', $this),
@@ -2564,6 +2590,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyRenewalConnectionsSingleReconnectUnder60()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyRenewalConnectionsSingleReconnectUnder60A', $this),
             static::generateEmail('testPolicyRenewalConnectionsSingleReconnectUnder60B', $this),
@@ -2825,6 +2853,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyRenewalConnectionsSingleReconnectReverse5Months()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyRenewalConnectionsSingleReconnectReverse5MonthsA', $this),
             static::generateEmail('testPolicyRenewalConnectionsSingleReconnectReverse5MonthsB', $this),
@@ -2893,6 +2923,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyRenewalConnections7Months()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyRenewalConnections7MonthsA', $this),
             static::generateEmail('testPolicyRenewalConnections7MonthsB', $this),
@@ -2956,6 +2988,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyRenewalConnectionsSingleReconnect7Months()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyRenewalConnectionsSingleReconnect7MonthsA', $this),
             static::generateEmail('testPolicyRenewalConnectionsSingleReconnect7MonthsB', $this),
@@ -3021,6 +3055,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyRenewalConnectionsSingleReconnectReverse7Months()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyRenewalConnectionsSingleReconnectReverse7MonthsA', $this),
             static::generateEmail('testPolicyRenewalConnectionsSingleReconnectReverse7MonthsB', $this),
@@ -3089,6 +3125,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyRenewalConnections11Months()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyRenewalConnections11MonthsA', $this),
             static::generateEmail('testPolicyRenewalConnections11MonthsB', $this),
@@ -3152,6 +3190,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyRenewalConnectionsSingleReconnect11Months()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyRenewalConnectionsSingleReconnect11MonthsA', $this),
             static::generateEmail('testPolicyRenewalConnectionsSingleReconnect11MonthsB', $this),
@@ -3217,6 +3257,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyRenewalConnectionsSingleReconnectReverse11Months()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyRenewalConnectionsSingleReconnectReverse11MonthsA', $this),
             static::generateEmail('testPolicyRenewalConnectionsSingleReconnectReverse11MonthsB', $this),
@@ -3285,6 +3327,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyRenewalSelfClaim()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyRenewalSelfClaimA', $this),
             static::generateEmail('testPolicyRenewalSelfClaimB', $this),
@@ -3328,6 +3372,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyRenewalNetworkClaim50()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyRenewalNetworkClaim40A', $this),
             static::generateEmail('testPolicyRenewalNetworkClaim40B', $this),
@@ -3373,6 +3419,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyRenewalNetworkClaim50WithDiscount()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyRenewalNetworkClaim40WithDiscountA', $this),
             static::generateEmail('testPolicyRenewalNetworkClaim40WithDiscountB', $this),
@@ -3469,6 +3517,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyRenewalNetworkClaim10WithDiscount()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyRenewalNetworkClaim10WithDiscountA', $this),
             static::generateEmail('testPolicyRenewalNetworkClaim10WithDiscountB', $this),
@@ -3665,6 +3715,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyActive()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyActiveA', $this),
             static::generateEmail('testPolicyActiveB', $this),
@@ -3715,6 +3767,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyActiveWithConnections()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyActiveWithConnectionsA', $this),
             static::generateEmail('testPolicyActiveWithConnectionsB', $this)
@@ -3781,6 +3835,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyPaymentsRenewalWithConnections()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyPaymentsRenewalWithConnectionsA', $this),
             static::generateEmail('testPolicyPaymentsRenewalWithConnectionsB', $this)
@@ -3874,6 +3930,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testYearlyPolicyPaymentsRenewalWithConnections()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testYearlyPolicyPaymentsRenewalWithConnectionsA', $this),
             static::generateEmail('testYearlyPolicyPaymentsRenewalWithConnectionsB', $this)
@@ -4199,6 +4257,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyActiveWithConnectionsNoReconnect()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyActiveWithConnectionsNoReconnectA', $this),
             static::generateEmail('testPolicyActiveWithConnectionsNoReconnectB', $this)
@@ -4309,6 +4369,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testNotReconnectedDoesNotAppear()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testNotReconnectedDoesNotAppearA', $this),
             static::generateEmail('testNotReconnectedDoesNotAppearB', $this),
@@ -4418,6 +4480,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyCancellationEmail()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyCancellationEmailA', $this),
             static::generateEmail('testPolicyCancellationEmailB', $this)
@@ -4440,6 +4504,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyCancellationEmailUpgrade()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyCancellationEmailUpgradeA', $this),
             static::generateEmail('testPolicyCancellationEmailUpgradeB', $this)
@@ -4494,6 +4560,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyCancellationEmailNotRenewed()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyCancellationEmailNotRenewedA', $this),
             static::generateEmail('testPolicyCancellationEmailNotRenewedB', $this),
@@ -4520,6 +4588,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyCancellationEmailNotReconnected()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyCancellationEmailNotReconnectedA', $this),
             static::generateEmail('testPolicyCancellationEmailNotReconnectedB', $this),
@@ -4569,6 +4639,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyCancellationEmailReconnected()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyCancellationEmailReconnectedA', $this),
             static::generateEmail('testPolicyCancellationEmailReconnectedB', $this),
@@ -4616,6 +4688,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyConnectionReduction()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyRenewalConnectionA', $this),
             static::generateEmail('testPolicyRenewalConnectionB', $this),
