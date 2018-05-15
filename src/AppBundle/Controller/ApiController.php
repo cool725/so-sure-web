@@ -159,6 +159,8 @@ class ApiController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, 'Too many requests', 422);
             }
 
+            $this->get('logger')->error('loginAction user google', ['id' => $user->getGoogleId()]);
+
             if ($emailUserData) {
                 $encoderService = $this->get('security.encoder_factory');
                 $encoder = $encoderService->getEncoder($user);
@@ -185,6 +187,7 @@ class ApiController extends BaseController
                     $user,
                     $this->getDataString($googleUserData, 'google_access_token')
                 )) {
+                $this->get('logger')->error('loginAction google validation error', ['id' => $user->getGoogleId()]);
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_EXISTS, 'Invalid token', 403);
                 }
             }

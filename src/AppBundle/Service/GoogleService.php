@@ -72,7 +72,9 @@ class GoogleService
     public function validateTokenId($id, $token)
     {
         try {
-            return $this->getUserIdFromToken($token) == $id;
+            $idFromToken = $this->getUserIdFromToken($token);
+            $this->get('logger')->error('loginAction user google', ['id' => $id, 'idFromToken' => $idFromToken]);
+            return  $idFromToken == $id;
         } catch (\Exception $e) {
             $this->logger->error(sprintf(
                 'Unable to validate google token for google id %s, Ex: %s',
