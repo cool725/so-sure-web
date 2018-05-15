@@ -2759,6 +2759,8 @@ class PolicyServiceTest extends WebTestCase
 
     public function testPolicyRenewalConnectionsSingleReconnect5Months()
     {
+        /** @var Policy $policyA */
+        /** @var Policy $policyB */
         list($policyA, $policyB) = $this->getPendingRenewalPolicies(
             static::generateEmail('testPolicyRenewalConnectionsSingleReconnect5MonthsA', $this),
             static::generateEmail('testPolicyRenewalConnectionsSingleReconnect5MonthsB', $this),
@@ -4052,6 +4054,10 @@ class PolicyServiceTest extends WebTestCase
 
         $this->assertEquals(
             $this->toTwoDp(10/12) + $paymentA->getAmount(),
+            $policyA->getNextPolicy()->getTotalSuccessfulPayments(new \DateTime('2017-01-02'), true)
+        );
+        $this->assertEquals(
+            10 + $paymentA->getAmount(),
             $policyA->getNextPolicy()->getTotalSuccessfulPayments(new \DateTime('2017-01-02'))
         );
 
@@ -4070,6 +4076,10 @@ class PolicyServiceTest extends WebTestCase
         );
         $this->assertEquals(
             $this->toTwoDp(10/12) + $paymentB->getAmount(),
+            $policyB->getNextPolicy()->getTotalSuccessfulPayments(new \DateTime('2017-01-01'), true)
+        );
+        $this->assertEquals(
+            10 + $paymentB->getAmount(),
             $policyB->getNextPolicy()->getTotalSuccessfulPayments(new \DateTime('2017-01-01'))
         );
 
