@@ -187,7 +187,7 @@ class ApiController extends BaseController
                     $user,
                     $this->getDataString($googleUserData, 'google_access_token')
                 )) {
-                $this->get('logger')->error('loginAction google validation error', ['id' => $user->getGoogleId()]);
+                    $this->get('logger')->error('loginAction google validation error', ['id' => $user->getGoogleId()]);
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_EXISTS, 'Invalid token', 403);
                 }
             }

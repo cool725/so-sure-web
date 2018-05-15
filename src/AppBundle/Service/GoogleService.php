@@ -50,6 +50,7 @@ class GoogleService
         $client->setDeveloperKey($this->googleApiKey);
 
         $payload = $client->verifyIdToken($token);
+        $this->logger->error('googleService payload', ['payload' => $payload]);
         if ($payload) {
             $userid = $payload['sub'];
             return $userid;
@@ -73,7 +74,7 @@ class GoogleService
     {
         try {
             $idFromToken = $this->getUserIdFromToken($token);
-            $this->logger->error('loginAction user google', ['id' => $id, 'idFromToken' => $idFromToken]);
+            $this->logger->error('googleService ', ['id' => $id, 'idFromToken' => $idFromToken]);
             return  $idFromToken == $id;
         } catch (\Exception $e) {
             $this->logger->error(sprintf(
