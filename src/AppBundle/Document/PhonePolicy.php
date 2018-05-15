@@ -259,8 +259,10 @@ class PhonePolicy extends Policy
         }
         $this->setImei($imei);
 
-        if ($this->getNextPolicy()) {
-            $this->getNextPolicy()->adjustImei($imei, $setReplacementDate);
+        /** @var PhonePolicy $nextPolicy */
+        $nextPolicy = $this->getNextPolicy();
+        if ($nextPolicy) {
+            $nextPolicy->adjustImei($imei, $setReplacementDate);
         }
     }
 
