@@ -73,7 +73,7 @@ class GoogleService
     {
         try {
             $idFromToken = $this->getUserIdFromToken($token);
-            $this->get('logger')->error('loginAction user google', ['id' => $id, 'idFromToken' => $idFromToken]);
+            $this->logger->error('loginAction user google', ['id' => $id, 'idFromToken' => $idFromToken]);
             return  $idFromToken == $id;
         } catch (\Exception $e) {
             $this->logger->error(sprintf(
