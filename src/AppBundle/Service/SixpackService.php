@@ -59,6 +59,7 @@ class SixpackService
     const EXPERIMENT_72_REPLACEMENT = 'seventytwo-hours';
     const EXPERIMENT_MONEY_LANDING = 'money-landing';
     const EXPERIMENT_PICSURE_SECTION = 'picsure-redesign';
+    const EXPERIMENT_EBAY_LANDING = 'ebay-landing';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';
@@ -84,6 +85,7 @@ class SixpackService
         self::EXPERIMENT_72_REPLACEMENT,
         self::EXPERIMENT_MONEY_LANDING,
         self::EXPERIMENT_PICSURE_SECTION,
+        self::EXPERIMENT_EBAY_LANDING,
     ];
 
     public static $authExperiments = [
@@ -113,6 +115,7 @@ class SixpackService
         self::EXPERIMENT_72_REPLACEMENT,
         self::EXPERIMENT_MONEY_LANDING,
         self::EXPERIMENT_PICSURE_SECTION,
+        self::EXPERIMENT_EBAY_LANDING,
     ];
 
     /**
