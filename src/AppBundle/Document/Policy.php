@@ -3617,10 +3617,22 @@ abstract class Policy
             $date = new \DateTime();
         }
         $totalPaid = 0;
+        $numberOfPayments = 0;
+        $totalDiscount = 0;
         foreach ($this->getSuccessfulPayments() as $payment) {
-            if ($payment->getDate() <= $date) {
-                $totalPaid += $payment->getAmount();
+            // payment applied in the future - ignore
+            if ($payment->getDate() > $date) {
+                continue;
             }
+            if ($payment instanceof PolicyDiscountPayment) {
+                $totalDiscount += $payment->getAmount();
+            } else {
+                $totalPaid += $payment->getAmount();
+                $numberOfPayments++;
+            }
+        }
+        if ($totalDiscount > 0) {
+            $totalPaid += $this->toTwoDp($numberOfPayments * $totalDiscount / 12);
         }
 
         return $totalPaid;
