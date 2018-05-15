@@ -21,7 +21,7 @@
         "hwi/oauth-bundle": "^0.5.0",
         "symfony/assetic-bundle": "^2.7",
         "drewm/mailchimp-api": "dev-api-v3",
-        "google/apiclient": "^2.0.0@RC",
+        "google/apiclient": "^2.0",
         "staffim/rollbar-bundle": "*",
         "judopay/judopay-sdk": "2.0.1.2",
         "aws/aws-sdk-php": "^3.15",

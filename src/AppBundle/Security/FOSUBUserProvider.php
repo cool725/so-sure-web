@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Security\Core\User\UserInterface;
 use AppBundle\Service\FacebookService;
+use AppBundle\Service\GoogleService;
 use AppBundle\Document\User;
 use HWI\Bundle\OAuthBundle\Security\Core\Exception\AccountNotLinkedException;
 use AppBundle\Validator\Constraints\AlphanumericValidator;
@@ -30,6 +31,8 @@ class FOSUBUserProvider extends BaseClass
     protected $authService;
 
     protected $facebook;
+
+    protected $google;
 
     /** @var DocumentManager */
     protected $dm;
@@ -104,6 +107,7 @@ class FOSUBUserProvider extends BaseClass
                 $username = $response->getResponse()['phone']['number'];
             }
         }
+
         #if ($search == "facebook_id") {
         #    $search = "facebookId";
         #}
@@ -196,6 +200,23 @@ class FOSUBUserProvider extends BaseClass
         //if user exists - go with the HWIOAuth way
         //$user = parent::loadUserByOAuthUserResponse($response);
 
+        var_dump($search);
+        var_dump($response->getAccessToken());
+
+        //if ($search == "googleId") {
+        if (!$this->google->validateToken(
+                $user,
+                $response->getAccessToken()
+            )) {
+            var_dump("NO");
+        }
+        //}
+        var_dump("YES");
+
+        die();
+
+
+
         if ($service != self::SERVICE_ACCOUNTKIT) {
             $setter = 'set' . ucfirst($service) . 'AccessToken';
             //update access token
@@ -211,6 +232,14 @@ class FOSUBUserProvider extends BaseClass
     public function setFacebook(FacebookService $facebook)
     {
         $this->facebook = $facebook;
+    }
+
+    /**
+     * @param GoogleService $google
+     */
+    public function setGoogle(GoogleService $google)
+    {
+        $this->google = $google;
     }
 
     protected function conformAlphanumeric($value, $length)

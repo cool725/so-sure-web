@@ -158,6 +158,11 @@
                                {% if app.user %}disabled{% endif %}>
                                 <i class="fa fa-facebook-official"></i> &nbsp;Continue with Facebook
                             </a>
+                            <a href="{{ path('hwi_oauth_service_redirect', {'service': 'google' }) }}"
+                               formnovalidate="formnovalidate"
+                               class="btn btn-google btn-block btn-pad"
+                                > &nbsp;Continue with Google
+                            </a>
                             {% if feature_enabled('starling') and not starling %}
                                 <div class="text-break text-grey">
                                     <div class="line"></div>OR<div class="line"></div>

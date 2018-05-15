@@ -172,6 +172,7 @@ hwi_oauth:
         properties:
             # these properties will be used/redefined later in the custom FOSUBUserProvider service.
             facebook: facebook_id
+            facebook: google_id
             starling: starlingId
             accountkit: accountkitId
     resource_owners:
@@ -189,6 +190,11 @@ hwi_oauth:
                 email:     email
                 firstname: first_name
                 lastname:  last_name
+        google:
+            type:           google
+            client_id:      "1062115475688-0ngn2v5s4bh7qtecchbgc6gn2lrbiejs.apps.googleusercontent.com"
+            client_secret:  "p4wDyrg1vb-7CsabgQHMermz"
+            scope:          "email profile"
         starling:
             type:              oauth2
             class:             'AppBundle\Classes\StarlingResourceOwner'
@@ -536,6 +542,7 @@ nelmio_security:
                 - https://*.googleadservices.com
                 - https://*.googlesyndication.com
                 - https://www.googleadservices.com # necessary?
+                - https://apis.google.com
                 - https://*.doubleclick.net
                 - https://www.google.com
                 - https://*.doubleclick.net
@@ -1025,6 +1032,7 @@ nelmio_security:
             - bnc.lt
             - starlingbank.com
             - campaign.wearesosure.com
+            - accounts.google.com
 
     # forced HTTPS handling, don't combine with flexible mode
     # and make sure you have SSL working on your site before enabling this

@@ -78,6 +78,14 @@
         <a href="#" class="btn btn-facebook btn-facebook-login btn-block"><i class="fa fa-facebook-official"></i> &nbsp;Login with Facebook</a>
     </div>
 
+    <div class="form-group">
+        <a href="{{ path('hwi_oauth_service_redirect', {'service': 'google' }) }}"
+           formnovalidate="formnovalidate"
+           class="btn btn-google btn-block btn-pad"
+            > &nbsp;Continue with Google
+        </a>
+    </div>
+
     {% if feature_enabled('starling') %}
     <div class="form-group">
         <a class="btn btn-block btn-starling" href="/login/starling"><img src="{{ cdn_url }}/images/StarlingMarkIcon.png" height="20px"> &nbsp;Login with Starling</a>
