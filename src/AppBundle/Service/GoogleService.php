@@ -46,8 +46,8 @@ class GoogleService
     public function getUserIdFromToken($token)
     {
         $client = new \Google_Client(['client_id' => $this->clientId]);
-        $client->setApplicationName($this->googleAppName);
-        $client->setDeveloperKey($this->googleApiKey);
+        //$client->setApplicationName($this->googleAppName);
+        //$client->setDeveloperKey($this->googleApiKey);
 
         $payload = $client->verifyIdToken($token);
         $this->logger->error('googleService payload', ['payload' => $payload]);
