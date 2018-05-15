@@ -23,31 +23,35 @@
 
     <section class="section--pad ebay__hero">
         <div class="container">
+            {# <h1 class="text-center"><span class="ebay_red">Mobile</span> <span class="ebay_blue">insurance</span> <span class="ebay_amber">you</span> <span class="ebay_green">deserve</span></h1> #}
+
+            <h1 class="text-center h-light">Mobile insurance you deserve.</h1>
+
+            <p class="big-text text-center">We're a new kind of insurer that's focused on people, <span class="ebay_red">not profits</span>. Providing insurance that's <span class="ebay_blue">reliable</span>, <span class="ebay_amber">rewarding</span> and altogether <span class="ebay_green">better</span>, so you can get back to worrying about the big stuff.</p>
+
+            {# <p class="big-text text-center">We’re a new kind of insurer – an insurer that’s focused on people, <span class="ebay_red">not profits</span>. We saw an opportunity to make insurance <span class="ebay_blue">better</span>. So that’s what we did. We provide mobile insurance that’s <span class="ebay_amber">simple</span>, reasonable and <span class="ebay_green">hassle-free</span>, so you can get back to worrying about the big stuff.</p> #}
+
             <h3 class="text-center h-light">in partnership with</h3>
             <img src="{{ cdn_url }}/images/ebaylogo_so-sure.png" alt="ebay" class="ebay-img img-center" width="240px">
 
-            {# Phone Search #}
-            {% if device_category() == 'Mobile' %}
-                {% set select_template = 'AppBundle:Default:selectPhoneMakeDropdown' %}
-            {% else %}
-                {% set select_template = 'AppBundle:Default:selectPhoneMakeSearch' %}
-            {% endif %}
-            {% if phone is defined and phone %}
-                {{ render(controller(select_template, {
-                    'type': 'homepage-sticky',
-                    'id': phone.id
-                })) }}
-            {% else %}
-                {{ render(controller(select_template, {
-                    'type': 'homepage-sticky',
-                })) }}
-            {% endif %}
-            {# End Phone Search #}
-
-            <div class="row">
-                <div class="col-md-8 col-md-offset-2">
-                    <p class="lead text-center">We’re a new kind of insurer – an insurer that’s focused on people, not profits. We saw an opportunity to make insurance better. So that’s what we did. We provide mobile insurance that’s simple, reasonable and hassle-free, so you can get back to worrying about the big stuff.</p>
-                </div>
+            <div class="animated slideInLeft">
+                {# Phone Search #}
+                {% if device_category() == 'Mobile' %}
+                    {% set select_template = 'AppBundle:Default:selectPhoneMakeDropdown' %}
+                {% else %}
+                    {% set select_template = 'AppBundle:Default:selectPhoneMakeSearch' %}
+                {% endif %}
+                {% if phone is defined and phone %}
+                    {{ render(controller(select_template, {
+                        'type': 'ebay',
+                        'id': phone.id
+                    })) }}
+                {% else %}
+                    {{ render(controller(select_template, {
+                        'type': 'ebay',
+                    })) }}
+                {% endif %}
+                {# End Phone Search #}
             </div>
 
         </div>
@@ -59,31 +63,26 @@
             <div class="row">
                 <div class="col-md-12 text-center">
                     <ul class="list-inline text-center">
-                        <li><img src="{{ cdn_url }}/images/moneycouk.png" alt="Money" class="money-img" width="120px"></li>
+                        {# <li><img src="{{ cdn_url }}/images/moneycouk.png" alt="Money" class="money-img" width="140px"></li>
                         <li><img src="{{ cdn_url }}/images/defacto_5.svg" alt="Defaqto" class="money-img" width="100px"></li>
-                        <li><img src="{{ cdn_url }}/images/trustpilot_so-sure.svg" alt="Trust Pilot" class="money-img" width="140px"></li>
-                        <li><img src="{{ cdn_url }}/images/go-compare_so-sure.svg" alt="Go Compare" class="money-img" width="140px"></li>
+                        <li><img src="{{ cdn_url }}/images/trustpilot_so-sure.svg" alt="Trust Pilot" class="money-img" width="150px"></li>
+                        <li><img src="{{ cdn_url }}/images/go-compare_so-sure.svg" alt="Go Compare" class="money-img" width="150px"></li> #}
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_defaqto.svg" alt="Defaqto" title="Defaqto" width="200px"></li>
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_trustpilot.svg" alt="TrustPilot" title="TrustPilot" width="200px"></li>
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_money.svg" alt="Money.co.uk" title="Money.co.uk" width="200px"></li>
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_go-compare.svg" alt="Go Compare" title="Go Compare" width="200px"></li>
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_theguardian.svg" alt="The Guardian" title="The Guardian" width="200px"></li>
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_financial-times.svg" alt="Financial Times" title="Financial Times" width="200px"></li>
                     </ul>
                 </div>
             </div>
         </div>
     </section>
 
-    {# Why so-sure #}
-{#     <section class="section--pad">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-8 col-md-offset-2">
-                    <h2>Why so-sure?</h2>
 
-                </div>
-            </div>
-        </div>
-    </section>
- #}
     <section class="section--pad ebay__cover">
         <div class="container">
-            <h2 class="text-center h-light">What's Covered</h2>
+            <h2 class="text-center">What's Covered</h2>
             <div class="row">
                 <div class="col-sm-6">
                     <div class="media">
@@ -159,7 +158,7 @@
         </div>
     </section>
 
-    <section class="section--pad">
+    <section class="section--pad ebay_compare">
         <div class="container">
 
             <h2 class="text-center">See How We Compare On Mobile Insurance</h2>
@@ -368,6 +367,56 @@
                         </tr>
                     </tbody>
                 </table>
+            </div>
+        </div>
+    </section>
+
+    <section class="section--pad ebay__cover_next">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <img src="{{ cdn_url }}/images/mobile_mike.svg" alt="Mobile Mike" class="">
+                </div>
+                <div class="col-md-8">
+                    <h2 class="text-blue">Premium Cover. Premium Service</h2>
+                    <ul class="list-unstyled">
+                        <li>Next working day replacement</li>
+                        <li>Cashback when you and your connections don't claim</li>
+                        <li>Low excess from just &pound;50 when validated with pic-sure</li>
+                        <li>Instant Cover</li>
+                        <li>Refurbished and second-hand devices up to 3 years old are covered</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="text-center">
+                <a href="#" class="btn btn-green btn-pad btn-lg h2 sosure-track" data-toggle="modal" data-target="#quoteModal" data-event="money-cta">Get Insured</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section--pad ebay_feedback">
+        <div class="container">
+            <h2 class="text-center">Happy Customers</h2>
+            <div id="carousel-feedback" class="carousel slide" data-ride="carousel">
+                <div class="carousel-inner" role="listbox">
+                    <div class="item active">
+                        <div class="speech-bubble clearfix"><mark>The whole experience has been seamless. From losing my phone to getting a replacement the next day and my fixed phone shortly after. Couldn't recommend them enough.</mark>
+                        <br><small>Jack Giddens</small></div>
+                    </div>
+                    <div class="item">
+                        <div class="speech-bubble clearfix"><mark>Fantastic product, excellent value for money. Couldn't believe how smooth the whole process has been - these guys aren't your typical insurance company. Their customer service has been brilliant. They obviously care about their customers! I've been recommending to all my friends.</mark>
+                        <br><small>Tom Katte</small></div>
+                    </div>
+                    <div class="item">
+                        <div class="speech-bubble clearfix"><mark>Excellent service I had a new phone in 24h delivered at the door</mark>
+                        <br><small>NEEDS A NAME</small></div>
+                    </div>
+                </div>
+                <ol class="carousel-indicators">
+                    <li data-target="#carousel-feedback" data-slide-to="0" class="active"></li>
+                    <li data-target="#carousel-feedback" data-slide-to="1"></li>
+                    <li data-target="#carousel-feedback" data-slide-to="2"></li>
+                </ol>
             </div>
         </div>
     </section>
