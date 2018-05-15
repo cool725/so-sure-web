@@ -47,7 +47,7 @@ class SixpackService
     const EXPERIMENT_APP_SHARE_METHOD = 'app-share-method';
     const EXPERIMENT_APP_PICSURE_LOCATION = 'app-picsure-location';
     const EXPERIMENT_SAVE_QUOTE_24HOURS = 'save-quote-24-hours';
-    const EXPERIMENT_USER_WELCOME_MODAL = 'welcome-modal';
+    // const EXPERIMENT_USER_WELCOME_MODAL = 'welcome-modal';
     const EXPERIMENT_QUOTE_INTERCOM_PURCHASE = 'quote-intercom-purchase';
     //const EXPERIMENT_MONEY_UNBOUNCE = 'money-unbounce';
     //const EXPERIMENT_MOBILE_SEARCH_DROPDOWN = 'mobile-dropdown-search';
@@ -59,6 +59,7 @@ class SixpackService
     const EXPERIMENT_72_REPLACEMENT = 'seventytwo-hours';
     const EXPERIMENT_MONEY_LANDING = 'money-landing';
     const EXPERIMENT_PICSURE_SECTION = 'picsure-redesign';
+    const EXPERIMENT_NEW_WELCOME_MODAL = 'new-welcome-modal';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';
