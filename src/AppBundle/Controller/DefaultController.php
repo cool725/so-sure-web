@@ -134,6 +134,14 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/ebay", name="ebay")
+     */
+    public function ebayLanding(Request $request)
+    {
+        return $this->render('AppBundle:Default:indexEbay.html.twig');
+    }
+
+    /**
      * @Route("/reimagined", name="reimagined")
      * @Route("/hasslefree", name="hasslefree")
      * @Template
