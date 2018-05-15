@@ -95,6 +95,41 @@ class PhonePolicyTest extends WebTestCase
         $this->assertNotEquals($now, $policy->getStatusUpdated());
     }
 
+    public function testCanAdjustPicSureStatusForClaim()
+    {
+        $policy = new SalvaPhonePolicy();
+        $terms = new PolicyTerms();
+        $terms->setVersion(PolicyTerms::VERSION_4);
+        $policy->setPolicyTerms($terms);
+
+        $this->assertNull($policy->getPicSureStatus());
+        $this->assertTrue($policy->canAdjustPicSureStatusForClaim());
+
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_REJECTED);
+        $this->assertTrue($policy->canAdjustPicSureStatusForClaim());
+
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_INVALID);
+        $this->assertTrue($policy->canAdjustPicSureStatusForClaim());
+
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_MANUAL);
+        $this->assertTrue($policy->canAdjustPicSureStatusForClaim());
+
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+        $this->assertFalse($policy->canAdjustPicSureStatusForClaim());
+
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+        $this->assertFalse($policy->canAdjustPicSureStatusForClaim());
+
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_CLAIM_APPROVED);
+        $this->assertFalse($policy->canAdjustPicSureStatusForClaim());
+
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_PREAPPROVED);
+        $this->assertFalse($policy->canAdjustPicSureStatusForClaim());
+
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_DISABLED);
+        $this->assertFalse($policy->canAdjustPicSureStatusForClaim());
+    }
+
     public function testEmptyPolicyReturnsCorrectApiData()
     {
         $policy = new SalvaPhonePolicy();

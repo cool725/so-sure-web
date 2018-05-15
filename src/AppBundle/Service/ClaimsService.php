@@ -83,6 +83,8 @@ class ClaimsService
         if (!$claim->getPolicy() instanceof PhonePolicy) {
             throw new \Exception('not policy');
         }
+        /** @var PhonePolicy $policy */
+        $policy = $claim->getPolicy();
         $claim->getPolicy()->updatePotValue();
         $this->dm->flush();
         $this->notifyMonetaryClaim($claim->getPolicy(), $claim, true);
@@ -96,6 +98,9 @@ class ClaimsService
             $this->notifyMonetaryClaim($networkConnection->getLinkedPolicy(), $claim, false);
         }
 
+        if ($policy->canAdjustPicSureStatusForClaim()) {
+            $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_CLAIM_APPROVED);
+        }
         $claim->setProcessed(true);
         $this->recordLostPhone($claim->getPolicy(), $claim);
         $this->dm->flush();
