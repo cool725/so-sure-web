@@ -986,7 +986,7 @@ class UserController extends BaseController
 
         /** @var User $user */
         $user = $this->getUser();
-        /** @var Policy $policy */
+        /** @var PhonePolicy $policy */
         $policy = $user->getUnpaidPolicy();
         if ($policy) {
             $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);

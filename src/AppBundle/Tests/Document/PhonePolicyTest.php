@@ -2641,6 +2641,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->setPhone(static::$phone);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
 
+        $discountPayment = null;
         if ($discount) {
             $discountPayment = new PolicyDiscountPayment();
             $discountPayment->setAmount($discount);
@@ -2651,7 +2652,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->create(rand(1, 999999), null, $date, rand(1, 9999));
         $policy->setPremiumInstallments($installments);
         $policy->setStatus(Policy::STATUS_ACTIVE);
-        if ($discount) {
+        if ($discount && $discountPayment) {
             $policy->getPremium()->setAnnualDiscount($discountPayment->getAmount());
         }
         if ($amount > 0) {
