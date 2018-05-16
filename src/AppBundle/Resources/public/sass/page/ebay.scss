@@ -349,11 +349,11 @@ $gadgetcover: #E8C955;
             }
         }
 
-        @include breakpoint(tablet) {
-            text-align: left;
+        @include breakpoint(laptop) {
+            // text-align: left;
 
             .col-md-4 {
-                text-align: right;
+                text-align: left;
 
                 img {
                     margin-top: 35px;
