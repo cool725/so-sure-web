@@ -615,6 +615,14 @@ $gadgetcover: #E8C955;
     min-height: 350px;
     max-width: 800px;
     margin: 15px auto;
+
+    @include breakpoint(tablet) {
+        min-height: 380px;
+    }
+
+    @include breakpoint(laptop) {
+        min-height: 350px;
+    }
 }
 
 .carousel-indicators {
