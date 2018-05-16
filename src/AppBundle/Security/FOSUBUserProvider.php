@@ -199,24 +199,6 @@ class FOSUBUserProvider extends BaseClass
 
         //if user exists - go with the HWIOAuth way
         //$user = parent::loadUserByOAuthUserResponse($response);
-
-        var_dump($search);
-        var_dump($response->getAccessToken());
-
-        //if ($search == "googleId") {
-        if (!$this->google->validateToken(
-                $user,
-                $response->getAccessToken()
-            )) {
-            var_dump("NO");
-        }
-        //}
-        var_dump("YES");
-
-        die();
-
-
-
         if ($service != self::SERVICE_ACCOUNTKIT) {
             $setter = 'set' . ucfirst($service) . 'AccessToken';
             //update access token

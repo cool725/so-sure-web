@@ -110,6 +110,16 @@
 	}
 }
 
+.btn-google {
+	@include btn($google, $white);
+
+	&:hover,
+	&:focus,
+	&:active {
+		color: $white;
+	}
+}
+
 .btn-starling {
 	@include btn($starling, $white);
 

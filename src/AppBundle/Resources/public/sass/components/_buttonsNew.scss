@@ -76,6 +76,10 @@
 	@include btn($facebook, $white, $white);
 }
 
+.btn-google {
+	@include btn($google, $white, $white);
+}
+
 .btn-starling {
 	@include btn($starling, $white, $white);
 }

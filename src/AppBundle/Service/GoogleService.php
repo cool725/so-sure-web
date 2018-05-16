@@ -45,21 +45,17 @@ class GoogleService
      */
     public function getUserIdFromToken($token)
     {
-        var_dump("getUserIdFromToken");
-        $client = new \Google_Client(['client_id' => "1062115475688-k4p91u0ju8kss69gb8g59r1e45vit38j.apps.googleusercontent.com"]);
+        $client = new \Google_Client(['client_id' => "1062115475688-lm82l8p6ckr2bp7mus2q7q7mkiu01q4f.apps.googleusercontent.com");
         $client->setApplicationName($this->googleAppName);
         $client->setDeveloperKey($this->googleApiKey);
-        var_dump("getUserIdFromToken client");
+        $client->setScopes('email profile');
 
         $payload = $client->verifyIdToken($token);
         $this->logger->error('googleService payload', ['payload' => $payload]);
         if ($payload) {
-            var_dump($payload);
             $userid = $payload['sub'];
             return $userid;
         }
-
-        var_dump("getUserIdFromToken failed");
 
         return null;
     }
@@ -69,7 +65,6 @@ class GoogleService
      */
     public function validateToken(User $user, $token)
     {
-        var_dump($user->getGoogleId());
         return $this->validateTokenId($user->getGoogleId(), $token);
     }
 
@@ -78,9 +73,8 @@ class GoogleService
      */
     public function validateTokenId($id, $token)
     {
-        $idFromToken = $this->getUserIdFromToken($token);
         try {
-            
+            $idFromToken = $this->getUserIdFromToken($token);        
             $this->logger->error('googleService ', ['id' => $id, 'idFromToken' => $idFromToken]);
             return  $idFromToken == $id;
         } catch (\Exception $e) {

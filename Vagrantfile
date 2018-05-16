@@ -140,7 +140,7 @@ Vagrant.configure("2") do |config|
     	inline: $deploy
     	
     dev1604_config.vm.provider "virtualbox" do |v|
-      v.customize ["modifyvm", :id, "--memory", 1200]
+      v.customize ["modifyvm", :id, "--memory", 2048]
       v.customize ["modifyvm", :id, "--cpus", 1]
       
       # Virtualbox has issues with symlinks - https://www.virtualbox.org/ticket/10085#comment:12
