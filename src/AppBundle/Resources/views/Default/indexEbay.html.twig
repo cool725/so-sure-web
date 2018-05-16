@@ -6,7 +6,7 @@
 {% set homepage = 1 %}
 {% set useDropdownSearch = 1 %}
 
-{% block title %}so-sure - Welcome to Social Insurance in partnership with Money{% endblock %}
+{% block title %}so-sure - Welcome to Social Insurance in partnership with eBay{% endblock %}
 {% block meta %}
     <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
 {% endblock %}
@@ -15,18 +15,157 @@
     {{ parent() }}
     {% stylesheets output='css/*.css'
     'components/animate.css/animate.min.css'
-    '@AppBundle/Resources/public/sass/page/money.scss'
+    '@AppBundle/Resources/public/sass/page/ebay.scss'
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
 {% block body %}
 
-    <section class="section--pad money__hero">
+    <section class="section--pad ebay__hero">
         <div class="container">
-            <h3 class="text-center h-light">in partnership with</h3>
-            <img src="{{ cdn_url }}/images/moneycouk.png" alt="Money" class="money-img img-center" width="240px">
+            <h1 class="text-center text-blue">
+                {% if main_title is defined and main_title %}
+                    {{ main_title }}
+                {% else %}
+                    Mobile insurance you deserve.
+                {% endif %}
+            </h1>
+            <p class="big-text text-center">We're a new kind of insurer that's focused on people, <span class="ebay_red">not profits</span>. Providing insurance that's <span class="ebay_blue">reliable</span>, <span class="ebay_amber">rewarding</span> and altogether <span class="ebay_green">better</span>.</p>
 
-            <h1 class="text-blue text-center">See How We Compare On Mobile Insurance <br><small class="h-light">with so-sure, we've got you covered</small></h1>
+            <div class="hidden-xs">
+                <h4 class="text-center h-light">in partnership with</h4>
+                <img src="{{ cdn_url }}/images/ebaylogo_so-sure.png" alt="ebay" class="ebay-img img-center" width="140px">
+            </div>
+
+            <div class="animated slideInLeft">
+                {# Phone Search #}
+                {% if device_category() == 'Mobile' %}
+                    {% set select_template = 'AppBundle:Default:selectPhoneMakeDropdown' %}
+                {% else %}
+                    {% set select_template = 'AppBundle:Default:selectPhoneMakeSearch' %}
+                {% endif %}
+                {% if phone is defined and phone %}
+                    {{ render(controller(select_template, {
+                        'type': 'ebay',
+                        'id': phone.id
+                    })) }}
+                {% else %}
+                    {{ render(controller(select_template, {
+                        'type': 'ebay',
+                    })) }}
+                {% endif %}
+                {# End Phone Search #}
+            </div>
+
+            <div class="visible-xs-block">
+                <h4 class="text-center h-light">in partnership with</h4>
+                <img src="{{ cdn_url }}/images/ebaylogo_so-sure.png" alt="ebay" class="ebay-img img-center" width="140px">
+            </div>
+
+        </div>
+    </section>
+
+    {# Press #}
+    <section class="ebay__press">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <ul class="list-inline text-center">
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_defaqto.svg" alt="Defaqto" title="Defaqto"></li>
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_trustpilot.svg" alt="TrustPilot" title="TrustPilot"></li>
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_money.svg" alt="Money.co.uk" title="Money.co.uk"></li>
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_go-compare.svg" alt="Go Compare" title="Go Compare"></li>
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_theguardian.svg" alt="The Guardian" title="The Guardian"></li>
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_financial-times.svg" alt="Financial Times" title="Financial Times"></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="section--pad ebay__cover">
+        <div class="container">
+            <h2 class="text-center">What's Covered</h2>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="media">
+                        <div class="media-left media-middle">
+                            <img src="{{ cdn_url }}/images/homepage/so-sure_theft.svg" alt="Theft" width="120px">
+                        </div>
+                        <div class="media-body">
+                            <h4 class="media-heading">Theft</h4>
+                            <p>We hate thieves as much as you do! We've got your back.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="media">
+                        <div class="media-left media-middle">
+                            <img src="{{ cdn_url }}/images/homepage/so-sure_loss.svg" alt="Loss" width="120px">
+                        </div>
+                        <div class="media-body">
+                            <h4 class="media-heading">Loss</h4>
+                            <p>The unexplained loss, usually at the pub ;) We've got your back.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="media">
+                        <div class="media-left media-middle">
+                            <img src="{{ cdn_url }}/images/homepage/so-sure_accidental_damage.svg" alt="Accidental Damage" width="120px">
+                        </div>
+                        <div class="media-body">
+                            <h4 class="media-heading">Accidental Damage</h4>
+                            <p>Dropped it down the loo? Dropped it while walking into someone? We've got your back.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="media">
+                        <div class="media-left media-middle">
+                            <img src="{{ cdn_url }}/images/homepage/so-sure_out_of_warranty_breakdown.svg" alt="Out of Warranty Breakdown" width="120px">
+                        </div>
+                        <div class="media-body">
+                            <h4 class="media-heading">Out of Warranty Breakdown</h4>
+                            <p>We've got your back. for cover outside of your warranty period.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="media">
+                        <div class="media-left media-middle">
+                            <img src="{{ cdn_url }}/images/homepage/so-sure_unauthorised_network_charges.svg" alt="Unauthorised Network Charges" width="120px">
+                        </div>
+                        <div class="media-body">
+                            <h4 class="media-heading">Unauthorised Network Charges</h4>
+                            <p>We've got your back for up to &pound;1000 of charges you shouldn't be paying.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="media">
+                        <div class="media-left media-middle">
+                            <img src="{{ cdn_url }}/images/homepage/so-sure_accessories.svg" alt="accessories" width="120px">
+                        </div>
+                        <div class="media-body">
+                            <h4 class="media-heading">Accessories</h4>
+                            <p>We've got your back for theft or loss of accessories up to &pound;100</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section--pad ebay_compare">
+        <div class="container">
+
+            <h2 class="text-center">See How We Compare On Mobile Insurance</h2>
 
             {# Mobile Table #}
             <div class="row visible-xs-block comparison__container">
@@ -215,7 +354,7 @@
                         <tr>
                             <td align="middle" class="border-left-right">
                                 <i class="fa fa-check-circle fa-2x text-blue" aria-hidden="true"></i> <br>
-                                Opportunity to get <br class="visible-xs-inline"> money back
+                                Opportunity to get <br class="visible-xs-inline"> ebay back
                             </td>
                             <td align="middle"><i class="fa fa-minus fa-lg text-grey" aria-hidden="true"></i></td>
                             <td align="middle"><i class="fa fa-minus fa-lg text-grey" aria-hidden="true"></i></td>
@@ -233,111 +372,10 @@
                     </tbody>
                 </table>
             </div>
-            <div class="text-center">
-                <a href="#" class="btn btn-green btn-pad btn-lg h2 sosure-track" data-toggle="modal" data-target="#quoteModal" data-event="money-cta">Get Insured</a>
-            </div>
         </div>
     </section>
 
-    {# Press #}
-    <section class="section--pad money__press">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-12 text-center">
-                    <h5>As featured in</h5>
-                    <img src="{{ cdn_url }}/images/moneycouk.png" alt="Money" class="money-img">
-                    <ul class="list-inline press-list text-center">
-                        <li class="press-img" title="The Guardian - Why Facebook and Microsoft say chatbots are the talk of the town"></li>
-                        <li class="press-img" title="Financial Times - Innovation to watch: Friends based insurance"></li>
-                        <li class="press-img" title="Insurance Post - so-sure to launch revolutionary social peer-to-peer mobile insurance app"></li>
-                        <li class="press-img" title="As seen on Money.co.uk"></li>
-                        <li class="press-img" title="Digital Top 50 Awards 2016 - B2C Start-up"></li>
-                        {# <li class="press-img" title="Insurance Choice Awards 2017 - ‘Best Insurance App' + 'Innovation of the Year' categories 2017"></li> #}
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="section--pad money__cover">
-        <div class="container">
-            <h2 class="text-center text-blue">What's Covered</h2>
-            <div class="row">
-                <div class="col-sm-6">
-                    <div class="media">
-                        <div class="media-left media-middle">
-                            <img src="{{ cdn_url }}/images/homepage/so-sure_theft.svg" alt="Theft" width="120px">
-                        </div>
-                        <div class="media-body">
-                            <h4 class="media-heading text-blue">Theft</h4>
-                            <p>We hate thieves as much as you do! We've got your back.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="media">
-                        <div class="media-left media-middle">
-                            <img src="{{ cdn_url }}/images/homepage/so-sure_loss.svg" alt="Loss" width="120px">
-                        </div>
-                        <div class="media-body">
-                            <h4 class="media-heading text-blue">Loss</h4>
-                            <p>The unexplained loss, usually at the pub ;) We've got your back.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm-6">
-                    <div class="media">
-                        <div class="media-left media-middle">
-                            <img src="{{ cdn_url }}/images/homepage/so-sure_accidental_damage.svg" alt="Accidental Damage" width="120px">
-                        </div>
-                        <div class="media-body">
-                            <h4 class="media-heading text-blue">Accidental Damage</h4>
-                            <p>Dropped it down the loo? Dropped it while walking into someone? We've got your back.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="media">
-                        <div class="media-left media-middle">
-                            <img src="{{ cdn_url }}/images/homepage/so-sure_out_of_warranty_breakdown.svg" alt="Out of Warranty Breakdown" width="120px">
-                        </div>
-                        <div class="media-body">
-                            <h4 class="media-heading text-blue">Out of Warranty Breakdown</h4>
-                            <p>We've got your back. for cover outside of your warranty period.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm-6">
-                    <div class="media">
-                        <div class="media-left media-middle">
-                            <img src="{{ cdn_url }}/images/homepage/so-sure_unauthorised_network_charges.svg" alt="Unauthorised Network Charges" width="120px">
-                        </div>
-                        <div class="media-body">
-                            <h4 class="media-heading text-blue">Unauthorised Network Charges</h4>
-                            <p>We've got your back for up to &pound;1000 of charges you shouldn't be paying.</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="media">
-                        <div class="media-left media-middle">
-                            <img src="{{ cdn_url }}/images/homepage/so-sure_accessories.svg" alt="accessories" width="120px">
-                        </div>
-                        <div class="media-body">
-                            <h4 class="media-heading text-blue">Accessories</h4>
-                            <p>We've got your back for theft or loss of accessories up to &pound;100</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="section--pad money__cover_next">
+    <section class="section--pad ebay__cover_next">
         <div class="container">
             <div class="row">
                 <div class="col-md-4">
@@ -350,6 +388,7 @@
                         <li>Cashback when you and your connections don't claim</li>
                         <li>Low excess from just &pound;50 when validated with pic-sure</li>
                         <li>Instant Cover</li>
+                        <li>Refurbished and second-hand devices up to 3 years old are covered</li>
                     </ul>
                 </div>
             </div>
@@ -359,15 +398,29 @@
         </div>
     </section>
 
-    <section class="section--pad money__feedback">
+    <section class="section--pad ebay_feedback">
         <div class="container">
-            <div class="row">
-                <div class="col-md-8 col-md-offset-2">
-                    <h3 class="text-center">What Our Customers Say</h3>
-                    <div class="speech-bubble animated fadeInLeft clearfix"><mark>Superb service with my first use of so-sure. I couldn't be happier with the way my claim was handled and I got my phone the next day 😁</mark><br><br>
-                    <img src="{{ cdn_url }}/images/feedback/so-sure_feedback_temp.png" alt="" class="img-circle" width="120px;">
-                    <br><small>Ben Allsopp General Manager, Living in London.</small></div>
+            <h2 class="text-center">Happy Customers</h2>
+            <div id="carousel-feedback" class="carousel slide" data-ride="carousel">
+                <div class="carousel-inner" role="listbox">
+                    <div class="item active">
+                        <div class="speech-bubble clearfix"><mark>The whole experience has been seamless. From losing my phone to getting a replacement the next day and my fixed phone shortly after. Couldn't recommend them enough.</mark>
+                        <br><small>Jack Giddens</small></div>
+                    </div>
+                    <div class="item">
+                        <div class="speech-bubble clearfix"><mark>Fantastic product, excellent value for money. Couldn't believe how smooth the whole process has been - these guys aren't your typical insurance company. Their customer service has been brilliant. They obviously care about their customers! I've been recommending to all my friends.</mark>
+                        <br><small>Tom Katte</small></div>
+                    </div>
+                    <div class="item">
+                        <div class="speech-bubble clearfix"><mark>Excellent service I had a new phone in 24h delivered at the door</mark>
+                        <br><small>Herve N</small></div>
+                    </div>
                 </div>
+                <ol class="carousel-indicators">
+                    <li data-target="#carousel-feedback" data-slide-to="0" class="active"></li>
+                    <li data-target="#carousel-feedback" data-slide-to="1"></li>
+                    <li data-target="#carousel-feedback" data-slide-to="2"></li>
+                </ol>
             </div>
         </div>
     </section>
@@ -388,7 +441,7 @@
     '@AppBundle/Resources/public/js/Default/images.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMakeSearch.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMakeDropdown.js'
-    '@AppBundle/Resources/public/js/Default/money.js'
+    '@AppBundle/Resources/public/js/Default/ebay.js'
  %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}

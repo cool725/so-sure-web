@@ -9,6 +9,9 @@
 {% elseif type is defined and type == 'homepage-sticky' %}
     {% set uid = '-1' %}
     {% set formId = 'dropdown-phone-form' ~ uid %}
+{% elseif type is defined and type == 'ebay' %}
+    {% set uid = '-1' %}
+    {% set formId = 'dropdown-phone-form' ~ uid %}
 {% elseif type is defined and type == 'footer' %}
     {% set uid = '-2' %}
     {% set formId = 'dropdown-phone-form' ~ uid %}
