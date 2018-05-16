@@ -138,17 +138,17 @@ class DefaultController extends BaseController
      */
     public function ebayLanding(Request $request)
     {
-        // $exp = $this->sixpack(
-        //     $request,
-        //     SixpackService::EXPERIMENT_EBAY_LANDING,
-        //     ['homepage', 'ebay-landing']
-        // );
+        $exp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_EBAY_LANDING,
+            ['homepage', 'ebay-landing']
+        );
 
-        // if ($exp == 'ebay') {
+        if ($exp == 'ebay-landing') {
             return $this->render('AppBundle:Default:indexEbay.html.twig');
-        // } else {
-            // return $this->redirectToRoute('homepage');
-        // }
+        } else {
+            return $this->redirectToRoute('homepage');
+        }
     }
 
     /**
