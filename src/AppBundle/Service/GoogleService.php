@@ -51,16 +51,22 @@ class GoogleService
 
         $payload = 'https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=' . $token;
         $json = file_get_contents($payload);
-        $userInfoArray = json_decode($json,true);
-        $googleEmail = $userInfoArray['email'];
-        $google_id= $userInfoArray['sub'];
 
+        $this->logger->error('googleService payload', ['payload' => $json]);
+        if ($json) {
+            $userInfoArray = json_decode($json, true);
+            $googleEmail = $userInfoArray['email'];
+            $googleId = $userInfoArray['sub'];
+            return $googleId;
+        }
+
+        /*
         //$payload = $client->verifyIdToken($token);
-        $this->logger->error('googleService payload', ['payload' => $payload]);
         if ($payload) {
             $userid = $payload['sub'];
             return $userid;
         }
+        */
 
         return null;
     }
