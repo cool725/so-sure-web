@@ -118,7 +118,7 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $phone->changePrice(9, new \DateTime());
     }
 
-    public function testChangePrice()
+    public function testChangePriceOneDay()
     {
         $phone = new Phone();
         $phone->init('Apple', 'Price', 9, 32, ['time'], 500);
@@ -126,6 +126,21 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $this->assertNotNull($phone->getSalvaMiniumumBinderMonthlyPremium());
         $future = new \DateTime();
         $future = $this->addBusinessDays($future, 1);
+        $phone->changePrice(9, $future);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testChangePriceOneDayBefore()
+    {
+        $phone = new Phone();
+        $phone->init('Apple', 'OneDayBefore', 9, 32, ['time'], 500);
+        $this->assertNotNull($phone->getSalvaBinderMonthlyPremium());
+        $this->assertNotNull($phone->getSalvaMiniumumBinderMonthlyPremium());
+        $future = new \DateTime();
+        $future = $this->addBusinessDays($future, 1);
+        $future = $future->sub(new \DateInterval('PT1S'));
         $phone->changePrice(9, $future);
     }
 

@@ -1199,10 +1199,10 @@ class Phone
             throw new \Exception(sprintf('Unable to determine min binder'));
         }
 
-        $now = new \DateTime();
-        $oneDay = $this->addBusinessDays($now, 1);
+        $oneDay = $this->addBusinessDays($date, 1);
         $dateDiff = $oneDay->diff($from);
-        if ($dateDiff->days == 0 || ($dateDiff->days > 0 && $dateDiff->invert)) {
+        print_r($dateDiff);
+        if ($dateDiff->invert) {
             throw new \Exception(sprintf(
                 '%s must be at least 1 business day (%s) after now',
                 $from->format(\DateTime::ATOM),
