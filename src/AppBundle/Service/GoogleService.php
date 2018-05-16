@@ -45,7 +45,7 @@ class GoogleService
      */
     public function getUserIdFromToken($token)
     {
-        $client = new \Google_Client(['client_id' => "1062115475688-lm82l8p6ckr2bp7mus2q7q7mkiu01q4f.apps.googleusercontent.com");
+        $client = new \Google_Client(['client_id' => "1062115475688-lm82l8p6ckr2bp7mus2q7q7mkiu01q4f.apps.googleusercontent.com"]);
         $client->setApplicationName($this->googleAppName);
         $client->setDeveloperKey($this->googleApiKey);
         $client->setScopes('email profile');
