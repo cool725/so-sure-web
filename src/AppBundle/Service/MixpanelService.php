@@ -346,9 +346,34 @@ class MixpanelService
         ];
         $data = $this->mixpanelData->data('engage', $query);
         $count = 0;
-        foreach ($data['results'] as $user) {
-            $this->queueDelete($user['$distinct_id'], 0);
-            $count++;
+        if ($data) {
+            foreach ($data['results'] as $user) {
+                $this->queueDelete($user['$distinct_id'], 0);
+                $count++;
+            }
+        }
+
+        // TODO: Remove me
+        // temporary fix to remove facebook browser data in order to clean out db to more manageable levels
+        // can be removed shorly after
+        $query = [
+            'selector' => '(behaviors["behavior_11111"] == 1)',
+            'behaviors' => [[
+                "window" => "90d",
+                "name" => "behavior_11111",
+                "event_selectors" => [[
+                    "event" => "Sixpack Experiment",
+                    "selector" => "((\"Facebook\" in event[\"\$browser\"]) and (defined (event[\"\$browser\"])))"
+                ]]
+            ]]
+        ];
+        $data = $this->mixpanelData->data('engage', $query);
+        if ($data) {
+            $count = 0;
+            foreach ($data['results'] as $user) {
+                $this->queueDelete($user['$distinct_id'], 0);
+                $count++;
+            }
         }
 
         return ['count' => $count, 'total' => $data['total']];
