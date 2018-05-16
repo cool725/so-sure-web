@@ -1201,7 +1201,6 @@ class Phone
 
         $oneDay = $this->addBusinessDays($date, 1);
         $dateDiff = $oneDay->diff($from);
-        print_r($dateDiff);
         if ($dateDiff->invert) {
             throw new \Exception(sprintf(
                 '%s must be at least 1 business day (%s) after now',
