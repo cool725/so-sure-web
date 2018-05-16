@@ -3617,7 +3617,8 @@ abstract class Policy
 
     /**
      * @param \DateTime|null $date
-     * @param boolean|null   $applyPartialDiscounts true to apply, false to completely ignore, and null to include in total
+     * @param boolean|null   $applyPartialDiscounts true to apply, false to completely ignore,
+     *                                              and null to include in total
      * @return float
      */
     public function getTotalSuccessfulPayments(\DateTime $date = null, $applyPartialDiscounts = null)
