@@ -310,6 +310,12 @@
                             {% endfor %}
                         </tr>
                         <tr>
+                            <td>Total # pic-sure claims approved (rejected/invalid/unstarted -> claims -> claims-approved) policies [KPI: ??]</td>
+                            {% for week in weeks %}
+                                <td>{% if week['kpi-picsure-claims-approved-policies'] is defined %}{{ week['kpi-picsure-claims-approved-policies'] }}{% else %}??{% endif %}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
                             <td>Total # pic-sure rejected policies [KPI: 148]</td>
                             {% for week in weeks %}
                                 <td>{{ week['kpi-picsure-rejected-policies'] }}</td>
@@ -337,6 +343,12 @@
                             <td>Active # pic-sure pre-approved (renewals) policies [KPI: ??]</td>
                             {% for week in weeks %}
                                 <td>{% if week['kpi-picsure-active-preapproved-policies'] is defined %}{{ week['kpi-picsure-active-preapproved-policies'] }}{% else %}??{% endif %}</td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <td>Active # pic-sure claims approved (rejected/invalid/unstarted -> claims -> claims-approved) policies [KPI: ??]</td>
+                            {% for week in weeks %}
+                                <td>{% if week['kpi-picsure-active-claims-approved-policies'] is defined %}{{ week['kpi-picsure-active-claims-approved-policies'] }}{% else %}??{% endif %}</td>
                             {% endfor %}
                         </tr>
                         <tr>

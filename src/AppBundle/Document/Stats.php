@@ -34,12 +34,14 @@ class Stats
     const KPI_PICSURE_TOTAL_APPROVED_POLICIES = 'kpi-picsure-approved-policies';
     const KPI_PICSURE_TOTAL_REJECTED_POLICIES = 'kpi-picsure-rejected-policies';
     const KPI_PICSURE_TOTAL_PREAPPROVED_POLICIES = 'kpi-picsure-preapproved-policies';
+    const KPI_PICSURE_TOTAL_CLAIMS_APPROVED_POLICIES = 'kpi-picsure-claims-approved-policies';
     const KPI_PICSURE_TOTAL_INVALID_POLICIES = 'kpi-picsure-invalid-policies';
 
     const KPI_PICSURE_ACTIVE_UNSTARTED_POLICIES = 'kpi-picsure-active-unstarted-policies';
     const KPI_PICSURE_ACTIVE_APPROVED_POLICIES = 'kpi-picsure-active-approved-policies';
     const KPI_PICSURE_ACTIVE_REJECTED_POLICIES = 'kpi-picsure-active-rejected-policies';
     const KPI_PICSURE_ACTIVE_PREAPPROVED_POLICIES = 'kpi-picsure-active-preapproved-policies';
+    const KPI_PICSURE_ACTIVE_CLAIMS_APPROVED_POLICIES = 'kpi-picsure-active-claims-approved-policies';
     const KPI_PICSURE_ACTIVE_INVALID_POLICIES = 'kpi-picsure-active-invalid-policies';
 
     const KPI_CANCELLED_AND_PAYMENT_OWED = 'kpi-cancelled-payment-owed';

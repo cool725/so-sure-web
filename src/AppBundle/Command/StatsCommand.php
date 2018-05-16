@@ -37,6 +37,11 @@ class StatsCommand extends ContainerAwareCommand
         $this->getStats()->set(Stats::KPI_PICSURE_TOTAL_REJECTED_POLICIES, $date, $data['picsureRejectedTotal']);
         $this->getStats()->set(Stats::KPI_PICSURE_TOTAL_UNSTARTED_POLICIES, $date, $data['picsureUnstartedTotal']);
         $this->getStats()->set(Stats::KPI_PICSURE_TOTAL_PREAPPROVED_POLICIES, $date, $data['picsurePreApprovedTotal']);
+        $this->getStats()->set(
+            Stats::KPI_PICSURE_TOTAL_CLAIMS_APPROVED_POLICIES,
+            $date,
+            $data['picsureClaimsApprovedTotal']
+        );
         $this->getStats()->set(Stats::KPI_PICSURE_TOTAL_INVALID_POLICIES, $date, $data['picsureInvalidTotal']);
 
         $this->getStats()->set(Stats::KPI_PICSURE_ACTIVE_APPROVED_POLICIES, $date, $data['picsureApprovedActive']);
@@ -46,6 +51,11 @@ class StatsCommand extends ContainerAwareCommand
             Stats::KPI_PICSURE_ACTIVE_PREAPPROVED_POLICIES,
             $date,
             $data['picsurePreApprovedActive']
+        );
+        $this->getStats()->set(
+            Stats::KPI_PICSURE_ACTIVE_CLAIMS_APPROVED_POLICIES,
+            $date,
+            $data['picsureClaimsApprovedActive']
         );
         $this->getStats()->set(Stats::KPI_PICSURE_ACTIVE_INVALID_POLICIES, $date, $data['picsureInvalidActive']);
     }

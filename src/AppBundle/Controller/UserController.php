@@ -986,6 +986,7 @@ class UserController extends BaseController
 
         /** @var User $user */
         $user = $this->getUser();
+        /** @var PhonePolicy $policy */
         $policy = $user->getUnpaidPolicy();
         if ($policy) {
             $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
@@ -1000,6 +1001,12 @@ class UserController extends BaseController
                         $request->headers->get('User-Agent'),
                         JudopayService::WEB_TYPE_UNPAID
                     );
+                } else {
+                    $this->get('logger')->warning(sprintf(
+                        'Unpaid policy %s has unpaid status, yet has a £%0.2f outstanding premium.',
+                        $policy->getId(),
+                        $amount
+                    ));
                 }
             } else {
                 $this->get('logger')->warning(sprintf(
@@ -1077,8 +1084,8 @@ class UserController extends BaseController
 
         $exp = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_USER_WELCOME_MODAL,
-            ['no-modal', 'welcome-modal'],
+            SixpackService::EXPERIMENT_NEW_WELCOME_MODAL,
+            ['current-welcome-modal', 'new-welcome-modal'],
             SixpackService::LOG_MIXPANEL_CONVERSION,
             $user->getId()
         );

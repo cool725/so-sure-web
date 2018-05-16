@@ -489,6 +489,8 @@ class SalvaExportService
     public function transformRenewal(SalvaPhonePolicy $policy = null)
     {
         if ($policy) {
+            /** @var SalvaPhonePolicy $nextPolicy */
+            $nextPolicy = $policy->getNextPolicy();
             $data = [
                 $policy->getSalvaPolicyNumber(),
                 $this->toTwoDp($policy->getPotValue()),
@@ -500,12 +502,12 @@ class SalvaExportService
                 ($policy->getCashback() && $policy->getCashback()->getStatus() == Cashback::STATUS_PAID) ?
                     $this->adjustDate($policy->getCashback()->getDate(), false) :
                     '',
-                $policy->isRenewed() ? $policy->getNextPolicy()->getSalvaPolicyNumber() : '',
-                $policy->isRenewed() ? $policy->getNextPolicy()->getPremium()->getMonthlyPremiumPrice() : '',
-                $policy->isRenewed() ? $policy->getNextPolicy()->getPremium()->getAnnualDiscount() : '',
-                $policy->isRenewed() ? $policy->getNextPolicy()->getPremium()->getMonthlyDiscount() : '',
+                $policy->isRenewed() ? $nextPolicy->getSalvaPolicyNumber() : '',
+                $policy->isRenewed() ? $nextPolicy->getPremium()->getMonthlyPremiumPrice() : '',
+                $policy->isRenewed() ? $nextPolicy->getPremium()->getAnnualDiscount() : '',
+                $policy->isRenewed() ? $nextPolicy->getPremium()->getMonthlyDiscount() : '',
                 $policy->isRenewed() ?
-                    $policy->getNextPolicy()->getPremium()->getAdjustedStandardMonthlyPremiumPrice() :
+                    $nextPolicy->getPremium()->getAdjustedStandardMonthlyPremiumPrice() :
                     '',
             ];
         } else {
