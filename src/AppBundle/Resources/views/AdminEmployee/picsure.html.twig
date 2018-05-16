@@ -44,7 +44,9 @@
 <div class="row" style="margin-top: 20px;">
     <div class="col-md-12 text-center">
         {% if policy.picsureCircumvention %}
-            <span class="fa fa-exclamation-triangle">Possible Fraud (i.e. too many attempts to do pic-sure and imei upload was too long, check events in mixpanel)<span class="fa fa-exclamation-triangle"></span></span>
+            <span class="fa fa-exclamation-triangle"> Possible Fraud (i.e. too many attempts to do pic-sure and imei upload was too long, check events in mixpanel) <span class="fa fa-exclamation-triangle"></span></span>
+        {% else %}
+            <span class="fa fa-thumbs-up"> No Fraud Detected <span class="fa fa-thumbs-up"></span></span>
         {% endif %}
     </div>
 </div>

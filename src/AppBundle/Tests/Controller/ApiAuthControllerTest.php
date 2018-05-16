@@ -3235,6 +3235,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $repo = $dm->getRepository(Policy::class);
         $updatedPolicy = $repo->find($policyData['id']);
         $this->assertEquals(PhonePolicy::PICSURE_STATUS_MANUAL, $updatedPolicy->getPicSureStatus());
+        $this->assertFalse($updatedPolicy->getPicsureCircumvention());
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
             'bucket' => 'ops.so-sure.com',
@@ -3246,6 +3247,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $repo = $dm->getRepository(Policy::class);
         $updatedPolicy = $repo->find($policyData['id']);
         $this->assertEquals(PhonePolicy::PICSURE_STATUS_MANUAL, $updatedPolicy->getPicSureStatus());
+        $this->assertTrue($updatedPolicy->getPicsureCircumvention());
     }
 
     /**
