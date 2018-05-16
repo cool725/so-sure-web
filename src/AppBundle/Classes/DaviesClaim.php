@@ -184,7 +184,7 @@ class DaviesClaim extends DaviesExcel
         ]);
     }
 
-    public function getExpectedExcess($validated = true, $picSureEnabled = false)
+    public function getExpectedExcess($validated, $picSureEnabled)
     {
         try {
             return Claim::getExcessValue($this->getClaimType(), $validated, $picSureEnabled);

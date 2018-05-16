@@ -171,7 +171,13 @@ trait DateTrait
         return $this->addBusinessDays($businessDays, 1);
     }
 
-    public function addBusinessDays($date, $days)
+    /**
+     * @param \DateTime $date
+     * @param integer   $days
+     * @return \DateTime
+     * @throws \Exception
+     */
+    public function addBusinessDays(\DateTime $date, $days)
     {
         $businessDays = clone $date;
         while ($days > 0) {

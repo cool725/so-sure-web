@@ -167,6 +167,62 @@ class ClaimsServiceTest extends WebTestCase
         $this->assertTrue($claim->getProcessed());
     }
 
+    public function testProcessClaimInvalidPicSure()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testProcessClaimInvalidPicSure', $this),
+            'bar'
+        );
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, true, true);
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_INVALID);
+        $this->assertEquals(0, $policy->getPotValue());
+
+        $claim = new Claim();
+        $claim->setStatus(Claim::STATUS_SETTLED);
+        $claim->setType(Claim::TYPE_THEFT);
+        $claim->setNumber(rand(1, 999999));
+        $policy->addClaim($claim);
+        static::$dm->flush();
+
+        $this->assertTrue(static::$claimsService->processClaim($claim));
+        $this->assertEquals(0, $policy->getPotValue());
+        $this->assertTrue($claim->getProcessed());
+
+        /** @var PhonePolicy $updatedPolicy */
+        $updatedPolicy = $this->assertPolicyExists(self::$container, $policy);
+        $this->assertEquals(PhonePolicy::PICSURE_STATUS_CLAIM_APPROVED, $updatedPolicy->getPicSureStatus());
+    }
+
+    public function testProcessClaimApprovedPicSure()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testProcessClaimApprovedPicSure', $this),
+            'bar'
+        );
+        $phone = static::getRandomPhone(static::$dm);
+        $policy = static::initPolicy($user, static::$dm, $phone, null, true, true);
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+        $this->assertEquals(0, $policy->getPotValue());
+
+        $claim = new Claim();
+        $claim->setStatus(Claim::STATUS_SETTLED);
+        $claim->setType(Claim::TYPE_THEFT);
+        $claim->setNumber(rand(1, 999999));
+        $policy->addClaim($claim);
+        static::$dm->flush();
+
+        $this->assertTrue(static::$claimsService->processClaim($claim));
+        $this->assertEquals(0, $policy->getPotValue());
+        $this->assertTrue($claim->getProcessed());
+
+        /** @var PhonePolicy $updatedPolicy */
+        $updatedPolicy = $this->assertPolicyExists(self::$container, $policy);
+        $this->assertEquals(PhonePolicy::PICSURE_STATUS_APPROVED, $updatedPolicy->getPicSureStatus());
+    }
+
     public function testProcessClaimRewards()
     {
         $user = static::createUser(

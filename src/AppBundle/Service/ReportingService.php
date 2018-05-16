@@ -596,6 +596,15 @@ class ReportingService
             $allTerms,
             true
         );
+        $data['picsureClaimsApprovedTotal'] = $policyRepo->countPicSurePolicies(
+            PhonePolicy::PICSURE_STATUS_CLAIM_APPROVED,
+            $allTerms
+        );
+        $data['picsureClaimsApprovedActive'] = $policyRepo->countPicSurePolicies(
+            PhonePolicy::PICSURE_STATUS_CLAIM_APPROVED,
+            $allTerms,
+            true
+        );
         $data['picsureUnstartedTotal'] = $policyRepo->countPicSurePolicies(null, $allTerms);
         $data['picsureUnstartedActive'] = $policyRepo->countPicSurePolicies(null, $allTerms, true);
 

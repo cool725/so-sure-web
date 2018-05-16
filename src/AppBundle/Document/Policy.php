@@ -134,6 +134,7 @@ abstract class Policy
     /**
      * @MongoDB\ReferenceOne(targetDocument="Policy", inversedBy="previousPolicy")
      * @Gedmo\Versioned
+     * @var Policy
      */
     protected $nextPolicy;
 
@@ -798,6 +799,9 @@ abstract class Policy
         return $this->getPreviousPolicy() != null;
     }
 
+    /**
+     * @return Policy
+     */
     public function getNextPolicy()
     {
         return $this->nextPolicy;
@@ -3611,16 +3615,35 @@ abstract class Policy
         return $this->areEqualToTwoDp(0, $this->getRemainderOfPolicyPrice($date));
     }
 
-    public function getTotalSuccessfulPayments(\DateTime $date = null)
+    /**
+     * @param \DateTime|null $date
+     * @param boolean|null   $applyPartialDiscounts true to apply, false to completely ignore,
+     *                                              and null to include in total
+     * @return float
+     */
+    public function getTotalSuccessfulPayments(\DateTime $date = null, $applyPartialDiscounts = null)
     {
         if (!$date) {
             $date = new \DateTime();
         }
         $totalPaid = 0;
+        $numberOfPayments = 0;
+        $totalDiscount = 0;
         foreach ($this->getSuccessfulPayments() as $payment) {
-            if ($payment->getDate() <= $date) {
-                $totalPaid += $payment->getAmount();
+            // payment applied in the future - ignore
+            if ($payment->getDate() > $date) {
+                continue;
             }
+            if ($payment instanceof \AppBundle\Document\Payment\PolicyDiscountPayment &&
+                $applyPartialDiscounts !== null) {
+                $totalDiscount += $payment->getAmount();
+            } else {
+                $totalPaid += $payment->getAmount();
+                $numberOfPayments++;
+            }
+        }
+        if ($totalDiscount > 0 && $applyPartialDiscounts) {
+            $totalPaid += $this->toTwoDp($numberOfPayments * $totalDiscount / 12);
         }
 
         return $totalPaid;
@@ -3681,7 +3704,7 @@ abstract class Policy
             return null;
         }
 
-        $totalPaid = $this->getTotalSuccessfulPayments($date);
+        $totalPaid = $this->getTotalSuccessfulPayments($date, false);
         $expectedPaid = $this->getTotalExpectedPaidToDate($date);
 
         $diff = $expectedPaid - $totalPaid;
@@ -3775,7 +3798,7 @@ abstract class Policy
             return null;
         }
 
-        $totalPaid = $this->getTotalSuccessfulPayments($date);
+        $totalPaid = $this->getTotalSuccessfulPayments($date, true);
         $expectedPaid = $this->getTotalExpectedPaidToDate($date);
         // print sprintf("%f =? %f", $totalPaid, $expectedPaid) . PHP_EOL;
 
