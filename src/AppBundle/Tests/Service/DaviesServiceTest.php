@@ -1949,7 +1949,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->replacementImei = $this->generateRandomImei();
         $this->assertTrue(static::$daviesService->saveClaim($daviesClaim, false));
         $this->assertEquals(
-            1,
+            2,
             count(self::$daviesService->getErrors()[$claim->getNumber()]),
             json_encode(self::$daviesService->getErrors())
         );
