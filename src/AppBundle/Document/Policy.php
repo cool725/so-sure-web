@@ -3615,7 +3615,13 @@ abstract class Policy
         return $this->areEqualToTwoDp(0, $this->getRemainderOfPolicyPrice($date));
     }
 
-    public function getTotalSuccessfulPayments(\DateTime $date = null, $applyPartialDiscounts = false)
+    /**
+     * @param \DateTime|null $date
+     * @param boolean|null   $applyPartialDiscounts true to apply, false to completely ignore,
+     *                                              and null to include in total
+     * @return float
+     */
+    public function getTotalSuccessfulPayments(\DateTime $date = null, $applyPartialDiscounts = null)
     {
         if (!$date) {
             $date = new \DateTime();
@@ -3628,14 +3634,15 @@ abstract class Policy
             if ($payment->getDate() > $date) {
                 continue;
             }
-            if ($payment instanceof PolicyDiscountPayment && $applyPartialDiscounts) {
+            if ($payment instanceof \AppBundle\Document\Payment\PolicyDiscountPayment &&
+                $applyPartialDiscounts !== null) {
                 $totalDiscount += $payment->getAmount();
             } else {
                 $totalPaid += $payment->getAmount();
                 $numberOfPayments++;
             }
         }
-        if ($totalDiscount > 0) {
+        if ($totalDiscount > 0 && $applyPartialDiscounts) {
             $totalPaid += $this->toTwoDp($numberOfPayments * $totalDiscount / 12);
         }
 
@@ -3697,7 +3704,7 @@ abstract class Policy
             return null;
         }
 
-        $totalPaid = $this->getTotalSuccessfulPayments($date);
+        $totalPaid = $this->getTotalSuccessfulPayments($date, false);
         $expectedPaid = $this->getTotalExpectedPaidToDate($date);
 
         $diff = $expectedPaid - $totalPaid;

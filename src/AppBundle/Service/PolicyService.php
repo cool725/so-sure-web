@@ -852,7 +852,7 @@ class PolicyService
 
         // premium installments must either be 1 or 12
         $policy->setPremiumInstallments($numPayments == 1 ? 1 : 12);
-        $paid = $policy->getTotalSuccessfulPayments($initialDate);
+        $paid = $policy->getTotalSuccessfulPayments($initialDate, true);
         if ($billingOffset) {
             $paid += $billingOffset;
         }
