@@ -357,9 +357,10 @@ class MixpanelService
         // with our sixpack tests and causes a huge increase (30k+ users over a few week period)
         // so delete any users over 1 day old with a facebook brower that have just 1 sixpack experiment
         $now = new \DateTime();
+        // @codingStandardsIgnoreStart
         $query = [
             'selector' => sprintf(
-                '(behaviors["behavior_11111"] == 1 and datetime(%s - 86400) > user["$last_seen"])',
+                '(behaviors["behavior_11111"] == 1 and datetime(%s - 86400) > user["$last_seen"] and behaviors["behavior_11112"] == 0 and behaviors["behavior_11113"] == 0)',
                 $now->format('U')
             ),
             'behaviors' => [[
@@ -369,8 +370,21 @@ class MixpanelService
                     "event" => "Sixpack Experiment",
                     "selector" => "((\"Facebook\" in event[\"\$browser\"]) and (defined (event[\"\$browser\"])))"
                 ]]
-            ]]
-        ];
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11112",
+                "event_selectors" => [[
+                    "event" => "Login"
+                ]]
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11113",
+                "event_selectors" => [[
+                    "event" => "Click on the Buy Now Button"
+                ]]
+            ]
+        ]];
+        // @codingStandardsIgnoreEnd
         $data = $this->mixpanelData->data('engage', $query);
         if ($data) {
             $count = 0;
