@@ -300,12 +300,9 @@ class RequestService
         if (mb_stripos($userAgentDetails->ua->family, 'crawler') !== false) {
             return true;
         }
-        // Although facebook should be allowed, there seems to be a 'preview' mode which causes havoc
-        // with our sixpack tests and causes a huge increase (30k+ users over a few week period)
-        // exclude for now until we can find a better solution
-        if (mb_stripos($userAgentDetails->ua->family, 'facebook') !== false) {
-            return true;
-        }
+        //if (mb_stripos($userAgentDetails->ua->family, 'facebook') !== false) {
+        //    return true;
+        //}
 
         // exclude bots from tracking
         if (in_array($userAgentDetails->ua->family, [

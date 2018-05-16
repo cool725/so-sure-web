@@ -353,11 +353,15 @@ class MixpanelService
             }
         }
 
-        // TODO: Remove me
-        // temporary fix to remove facebook browser data in order to clean out db to more manageable levels
-        // can be removed shorly after
+        // Although facebook should be allowed, there seems to be a 'preview' mode which causes havoc
+        // with our sixpack tests and causes a huge increase (30k+ users over a few week period)
+        // so delete any users over 1 day old with a facebook brower that have just 1 sixpack experiment
+        $now = new \DateTime();
         $query = [
-            'selector' => '(behaviors["behavior_11111"] == 1)',
+            'selector' => sprintf(
+                '(behaviors["behavior_11111"] == 1 and datetime(%s - 86400) > user["$last_seen"])',
+                $now->format('U')
+            ),
             'behaviors' => [[
                 "window" => "90d",
                 "name" => "behavior_11111",
