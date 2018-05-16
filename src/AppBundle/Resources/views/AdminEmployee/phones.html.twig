@@ -287,7 +287,8 @@
               <div class="col-sm-6">
                 <div class="form-group">
                   <label for="phone-gwp" class="control-label col-sm-2">
-                    <i class="fa fa-warning" title="Must be in the future (1 second min).  However, it can take up to 10 minutes before policy prices will be guarenteed due to possible purchaes in progress."></i>&nbsp;
+                      {# from tech perspective, 1 second, from business perspective 1 business day #}
+                    <i class="fa fa-warning" title="Must be in the future.  However, it can take up to 10 minutes after the date/time entered before policy prices will be guarenteed due to possible purchaes in progress."></i>&nbsp;
                     From:
                   </label>
                   <div class="col-sm-10">
@@ -297,6 +298,8 @@
                         <span class="fa fa-calendar"></span>
                       </span>
                     </div>
+                      <br>
+                      Must be <strong>{{ one_day|date("F j, Y H:i", "Europe/London") }}</strong> or later (1 business day)
                   </div>
                 </div>
               </div>
@@ -315,7 +318,7 @@
               </div>
             </div>
             <div class="row">
-              <div class="col-sm-4">
+              <div class="col-sm-6">
                 <div class="form-group">
                   <label for="phone-gwp" class="control-label col-sm-2">GWP:</label>
                   <div class="col-sm-10">

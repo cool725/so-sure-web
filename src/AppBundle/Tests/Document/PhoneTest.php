@@ -3,6 +3,7 @@
 namespace AppBundle\Tests\Document;
 
 use AppBundle\Classes\SoSure;
+use AppBundle\Document\DateTrait;
 use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePrice;
 
@@ -11,6 +12,8 @@ use AppBundle\Document\PhonePrice;
  */
 class PhoneTest extends \PHPUnit\Framework\TestCase
 {
+    use DateTrait;
+
     public static function setUpBeforeClass()
     {
     }
@@ -113,6 +116,43 @@ class PhoneTest extends \PHPUnit\Framework\TestCase
         $this->assertNull($phone->getSalvaBinderMonthlyPremium());
         $this->assertNull($phone->getSalvaMiniumumBinderMonthlyPremium());
         $phone->changePrice(9, new \DateTime());
+    }
+
+    public function testChangePrice()
+    {
+        $phone = new Phone();
+        $phone->init('Apple', 'Price', 9, 32, ['time'], 500);
+        $this->assertNotNull($phone->getSalvaBinderMonthlyPremium());
+        $this->assertNotNull($phone->getSalvaMiniumumBinderMonthlyPremium());
+        $future = new \DateTime();
+        $future = $this->addBusinessDays($future, 1);
+        $phone->changePrice(9, $future);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testChangePriceImmediate()
+    {
+        $phone = new Phone();
+        $phone->init('Apple', 'Immediate', 9, 32, ['time'], 500);
+        $this->assertNotNull($phone->getSalvaBinderMonthlyPremium());
+        $this->assertNotNull($phone->getSalvaMiniumumBinderMonthlyPremium());
+        $phone->changePrice(9, new \DateTime());
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testChangePricePast()
+    {
+        $phone = new Phone();
+        $phone->init('Apple', 'Past', 9, 32, ['time'], 500);
+        $this->assertNotNull($phone->getSalvaBinderMonthlyPremium());
+        $this->assertNotNull($phone->getSalvaMiniumumBinderMonthlyPremium());
+        $past = new \DateTime();
+        $past = $past->sub(new \DateInterval('P7D'));
+        $phone->changePrice(9, $past);
     }
 
     /**
