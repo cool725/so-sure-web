@@ -95,6 +95,41 @@ class PhonePolicyTest extends WebTestCase
         $this->assertNotEquals($now, $policy->getStatusUpdated());
     }
 
+    public function testCanAdjustPicSureStatusForClaim()
+    {
+        $policy = new SalvaPhonePolicy();
+        $terms = new PolicyTerms();
+        $terms->setVersion(PolicyTerms::VERSION_4);
+        $policy->setPolicyTerms($terms);
+
+        $this->assertNull($policy->getPicSureStatus());
+        $this->assertTrue($policy->canAdjustPicSureStatusForClaim());
+
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_REJECTED);
+        $this->assertTrue($policy->canAdjustPicSureStatusForClaim());
+
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_INVALID);
+        $this->assertTrue($policy->canAdjustPicSureStatusForClaim());
+
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_MANUAL);
+        $this->assertTrue($policy->canAdjustPicSureStatusForClaim());
+
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+        $this->assertFalse($policy->canAdjustPicSureStatusForClaim());
+
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_APPROVED);
+        $this->assertFalse($policy->canAdjustPicSureStatusForClaim());
+
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_CLAIM_APPROVED);
+        $this->assertFalse($policy->canAdjustPicSureStatusForClaim());
+
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_PREAPPROVED);
+        $this->assertFalse($policy->canAdjustPicSureStatusForClaim());
+
+        $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_DISABLED);
+        $this->assertFalse($policy->canAdjustPicSureStatusForClaim());
+    }
+
     public function testEmptyPolicyReturnsCorrectApiData()
     {
         $policy = new SalvaPhonePolicy();
@@ -2589,7 +2624,7 @@ class PhonePolicyTest extends WebTestCase
         );
     }
 
-    private function createPolicyForCancellation($amount, $commission, $installments, $date = null)
+    private function createPolicyForCancellation($amount, $commission, $installments, $date = null, $discount = null)
     {
         if (!$date) {
             $date = new \DateTime("2016-01-01");
@@ -2605,6 +2640,15 @@ class PhonePolicyTest extends WebTestCase
         $policy = new SalvaPhonePolicy();
         $policy->setPhone(static::$phone);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+
+        if ($discount) {
+            $discountPayment = new PolicyDiscountPayment();
+            $discountPayment->setAmount($discount);
+            $discountPayment->setDate($date);
+            $policy->addPayment($discountPayment);
+            $policy->getPremium()->setAnnualDiscount($discountPayment->getAmount());
+        }
+
         $policy->create(rand(1, 999999), null, $date, rand(1, 9999));
         $policy->setPremiumInstallments($installments);
         $policy->setStatus(Policy::STATUS_ACTIVE);
@@ -3146,6 +3190,20 @@ class PhonePolicyTest extends WebTestCase
         $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2016-04-15 15:01')));
         $this->assertFalse($policy->isPolicyPaidToDate(new \DateTime('2016-04-28 16:01')));
         $this->assertFalse($policy->isPolicyPaidToDate(new \DateTime('2016-05-01 00:01')));
+    }
+
+    public function testPolicyIsPaidToDateDiscount()
+    {
+        $date = new \DateTime('2018-02-27 00:00');
+        $policy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getAdjustedStandardMonthlyPremiumPrice(15, $date),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            12,
+            $date,
+            15
+        );
+        $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2018-02-27 00:00')));
+        $this->assertFalse($policy->isPolicyPaidToDate(new \DateTime('2018-03-31 00:00')));
     }
 
     public function testHasCorrectPolicyStatus()

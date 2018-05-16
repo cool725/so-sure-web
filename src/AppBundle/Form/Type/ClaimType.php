@@ -52,25 +52,32 @@ class ClaimType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
             $claim = $event->getData();
             $form = $event->getForm();
+            $picSureEnabled = $claim->getPolicy() ? $claim->getPolicy()->isPicSurePolicy() : true;
+            $validated = $claim->getPolicy() ? $claim->getPolicy()->isPicSureValidated() : false;
             $choices = [];
-            if ($claim->getPolicy()->isAdditionalClaimLostTheftApprovedAllowed()) {
+            if ($claim->getPolicy() &&  $claim->getPolicy()->isAdditionalClaimLostTheftApprovedAllowed()) {
                 $choices = [
-                    $this->getClaimTypeCopy(Claim::TYPE_LOSS) => Claim::TYPE_LOSS,
-                    $this->getClaimTypeCopy(Claim::TYPE_THEFT) => Claim::TYPE_THEFT,
+                    $this->getClaimTypeCopy(Claim::TYPE_LOSS, $validated, $picSureEnabled) => Claim::TYPE_LOSS,
+                    $this->getClaimTypeCopy(Claim::TYPE_THEFT, $validated, $picSureEnabled) => Claim::TYPE_THEFT,
                 ];
             }
             $choices = array_merge($choices, [
-                $this->getClaimTypeCopy(Claim::TYPE_DAMAGE) => Claim::TYPE_DAMAGE,
-                $this->getClaimTypeCopy(Claim::TYPE_WARRANTY) => Claim::TYPE_WARRANTY,
-                $this->getClaimTypeCopy(Claim::TYPE_EXTENDED_WARRANTY) => Claim::TYPE_EXTENDED_WARRANTY,
+                $this->getClaimTypeCopy(Claim::TYPE_DAMAGE, $validated, $picSureEnabled) => Claim::TYPE_DAMAGE,
+                $this->getClaimTypeCopy(Claim::TYPE_WARRANTY, $validated, $picSureEnabled) => Claim::TYPE_WARRANTY,
+                $this->getClaimTypeCopy(Claim::TYPE_EXTENDED_WARRANTY, $validated, $picSureEnabled) =>
+                    Claim::TYPE_EXTENDED_WARRANTY,
             ]);
             $form->add('type', ChoiceType::class, ['choices' => $choices]);
         });
     }
 
-    private function getClaimTypeCopy($claimType)
+    private function getClaimTypeCopy($claimType, $picSureValidated, $picSureEnabled)
     {
-        return sprintf('%s - £%d excess', $claimType, Claim::getExcessValue($claimType));
+        return sprintf(
+            '%s - £%d excess',
+            $claimType,
+            Claim::getExcessValue($claimType, $picSureValidated, $picSureEnabled)
+        );
     }
 
     public function configureOptions(OptionsResolver $resolver)

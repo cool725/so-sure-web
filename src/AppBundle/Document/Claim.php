@@ -1136,13 +1136,17 @@ class Claim
         ])) {
             return 0;
         }
+        /** @var PhonePolicy $phonePolicy */
+        $phonePolicy = $this->getPolicy();
+        $picSureEnabled = $phonePolicy->isPicSurePolicy();
+        $picSureValidated = $phonePolicy->isPicSureValidated();
 
-        return self::getExcessValue($this->getType());
+        return self::getExcessValue($this->getType(), $picSureValidated, $picSureEnabled);
     }
 
-    public static function getExcessValue($type, $validated = true, $picSureEnabled = false)
+    public static function getExcessValue($type, $picSureValidated, $picSureEnabled)
     {
-        if ($picSureEnabled && !$validated) {
+        if ($picSureEnabled && !$picSureValidated) {
             return 150;
         }
 

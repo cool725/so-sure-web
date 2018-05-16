@@ -272,6 +272,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $phones = $phones->sort('memory', 'asc');
         $pager = $this->pager($request, $phones);
 
+        $now = new \DateTime();
+        $oneDay = $this->addBusinessDays($now, 1);
         return [
             'phones' => $pager->getCurrentPageResults(),
             'form' => $searchForm->createView(),
@@ -279,6 +281,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'new_phone' => $newPhoneForm->createView(),
             'makes' => $makes,
             'additional_phones' => $additionalPhonesForm->createView(),
+            'one_day' => $oneDay,
         ];
     }
 
