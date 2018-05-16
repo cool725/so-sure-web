@@ -134,10 +134,10 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/ebay", name="ebay")
+     * @Route("/eb", name="eb")
      * @Template
      */
-    public function ebayLanding(Request $request)
+    public function ebLanding(Request $request)
     {
         $exp = $this->sixpack(
             $request,
@@ -153,10 +153,10 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/ebay1", name="ebay1")
+     * @Route("/eb1", name="eb1")
      * @Template
      */
-    public function ebay1Landing(Request $request)
+    public function eb1Landing(Request $request)
     {
 
         $data = [
@@ -177,10 +177,10 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/ebay2", name="ebay2")
+     * @Route("/eb2", name="eb2")
      * @Template
      */
-    public function ebay2Landing(Request $request)
+    public function eb2Landing(Request $request)
     {
 
         $data = [
