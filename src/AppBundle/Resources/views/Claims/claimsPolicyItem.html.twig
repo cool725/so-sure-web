@@ -672,18 +672,20 @@
         <div role="tabpanel" class="tab-pane" id="admin">
             <h3>Common Actions</h3>
             <table class="table table-striped">
-                {% if policy.premiumPlan == 'monthly' %}
                 <tr>
                     <td>Billing day of month</td>
                     <td>
-                        {{ form_start(billing_form, {'attr': {'class': 'form-inline'}}) }}
-                        {{ form_widget(billing_form.day) }}
-                        {{ form_widget(billing_form.update, {'label': 'Change billing date', 'attr': {'class': 'btn btn-danger confirm-usertoken-clear'}}) }}
-                        {{ form_end(billing_form) }}
-                        {% if not policy.isPolicyPaidToDate %}<strong>Policy must be paid to date before update is allowed</strong>{% endif %}
+                        {% if policy.premiumPlan == 'monthly' %}
+                            {{ form_start(billing_form, {'attr': {'class': 'form-inline'}}) }}
+                            {{ form_widget(billing_form.day) }}
+                            {{ form_widget(billing_form.update, {'label': 'Change billing date', 'attr': {'class': 'btn btn-danger confirm-usertoken-clear'}}) }}
+                            {{ form_end(billing_form) }}
+                            {% if not policy.isPolicyPaidToDate %}<strong>Policy must be paid to date before update is allowed</strong>{% endif %}
+                        {% else %}
+                            Policy either does not yet exist, or is an annual policy. Billing date change is not allowed.
+                        {% endif %}
                     </td>
                 </tr>
-                {% endif %}
                 <tr>
                     <td>
                         Regenerate Policy Terms & Schedule<br />(Name change, etc)

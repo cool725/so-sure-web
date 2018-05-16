@@ -1099,7 +1099,7 @@ class PurchaseController extends BaseController
 
                     $this->get('app.sixpack')->convertByClientId(
                         $policy->getUser()->getId(),
-                        SixpackService::EXPERIMENT_USER_WELCOME_MODAL
+                        SixpackService::EXPERIMENT_NEW_WELCOME_MODAL
                     );
 
                     // @codingStandardsIgnoreStart

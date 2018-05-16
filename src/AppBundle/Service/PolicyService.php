@@ -1791,6 +1791,12 @@ class PolicyService
         );
     }
 
+    /**
+     * @param Policy         $policy
+     * @param \DateTime|null $date
+     * @return Policy
+     * @throws \Exception
+     */
     public function createPendingRenewal(Policy $policy, \DateTime $date = null)
     {
         $policyTermsRepo = $this->dm->getRepository(PolicyTerms::class);
