@@ -26,8 +26,10 @@
             <h1 class="text-center text-blue">Mobile insurance you deserve.</h1>
             <p class="big-text text-center">We're a new kind of insurer that's focused on people, <span class="ebay_red">not profits</span>. Providing insurance that's <span class="ebay_blue">reliable</span>, <span class="ebay_amber">rewarding</span> and altogether <span class="ebay_green">better</span>.</p>
 
-            <h3 class="text-center h-light">in partnership with</h3>
-            <img src="{{ cdn_url }}/images/ebaylogo_so-sure.png" alt="ebay" class="ebay-img img-center" width="240px">
+            <div class="hidden-xs">
+                <h3 class="text-center h-light">in partnership with</h3>
+                <img src="{{ cdn_url }}/images/ebaylogo_so-sure.png" alt="ebay" class="ebay-img img-center" width="180px">
+            </div>
 
             <div class="animated slideInLeft">
                 {# Phone Search #}
@@ -49,25 +51,26 @@
                 {# End Phone Search #}
             </div>
 
+            <div class="visible-xs-block">
+                <h3 class="text-center h-light">in partnership with</h3>
+                <img src="{{ cdn_url }}/images/ebaylogo_so-sure.png" alt="ebay" class="ebay-img img-center" width="180px">
+            </div>
+
         </div>
     </section>
 
     {# Press #}
-    <section class="section--pad ebay__press">
+    <section class="ebay__press">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12 text-center">
                     <ul class="list-inline text-center">
-                        {# <li><img src="{{ cdn_url }}/images/moneycouk.png" alt="Money" class="money-img" width="140px"></li>
-                        <li><img src="{{ cdn_url }}/images/defacto_5.svg" alt="Defaqto" class="money-img" width="100px"></li>
-                        <li><img src="{{ cdn_url }}/images/trustpilot_so-sure.svg" alt="Trust Pilot" class="money-img" width="150px"></li>
-                        <li><img src="{{ cdn_url }}/images/go-compare_so-sure.svg" alt="Go Compare" class="money-img" width="150px"></li> #}
-                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_defaqto.svg" alt="Defaqto" title="Defaqto" width="200px"></li>
-                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_trustpilot.svg" alt="TrustPilot" title="TrustPilot" width="200px"></li>
-                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_money.svg" alt="Money.co.uk" title="Money.co.uk" width="200px"></li>
-                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_go-compare.svg" alt="Go Compare" title="Go Compare" width="200px"></li>
-                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_theguardian.svg" alt="The Guardian" title="The Guardian" width="200px"></li>
-                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_financial-times.svg" alt="Financial Times" title="Financial Times" width="200px"></li>
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_defaqto.svg" alt="Defaqto" title="Defaqto"></li>
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_trustpilot.svg" alt="TrustPilot" title="TrustPilot"></li>
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_money.svg" alt="Money.co.uk" title="Money.co.uk"></li>
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_go-compare.svg" alt="Go Compare" title="Go Compare"></li>
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_theguardian.svg" alt="The Guardian" title="The Guardian"></li>
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_financial-times.svg" alt="Financial Times" title="Financial Times"></li>
                     </ul>
                 </div>
             </div>
@@ -81,7 +84,7 @@
             <div class="row">
                 <div class="col-sm-6">
                     <div class="media">
-                        <div class="media-left">
+                        <div class="media-left media-middle">
                             <img src="{{ cdn_url }}/images/homepage/so-sure_theft.svg" alt="Theft" width="120px">
                         </div>
                         <div class="media-body">
@@ -92,7 +95,7 @@
                 </div>
                 <div class="col-sm-6">
                     <div class="media">
-                        <div class="media-left">
+                        <div class="media-left media-middle">
                             <img src="{{ cdn_url }}/images/homepage/so-sure_loss.svg" alt="Loss" width="120px">
                         </div>
                         <div class="media-body">
@@ -105,7 +108,7 @@
             <div class="row">
                 <div class="col-sm-6">
                     <div class="media">
-                        <div class="media-left">
+                        <div class="media-left media-middle">
                             <img src="{{ cdn_url }}/images/homepage/so-sure_accidental_damage.svg" alt="Accidental Damage" width="120px">
                         </div>
                         <div class="media-body">
@@ -116,7 +119,7 @@
                 </div>
                 <div class="col-sm-6">
                     <div class="media">
-                        <div class="media-left">
+                        <div class="media-left media-middle">
                             <img src="{{ cdn_url }}/images/homepage/so-sure_out_of_warranty_breakdown.svg" alt="Out of Warranty Breakdown" width="120px">
                         </div>
                         <div class="media-body">
@@ -129,7 +132,7 @@
             <div class="row">
                 <div class="col-sm-6">
                     <div class="media">
-                        <div class="media-left">
+                        <div class="media-left media-middle">
                             <img src="{{ cdn_url }}/images/homepage/so-sure_unauthorised_network_charges.svg" alt="Unauthorised Network Charges" width="120px">
                         </div>
                         <div class="media-body">
@@ -140,7 +143,7 @@
                 </div>
                 <div class="col-sm-6">
                     <div class="media">
-                        <div class="media-left">
+                        <div class="media-left media-middle">
                             <img src="{{ cdn_url }}/images/homepage/so-sure_accessories.svg" alt="accessories" width="120px">
                         </div>
                         <div class="media-body">
@@ -404,7 +407,7 @@
                     </div>
                     <div class="item">
                         <div class="speech-bubble clearfix"><mark>Excellent service I had a new phone in 24h delivered at the door</mark>
-                        <br><small>NEEDS A NAME</small></div>
+                        <br><small>Herve N</small></div>
                     </div>
                 </div>
                 <ol class="carousel-indicators">

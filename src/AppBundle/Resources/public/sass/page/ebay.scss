@@ -302,6 +302,14 @@ $gadgetcover: #E8C955;
         background: $off-white;
         position: relative;
         z-index: 1;
+
+        img {
+            width: 100px;
+
+            @include breakpoint(tablet) {
+                width: 200px;
+            }
+        }
     }
 
     &__cover {
@@ -346,6 +354,10 @@ $gadgetcover: #E8C955;
 
             .col-md-4 {
                 text-align: right;
+
+                img {
+                    margin-top: 35px;
+                }
             }
         }
     }
@@ -387,7 +399,7 @@ $gadgetcover: #E8C955;
 }
 
 // TODO: Move!
-.dropdown-phone-form--homepage {
+.dropdown-phone-form {
     max-width: 450px;
     background-color: $white;
     padding: 0;
