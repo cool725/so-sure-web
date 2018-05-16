@@ -53,11 +53,7 @@ class ApiController extends BaseController
                 throw new \Exception('Debug Exception Test');
             }
 
-            $this->get('logger')->error('loginAction');
-
             $data = json_decode($request->getContent(), true)['body'];
-
-            $this->get('logger')->error('loginAction body', ['body' => $data]);
 
             $emailUserData = null;
             $facebookUserData = null;
@@ -90,8 +86,6 @@ class ApiController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
             }
 
-            $this->get('logger')->error('loginAction google', ['googleUserData' => $googleUserData]);
-
             $dm = $this->getManager();
             $repo = $dm->getRepository(User::class);
             $user = null;
@@ -111,8 +105,6 @@ class ApiController extends BaseController
                 $mobileNumber = $facebook->getAccountKitMobileNumber($authorizationCode);
                 $user = $repo->findOneBy(['mobileNumber' => $mobileNumber]);
             }
-
-            $this->get('logger')->error('loginAction user', ['user' => $user]);
 
             if (!$user) {
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_ABSENT, 'User not found', 403);
@@ -159,8 +151,6 @@ class ApiController extends BaseController
                 return $this->getErrorJsonResponse(ApiErrorCode::ERROR_TOO_MANY_REQUESTS, 'Too many requests', 422);
             }
 
-            $this->get('logger')->error('loginAction user google', ['id' => $user->getGoogleId()]);
-
             if ($emailUserData) {
                 $encoderService = $this->get('security.encoder_factory');
                 $encoder = $encoderService->getEncoder($user);
@@ -187,7 +177,6 @@ class ApiController extends BaseController
                     $user,
                     $this->getDataString($googleUserData, 'google_access_token')
                 )) {
-                    $this->get('logger')->error('loginAction google validation error', ['id' => $user->getGoogleId()]);
                     return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_EXISTS, 'Invalid token', 403);
                 }
             }
