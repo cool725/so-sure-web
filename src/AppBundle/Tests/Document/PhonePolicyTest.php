@@ -2646,13 +2646,14 @@ class PhonePolicyTest extends WebTestCase
             $discountPayment->setAmount($discount);
             $discountPayment->setDate($date);
             $policy->addPayment($discountPayment);
-            $policy->getPremium()->setAnnualDiscount($discountPayment->getAmount());
         }
 
         $policy->create(rand(1, 999999), null, $date, rand(1, 9999));
         $policy->setPremiumInstallments($installments);
         $policy->setStatus(Policy::STATUS_ACTIVE);
-
+        if ($discount) {
+            $policy->getPremium()->setAnnualDiscount($discountPayment->getAmount());
+        }
         if ($amount > 0) {
             self::addPayment($policy, $amount, $commission, null, $date);
         }
@@ -2756,6 +2757,37 @@ class PhonePolicyTest extends WebTestCase
             $this->assertEquals(
                 $monthlyPolicy->getPremium()->getMonthlyPremiumPrice() * $i,
                 $monthlyPolicy->getOutstandingPremiumToDate($date)
+            );
+        }
+    }
+
+    public function testOutstandingPremiumToDateWithDiscount()
+    {
+        $date = new \DateTime('2016-01-01');
+        $monthlyPolicy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getAdjustedStandardMonthlyPremiumPrice(10, $date),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            12,
+            $date,
+            10
+        );
+        $this->assertEquals(0, $monthlyPolicy->getOutstandingPremiumToDate($date));
+        $this->assertTrue($monthlyPolicy->isValidPolicy(null));
+        $this->assertTrue($monthlyPolicy->getPremium()->hasAnnualDiscount());
+        $this->assertNotEquals(
+            $monthlyPolicy->getPremium()->getAdjustedStandardMonthlyPremiumPrice(),
+            $monthlyPolicy->getPremium()->getMonthlyPremiumPrice()
+        );
+
+        // needs to be just slightly after 1 month
+        $date->add(new \DateInterval('P1D'));
+
+        for ($i = 1; $i <= 11; $i++) {
+            $date->add(new \DateInterval('P1M'));
+            $this->assertEquals(
+                $monthlyPolicy->getPremium()->getAdjustedStandardMonthlyPremiumPrice() * $i,
+                $monthlyPolicy->getOutstandingPremiumToDate($date),
+                sprintf('date: %s, month: %d', $date->format(\DateTime::ATOM), $i)
             );
         }
     }
