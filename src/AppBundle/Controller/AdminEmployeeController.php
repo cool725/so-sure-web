@@ -1353,12 +1353,20 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $scheduledPaymentRepo = $dm->getRepository(ScheduledPayment::class);
         $scheduledPayments = $scheduledPaymentRepo->findMonthlyScheduled($date);
         $total = 0;
+        $totalJudo = 0;
+        $totalBacs = 0;
         foreach ($scheduledPayments as $scheduledPayment) {
+            /** @var ScheduledPayment $scheduledPayment */
             if (in_array(
                 $scheduledPayment->getStatus(),
                 [ScheduledPayment::STATUS_SCHEDULED, ScheduledPayment::STATUS_SUCCESS]
             )) {
                 $total += $scheduledPayment->getAmount();
+                if ($scheduledPayment->getPolicy()->getUser()->hasBacsPaymentMethod()) {
+                    $totalBacs += $scheduledPayment->getAmount();
+                } else {
+                    $totalJudo += $scheduledPayment->getAmount();
+                }
             }
         }
 
@@ -1368,6 +1376,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'end' => $end,
             'scheduledPayments' => $scheduledPayments,
             'total' => $total,
+            'totalJudo' => $totalJudo,
+            'totalBacs' => $totalBacs,
         ];
     }
 
