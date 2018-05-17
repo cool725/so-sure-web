@@ -1,6 +1,7 @@
 window.addEventListener("load", function(){
   if (window.cookieconsent) {
     window.cookieconsent.initialise({
+      container: document.getElementById("content"),
       palette: {
         popup: {
           background: "#237afc"
@@ -16,6 +17,7 @@ window.addEventListener("load", function(){
         dismiss: "Close",
         href: "https://www.iubenda.com/privacy-policy/7805295/cookie-policy"
       },
+      dismissTimeOut: 3000,
       dismissOnScroll: 500,
       onStatusChange: function(status) {
           this.element.parentNode.removeChild(this.element);
