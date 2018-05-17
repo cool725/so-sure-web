@@ -910,6 +910,16 @@ class Phone
         return $name;
     }
 
+    public function getNameFormSafe()
+    {
+        $name = $this->getName();
+        if ($this->memory) {
+            $name = sprintf("%s (%s GB)", $name, $this->getMemory());
+        }
+
+        return $name;
+    }
+
     public function getModelMemory()
     {
         $name = sprintf("%s", $this->model);
