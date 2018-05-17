@@ -394,15 +394,26 @@ abstract class BaseController extends Controller
         return null;
     }
 
-    protected function formToMongoSearch($form, $qb, $formField, $mongoField, $run = false, $queryType = self::MONGO_QUERY_TYPE_REGEX)
-    {
+    protected function formToMongoSearch(
+        $form,
+        $qb,
+        $formField,
+        $mongoField,
+        $run = false,
+        $queryType = self::MONGO_QUERY_TYPE_REGEX
+    ) {
         $data = (string) $form->get($formField)->getData();
 
         return $this->dataToMongoSearch($qb, $data, $mongoField, $run, $queryType);
     }
 
-    protected function dataToMongoSearch($qb, $data, $mongoField, $run = false, $queryType = self::MONGO_QUERY_TYPE_REGEX)
-    {
+    protected function dataToMongoSearch(
+        $qb,
+        $data,
+        $mongoField,
+        $run = false,
+        $queryType = self::MONGO_QUERY_TYPE_REGEX
+    ) {
         if (mb_strlen($data) == 0) {
             return null;
         }
