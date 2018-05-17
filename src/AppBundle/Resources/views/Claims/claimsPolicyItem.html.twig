@@ -259,6 +259,20 @@
                                 {% endfor %}
                             </td>
                         </tr>
+                        <tr>
+                            <td>
+                                pic-sure Circumvention
+                            </td>
+                            <td>
+                                {% if policy.picSureCircumvention is null %}
+                                    <span> Pre Anti-fraud check</span>
+                                {% elseif policy.picSureCircumvention == true %}
+                                    <span class="fa fa-exclamation-triangle"> Possible Fraud (i.e. too many attempts to do pic-sure and imei upload was too long, check events in mixpanel) <span class="fa fa-exclamation-triangle"></span></span>
+                                {% elseif policy.picSureCircumvention == false %}
+                                    <span class="fa fa-thumbs-up"> No Fraud Detected <span class="fa fa-thumbs-up"></span></span>
+                                {% endif %}
+                            </td>
+                        </tr>
                         {% endif %}
                     </table>
                 </div>

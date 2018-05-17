@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -1186,6 +1187,28 @@ class ApiAuthController extends BaseController
             $picsure->setKey($this->getDataString($data, 'key'));
             $policy->addPolicyFile($picsure);
             $policy->setPicSureStatus(PhonePolicy::PICSURE_STATUS_MANUAL);
+            // for typo in the app: to be removed eventually
+            if (isset($result['Metadata']['attemps'])) {
+                $picsure->addMetadata('picsure-attempts', $result['Metadata']['attemps']);
+            }
+            if (isset($result['Metadata']['attempts'])) {
+                $picsure->addMetadata('picsure-attempts', $result['Metadata']['attempts']);
+            }
+            if (isset($result['Metadata']['suspected-fraud'])) {
+                $picsure->addMetadata('picsure-suspected-fraud', $result['Metadata']['suspected-fraud']);
+                if ($result['Metadata']['suspected-fraud'] === "1") {
+                    $policy->setPicSureCircumvention(true);
+                    /** @var LoggerInterface $logger */
+                    $logger = $this->get('logger');
+                    $logger->error(sprintf(
+                        'Detected pic-sure circumvention attempt for policy %s',
+                        $policy->getId()
+                    ));
+                } else {
+                    $policy->setPicSureCircumvention(false);
+                }
+            }
+
             $dm->flush();
 
             $this->get('event_dispatcher')->dispatch(

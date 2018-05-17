@@ -3233,8 +3233,10 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(Policy::class);
+        /** @var PhonePolicy $updatedPolicy */
         $updatedPolicy = $repo->find($policyData['id']);
         $this->assertEquals(PhonePolicy::PICSURE_STATUS_MANUAL, $updatedPolicy->getPicSureStatus());
+        $this->assertFalse($updatedPolicy->getPicSureCircumvention());
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
             'bucket' => 'ops.so-sure.com',
@@ -3244,8 +3246,10 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(Policy::class);
+        /** @var PhonePolicy $updatedPolicy */
         $updatedPolicy = $repo->find($policyData['id']);
         $this->assertEquals(PhonePolicy::PICSURE_STATUS_MANUAL, $updatedPolicy->getPicSureStatus());
+        $this->assertTrue($updatedPolicy->getPicSureCircumvention());
     }
 
     /**

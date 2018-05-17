@@ -5,6 +5,7 @@ namespace AppBundle\Command;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PolicyService;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,6 +15,7 @@ use Symfony\Component\Console\Helper\Table;
 use AppBundle\Document\SalvaPhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhonePolicy;
+use AppBundle\Document\File\PicSureFile;
 use AppBundle\Document\ScheduledPayment;
 
 class ValidatePolicyCommand extends BaseCommand
@@ -78,6 +80,12 @@ class ValidatePolicyCommand extends BaseCommand
                 'Show all unpaid, rather than those close to expiry'
             )
             ->addOption(
+                'resync-picsure-s3file-metadata',
+                null,
+                InputOption::VALUE_NONE,
+                'Set the picsure metadata from S3 metadata'
+            )
+            ->addOption(
                 'resync-picsure-s3file-status',
                 null,
                 InputOption::VALUE_NONE,
@@ -99,6 +107,7 @@ class ValidatePolicyCommand extends BaseCommand
         $adjustScheduledPayments = $input->getOption('adjust-scheduled-payments');
         $skipEmail = true === $input->getOption('skip-email');
         $all = true === $input->getOption('all');
+        $resyncPicsureMetadata = true === $input->getOption('resync-picsure-s3file-metadata');
         $resyncPicsure = true === $input->getOption('resync-picsure-s3file-status');
         $validateDate = null;
         if ($date) {
@@ -107,6 +116,8 @@ class ValidatePolicyCommand extends BaseCommand
 
         if ($resyncPicsure) {
             $this->resyncPicsureStatus();
+        } elseif ($resyncPicsureMetadata) {
+            $this->resyncPicsureMetadata();
         } else {
             /** @var PolicyService $policyService */
             $policyService = $this->getContainer()->get('app.policy');
@@ -436,6 +447,61 @@ class ValidatePolicyCommand extends BaseCommand
                 $metadata = $files[0]->getMetadata();
                 if (empty($metadata['picsure-status'])) {
                     $files[0]->addMetadata('picsure-status', $policy->getPicSureStatus());
+                }
+            }
+        }
+        $this->getManager()->flush();
+    }
+
+    private function resyncPicsureMetadata()
+    {
+        /** @var \Aws\S3\S3Client */
+        $s3 = $this->getContainer()->get('aws.s3');
+        $policyRepo = $this->getManager()->getRepository(PhonePolicy::class);
+        $filesRepo = $this->getManager()->getRepository(PicSureFile::class);
+        $picsureFiles = $filesRepo->findAll();
+
+        $picsurePolicies = $policyRepo->findBy(
+            ['picSureStatus' => ['$in' => [PhonePolicy::PICSURE_STATUS_MANUAL,
+                                        PhonePolicy::PICSURE_STATUS_APPROVED,
+                                        PhonePolicy::PICSURE_STATUS_INVALID,
+                                        PhonePolicy::PICSURE_STATUS_REJECTED]]]
+        );
+
+        foreach ($picsurePolicies as $policy) {
+            $files = $policy->getPolicyPicSureFiles();
+            if (count($files) > 0) {
+                foreach ($files as $file) {
+                    $result = $s3->getObject(array(
+                        'Bucket' => $file->getBucket(),
+                        'Key'    => $file->getKey(),
+                    ));
+                    if (!empty($result['Metadata'])) {
+                        $metadata = $file->getMetadata();
+                        // for typo in the app: to be removed eventually
+                        if (isset($result['Metadata']['attemps']) && !isset($metadata['picsure-attempts'])) {
+                            $file->addMetadata('picsure-attempts', $result['Metadata']['attemps']);
+                        }
+                        if (isset($result['Metadata']['attempts']) && !isset($metadata['picsure-attempts'])) {
+                            $file->addMetadata('picsure-attempts', $result['Metadata']['attempts']);
+                        }
+                        if (isset($result['Metadata']['suspected-fraud']) &&
+                            !isset($metadata['picsure-suspected-fraud'])
+                        ) {
+                            $file->addMetadata('picsure-suspected-fraud', $result['Metadata']['suspected-fraud']);
+                            if ($result['Metadata']['suspected-fraud'] === "1") {
+                                $policy->setPicSureCircumvention(true);
+                                /** @var LoggerInterface $logger */
+                                $logger = $this->getContainer()->get('logger');
+                                $logger->error(sprintf(
+                                    'Detected pic-sure circumvention attempt for policy %s',
+                                    $policy->getId()
+                                ));
+                            } else {
+                                $policy->setPicSureCircumvention(false);
+                            }
+                        }
+                    }
                 }
             }
         }
