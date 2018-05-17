@@ -489,9 +489,14 @@ class ValidatePolicyCommand extends BaseCommand
                         ) {
                             $file->addMetadata('picsure-suspected-fraud', $result['Metadata']['suspected-fraud']);
                             if ($result['Metadata']['suspected-fraud'] === "1") {
-                                $policy->setPicsureCircumvention(true);
+                                $policy->setPicSureCircumvention(true);
+                                $logger = $this->getContainer()->get('logger');
+                                $logger->error(sprintf(
+                                    'Detected pic-sure circumvention attempt for policy %s',
+                                    $policy->getId()
+                                ));
                             } else {
-                                $policy->setPicsureCircumvention(false);
+                                $policy->setPicSureCircumvention(false);
                             }
                         }
                     }

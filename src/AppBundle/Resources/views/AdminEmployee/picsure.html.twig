@@ -27,6 +27,14 @@
 <div class="row">
     <div class="col-md-3">
         <h4><a href="{{ path('admin_policy', {'id': policy.id}) }}">{{ policy.policyNumber }}</a></h4>
+        {% if policy.picSureCircumvention is null %}
+            <span> Pre Anti-fraud check</span>
+        {% elseif policy.picSureCircumvention == true %}
+            <span class="fa fa-exclamation-triangle"> Possible Fraud (i.e. too many attempts to do pic-sure and imei upload was too long, check events in mixpanel) <span class="fa fa-exclamation-triangle"></span></span>
+        {% elseif policy.picSureCircumvention == false %}
+            <span class="fa fa-thumbs-up"> No Fraud Detected <span class="fa fa-thumbs-up"></span></span>
+        {% endif %}
+
     </div>
     <div class="col-md-7">
         {% if policy.picSureStatus == 'manual' %}
@@ -38,17 +46,6 @@
                 href="{{ path('admin_picsure_reject', {'id': policy.id}) }}"><i class="fa fa-minus"></i> Damaged</a>
         {% elseif policy.picSureStatus == 'approved' %}
             Approved at: {{ policy.picSureApprovedDate | date}}
-        {% endif %}
-    </div>
-</div>
-<div class="row" style="margin-top: 20px;">
-    <div class="col-md-12 text-center">
-        {% if policy.picsureCircumvention is not null %}
-            {% if policy.picsureCircumvention == true %}
-                <span class="fa fa-exclamation-triangle"> Possible Fraud (i.e. too many attempts to do pic-sure and imei upload was too long, check events in mixpanel) <span class="fa fa-exclamation-triangle"></span></span>
-            {% elseif policy.picsureCircumvention == false %}
-                <span class="fa fa-thumbs-up"> No Fraud Detected <span class="fa fa-thumbs-up"></span></span>
-            {% endif %}
         {% endif %}
     </div>
 </div>

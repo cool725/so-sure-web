@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use Psr\Log\LoggerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -1196,9 +1197,15 @@ class ApiAuthController extends BaseController
             if (isset($result['Metadata']['suspected-fraud'])) {
                 $picsure->addMetadata('picsure-suspected-fraud', $result['Metadata']['suspected-fraud']);
                 if ($result['Metadata']['suspected-fraud'] === "1") {
-                    $policy->setPicsureCircumvention(true);
+                    $policy->setPicSureCircumvention(true);
+                    /** @var LoggerInterface $logger */
+                    $logger = $this->get('logger');
+                    $logger->error(sprintf(
+                        'Detected pic-sure circumvention attempt for policy %s',
+                        $policy->getId()
+                    ));
                 } else {
-                    $policy->setPicsureCircumvention(false);
+                    $policy->setPicSureCircumvention(false);
                 }
             }
 
