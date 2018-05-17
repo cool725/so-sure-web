@@ -5,6 +5,7 @@ namespace AppBundle\Command;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PolicyService;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -490,6 +491,7 @@ class ValidatePolicyCommand extends BaseCommand
                             $file->addMetadata('picsure-suspected-fraud', $result['Metadata']['suspected-fraud']);
                             if ($result['Metadata']['suspected-fraud'] === "1") {
                                 $policy->setPicSureCircumvention(true);
+                                /** @var LoggerInterface $logger */
                                 $logger = $this->getContainer()->get('logger');
                                 $logger->error(sprintf(
                                     'Detected pic-sure circumvention attempt for policy %s',
