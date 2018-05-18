@@ -221,9 +221,11 @@ class BICommand extends BaseCommand
                 sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getReferer() : ''),
                 sprintf('"%s"', $claim->getInitialSuspicion() ? 'yes' : 'no'),
                 sprintf('"%s"', $claim->getFinalSuspicion() ? 'yes' : 'no'),
-                sprintf('"%s"', $claim->getReplacementReceivedDate() ?
-                    $claim->getReplacementReceivedDate()->format('Y-m-d') :
-                    ''
+                sprintf(
+                    '"%s"',
+                    $claim->getReplacementReceivedDate() ?
+                        $claim->getReplacementReceivedDate()->format('Y-m-d') :
+                        ''
                 ),
             ]);
         }
