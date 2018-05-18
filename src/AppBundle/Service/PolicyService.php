@@ -1037,52 +1037,6 @@ class PolicyService
     /**
      * @param Policy $policy
      */
-    public function weeklyEmail(Policy $policy)
-    {
-        if (!$this->mailer) {
-            return;
-        }
-
-        // No need to send weekly email if pot is full
-        if ($policy->isPotCompletelyFilled()) {
-            return;
-        }
-
-        /** @var EmailOptOutRepository $repo */
-        $repo = $this->dm->getRepository(EmailOptOut::class);
-        if ($repo->isOptedOut($policy->getUser()->getEmail(), EmailOptOut::OPTOUT_CAT_WEEKLY)) {
-            return;
-        }
-
-        try {
-            $this->mailer->sendTemplate(
-                sprintf('Happy Wednesday!'),
-                $policy->getUser()->getEmail(),
-                'AppBundle:Email:policy/weekly.html.twig',
-                ['policy' => $policy],
-                'AppBundle:Email:policy/weekly.txt.twig',
-                ['policy' => $policy],
-                null,
-                null,
-                MailerService::EMAIL_WEEKLY
-            );
-            $policy->setLastEmailed(new \DateTime());
-
-            return true;
-        } catch (\Exception $e) {
-            $this->logger->error(sprintf(
-                'Failed sending policy weekly email to %s. Ex: %s',
-                $policy->getUser()->getEmail(),
-                $e->getMessage()
-            ));
-
-            return false;
-        }
-    }
-
-    /**
-     * @param Policy $policy
-     */
     public function cancelledPolicyEmail(Policy $policy, $baseTemplate = null)
     {
         if (!$this->mailer) {

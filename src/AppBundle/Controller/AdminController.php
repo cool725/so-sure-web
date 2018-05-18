@@ -132,7 +132,7 @@ class AdminController extends BaseController
         $dm->persist($phone);
         $dm->flush();
         $this->addFlash(
-            'notice',
+            'success',
             'Your changes were saved!'
         );
 
@@ -171,7 +171,7 @@ class AdminController extends BaseController
 
             $dm->flush();
             $this->addFlash(
-                'notice',
+                'success',
                 'Your changes were saved!'
             );
 
@@ -218,7 +218,7 @@ class AdminController extends BaseController
             }
             $dm->flush();
             $this->addFlash(
-                'notice',
+                'success',
                 'Your changes were saved!'
             );
         }
@@ -249,7 +249,7 @@ class AdminController extends BaseController
             }
             $dm->flush();
             $this->addFlash(
-                'notice',
+                'success',
                 $message
             );
         }
@@ -274,7 +274,7 @@ class AdminController extends BaseController
             $dm->remove($phone);
             $dm->flush();
             $this->addFlash(
-                'notice',
+                'success',
                 'Phone deleted!'
             );
         }
@@ -1193,7 +1193,7 @@ class AdminController extends BaseController
             }
             $dm->flush();
             $this->addFlash(
-                'notice',
+                'success',
                 $message
             );
         }

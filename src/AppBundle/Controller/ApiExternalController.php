@@ -130,8 +130,7 @@ class ApiExternalController extends BaseController
                 // TODO: Should we resubscribe if unsubscribed_from_emails is false?
                 if ($item['unsubscribed_from_emails']) {
                     $invitation = $this->get('app.invitation');
-                    $invitation->optout($item['email'], EmailOptOut::OPTOUT_CAT_AQUIRE);
-                    $invitation->optout($item['email'], EmailOptOut::OPTOUT_CAT_RETAIN);
+                    $invitation->optout($item['email'], EmailOptOut::OPTOUT_CAT_MARKETING);
                     $invitation->rejectAllInvitations($item['email']);
                 }
             } else {

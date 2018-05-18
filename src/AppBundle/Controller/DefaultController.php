@@ -2,10 +2,12 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Service\MailerService;
 use AppBundle\Service\RequestService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -999,19 +1001,15 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/optout", name="optout")
+     * @Route("/optout", name="optout_old")
+     * @Route("/communications", name="optout")
      * @Template()
      */
     public function optOutAction(Request $request)
     {
         $form = $this->createFormBuilder()
-            ->add('email', EmailType::class, array(
-                'label' => "Email",
-            ))
-            ->add('decline', SubmitType::class, array(
-                'label' => "Opt out",
-                'attr' => ['class' => 'btn btn-danger'],
-            ))
+            ->add('email', EmailType::class)
+            ->add('decline', SubmitType::class)
             ->getForm();
 
         $email = null;
@@ -1019,7 +1017,23 @@ class DefaultController extends BaseController
         if ($form->isSubmitted() && $form->isValid()) {
             $hash = urlencode(base64_encode($form->getData()['email']));
 
-            return new RedirectResponse($this->generateUrl('optout_hash', ['hash' => $hash]));
+            /** @var MailerService $mailer */
+            $mailer = $this->get('app.mailer');
+            $mailer->sendTemplate(
+                'Update your communication preferences',
+                $email,
+                'AppBundle:Email:optOutLink.html.twig',
+                ['hash' => $hash],
+                'AppBundle:Email:optOutLink.txt.twig',
+                ['hash' => $hash]
+            );
+
+            $this->addFlash(
+                'success',
+                'Thanks! You should receive an email shortly.'
+            );
+
+            return new RedirectResponse($this->generateUrl('optout'));
         }
 
         return array(
@@ -1028,39 +1042,68 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/optout/{hash}", name="optout_hash")
+     * @Route("/optout/{hash}", name="optout_hash_old")
+     * @Route("/communications/{hash}", name="optout_hash")
      * @Template()
      */
     public function optOutHashAction(Request $request, $hash)
     {
-        $form = $this->createFormBuilder()
-            ->add('add', SubmitType::class)
-            ->getForm();
-
-
         if (!$hash) {
             return new RedirectResponse($this->generateUrl('optout'));
         }
 
         $email = base64_decode(urldecode($hash));
-        $invitationService = $this->get('app.invitation');
 
         $cat = $request->get('cat');
         if (!$cat) {
             $cat = EmailOptOut::OPTOUT_CAT_ALL;
         }
-        $form->handleRequest($request);
+
+        $invitationService = $this->get('app.invitation');
+        $optOut = $invitationService->isOptedOut($email, $cat);
+
+        $optInForm = $this->get('form.factory')
+            ->createNamedBuilder('optin_form')
+            ->add('optin', CheckboxType::class, [
+                'label' => 'I would like to receive marketing emails from so-sure!',
+                'required' => false
+            ])
+            ->add('add', SubmitType::class)
+            ->getForm();
+
+        $optOutForm = $this->get('form.factory')
+            ->createNamedBuilder('optin_form')
+            ->add('optout', CheckboxType    ::class, [
+                'label' => 'I do not wish to recieve any unnecessary emails from so-sure',
+                'required' => false,
+                'data' => $optOut,
+            ])
+            ->add('add', SubmitType::class)
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('optout_form')) {
+                $optInForm->handleRequest($request);
+
+            } elseif ($request->request->has('optin_form')) {
+                $optOutForm->handleRequest($request);
+            }
+        }
+
+        /*
         if ($form->isSubmitted() && $form->isValid()) {
             $invitationService->optin($email, $cat);
         } else {
             $invitationService->optout($email, $cat);
             $invitationService->rejectAllInvitations($email);
         }
+        */
 
         return array(
             'category' => $cat,
             'email' => $email,
-            'form_optin' => $form->createView(),
+            'optin_form' => $optInForm->createView(),
+            'optout_form' => $optOutForm->createView(),
             'is_opted_out' => $invitationService->isOptedOut($email, $cat),
         );
     }

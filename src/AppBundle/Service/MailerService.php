@@ -67,10 +67,9 @@ class MailerService
         $textData = null,
         $attachmentFiles = null,
         $bcc = null,
-        $emailType = null,
         $from = null
     ) {
-        $this->addUnsubsribeHash($to, $htmlData, $emailType);
+        $this->addUnsubsribeHash($to, $htmlData);
         // print $subject;
         // base campaign on template name
         // AppBundle:Email:quote/priceGuarentee.html.twig
@@ -108,7 +107,7 @@ class MailerService
         }
     }
 
-    private function addUnsubsribeHash($to, &$array, $emailType = null)
+    private function addUnsubsribeHash($to, &$array)
     {
         $hash = null;
         // TODO: Add swiftmailer header check
@@ -119,22 +118,12 @@ class MailerService
         }
         if ($hash) {
             $data = ['hash' => $hash];
-            if ($emailType) {
-                $data['cat'] = $this->emailTypeToOptOut($emailType);
-            }
             $array['unsubscribe_url'] = $this->routerService->generateUrl(
                 'optout_hash',
                 $data
             );
         } else {
             $array['unsubscribe_url'] = "mailto:hello@wearesosure.com?Subject=I don't want these emails anymore!";
-        }
-    }
-
-    private function emailTypeToOptOut($emailType)
-    {
-        if ($emailType == self::EMAIL_WEEKLY) {
-            return OptOut::OPTOUT_CAT_WEEKLY;
         }
     }
 

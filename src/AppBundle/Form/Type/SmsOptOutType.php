@@ -23,7 +23,7 @@ class SmsOptOutType extends AbstractType
                 'choices' => [
                     SmsOptOut::OPTOUT_CAT_ALL => SmsOptOut::OPTOUT_CAT_ALL,
                     SmsOptOut::OPTOUT_CAT_INVITATIONS => SmsOptOut::OPTOUT_CAT_INVITATIONS,
-                    SmsOptOut::OPTOUT_CAT_WEEKLY => SmsOptOut::OPTOUT_CAT_WEEKLY,
+                    SmsOptOut::OPTOUT_CAT_MARKETING => SmsOptOut::OPTOUT_CAT_MARKETING,
                 ]
             ])
             ->add('notes', TextType::class, ['required' => false])

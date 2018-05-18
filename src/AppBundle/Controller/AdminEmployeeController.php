@@ -1998,7 +1998,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             }
             $dm->flush();
             $this->addFlash(
-                'notice',
+                'success',
                 $message
             );
         }
@@ -2029,7 +2029,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             }
             $dm->flush();
             $this->addFlash(
-                'notice',
+                'success',
                 $message
             );
         }

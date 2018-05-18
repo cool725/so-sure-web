@@ -865,7 +865,6 @@ class InvitationService
                 ['invitation' => $invitation],
                 null,
                 null,
-                null,
                 $from
             );
             $invitation->setStatus(EmailInvitation::STATUS_SENT);

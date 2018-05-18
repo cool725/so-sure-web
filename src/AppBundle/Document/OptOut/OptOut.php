@@ -16,9 +16,7 @@ abstract class OptOut
 {
     const OPTOUT_CAT_ALL = 'all';
     const OPTOUT_CAT_INVITATIONS = 'invitations';
-    const OPTOUT_CAT_WEEKLY = 'weekly';
-    const OPTOUT_CAT_AQUIRE = 'aquire';
-    const OPTOUT_CAT_RETAIN = 'retain';
+    const OPTOUT_CAT_MARKETING = 'marketing'; // new category to replace aquire/retain
 
     /**
      * @MongoDB\Id
@@ -32,7 +30,8 @@ abstract class OptOut
     protected $created;
 
     /**
-     * @Assert\Choice({"all", "invitations", "weekly", "aquire", "retain"}, strict=true)
+     * TODO: remove aquire/retain
+     * @Assert\Choice({"all", "invitations", "weekly", "aquire", "retain", "marketing"}, strict=true)
      * @MongoDB\Field(type="string")
      */
     protected $category;

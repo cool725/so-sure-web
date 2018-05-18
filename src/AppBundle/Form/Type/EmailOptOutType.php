@@ -23,7 +23,7 @@ class EmailOptOutType extends AbstractType
                 'choices' => [
                     EmailOptOut::OPTOUT_CAT_ALL => EmailOptOut::OPTOUT_CAT_ALL,
                     EmailOptOut::OPTOUT_CAT_INVITATIONS => EmailOptOut::OPTOUT_CAT_INVITATIONS,
-                    EmailOptOut::OPTOUT_CAT_WEEKLY => EmailOptOut::OPTOUT_CAT_WEEKLY,
+                    EmailOptOut::OPTOUT_CAT_MARKETING => EmailOptOut::OPTOUT_CAT_MARKETING,
                 ]
             ])
             ->add('notes', TextType::class, ['required' => false])

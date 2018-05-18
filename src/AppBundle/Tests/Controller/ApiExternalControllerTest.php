@@ -287,8 +287,7 @@ class ApiExternalControllerTest extends BaseApiControllerTest
         $this->assertGreaterThan(1, count($optouts));
         foreach ($optouts as $optout) {
             $this->assertTrue(in_array($optout->getCategory(), [
-                EmailOptOut::OPTOUT_CAT_AQUIRE,
-                EmailOptOut::OPTOUT_CAT_RETAIN
+                EmailOptOut::OPTOUT_CAT_MARKETING
             ]));
         }
     }
