@@ -167,7 +167,7 @@ class InvitationServiceAdditionalTest extends WebTestCase
 
         $optOut = new EmailOptOut();
         $optOut->setEmail(static::generateEmail('EmailInvitationReinviteOptOut-invite', $this));
-        $optOut->setCategory(SmsOptOut::OPTOUT_CAT_INVITATIONS);
+        $optOut->addCategory(SmsOptOut::OPTOUT_CAT_INVITATIONS);
         static::$dm->persist($optOut);
         static::$dm->flush();
 
