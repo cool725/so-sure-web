@@ -78,7 +78,7 @@ use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\ImeiType;
 use AppBundle\Form\Type\NoteType;
 use AppBundle\Form\Type\EmailOptOutType;
-use AppBundle\Form\Type\SmsOptOutType;
+use AppBundle\Form\Type\AdminSmsOptOutType;
 use AppBundle\Form\Type\PartialPolicyType;
 use AppBundle\Form\Type\UserSearchType;
 use AppBundle\Form\Type\PhoneSearchType;

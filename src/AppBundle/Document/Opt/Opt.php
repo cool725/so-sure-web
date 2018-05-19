@@ -50,7 +50,7 @@ abstract class Opt
     protected $category;
 
     /**
-     * @Assert\Choice({"preferences"}, strict=true)
+     * @Assert\Choice({"preferences", "admin", "intercom"}, strict=true)
      * @MongoDB\Field(type="string")
      */
     protected $location;

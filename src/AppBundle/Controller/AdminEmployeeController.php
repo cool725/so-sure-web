@@ -69,7 +69,7 @@ use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\ImeiType;
 use AppBundle\Form\Type\NoteType;
 use AppBundle\Form\Type\EmailOptOutType;
-use AppBundle\Form\Type\SmsOptOutType;
+use AppBundle\Form\Type\AdminSmsOptOutType;
 use AppBundle\Form\Type\PartialPolicyType;
 use AppBundle\Form\Type\UserSearchType;
 use AppBundle\Form\Type\PhoneSearchType;
@@ -361,7 +361,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->createNamedBuilder('email_form', AdminEmailOptOutType::class, $emailOptOut)
             ->getForm();
         $smsForm = $this->get('form.factory')
-            ->createNamedBuilder('sms_form', SmsOptOutType::class, $smsOptOut)
+            ->createNamedBuilder('sms_form', AdminSmsOptOutType::class, $smsOptOut)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {

@@ -12,16 +12,17 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Opt\SmsOptOut;
 
-class SmsOptOutType extends AbstractType
+class AdminSmsOptOutType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
             ->add('mobile', TextType::class)
-            ->add('category', ChoiceType::class, [
-                'required' => true,
+            ->add('categories', ChoiceType::class, [
+                'required' => false,
+                'multiple' => true,
+                'expanded' => true,
                 'choices' => [
-                    SmsOptOut::OPTOUT_CAT_ALL => SmsOptOut::OPTOUT_CAT_ALL,
                     SmsOptOut::OPTOUT_CAT_INVITATIONS => SmsOptOut::OPTOUT_CAT_INVITATIONS,
                     SmsOptOut::OPTOUT_CAT_MARKETING => SmsOptOut::OPTOUT_CAT_MARKETING,
                 ]
@@ -34,7 +35,7 @@ class SmsOptOutType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'AppBundle\Document\OptOut\SmsOptOut',
+            'data_class' => 'AppBundle\Document\Opt\SmsOptOut',
         ));
     }
 }

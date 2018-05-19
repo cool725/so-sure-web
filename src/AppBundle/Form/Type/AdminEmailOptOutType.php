@@ -18,10 +18,11 @@ class AdminEmailOptOutType extends AbstractType
     {
         $builder
             ->add('email', TextType::class)
-            ->add('category', ChoiceType::class, [
-                'required' => true,
+            ->add('categories', ChoiceType::class, [
+                'required' => false,
+                'multiple' => true,
+                'expanded' => true,
                 'choices' => [
-                    EmailOptOut::OPTOUT_CAT_ALL => EmailOptOut::OPTOUT_CAT_ALL,
                     EmailOptOut::OPTOUT_CAT_INVITATIONS => EmailOptOut::OPTOUT_CAT_INVITATIONS,
                     EmailOptOut::OPTOUT_CAT_MARKETING => EmailOptOut::OPTOUT_CAT_MARKETING,
                 ]
