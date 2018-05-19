@@ -1013,6 +1013,12 @@ class DefaultController extends BaseController
      */
     public function optOutAction(Request $request)
     {
+        if ($this->getUser()) {
+            $hash = urlencode(base64_encode($this->getUser()->getEmail()));
+
+            return new RedirectResponse($this->generateUrl('optout_hash', ['hash' => $hash]));
+        }
+
         $form = $this->createFormBuilder()
             ->add('email', EmailType::class, [
                 'data' => $request->get('email')

@@ -22,6 +22,8 @@ abstract class Opt
     const OPTIN_CAT_MARKETING = 'marketing';
 
     const OPT_LOCATION_PREFERNCES = 'preferences';
+    const OPT_LOCATION_ADMIN = 'admin';
+    const OPT_LOCATION_INTERCOM = 'intercom';
 
     /**
      * @MongoDB\Id
@@ -54,7 +56,7 @@ abstract class Opt
     protected $location;
 
     /**
-     * @MongoDB\Field(type="hash")
+     * @MongoDB\Field(type="collection")
      */
     protected $categories = array();
 

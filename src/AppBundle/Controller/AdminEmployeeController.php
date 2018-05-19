@@ -353,7 +353,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $dm = $this->getManager();
 
         $emailOptOut = new EmailOptOut();
+        $emailOptOut->setLocation(EmailOptOut::OPT_LOCATION_ADMIN);
         $smsOptOut = new SmsOptOut();
+        $smsOptOut->setLocation(EmailOptOut::OPT_LOCATION_ADMIN);
 
         $emailForm = $this->get('form.factory')
             ->createNamedBuilder('email_form', AdminEmailOptOutType::class, $emailOptOut)
