@@ -1,6 +1,6 @@
 <?php
 
-namespace AppBundle\Document\OptOut;
+namespace AppBundle\Document\Opt;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use AppBundle\Document\PhoneTrait;
@@ -8,9 +8,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 
 /**
- * @MongoDB\Document(repositoryClass="AppBundle\Repository\OptOut\SmsOptOutRepository")
+ * @MongoDB\Document()
  */
-class SmsOptOut extends OptOut
+class SmsOptIn extends Opt
 {
     use PhoneTrait;
 
@@ -27,6 +27,9 @@ class SmsOptOut extends OptOut
 
     public function setMobile($mobile)
     {
+        if ($this->mobile != $this->normalizeUkMobile($mobile)) {
+            $this->setUpdated(new \DateTime());
+        }
         $this->mobile = $this->normalizeUkMobile($mobile);
     }
 }

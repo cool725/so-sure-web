@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Form\Type\AdminEmailOptOutType;
 use AppBundle\Service\JudopayService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -43,9 +44,9 @@ use AppBundle\Document\Stats;
 use AppBundle\Document\ImeiTrait;
 use AppBundle\Document\Form\AdminMakeModel;
 use AppBundle\Document\Form\Roles;
-use AppBundle\Document\OptOut\OptOut;
-use AppBundle\Document\OptOut\EmailOptOut;
-use AppBundle\Document\OptOut\SmsOptOut;
+use AppBundle\Document\Opt\OptOut;
+use AppBundle\Document\Opt\EmailOptOut;
+use AppBundle\Document\Opt\SmsOptOut;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\File\S3File;
 use AppBundle\Document\File\JudoFile;
@@ -355,7 +356,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $smsOptOut = new SmsOptOut();
 
         $emailForm = $this->get('form.factory')
-            ->createNamedBuilder('email_form', EmailOptOutType::class, $emailOptOut)
+            ->createNamedBuilder('email_form', AdminEmailOptOutType::class, $emailOptOut)
             ->getForm();
         $smsForm = $this->get('form.factory')
             ->createNamedBuilder('sms_form', SmsOptOutType::class, $smsOptOut)

@@ -2,8 +2,8 @@
 
 namespace AppBundle\Command;
 
-use AppBundle\Document\OptOut\EmailOptOut;
-use AppBundle\Document\OptOut\OptOut;
+use AppBundle\Document\Opt\EmailOptOut;
+use AppBundle\Document\Opt\OptOut;
 use AppBundle\Document\User;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -30,29 +30,8 @@ class TestCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->migrateOptOut();
+        $this->testBirthday();
         $output->writeln('Finished');
-    }
-
-    private function migrateOptOut()
-    {
-        $repo = $this->getManager()->getRepository(EmailOptOut::class);
-        $optOuts = $repo->findAll();
-        $migrated = [];
-        foreach ($optOuts as $optOut) {
-            /** @var EmailOptOut $optOut */
-            if ($optOut->getCategory() == 'aquire' || $optOut->getCategory() == 'retain') {
-                if (in_array($optOut->getEmail(), $migrated)) {
-                    $this->getManager()->remove($optOut);
-                } else {
-                    $optOut->setCategory(OptOut::OPTOUT_CAT_MARKETING);
-                    $migrated[] = $optOut->getEmail();
-                }
-            } elseif ($optOut->getCategory() == 'weekly') {
-                $this->getManager()->remove($optOut);
-            }
-        }
-        $this->getManager()->flush();
     }
 
     private function testBirthday()

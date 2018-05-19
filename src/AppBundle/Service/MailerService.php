@@ -1,7 +1,7 @@
 <?php
 namespace AppBundle\Service;
 
-use AppBundle\Document\OptOut\OptOut;
+use AppBundle\Document\Opt\OptOut;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Templating\EngineInterface;
 

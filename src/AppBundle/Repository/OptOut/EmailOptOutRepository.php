@@ -2,7 +2,7 @@
 
 namespace AppBundle\Repository\OptOut;
 
-use AppBundle\Document\OptOut\EmailOptOut;
+use AppBundle\Document\Opt\EmailOptOut;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 
 class EmailOptOutRepository extends DocumentRepository
@@ -17,7 +17,7 @@ class EmailOptOutRepository extends DocumentRepository
         $categoryAll = EmailOptOut::OPTOUT_CAT_ALL;
         return $this->createQueryBuilder()
             ->field('email')->equals(mb_strtolower($email))
-            ->field('category')->in([$categoryAll, $category])
+            ->field('categories')->in([$categoryAll, $category])
             ->getQuery()
             ->execute();
     }

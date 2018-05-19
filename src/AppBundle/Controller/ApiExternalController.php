@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\IpUtils;
 
 use AppBundle\Document\Phone;
 use AppBundle\Document\User;
-use AppBundle\Document\OptOut\EmailOptOut;
+use AppBundle\Document\Opt\EmailOptOut;
 
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Classes\GoCompare;

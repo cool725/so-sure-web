@@ -2,8 +2,14 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Document\Opt\EmailOptIn;
+use AppBundle\Form\Type\EmailOptInType;
+use AppBundle\Form\Type\EmailOptOutType;
+use AppBundle\Service\InvitationService;
 use AppBundle\Service\MailerService;
+use AppBundle\Service\RateLimitService;
 use AppBundle\Service\RequestService;
+use PHPStan\Rules\Arrays\AppendedArrayItemTypeRule;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 
@@ -41,7 +47,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhoneTrait;
-use AppBundle\Document\OptOut\EmailOptOut;
+use AppBundle\Document\Opt\EmailOptOut;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\PolicyTerms;
 
@@ -1008,13 +1014,28 @@ class DefaultController extends BaseController
     public function optOutAction(Request $request)
     {
         $form = $this->createFormBuilder()
-            ->add('email', EmailType::class)
+            ->add('email', EmailType::class, [
+                'data' => $request->get('email')
+            ])
             ->add('decline', SubmitType::class)
             ->getForm();
 
         $email = null;
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $rateLimit = $this->get('app.ratelimit');
+            if (!$rateLimit->allowedByIp(
+                RateLimitService::DEVICE_TYPE_OPT,
+                $request->getClientIp()
+            )) {
+                $this->addFlash(
+                    'error',
+                    'Too many requests! Please try again later'
+                );
+
+                return new RedirectResponse($this->generateUrl('optout'));
+            }
+
             $hash = urlencode(base64_encode($form->getData()['email']));
 
             /** @var MailerService $mailer */
@@ -1051,42 +1072,99 @@ class DefaultController extends BaseController
         if (!$hash) {
             return new RedirectResponse($this->generateUrl('optout'));
         }
+        $rateLimit = $this->get('app.ratelimit');
+        if (!$rateLimit->allowedByIp(
+            RateLimitService::DEVICE_TYPE_OPT,
+            $request->getClientIp()
+        )) {
+            $this->addFlash(
+                'error',
+                'Too many requests! Please try again later'
+            );
+
+            return new RedirectResponse($this->generateUrl('optout'));
+        }
 
         $email = base64_decode(urldecode($hash));
 
-        $cat = $request->get('cat');
-        if (!$cat) {
-            $cat = EmailOptOut::OPTOUT_CAT_ALL;
+        /** @var InvitationService $invitationService */
+        $invitationService = $this->get('app.invitation');
+
+        /** @var EmailOptOutRepository $optOutRepo */
+        $optOutRepo = $this->getManager()->getRepository(EmailOptOut::class);
+        $optOut = $optOutRepo->findOneBy(['email' => mb_strtolower($email)]);
+        if (!$optOut) {
+            $optOut = new EmailOptOut();
+            $optOut->setEmail($email);
         }
 
-        $invitationService = $this->get('app.invitation');
-        $optOut = $invitationService->isOptedOut($email, $cat);
+        $optInRepo = $this->getManager()->getRepository(EmailOptIn::class);
+        $optIn = $optInRepo->findOneBy(['email' => mb_strtolower($email)]);
+        if (!$optIn) {
+            $optIn = new EmailOptIn();
+            $optIn->setEmail($email);
+        }
 
         $optInForm = $this->get('form.factory')
-            ->createNamedBuilder('optin_form')
-            ->add('optin', CheckboxType::class, [
-                'label' => 'I would like to receive marketing emails from so-sure!',
-                'required' => false
-            ])
-            ->add('add', SubmitType::class)
+            ->createNamedBuilder('optin_form', EmailOptInType::class, $optIn)
             ->getForm();
 
         $optOutForm = $this->get('form.factory')
-            ->createNamedBuilder('optin_form')
-            ->add('optout', CheckboxType    ::class, [
-                'label' => 'I do not wish to recieve any unnecessary emails from so-sure',
-                'required' => false,
-                'data' => $optOut,
-            ])
-            ->add('add', SubmitType::class)
+            ->createNamedBuilder('optout_form', EmailOptOutType::class, $optOut)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('optout_form')) {
-                $optInForm->handleRequest($request);
-
-            } elseif ($request->request->has('optin_form')) {
                 $optOutForm->handleRequest($request);
+                if ($optOutForm->isSubmitted() && $optOutForm->isValid()) {
+                    $optOut->setLocation(EmailOptOut::OPT_LOCATION_PREFERNCES);
+                    $optIn->setIdentityLog($this->getIdentityLogWeb($request));
+                    if ($email != $optOut->getEmail()) {
+                        throw new \Exception(sprintf(
+                            'Optout hacking attempt %s != $s',
+                            $email,
+                            $optOut->getEmail()
+                        ));
+                    }
+                    if (in_array(EmailOptOut::OPTOUT_CAT_INVITATIONS, $optOut->getCategories())) {
+                        $invitationService->rejectAllInvitations($email);
+                    }
+
+                    $this->getManager()->persist($optOut);
+                    $this->getManager()->flush();
+
+                    $this->addFlash(
+                        'success',
+                        'Your preferences have been updated.'
+                    );
+
+                    return new RedirectResponse($this->generateUrl('optout_hash', ['hash' => $hash]));
+                } else {
+                    $this->addFlash(
+                        'danger',
+                        'Sorry, there was a problem submitting this form. Please contact us.'
+                    );
+                }
+            } elseif ($request->request->has('optin_form')) {
+                $optInForm->handleRequest($request);
+                if ($optInForm->isSubmitted() && $optInForm->isValid()) {
+                    $optIn->setLocation(EmailOptIn::OPT_LOCATION_PREFERNCES);
+                    $optIn->setIdentityLog($this->getIdentityLogWeb($request));
+
+                    $this->getManager()->persist($optIn);
+                    $this->getManager()->flush();
+
+                    $this->addFlash(
+                        'success',
+                        'Your preferences have been updated.'
+                    );
+                    return new RedirectResponse($this->generateUrl('optout_hash', ['hash' => $hash]));
+                } else {
+                    $this->addFlash(
+                        'danger',
+                        'Sorry, there was a problem submitting this form. Please contact us.'
+                    );
+                }
             }
         }
 
@@ -1100,11 +1178,9 @@ class DefaultController extends BaseController
         */
 
         return array(
-            'category' => $cat,
             'email' => $email,
             'optin_form' => $optInForm->createView(),
             'optout_form' => $optOutForm->createView(),
-            'is_opted_out' => $invitationService->isOptedOut($email, $cat),
         );
     }
 
