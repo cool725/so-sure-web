@@ -1099,6 +1099,7 @@ class DefaultController extends BaseController
 
         /** @var EmailOptOutRepository $optOutRepo */
         $optOutRepo = $this->getManager()->getRepository(EmailOptOut::class);
+        /** @var EmailOptOut $optOut */
         $optOut = $optOutRepo->findOneBy(['email' => mb_strtolower($email)]);
         if (!$optOut) {
             $optOut = new EmailOptOut();
@@ -1174,15 +1175,6 @@ class DefaultController extends BaseController
                 }
             }
         }
-
-        /*
-        if ($form->isSubmitted() && $form->isValid()) {
-            $invitationService->optin($email, $cat);
-        } else {
-            $invitationService->optout($email, $cat);
-            $invitationService->rejectAllInvitations($email);
-        }
-        */
 
         return array(
             'email' => $email,

@@ -530,17 +530,14 @@ class InvitationServiceTest extends WebTestCase
 
         $optOut = new EmailOptOut();
         $optOut->setEmail(static::generateEmail('invite2', $this));
-        $optOut->setCategory(EmailOptOut::OPTOUT_CAT_INVITATIONS);
+        $optOut->addCategory(EmailOptOut::OPTOUT_CAT_INVITATIONS);
         static::$dm->persist($optOut);
         static::$dm->flush();
 
         $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('invite2', $this));
     }
 
-    /**
-     * @expectedException AppBundle\Exception\OptOutException
-     */
-    public function testOptOutCatAllEmailInvitation()
+    public function testOptOutCatMarketingEmailInvitation()
     {
         $user = static::createUser(
             static::$userManager,
@@ -552,11 +549,12 @@ class InvitationServiceTest extends WebTestCase
 
         $optOut = new EmailOptOut();
         $optOut->setEmail(static::generateEmail('invite3', $this));
-        $optOut->setCategory(EmailOptOut::OPTOUT_CAT_ALL);
+        $optOut->addCategory(EmailOptOut::OPTIN_CAT_MARKETING);
         static::$dm->persist($optOut);
         static::$dm->flush();
 
         $invitation = self::$invitationService->inviteByEmail($policy, static::generateEmail('invite3', $this));
+        $this->assertTrue($invitation instanceof EmailInvitation);
     }
 
     public function testNoOptOutEmailInvitation()
@@ -2114,7 +2112,7 @@ class InvitationServiceTest extends WebTestCase
         $this->assertTrue($connectionFound);
     }
 
-    public function testOptOut()
+    public function testOptOutMultipleTimes()
     {
         $email = static::generateEmail('optout', $this);
 
@@ -2122,10 +2120,10 @@ class InvitationServiceTest extends WebTestCase
         $repo = $dm->getRepository(EmailOptOut::class);
         $this->assertEquals(0, count($repo->findBy(['email' => mb_strtolower($email)])));
 
-        static::$invitationService->optout($email, EmailOptOut::OPTOUT_CAT_ALL);
+        static::$invitationService->optout($email, EmailOptOut::OPTOUT_CAT_INVITATIONS, EmailOptOut::OPT_LOCATION_ADMIN);
         $this->assertEquals(1, count($repo->findBy(['email' => mb_strtolower($email)])));
 
-        static::$invitationService->optout($email, EmailOptOut::OPTOUT_CAT_ALL);
+        static::$invitationService->optout($email, EmailOptOut::OPTOUT_CAT_INVITATIONS, EmailOptOut::OPT_LOCATION_ADMIN);
         $this->assertEquals(1, count($repo->findBy(['email' => mb_strtolower($email)])));
     }
 

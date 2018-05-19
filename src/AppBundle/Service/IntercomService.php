@@ -1276,7 +1276,7 @@ class IntercomService
     {
         $optout = new EmailOptOut();
         $optout->setLocation(EmailOptOut::OPT_LOCATION_INTERCOM);
-        $optout->setCategory($category);
+        $optout->addCategory($category);
         $optout->setEmail($email);
         $this->dm->persist($optout);
     }
