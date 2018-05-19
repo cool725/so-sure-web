@@ -287,6 +287,7 @@ class ApiExternalControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
 
         $repo = self::$dm->getRepository(EmailOptOut::class);
+        /** @var EmailOptOut $optout */
         $optout = $repo->findOneBy(['email' => 'patrick@so-sure.com']);
         $this->assertNotNull($optout);
 
