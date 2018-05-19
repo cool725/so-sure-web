@@ -2120,10 +2120,18 @@ class InvitationServiceTest extends WebTestCase
         $repo = $dm->getRepository(EmailOptOut::class);
         $this->assertEquals(0, count($repo->findBy(['email' => mb_strtolower($email)])));
 
-        static::$invitationService->optout($email, EmailOptOut::OPTOUT_CAT_INVITATIONS, EmailOptOut::OPT_LOCATION_ADMIN);
+        static::$invitationService->optout(
+            $email,
+            EmailOptOut::OPTOUT_CAT_INVITATIONS,
+            EmailOptOut::OPT_LOCATION_ADMIN
+        );
         $this->assertEquals(1, count($repo->findBy(['email' => mb_strtolower($email)])));
 
-        static::$invitationService->optout($email, EmailOptOut::OPTOUT_CAT_INVITATIONS, EmailOptOut::OPT_LOCATION_ADMIN);
+        static::$invitationService->optout(
+            $email,
+            EmailOptOut::OPTOUT_CAT_INVITATIONS,
+            EmailOptOut::OPT_LOCATION_ADMIN
+        );
         $this->assertEquals(1, count($repo->findBy(['email' => mb_strtolower($email)])));
     }
 
