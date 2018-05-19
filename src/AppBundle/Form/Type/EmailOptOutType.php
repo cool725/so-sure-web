@@ -15,14 +15,14 @@ use AppBundle\Document\Opt\EmailOptOut;
 
 class EmailOptOutType extends AbstractType
 {
-    // @codingStandardsIgnoreStart
     public static $choices = [
+        // @codingStandardsIgnoreStart
         'I do not want to receive invitations to so-sure from other so-sure members' =>
             EmailOptOut::OPTOUT_CAT_INVITATIONS,
         'I do not want to receive any non-essential communications from so-sure (such as reward pot reminders and pic-sure reminders)' =>
             EmailOptOut::OPTOUT_CAT_MARKETING,
+        // @codingStandardsIgnoreEnd
     ];
-    // @codingStandardsIgnoreEnd
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
