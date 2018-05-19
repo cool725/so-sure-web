@@ -5,6 +5,7 @@ namespace AppBundle\Controller;
 use AppBundle\Document\Opt\EmailOptIn;
 use AppBundle\Form\Type\EmailOptInType;
 use AppBundle\Form\Type\EmailOptOutType;
+use AppBundle\Repository\OptOut\EmailOptOutRepository;
 use AppBundle\Service\InvitationService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\RateLimitService;
@@ -1127,7 +1128,7 @@ class DefaultController extends BaseController
                     $optIn->setIdentityLog($this->getIdentityLogWeb($request));
                     if ($email != $optOut->getEmail()) {
                         throw new \Exception(sprintf(
-                            'Optout hacking attempt %s != $s',
+                            'Optout hacking attempt %s != %s',
                             $email,
                             $optOut->getEmail()
                         ));

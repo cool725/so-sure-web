@@ -393,7 +393,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 }
             }
         }
-        $repo = $dm->getRepository(OptOut::class);
+        $repo = $dm->getRepository(EmailOptOut::class);
         $oupouts = $repo->findAll();
 
         return [

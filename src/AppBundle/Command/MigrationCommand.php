@@ -51,7 +51,7 @@ class MigrationCommand extends BaseCommand
                 if (in_array($optOut->getEmail(), $migrated)) {
                     $this->getManager()->remove($optOut);
                 } else {
-                    $optOut->setCategory(OptOut::OPTOUT_CAT_MARKETING);
+                    $optOut->setCategory(EmailOptOut::OPTOUT_CAT_MARKETING);
                     $migrated[] = $optOut->getEmail();
                 }
             } elseif ($optOut->getCategory() == 'weekly') {
