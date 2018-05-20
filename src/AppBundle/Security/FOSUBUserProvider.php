@@ -37,7 +37,7 @@ class FOSUBUserProvider extends BaseClass
     protected $intercom;
 
     /** @var MixpanelService */
-    protected  $mixpanel;
+    protected $mixpanel;
 
     /** @var DocumentManager */
     protected $dm;
