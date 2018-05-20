@@ -2,6 +2,9 @@
 
 namespace AppBundle\Tests\Controller;
 
+use AppBundle\Classes\SoSure;
+use AppBundle\Document\Opt\EmailOptIn;
+use AppBundle\Document\Opt\EmailOptOut;
 use AppBundle\Document\PhonePrice;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
@@ -221,5 +224,72 @@ class DefaultControllerTest extends BaseControllerTest
             );
             $this->assertTrue(in_array($expected_url, $arrayLinks));
         }
+    }
+
+    public function testOptOutEmail()
+    {
+        $email1 = self::generateEmail('testOptOutEmail-1', $this);
+        $email2 = self::generateEmail('testOptOutEmail-2', $this);
+
+        $crawler = self::$client->request('GET', '/communications');
+        $form = $crawler->selectButton('form[decline]')->form();
+        $form['form[email]'] = $email1;
+        self::$client->followRedirects();
+        $crawler = self::$client->submit($form);
+        self::$client->followRedirects(false);
+        $this->expectFlashSuccess($crawler, 'receive an email shortly');
+
+        self::$client->enableProfiler();
+        $crawler = self::$client->request('GET', '/communications');
+        $form = $crawler->selectButton('form[decline]')->form();
+        $form['form[email]'] = $email2;
+        $crawler = self::$client->submit($form);
+        self::$client->getResponse();
+        $mailCollector = self::$client->getProfile()->getCollector('swiftmailer');
+        $collectedMessages = $mailCollector->getMessages();
+        $this->assertCount(1, $collectedMessages);
+        $collectedMessages = $mailCollector->getMessages();
+        $this->assertCount(1, $collectedMessages);
+        $this->assertContains('manage your communication preferences', $collectedMessages[0]->getBody());
+    }
+
+    public function testOptInEmailHash()
+    {
+        $email = self::generateEmail('testOptInEmailHash', $this);
+
+        $url = sprintf('/communications/%s', SoSure::encodeCommunicationsHash($email));
+        $crawler = self::$client->request('GET', $url);
+        $form = $crawler->selectButton('optin_form[update]')->form();
+        $form['optin_form[categories]'][0]->tick(); // = EmailOptIn::OPTIN_CAT_MARKETING;
+        self::$client->followRedirects();
+        $crawler = self::$client->submit($form);
+        self::$client->followRedirects(false);
+        $this->expectFlashSuccess($crawler, 'Your preferences have been updated');
+
+        $repo = self::$dm->getRepository(EmailOptIn::class);
+        /** @var EmailOptIn $optin */
+        $optin = $repo->findOneBy(['email' => mb_strtolower($email)]);
+        $this->assertNotNull($optin);
+        $this->assertContains(EmailOptIn::OPTIN_CAT_MARKETING, $optin->getCategories());
+    }
+
+    public function testOptOutEmailHash()
+    {
+        $email = self::generateEmail('testOptOutEmailHash', $this);
+
+        $url = sprintf('/communications/%s', SoSure::encodeCommunicationsHash($email));
+        $crawler = self::$client->request('GET', $url);
+        $form = $crawler->selectButton('optout_form[update]')->form();
+        $form['optout_form[categories]'][0]->tick();
+        self::$client->followRedirects();
+        $crawler = self::$client->submit($form);
+        self::$client->followRedirects(false);
+        $this->expectFlashSuccess($crawler, 'Your preferences have been updated');
+
+        $repo = self::$dm->getRepository(EmailOptOut::class);
+        /** @var EmailOptOut $optin */
+        $optout = $repo->findOneBy(['email' => mb_strtolower($email)]);
+        $this->assertNotNull($optout);
+        $this->assertContains(EmailOptOut::OPTOUT_CAT_INVITATIONS, $optout->getCategories());
     }
 }

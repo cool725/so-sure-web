@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Classes\SoSure;
 use AppBundle\Document\Opt\EmailOptIn;
 use AppBundle\Form\Type\EmailOptInType;
 use AppBundle\Form\Type\EmailOptOutType;
@@ -1015,7 +1016,7 @@ class DefaultController extends BaseController
     public function optOutAction(Request $request)
     {
         if ($this->getUser()) {
-            $hash = urlencode(base64_encode($this->getUser()->getEmail()));
+            $hash = SoSure::encodeCommunicationsHash($this->getUser()->getEmail());
 
             return new RedirectResponse($this->generateUrl('optout_hash', ['hash' => $hash]));
         }
@@ -1043,7 +1044,7 @@ class DefaultController extends BaseController
                 return new RedirectResponse($this->generateUrl('optout'));
             }
 
-            $hash = urlencode(base64_encode($form->getData()['email']));
+            $hash = SoSure::encodeCommunicationsHash($form->getData()['email']);
 
             /** @var MailerService $mailer */
             $mailer = $this->get('app.mailer');
@@ -1092,7 +1093,7 @@ class DefaultController extends BaseController
             return new RedirectResponse($this->generateUrl('optout'));
         }
 
-        $email = base64_decode(urldecode($hash));
+        $email = SoSure::decodeCommunicationsHash($hash);
 
         /** @var InvitationService $invitationService */
         $invitationService = $this->get('app.invitation');
@@ -1127,7 +1128,7 @@ class DefaultController extends BaseController
                 if ($optOutForm->isSubmitted() && $optOutForm->isValid()) {
                     $optOut->setLocation(EmailOptOut::OPT_LOCATION_PREFERNCES);
                     $optIn->setIdentityLog($this->getIdentityLogWeb($request));
-                    if ($email != $optOut->getEmail()) {
+                    if (mb_strtolower($email) != $optOut->getEmail()) {
                         throw new \Exception(sprintf(
                             'Optout hacking attempt %s != %s',
                             $email,
