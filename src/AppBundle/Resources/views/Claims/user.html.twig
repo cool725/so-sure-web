@@ -155,10 +155,12 @@
                     </td>
                 </tr>
                 {% if makemodel_form is defined %}
+                    {{ form_start(makemodel_form)}}
                 <tr>
-                    <td>Recipero Make/Model Check</td>
                     <td>
-                        {{ form_start(makemodel_form)}}
+                        Recipero Make/Model Check
+                    </td>
+                    <td>
                         <span class="text-danger">
                         {{ form_errors(makemodel_form) }}
                         {{ form_errors(makemodel_form.imei) }}
@@ -167,12 +169,13 @@
                         {{ form_widget(makemodel_form.imei, {'attr': {'placeholder':'IMEI'}})}}
                         <br>-- or --<br>
                         {{ form_widget(makemodel_form.serialNumber, {'attr': {'placeholder':'Serial Number'}})}}
-                        <br>
-                        {{ form_widget(makemodel_form.check, {'attr': {'class': 'btn btn-info'}})}}
-                        {{ form_end(makemodel_form)}}
+                    </td>
+                    <td>
+                        {{ form_widget(makemodel_form.check, {'label': 'Run Check', 'attr': {'class': 'btn btn-info'}})}}
                         <br>
                         £0.05 to run check
                     </td>
+                    {{ form_end(makemodel_form)}}
                 </tr>
                 {% endif %}
                 {% if is_granted('ROLE_EMPLOYEE') %}
@@ -228,6 +231,22 @@
                             <button type="button" class="btn btn-info" data-toggle="modal" data-target="#newRoleModal"><i class="fa fa-plus"></i> Edit Roles</button>
                         </td>
                     {% endif %}
+                </tr>
+                <tr>
+                    <td colspan="1">Delete</td>
+                    <td>
+                    </td>
+                    <td>
+                        {% if not user.canDelete %}
+                            Unable to delete user due to data rentention rules (policy was created)
+                        {% elseif is_granted('ROLE_ADMIN') %}
+                                {{ form_start(delete_form) }}
+                                {{ form_widget(delete_form.delete, {'label': 'Delete User', 'attr': {'class': 'btn btn-danger'}}) }}
+                                {{ form_end(delete_form) }}
+                        {% else %}
+                            Insufficient permission to delete
+                        {% endif %}
+                        </td>
                 </tr>
                 {% endif %}
             </table>

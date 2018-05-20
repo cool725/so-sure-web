@@ -49,6 +49,7 @@ class IntercomService
 
     const QUEUE_LEAD = 'lead';
     const QUEUE_USER = 'user';
+    const QUEUE_USER_DELETE = 'user-delete';
     const QUEUE_MESSAGE = 'message';
 
     const QUEUE_EVENT_POLICY_CREATED = 'policy-created';
@@ -692,6 +693,12 @@ class IntercomService
                     }
 
                     $this->update($this->getUser($data['userId']));
+                } elseif ($action == self::QUEUE_USER_DELETE) {
+                    if (!isset($data['userId'])) {
+                        throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
+                    }
+
+                    $this->deleteUser($this->getUser($data['userId']));
                 } elseif ($action == self::QUEUE_LEAD) {
                     if (!isset($data['leadId'])) {
                         throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));

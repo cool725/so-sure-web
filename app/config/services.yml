@@ -17,6 +17,8 @@ services:
             - [setEncoderFactory, ["@security.encoder_factory"]]
             - [setAuthService, ["@security.authorization_checker"]]
             - [setDm, ["@doctrine_mongodb.odm.default_document_manager"]]
+            - [setIntercom, ['@app.intercom']]
+            - [setMixpanel, ['@app.mixpanel']]
 
     app.user.cognitoidentity:
         class: AppBundle\Security\CognitoIdentityUserProvider
