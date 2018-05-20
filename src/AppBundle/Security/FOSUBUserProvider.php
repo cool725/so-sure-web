@@ -400,7 +400,9 @@ class FOSUBUserProvider extends BaseClass
             throw new \Exception(sprintf('Unable to delete user %s due to rentention rules', $user->getId()));
         }
         if ($user->getIntercomId()) {
-            $this->intercom->queueUser($user, IntercomService::QUEUE_USER_DELETE);
+            $this->intercom->queueUser($user, IntercomService::QUEUE_USER_DELETE, [
+                'intercomId' => $user->getIntercomId()
+            ]);
         }
         $this->mixpanel->queueDelete($user->getId());
 

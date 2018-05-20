@@ -694,11 +694,11 @@ class IntercomService
 
                     $this->update($this->getUser($data['userId']));
                 } elseif ($action == self::QUEUE_USER_DELETE) {
-                    if (!isset($data['userId'])) {
+                    if (!isset($data['additional']) || !isset($data['additional']['intercomId'])) {
                         throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
                     }
 
-                    $this->deleteUser($this->getUser($data['userId']));
+                    $this->deleteUser($data['additional']['intercomId']);
                 } elseif ($action == self::QUEUE_LEAD) {
                     if (!isset($data['leadId'])) {
                         throw new \InvalidArgumentException(sprintf('Unknown message in queue %s', json_encode($data)));
