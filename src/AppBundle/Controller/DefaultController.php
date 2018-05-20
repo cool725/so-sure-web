@@ -1044,7 +1044,8 @@ class DefaultController extends BaseController
                 return new RedirectResponse($this->generateUrl('optout'));
             }
 
-            $hash = SoSure::encodeCommunicationsHash($form->getData()['email']);
+            $email = $form->getData()['email'];
+            $hash = SoSure::encodeCommunicationsHash($email);
 
             /** @var MailerService $mailer */
             $mailer = $this->get('app.mailer');
