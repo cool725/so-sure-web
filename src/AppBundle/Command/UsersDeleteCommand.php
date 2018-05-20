@@ -67,7 +67,7 @@ class UsersDeleteCommand extends BaseCommand
         /** @var UserRepository $repo */
         $repo = $this->getManager()->getRepository(User::class);
         $users = $repo->findBy(['created' => ['$lte' => $seventeenMonths]]);
-        print count($users);
+        $output->writeln(sprintf('%d users are 17 months after creation', count($users)));
         foreach ($users as $user) {
             /** @var User $user */
 
