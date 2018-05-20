@@ -1,5 +1,14 @@
 {% extends 'admin_claims_base.html.twig' %}
 
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+        '@AppBundle/Resources/public/js/Claims/user.js'
+    %}
+        <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+{% endblock %}
+
 {% block body %}
 <div class="container">
     <div class="row">
@@ -241,7 +250,7 @@
                             Unable to delete user due to data rentention rules (policy was created)
                         {% elseif is_granted('ROLE_ADMIN') %}
                                 {{ form_start(delete_form) }}
-                                {{ form_widget(delete_form.delete, {'label': 'Delete User', 'attr': {'class': 'btn btn-danger'}}) }}
+                                {{ form_widget(delete_form.delete, {'label': 'Delete User', 'attr': {'class': 'btn btn-danger confirm-delete-user'}}) }}
                                 {{ form_end(delete_form) }}
                         {% else %}
                             Insufficient permission to delete
