@@ -3,32 +3,35 @@
 namespace AppBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use AppBundle\Validator\Constraints\AgeValidator;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Opt\EmailOptOut;
 
-class UserDetailType extends AbstractType
+class EmailOptInType extends AbstractType
 {
+    public static $choices = [
+        'I would like to receive emails from so-sure!' => EmailOptOut::OPTIN_CAT_MARKETING,
+    ];
+
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $years = [];
-        $now = new \DateTime();
-        for ($year = (int) $now->format('Y'); $year >= $now->format('Y') - AgeValidator::MAX_AGE; $year--) {
-            $years[] = $year;
-        }
-
         $builder
-            ->add('firstName', TextType::class)
-            ->add('lastName', TextType::class)
-            ->add('birthday', DateType::class, ['years' => $years])
-            ->add('mobileNumber', TextType::class)
+            ->add('email', HiddenType::class)
+            ->add('notes', HiddenType::class, [
+                'data' => json_encode(self::$choices)
+            ])
+            ->add('categories', ChoiceType::class, [
+                'required' => false,
+                'multiple' => true,
+                'expanded' => true,
+                'choices' => self::$choices,
+            ])
             ->add('update', SubmitType::class)
         ;
     }
@@ -36,7 +39,7 @@ class UserDetailType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'AppBundle\Document\User',
+            'data_class' => 'AppBundle\Document\Opt\EmailOptIn',
         ));
     }
 }

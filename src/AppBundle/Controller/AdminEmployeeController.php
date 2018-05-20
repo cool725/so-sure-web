@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Form\Type\AdminEmailOptOutType;
 use AppBundle\Service\JudopayService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -43,9 +44,9 @@ use AppBundle\Document\Stats;
 use AppBundle\Document\ImeiTrait;
 use AppBundle\Document\Form\AdminMakeModel;
 use AppBundle\Document\Form\Roles;
-use AppBundle\Document\OptOut\OptOut;
-use AppBundle\Document\OptOut\EmailOptOut;
-use AppBundle\Document\OptOut\SmsOptOut;
+use AppBundle\Document\Opt\OptOut;
+use AppBundle\Document\Opt\EmailOptOut;
+use AppBundle\Document\Opt\SmsOptOut;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\File\S3File;
 use AppBundle\Document\File\JudoFile;
@@ -68,7 +69,7 @@ use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\ImeiType;
 use AppBundle\Form\Type\NoteType;
 use AppBundle\Form\Type\EmailOptOutType;
-use AppBundle\Form\Type\SmsOptOutType;
+use AppBundle\Form\Type\AdminSmsOptOutType;
 use AppBundle\Form\Type\PartialPolicyType;
 use AppBundle\Form\Type\UserSearchType;
 use AppBundle\Form\Type\PhoneSearchType;
@@ -352,13 +353,15 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $dm = $this->getManager();
 
         $emailOptOut = new EmailOptOut();
+        $emailOptOut->setLocation(EmailOptOut::OPT_LOCATION_ADMIN);
         $smsOptOut = new SmsOptOut();
+        $smsOptOut->setLocation(EmailOptOut::OPT_LOCATION_ADMIN);
 
         $emailForm = $this->get('form.factory')
-            ->createNamedBuilder('email_form', EmailOptOutType::class, $emailOptOut)
+            ->createNamedBuilder('email_form', AdminEmailOptOutType::class, $emailOptOut)
             ->getForm();
         $smsForm = $this->get('form.factory')
-            ->createNamedBuilder('sms_form', SmsOptOutType::class, $smsOptOut)
+            ->createNamedBuilder('sms_form', AdminSmsOptOutType::class, $smsOptOut)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
@@ -390,7 +393,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 }
             }
         }
-        $repo = $dm->getRepository(OptOut::class);
+        $repo = $dm->getRepository(EmailOptOut::class);
         $oupouts = $repo->findAll();
 
         return [
@@ -1998,7 +2001,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             }
             $dm->flush();
             $this->addFlash(
-                'notice',
+                'success',
                 $message
             );
         }
@@ -2029,7 +2032,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             }
             $dm->flush();
             $this->addFlash(
-                'notice',
+                'success',
                 $message
             );
         }

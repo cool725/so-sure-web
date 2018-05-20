@@ -10,7 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ODM\MongoDB\DocumentRepository;
-use AppBundle\Document\OptOut\EmailOptOut;
+use AppBundle\Document\Opt\EmailOptOut;
 
 class EmailInvitationType extends AbstractType
 {

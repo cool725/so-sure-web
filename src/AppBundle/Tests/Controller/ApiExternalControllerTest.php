@@ -5,7 +5,7 @@ namespace AppBundle\Tests\Controller;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use AppBundle\Document\User;
 use AppBundle\Document\Phone;
-use AppBundle\Document\OptOut\EmailOptOut;
+use AppBundle\Document\Opt\EmailOptOut;
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Classes\GoCompare;
 use AppBundle\Service\RateLimitService;
@@ -202,6 +202,10 @@ class ApiExternalControllerTest extends BaseApiControllerTest
 
     public function testIntercomValidUnsubUser()
     {
+        $repo = self::$dm->getRepository(EmailOptOut::class);
+        $optouts = $repo->findBy(['email' => 'patrick@so-sure.com']);
+        $this->assertEquals(0, count($optouts));
+
         $data = '{
   "type" : "notification_event",
   "app_id" : "hp8z6qfh",
@@ -283,14 +287,12 @@ class ApiExternalControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(200);
 
         $repo = self::$dm->getRepository(EmailOptOut::class);
-        $optouts = $repo->findBy(['email' => 'patrick@so-sure.com']);
-        $this->assertGreaterThan(1, count($optouts));
-        foreach ($optouts as $optout) {
-            $this->assertTrue(in_array($optout->getCategory(), [
-                EmailOptOut::OPTOUT_CAT_AQUIRE,
-                EmailOptOut::OPTOUT_CAT_RETAIN
-            ]));
-        }
+        /** @var EmailOptOut $optout */
+        $optout = $repo->findOneBy(['email' => 'patrick@so-sure.com']);
+        $this->assertNotNull($optout);
+
+        $this->assertTrue(in_array(EmailOptOut::OPTOUT_CAT_MARKETING, $optout->getCategories()));
+        $this->assertEquals(EmailOptOut::OPT_LOCATION_INTERCOM, $optout->getLocation());
     }
 
     public function testMixpanelDelete()

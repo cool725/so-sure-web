@@ -11,7 +11,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Policy;
 use AppBundle\Document\Payment\Payment;
-use AppBundle\Document\OptOut\EmailOptOut;
+use AppBundle\Document\Opt\EmailOptOut;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
@@ -442,8 +442,7 @@ class IntercomService
         // optout
         /** @var EmailOptOutRepository $emailOptOutRepo */
         $emailOptOutRepo = $this->dm->getRepository(EmailOptOut::class);
-        $optedOut = $emailOptOutRepo->isOptedOut($user->getEmail(), EmailOptOut::OPTOUT_CAT_AQUIRE) ||
-            $emailOptOutRepo->isOptedOut($user->getEmail(), EmailOptOut::OPTOUT_CAT_RETAIN);
+        $optedOut = $emailOptOutRepo->isOptedOut($user->getEmail(), EmailOptOut::OPTOUT_CAT_MARKETING);
         if ($optedOut) {
             $data['unsubscribed_from_emails'] = true;
         }
@@ -1129,11 +1128,9 @@ class IntercomService
 
             foreach ($resp->contacts as $lead) {
                 if (mb_strlen(trim($lead->email)) > 0) {
-                    $optedOut = $emailOptOutRepo->isOptedOut($lead->email, EmailOptOut::OPTOUT_CAT_AQUIRE) ||
-                        $emailOptOutRepo->isOptedOut($lead->email, EmailOptOut::OPTOUT_CAT_RETAIN);
+                    $optedOut = $emailOptOutRepo->isOptedOut($lead->email, EmailOptOut::OPTOUT_CAT_MARKETING);
                     if ($lead->unsubscribed_from_emails && !$optedOut) {
-                        $this->addEmailOptOut($lead->email, EmailOptOut::OPTOUT_CAT_AQUIRE);
-                        $this->addEmailOptOut($lead->email, EmailOptOut::OPTOUT_CAT_RETAIN);
+                        $this->addEmailOptOut($lead->email, EmailOptOut::OPTOUT_CAT_MARKETING);
                         $output[] = sprintf("Added optout for %s", $lead->email);
                     }
                 }
@@ -1228,12 +1225,10 @@ class IntercomService
                         }
                         $emails[trim($user->email)] = $user->id;
                     }
-                    $optedOut = $emailOptOutRepo->isOptedOut($user->email, EmailOptOut::OPTOUT_CAT_AQUIRE) ||
-                        $emailOptOutRepo->isOptedOut($user->email, EmailOptOut::OPTOUT_CAT_RETAIN);
+                    $optedOut = $emailOptOutRepo->isOptedOut($user->email, EmailOptOut::OPTOUT_CAT_MARKETING);
                     if ($user->unsubscribed_from_emails && !$optedOut) {
                         // Webhook callback from intercom issue
-                        $this->addEmailOptOut($user->email, EmailOptOut::OPTOUT_CAT_AQUIRE);
-                        $this->addEmailOptOut($user->email, EmailOptOut::OPTOUT_CAT_RETAIN);
+                        $this->addEmailOptOut($user->email, EmailOptOut::OPTOUT_CAT_MARKETING);
                         $output[] = sprintf("Added optout for %s", $user->email);
                     } elseif (!$user->unsubscribed_from_emails && $optedOut) {
                         // sosure user listener -> queue -> intercom update issue
@@ -1280,7 +1275,8 @@ class IntercomService
     private function addEmailOptOut($email, $category)
     {
         $optout = new EmailOptOut();
-        $optout->setCategory($category);
+        $optout->setLocation(EmailOptOut::OPT_LOCATION_INTERCOM);
+        $optout->addCategory($category);
         $optout->setEmail($email);
         $this->dm->persist($optout);
     }
