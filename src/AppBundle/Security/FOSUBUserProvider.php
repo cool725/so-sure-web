@@ -2,6 +2,9 @@
 namespace AppBundle\Security;
 
 use AppBundle\Document\Invitation\Invitation;
+use AppBundle\Document\Opt\EmailOptIn;
+use AppBundle\Document\Opt\EmailOptOut;
+use AppBundle\Document\Opt\Opt;
 use AppBundle\Document\PhoneTrait;
 use AppBundle\Service\IntercomService;
 use AppBundle\Service\MixpanelService;
@@ -423,5 +426,34 @@ class FOSUBUserProvider extends BaseClass
         if ($flush) {
             $this->dm->flush();
         }
+    }
+
+    public function resyncOpts()
+    {
+        $userRepo = $this->dm->getRepository(User::class);
+        $optinRepo = $this->dm->getRepository(EmailOptIn::class);
+        $optoutRepo = $this->dm->getRepository(EmailOptOut::class);
+
+        $optins = $optinRepo->findBy(['user' => null]);
+        foreach ($optins as $optin) {
+            /** @var EmailOptIn $optin */
+            /** @var User $user */
+            $user = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($optin->getEmail())]);
+            if ($user) {
+                $user->addOpt($optin);
+            }
+        }
+
+        $optouts = $optoutRepo->findBy(['user' => null]);
+        foreach ($optouts as $optout) {
+            /** @var EmailOptOut $optout */
+            /** @var User $user */
+            $user = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($optout->getEmail())]);
+            if ($user) {
+                $user->addOpt($optout);
+            }
+        }
+
+        $this->dm->flush();
     }
 }
