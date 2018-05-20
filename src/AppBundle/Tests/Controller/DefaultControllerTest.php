@@ -287,7 +287,7 @@ class DefaultControllerTest extends BaseControllerTest
         $this->expectFlashSuccess($crawler, 'Your preferences have been updated');
 
         $repo = self::$dm->getRepository(EmailOptOut::class);
-        /** @var EmailOptOut $optin */
+        /** @var EmailOptOut $optout */
         $optout = $repo->findOneBy(['email' => mb_strtolower($email)]);
         $this->assertNotNull($optout);
         $this->assertContains(EmailOptOut::OPTOUT_CAT_INVITATIONS, $optout->getCategories());
