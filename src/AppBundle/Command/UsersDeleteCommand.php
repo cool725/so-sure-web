@@ -67,6 +67,7 @@ class UsersDeleteCommand extends BaseCommand
 
         /** @var FOSUBUserProvider $fosUser */
         $fosUser = $this->getContainer()->get('app.user');
+        $fosUser->resyncOpts();
 
         /** @var UserRepository $repo */
         $repo = $this->getManager()->getRepository(User::class);

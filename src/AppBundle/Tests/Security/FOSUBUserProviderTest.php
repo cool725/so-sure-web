@@ -4,6 +4,8 @@ namespace AppBundle\Tests\Security;
 
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\Invitation;
+use AppBundle\Document\Opt\EmailOptIn;
+use AppBundle\Document\Opt\EmailOptOut;
 use AppBundle\Document\User;
 use AppBundle\Security\FOSUBUserProvider;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -466,5 +468,34 @@ class FOSUBUserProviderTest extends WebTestCase
         }
 
         return $responseMock;
+    }
+
+    public function testResyncOpts()
+    {
+        $email = static::generateEmail('testResyncOpts', $this);
+        $user = static::createUser(
+            static::$userManager,
+            $email,
+            'bar',
+            static::$dm
+        );
+
+        $optOut = new EmailOptOut();
+        $optOut->setEmail($email);
+        $optOut->addCategory(EmailOptOut::OPTOUT_CAT_INVITATIONS);
+        static::$dm->persist($optOut);
+
+        $emailOptIn = new EmailOptIn();
+        $emailOptIn->setEmail($email);
+        $emailOptIn->addCategory(EmailOptIn::OPTIN_CAT_MARKETING);
+        $emailOptIn->setUpdated(new \DateTime('2017-01-01'));
+        static::$dm->persist($emailOptIn);
+
+        static::$dm->flush();
+
+        static::$userService->resyncOpts();
+
+        $updatedUser = $this->assertUserExists(static::$container, $user);
+        $this->assertCount(2, $updatedUser->getOpts());
     }
 }
