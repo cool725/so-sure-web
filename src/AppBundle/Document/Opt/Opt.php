@@ -3,6 +3,8 @@
 namespace AppBundle\Document\Opt;
 
 use AppBundle\Document\IdentityLog;
+use AppBundle\Document\User;
+use Gedmo\Mapping\Annotation as Gedmo;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
@@ -12,6 +14,7 @@ use AppBundle\Validator\Constraints as AppAssert;
  * @MongoDB\InheritanceType("SINGLE_COLLECTION")
  * @MongoDB\DiscriminatorField("optout_type")
  * @MongoDB\DiscriminatorMap({"email"="EmailOptOut", "sms"="SmsOptOut", "optinEmail"="EmailOptIn"})
+ * @Gedmo\Loggable
  */
 abstract class Opt
 {
@@ -71,6 +74,13 @@ abstract class Opt
      * @MongoDB\EmbedOne(targetDocument="AppBundle\Document\IdentityLog")
      */
     protected $identityLog;
+
+    /**
+     * @MongoDB\ReferenceOne(targetDocument="AppBundle\Document\User", inversedBy="opts")
+     * @Gedmo\Versioned
+     * @var User
+     */
+    protected $user;
 
     public function __construct()
     {
@@ -162,5 +172,18 @@ abstract class Opt
     public function setIdentityLog(IdentityLog $identityLog)
     {
         $this->identityLog = $identityLog;
+    }
+
+    /**
+     * @return User|null
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    public function setUser(User $user)
+    {
+        $this->user = $user;
     }
 }
