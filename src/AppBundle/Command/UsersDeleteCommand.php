@@ -5,6 +5,7 @@ namespace AppBundle\Command;
 use AppBundle\Classes\SoSure;
 use AppBundle\Repository\UserRepository;
 use AppBundle\Service\JudopayService;
+use AppBundle\Service\MailerService;
 use AppBundle\Service\PolicyService;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
