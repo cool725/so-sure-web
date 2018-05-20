@@ -4,6 +4,7 @@ namespace AppBundle\Command;
 
 use AppBundle\Classes\SoSure;
 use AppBundle\Repository\UserRepository;
+use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Service\JudopayService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PolicyService;
@@ -64,6 +65,9 @@ class UsersDeleteCommand extends BaseCommand
 
         // TODO: Resync optin with users
 
+        /** @var FOSUBUserProvider $fosUser */
+        $fosUser = $this->getContainer()->get('app.user');
+
         /** @var UserRepository $repo */
         $repo = $this->getManager()->getRepository(User::class);
         $users = $repo->findBy(['created' => ['$lte' => $seventeenMonths]]);
@@ -92,7 +96,7 @@ class UsersDeleteCommand extends BaseCommand
             }
 
             if (!$skipDelete && $user->shouldDelete()) {
-                $this->getManager()->remove($user);
+                $fosUser->deleteUser($user);
                 $output->writeln(sprintf(
                     'Deleted user %s (%s)',
                     $user->getEmail(),

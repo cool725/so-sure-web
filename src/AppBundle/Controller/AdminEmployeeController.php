@@ -3,6 +3,7 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Form\Type\AdminEmailOptOutType;
+use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Service\JudopayService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -1068,6 +1069,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $roleForm = $this->get('form.factory')
             ->createNamedBuilder('user_role_form', UserRoleType::class, $role)
             ->getForm();
+        $deleteForm = $this->get('form.factory')
+            ->createNamedBuilder('delete_form')
+            ->add('delete', SubmitType::class)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('user_role_form')) {
@@ -1277,6 +1282,20 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
                     return $this->redirectToRoute('admin_user', ['id' => $id]);
                 }
+            } elseif ($request->request->has('delete_form')) {
+                $deleteForm->handleRequest($request);
+                if ($deleteForm->isValid()) {
+                    /** @var FOSUBUserProvider $userService */
+                    $userService = $this->get('app.user');
+                    $userService->deleteUser($user);
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        'Deleted User'
+                    );
+
+                    return $this->redirectToRoute('admin_users');
+                }
             }
         }
         
@@ -1292,6 +1311,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'user_high_risk_form' => $userHighRiskForm->createView(),
             'makemodel_form' => $makeModelForm->createView(),
             'sanctions_form' => $sanctionsForm->createView(),
+            'delete_form' => $deleteForm->createView(),
             'postcode' => $postcode,
             'census' => $census,
             'income' => $income,
