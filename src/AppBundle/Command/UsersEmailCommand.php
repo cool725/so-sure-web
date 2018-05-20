@@ -47,6 +47,7 @@ class UsersEmailCommand extends BaseCommand
         foreach ($users as $user) {
             /** @var User $user */
             $this->emailUser($user);
+            $output->writeln($user->getId());
         }
 
         $output->writeln('Finished');
