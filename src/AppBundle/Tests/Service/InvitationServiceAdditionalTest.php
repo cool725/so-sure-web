@@ -136,6 +136,57 @@ class InvitationServiceAdditionalTest extends WebTestCase
         $this->assertEquals($count, count($emailInvitationRepo->findSystemReinvitations($future)));
     }
 
+    /**
+     * @expectedException AppBundle\Exception\OptOutException
+     */
+    public function testEmailOptOutInvite()
+    {
+        $this->removeAllEmailInvitations();
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testEmailOptOutInvite-user', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+
+        $optOut = new EmailOptOut();
+        $optOut->setEmail(static::generateEmail('testEmailOptOutInvite-invite', $this));
+        $optOut->addCategory(SmsOptOut::OPTOUT_CAT_INVITATIONS);
+        static::$dm->persist($optOut);
+        static::$dm->flush();
+
+        $invitation = self::$invitationService->inviteByEmail(
+            $policy,
+            static::generateEmail('testEmailOptOutInvite-invite', $this)
+        );
+        $this->assertTrue($invitation instanceof EmailInvitation);
+    }
+
+    public function testEmailOptOutMarketingInvite()
+    {
+        $this->removeAllEmailInvitations();
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testEmailOptOutMarketingInvite-user', $this),
+            'bar'
+        );
+        $policy = static::initPolicy($user, static::$dm, static::$phone, null, false, true);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+
+        $optOut = new EmailOptOut();
+        $optOut->setEmail(static::generateEmail('testEmailOptOutInvite-invite', $this));
+        $optOut->addCategory(SmsOptOut::OPTIN_CAT_MARKETING);
+        static::$dm->persist($optOut);
+        static::$dm->flush();
+
+        $invitation = self::$invitationService->inviteByEmail(
+            $policy,
+            static::generateEmail('testEmailOptOutMarketingInvite-invite', $this)
+        );
+        $this->assertTrue($invitation instanceof EmailInvitation);
+    }
+
     public function testEmailInvitationReinviteOptOut()
     {
         $this->removeAllEmailInvitations();
