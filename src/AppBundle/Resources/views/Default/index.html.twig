@@ -131,6 +131,15 @@
         </div>
     </section>
 
+    {% if trustpilot is defined and trustpilot == 'trustpilot' %}
+    <section class="section--pad homepage--trustpilot">
+        <div class="container">
+            <img src="{{ cdn_url }}/images/press/ebay_so-sure_trustpilot.svg" alt="TrustPilot" title="TrustPilot" width="240px" class="img-center">
+            <div class="speech-bubble clearfix"><mark>Really straight-forward insurance. I found the claims process easy and received great customer service. Would recommend.</mark><br><small>Laura Barlow</small></div>
+        </div>
+    </section>
+    {% endif %}
+
     {# Press #}
     <section class="section--pad homepage--press">
         <div class="container">
