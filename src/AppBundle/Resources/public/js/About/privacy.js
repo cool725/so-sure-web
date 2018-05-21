@@ -7,4 +7,10 @@ $(document).ready(function () {
             scrollTop: $(link).offset().top - 500
         }, 2000).bind(link);
     });
+
+
+    $('.print').click(function() {
+        //$('#privacy-accordion .collapse').collapse('show');
+        window.print();
+    });
 });

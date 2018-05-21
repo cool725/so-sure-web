@@ -1,5 +1,5 @@
 {% if environment != 'prod' %}
-    <nav class="navbar navbar-fixed-bottom" style="background-color:#EFEFEF;height:40px;">
+    <nav class="navbar navbar-fixed-bottom hidden-print d-print-none" style="background-color:#EFEFEF;height:40px;">
         <div class="container-fluid">
             <div class="navbar-header">
                 <ul class="navbar-brand list-inline">
@@ -21,7 +21,7 @@
         </div>
     </nav>
 
-    <div class="modal fade" id="devModal" tabindex="-1" role="dialog">
+    <div class="modal fade" id="devModal hidden-print d-print-none" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document" style="width: 60%;">
             <div class="modal-content">
                 <div class="modal-header">

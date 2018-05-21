@@ -4,17 +4,26 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    {% stylesheets
-    %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+    {% stylesheets output='css/*.css'
+        '@AppBundle/Resources/public/sass/page/privacy.scss'
+    %}
+        <link rel="stylesheet" href="{{ asset_url }}">
+    {% endstylesheets %}
 {% endblock %}
 
 {% block body %}
 <section class="about-section section--pad">
     <div class="container" id="terms">
         <div class="row">
-            <div class="col-md-12">
-
+            <div class="col-md-8">
                 <h1 class="section-title">Website privacy policy (GDPR version)</h1>
+            </div>
+            <div class="col-md-4">
+                <a href="#" class="print"><i class="fa fa-print"></i> Print page</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
                 <p>
                     Welcome to the so-sure's privacy notice.
                 </p>
@@ -205,28 +214,28 @@
                                 <p>
                                     <strong>Third parties or publicly available sources.</strong> We may receive personal data about you from various third parties and public sources as set out below:
                                 </p>
-                                <p>
-                                    <h2>TODO!!</h2>
-                                    Technical Data from the following parties:
-                                    <ul>
-                                       <li>
-                                           (a)  analytics providers such as Google based outside the EU;
-                                       </li>
-                                        <li>
-                                            (b)  advertising networks [such as [NAME] based [inside OR outside] the EU]; and
-                                        </li>
-                                        <li>
-                                            (c)  search information providers [such as [NAME] based [inside OR outside] the EU].
-                                        </li>
-                                    </ul>
-
-                                </p> 
-                                <p>
-                                    Contact, Financial and Transaction Data from providers of technical, payment and delivery services such as Judopay based inside the EU and Accesspay based inside the EU.
-                                </p>
-                                <p>
-                                    Identity and Contact Data from data brokers or aggregators.
-                                </p>
+                                <ul>
+                                    <li>
+                                        Technical Data from the following parties:
+                                        <ul>
+                                            <li>
+                                                (a)  analytics providers such as Google based outside the EU;
+                                            </li>
+                                            <li>
+                                                (b)  advertising networks such as Facebook based outside the EU; and
+                                            </li>
+                                            <li>
+                                                (c)  search information providers such as Google based outside the EU.
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        Contact, Financial and Transaction Data from providers of technical, payment and delivery services such as Judopay based inside the EU and Accesspay based inside the EU.
+                                    </li>
+                                    <li>
+                                        Identity and Contact Data from data brokers or aggregators.
+                                    </li>
+                                </ul>
                             </div>
                         </div>
                     </div>
@@ -477,22 +486,17 @@
                                 <p>
                                     We may have to share your personal data with the parties set out below for the purposes set out in the table in paragraph 4 above.
                                 </p>
-                                <p>
-                                    Internal Third Parties as set out in the Glossary.
-                                </p>
-                                <p>
-                                    External Third Parties as set out in the Glossary.
-                                </p>
-                                <p>
-                                    <h2>TODO!!</h2>
-                                    [Specific third parties [listed in the table in [paragraph 4] above] OR such as [SPECIFIC THIRD PARTIES]].]
-                                </p>
-                                <p>
-                                    Third parties to whom we may choose to sell, transfer, or merge parts of our business or our assets. Alternatively, we may seek to acquire other businesses or merge with them. If a change happens to our business, then the new owners may use your personal data in the same way as set out in this privacy notice.
-                                </p>
-                                <p>
-                                    We require all third parties to respect the security of your personal data and to treat it in accordance with the law. We do not allow our third-party service providers to use your personal data for their own purposes and only permit them to process your personal data for specified purposes and in accordance with our instructions.
-                                </p>
+                                <ul>
+                                    <li>
+                                        External Third Parties as set out in the <a href="#collapseGlossary" data-link="#third-party-external" class="scroll-to-link">Glossary</a>.
+                                    </li>
+                                    <li>
+                                        Third parties to whom we may choose to sell, transfer, or merge parts of our business or our assets. Alternatively, we may seek to acquire other businesses or merge with them. If a change happens to our business, then the new owners may use your personal data in the same way as set out in this privacy notice.
+                                    </li>
+                                    <li>
+                                        We require all third parties to respect the security of your personal data and to treat it in accordance with the law. We do not allow our third-party service providers to use your personal data for their own purposes and only permit them to process your personal data for specified purposes and in accordance with our instructions.
+                                    </li>
+                                </ul>
                             </div>
                         </div>
                     </div>
@@ -682,26 +686,29 @@
                                 <p>
                                     <strong>Comply with a legal or regulatory obligation</strong> means processing your personal data where it is necessary for compliance with a legal or regulatory obligation that we are subject to.
                                 </p> 
-                                <p>
-                                    <strong>THIRD PARTIES</strong>
-                                </p> 
-                                <p>
+                                <p id="third-party-external">
                                     <strong>EXTERNAL THIRD PARTIES</strong>  
                                 </p>
-                                <p>
-                                    <h2>TODO</h2>
-                                    Service providers [acting as processors] based [SPECIFIC COUNTRIES] who provide [IT and system administration services].
-                                </p>
-                                <p>
-                                    Professional advisers [acting as processors or joint controllers] including lawyers, bankers, auditors and insurers based [SPECIFIC COUNTRIES] who provide [consultancy, banking, legal, insurance and accounting services].
-                                </p>
-                                <p>
-                                    HM Revenue & Customs, regulators and other authorities [acting as processors or joint controllers] based [in the United Kingdom] [who require reporting of processing activities in certain circumstances].
-                                </p>
-                                <p>
-                                    <h2>TODO!!</h2>
-                                    [DETAILS OF ANY OTHER THIRD PARTIES, FOR EXAMPLE, MARKET RESEARCHERS, FRAUD PREVENTION AGENCIES, PRICE COMPARISON SITES ETC].
-                                </p>
+                                <ul>
+                                    <li>
+                                        Professional advisers acting as processors or joint controllers including lawyers, bankers, auditors and insurers based in the United Kingdom who provide consultancy, banking, legal, insurance and accounting services.
+                                    </li>
+                                    <li>
+                                        HM Revenue & Customs, regulators and other authorities acting as processors or joint controllers based in the United Kingdom who require reporting of processing activities in certain circumstances.
+                                    </li>
+                                    <li>
+                                        Software as a service (SAAS) providers acting as processors based in the United Kindom, other EU countries, and the USA.
+                                    </li>
+                                    <li>
+                                        Claims handlers acting as processors or joint controllers based in the United Kindom.
+                                    </li>
+                                    <li>
+                                        Other insurance and fraud prevention agencies acting as processors or joint controllers based in the United Kingdom.
+                                    </li>
+                                    <li>
+                                        Payment gateway, merchant services, and banking services acting as processors or joint controllers based in the United Kingdom.
+                                    </li>
+                                </ul>
                                 <p>
                                     <strong>YOUR LEGAL RIGHTS</strong>  
                                 </p> 
