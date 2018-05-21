@@ -383,64 +383,64 @@
         }
     }
 
-    &--hero-background-defacto {
-        // Mobile
-        padding: 20px 15px 130px;
-        background: transparent url('#{$cdn_url}/images/homepage/so-sure_homepage_hero_mobile_background_defacto_5.svg') no-repeat center bottom;
-        background-size: 85%;
+    // &--hero-background-defacto {
+    //     // Mobile
+    //     padding: 20px 15px 130px;
+    //     background: transparent url('#{$cdn_url}/images/homepage/so-sure_homepage_hero_mobile_background_defacto_5.svg') no-repeat center bottom;
+    //     background-size: 85%;
 
 
-        @include breakpoint(mobM) {
-            padding-bottom: 160px;
-        }
+    //     @include breakpoint(mobM) {
+    //         padding-bottom: 160px;
+    //     }
 
-        @include breakpoint(mobL) {
-            padding-bottom: 240px;
-        }
+    //     @include breakpoint(mobL) {
+    //         padding-bottom: 240px;
+    //     }
 
-        // Tablet
-        @include breakpoint(tablet) {
-            padding-bottom: 340px;
-        }
+    //     // Tablet
+    //     @include breakpoint(tablet) {
+    //         padding-bottom: 340px;
+    //     }
 
-        @include breakpoint(laptop) {
-            padding: 100px 15px 200px;
-            // Reset background
-            background: transparent;
+    //     @include breakpoint(laptop) {
+    //         padding: 100px 15px 200px;
+    //         // Reset background
+    //         background: transparent;
 
-            &:after, &:before {
-                width: 100%; height: 100%;
-                content: '';
-                position: absolute;
-                z-index: 0;
-                left: 50%;
-                margin-left: -50%;
-            }
+    //         &:after, &:before {
+    //             width: 100%; height: 100%;
+    //             content: '';
+    //             position: absolute;
+    //             z-index: 0;
+    //             left: 50%;
+    //             margin-left: -50%;
+    //         }
 
-            // Add the Buildings
-            &:before {
-                bottom: 0;
-                background: transparent url('#{$cdn_url}/images/homepage/so-sure_hero_background_defacto_right.svg') no-repeat center bottom;
-                background-size: 1900px;
-            }
+    //         // Add the Buildings
+    //         &:before {
+    //             bottom: 0;
+    //             background: transparent url('#{$cdn_url}/images/homepage/so-sure_hero_background_defacto_right.svg') no-repeat center bottom;
+    //             background-size: 1900px;
+    //         }
 
-            // Add the Clouds
-            &:after {
-                top: 0; left: 50%;
-                background: transparent url('#{$cdn_url}/images/homepage/so-sure_homepage-hero-clouds-combined.svg') repeat-x center top;
-                background-size: 100%;
-            }
-        }
+    //         // Add the Clouds
+    //         &:after {
+    //             top: 0; left: 50%;
+    //             background: transparent url('#{$cdn_url}/images/homepage/so-sure_homepage-hero-clouds-combined.svg') repeat-x center top;
+    //             background-size: 100%;
+    //         }
+    //     }
 
-        // Desktop
-        @include breakpoint(desktop) {
-            padding: 120px 15px 200px;
-        }
+    //     // Desktop
+    //     @include breakpoint(desktop) {
+    //         padding: 120px 15px 200px;
+    //     }
 
-        @include breakpoint(hd) {
-            padding: 200px 15px;
-        }
-    }
+    //     @include breakpoint(hd) {
+    //         padding: 200px 15px;
+    //     }
+    // }
 
     &--what-is-so-sure {
 
