@@ -120,6 +120,10 @@
 
         <h4 class="text-center">All this covered and more...</h4>
 
+        {% if moneyBackGuarantee is defined and moneyBackGuarantee == 'money-back-guarantee' %}
+        <p class="text-center lead">Plus.. we're so-sure you'll love us, we'll give you a 14 day money back guarantee</p>
+        {% endif %}
+
         <div class="checkout--step">
             <div class="container">
 

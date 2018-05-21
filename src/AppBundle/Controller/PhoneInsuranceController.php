@@ -522,16 +522,16 @@ class PhoneInsuranceController extends BaseController
             $this->get('app.sixpack')->convert(
                 SixpackService::EXPERIMENT_HOMEPAGE_AA_V2
             );
-            
+
             $this->get('app.sixpack')->convert(
                 SixpackService::EXPERIMENT_DEFACTO
             );
         }
 
-        $replacement = $this->sixpack(
+        $moneyBackGuarantee = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_72_REPLACEMENT,
-            ['next-working-day', 'seventytwo-hours']
+            SixpackService::EXPERIMENT_MONEY_BACK_GUARANTEE,
+            ['no-money-back-guarantee', 'money-back-guarantee']
         );
 
         $data = array(
@@ -553,13 +553,13 @@ class PhoneInsuranceController extends BaseController
                 ],
                 ['memory' => 'asc']
             ),
-            'comparision'     => $phone->getComparisions(),
-            'comparision_max' => $maxComparision,
-            'coming_soon'     => $phone->getCurrentPhonePrice() ? false : true,
-            'days_test'       => $daysTest,
-            'slider_test'     => 'slide-me',
-            'intercom_test'   => $expIntercom,
-            'replacement'     => $replacement,
+            'comparision'        => $phone->getComparisions(),
+            'comparision_max'    => $maxComparision,
+            'coming_soon'        => $phone->getCurrentPhonePrice() ? false : true,
+            'days_test'          => $daysTest,
+            'slider_test'        => 'slide-me',
+            'intercom_test'      => $expIntercom,
+            'moneyBackGuarantee' => $moneyBackGuarantee,
         );
 
         $template = 'AppBundle:PhoneInsurance:quote.html.twig';
