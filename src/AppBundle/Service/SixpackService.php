@@ -63,6 +63,7 @@ class SixpackService
     const EXPERIMENT_EBAY_LANDING_1 = 'ebay-landing-1';
     const EXPERIMENT_EBAY_LANDING_2 = 'ebay-landing-2';
     const EXPERIMENT_NEW_WELCOME_MODAL = 'new-welcome-modal';
+    const EXPERIMENT_MONEY_BACK_GUARANTEE = 'money-back-guarantee';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';
@@ -91,6 +92,7 @@ class SixpackService
         self::EXPERIMENT_EBAY_LANDING,
         self::EXPERIMENT_EBAY_LANDING_1,
         self::EXPERIMENT_EBAY_LANDING_2,
+        self::EXPERIMENT_MONEY_BACK_GUARANTEE,
     ];
 
     public static $authExperiments = [
@@ -123,6 +125,7 @@ class SixpackService
         self::EXPERIMENT_EBAY_LANDING,
         self::EXPERIMENT_EBAY_LANDING_1,
         self::EXPERIMENT_EBAY_LANDING_2,
+        self::EXPERIMENT_MONEY_BACK_GUARANTEE,
     ];
 
     /**
