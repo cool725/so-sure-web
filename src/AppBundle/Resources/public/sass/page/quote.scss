@@ -52,7 +52,16 @@
 		}
 	}
 
-	&__right {}
+	&__right {
+        .trustpilot {
+            display: block;
+            margin: 15px auto 0;
+
+            @include breakpoint(laptop) {
+                margin: 0;
+            }
+        }
+    }
 
 	&__cta {
 
