@@ -41,6 +41,10 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     const GENDER_FEMALE = 'female';
     const GENDER_UNKNOWN = 'unknown';
 
+    const ROLE_CLAIMS = 'ROLE_CLAIMS';
+    const ROLE_EMPLOYEE = 'ROLE_EMPLOYEE';
+    const ROLE_ADMIN = 'ROLE_ADMIN';
+
     /**
      * @MongoDB\Id
      */
@@ -722,12 +726,12 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     public function hasEmployeeRole()
     {
-        return $this->hasRole('ROLE_EMPLOYEE') || $this->hasRole('ROLE_ADMIN');
+        return $this->hasRole(self::ROLE_EMPLOYEE) || $this->hasRole(self::ROLE_ADMIN);
     }
 
     public function hasClaimsRole()
     {
-        return $this->hasRole('ROLE_CLAIMS');
+        return $this->hasRole(self::ROLE_CLAIMS);
     }
 
     public function hasCancelledPolicy()
@@ -1765,6 +1769,10 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     public function shouldDelete(\DateTime $date = null)
     {
+        if ($this->hasClaimsRole() || $this->hasEmployeeRole()) {
+            return false;
+        }
+
         if (!$this->canDelete($date)) {
             return false;
         }
@@ -1778,6 +1786,10 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     public function shouldNotifyDelete(\DateTime $date = null)
     {
+        if ($this->hasClaimsRole() || $this->hasEmployeeRole()) {
+            return false;
+        }
+
         if (!$this->canDelete($date)) {
             return false;
         }
