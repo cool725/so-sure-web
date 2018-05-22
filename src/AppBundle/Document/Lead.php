@@ -144,6 +144,7 @@ class Lead
         $user->setEmail($this->getEmail());
         $user->setCreated($this->getCreated());
         $user->setIntercomId($this->getIntercomId());
-        $user->setMobileNumber($this->getMobileNumber());
+        // Commenting out as could cause duplicate mobile numbers, which could cause login issues
+        // $user->setMobileNumber($this->getMobileNumber());
     }
 }
