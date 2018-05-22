@@ -9,7 +9,7 @@
 
 		h4 {
 			cursor: pointer;
-			line-height: 1.5;			
+			line-height: 1.5;
 		}
 
 		&:hover, &:focus {
@@ -18,9 +18,9 @@
 
 		&:after {
 		    font-family: FontAwesome;
-		    content: '\f054';        
+		    content: '\f054';
 		    position: absolute;
-		    top: 10px; right: 10px;			
+		    top: 10px; right: 10px;
 		}
 	}
 
@@ -29,3 +29,18 @@
 	}
 }
 
+.panel-sosure {
+	background-color: $off-white;
+	padding-bottom: 30px;
+	margin: 0 0 25px;
+	border: 1px solid $pale-grey;
+
+	@include breakpoint(laptop) {
+		margin: 50px 0;
+
+		.optouts {
+			max-width: 600px;
+			margin: 0 auto;
+		}
+	}
+}
