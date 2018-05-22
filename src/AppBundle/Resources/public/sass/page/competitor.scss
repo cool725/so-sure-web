@@ -3,6 +3,7 @@
 @import "../common/variables";
 @import "../mixins";
 @import "../common/paletteNew";
+@import "../common/type";
 
 $protectyourbubble: #383570;
 $loveitcoverit: #CD355E;
@@ -37,8 +38,8 @@ $gadgetcover: #E8C955;
             }
             th {
                 text-align: center;
-                padding-top: 25px !important;
-                padding-bottom: 25px !important;
+                padding-top: 15px !important;
+                padding-bottom: 15px !important;
                 border-bottom: 0 !important;
                 position: relative;
 
@@ -115,8 +116,8 @@ $gadgetcover: #E8C955;
 
         tbody {
             td {
-                padding-top: 25px !important;
-                padding-bottom: 25px !important;
+                padding-top: 15px !important;
+                padding-bottom: 15px !important;
             }
 
             td.border-left-right {
@@ -299,7 +300,7 @@ $gadgetcover: #E8C955;
     }
 
     &__press {
-        background: $off-white;
+        // background: $off-white;
         position: relative;
         z-index: 1;
 
@@ -313,6 +314,10 @@ $gadgetcover: #E8C955;
     }
 
     &__cover {
+        // background-color: $off-white;
+        position: relative;
+        z-index: 11;
+        box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.05);
 
         .media {
             margin-bottom: 30px;
@@ -323,43 +328,9 @@ $gadgetcover: #E8C955;
         }
     }
 
-    &__cover_next {
-        // background-color: $off-white;
-
-        .col-md-4 {
-            text-align: center;
-        }
-
-        ul {
-            margin-bottom: 30px;
-
-            li {
-                font-size: 18px;
-                // font-weight: bold;
-                padding-left: 42px;
-                padding-bottom: 10px;
-                margin: 15px 0 20px;
-                background: transparent url('#{$cdn_url}/images/logo/so-sure-blue-smile.svg') no-repeat top left;
-                background-size: 30px;
-
-                small {
-                    font-weight: normal;
-                }
-
-            }
-        }
-
-        @include breakpoint(laptop) {
-            // text-align: left;
-
-            .col-md-4 {
-                text-align: left;
-
-                img {
-                    margin-top: 35px;
-                }
-            }
-        }
+    &__why_we_are_different {
+        background-color: $off-white;
+        padding-bottom: 60px;
     }
 
     &_compare {
@@ -379,22 +350,6 @@ $gadgetcover: #E8C955;
             }
 
         }
-    }
-
-    &_red {
-        color: $ered;
-    }
-
-    &_blue {
-        color: $eblue;
-    }
-
-    &_amber {
-        color: $eamber;
-    }
-
-    &_green {
-        color: $egreen;
     }
 }
 
@@ -628,5 +583,34 @@ $gadgetcover: #E8C955;
 
     li.active {
         background: $dark-grey;
+    }
+}
+
+.ol--blue-counter {
+    list-style: none;
+    padding-bottom: 30px;
+    padding-left: 60px;
+    position: relative;
+
+    li {
+        counter-increment: item;
+        position: relative;
+
+        &:before {
+            width: 40px; height: 40px;
+            display: inline-block;
+            content: counter(item);
+            position: absolute;
+            top: 0; left: -55px;
+            text-align: center;
+            color: $white;
+            font-family: $avenir-heavy;
+            font-size: 24px;
+            line-height: 1.8;
+
+
+            background-color: $primary-blue;
+            @include border-radius(100%);
+        }
     }
 }
