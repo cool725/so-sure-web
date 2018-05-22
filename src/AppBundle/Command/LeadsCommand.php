@@ -56,6 +56,7 @@ class LeadsCommand extends BaseCommand
         $yesterday = $yesterday->sub(new \DateInterval(('P1D')));
         $leads = $leadsRepo->findBy(['email' => ['$ne' => null], 'created' => ['$lte' => $yesterday]]);
         $count = 0;
+        $newUsers = [];
         foreach ($leads as $lead) {
             /** @var Lead $lead */
 
@@ -72,7 +73,7 @@ class LeadsCommand extends BaseCommand
 
             $user = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($lead->getEmail())]);
             // user exists, so lead can be removed
-            if ($user) {
+            if ($user || in_array(mb_strtolower($lead->getEmail()), $newUsers)) {
                 $output->writeln(sprintf('Deleting lead %s as user exists', $lead->getEmail()));
                 $this->getManager()->remove($lead);
             } else {
@@ -82,11 +83,10 @@ class LeadsCommand extends BaseCommand
                 $user->setEnabled(true);
                 $lead->populateUser($user);
                 $this->getManager()->persist($user);
+                $newUsers[] = mb_strtolower($lead->getEmail());
             }
-
-            $this->getManager()->flush();
         }
-
+        $this->getManager()->flush();
 
         $output->writeln(sprintf('Finished. Processed %d of %d leads', $count, count($leads)));
     }
