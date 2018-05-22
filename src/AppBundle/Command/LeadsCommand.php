@@ -9,6 +9,8 @@ use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Service\JudopayService;
 use AppBundle\Service\MailerService;
 use AppBundle\Service\PolicyService;
+use Doctrine\ODM\MongoDB\DocumentRepository;
+use FOS\UserBundle\Model\UserManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -44,9 +46,11 @@ class LeadsCommand extends BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $process = $input->getOption('process');
+        /** @var UserManagerInterface $userManager */
         $userManager = $this->getContainer()->get('fos_user.user_manager');
         /** @var UserRepository $userRepo */
         $userRepo = $this->getManager()->getRepository(User::class);
+        /** @var DocumentRepository $leadsRepo */
         $leadsRepo = $this->getManager()->getRepository(Lead::class);
         $yesterday = new \DateTime();
         $yesterday = $yesterday->sub(new \DateInterval(('P1D')));
