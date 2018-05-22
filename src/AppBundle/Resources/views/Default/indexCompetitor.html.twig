@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+
+{# Set vars #}
+{% set new_stylesheet = 1 %}
+{% set new_footer = 1 %}
+{% set homepage = 1 %}
+{% set useDropdownSearch = 1 %}
+
+{% block title %}so-sure - Welcome to Social Insurance in partnership with eBay{% endblock %}
+{% block meta %}
+    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets output='css/*.css'
+    'components/animate.css/animate.min.css'
+    '@AppBundle/Resources/public/sass/page/competitor.scss'
+ %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{% block body %}
+
+    <section class="section--pad competitor__hero">
+        <div class="container">
+            <h1 class="text-center text-blue">
+                {% if headline is defined and headline %}
+                    {{ headline }}
+                {% else %}
+                    Mobile insurance you deserve.
+                {% endif %}
+            </h1>
+            {% if sub_heading is defined and sub_heading %}
+                <p class="big-text text-center">
+                    {{ sub_heading }}
+                    {% if sub_heading2 is defined and sub_heading2 %}
+                        <br> {{ sub_heading2 }}
+                    {% endif %}
+                </p>
+            {% endif %}
+            {# <p class="big-text text-center">We're a new kind of insurer that's focused on people, <span class="ebay_red">not profits</span>. Providing insurance that's <span class="ebay_blue">reliable</span>, <span class="ebay_amber">rewarding</span> and altogether <span class="ebay_green">better</span>.</p> #}
+
+            <div class="animated slideInLeft">
+                {# Phone Search #}
+                {% if device_category() == 'Mobile' %}
+                    {% set select_template = 'AppBundle:Default:selectPhoneMakeDropdown' %}
+                {% else %}
+                    {% set select_template = 'AppBundle:Default:selectPhoneMakeSearch' %}
+                {% endif %}
+                {% if phone is defined and phone %}
+                    {{ render(controller(select_template, {
+                        'type': 'ebay',
+                        'id': phone.id
+                    })) }}
+                {% else %}
+                    {{ render(controller(select_template, {
+                        'type': 'ebay',
+                    })) }}
+                {% endif %}
+                {# End Phone Search #}
+            </div>
+
+        </div>
+    </section>
+
+    {# Page Modals #}
+    {% include 'AppBundle::Default/modalQuote.html.twig' with {'selectPhoneMakeType': 'other_pages'} %}
+    {# End Page Modals #}
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    'components/lozad/lozad.min.js'
+    'components/dot/doT.min.js'
+    'components/corejs-typeahead/typeahead.bundle.min.js'
+    'components/fuse.js/fuse.min.js'
+    '@AppBundle/Resources/public/js/Default/images.js'
+    '@AppBundle/Resources/public/js/Default/selectPhoneMakeSearch.js'
+    '@AppBundle/Resources/public/js/Default/selectPhoneMakeDropdown.js'
+    '@AppBundle/Resources/public/js/Default/competitor.js'
+ %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}
+
