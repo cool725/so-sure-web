@@ -2,6 +2,7 @@
 
 {# Set vars #}
 {% set new_stylesheet = 1 %}
+{% set include_emoji = 1 %}
 
 {% block title %}{{ phone.model }} Insurance - {{ phone.make }} - so-sure: Social Insurance{% endblock %}
 {% block meta %}
@@ -158,7 +159,7 @@
                                     <li>
                                         <i class="fa fa-check text-blue" aria-hidden="true"></i>
                                         {% if moneyBackGuarantee is defined and moneyBackGuarantee == 'money-back-guarantee' %}
-                                            14 day money back guarantee
+                                            <mark class="mgreen">14 day money back guarantee 💰🔙</mark>
                                         {% else %}
                                             Next working day replacement or repair
                                         {% endif %}

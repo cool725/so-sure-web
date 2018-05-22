@@ -5,6 +5,7 @@
 {% set new_stylesheet = 1 %}
 {% set distraction_free = 1 %}
 {% set new_footer = 1 %}
+{% set include_emoji = 1 %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -103,7 +104,7 @@
                     </div>
                     <h4 class="text-center">Plus worldwide cover on trips not exceeding 90 days</h4>
                     {% if moneyBackGuarantee is defined and moneyBackGuarantee == 'money-back-guarantee' %}
-                    <p class="hidden-xs text-center lead">Plus.. we're so-sure you'll love us, we'll give you a 14 day money back guarantee</p>
+                        <div class="h4 h-light text-center"><mark class="mgreen">Plus.. We're so-sure you'll love us, we'll give you a 14 day money back guarantee 💰🔙</mark></div>
                     {% endif %}
                 </div>
             </div>
