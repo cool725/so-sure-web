@@ -7,6 +7,7 @@ use AppBundle\Document\Opt\EmailOptOut;
 use AppBundle\Document\Opt\Opt;
 use AppBundle\Document\PhoneTrait;
 use AppBundle\Service\IntercomService;
+use AppBundle\Service\MailerService;
 use AppBundle\Service\MixpanelService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface;
@@ -45,6 +46,9 @@ class FOSUBUserProvider extends BaseClass
     /** @var DocumentManager */
     protected $dm;
 
+    /** @var MailerService */
+    protected $mailer;
+
     public function setRequestStack(RequestStack $requestStack)
     {
         $this->requestStack = $requestStack;
@@ -76,6 +80,11 @@ class FOSUBUserProvider extends BaseClass
     public function setMixpanel(MixpanelService $mixpanel)
     {
         $this->mixpanel = $mixpanel;
+    }
+
+    public function setMailer(MailerService $mailer)
+    {
+        $this->mailer = $mailer;
     }
 
     /**
@@ -421,6 +430,25 @@ class FOSUBUserProvider extends BaseClass
             }
             $user->setReceivedInvitations(null);
         }
+
+        $opt = $this->dm->getRepository(Opt::class);
+        $opts = $opt->findBy(['email' => $user->getEmailCanonical()]);
+        foreach ($opts as $opt) {
+            $this->dm->remove($opt);
+        }
+        if ($flush) {
+            $this->dm->flush();
+        }
+
+        $this->mailer->sendTemplate(
+            'Goodbye',
+            $user->getEmail(),
+            'AppBundle:Email:user/deleted.html.twig',
+            ['user' => $user],
+            'AppBundle:Email:user/deleted.html.twig',
+            ['user' => $user]
+        );
+
         $this->dm->remove($user);
 
         if ($flush) {

@@ -19,6 +19,7 @@ services:
             - [setDm, ["@doctrine_mongodb.odm.default_document_manager"]]
             - [setIntercom, ['@app.intercom']]
             - [setMixpanel, ['@app.mixpanel']]
+            - [setMailer, ['@app.mailer']]
 
     app.user.cognitoidentity:
         class: AppBundle\Security\CognitoIdentityUserProvider
