@@ -7,7 +7,7 @@
 	<div style="font-size: 14px; text-align: left;">
 	   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
 	   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
-			Hi {% if user.name %}{{ user.name }}{% else %}{{ user.email }}{% endif %},
+			Hi {% if user.name|length > 1 %}{{ user.name }}{% else %}{{ user.email }}{% endif %},
 			<br><br>
 			One of the biggest changes to UK data privacy law comes into effect on 25 May 2018. The General Data Protection Regulation, also known as GDPR, means that you'll have more control over how your data is used.
 			<br><br>
