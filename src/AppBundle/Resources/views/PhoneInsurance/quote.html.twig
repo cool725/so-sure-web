@@ -207,6 +207,19 @@
 
     {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}
 
+    {% if moneyBackGuarantee is defined and moneyBackGuarantee == 'money-back-guarantee' %}
+        <section class="section--pad">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2">
+                        <h3 class="text-center">Don't just take their word for it - try for yourself</h3>
+                        <div class="h3 h-light text-center"><mark class="mgreen">We pride ourselves on our service - if you're not satisfied within the first 14 days we'll give you a full refund 💰🔙</mark></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endif %}
+
     {% include 'AppBundle::Default/whySoSure.html.twig' %}
 
     <section class="phone-details background-blue">
