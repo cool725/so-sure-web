@@ -9,9 +9,6 @@
 {% elseif type is defined and type == 'homepage-sticky' %}
     {% set uid = '-1' %}
     {% set formId = 'dropdown-phone-form' ~ uid %}
-{% elseif type is defined and type == 'ebay' %}
-    {% set uid = '-1' %}
-    {% set formId = 'dropdown-phone-form' ~ uid %}
 {% elseif type is defined and type == 'footer' %}
     {% set uid = '-2' %}
     {% set formId = 'dropdown-phone-form' ~ uid %}
@@ -22,43 +19,54 @@
 <div id="select-phone-data"
      class="dropdown-phone-form"
      data-phones='{{ phones|json_encode|raw }}'
-     data-sticky-search="true">
+     data-sticky-search="true"
+     data-show-single-mem-opt="{% if memoptions is defined and memoptions == 'single-mem-hide-dropdown' %}true{% else %}false{% endif %}">
 
-    {{ form_start(form_phone, { 'attr': { 'id': formId }}) }}
-    <div class="form-group">
-        <span id="phone" class="h4"></span>
-    </div>
-    <div class="form-group">
-        {{ form_widget(form_phone.make, {
-          'attr': {
-            'class': 'select-phone-make form-control animated pulse'
-        }}) }}
-    </div>
-    <div class="form-group">
-        {{ form_widget(form_phone.model, {
-          'attr': {
-            'class': 'select-phone-model form-control animated pulse',
-            'style': 'display:none;'
-        }}) }}
-    </div>
-    <div class="form-group">
-        {{ form_widget(form_phone.memory, {
-            'attr': {
-                'class': 'select-phone-memory form-control animated pulse',
+    {{ form_start(form_phone, { 'attr': { 'id': formId, 'autocomplete': 'off' }}) }}
+        {% if memoptions is defined and memoptions == 'single-mem-hide-dropdown' %}
+            <div id="phone" class="form-group clearfix">
+                <div class="row">
+                    <div class="col-xs-9">
+                        <h4 id="phone-name" class="h-light"></h4>
+                    </div>
+                    <div class="col-xs-3 clearfix">
+                        <button id="expand-btn" class="btn btn-blue-hollow btn-block" type="button">Quote</button>
+                        <button id="phone-btn" class="btn btn-green btn-block" type="button" style="display:none;">Quote</button>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        <div class="form-group">
+            {{ form_widget(form_phone.make, {
+              'attr': {
+                'class': 'select-phone-option select-phone-make form-control'
+            }}) }}
+        </div>
+        <div class="form-group">
+            {{ form_widget(form_phone.model, {
+              'attr': {
+                'class': 'select-phone-option select-phone-model form-control',
                 'style': 'display:none;'
             }}) }}
-    </div>
-    <div class="form-group">
-        {{ form_widget(form_phone.next, {
-          'label': buttonText,
-          'attr': {
-            'class': 'btn btn-green btn-block btn-pad animated pulse select-phone-btn',
-            'style': 'display:none;'
-        }}) }}
-    </div>
+        </div>
+        <div class="form-group">
+            {{ form_widget(form_phone.memory, {
+                'attr': {
+                    'class': 'select-phone-option select-phone-memory form-control',
+                    'style': 'display:none;'
+                }}) }}
+        </div>
+        <div id="quote-controls" class="form-group" style="display:none;">
+            {{ form_widget(form_phone.next, {
+              'label': buttonText,
+              'attr': {
+                'class': 'btn btn-green btn-block btn-pad select-phone-btn',
+            }}) }}
+        </div>
+{#         {% if memoptions is defined and memoptions == 'single-mem-hide-dropdown' %}
+            <div id="phone-pull-down" class="form-group">
+                <a href="#"><i class="fa fa-chevron-down" aria-hidden="true"></i></a>
+            </div>
+        {% endif %} #}
     {{ form_end(form_phone) }}
-
-    <div class="form-group">
-        <a id="reset-sticky" href="#" class="btn btn-link btn-block"><i class="fa fa-undo" aria-hidden="true"></i> reset</a>
-    </div>
 </div>
