@@ -4,6 +4,7 @@ namespace AppBundle\Service;
 use AppBundle\Repository\OptOut\EmailOptOutRepository;
 use AppBundle\Repository\UserRepository;
 use GuzzleHttp\Exception\ClientException;
+use http\Exception;
 use Predis\Client;
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\Claim;
@@ -792,21 +793,36 @@ class IntercomService
                     json_encode($data),
                     $e->getMessage()
                 ));
-            } catch (\Exception $e) {
-                if (isset($data['retryAttempts']) && $data['retryAttempts'] < 2) {
-                    $data['retryAttempts'] += 1;
-                    $this->redis->rpush(self::KEY_INTERCOM_QUEUE, serialize($data));
+            } catch (ClientException $e) {
+                if ($e->getCode() != 404) {
+                    $this->requeue($data, $e);
                 } else {
-                    $this->logger->error(sprintf(
-                        'Error (retry exceeded) sending message to Intercom %s. Ex: %s',
+                    $this->logger->info(sprintf(
+                        'Error sending message (unknown user) to Intercom %s. Ex: %s',
                         json_encode($data),
                         $e->getMessage()
                     ));
                 }
+            } catch (\Exception $e) {
+                $this->requeue($data, $e);
             }
         }
 
         return $processed;
+    }
+
+    private function requeue($data, \Exception $e)
+    {
+        if (isset($data['retryAttempts']) && $data['retryAttempts'] < 2) {
+            $data['retryAttempts'] += 1;
+            $this->redis->rpush(self::KEY_INTERCOM_QUEUE, serialize($data));
+        } else {
+            $this->logger->error(sprintf(
+                'Error (retry exceeded) sending message to Intercom %s. Ex: %s',
+                json_encode($data),
+                $e->getMessage()
+            ));
+        }
     }
 
     private function getLead($id)

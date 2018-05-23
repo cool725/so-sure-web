@@ -49,6 +49,15 @@ class AboutController extends BaseController
     }
 
     /**
+     * @Route("/privacy", name="privacy", options={"sitemap"={"priority":"0.5","changefreq":"daily"}})
+     * @Template
+     */
+    public function privacyAction()
+    {
+        return array();
+    }
+
+    /**
      * @Route("/how-to-contact-so-sure", name="about_how_to_contact_so_sure")
      * @Template
      */
