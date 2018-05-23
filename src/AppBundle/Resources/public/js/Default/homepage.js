@@ -5,39 +5,48 @@ $(function(){
     $('.search-phone').each(function(index, el) {
         var container = $(this).parents('.search-phone-form');
         $(this).on('focus', function(){
-
             // Add focus style
             $(container).addClass('search-phone-form--focus');
-
-            // If mobile slide up to make more room
-            // if (sosure.globals.device_category == 'Mobile') {
-            //     $('html,body').animate({scrollTop: $(this).offset().top - 100}, 800);
-            // }
-        });
-
-        // Remove class on blur
-        $(this).on('blur', function(){
+        }).on('blur', function(){
             $(container).removeClass('search-phone-form--focus');
         });
     });
 
-    // Sticky Search - Homepage only
-    function stickySearch() {
-        var windowTop  = $(window).scrollTop();
-        var searchBox  = $('#select-phone-data');
-        var offsetTop  = $('.homepage--hero').height();
-        var hitPoint   = $('.homepage--instant-quote').offset().top;
+    // Sticky search - now using affix BS
+    var stickySearch = $('#select-phone-data').data('sticky-search');
 
-        if (windowTop > offsetTop && windowTop < hitPoint) {
-            $(searchBox).addClass('search-phone-form--sticky').addClass('animated bounceInDown');
-        } else {
-            $(searchBox).removeClass('search-phone-form--sticky').removeClass('animated bounceInDown');
-        }
+    // Single MEM Option/Look Test
+    // Add test layer
+    var memOptTest = $('#select-phone-data').data('show-single-mem-opt');
+
+    if (stickySearch) {
+        // Init BS affix
+        $('#select-phone-data').affix({
+            offset: {
+                top: stickyOffset + 700,
+                bottom: function () {
+                    return (this.bottom = $('footer').outerHeight(true) + 1000)
+                }
+            }
+        }).on('affixed.bs.affix', function(e) {
+            // This event is fired after the element has been affixed.
+            // console.log('affixed.bs.affix');
+
+            // Add animation
+            $(this).addClass('animated fadeInDown');
+
+        }).on('affix-top.bs.affix',function() {
+            // This event fires immediately before the element has been affixed-top.
+            // console.log('affix-top.bs.affix ');
+
+            // if (memOptTest == true) {
+            //     showOptions();
+            // }
+
+            // Remove animation to refire
+            $(this).removeClass('animated fadeInDown');
+
+        });
     }
-
-    if ($('#select-phone-data').data('sticky-search') == true ) {
-        $(window).scroll(stickySearch);
-    }
-
 
 });

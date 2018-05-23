@@ -125,7 +125,7 @@
             <div class="search--box text-center">
                 {# Phone Search #}
                 {% if device_category() == 'Mobile' %}
-                    {{ render(controller('AppBundle:Default:selectPhoneMakeDropdown')) }}
+                    {{ render(controller('AppBundle:Default:selectPhoneMakeDropdown'|merge(app.request.query.all))) }}
                 {% else %}
                     {{ render(controller('AppBundle:Default:selectPhoneMakeSearch')) }}
                 {% endif %}
