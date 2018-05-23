@@ -63,10 +63,8 @@
                 'class': 'btn btn-green btn-block btn-pad select-phone-btn',
             }}) }}
         </div>
-{#         {% if memoptions is defined and memoptions == 'single-mem-hide-dropdown' %}
-            <div id="phone-pull-down" class="form-group">
-                <a href="#"><i class="fa fa-chevron-down" aria-hidden="true"></i></a>
-            </div>
-        {% endif %} #}
+        {% if memoptions is defined and memoptions == 'single-mem-hide-dropdown' %}
+            <a id="phone-pull-down" href="#" class="btn btn-link btn-block"><i class="fa fa-chevron-up fa-lg" aria-hidden="true"></i></a>
+        {% endif %}
     {{ form_end(form_phone) }}
 </div>
