@@ -16,11 +16,6 @@ window.addEventListener("load", function(){
       content: {
         dismiss: "Close",
         href: "https://www.iubenda.com/privacy-policy/7805295/cookie-policy"
-      },
-      dismissTimeOut: 3000,
-      dismissOnScroll: 500,
-      onStatusChange: function(status) {
-          this.element.parentNode.removeChild(this.element);
       }
     })
   }
