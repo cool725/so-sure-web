@@ -63,6 +63,8 @@ class SixpackService
     const EXPERIMENT_EBAY_LANDING_2 = 'ebay-landing-2';
     const EXPERIMENT_NEW_WELCOME_MODAL = 'new-welcome-modal';
     const EXPERIMENT_TRUSTPILOT_REVIEW = 'trustpilot';
+    // New Test Homepage Copy
+    const EXPERIMENT_HOMEPAGE_NEW_COPY = 'homepage-new-copy';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';
@@ -91,6 +93,8 @@ class SixpackService
         self::EXPERIMENT_EBAY_LANDING_1,
         self::EXPERIMENT_EBAY_LANDING_2,
         self::EXPERIMENT_TRUSTPILOT_REVIEW,
+        // New Test Homepage Copy
+        self::EXPERIMENT_HOMEPAGE_NEW_COPY,
     ];
 
     public static $authExperiments = [
@@ -123,6 +127,8 @@ class SixpackService
         self::EXPERIMENT_EBAY_LANDING,
         self::EXPERIMENT_EBAY_LANDING_1,
         self::EXPERIMENT_EBAY_LANDING_2,
+        // New Test Homepage Copy
+        self::EXPERIMENT_HOMEPAGE_NEW_COPY,
     ];
 
     /**
