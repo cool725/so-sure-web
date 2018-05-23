@@ -242,7 +242,14 @@
                         {% if serial != payment.serialNumber %}
                             {% if serial != '' %}</table>{% endif %}
                             <h4>
-                            {{ payment.serialNumber }}
+                                {% if payment.serialNumber %}
+                                    <a href="#" data-toggle="modal" data-target="#serialNumberModal" data-serial="{{ payment.serialNumber }}"
+                                       data-details-url="{{ path('admin_bacs_serial_number_details', {'serial': payment.serialNumber} ) }}">
+                                        {{ payment.serialNumber }}
+                                    </a>
+                                {% else %}
+                                    {{ payment.serialNumber }}
+                                {% endif %}
                             {% for file in files %}
                                 {% if file.serialNumber == payment.serialNumber %}
                                     (Generated: {{  file.date|date('d M Y H:i', 'Europe/London')  }})
