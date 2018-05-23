@@ -32,7 +32,13 @@ class UsersEmailCommand extends BaseCommand
                 'skip-email',
                 null,
                 InputOption::VALUE_NONE,
-                'do not send warning email'
+                'if set, do not email'
+            )
+            ->addOption(
+                'from',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'optional id to restart from'
             )
         ;
     }
@@ -40,14 +46,33 @@ class UsersEmailCommand extends BaseCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $skipEmail = true === $input->getOption('skip-email');
+        $from = $input->getOption('from');
         /** @var UserRepository $repo */
         $repo = $this->getManager()->getRepository(User::class);
         $users = $repo->findAll();
         $output->writeln(sprintf('%d users', count($users)));
+        $process = true;
+        if ($from) {
+            $process = false;
+        }
         foreach ($users as $user) {
+            if ($from && $user->getId() == $from) {
+                $process = true;
+            }
+
+            if (!$process) {
+                continue;
+            }
+
             /** @var User $user */
-            $this->emailUser($user);
-            $output->writeln($user->getId());
+            try {
+                if (!$skipEmail) {
+                    $this->emailUser($user);
+                }
+                $output->writeln($user->getId());
+            } catch (\Exception $e) {
+                $output->writeln(sprintf('Error %s %s', $user->getId(), $e->getMessage()));
+            }
         }
 
         $output->writeln('Finished');
