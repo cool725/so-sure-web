@@ -420,7 +420,7 @@
             // Add the Buildings
             &:before {
                 bottom: 0;
-                background: transparent url('#{$cdn_url}/images/homepage/so-sure_hero_background_trustpilot_right.svg') no-repeat center bottom;
+                background: transparent url('#{$cdn_url}/images/homepage/so-sure_hero_background_trustpilot_right_banner.svg') no-repeat center bottom;
                 background-size: 1900px;
             }
 
@@ -457,15 +457,57 @@
     }
 
     &__press {
-        // background: $off-white;
+        background: $off-white;
         position: relative;
         z-index: 1;
         margin: 25px 0 0;
 
-        img {
+        &_defaqto {
             width: 100px;
+        }
 
-            @include breakpoint(tablet) {
+        &_trustpilot {
+            width: 100px;
+        }
+
+        &_money {
+            width: 100px;
+        }
+
+        &_gocompare {
+            width: 100px;
+        }
+
+        &_theguardian {
+            width: 100px;
+        }
+
+        &_financialtimes {
+            width: 100px;
+        }
+
+        @include breakpoint(tablet) {
+            &_defaqto {
+                width: 140px;
+            }
+
+            &_trustpilot {
+                width: 140px;
+            }
+
+            &_money {
+                width: 140px;
+            }
+
+            &_gocompare {
+                width: 200px;
+            }
+
+            &_theguardian {
+                width: 200px;
+            }
+
+            &_financialtimes {
                 width: 200px;
             }
         }
