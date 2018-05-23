@@ -1,23 +1,34 @@
 {% extends 'base.html.twig' %}
+
+{# Set vars #}
+{% set new_stylesheet = 1 %}
+{% set new_footer = 1 %}
+
 {% block body %}
-  <div class="section hero" style="min-height: 700px;">
-    <div class="container text-center">
-      <img class="logo" src="{{ cdn_url }}/images/logo/unhappy-so-sure-smiley.svg" alt="Unhappy so-sure smiley" style="width: 20%; margin-top: 50px;"></img>
-      <h2 class="section-title">Sorry, you're leaving us</h2>
-            <p>Enter your email below and we'll opt you out of future communications and invitations.</p>
-            {{ form_start(form_optout) }}
-                <div class="row">
-                    <div class="col-sm-4 col-sm-offset-4">
-                    <div class="input-group">
-                        {{ form_widget(form_optout.email, { 'attr': {'placeholder': 'Email Address', 'class': 'form-control'}}) }}
-                        <span class="input-group-btn">
-                            {{ form_widget(form_optout.decline, {'label': 'Opt out', 'attr': {'class': 'btn btn-danger'}}) }}
-                        </span>
-                    </div>
+    <section class="section--pad">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-10 col-md-offset-1">
+                    <div class="panel panel-sosure">
+                        <div class="panel-body text-center">
+                            <h3>Manage your communication preferences</h3>
+                            <p class="lead">Enter your email to receive an email with a link to manage your communication preferences.</p>
+                            {{ form_start(form_optout) }}
+                                <div class="row">
+                                    <div class="col-sm-6 col-sm-offset-3">
+                                        <div class="input-group">
+                                            {{ form_widget(form_optout.email, { 'attr': {'placeholder': 'Email Address', 'class': 'form-control'}}) }}
+                                            <span class="input-group-btn">
+                                                {{ form_widget(form_optout.decline, {'label': 'Email me', 'attr': {'class': 'btn btn-blue btn-pad'}}) }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            {{ form_end(form_optout) }}
+                        </div>
                     </div>
                 </div>
-            {{ form_end(form_optout) }}
-    </div>
-  </div>
-
+            </div>
+        </div>
+    </section>
 {% endblock %}

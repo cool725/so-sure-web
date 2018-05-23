@@ -10,6 +10,7 @@
 {% set pathSuffix   = '' %}
 {% set formID       = '' %}
 {% set formClass    = 'form-inline--homepage select-phone-form' %}
+{% set placeholder  = 'Find your phone e.g. iPhone 8 Plus...' %}
 
 {% if phone %}
   {% set formAction   = path('quote_phone', {'id': phone.id }) %}
@@ -22,6 +23,10 @@
     {% set formID = 'search-phone-form-homepage' %}
     {% set uid    = '-1' %}
     {% set stickySearch = true %}
+{% elseif type is defined and type == 'ebay' %}
+    {% set formID = 'search-phone-form-homepage' %}
+    {% set uid    = '-1' %}
+    {% set placeholder = 'Find your phone to get a quote' %}
 {% elseif type == 'purchase-select' %}
     {% set basePath = '/select-phone-search/purchase-select/' %}
 {% elseif type == 'purchase-change' %}
@@ -57,7 +62,7 @@
         <input type="text"
              id="search-phone{{ uid }}"
              class="required search-phone-text search-phone"
-             placeholder="Find your phone e.g. iPhone 8 Plus..."
+             placeholder="{{ placeholder }}"
              value="" />
     </form>
 

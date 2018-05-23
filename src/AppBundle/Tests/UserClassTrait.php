@@ -164,6 +164,9 @@ trait UserClassTrait
         return str_replace("+44", "0", $mobile);
     }
 
+    /**
+     * @return PhonePolicy
+     */
     public static function initPolicy(
         User $user,
         \Doctrine\ODM\MongoDB\DocumentManager $dm,

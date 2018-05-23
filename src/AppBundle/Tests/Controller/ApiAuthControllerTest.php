@@ -3233,8 +3233,10 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(Policy::class);
+        /** @var PhonePolicy $updatedPolicy */
         $updatedPolicy = $repo->find($policyData['id']);
         $this->assertEquals(PhonePolicy::PICSURE_STATUS_MANUAL, $updatedPolicy->getPicSureStatus());
+        $this->assertFalse($updatedPolicy->getPicSureCircumvention());
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
             'bucket' => 'ops.so-sure.com',
@@ -3244,8 +3246,10 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
         $repo = $dm->getRepository(Policy::class);
+        /** @var PhonePolicy $updatedPolicy */
         $updatedPolicy = $repo->find($policyData['id']);
         $this->assertEquals(PhonePolicy::PICSURE_STATUS_MANUAL, $updatedPolicy->getPicSureStatus());
+        $this->assertTrue($updatedPolicy->getPicSureCircumvention());
     }
 
     /**
@@ -3430,7 +3434,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $this->payPolicyMonthly($userA, $policyA, $lastYear);
         $this->assertEquals(Policy::STATUS_ACTIVE, $policyA->getStatus());
 
-        for ($i = 1; $i < 15; $i++) {
+        $connectNo = 20;
+
+        for ($i = 1; $i <= $connectNo; $i++) {
             $userB = self::createUser(
                 self::$userManager,
                 self::generateEmail(sprintf('testApiReconnectTooManyB%d', $i), $this),
@@ -3481,11 +3487,11 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $url = sprintf("/api/v1/auth/policy/%s?_method=GET", $renewalPolicyA->getId());
         $crawler = static::postRequest(self::$client, $cognitoIdentityIdA, $url, [
         ]);
-        $data = $this->verifyResponse(200);
+        $policyData = $this->verifyResponse(200);
 
         $url = sprintf("/api/v1/auth/policy/%s/reconnect", $renewalPolicyA->getId());
         $count = 0;
-        foreach ($data['connections'] as $connection) {
+        foreach ($policyData['connections'] as $connection) {
             if (!$connection['reconnect_on_renewal']) {
                 $crawler = static::postRequest(self::$client, $cognitoIdentityIdA, $url, [
                     'renew' => true,
@@ -3496,7 +3502,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
             }
         }
 
-        $this->assertGreaterThan(4, $count);
+        $this->assertEquals($connectNo, $policyData['pot']['max_connections'] + $count);
 
         $url = sprintf("/api/v1/auth/policy/%s?_method=GET", $renewalPolicyA->getId());
         $crawler = static::postRequest(self::$client, $cognitoIdentityIdA, $url, [

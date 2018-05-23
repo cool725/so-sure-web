@@ -1,0 +1,10 @@
+{% extends 'AppBundle:Email:base.txt.twig' %}
+{% block body %}
+**
+------------------------------------------------------------
+You recently requested a link to manage your communication preferences with so-sure.
+
+Update Preferences here:
+{{ url('optout_hash', {'hash': hash}) }}
+
+{% endblock body %}

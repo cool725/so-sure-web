@@ -166,6 +166,10 @@
                                         {{ policy.payerOrUser.paymentMethod }}
                                     {% endif %}
                                     (Mandate: {{ policy.payerOrUser.paymentMethod.bankAccount.mandateStatus }})
+                                    <br>
+                                    Initial date: {{  policy.payerOrUser.paymentMethod.bankAccount.initialNotificationDate| date('d M Y')   }}
+                                    <br>
+                                    and then on the {{  policy.payerOrUser.paymentMethod.bankAccount.standardNotificationDate|date('jS')  }}
                                 </td>
                             </tr>
                         {% endif %}
@@ -257,6 +261,20 @@
                                 {% for location in policy.picsureLocations %}
                                     [{{ location.coordinates[1]}},{{ postcode.location.coordinates[0]}}] 
                                 {% endfor %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                pic-sure Circumvention
+                            </td>
+                            <td>
+                                {% if policy.picSureCircumvention is null %}
+                                    <span> Pre Anti-fraud check</span>
+                                {% elseif policy.picSureCircumvention == true %}
+                                    <span class="fa fa-exclamation-triangle"> Possible Fraud (i.e. too many attempts to do pic-sure and imei upload was too long, check events in mixpanel) <span class="fa fa-exclamation-triangle"></span></span>
+                                {% elseif policy.picSureCircumvention == false %}
+                                    <span class="fa fa-thumbs-up"> No Fraud Detected <span class="fa fa-thumbs-up"></span></span>
+                                {% endif %}
                             </td>
                         </tr>
                         {% endif %}
@@ -672,18 +690,20 @@
         <div role="tabpanel" class="tab-pane" id="admin">
             <h3>Common Actions</h3>
             <table class="table table-striped">
-                {% if policy.premiumPlan == 'monthly' %}
                 <tr>
                     <td>Billing day of month</td>
                     <td>
-                        {{ form_start(billing_form, {'attr': {'class': 'form-inline'}}) }}
-                        {{ form_widget(billing_form.day) }}
-                        {{ form_widget(billing_form.update, {'label': 'Change billing date', 'attr': {'class': 'btn btn-danger confirm-usertoken-clear'}}) }}
-                        {{ form_end(billing_form) }}
-                        {% if not policy.isPolicyPaidToDate %}<strong>Policy must be paid to date before update is allowed</strong>{% endif %}
+                        {% if policy.premiumPlan == 'monthly' %}
+                            {{ form_start(billing_form, {'attr': {'class': 'form-inline'}}) }}
+                            {{ form_widget(billing_form.day) }}
+                            {{ form_widget(billing_form.update, {'label': 'Change billing date', 'attr': {'class': 'btn btn-danger confirm-usertoken-clear'}}) }}
+                            {{ form_end(billing_form) }}
+                            {% if not policy.isPolicyPaidToDate %}<strong>Policy must be paid to date before update is allowed</strong>{% endif %}
+                        {% else %}
+                            Policy either does not yet exist, or is an annual policy. Billing date change is not allowed.
+                        {% endif %}
                     </td>
                 </tr>
-                {% endif %}
                 <tr>
                     <td>
                         Regenerate Policy Terms & Schedule<br />(Name change, etc)

@@ -80,6 +80,7 @@ twig:
         form_client_validation: true
         api_base_url: "%api_base_url%"
         web_base_url: "%web_base_url%"
+        cookie_url: "https://www.iubenda.com/privacy-policy/7805295/cookie-policy"
 
 doctrine_mongodb:
     connections:
@@ -790,6 +791,7 @@ nelmio_security:
                 - https://downloads.intercomcdn.com
                 - https://uploads.intercomusercontent.com
                 - https://gifs.intercomcdn.com
+                - https://intercom.help
                 - https://t.co
                 - https://*.doubleclick.net
                 - https://*.googleadservices.com

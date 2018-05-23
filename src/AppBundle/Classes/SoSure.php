@@ -42,4 +42,14 @@ class SoSure
     {
         return new \DateInterval('P90D');
     }
+
+    public static function encodeCommunicationsHash($email)
+    {
+        return urlencode(base64_encode($email));
+    }
+
+    public static function decodeCommunicationsHash($hash)
+    {
+        return base64_decode(urldecode($hash));
+    }
 }

@@ -1,15 +1,15 @@
 <?php
 
-namespace AppBundle\Document\OptOut;
+namespace AppBundle\Document\Opt;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 
 /**
- * @MongoDB\Document(repositoryClass="AppBundle\Repository\OptOut\EmailOptOutRepository")
+ * @MongoDB\Document()
  */
-class EmailOptOut extends OptOut
+class EmailOptIn extends Opt
 {
     /**
      * @Assert\Email(strict=true)
@@ -24,6 +24,9 @@ class EmailOptOut extends OptOut
 
     public function setEmail($email)
     {
+        if ($this->email != mb_strtolower($email)) {
+            $this->setUpdated(new \DateTime());
+        }
         $this->email = mb_strtolower($email);
     }
 }

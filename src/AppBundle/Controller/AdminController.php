@@ -21,6 +21,7 @@ use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\UserRepository;
 use AppBundle\Service\BacsService;
 use AppBundle\Service\LloydsService;
+use AppBundle\Service\MailerService;
 use AppBundle\Service\ReportingService;
 use AppBundle\Service\SequenceService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -58,9 +59,9 @@ use AppBundle\Document\Invoice;
 use AppBundle\Document\Feature;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Stats;
-use AppBundle\Document\OptOut\OptOut;
-use AppBundle\Document\OptOut\EmailOptOut;
-use AppBundle\Document\OptOut\SmsOptOut;
+use AppBundle\Document\Opt\OptOut;
+use AppBundle\Document\Opt\EmailOptOut;
+use AppBundle\Document\Opt\SmsOptOut;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\File\S3File;
 use AppBundle\Document\File\JudoFile;
@@ -77,7 +78,7 @@ use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\ImeiType;
 use AppBundle\Form\Type\NoteType;
 use AppBundle\Form\Type\EmailOptOutType;
-use AppBundle\Form\Type\SmsOptOutType;
+use AppBundle\Form\Type\AdminSmsOptOutType;
 use AppBundle\Form\Type\PartialPolicyType;
 use AppBundle\Form\Type\UserSearchType;
 use AppBundle\Form\Type\PhoneSearchType;
@@ -131,7 +132,7 @@ class AdminController extends BaseController
         $dm->persist($phone);
         $dm->flush();
         $this->addFlash(
-            'notice',
+            'success',
             'Your changes were saved!'
         );
 
@@ -150,10 +151,10 @@ class AdminController extends BaseController
 
         $dm = $this->getManager();
         $repo = $dm->getRepository(Phone::class);
+        /** @var Phone $phone */
         $phone = $repo->find($id);
         if ($phone) {
             $gwp = $request->get('gwp');
-            $now = new \DateTime();
             $from = new \DateTime($request->get('from'), new \DateTimeZone(SoSure::TIMEZONE));
             $to = null;
             if ($request->get('to')) {
@@ -170,8 +171,26 @@ class AdminController extends BaseController
 
             $dm->flush();
             $this->addFlash(
-                'notice',
+                'success',
                 'Your changes were saved!'
+            );
+
+            /** @var MailerService $mailer */
+            $mailer = $this->get('app.mailer');
+            $mailer->send(
+                sprintf('Phone pricing update for %s', $phone),
+                'marketing@so-sure.com',
+                sprintf(
+                    'On %s, the price for %s will be updated to £%0.2f (£%0.2f GWP). Notes: %s',
+                    $from->format(\DateTime::ATOM),
+                    $phone,
+                    $this->withIpt($gwp),
+                    $gwp,
+                    $notes
+                ),
+                null,
+                null,
+                'tech@so-sure.com'
             );
         }
 
@@ -199,7 +218,7 @@ class AdminController extends BaseController
             }
             $dm->flush();
             $this->addFlash(
-                'notice',
+                'success',
                 'Your changes were saved!'
             );
         }
@@ -230,7 +249,7 @@ class AdminController extends BaseController
             }
             $dm->flush();
             $this->addFlash(
-                'notice',
+                'success',
                 $message
             );
         }
@@ -255,7 +274,7 @@ class AdminController extends BaseController
             $dm->remove($phone);
             $dm->flush();
             $this->addFlash(
-                'notice',
+                'success',
                 'Phone deleted!'
             );
         }
@@ -1174,7 +1193,7 @@ class AdminController extends BaseController
             }
             $dm->flush();
             $this->addFlash(
-                'notice',
+                'success',
                 $message
             );
         }

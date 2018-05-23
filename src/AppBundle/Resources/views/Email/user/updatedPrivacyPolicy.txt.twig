@@ -1,0 +1,14 @@
+{% extends 'AppBundle:Email:base.txt.twig' %}
+{% block body %}
+**
+------------------------------------------------------------
+Hi {% if user.name %}{{ user.name }}{% else %}{{ user.email }}{% endif %},
+
+One of the biggest changes to UK data privacy law comes into effect on 25 May 2018. The General Data Protection Regulation, also known as GDPR, means that you'll have more control over how your data is used.
+
+GDPR ensures that organisations protect your personal data better. To reflect these changes and new obligations, we've updated our privacy privacy which now tells you what we do with your personal data, how it's used and your rights as an individual under the new law.
+
+Should you with to opt-out of receiving information from so-sure you can do so here:
+{{ url('optout_hash', {'hash': hash}) }}
+
+{% endblock body %}

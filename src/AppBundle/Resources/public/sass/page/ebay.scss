@@ -1,0 +1,632 @@
+// ebay.scss
+
+@import "../common/variables";
+@import "../mixins";
+@import "../common/paletteNew";
+
+$protectyourbubble: #383570;
+$loveitcoverit: #CD355E;
+$gadgetcover: #E8C955;
+
+.navbar {
+    background-color: $white;
+}
+
+.table {
+
+    &__comparison {
+        max-width: 800px;
+        margin: 25px auto;
+        background-color: $white;
+        box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.1);
+
+        > tbody {
+            > tr {
+                > td {
+                    vertical-align: middle;
+                    border-top: 0;
+                }
+            }
+        }
+
+        thead {
+            > tr {
+                > th {
+                    vertical-align: middle;
+                }
+            }
+            th {
+                text-align: center;
+                padding-top: 25px !important;
+                padding-bottom: 25px !important;
+                border-bottom: 0 !important;
+                position: relative;
+
+                @include breakpoint(tablet){
+                    &:after {
+                        width: 0; height: 0;
+                        content: '';
+                        position: absolute;
+                        z-index: 100;
+                        top: 100%; left: 50%;
+                        margin-left: -10px;
+                        border-left: 10px solid transparent;
+                        border-right: 10px solid transparent;
+                        border-top: 10px solid;
+                    }
+                }
+
+                &:first-of-type {
+                    &:after {
+                        border: none;
+                    }
+                }
+            }
+
+            th.border-left-right {
+                border-left: 2px solid $primary-blue;
+                border-right: 2px solid $primary-blue;
+            }
+            th.border-left-right-bottom {
+                border-left: 2px solid $primary-blue;
+                border-right: 2px solid $primary-blue;
+                border-bottom: 2px solid $primary-blue;
+            }
+
+            .so-sure {
+                background-color: $primary-blue;
+
+                &:after {
+                    border-top: 10px solid $primary-blue;
+                }
+            }
+            .protectyourbubble {
+                background-color: $protectyourbubble;
+
+                &:after {
+                    border-top: 10px solid $protectyourbubble;
+                }
+            }
+            .loveitcoverit {
+                background-color: $lightest-blue;
+
+                &:after {
+                    border-top: 10px solid $lightest-blue;
+                }
+            }
+            .gadgetcover {
+                background-color: $gadgetcover;
+
+                &:after {
+                    border-top: 10px solid $gadgetcover;
+                }
+            }
+        }
+
+        .fa.protectyourbubble {
+            color: $protectyourbubble;
+        }
+        .fa.loveitcoverit {
+            color: $loveitcoverit;
+        }
+        .fa.gadgetcover {
+            color: $gadgetcover;
+        }
+
+        tbody {
+            td {
+                padding-top: 25px !important;
+                padding-bottom: 25px !important;
+            }
+
+            td.border-left-right {
+                border-left: 2px solid $primary-blue;
+                border-right: 2px solid $primary-blue;
+
+                font-weight: bold;
+            }
+            td.border-left-right-bottom {
+                border-left: 2px solid $primary-blue;
+                border-right: 2px solid $primary-blue;
+                border-bottom: 2px solid $primary-blue;
+
+                font-weight: bold;
+            }
+        }
+    }
+}
+
+.comparison {
+
+    &__container {
+        .left {
+            padding-right: 0;
+        }
+
+        .right {
+            padding-left: 0;
+        }
+    }
+
+    &__list {
+        text-align: center;
+        margin: 0 0 25px;
+
+        &_border {
+            border-right: 1px solid $pale-grey;
+        }
+
+        li {
+            vertical-align: middle;
+            padding: 15px;
+            position: relative;
+
+            &:first-of-type {
+                height: 90px;
+                line-height: 55px;
+                // padding: 30px 15px;
+            }
+
+            &:nth-child(even) {
+                background-color: $off-white;
+            }
+
+            .fa {
+                margin-bottom: 5px;
+            }
+        }
+
+        li.so-sure {
+            background-color: $primary-blue;
+        }
+
+        li.protectyourbubble {
+            background-color: $protectyourbubble;
+            color: $white;
+        }
+
+        .fa.protectyourbubble {
+            color: $protectyourbubble;
+        }
+
+        li.loveitcoverit {
+            background-color: $lightest-blue;
+            color: $white;
+        }
+
+        .fa.loveitcoverit {
+            color: $loveitcoverit;
+        }
+
+        li.gadgetcover {
+            background-color: $gadgetcover;
+            color: $white;
+        }
+
+        .fa.gadgetcover {
+            color: $gadgetcover;
+        }
+    }
+}
+
+.comparison__controls {
+    position: absolute;
+    top: 20px;
+
+    &_left {
+        left: 10px;
+    }
+
+    &_right {
+        right: 10px;
+    }
+}
+
+.speech-bubble {
+    text-align: center;
+    position: relative;
+    font-size: 18px;
+    margin: 50px 0;
+    // @include border-radius(20px);
+
+    @include breakpoint(tablet) {
+        font-size: 24px;
+        margin: 80px 0;
+    }
+
+    &:before, &:after {
+        font-family: serif;
+        font-size: 80px;
+        color: $grey;
+        line-height: 0;
+        position: absolute;
+    }
+
+    &:before {
+        content: open-quote;
+        top: -10px; left: 50%;
+        margin-left: -20px;
+
+        // @include breakpoint(tablet) {
+        //     top: 10px; left: -35px;
+        //     margin: 0;
+        // }
+    }
+
+    &:after {
+        display: none;
+        content: close-quote;
+
+        // @include breakpoint(tablet) {
+        //     display: block;
+        //     bottom: 10px; right: -35pxy
+        // }
+    }
+}
+
+.table-responsive {
+    border: none;
+
+    > .fixed-column {
+        width: auto;
+        position: absolute;
+        display: inline-block;
+        z-index: 10;
+
+        @include breakpoint(tablet) {
+            display: none;
+        }
+    }
+}
+
+.ebay {
+
+    &__hero {
+        position: relative;
+        z-index: 10;
+        h1 {
+            font-size: 30px;
+            margin-top: 30px;
+
+            @include breakpoint(tablet) {
+                font-size: 46px;
+            }
+        }
+
+        .search-phone-form {
+            margin: 25px auto;
+        }
+    }
+
+    &__press {
+        background: $off-white;
+        position: relative;
+        z-index: 1;
+
+        img {
+            width: 100px;
+
+            @include breakpoint(tablet) {
+                width: 200px;
+            }
+        }
+    }
+
+    &__cover {
+
+        .media {
+            margin-bottom: 30px;
+        }
+
+        .media-heading {
+            margin-top: 30px;
+        }
+    }
+
+    &__cover_next {
+        // background-color: $off-white;
+
+        .col-md-4 {
+            text-align: center;
+        }
+
+        ul {
+            margin-bottom: 30px;
+
+            li {
+                font-size: 18px;
+                // font-weight: bold;
+                padding-left: 42px;
+                padding-bottom: 10px;
+                margin: 15px 0 20px;
+                background: transparent url('#{$cdn_url}/images/logo/so-sure-blue-smile.svg') no-repeat top left;
+                background-size: 30px;
+
+                small {
+                    font-weight: normal;
+                }
+
+            }
+        }
+
+        @include breakpoint(laptop) {
+            // text-align: left;
+
+            .col-md-4 {
+                text-align: left;
+
+                img {
+                    margin-top: 35px;
+                }
+            }
+        }
+    }
+
+    &_compare {
+        background: $off-white;
+    }
+
+    &_feedback {
+        background: $off-white;
+        text-align: center;
+
+        img {
+            border-radius: 50%;
+            border: 15px solid $off-white;
+
+            &:hover {
+                border-color: $lightest-blue;
+            }
+
+        }
+    }
+
+    &_red {
+        color: $ered;
+    }
+
+    &_blue {
+        color: $eblue;
+    }
+
+    &_amber {
+        color: $eamber;
+    }
+
+    &_green {
+        color: $egreen;
+    }
+}
+
+// TODO: Move!
+.dropdown-phone-form {
+    max-width: 450px;
+    background-color: $white;
+    padding: 0;
+    position: relative;
+    margin: 0 auto;
+    z-index: 5;
+}
+
+.search-phone-form--homepage {
+    max-width: 450px;
+    background-color: $white;
+    padding: 0;
+    position: relative;
+    margin: 0 auto;
+    z-index: 15;
+
+    // Hide the form on load
+    .select-phone-form {
+        display: none;
+    }
+
+    .search-phone-text {
+        border-color: transparent;
+    }
+
+    .form-inline--homepage {
+
+        .form-group {
+            margin-bottom: 0;
+        }
+
+        @include breakpoint(desktop) {
+
+            .form-group {
+                display: inline-block;
+                vertical-align: middle;
+            }
+
+        }
+
+        .form-control {
+            vertical-align: initial;
+            border-color: transparent;
+            padding-left: 35px;
+        }
+
+        .btn {
+            font-size: 18px;
+        }
+
+    }
+
+    .twitter-typeahead {
+        z-index: 99;
+
+        .tt-hint,
+        .tt-input {
+            height: 40px;
+            padding-left: 40px;
+            margin-bottom: 10px;
+
+            @include breakpoint(laptop) {
+                height: 57px;
+                padding-left: 60px;
+                margin-bottom: 0;
+            }
+        }
+
+        &:before {
+            content: '\f002';
+            color: $eblue;
+            font-family: FontAwesome;
+            font-size: 24px;
+            position: absolute;
+            z-index: 10;
+            left: 10px; top: 0;
+
+            @include breakpoint(laptop) {
+                font-size: 34px;
+                top: 2px;
+            }
+        }
+
+        @include breakpoint(tablet) {
+            font-size: 20px;
+        }
+    }
+
+    .tt-menu {
+        margin-top: 11px;
+
+        @include breakpoint(tablet) {
+            width: 430px;
+        }
+
+        @include breakpoint(laptop) {
+            width: 530px;
+        }
+
+        @include breakpoint(desktop) {
+            width: 630px;
+        }
+    }
+
+    .tt-suggestion {
+        font-size: 16px;
+    }
+
+    // Add style to search form - set width
+    max-width: 450px;
+    padding: 10px;
+
+    @include border-radius(6px);
+    // border: 1px solid $grey;
+    background-color: $lightest-blue;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+
+    // search form - set width
+    @include breakpoint(laptop) {
+        max-width: 550px;
+    }
+
+    // search form - set width
+    @include breakpoint(desktop) {
+        max-width: 650px;
+    }
+}
+
+// Style input on focus
+.search-phone-form--focus {
+    border-color: $primary-blue;
+
+    .twitter-typeahead {
+
+        &:before {
+            color: $primary-blue;
+        }
+    }
+}
+
+.search-phone-form--sticky {
+    position: fixed;
+    top: 60px; left: 0; right: 0;
+    z-index: 999;
+
+    margin-left: 10px;
+    margin-right: 10px;
+
+    padding: 0 10px;
+
+    .twitter-typeahead {
+
+        .tt-hint,
+        .tt-input {
+
+            @include breakpoint(laptop) {
+                height: 38px;
+                padding: 0 0 0 50px;
+            }
+        }
+
+        &:before {
+
+            @include breakpoint(laptop) {
+                font-size: 23px;
+                top: 2px;
+            }
+        }
+
+        @include breakpoint(tablet) {
+            font-size: 18px;
+        }
+
+        .tt-menu {
+            margin-top: 1px;
+        }
+    }
+
+    border-color: $light-blue;
+
+    @include breakpoint(tablet) {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    // search form - set width/height
+    @include breakpoint(laptop) {
+        height: 40px;
+    }
+
+    @include breakpoint(desktop) {
+        top: 5px;
+        z-index: 1001;
+    }
+}
+
+.dropdown-phone-form #reset-sticky {
+    display: none;
+}
+
+.dropdown-phone-form.search-phone-form--sticky {
+    top: 55px;
+    background-color: $black-opaque;
+
+    @include border-bottom-radius(4px);
+
+    #reset-sticky {
+        color: $white;
+    }
+}
+
+#carousel-feedback {
+    min-height: 350px;
+    max-width: 800px;
+    margin: 15px auto;
+
+    @include breakpoint(tablet) {
+        min-height: 380px;
+    }
+}
+
+.carousel-indicators {
+    li {
+        border: 1px solid $dark-grey;
+    }
+
+    li.active {
+        background: $dark-grey;
+    }
+}

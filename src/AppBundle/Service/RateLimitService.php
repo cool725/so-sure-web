@@ -5,8 +5,8 @@ use Predis\Client;
 use Psr\Log\LoggerInterface;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
-use AppBundle\Document\OptOut\EmailOptOut;
-use AppBundle\Document\OptOut\SmsOptOut;
+use AppBundle\Document\Opt\EmailOptOut;
+use AppBundle\Document\Opt\SmsOptOut;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\Invitation\Invitation;
@@ -28,6 +28,7 @@ class RateLimitService
     const DEVICE_TYPE_RESET = 'reset';
     const DEVICE_TYPE_TOKEN = 'token';
     const DEVICE_TYPE_USER_LOGIN = 'user-login';
+    const DEVICE_TYPE_OPT = 'optout';
 
     public static $cacheTimes = [
         self::DEVICE_TYPE_IMEI => 86400, // 1 day
@@ -37,7 +38,8 @@ class RateLimitService
         self::DEVICE_TYPE_POLICY => 604800, // 7 days
         self::DEVICE_TYPE_RESET => 3600, // 1 hour
         self::DEVICE_TYPE_TOKEN => 600, // 10 minutes
-        self::DEVICE_TYPE_USER_LOGIN => 3600, // 10 minutes
+        self::DEVICE_TYPE_USER_LOGIN => 3600, // 1 hour
+        self::DEVICE_TYPE_OPT => 600, // 10 minutes
         'replay' => 60, // 1 minute
     ];
 
@@ -50,6 +52,7 @@ class RateLimitService
         self::DEVICE_TYPE_RESET => 2,
         self::DEVICE_TYPE_TOKEN => 10,
         self::DEVICE_TYPE_USER_LOGIN => 10,
+        self::DEVICE_TYPE_OPT => 3,
     ];
 
     public static $maxIpRequests = [
@@ -60,6 +63,7 @@ class RateLimitService
         self::DEVICE_TYPE_POLICY => 50,
         self::DEVICE_TYPE_RESET => 14,
         self::DEVICE_TYPE_TOKEN => 100,
+        self::DEVICE_TYPE_OPT => 14,
     ];
 
     public static $excludedIps = [

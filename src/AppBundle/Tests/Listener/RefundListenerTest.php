@@ -482,6 +482,16 @@ class RefundListenerTest extends WebTestCase
         $this->assertTrue($refund['received'] == 0);
         $this->assertTrue($refund['refunded'] < 0);
 
+        $foundRefund = false;
+        foreach ($updatedRenewalPolicy->getPayments() as $payment) {
+            /** @var Payment $payment */
+            if ($payment instanceof PolicyDiscountRefundPayment) {
+                $foundRefund = true;
+                $this->assertNotNull($payment->getNotes());
+            }
+        }
+        $this->assertTrue($foundRefund);
+
         $total = Payment::sumPayments($updatedRenewalPolicy->getPayments(), false);
         $this->assertEquals(2, $total['numReceived']);
         $this->assertEquals(2, $total['numRefunded']);

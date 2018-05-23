@@ -126,7 +126,7 @@
                 <div class="col-sm-8 col-sm-offset-2 col-md-8 col-md-offset-2">
                     <div class="form-group {% if form_errors(purchase_form.imei) %}has-error{% endif %} col-sm-6 {% if purchase_form.serialNumber is not defined %}col-sm-offset-3{% endif %}">
                         {{ form_label(purchase_form.imei, 'IMEI Number:', { 'label_attr': {'class': 'sr-only'} }) }}
-                        {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control imei', 'placeholder':'IMEI Number'}}) }}
+                        {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control imei', 'placeholder':'IMEI Number', 'data-hj-suppress' : ''}}) }}
                         <label class="samsung-imei">Numbers only please (no / required)</label>
                         <div class="help-block with-errors">{{ form_errors(purchase_form.imei) }}</div>
                         <div class="help-block">
@@ -137,7 +137,7 @@
                     {% if purchase_form.serialNumber is defined %}
                         <div class="form-group {% if form_errors(purchase_form.serialNumber) %}has-error{% endif %} {% if purchase_form.serialNumber is defined %}col-sm-6{% endif %}">
                             {{ form_label(purchase_form.serialNumber, 'Serial Number:', { 'label_attr': {'class': 'sr-only'} }) }}
-                            {{ form_widget(purchase_form.serialNumber, {'attr':{'class':'form-control',  'pattern': '[a-zA-Z0-9]{5,32}', 'title': 'Enter a valid serial number', 'placeholder':'Serial Number'}}) }}
+                            {{ form_widget(purchase_form.serialNumber, {'attr':{'class':'form-control',  'pattern': '[a-zA-Z0-9]{5,32}', 'title': 'Enter a valid serial number', 'placeholder':'Serial Number', 'data-hj-suppress' : ''}}) }}
                             <div class="help-block with-errors">{{ form_errors(purchase_form.serialNumber) }}</div>
                             <div class="panel panel-default">
                                 <div class="panel-heading"

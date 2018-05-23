@@ -1,29 +1,45 @@
+{% form_theme optin_form 'AppBundle:Form:fields.html.twig' %}
+{% form_theme optout_form 'AppBundle:Form:fields.html.twig' %}
 {% extends 'base.html.twig' %}
-{% block body %}
-  <div class="section hero" style="min-height: 700px;">
-    <div class="container text-center">
-      {% if is_opted_out %}
-        <img class="logo" src="{{ cdn_url }}/images/logo/unhappy-so-sure-smiley.svg" alt="Unhappy so-sure smiley" style="width: 20%; margin-top: 50px;"></img>
-        <h2 class="section-title">Sorry, you're leaving us</h2>
-        <p class="pre-launch-description">
-        {{ email }} is now opted out of {{ category }} email communications from so-sure.
-        </p>
-        <p>
-          Made a mistake?
-          {{ form_start(form_optin) }}
-            <span class="input-group-btn">
-                {{ form_widget(form_optin.add, {'label': 'Opt back in', 'attr': {'class': 'btn btn-success'}}) }}
-            </span>
-          {{ form_end(form_optin) }}
-        </p>
-      {% else %}
-        <img class="logo" src="{{ cdn_url }}/images/logo/happy-so-sure-smiley.svg" alt="Happy so-sure smiley" style="width: 20%; margin-top: 50px;"></img>
-        <h2 class="section-title">Welcome back to so-sure</h2>
-        <p class="pre-launch-description">
-        Glad you decided to opt back in to {{ category }} email communications, {{ email }}.
-        </p>
-      {% endif %}
-    </div>
-  </div>
 
+{# Set vars #}
+{% set new_stylesheet = 1 %}
+{% set new_footer = 1 %}
+
+{% block body %}
+    <section class="section--pad">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-10 col-md-offset-1">
+                    <div class="panel panel-sosure">
+                        <div class="panel-body text-center">
+                            <h3>Manage your communication preferences</h3>
+                            <div class="h2">{{  email }}</div>
+                            <div class="optouts">
+                                <h4>Marketing Communications:</h4>
+                                {{ form_start(optin_form, { 'attr': {'class': ''}}) }}
+                                    <div class="form-group">
+                                        {{ form_widget(optin_form.categories) }}
+                                    </div>
+                                    <div class="form-group">
+                                        {{ form_widget(optin_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-blue'}}) }}
+                                    </div>
+                                {{ form_end(optin_form) }}
+                                <h4>We respect your preferences</h4>
+                                <p class="lead">Beyond marketing communications, we also send emails related to your policy, reward pot, pic-sure and invitations from other members.</p>
+                                {{ form_start(optout_form) }}
+                                <div class="form-group">
+                                    {{ form_widget(optout_form.categories) }}
+                                </div>
+                                <div class="form-group">
+                                    {{ form_widget(optout_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-blue'}}) }}
+                                </div>
+                                {{ form_end(optout_form) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}

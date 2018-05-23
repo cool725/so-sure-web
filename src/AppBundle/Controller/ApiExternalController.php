@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\IpUtils;
 
 use AppBundle\Document\Phone;
 use AppBundle\Document\User;
-use AppBundle\Document\OptOut\EmailOptOut;
+use AppBundle\Document\Opt\EmailOptOut;
 
 use AppBundle\Classes\ApiErrorCode;
 use AppBundle\Classes\GoCompare;
@@ -130,8 +130,11 @@ class ApiExternalController extends BaseController
                 // TODO: Should we resubscribe if unsubscribed_from_emails is false?
                 if ($item['unsubscribed_from_emails']) {
                     $invitation = $this->get('app.invitation');
-                    $invitation->optout($item['email'], EmailOptOut::OPTOUT_CAT_AQUIRE);
-                    $invitation->optout($item['email'], EmailOptOut::OPTOUT_CAT_RETAIN);
+                    $invitation->optout(
+                        $item['email'],
+                        EmailOptOut::OPTOUT_CAT_MARKETING,
+                        EmailOptOut::OPT_LOCATION_INTERCOM
+                    );
                     $invitation->rejectAllInvitations($item['email']);
                 }
             } else {

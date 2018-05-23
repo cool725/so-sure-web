@@ -2,6 +2,8 @@
 
 namespace AppBundle\Tests\Document;
 
+use AppBundle\Document\Opt\EmailOptIn;
+use AppBundle\Document\Opt\EmailOptOut;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
@@ -513,5 +515,115 @@ class UserTest extends \PHPUnit\Framework\TestCase
 
         $this->assertFalse($policyA->getUser()->hasPolicyCancelledAndPaymentOwed());
         $this->assertFalse($policyB->getUser()->hasPolicyCancelledAndPaymentOwed());
+    }
+
+    public function testCanDeleteNoPolicy()
+    {
+        $user = new User();
+        $this->assertTrue($user->canDelete());
+    }
+
+    public function testCanDeletePartialPolicy()
+    {
+        $user = new User();
+        $policy = new PhonePolicy();
+        $user->addPolicy($policy);
+        $this->assertTrue($user->canDelete());
+    }
+
+    public function testCanDeletePolicy()
+    {
+        $user = new User();
+        $user->setCreated(new \DateTime('2016-01-01'));
+        $policy = new PhonePolicy();
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setEnd(new \DateTime('2017-01-01'));
+        $user->addPolicy($policy);
+
+        $this->assertFalse($user->canDelete(new \DateTime('2000-01-01')));
+        $this->assertFalse($user->canDelete(new \DateTime('2018-01-01')));
+        $this->assertFalse($user->canDelete(new \DateTime('2024-06-01')));
+        // 7.5 years after end date
+        $this->assertTrue($user->canDelete(new \DateTime('2024-07-03')));
+        $this->assertTrue($user->canDelete(new \DateTime('2030-01-01')));
+    }
+
+    public function testShouldDeleteNoPolicy()
+    {
+        $user = new User();
+        $user->setCreated(new \DateTime('2016-01-01'));
+        $this->assertFalse($user->shouldDelete(new \DateTime('2000-01-01')));
+        $this->assertFalse($user->shouldDelete(new \DateTime('2017-06-01')));
+        $this->assertTrue($user->shouldDelete(new \DateTime('2017-07-03')));
+        $this->assertTrue($user->shouldDelete(new \DateTime('2024-07-03')));
+
+        $emailOptOut = new EmailOptOut();
+        $emailOptOut->setUpdated(new \DateTime('2017-01-01'));
+        $user->addOpt($emailOptOut);
+        $this->assertFalse($user->shouldDelete(new \DateTime('2000-01-01')));
+        $this->assertFalse($user->shouldDelete(new \DateTime('2017-06-01')));
+        $this->assertTrue($user->shouldDelete(new \DateTime('2017-07-03')));
+        $this->assertTrue($user->shouldDelete(new \DateTime('2024-07-03')));
+
+        // dates should be increased if opt in is recorded
+        $emailOptIn = new EmailOptIn();
+        $emailOptIn->addCategory(EmailOptIn::OPTIN_CAT_MARKETING);
+        $emailOptIn->setUpdated(new \DateTime('2017-01-01'));
+        $user->addOpt($emailOptIn);
+        $this->assertFalse($user->shouldDelete(new \DateTime('2000-01-01')));
+        $this->assertFalse($user->shouldDelete(new \DateTime('2018-06-01')));
+        $this->assertTrue($user->shouldDelete(new \DateTime('2018-07-03')));
+        $this->assertTrue($user->shouldDelete(new \DateTime('2024-07-03')));
+    }
+
+    public function testShouldDeleteRoles()
+    {
+        foreach ([User::ROLE_CLAIMS, User::ROLE_EMPLOYEE, User::ROLE_ADMIN] as $role) {
+            $user = new User();
+            $user->setCreated(new \DateTime('2016-01-01'));
+            $this->assertTrue($user->shouldDelete(new \DateTime('2017-07-03')));
+
+            $user->addRole($role);
+            $this->assertFalse($user->shouldDelete(new \DateTime('2017-07-03')));
+        }
+    }
+
+    public function testShouldDeletePartialPolicy()
+    {
+        $user = new User();
+        $policy = new PhonePolicy();
+        $user->addPolicy($policy);
+        $user->setCreated(new \DateTime('2016-01-01'));
+        $this->assertFalse($user->shouldDelete(new \DateTime('2000-01-01')));
+        $this->assertFalse($user->shouldDelete(new \DateTime('2017-06-01')));
+        $this->assertTrue($user->shouldDelete(new \DateTime('2017-07-03')));
+        $this->assertTrue($user->shouldDelete(new \DateTime('2024-07-03')));
+
+        // dates should be increased if opt in is recorded
+        $emailOptIn = new EmailOptIn();
+        $emailOptIn->addCategory(EmailOptIn::OPTIN_CAT_MARKETING);
+        $emailOptIn->setUpdated(new \DateTime('2017-01-01'));
+        $user->addOpt($emailOptIn);
+        $this->assertFalse($user->shouldDelete(new \DateTime('2000-01-01')));
+        $this->assertFalse($user->shouldDelete(new \DateTime('2018-06-01')));
+        $this->assertTrue($user->shouldDelete(new \DateTime('2018-07-03')));
+        $this->assertTrue($user->shouldDelete(new \DateTime('2024-07-03')));
+    }
+
+    public function testShouldDeletePolicy()
+    {
+        $user = new User();
+        $user->setCreated(new \DateTime('2016-01-01'));
+        $policy = new PhonePolicy();
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $policy->setEnd(new \DateTime('2017-01-01'));
+        $user->addPolicy($policy);
+
+        $this->assertFalse($user->shouldDelete(new \DateTime('2000-01-01')));
+        $this->assertFalse($user->shouldDelete(new \DateTime('2018-01-01')));
+        $this->assertFalse($user->shouldDelete(new \DateTime('2024-06-01')));
+        // 7.5 years after end date
+        $this->assertTrue($user->shouldDelete(new \DateTime('2024-07-03')));
+        $this->assertTrue($user->shouldDelete(new \DateTime('2030-01-01')));
     }
 }

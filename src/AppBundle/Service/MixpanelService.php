@@ -346,9 +346,52 @@ class MixpanelService
         ];
         $data = $this->mixpanelData->data('engage', $query);
         $count = 0;
-        foreach ($data['results'] as $user) {
-            $this->queueDelete($user['$distinct_id'], 0);
-            $count++;
+        if ($data) {
+            foreach ($data['results'] as $user) {
+                $this->queueDelete($user['$distinct_id'], 0);
+                $count++;
+            }
+        }
+
+        // Although facebook should be allowed, there seems to be a 'preview' mode which causes havoc
+        // with our sixpack tests and causes a huge increase (30k+ users over a few week period)
+        // so delete any users over 1 day old with a facebook brower that have just 1 sixpack experiment
+        $now = new \DateTime();
+        // @codingStandardsIgnoreStart
+        $query = [
+            'selector' => sprintf(
+                '(behaviors["behavior_11111"] == 1 and datetime(%s - 86400) > user["$last_seen"] and behaviors["behavior_11112"] == 0 and behaviors["behavior_11113"] == 0)',
+                $now->format('U')
+            ),
+            'behaviors' => [[
+                "window" => "90d",
+                "name" => "behavior_11111",
+                "event_selectors" => [[
+                    "event" => "Sixpack Experiment",
+                    "selector" => "((\"Facebook\" in event[\"\$browser\"]) and (defined (event[\"\$browser\"])))"
+                ]]
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11112",
+                "event_selectors" => [[
+                    "event" => "Login"
+                ]]
+            ], [
+                "window" => "90d",
+                "name" => "behavior_11113",
+                "event_selectors" => [[
+                    "event" => "Click on the Buy Now Button"
+                ]]
+            ]
+        ]];
+        // @codingStandardsIgnoreEnd
+        $data = $this->mixpanelData->data('engage', $query);
+        if ($data) {
+            $count = 0;
+            foreach ($data['results'] as $user) {
+                $this->queueDelete($user['$distinct_id'], 0);
+                $count++;
+            }
         }
 
         return ['count' => $count, 'total' => $data['total']];

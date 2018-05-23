@@ -2624,7 +2624,7 @@ class PhonePolicyTest extends WebTestCase
         );
     }
 
-    private function createPolicyForCancellation($amount, $commission, $installments, $date = null)
+    private function createPolicyForCancellation($amount, $commission, $installments, $date = null, $discount = null)
     {
         if (!$date) {
             $date = new \DateTime("2016-01-01");
@@ -2640,10 +2640,21 @@ class PhonePolicyTest extends WebTestCase
         $policy = new SalvaPhonePolicy();
         $policy->setPhone(static::$phone);
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
+
+        $discountPayment = null;
+        if ($discount) {
+            $discountPayment = new PolicyDiscountPayment();
+            $discountPayment->setAmount($discount);
+            $discountPayment->setDate($date);
+            $policy->addPayment($discountPayment);
+        }
+
         $policy->create(rand(1, 999999), null, $date, rand(1, 9999));
         $policy->setPremiumInstallments($installments);
         $policy->setStatus(Policy::STATUS_ACTIVE);
-
+        if ($discount && $discountPayment) {
+            $policy->getPremium()->setAnnualDiscount($discountPayment->getAmount());
+        }
         if ($amount > 0) {
             self::addPayment($policy, $amount, $commission, null, $date);
         }
@@ -2747,6 +2758,37 @@ class PhonePolicyTest extends WebTestCase
             $this->assertEquals(
                 $monthlyPolicy->getPremium()->getMonthlyPremiumPrice() * $i,
                 $monthlyPolicy->getOutstandingPremiumToDate($date)
+            );
+        }
+    }
+
+    public function testOutstandingPremiumToDateWithDiscount()
+    {
+        $date = new \DateTime('2016-01-01');
+        $monthlyPolicy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getAdjustedStandardMonthlyPremiumPrice(10, $date),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            12,
+            $date,
+            10
+        );
+        $this->assertEquals(0, $monthlyPolicy->getOutstandingPremiumToDate($date));
+        $this->assertTrue($monthlyPolicy->isValidPolicy(null));
+        $this->assertTrue($monthlyPolicy->getPremium()->hasAnnualDiscount());
+        $this->assertNotEquals(
+            $monthlyPolicy->getPremium()->getAdjustedStandardMonthlyPremiumPrice(),
+            $monthlyPolicy->getPremium()->getMonthlyPremiumPrice()
+        );
+
+        // needs to be just slightly after 1 month
+        $date->add(new \DateInterval('P1D'));
+
+        for ($i = 1; $i <= 11; $i++) {
+            $date->add(new \DateInterval('P1M'));
+            $this->assertEquals(
+                $monthlyPolicy->getPremium()->getAdjustedStandardMonthlyPremiumPrice() * $i,
+                $monthlyPolicy->getOutstandingPremiumToDate($date),
+                sprintf('date: %s, month: %d', $date->format(\DateTime::ATOM), $i)
             );
         }
     }
@@ -3181,6 +3223,20 @@ class PhonePolicyTest extends WebTestCase
         $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2016-04-15 15:01')));
         $this->assertFalse($policy->isPolicyPaidToDate(new \DateTime('2016-04-28 16:01')));
         $this->assertFalse($policy->isPolicyPaidToDate(new \DateTime('2016-05-01 00:01')));
+    }
+
+    public function testPolicyIsPaidToDateDiscount()
+    {
+        $date = new \DateTime('2018-02-27 00:00');
+        $policy = $this->createPolicyForCancellation(
+            static::$phone->getCurrentPhonePrice()->getAdjustedStandardMonthlyPremiumPrice(15, $date),
+            Salva::MONTHLY_TOTAL_COMMISSION,
+            12,
+            $date,
+            15
+        );
+        $this->assertTrue($policy->isPolicyPaidToDate(new \DateTime('2018-02-27 00:00')));
+        $this->assertFalse($policy->isPolicyPaidToDate(new \DateTime('2018-03-31 00:00')));
     }
 
     public function testHasCorrectPolicyStatus()

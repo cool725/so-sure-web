@@ -2,7 +2,12 @@
 namespace AppBundle\Security;
 
 use AppBundle\Document\Invitation\Invitation;
+use AppBundle\Document\Opt\EmailOptIn;
+use AppBundle\Document\Opt\EmailOptOut;
+use AppBundle\Document\Opt\Opt;
 use AppBundle\Document\PhoneTrait;
+use AppBundle\Service\IntercomService;
+use AppBundle\Service\MixpanelService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface;
 use HWI\Bundle\OAuthBundle\Security\Core\User\FOSUBUserProvider as BaseClass;
@@ -31,6 +36,12 @@ class FOSUBUserProvider extends BaseClass
 
     protected $facebook;
 
+    /** @var IntercomService */
+    protected $intercom;
+
+    /** @var MixpanelService */
+    protected $mixpanel;
+
     /** @var DocumentManager */
     protected $dm;
 
@@ -55,6 +66,16 @@ class FOSUBUserProvider extends BaseClass
     public function setDm(DocumentManager $dm)
     {
         $this->dm = $dm;
+    }
+
+    public function setIntercom(IntercomService $intercom)
+    {
+        $this->intercom = $intercom;
+    }
+
+    public function setMixpanel(MixpanelService $mixpanel)
+    {
+        $this->mixpanel = $mixpanel;
     }
 
     /**
@@ -359,19 +380,7 @@ class FOSUBUserProvider extends BaseClass
             }
             // as username is tied to email for our case, delete the duplicate user
             if ($duplicate->getEmailCanonical() == $email) {
-                if ($duplicate->hasPartialPolicy()) {
-                    foreach ($duplicate->getPartialPolicies() as $partialPolicy) {
-                        $this->dm->remove($partialPolicy);
-                    }
-                }
-                if ($duplicate->getReceivedInvitations() && count($duplicate->getReceivedInvitations()) > 0) {
-                    foreach ($duplicate->getReceivedInvitations() as $invitation) {
-                        /** @var Invitation $invitation */
-                        $invitation->setInvitee(null);
-                    }
-                    $duplicate->setReceivedInvitations(null);
-                }
-                $this->dm->remove($duplicate);
+                $this->deleteUser($duplicate);
             }
         }
         $this->dm->flush();
@@ -386,5 +395,65 @@ class FOSUBUserProvider extends BaseClass
         }
 
         return true;
+    }
+
+    public function deleteUser(User $user, $flush = false)
+    {
+        if (!$user->canDelete()) {
+            throw new \Exception(sprintf('Unable to delete user %s due to rentention rules', $user->getId()));
+        }
+        if ($user->getIntercomId()) {
+            $this->intercom->queueUser($user, IntercomService::QUEUE_USER_DELETE, [
+                'intercomId' => $user->getIntercomId()
+            ]);
+        }
+        $this->mixpanel->queueDelete($user->getId());
+
+        if ($user->hasPartialPolicy()) {
+            foreach ($user->getPartialPolicies() as $partialPolicy) {
+                $this->dm->remove($partialPolicy);
+            }
+        }
+        if ($user->getReceivedInvitations() && count($user->getReceivedInvitations()) > 0) {
+            foreach ($user->getReceivedInvitations() as $invitation) {
+                /** @var Invitation $invitation */
+                $invitation->setInvitee(null);
+            }
+            $user->setReceivedInvitations(null);
+        }
+        $this->dm->remove($user);
+
+        if ($flush) {
+            $this->dm->flush();
+        }
+    }
+
+    public function resyncOpts()
+    {
+        $userRepo = $this->dm->getRepository(User::class);
+        $optinRepo = $this->dm->getRepository(EmailOptIn::class);
+        $optoutRepo = $this->dm->getRepository(EmailOptOut::class);
+
+        $optins = $optinRepo->findBy(['user' => null]);
+        foreach ($optins as $optin) {
+            /** @var EmailOptIn $optin */
+            /** @var User $user */
+            $user = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($optin->getEmail())]);
+            if ($user) {
+                $user->addOpt($optin);
+            }
+        }
+
+        $optouts = $optoutRepo->findBy(['user' => null]);
+        foreach ($optouts as $optout) {
+            /** @var EmailOptOut $optout */
+            /** @var User $user */
+            $user = $userRepo->findOneBy(['emailCanonical' => mb_strtolower($optout->getEmail())]);
+            if ($user) {
+                $user->addOpt($optout);
+            }
+        }
+
+        $this->dm->flush();
     }
 }

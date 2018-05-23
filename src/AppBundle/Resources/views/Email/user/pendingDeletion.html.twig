@@ -1,0 +1,23 @@
+{% set logo_image = 'happy' %}
+{% extends 'AppBundle:Email:base.html.twig' %}
+{% import "AppBundle:Email:macros.html.twig" as macros %}
+{% block title %}Your communication preferences.{% endblock %}
+{% block body %}
+	{{ macros.start_table() }}
+	<div style="font-size: 14px; text-align: left;">
+	   <!--?xml version="1.0" encoding="UTF-8" standalone="no"?-->
+	   <div style="font-size: 14px; text-align: center;"><span style="font-family:arial,helvetica neue,helvetica,sans-serif">
+			Hi {% if user.name %}{{ user.name }}{% else %}{{ user.email }}{% endif %},
+			<br><br>
+			Are you ready to say goodbye to So-Sure updates?
+			<br><br>
+			We wanted to check in to make sure you know you might miss out on being the first to know about our exciting offers, or new technologies. Or the chance to get promotional offers. Or insurance news in general.
+			<br><br>
+			With just a few days to go until GDPR comes into effect, there's not long to confirm you still want all of this good stuff.
+			<br><br>
+			Keep So-Sure updates in your inbox. Take a few seconds to complete the form <a href="{{ url('optout_hash', {'hash': hash}) }}">here</a>.
+	   </div>
+	</div>
+	{{ macros.end_table() }}
+    {{ macros.email_button_table(url('optout_hash', {'hash': hash}), "Update Preferences", "Update Preferences")}}
+{% endblock %}

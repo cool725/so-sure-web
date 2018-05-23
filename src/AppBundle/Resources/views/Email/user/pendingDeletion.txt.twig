@@ -1,0 +1,16 @@
+{% extends 'AppBundle:Email:base.txt.twig' %}
+{% block body %}
+**
+------------------------------------------------------------
+Hi {% if user.name %}{{ user.name }}{% else %}{{ user.email }}{% endif %},
+
+Are you ready to say goodbye to So-Sure updates?
+
+We wanted to check in to make sure you know you might miss out on being the first to know about our exciting offers, or new technologies. Or the chance to get promotional offers. Or insurance news in general.
+
+With just a few days to go until GDPR comes into effect, there's not long to confirm you still want all of this good stuff.
+
+Keep So-Sure updates in your inbox. Take a few seconds to complete the form here:
+{{ url('optout_hash', {'hash': hash}) }}
+
+{% endblock body %}
