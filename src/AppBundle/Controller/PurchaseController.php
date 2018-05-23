@@ -9,6 +9,7 @@ use AppBundle\Exception\InvalidEmailException;
 use AppBundle\Exception\InvalidFullNameException;
 use AppBundle\Form\Type\BacsConfirmType;
 use AppBundle\Form\Type\BacsType;
+use AppBundle\Repository\JudoPaymentRepository;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\PolicyRepository;
@@ -937,18 +938,25 @@ class PurchaseController extends BaseController
      */
     public function purchaseJudoPayFailAction(Request $request)
     {
-        $this->get('logger')->info(sprintf(
+        $msg = sprintf(
             'Judo Web Failure ReceiptId: %s Ref: %s',
             $request->get('ReceiptId'),
             $request->get('Reference')
-        ));
+        );
+        $this->get('logger')->info($msg);
         $user = $this->getUser();
         $dm = $this->getManager();
+
+        /** @var JudopayService $judo */
         $judo = $this->get('app.judopay');
-        $repo = $dm->getRepository(Payment::class);
+
+        /** @var JudoPaymentRepository $repo */
+        $repo = $dm->getRepository(JudoPayment::class);
+
+        /** @var JudoPayment $payment */
         $payment = $repo->findOneBy(['reference' => $request->get('Reference')]);
         if (!$payment) {
-            throw new \Exception('Unable to locate payment');
+            throw new \Exception(sprintf('Unable to locate payment. Details: %s', $msg));
         }
         $policy = $payment->getPolicy();
 
