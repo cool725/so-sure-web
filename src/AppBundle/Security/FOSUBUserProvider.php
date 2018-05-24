@@ -406,7 +406,7 @@ class FOSUBUserProvider extends BaseClass
         return true;
     }
 
-    public function deleteUser(User $user, $flush = false)
+    public function deleteUser(User $user, $sendEmail = true, $flush = false)
     {
         if (!$user->canDelete()) {
             throw new \Exception(sprintf('Unable to delete user %s due to rentention rules', $user->getId()));
@@ -440,14 +440,16 @@ class FOSUBUserProvider extends BaseClass
             $this->dm->flush();
         }
 
-        $this->mailer->sendTemplate(
-            'Goodbye',
-            $user->getEmail(),
-            'AppBundle:Email:user/deleted.html.twig',
-            ['user' => $user],
-            'AppBundle:Email:user/deleted.html.twig',
-            ['user' => $user]
-        );
+        if ($sendEmail) {
+            $this->mailer->sendTemplate(
+                'Goodbye',
+                $user->getEmail(),
+                'AppBundle:Email:user/deleted.html.twig',
+                ['user' => $user],
+                'AppBundle:Email:user/deleted.html.twig',
+                ['user' => $user]
+            );
+        }
 
         $this->dm->remove($user);
 
