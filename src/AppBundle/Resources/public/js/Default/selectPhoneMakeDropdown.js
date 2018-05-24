@@ -20,9 +20,9 @@ $(function() {
 
             // If make selected customise default value
             if (make.val()) {
-                model.append($('<option />').val('').text('Now select your ' + make.val() + ' device'));
+                model.append($('<option />').val('').text('Next select your ' + make.val() + ' device'));
             } else {
-                model.append($('<option />').val('').text('Select your phone make first'));
+                model.append($('<option />').val('').text('Find your phone for an instant quote...'));
             }
 
             // Clear the other select out
@@ -64,7 +64,7 @@ $(function() {
 
             // If model selected customise default value
             if (model) {
-                memory.append($('<option />').val('').text('And finally select your memory size'));
+                memory.append($('<option />').val('').text('Which memory size ' + model.val() + '?'));
             } else {
                 memory.append($('<option />').val('').text('Select your phone model first'));
             }
@@ -86,6 +86,8 @@ $(function() {
             // As model will be shown anyway
             memory.hide();
             controls.hide();
+
+            $('.select-phone-make').addClass('.select-phone-make-focus');
 
             // Update Models
             updateModels();
@@ -140,6 +142,7 @@ $(function() {
                         make.show();
                         memory.hide();
                         $(this).hide();
+                        controls.hide();
                     }
                 }
             } else {

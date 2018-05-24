@@ -5,6 +5,16 @@
     #phone-pull-down {
         display: none;
     }
+
+    &-single-mem {
+        .select-phone-option {
+            font-family: $avenir-heavy;
+
+            &-focus {
+                color: $primary-blue;
+            }
+        }
+    }
 }
 
 .dropdown-phone-form.affix {
@@ -23,3 +33,11 @@
     color: $primary-blue;
 }
 
+// .select-phone-make.form-control {
+// //     font-weight: bold;
+// // }
+
+// .select-phone-option {
+//     font-family: $avenir-heavy;
+//     color: $primary-blue;
+// }

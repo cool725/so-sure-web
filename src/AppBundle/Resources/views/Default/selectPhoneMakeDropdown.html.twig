@@ -17,7 +17,7 @@
 {% endif %}
 
 <div id="select-phone-data"
-     class="dropdown-phone-form"
+     class="dropdown-phone-form {% if memoptions is defined and memoptions == 'single-mem-hide-dropdown' %}dropdown-phone-form-single-mem{% endif %}"
      data-phones='{{ phones|json_encode|raw }}'
      data-sticky-search="true"
      data-show-single-mem-opt="{% if memoptions is defined and memoptions == 'single-mem-hide-dropdown' %}true{% else %}false{% endif %}">
@@ -25,16 +25,16 @@
         <div class="form-group">
             {{ form_widget(form_phone.make, {
               'attr': {
-                'class': 'select-phone-option select-phone-make form-control'
+                'class': 'select-phone-option select-phone-make form-control animated pulse'
             }}) }}
             {{ form_widget(form_phone.model, {
               'attr': {
-                'class': 'select-phone-option select-phone-model form-control',
+                'class': 'select-phone-option select-phone-model form-control animated pulse select-phone-option-focus',
                 'style': 'display:none;'
             }}) }}
             {{ form_widget(form_phone.memory, {
                 'attr': {
-                    'class': 'select-phone-option select-phone-memory form-control',
+                    'class': 'select-phone-option select-phone-memory form-control animated pulse select-phone-option-focus',
                     'style': 'display:none;'
             }}) }}
             {{ form_widget(form_phone.next, {
