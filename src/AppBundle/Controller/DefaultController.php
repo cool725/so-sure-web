@@ -211,7 +211,7 @@ class DefaultController extends BaseController
     }
 
     /**
-     * @Route("/so-sure-carphone-warehouse", name="so_sure_carphone_warehouse")
+     * @Route("/comparison", name="comparison")
      * @Template
      */
     public function soSureCompetitors(Request $request)
@@ -219,7 +219,7 @@ class DefaultController extends BaseController
 
         $data = null;
 
-        if ($request->get('_route') == "so_sure_carphone_warehouse") {
+        if ($request->get('_route') == "comparison") {
             $data = [
                 'headline'     => 'Mobile Insurance Beyond Compare',
                 'sub_heading'  => 'But if you do want to compare…',
