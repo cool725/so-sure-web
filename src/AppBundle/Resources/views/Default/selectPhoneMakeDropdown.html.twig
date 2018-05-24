@@ -25,22 +25,22 @@
         <div class="form-group">
             {{ form_widget(form_phone.make, {
               'attr': {
-                'class': 'select-phone-option select-phone-make form-control animated pulse'
+                'class': 'select-phone-option select-phone-make form-control animated flipInX'
             }}) }}
             {{ form_widget(form_phone.model, {
               'attr': {
-                'class': 'select-phone-option select-phone-model form-control animated pulse select-phone-option-focus',
+                'class': 'select-phone-option select-phone-model form-control animated flipInX select-phone-option-focus',
                 'style': 'display:none;'
             }}) }}
             {{ form_widget(form_phone.memory, {
                 'attr': {
-                    'class': 'select-phone-option select-phone-memory form-control animated pulse select-phone-option-focus',
+                    'class': 'select-phone-option select-phone-memory form-control animated flipInX select-phone-option-focus',
                     'style': 'display:none;'
             }}) }}
             {{ form_widget(form_phone.next, {
               'label': buttonText,
               'attr': {
-                'class': 'btn btn-green btn-block btn-pad select-phone-btn',
+                'class': 'btn btn-green btn-block btn-pad select-phone-btn animated bounceIn',
                 'style': 'display:none;'
             }}) }}
         </div>

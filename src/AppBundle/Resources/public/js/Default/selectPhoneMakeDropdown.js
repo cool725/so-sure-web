@@ -137,7 +137,7 @@ $(function() {
                     // console.log(make.val() + ' ' + model.val() + ' has only one storage size');
                     if (value != '') {
                         memory.val(memSel);
-                        controls.fadeIn();
+                        controls.show();
                     } else {
                         make.show();
                         memory.hide();
@@ -159,7 +159,7 @@ $(function() {
         $('.select-phone-memory').on('change', function() {
 
             if ($(this).val() != '') {
-                controls.fadeIn();
+                controls.show();
             } else {
                 controls.hide();
                 if (memOptTest == true) {
