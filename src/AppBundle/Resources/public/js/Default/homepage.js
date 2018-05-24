@@ -28,7 +28,7 @@ $(function(){
         // Init BS affix
         $('#select-phone-data').affix({
             offset: {
-                top: stickyOffset + 700,
+                top: stickyOffset + 50,
                 bottom: function () {
                     return (this.bottom = $('footer').outerHeight(true) + 1000)
                 }

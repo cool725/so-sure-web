@@ -20,7 +20,7 @@ $(function() {
 
             // If make selected customise default value
             if (make.val()) {
-                model.append($('<option />').val('').text('Next select your ' + make.val() + ' device'));
+                model.append($('<option />').val('').text('Now select your ' + make.val() + ' device'));
             } else {
                 model.append($('<option />').val('').text('Find your phone for an instant quote...'));
             }
