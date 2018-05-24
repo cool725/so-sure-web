@@ -39,10 +39,6 @@
                 </p>
             {% endif %}
 
-{#             <p class="text-center">
-                <a href="#" class="scroll-to" data-scroll-to-anchor="#comparison-table"><i class="fa fa-chevron-down fa-2x text-blue animated slideInRight" aria-hidden="true"></i></a>
-            </p> #}
-
             {# Mobile Table #}
             <div class="row visible-xs-block comparison__container">
                 <div class="col-xs-6 left">
@@ -249,64 +245,16 @@
                 </table>
             </div>
 
+            <div class="text-center">
+                <a href="#" class="btn btn-green btn-pad btn-lg h2 sosure-track" data-toggle="modal" data-target="#quoteModal" data-event="money-cta">Get Insured</a>
+            </div>
+
         </div>
     </section>
-
-    {# Comparison #}
-{#     <section class="section--pad competitor_compare" id="comparison-table">
-        <div class="container">
-            {# <h2 class="text-center">See How We Compare On Mobile Insurance</h2> #}
-
-
-        {# </div> #}
-    {# </section> #}
-
-{#     <div class="section--pad">
-        <div class="container">
-            <div class="animated slideInLeft">
-                <h2 class="text-blue text-center">Get an Instant Quote</h2>
-                {# Phone Search #}
-               {#  {% if device_category() == 'Mobile' %}
-                    {% set select_template = 'AppBundle:Default:selectPhoneMakeDropdown' %}
-                {% else %}
-                    {% set select_template = 'AppBundle:Default:selectPhoneMakeSearch' %}
-                {% endif %}
-                {% if phone is defined and phone %}
-                    {{ render(controller(select_template, {
-                        'type': 'ebay',
-                        'id': phone.id
-                    })) }}
-                {% else %}
-                    {{ render(controller(select_template, {
-                        'type': 'ebay',
-                    })) }}
-                {% endif %} #}
-                {# End Phone Search #}
-            {# </div> #}
-        {# </div> #}
-    {# </div>  #}
 
     {# Press #}
     <section class="competitor__press">
         <div class="container-fluid">
-            <h2 class="text-center">Get an Instant Quote</h2>
-            {# Phone Search #}
-            {% if device_category() == 'Mobile' %}
-                {% set select_template = 'AppBundle:Default:selectPhoneMakeDropdown' %}
-            {% else %}
-                {% set select_template = 'AppBundle:Default:selectPhoneMakeSearch' %}
-            {% endif %}
-            {% if phone is defined and phone %}
-                {{ render(controller(select_template, {
-                    'type': 'ebay',
-                    'id': phone.id
-                })) }}
-            {% else %}
-                {{ render(controller(select_template, {
-                    'type': 'ebay',
-                })) }}
-            {% endif %}
-            {# End Phone Search #}
             <div class="row">
                 <div class="col-md-12 text-center">
                     <ul class="list-inline text-center">
