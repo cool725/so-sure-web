@@ -21,7 +21,6 @@
      data-phones='{{ phones|json_encode|raw }}'
      data-sticky-search="true"
      data-show-single-mem-opt="{% if memoptions is defined and memoptions == 'single-mem-hide-dropdown' %}true{% else %}false{% endif %}">
-
     {{ form_start(form_phone, { 'attr': { 'id': formId, 'autocomplete': 'off' }}) }}
         <div class="form-group">
             {{ form_widget(form_phone.make, {
