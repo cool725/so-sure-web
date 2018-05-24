@@ -1,43 +1,45 @@
 {% form_theme optin_form 'AppBundle:Form:fields.html.twig' %}
 {% form_theme optout_form 'AppBundle:Form:fields.html.twig' %}
 {% extends 'base.html.twig' %}
+
+{# Set vars #}
+{% set new_stylesheet = 1 %}
+{% set new_footer = 1 %}
+
 {% block body %}
-  <div class="section" style="min-height: 700px;">
-    <div class="container text-center">
-        <h2 class="section-title">Manage your communication preferences</h2>
-        <h4>{{  email }}</h4>
-
-        <h4 style="margin-top: 30px;">Marketing Communications</h4>
-        {{ form_start(optin_form) }}
-        <div class="row">
-            <div class="col-md-12">
-                {{ form_widget(optin_form.categories) }}
+    <section class="section--pad">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-10 col-md-offset-1">
+                    <div class="panel panel-sosure">
+                        <div class="panel-body text-center">
+                            <h3>Manage your communication preferences</h3>
+                            <div class="h2">{{  email }}</div>
+                            <div class="optouts">
+                                <h4>Marketing Communications:</h4>
+                                {{ form_start(optin_form, { 'attr': {'class': ''}}) }}
+                                    <div class="form-group">
+                                        {{ form_widget(optin_form.categories) }}
+                                    </div>
+                                    <div class="form-group">
+                                        {{ form_widget(optin_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-blue'}}) }}
+                                    </div>
+                                {{ form_end(optin_form) }}
+                                <h4>We respect your preferences</h4>
+                                <p class="lead">Beyond marketing communications, we also send emails related to your policy, reward pot, pic-sure and invitations from other members.</p>
+                                {{ form_start(optout_form) }}
+                                <div class="form-group">
+                                    {{ form_widget(optout_form.categories) }}
+                                </div>
+                                <div class="form-group">
+                                    {{ form_widget(optout_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-blue'}}) }}
+                                </div>
+                                {{ form_end(optout_form) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-12">
-                {{ form_widget(optin_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-success'}}) }}
-            </div>
-        </div>
-        {{ form_end(optin_form) }}
-
-        <h4 style="margin-top: 50px;">We respect your preferences</h4>
-        <h4>Beyond marketing communications, we also send emails related to your policy, reward pot, pic-sure and invitations from other members.</h4>
-
-        {{ form_start(optout_form) }}
-        <div class="row">
-            <div class="col-md-12">
-                {{ form_widget(optout_form.categories) }}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                {{ form_widget(optout_form.update, {'label': 'Update', 'attr': {'class': 'btn btn-success'}}) }}
-            </div>
-        </div>
-        {{ form_end(optout_form) }}
-
-    </div>
-  </div>
-
+    </section>
 {% endblock %}

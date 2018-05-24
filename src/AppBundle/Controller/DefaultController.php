@@ -86,10 +86,10 @@ class DefaultController extends BaseController
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
 
-        $defacto = $this->sixpack(
+        $trustpilot = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_DEFACTO,
-            ['no-defacto', 'defacto']
+            SixpackService::EXPERIMENT_TRUSTPILOT_REVIEW,
+            ['no-trustpilot', 'trustpilot']
         );
 
         $replacement = $this->sixpack(
@@ -110,7 +110,7 @@ class DefaultController extends BaseController
             // Make sure to check homepage landing below too
             'replacement'         => $replacement,
             'picsure'             => $picsure,
-            'defacto'             => $defacto,
+            'trustpilot'          => $trustpilot,
             'referral'            => $referral,
             'phone'               => $this->getQuerystringPhone($request),
         );

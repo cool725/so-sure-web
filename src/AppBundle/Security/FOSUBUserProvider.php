@@ -7,6 +7,7 @@ use AppBundle\Document\Opt\EmailOptOut;
 use AppBundle\Document\Opt\Opt;
 use AppBundle\Document\PhoneTrait;
 use AppBundle\Service\IntercomService;
+use AppBundle\Service\MailerService;
 use AppBundle\Service\MixpanelService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface;
@@ -45,6 +46,9 @@ class FOSUBUserProvider extends BaseClass
     /** @var DocumentManager */
     protected $dm;
 
+    /** @var MailerService */
+    protected $mailer;
+
     public function setRequestStack(RequestStack $requestStack)
     {
         $this->requestStack = $requestStack;
@@ -76,6 +80,11 @@ class FOSUBUserProvider extends BaseClass
     public function setMixpanel(MixpanelService $mixpanel)
     {
         $this->mixpanel = $mixpanel;
+    }
+
+    public function setMailer(MailerService $mailer)
+    {
+        $this->mailer = $mailer;
     }
 
     /**
@@ -397,7 +406,7 @@ class FOSUBUserProvider extends BaseClass
         return true;
     }
 
-    public function deleteUser(User $user, $flush = false)
+    public function deleteUser(User $user, $sendEmail = true, $flush = false)
     {
         if (!$user->canDelete()) {
             throw new \Exception(sprintf('Unable to delete user %s due to rentention rules', $user->getId()));
@@ -421,6 +430,27 @@ class FOSUBUserProvider extends BaseClass
             }
             $user->setReceivedInvitations(null);
         }
+
+        $opt = $this->dm->getRepository(Opt::class);
+        $opts = $opt->findBy(['email' => $user->getEmailCanonical()]);
+        foreach ($opts as $opt) {
+            $this->dm->remove($opt);
+        }
+        if ($flush) {
+            $this->dm->flush();
+        }
+
+        if ($sendEmail) {
+            $this->mailer->sendTemplate(
+                'Goodbye',
+                $user->getEmail(),
+                'AppBundle:Email:user/deleted.html.twig',
+                ['user' => $user],
+                'AppBundle:Email:user/deleted.html.twig',
+                ['user' => $user]
+            );
+        }
+
         $this->dm->remove($user);
 
         if ($flush) {

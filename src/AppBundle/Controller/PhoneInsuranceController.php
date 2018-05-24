@@ -522,11 +522,17 @@ class PhoneInsuranceController extends BaseController
             $this->get('app.sixpack')->convert(
                 SixpackService::EXPERIMENT_HOMEPAGE_AA_V2
             );
-            
+
             $this->get('app.sixpack')->convert(
-                SixpackService::EXPERIMENT_DEFACTO
+                SixpackService::EXPERIMENT_TRUSTPILOT_REVIEW
             );
         }
+
+        $trustpilot = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_TRUSTPILOT_REVIEW,
+            ['no-trustpilot', 'trustpilot']
+        );
 
         $replacement = $this->sixpack(
             $request,
@@ -559,7 +565,7 @@ class PhoneInsuranceController extends BaseController
             'days_test'       => $daysTest,
             'slider_test'     => 'slide-me',
             'intercom_test'   => $expIntercom,
-            'replacement'     => $replacement,
+            'trustpilot'     => $trustpilot,
         );
 
         $template = 'AppBundle:PhoneInsurance:quote.html.twig';
