@@ -22,3 +22,10 @@
     text-overflow: ellipsis;
     color: $primary-blue;
 }
+
+.select-phone-make {
+    &:focus {
+        // color: $primary-blue;
+        // font-weight: bold;
+    }
+}

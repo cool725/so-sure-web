@@ -43,7 +43,7 @@ $(function(){
             // This event fires immediately before the element has been affixed-top.
 
             if (memOptTest == true) {
-                showOptions();
+                // showOptions();
             }
 
             // Remove animation to refire
@@ -52,95 +52,97 @@ $(function(){
         });
 
         // Setup test
-        if (memOptTest == true) {
-            var phone    = $('#phone');
-            var make     = $('.select-phone-make');
-            var intMake  = false;
-            var model    = $('.select-phone-model');
-            var intModel = false;
-            var memory   = $('.select-phone-memory');
-            var intMemory = false;
-            var controls   = $('#quote-controls');
-            var pullDown = $('#phone-pull-down');
+        // if (memOptTest == true) {
+        //     var phone    = $('#phone');
+        //     var make     = $('.select-phone-make');
+        //     var intMake  = false;
+        //     var model    = $('.select-phone-model');
+        //     var intModel = false;
+        //     var memory   = $('.select-phone-memory');
+        //     var intMemory = false;
+        //     var controls   = $('#quote-controls');
+        //     var pullDown = $('#phone-pull-down');
 
-            function collapseOptions() {
-                if (intMake) {
-                    phone.show();
-                    model.slideUp();
-                    make.slideUp();
-                    controls.slideUp();
-                    memory.slideUp();
-                    pullDown.hide();
+        //     function collapseOptions() {
+        //         if (intMake) {
+        //             phone.show();
+        //             model.hide();
+        //             make.hide();
+        //             controls.hide();
+        //             memory.hide();
+        //             pullDown.hide();
 
-                    collapsed = true;
-                }
-            }
+        //             collapsed = true;
+        //         }
+        //     }
 
-            function showOptions() {
-                make.show();
-                if (intMake) {
-                    model.show();
-                }
-                if (intModel) {
-                    memory.show();
-                }
-                if (intMemory) {
-                    controls.show();
-                }
-                phone.hide();
-                pullDown.hide();
+        //     function showOptions() {
+        //         make.show();
+        //         if (intMake) {
+        //             model.show();
+        //         }
+        //         if (intModel) {
+        //             memory.show();
+        //         }
+        //         if (intMemory) {
+        //             controls.show();
+        //         }
+        //         phone.hide();
+        //         pullDown.hide();
 
-                collapsed = false;
-            }
+        //         collapsed = false;
+        //     }
 
-            function scrollCheck() {
-                if (make.val() != '') {
-                    intMake = true;
+        //     function scrollCheck() {
 
-                    if ($('.affix').length && collapsed == false) {
-                        pullDown.css('display','block');
-                    }
-                }
-                if (model.val() != '') {
-                    intModel = true;
-                }
-                if (memory.val() != '') {
-                    intMemory = true;
+        //         if (make.val() != '') {
+        //             intMake = true;
 
-                    // If all options selected allow btn to work
-                    $('#phone-btn').show();
-                    $('#expand-btn').hide();
+        //             if ($('.affix').length && collapsed == false) {
+        //                 // pullDown.css('display','block').addClass('animated slideInDown');
+        //                 // setTimeout(collapseOptions, 1000);
+        //             }
+        //         }
+        //         if (model.val() != '') {
+        //             intModel = true;
+        //         }
+        //         if (memory.val() != '') {
+        //             intMemory = true;
 
-                    // Mimic the click
-                    $('#phone-btn').click(function() {
-                        $('#launch_phone_next').click();
-                        collapseOptions();
-                    });
-                } else {
-                    $('#phone-btn').hide();
-                    $('#expand-btn').show();
-                }
-            }
+        //             // If all options selected allow btn to work
+        //             $('#phone-btn').show();
+        //             $('#expand-btn').hide();
 
-            // Fire checks on scroll
-            $(window).scroll(scrollCheck);
+        //             // Mimic the click
+        //             $('#phone-btn').click(function() {
+        //                 $('#launch_phone_next').click();
+        //                 collapseOptions();
+        //             });
+        //         } else {
+        //             $('#phone-btn').hide();
+        //             $('#expand-btn').show();
+        //         }
+        //     }
 
-            // Collapse on click
-            $(pullDown).on('click', function(e) {
-                // Prevent anchor
-                e.preventDefault();
-                // Collapse options
-                collapseOptions();
-            });
+        //     // Fire checks on scroll
+        //     // $(window).scroll(scrollCheck);
 
-            // Trigger to show again
-            $('#phone-name, #expand-btn').click(function(e) {
-                // Prevent anchor
-                e.preventDefault();
-                // Show options
-                showOptions();
-            });
-        }
+        //     // Collapse on click
+        //     $(pullDown).on('click', function(e) {
+        //         // Prevent anchor
+        //         e.preventDefault();
+        //         // Collapse options
+        //         collapseOptions();
+        //     });
+
+        //     // Trigger to show again
+        //     $('#phone-name, #expand-btn').click(function(e) {
+        //         // Prevent anchor
+        //         e.preventDefault();
+        //         // Show options
+        //         showOptions();
+        //     });
+        // }
     }
 
 });
