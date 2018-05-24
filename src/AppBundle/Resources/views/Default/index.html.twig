@@ -30,7 +30,7 @@
                     <br class="hidden-xs"> {{ main_cont }}
                 {% endif %}
             {% elseif homepageCopy is defined and homepageCopy == 'homepage-new-copy' %}
-                Mobile insurance <br class="hidden-xs hidden-sm hidden-md"> designed for you.
+                Mobile insurance <br> designed for you.
             {% else %}
                 Mobile Phone Insurance <br> How it Should Be
             {% endif %}
@@ -159,23 +159,33 @@
         <section class="section--pad homepage--what-is-so-sure">
             <div class="container">
                 <div class="row">
-                    <div class="col-md-7">
-                        <h2 class="h1">What is so-sure?</h2>
-                        {% if homepageCopy is defined and homepageCopy == 'homepage-new-copy' %}
+                    {% if homepageCopy is defined and homepageCopy == 'homepage-new-copy' %}
+                        <div class="col-md-7">
+                            <h2 class="h1">Who is so-sure?</h2>
                             <p class="lead">We’re a new kind of insurer – an insurer that’s focused on people, not profits. We saw an opportunity to make insurance better. So that’s what we did. We provide mobile insurance that’s simple, reasonable and hassle-free, so you can get back to worrying about the big stuff.</p>
-                        {% else %}
+                        </div>
+                        <div class="col-md-5">
+                            <div class="img-container">
+                                <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/so-sure_what_is_so-sure_new_old.png"
+                                     alt="What is so-sure?"
+                                     class="img-responsive img-responsive--center so-sure_homepage-what-is-so-sure lozad">
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="col-md-7">
+                            <h2 class="h1">What is so-sure?</h2>
                             <p class="lead">When insurance started in 17th century it was great: when you claimed you had customer red carpet treatment and when there were no claims, you got your money back.</p>
                             <p class="lead">This is why our founder, Dylan, who spent the past 10 years working from inside the insurance world as a private equity investor, decided to take insurance back to its roots, providing you with a modern-day insurance, how it should be.</p>
                             <p class="lead">Dylan redesigned insurance around the customer, which is why we get you back on your feet {% if replacement is defined and replacement == 'seventytwo-hours' %}in the next 1-3 working days{% else %}the next working day{% endif %} (as opposed to 4-18 days by our competition), and why you can get up to 80% of your money back, every year, when you and your friends don't claim.</p>
-                        {% endif %}
-                    </div>
-                    <div class="col-md-5">
-                        <div class="img-container">
-                            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/so-sure_what_is_so-sure_new_old.png"
-                                 alt="What is so-sure?"
-                                 class="img-responsive img-responsive--center so-sure_homepage-what-is-so-sure lozad">
                         </div>
-                    </div>
+                        <div class="col-md-5">
+                            <div class="img-container">
+                                <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/so-sure_what_is_so-sure_new_old.png"
+                                     alt="What is so-sure?"
+                                     class="img-responsive img-responsive--center so-sure_homepage-what-is-so-sure lozad">
+                            </div>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </section>
@@ -207,44 +217,67 @@
     {# Why we're better than the rest #}
     <section class="section--pad homepage--why-we-are-better">
         <div class="container">
-            <h2 class="text-center h1">Why we're better than the rest</h2>
-            <div class="row">
-                <div class="col-md-5">
-                    <div class="img-container">
-                        <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/so-sure_balloon_better.svg"
-                             class="img-responsive img-responsive--center so-sure_homepage-balloon lozad" alt="We lift you up when something bad happens">
+            {% if homepageCopy is defined and homepageCopy == 'homepage-new-copy' %}
+                {# <h2 class="text-center h1">Why we're better than the rest</h2> #}
+                <div class="row">
+                    <div class="col-md-7">
+                        <h2 class="h1">We do things differently</h2>
+                        <p class="lead">We've designed our insurance with you in mind. That's why we’ve created a product that looks after you when bad stuff happens but rewards you when you’re being careful.</p>
+                        <p class="lead">If you make a claim, our friendly team will aim to get you back up and running with a replacement phone within 24-72 hours.</p>
+                        <p class="lead">But if you don’t find yourself making a claim, we could end up returning 80% of your premium each year through our reward pot. We call this social insurance, and we believe it’s the future.</p>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="img-container">
+                            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/so-sure_balloon_better.svg"
+                                 class="img-center lozad" width="280px" alt="We lift you up when something bad happens">
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-7">
-                    <ol class="ol--blue-counter">
-                        <li>
-                            <h3 class="text-blue">We don’t hide behind the small print and painful claims process</h3>
-                            <p>We’re upfront and honest with our customers on what is covered, what is not, and what the claims process looks like. This means that there’s no nasty surprises when you have an issue with your device. And you don’t need a law degree to understand our policy - everything is explained in plain English.</p>
-                        </li>
-                        <li>
-                            <h3 class="text-blue">If something bad happens, we aim to provide {% if replacement is defined and replacement == 'seventytwo-hours' %}you with a working device within 72 hours{% else %}next working day repair or replacement{% endif %}</h3>
-                            <p>As simple as that. It sucks to be without your phone, we understand it and work with a global phone provider and world-class logistics company who help us get a model back in your hands {% if replacement is defined and replacement == 'seventytwo-hours' %}back in your hands within 24-72 hours{% else %}the next working day{% endif %}.</p>
-                        </li>
-                        <li>
-                            <h3 class="text-blue">And if you’re careful, we reward you with up to 80% of your money</h3>
-                            <p>Connect with your family and friends and get up to 80% of your money back if you and your connections don’t claim. It finally pays to be careful!</p>
-                        </li>
-                    </ol>
+            {% else %}
+                <h2 class="text-center h1">Why we're better than the rest</h2>
+                <div class="row">
+                    <div class="col-md-5">
+                        <div class="img-container">
+                            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/so-sure_balloon_better.svg"
+                                 class="img-responsive img-responsive--center so-sure_homepage-balloon lozad" alt="We lift you up when something bad happens">
+                        </div>
+                    </div>
+                    <div class="col-md-7">
+                        <ol class="ol--blue-counter">
+                            <li>
+                                <h3 class="text-blue">We don’t hide behind the small print and painful claims process</h3>
+                                <p>We’re upfront and honest with our customers on what is covered, what is not, and what the claims process looks like. This means that there’s no nasty surprises when you have an issue with your device. And you don’t need a law degree to understand our policy - everything is explained in plain English.</p>
+                            </li>
+                            <li>
+                                <h3 class="text-blue">If something bad happens, we aim to provide {% if replacement is defined and replacement == 'seventytwo-hours' %}you with a working device within 72 hours{% else %}next working day repair or replacement{% endif %}</h3>
+                                <p>As simple as that. It sucks to be without your phone, we understand it and work with a global phone provider and world-class logistics company who help us get a model back in your hands {% if replacement is defined and replacement == 'seventytwo-hours' %}back in your hands within 24-72 hours{% else %}the next working day{% endif %}.</p>
+                            </li>
+                            <li>
+                                <h3 class="text-blue">And if you’re careful, we reward you with up to 80% of your money</h3>
+                                <p>Connect with your family and friends and get up to 80% of your money back if you and your connections don’t claim. It finally pays to be careful!</p>
+                            </li>
+                        </ol>
+                    </div>
                 </div>
-            </div>
-            <div class="text-center">
-                <a href="#"
-                   class="btn btn-blue btn-pad btn-lg scroll-to"
-                   data-scroll-to-anchor=".homepage--we-compare-well"><i class="fa fa-angle-down hidden-xs" aria-hidden="true"></i> &nbsp; <strong>We're still up to 40% cheaper than traditional insurers</strong> &nbsp; <i class="fa fa-angle-down hidden-xs" aria-hidden="true"></i></a>
-            </div>
+                <div class="text-center">
+                    <a href="#"
+                       class="btn btn-blue btn-pad btn-lg scroll-to"
+                       data-scroll-to-anchor=".homepage--we-compare-well"><i class="fa fa-angle-down hidden-xs" aria-hidden="true"></i> &nbsp; <strong>We're still up to 40% cheaper than traditional insurers</strong> &nbsp; <i class="fa fa-angle-down hidden-xs" aria-hidden="true"></i></a>
+                </div>
+            {% endif %}
         </div>
     </section>
 
     {# Cover Details #}
     <section class="section--pad homepage--cover-details">
         <div class="container">
-            <h2 class="h1">Cover Details</h2>
-            <p class="lead">We give you peace of mind and cover you for:</p>
+            {% if homepageCopy is defined and homepageCopy == 'homepage-new-copy' %}
+                <h2>Come rain, shine or cracked screen, we’re here for you and your social circle</h2>
+                <p class="lead">In just a few clicks, you’ll be instantly covered for loss, theft, accidental damage, out-of-warranty breakdowns and even international travel. <br>And unlike other insurers, we cover phones that are up to three years old.</p>
+            {% else %}
+                <h2 class="h1">Cover Details</h2>
+                <p class="lead">We give you peace of mind and cover you for:</p>
+            {% endif %}
             <div class="row">
                 <div class="col-md-10 col-md-offset-1">
                     <div class="row">
@@ -423,7 +456,11 @@
         </div>
     </section>
 
-    {% include 'AppBundle::Default/_sectionComparison.html.twig' %}
+    {% if homepageCopy is defined and homepageCopy == 'homepage-new-copy' %}
+        {% include 'AppBundle::Default/_sectionComparisonAlt.html.twig' %}
+    {% else %}
+        {% include 'AppBundle::Default/_sectionComparison.html.twig' %}
+    {% endif %}
 
     {% include 'AppBundle::Default/_sectionFeedback.html.twig' %}
 
