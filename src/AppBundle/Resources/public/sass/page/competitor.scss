@@ -300,7 +300,7 @@ $gadgetcover: #E8C955;
     }
 
     &__press {
-        // background: $off-white;
+        background: $off-white;
         position: relative;
         z-index: 1;
 
@@ -317,7 +317,7 @@ $gadgetcover: #E8C955;
         // background-color: $off-white;
         position: relative;
         z-index: 11;
-        box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.05);
+        // box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.05);
 
         .media {
             margin-bottom: 30px;
@@ -328,13 +328,53 @@ $gadgetcover: #E8C955;
         }
     }
 
+
+    &__cover_next {
+        background-color: $off-white;
+
+        .col-md-4 {
+            text-align: center;
+        }
+
+        ul {
+            margin-bottom: 30px;
+
+            li {
+                font-size: 18px;
+                // font-weight: bold;
+                padding-left: 42px;
+                padding-bottom: 10px;
+                margin: 15px 0 20px;
+                background: transparent url('#{$cdn_url}/images/logo/so-sure-blue-smile.svg') no-repeat top left;
+                background-size: 30px;
+
+                small {
+                    font-weight: normal;
+                }
+
+            }
+        }
+
+        @include breakpoint(laptop) {
+            // text-align: left;
+
+            .col-md-4 {
+                text-align: left;
+
+                img {
+                    margin-top: 35px;
+                }
+            }
+        }
+    }
+
     &__why_we_are_different {
         background-color: $off-white;
         padding-bottom: 60px;
     }
 
     &_compare {
-        background: $off-white;
+        // background: $off-white;
     }
 
     &_feedback {

@@ -39,55 +39,9 @@
                 </p>
             {% endif %}
 
-            <div class="animated slideInLeft">
-                {# Phone Search #}
-                {% if device_category() == 'Mobile' %}
-                    {% set select_template = 'AppBundle:Default:selectPhoneMakeDropdown' %}
-                {% else %}
-                    {% set select_template = 'AppBundle:Default:selectPhoneMakeSearch' %}
-                {% endif %}
-                {% if phone is defined and phone %}
-                    {{ render(controller(select_template, {
-                        'type': 'ebay',
-                        'id': phone.id
-                    })) }}
-                {% else %}
-                    {{ render(controller(select_template, {
-                        'type': 'ebay',
-                    })) }}
-                {% endif %}
-                {# End Phone Search #}
-            </div>
-
-            <p class="text-center">
+{#             <p class="text-center">
                 <a href="#" class="scroll-to" data-scroll-to-anchor="#comparison-table"><i class="fa fa-chevron-down fa-2x text-blue animated slideInRight" aria-hidden="true"></i></a>
-            </p>
-
-        </div>
-    </section>
-
-    {# Press #}
-    <section class="competitor__press">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-12 text-center">
-                    <ul class="list-inline text-center">
-                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_defaqto.svg" alt="Defaqto" title="Defaqto"></li>
-                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_trustpilot.svg" alt="TrustPilot" title="TrustPilot"></li>
-                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_money.svg" alt="Money.co.uk" title="Money.co.uk"></li>
-                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_go-compare.svg" alt="Go Compare" title="Go Compare"></li>
-                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_theguardian.svg" alt="The Guardian" title="The Guardian"></li>
-                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_financial-times.svg" alt="Financial Times" title="Financial Times"></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    {# Comparison #}
-    <section class="section--pad competitor_compare" id="comparison-table">
-        <div class="container">
-            <h2 class="text-center">See How We Compare On Mobile Insurance</h2>
+            </p> #}
 
             {# Mobile Table #}
             <div class="row visible-xs-block comparison__container">
@@ -294,13 +248,84 @@
                     </tbody>
                 </table>
             </div>
+
+        </div>
+    </section>
+
+    {# Comparison #}
+{#     <section class="section--pad competitor_compare" id="comparison-table">
+        <div class="container">
+            {# <h2 class="text-center">See How We Compare On Mobile Insurance</h2> #}
+
+
+        {# </div> #}
+    {# </section> #}
+
+{#     <div class="section--pad">
+        <div class="container">
+            <div class="animated slideInLeft">
+                <h2 class="text-blue text-center">Get an Instant Quote</h2>
+                {# Phone Search #}
+               {#  {% if device_category() == 'Mobile' %}
+                    {% set select_template = 'AppBundle:Default:selectPhoneMakeDropdown' %}
+                {% else %}
+                    {% set select_template = 'AppBundle:Default:selectPhoneMakeSearch' %}
+                {% endif %}
+                {% if phone is defined and phone %}
+                    {{ render(controller(select_template, {
+                        'type': 'ebay',
+                        'id': phone.id
+                    })) }}
+                {% else %}
+                    {{ render(controller(select_template, {
+                        'type': 'ebay',
+                    })) }}
+                {% endif %} #}
+                {# End Phone Search #}
+            {# </div> #}
+        {# </div> #}
+    {# </div>  #}
+
+    {# Press #}
+    <section class="competitor__press">
+        <div class="container-fluid">
+            <h2 class="text-center">Get an Instant Quote</h2>
+            {# Phone Search #}
+            {% if device_category() == 'Mobile' %}
+                {% set select_template = 'AppBundle:Default:selectPhoneMakeDropdown' %}
+            {% else %}
+                {% set select_template = 'AppBundle:Default:selectPhoneMakeSearch' %}
+            {% endif %}
+            {% if phone is defined and phone %}
+                {{ render(controller(select_template, {
+                    'type': 'ebay',
+                    'id': phone.id
+                })) }}
+            {% else %}
+                {{ render(controller(select_template, {
+                    'type': 'ebay',
+                })) }}
+            {% endif %}
+            {# End Phone Search #}
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <ul class="list-inline text-center">
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_defaqto.svg" alt="Defaqto" title="Defaqto"></li>
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_trustpilot.svg" alt="TrustPilot" title="TrustPilot"></li>
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_money.svg" alt="Money.co.uk" title="Money.co.uk"></li>
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_go-compare.svg" alt="Go Compare" title="Go Compare"></li>
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_theguardian.svg" alt="The Guardian" title="The Guardian"></li>
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_financial-times.svg" alt="Financial Times" title="Financial Times"></li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </section>
 
     {# Whats Covered #}
     <section class="section--pad competitor__cover">
         <div class="container">
-            <h2 class="text-center">What's Covered</h2>
+            <h2 class="text-center">Protect Your Phone From..</h2>
             <div class="row">
                 <div class="col-sm-6">
                     <div class="media">
@@ -377,30 +402,31 @@
     </section>
 
 
-    {# Why we're better than the rest #}
-    <section class="section--pad competitor__why_we_are_different">
+    <section class="section--pad competitor__cover_next">
         <div class="container">
             <div class="row">
-                <div class="col-md-10 col-md-offset-1">
-                    <h2 class="text-center">Why We’re Different</h2>
-                    <ol class="ol--blue-counter">
-                        <li>
-                            <h3 class="text-blue">Terms &amp; Conditions that are designed with you in mind. Simple, fair and transparent</h3>
-                            <p class="lead">How many times have you heard 'sorry, but our terms state...' or 'as per clause 2.0 of your contract'?  We on the other hand, lay everything out on the table.  Should you want to read the terms, you’ll find easy to read and understand. See for yourself {insert link}.</p>
-                        </li>
-                        <li>
-                            <h3 class="text-blue">Fastest Phone Replacement.</h3>
-                            <p class="lead">If you make a claim, our friendly team will aim to get you back up and running with a replacement phone within 24-72 hours. But if you don’t find yourself making a claim, we could end up returning 80% of your premium each year through our reward pot. Find out more here {insert link}.</p>
-                        </li>
-                        <li>
-                            <h3 class="text-blue">Protecting you when you make a claim, and rewarding you when you don't</h3>
-                            <p class="lead">Here at so-sure, we’re all about sharing the love. That’s why we’ve introduced the Reward Pot. By joining forces with your most careful friends and family members, you could see 80% of your insurance premium reimbursed every year. Yes, really.</p>
-                        </li>
-                    </ol>
+                <div class="col-md-4">
+                    <img src="{{ cdn_url }}/images/mobile_mike.svg" alt="Mobile Mike" class="">
+                </div>
+                <div class="col-md-8">
+                    <h2>Premium Cover. Premium Service</h2>
+                    <ul class="list-unstyled">
+                        <li>Next working day replacement</li>
+                        <li>Cashback when you and your connections don't claim</li>
+                        <li>Low excess from just &pound;50 when validated with pic-sure</li>
+                        <li>Instant Cover</li>
+                        <li>Refurbished and second-hand devices up to 3 years old are covered</li>
+                    </ul>
                 </div>
             </div>
+            <div class="text-center">
+                <a href="#" class="btn btn-green btn-pad btn-lg h2 sosure-track" data-toggle="modal" data-target="#quoteModal" data-event="money-cta">Get Insured</a>
+            </div>
         </div>
+        <div class="section--pad"></div>
     </section>
+
+    {# <div class="section--pad"></div> #}
 
     {# Page Modals #}
     {% include 'AppBundle::Default/modalQuote.html.twig' with {'selectPhoneMakeType': 'other_pages'} %}
