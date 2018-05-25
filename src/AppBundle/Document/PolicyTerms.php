@@ -24,6 +24,7 @@ class PolicyTerms extends PolicyDocument
     // Same as version 2, but released 2 Nov 2017
     const VERSION_4 = 'Version 4 Nov 2017';
 
+    // Same as version 4, but update for GDPR
     const VERSION_5 = 'Version 5 May 2018';
 
     public static $allVersions = [
