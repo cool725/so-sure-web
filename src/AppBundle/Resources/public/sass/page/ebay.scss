@@ -284,6 +284,7 @@ $gadgetcover: #E8C955;
     &__hero {
         position: relative;
         z-index: 10;
+
         h1 {
             font-size: 30px;
             margin-top: 30px;
@@ -296,14 +297,61 @@ $gadgetcover: #E8C955;
         .search-phone-form {
             margin: 25px auto;
         }
+
+        @include breakpoint(tablet) {
+            padding-bottom: 90px;
+        }
     }
 
     &__hero_o {
+        background: rgb(0, 63, 199) url('#{$cdn_url}/images/landing_pages/broken_screen_opacity_hero.png') no-repeat;
+        background-size: 500px;
+        background-position: top right;
 
+        @include breakpoint(tablet) {
+            background-size: 800px;
+        }
+
+        h1, p {
+            color: $white;
+        }
     }
 
     &__hero_1 {
+        background: rgb(30, 35, 50);
+        background-image:
+            url('#{$cdn_url}/images/landing_pages/circle_hero.svg'),
+            url('#{$cdn_url}/images/landing_pages/circle_hero.svg'),
+            url('#{$cdn_url}/images/landing_pages/circle_hero.svg'),
+            url('#{$cdn_url}/images/landing_pages/circle_hero.svg');
+        background-position:
+            5% -10%,
+            80% 20%,
+            10% 130%,
+            105% 120%;
+        background-size:
+            90px,
+            100px,
+            80px,
+            100px;
+        background-repeat: no-repeat;
 
+        @include breakpoint(tablet) {
+            background-position:
+                5% -50%,
+                89% -25%,
+                10% 140%,
+                105% 120%;
+            background-size:
+                190px,
+                140px,
+                200px,
+                180px;
+        }
+
+        h1, p {
+            color: $white;
+        }
     }
 
     &__hero_2 {
@@ -314,11 +362,62 @@ $gadgetcover: #E8C955;
         background: $off-white;
         position: relative;
         z-index: 1;
+        margin: 0 0 0;
 
         img {
-            width: 100px;
+            opacity: 0.8;
 
-            @include breakpoint(tablet) {
+            &:hover {
+                opacity: 1;
+            }
+        }
+
+        &_defaqto {
+            width: 100px;
+        }
+
+        &_trustpilot {
+            width: 100px;
+        }
+
+        &_money {
+            width: 100px;
+        }
+
+        &_gocompare {
+            width: 100px;
+        }
+
+        &_theguardian {
+            width: 100px;
+        }
+
+        &_financialtimes {
+            width: 100px;
+        }
+
+        @include breakpoint(tablet) {
+            &_defaqto {
+                width: 140px;
+            }
+
+            &_trustpilot {
+                width: 140px;
+            }
+
+            &_money {
+                width: 140px;
+            }
+
+            &_gocompare {
+                width: 200px;
+            }
+
+            &_theguardian {
+                width: 200px;
+            }
+
+            &_financialtimes {
                 width: 200px;
             }
         }
@@ -413,7 +512,7 @@ $gadgetcover: #E8C955;
 // TODO: Move!
 .dropdown-phone-form {
     max-width: 450px;
-    background-color: $white;
+    // background-color: $white;
     padding: 0;
     position: relative;
     margin: 0 auto;
@@ -422,7 +521,7 @@ $gadgetcover: #E8C955;
 
 .search-phone-form--homepage {
     max-width: 450px;
-    background-color: $white;
+    // background-color: $white;
     padding: 0;
     position: relative;
     margin: 0 auto;
@@ -641,4 +740,8 @@ $gadgetcover: #E8C955;
     li.active {
         background: $dark-grey;
     }
+}
+
+.footer-homepage {
+    padding-top: 40px;
 }
