@@ -21,7 +21,7 @@
 
 {% block body %}
 
-    <section class="section--pad ebay__hero">
+    <section class="section--pad ebay__hero {% if hero_class is defined and hero_class %}{{ hero_class }}{% else %}ebay__hero_0{% endif %}">
         <div class="container">
             <h1 class="text-center text-blue">
                 {% if main_title is defined and main_title %}
@@ -30,7 +30,7 @@
                     Mobile insurance you deserve.
                 {% endif %}
             </h1>
-            <p class="big-text text-center">We're a new kind of insurer that's focused on people, <span class="ebay_red">not profits</span>. Providing insurance that's <span class="ebay_blue">reliable</span>, <span class="ebay_amber">rewarding</span> and altogether <span class="ebay_green">better</span>.</p>
+            <p class="big-text text-center"><span class="ebay_red">Insurance</span> that's <span class="ebay_blue">reliable</span>, <span class="ebay_amber">rewarding</span> and altogether <span class="ebay_green">better</span>.</p>
 
             <div class="animated slideInLeft">
                 {# Phone Search #}

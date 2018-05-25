@@ -171,6 +171,7 @@ class DefaultController extends BaseController
 
         $data = [
             'main_title' => 'Honest Insurance for Honest People',
+            'hero_class' => 'ebay__hero__1',
         ];
 
         $exp = $this->sixpack(
