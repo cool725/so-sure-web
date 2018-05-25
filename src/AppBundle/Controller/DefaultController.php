@@ -211,6 +211,31 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/comparison", name="comparison")
+     * @Template
+     */
+    public function soSureCompetitors(Request $request)
+    {
+        $data = [
+            'headline'     => 'Mobile Insurance Beyond Compare',
+            'sub_heading'  => 'But if you do want to compare…',
+            'sub_heading2' => 'here’s how we stack up against the competition',
+        ];
+
+        $exp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_COMPETITOR_LANDING,
+            ['homepage', 'competitor-landing']
+        );
+
+        if ($exp == 'competitor-landing') {
+            return $this->render('AppBundle:Default:indexCompetitor.html.twig', $data);
+        } else {
+            return $this->redirectToRoute('homepage');
+        }
+    }
+
+    /**
      * @Route("/reimagined", name="reimagined")
      * @Route("/hasslefree", name="hasslefree")
      * @Template
