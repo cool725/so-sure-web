@@ -299,7 +299,7 @@ $gadgetcover: #E8C955;
         }
 
         @include breakpoint(tablet) {
-            padding-bottom: 90px;
+            padding-bottom: 110px;
         }
     }
 
@@ -355,22 +355,55 @@ $gadgetcover: #E8C955;
     }
 
     &__hero_2 {
+        background: rgb(30, 35, 50);
+        background-image:
+            url('#{$cdn_url}/images/landing_pages/tria_a.svg'),
+            url('#{$cdn_url}/images/landing_pages/tria_b.svg'),
+            url('#{$cdn_url}/images/landing_pages/tria_b.svg'),
+            url('#{$cdn_url}/images/landing_pages/tria_a.svg');
+        background-position:
+            5% -10%,
+            90% -20%,
+            10% 100%,
+            105% 120%;
+        background-size:
+            140px,
+            120px,
+            100px,
+            150px;
+        background-repeat: no-repeat;
 
+        @include breakpoint(tablet) {
+            background-position:
+                5% -110%,
+                89% -70%,
+                -3% 130%,
+                right -100px bottom -100px;
+            background-size:
+                300px,
+                240px,
+                230px,
+                280px;
+        }
+
+        h1, p {
+            color: $white;
+        }
     }
 
     &__press {
         background: $off-white;
         position: relative;
         z-index: 1;
-        margin: 0 0 0;
+        margin: 0;
 
-        img {
-            opacity: 0.8;
+        // img {
+        //     opacity: 0.8;
 
-            &:hover {
-                opacity: 1;
-            }
-        }
+        //     &:hover {
+        //         opacity: 1;
+        //     }
+        // }
 
         &_defaqto {
             width: 100px;
@@ -423,7 +456,16 @@ $gadgetcover: #E8C955;
         }
     }
 
+    &__why {
+        background-color: $off-white ;
+    }
+
     &__cover {
+        p {
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
 
         .media {
             margin-bottom: 30px;
