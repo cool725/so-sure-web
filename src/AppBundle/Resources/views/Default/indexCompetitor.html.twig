@@ -274,78 +274,7 @@
     <section class="section--pad competitor__cover">
         <div class="container">
             <h2 class="text-center">Protect Your Phone From..</h2>
-            <div class="row">
-                <div class="col-sm-6">
-                    <div class="media">
-                        <div class="media-left media-middle">
-                            <img src="{{ cdn_url }}/images/homepage/so-sure_theft.svg" alt="Theft" width="120px">
-                        </div>
-                        <div class="media-body">
-                            <h4 class="media-heading">Theft</h4>
-                            <p>We hate thieves as much as you do! We've got your back</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="media">
-                        <div class="media-left media-middle">
-                            <img src="{{ cdn_url }}/images/homepage/so-sure_loss.svg" alt="Loss" width="120px">
-                        </div>
-                        <div class="media-body">
-                            <h4 class="media-heading">Loss</h4>
-                            <p>A lot of companies make you pay more to cover loss. Not us, it's all included <strong><u>as standard</u></strong></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm-6">
-                    <div class="media">
-                        <div class="media-left media-middle">
-                            <img src="{{ cdn_url }}/images/homepage/so-sure_accidental_damage.svg" alt="Accidental Damage" width="120px">
-                        </div>
-                        <div class="media-body">
-                            <h4 class="media-heading">Accidental Damage</h4>
-                            <p>Dropped it down the loo? Dropped it while walking into someone? We've got your back</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="media">
-                        <div class="media-left media-middle">
-                            <img src="{{ cdn_url }}/images/homepage/so-sure_out_of_warranty_breakdown.svg" alt="Out of Warranty Breakdown" width="120px">
-                        </div>
-                        <div class="media-body">
-                            <h4 class="media-heading">Out of Warranty Breakdown</h4>
-                            <p>We've got your back for cover outside of your warranty period</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm-6">
-                    <div class="media">
-                        <div class="media-left media-middle">
-                            <img src="{{ cdn_url }}/images/homepage/so-sure_unauthorised_network_charges.svg" alt="Unauthorised Network Charges" width="120px">
-                        </div>
-                        <div class="media-body">
-                            <h4 class="media-heading">Unauthorised Network Charges</h4>
-                            <p>We've got your back for up to &pound;1000 of charges you shouldn't be paying</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <div class="media">
-                        <div class="media-left media-middle">
-                            <img src="{{ cdn_url }}/images/homepage/so-sure_worldwide_cover.svg" alt="accessories" width="120px">
-                        </div>
-                        <div class="media-body">
-                            <h4 class="media-heading">Trips Abroad</h4>
-                            <p>We’ll cover you on your holidays -  anywhere on the planet for up to 90 days</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {% include 'AppBundle::Default/_whatsCovered.html.twig' %}
         </div>
     </section>
 
