@@ -258,6 +258,11 @@ class PurchaseController extends BaseController
         /** @var \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface $csrf */
         $csrf = $this->get('security.csrf.token_manager');
 
+        // Convert point from quote
+        $this->get('app.sixpack')->convert(
+            SixpackService::EXPERIMENT_MONEY_BACK_GUARANTEE
+        );
+
         $moneyBackGuarantee = $this->sixpack(
             $request,
             SixpackService::EXPERIMENT_MONEY_BACK_GUARANTEE,
@@ -580,6 +585,11 @@ class PurchaseController extends BaseController
                 }
             }
         }
+
+        // Convert point from address
+        $this->get('app.sixpack')->convert(
+            SixpackService::EXPERIMENT_MONEY_BACK_GUARANTEE
+        );
 
         $moneyBackGuarantee = $this->sixpack(
             $request,
