@@ -65,6 +65,8 @@ class SixpackService
     // New Exp Competitor Landing
     const EXPERIMENT_COMPETITOR_LANDING = 'competitor-landing';
     const EXPERIMENT_TRUSTPILOT_REVIEW = 'trustpilot';
+    // New Test Single Mem Option
+    const EXPERIMENT_MEMORY_OPTIONS = 'single-progressive-dropdown';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';
@@ -95,6 +97,8 @@ class SixpackService
         // New Exp Competitor Landing
         self::EXPERIMENT_COMPETITOR_LANDING,
         self::EXPERIMENT_TRUSTPILOT_REVIEW,
+        // New Test Single Mem Option
+        self::EXPERIMENT_MEMORY_OPTIONS,
     ];
 
     public static $authExperiments = [
@@ -140,6 +144,8 @@ class SixpackService
         self::EXPERIMENT_HOMEPAGE_AA_V2,
         self::EXPERIMENT_DOB,
         self::EXPERIMENT_TRUSTPILOT_REVIEW,
+        // New Test Single Mem Option
+        self::EXPERIMENT_MEMORY_OPTIONS,
     ];
 
     /** @var LoggerInterface */
