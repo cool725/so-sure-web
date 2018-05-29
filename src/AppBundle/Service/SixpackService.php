@@ -62,6 +62,8 @@ class SixpackService
     const EXPERIMENT_EBAY_LANDING_1 = 'ebay-landing-1';
     const EXPERIMENT_EBAY_LANDING_2 = 'ebay-landing-2';
     const EXPERIMENT_NEW_WELCOME_MODAL = 'new-welcome-modal';
+    // New Exp Competitor Landing
+    const EXPERIMENT_COMPETITOR_LANDING = 'competitor-landing';
     const EXPERIMENT_TRUSTPILOT_REVIEW = 'trustpilot';
     // New Test Single Mem Option
     const EXPERIMENT_MEMORY_OPTIONS = 'single-progressive-dropdown';
@@ -92,6 +94,8 @@ class SixpackService
         self::EXPERIMENT_EBAY_LANDING,
         self::EXPERIMENT_EBAY_LANDING_1,
         self::EXPERIMENT_EBAY_LANDING_2,
+        // New Exp Competitor Landing
+        self::EXPERIMENT_COMPETITOR_LANDING,
         self::EXPERIMENT_TRUSTPILOT_REVIEW,
         // New Test Single Mem Option
         self::EXPERIMENT_MEMORY_OPTIONS,
@@ -127,6 +131,8 @@ class SixpackService
         self::EXPERIMENT_EBAY_LANDING,
         self::EXPERIMENT_EBAY_LANDING_1,
         self::EXPERIMENT_EBAY_LANDING_2,
+        // New Exp Competitor Landing
+        self::EXPERIMENT_COMPETITOR_LANDING,
     ];
 
     /**

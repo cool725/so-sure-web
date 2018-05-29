@@ -169,6 +169,8 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
         }
         $sixMonthsAgo = new \DateTime();
         $sixMonthsAgo = $sixMonthsAgo->sub(new \DateInterval('P6M'));
+        $sevenMonthsAgo = new \DateTime();
+        $sevenMonthsAgo = $sevenMonthsAgo->sub(new \DateInterval('P7M'));
         $adjusted = [];
         for ($i = 0; $i < 5; $i++) {
             $phone = $phones[rand(0, count($phones) - 1)];
@@ -180,7 +182,7 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
             if ($phone->getSalvaMiniumumBinderMonthlyPremium() < $phone->getCurrentPhonePrice()->getGwp() - 0.30) {
                 $adjustedPrice = $phone->getCurrentPhonePrice()->getGwp() - 0.30;
             }
-            $phone->changePrice($adjustedPrice, $sixMonthsAgo, null, null, $sixMonthsAgo);
+            $phone->changePrice($adjustedPrice, $sixMonthsAgo, null, null, $sevenMonthsAgo);
         }
 
         // Sample user for apple

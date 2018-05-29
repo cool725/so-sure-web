@@ -6,7 +6,7 @@
 {% set homepage = 1 %}
 {% set useDropdownSearch = 1 %}
 
-{% block title %}so-sure - Welcome to Social Insurance in partnership with Money{% endblock %}
+{% block title %}so-sure - Welcome to Social Insurance in partnership with eBay{% endblock %}
 {% block meta %}
     <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
 {% endblock %}
@@ -15,18 +15,29 @@
     {{ parent() }}
     {% stylesheets output='css/*.css'
     'components/animate.css/animate.min.css'
-    '@AppBundle/Resources/public/sass/page/money.scss'
+    '@AppBundle/Resources/public/sass/page/competitor.scss'
  %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
 {% block body %}
 
-    <section class="section--pad money__hero">
+    <section class="section--pad competitor__hero">
         <div class="container">
-            <h3 class="text-center h-light">in partnership with</h3>
-            <img src="{{ cdn_url }}/images/moneycouk.png" alt="Money" class="money-img img-center" width="240px">
-
-            <h1 class="text-blue text-center">See How We Compare On Mobile Insurance <br><small class="h-light">with so-sure, we've got you covered</small></h1>
+            <h1 class="text-center text-blue">
+                {% if headline is defined and headline %}
+                    {{ headline }}
+                {% else %}
+                    Mobile insurance you deserve.
+                {% endif %}
+            </h1>
+            {% if sub_heading is defined and sub_heading %}
+                <p class="big-text text-center">
+                    {{ sub_heading }}
+                    {% if sub_heading2 is defined and sub_heading2 %}
+                        <br> {{ sub_heading2 }}
+                    {% endif %}
+                </p>
+            {% endif %}
 
             {# Mobile Table #}
             <div class="row visible-xs-block comparison__container">
@@ -166,22 +177,22 @@
                             <th with="25%" class="so-sure border-left-right">
                                 <img src="{{ cdn_url }}/images/logo/so-sure_so-sure-full-logo-white-flat.svg"
                                      alt="so-sure"
-                                     width="120px">
+                                     width="110px">
                             </th>
                             <th class="protectyourbubble text-white" width="25%">
                                 <img src="{{ cdn_url }}/images/competitor_logos/so-sure-protect-your-bubble-logo.svg"
                                      alt="Protectyourbubble"
-                                     width="120px">
+                                     width="100px">
                             </th>
                             <th class="loveitcoverit text-white" width="25%">
                                 <img src="{{ cdn_url }}/images/competitor_logos/so-sure-love-it-cover-it-logo.svg"
                                      alt="Loveitcoverit"
-                                     width="120px">
+                                     width="100px">
                             </th>
                             <th class="gadgetcover" width="25%">
                                 <img src="{{ cdn_url }}/images/competitor_logos/so-sure-gadget-cover-logo.svg"
                                      alt="Gadget Cover"
-                                     width="80px">
+                                     width="70px">
                             </th>
                         </tr>
                     </thead>
@@ -233,73 +244,66 @@
                     </tbody>
                 </table>
             </div>
+
             <div class="text-center">
-                <a href="#" class="btn btn-green btn-pad btn-lg h2 sosure-track" data-toggle="modal" data-target="#quoteModal" data-event="money-cta">Get Insured</a>
+                <a href="#" class="btn btn-green btn-pad btn-lg h1 sosure-track" data-toggle="modal" data-target="#quoteModal" data-event="money-cta">GET INSURED</a>
             </div>
+
         </div>
     </section>
 
     {# Press #}
-    <section class="section--pad money__press">
+    <section class="competitor__press">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12 text-center">
-                    <h5>As featured in</h5>
-                    <img src="{{ cdn_url }}/images/moneycouk.png" alt="Money" class="money-img">
-                    <ul class="list-inline press-list text-center">
-                        <li class="press-img" title="The Guardian - Why Facebook and Microsoft say chatbots are the talk of the town"></li>
-                        <li class="press-img" title="Financial Times - Innovation to watch: Friends based insurance"></li>
-                        <li class="press-img" title="Insurance Post - so-sure to launch revolutionary social peer-to-peer mobile insurance app"></li>
-                        <li class="press-img" title="As seen on Money.co.uk"></li>
-                        <li class="press-img" title="Digital Top 50 Awards 2016 - B2C Start-up"></li>
-                        {# <li class="press-img" title="Insurance Choice Awards 2017 - ‘Best Insurance App' + 'Innovation of the Year' categories 2017"></li> #}
+                    <ul class="list-inline text-center">
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_defaqto.svg" alt="Defaqto" title="Defaqto"></li>
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_trustpilot.svg" alt="TrustPilot" title="TrustPilot"></li>
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_money.svg" alt="Money.co.uk" title="Money.co.uk"></li>
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_go-compare.svg" alt="Go Compare" title="Go Compare"></li>
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_theguardian.svg" alt="The Guardian" title="The Guardian"></li>
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_financial-times.svg" alt="Financial Times" title="Financial Times"></li>
                     </ul>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="section--pad money__cover">
+    {# Whats Covered #}
+    <section class="section--pad competitor__cover">
         <div class="container">
-            <h2 class="text-center">What's Covered</h2>
+            <h2 class="text-center">Protect Your Phone From..</h2>
             {% include 'AppBundle::Default/_whatsCovered.html.twig' %}
         </div>
     </section>
 
-    <section class="section--pad money__cover_next">
+
+    <section class="section--pad competitor__cover_next">
         <div class="container">
             <div class="row">
                 <div class="col-md-4">
                     <img src="{{ cdn_url }}/images/mobile_mike.svg" alt="Mobile Mike" class="">
                 </div>
                 <div class="col-md-8">
-                    <h2 class="text-blue">Premium Cover. Premium Service</h2>
+                    <h2>Premium Cover. Premium Service</h2>
                     <ul class="list-unstyled">
                         <li>Next working day replacement</li>
                         <li>Cashback when you and your connections don't claim</li>
                         <li>Low excess from just &pound;50 when validated with pic-sure</li>
                         <li>Instant Cover</li>
+                        <li>Refurbished and second-hand devices up to 3 years old are covered</li>
                     </ul>
                 </div>
             </div>
             <div class="text-center">
-                <a href="#" class="btn btn-green btn-pad btn-lg h2 sosure-track" data-toggle="modal" data-target="#quoteModal" data-event="money-cta">Get Insured</a>
+                <a href="#" class="btn btn-green btn-pad btn-lg h1 sosure-track" data-toggle="modal" data-target="#quoteModal" data-event="money-cta">GET INSURED</a>
             </div>
         </div>
+        <div class="section--pad"></div>
     </section>
 
-    <section class="section--pad money__feedback">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-8 col-md-offset-2">
-                    <h3 class="text-center">What Our Customers Say</h3>
-                    <div class="speech-bubble animated fadeInLeft clearfix"><mark>Superb service with my first use of so-sure. I couldn't be happier with the way my claim was handled and I got my phone the next day 😁</mark><br><br>
-                    <img src="{{ cdn_url }}/images/feedback/so-sure_feedback_temp.png" alt="" class="img-circle" width="120px;">
-                    <br><small>Ben Allsopp General Manager, Living in London.</small></div>
-                </div>
-            </div>
-        </div>
-    </section>
+    {# <div class="section--pad"></div> #}
 
     {# Page Modals #}
     {% include 'AppBundle::Default/modalQuote.html.twig' with {'selectPhoneMakeType': 'other_pages'} %}
@@ -317,7 +321,7 @@
     '@AppBundle/Resources/public/js/Default/images.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMakeSearch.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMakeDropdown.js'
-    '@AppBundle/Resources/public/js/Default/money.js'
+    '@AppBundle/Resources/public/js/Default/competitor.js'
  %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
