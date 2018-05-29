@@ -156,7 +156,7 @@
 
                 <div class="form-group {% if form_errors(purchase_form.imei) %}has-error{% endif %}">
                     {{ form_label(purchase_form.imei, 'IMEI Number:', { 'label_attr': {'class': 'sr-only'} }) }}
-                    {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control imei', 'placeholder':'IMEI Number'}}) }}
+                    {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control imei', 'placeholder':'IMEI Number', 'data-hj-suppress' : ''}}) }}
                     <label class="samsung-imei">Numbers only please (no / required)</label>
                     <div class="help-block with-errors">{{ form_errors(purchase_form.imei) }}</div>
                     <div class="help-block text-center">
@@ -171,7 +171,7 @@
                 {% if purchase_form.serialNumber is defined %}
                     <div class="form-group {% if form_errors(purchase_form.serialNumber) %}has-error{% endif %}">
                         {{ form_label(purchase_form.serialNumber, 'Serial Number:', { 'label_attr': {'class': 'sr-only'} }) }}
-                        {{ form_widget(purchase_form.serialNumber, {'attr':{'class':'form-control',  'pattern': '[a-zA-Z0-9]{5,32}', 'title': 'Enter a valid serial number', 'placeholder':'Serial Number'}}) }}
+                        {{ form_widget(purchase_form.serialNumber, {'attr':{'class':'form-control',  'pattern': '[a-zA-Z0-9]{5,32}', 'title': 'Enter a valid serial number', 'placeholder':'Serial Number', 'data-hj-suppress' : ''}}) }}
                         <div class="help-block with-errors">{{ form_errors(purchase_form.serialNumber) }}</div>
                         <div class="help-block text-center">
                             <a href="#"

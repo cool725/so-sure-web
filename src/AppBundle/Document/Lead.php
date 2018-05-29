@@ -79,6 +79,11 @@ class Lead
         return $this->id;
     }
 
+    public function getCreated()
+    {
+        return $this->created;
+    }
+
     public function getMobileNumber()
     {
         return $this->mobileNumber;
@@ -132,5 +137,14 @@ class Lead
     public function setIntercomId($intercomId)
     {
         $this->intercomId = $intercomId;
+    }
+
+    public function populateUser(User $user)
+    {
+        $user->setEmail($this->getEmail());
+        $user->setCreated($this->getCreated());
+        $user->setIntercomId($this->getIntercomId());
+        // Commenting out as could cause duplicate mobile numbers, which could cause login issues
+        // $user->setMobileNumber($this->getMobileNumber());
     }
 }

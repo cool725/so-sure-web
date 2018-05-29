@@ -524,9 +524,15 @@ class PhoneInsuranceController extends BaseController
             );
 
             $this->get('app.sixpack')->convert(
-                SixpackService::EXPERIMENT_DEFACTO
+                SixpackService::EXPERIMENT_TRUSTPILOT_REVIEW
             );
         }
+      
+        $trustpilot = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_TRUSTPILOT_REVIEW,
+            ['no-trustpilot', 'trustpilot']
+        );
 
         $moneyBackGuarantee = $this->sixpack(
             $request,
@@ -553,12 +559,13 @@ class PhoneInsuranceController extends BaseController
                 ],
                 ['memory' => 'asc']
             ),
-            'comparision'        => $phone->getComparisions(),
-            'comparision_max'    => $maxComparision,
-            'coming_soon'        => $phone->getCurrentPhonePrice() ? false : true,
-            'days_test'          => $daysTest,
-            'slider_test'        => 'slide-me',
-            'intercom_test'      => $expIntercom,
+            'comparision'     => $phone->getComparisions(),
+            'comparision_max' => $maxComparision,
+            'coming_soon'     => $phone->getCurrentPhonePrice() ? false : true,
+            'days_test'       => $daysTest,
+            'slider_test'     => 'slide-me',
+            'intercom_test'   => $expIntercom,
+            'trustpilot'     => $trustpilot,
             'moneyBackGuarantee' => $moneyBackGuarantee,
         );
 

@@ -86,10 +86,10 @@ class DefaultController extends BaseController
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
 
-        $defacto = $this->sixpack(
+        $trustpilot = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_DEFACTO,
-            ['no-defacto', 'defacto']
+            SixpackService::EXPERIMENT_TRUSTPILOT_REVIEW,
+            ['no-trustpilot', 'trustpilot']
         );
 
         $replacement = $this->sixpack(
@@ -110,7 +110,7 @@ class DefaultController extends BaseController
             // Make sure to check homepage landing below too
             'replacement'         => $replacement,
             'picsure'             => $picsure,
-            'defacto'             => $defacto,
+            'trustpilot'          => $trustpilot,
             'referral'            => $referral,
             'phone'               => $this->getQuerystringPhone($request),
         );
@@ -171,6 +171,7 @@ class DefaultController extends BaseController
 
         $data = [
             'main_title' => 'Honest Insurance for Honest People',
+            'hero_class' => 'ebay__hero_1',
         ];
 
         $exp = $this->sixpack(
@@ -195,6 +196,7 @@ class DefaultController extends BaseController
 
         $data = [
             'main_title' => 'Insurance You Deserve',
+            'hero_class' => 'ebay__hero_2',
         ];
 
         $exp = $this->sixpack(
@@ -205,6 +207,31 @@ class DefaultController extends BaseController
 
         if ($exp == 'ebay-landing') {
             return $this->render('AppBundle:Default:indexEbay.html.twig', $data);
+        } else {
+            return $this->redirectToRoute('homepage');
+        }
+    }
+
+    /**
+     * @Route("/comparison", name="comparison")
+     * @Template
+     */
+    public function soSureCompetitors(Request $request)
+    {
+        $data = [
+            'headline'     => 'Mobile Insurance Beyond Compare',
+            'sub_heading'  => 'But if you do want to compare…',
+            'sub_heading2' => 'here’s how we stack up against the competition',
+        ];
+
+        $exp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_COMPETITOR_LANDING,
+            ['homepage', 'competitor-landing']
+        );
+
+        if ($exp == 'competitor-landing') {
+            return $this->render('AppBundle:Default:indexCompetitor.html.twig', $data);
         } else {
             return $this->redirectToRoute('homepage');
         }
@@ -303,6 +330,12 @@ class DefaultController extends BaseController
             }
         }
 
+        $memoptions = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_MEMORY_OPTIONS,
+            ['three-dropdowns', 'single-progressive-dropdown']
+        );
+
         // throw new \Exception(print_r($this->getPhonesArray(), true));
 
         return [
@@ -310,6 +343,7 @@ class DefaultController extends BaseController
             'phones' => $this->getPhonesArray(),
             'type' => $type,
             'phone' => $phone,
+            'memoptions' => $memoptions,
         ];
     }
 

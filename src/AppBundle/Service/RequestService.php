@@ -338,6 +338,9 @@ class RequestService
         if (mb_stripos($userAgent, 'Go-http-client') !== false) {
             return true;
         }
+        if (mb_stripos($userAgent, 'Google-Apps-Script') !== false) {
+            return true;
+        }
 
         return false;
     }

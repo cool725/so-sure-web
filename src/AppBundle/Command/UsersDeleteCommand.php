@@ -97,7 +97,7 @@ class UsersDeleteCommand extends BaseCommand
             }
 
             if (!$skipDelete && $user->shouldDelete()) {
-                $fosUser->deleteUser($user);
+                $fosUser->deleteUser($user, false);
                 $output->writeln(sprintf(
                     'Deleted user %s (%s)',
                     $user->getEmail(),

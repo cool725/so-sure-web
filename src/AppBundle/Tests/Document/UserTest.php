@@ -576,6 +576,17 @@ class UserTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($user->shouldDelete(new \DateTime('2024-07-03')));
     }
 
+    public function testShouldDeleteRoles()
+    {
+        foreach ([User::ROLE_CLAIMS, User::ROLE_EMPLOYEE, User::ROLE_ADMIN] as $role) {
+            $user = new User();
+            $user->setCreated(new \DateTime('2016-01-01'));
+            $this->assertTrue($user->shouldDelete(new \DateTime('2017-07-03')));
+
+            $user->addRole($role);
+            $this->assertFalse($user->shouldDelete(new \DateTime('2017-07-03')));
+        }
+    }
 
     public function testShouldDeletePartialPolicy()
     {

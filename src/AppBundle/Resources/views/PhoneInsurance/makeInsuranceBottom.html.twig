@@ -43,11 +43,11 @@
             {{ render(controller(select_template, {
                 'type': 'homepage-sticky',
                 'id': phone.id
-            })) }}
+            }|merge(app.request.query.all))) }}
         {% else %}
             {{ render(controller(select_template, {
                 'type': 'homepage-sticky',
-            })) }}
+            }|merge(app.request.query.all))) }}
         {% endif %}
         {# End Phone Search #}
 

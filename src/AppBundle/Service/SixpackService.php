@@ -54,7 +54,6 @@ class SixpackService
     const EXPERIMENT_STEP_3 = 'step-3-payment-new';
     const EXPERIMENT_PURCHASE_FLOW_BACS = 'purchase-flow-bacs';
     const EXPERIMENT_CPC_QUOTE_HOMEPAGE = 'cpc-quote-or-homepage';
-    const EXPERIMENT_DEFACTO = 'defacto';
     const EXPERIMENT_DOB = 'purchase-funnel-dob-dropdown';
     const EXPERIMENT_72_REPLACEMENT = 'seventytwo-hours';
     const EXPERIMENT_MONEY_LANDING = 'money-landing';
@@ -63,6 +62,12 @@ class SixpackService
     const EXPERIMENT_EBAY_LANDING_1 = 'ebay-landing-1';
     const EXPERIMENT_EBAY_LANDING_2 = 'ebay-landing-2';
     const EXPERIMENT_NEW_WELCOME_MODAL = 'new-welcome-modal';
+    // New Exp Competitor Landing
+    const EXPERIMENT_COMPETITOR_LANDING = 'competitor-landing';
+    const EXPERIMENT_TRUSTPILOT_REVIEW = 'trustpilot';
+    // New Test Single Mem Option
+    const EXPERIMENT_MEMORY_OPTIONS = 'single-progressive-dropdown';
+    // New Test Money Back Guarantee
     const EXPERIMENT_MONEY_BACK_GUARANTEE = 'money-back-guarantee';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
@@ -84,7 +89,6 @@ class SixpackService
         self::EXPERIMENT_STEP_3,
         self::EXPERIMENT_PURCHASE_FLOW_BACS,
         self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
-        self::EXPERIMENT_DEFACTO,
         self::EXPERIMENT_DOB,
         self::EXPERIMENT_72_REPLACEMENT,
         self::EXPERIMENT_MONEY_LANDING,
@@ -92,7 +96,13 @@ class SixpackService
         self::EXPERIMENT_EBAY_LANDING,
         self::EXPERIMENT_EBAY_LANDING_1,
         self::EXPERIMENT_EBAY_LANDING_2,
-        self::EXPERIMENT_MONEY_BACK_GUARANTEE,
+        // New Exp Competitor Landing
+        self::EXPERIMENT_COMPETITOR_LANDING,
+        self::EXPERIMENT_TRUSTPILOT_REVIEW,
+        // New Test Single Mem Option
+        self::EXPERIMENT_MEMORY_OPTIONS,
+        // New Test Money Back Guarantee
+         self::EXPERIMENT_MONEY_BACK_GUARANTEE,
     ];
 
     public static $authExperiments = [
@@ -125,9 +135,10 @@ class SixpackService
         self::EXPERIMENT_EBAY_LANDING,
         self::EXPERIMENT_EBAY_LANDING_1,
         self::EXPERIMENT_EBAY_LANDING_2,
-        self::EXPERIMENT_MONEY_BACK_GUARANTEE,
+        // New Exp Competitor Landing
+        self::EXPERIMENT_COMPETITOR_LANDING,
     ];
-
+  
     /**
      * For cases where there are multiple conversion points (e.g. convert on progress and later convert on purchase)
      * @var array
@@ -135,8 +146,12 @@ class SixpackService
     public static $purchaseConversionKpi = [
         self::EXPERIMENT_QUOTE_INTERCOM_PURCHASE,
         self::EXPERIMENT_HOMEPAGE_AA_V2,
-        self::EXPERIMENT_DEFACTO,
         self::EXPERIMENT_DOB,
+        self::EXPERIMENT_TRUSTPILOT_REVIEW,
+        // New Test Single Mem Option
+        self::EXPERIMENT_MEMORY_OPTIONS,
+        // New Test Money Back Guarantee
+        self::EXPERIMENT_MONEY_BACK_GUARANTEE,
     ];
 
     /** @var LoggerInterface */

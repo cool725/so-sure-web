@@ -171,6 +171,22 @@ trait DateTrait
         return $this->addBusinessDays($businessDays, 1);
     }
 
+    public function getNextBusinessDay(\DateTime $date, \DateTime $now = null)
+    {
+        if (!$now) {
+            $now = new \DateTime();
+        }
+
+        // make sure we don't run in the past
+        if ($date < $now) {
+            $businessDays = $now;
+        } else {
+            $businessDays = clone $date;
+        }
+
+        return $this->addBusinessDays($businessDays, 1);
+    }
+
     /**
      * @param \DateTime $date
      * @param integer   $days

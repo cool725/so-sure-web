@@ -1026,8 +1026,11 @@ class BacsService
         $metadata['debit-amount'] = 0;
         foreach ($scheduledPayments as $scheduledPayment) {
             /** @var ScheduledPayment $scheduledPayment */
+            $scheduledDate = $this->getNextBusinessDay($scheduledPayment->getScheduled());
+
             /** @var BacsPaymentMethod $bacs */
             $bacs = $scheduledPayment->getPolicy()->getUser()->getPaymentMethod();
+
             if (!$bacs || !$bacs->getBankAccount()) {
                 $msg = sprintf(
                     'Skipping scheduled payment %s as unable to determine payment method or missing bank account',
@@ -1061,11 +1064,11 @@ class BacsService
                 $this->logger->error($msg);
                 continue;
             }
-            if (!$bankAccount->allowedProcessing($scheduledPayment->getScheduled())) {
+            if (!$bankAccount->allowedProcessing($scheduledDate)) {
                 $msg = sprintf(
                     'Skipping scheduled payment %s as processing date is not allowed (%s / initial: %s)',
                     $scheduledPayment->getId(),
-                    $scheduledPayment->getScheduled()->format('d/m/y'),
+                    $scheduledDate->format('d/m/y'),
                     $bankAccount->isFirstPayment() ? 'yes' : 'no'
                 );
                 $this->logger->error($msg);
@@ -1080,7 +1083,6 @@ class BacsService
             $scheduledPayment->setPayment($payment);
 
             $metadata['debit-amount'] += $scheduledPayment->getAmount();
-            $scheduledDate = $this->getCurrentOrNextBusinessDay($scheduledPayment->getScheduled());
             $lines[] = implode(',', [
                 sprintf('"%s"', $scheduledDate->format('d/m/y')),
                 '"Scheduled Payment"',
