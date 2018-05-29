@@ -298,48 +298,55 @@
     <section class="section--pad homepage--cover-details">
         <div class="container">
             {% if homepageCopy is defined and homepageCopy == 'homepage-new-copy' %}
-                <h2>Come rain, shine or cracked screen, we’re here for you and your social circle</h2>
-                <p class="lead">In just a few clicks, you’ll be instantly covered for loss, theft, accidental damage, out-of-warranty breakdowns and even international travel. <br>And unlike other insurers, we cover phones that are up to three years old.</p>
+                <div class="row">
+                    <div class="col-md-5">
+                        <h2>Come rain, shine or cracked screen, we’re here for you and your social circle</h2>
+                        <p class="lead">In just a few clicks, you’ll be instantly covered for loss, theft, accidental damage, out-of-warranty breakdowns and even international travel. <br>And unlike other insurers, we cover phones that are up to three years old.</p>
+                    </div>
+                    <div class="col-md-7">
+
+                    </div>
+                </div>
             {% else %}
                 <h2 class="h1">Cover Details</h2>
                 <p class="lead">We give you peace of mind and cover you for:</p>
-            {% endif %}
-            <div class="row">
-                <div class="col-md-10 col-md-offset-1">
-                    <div class="row">
-                        <div class="col-sm-6 col-md-4">
-                            <div class="cover-img lozad theft"
-                                 data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
-                            <h4>Theft <br><small class="hidden-xs">&nbsp;</small></h4>
-                        </div>
-                         <div class="col-sm-6 col-md-4">
-                            <div class="cover-img lozad loss"
-                                 data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
-                            <h4>Loss <br><small class="hidden-xs">&nbsp;</small></h4>
-                        </div>
-                      <div class="col-sm-6 col-md-4">
-                            <div class="cover-img lozad accidental-damage"
-                                 data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
-                            <h4>Accidental Damage <br><small>Including cracked screen &amp; water damage </small></h4>
-                        </div>
-                        <div class="col-sm-6 col-md-4">
-                            <div class="cover-img lozad breakdown"
-                                 data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
-                            <h4>Out of Warranty Breakdown <br><small class="hidden-xs">&nbsp;</small></h4>
-                        </div>
-                       <div class="col-sm-6 col-md-4">
-                            <div class="cover-img lozad charges"
-                                 data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
-                            <h4>Unauthorised Network Charges <br><small >Up to the value of £1000 inc. VAT</small></h4>
-                        </div>
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1">
+                        <div class="row">
+                            <div class="col-sm-6 col-md-4">
+                                <div class="cover-img lozad theft"
+                                     data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
+                                <h4>Theft <br><small class="hidden-xs">&nbsp;</small></h4>
+                            </div>
+                             <div class="col-sm-6 col-md-4">
+                                <div class="cover-img lozad loss"
+                                     data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
+                                <h4>Loss <br><small class="hidden-xs">&nbsp;</small></h4>
+                            </div>
                           <div class="col-sm-6 col-md-4">
-                            <div class="cover-img lozad accessories"
-                                 data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
-                            <h4>Accessories <br><small>Up to the value of £100 inc. VAT for theft or loss claims</small></h4>
+                                <div class="cover-img lozad accidental-damage"
+                                     data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
+                                <h4>Accidental Damage <br><small>Including cracked screen &amp; water damage </small></h4>
+                            </div>
+                            <div class="col-sm-6 col-md-4">
+                                <div class="cover-img lozad breakdown"
+                                     data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
+                                <h4>Out of Warranty Breakdown <br><small class="hidden-xs">&nbsp;</small></h4>
+                            </div>
+                           <div class="col-sm-6 col-md-4">
+                                <div class="cover-img lozad charges"
+                                     data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
+                                <h4>Unauthorised Network Charges <br><small >Up to the value of £1000 inc. VAT</small></h4>
+                            </div>
+                              <div class="col-sm-6 col-md-4">
+                                <div class="cover-img lozad accessories"
+                                     data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
+                                <h4>Accessories <br><small>Up to the value of £100 inc. VAT for theft or loss claims</small></h4>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            {% endif %}
         </div>
     </section>
 
