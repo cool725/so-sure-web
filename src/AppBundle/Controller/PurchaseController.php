@@ -242,6 +242,11 @@ class PurchaseController extends BaseController
                     }
                     $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_RECEIVE_DETAILS, $data);
 
+                    // Convert point from quote
+                    $this->get('app.sixpack')->convert(
+                        SixpackService::EXPERIMENT_MONEY_BACK_GUARANTEE
+                    );
+
                     if ($user->hasPartialPolicy()) {
                         return new RedirectResponse(
                             $this->generateUrl('purchase_step_policy_id', [
@@ -257,11 +262,6 @@ class PurchaseController extends BaseController
 
         /** @var \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface $csrf */
         $csrf = $this->get('security.csrf.token_manager');
-
-        // Convert point from quote
-        $this->get('app.sixpack')->convert(
-            SixpackService::EXPERIMENT_MONEY_BACK_GUARANTEE
-        );
 
         $moneyBackGuarantee = $this->sixpack(
             $request,
@@ -585,11 +585,6 @@ class PurchaseController extends BaseController
                 }
             }
         }
-
-        // Convert point from address
-        $this->get('app.sixpack')->convert(
-            SixpackService::EXPERIMENT_MONEY_BACK_GUARANTEE
-        );
 
         $moneyBackGuarantee = $this->sixpack(
             $request,

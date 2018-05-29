@@ -1161,11 +1161,6 @@ class UserController extends BaseController
             $this->generateUrl('purchase_cancel', ['id' => $user->getLatestPolicy()->getId()])
         ));
 
-        // Convert point from purchase
-        $this->get('app.sixpack')->convert(
-            SixpackService::EXPERIMENT_MONEY_BACK_GUARANTEE
-        );
-
         return array(
             'policy_key' => $this->getParameter('policy_key'),
             'policy' => $user->getLatestPolicy(),

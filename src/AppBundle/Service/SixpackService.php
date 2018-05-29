@@ -69,6 +69,13 @@ class SixpackService
     const EXPERIMENT_MEMORY_OPTIONS = 'single-progressive-dropdown';
     // New Test Money Back Guarantee
     const EXPERIMENT_MONEY_BACK_GUARANTEE = 'money-back-guarantee';
+    // Exp 1
+
+    // Exp 2
+
+    // Exp 3
+
+    // Exp 4
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';
@@ -138,7 +145,7 @@ class SixpackService
         // New Exp Competitor Landing
         self::EXPERIMENT_COMPETITOR_LANDING,
     ];
-  
+
     /**
      * For cases where there are multiple conversion points (e.g. convert on progress and later convert on purchase)
      * @var array
