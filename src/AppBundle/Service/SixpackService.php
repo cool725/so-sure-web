@@ -64,7 +64,7 @@ class SixpackService
     const EXPERIMENT_NEW_WELCOME_MODAL = 'new-welcome-modal';
     const EXPERIMENT_TRUSTPILOT_REVIEW = 'trustpilot';
     // New Test Single Mem Option
-    const EXPERIMENT_MEMORY_OPTIONS = 'single-mem-hide-dropdown';
+    const EXPERIMENT_MEMORY_OPTIONS = 'single-progressive-dropdown';
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';

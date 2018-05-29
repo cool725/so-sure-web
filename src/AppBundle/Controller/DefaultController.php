@@ -306,7 +306,7 @@ class DefaultController extends BaseController
         $memoptions = $this->sixpack(
             $request,
             SixpackService::EXPERIMENT_MEMORY_OPTIONS,
-            ['single-mem-show-dropdown', 'single-mem-hide-dropdown']
+            ['three-dropdowns', 'single-progressive-dropdown']
         );
 
         // throw new \Exception(print_r($this->getPhonesArray(), true));
