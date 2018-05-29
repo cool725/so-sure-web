@@ -440,15 +440,6 @@
 
     &--what-is-so-sure {
 
-        @include breakpoint(tablet) {
-            .so-sure_homepage-what-is-so-sure {
-                max-width: 400px;
-            }
-        }
-
-        @include breakpoint(laptop) {
-            padding-top: 80px;
-        }
 
     }
 
