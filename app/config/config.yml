@@ -430,6 +430,7 @@ nelmio_security:
             connect-src:
                 - 'self'
                 - wss://wearesosure.com
+                - https://cdn.so-sure.com
                 - https://api.intercom.io
                 - https://api-iam.intercom.io
                 - https://api-ping.intercom.io
