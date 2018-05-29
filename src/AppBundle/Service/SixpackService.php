@@ -110,6 +110,13 @@ class SixpackService
         self::EXPERIMENT_MEMORY_OPTIONS,
         // New Test Money Back Guarantee
          self::EXPERIMENT_MONEY_BACK_GUARANTEE,
+        // Exp 1
+
+        // Exp 2
+
+        // Exp 3
+
+        // Exp 4
     ];
 
     public static $authExperiments = [
@@ -144,6 +151,13 @@ class SixpackService
         self::EXPERIMENT_EBAY_LANDING_2,
         // New Exp Competitor Landing
         self::EXPERIMENT_COMPETITOR_LANDING,
+        // Exp 1
+
+        // Exp 2
+
+        // Exp 3
+
+        // Exp 4
     ];
 
     /**
@@ -159,6 +173,13 @@ class SixpackService
         self::EXPERIMENT_MEMORY_OPTIONS,
         // New Test Money Back Guarantee
         self::EXPERIMENT_MONEY_BACK_GUARANTEE,
+        // Exp 1
+
+        // Exp 2
+
+        // Exp 3
+
+        // Exp 4
     ];
 
     /** @var LoggerInterface */
