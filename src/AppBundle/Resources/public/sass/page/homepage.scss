@@ -41,7 +41,7 @@
     padding-left: 60px;
     position: relative;
 
-    li {
+    > li {
         counter-increment: item;
         position: relative;
 
@@ -698,6 +698,10 @@
             &:focus {
                 outline: 0;
             }
+        }
+
+        .media {
+            margin-bottom: 25px;
         }
 
         .cover-img {

@@ -114,6 +114,7 @@
         </div>
     </section>
 
+    {# TEST - Trustpilot #}
     {% if trustpilot is defined and trustpilot == 'trustpilot' %}
         {# Press #}
         <section class="homepage__press">
@@ -154,6 +155,7 @@
                 </div>
             </div>
         </section>
+    {# TEST - Homepage Copy #}
     {% elseif homepageCopy is defined and homepageCopy == 'homepage-new-copy' %}
         {# Press #}
         <section class="homepage__press">
@@ -243,6 +245,7 @@
     {# Why we're better than the rest #}
     <section class="section--pad homepage--why-we-are-better">
         <div class="container">
+            {# TEST - Homepage Copy #}
             {% if homepageCopy is defined and homepageCopy == 'homepage-new-copy' %}
                 {# <h2 class="text-center h1">Why we're better than the rest</h2> #}
                 <div class="row">
@@ -297,14 +300,80 @@
     {# Cover Details #}
     <section class="section--pad homepage--cover-details">
         <div class="container">
+            {# TEST - Homepage Copy #}
             {% if homepageCopy is defined and homepageCopy == 'homepage-new-copy' %}
                 <div class="row">
                     <div class="col-md-5">
-                        <h2>Come rain, shine or cracked screen, we’re here for you and your social circle</h2>
-                        <p class="lead">In just a few clicks, you’ll be instantly covered for loss, theft, accidental damage, out-of-warranty breakdowns and even international travel. <br>And unlike other insurers, we cover phones that are up to three years old.</p>
+                        <h2 class="text-left">Come rain, shine or cracked screen, we’re here for you and your social circle</h2>
+                        <p class="lead text-left">In just a few clicks, you’ll be instantly covered for loss, theft, accidental damage, out-of-warranty breakdowns and even international travel. And unlike other insurers, we cover phones that are up to three years old.</p>
                     </div>
-                    <div class="col-md-7">
-
+                    <div class="col-md-7 text-left">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="media">
+                                    <div class="media-left media-middle">
+                                        <img src="{{ cdn_url }}/images/homepage/so-sure_theft.svg" alt="Theft" width="100px">
+                                    </div>
+                                    <div class="media-body media-middle">
+                                        <h4 class="media-heading h-light">Theft</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="media">
+                                    <div class="media-left media-middle">
+                                        <img src="{{ cdn_url }}/images/homepage/so-sure_loss.svg" alt="Loss" width="100px">
+                                    </div>
+                                    <div class="media-body media-middle">
+                                        <h4 class="media-heading h-light">Loss</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="media">
+                                    <div class="media-left media-middle">
+                                        <img src="{{ cdn_url }}/images/homepage/so-sure_accidental_damage.svg" alt="Accidental Damage" width="100px">
+                                    </div>
+                                    <div class="media-body media-middle">
+                                        <h4 class="media-heading h-light">Accidental Damage</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="media">
+                                    <div class="media-left media-middle">
+                                        <img src="{{ cdn_url }}/images/homepage/so-sure_out_of_warranty_breakdown.svg" alt="Out of Warranty Breakdown" width="100px">
+                                    </div>
+                                    <div class="media-body media-middle">
+                                        <h4 class="media-heading h-light">Out of Warranty Breakdown</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="media">
+                                    <div class="media-left media-middle">
+                                        <img src="{{ cdn_url }}/images/homepage/so-sure_unauthorised_network_charges.svg" alt="Unauthorised Network Charges" width="100px">
+                                    </div>
+                                    <div class="media-body media-middle">
+                                        <h4 class="media-heading h-light">Unauthorised Network Charges</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="media">
+                                    <div class="media-left media-middle">
+                                        <img src="{{ cdn_url }}/images/homepage/so-sure_accessories.svg" alt="accessories" width="100px">
+                                    </div>
+                                    <div class="media-body media-middle">
+                                        <h4 class="media-heading h-light">Accessories</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             {% else %}
@@ -421,6 +490,40 @@
                         </div>
 
 
+                    </div>
+                </div>
+            </div>
+        </section>
+    {# TEST - Homepage Copy #}
+    {% elseif homepageCopy is defined and homepageCopy == 'homepage-new-copy' %}
+        {# What we don't cover #}
+        <section class="homepage--what-we-dont-cover">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2">
+                        <h2 class="h1">What We Don't Cover</h2>
+                        {# <h3>Excess</h3> #}
+                        <ul class="list-unstyled">
+                            <li class="h3">
+                                Excess:
+                                <ul class="list-unstyled">
+                                    <li class="h4 h-light"><strong class="h4"><i class="fa fa-question-circle" data-container="body" data-toggle="popover" data-placement="top" data-content="pic-sure is our free app-based process to prove your phone is in good working condition and your screen is not cracked" aria-hidden="true"></i> pic-sure validated:</strong> £70 for Theft/Loss and £50 for Accidental Damage/Breakdown.</li>
+                                    <li class="h4 h-light"><strong class="h4">otherwise:</strong> £150 for Theft/Loss/Accidental Damage/Breakdown without pic-sure</li>
+                                </ul>
+                            </li>
+                            <li class="h3">
+                                Putting your phone at risk:
+                                <ul class="list-unstyled">
+                                    <li class="h4 h-light">Theft, Loss, Accidental Damage or Breakdown where you have knowingly put your phone at risk</li>
+                                </ul>
+                            </li>
+                            <li class="h3">
+                                Multiple Theft/Loss Claims:
+                                <ul class="list-unstyled">
+                                    <li class="h4 h-light">3+ claims for Loss and/or Theft in any policy year</li>
+                                </ul>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
