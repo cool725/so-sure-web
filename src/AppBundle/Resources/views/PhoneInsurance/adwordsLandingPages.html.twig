@@ -21,12 +21,12 @@
 
 {% block body %}
 
-    {# <h1>Hello!</h1> #}
+    {# Hero #}
     <section class="section--pad landing__hero">
         <div class="container">
             <div class="row">
-                <div class="col-sm-6">
-                    <h1>{{ phone.make }} {{ phone.model }}</h1>
+                <div class="col-sm-5 col-sm-offset-1">
+                    <h1 class="h-nom">{{ phone.make }} {{ phone.model }}</h1>
                     <p class="lead">Insurance that’s simple, reliable and altogether better.</p>
                     <ul class="list-unstyled fa-list-bullet">
                         <li>
@@ -50,9 +50,37 @@
                             Low excess from just £50 when validated with pic-sure
                         </li>
                     </ul>
+                    <div class="h1">&pound;{{ phone_price.monthlyPremiumPrice }}</div>
                 </div>
-                <div class="col-sm-6">
+                <div class="col-sm-5">
+                    <img src="{{ phone.imageUrlWithFallback }}"
+                         alt="so-sure - {{ phone.make|capitalize }} {{ phone.model }} insurance"
+                         class="img-center">
+                    {% if phones | length > 1 %}
+                        <div class="btn-group text-center" role="group">
+                            {% for phone_mem in phones %}
+                                {# <a {% if phone_mem.id != phone.id  %}href="{{ path('quote_make_model_memory', {'make': phone_mem.makeCanonical, 'model': phone_mem.encodedModelCanonical, 'memory': phone_mem.memory}) }}"{% else %}disabled{% endif %} class="btn btn-xs{% if phone_mem.id == phone.id  %}btn-blue{% else %}btn-blue-hollow{% endif %}">{{ phone_mem.memory }}GB</a> #}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
 
+    {# Press #}
+    <section class="homepage__press">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12 text-center">
+                    <ul class="list-inline text-center">
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_defaqto.svg" alt="Defaqto" title="Defaqto" class="homepage__press_defaqto"></li>
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_trustpilot.svg" alt="TrustPilot" title="TrustPilot" class="homepage__press_trustpilot"></li>
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_money.svg" alt="Money.co.uk" title="Money.co.uk" class="homepage__press_money"></li>
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_go-compare.svg" alt="Go Compare" title="Go Compare" class="homepage__press_gocompare"></li>
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_theguardian.svg" alt="The Guardian" title="The Guardian" class="homepage__press_theguardian"></li>
+                        <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_financial-times.svg" alt="Financial Times" title="Financial Times" class="homepage__press_financialtimes"></li>
+                    </ul>
                 </div>
             </div>
         </div>
