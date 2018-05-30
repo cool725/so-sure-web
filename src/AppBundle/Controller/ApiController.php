@@ -631,7 +631,6 @@ class ApiController extends BaseController
                     }
                     */
                 } elseif ($googleId !== null) {
-                    /*
                     $googleService = $this->get('app.google');
                     if (!$googleService->validateTokenId(
                         $googleId,
@@ -639,7 +638,6 @@ class ApiController extends BaseController
                     )) {
                         return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_EXISTS, 'Invalid token', 403);
                     }
-                    */
                 }
 
                 $userManager = $this->get('fos_user.user_manager');

@@ -12,29 +12,17 @@ class GoogleService
     protected $logger;
 
     /** @var string */
-    protected $googleAppName;
-
-    /** @var string */
-    protected $googleApiKey;
-
-    /** @var string */
     protected $googleClientId;
 
     /**
      * @param LoggerInterface $logger
-     * @param string          $googleAppName
-     * @param string          $googleApiKey
      * @param string          $clientId
      */
     public function __construct(
         LoggerInterface $logger,
-        $googleAppName,
-        $googleApiKey,
         $clientId
     ) {
         $this->logger = $logger;
-        $this->googleAppName = $googleAppName;
-        $this->googleApiKey = $googleApiKey;
         $this->googleClientId = $googleClientId;
     }
 
@@ -48,6 +36,7 @@ class GoogleService
         $client = new \Google_Client(['client_id' => $this->googleClientId]);
 
         $payload = $client->verifyIdToken($token);
+        $this->logger->error('googleService payload', ['payload' => $payload]);
         if ($payload) {
             $userid = $payload['sub'];
             return $userid;
@@ -71,6 +60,7 @@ class GoogleService
     {
         try {
             $idFromToken = $this->getUserIdFromToken($token);        
+            $this->logger->error('googleService ', ['id' => $id, 'idFromToken' => $idFromToken]);
             return  $idFromToken == $id;
         } catch (\Exception $e) {
             $this->logger->error(sprintf(

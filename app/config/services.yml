@@ -52,8 +52,6 @@ services:
         class: AppBundle\Service\GoogleService
         arguments:
             - "@logger"
-            - "%google_appname%"
-            - "%google_apikey%"
             - "%google_clientid%"
 
     app.mailchimp.prelaunch:
