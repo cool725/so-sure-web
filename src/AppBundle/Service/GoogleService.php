@@ -45,10 +45,11 @@ class GoogleService
      */
     public function getUserIdFromToken($token)
     {
-        $client = new \Google_Client(['client_id' => "1062115475688-lm82l8p6ckr2bp7mus2q7q7mkiu01q4f.apps.googleusercontent.com"]);
+        $client = new \Google_Client(['client_id' => "1062115475688-0ngn2v5s4bh7qtecchbgc6gn2lrbiejs.apps.googleusercontent.com"]);
         //$client->setApplicationName($this->googleAppName);
         //$client->setDeveloperKey($this->googleApiKey);
 
+        /*
         $payload = 'https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=' . $token;
         $json = file_get_contents($payload);
 
@@ -59,14 +60,14 @@ class GoogleService
             $googleId = $userInfoArray['sub'];
             return $googleId;
         }
+        */
 
-        /*
-        //$payload = $client->verifyIdToken($token);
+        $payload = $client->verifyIdToken($token);
+        $this->logger->error('googleService payload', ['payload' => $payload]);
         if ($payload) {
             $userid = $payload['sub'];
             return $userid;
         }
-        */
 
         return null;
     }
