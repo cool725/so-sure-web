@@ -22,12 +22,12 @@
 {% block body %}
 
     {# Hero #}
-    <section class="section--pad landing__hero">
+    <section class="landing__hero">
         <div class="container">
             <div class="row">
-                <div class="col-sm-5 col-sm-offset-1">
-                    <h1 class="h-nom">{{ phone.make }} {{ phone.model }}</h1>
-                    <p class="lead">Insurance that’s simple, reliable and altogether better.</p>
+                <div class="col-sm-7 col-sm-offset-0 col-md-7 col-md-offset-1">
+                    <h1>{{ phone.make }} {{ phone.model }} <small class="sr-only">{{ phone.memory }}GB</small></h1>
+                    <span class="h3 h-light">Insurance that’s simple, reliable and altogether better.</span>
                     <ul class="list-unstyled fa-list-bullet">
                         <li>
                             <i class="fa fa-check text-green" aria-hidden="true"></i>
@@ -50,17 +50,32 @@
                             Low excess from just £50 when validated with pic-sure
                         </li>
                     </ul>
-                    <div class="h1">&pound;{{ phone_price.monthlyPremiumPrice }}</div>
+                    <div class="row">
+                        <div class="col-sm-8 col-sm-push-4 text-center">
+                            <span class="h1">&pound;{{ phone_price.monthlyPremiumPrice }} <small>per month</small></span>
+                        </div>
+                        <div class="col-sm-4 col-sm-pull-8">
+                            {{ form_start(buy_form) }}
+                                {{ form_widget(buy_form.buy_tablet, {'label': 'GET INSURED', 'attr': {'class': 'btn btn-ad-green btn-pad btn-block'}}) }}
+                            {{ form_end(buy_form) }}
+                        </div>
+                    </div>
                 </div>
-                <div class="col-sm-5">
-                    <img src="{{ phone.imageUrlWithFallback }}"
-                         alt="so-sure - {{ phone.make|capitalize }} {{ phone.model }} insurance"
-                         class="img-center">
+                <div class="col-sm-4 col-md-3">
+                    <div class="phone-img">
+                        <img src="{{ phone.imageUrlWithFallback }}"
+                             alt="so-sure - {{ phone.make|capitalize }} {{ phone.model }} {{ phone.memory }}GB insurance"
+                             class="img-center hidden-xs" width="130px">
+                    </div>
                     {% if phones | length > 1 %}
-                        <div class="btn-group text-center" role="group">
-                            {% for phone_mem in phones %}
-                                {# <a {% if phone_mem.id != phone.id  %}href="{{ path('quote_make_model_memory', {'make': phone_mem.makeCanonical, 'model': phone_mem.encodedModelCanonical, 'memory': phone_mem.memory}) }}"{% else %}disabled{% endif %} class="btn btn-xs{% if phone_mem.id == phone.id  %}btn-blue{% else %}btn-blue-hollow{% endif %}">{{ phone_mem.memory }}GB</a> #}
-                            {% endfor %}
+                        <div class="text-center">
+                            <div class="h5">Different storage size?</div>
+                            <div class="btn-group btn-group-sm" role="group">
+                                {% for phone_mem in phones %}
+                                    {# <button type="button" class="btn btn-default">Left</button> #}
+                                    <a {% if phone_mem.id != phone.id  %}href="{{ path('make_model_memory', {'make': phone_mem.makeCanonical, 'model': phone_mem.encodedModelCanonical, 'memory': phone_mem.memory}) }}"{% else %}readonly{% endif %} class="btn {% if phone_mem.id == phone.id  %}btn-ad-green{% else %}btn-ad-green-hollow{% endif %}">{{ phone_mem.memory }}GB</a>
+                                {% endfor %}
+                            </div>
                         </div>
                     {% endif %}
                 </div>
@@ -69,7 +84,7 @@
     </section>
 
     {# Press #}
-    <section class="homepage__press">
+    <section class="landing__press">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12 text-center">

@@ -203,8 +203,8 @@ class PhoneInsuranceController extends BaseController
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
      * @Route("/phone-insurance/{make}+{model}", name="quote_make_model",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
-     * @Route("/{make}+{model}", name="make_model",
-     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
+     * @Route("/{make}+{model}+{memory}GB", name="make_model_memory",
+     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
      * @Route("/insure/{make}+{model}+{memory}GB", name="insure_make_model_memory",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
      * @Route("/insure/{make}+{model}", name="insure_make_model",
@@ -572,7 +572,7 @@ class PhoneInsuranceController extends BaseController
 
         $template = 'AppBundle:PhoneInsurance:quote.html.twig';
 
-        if (in_array($request->get('_route'), ['make_model'])) {
+        if (in_array($request->get('_route'), ['make_model_memory'])) {
             // If adwords landing page
             return $this->render('AppBundle:PhoneInsurance:adwordsLandingPages.html.twig', $data);
         } else {
