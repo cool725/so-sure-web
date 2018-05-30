@@ -158,7 +158,7 @@
     {# TEST - Homepage Copy #}
     {% elseif homepageCopy is defined and homepageCopy == 'homepage-new-copy' %}
         {# Press #}
-        <section class="homepage__press">
+        <section class="homepage__press background-white">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-12 text-center">
@@ -180,7 +180,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-10 col-md-offset-1">
-                        <h2 class="h1 text-center h-nom">Who is so-sure?</h2>
+                        {# <h2 class="h1 text-center h-nom">Who is so-sure?</h2> #}
                         <p class="big-text text-center">We’re a new kind of insurer – an insurer that’s focused on people, not profits. We saw an opportunity to make insurance better. So that’s what we did. We provide mobile insurance that’s simple, reasonable and hassle-free, so you can get back to worrying about the big stuff.</p>
                     </div>
                 </div>
@@ -250,13 +250,10 @@
                 {# <h2 class="text-center h1">Why we're better than the rest</h2> #}
                 <div class="row">
                     <div class="col-md-5">
-                        <div class="img-container">
-                            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/so-sure_balloon_better.svg"
-                                 class="img-center lozad" width="280px" alt="We lift you up when something bad happens">
-                        </div>
+                        <img src="{{ cdn_url }}/images/homepage/iphone_x_so-sure_app.svg" alt="" width="190px;" class="img-center">
                     </div>
                     <div class="col-md-7">
-                        <h2 class="h1">We do things differently</h2>
+                        <h2 class="h1 h-nom">We do things differently</h2>
                         <p class="lead">We've designed our insurance with you in mind. That's why we’ve created a product that looks after you when bad stuff happens but rewards you when you’re being careful.</p>
                         <p class="lead">If you make a claim, our friendly team will aim to get you back up and running with a replacement phone within 24-72 hours.</p>
                         <p class="lead">But if you don’t find yourself making a claim, we could end up returning 80% of your premium each year through our reward pot. We call this social insurance, and we believe it’s the future.</p>
@@ -296,6 +293,19 @@
             {% endif %}
         </div>
     </section>
+
+    {# TEST - Homepage Copy #}
+    {% if homepageCopy is defined and homepageCopy == 'homepage-new-copy' %}
+        <div class="curved-background hidden-xs">
+            <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 2000 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                    <g id="Artboard" fill="#d6ebff">
+                        <path d="M0,0 L2000,0 L2000,139.921588 C1890.08746,181.703317 1753.08746,201.692115 1589,199.887983 C1424.91254,198.083852 1258.91254,174.763587 1091,129.927189 C918.666667,89.9495926 740,69.9607942 555,69.9607942 C370,69.9607942 185,113.269857 0,199.887983 L0,0 Z" id="Rectangle" transform="translate(1000.000000, 100.000000) scale(-1, 1) translate(-1000.000000, -100.000000) "></path>
+                    </g>
+                </g>
+            </svg>
+        </div>
+    {% endif %}
 
     {# Cover Details #}
     <section class="section--pad homepage--cover-details">
