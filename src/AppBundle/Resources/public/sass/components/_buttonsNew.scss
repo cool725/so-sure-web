@@ -68,6 +68,10 @@
 	@include btn($green, $white, $white);
 }
 
+.btn-ad-green {
+	@include btn($dark-ad-green, $white, $white);
+}
+
 .btn-white {
 	@include btn($white, $white, $white);
 }

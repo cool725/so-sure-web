@@ -7,14 +7,60 @@
 .landing {
 
     &__hero {
+        background-color: $light-ad-grey;
+        padding-top: 40px;
+        padding-bottom: 40px;
 
+        h1 {
+            color: $dark-ad-green;
+            margin: 0 0 5px;
+        }
+
+        .phone-img {
+            margin-top: 20px;
+        }
+
+        @include breakpoint(tablet) {
+            padding-top: 80px;
+            padding-bottom: 100px;
+        }
+
+        // background: rgb(30, 35, 50);
+        background-image:
+            url('#{$cdn_url}/images/landing_pages/tria_c.svg'),
+            url('#{$cdn_url}/images/landing_pages/tria_d.svg'),
+            url('#{$cdn_url}/images/landing_pages/tria_d.svg'),
+            url('#{$cdn_url}/images/landing_pages/tria_c.svg');
+        background-position:
+            5% -10%,
+            90% -20%,
+            10% 100%,
+            105% 120%;
+        background-size:
+            140px,
+            120px,
+            100px,
+            150px;
+        background-repeat: no-repeat;
+
+        @include breakpoint(tablet) {
+            background-position:
+                5% -60%,
+                89% -40%,
+                -3% 130%,
+                right -100px bottom -100px;
+            background-size:
+                300px,
+                240px,
+                230px,
+                280px;
+        }
     }
 
     &__press {
         background: $off-white;
         position: relative;
         z-index: 1;
-        margin: 25px 0 0;
 
         &_defaqto {
             width: 100px;
