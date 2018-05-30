@@ -14,14 +14,49 @@
     {{ parent() }}
     {% stylesheets output='css/*.css'
     '@AppBundle/Resources/public/sass/page/homepage.scss'
-    '@AppBundle/Resources/public/sass/page/quoteNewDesign.scss'
+    '@AppBundle/Resources/public/sass/page/adwordsLanding.scss'
     %}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
 {% block body %}
 
-    <h1>Hello!</h1>
+    {# <h1>Hello!</h1> #}
+    <section class="section--pad landing__hero">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-6">
+                    <h1>{{ phone.make }} {{ phone.model }}</h1>
+                    <p class="lead">Insurance that’s simple, reliable and altogether better.</p>
+                    <ul class="list-unstyled fa-list-bullet">
+                        <li>
+                            <i class="fa fa-check text-green" aria-hidden="true"></i>
+                            Instant cover
+                        </li>
+                        <li>
+                            <i class="fa fa-check text-green" aria-hidden="true"></i>
+                            Replacement phone within the 72 hours
+                        </li>
+                        <li>
+                            <i class="fa fa-check text-green" aria-hidden="true"></i>
+                            Damage, Loss, Theft &amp; Breakdown
+                        </li>
+                        <li>
+                            <i class="fa fa-check text-green" aria-hidden="true"></i>
+                            Worldwide cover
+                        </li>
+                        <li>
+                            <i class="fa fa-check text-green" aria-hidden="true"></i>
+                            Low excess from just £50 when validated with pic-sure
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-sm-6">
+
+                </div>
+            </div>
+        </div>
+    </section>
 
     {# Page Modals #}
     <div class="modal modal-fullscreen fade"
