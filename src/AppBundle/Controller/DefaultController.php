@@ -122,7 +122,11 @@ class DefaultController extends BaseController
             'homepageCopy'        => $homepageCopy,
         );
 
-        $template = 'AppBundle:Default:index.html.twig';
+        if ($homepageCopy == 'homepage-new-copy') {
+            $template = 'AppBundle:Default:indexHomepageCopy.html.twig';
+        } else {
+            $template = 'AppBundle:Default:index.html.twig';
+        }
 
         return $this->render($template, $data);
     }

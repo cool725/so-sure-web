@@ -29,8 +29,6 @@
                 {% if main_cont is defined and main_cont %}
                     <br class="hidden-xs"> {{ main_cont }}
                 {% endif %}
-            {% elseif homepageCopy is defined and homepageCopy == 'homepage-new-copy' %}
-                Mobile insurance <br> designed for you
             {% else %}
                 Mobile Phone Insurance <br> How it Should Be
             {% endif %}
@@ -46,8 +44,6 @@
                     <br class="hidden-xs"> {{ sub_cont }}
                 {% endif %}
             </p>
-        {% elseif homepageCopy is defined and homepageCopy == 'homepage-new-copy' %}
-            <p class="lead">Here protecting you when you make a claim, and rewarding you when you don't.</p>
         {% else %}
             <p class="lead">Providing exceptional experience when you claim, <br class="hidden-xs">and rewarding you and your friends when you don't</p>
         {% endif %}
@@ -155,47 +151,6 @@
                 </div>
             </div>
         </section>
-    {# TEST - Homepage Copy #}
-    {% elseif homepageCopy is defined and homepageCopy == 'homepage-new-copy' %}
-        {# Press #}
-        <section class="homepage__press">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-12 text-center">
-                        <ul class="list-inline text-center">
-                            <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_defaqto.svg" alt="Defaqto" title="Defaqto" class="homepage__press_defaqto"></li>
-                            <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_trustpilot.svg" alt="TrustPilot" title="TrustPilot" class="homepage__press_trustpilot"></li>
-                            <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_money.svg" alt="Money.co.uk" title="Money.co.uk" class="homepage__press_money"></li>
-                            <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_go-compare.svg" alt="Go Compare" title="Go Compare" class="homepage__press_gocompare"></li>
-                            <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_theguardian.svg" alt="The Guardian" title="The Guardian" class="homepage__press_theguardian"></li>
-                            <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_financial-times.svg" alt="Financial Times" title="Financial Times" class="homepage__press_financialtimes"></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        {# What is so-sure? #}
-        <section class="section--pad homepage--what-is-so-sure">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-10 col-md-offset-1">
-                        {# <h2 class="h1 text-center h-nom">Who is so-sure?</h2> #}
-                        <p class="big-text text-center">We’re a new kind of insurer – an insurer that’s focused on people, not profits. We saw an opportunity to make insurance better. So that’s what we did. We provide mobile insurance that’s simple, reasonable and hassle-free, so you can get back to worrying about the big stuff.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <div class="curved-background curved-background__bg-blue hidden-xs">
-            <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 2000 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                    <g id="Artboard" fill="#ffffff">
-                        <path d="M0,0 L2000,0 L2000,139.921588 C1890.08746,181.703317 1753.08746,201.692115 1589,199.887983 C1424.91254,198.083852 1258.91254,174.763587 1091,129.927189 C918.666667,89.9495926 740,69.9607942 555,69.9607942 C370,69.9607942 185,113.269857 0,199.887983 L0,0 Z" id="Rectangle" transform="translate(1000.000000, 100.000000) scale(-1, 1) translate(-1000.000000, -100.000000) "></path>
-                    </g>
-                </g>
-            </svg>
-        </div>
     {% else %}
         {# What is so-sure? #}
         <section class="section--pad homepage--what-is-so-sure">
@@ -245,187 +200,80 @@
     {# Why we're better than the rest #}
     <section class="section--pad homepage--why-we-are-better">
         <div class="container">
-            {# TEST - Homepage Copy #}
-            {% if homepageCopy is defined and homepageCopy == 'homepage-new-copy' %}
-                {# <h2 class="text-center h1">Why we're better than the rest</h2> #}
-                <div class="row">
-                    <div class="col-md-7 col-md-push-5">
-                        <h2 class="h1">We do things differently</h2>
-                        <p class="lead">We've designed our insurance with you in mind. That's why we’ve created a product that looks after you when bad stuff happens but rewards you when you’re being careful.</p>
-                        <p class="lead">If you make a claim, our friendly team will aim to get you back up and running with a replacement phone within 24-72 hours.</p>
-                        <p class="lead">But if you don’t find yourself making a claim, we could end up returning 80% of your premium each year through our reward pot. We call this social insurance, and we believe it’s the future.</p>
-                    </div>
-                    <div class="col-md-5 col-md-pull-7">
-                        <img src="{{ cdn_url }}/images/homepage/so-sure_app_web.png" class="img-center img-app">
+            <h2 class="text-center h1">Why we're better than the rest</h2>
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="img-container">
+                        <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/so-sure_balloon_better.svg"
+                             class="img-responsive img-responsive--center so-sure_homepage-balloon lozad" alt="We lift you up when something bad happens">
                     </div>
                 </div>
-            {% else %}
-                <h2 class="text-center h1">Why we're better than the rest</h2>
-                <div class="row">
-                    <div class="col-md-5">
-                        <div class="img-container">
-                            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/so-sure_balloon_better.svg"
-                                 class="img-responsive img-responsive--center so-sure_homepage-balloon lozad" alt="We lift you up when something bad happens">
-                        </div>
-                    </div>
-                    <div class="col-md-7">
-                        <ol class="ol--blue-counter">
-                            <li>
-                                <h3 class="text-blue">We don’t hide behind the small print and painful claims process</h3>
-                                <p>We’re upfront and honest with our customers on what is covered, what is not, and what the claims process looks like. This means that there’s no nasty surprises when you have an issue with your device. And you don’t need a law degree to understand our policy - everything is explained in plain English.</p>
-                            </li>
-                            <li>
-                                <h3 class="text-blue">If something bad happens, we aim to provide {% if replacement is defined and replacement == 'seventytwo-hours' %}you with a working device within 72 hours{% else %}next working day repair or replacement{% endif %}</h3>
-                                <p>As simple as that. It sucks to be without your phone, we understand it and work with a global phone provider and world-class logistics company who help us get a model back in your hands {% if replacement is defined and replacement == 'seventytwo-hours' %}back in your hands within 24-72 hours{% else %}the next working day{% endif %}.</p>
-                            </li>
-                            <li>
-                                <h3 class="text-blue">And if you’re careful, we reward you with up to 80% of your money</h3>
-                                <p>Connect with your family and friends and get up to 80% of your money back if you and your connections don’t claim. It finally pays to be careful!</p>
-                            </li>
-                        </ol>
-                    </div>
+                <div class="col-md-7">
+                    <ol class="ol--blue-counter">
+                        <li>
+                            <h3 class="text-blue">We don’t hide behind the small print and painful claims process</h3>
+                            <p>We’re upfront and honest with our customers on what is covered, what is not, and what the claims process looks like. This means that there’s no nasty surprises when you have an issue with your device. And you don’t need a law degree to understand our policy - everything is explained in plain English.</p>
+                        </li>
+                        <li>
+                            <h3 class="text-blue">If something bad happens, we aim to provide {% if replacement is defined and replacement == 'seventytwo-hours' %}you with a working device within 72 hours{% else %}next working day repair or replacement{% endif %}</h3>
+                            <p>As simple as that. It sucks to be without your phone, we understand it and work with a global phone provider and world-class logistics company who help us get a model back in your hands {% if replacement is defined and replacement == 'seventytwo-hours' %}back in your hands within 24-72 hours{% else %}the next working day{% endif %}.</p>
+                        </li>
+                        <li>
+                            <h3 class="text-blue">And if you’re careful, we reward you with up to 80% of your money</h3>
+                            <p>Connect with your family and friends and get up to 80% of your money back if you and your connections don’t claim. It finally pays to be careful!</p>
+                        </li>
+                    </ol>
                 </div>
-                <div class="text-center">
-                    <a href="#"
-                       class="btn btn-blue btn-pad btn-lg scroll-to"
-                       data-scroll-to-anchor=".homepage--we-compare-well"><i class="fa fa-angle-down hidden-xs" aria-hidden="true"></i> &nbsp; <strong>We're still up to 40% cheaper than traditional insurers</strong> &nbsp; <i class="fa fa-angle-down hidden-xs" aria-hidden="true"></i></a>
-                </div>
-            {% endif %}
+            </div>
+            <div class="text-center">
+                <a href="#"
+                   class="btn btn-blue btn-pad btn-lg scroll-to"
+                   data-scroll-to-anchor=".homepage--we-compare-well"><i class="fa fa-angle-down hidden-xs" aria-hidden="true"></i> &nbsp; <strong>We're still up to 40% cheaper than traditional insurers</strong> &nbsp; <i class="fa fa-angle-down hidden-xs" aria-hidden="true"></i></a>
+            </div>
         </div>
     </section>
-
-    {# TEST - Homepage Copy #}
-    {% if homepageCopy is defined and homepageCopy == 'homepage-new-copy' %}
-        <div class="curved-background hidden-xs">
-            <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 2000 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                    <g id="Artboard" fill="#d6ebff">
-                        <path d="M0,0 L2000,0 L2000,139.921588 C1890.08746,181.703317 1753.08746,201.692115 1589,199.887983 C1424.91254,198.083852 1258.91254,174.763587 1091,129.927189 C918.666667,89.9495926 740,69.9607942 555,69.9607942 C370,69.9607942 185,113.269857 0,199.887983 L0,0 Z" id="Rectangle" transform="translate(1000.000000, 100.000000) scale(-1, 1) translate(-1000.000000, -100.000000) "></path>
-                    </g>
-                </g>
-            </svg>
-        </div>
-    {% endif %}
 
     {# Cover Details #}
     <section class="section--pad homepage--cover-details">
         <div class="container">
-            {# TEST - Homepage Copy #}
-            {% if homepageCopy is defined and homepageCopy == 'homepage-new-copy' %}
-                <div class="row">
-                    <div class="col-md-5">
-                        <h2 class="text-left h2c">Come rain, shine or cracked screen, we’re here for you and your social circle</h2>
-                        <p class="lead text-left">In just a few clicks, you’ll be instantly covered for loss, theft, accidental damage, out-of-warranty breakdowns and even international travel. And unlike other insurers, we cover phones that are up to three years old.</p>
-                    </div>
-                    <div class="col-md-7 text-left">
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="media">
-                                    <div class="media-left media-middle">
-                                        <img src="{{ cdn_url }}/images/homepage/so-sure_theft.svg" alt="Theft" width="100px">
-                                    </div>
-                                    <div class="media-body media-middle">
-                                        <h4 class="media-heading h-light">Theft</h4>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="media">
-                                    <div class="media-left media-middle">
-                                        <img src="{{ cdn_url }}/images/homepage/so-sure_loss.svg" alt="Loss" width="100px">
-                                    </div>
-                                    <div class="media-body media-middle">
-                                        <h4 class="media-heading h-light">Loss</h4>
-                                    </div>
-                                </div>
-                            </div>
+            <h2 class="h1">Cover Details</h2>
+            <p class="lead">We give you peace of mind and cover you for:</p>
+            <div class="row">
+                <div class="col-md-10 col-md-offset-1">
+                    <div class="row">
+                        <div class="col-sm-6 col-md-4">
+                            <div class="cover-img lozad theft"
+                                 data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
+                            <h4>Theft <br><small class="hidden-xs">&nbsp;</small></h4>
                         </div>
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="media">
-                                    <div class="media-left media-middle">
-                                        <img src="{{ cdn_url }}/images/homepage/so-sure_accidental_damage.svg" alt="Accidental Damage" width="100px">
-                                    </div>
-                                    <div class="media-body media-middle">
-                                        <h4 class="media-heading h-light">Accidental Damage</h4>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="media">
-                                    <div class="media-left media-middle">
-                                        <img src="{{ cdn_url }}/images/homepage/so-sure_out_of_warranty_breakdown.svg" alt="Out of Warranty Breakdown" width="100px">
-                                    </div>
-                                    <div class="media-body media-middle">
-                                        <h4 class="media-heading h-light">Out of Warranty Breakdown</h4>
-                                    </div>
-                                </div>
-                            </div>
+                         <div class="col-sm-6 col-md-4">
+                            <div class="cover-img lozad loss"
+                                 data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
+                            <h4>Loss <br><small class="hidden-xs">&nbsp;</small></h4>
                         </div>
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <div class="media">
-                                    <div class="media-left media-middle">
-                                        <img src="{{ cdn_url }}/images/homepage/so-sure_unauthorised_network_charges.svg" alt="Unauthorised Network Charges" width="100px">
-                                    </div>
-                                    <div class="media-body media-middle">
-                                        <h4 class="media-heading h-light">Unauthorised Network Charges</h4>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="media">
-                                    <div class="media-left media-middle">
-                                        <img src="{{ cdn_url }}/images/homepage/so-sure_accessories.svg" alt="accessories" width="100px">
-                                    </div>
-                                    <div class="media-body media-middle">
-                                        <h4 class="media-heading h-light">Accessories</h4>
-                                    </div>
-                                </div>
-                            </div>
+                      <div class="col-sm-6 col-md-4">
+                            <div class="cover-img lozad accidental-damage"
+                                 data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
+                            <h4>Accidental Damage <br><small>Including cracked screen &amp; water damage </small></h4>
                         </div>
-                    </div>
-                </div>
-            {% else %}
-                <h2 class="h1">Cover Details</h2>
-                <p class="lead">We give you peace of mind and cover you for:</p>
-                <div class="row">
-                    <div class="col-md-10 col-md-offset-1">
-                        <div class="row">
-                            <div class="col-sm-6 col-md-4">
-                                <div class="cover-img lozad theft"
-                                     data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
-                                <h4>Theft <br><small class="hidden-xs">&nbsp;</small></h4>
-                            </div>
-                             <div class="col-sm-6 col-md-4">
-                                <div class="cover-img lozad loss"
-                                     data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
-                                <h4>Loss <br><small class="hidden-xs">&nbsp;</small></h4>
-                            </div>
+                        <div class="col-sm-6 col-md-4">
+                            <div class="cover-img lozad breakdown"
+                                 data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
+                            <h4>Out of Warranty Breakdown <br><small class="hidden-xs">&nbsp;</small></h4>
+                        </div>
+                       <div class="col-sm-6 col-md-4">
+                            <div class="cover-img lozad charges"
+                                 data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
+                            <h4>Unauthorised Network Charges <br><small >Up to the value of £1000 inc. VAT</small></h4>
+                        </div>
                           <div class="col-sm-6 col-md-4">
-                                <div class="cover-img lozad accidental-damage"
-                                     data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
-                                <h4>Accidental Damage <br><small>Including cracked screen &amp; water damage </small></h4>
-                            </div>
-                            <div class="col-sm-6 col-md-4">
-                                <div class="cover-img lozad breakdown"
-                                     data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
-                                <h4>Out of Warranty Breakdown <br><small class="hidden-xs">&nbsp;</small></h4>
-                            </div>
-                           <div class="col-sm-6 col-md-4">
-                                <div class="cover-img lozad charges"
-                                     data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
-                                <h4>Unauthorised Network Charges <br><small >Up to the value of £1000 inc. VAT</small></h4>
-                            </div>
-                              <div class="col-sm-6 col-md-4">
-                                <div class="cover-img lozad accessories"
-                                     data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
-                                <h4>Accessories <br><small>Up to the value of £100 inc. VAT for theft or loss claims</small></h4>
-                            </div>
+                            <div class="cover-img lozad accessories"
+                                 data-background-image="{{ cdn_url }}/images/homepage/whats_covered_sprite_2x.png"></div>
+                            <h4>Accessories <br><small>Up to the value of £100 inc. VAT for theft or loss claims</small></h4>
                         </div>
                     </div>
                 </div>
-            {% endif %}
+            </div>
         </div>
     </section>
 
@@ -504,39 +352,6 @@
                 </div>
             </div>
         </section>
-    {# TEST - Homepage Copy #}
-    {% elseif homepageCopy is defined and homepageCopy == 'homepage-new-copy' %}
-        {# What we don't cover #}
-        <section class="homepage--what-we-dont-cover">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-8 col-md-offset-2">
-                        <h2>What We Don't Cover</h2>
-                        <ul class="list-unstyled">
-                            <li class="h4">
-                                Excess:
-                                <ul class="list-unstyled">
-                                    <li class="h5 h-light"><strong class="h4"><i class="fa fa-question-circle" data-container="body" data-toggle="popover" data-placement="top" data-content="pic-sure is our free app-based process to prove your phone is in good working condition and your screen is not cracked" aria-hidden="true"></i> pic-sure validated:</strong> £70 for Theft/Loss and £50 for Accidental Damage/Breakdown.</li>
-                                    <li class="h5 h-light"><strong class="h4">otherwise:</strong> £150 for Theft/Loss/Accidental Damage/Breakdown without pic-sure</li>
-                                </ul>
-                            </li>
-                            <li class="h4">
-                                Putting your phone at risk:
-                                <ul class="list-unstyled">
-                                    <li class="h5 h-light">Theft, Loss, Accidental Damage or Breakdown where you have knowingly put your phone at risk</li>
-                                </ul>
-                            </li>
-                            <li class="h4">
-                                Multiple Theft/Loss Claims:
-                                <ul class="list-unstyled">
-                                    <li class="h5 h-light">3+ claims for Loss and/or Theft in any policy year</li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
     {% else %}
         {# What we don't cover #}
         <section class="homepage--what-we-dont-cover">
@@ -601,12 +416,7 @@
         </div>
     </section>
 
-    {% if homepageCopy is defined and homepageCopy == 'homepage-new-copy' %}
-        {% include 'AppBundle::Default/_sectionComparisonAlt.html.twig' %}
-    {% else %}
-        {% include 'AppBundle::Default/_sectionComparison.html.twig' %}
-    {% endif %}
-
+    {% include 'AppBundle::Default/_sectionComparison.html.twig' %}
     {% include 'AppBundle::Default/_sectionFeedback.html.twig' %}
 
     {# Instant Quote #}
