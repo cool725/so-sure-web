@@ -192,8 +192,8 @@ hwi_oauth:
                 lastname:  last_name
         google:
             type:           google
-            client_id:      "1062115475688-0ngn2v5s4bh7qtecchbgc6gn2lrbiejs.apps.googleusercontent.com"
-            client_secret:  "p4wDyrg1vb-7CsabgQHMermz"
+            client_id:      "%google_clientauth_id%"
+            client_secret:  "%google_clientauth_secret%"
             scope:          "email profile"
         starling:
             type:              oauth2

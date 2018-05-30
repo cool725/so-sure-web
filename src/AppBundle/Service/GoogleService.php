@@ -36,7 +36,6 @@ class GoogleService
         $client = new \Google_Client(['client_id' => $this->googleClientId]);
 
         $payload = $client->verifyIdToken($token);
-        $this->logger->error('googleService payload', ['payload' => $payload]);
         if ($payload) {
             $userid = $payload['sub'];
             return $userid;
@@ -60,7 +59,6 @@ class GoogleService
     {
         try {
             $idFromToken = $this->getUserIdFromToken($token);        
-            $this->logger->error('googleService ', ['id' => $id, 'idFromToken' => $idFromToken]);
             return  $idFromToken == $id;
         } catch (\Exception $e) {
             $this->logger->error(sprintf(
