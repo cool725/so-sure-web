@@ -104,8 +104,10 @@ hr {
 
 mark {
 	background-color: $lightest-blue;
-	padding: 4px;
-	@include border-radius(2px);
+}
+
+mark.mgreen {
+	background-color: lighten($green, 35%);
 }
 
 // Helpers - for rapid prototyping

@@ -5,6 +5,7 @@
 {% set new_stylesheet = 1 %}
 {% set distraction_free = 1 %}
 {% set new_footer = 1 %}
+{% set include_emoji = 1 %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -71,6 +72,9 @@
                 <li class="h4"><i class="fa fa-check text-green" aria-hidden="true"></i> Accidental damage</li>
                 <li class="h4"><i class="fa fa-check text-green" aria-hidden="true"></i> Out of warranty breakdown</li>
                 <li class="h4"><i class="fa fa-check text-green" aria-hidden="true"></i> Worldwide coverage</li>
+                {% if moneyBackGuarantee is defined and moneyBackGuarantee == 'money-back-guarantee' %}
+                <li class="h4"><i class="fa fa-plus text-blue" aria-hidden="true"></i> 14 day money back guarantee</li>
+                {% endif %}
             </ul>
             <div class="benefits--review-desktop hidden-xs">
                 <div class="benefits--inner">
@@ -99,6 +103,9 @@
                         </div>
                     </div>
                     <h4 class="text-center">Plus worldwide cover on trips not exceeding 90 days</h4>
+                    {% if moneyBackGuarantee is defined and moneyBackGuarantee == 'money-back-guarantee' %}
+                        <div class="h4 h-light text-center"><mark class="mgreen">Plus.. We're so-sure you'll love us, we'll give you a 14 day money back guarantee 💰🔙</mark></div>
+                    {% endif %}
                 </div>
             </div>
         </div>
