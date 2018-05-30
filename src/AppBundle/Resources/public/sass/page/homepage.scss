@@ -581,6 +581,14 @@
             white-space: normal;
         }
 
+        .img-app {
+            width: 300px;
+
+            @include breakpoint(laptop) {
+                width: 400px;
+            }
+        }
+
     }
 
     &--pic-sure {
@@ -603,80 +611,6 @@
                 }
             }
         }
-
-
-        // ol {
-        //     li {
-        //         img {
-        //             display:block;
-
-        //             @include breakpoint(tablet) {
-        //                 float: left;
-        //             }
-        //         }
-        //     }
-        // }
-        // background-color: $lightest-blue;
-
-        // p {
-        //     max-width: 800px;
-        //     margin-left: auto;
-        //     margin-right: auto;
-        // }
-
-        // .p-arrow {
-        //     position: relative;
-
-        //     @include breakpoint(laptop) {
-        //         &:after {
-        //             width: 100px; height: 120px;
-        //             content: '';
-        //             background: transparent url('#{$cdn_url}/images/homepage/pic-sure_p_arrow.svg') no-repeat;
-        //             position: absolute;
-        //             top: 100%; right: -20px;
-        //         }
-        //     }
-        // }
-
-        // table { //TODO - Move to tables scss
-        //     max-width: 600px;
-        //     margin: 30px auto 0;
-
-        //     @include breakpoint(laptop) {
-        //         margin-bottom: 30px;
-        //     }
-
-        //     thead {
-        //         td {
-        //             padding: 30px 15px;
-        //             text-align: center;
-        //             vertical-align: middle;
-        //         }
-        //     }
-
-        //     tr {
-        //         td.sosure {
-        //             background-color: $white;
-        //         }
-
-        //         td.contrast {
-        //             background-color: lighten($lightest-blue, 6%);
-        //             opacity: 0.7;
-        //         }
-        //     }
-
-        //     tbody {
-        //         td {
-        //             padding: 15px;
-        //             border-color: darken($lightest-blue, 6%);
-        //             vertical-align: middle;
-        //         }
-        //     }
-        // }
-
-        // .app-link {
-        //     margin-top: 40px;
-        // }
     }
 
     &--trustpilot {
@@ -744,6 +678,10 @@
                 left: -60px; bottom: 10px;
                 width: 175px; height: 52px;
                 background: transparent url('#{$cdn_url}/images/homepage/so-sure_cover_section_arrow.svg') center center no-repeat;
+            }
+
+            .h2c {
+                padding-top: 5%;
             }
         }
     }

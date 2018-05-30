@@ -158,7 +158,7 @@
     {# TEST - Homepage Copy #}
     {% elseif homepageCopy is defined and homepageCopy == 'homepage-new-copy' %}
         {# Press #}
-        <section class="homepage__press background-white">
+        <section class="homepage__press">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-12 text-center">
@@ -249,14 +249,14 @@
             {% if homepageCopy is defined and homepageCopy == 'homepage-new-copy' %}
                 {# <h2 class="text-center h1">Why we're better than the rest</h2> #}
                 <div class="row">
-                    <div class="col-md-5">
-                        <img src="{{ cdn_url }}/images/homepage/iphone_x_so-sure_app.svg" alt="" width="190px;" class="img-center">
-                    </div>
-                    <div class="col-md-7">
+                    <div class="col-md-7 col-md-push-5">
                         <h2 class="h1 h-nom">We do things differently</h2>
                         <p class="lead">We've designed our insurance with you in mind. That's why we’ve created a product that looks after you when bad stuff happens but rewards you when you’re being careful.</p>
                         <p class="lead">If you make a claim, our friendly team will aim to get you back up and running with a replacement phone within 24-72 hours.</p>
                         <p class="lead">But if you don’t find yourself making a claim, we could end up returning 80% of your premium each year through our reward pot. We call this social insurance, and we believe it’s the future.</p>
+                    </div>
+                    <div class="col-md-5 col-md-pull-7">
+                        <img src="{{ cdn_url }}/images/homepage/so-sure_app_web.png" class="img-center img-app">
                     </div>
                 </div>
             {% else %}
@@ -314,7 +314,7 @@
             {% if homepageCopy is defined and homepageCopy == 'homepage-new-copy' %}
                 <div class="row">
                     <div class="col-md-5">
-                        <h2 class="text-left">Come rain, shine or cracked screen, we’re here for you and your social circle</h2>
+                        <h2 class="text-left h2c">Come rain, shine or cracked screen, we’re here for you and your social circle</h2>
                         <p class="lead text-left">In just a few clicks, you’ll be instantly covered for loss, theft, accidental damage, out-of-warranty breakdowns and even international travel. And unlike other insurers, we cover phones that are up to three years old.</p>
                     </div>
                     <div class="col-md-7 text-left">
@@ -511,26 +511,25 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-8 col-md-offset-2">
-                        <h2 class="h1">What We Don't Cover</h2>
-                        {# <h3>Excess</h3> #}
+                        <h2>What We Don't Cover</h2>
                         <ul class="list-unstyled">
-                            <li class="h3">
+                            <li class="h4">
                                 Excess:
                                 <ul class="list-unstyled">
-                                    <li class="h4 h-light"><strong class="h4"><i class="fa fa-question-circle" data-container="body" data-toggle="popover" data-placement="top" data-content="pic-sure is our free app-based process to prove your phone is in good working condition and your screen is not cracked" aria-hidden="true"></i> pic-sure validated:</strong> £70 for Theft/Loss and £50 for Accidental Damage/Breakdown.</li>
-                                    <li class="h4 h-light"><strong class="h4">otherwise:</strong> £150 for Theft/Loss/Accidental Damage/Breakdown without pic-sure</li>
+                                    <li class="h5 h-light"><strong class="h4"><i class="fa fa-question-circle" data-container="body" data-toggle="popover" data-placement="top" data-content="pic-sure is our free app-based process to prove your phone is in good working condition and your screen is not cracked" aria-hidden="true"></i> pic-sure validated:</strong> £70 for Theft/Loss and £50 for Accidental Damage/Breakdown.</li>
+                                    <li class="h5 h-light"><strong class="h4">otherwise:</strong> £150 for Theft/Loss/Accidental Damage/Breakdown without pic-sure</li>
                                 </ul>
                             </li>
-                            <li class="h3">
+                            <li class="h4">
                                 Putting your phone at risk:
                                 <ul class="list-unstyled">
-                                    <li class="h4 h-light">Theft, Loss, Accidental Damage or Breakdown where you have knowingly put your phone at risk</li>
+                                    <li class="h5 h-light">Theft, Loss, Accidental Damage or Breakdown where you have knowingly put your phone at risk</li>
                                 </ul>
                             </li>
-                            <li class="h3">
+                            <li class="h4">
                                 Multiple Theft/Loss Claims:
                                 <ul class="list-unstyled">
-                                    <li class="h4 h-light">3+ claims for Loss and/or Theft in any policy year</li>
+                                    <li class="h5 h-light">3+ claims for Loss and/or Theft in any policy year</li>
                                 </ul>
                             </li>
                         </ul>
