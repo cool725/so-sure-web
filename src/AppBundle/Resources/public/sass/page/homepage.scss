@@ -500,6 +500,22 @@
         }
     }
 
+    &__press_grayscale {
+        img {
+            filter: gray;
+            -webkit-filter: grayscale(1);
+            filter: grayscale(1);
+            opacity: 0.5;
+
+            &:hover {
+                filter: none;
+                -webkit-filter: none;
+                filter: none;
+                opacity: 1;
+            }
+        }
+    }
+
     &--press {
         // text-align: center;
         h4 {
@@ -580,15 +596,19 @@
         .btn {
             white-space: normal;
         }
+    }
+
+    &--we-do-things-differently {
+        background-color: $lightest-blue;
 
         .img-app {
             width: 300px;
 
             @include breakpoint(laptop) {
                 width: 400px;
+                margin-top: 40px;
             }
         }
-
     }
 
     &--pic-sure {
@@ -680,8 +700,9 @@
                 background: transparent url('#{$cdn_url}/images/homepage/so-sure_cover_section_arrow.svg') center center no-repeat;
             }
 
-            .h2c {
-                padding-top: 5%;
+            // Oh how wank
+            .h2-d {
+                margin-top: 70px;
             }
         }
     }

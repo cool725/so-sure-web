@@ -61,3 +61,8 @@
     /* inline-block space fix */
     margin-right: -4px;
 }
+
+.v-center {
+   display: flex;
+   align-items: center;
+}

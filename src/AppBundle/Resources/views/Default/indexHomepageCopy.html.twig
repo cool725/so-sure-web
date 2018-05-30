@@ -22,7 +22,7 @@
 
     {# Hero #}
     <section class="homepage--hero homepage--hero-background">
-        <h1 class="homepage--hero-h1">Mobile insurance <br> designed for you</h1>
+        <h1 class="homepage--hero-h1">Mobile Insurance <br> Designed For You</h1>
         <p class="lead">Here protecting you when you make a claim, and rewarding you when you don't.</p>
         {# Phone Search #}
         {% if device_category() == 'Mobile' %}
@@ -87,7 +87,7 @@
     </section>
 
     {# Press #}
-    <section class="homepage__press">
+    <section class="homepage__press homepage__press_grayscale">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12 text-center">
@@ -109,7 +109,6 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-10 col-md-offset-1">
-                    {# <h2 class="h1 text-center h-nom">Who is so-sure?</h2> #}
                     <p class="big-text text-center">We’re a new kind of insurer – an insurer that’s focused on people, not profits. We saw an opportunity to make insurance better. So that’s what we did. We provide mobile insurance that’s simple, reasonable and hassle-free, so you can get back to worrying about the big stuff.</p>
                 </div>
             </div>
@@ -127,7 +126,7 @@
     </div>
 
     {# Why we're better than the rest #}
-    <section class="section--pad homepage--why-we-are-better">
+    <section class="section--pad homepage--we-do-things-differently">
         <div class="container">
             <div class="row">
                 <div class="col-md-7 col-md-push-5">
@@ -158,7 +157,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-5">
-                    <h2 class="text-left h2c">Come rain, shine or cracked screen, we’re here for you and your social circle</h2>
+                    <h2 class="text-left h2-d">Come rain, shine or cracked screen, we’re here for you and your social circle</h2>
                     <p class="lead text-left">In just a few clicks, you’ll be instantly covered for loss, theft, accidental damage, out-of-warranty breakdowns and even international travel. And unlike other insurers, we cover phones that are up to three years old.</p>
                 </div>
                 <div class="col-md-7 text-left">
@@ -233,43 +232,13 @@
         </div>
     </section>
 
-    {# Travel When Abroad #}
-    <section class="homepage--when-you-travel">
-        <div class="cloud cloud--top">
-            <img src="{{ cdn_url }}/images/homepage/so-sure_cloud_top_expanded.svg"
-                 alt="cloud top"
-                 align="top">
-        </div>
-        <div class="container">
-            <h2 class="h1">Including When You Travel Abroad</h2>
-            <p class="lead">We have your back whilst you're on the road (as long as your trip does not exceed 90 days)</p>
-            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs="
-                 data-src="{{ cdn_url }}/images/homepage/so-sure_airways.svg"
-                 alt="so-sure - airways"
-                 class="img-responsive img-responsive--center so-sure_airways lozad">
-        </div>
-        <div class="cloud cloud--bottom">
-            <img src="{{ cdn_url }}/images/homepage/so-sure_cloud_bottom_expanded.svg"
-                 alt="cloud bottom"
-                 align="bottom">
-        </div>
-    </section>
-
-
     {# What we don't cover #}
     <section class="homepage--what-we-dont-cover">
         <div class="container">
             <div class="row">
-                <div class="col-md-8 col-md-offset-2">
-                    <h2>What We Don't Cover</h2>
+                <div class="col-md-8 col-md-offset-2 text-center">
+                    <h2 class="h3">What We Don't Cover</h2>
                     <ul class="list-unstyled">
-                        <li class="h4">
-                            Excess:
-                            <ul class="list-unstyled">
-                                <li class="h5 h-light"><strong class="h4"><i class="fa fa-question-circle" data-container="body" data-toggle="popover" data-placement="top" data-content="pic-sure is our free app-based process to prove your phone is in good working condition and your screen is not cracked" aria-hidden="true"></i> pic-sure validated:</strong> £70 for Theft/Loss and £50 for Accidental Damage/Breakdown.</li>
-                                <li class="h5 h-light"><strong class="h4">otherwise:</strong> £150 for Theft/Loss/Accidental Damage/Breakdown without pic-sure</li>
-                            </ul>
-                        </li>
                         <li class="h4">
                             Putting your phone at risk:
                             <ul class="list-unstyled">
@@ -298,7 +267,7 @@
         </svg>
     </div>
 
-    {% include 'AppBundle::Default/_sectionRewardPot.html.twig' %}
+    {% include 'AppBundle::Default/_sectionComparisonAlt.html.twig' %}
 
     <div class="curved-background hidden-xs">
         <svg preserveAspectRatio="xMinYMin meet" viewBox="0 0 2000 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -335,27 +304,45 @@
         </div>
     </section>
 
-    {% include 'AppBundle::Default/_sectionComparisonAlt.html.twig' %}
-    {% include 'AppBundle::Default/_sectionFeedback.html.twig' %}
-
-    {# Instant Quote #}
-    <section class="homepage--instant-quote">
+    {# Quotes #}
+    <section class="section--pad homepage--feedback background-off-white" id="customer-feedback">
         <div class="container">
-            <h2 class="text-center h1">Get Your Instant Quote</h2>
-            {# Phone Search #}
-            {% if phone is defined and phone %}
-                {{ render(controller('AppBundle:Default:selectPhoneMakeSearch', {
-                    'type': 'footer',
-                    'id': phone.id
-                })) }}
-            {% else %}
-                {{ render(controller('AppBundle:Default:selectPhoneMakeSearch', {
-                    'type': 'footer',
-                })) }}
-            {% endif %}
-            {# End Phone Search #}
-            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/so-sure_form_rocket.svg"
-                 class="img-responsive form-rocket lozad" alt="so-sure - rocket">
+            <h2 class="h1">Our Customers Love Us</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/feedback/so-sure_feedback_honor_b.png"
+                         alt="Honor B"
+                         width="120px" class="lozad">
+                    <blockquote>
+                        <p>"Your terms and conditions are so clear and concise it makes the customer feel like you actually care about them"</p>
+                        <footer>
+                            Honor B.
+                        </footer>
+                    </blockquote>
+                </div>
+                <div class="col-md-4">
+                    <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/feedback/so-sure_feedback_herve_n.png"
+                         alt="Herve N"
+                         width="120px" class="lozad">
+                    <blockquote>
+                        <p>"My so-sure claim was super fast and everyone was really friendly! Based on previous phone insurance experiences, I can honestly say this truly is a revolution"</p>
+                        <footer>
+                            Herve N.
+                        </footer>
+                    </blockquote>
+                </div>
+                <div class="col-md-4">
+                    <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/feedback/so-sure_feedback_ted_e.png"
+                         alt="Ted E"
+                         width="120px" class="lozad">
+                    <blockquote>
+                        <p>"After the 1st year, I got 71% money back. I used it to spruce up my new apartment. Never imagined my phone insurance would pay my IKEA bill!"</p>
+                        <footer>
+                            Ted E.
+                        </footer>
+                    </blockquote>
+                </div>
+            </div>
         </div>
     </section>
 
