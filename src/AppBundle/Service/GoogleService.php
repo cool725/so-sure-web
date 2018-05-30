@@ -18,7 +18,7 @@ class GoogleService
     protected $googleApiKey;
 
     /** @var string */
-    protected $clientId;
+    protected $googleClientId;
 
     /**
      * @param LoggerInterface $logger
@@ -35,7 +35,7 @@ class GoogleService
         $this->logger = $logger;
         $this->googleAppName = $googleAppName;
         $this->googleApiKey = $googleApiKey;
-        $this->clientId = $clientId;
+        $this->googleClientId = $googleClientId;
     }
 
     /**
@@ -45,26 +45,9 @@ class GoogleService
      */
     public function getUserIdFromToken($token)
     {
-        $this->logger->error('googleService id', ['id' => $this->clientId]);
-        $client = new \Google_Client(['client_id' => $this->clientId]);
-        //$client->setApplicationName($this->googleAppName);
-        //$client->setDeveloperKey($this->googleApiKey);
-
-        /*
-        $payload = 'https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=' . $token;
-        $json = file_get_contents($payload);
-
-        $this->logger->error('googleService payload', ['payload' => $json]);
-        if ($json) {
-            $userInfoArray = json_decode($json, true);
-            $googleEmail = $userInfoArray['email'];
-            $googleId = $userInfoArray['sub'];
-            return $googleId;
-        }
-        */
+        $client = new \Google_Client(['client_id' => $this->googleClientId]);
 
         $payload = $client->verifyIdToken($token);
-        $this->logger->error('googleService payload', ['payload' => $payload]);
         if ($payload) {
             $userid = $payload['sub'];
             return $userid;
@@ -88,7 +71,6 @@ class GoogleService
     {
         try {
             $idFromToken = $this->getUserIdFromToken($token);        
-            $this->logger->error('googleService ', ['id' => $id, 'idFromToken' => $idFromToken]);
             return  $idFromToken == $id;
         } catch (\Exception $e) {
             $this->logger->error(sprintf(

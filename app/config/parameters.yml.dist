@@ -51,7 +51,7 @@ parameters:
     google_apikey:
     google_analytics:
     ga_tag_manager_env: '&gtm_auth=&gtm_preview=env-4&gtm_cookies_win=x'
-    google_android_clientid:
+    google_clientid:
 
     rollbar_access_token:
 
