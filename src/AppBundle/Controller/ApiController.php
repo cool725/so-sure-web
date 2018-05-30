@@ -621,7 +621,6 @@ class ApiController extends BaseController
                 }
             } else {
                 if ($facebookId !== null) {
-                    /*
                     $facebookService = $this->get('app.facebook');
                     if (!$facebookService->validateTokenId(
                         $facebookId,
@@ -629,7 +628,6 @@ class ApiController extends BaseController
                     )) {
                         return $this->getErrorJsonResponse(ApiErrorCode::ERROR_USER_EXISTS, 'Invalid token', 403);
                     }
-                    */
                 } elseif ($googleId !== null) {
                     $googleService = $this->get('app.google');
                     if (!$googleService->validateTokenId(
