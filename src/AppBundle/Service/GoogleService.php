@@ -16,11 +16,11 @@ class GoogleService
 
     /**
      * @param LoggerInterface $logger
-     * @param string          $clientId
+     * @param string          $googleClientId
      */
     public function __construct(
         LoggerInterface $logger,
-        $clientId
+        $googleClientId
     ) {
         $this->logger = $logger;
         $this->googleClientId = $googleClientId;
@@ -58,7 +58,7 @@ class GoogleService
     public function validateTokenId($id, $token)
     {
         try {
-            $idFromToken = $this->getUserIdFromToken($token);        
+            $idFromToken = $this->getUserIdFromToken($token);
             return  $idFromToken == $id;
         } catch (\Exception $e) {
             $this->logger->error(sprintf(

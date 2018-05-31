@@ -603,7 +603,12 @@ class ApiController extends BaseController
             $facebookId = $this->getDataString($data, 'facebook_id');
             $googleId = $this->getDataString($data, 'google_id');
             $mobileNumber = $this->getDataString($data, 'mobile_number');
-            $userExists = $repo->existsUser($this->getDataString($data, 'email'), $facebookId, $mobileNumber, $googleId);
+            $userExists = $repo->existsUser(
+                $this->getDataString($data, 'email'),
+                $facebookId,
+                $mobileNumber,
+                $googleId
+            );
             if ($userExists) {
                 // Special case for prelaunch users - allow them to 'create' an account without
                 // being recreated in account in the db.  This is only allowed once per user

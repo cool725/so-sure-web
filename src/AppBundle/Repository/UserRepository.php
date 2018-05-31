@@ -53,8 +53,13 @@ class UserRepository extends DocumentRepository
                 ->count() > 0;
     }
 
-    public function getDuplicateUsers(User $user = null, $email = null, $facebookId = null, $mobileNumber = null, $googleId = null)
-    {
+    public function getDuplicateUsers(
+        User $user = null,
+        $email = null,
+        $facebookId = null,
+        $mobileNumber = null,
+        $googleId = null
+    ) {
         // If there's nothing to query, then another user doesn't exist
         if (!$email && !$facebookId && !$mobileNumber) {
             return null;
@@ -83,8 +88,13 @@ class UserRepository extends DocumentRepository
             ->execute();
     }
 
-    public function existsAnotherUser(User $user = null, $email = null, $facebookId = null, $mobileNumber = null, $googleId = null)
-    {
+    public function existsAnotherUser(
+        User $user = null,
+        $email = null,
+        $facebookId = null,
+        $mobileNumber = null,
+        $googleId = null
+    ) {
         if ($duplicate = $this->getDuplicateUsers($user, $email, $facebookId, $mobileNumber, $googleId)) {
             return $duplicate->count() > 0;
         }
