@@ -20,37 +20,11 @@ class SixpackService
     // don't log to mixpanel
     const LOG_MIXPANEL_NONE = 'none';
 
-    //const EXPERIMENT_HOMEPAGE_AA = 'homepage-aa';
-    //const EXPERIMENT_QUOTE_CALC_LOWER = 'quote-calc-lower';
-    //const EXPERIMENT_LANDING_HOME = 'landing-or-home';
-    //const EXPERIMENT_CPC_QUOTE_MANUFACTURER = 'cpc-quote-or-manufacturer';
-    //const EXPERIMENT_HOMEPAGE_PHONE_IMAGE = 'homepage-phone-image';
-    // const EXPERIMENT_QUOTE_SLIDER = 'quote-slider';
-    //const EXPERIMENT_PYG_HOME= 'pyg-or-home';
-    //const EXPERIMENT_QUOTE_SIMPLE_COMPLEX_SPLIT = 'quote-simple-complex-split';
-    //const EXPERIMENT_QUOTE_SIMPLE_SPLIT = 'quote-simple-split';
-    //const EXPERIMENT_CPC_MANUFACTURER_HOME = 'cpc-manufacturer-or-home';
-    //const EXPERIMENT_CPC_MANUFACTURER_WITH_HOME = 'cpc-manufacturer-with-home';
-    //const EXPERIMENT_POSTCODE = 'postcode';
-    //const EXPERIMENT_HOMEPAGE_V1_V2 = 'homepage-v1-v2';
-    //const EXPERIMENT_HOMEPAGE_V1_V2OLD_V2NEW = 'homepage-v1-v2old-v2new';
-    //const EXPERIMENT_FUNNEL_V1_V2 = 'funnel-v1-v2';
-    //const EXPERIMENT_HOMEPAGE_STICKYSEARCH_PICSURE = 'homepage-v2-sticksearch-picsure';
-    //const EXPERIMENT_HOMEPAGE_STICKYSEARCH_SHUFFLE = 'homepage-v2-sticksearch-shuffle';
-    //const EXPERIMENT_QUOTE_SECTIONS = 'quote-sections';
-    //const EXPERIMENT_POLICY_PDF_DOWNLOAD = 'policy-pdf-download';
-    //const EXPERIMENT_CANCELLATION = 'cancellation';
-    //const EXPERIMENT_NEW_QUOTE_DESIGN = 'new-quote-design';
-    //const EXPERIMENT_CPC_MANUFACTURER_OLD_NEW = 'cpc-manufacturer-old-new';
-
     const EXPERIMENT_HOMEPAGE_AA_V2 = 'homepage-aa-v2';
     const EXPERIMENT_APP_SHARE_METHOD = 'app-share-method';
     const EXPERIMENT_APP_PICSURE_LOCATION = 'app-picsure-location';
     const EXPERIMENT_SAVE_QUOTE_24HOURS = 'save-quote-24-hours';
     // const EXPERIMENT_USER_WELCOME_MODAL = 'welcome-modal';
-    const EXPERIMENT_QUOTE_INTERCOM_PURCHASE = 'quote-intercom-purchase';
-    //const EXPERIMENT_MONEY_UNBOUNCE = 'money-unbounce';
-    //const EXPERIMENT_MOBILE_SEARCH_DROPDOWN = 'mobile-dropdown-search';
     const EXPERIMENT_STEP_3 = 'step-3-payment-new';
     const EXPERIMENT_PURCHASE_FLOW_BACS = 'purchase-flow-bacs';
     const EXPERIMENT_CPC_QUOTE_HOMEPAGE = 'cpc-quote-or-homepage';
@@ -92,7 +66,6 @@ class SixpackService
     public static $unauthExperiments = [
         self::EXPERIMENT_HOMEPAGE_AA_V2,
         self::EXPERIMENT_SAVE_QUOTE_24HOURS,
-        self::EXPERIMENT_QUOTE_INTERCOM_PURCHASE,
         self::EXPERIMENT_STEP_3,
         self::EXPERIMENT_PURCHASE_FLOW_BACS,
         self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
@@ -165,7 +138,6 @@ class SixpackService
      * @var array
      */
     public static $purchaseConversionKpi = [
-        self::EXPERIMENT_QUOTE_INTERCOM_PURCHASE,
         self::EXPERIMENT_HOMEPAGE_AA_V2,
         self::EXPERIMENT_DOB,
         self::EXPERIMENT_TRUSTPILOT_REVIEW,
