@@ -1,0 +1,9 @@
+{% extends 'AppBundle:Email:base.txt.twig' %}
+{% block body %}
+**
+------------------------------------------------------------
+Hi {% if user.name %}{{ user.name }}{% else %}{{ user.email }}{% endif %},
+<br><br>
+As per your request, we have deleted all information we have related your account/email address.
+
+{% endblock body %}

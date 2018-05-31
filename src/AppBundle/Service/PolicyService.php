@@ -32,8 +32,8 @@ use AppBundle\Document\IdentityLog;
 use AppBundle\Document\CurrencyTrait;
 use AppBundle\Document\DateTrait;
 use AppBundle\Document\Connection\Connection;
-use AppBundle\Document\OptOut\EmailOptOut;
-use AppBundle\Document\OptOut\SmsOptOut;
+use AppBundle\Document\Opt\EmailOptOut;
+use AppBundle\Document\Opt\SmsOptOut;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\Invitation\Invitation;
@@ -1031,52 +1031,6 @@ class PolicyService
                 sprintf('Failed sending policy email to %s', $policy->getUser()->getEmail()),
                 ['exception' => $e]
             );
-        }
-    }
-
-    /**
-     * @param Policy $policy
-     */
-    public function weeklyEmail(Policy $policy)
-    {
-        if (!$this->mailer) {
-            return;
-        }
-
-        // No need to send weekly email if pot is full
-        if ($policy->isPotCompletelyFilled()) {
-            return;
-        }
-
-        /** @var EmailOptOutRepository $repo */
-        $repo = $this->dm->getRepository(EmailOptOut::class);
-        if ($repo->isOptedOut($policy->getUser()->getEmail(), EmailOptOut::OPTOUT_CAT_WEEKLY)) {
-            return;
-        }
-
-        try {
-            $this->mailer->sendTemplate(
-                sprintf('Happy Wednesday!'),
-                $policy->getUser()->getEmail(),
-                'AppBundle:Email:policy/weekly.html.twig',
-                ['policy' => $policy],
-                'AppBundle:Email:policy/weekly.txt.twig',
-                ['policy' => $policy],
-                null,
-                null,
-                MailerService::EMAIL_WEEKLY
-            );
-            $policy->setLastEmailed(new \DateTime());
-
-            return true;
-        } catch (\Exception $e) {
-            $this->logger->error(sprintf(
-                'Failed sending policy weekly email to %s. Ex: %s',
-                $policy->getUser()->getEmail(),
-                $e->getMessage()
-            ));
-
-            return false;
         }
     }
 

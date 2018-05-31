@@ -2,6 +2,8 @@
 
 namespace AppBundle\Command;
 
+use AppBundle\Document\Opt\EmailOptOut;
+use AppBundle\Document\Opt\OptOut;
 use AppBundle\Document\User;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -28,6 +30,12 @@ class TestCommand extends BaseCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->testBirthday();
+        $output->writeln('Finished');
+    }
+
+    private function testBirthday()
+    {
         $repo = $this->getManager()->getRepository(User::class);
         foreach ($repo->findAll() as $user) {
             /** @var User $user */
@@ -52,8 +60,5 @@ class TestCommand extends BaseCommand
                 }
             }
         }
-
-
-        $output->writeln('Finished');
     }
 }

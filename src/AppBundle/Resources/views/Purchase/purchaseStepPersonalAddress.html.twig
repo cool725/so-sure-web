@@ -6,6 +6,7 @@
 {% set new_stylesheet = 1 %}
 {% set distraction_free = 1 %}
 {% set new_footer = 1 %}
+{% set include_emoji = 1 %}
 
 {% set showAddress = purchase_form.addressLine1.vars.data | length > 0 or purchase_form.postcode.vars.data | length > 0 %}
 {% set showDOB = purchase_form.name.vars.data | length > 0 and purchase_form.email.vars.data | length > 0 %}
@@ -119,6 +120,10 @@
         </ul>
 
         <h4 class="text-center">All this covered and more...</h4>
+
+        {% if moneyBackGuarantee is defined and moneyBackGuarantee == 'money-back-guarantee' %}
+            <div class="h4 h-light text-center"><mark class="mgreen">Plus.. We're so-sure you'll love us, we'll give you a 14 day money back guarantee 💰🔙</mark></div>
+        {% endif %}
 
         <div class="checkout--step">
             <div class="container">

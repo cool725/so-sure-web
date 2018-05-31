@@ -5,14 +5,6 @@
     padding: 40px 0;
 }
 
-@include breakpoint(mobileonly) {
-
-	.section--pad {
-	    padding: 20px 0;
-	}
-
-}
-
 .section--arrow {
     position: relative;
 
@@ -60,4 +52,9 @@
     text-align: left;
     /* inline-block space fix */
     margin-right: -4px;
+}
+
+.v-center {
+   display: flex;
+   align-items: center;
 }

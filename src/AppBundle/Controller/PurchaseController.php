@@ -9,6 +9,7 @@ use AppBundle\Exception\InvalidEmailException;
 use AppBundle\Exception\InvalidFullNameException;
 use AppBundle\Form\Type\BacsConfirmType;
 use AppBundle\Form\Type\BacsType;
+use AppBundle\Repository\JudoPaymentRepository;
 use AppBundle\Repository\PaymentRepository;
 use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\PolicyRepository;
@@ -241,6 +242,11 @@ class PurchaseController extends BaseController
                     }
                     $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_RECEIVE_DETAILS, $data);
 
+                    // Convert point from quote
+                    $this->get('app.sixpack')->convert(
+                        SixpackService::EXPERIMENT_MONEY_BACK_GUARANTEE
+                    );
+
                     if ($user->hasPartialPolicy()) {
                         return new RedirectResponse(
                             $this->generateUrl('purchase_step_policy_id', [
@@ -257,6 +263,12 @@ class PurchaseController extends BaseController
         /** @var \Symfony\Component\Security\Csrf\CsrfTokenManagerInterface $csrf */
         $csrf = $this->get('security.csrf.token_manager');
 
+        $moneyBackGuarantee = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_MONEY_BACK_GUARANTEE,
+            ['no-money-back-guarantee', 'money-back-guarantee']
+        );
+
         $data = array(
             'purchase_form' => $purchaseForm->createView(),
             'step' => 1,
@@ -271,6 +283,7 @@ class PurchaseController extends BaseController
             // 'postcode' => $this->sixpack($request, SixpackService::EXPERIMENT_POSTCODE, ['comma', 'split', 'type']),
             'postcode' => 'comma',
             'showDropdown' => $dobExp,
+            'moneyBackGuarantee' => $moneyBackGuarantee,
         );
 
         return $this->render('AppBundle:Purchase:purchaseStepPersonalAddress.html.twig', $data);
@@ -573,6 +586,12 @@ class PurchaseController extends BaseController
             }
         }
 
+        $moneyBackGuarantee = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_MONEY_BACK_GUARANTEE,
+            ['no-money-back-guarantee', 'money-back-guarantee']
+        );
+
         $exp = $this->sixpack(
             $request,
             SixpackService::EXPERIMENT_STEP_3,
@@ -603,6 +622,7 @@ class PurchaseController extends BaseController
             ) : null,
             'billing_date' => $billingDate,
             'payment_provider' => $paymentProviderTest,
+            'moneyBackGuarantee' => $moneyBackGuarantee,
         );
 
         return $this->render($template, $data);
@@ -937,18 +957,25 @@ class PurchaseController extends BaseController
      */
     public function purchaseJudoPayFailAction(Request $request)
     {
-        $this->get('logger')->info(sprintf(
+        $msg = sprintf(
             'Judo Web Failure ReceiptId: %s Ref: %s',
             $request->get('ReceiptId'),
             $request->get('Reference')
-        ));
+        );
+        $this->get('logger')->info($msg);
         $user = $this->getUser();
         $dm = $this->getManager();
+
+        /** @var JudopayService $judo */
         $judo = $this->get('app.judopay');
-        $repo = $dm->getRepository(Payment::class);
+
+        /** @var JudoPaymentRepository $repo */
+        $repo = $dm->getRepository(JudoPayment::class);
+
+        /** @var JudoPayment $payment */
         $payment = $repo->findOneBy(['reference' => $request->get('Reference')]);
         if (!$payment) {
-            throw new \Exception('Unable to locate payment');
+            throw new \Exception(sprintf('Unable to locate payment. Details: %s', $msg));
         }
         $policy = $payment->getPolicy();
 

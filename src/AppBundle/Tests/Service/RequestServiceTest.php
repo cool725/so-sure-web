@@ -99,6 +99,8 @@ class RequestServiceTest extends WebTestCase
             'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:14.0; ips-agent) Gecko/20100101 Firefox/14.0.1',
             'Mozilla/5.0 (compatible; ScoutJet; +http://www.scoutjet.com/)',
             'Go-http-client/1.1',
+            'Mozilla/5.0 (compatible; Google-Apps-Script)',
+            //'Mozilla/5.0 (Linux; Android 8.0.0; SM-G950F Build/R16NW; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/66.0.3359.158 Mobile Safari/537.36 [FB_IAB/FB4A;FBAV/172.0.0.66.93;]' // facebook
         ];
         // @codingStandardsIgnoreEnd
         

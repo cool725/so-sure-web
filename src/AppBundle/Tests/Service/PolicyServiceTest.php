@@ -21,8 +21,8 @@ use AppBundle\Document\Connection\RenewalConnection;
 use AppBundle\Document\Payment\JudoPayment;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
-use AppBundle\Document\OptOut\EmailOptOut;
-use AppBundle\Document\OptOut\SmsOptOut;
+use AppBundle\Document\Opt\EmailOptOut;
+use AppBundle\Document\Opt\SmsOptOut;
 use AppBundle\Service\InvitationService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use AppBundle\Exception\InvalidPremiumException;
@@ -1084,39 +1084,6 @@ class PolicyServiceTest extends WebTestCase
         $updatedPolicy = $policyRepo->find($policy->getId());
 
         $this->assertEquals($premium, $updatedPolicy->getPremium());
-    }
-
-    public function testWeeklyEmail()
-    {
-        $user = static::createUser(
-            static::$userManager,
-            static::generateEmail('weekly', $this),
-            'bar',
-            static::$dm
-        );
-        $policy = static::initPolicy(
-            $user,
-            static::$dm,
-            $this->getRandomPhone(static::$dm),
-            new \DateTime('2016-09-30'),
-            true
-        );
-
-        $policy->setStatus(PhonePolicy::STATUS_PENDING);
-        static::$policyService->setEnvironment('prod');
-        static::$policyService->create($policy, new \DateTime('2016-10-01'));
-        static::$policyService->setEnvironment('test');
-        static::$dm->flush();
-        
-        $this->assertTrue(static::$policyService->weeklyEmail($policy));
-        
-        $optout = new EmailOptOut();
-        $optout->setCategory(EmailOptOut::OPTOUT_CAT_WEEKLY);
-        $optout->setEmail(static::generateEmail('weekly', $this));
-        static::$dm->persist($optout);
-        static::$dm->flush();
-
-        $this->assertNull(static::$policyService->weeklyEmail($policy));
     }
 
     public function testPoliciesPendingCancellation()

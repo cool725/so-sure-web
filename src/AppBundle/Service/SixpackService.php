@@ -54,12 +54,28 @@ class SixpackService
     const EXPERIMENT_STEP_3 = 'step-3-payment-new';
     const EXPERIMENT_PURCHASE_FLOW_BACS = 'purchase-flow-bacs';
     const EXPERIMENT_CPC_QUOTE_HOMEPAGE = 'cpc-quote-or-homepage';
-    const EXPERIMENT_DEFACTO = 'defacto';
     const EXPERIMENT_DOB = 'purchase-funnel-dob-dropdown';
     const EXPERIMENT_72_REPLACEMENT = 'seventytwo-hours';
     const EXPERIMENT_MONEY_LANDING = 'money-landing';
     const EXPERIMENT_PICSURE_SECTION = 'picsure-redesign';
+    const EXPERIMENT_EBAY_LANDING = 'ebay-landing';
+    const EXPERIMENT_EBAY_LANDING_1 = 'ebay-landing-1';
+    const EXPERIMENT_EBAY_LANDING_2 = 'ebay-landing-2';
     const EXPERIMENT_NEW_WELCOME_MODAL = 'new-welcome-modal';
+    // New Exp Competitor Landing
+    const EXPERIMENT_COMPETITOR_LANDING = 'competitor-landing';
+    const EXPERIMENT_TRUSTPILOT_REVIEW = 'trustpilot';
+    // New Test Single Mem Option
+    const EXPERIMENT_MEMORY_OPTIONS = 'single-progressive-dropdown';
+    // New Test Money Back Guarantee
+    const EXPERIMENT_MONEY_BACK_GUARANTEE = 'money-back-guarantee';
+    // Exp 1
+    const EXPERIMENT_HOMEPAGE_NEW_COPY = 'homepage-new-copy';
+    // Exp 2
+
+    // Exp 3
+
+    // Exp 4
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';
@@ -80,11 +96,27 @@ class SixpackService
         self::EXPERIMENT_STEP_3,
         self::EXPERIMENT_PURCHASE_FLOW_BACS,
         self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
-        self::EXPERIMENT_DEFACTO,
         self::EXPERIMENT_DOB,
         self::EXPERIMENT_72_REPLACEMENT,
         self::EXPERIMENT_MONEY_LANDING,
         self::EXPERIMENT_PICSURE_SECTION,
+        self::EXPERIMENT_EBAY_LANDING,
+        self::EXPERIMENT_EBAY_LANDING_1,
+        self::EXPERIMENT_EBAY_LANDING_2,
+        // New Exp Competitor Landing
+        self::EXPERIMENT_COMPETITOR_LANDING,
+        self::EXPERIMENT_TRUSTPILOT_REVIEW,
+        // New Test Single Mem Option
+        self::EXPERIMENT_MEMORY_OPTIONS,
+        // New Test Money Back Guarantee
+         self::EXPERIMENT_MONEY_BACK_GUARANTEE,
+        // Exp 1
+        self::EXPERIMENT_HOMEPAGE_NEW_COPY,
+        // Exp 2
+
+        // Exp 3
+
+        // Exp 4
     ];
 
     public static $authExperiments = [
@@ -114,6 +146,18 @@ class SixpackService
         self::EXPERIMENT_72_REPLACEMENT,
         self::EXPERIMENT_MONEY_LANDING,
         self::EXPERIMENT_PICSURE_SECTION,
+        self::EXPERIMENT_EBAY_LANDING,
+        self::EXPERIMENT_EBAY_LANDING_1,
+        self::EXPERIMENT_EBAY_LANDING_2,
+        // New Exp Competitor Landing
+        self::EXPERIMENT_COMPETITOR_LANDING,
+        // Exp 1
+        self::EXPERIMENT_HOMEPAGE_NEW_COPY,
+        // Exp 2
+
+        // Exp 3
+
+        // Exp 4
     ];
 
     /**
@@ -123,8 +167,19 @@ class SixpackService
     public static $purchaseConversionKpi = [
         self::EXPERIMENT_QUOTE_INTERCOM_PURCHASE,
         self::EXPERIMENT_HOMEPAGE_AA_V2,
-        self::EXPERIMENT_DEFACTO,
         self::EXPERIMENT_DOB,
+        self::EXPERIMENT_TRUSTPILOT_REVIEW,
+        // New Test Single Mem Option
+        self::EXPERIMENT_MEMORY_OPTIONS,
+        // New Test Money Back Guarantee
+        self::EXPERIMENT_MONEY_BACK_GUARANTEE,
+        // Exp 1
+
+        // Exp 2
+
+        // Exp 3
+
+        // Exp 4
     ];
 
     /** @var LoggerInterface */

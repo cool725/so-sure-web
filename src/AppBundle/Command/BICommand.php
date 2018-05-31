@@ -170,6 +170,7 @@ class BICommand extends BaseCommand
             '"First Referer"',
             '"Claim Initial Suspicion"',
             '"Claim Final Suspicion"',
+            '"Claim Replacement Received Date"',
         ]);
         foreach ($claims as $claim) {
             /** @var Claim $claim */
@@ -220,6 +221,12 @@ class BICommand extends BaseCommand
                 sprintf('"%s"', $user->getAttribution() ? $user->getAttribution()->getReferer() : ''),
                 sprintf('"%s"', $claim->getInitialSuspicion() ? 'yes' : 'no'),
                 sprintf('"%s"', $claim->getFinalSuspicion() ? 'yes' : 'no'),
+                sprintf(
+                    '"%s"',
+                    $claim->getReplacementReceivedDate() ?
+                        $claim->getReplacementReceivedDate()->format('Y-m-d') :
+                        ''
+                ),
             ]);
         }
         if (!$skipS3) {

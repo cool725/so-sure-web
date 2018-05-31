@@ -1,9 +1,43 @@
-// _dropdown.scss
-
+// dropdown.scss
 .dropdown-phone-form {
 
-    .form-chosen {
-        border: none;
-        font-weight: bold;
+    #phone,
+    #phone-pull-down {
+        display: none;
+    }
+
+    &-single-mem {
+        .select-phone-option {
+            font-family: $avenir-heavy;
+
+            &-focus {
+                color: $primary-blue;
+            }
+        }
     }
 }
+
+.dropdown-phone-form.affix {
+    padding-top: 15px;
+    box-shadow: 0 3px 5px rgba(57, 63, 72, 0.15);
+}
+
+#phone-name {
+    width: 300px;
+    text-align: left;
+    margin: 0;
+    padding: 8px 0 0 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: $primary-blue;
+}
+
+// .select-phone-make.form-control {
+// //     font-weight: bold;
+// // }
+
+// .select-phone-option {
+//     font-family: $avenir-heavy;
+//     color: $primary-blue;
+// }

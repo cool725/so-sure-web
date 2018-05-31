@@ -1,0 +1,13 @@
+// privacy.scss
+
+@import "../mixins";
+@import "../common/type";
+@import "../common/paletteNew";
+
+@media print {
+  .panel-collapse,
+  .panel-collapse .collapse {
+    height: auto !important;
+    display: block;
+  }
+}

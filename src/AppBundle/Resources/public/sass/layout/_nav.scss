@@ -10,7 +10,7 @@
 }
 
 .navbar-default .navbar-collapse {
-	background-color: $white;
+    background-color: $white;
     border-top: 1px solid $grey-light;
     border-bottom: 1px solid $grey-light;
 }
@@ -28,15 +28,15 @@
     color: $white;
 
     &:hover {
-    	color: darken($blue, 20%);
-    	transition: all 0.3s ease;
+        color: darken($blue, 20%);
+        transition: all 0.3s ease;
     }
 
     &:focus {
-    	color: $black;
-    	border-color: $black;
-    	outline: none;
-    	transition: all 0.3s ease;
+        color: $black;
+        border-color: $black;
+        outline: none;
+        transition: all 0.3s ease;
     }
 
     @include breakpoint(laptop) {
@@ -54,20 +54,20 @@
     background-color: transparent;
     border: none;
 
-	.icon-bar {
-		background-color: $blue;
-	}
+    .icon-bar {
+        background-color: $blue;
+    }
 
-	&:hover, &:focus {
-		background-color: transparent;
-		border: none;
-		outline: none;
-		transition: all 0.3s ease;
+    &:hover, &:focus {
+        background-color: transparent;
+        border: none;
+        outline: none;
+        transition: all 0.3s ease;
 
-		.icon-bar {
-			background-color: darken($blue, 20%);
-		}
-	}
+        .icon-bar {
+            background-color: darken($blue, 20%);
+        }
+    }
 
     @include breakpoint(laptop) {
         display: none;
@@ -76,24 +76,24 @@
 
 @include breakpoint(laptop) {
 
-	.navbar-default .navbar-collapse {
-		background-color: transparent;
-		border: none;
-	}
+    .navbar-default .navbar-collapse {
+        background-color: transparent;
+        border: none;
+    }
 
 }
 
 @include breakpoint(laptop) {
 
-	.navbar-nav > li {
-		margin: 0 5px;
-		padding: 0 5px;
-	}
+    .navbar-nav > li {
+        margin: 0 5px;
+        padding: 0 5px;
+    }
 
 }
 
 .navbar-sticky {
-    box-shadow: 0 3px 5px rgba(57, 63, 72, 0.3);
+    box-shadow: 0 3px 5px rgba(57, 63, 72, 0.2);
 }
 
 // Secondary Nav
@@ -118,4 +118,3 @@
     position: fixed;
     background-color: transparent;
 }
-

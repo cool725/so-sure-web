@@ -35,7 +35,7 @@ use AppBundle\Document\Phone;
 use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Policy;
 use AppBundle\Document\PhoneTrait;
-use AppBundle\Document\OptOut\EmailOptOut;
+use AppBundle\Document\Opt\EmailOptOut;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\PolicyTerms;
 
@@ -522,16 +522,22 @@ class PhoneInsuranceController extends BaseController
             $this->get('app.sixpack')->convert(
                 SixpackService::EXPERIMENT_HOMEPAGE_AA_V2
             );
-            
+
             $this->get('app.sixpack')->convert(
-                SixpackService::EXPERIMENT_DEFACTO
+                SixpackService::EXPERIMENT_TRUSTPILOT_REVIEW
             );
         }
-
-        $replacement = $this->sixpack(
+      
+        $trustpilot = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_72_REPLACEMENT,
-            ['next-working-day', 'seventytwo-hours']
+            SixpackService::EXPERIMENT_TRUSTPILOT_REVIEW,
+            ['no-trustpilot', 'trustpilot']
+        );
+
+        $moneyBackGuarantee = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_MONEY_BACK_GUARANTEE,
+            ['no-money-back-guarantee', 'money-back-guarantee']
         );
 
         $data = array(
@@ -559,7 +565,8 @@ class PhoneInsuranceController extends BaseController
             'days_test'       => $daysTest,
             'slider_test'     => 'slide-me',
             'intercom_test'   => $expIntercom,
-            'replacement'     => $replacement,
+            'trustpilot'     => $trustpilot,
+            'moneyBackGuarantee' => $moneyBackGuarantee,
         );
 
         $template = 'AppBundle:PhoneInsurance:quote.html.twig';

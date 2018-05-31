@@ -300,6 +300,9 @@ class RequestService
         if (mb_stripos($userAgentDetails->ua->family, 'crawler') !== false) {
             return true;
         }
+        //if (mb_stripos($userAgentDetails->ua->family, 'facebook') !== false) {
+        //    return true;
+        //}
 
         // exclude bots from tracking
         if (in_array($userAgentDetails->ua->family, [
@@ -333,6 +336,9 @@ class RequestService
             return true;
         }
         if (mb_stripos($userAgent, 'Go-http-client') !== false) {
+            return true;
+        }
+        if (mb_stripos($userAgent, 'Google-Apps-Script') !== false) {
             return true;
         }
 

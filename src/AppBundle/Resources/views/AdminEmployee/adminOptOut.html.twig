@@ -28,6 +28,7 @@
                         <th>Email</th>
                         <th>Mobile</th>
                         <th>Category</th>
+                        <th>Location</th>
                         <th>Date</th>
                         <th>Notes</th>
                     </tr>
@@ -37,7 +38,8 @@
                         <tr>
                             <td>{% if optout.email is defined %}{{ optout.email }}{% endif %}</td>
                             <td>{% if optout.mobile is defined %}{{ optout.mobile }}{% endif %}</td>
-                            <td>{{ optout.category }}</td>
+                            <td>{{ optout.categories|json_encode }}</td>
+                            <td>{{ optout.location }}</td>
                             <td>{{ optout.created|date }}</td>
                             <td>{{ optout.notes }}</td>
                         </tr>
@@ -70,11 +72,11 @@
             </div>
             <div class="row">
                 <div class="form-group col-sm-4">
-                    {{ form_label(email_form.category, 'Category') }}
+                    {{ form_label(email_form.categories, 'Categories') }}
                 </div>
                 <div class="form-group col-sm-4">
-                    {{ form_errors(email_form.category) }}
-                    {{ form_widget(email_form.category) }}
+                    {{ form_errors(email_form.categories) }}
+                    {{ form_widget(email_form.categories) }}
                 </div>
             </div>
             <div class="row">
@@ -117,11 +119,11 @@
             </div>
             <div class="row">
                 <div class="form-group col-sm-4">
-                    {{ form_label(sms_form.category, 'Category') }}
+                    {{ form_label(sms_form.categories, 'Categories') }}
                 </div>
                 <div class="form-group col-sm-4">
-                    {{ form_errors(sms_form.category) }}
-                    {{ form_widget(sms_form.category) }}
+                    {{ form_errors(sms_form.categories) }}
+                    {{ form_widget(sms_form.categories) }}
                 </div>
             </div>
             <div class="row">

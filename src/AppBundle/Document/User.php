@@ -3,6 +3,8 @@
 
 namespace AppBundle\Document;
 
+use AppBundle\Document\Opt\EmailOptIn;
+use AppBundle\Document\Opt\Opt;
 use Doctrine\Common\Collections\ArrayCollection;
 use FOS\UserBundle\Model\User as BaseUser;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
@@ -32,9 +34,16 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     const MAX_POLICIES_PER_USER = 2;
 
+    const DAYS_SHOULD_DELETE_USER_WITHOUT_POLICY = 547; // 18 months
+    const DAYS_SHOULD_DELETE_USER_WITH_POLICY = 2737; // 7.5 years
+
     const GENDER_MALE = 'male';
     const GENDER_FEMALE = 'female';
     const GENDER_UNKNOWN = 'unknown';
+
+    const ROLE_CLAIMS = 'ROLE_CLAIMS';
+    const ROLE_EMPLOYEE = 'ROLE_EMPLOYEE';
+    const ROLE_ADMIN = 'ROLE_ADMIN';
 
     /**
      * @MongoDB\Id
@@ -274,6 +283,11 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @MongoDB\ReferenceMany(targetDocument="MultiPay", mappedBy="payer", cascade={"persist"})
      */
     protected $multipays;
+
+    /**
+     * @MongoDB\ReferenceMany(targetDocument="AppBundle\Document\Opt\Opt", mappedBy="user")
+     */
+    protected $opts = array();
 
     /**
      * @Assert\Type("bool")
@@ -626,6 +640,17 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         $this->payerPolicies[] = $policy;
     }
 
+    public function addOpt(Opt $opt)
+    {
+        $opt->setUser($this);
+        $this->opts[] = $opt;
+    }
+
+    public function getOpts()
+    {
+        return $this->opts;
+    }
+
     public function getMultiPays()
     {
         return $this->multipays;
@@ -717,12 +742,12 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     public function hasEmployeeRole()
     {
-        return $this->hasRole('ROLE_EMPLOYEE') || $this->hasRole('ROLE_ADMIN');
+        return $this->hasRole(self::ROLE_EMPLOYEE) || $this->hasRole(self::ROLE_ADMIN);
     }
 
     public function hasClaimsRole()
     {
-        return $this->hasRole('ROLE_CLAIMS');
+        return $this->hasRole(self::ROLE_CLAIMS);
     }
 
     public function hasCancelledPolicy()
@@ -1741,6 +1766,83 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             }
         }
         return $scode;
+    }
+
+    public function canDelete(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        // If the user has ever had a policy other than partial, we are unable to delete (unless after 7.5 years)
+        foreach ($this->getPolicies() as $policy) {
+            /** @var Policy $policy */
+            if ($policy->getStatus() && $policy->getEnd()) {
+                $diff = $policy->getEnd()->diff($date);
+                if ($diff->invert || $diff->days <= self::DAYS_SHOULD_DELETE_USER_WITH_POLICY) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public function getShouldDeleteDate()
+    {
+        $comparisionDate = $this->getCreated();
+        // Any marketing optin should indicate that the user wishes to remain in the system
+        // TODO: allow for user re-optin
+        foreach ($this->getOpts() as $opt) {
+            /** @var EmailOptIn $opt */
+            if ($opt instanceof EmailOptIn && $opt->getUpdated() > $comparisionDate &&
+                in_array(EmailOptIn::OPTIN_CAT_MARKETING, $opt->getCategories())) {
+                $comparisionDate = $opt->getUpdated();
+            }
+        }
+
+        $deleteDate = clone $comparisionDate;
+        $deleteDate = $deleteDate->add(new \DateInterval(
+            sprintf('P%dD', self::DAYS_SHOULD_DELETE_USER_WITHOUT_POLICY)
+        ));
+
+        return $deleteDate;
+    }
+
+    public function shouldDelete(\DateTime $date = null)
+    {
+        if ($this->hasClaimsRole() || $this->hasEmployeeRole()) {
+            return false;
+        }
+
+        if (!$this->canDelete($date)) {
+            return false;
+        }
+
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        return $date >= $this->getShouldDeleteDate();
+    }
+
+    public function shouldNotifyDelete(\DateTime $date = null)
+    {
+        if ($this->hasClaimsRole() || $this->hasEmployeeRole()) {
+            return false;
+        }
+
+        if (!$this->canDelete($date)) {
+            return false;
+        }
+
+        if (!$date) {
+            $date = new \DateTime();
+        }
+
+        $diff = $date->diff($this->getShouldDeleteDate());
+
+        return $diff->invert && $diff->days == 21;
     }
 
     public function toApiArray($intercomHash = null, $identityId = null, $token = null, $debug = false)

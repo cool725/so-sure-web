@@ -5,6 +5,7 @@
 {% set new_stylesheet = 1 %}
 {% set distraction_free = 1 %}
 {% set new_footer = 1 %}
+{% set include_emoji = 1 %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -71,6 +72,9 @@
                 <li class="h4"><i class="fa fa-check text-green" aria-hidden="true"></i> Accidental damage</li>
                 <li class="h4"><i class="fa fa-check text-green" aria-hidden="true"></i> Out of warranty breakdown</li>
                 <li class="h4"><i class="fa fa-check text-green" aria-hidden="true"></i> Worldwide coverage</li>
+                {% if moneyBackGuarantee is defined and moneyBackGuarantee == 'money-back-guarantee' %}
+                <li class="h4"><i class="fa fa-plus text-blue" aria-hidden="true"></i> 14 day money back guarantee</li>
+                {% endif %}
             </ul>
             <div class="benefits--review-desktop hidden-xs">
                 <div class="benefits--inner">
@@ -99,6 +103,9 @@
                         </div>
                     </div>
                     <h4 class="text-center">Plus worldwide cover on trips not exceeding 90 days</h4>
+                    {% if moneyBackGuarantee is defined and moneyBackGuarantee == 'money-back-guarantee' %}
+                        <div class="h4 h-light text-center"><mark class="mgreen">Plus.. We're so-sure you'll love us, we'll give you a 14 day money back guarantee 💰🔙</mark></div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -149,7 +156,7 @@
 
                 <div class="form-group {% if form_errors(purchase_form.imei) %}has-error{% endif %}">
                     {{ form_label(purchase_form.imei, 'IMEI Number:', { 'label_attr': {'class': 'sr-only'} }) }}
-                    {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control imei', 'placeholder':'IMEI Number'}}) }}
+                    {{ form_widget(purchase_form.imei, {'attr':{'class':'form-control imei', 'placeholder':'IMEI Number', 'data-hj-suppress' : ''}}) }}
                     <label class="samsung-imei">Numbers only please (no / required)</label>
                     <div class="help-block with-errors">{{ form_errors(purchase_form.imei) }}</div>
                     <div class="help-block text-center">
@@ -164,7 +171,7 @@
                 {% if purchase_form.serialNumber is defined %}
                     <div class="form-group {% if form_errors(purchase_form.serialNumber) %}has-error{% endif %}">
                         {{ form_label(purchase_form.serialNumber, 'Serial Number:', { 'label_attr': {'class': 'sr-only'} }) }}
-                        {{ form_widget(purchase_form.serialNumber, {'attr':{'class':'form-control',  'pattern': '[a-zA-Z0-9]{5,32}', 'title': 'Enter a valid serial number', 'placeholder':'Serial Number'}}) }}
+                        {{ form_widget(purchase_form.serialNumber, {'attr':{'class':'form-control',  'pattern': '[a-zA-Z0-9]{5,32}', 'title': 'Enter a valid serial number', 'placeholder':'Serial Number', 'data-hj-suppress' : ''}}) }}
                         <div class="help-block with-errors">{{ form_errors(purchase_form.serialNumber) }}</div>
                         <div class="help-block text-center">
                             <a href="#"

@@ -68,6 +68,14 @@ class PolicySearchType extends BaseType
                 'data' => 'current',
                 'choices' => $statuses,
             ])
+            ->add('paymentMethod', ChoiceType::class, [
+                'required' => false,
+                'placeholder' => 'Any',
+                'choices' => [
+                    'Judo' => 'judo',
+                    'Bacs' => 'bacs',
+                ]
+            ])
             ->add('sosure', ChoiceType::class, [
                 'required' => false,
                 'choices' => [
@@ -86,9 +94,11 @@ class PolicySearchType extends BaseType
             ->add('id', TextType::class, ['required' => false])
             ->add('invalid', CheckboxType::class, ['required' => false])
             ->add('phone', DocumentType::class, [
-                'placeholder' => 'Select your device',
+                'placeholder' => 'Search by device',
                 'class' => 'AppBundle:Phone',
                 'required' => false,
+                'choice_label' => 'getNameFormSafe',
+                'choice_value' => 'id',
                 'query_builder' => function (PhoneRepository $dr) {
                     return $dr->findActiveInactive();
                 }
@@ -110,6 +120,7 @@ class PolicySearchType extends BaseType
             $this->formQuerystring($form, $currentRequest, 'serial');
             $this->formQuerystring($form, $currentRequest, 'id');
             $this->formQuerystring($form, $currentRequest, 'phone');
+            $this->formQuerystring($form, $currentRequest, 'paymentMethod');
             if ($currentRequest && $currentRequest->query->get('invalid') !== null) {
                 $form->get('invalid')->setData((bool) $currentRequest->query->get('invalid'));
             } else {

@@ -59,9 +59,9 @@ use AppBundle\Document\Invoice;
 use AppBundle\Document\Feature;
 use AppBundle\Document\Connection\StandardConnection;
 use AppBundle\Document\Stats;
-use AppBundle\Document\OptOut\OptOut;
-use AppBundle\Document\OptOut\EmailOptOut;
-use AppBundle\Document\OptOut\SmsOptOut;
+use AppBundle\Document\Opt\OptOut;
+use AppBundle\Document\Opt\EmailOptOut;
+use AppBundle\Document\Opt\SmsOptOut;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\File\S3File;
 use AppBundle\Document\File\JudoFile;
@@ -78,7 +78,7 @@ use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\ImeiType;
 use AppBundle\Form\Type\NoteType;
 use AppBundle\Form\Type\EmailOptOutType;
-use AppBundle\Form\Type\SmsOptOutType;
+use AppBundle\Form\Type\AdminSmsOptOutType;
 use AppBundle\Form\Type\PartialPolicyType;
 use AppBundle\Form\Type\UserSearchType;
 use AppBundle\Form\Type\PhoneSearchType;
@@ -132,7 +132,7 @@ class AdminController extends BaseController
         $dm->persist($phone);
         $dm->flush();
         $this->addFlash(
-            'notice',
+            'success',
             'Your changes were saved!'
         );
 
@@ -171,7 +171,7 @@ class AdminController extends BaseController
 
             $dm->flush();
             $this->addFlash(
-                'notice',
+                'success',
                 'Your changes were saved!'
             );
 
@@ -218,7 +218,7 @@ class AdminController extends BaseController
             }
             $dm->flush();
             $this->addFlash(
-                'notice',
+                'success',
                 'Your changes were saved!'
             );
         }
@@ -249,7 +249,7 @@ class AdminController extends BaseController
             }
             $dm->flush();
             $this->addFlash(
-                'notice',
+                'success',
                 $message
             );
         }
@@ -274,7 +274,7 @@ class AdminController extends BaseController
             $dm->remove($phone);
             $dm->flush();
             $this->addFlash(
-                'notice',
+                'success',
                 'Phone deleted!'
             );
         }
@@ -1193,7 +1193,7 @@ class AdminController extends BaseController
             }
             $dm->flush();
             $this->addFlash(
-                'notice',
+                'success',
                 $message
             );
         }

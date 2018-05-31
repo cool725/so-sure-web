@@ -1,141 +1,177 @@
-$(function(){
+$(function() {
 
+    // Check for the dropdown
     if ($('.dropdown-phone-form').length) {
 
-        // Phone data
-        var phones = $('#select-phone-data').data('phones');
+        // Elements & Data
+        var phones     = $('#select-phone-data').data('phones');
+        var memOptTest = $('#select-phone-data').data('show-single-mem-opt');
+        var make       = $('.select-phone-make');
+        var model      = $('.select-phone-model');
+        var memory     = $('.select-phone-memory');
+        var controls   = $('#launch_phone_next');
 
-        // Update the select
+        // Update Models Select
         var updateModels = function() {
 
-            // Make value
-            var make = $('.select-phone-make').val();
-            var model = $('.select-phone-model');
-            var memory = $('.select-phone-memory');
-
-            // Clear incase make changed
+            // Clear incase model change
             model.empty();
             memory.empty();
 
             // If make selected customise default value
-            if (make) {
-                model.append($('<option />').val('').text('Now select your ' + make + ' device'));
+            if (make.val()) {
+                model.append($('<option />').val('').text('Now select your ' + make.val() + ' device'));
             } else {
-                model.append($('<option />').val('').text('Select your phone make first'));
+                model.append($('<option />').val('').text('Find your phone for an instant quote...'));
             }
 
             // Clear the other select out
             memory.append($('<option />').val('').text('Select your phone model first'));
 
-            // TODO: Add Title - Top Models
-            // model.append($('<option disabled />').val('').text('Top Models'));
-
             // Get phones from list and show featured
-            $.each(phones[make], function(key, value) {
+            $.each(phones[make.val()], function(key, value) {
                 $.each(value, function(key2, mod) {
                     if (mod['featured'] && !model.find('option[value="' + key +'"]').length) {
-                        model.append($('<option />').val(key).text(key));
+                        if (memOptTest == true) {
+                            model.append($('<option />').val(key).text(make.val() + ' ' + key));
+                        } else {
+                            model.append($('<option />').val(key).text(key));
+                        }
                     }
                 });
             });
-
-            // TODO: Add Title - Models
-            // model.append($('<option disabled />').val('').text('Models'));
 
             // Get phones from list and show the rest
-            $.each(phones[make], function(key, value) {
+            $.each(phones[make.val()], function(key, value) {
                 $.each(value, function(key2, mod) {
                     if (!mod['featured'] && !model.find('option[value="' + key +'"]').length) {
-                        model.append($('<option />').val(key).text(key));
+                        if (memOptTest == true) {
+                            model.append($('<option />').val(key).text(make.val() + ' ' + key));
+                        } else {
+                            model.append($('<option />').val(key).text(key));
+                        }
                     }
                 });
             });
+
         }
 
+        // Update Memory Select
         var updateMemory = function() {
-            // Make value
-            var make = $('.select-phone-make').val();
-            var model = $('.select-phone-model').val();
-            var memory = $('.select-phone-memory');
 
-            // Clear incase model changed
+            // Clear incase model change
             memory.empty();
 
             // If model selected customise default value
             if (model) {
-                memory.append($('<option />').val('').text('And finally select your memory size'));
+                memory.append($('<option />').val('').text('Which memory size ' + model.val() + '?'));
             } else {
                 memory.append($('<option />').val('').text('Select your phone model first'));
             }
 
             // Get phones from list and add to options
-            $.each(phones[make][model], function(key, value) {
-                memory.append($('<option />').val(key).text(value['memory'] + ' GB'));
+            $.each(phones[make.val()][model.val()], function(key, value) {
+                if (memOptTest == true) {
+                    memory.append($('<option />').val(key).text(make.val() + ' ' + model.val() + ' ' + value['memory'] + 'GB'));
+                } else {
+                    memory.append($('<option />').val(key).text(value['memory'] + 'GB'));
+                }
             });
+
         }
 
-        var resetAll = function() {
+        // When user selects make > update
+        $('.select-phone-make').on('change', function() {
 
-            // Make value
-            var make = $('.select-phone-make');
-            var model = $('.select-phone-model');
-            var memory = $('.select-phone-memory');
+            // As model will be shown anyway
+            memory.hide();
+            controls.hide();
 
-            make.val('');
-            model.empty().hide();
-            memory.empty().hide();
-            $('.select-phone-btn').hide();
-            $('#reset-sticky').hide();
-
-            updateModels();
-        }
-
-        // When user selects option update results
-        $('.select-phone-make').on('change', function(e) {
+            $('.select-phone-make').addClass('.select-phone-make-focus');
 
             // Update Models
             updateModels();
 
             if ($(this).val() != '') {
-                $('.select-phone-model').show();
+                model.show();
+                if (memOptTest == true) {
+                    $(this).hide();
+                }
             } else {
-                $('.select-phone-model').hide();
+                model.hide();
+                memory.hide();
+                if (memOptTest == true) {
+
+                }
             }
+
         });
 
-        // When user selects option update results
-        $('.select-phone-model').on('change', function(e) {
+        // When user selects model > update
+        $('.select-phone-model').on('change', function() {
+
+            var value = $(this).val();
 
             // Update Memory
             updateMemory();
 
-            if ($(this).val() != '') {
-                $('.select-phone-memory').show();
+            // Get memory options
+            var memSel = memory.children('option').not('[value=""]').val();
+            var memOpt = memory.children('option').not('[value=""]').size();
+
+            // Check for memory test otherwise revert
+            if (memOptTest == true) {
+                // If more than one storage option
+                if (memOpt > 1) {
+                    // console.log(make.val() + ' ' + model.val() + ' has more than one storage size');
+                    if (value != '') {
+                        memory.show();
+                        $(this).hide();
+                    } else {
+                        make.show();
+                        memory.hide();
+                        $(this).hide();
+                    }
+                } else {
+                    // If only one storage option
+                    // console.log(make.val() + ' ' + model.val() + ' has only one storage size');
+                    if (value != '') {
+                        memory.val(memSel);
+                        controls.show();
+                    } else {
+                        make.show();
+                        memory.hide();
+                        $(this).hide();
+                        controls.hide();
+                    }
+                }
             } else {
-                $('.select-phone-memory').hide();
+                if (value != '') {
+                    memory.show();
+                } else {
+                    make.show();
+                    memory.hide();
+                }
             }
         });
 
-        // When user selects option update results
-        $('.select-phone-memory').on('change', function(e) {
-
-            // TODO: Memory options if one dont show
-            // var memOpt = $(this).children('option').not('[value=""]').size();
-            // console.log(memOpt);
+        // When user selects memory > update
+        $('.select-phone-memory').on('change', function() {
 
             if ($(this).val() != '') {
-                $('.select-phone-btn').show();
-                $('#reset-sticky').css('display', 'block');
+                controls.show();
             } else {
-                $('.select-phone-btn').hide()
+                controls.hide();
+                if (memOptTest == true) {
+                    $(this).hide();
+                    model.show();
+                }
             }
+
         });
 
+        // Update the models on load
         updateModels();
-
-        $('#reset-sticky').click(function(e) {
-            e.preventDefault();
-            resetAll();
-        });
     }
+
 });

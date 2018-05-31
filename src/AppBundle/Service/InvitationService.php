@@ -22,8 +22,8 @@ use AppBundle\Document\User;
 use AppBundle\Document\Lead;
 use AppBundle\Document\Reward;
 use AppBundle\Document\Connection\RewardConnection;
-use AppBundle\Document\OptOut\EmailOptOut;
-use AppBundle\Document\OptOut\SmsOptOut;
+use AppBundle\Document\Opt\EmailOptOut;
+use AppBundle\Document\Opt\SmsOptOut;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Invitation\SmsInvitation;
 use AppBundle\Document\Invitation\SCodeInvitation;
@@ -865,7 +865,6 @@ class InvitationService
                 ['invitation' => $invitation],
                 null,
                 null,
-                null,
                 $from
             );
             $invitation->setStatus(EmailInvitation::STATUS_SENT);
@@ -1210,35 +1209,17 @@ class InvitationService
         return count($optouts) > 0;
     }
 
-    public function optout($email, $category = null)
+    public function optout($email, $category, $location)
     {
-        if (!$category) {
-            $category = EmailOptOut::OPTOUT_CAT_ALL;
-        }
-
         /** @var EmailOptOutRepository $optoutRepo */
         $optoutRepo = $this->dm->getRepository(EmailOptOut::class);
         if (!$optoutRepo->isOptedOut($email, $category)) {
             $optout = new EmailOptOut();
-            $optout->setCategory($category);
+            $optout->addCategory($category);
+            $optout->setLocation($location);
             $optout->setEmail($email);
 
             $this->dm->persist($optout);
-        }
-        $this->dm->flush();
-    }
-
-    public function optin($email, $category = null)
-    {
-        if (!$category) {
-            $category = EmailOptOut::OPTOUT_CAT_ALL;
-        }
-
-        /** @var EmailOptOutRepository $optoutRepo */
-        $optoutRepo = $this->dm->getRepository(EmailOptOut::class);
-        $optOuts = $optoutRepo->findOptOut($email, $category);
-        foreach ($optOuts as $optOut) {
-            $this->dm->remove($optOut);
         }
         $this->dm->flush();
     }

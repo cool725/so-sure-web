@@ -51,6 +51,7 @@ class RateLimitServiceTest extends WebTestCase
             RateLimitService::DEVICE_TYPE_POLICY,
             RateLimitService::DEVICE_TYPE_RESET,
             RateLimitService::DEVICE_TYPE_TOKEN,
+            RateLimitService::DEVICE_TYPE_OPT,
         ];
         foreach ($rates as $type) {
             for ($i = 1; $i < 100; $i++) {

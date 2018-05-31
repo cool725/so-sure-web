@@ -2,7 +2,7 @@
 
 namespace AppBundle\Repository\OptOut;
 
-use AppBundle\Document\OptOut\SmsOptOut;
+use AppBundle\Document\Opt\SmsOptOut;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 
 class SmsOptOutRepository extends DocumentRepository

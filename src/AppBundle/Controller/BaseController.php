@@ -48,6 +48,10 @@ abstract class BaseController extends Controller
     use PhoneTrait;
     use ControllerTrait;
 
+    const MONGO_QUERY_TYPE_REGEX = 'regex';
+    const MONGO_QUERY_TYPE_EQUAL = 'equal';
+    const MONGO_QUERY_TYPE_ID = 'id';
+
     public function isDataStringPresent($data, $field)
     {
         return mb_strlen($this->getDataString($data, $field)) > 0;
@@ -390,26 +394,42 @@ abstract class BaseController extends Controller
         return null;
     }
 
-    protected function formToMongoSearch($form, $qb, $formField, $mongoField, $run = false, $exact = false)
-    {
+    protected function formToMongoSearch(
+        $form,
+        $qb,
+        $formField,
+        $mongoField,
+        $run = false,
+        $queryType = self::MONGO_QUERY_TYPE_REGEX
+    ) {
         $data = (string) $form->get($formField)->getData();
 
-        return $this->dataToMongoSearch($qb, $data, $mongoField, $run, $exact);
+        return $this->dataToMongoSearch($qb, $data, $mongoField, $run, $queryType);
     }
 
-    protected function dataToMongoSearch($qb, $data, $mongoField, $run = false, $exact = false)
-    {
+    protected function dataToMongoSearch(
+        $qb,
+        $data,
+        $mongoField,
+        $run = false,
+        $queryType = self::MONGO_QUERY_TYPE_REGEX
+    ) {
         if (mb_strlen($data) == 0) {
             return null;
         }
 
         // Escape special chars
         $data = preg_quote($data, '/');
-        if ($exact) {
-            $qb = $qb->addAnd($qb->expr()->field($mongoField)->equals($data));
-        } else {
+        if ($queryType == self::MONGO_QUERY_TYPE_REGEX) {
             $qb = $qb->addAnd($qb->expr()->field($mongoField)->equals(new MongoRegex(sprintf("/.*%s.*/i", $data))));
+        } elseif ($queryType == self::MONGO_QUERY_TYPE_EQUAL) {
+            $qb = $qb->addAnd($qb->expr()->field($mongoField)->equals($data));
+        } elseif ($queryType == self::MONGO_QUERY_TYPE_ID) {
+            $qb = $qb->addAnd($qb->expr()->field($mongoField)->equals(new \MongoId($data)));
+        } else {
+            throw new \Exception('unknown query type');
         }
+
         if ($run) {
             return $qb->getQuery()->execute();
         }
@@ -816,13 +836,37 @@ abstract class BaseController extends Controller
                 $policiesQb->expr()->field('status')->in([Policy::STATUS_PENDING_RENEWAL])
             );
         } else {
-            $this->formToMongoSearch($form, $policiesQb, 'status', 'status', false, true);
+            $this->formToMongoSearch(
+                $form,
+                $policiesQb,
+                'status',
+                'status',
+                false,
+                self::MONGO_QUERY_TYPE_EQUAL
+            );
         }
 
         $this->formToMongoSearch($form, $policiesQb, 'policy', 'policyNumber');
         $this->formToMongoSearch($form, $policiesQb, 'imei', 'imei');
-        $this->formToMongoSearch($form, $policiesQb, 'id', '_id', false, true);
+        $this->formToMongoSearch(
+            $form,
+            $policiesQb,
+            'id',
+            '_id',
+            false,
+            self::MONGO_QUERY_TYPE_ID
+        );
         $this->formToMongoSearch($form, $policiesQb, 'serial', 'serialNumber');
+        if ($form->get('phone')->getData()) {
+            $this->dataToMongoSearch(
+                $policiesQb,
+                $form->get('phone')->getData()->getId(),
+                'phone.$id',
+                false,
+                self::MONGO_QUERY_TYPE_ID
+            );
+        }
+
         if (!$includeInvalidPolicies) {
             $policy = new PhonePolicy();
             $search = sprintf('%s/', $policy->getPolicyNumberPrefix());
@@ -835,6 +879,7 @@ abstract class BaseController extends Controller
             'mobile' => 'mobileNumber',
             'postcode' => 'billingAddress.postcode',
             'facebookId' => 'facebookId',
+            'paymentMethod' => 'paymentMethod.type',
         ];
         foreach ($userFormData as $formField => $dataField) {
             $ids = $this->queryToMongoSearch(

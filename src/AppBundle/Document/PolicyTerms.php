@@ -24,12 +24,20 @@ class PolicyTerms extends PolicyDocument
     // Same as version 2, but released 2 Nov 2017
     const VERSION_4 = 'Version 4 Nov 2017';
 
+    // Same as version 4, but update for GDPR
+    const VERSION_5 = 'Version 5 May 2018';
+
+    // Minor tweaks for pic-sure, repair, & non-payment full recovery costs
+    const VERSION_6 = 'Version 6 May 2018';
+
     public static $allVersions = [
         self::VERSION_0,
         self::VERSION_1,
         self::VERSION_2,
         self::VERSION_3,
         self::VERSION_4,
+        self::VERSION_5,
+        self::VERSION_6,
     ];
 
     public function getVersionNumber()
@@ -47,8 +55,11 @@ class PolicyTerms extends PolicyDocument
             return '3';
         } elseif (in_array($version, [self::VERSION_4])) {
             return '4';
+        } elseif (in_array($version, [self::VERSION_5])) {
+            return '5';
+        } elseif (in_array($version, [self::VERSION_6])) {
+            return '6';
         }
-
         return null;
     }
 

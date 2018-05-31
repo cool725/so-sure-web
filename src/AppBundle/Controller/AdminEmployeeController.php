@@ -2,6 +2,8 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Form\Type\AdminEmailOptOutType;
+use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Service\JudopayService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -43,9 +45,9 @@ use AppBundle\Document\Stats;
 use AppBundle\Document\ImeiTrait;
 use AppBundle\Document\Form\AdminMakeModel;
 use AppBundle\Document\Form\Roles;
-use AppBundle\Document\OptOut\OptOut;
-use AppBundle\Document\OptOut\EmailOptOut;
-use AppBundle\Document\OptOut\SmsOptOut;
+use AppBundle\Document\Opt\OptOut;
+use AppBundle\Document\Opt\EmailOptOut;
+use AppBundle\Document\Opt\SmsOptOut;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\File\S3File;
 use AppBundle\Document\File\JudoFile;
@@ -68,7 +70,7 @@ use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\ImeiType;
 use AppBundle\Form\Type\NoteType;
 use AppBundle\Form\Type\EmailOptOutType;
-use AppBundle\Form\Type\SmsOptOutType;
+use AppBundle\Form\Type\AdminSmsOptOutType;
 use AppBundle\Form\Type\PartialPolicyType;
 use AppBundle\Form\Type\UserSearchType;
 use AppBundle\Form\Type\PhoneSearchType;
@@ -352,13 +354,15 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $dm = $this->getManager();
 
         $emailOptOut = new EmailOptOut();
+        $emailOptOut->setLocation(EmailOptOut::OPT_LOCATION_ADMIN);
         $smsOptOut = new SmsOptOut();
+        $smsOptOut->setLocation(EmailOptOut::OPT_LOCATION_ADMIN);
 
         $emailForm = $this->get('form.factory')
-            ->createNamedBuilder('email_form', EmailOptOutType::class, $emailOptOut)
+            ->createNamedBuilder('email_form', AdminEmailOptOutType::class, $emailOptOut)
             ->getForm();
         $smsForm = $this->get('form.factory')
-            ->createNamedBuilder('sms_form', SmsOptOutType::class, $smsOptOut)
+            ->createNamedBuilder('sms_form', AdminSmsOptOutType::class, $smsOptOut)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
@@ -390,7 +394,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 }
             }
         }
-        $repo = $dm->getRepository(OptOut::class);
+        $repo = $dm->getRepository(EmailOptOut::class);
         $oupouts = $repo->findAll();
 
         return [
@@ -1065,6 +1069,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $roleForm = $this->get('form.factory')
             ->createNamedBuilder('user_role_form', UserRoleType::class, $role)
             ->getForm();
+        $deleteForm = $this->get('form.factory')
+            ->createNamedBuilder('delete_form')
+            ->add('delete', SubmitType::class)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('user_role_form')) {
@@ -1274,6 +1282,20 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
                     return $this->redirectToRoute('admin_user', ['id' => $id]);
                 }
+            } elseif ($request->request->has('delete_form')) {
+                $deleteForm->handleRequest($request);
+                if ($deleteForm->isValid()) {
+                    /** @var FOSUBUserProvider $userService */
+                    $userService = $this->get('app.user');
+                    $userService->deleteUser($user);
+                    $dm->flush();
+                    $this->addFlash(
+                        'success',
+                        'Deleted User'
+                    );
+
+                    return $this->redirectToRoute('admin_users');
+                }
             }
         }
         
@@ -1289,6 +1311,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'user_high_risk_form' => $userHighRiskForm->createView(),
             'makemodel_form' => $makeModelForm->createView(),
             'sanctions_form' => $sanctionsForm->createView(),
+            'delete_form' => $deleteForm->createView(),
             'postcode' => $postcode,
             'census' => $census,
             'income' => $income,
@@ -1353,12 +1376,20 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $scheduledPaymentRepo = $dm->getRepository(ScheduledPayment::class);
         $scheduledPayments = $scheduledPaymentRepo->findMonthlyScheduled($date);
         $total = 0;
+        $totalJudo = 0;
+        $totalBacs = 0;
         foreach ($scheduledPayments as $scheduledPayment) {
+            /** @var ScheduledPayment $scheduledPayment */
             if (in_array(
                 $scheduledPayment->getStatus(),
                 [ScheduledPayment::STATUS_SCHEDULED, ScheduledPayment::STATUS_SUCCESS]
             )) {
                 $total += $scheduledPayment->getAmount();
+                if ($scheduledPayment->getPolicy()->getUser()->hasBacsPaymentMethod()) {
+                    $totalBacs += $scheduledPayment->getAmount();
+                } else {
+                    $totalJudo += $scheduledPayment->getAmount();
+                }
             }
         }
 
@@ -1368,6 +1399,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'end' => $end,
             'scheduledPayments' => $scheduledPayments,
             'total' => $total,
+            'totalJudo' => $totalJudo,
+            'totalBacs' => $totalBacs,
         ];
     }
 
@@ -1988,7 +2021,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             }
             $dm->flush();
             $this->addFlash(
-                'notice',
+                'success',
                 $message
             );
         }
@@ -2019,7 +2052,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             }
             $dm->flush();
             $this->addFlash(
-                'notice',
+                'success',
                 $message
             );
         }

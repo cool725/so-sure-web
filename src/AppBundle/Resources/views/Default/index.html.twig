@@ -21,7 +21,7 @@
 {% block body %}
 
     {# Hero #}
-    <section class="homepage--hero {% if defacto is defined and defacto == 'defacto' %}homepage--hero-background-defacto{% else %}homepage--hero-background{% endif %}">
+    <section class="homepage--hero homepage--hero-background {% if trustpilot is defined and trustpilot %}homepage--hero-background-trustpilot{% endif %}">
 
         <h1 class="homepage--hero-h1">
             {% if main is defined and main %}
@@ -58,11 +58,11 @@
             {{ render(controller(select_template, {
                 'type': 'homepage-sticky',
                 'id': phone.id
-            })) }}
+            }|merge(app.request.query.all))) }}
         {% else %}
             {{ render(controller(select_template, {
                 'type': 'homepage-sticky',
-            })) }}
+            }|merge(app.request.query.all))) }}
         {% endif %}
         {# End Phone Search #}
 
@@ -110,49 +110,92 @@
         </div>
     </section>
 
-    {# What is so-sure? #}
-    <section class="section--pad homepage--what-is-so-sure">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-7">
-                    <h2 class="h1">What is so-sure?</h2>
-                    <p class="lead">When insurance started in 17th century it was great: when you claimed you had customer red carpet treatment and when there were no claims, you got your money back.</p>
-                    <p class="lead">This is why our founder, Dylan, who spent the past 10 years working from inside the insurance world as a private equity investor, decided to take insurance back to its roots, providing you with a modern-day insurance, how it should be.</p>
-                    <p class="lead">Dylan redesigned insurance around the customer, which is why we get you back on your feet {% if replacement is defined and replacement == 'seventytwo-hours' %}in the next 1-3 working days{% else %}the next working day{% endif %} (as opposed to 4-18 days by our competition), and why you can get up to 80% of your money back, every year, when you and your friends don't claim.</p>
-                </div>
-                <div class="col-md-5">
-                    <div class="img-container">
-                        <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/so-sure_what_is_so-sure_new_old.png"
-                             alt="What is so-sure?"
-                             class="img-responsive img-responsive--center so-sure_homepage-what-is-so-sure lozad">
+    {# TEST - Trustpilot #}
+    {% if trustpilot is defined and trustpilot == 'trustpilot' %}
+        {# Press #}
+        <section class="homepage__press">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12 text-center">
+                        <ul class="list-inline text-center">
+                            <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_defaqto.svg" alt="Defaqto" title="Defaqto" class="homepage__press_defaqto"></li>
+                            <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_trustpilot.svg" alt="TrustPilot" title="TrustPilot" class="homepage__press_trustpilot"></li>
+                            <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_money.svg" alt="Money.co.uk" title="Money.co.uk" class="homepage__press_money"></li>
+                            <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_go-compare.svg" alt="Go Compare" title="Go Compare" class="homepage__press_gocompare"></li>
+                            <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_theguardian.svg" alt="The Guardian" title="The Guardian" class="homepage__press_theguardian"></li>
+                            <li><img src="{{ cdn_url }}/images/press/ebay_so-sure_financial-times.svg" alt="Financial Times" title="Financial Times" class="homepage__press_financialtimes"></li>
+                        </ul>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    {# Press #}
-    <section class="section--pad homepage--press">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-7">
-                    <h4>As Seen In</h4>
-                    <ul class="list-inline press-list press-list--1">
-                        <li class="press-img" title="The Guardian - Why Facebook and Microsoft say chatbots are the talk of the town"></li>
-                        <li class="press-img" title="Financial Times - Innovation to watch: Friends based insurance"></li>
-                        <li class="press-img" title="Insurance Post - so-sure to launch revolutionary social peer-to-peer mobile insurance app"></li>
-                    </ul>
-                </div>
-                <div class="col-md-5">
-                    <h4>Awards</h4>
-                    <ul class="list-inline press-list press-list--2">
-                        <li class="press-img digital-top-50" title="Digital Top 50 Awards 2016 - B2C Start-up"></li>
-                        <li class="press-img insurance-choice-awards" title="Insurance Choice Awards 2017 - ‘Best Insurance App' + 'Innovation of the Year' categories 2017"></li>
-                    </ul>
+        {# What is so-sure? #}
+        <section class="section--pad homepage--what-is-so-sure">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-7">
+                        <h2 class="h1">What is so-sure?</h2>
+
+                        <p class="lead">When insurance started in 17th century it was great: when you claimed you had customer red carpet treatment and when there were no claims, you got your money back.</p>
+                        <p class="lead">This is why our founder, Dylan, who spent the past 10 years working from inside the insurance world as a private equity investor, decided to take insurance back to its roots, providing you with a modern-day insurance, how it should be.</p>
+                        <p class="lead">Dylan redesigned insurance around the customer, which is why we get you back on your feet {% if replacement is defined and replacement == 'seventytwo-hours' %}in the next 1-3 working days{% else %}the next working day{% endif %} (as opposed to 4-18 days by our competition), and why you can get up to 80% of your money back, every year, when you and your friends don't claim.</p>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="img-container">
+                            <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/so-sure_what_is_so-sure_new_old.png"
+                                 alt="What is so-sure?"
+                                 class="img-responsive img-responsive--center so-sure_homepage-what-is-so-sure lozad">
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    {% else %}
+        {# What is so-sure? #}
+        <section class="section--pad homepage--what-is-so-sure">
+            <div class="container">
+                <div class="row">
+                        <div class="col-md-7">
+                            <h2 class="h1">What is so-sure?</h2>
+                            <p class="lead">When insurance started in 17th century it was great: when you claimed you had customer red carpet treatment and when there were no claims, you got your money back.</p>
+                            <p class="lead">This is why our founder, Dylan, who spent the past 10 years working from inside the insurance world as a private equity investor, decided to take insurance back to its roots, providing you with a modern-day insurance, how it should be.</p>
+                            <p class="lead">Dylan redesigned insurance around the customer, which is why we get you back on your feet {% if replacement is defined and replacement == 'seventytwo-hours' %}in the next 1-3 working days{% else %}the next working day{% endif %} (as opposed to 4-18 days by our competition), and why you can get up to 80% of your money back, every year, when you and your friends don't claim.</p>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="img-container">
+                                <img src="data:image/png;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" data-src="{{ cdn_url }}/images/homepage/so-sure_what_is_so-sure_new_old.png"
+                                     alt="What is so-sure?"
+                                     class="img-responsive img-responsive--center so-sure_homepage-what-is-so-sure lozad">
+                            </div>
+                        </div>
+                </div>
+            </div>
+        </section>
+
+        {# Press #}
+        <section class="section--pad homepage--press">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-7">
+                        <h4>As Seen In</h4>
+                        <ul class="list-inline press-list press-list--1">
+                            <li class="press-img" title="The Guardian - Why Facebook and Microsoft say chatbots are the talk of the town"></li>
+                            <li class="press-img" title="Financial Times - Innovation to watch: Friends based insurance"></li>
+                            <li class="press-img" title="Insurance Post - so-sure to launch revolutionary social peer-to-peer mobile insurance app"></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-5">
+                        <h4>Awards</h4>
+                        <ul class="list-inline press-list press-list--2">
+                            <li class="press-img digital-top-50" title="Digital Top 50 Awards 2016 - B2C Start-up"></li>
+                            <li class="press-img insurance-choice-awards" title="Insurance Choice Awards 2017 - ‘Best Insurance App' + 'Innovation of the Year' categories 2017"></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endif %}
 
     {# Why we're better than the rest #}
     <section class="section--pad homepage--why-we-are-better">
@@ -374,7 +417,6 @@
     </section>
 
     {% include 'AppBundle::Default/_sectionComparison.html.twig' %}
-
     {% include 'AppBundle::Default/_sectionFeedback.html.twig' %}
 
     {# Instant Quote #}

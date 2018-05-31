@@ -92,10 +92,15 @@ class RefundListener
                         $total
                     ));
                 }
+                $notes = sprintf(
+                    'initial discount £%0.2f. policy is now cancelled and refund due to customer',
+                    $total
+                );
                 // Offset the policy discount with a refund
                 $policyDiscountRefundPayment = new PolicyDiscountRefundPayment();
                 $policyDiscountRefundPayment->setAmount(0 - $total);
                 $policyDiscountRefundPayment->setDate($event->getDate());
+                $policyDiscountRefundPayment->setNotes($notes);
                 $policy->addPayment($policyDiscountRefundPayment);
 
                 // and convert to cashback
