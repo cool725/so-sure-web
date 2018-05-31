@@ -368,22 +368,12 @@ class PhoneInsuranceController extends BaseController
             ->add('claim_used', HiddenType::class)
             ->getForm();
 
-        $daysTest = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_SAVE_QUOTE_24HOURS,
-            ['7days', '24hours']
-        );
-
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('lead_form')) {
                 try {
                     $leadForm->handleRequest($request);
 
                     if ($leadForm->isValid()) {
-                        $this->get('app.sixpack')->convert(
-                            SixpackService::EXPERIMENT_SAVE_QUOTE_24HOURS
-                        );
-
                         $leadRepo = $dm->getRepository(Lead::class);
                         $existingLead = $leadRepo->findOneBy(['email' => mb_strtolower($lead->getEmail())]);
                         if (!$existingLead) {
@@ -552,7 +542,6 @@ class PhoneInsuranceController extends BaseController
             'comparision'     => $phone->getComparisions(),
             'comparision_max' => $maxComparision,
             'coming_soon'     => $phone->getCurrentPhonePrice() ? false : true,
-            'days_test'       => $daysTest,
             'slider_test'     => 'slide-me',
             'trustpilot'     => $trustpilot,
             'moneyBackGuarantee' => $moneyBackGuarantee,

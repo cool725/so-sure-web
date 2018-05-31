@@ -23,7 +23,6 @@ class SixpackService
     const EXPERIMENT_HOMEPAGE_AA_V2 = 'homepage-aa-v2';
     const EXPERIMENT_APP_SHARE_METHOD = 'app-share-method';
     const EXPERIMENT_APP_PICSURE_LOCATION = 'app-picsure-location';
-    const EXPERIMENT_SAVE_QUOTE_24HOURS = 'save-quote-24-hours';
     // const EXPERIMENT_USER_WELCOME_MODAL = 'welcome-modal';
     const EXPERIMENT_STEP_3 = 'step-3-payment-new';
     const EXPERIMENT_PURCHASE_FLOW_BACS = 'purchase-flow-bacs';
@@ -65,7 +64,6 @@ class SixpackService
 
     public static $unauthExperiments = [
         self::EXPERIMENT_HOMEPAGE_AA_V2,
-        self::EXPERIMENT_SAVE_QUOTE_24HOURS,
         self::EXPERIMENT_STEP_3,
         self::EXPERIMENT_PURCHASE_FLOW_BACS,
         self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
