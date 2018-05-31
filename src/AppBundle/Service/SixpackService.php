@@ -70,7 +70,7 @@ class SixpackService
     // New Test Money Back Guarantee
     const EXPERIMENT_MONEY_BACK_GUARANTEE = 'money-back-guarantee';
     // Exp 1
-
+    const EXPERIMENT_HOMEPAGE_NEW_COPY = 'homepage-new-copy';
     // Exp 2
 
     // Exp 3
@@ -111,7 +111,7 @@ class SixpackService
         // New Test Money Back Guarantee
          self::EXPERIMENT_MONEY_BACK_GUARANTEE,
         // Exp 1
-
+        self::EXPERIMENT_HOMEPAGE_NEW_COPY,
         // Exp 2
 
         // Exp 3
@@ -152,7 +152,7 @@ class SixpackService
         // New Exp Competitor Landing
         self::EXPERIMENT_COMPETITOR_LANDING,
         // Exp 1
-
+        self::EXPERIMENT_HOMEPAGE_NEW_COPY,
         // Exp 2
 
         // Exp 3

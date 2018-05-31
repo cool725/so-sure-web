@@ -41,7 +41,7 @@
     padding-left: 60px;
     position: relative;
 
-    li {
+    > li {
         counter-increment: item;
         position: relative;
 
@@ -113,10 +113,6 @@
         // Strapline
         p {
             margin-bottom: 0 0 30px;
-
-            @include breakpoint(tablet) {
-                font-size: 20px;
-            }
         }
 
         // Tooltips
@@ -444,15 +440,6 @@
 
     &--what-is-so-sure {
 
-        @include breakpoint(tablet) {
-            .so-sure_homepage-what-is-so-sure {
-                max-width: 400px;
-            }
-        }
-
-        @include breakpoint(laptop) {
-            padding-top: 80px;
-        }
 
     }
 
@@ -509,6 +496,22 @@
 
             &_financialtimes {
                 width: 200px;
+            }
+        }
+    }
+
+    &__press_grayscale {
+        img {
+            filter: gray;
+            -webkit-filter: grayscale(1);
+            filter: grayscale(1);
+            opacity: 0.5;
+
+            &:hover {
+                filter: none;
+                -webkit-filter: none;
+                filter: none;
+                opacity: 1;
             }
         }
     }
@@ -593,7 +596,19 @@
         .btn {
             white-space: normal;
         }
+    }
 
+    &--we-do-things-differently {
+        background-color: $lightest-blue;
+
+        .img-app {
+            width: 300px;
+
+            @include breakpoint(laptop) {
+                width: 400px;
+                margin-top: 40px;
+            }
+        }
     }
 
     &--pic-sure {
@@ -616,80 +631,6 @@
                 }
             }
         }
-
-
-        // ol {
-        //     li {
-        //         img {
-        //             display:block;
-
-        //             @include breakpoint(tablet) {
-        //                 float: left;
-        //             }
-        //         }
-        //     }
-        // }
-        // background-color: $lightest-blue;
-
-        // p {
-        //     max-width: 800px;
-        //     margin-left: auto;
-        //     margin-right: auto;
-        // }
-
-        // .p-arrow {
-        //     position: relative;
-
-        //     @include breakpoint(laptop) {
-        //         &:after {
-        //             width: 100px; height: 120px;
-        //             content: '';
-        //             background: transparent url('#{$cdn_url}/images/homepage/pic-sure_p_arrow.svg') no-repeat;
-        //             position: absolute;
-        //             top: 100%; right: -20px;
-        //         }
-        //     }
-        // }
-
-        // table { //TODO - Move to tables scss
-        //     max-width: 600px;
-        //     margin: 30px auto 0;
-
-        //     @include breakpoint(laptop) {
-        //         margin-bottom: 30px;
-        //     }
-
-        //     thead {
-        //         td {
-        //             padding: 30px 15px;
-        //             text-align: center;
-        //             vertical-align: middle;
-        //         }
-        //     }
-
-        //     tr {
-        //         td.sosure {
-        //             background-color: $white;
-        //         }
-
-        //         td.contrast {
-        //             background-color: lighten($lightest-blue, 6%);
-        //             opacity: 0.7;
-        //         }
-        //     }
-
-        //     tbody {
-        //         td {
-        //             padding: 15px;
-        //             border-color: darken($lightest-blue, 6%);
-        //             vertical-align: middle;
-        //         }
-        //     }
-        // }
-
-        // .app-link {
-        //     margin-top: 40px;
-        // }
     }
 
     &--trustpilot {
@@ -711,6 +652,10 @@
             &:focus {
                 outline: 0;
             }
+        }
+
+        .media {
+            margin-bottom: 25px;
         }
 
         .cover-img {
@@ -753,6 +698,11 @@
                 left: -60px; bottom: 10px;
                 width: 175px; height: 52px;
                 background: transparent url('#{$cdn_url}/images/homepage/so-sure_cover_section_arrow.svg') center center no-repeat;
+            }
+
+            // Oh how wank
+            .h2-d {
+                margin-top: 70px;
             }
         }
     }
