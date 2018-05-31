@@ -11,7 +11,8 @@
     }
 
     &__hero {
-        background-color: $light-ad-grey;
+        // background-color: $light-ad-grey;
+        background-color: $off-white;
         padding-top: 40px;
         padding-bottom: 40px;
         position: relative;
@@ -37,10 +38,10 @@
 
         // background: rgb(30, 35, 50);
         background-image:
-            url('#{$cdn_url}/images/landing_pages/tria_c.svg'),
-            url('#{$cdn_url}/images/landing_pages/tria_d.svg'),
-            url('#{$cdn_url}/images/landing_pages/tria_d.svg'),
-            url('#{$cdn_url}/images/landing_pages/tria_c.svg');
+            url('#{$cdn_url}/images/landing_pages/tria_e.svg'),
+            url('#{$cdn_url}/images/landing_pages/tria_f.svg'),
+            url('#{$cdn_url}/images/landing_pages/tria_f.svg'),
+            url('#{$cdn_url}/images/landing_pages/tria_e.svg');
         background-position:
             5% -10%,
             90% -20%,

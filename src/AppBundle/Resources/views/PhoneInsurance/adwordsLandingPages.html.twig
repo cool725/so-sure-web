@@ -16,6 +16,7 @@
     {{ parent() }}
     {% stylesheets output='css/*.css'
     '@AppBundle/Resources/public/sass/page/homepage.scss'
+    'components/animate.css/animate.min.css'
     '@AppBundle/Resources/public/sass/page/adwordsLanding.scss'
     %}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
@@ -77,7 +78,7 @@
                     <div class="phone-img">
                         <img src="{{ phone.imageUrlWithFallback }}"
                              alt="so-sure - {{ phone.make|capitalize }} {{ phone.model }} {{ phone.memory }}GB insurance"
-                             class="img-center hidden-xs" width="130px">
+                             class="img-center hidden-xs" width="150px">
                     </div>
                     {% if phones | length > 1 %}
                         <div class="text-center">
@@ -361,6 +362,6 @@
     '@AppBundle/Resources/public/js/Default/sliderNew.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMakeSearch.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMakeDropdown.js'
-    '@AppBundle/Resources/public/js/Default/quote.js' %}
+    '@AppBundle/Resources/public/js/Default/adwordsLandingPages.js' %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
