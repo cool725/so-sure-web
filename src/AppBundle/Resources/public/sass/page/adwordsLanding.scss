@@ -6,10 +6,15 @@
 
 .landing {
 
+    &__nav {
+        background: transparent;
+    }
+
     &__hero {
         background-color: $light-ad-grey;
         padding-top: 40px;
         padding-bottom: 40px;
+        position: relative;
 
         h1 {
             color: $dark-ad-green;
@@ -23,6 +28,11 @@
         @include breakpoint(tablet) {
             padding-top: 80px;
             padding-bottom: 100px;
+        }
+
+        &:after {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
         }
 
         // background: rgb(30, 35, 50);
@@ -58,7 +68,7 @@
     }
 
     &__press {
-        background: $off-white;
+        // background: $off-white;
         position: relative;
         z-index: 1;
 
@@ -119,6 +129,23 @@
                 width: 200px;
             }
         }
+    }
+
+    &__we-do-things-differently {
+        // background-color: $lightest-blue;
+
+        .img-app {
+            width: 300px;
+
+            @include breakpoint(laptop) {
+                width: 400px;
+                margin-top: 40px;
+            }
+        }
+    }
+
+    &__excess {
+        // text-align: center;
     }
 
 }
