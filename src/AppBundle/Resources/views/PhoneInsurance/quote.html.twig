@@ -129,7 +129,7 @@
 
                         {# Save Quote #}
                         {% if feature_enabled('quote-lead') and coming_soon == false and phone.initialPrice > 0 %}
-                            <h3>Guarantee this price for the next {%  if days_test == '7days' %}7 days{% else %}24 hours{% endif %}</h3>
+                            <h3>Guarantee this price for the next 24 hours</h3>
                             {{ form_start(lead_form, {'attr': {'class': 'form-inline quote__save'}}) }}
                                 {{ form_label(lead_form.email, 'Your email:', { 'label_attr': {'class': 'sr-only'} }) }}
                                 {{ form_widget(lead_form.email, {'attr':{'class':'form-control', 'placeholder': 'Enter your email'}}) }}
@@ -172,18 +172,10 @@
                                     <li><i class="fa fa-check text-blue" aria-hidden="true"></i> Instant cover when you purchase your policy</li>
                                     <li><i class="fa fa-check text-blue" aria-hidden="true"></i> Up to 80% cashback every year</li>
                                 </ul>
-                                {% if intercom_test == 'intercom' %}
-                                    <div class="text-center">
-                                        <a href="mailto:hello@wearesosure.com?subject=More information about your {{ phone }} policy"
-                                           class="open-intercom text-underline sosure-track sosure-track-intercom" data-event="quote-intercom">
-                                            Questions? Start a CHAT with us
-                                        </a>
-                                    </div>
-                                {% endif %}
                             </div>
                         </div>
                         {# CTA #}
-                        <div class="quote__cta visible-xs text-center" {% if intercom_test == "intercom" %}style="margin-top: 20px"{% endif %}>
+                        <div class="quote__cta visible-xs text-center">
                             <div class="form-group">
                                 {{ form_start(buy_form_banner) }}
                                     {{ form_widget(buy_form_banner.buy, {'label': 'Get Started', 'attr': {'class': 'btn btn btn-green btn-block btn-pad btn-big-text'}}) }}
