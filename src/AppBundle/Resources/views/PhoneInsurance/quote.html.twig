@@ -2,6 +2,7 @@
 
 {# Set vars #}
 {% set new_stylesheet = 1 %}
+{% set include_emoji = 1 %}
 
 {% block title %}{{ phone.model }} Insurance - {{ phone.make }} - so-sure: Social Insurance{% endblock %}
 {% block meta %}
@@ -160,8 +161,8 @@
                                 <ul class="list-unstyled fa-list-bullet">
                                     <li>
                                         <i class="fa fa-check text-blue" aria-hidden="true"></i>
-                                        {% if replacement is defined and replacement == 'seventytwo-hours' %}
-                                            Replacement within 24 to 72 hours
+                                        {% if moneyBackGuarantee is defined and moneyBackGuarantee == 'money-back-guarantee' %}
+                                            <mark class="mgreen">14 day money back guarantee 💰🔙</mark>
                                         {% else %}
                                             Next working day replacement or repair
                                         {% endif %}
@@ -208,6 +209,19 @@
     {% include 'AppBundle::Default/faqs.html.twig' %}
 
     {% include 'AppBundle::Default/feedbackQuotes.html.twig' %}
+
+    {% if moneyBackGuarantee is defined and moneyBackGuarantee == 'money-back-guarantee' %}
+        <section class="section--pad money-back">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2">
+                        <div class="h3 text-center text-white">Don't just take their word for it - try for yourself!</div>
+                        <div class="h3 h-light text-center text-white">We pride ourselves on our service - if you're not satisfied within the first 📅 14 days we'll give you a full refund 💰🔙</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    {% endif %}
 
     {% include 'AppBundle::Default/whySoSure.html.twig' %}
 

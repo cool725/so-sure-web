@@ -527,17 +527,17 @@ class PhoneInsuranceController extends BaseController
                 SixpackService::EXPERIMENT_TRUSTPILOT_REVIEW
             );
         }
-
+      
         $trustpilot = $this->sixpack(
             $request,
             SixpackService::EXPERIMENT_TRUSTPILOT_REVIEW,
             ['no-trustpilot', 'trustpilot']
         );
 
-        $replacement = $this->sixpack(
+        $moneyBackGuarantee = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_72_REPLACEMENT,
-            ['next-working-day', 'seventytwo-hours']
+            SixpackService::EXPERIMENT_MONEY_BACK_GUARANTEE,
+            ['no-money-back-guarantee', 'money-back-guarantee']
         );
 
         $data = array(
@@ -566,6 +566,7 @@ class PhoneInsuranceController extends BaseController
             'slider_test'     => 'slide-me',
             'intercom_test'   => $expIntercom,
             'trustpilot'     => $trustpilot,
+            'moneyBackGuarantee' => $moneyBackGuarantee,
         );
 
         $template = 'AppBundle:PhoneInsurance:quote.html.twig';

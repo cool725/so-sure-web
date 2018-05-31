@@ -1173,7 +1173,7 @@
     max-width: 450px;
     background-color: $white;
     padding: 0;
-    position: relative;
+    // position: relative;
     margin: 0 auto;
     z-index: 5;
 
@@ -1299,15 +1299,13 @@
     }
 }
 
-.search-phone-form--sticky {
+// Sticky Search - Using BS affix
+.affix {
     position: fixed;
     top: 60px; left: 0; right: 0;
     z-index: 999;
-
-    margin-left: 10px;
-    margin-right: 10px;
-
     padding: 0 10px;
+    border-color: $light-blue;
 
     .twitter-typeahead {
 
@@ -1337,14 +1335,11 @@
         }
     }
 
-    border-color: $light-blue;
-
     @include breakpoint(tablet) {
         margin-left: auto;
         margin-right: auto;
     }
 
-    // search form - set width/height
     @include breakpoint(laptop) {
         height: 40px;
     }
@@ -1355,19 +1350,15 @@
     }
 }
 
-.dropdown-phone-form #reset-sticky {
-    display: none;
+.affix-bottom {
+    position: absolute;
 }
 
-.dropdown-phone-form.search-phone-form--sticky {
+// Dropdown Sticky
+.dropdown-phone-form.affix {
     top: 55px;
-    background-color: $black-opaque;
-
-    @include border-bottom-radius(4px);
-
-    #reset-sticky {
-        color: $white;
-    }
+    padding-top: 15px;
+    background-color: $off-white !important;
 }
 
 .speech-bubble {
