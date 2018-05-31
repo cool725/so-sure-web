@@ -53,7 +53,7 @@ parameters:
     ga_tag_manager_env: '&gtm_auth=&gtm_preview=env-4&gtm_cookies_win=x'
     google_clientauth_id:
     google_clientauth_secret:
-    google_clientid:
+    google_clientid: changeme
 
     rollbar_access_token:
 
