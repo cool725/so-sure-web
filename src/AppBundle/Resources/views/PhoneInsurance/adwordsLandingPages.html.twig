@@ -39,9 +39,9 @@
     <section class="landing__hero">
         <div class="container">
             <div class="row">
-                <div class="col-sm-7 col-sm-offset-0 col-md-7 col-md-offset-1">
+                <div class="col-sm-7 col-sm-offset-0 col-md-6 col-md-offset-1">
                     <h1>{{ phone.make }} {{ phone.model }} Insurance</h1>
-                    <span class="h3 h-light">Insurance that’s simple, reliable and altogether better.</span><br>
+                    <span class="h3 h-light">Insurance that’s simple, reliable &amp; altogether better.</span><br>
                     <span class="h2">&pound;{{ phone_price.monthlyPremiumPrice }} <small class="h-light">per month</small></span>
                     <ul class="list-unstyled fa-list-bullet">
                         <li>
@@ -78,11 +78,11 @@
                         {% if currentPhone == 'Apple iPhone X' %}
                             <img src="{{ cdn_url }}/images/landing_pages/iphone_X_smashed_.svg"
                                  alt="so-sure - {{ phone.make|capitalize }} {{ phone.model }} {{ phone.memory }}GB insurance"
-                                 class="hidden-xs" width="170px">
+                                 class="hidden-xs" width="200px">
                         {% elseif currentPhone == 'Samsung Galaxy S8' or currentPhone == 'Samsung Galaxy S8+' %}
                             <img src="{{ cdn_url }}/images/landing_pages/s8_smashed.svg"
                                  alt="so-sure - {{ phone.make|capitalize }} {{ phone.model }} {{ phone.memory }}GB insurance"
-                                 class="hidden-xs" width="170px">
+                                 class="hidden-xs" width="200px">
                         {% else %}
                             <img src="{{ phone.imageUrlWithFallback }}"
                                  alt="so-sure - {{ phone.make|capitalize }} {{ phone.model }} {{ phone.memory }}GB insurance"
