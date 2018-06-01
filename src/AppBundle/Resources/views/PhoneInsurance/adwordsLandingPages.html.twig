@@ -5,6 +5,9 @@
 {% set distraction_free = 1 %}
 {% set new_footer = 1 %}
 {% set include_emoji = 1 %}
+{# Add alt link to plus #}
+{% set currentPhone = phone.make ~ " " ~ phone.model %}
+
 
 {% block title %}{{ phone.model }} Insurance - {{ phone.make }} - so-sure: Social Insurance{% endblock %}
 {% block meta %}
@@ -22,17 +25,13 @@
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
 
-{# {% block nav %}
-    <nav class="navbar navbar-default landing__nav">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <a class="navbar-brand" href="/">
-                    <div class="so-sure-logo so-sure-logo-blue-flat"></div>
-                </a>
-            </div>
-        </div>
-    </nav>
-{% endblock %} #}
+{% block nav %}
+    <div class="landing__logo">
+        <a href="/">
+            <div class="so-sure-logo so-sure-logo-blue-flat"></div>
+        </a>
+    </div>
+{% endblock %}
 
 {% block body %}
 
@@ -76,12 +75,22 @@
                 </div>
                 <div class="col-sm-4 col-md-3">
                     <div class="phone-img">
-                        <img src="{{ phone.imageUrlWithFallback }}"
-                             alt="so-sure - {{ phone.make|capitalize }} {{ phone.model }} {{ phone.memory }}GB insurance"
-                             class="img-center hidden-xs" width="150px">
+                        {% if currentPhone == 'Apple iPhone X' %}
+                            <img src="{{ cdn_url }}/images/landing_pages/iphone_X_smashed_.svg"
+                                 alt="so-sure - {{ phone.make|capitalize }} {{ phone.model }} {{ phone.memory }}GB insurance"
+                                 class="hidden-xs" width="170px">
+                        {% elseif currentPhone == 'Samsung Galaxy S8' or currentPhone == 'Samsung Galaxy S8+' %}
+                            <img src="{{ cdn_url }}/images/landing_pages/s8_smashed.svg"
+                                 alt="so-sure - {{ phone.make|capitalize }} {{ phone.model }} {{ phone.memory }}GB insurance"
+                                 class="hidden-xs" width="170px">
+                        {% else %}
+                            <img src="{{ phone.imageUrlWithFallback }}"
+                                 alt="so-sure - {{ phone.make|capitalize }} {{ phone.model }} {{ phone.memory }}GB insurance"
+                                 class="hidden-xs" width="150px">
+                        {% endif %}
                     </div>
-                    {% if phones | length > 1 %}
-                        <div class="text-center">
+                    <div class="">
+                        {% if phones | length > 1 %}
                             <div class="h5">Different storage size?</div>
                             <div class="btn-group btn-group-sm" role="group">
                                 {% for phone_mem in phones %}
@@ -89,15 +98,33 @@
                                     <a {% if phone_mem.id != phone.id  %}href="{{ path('make_model_memory', {'make': phone_mem.makeCanonical, 'model': phone_mem.encodedModelCanonical, 'memory': phone_mem.memory}) }}"{% else %}readonly{% endif %} class="btn {% if phone_mem.id == phone.id  %}btn-ad-green{% else %}btn-ad-green-hollow{% endif %}">{{ phone_mem.memory }}GB</a>
                                 {% endfor %}
                             </div>
-                        </div>
-                    {% endif %}
+                        {% endif %}
+
+                        {% if currentPhone == 'Apple iPhone 7' %}
+                            <a class="btn btn-link btn-pad" href="{{ path('make_model_memory', {'make': 'apple', 'model': 'iphone+7+plus', 'memory': phone.memory}) }}">Looking for the iPhone 7 Plus?</a>
+                        {% elseif currentPhone == 'Apple iPhone 7 Plus' %}
+                            <a class="btn btn-link btn-pad" href="{{ path('make_model_memory', {'make': 'apple', 'model': 'iphone+7', 'memory': phone.memory}) }}">Looking for the iPhone 7?</a>
+                        {% elseif currentPhone == 'Apple iPhone 8' %}
+                            <a class="btn btn-link btn-pad" href="{{ path('make_model_memory', {'make': 'apple', 'model': 'iphone+8+plus', 'memory': phone.memory}) }}">Looking for the iPhone 8 Plus?</a>
+                        {% elseif currentPhone == 'Apple iPhone 8 Plus' %}
+                            <a class="btn btn-link btn-pad" href="{{ path('make_model_memory', {'make': 'apple', 'model': 'iphone+8', 'memory': phone.memory}) }}">Looking for the iPhone 8?</a>
+                        {% elseif currentPhone == 'Samsung Galaxy S8' %}
+                            <a class="btn btn-link btn-pad" href="{{ path('make_model_memory', {'make': 'samsung', 'model': 'galaxy+s8-plus', 'memory': phone.memory}) }}">Looking for the S8 Plus?</a>
+                        {% elseif currentPhone == 'Samsung Galaxy S8+' %}
+                            <a class="btn btn-link btn-pad" href="{{ path('make_model_memory', {'make': 'samsung', 'model': 'galaxy+s8', 'memory': phone.memory}) }}">Looking for the S8?</a>
+                        {% elseif currentPhone == 'Samsung Galaxy S9' %}
+                            <a class="btn btn-link btn-pad" href="{{ path('make_model_memory', {'make': 'samsung', 'model': 'galaxy+s9-plus', 'memory': phone.memory}) }}">Looking for the S9 Plus?</a>
+                        {% elseif currentPhone == 'Samsung Galaxy S8' %}
+                            <a class="btn btn-link btn-pad" href="{{ path('make_model_memory', {'make': 'samsung', 'model': 'galaxy+s9', 'memory': phone.memory}) }}">Looking for the S9?</a>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
     {# Press #}
-    <section class="landing__press">
+    <section class="landing__press landing__press_grayscale">
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12 text-center">
@@ -136,11 +163,11 @@
     <section class="section--pad landing__excess">
         <div class="container">
             <div class="row">
-                <div class="col-md-8">
+                <div class="col-md-8 col-md-offset-2 text-center">
                     <h2>How Do We Offer Such A Low Excess?</h2>
                     <p class="lead">When something happens to your phone, it’s already bad news. Nobody wants to pay a small fortune in excess fees to get back up and running. </p>
-                    <p class="h3 h-light"><mark>Expensive Phones + Fraudulent Claims = High Excess Fees 💸</mark></p>
-                    <p class="lead">But not with us….</p>
+                    <p class="h3 h-light text-center"><mark>Expensive Phones + Fraudulent Claims = High Excess Fees 💸</mark></p>
+                    <p class="h3 h-light">But not with us….</p>
                     <p class="lead">We’ve created a revolutionary anti-fraud process called pic-sure where by validating the existence and condition of your phone, you benefit from a super low excess and a hassle free claims process.</p>
                     <p class="lead">With this pic-sure process reducing the amount of fraudulent claims, we’re able to pass on the savings to you and offer the lowest excess around.</p>
                     <p class="lead">Honest Insurance for Honest People… Everyone Wins!</p>
@@ -230,7 +257,7 @@
     </section>
 
     {# What we don't cover #}
-    <section class="homepage--what-we-dont-cover">
+    <section class="section--pad landing__what-we-dont-cover">
         <div class="container">
             <div class="row">
                 <div class="col-md-8 col-md-offset-2 text-center">
