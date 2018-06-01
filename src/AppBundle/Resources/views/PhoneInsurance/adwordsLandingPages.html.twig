@@ -74,7 +74,7 @@
                     </div>
                 </div>
                 <div class="col-sm-4 col-md-3">
-                    <div class="phone-img">
+                    <div class="phone-img text-center">
                         {% if currentPhone == 'Apple iPhone X' %}
                             <img src="{{ cdn_url }}/images/landing_pages/iphone_X_smashed_.svg"
                                  alt="so-sure - {{ phone.make|capitalize }} {{ phone.model }} {{ phone.memory }}GB insurance"
@@ -89,7 +89,7 @@
                                  class="hidden-xs" width="150px">
                         {% endif %}
                     </div>
-                    <div class="">
+                    <div class="text-center">
                         {% if phones | length > 1 %}
                             <div class="h5">Different storage size?</div>
                             <div class="btn-group btn-group-sm" role="group">
