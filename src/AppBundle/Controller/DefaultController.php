@@ -134,7 +134,7 @@ class DefaultController extends BaseController
     /**
      * @Route("/money", name="money")
      */
-    public function moneyLanding(Request $request)
+    public function moneyLanding()
     {
         return $this->render('AppBundle:Default:indexMoney.html.twig');
     }
