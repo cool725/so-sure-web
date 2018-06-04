@@ -202,8 +202,9 @@
             > tr {
                 > td {
                     font-family: $avenir-heavy;
-                        padding-top: 10px;
-                        padding-bottom: 10px;
+                    padding-top: 10px;
+                    padding-bottom: 10px;
+                    vertical-align: middle;
                 }
                 &:nth-child(even) {
                     > td {
