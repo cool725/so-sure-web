@@ -75,6 +75,10 @@
         position: relative;
         z-index: 1;
 
+        ul {
+            margin-bottom: 0;
+        }
+
         &_defaqto {
             width: 100px;
         }
@@ -151,7 +155,7 @@
     }
 
     &__we-do-things-differently {
-        // background-color: $lightest-blue;
+        background-color: $off-white;
 
         .img-app {
             width: 300px;
@@ -165,7 +169,18 @@
 
     &__excess {
         // text-align: center;
-        background-color: $off-white;
+        // background-color: $off-white;
+
+        .cover__list {
+            @include breakpoint(laptop) {
+                margin-top: 100px;
+            }
+        }
+    }
+
+    &__cover-details {
+        text-align: left;
+        // background: $off-white;
     }
 
     &__what-we-dont-cover {

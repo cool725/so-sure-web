@@ -46,7 +46,7 @@
                     <ul class="list-unstyled fa-list-bullet">
                         <li>
                             <i class="fa fa-check text-green" aria-hidden="true"></i>
-                            Excess Just &pound;50
+                            Excess from &pound;50
                         </li>
                         <li>
                             <i class="fa fa-check text-green" aria-hidden="true"></i>
@@ -166,28 +166,45 @@
     <section class="section--pad landing__excess">
         <div class="container">
             <div class="row">
-                <div class="col-md-8 col-md-offset-2 text-center">
+                <div class="col-md-8 col-md-offset-2">
                     <h2>How Do We Offer Such A Low Excess?</h2>
                     <p class="lead">When something happens to your phone, it’s already bad news. Nobody wants to pay a small fortune in excess fees to get back up and running. </p>
                     <p class="h3 h-light text-center"><mark>Expensive Phones + Fraudulent Claims = High Excess Fees 💸</mark></p>
-                    <p class="h3 h-light">But not with us….</p>
+                    <p class="lead">But not with us...</p>
                     <p class="lead">We’ve created a revolutionary anti-fraud process called pic-sure where by validating the existence and condition of your phone, you benefit from a super low excess and a hassle free claims process.</p>
-                    <p class="lead">With this pic-sure process reducing the amount of fraudulent claims, we’re able to pass on the savings to you and offer the lowest excess around.</p>
-                    <p class="lead">Honest Insurance for Honest People… Everyone Wins!</p>
+                    <div class="h4">If you decide not to validate, you still get the same great claims process, but your excess will be £150... It's a no brainer.</div>
+                    <h3>Here’s How it Works</h3>
+                    <ol class="ol--blue-counter ol--blue-counter__line cover__list">
+                        <li class="h4 h-light clearfix">
+                            <img src="{{ cdn_url }}/images/homepage/pic-sure_steps_homepage_1.svg" alt="Get covered in less than 2 minutes through our app or website"><br>
+                            <span>Get covered in less than 2 minutes through our app or website</span>
+                        </li>
+                        <li class="h4 h-light clearfix">
+                            <img src="{{ cdn_url }}/images/homepage/pic-sure_steps_homepage_2.svg" alt="Login and validate your phone with pic-sure in seconds"><br>
+                            <span>Login and validate your phone with pic-sure in seconds</span>
+                        </li>
+                        <li class="h4 h-light clearfix">
+                            <img src="{{ cdn_url }}/images/homepage/pic-sure_steps_homepage_3.svg" alt="Hooray, your excess is reduced and we know you're honest :)"><br>
+                            <span>Hooray, your excess is reduced and we know you're honest :)</span>
+                        </li>
+                    </ol>
+                    <div class="h3 text-center">Honest Insurance for Honest People… Everyone Wins!</div>
                 </div>
             </div>
         </div>
     </section>
 
+    {% include 'AppBundle::Default/_sectionComparisonAlt.html.twig' %}
+
     {# Cover Details #}
-    <section class="section--pad homepage--cover-details">
+    <section class="section--pad homepage--cover-details landing__cover-details">
         <div class="container">
             <div class="row">
                 <div class="col-md-5">
-                    <h2 class="text-left h2-d">Come rain, shine or cracked screen, we’re here for you and your social circle</h2>
+                    <h2 class="text-left h2-d">What We Cover</h2>
                     <p class="lead text-left">In just a few clicks, you’ll be instantly covered for loss, theft, accidental damage, out-of-warranty breakdowns and even international travel. And unlike other insurers, we cover phones that are up to three years old.</p>
                 </div>
-                <div class="col-md-7 text-left">
+                <div class="col-md-7">
                     <div class="row">
                         <div class="col-sm-6">
                             <div class="media">
@@ -264,18 +281,18 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-8 col-md-offset-2 text-center">
-                    <h2 class="h3">What We Don't Cover</h2>
+                    <h2 class="h3">⚠️ What We Don't Cover ⚠️</h2>
                     <ul class="list-unstyled">
                         <li class="h4">
                             Putting your phone at risk:
                             <ul class="list-unstyled">
-                                <li class="h5 h-light">Theft, Loss, Accidental Damage or Breakdown where you have knowingly put your phone at risk</li>
+                                <li class="h5 h-light">❌ Theft, Loss, Accidental Damage or Breakdown where you have knowingly put your phone at risk</li>
                             </ul>
                         </li>
                         <li class="h4">
                             Multiple Theft/Loss Claims:
                             <ul class="list-unstyled">
-                                <li class="h5 h-light">3+ claims for Loss and/or Theft in any policy year</li>
+                                <li class="h5 h-light">❌ 3+ claims for Loss and/or Theft in any policy year</li>
                             </ul>
                         </li>
                     </ul>
@@ -283,8 +300,6 @@
             </div>
         </div>
     </section>
-
-    {% include 'AppBundle::Default/_sectionComparisonAlt.html.twig' %}
 
     {# Claims procss #}
     <section class="section--pad homepage--claims-process">
