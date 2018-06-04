@@ -545,13 +545,20 @@ class PhoneInsuranceController extends BaseController
             'moneyBackGuarantee' => $moneyBackGuarantee,
         );
 
-        $template = 'AppBundle:PhoneInsurance:quote.html.twig';
-
+        // Adwords landingpage test
         if (in_array($request->get('_route'), ['make_model_memory'])) {
-            // If adwords landing page
-            return $this->render('AppBundle:PhoneInsurance:adwordsLandingPages.html.twig', $data);
+            $adwordsLanding = $this->sixpack(
+                $request,
+                SixpackService::EXPERIMENT_ADWORDS_LANDING,
+                ['adwords-homepage', 'adwords-landingpage']
+            );
+            if ($adwordsLanding == 'adwords-landingpage') {
+                return $this->render('AppBundle:PhoneInsurance:adwordsLandingPages.html.twig', $data);
+            } else {
+                return $this->redirectToRoute('homepage');
+            }
         } else {
-            return $this->render($template, $data);
+            return $this->render('AppBundle:PhoneInsurance:quote.html.twig', $data);
         }
     }
 
