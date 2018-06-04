@@ -98,27 +98,27 @@
                             <div class="h5">Different storage size?</div>
                             <div class="btn-group btn-group-sm" role="group">
                                 {% for phone_mem in phones %}
-                                    <a {% if phone_mem.id != phone.id  %}href="{{ path('make_model_memory', {'make': phone_mem.makeCanonical, 'model': phone_mem.encodedModelCanonical, 'memory': phone_mem.memory}) }}"{% else %}readonly{% endif %} class="btn {% if phone_mem.id == phone.id  %}btn-ad-green{% else %}btn-ad-green-hollow{% endif %}">{{ phone_mem.memory }}GB</a>
+                                    <a {% if phone_mem.id != phone.id  %}href="{{ path('insurance_make_model_memory', {'make': phone_mem.makeCanonical, 'model': phone_mem.encodedModelCanonical, 'memory': phone_mem.memory}) }}"{% else %}readonly{% endif %} class="btn {% if phone_mem.id == phone.id  %}btn-ad-green{% else %}btn-ad-green-hollow{% endif %}">{{ phone_mem.memory }}GB</a>
                                 {% endfor %}
                             </div>
                         {% endif %}
 
                         {% if currentPhone == 'Apple iPhone 7' %}
-                            <a class="btn btn-link btn-pad btn-xs" href="{{ path('make_model_memory', {'make': 'apple', 'model': 'iphone+7+plus', 'memory': phone.memory}) }}">Looking for the iPhone 7 Plus?</a>
+                            <a class="btn btn-link btn-pad btn-xs" href="{{ path('insurance_make_model_memory', {'make': 'apple', 'model': 'iphone+7+plus', 'memory': phone.memory}) }}">Looking for the iPhone 7 Plus?</a>
                         {% elseif currentPhone == 'Apple iPhone 7 Plus' %}
-                            <a class="btn btn-link btn-pad btn-xs" href="{{ path('make_model_memory', {'make': 'apple', 'model': 'iphone+7', 'memory': phone.memory}) }}">Looking for the iPhone 7?</a>
+                            <a class="btn btn-link btn-pad btn-xs" href="{{ path('insurance_make_model_memory', {'make': 'apple', 'model': 'iphone+7', 'memory': phone.memory}) }}">Looking for the iPhone 7?</a>
                         {% elseif currentPhone == 'Apple iPhone 8' %}
-                            <a class="btn btn-link btn-pad btn-xs" href="{{ path('make_model_memory', {'make': 'apple', 'model': 'iphone+8+plus', 'memory': phone.memory}) }}">Looking for the iPhone 8 Plus?</a>
+                            <a class="btn btn-link btn-pad btn-xs" href="{{ path('insurance_make_model_memory', {'make': 'apple', 'model': 'iphone+8+plus', 'memory': phone.memory}) }}">Looking for the iPhone 8 Plus?</a>
                         {% elseif currentPhone == 'Apple iPhone 8 Plus' %}
-                            <a class="btn btn-link btn-pad btn-xs" href="{{ path('make_model_memory', {'make': 'apple', 'model': 'iphone+8', 'memory': phone.memory}) }}">Looking for the iPhone 8?</a>
+                            <a class="btn btn-link btn-pad btn-xs" href="{{ path('insurance_make_model_memory', {'make': 'apple', 'model': 'iphone+8', 'memory': phone.memory}) }}">Looking for the iPhone 8?</a>
                         {% elseif currentPhone == 'Samsung Galaxy S8' %}
-                            <a class="btn btn-link btn-pad btn-xs" href="{{ path('make_model_memory', {'make': 'samsung', 'model': 'galaxy+s8-plus', 'memory': phone.memory}) }}">Looking for the S8 Plus?</a>
+                            <a class="btn btn-link btn-pad btn-xs" href="{{ path('insurance_make_model_memory', {'make': 'samsung', 'model': 'galaxy+s8-plus', 'memory': phone.memory}) }}">Looking for the S8 Plus?</a>
                         {% elseif currentPhone == 'Samsung Galaxy S8+' %}
-                            <a class="btn btn-link btn-pad btn-xs" href="{{ path('make_model_memory', {'make': 'samsung', 'model': 'galaxy+s8', 'memory': phone.memory}) }}">Looking for the S8?</a>
+                            <a class="btn btn-link btn-pad btn-xs" href="{{ path('insurance_make_model_memory', {'make': 'samsung', 'model': 'galaxy+s8', 'memory': phone.memory}) }}">Looking for the S8?</a>
                         {% elseif currentPhone == 'Samsung Galaxy S9' %}
-                            <a class="btn btn-link btn-pad btn-xs" href="{{ path('make_model_memory', {'make': 'samsung', 'model': 'galaxy+s9-plus', 'memory': '128'}) }}">Looking for the S9 Plus?</a>
+                            <a class="btn btn-link btn-pad btn-xs" href="{{ path('insurance_make_model_memory', {'make': 'samsung', 'model': 'galaxy+s9-plus', 'memory': '128'}) }}">Looking for the S9 Plus?</a>
                         {% elseif currentPhone == 'Samsung Galaxy S9+' %}
-                            <a class="btn btn-link btn-pad btn-xs" href="{{ path('make_model_memory', {'make': 'samsung', 'model': 'galaxy+s9', 'memory': '64'}) }}">Looking for the S9?</a>
+                            <a class="btn btn-link btn-pad btn-xs" href="{{ path('insurance_make_model_memory', {'make': 'samsung', 'model': 'galaxy+s9', 'memory': '64'}) }}">Looking for the S9?</a>
                         {% endif %}
                     </div>
                 </div>

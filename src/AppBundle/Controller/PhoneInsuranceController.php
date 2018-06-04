@@ -203,7 +203,7 @@ class PhoneInsuranceController extends BaseController
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
      * @Route("/phone-insurance/{make}+{model}", name="quote_make_model",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
-     * @Route("/{make}+{model}+{memory}GB", name="make_model_memory",
+     * @Route("/insurance+{make}+{model}+{memory}GB", name="insurance_make_model_memory",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
      * @Route("/insure/{make}+{model}+{memory}GB", name="insure_make_model_memory",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
@@ -546,7 +546,7 @@ class PhoneInsuranceController extends BaseController
         );
 
         // Adwords landingpage test
-        if (in_array($request->get('_route'), ['make_model_memory'])) {
+        if (in_array($request->get('_route'), ['insurance_make_model_memory'])) {
             $adwordsLanding = $this->sixpack(
                 $request,
                 SixpackService::EXPERIMENT_ADWORDS_LANDING,
