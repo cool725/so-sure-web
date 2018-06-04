@@ -129,7 +129,7 @@
 
                         {# Save Quote #}
                         {% if feature_enabled('quote-lead') and coming_soon == false and phone.initialPrice > 0 %}
-                            <h3>Guarantee this price for the next 24 hours</h3>
+                            <h3>Guarantee this price for the next 7 days</h3>
                             {{ form_start(lead_form, {'attr': {'class': 'form-inline quote__save'}}) }}
                                 {{ form_label(lead_form.email, 'Your email:', { 'label_attr': {'class': 'sr-only'} }) }}
                                 {{ form_widget(lead_form.email, {'attr':{'class':'form-control', 'placeholder': 'Enter your email'}}) }}
