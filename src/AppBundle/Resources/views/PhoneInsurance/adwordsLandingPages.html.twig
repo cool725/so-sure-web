@@ -79,6 +79,10 @@
                             <img src="{{ cdn_url }}/images/landing_pages/iphone_X_smashed_.svg"
                                  alt="so-sure - {{ phone.make|capitalize }} {{ phone.model }} {{ phone.memory }}GB insurance"
                                  class="hidden-xs" width="200px">
+                        {% elseif currentPhone == 'Apple iPhone 7' or currentPhone == 'Apple iPhone 7 Plus' %}
+                            <img src="{{ cdn_url }}/images/landing_pages/iphone_7_smashed.svg"
+                                 alt="so-sure - {{ phone.make|capitalize }} {{ phone.model }} {{ phone.memory }}GB insurance"
+                                 class="hidden-xs" width="200px">
                         {% elseif currentPhone == 'Samsung Galaxy S8' or currentPhone == 'Samsung Galaxy S8+' %}
                             <img src="{{ cdn_url }}/images/landing_pages/s8_smashed.svg"
                                  alt="so-sure - {{ phone.make|capitalize }} {{ phone.model }} {{ phone.memory }}GB insurance"
@@ -94,7 +98,6 @@
                             <div class="h5">Different storage size?</div>
                             <div class="btn-group btn-group-sm" role="group">
                                 {% for phone_mem in phones %}
-                                    {# <button type="button" class="btn btn-default">Left</button> #}
                                     <a {% if phone_mem.id != phone.id  %}href="{{ path('make_model_memory', {'make': phone_mem.makeCanonical, 'model': phone_mem.encodedModelCanonical, 'memory': phone_mem.memory}) }}"{% else %}readonly{% endif %} class="btn {% if phone_mem.id == phone.id  %}btn-ad-green{% else %}btn-ad-green-hollow{% endif %}">{{ phone_mem.memory }}GB</a>
                                 {% endfor %}
                             </div>
