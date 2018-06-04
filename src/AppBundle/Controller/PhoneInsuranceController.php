@@ -212,6 +212,8 @@ class PhoneInsuranceController extends BaseController
      */
     public function quoteAction(Request $request, $id = null, $make = null, $model = null, $memory = null)
     {
+
+        // Here ???
         if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
             $exp = $this->sixpack(
                 $request,
@@ -324,6 +326,7 @@ class PhoneInsuranceController extends BaseController
 
         $quoteUrl = $this->setPhoneSession($request, $phone);
 
+        // Here ???
         // We have run various tests for cpc traffic in the page where both manufacturer and homepage
         // outperformed quote page. Also homepage was better than manufacturer page
         if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
@@ -529,7 +532,7 @@ class PhoneInsuranceController extends BaseController
                 SixpackService::EXPERIMENT_TRUSTPILOT_REVIEW
             );
         }
-      
+
         $trustpilot = $this->sixpack(
             $request,
             SixpackService::EXPERIMENT_TRUSTPILOT_REVIEW,
