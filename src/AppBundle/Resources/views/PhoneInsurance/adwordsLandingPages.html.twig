@@ -167,114 +167,293 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-8 col-md-offset-2">
-                    <h2>How Do We Offer Such A Low Excess?</h2>
+                    <h2 class="text-center">How Do We Offer Such A Low Excess?</h2>
                     <p class="lead">When something happens to your phone, it’s already bad news. Nobody wants to pay a small fortune in excess fees to get back up and running. </p>
-                    <p class="h3 h-light text-center"><mark>Expensive Phones + Fraudulent Claims = High Excess Fees 💸</mark></p>
-                    <p class="lead">But not with us...</p>
+                    <p class="h3 text-center"><mark>Expensive Phones + Fraudulent Claims = High Excess Fees 💸</mark></p>
+                    <div class="h4 text-center">But not with us...</div>
                     <p class="lead">We’ve created a revolutionary anti-fraud process called pic-sure where by validating the existence and condition of your phone, you benefit from a super low excess and a hassle free claims process.</p>
                     <div class="h4">If you decide not to validate, you still get the same great claims process, but your excess will be £150... It's a no brainer.</div>
-                    <h3>Here’s How it Works</h3>
-                    <ol class="ol--blue-counter ol--blue-counter__line cover__list">
-                        <li class="h4 h-light clearfix">
-                            <img src="{{ cdn_url }}/images/homepage/pic-sure_steps_homepage_1.svg" alt="Get covered in less than 2 minutes through our app or website"><br>
-                            <span>Get covered in less than 2 minutes through our app or website</span>
-                        </li>
-                        <li class="h4 h-light clearfix">
-                            <img src="{{ cdn_url }}/images/homepage/pic-sure_steps_homepage_2.svg" alt="Login and validate your phone with pic-sure in seconds"><br>
-                            <span>Login and validate your phone with pic-sure in seconds</span>
-                        </li>
-                        <li class="h4 h-light clearfix">
-                            <img src="{{ cdn_url }}/images/homepage/pic-sure_steps_homepage_3.svg" alt="Hooray, your excess is reduced and we know you're honest :)"><br>
-                            <span>Hooray, your excess is reduced and we know you're honest :)</span>
-                        </li>
-                    </ol>
+                    <div class="row text-center">
+                        <div class="col-sm-4">
+                            <img src="{{ cdn_url }}/images/homepage/pic-sure_steps_homepage_1.svg" alt="Get covered in less than 2 minutes through our app or website" width="130px"><br>
+                            <span>1. Get covered in less than 2 minutes through our app or website</span>
+                        </div>
+                        <div class="col-sm-4">
+                            <img src="{{ cdn_url }}/images/homepage/pic-sure_steps_homepage_2.svg" alt="Login and validate your phone with pic-sure in seconds" width="130px"><br>
+                            <span>2. Login and validate your phone with pic-sure in seconds</span>
+                        </div>
+                        <div class="col-sm-4">
+                            <img src="{{ cdn_url }}/images/homepage/pic-sure_steps_homepage_3.svg" alt="Hooray, your excess is reduced and we know you're honest :)" width="130px"><br>
+                            <span>3. Hooray, your excess is reduced and we know you're honest</span>
+                        </div>
+                    </div>
                     <div class="h3 text-center">Honest Insurance for Honest People… Everyone Wins!</div>
                 </div>
             </div>
         </div>
     </section>
 
-    {% include 'AppBundle::Default/_sectionComparisonAlt.html.twig' %}
-
-    {# Cover Details #}
-    <section class="section--pad homepage--cover-details landing__cover-details">
+    <section class="section--pad landing__excess_cont">
         <div class="container">
+            <h3 class="text-center">How We Compare On {{ phone.make }} {{ phone.model }} Excess</h3>
             <div class="row">
-                <div class="col-md-5">
-                    <h2 class="text-left h2-d">What We Cover</h2>
-                    <p class="lead text-left">In just a few clicks, you’ll be instantly covered for loss, theft, accidental damage, out-of-warranty breakdowns and even international travel. And unlike other insurers, we cover phones that are up to three years old.</p>
+                <div class="col-md-10 col-md-offset-1">
+                    <div class="table-responsive">
+                        <table class="table table-condensed landing__excess_table">
+                            <thead>
+                                <tr>
+                                    <th align="center"></th>
+                                    <th align="center">ProtectYourBubble</th>
+                                    <th align="center">Insurance2Go</th>
+                                    <th align="center">SwitchedOn</th>
+                                    <th align="center">LoveItCoverIt</th>
+                                    <th align="center">Tinhat</th>
+                                    <th align="center">SO-SURE</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td align="center" class="text-muted">Accidental Damage</td>
+                                    {# ProtectYourBubble #}
+                                    <td align="center">
+                                        {% if currentPhone == 'Apple iPhone 7' or currentPhone == 'Apple iPhone 7 Plus' %}
+                                            £60
+                                        {% elseif currentPhone == 'Apple iPhone X' %}
+                                            £90
+                                        {% elseif currentPhone == 'Samsung Galaxy S8' %}
+                                            £75
+                                        {% elseif currentPhone == 'Samsung Galaxy S9' %}
+                                            £75
+                                        {% elseif currentPhone == 'Samsung Galaxy S9+' %}
+                                            £75
+                                        {% endif %}
+                                    </td>
+                                    {# Insurance2Go #}
+                                    <td align="center">
+                                        {% if currentPhone == 'Apple iPhone 7' or currentPhone == 'Apple iPhone 7 Plus' %}
+                                            £75
+                                        {% elseif currentPhone == 'Apple iPhone X' %}
+                                            £100
+                                        {% elseif currentPhone == 'Samsung Galaxy S8' %}
+                                            £75
+                                        {% elseif currentPhone == 'Samsung Galaxy S9' %}
+                                            £75
+                                        {% elseif currentPhone == 'Samsung Galaxy S9+' %}
+                                            £75
+                                        {% endif %}
+                                    </td>
+                                    {# SwitchedOn #}
+                                    <td align="center">
+                                        {% if currentPhone == 'Apple iPhone 7' or currentPhone == 'Apple iPhone 7 Plus' %}
+                                            £50
+                                        {% elseif currentPhone == 'Apple iPhone X' %}
+                                            £50
+                                        {% elseif currentPhone == 'Samsung Galaxy S8' %}
+                                            £50
+                                        {% elseif currentPhone == 'Samsung Galaxy S9' %}
+                                            £50
+                                        {% elseif currentPhone == 'Samsung Galaxy S9+' %}
+                                            £50
+                                        {% endif %}
+                                    </td>
+                                    {# LoveItCoverIt #}
+                                    <td align="center">
+                                        {% if currentPhone == 'Apple iPhone 7' or currentPhone == 'Apple iPhone 7 Plus' %}
+                                            £50
+                                        {% elseif currentPhone == 'Apple iPhone X' %}
+                                            £80
+                                        {% elseif currentPhone == 'Samsung Galaxy S8' %}
+                                            £60
+                                        {% elseif currentPhone == 'Samsung Galaxy S9' %}
+                                            £60
+                                        {% elseif currentPhone == 'Samsung Galaxy S9+' %}
+                                            £60
+                                        {% endif %}
+                                    </td>
+                                    {# Tinhat #}
+                                    <td align="center">
+                                        {% if currentPhone == 'Apple iPhone 7' or currentPhone == 'Apple iPhone 7 Plus' %}
+                                            £75
+                                        {% elseif currentPhone == 'Apple iPhone X' %}
+                                            £100
+                                        {% elseif currentPhone == 'Samsung Galaxy S8' %}
+                                            £75
+                                        {% elseif currentPhone == 'Samsung Galaxy S9' %}
+                                            £75
+                                        {% elseif currentPhone == 'Samsung Galaxy S9+' %}
+                                            £100
+                                        {% endif %}
+                                    </td>
+                                    {# so-sure #}
+                                    <td align="center">£50</td>
+                                </tr>
+                                <tr>
+                                    <td align="center" class="text-muted">Theft</td>
+                                    {# ProtectYourBubble #}
+                                    <td align="center">
+                                        {% if currentPhone == 'Apple iPhone 7' or currentPhone == 'Apple iPhone 7 Plus' %}
+                                            £100
+                                        {% elseif currentPhone == 'Apple iPhone X' %}
+                                            £100
+                                        {% elseif currentPhone == 'Samsung Galaxy S8' %}
+                                            £100
+                                        {% elseif currentPhone == 'Samsung Galaxy S9' %}
+                                            £100
+                                        {% elseif currentPhone == 'Samsung Galaxy S9+' %}
+                                            £100
+                                        {% endif %}
+                                    </td>
+                                    {# Insurance2Go #}
+                                    <td align="center">
+                                        {% if currentPhone == 'Apple iPhone 7' or currentPhone == 'Apple iPhone 7 Plus' %}
+                                            £75
+                                        {% elseif currentPhone == 'Apple iPhone X' %}
+                                            £100
+                                        {% elseif currentPhone == 'Samsung Galaxy S8' %}
+                                            £75
+                                        {% elseif currentPhone == 'Samsung Galaxy S9' %}
+                                            £75
+                                        {% elseif currentPhone == 'Samsung Galaxy S9+' %}
+                                            £75
+                                        {% endif %}
+                                    </td>
+                                    {# SwitchedOn #}
+                                    <td align="center">
+                                        {% if currentPhone == 'Apple iPhone 7' or currentPhone == 'Apple iPhone 7 Plus' %}
+                                            £50
+                                        {% elseif currentPhone == 'Apple iPhone X' %}
+                                            £50
+                                        {% elseif currentPhone == 'Samsung Galaxy S8' %}
+                                            £50
+                                        {% elseif currentPhone == 'Samsung Galaxy S9' %}
+                                            £50
+                                        {% elseif currentPhone == 'Samsung Galaxy S9+' %}
+                                            £50
+                                        {% endif %}
+                                    </td>
+                                    {# LoveItCoverIt #}
+                                    <td align="center">
+                                        {% if currentPhone == 'Apple iPhone 7' or currentPhone == 'Apple iPhone 7 Plus' %}
+                                            £75
+                                        {% elseif currentPhone == 'Apple iPhone X' %}
+                                            £100
+                                        {% elseif currentPhone == 'Samsung Galaxy S8' %}
+                                            £75
+                                        {% elseif currentPhone == 'Samsung Galaxy S9' %}
+                                            £75
+                                        {% elseif currentPhone == 'Samsung Galaxy S9+' %}
+                                            £75
+                                        {% endif %}
+                                    </td>
+                                    {# Tinhat #}
+                                    <td align="center">
+                                        {% if currentPhone == 'Apple iPhone 7' or currentPhone == 'Apple iPhone 7 Plus' %}
+                                            £75
+                                        {% elseif currentPhone == 'Apple iPhone X' %}
+                                            £100
+                                        {% elseif currentPhone == 'Samsung Galaxy S8' %}
+                                            £75
+                                        {% elseif currentPhone == 'Samsung Galaxy S9' %}
+                                            £75
+                                        {% elseif currentPhone == 'Samsung Galaxy S9+' %}
+                                            £100
+                                        {% endif %}
+                                    </td>
+                                    {# so-sure #}
+                                    <td align="center">£70</td>
+                                </tr>
+                                <tr>
+                                    <td align="center" class="text-muted">Loss</td>
+                                    {# ProtectYourBubble #}
+                                    <td align="center">
+                                        {% if currentPhone == 'Apple iPhone 7' or currentPhone == 'Apple iPhone 7 Plus' %}
+                                            £100
+                                        {% elseif currentPhone == 'Apple iPhone X' %}
+                                            £100
+                                        {% elseif currentPhone == 'Samsung Galaxy S8' %}
+                                            £100
+                                        {% elseif currentPhone == 'Samsung Galaxy S9' %}
+                                            £100
+                                        {% elseif currentPhone == 'Samsung Galaxy S9+' %}
+                                            £100
+                                        {% endif %}
+                                    </td>
+                                    {# Insurance2Go #}
+                                    <td align="center">
+                                        {% if currentPhone == 'Apple iPhone 7' or currentPhone == 'Apple iPhone 7 Plus' %}
+                                            £75
+                                        {% elseif currentPhone == 'Apple iPhone X' %}
+                                            £100
+                                        {% elseif currentPhone == 'Samsung Galaxy S8' %}
+                                            £75
+                                        {% elseif currentPhone == 'Samsung Galaxy S9' %}
+                                            £75
+                                        {% elseif currentPhone == 'Samsung Galaxy S9+' %}
+                                            £75
+                                        {% endif %}
+                                    </td>
+                                    {# SwitchedOn #}
+                                    <td align="center">
+                                        {% if currentPhone == 'Apple iPhone 7' or currentPhone == 'Apple iPhone 7 Plus' %}
+                                            £75
+                                        {% elseif currentPhone == 'Apple iPhone X' %}
+                                            £70
+                                        {% elseif currentPhone == 'Samsung Galaxy S8' %}
+                                            £70
+                                        {% elseif currentPhone == 'Samsung Galaxy S9' %}
+                                            £75
+                                        {% elseif currentPhone == 'Samsung Galaxy S9+' %}
+                                            £70
+                                        {% endif %}
+                                    </td>
+                                    {# LoveItCoverIt #}
+                                    <td align="center">
+                                        {% if currentPhone == 'Apple iPhone 7' or currentPhone == 'Apple iPhone 7 Plus' %}
+                                            £75
+                                        {% elseif currentPhone == 'Apple iPhone X' %}
+                                            £120
+                                        {% elseif currentPhone == 'Samsung Galaxy S8' %}
+                                            £75
+                                        {% elseif currentPhone == 'Samsung Galaxy S9' %}
+                                            £75
+                                        {% elseif currentPhone == 'Samsung Galaxy S9+' %}
+                                            £75
+                                        {% endif %}
+                                    </td>
+                                    {# Tinhat #}
+                                    <td align="center">
+                                        {% if currentPhone == 'Apple iPhone 7' or currentPhone == 'Apple iPhone 7 Plus' %}
+                                            £75
+                                        {% elseif currentPhone == 'Apple iPhone X' %}
+                                            £100
+                                        {% elseif currentPhone == 'Samsung Galaxy S8' %}
+                                            £75
+                                        {% elseif currentPhone == 'Samsung Galaxy S9' %}
+                                            £75
+                                        {% elseif currentPhone == 'Samsung Galaxy S9+' %}
+                                            £100
+                                        {% endif %}
+                                    </td>
+                                    {# so-sure #}
+                                    <td align="center">£70</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="col-md-7">
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="media">
-                                <div class="media-left media-middle">
-                                    <img src="{{ cdn_url }}/images/homepage/so-sure_theft.svg" alt="Theft" width="100px">
-                                </div>
-                                <div class="media-body media-middle">
-                                    <h4 class="media-heading h-light">Theft</h4>
-                                </div>
-                            </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-2 col-sm-offset-5">
+                    {{ form_start(buy_form_banner) }}
+                        <div class="form-group">
+                            {{ form_widget(buy_form_banner.buy, {'label': 'GET INSURED', 'attr': {'class': 'btn btn-ad-green btn-pad btn-block'}}) }}
                         </div>
-                        <div class="col-sm-6">
-                            <div class="media">
-                                <div class="media-left media-middle">
-                                    <img src="{{ cdn_url }}/images/homepage/so-sure_loss.svg" alt="Loss" width="100px">
-                                </div>
-                                <div class="media-body media-middle">
-                                    <h4 class="media-heading h-light">Loss</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="media">
-                                <div class="media-left media-middle">
-                                    <img src="{{ cdn_url }}/images/homepage/so-sure_accidental_damage.svg" alt="Accidental Damage" width="100px">
-                                </div>
-                                <div class="media-body media-middle">
-                                    <h4 class="media-heading h-light">Accidental Damage</h4>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="media">
-                                <div class="media-left media-middle">
-                                    <img src="{{ cdn_url }}/images/homepage/so-sure_out_of_warranty_breakdown.svg" alt="Out of Warranty Breakdown" width="100px">
-                                </div>
-                                <div class="media-body media-middle">
-                                    <h4 class="media-heading h-light">Out of Warranty Breakdown</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <div class="media">
-                                <div class="media-left media-middle">
-                                    <img src="{{ cdn_url }}/images/homepage/so-sure_unauthorised_network_charges.svg" alt="Unauthorised Network Charges" width="100px">
-                                </div>
-                                <div class="media-body media-middle">
-                                    <h4 class="media-heading h-light">Unauthorised Network Charges</h4>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="media">
-                                <div class="media-left media-middle">
-                                    <img src="{{ cdn_url }}/images/homepage/so-sure_accessories.svg" alt="accessories" width="100px">
-                                </div>
-                                <div class="media-body media-middle">
-                                    <h4 class="media-heading h-light">Accessories</h4>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    {{ form_end(buy_form_banner) }}
                 </div>
             </div>
         </div>
     </section>
+
 
     {# What we don't cover #}
     <section class="section--pad landing__what-we-dont-cover">
@@ -321,20 +500,6 @@
                     <span class="large-no">3</span>
                     <h4 class="h3 text-blue">Approve Claim</h4>
                     <p class="text-left">Once your claim is approved, we take your excess payment over the phone and aim to get a replacement phone {% if replacement is defined and replacement == 'seventytwo-hours' %}within the 72 hours{% else %}in the next working day{% endif %}. If you prefer to have your phone repaired, it may take more time.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="section--pad">
-        <div class="container">
-            <div class="row">
-                <div class="col-sm-2 col-sm-offset-5">
-                    {{ form_start(buy_form_banner) }}
-                        <div class="form-group">
-                            {{ form_widget(buy_form_banner.buy, {'label': 'GET INSURED', 'attr': {'class': 'btn btn-ad-green btn-pad btn-block'}}) }}
-                        </div>
-                    {{ form_end(buy_form_banner) }}
                 </div>
             </div>
         </div>

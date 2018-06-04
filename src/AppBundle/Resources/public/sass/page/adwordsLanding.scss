@@ -3,6 +3,7 @@
 @import "../common/variables";
 @import "../mixins";
 @import "../common/paletteNew";
+@import "../common/type";
 
 .landing {
 
@@ -170,10 +171,45 @@
     &__excess {
         // text-align: center;
         // background-color: $off-white;
+    }
 
-        .cover__list {
-            @include breakpoint(laptop) {
-                margin-top: 100px;
+    &__excess_cont {
+        background-color: $lightest-blue;
+    }
+
+    &__excess_table {
+        background-color: $white;
+
+        > thead {
+            > tr {
+                &:first-of-type {
+                    > th {
+                        font-family: $avenir-heavy;
+                        color: $white;
+                        background-color: $dark-ad-green;
+                        border: 0;
+                        padding-top: 15px;
+                        padding-bottom: 15px;
+                    }
+                }
+                > th {
+                    background-color: $pale-grey;
+                }
+            }
+        }
+
+        > tbody {
+            > tr {
+                > td {
+                    font-family: $avenir-heavy;
+                        padding-top: 10px;
+                        padding-bottom: 10px;
+                }
+                &:nth-child(even) {
+                    > td {
+                        background-color: $off-white;
+                    }
+                }
             }
         }
     }
@@ -188,3 +224,4 @@
     }
 
 }
+
