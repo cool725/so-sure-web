@@ -88,7 +88,7 @@ class DaviesService extends S3EmailService
         foreach ($missingClaims as $missingClaim) {
             if (isset($missingClaim)) {
                 /** @var Claim $claim */
-                $claim = $repoClaims->findOneByNumber($missingClaim);
+                $claim = $repoClaims->findOneBy(['number' => $missingClaim]);
                 $msg = sprintf(
                     'Unable to locate db claim %s in the import file related to our policy %s',
                     $missingClaim,
