@@ -212,8 +212,6 @@ class PhoneInsuranceController extends BaseController
      */
     public function quoteAction(Request $request, $id = null, $make = null, $model = null, $memory = null)
     {
-
-        // Here ???
         if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
             $exp = $this->sixpack(
                 $request,
@@ -325,33 +323,6 @@ class PhoneInsuranceController extends BaseController
         }
 
         $quoteUrl = $this->setPhoneSession($request, $phone);
-
-        // Here ???
-        // We have run various tests for cpc traffic in the page where both manufacturer and homepage
-        // outperformed quote page. Also homepage was better than manufacturer page
-        if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
-            $exp = $this->sixpack(
-                $request,
-                SixpackService::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
-                ['homepage', 'quote']
-            );
-            if ($exp == 'homepage') {
-                return new RedirectResponse($this->generateUrl('homepage'));
-            }
-            /*
-            if (in_array($make, ["Samsung", "Apple", "OnePlus", "Sony"])) {
-                return new RedirectResponse($this->generateUrl('insure_make', ['make' => $phone->getMake()]));
-            } else {
-                return new RedirectResponse($this->generateUrl('homepage'));
-            }
-            */
-        }
-        /*
-        $sliderTest = $this->get('app.sixpack')->participate(
-            SixpackService::EXPERIMENT_QUOTE_SLIDER,
-            ['slide-me', 'original']
-        );
-        */
 
         $user = new User();
 
