@@ -13,7 +13,7 @@ class SixpackListener
     protected $sixpack;
 
     /** @var LoggerInterface */
-    protected  $logger;
+    protected $logger;
 
     /**
      * @param SixpackService  $sixpack
