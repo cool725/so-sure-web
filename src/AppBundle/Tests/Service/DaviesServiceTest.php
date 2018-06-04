@@ -1836,7 +1836,7 @@ class DaviesServiceTest extends WebTestCase
     public function testReportMissingClaims()
     {
         $policy = static::createUserPolicy(true);
-        $policy->getUser()->setEmail(static::generateEmail('testSaveClaimValidationError', $this));
+        $policy->getUser()->setEmail(static::generateEmail('testReportMissingClaims', $this));
         $claim = new Claim();
         $claim->setNumber(rand(1, 999999));
         $claim->setType(Claim::TYPE_LOSS);
@@ -1859,8 +1859,7 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->initialSuspicion = null;
         $daviesClaim->finalSuspicion = null;
         $daviesClaim->lossDescription = '1234';
-        //$daviesClaim->policyNumber = $claim->geP();
-        $daviesClaim->claimNumber = '5345454545';
+        $daviesClaim->claimNumber = rand(1, 999999);
 
         $daviesClaims = array($daviesClaim);
 
@@ -1870,9 +1869,6 @@ class DaviesServiceTest extends WebTestCase
         $this->insureErrorExists('/'. $claim->getNumber() .'/');
         $this->insureErrorExists('/'. preg_quote($claim->getPolicy()->getPolicyNumber(), '/') .'/');
     }
-
-
-
 
     public function testSaveClaimsNoClaimsFound()
     {
