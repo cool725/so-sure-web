@@ -421,8 +421,8 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
         $imeiService = $this->get('app.imei');
         $invitationService = $this->get('app.invitation');
         $dm = $this->getManager();
-        $repo = $dm->getRepository(Policy::class);
-        /** @var Policy $policy */
+        $repo = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $policy */
         $policy = $repo->find($id);
         if (!$policy) {
             throw $this->createNotFoundException('Policy not found');
