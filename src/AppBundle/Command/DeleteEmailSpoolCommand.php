@@ -3,6 +3,7 @@
 namespace AppBundle\Command;
 
 use AppBundle\Service\PCAService;
+use Predis\Client;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -27,6 +28,6 @@ class DeleteEmailSpoolCommand extends ContainerAwareCommand
         $redis = $this->getContainer()->get('snc_redis.mailer');
         $output->writeln(sprintf('%d emails in queue (prior to this)', $redis->llen('swiftmailer')));
 
-        $redis->del('swiftmailer');
+        $redis->del(['swiftmailer']);
     }
 }
