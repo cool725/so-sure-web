@@ -382,8 +382,6 @@ class PhoneInsuranceController extends BaseController
                         } else {
                             $lead = $existingLead;
                         }
-                        $days = new \DateTime();
-                        $days = $days->add(new \DateInterval(sprintf('P%dD', 1)));
                         $mailer = $this->get('app.mailer');
                         $mailer->sendTemplate(
                             sprintf('Your saved so-sure quote for %s', $phone),
