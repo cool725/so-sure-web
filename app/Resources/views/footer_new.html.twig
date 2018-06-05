@@ -64,4 +64,6 @@
    data-fb-redirect="{{ url("hwi_oauth_service_redirect", {service: "facebook"}) }}"
    {% if use_pca is defined %}data-pca-key="{{ pca_webkey }}"{% endif %}
    data-device-category="{{ device_category() }}"
+   data-rollbar-client-token="{{ rollbar_client_access_token }}"
+   data-environment="{{ environment }}"
    ></div>

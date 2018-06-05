@@ -53,6 +53,7 @@ parameters:
     ga_tag_manager_env: '&gtm_auth=&gtm_preview=env-4&gtm_cookies_win=x'
 
     rollbar_access_token:
+    rollbar_client_access_token:
 
     heap_id:
     mixpanel_apitoken:
