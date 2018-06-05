@@ -3170,6 +3170,77 @@ class ApiAuthControllerTest extends BaseApiControllerTest
         $data = $this->verifyResponse(422, ApiErrorCode::ERROR_INVITATION_CONNECTED);
     }
 
+
+    // policy/{id}/imei
+
+    /**
+     *
+     */
+    public function testImei()
+    {
+        $user = self::createUser(
+            self::$userManager,
+            self::generateEmail('testImei', $this),
+            'foo'
+        );
+        $cognitoIdentityId = $this->getAuthUser($user);
+        $crawler = $this->generatePolicy($cognitoIdentityId, $user);
+        $policyData = $this->verifyResponse(200);
+
+        $this->payPolicy($user, $policyData['id']);
+        $url = sprintf("/api/v1/auth/policy/%s/imei", $policyData['id']);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+        ]);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'bucket' => 'foo',
+        ]);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'key' => 'foo',
+        ]);
+        $data = $this->verifyResponse(400, ApiErrorCode::ERROR_MISSING_PARAM);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'bucket' => 'ops.so-sure.com',
+            'key' => 'php-unit-tests/Controller/ApiAuthControllerTest/KEY_NOT_FOUND',
+        ]);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_IMEI_FILE_NOT_FOUND);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'bucket' => 'ops.so-sure.com',
+            'key' => 'php-unit-tests/Controller/ApiAuthControllerTest/imei-invalid.txt',
+        ]);
+        $data = $this->verifyResponse(422, ApiErrorCode::ERROR_POLICY_IMEI_FILE_INVALID);
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'bucket' => 'ops.so-sure.com',
+            'key' => 'php-unit-tests/Controller/ApiAuthControllerTest/imei-valid1.png',
+        ]);
+        $data = $this->verifyResponse(200);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        /** @var PhonePolicy $updatedPolicy */
+        $updatedPolicy = $repo->find($policyData['id']);
+        $this->assertFalse($updatedPolicy->getImeiCircumvention());
+
+        $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
+            'bucket' => 'ops.so-sure.com',
+            'key' => 'php-unit-tests/Controller/ApiAuthControllerTest/imei-valid2.png',
+        ]);
+        $data = $this->verifyResponse(200);
+
+        $dm = self::$client->getContainer()->get('doctrine_mongodb.odm.default_document_manager');
+        $repo = $dm->getRepository(Policy::class);
+        /** @var PhonePolicy $updatedPolicy */
+        $updatedPolicy = $repo->find($policyData['id']);
+        $this->assertTrue($updatedPolicy->getImeiCircumvention());
+    }
+
     // policy/{id}/picsure
 
     /**

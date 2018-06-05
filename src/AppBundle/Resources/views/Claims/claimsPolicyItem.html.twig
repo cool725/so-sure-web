@@ -72,6 +72,20 @@
                             <td>{{ policy.imei }}
                             </td>
                         </tr>
+                        <tr>
+                            <td>
+                                IMEI Circumvention
+                            </td>
+                            <td>
+                                {% if policy.imeiCircumvention is null %}
+                                    <span> Pre Anti-fraud check</span>
+                                {% elseif policy.imeiCircumvention == true %}
+                                    <span class="fa fa-exclamation-triangle"> Possible Fraud <span class="fa fa-exclamation-triangle"></span></span>
+                                {% elseif policy.imeiCircumvention == false %}
+                                    <span class="fa fa-thumbs-up"> No Fraud Detected <span class="fa fa-thumbs-up"></span></span>
+                                {% endif %}
+                            </td>
+                        </tr>
                         {% endif %}
                         <tr>
                             <td>Policy Status</td>

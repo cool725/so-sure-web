@@ -7,6 +7,7 @@ use Gedmo\Mapping\Annotation as Gedmo;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
 use AppBundle\Exception\InvalidPremiumException;
+use AppBundle\Document\File\ImeiFile;
 use AppBundle\Document\File\PicSureFile;
 
 /**
@@ -152,6 +153,13 @@ class PhonePolicy extends Policy
      * @Gedmo\Versioned
      */
     protected $name;
+
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
+    protected $imeiCircumvention;
 
     /**
      * @Assert\Choice({"preapproved", "approved", "invalid", "rejected", "manual", "disabled", "claim-approved"},
@@ -647,6 +655,21 @@ class PhonePolicy extends Policy
     public function getPolicyNumberPrefix()
     {
         return 'Mob';
+    }
+
+    public function getPolicyImeiFiles()
+    {
+        return $this->getPolicyFilesByType(ImeiFile::class);
+    }
+
+    public function getImeiCircumvention()
+    {
+        return $this->imeiCircumvention;
+    }
+
+    public function setImeiCircumvention($imeiCircumvention)
+    {
+        $this->imeiCircumvention = $imeiCircumvention;
     }
 
     public function isPicSurePolicy()

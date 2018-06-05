@@ -26,6 +26,7 @@ use AppBundle\Document\User;
 use AppBundle\Document\MultiPay;
 use AppBundle\Document\Invitation\Invitation;
 use AppBundle\Document\JudoPaymentMethod;
+use AppBundle\Document\File\ImeiFile;
 use AppBundle\Document\File\PicSureFile;
 use AppBundle\Document\Connection\Connection;
 use AppBundle\Document\Coordinates;
@@ -1135,6 +1136,101 @@ class ApiAuthController extends BaseController
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_INVALD_DATA_FORMAT, $ex->getMessage(), 422);
         } catch (\Exception $e) {
             $this->get('logger')->error('Error in api payPolicy.', ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
+        }
+    }
+
+    /**
+     * @Route("/policy/{id}/imei", name="api_auth_imei")
+     * @Method({"POST"})
+     */
+    public function imeiAction(Request $request, $id)
+    {
+        $dm = $this->getManager();
+        $data = null;
+        try {
+            $data = json_decode($request->getContent(), true)['body'];
+            if (!$this->validateFields($data, ['bucket', 'key'])) {
+                return $this->getErrorJsonResponse(ApiErrorCode::ERROR_MISSING_PARAM, 'Missing parameters', 400);
+            }
+
+            $repo = $dm->getRepository(Policy::class);
+            $policy = $repo->find($id);
+            if (!$policy) {
+                throw new NotFoundHttpException();
+            }
+            $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
+            $s3 = $this->get('aws.s3');
+            $result = $s3->getObject(array(
+                'Bucket' => $this->getDataString($data, 'bucket'),
+                'Key'    => $this->getDataString($data, 'key'),
+            ));
+
+            if (!in_array($result['ContentType'], array('image/jpeg', 'image/png', 'binary/octet-stream'))) {
+                $msg = sprintf(
+                    'Invalid file s3://%s/%s of type %s',
+                    $this->getDataString($data, 'bucket'),
+                    $this->getDataString($data, 'key'),
+                    $result['ContentType']
+                );
+                $this->get('logger')->error($msg);
+
+                return $this->getErrorJsonResponse(
+                    ApiErrorCode::ERROR_POLICY_IMEI_FILE_INVALID,
+                    $msg,
+                    422
+                );
+            }
+
+            $imei = new ImeiFile();
+            $imei->setBucket($this->getDataString($data, 'bucket'));
+            $imei->setKey($this->getDataString($data, 'key'));
+            $policy->addPolicyFile($imei);
+            if (isset($result['Metadata']['colours'])) {
+                $imei->addMetadata('imei-colours', $result['Metadata']['colours']);
+            }
+            if (isset($result['Metadata']['age'])) {
+                $imei->addMetadata('imei-age', $result['Metadata']['age']);
+            }
+            if (isset($result['Metadata']['size'])) {
+                $imei->addMetadata('imei-size', $result['Metadata']['size']);
+            }
+            if (isset($result['Metadata']['suspected-fraud'])) {
+                $imei->addMetadata('imei-suspected-fraud', $result['Metadata']['suspected-fraud']);
+                if ($result['Metadata']['suspected-fraud'] === "1") {
+                    $policy->setImeiCircumvention(true);
+                    /** @var LoggerInterface $logger */
+                    $logger = $this->get('logger');
+                    $logger->error(sprintf(
+                        'Detected imei circumvention attempt for policy %s',
+                        $policy->getId()
+                    ));
+                } else {
+                    $policy->setImeiCircumvention(false);
+                }
+            }
+
+            $dm->flush();
+
+            return new JsonResponse($policy->toApiArray());
+        } catch (AccessDeniedException $ade) {
+            return $this->getErrorJsonResponse(ApiErrorCode::ERROR_ACCESS_DENIED, 'Access denied', 403);
+        } catch (\Aws\S3\Exception\S3Exception $e) {
+            $msg = sprintf(
+                'Missing file s3://%s/%s',
+                $this->getDataString($data, 'bucket'),
+                $this->getDataString($data, 'key')
+            );
+            $this->get('logger')->error($msg, ['exception' => $e]);
+
+            return $this->getErrorJsonResponse(
+                ApiErrorCode::ERROR_POLICY_IMEI_FILE_NOT_FOUND,
+                $msg,
+                422
+            );
+        } catch (\Exception $e) {
+            $this->get('logger')->error('Error in api imeiAction.', ['exception' => $e]);
 
             return $this->getErrorJsonResponse(ApiErrorCode::ERROR_UNKNOWN, 'Server Error', 500);
         }
