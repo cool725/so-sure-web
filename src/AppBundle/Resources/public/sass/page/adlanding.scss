@@ -160,6 +160,7 @@
 
         .img-app {
             width: 300px;
+            margin-bottom: 20px;
 
             @include breakpoint(laptop) {
                 width: 400px;
