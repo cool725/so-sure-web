@@ -362,17 +362,24 @@ class FOSUBUserProvider extends BaseClass
      * @param string $email
      * @param string $mobile
      * @param string $facebookId
+     * @param string $googleId
      * @return bool True if resolved; false if unable to resolve (e.g. user must login as policy exists)
      */
-    public function resolveDuplicateUsers(User $user = null, $email = null, $mobile = null, $facebookId = null)
-    {
+    public function resolveDuplicateUsers(
+        User $user = null,
+        $email = null,
+        $mobile = null,
+        $facebookId = null,
+        $googleId = null
+    ) {
         /** @var \AppBundle\Repository\UserRepository $userRepo */
         $userRepo = $this->dm->getRepository(User::class);
         $users = $userRepo->getDuplicateUsers(
             $user,
             $email,
             $facebookId,
-            $mobile
+            $mobile,
+            $googleId
         );
         if (!$users || count($users) == 0) {
             return true;
@@ -398,6 +405,10 @@ class FOSUBUserProvider extends BaseClass
                 $duplicate->setFacebookId(null);
                 $duplicate->setFacebookAccessToken(null);
             }
+            if ($duplicate->getGoogleId() == $googleId) {
+                $duplicate->setGoogleId(null);
+                $duplicate->setGoogleAccessToken(null);
+            }
             // as username is tied to email for our case, delete the duplicate user
             if ($duplicate->getEmailCanonical() == $email) {
                 $this->deleteUser($duplicate);
@@ -409,7 +420,8 @@ class FOSUBUserProvider extends BaseClass
             $user,
             $email,
             $facebookId,
-            $mobile
+            $mobile,
+            $googleId
         )) {
             return false;
         }

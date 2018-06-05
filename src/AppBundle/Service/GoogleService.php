@@ -31,7 +31,7 @@ class GoogleService
      *
      * @return string|null
      */
-    public function getUserIdFromToken($token)
+    public function getGoogleIdFromToken($token)
     {
         $client = new \Google_Client(['client_id' => $this->googleClientId]);
 
@@ -58,7 +58,7 @@ class GoogleService
     public function validateTokenId($id, $token)
     {
         try {
-            $idFromToken = $this->getUserIdFromToken($token);
+            $idFromToken = $this->getGoogleIdFromToken($token);
             return  $idFromToken == $id;
         } catch (\Exception $e) {
             $this->logger->error(sprintf(
