@@ -237,12 +237,12 @@ class PhoneInsuranceController extends BaseController
         }
 
         if (in_array($request->get('_route'), ['test_insurance_make_model_memory'])) {
-            $adwordsLanding = $this->sixpack(
+            $adLanding = $this->sixpack(
                 $request,
                 SixpackService::EXPERIMENT_ADWORDS_LANDING,
-                ['adwords-homepage', 'adwords-landingpage']
+                ['ad-homepage', 'ad-landing']
             );
-            if ($adwordsLanding == 'adwords-landingpage') {
+            if ($adLanding == 'ad-landing') {
                 return $this->redirectToRoute('insurance_make_model_memory', [
                     'make' => $make,
                     'model' => $model,

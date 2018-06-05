@@ -72,7 +72,7 @@ class SixpackService
     // Exp 1
     const EXPERIMENT_HOMEPAGE_NEW_COPY = 'homepage-new-copy';
     // Exp 2
-    const EXPERIMENT_ADWORDS_LANDING = 'adwords-landingpage';
+    const EXPERIMENT_ADWORDS_LANDING = 'ad-landing';
     // Exp 3
 
     // Exp 4
