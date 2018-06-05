@@ -430,6 +430,7 @@ nelmio_security:
             connect-src:
                 - 'self'
                 - wss://wearesosure.com
+                - https://cdn.so-sure.com
                 - https://api.intercom.io
                 - https://api-iam.intercom.io
                 - https://api-ping.intercom.io
@@ -526,6 +527,8 @@ nelmio_security:
                 - https://js.intercomcdn.com
                 - https://*.hotjar.com
                 - http://*.hotjar.com
+                - https://js.hs-scripts.com
+                - https://js.hs-analytics.net
                 - https://*.pcapredict.com
                 - http://*.pcapredict.com
                 - https://ajax.googleapis.com
@@ -792,6 +795,7 @@ nelmio_security:
                 - https://uploads.intercomusercontent.com
                 - https://gifs.intercomcdn.com
                 - https://intercom.help
+                - https://track.hubspot.com
                 - https://t.co
                 - https://*.doubleclick.net
                 - https://*.googleadservices.com

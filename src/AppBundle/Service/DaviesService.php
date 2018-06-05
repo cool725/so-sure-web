@@ -82,13 +82,17 @@ class DaviesService extends S3EmailService
         }
 
         $foundClaims = array_intersect($processedClaims, $dbClaims);
+
         $missingClaims = array_diff($dbClaims, $foundClaims);
 
         foreach ($missingClaims as $missingClaim) {
             if (isset($missingClaim)) {
+                /** @var Claim $claim */
+                $claim = $repoClaims->findOneBy(['number' => $missingClaim]);
                 $msg = sprintf(
-                    'Unable to locate db claim %s in the import file',
-                    $missingClaim
+                    'Unable to locate db claim %s in the import file related to our policy %s',
+                    $missingClaim,
+                    $claim->getPolicy()->getPolicyNumber()
                 );
                 $this->errors[$missingClaim][] = $msg;
             }

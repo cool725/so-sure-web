@@ -821,6 +821,7 @@ services:
         class:   AppBundle\Listener\SixpackListener
         arguments:
             - "@app.sixpack"
+            - "@logger"
         tags:
             -  { name: kernel.event_listener, event: event.policy.created, method: onPolicyCreatedEvent }
 

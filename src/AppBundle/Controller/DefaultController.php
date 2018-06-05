@@ -104,6 +104,12 @@ class DefaultController extends BaseController
             ['simple-picsure', 'picsure-redesign']
         );
 
+        $homepageCopy = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_HOMEPAGE_NEW_COPY,
+            ['homepage-old-copy', 'homepage-new-copy']
+        );
+
         $this->get('app.mixpanel')->queueTrackWithUtm(MixpanelService::EVENT_HOME_PAGE);
 
         $data = array(
@@ -113,9 +119,14 @@ class DefaultController extends BaseController
             'trustpilot'          => $trustpilot,
             'referral'            => $referral,
             'phone'               => $this->getQuerystringPhone($request),
+            'homepageCopy'        => $homepageCopy,
         );
 
-        $template = 'AppBundle:Default:index.html.twig';
+        if ($homepageCopy == 'homepage-new-copy') {
+            $template = 'AppBundle:Default:indexHomepageCopy.html.twig';
+        } else {
+            $template = 'AppBundle:Default:index.html.twig';
+        }
 
         return $this->render($template, $data);
     }
@@ -171,6 +182,7 @@ class DefaultController extends BaseController
 
         $data = [
             'main_title' => 'Honest Insurance for Honest People',
+            'hero_class' => 'ebay__hero_1',
         ];
 
         $exp = $this->sixpack(
@@ -195,6 +207,7 @@ class DefaultController extends BaseController
 
         $data = [
             'main_title' => 'Insurance You Deserve',
+            'hero_class' => 'ebay__hero_2',
         ];
 
         $exp = $this->sixpack(
@@ -328,6 +341,12 @@ class DefaultController extends BaseController
             }
         }
 
+        $memoptions = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_MEMORY_OPTIONS,
+            ['three-dropdowns', 'single-progressive-dropdown']
+        );
+
         // throw new \Exception(print_r($this->getPhonesArray(), true));
 
         return [
@@ -335,6 +354,7 @@ class DefaultController extends BaseController
             'phones' => $this->getPhonesArray(),
             'type' => $type,
             'phone' => $phone,
+            'memoptions' => $memoptions,
         ];
     }
 
