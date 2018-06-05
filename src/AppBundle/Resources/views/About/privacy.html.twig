@@ -1,5 +1,17 @@
 {% extends 'base.html.twig' %}
 
+{% block nav %}
+    {% if not hide_nav %}
+        {% include '::nav.html.twig' %}
+    {% endif %}
+{% endblock %}
+
+{% block footer %}
+    {% if not hide_footer %}
+        {% include '::footer.html.twig' %}
+    {% endif %}
+{% endblock %}
+
 {% block title %}so-sure - Privacy{% endblock %}
 
 {% block stylesheets %}
