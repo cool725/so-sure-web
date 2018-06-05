@@ -151,11 +151,13 @@
         {% block javascripts %}
             {% if hide_cookie_warning is defined and hide_cookie_warning %}
                 {% javascripts
+                '../app/Resources/public/js/rollbar.js'
                 '@AppBundle/Resources/public/js/*' %}
                 <script src="{{ asset_url }}"></script>
                 {% endjavascripts %}
             {% else %}
                 {% javascripts
+                 '../app/Resources/public/js/rollbar.js'
                 'components/cookieconsent/cookieconsent.min.js'
                 '@AppBundle/Resources/public/js/*' %}
                 <script src="{{ asset_url }}"></script>
