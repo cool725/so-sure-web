@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Form\Type\AdminEmailOptOutType;
 use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Service\FraudService;
@@ -961,13 +962,15 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                         $date->getTimestamp(),
                         $policy->getId()
                     );
+                    /** @var JudoPaymentMethod $judoPaymentMethod */
+                    $judoPaymentMethod = $policy->getUser()->getPaymentMethod();
                     $judopay->add(
                         $policy,
                         $details['receiptId'],
                         $details['consumer']['consumerToken'],
                         $details['cardDetails']['cardToken'],
                         Payment::SOURCE_TOKEN,
-                        $policy->getUser()->getPaymentMethod()->getDeviceDna(),
+                        $judoPaymentMethod->getDeviceDna(),
                         $date
                     );
                     $this->addFlash(
