@@ -527,6 +527,7 @@ nelmio_security:
                 - https://js.intercomcdn.com
                 - https://*.hotjar.com
                 - http://*.hotjar.com
+                - https://js.hs-scripts.com
                 - https://*.pcapredict.com
                 - http://*.pcapredict.com
                 - https://ajax.googleapis.com
