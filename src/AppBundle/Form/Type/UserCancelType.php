@@ -10,6 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use AppBundle\Validator\Constraints\AgeValidator;
+use AppBundle\Document\Policy;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Opt\EmailOptOut;
@@ -20,14 +21,14 @@ class UserCancelType extends AbstractType
     {
         $builder
             ->add('reason', ChoiceType::class, ['choices' => [
-                'Already broken/damaged' => 'damaged',
-                'Too Expensive' => 'cost',
-                'Insuring with another provider' => 'elsewhere',
-                'Already covered' => 'existing',
-                'Do not want phone insurance' => 'undesired',
-                'Technical difficulties' => 'technical',
-                'pic-sure phone validation is annoying' => 'pic-sure',
-                'Other' => 'unknown',
+                'Already broken/damaged' => Policy::COOLOFF_REASON_DAMAGED,
+                'Too Expensive' => Policy::COOLOFF_REASON_COST,
+                'Insuring with another provider' => Policy::COOLOFF_REASON_ELSEWHERE,
+                'Already covered' => Policy::COOLOFF_REASON_EXISTING,
+                'Do not want phone insurance' => Policy::COOLOFF_REASON_UNDESIRED,
+                'Technical difficulties' => Policy::COOLOFF_REASON_TECHNICAL,
+                'pic-sure phone validation is annoying' => Policy::COOLOFF_REASON_PICSURE,
+                'Other' => Policy::COOLOFF_REASON_UNKNOWN,
             ],
                 'placeholder' => 'Select a reason',
             ])

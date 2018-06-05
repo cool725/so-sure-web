@@ -101,6 +101,27 @@ abstract class Policy
     const METRIC_HARD_ACTIVATION = 'hard-activation';
     const METRIC_RENEWAL = 'renewal';
 
+    // coolooff reasons
+    const COOLOFF_REASON_DAMAGED ='damaged';
+    const COOLOFF_REASON_COST = 'cost';
+    const COOLOFF_REASON_ELSEWHERE = 'elsewhere';
+    const COOLOFF_REASON_EXISTING = 'existing';
+    const COOLOFF_REASON_UNDESIRED = 'undesidered';
+    const COOLOFF_REASON_TECHNICAL = 'technical';
+    const COOLOFF_REASON_PICSURE = 'pic-sure';
+    const COOLOFF_REASON_UNKNOWN = 'unknown';
+
+    public static $cooloffReasons = [
+        self::COOLOFF_REASON_DAMAGED,
+        self::COOLOFF_REASON_COST,
+        self::COOLOFF_REASON_ELSEWHERE,
+        self::COOLOFF_REASON_EXISTING,
+        self::COOLOFF_REASON_UNDESIRED,
+        self::COOLOFF_REASON_TECHNICAL,
+        self::COOLOFF_REASON_PICSURE,
+        self::COOLOFF_REASON_UNKNOWN,
+    ];
+
     public static $riskLevels = [
         self::RISK_CONNECTED_POT_ZERO => self::RISK_LEVEL_HIGH,
         self::RISK_CONNECTED_SELF_CLAIM => self::RISK_LEVEL_HIGH,

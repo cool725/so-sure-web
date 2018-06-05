@@ -2,6 +2,7 @@
 
 namespace AppBundle\Form\Type;
 
+use AppBundle\Document\Form\Cancel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -16,6 +17,7 @@ class CancelPolicyType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        /** @var Policy $policy */
         $policy = $builder->getData()->getPolicy();
         $data = [];
         $data = $this->addCancellationReason($data, $policy, Policy::CANCELLED_ACTUAL_FRAUD, 'Fraud (actual)');
@@ -26,8 +28,18 @@ class CancelPolicyType extends AbstractType
 
         $preferred = [];
         if ($policy->isWithinCooloffPeriod() && !$policy->hasMonetaryClaimed(true)) {
-            $data = $this->addCancellationReason($data, $policy, Policy::CANCELLED_COOLOFF, 'Cooloff');
-            $preferred[] = Policy::CANCELLED_COOLOFF;
+            // if requested cancellation reason has already been set by the user, just allow cooloff
+            // however, if not set, then allow subcategories
+            if ($policy->getRequestedCancellationReason()) {
+                $data = $this->addCancellationReason($data, $policy, Policy::CANCELLED_COOLOFF, 'Cooloff');
+                $preferred[] = Policy::CANCELLED_COOLOFF;
+            } else {
+                foreach (Policy::$cooloffReasons as $cooloff) {
+                    $value = Cancel::getEncodedCooloffReason($cooloff);
+                    $data = $this->addCancellationReason($data, $policy, Policy::CANCELLED_COOLOFF, $value, $value);
+                    $preferred[] = $value;
+                }
+            }
         } else {
             $data = $this->addCancellationReason($data, $policy, Policy::CANCELLED_USER_REQUESTED, 'User Requested');
         }
@@ -47,10 +59,13 @@ class CancelPolicyType extends AbstractType
         ;
     }
 
-    private function addCancellationReason($data, $policy, $reason, $name)
+    private function addCancellationReason($data, $policy, $reason, $name, $value = null)
     {
+        if (!$value) {
+            $value = $reason;
+        }
         if ($policy->canCancel($reason)) {
-            $data[$name] = $reason;
+            $data[$name] = $value;
         }
 
         return $data;
