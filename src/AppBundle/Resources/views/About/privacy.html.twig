@@ -26,14 +26,13 @@
 {% block body %}
 <section class="about-section section--pad">
     <div class="container" id="terms">
+        {%  if not hide_title %}
         <div class="row">
-            <div class="col-md-8">
+            <div class="col-md-12">
                 <h1 class="section-title">Website privacy policy (GDPR version)</h1>
             </div>
-            <div class="col-md-4">
-                <a href="#" class="print"><i class="fa fa-print"></i> Print page</a>
-            </div>
         </div>
+        {% endif %}
         <div class="row">
             <div class="col-md-12">
                 <p>

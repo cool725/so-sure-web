@@ -58,6 +58,7 @@ class AboutController extends BaseController
         $hideCookieWarning = false;
         $hideNav = false;
         $hideFooter = false;
+        $hideTitle = false;
 
         $isSoSureApp = false;
         $session = $request->getSession();
@@ -76,6 +77,7 @@ class AboutController extends BaseController
             $hideCookieWarning = true;
             $hideNav = true;
             $hideFooter = true;
+            $hideTitle = true;
         }
 
         return [
@@ -83,6 +85,7 @@ class AboutController extends BaseController
             'hide_cookie_warning' => $hideCookieWarning,
             'hide_nav' => $hideNav,
             'hide_footer' => $hideFooter,
+            'hide_title' => $hideTitle,
         ];
     }
 
