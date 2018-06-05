@@ -795,6 +795,7 @@ nelmio_security:
                 - https://uploads.intercomusercontent.com
                 - https://gifs.intercomcdn.com
                 - https://intercom.help
+                - https://track.hubspot.com
                 - https://t.co
                 - https://*.doubleclick.net
                 - https://*.googleadservices.com
