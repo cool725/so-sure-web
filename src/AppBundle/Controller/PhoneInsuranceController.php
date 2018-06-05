@@ -203,12 +203,14 @@ class PhoneInsuranceController extends BaseController
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
      * @Route("/phone-insurance/{make}+{model}", name="quote_make_model",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
-     * @Route("/insurance+{make}+{model}+{memory}GB", name="insurance_make_model_memory",
-     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
      * @Route("/insure/{make}+{model}+{memory}GB", name="insure_make_model_memory",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
      * @Route("/insure/{make}+{model}", name="insure_make_model",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
+     * @Route("/insurance-phone/{make}+{model}+{memory}GB", name="test_insurance_make_model_memory",
+     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
+     * @Route("/insurance/{make}+{model}+{memory}GB", name="insurance_make_model_memory",
+     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
      */
     public function quoteAction(Request $request, $id = null, $make = null, $model = null, $memory = null)
     {
@@ -231,6 +233,23 @@ class PhoneInsuranceController extends BaseController
                     'make' => $make,
                     'model' => $model,
                 ]));
+            }
+        }
+
+        if (in_array($request->get('_route'), ['test_insurance_make_model_memory'])) {
+            $adwordsLanding = $this->sixpack(
+                $request,
+                SixpackService::EXPERIMENT_ADWORDS_LANDING,
+                ['adwords-homepage', 'adwords-landingpage']
+            );
+            if ($adwordsLanding == 'adwords-landingpage') {
+                return $this->redirectToRoute('insurance_make_model_memory', [
+                    'make' => $make,
+                    'model' => $model,
+                    'memory' => $memory,
+                ]);
+            } else {
+                return $this->redirectToRoute('homepage');
             }
         }
 
@@ -547,16 +566,7 @@ class PhoneInsuranceController extends BaseController
 
         // Adwords landingpage test
         if (in_array($request->get('_route'), ['insurance_make_model_memory'])) {
-            $adwordsLanding = $this->sixpack(
-                $request,
-                SixpackService::EXPERIMENT_ADWORDS_LANDING,
-                ['adwords-homepage', 'adwords-landingpage']
-            );
-            if ($adwordsLanding == 'adwords-landingpage') {
-                return $this->render('AppBundle:PhoneInsurance:adwordsLandingPages.html.twig', $data);
-            } else {
-                return $this->redirectToRoute('homepage');
-            }
+            return $this->render('AppBundle:PhoneInsurance:adlanding.html.twig', $data);
         } else {
             return $this->render('AppBundle:PhoneInsurance:quote.html.twig', $data);
         }

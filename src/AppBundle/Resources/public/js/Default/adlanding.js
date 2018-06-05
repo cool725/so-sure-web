@@ -1,4 +1,4 @@
-// adwordsLandingPages.js
+// adlanding.js
 $(function(){
 
     setTimeout(function(){

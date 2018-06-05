@@ -20,7 +20,7 @@
     {% stylesheets output='css/*.css'
     '@AppBundle/Resources/public/sass/page/homepage.scss'
     'components/animate.css/animate.min.css'
-    '@AppBundle/Resources/public/sass/page/adwordsLanding.scss'
+    '@AppBundle/Resources/public/sass/page/adLanding.scss'
     %}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
@@ -84,6 +84,10 @@
                                  alt="so-sure - {{ phone.make|capitalize }} {{ phone.model }} {{ phone.memory }}GB insurance"
                                  class="hidden-xs" width="200px">
                         {% elseif currentPhone == 'Samsung Galaxy S8' or currentPhone == 'Samsung Galaxy S8+' %}
+                            <img src="{{ cdn_url }}/images/landing_pages/s8_smashed.svg"
+                                 alt="so-sure - {{ phone.make|capitalize }} {{ phone.model }} {{ phone.memory }}GB insurance"
+                                 class="hidden-xs" width="200px">
+                        {% elseif currentPhone == 'Samsung Galaxy S9' or currentPhone == 'Samsung Galaxy S9+' %}
                             <img src="{{ cdn_url }}/images/landing_pages/s8_smashed.svg"
                                  alt="so-sure - {{ phone.make|capitalize }} {{ phone.model }} {{ phone.memory }}GB insurance"
                                  class="hidden-xs" width="200px">
@@ -157,37 +161,6 @@
                 </div>
                 <div class="col-md-5 col-md-pull-7">
                     <img src="{{ cdn_url }}/images/landing_pages/so-sure_app_landing.png" class="img-center img-app">
-                </div>
-            </div>
-        </div>
-    </section>
-
-    {# Excess #}
-    <section class="section--pad landing__excess">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-8 col-md-offset-2">
-                    <h2 class="text-center">How Do We Offer Such A Low Excess?</h2>
-                    <p class="lead">When something happens to your phone, it’s already bad news. Nobody wants to pay a small fortune in excess fees to get back up and running. </p>
-                    <p class="h3 text-center"><mark>Expensive Phones + Fraudulent Claims = High Excess Fees 💸</mark></p>
-                    <div class="h4 text-center">But not with us...</div>
-                    <p class="lead">We’ve created a revolutionary anti-fraud process called pic-sure where by validating the existence and condition of your phone, you benefit from a super low excess and a hassle free claims process.</p>
-                    <div class="h4">If you decide not to validate, you still get the same great claims process, but your excess will be £150... It's a no brainer.</div>
-                    <div class="row text-center">
-                        <div class="col-sm-4">
-                            <img src="{{ cdn_url }}/images/homepage/pic-sure_steps_homepage_1.svg" alt="Get covered in less than 2 minutes through our app or website" width="130px"><br>
-                            <span>1. Get covered in less than 2 minutes through our app or website</span>
-                        </div>
-                        <div class="col-sm-4">
-                            <img src="{{ cdn_url }}/images/homepage/pic-sure_steps_homepage_2.svg" alt="Login and validate your phone with pic-sure in seconds" width="130px"><br>
-                            <span>2. Login and validate your phone with pic-sure in seconds</span>
-                        </div>
-                        <div class="col-sm-4">
-                            <img src="{{ cdn_url }}/images/homepage/pic-sure_steps_homepage_3.svg" alt="Hooray, your excess is reduced and we know you're honest :)" width="130px"><br>
-                            <span>3. Hooray, your excess is reduced and we know you're honest</span>
-                        </div>
-                    </div>
-                    <div class="h3 text-center">Honest Insurance for Honest People… Everyone Wins!</div>
                 </div>
             </div>
         </div>
@@ -454,6 +427,36 @@
         </div>
     </section>
 
+    {# Excess #}
+    <section class="section--pad landing__excess">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2">
+                    <h2 class="text-center">How Do We Offer Such A Low Excess?</h2>
+                    <p class="lead">When something happens to your phone, it’s already bad news. Nobody wants to pay a small fortune in excess fees to get back up and running. </p>
+                    <p class="h3 text-center"><mark>Expensive Phones + Fraudulent Claims = High Excess Fees 💸</mark></p>
+                    <div class="h4 text-center">But not with us...</div>
+                    <p class="lead">We’ve created a revolutionary anti-fraud process called pic-sure where by validating the existence and condition of your phone, you benefit from a super low excess and a hassle free claims process.</p>
+                    <div class="h4">If you decide not to validate, you still get the same great claims process, but your excess will be £150... It's a no brainer.</div>
+                    <div class="row text-center">
+                        <div class="col-sm-4">
+                            <img src="{{ cdn_url }}/images/homepage/pic-sure_steps_homepage_1.svg" alt="Get covered in less than 2 minutes through our app or website" width="130px"><br>
+                            <span>1. Get covered in less than 2 minutes through our app or website</span>
+                        </div>
+                        <div class="col-sm-4">
+                            <img src="{{ cdn_url }}/images/homepage/pic-sure_steps_homepage_2.svg" alt="Login and validate your phone with pic-sure in seconds" width="130px"><br>
+                            <span>2. Login and validate your phone with pic-sure in seconds</span>
+                        </div>
+                        <div class="col-sm-4">
+                            <img src="{{ cdn_url }}/images/homepage/pic-sure_steps_homepage_3.svg" alt="Hooray, your excess is reduced and we know you're honest :)" width="130px"><br>
+                            <span>3. Hooray, your excess is reduced and we know you're honest</span>
+                        </div>
+                    </div>
+                    <div class="h3 text-center">Honest Insurance for Honest People… Everyone Wins!</div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     {# What we don't cover #}
     <section class="section--pad landing__what-we-dont-cover">
@@ -586,6 +589,6 @@
     '@AppBundle/Resources/public/js/Default/sliderNew.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMakeSearch.js'
     '@AppBundle/Resources/public/js/Default/selectPhoneMakeDropdown.js'
-    '@AppBundle/Resources/public/js/Default/adwordsLandingPages.js' %}
+    '@AppBundle/Resources/public/js/Default/adlanding.js' %}
     <script src="{{ asset_url }}"></script>{% endjavascripts %}
 {% endblock %}
