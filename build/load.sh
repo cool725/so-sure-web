@@ -42,3 +42,5 @@ for feature in "renewal" "picsure" "bacs"
 do
   sudo app/console --env=$ENV sosure:feature $feature true
 done
+
+sudo app/console --env=$ENV sosure:delete:email:spool

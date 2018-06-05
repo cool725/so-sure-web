@@ -1833,6 +1833,43 @@ class DaviesServiceTest extends WebTestCase
         $this->insureWarningExists('/does not have a replacement IMEI/');
     }
 
+    public function testReportMissingClaims()
+    {
+        $policy = static::createUserPolicy(true);
+        $policy->getUser()->setEmail(static::generateEmail('testReportMissingClaims', $this));
+        $claim = new Claim();
+        $claim->setNumber(rand(1, 999999));
+        $claim->setType(Claim::TYPE_LOSS);
+        $claim->setStatus(Claim::STATUS_APPROVED);
+
+        $yesterday = new \DateTime();
+        $yesterday = $yesterday->sub(new \DateInterval('P1D'));
+        $claim->setRecordedDate($yesterday);
+
+        $policy->addClaim($claim);
+        static::$dm->persist($policy->getUser());
+        static::$dm->persist($policy);
+        static::$dm->persist($claim);
+        static::$dm->flush();
+
+        $daviesClaim = new DaviesClaim();
+        //$daviesClaim->claimNumber = $claim->getNumber();
+        $daviesClaim->status = DaviesClaim::STATUS_CLOSED;
+        $daviesClaim->finalSuspicion = null;
+        $daviesClaim->initialSuspicion = null;
+        $daviesClaim->finalSuspicion = null;
+        $daviesClaim->lossDescription = '1234';
+        $daviesClaim->claimNumber = rand(1, 999999);
+
+        $daviesClaims = array($daviesClaim);
+
+        self::$daviesService->reportMissingClaims($daviesClaims);
+        // print_r(self::$daviesService->getErrors());
+
+        $this->insureErrorExists('/'. $claim->getNumber() .'/');
+        $this->insureErrorExists('/'. preg_quote($claim->getPolicy()->getPolicyNumber(), '/') .'/');
+    }
+
     public function testSaveClaimsNoClaimsFound()
     {
         $policy = static::createUserPolicy(true);

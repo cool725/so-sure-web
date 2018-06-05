@@ -5,6 +5,7 @@ namespace AppBundle\Tests\Listener;
 use AppBundle\Service\PolicyService;
 use AppBundle\Service\SixpackService;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 use AppBundle\Listener\SixpackListener;
@@ -30,6 +31,8 @@ class SixpackListenerTest extends WebTestCase
     protected static $sixpackService;
     /** @var PolicyService */
     protected static $policyService;
+    /** @var LoggerInterface */
+    protected static $logger;
 
     public static function setUpBeforeClass()
     {
@@ -53,6 +56,9 @@ class SixpackListenerTest extends WebTestCase
         /** @var PolicyService $policyService */
         $policyService = self::$container->get('app.policy');
         self::$policyService = $policyService;
+        /** @var LoggerInterface $logger */
+        $logger = self::$container->get('logger');
+        self::$logger = $logger;
     }
 
     public function tearDown()
@@ -89,7 +95,7 @@ class SixpackListenerTest extends WebTestCase
         $policy->setUser($user);
         $policy->setId(rand(1, 99999));
 
-        $listener = new SixpackListener(static::$sixpackService);
+        $listener = new SixpackListener(static::$sixpackService, static::$logger);
         $listener->onPolicyCreatedEvent(new PolicyEvent($policy));
 
         // difficult to test via framework, but at least execute code to check for errors
