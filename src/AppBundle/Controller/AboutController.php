@@ -52,9 +52,41 @@ class AboutController extends BaseController
      * @Route("/privacy", name="privacy", options={"sitemap"={"priority":"0.5","changefreq":"daily"}})
      * @Template
      */
-    public function privacyAction()
+    public function privacyAction(Request $request)
     {
-        return array();
+        $intercomEnabled = true;
+        $hideCookieWarning = false;
+        $hideNav = false;
+        $hideFooter = false;
+        $hideTitle = false;
+
+        $isSoSureApp = false;
+        $session = $request->getSession();
+        if ($session) {
+            if ($session->get('sosure-app') == "1") {
+                $isSoSureApp = true;
+            }
+            if ($request->headers->get('X-SOSURE-APP') == "1" || $request->get('X-SOSURE-APP') == "1") {
+                $session->set('sosure-app', 1);
+                $isSoSureApp = true;
+            }
+        }
+
+        if ($isSoSureApp) {
+            $intercomEnabled = false;
+            $hideCookieWarning = true;
+            $hideNav = true;
+            $hideFooter = true;
+            $hideTitle = true;
+        }
+
+        return [
+            'intercom_enabled' => $intercomEnabled,
+            'hide_cookie_warning' => $hideCookieWarning,
+            'hide_nav' => $hideNav,
+            'hide_footer' => $hideFooter,
+            'hide_title' => $hideTitle,
+        ];
     }
 
     /**
