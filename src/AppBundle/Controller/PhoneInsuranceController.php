@@ -383,7 +383,7 @@ class PhoneInsuranceController extends BaseController
                             $lead = $existingLead;
                         }
                         $days = new \DateTime();
-                        $days = $days->add(new \DateInterval(sprintf('P%dD', $daysTest == '7days' ? 7 : 1)));
+                        $days = $days->add(new \DateInterval(sprintf('P%dD', 1)));
                         $mailer = $this->get('app.mailer');
                         $mailer->sendTemplate(
                             sprintf('Your saved so-sure quote for %s', $phone),
@@ -397,14 +397,6 @@ class PhoneInsuranceController extends BaseController
                         $this->get('app.mixpanel')->queuePersonProperties([
                             '$email' => $lead->getEmail()
                         ], true);
-                        if ($daysTest == '7days') {
-                            $this->get('app.intercom')->queueLead($lead, IntercomService::QUEUE_EVENT_SAVE_QUOTE, [
-                                'quoteUrl' => $quoteUrl,
-                                'phone' => $phone->__toString(),
-                                'price' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-                                'expires' => $days,
-                            ]);
-                        }
 
                         $this->addFlash('success', sprintf(
                             "Thanks! Your quote is guaranteed now and we'll send you an email confirmation."
