@@ -4,7 +4,10 @@ namespace AppBundle\Controller;
 
 use AppBundle\Form\Type\AdminEmailOptOutType;
 use AppBundle\Security\FOSUBUserProvider;
+use AppBundle\Service\FraudService;
 use AppBundle\Service\JudopayService;
+use AppBundle\Service\PolicyService;
+use AppBundle\Service\ReceperioService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -410,12 +413,16 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
      */
     public function claimsPolicyAction(Request $request, $id)
     {
+        /** @var PolicyService $policyService */
         $policyService = $this->get('app.policy');
+        /** @var FraudService $fraudService */
         $fraudService = $this->get('app.fraud');
+        /** @var ReceperioService $imeiService */
         $imeiService = $this->get('app.imei');
         $invitationService = $this->get('app.invitation');
         $dm = $this->getManager();
         $repo = $dm->getRepository(Policy::class);
+        /** @var Policy $policy */
         $policy = $repo->find($id);
         if (!$policy) {
             throw $this->createNotFoundException('Policy not found');
@@ -525,6 +532,9 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 $cancelForm->handleRequest($request);
                 if ($cancelForm->isValid()) {
                     if ($policy->canCancel($cancel->getCancellationReason())) {
+                        if ($cancel->getRequestedCancellationReason()) {
+                            $policy->setRequestedCancellationReason($cancel->getRequestedCancellationReason());
+                        }
                         $policyService->cancel(
                             $policy,
                             $cancel->getCancellationReason()

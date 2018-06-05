@@ -80,6 +80,9 @@
                               {% if policy.cancelledReason %}
                                 / {{ policy.cancelledReason }}
                               {% endif %}
+                                {% if policy.getRequestedCancellationReason %}
+                                    / {{ policy.getRequestedCancellationReason }}
+                                {% endif %}
                             </td>
                         </tr>
                         {% if policy.isPolicy %}
