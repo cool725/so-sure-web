@@ -207,6 +207,10 @@ class PhoneInsuranceController extends BaseController
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
      * @Route("/insure/{make}+{model}", name="insure_make_model",
      *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+"})
+     * @Route("/insurance-phone/{make}+{model}+{memory}GB", name="test_insurance_make_model_memory",
+     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
+     * @Route("/insurance/{make}+{model}+{memory}GB", name="insurance_make_model_memory",
+     *          requirements={"make":"[a-zA-Z]+","model":"[\+\-\.a-zA-Z0-9() ]+","memory":"[0-9]+"})
      */
     public function quoteAction(Request $request, $id = null, $make = null, $model = null, $memory = null)
     {
@@ -229,6 +233,23 @@ class PhoneInsuranceController extends BaseController
                     'make' => $make,
                     'model' => $model,
                 ]));
+            }
+        }
+
+        if (in_array($request->get('_route'), ['test_insurance_make_model_memory'])) {
+            $adLanding = $this->sixpack(
+                $request,
+                SixpackService::EXPERIMENT_AD_LANDING,
+                ['ad-homepage', 'ad-landing']
+            );
+            if ($adLanding == 'ad-landing') {
+                return $this->redirectToRoute('insurance_make_model_memory', [
+                    'make' => $make,
+                    'model' => $model,
+                    'memory' => $memory,
+                ]);
+            } else {
+                return $this->redirectToRoute('homepage');
             }
         }
 
@@ -321,32 +342,6 @@ class PhoneInsuranceController extends BaseController
         }
 
         $quoteUrl = $this->setPhoneSession($request, $phone);
-
-        // We have run various tests for cpc traffic in the page where both manufacturer and homepage
-        // outperformed quote page. Also homepage was better than manufacturer page
-        if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
-            $exp = $this->sixpack(
-                $request,
-                SixpackService::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
-                ['homepage', 'quote']
-            );
-            if ($exp == 'homepage') {
-                return new RedirectResponse($this->generateUrl('homepage'));
-            }
-            /*
-            if (in_array($make, ["Samsung", "Apple", "OnePlus", "Sony"])) {
-                return new RedirectResponse($this->generateUrl('insure_make', ['make' => $phone->getMake()]));
-            } else {
-                return new RedirectResponse($this->generateUrl('homepage'));
-            }
-            */
-        }
-        /*
-        $sliderTest = $this->get('app.sixpack')->participate(
-            SixpackService::EXPERIMENT_QUOTE_SLIDER,
-            ['slide-me', 'original']
-        );
-        */
 
         $user = new User();
 
@@ -527,7 +522,7 @@ class PhoneInsuranceController extends BaseController
                 SixpackService::EXPERIMENT_TRUSTPILOT_REVIEW
             );
         }
-      
+
         $trustpilot = $this->sixpack(
             $request,
             SixpackService::EXPERIMENT_TRUSTPILOT_REVIEW,
@@ -569,12 +564,11 @@ class PhoneInsuranceController extends BaseController
             'moneyBackGuarantee' => $moneyBackGuarantee,
         );
 
-        $template = 'AppBundle:PhoneInsurance:quote.html.twig';
-
-        if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
-            return $this->render($template, $data);
+        // Adwords landingpage test
+        if (in_array($request->get('_route'), ['insurance_make_model_memory'])) {
+            return $this->render('AppBundle:PhoneInsurance:adlanding.html.twig', $data);
         } else {
-            return $this->render($template, $data);
+            return $this->render('AppBundle:PhoneInsurance:quote.html.twig', $data);
         }
     }
 

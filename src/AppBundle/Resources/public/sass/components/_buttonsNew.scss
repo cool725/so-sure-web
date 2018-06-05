@@ -3,6 +3,7 @@
 .btn {
 	@include border-radius(4px);
 	border-width: 1px;
+	font-family: $avenir-heavy;
 
 	&:hover {
 		transition: all 0.3s ease;
@@ -66,6 +67,10 @@
 
 .btn-green {
 	@include btn($green, $white, $white);
+}
+
+.btn-ad-green {
+	@include btn($dark-ad-green, $white, $white);
 }
 
 .btn-white {

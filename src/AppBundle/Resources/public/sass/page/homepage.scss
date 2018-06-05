@@ -1019,10 +1019,6 @@
             max-width: 800px;
             margin: 15px auto;
         }
-
-        @include breakpoint(tablet) {
-            padding-top: 0;
-        }
     }
 
     &--we-compare-well {
