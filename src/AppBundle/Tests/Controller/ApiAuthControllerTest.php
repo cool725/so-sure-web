@@ -3173,6 +3173,9 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
     // policy/{id}/imei
 
+    /**
+     *
+     */
     public function testImei()
     {
         $user = self::createUser(
