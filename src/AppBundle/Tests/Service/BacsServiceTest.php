@@ -95,4 +95,24 @@ class BacsServiceTest extends WebTestCase
         $this->assertEquals('test', $payment->getNotes());
         $this->assertNull($payment->isSuccess());
     }
+
+    public function testCheckSubmissionFile()
+    {
+        $passingFile = [self::$bacsService->getHeader()];
+        $failingFile = [implode(',', [
+            '"Processing Date"',
+            '"Action"',
+            '"BACS Transaction Code"',
+            '"Name"',
+            '"Sort Code"',
+            '"Account"',
+            '"UserId"',
+            '"PolicyId"',
+            '"PaymentId"',
+        ])];
+        $this->assertTrue(self::$bacsService->checkSubmissionFile($passingFile));
+        $this->assertFalse(self::$bacsService->checkSubmissionFile($failingFile));
+
+
+    }
 }
