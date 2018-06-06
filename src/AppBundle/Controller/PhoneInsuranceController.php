@@ -387,9 +387,9 @@ class PhoneInsuranceController extends BaseController
                             sprintf('Your saved so-sure quote for %s', $phone),
                             $lead->getEmail(),
                             'AppBundle:Email:quote/priceGuarentee.html.twig',
-                            ['phone' => $phone, 'days' => $days, 'quoteUrl' => $quoteUrl],
+                            ['phone' => $phone, 'days' => '7days', 'quoteUrl' => $quoteUrl],
                             'AppBundle:Email:quote/priceGuarentee.txt.twig',
-                            ['phone' => $phone, 'days' => $days, 'quoteUrl' => $quoteUrl]
+                            ['phone' => $phone, 'days' => '7days', 'quoteUrl' => $quoteUrl]
                         );
                         $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_LEAD_CAPTURE);
                         $this->get('app.mixpanel')->queuePersonProperties([
