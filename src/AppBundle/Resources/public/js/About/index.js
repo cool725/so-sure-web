@@ -23,44 +23,46 @@ $(function(){
         Intercom('showNewMessage', $(this).data('intercom-msg'));
     });
 
-    $('#contact-us-form').validate({
-        debug: false,
-        onkeyup: false,
-        focusCleanup: true,
-        validClass: 'has-success',
-        rules: {
-            "contact_form[name]" : {
-                required: true
+    if ($('#contact-us-form').length) {
+        $('#contact-us-form').validate({
+            debug: false,
+            onkeyup: false,
+            focusCleanup: true,
+            validClass: 'has-success',
+            rules: {
+                "contact_form[name]" : {
+                    required: true
+                },
+                "contact_form[email]" : {
+                    required: true,
+                    email: true
+                },
+                "contact_form[phone]" : {
+                    required: true,
+                    phoneIntl: true
+                },
+                "contact_form[message]" : {
+                    required: true
+                }
             },
-            "contact_form[email]" : {
-                required: true,
-                email: true
+            messages: {
+                "contact_form[name]" : {
+                    required: 'Please enter your name'
+                },
+                "contact_form[email]" : {
+                    required: 'Please enter a valid email address',
+                    email:  'Please enter a valid email address'
+                },
+                "contact_form[phone]" : {
+                    required: 'Please enter a valid phone number',
+                },
+                "contact_form[message]" : {
+                    required: "Please tell us what you'd like to talk about"
+                }
             },
-            "contact_form[phone]" : {
-                required: true,
-                phoneIntl: true
-            },
-            "contact_form[message]" : {
-                required: true
+            submitHandler: function(form) {
+                form.submit();
             }
-        },
-        messages: {
-            "contact_form[name]" : {
-                required: 'Please enter your name'
-            },
-            "contact_form[email]" : {
-                required: 'Please enter a valid email address',
-                email:  'Please enter a valid email address'
-            },
-            "contact_form[phone]" : {
-                required: 'Please enter a valid phone number',
-            },
-            "contact_form[message]" : {
-                required: "Please tell us what you'd like to talk about"
-            }
-        },
-        submitHandler: function(form) {
-            form.submit();
-        }
-    });
+        });
+    }
 });
