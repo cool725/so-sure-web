@@ -682,6 +682,7 @@ class AdminController extends BaseController
             'addacs' => $s3FileRepo->getAllFiles($date, 'bacsReportAddacs'),
             'auddis' => $s3FileRepo->getAllFiles($date, 'bacsReportAuddis'),
             'arudds' => $s3FileRepo->getAllFiles($date, 'bacsReportArudd'),
+            'ddic' => $s3FileRepo->getAllFiles($date, 'bacsReportDdic'),
             'input' => $s3FileRepo->getAllFiles($date, 'bacsReportInput'),
             'payments' => $paymentsRepo->findPayments($date),
             'uploadForm' => $uploadForm->createView(),

@@ -8,6 +8,7 @@ use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Document\File\BacsReportAddacsFile;
 use AppBundle\Document\File\BacsReportAruddFile;
 use AppBundle\Document\File\BacsReportAuddisFile;
+use AppBundle\Document\File\BacsReportDdicFile;
 use AppBundle\Document\File\BacsReportInputFile;
 use AppBundle\Document\File\DirectDebitNotificationFile;
 use AppBundle\Document\File\S3File;
@@ -398,7 +399,7 @@ class BacsService
         $elementList = $xpath->query('//BACSDocument/Data/MessagingAdvices/MessagingAdvice');
         /** @var \DOMElement $element */
         foreach ($elementList as $element) {
-            $this->validateSun($element);
+            $this->validateSun($element, 'user-number');
             $this->validateRecordType($element, "A");
 
             $results['instructions']++;
@@ -532,8 +533,6 @@ class BacsService
     {
         $results = [
             'records' => 0,
-            'success' => true,
-            'failed-payments' => 0,
             'details' => [],
         ];
 
@@ -548,69 +547,30 @@ class BacsService
         $dom->loadXML($xml, LIBXML_NOBLANKS);
         $xpath = new DOMXPath($dom);
 
-        $this->validateServiceLicenseInformation($xpath);
+        $this->validateServiceUserNumber($xpath);
 
         $submittedPayments = $paymentRepo->findBy(['status' => BacsPayment::STATUS_SUBMITTED]);
 
         $elementList = $xpath->query(
-            '//VocaDocument/Data/Document/NewAdvices/DDICAdvice/SUReference'
+            '//VocaDocument/Data/Document/NewAdvices/DDICAdvice'
         );
         /** @var \DOMElement $element */
         foreach ($elementList as $element) {
             $results['records']++;
-            $returnCode = $this->getReturnCode($element);
-            $reference = $this->getReference($element, 'ref');
-            $originalProcessingDate = $this->getOriginalProcessingDate($element);
+            $reasonCode = $this->getChildNodeValue($element, 'ReasonCode');
+            $reference = $this->getChildNodeValue($element, 'SUReference');
             /** @var User $user */
             $user = $repo->findOneBy(['paymentMethod.bankAccount.reference' => $reference]);
             if (!$user) {
-                $results['success'] = false;
                 $this->logger->error(sprintf('Unable to locate bacs reference %s', $reference));
 
                 continue;
             }
-
-            $foundPayments = 0;
-            foreach ($submittedPayments as $submittedPayment) {
-                /** @var BacsPayment $submittedPayment */
-                if ($submittedPayment->getPolicy()->getUser()->getId() == $user->getId()) {
-                    $foundPayments++;
-                    $submittedPayment->setStatus(BacsPayment::STATUS_FAILURE);
-                    $results['failed-payments']++;
-                    $days = $submittedPayment->getDate()->diff($originalProcessingDate);
-                    $results['details'][$reference] = [$submittedPayment->getId() => $days->days];
-                    if ($days->days > 5) {
-                        $this->logger->warning(sprintf(
-                            'Failed Payment %s for user %s was %d days off from processing date',
-                            $submittedPayment->getId(),
-                            $user->getId(),
-                            $days->days
-                        ));
-                    }
-                }
-            }
-
-            if ($foundPayments == 0) {
-                $this->logger->error(sprintf(
-                    'Failed to find any pending(submitted) payments for user %s',
-                    $user->getId()
-                ));
-            } elseif ($foundPayments > 1) {
-                $this->logger->error(sprintf('Failed %d payments for user %s', $foundPayments, $user->getId()));
-            }
-
-            if ($foundPayments > 0) {
-                // TODO: move mandate from user to policy
-                $policy = $user->getLatestPolicy();
-                if ($policy) {
-                    $this->failedPaymentEmail($policy);
-                } else {
-                    $this->logger->warning(sprintf(
-                        'User %s does not have a latest policy (cancelled?). Skipping failed payment email',
-                        $user->getId()
-                    ));
-                }
-            }
+            /** @var BacsPaymentMethod $bacsPaymentMethod */
+            $bacsPaymentMethod = $user->getPaymentMethod();
+            $bacsPaymentMethod->getBankAccount()->setMandateStatus(BankAccount::MANDATE_CANCELLED);
+            // TODO: need to add bacs chargeback payments I think?
+            
         }
 
         return $results;
@@ -679,7 +639,7 @@ class BacsService
         $elementList = $xpath->query('//BACSDocument/Data/MessagingAdvices/MessagingHeader');
         /** @var \DOMElement $element */
         foreach ($elementList as $element) {
-            $this->validateSun($element);
+            $this->validateSun($element, 'user-number');
         }
     }
 
@@ -692,9 +652,22 @@ class BacsService
         }
     }
 
-    private function validateSun(\DOMElement $element, $userNumberAttribute = 'user-number')
+    private function validateServiceUserNumber($xpath)
     {
-        $sun = $element->attributes->getNamedItem($userNumberAttribute)->nodeValue;
+        $elementList = $xpath->query('//VocaDocument/Data/Document/ServiceUserNumber');
+        /** @var \DOMElement $element */
+        foreach ($elementList as $element) {
+            $this->validateSun($element);
+        }
+    }
+
+    private function validateSun(\DOMElement $element, $userNumberAttribute = null)
+    {
+        if ($userNumberAttribute) {
+            $sun = $element->attributes->getNamedItem($userNumberAttribute)->nodeValue;
+        } else {
+            $sun = $element->nodeValue;
+        }
         if ($sun != self::SUN) {
             throw new \Exception(sprintf('Invalid SUN %s', $sun));
         }
@@ -708,6 +681,18 @@ class BacsService
     private function getReference(\DOMElement $element, $referenceName = 'reference')
     {
         return trim($element->attributes->getNamedItem($referenceName)->nodeValue);
+    }
+
+    private function getChildNodeValue(\DOMElement $element, $name)
+    {
+        foreach ($element->childNodes as $childNode) {
+            /** @var \DOMElement $childNode */
+            if ($childNode->nodeName == $name) {
+                return trim($childNode->nodeValue);
+            }
+        }
+
+        return null;
     }
 
     private function getReason(\DOMElement $element)
@@ -764,7 +749,7 @@ class BacsService
         $elementList = $xpath->query('//BACSDocument/Data/MessagingAdvices/MessagingAdvice');
         /** @var \DOMElement $element */
         foreach ($elementList as $element) {
-            $this->validateSun($element);
+            $this->validateSun($element, 'user-number');
             $recordType = $this->getRecordType($element);
             if ($recordType == "V") {
                 $this->validateFileType($element);
