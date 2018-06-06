@@ -4,8 +4,23 @@ $(function(){
     // Full name
     jQuery.validator.addMethod('fullName', function(value, element) {
 
-        // Strip accent marks
-        value = value.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        function removeAccents (text) {
+            var accents    = 'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž',
+                accentsOut = "AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz",
+                textNoAccents = [];
+
+            for (var i in text) {
+                var idx = accents.indexOf(text[i]);
+                if (idx != -1)
+                    textNoAccents[i] = accentsOut.substr(idx, 1);
+                else
+                    textNoAccents[i] = text[i];
+            }
+
+            return textNoAccents.join('');
+        }
+
+        removeAccents(value);
 
         return this.optional(element) || value.match(/\w+\s+\w+/);
 
