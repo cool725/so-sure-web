@@ -1187,14 +1187,14 @@ class ApiAuthController extends BaseController
             $imei->setBucket($this->getDataString($data, 'bucket'));
             $imei->setKey($this->getDataString($data, 'key'));
             $policy->addPolicyFile($imei);
-            if (isset($result['Metadata']['colours'])) {
-                $imei->addMetadata('imei-colours', $result['Metadata']['colours']);
+            if (isset($result['Metadata']['match-header-colour'])) {
+                $imei->addMetadata('imei-match-header-colour', $result['Metadata']['match-header-colour']);
             }
-            if (isset($result['Metadata']['age'])) {
-                $imei->addMetadata('imei-age', $result['Metadata']['age']);
+            if (isset($result['Metadata']['age-seconds'])) {
+                $imei->addMetadata('imei-age-seconds', $result['Metadata']['age-seconds']);
             }
-            if (isset($result['Metadata']['size'])) {
-                $imei->addMetadata('imei-size', $result['Metadata']['size']);
+            if (isset($result['Metadata']['match-screen-size'])) {
+                $imei->addMetadata('imei-match-screen-size', $result['Metadata']['match-screen-size']);
             }
             if (isset($result['Metadata']['suspected-fraud'])) {
                 $imei->addMetadata('imei-suspected-fraud', $result['Metadata']['suspected-fraud']);
