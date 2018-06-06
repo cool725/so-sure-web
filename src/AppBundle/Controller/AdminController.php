@@ -850,7 +850,7 @@ class AdminController extends BaseController
     public function adminBankingAction(Request $request, $year = null, $month = null)
     {
         // default 30s for prod is no longer enough
-        set_time_limit(60);
+        set_time_limit(120);
 
         $now = new \DateTime();
         if (!$year) {
