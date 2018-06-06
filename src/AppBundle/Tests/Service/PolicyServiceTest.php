@@ -1400,6 +1400,43 @@ class PolicyServiceTest extends WebTestCase
         $this->assertNull($renewalPolicy->getStart());
     }
 
+    public function testPolicyAutoRenewWhenCancelled()
+    {
+        $user = static::createUser(
+            static::$userManager,
+            static::generateEmail('testPolicyAutoRenewWhenCancelled', $this),
+            'bar',
+            static::$dm
+        );
+        $policy = static::initPolicy(
+            $user,
+            static::$dm,
+            $this->getRandomPhone(static::$dm),
+            new \DateTime('2016-01-01'),
+            true
+        );
+
+        $policy->setStatus(PhonePolicy::STATUS_PENDING);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy, new \DateTime('2016-06-01'), true);
+        static::$policyService->setEnvironment('test');
+        static::$dm->flush();
+        $this->assertEquals(new \DateTimeZone(Salva::SALVA_TIMEZONE), $policy->getStart()->getTimeZone());
+
+        $this->assertEquals(Policy::STATUS_ACTIVE, $policy->getStatus());
+
+        $renewalPolicy = static::$policyService->createPendingRenewal(
+            $policy,
+            new \DateTime('2017-05-15')
+        );
+        $this->assertEquals(Policy::STATUS_PENDING_RENEWAL, $renewalPolicy->getStatus());
+
+        $this->assertFalse(static::$policyService->autoRenew($policy, new \DateTime('2017-06-01')));
+        $this->assertEquals(Policy::STATUS_UNRENEWED, $renewalPolicy->getStatus());
+        $this->assertNull($policy->getCashback());
+        $this->assertNull($renewalPolicy->getStart());
+    }
+
     public function testPolicyAutoRenewPaid()
     {
         $user = static::createUser(
