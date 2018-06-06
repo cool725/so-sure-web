@@ -382,14 +382,16 @@ class PhoneInsuranceController extends BaseController
                         } else {
                             $lead = $existingLead;
                         }
+                        $days = new \DateTime();
+                        $days = $days->add(new \DateInterval(sprintf('P%dD', 7)));
                         $mailer = $this->get('app.mailer');
                         $mailer->sendTemplate(
                             sprintf('Your saved so-sure quote for %s', $phone),
                             $lead->getEmail(),
                             'AppBundle:Email:quote/priceGuarentee.html.twig',
-                            ['phone' => $phone, 'days' => '7days', 'quoteUrl' => $quoteUrl],
+                            ['phone' => $phone, 'days' => $days, 'quoteUrl' => $quoteUrl],
                             'AppBundle:Email:quote/priceGuarentee.txt.twig',
-                            ['phone' => $phone, 'days' => '7days', 'quoteUrl' => $quoteUrl]
+                            ['phone' => $phone, 'days' => $days, 'quoteUrl' => $quoteUrl]
                         );
                         $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_LEAD_CAPTURE);
                         $this->get('app.mixpanel')->queuePersonProperties([
