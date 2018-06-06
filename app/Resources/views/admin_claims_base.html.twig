@@ -37,7 +37,9 @@
         {# End Page Content #}
 
         {# Footer #}
-        {% block footer %}{% endblock %}
+        {% block footer %}
+            {% include '::footer_data.html.twig' %}
+        {% endblock %}
 
         {# If using CDN else load locally #}
         {% if use_cdn %}
