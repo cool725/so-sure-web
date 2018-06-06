@@ -84,6 +84,15 @@ class OpsController extends BaseController
     }
 
     /**
+     * @Route("/rollbar-js-error", name="ops_rollbar_js_error")
+     * @Template()
+     */
+    public function rollbarJsErrorAction()
+    {
+        return [];
+    }
+
+    /**
      * @Route("/exception503", name="ops_exception_503")
      */
     public function exceptionDeniedAction()

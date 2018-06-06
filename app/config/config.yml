@@ -81,6 +81,7 @@ twig:
         api_base_url: "%api_base_url%"
         web_base_url: "%web_base_url%"
         cookie_url: "https://www.iubenda.com/privacy-policy/7805295/cookie-policy"
+        rollbar_client_access_token: "%rollbar_client_access_token%"
 
 doctrine_mongodb:
     connections:
@@ -443,6 +444,7 @@ nelmio_security:
                 - https://uploads.intercomcdn.com
                 - https://uploads.intercomusercontent.com
                 - https://js.intercomcdn.com
+                - https://api.rollbar.com
                 - https://app.getsentry.com
                 - https://*.optimizely.com
                 - https://player.vimeo.com
@@ -515,6 +517,7 @@ nelmio_security:
                 - https://app.prodpad.com # necessary?
                 - https://cdn.iubenda.com
                 - http://cdn.iubenda.com
+                - https://cdnjs.cloudflare.com
                 - https://*.facebook.net
                 - http://*.facebook.net
                 - https://*.facebook.com

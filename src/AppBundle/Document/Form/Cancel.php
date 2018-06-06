@@ -12,8 +12,30 @@ class Cancel
     /** @var string */
     protected $cancellationReason;
 
+    /** @var string */
+    protected $requestedCancellationReason;
+
     /** @var boolean */
     protected $skipNetworkEmail;
+
+    public static function getEncodedCooloffReason($reason)
+    {
+        return sprintf('%s - %s', ucfirst(Policy::CANCELLED_COOLOFF), $reason);
+    }
+
+    public static function isEncodedCooloffReason($reason)
+    {
+        return mb_stripos($reason, self::getEncodedCooloffReason(null)) !== false;
+    }
+
+    public static function getDecodedCooloffReason($reason)
+    {
+        if (self::isEncodedCooloffReason($reason)) {
+            return mb_substr($reason, mb_strlen(self::getEncodedCooloffReason(null)));
+        } else {
+            return null;
+        }
+    }
 
     public function getPolicy()
     {
@@ -32,7 +54,22 @@ class Cancel
     
     public function setCancellationReason($cancellationReason)
     {
-        $this->cancellationReason = $cancellationReason;
+        if (self::isEncodedCooloffReason($cancellationReason)) {
+            $this->cancellationReason = Policy::CANCELLED_COOLOFF;
+            $this->setRequestedCancellationReason(self::getDecodedCooloffReason($cancellationReason));
+        } else {
+            $this->cancellationReason = $cancellationReason;
+        }
+    }
+
+    public function getRequestedCancellationReason()
+    {
+        return $this->requestedCancellationReason;
+    }
+
+    public function setRequestedCancellationReason($requestedCancellationReason)
+    {
+        $this->requestedCancellationReason = $requestedCancellationReason;
     }
 
     public function getSkipNetworkEmail()

@@ -67,9 +67,4 @@
     </div>
 </footer>
 
-<!-- Analytics -->
-<div id="ss-root" data-fb-id="{{ fb_appid }}"
-   data-fb-redirect="{{ url("hwi_oauth_service_redirect", {service: "facebook"}) }}"
-   {% if use_pca is defined %}data-pca-key="{{ pca_webkey }}"{% endif %}
-   data-device-category="{{ device_category() }}"
-   ></div>
+{% include '::footer_data.html.twig' %}
