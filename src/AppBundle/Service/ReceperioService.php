@@ -57,6 +57,7 @@ class ReceperioService extends BaseImeiService
     /** @var RateLimitService */
     protected $rateLimit;
 
+    /** @var MailerService */
     protected $mailer;
 
     protected $statsd;
@@ -938,8 +939,11 @@ class ReceperioService extends BaseImeiService
                 // @codingStandardsIgnoreStart
                 $this->mailer->send(
                     sprintf('Missing ModelReference for %s', $serialNumber),
-                    'tech+ops@so-sure.com',
-                    sprintf("A recent make/model query for %s returned a successful response but the response was missing a modelreference.  Email support@recipero.com\n\n----------\n\nDear Recipero Support,\nCan you please add modelreference '%s' for the '%s' phone to our account?\n\nResponse returned by recipero: %s", $serialNumber, $phone->getDevices()[0], $phone, json_encode($data))
+                    'support@recipero.com',
+                    sprintf("A recent make/model query for %s returned a successful response but the response was missing a modelreference.  Email support@recipero.com\n\n----------\n\nDear Recipero Support,\nCan you please add modelreference '%s' for the '%s' phone to our account?\n\nResponse returned by recipero: %s", $serialNumber, $phone->getDevices()[0], $phone, json_encode($data)),
+                    null,
+                    null,
+                    'tech+ops@so-sure.com'
                 );
                 // @codingStandardsIgnoreEnd
 
