@@ -3650,6 +3650,27 @@ class PhonePolicyTest extends WebTestCase
         $this->assertEquals($repurchase->getId(), $claim->getLinkedPolicy()->getId());
     }
 
+    public function testAutoRenewWhenCancelled()
+    {
+        $policy = $this->getPolicy(static::generateEmail('testRenewPicSurePreApproved', $this));
+        $policy->setId(rand(1, 9999999));
+
+        $this->assertFalse($policy->isRenewed());
+        $this->assertNull($policy->getPicSureStatus());
+        $this->assertTrue($policy->getUser()->getAnalytics()['hasOutstandingPicSurePolicy']);
+
+        $renewalPolicy = $this->getRenewalPolicy($policy);
+
+        $this->assertFalse($policy->isRenewed());
+        $this->assertTrue($renewalPolicy->isRenewalAllowed(false, new \DateTime('2016-12-15')));
+
+        $policy->cancel(Policy::CANCELLED_USER_REQUESTED, new \DateTime('2016-12-30'));
+
+        $this->assertFalse($renewalPolicy->renew(0, true, new \DateTime('2017-01-01')));
+
+        $this->assertFalse($policy->isRenewed());
+    }
+
     public function testRenewPicSurePreApproved()
     {
         $policy = $this->getPolicy(static::generateEmail('testRenewPicSurePreApproved', $this));

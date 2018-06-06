@@ -162,6 +162,7 @@ abstract class Policy
     /**
      * @MongoDB\ReferenceOne(targetDocument="Policy", inversedBy="nextPolicy")
      * @Gedmo\Versioned
+     * @var Policy
      */
     protected $previousPolicy;
 
@@ -810,6 +811,9 @@ abstract class Policy
         $this->user = $user;
     }
 
+    /**
+     * @return Policy
+     */
     public function getPreviousPolicy()
     {
         return $this->previousPolicy;
@@ -3087,6 +3091,10 @@ abstract class Policy
             }
         }
 
+        if ($this->getPreviousPolicy()->getStatus() == self::STATUS_CANCELLED) {
+            return false;
+        }
+
         return true;
     }
 
@@ -3134,6 +3142,11 @@ abstract class Policy
             $date = new \DateTime();
         }
 
+        // For autorenewals, no need to warn if previous policy was cancelled
+        if ($autoRenew && $this->getPreviousPolicy()->getStatus() == self::STATUS_CANCELLED) {
+            return false;
+        }
+
         if (!$this->isRenewalAllowed($autoRenew, $date)) {
             throw new \Exception(sprintf(
                 'Unable to renew policy %s as status is incorrect or its too late',
@@ -3169,6 +3182,8 @@ abstract class Policy
                 $this->addRenewalConnection($connection->createRenewal($renew));
             }
         }
+
+        return true;
     }
 
     public function unrenew(\DateTime $date = null)

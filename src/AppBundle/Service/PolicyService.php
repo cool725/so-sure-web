@@ -1840,11 +1840,9 @@ class PolicyService
 
     public function autoRenew(Policy $policy, \DateTime $date = null)
     {
-        if ($policy->isFullyPaid()) {
-            return $this->renew($policy, $policy->getPremiumInstallmentCount(), null, true, $date);
-        } else {
+        if ($policy->getStatus() == Policy::STATUS_CANCELLED || !$policy->isFullyPaid()) {
             $this->logger->warning(sprintf(
-                'Skipping renewal as policy %s/%s is not fully paid',
+                'Skipping renewal as policy %s/%s is not fully paid or cancelled',
                 $policy->getId(),
                 $policy->getPolicyNumber()
             ));
@@ -1852,6 +1850,8 @@ class PolicyService
             $this->dm->flush();
 
             return false;
+        } else {
+            return $this->renew($policy, $policy->getPremiumInstallmentCount(), null, true, $date);
         }
     }
 
@@ -1902,7 +1902,10 @@ class PolicyService
             $payer->addPayerPolicy($newPolicy);
         }
         $this->create($newPolicy, $startDate, false, $numPayments);
-        $newPolicy->renew($discount, $autoRenew, $date);
+        if (!$newPolicy->renew($discount, $autoRenew, $date)) {
+            return null;
+        }
+
         $this->generateScheduledPayments($newPolicy, $startDate, $numPayments);
         $policy->addMetric(Policy::METRIC_RENEWAL);
 
