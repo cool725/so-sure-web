@@ -13,6 +13,7 @@ use AppBundle\Document\File\BacsReportInputFile;
 use AppBundle\Document\File\DirectDebitNotificationFile;
 use AppBundle\Document\File\S3File;
 use AppBundle\Document\File\UploadFile;
+use AppBundle\Document\Payment\BacsIndemnityPayment;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Document\Payment\Payment;
 use AppBundle\Document\Policy;
@@ -533,6 +534,7 @@ class BacsService
     {
         $results = [
             'records' => 0,
+            'indemnity-amount' => 0,
             'details' => [],
         ];
 
@@ -558,7 +560,11 @@ class BacsService
         foreach ($elementList as $element) {
             $results['records']++;
             $reasonCode = $this->getChildNodeValue($element, 'ReasonCode');
+            $reasonCodeMeaning = $this->getChildNodeValue($element, 'ReasonCodeMeaning');
             $reference = $this->getChildNodeValue($element, 'SUReference');
+            $amount = $this->getChildNodeValue($element, 'TotalAmount');
+            $results['indemnity-amount'] += $amount;
+            $results['details'][] = [$reference => [$reasonCode => $reasonCodeMeaning]];
             /** @var User $user */
             $user = $repo->findOneBy(['paymentMethod.bankAccount.reference' => $reference]);
             if (!$user) {
@@ -569,9 +575,19 @@ class BacsService
             /** @var BacsPaymentMethod $bacsPaymentMethod */
             $bacsPaymentMethod = $user->getPaymentMethod();
             $bacsPaymentMethod->getBankAccount()->setMandateStatus(BankAccount::MANDATE_CANCELLED);
-            // TODO: need to add bacs chargeback payments I think?
-            
+            $this->logger->warning(sprintf(
+                'Cancelled bacs mandate for User (%s) due to DDIC. Review as cancellation may not be needed.',
+                $user->getId()
+            ));
+            $indemnityPayment = new BacsIndemnityPayment();
+            $indemnityPayment->setAmount(0 - $amount);
+            $indemnityPayment->setStatus(BacsIndemnityPayment::STATUS_RAISED);
+            $indemnityPayment->setSource(BacsIndemnityPayment::SOURCE_SYSTEM);
+            $user->getLatestPolicy()->addPayment($indemnityPayment);
+            $this->dm->persist($indemnityPayment);
         }
+
+        $this->dm->flush();
 
         return $results;
     }

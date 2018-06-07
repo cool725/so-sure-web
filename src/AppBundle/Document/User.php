@@ -1014,6 +1014,9 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
         return $policies[0];
     }
 
+    /**
+     * @return Policy|null
+     */
     public function getLatestPolicy()
     {
         $policies = $this->getValidPolicies(true);
