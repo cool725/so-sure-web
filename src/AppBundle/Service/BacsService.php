@@ -229,6 +229,23 @@ class BacsService
         return true;
     }
 
+    public function checkSubmissionFile($fileDataArray)
+    {
+        $columnCount = count(str_getcsv($this->getHeader(), ",", '"'));
+
+        foreach ($fileDataArray as $line) {
+            if (!$line || mb_strlen($line) == 0) {
+                continue;
+            }
+            $lineData = str_getcsv($line, ",", '"');
+            if (count($lineData) != $columnCount) {
+                return false;
+            } else {
+                return true;
+            }
+        }
+    }
+
     public function processSubmissionUpload(UploadedFile $file, $debit = true)
     {
         $tmpFile = $file->move(sys_get_temp_dir());
@@ -238,6 +255,10 @@ class BacsService
 
         $fileData = file_get_contents($tmpFile);
         $fileDataArray = explode(PHP_EOL, $fileData);
+
+        if (!$this->checkSubmissionFile($fileDataArray)) {
+            throw new \Exception('Invalid submission file, number of parameter is invalid');
+        }
 
         $this->uploadSftp($fileData, $sftpFilename, $debit);
 
