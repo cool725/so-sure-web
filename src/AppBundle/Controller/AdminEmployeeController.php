@@ -2133,8 +2133,10 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(PhonePolicy::class);
+        /** @var PhonePolicy $policy */
         $policy = null;
         if ($id) {
+            /** @var PhonePolicy $policy */
             $policy = $repo->find($id);
         }
         $picSureSearchForm = $this->get('form.factory')
@@ -2185,6 +2187,14 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
                 'AppBundle:Email:picsure/rejected.txt.twig',
                 ['policy' => $policy]
             );
+            if ($policy->isWithinCooloffPeriod()) {
+                $mailer->sendTemplate(
+                    'Please cancel (cooloff) policy due to pic-sure rejection',
+                    'support@wearesosure.com',
+                    'AppBundle:Email:picsure/adminRejected.html.twig',
+                    ['policy' => $policy]
+                );
+            }
             try {
                 $push = $this->get('app.push');
                 // @codingStandardsIgnoreStart
