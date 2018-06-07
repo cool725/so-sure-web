@@ -940,7 +940,7 @@ class ReceperioService extends BaseImeiService
                 $this->mailer->send(
                     sprintf('Missing ModelReference for %s', $serialNumber),
                     'support@recipero.com',
-                    sprintf("Dear Recipero Support,\nCan you please add modelreference '%s' for the '%s' phone to our account?\n\nResponse returned by recipero: %s", $serialNumber, $phone->getDevices()[0], $phone, json_encode($data)),
+                    sprintf("Dear Recipero Support,\nCan you please add modelreference '%s' for the '%s' phone to our account?\n\nResponse returned by recipero: %s", $phone->getDevices()[0], $phone, json_encode($data)),
                     null,
                     null,
                     'tech+ops@so-sure.com'
