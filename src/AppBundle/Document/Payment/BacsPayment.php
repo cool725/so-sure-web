@@ -17,6 +17,9 @@ class BacsPayment extends Payment
 {
     use DateTrait;
 
+    const DAYS_CREDIT = 2;
+    const DAYS_REVERSE = 5;
+
     const STATUS_PENDING = 'pending';
     const STATUS_GENERATED = 'generated';
     const STATUS_SUBMITTED = 'submitted';
@@ -143,8 +146,8 @@ class BacsPayment extends Payment
             $date = new \DateTime();
         }
         $this->setSubmittedDate($date);
-        $this->setBacsCreditDate($this->addBusinessDays($date, 2));
-        $this->setBacsReversedDate($this->addBusinessDays($date, 5));
+        $this->setBacsCreditDate($this->addBusinessDays($date, self::DAYS_CREDIT));
+        $this->setBacsReversedDate($this->addBusinessDays($date, self::DAYS_REVERSE));
     }
 
     public function inProgress()

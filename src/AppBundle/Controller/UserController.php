@@ -2,6 +2,8 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Document\DateTrait;
+use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Security\UserVoter;
 use AppBundle\Service\PCAService;
 use AppBundle\Service\SequenceService;
@@ -85,6 +87,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class UserController extends BaseController
 {
+    use DateTrait;
+
     /**
      * @Route("/", name="user_home")
      * @Route("/{policyId}", name="user_policy", requirements={"policyId":"[0-9a-f]{24,24}"})
@@ -1177,12 +1181,15 @@ class UserController extends BaseController
      */
     public function paymentDetailsAction(Request $request, $policyId = null)
     {
+        /** @var User $user */
         $user = $this->getUser();
         $dm = $this->getManager();
         $policyRepo = $dm->getRepository(Policy::class);
         if ($policyId) {
+            /** @var Policy $policy */
             $policy = $policyRepo->find($policyId);
         } else {
+            /** @var Policy $policy */
             $policy = $user->getLatestPolicy();
         }
         $this->denyAccessUnlessGranted(PolicyVoter::VIEW, $policy);
@@ -1203,6 +1210,14 @@ class UserController extends BaseController
         if ($bacsFeature && $policy->getPremiumPlan() != Policy::PLAN_MONTHLY) {
             $bacsFeature = false;
         }
+        // we need enough time for the bacs to be billed + reverse payment to be notified + 1 day internal processing
+        // or no point in swapping to bacs
+        $date = new \DateTime();
+        $date = $this->addBusinessDays($date, BacsPayment::DAYS_REVERSE + 1);
+        if ($bacsFeature && $policy->getPolicyExpirationDate() > $date) {
+            $bacsFeature = false;
+        }
+
         $paymentService = $this->get('app.payment');
         // TODO: Move to ajax call
         $webpay = null;
