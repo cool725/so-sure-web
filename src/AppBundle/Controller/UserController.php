@@ -1092,6 +1092,13 @@ class UserController extends BaseController
         if ($bacsFeature && $policy->getPremiumPlan() != Policy::PLAN_MONTHLY) {
             $bacsFeature = false;
         }
+        // we need enough time for the bacs to be billed + reverse payment to be notified + 1 day internal processing
+        // or no point in swapping to bacs
+        $date = new \DateTime();
+        $date = $this->addBusinessDays($date, BacsPayment::DAYS_REVERSE + 1);
+        if ($bacsFeature && $policy->getPolicyExpirationDate() > $date) {
+            $bacsFeature = false;
+        }
 
         $data = [
             'phone' => $policy ? $policy->getPhone() : null,
