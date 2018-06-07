@@ -63,9 +63,37 @@
                  style="{% if default_login_method == 'email' %}display: none;{% endif %}"
                  data-csrf="{{ csrf_token('account-kit') }}"
                  data-toggle="{% if app.request.clientIp == davies_ip %}1{% else %}0{% endif %}">
-                Account Kit
+                <form method="get" action="https://www.accountkit.com/v1.0/basic/dialog/sms_login/" autocomplete="off">
+                <div class="form-group">
+                    <input type="hidden" value="+44" id="country_code" class="form-control" />
+                    <input type="hidden" name="app_id" value="{{ fb_appid }}">
+                    <input type="hidden" name="redirect" value="{{ app.request.schemeAndHttpHost }}/login/check-accountkit">
+                    <input type="hidden" name="state" value="{{ accountkit_state() }}">
+                    <input type="hidden" name="fbAppEventsEnabled" value=true>
+                    <input type="hidden" name="debug" value=false>
+                </div>
+                <div class="form-group">
+                    <input placeholder="Mobile Number - UK numbers only!" id="phone_number" name="phone_number" class="form-control input-lg" type="tel" />
+                </div>
+                {% if error %}
+                    <div class="error-text" style="padding-bottom: 10px;">Sorry, we were unable to log you in. You can try again, or <a href="mailto:support@wearesosure.com" class="open-intercom">contact us</a> for help.</div>
+                {% endif %}
+                <div class="form-group">
+                   <button class="btn btn-green btn-pad btn-block">
+                        <span id="btn-spinner" style="display:none;"><i class="fa fa-refresh fa-spin"></i></span>
+                        Login via SMS
+                    </button>
+                    <span class="help-block"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This will open a popup.</span>
+
+                </div>
+                </form>
+                <div id="sms-login__warning" class="form-group" style="display:none;">
+                    <div class="help-block">
+                        <small>There may be a small delay whilst we open a new window.<br><br></small>
+                    </div>
+                </div>
             </div>
-            <a href="#" id="swap-login" class="btn btn-link btn-xs">Prefer <span>{% if default_login_method == 'accountkit' %}email{% else %}mobile{% endif %}</span> login?</a>
+            <a href="#" id="swap-login" class="btn btn-link btn-xs">Prefer to login via <span>{% if default_login_method == 'accountkit' %}email{% else %}SMS{% endif %}</span>?</a>
 
             <div class="text-break text-grey">
                 <div class="line"></div>OR<div class="line"></div>
