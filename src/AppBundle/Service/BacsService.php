@@ -579,12 +579,16 @@ class BacsService
                 'Cancelled bacs mandate for User (%s) due to DDIC. Review as cancellation may not be needed.',
                 $user->getId()
             ));
-            $indemnityPayment = new BacsIndemnityPayment();
-            $indemnityPayment->setAmount(0 - $amount);
-            $indemnityPayment->setStatus(BacsIndemnityPayment::STATUS_RAISED);
-            $indemnityPayment->setSource(BacsIndemnityPayment::SOURCE_SYSTEM);
-            $user->getLatestPolicy()->addPayment($indemnityPayment);
-            $this->dm->persist($indemnityPayment);
+            /** @var PhonePolicy $policy */
+            $policy = $user->getLatestPolicy();
+            if ($policy) {
+                $indemnityPayment = new BacsIndemnityPayment();
+                $indemnityPayment->setAmount(0 - $amount);
+                $indemnityPayment->setStatus(BacsIndemnityPayment::STATUS_RAISED);
+                $indemnityPayment->setSource(BacsIndemnityPayment::SOURCE_SYSTEM);
+                $user->getLatestPolicy()->addPayment($indemnityPayment);
+                $this->dm->persist($indemnityPayment);
+            }
         }
 
         $this->dm->flush();
