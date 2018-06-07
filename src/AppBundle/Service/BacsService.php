@@ -832,6 +832,7 @@ class BacsService
     public function bacsFileSubmitted(AccessPayFile $file)
     {
         $file->setStatus(AccessPayFile::STATUS_SUBMITTED);
+        $file->setSubmittedDate(new \DateTime());
         $paymentRepo = $this->dm->getRepository(BacsPayment::class);
 
         $payments = $paymentRepo->findBy([
