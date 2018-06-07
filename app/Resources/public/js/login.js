@@ -13,7 +13,7 @@ window.fbAsyncInit = function() {
   FB.init({
     appId: document.getElementById('ss-root').getAttribute('data-fb-id'),
     xfbml: true,
-    version: 'v2.5',
+    version: 'v2.12',
     status     : true
   });
 };
