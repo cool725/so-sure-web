@@ -586,7 +586,7 @@ class BacsService
                 $indemnityPayment->setAmount(0 - $amount);
                 $indemnityPayment->setStatus(BacsIndemnityPayment::STATUS_RAISED);
                 $indemnityPayment->setSource(BacsIndemnityPayment::SOURCE_SYSTEM);
-                $user->getLatestPolicy()->addPayment($indemnityPayment);
+                $policy->addPayment($indemnityPayment);
                 $this->dm->persist($indemnityPayment);
             }
         }
