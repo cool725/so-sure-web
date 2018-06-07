@@ -74,7 +74,7 @@ class SixpackService
     // Exp 2
     const EXPERIMENT_AD_LANDING = 'ad-landing';
     // Exp 3
-
+    const EXPERIMENT_STARLING_LANDING = 'starling-landing';
     // Exp 4
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
@@ -115,7 +115,7 @@ class SixpackService
         // Exp 2
         self::EXPERIMENT_AD_LANDING,
         // Exp 3
-
+        self::EXPERIMENT_STARLING_LANDING,
         // Exp 4
     ];
 
@@ -156,7 +156,7 @@ class SixpackService
         // Exp 2
         self::EXPERIMENT_AD_LANDING,
         // Exp 3
-
+        self::EXPERIMENT_STARLING_LANDING,
         // Exp 4
     ];
 

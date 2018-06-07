@@ -155,6 +155,25 @@ class DefaultController extends BaseController
     }
 
     /**
+     * @Route("/starling-bank", name="starling_bank")
+     * @Template
+     */
+    public function starlingLanding(Request $request)
+    {
+        $exp = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_STARLING_LANDING,
+            ['homepage', 'starling-landing']
+        );
+
+        if ($exp == 'starling-landing') {
+            return $this->render('AppBundle:Default:indexStarlingBank.html.twig');
+        } else {
+            return $this->redirectToRoute('homepage');
+        }
+    }
+
+    /**
      * @Route("/eb", name="eb")
      * @Template
      */

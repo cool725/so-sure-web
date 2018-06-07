@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{# Set vars #}
+{% set new_stylesheet = 1 %}
+{% set new_footer = 1 %}
+{% set homepage = 1 %}
+{% set useDropdownSearch = 1 %}
+
+{% block title %}so-sure - Welcome to Social Insurance in partnership with Starling Bank{% endblock %}
+{% block meta %}
+    <meta name="description" content="Social mobile phone insurance that's better and up to 80% cheaper when you connect with friends and don't claim. Download our app now to see how much you could save."/>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets output='css/*.css'
+    'components/animate.css/animate.min.css'
+    '@AppBundle/Resources/public/sass/page/starling.scss'
+ %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+{% block body %}
+
+
+
+    {# Page Modals #}
+    {% include 'AppBundle::Default/modalQuote.html.twig' with {'selectPhoneMakeType': 'other_pages'} %}
+    {# End Page Modals #}
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    'components/lozad/lozad.min.js'
+    'components/dot/doT.min.js'
+    'components/corejs-typeahead/typeahead.bundle.min.js'
+    'components/fuse.js/fuse.min.js'
+    '@AppBundle/Resources/public/js/Default/images.js'
+    '@AppBundle/Resources/public/js/Default/selectPhoneMakeSearch.js'
+    '@AppBundle/Resources/public/js/Default/selectPhoneMakeDropdown.js'
+    '@AppBundle/Resources/public/js/Default/starling.js'
+ %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}
+
