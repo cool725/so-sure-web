@@ -3218,7 +3218,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
             'bucket' => 'ops.so-sure.com',
-            'key' => 'php-unit-tests/Controller/ApiAuthControllerTest/imei-valid1.png',
+            'key' => 'php-unit-tests/Controller/ApiAuthControllerTest/imei-valid-no-suspected-fraud.png',
         ]);
         $data = $this->verifyResponse(200);
 
@@ -3230,7 +3230,7 @@ class ApiAuthControllerTest extends BaseApiControllerTest
 
         $crawler = static::postRequest(self::$client, $cognitoIdentityId, $url, [
             'bucket' => 'ops.so-sure.com',
-            'key' => 'php-unit-tests/Controller/ApiAuthControllerTest/imei-valid2.png',
+            'key' => 'php-unit-tests/Controller/ApiAuthControllerTest/imei-valid-suspected-fraud.png',
         ]);
         $data = $this->verifyResponse(200);
 
