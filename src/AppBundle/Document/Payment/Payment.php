@@ -24,6 +24,8 @@ use AppBundle\Document\ScheduledPayment;
  *      "judo"="JudoPayment",
  *      "sosure"="SoSurePayment",
  *      "bacs"="BacsPayment",
+ *      "bacs"="BacsPayment",
+ *      "bacsIndemnity"="BacsIndemnityPayment",
  *      "chargeback"="ChargebackPayment",
  *      "potReward"="PotRewardPayment",
  *      "policyDiscount"="PolicyDiscountPayment",
