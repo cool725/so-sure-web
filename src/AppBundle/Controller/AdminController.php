@@ -694,7 +694,7 @@ class AdminController extends BaseController
     }
 
     /**
-     * @Route("/bacs/file/{id}", name="admin_bacs_file")
+     * @Route("/bacs/file/download/{id}", name="admin_bacs_file")
      */
     public function bacsDownloadFileAction($id)
     {
@@ -721,7 +721,7 @@ class AdminController extends BaseController
     }
 
     /**
-     * @Route("/bacs/serial-number-details/{serial}", name="admin_bacs_serial_number_details")
+     * @Route("/bacs/users/serial/{serial}", name="admin_bacs_serial_number_details")
      * @Method({"GET"})
      */
     public function bacsFileAction($serial)
@@ -743,9 +743,9 @@ class AdminController extends BaseController
     }
 
     /**
-     * @Route("/bacs/submit/{id}", name="admin_bacs_submit")
-     * @Route("/bacs/cancel/{id}", name="admin_bacs_cancel")
-     * @Route("/bacs/serial-number/{id}", name="admin_bacs_update_serial_number")
+     * @Route("/bacs/file/submit/{id}", name="admin_bacs_submit")
+     * @Route("/bacs/file/cancel/{id}", name="admin_bacs_cancel")
+     * @Route("/bacs/file/serial/{id}", name="admin_bacs_update_serial_number")
      * @Method({"POST"})
      */
     public function bacsEditFileAction(Request $request, $id)
@@ -762,6 +762,7 @@ class AdminController extends BaseController
             $message = 'Unknown';
             if ($request->get('_route') == 'admin_bacs_submit') {
                 $file->setStatus(AccessPayFile::STATUS_SUBMITTED);
+                $file->setSubmittedDate(new \DateTime());
                 $paymentRepo = $dm->getRepository(BacsPayment::class);
 
                 $payments = $paymentRepo->findBy([
@@ -809,8 +810,9 @@ class AdminController extends BaseController
     }
 
     /**
-     * @Route("/bacs/approve/{id}", name="admin_bacs_approve")
-     * @Route("/bacs/reject/{id}", name="admin_bacs_reject")
+     * @Route("/bacs/payment/approve/{id}", name="admin_bacs_payment_approve")
+     * @Route("/bacs/payment/reject/{id}", name="admin_bacs_payment_reject")
+     * @Route("/bacs/payment/serial/{id}/", name="admin_bacs_payment_serial")
      * @Method({"POST"})
      */
     public function bacsPaymentAction(Request $request, $id)
@@ -820,9 +822,10 @@ class AdminController extends BaseController
         }
 
         $dm = $this->getManager();
-        $repo = $dm->getRepository(BacsPayment::class);
+        $paymentRepo = $dm->getRepository(BacsPayment::class);
+        $accessPayRepo = $dm->getRepository(AccessPayFile::class);
         /** @var BacsPayment $payment */
-        $payment = $repo->find($id);
+        $payment = $paymentRepo->find($id);
         if ($payment) {
             $message = 'Unknown';
             if ($request->get('_route') == 'admin_bacs_approve') {
@@ -831,6 +834,25 @@ class AdminController extends BaseController
             } elseif ($request->get('_route') == 'admin_bacs_reject') {
                 $payment->reject();
                 $message = 'Payment is rejected';
+            } elseif ($request->get('_route') == 'admin_bacs_payment_serial') {
+                $serial = $request->get('serialNumber');
+
+                $payment->setSerialNumber($serial);
+
+                /** @var AccessPayFile $accessPayFile */
+                $accessPayFile = $accessPayRepo->findOneBy(['serialNumber' => $serial]);
+                if ($accessPayFile) {
+                    // Moving forward, submitted date should be present, but for older files use the created date,
+                    // which should more or less match
+                    if ($accessPayFile->getSubmittedDate()) {
+                        $payment->submit($accessPayFile->getSubmittedDate());
+                    } else {
+                        $payment->submit($accessPayFile->getCreated());
+                    }
+                    $message = 'Serial number has been updated and payment dates updated to match submission file';
+                } else {
+                    $message = 'Serial number has been updated, but unable to locate submission file to update dates';
+                }
             }
             $dm->flush();
             $this->addFlash(
