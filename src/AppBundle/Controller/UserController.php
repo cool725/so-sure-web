@@ -1096,7 +1096,7 @@ class UserController extends BaseController
         // or no point in swapping to bacs
         $date = new \DateTime();
         $date = $this->addBusinessDays($date, BacsPayment::DAYS_REVERSE + 1);
-        if ($bacsFeature && $policy->getPolicyExpirationDate() > $date) {
+        if ($bacsFeature && $policy->getPolicyExpirationDate() < $date) {
             $bacsFeature = false;
         }
 
@@ -1221,7 +1221,7 @@ class UserController extends BaseController
         // or no point in swapping to bacs
         $date = new \DateTime();
         $date = $this->addBusinessDays($date, BacsPayment::DAYS_REVERSE + 1);
-        if ($bacsFeature && $policy->getPolicyExpirationDate() > $date) {
+        if ($bacsFeature && $policy->getPolicyExpirationDate() < $date) {
             $bacsFeature = false;
         }
 
