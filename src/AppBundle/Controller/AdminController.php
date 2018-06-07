@@ -11,6 +11,7 @@ use AppBundle\Form\Type\BacsMandatesType;
 use AppBundle\Form\Type\BacsUploadFileType;
 use AppBundle\Form\Type\ReconciliationFileType;
 use AppBundle\Form\Type\SequenceType;
+use AppBundle\Repository\BacsPaymentRepository;
 use AppBundle\Repository\File\BarclaysFileRepository;
 use AppBundle\Repository\File\BarclaysStatementFileRepository;
 use AppBundle\Repository\File\JudoFileRepository;
@@ -557,6 +558,7 @@ class AdminController extends BaseController
         /** @var UserRepository $userRepo */
         $userRepo = $dm->getRepository(User::class);
         $s3FileRepo = $dm->getRepository(S3File::class);
+        /** @var BacsPaymentRepository $paymentsRepo */
         $paymentsRepo = $dm->getRepository(BacsPayment::class);
         $sequenceRepo = $dm->getRepository(Sequence::class);
         /** @var Sequence $currentSequence */
