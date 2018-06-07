@@ -47,6 +47,14 @@ class AccessPayFile extends UploadFile
      */
     protected $status;
 
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     * @Gedmo\Versioned
+     * @var \DateTime
+     */
+    protected $submittedDate;
+
     public function __construct()
     {
         parent::__construct();
@@ -76,6 +84,16 @@ class AccessPayFile extends UploadFile
     public function setStatus($status)
     {
         $this->status = $status;
+    }
+
+    public function setSubmittedDate(\DateTime $submittedDate)
+    {
+        $this->submittedDate = $submittedDate;
+    }
+
+    public function getSubmittedDate()
+    {
+        return $this->submittedDate;
     }
 
     /**
