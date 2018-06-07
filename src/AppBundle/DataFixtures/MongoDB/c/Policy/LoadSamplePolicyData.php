@@ -4,6 +4,7 @@ namespace AppBundle\DataFixtures\MongoDB\c\Policy;
 
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
+use AppBundle\Document\DateTrait;
 use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Document\Payment\BacsPayment;
 use AppBundle\Repository\PolicyRepository;
@@ -39,6 +40,7 @@ use Symfony\Component\Routing\RouterInterface;
 class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
 {
     use ImeiTrait;
+    use DateTrait;
 
     const CLAIM_NONE = 'none';
     const CLAIM_RANDOM = 'random';
@@ -540,6 +542,9 @@ class LoadSamplePolicyData implements FixtureInterface, ContainerAwareInterface
                 $bankAccount->setMandateStatus(BankAccount::MANDATE_FAILURE);
             } elseif ($status == 2) {
                 $bankAccount->setMandateStatus(BankAccount::MANDATE_PENDING_APPROVAL);
+                $initialPaymentSubmissionDate = new \DateTime();
+                $initialPaymentSubmissionDate = $this->addBusinessDays($initialPaymentSubmissionDate, 2);
+                $bankAccount->setInitialPaymentSubmissionDate($initialPaymentSubmissionDate);
             } elseif ($status == 3) {
                 $bankAccount->setMandateStatus(BankAccount::MANDATE_PENDING_INIT);
             } elseif ($status == 4) {

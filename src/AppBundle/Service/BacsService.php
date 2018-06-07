@@ -826,6 +826,65 @@ class BacsService
     }
 
     /**
+     * Mark file as submitted and update payment data
+     * @param AccessPayFile $file
+     */
+    public function bacsFileSubmitted(AccessPayFile $file)
+    {
+        $file->setStatus(AccessPayFile::STATUS_SUBMITTED);
+        $file->setSubmittedDate(new \DateTime());
+        $paymentRepo = $this->dm->getRepository(BacsPayment::class);
+
+        $payments = $paymentRepo->findBy([
+            'serialNumber' => $file->getSerialNumber(),
+            'status' => BacsPayment::STATUS_GENERATED
+        ]);
+        foreach ($payments as $payment) {
+            /** @var BacsPayment $payment */
+            $payment->setStatus(BacsPayment::STATUS_SUBMITTED);
+            $payment->submit();
+        }
+
+        // TODO: update bacs mandate date if necessary
+
+        $this->dm->flush();
+    }
+
+    /**
+     * Mark file as cancelled
+     * @param AccessPayFile $file
+     */
+    public function bacsFileCancelled(AccessPayFile $file)
+    {
+        $file->setStatus(AccessPayFile::STATUS_CANCELLED);
+        $this->dm->flush();
+    }
+
+    /**
+     * Update payments with new serial number
+     * @param AccessPayFile $file
+     * @param string        $serialNumber
+     */
+    public function bacsFileUpdateSerialNumber(AccessPayFile $file, $serialNumber)
+    {
+        $paymentRepo = $this->dm->getRepository(BacsPayment::class);
+        $payments = $paymentRepo->findBy([
+            'serialNumber' => $file->getSerialNumber(),
+            'status' => BacsPayment::STATUS_GENERATED
+        ]);
+        foreach ($payments as $payment) {
+            /** @var BacsPayment $payment */
+            $payment->setSerialNumber($serialNumber);
+        }
+
+        $file->setSerialNumber($serialNumber);
+        $metadata = $file->getMetadata();
+        $metadata['serial-number'] = $serialNumber;
+        $file->setMetadata($metadata);
+        $this->dm->flush();
+    }
+
+    /**
      * @param \DOMElement $element
      * @param string      $name
      * @param mixed       $missingValue

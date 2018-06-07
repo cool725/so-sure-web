@@ -19,6 +19,7 @@ class BacsPaymentRepository extends PaymentRepository
             ->field('date')->gte($startDay)
             ->field('date')->lt($nextDay)
             ->sort('date', 'desc')
+            ->sort('serialNumber', 'desc')
             ->getQuery()
             ->execute();
     }

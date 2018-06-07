@@ -11,6 +11,7 @@ use AppBundle\Form\Type\BacsMandatesType;
 use AppBundle\Form\Type\BacsUploadFileType;
 use AppBundle\Form\Type\ReconciliationFileType;
 use AppBundle\Form\Type\SequenceType;
+use AppBundle\Repository\BacsPaymentRepository;
 use AppBundle\Repository\File\BarclaysFileRepository;
 use AppBundle\Repository\File\BarclaysStatementFileRepository;
 use AppBundle\Repository\File\JudoFileRepository;
@@ -557,6 +558,7 @@ class AdminController extends BaseController
         /** @var UserRepository $userRepo */
         $userRepo = $dm->getRepository(User::class);
         $s3FileRepo = $dm->getRepository(S3File::class);
+        /** @var BacsPaymentRepository $paymentsRepo */
         $paymentsRepo = $dm->getRepository(BacsPayment::class);
         $sequenceRepo = $dm->getRepository(Sequence::class);
         /** @var Sequence $currentSequence */
@@ -755,6 +757,8 @@ class AdminController extends BaseController
             throw new \InvalidArgumentException('Invalid csrf token');
         }
 
+        /** @var BacsService $bacsService */
+        $bacsService = $this->get('app.bacs');
         $dm = $this->getManager();
         $repo = $dm->getRepository(AccessPayFile::class);
         /** @var AccessPayFile $file */
@@ -762,39 +766,16 @@ class AdminController extends BaseController
         if ($file) {
             $message = 'Unknown';
             if ($request->get('_route') == 'admin_bacs_submit') {
-                $file->setStatus(AccessPayFile::STATUS_SUBMITTED);
-                $file->setSubmittedDate(new \DateTime());
-                $paymentRepo = $dm->getRepository(BacsPayment::class);
-
-                $payments = $paymentRepo->findBy([
-                    'serialNumber' => $file->getSerialNumber(),
-                    'status' => BacsPayment::STATUS_GENERATED
-                ]);
-                foreach ($payments as $payment) {
-                    $payment->setStatus(BacsPayment::STATUS_SUBMITTED);
-                    $payment->submit();
-                }
-
+                $bacsService->bacsFileSubmitted($file);
                 $message = sprintf('Bacs file %s is marked as submitted', $file->getFileName());
             } elseif ($request->get('_route') == 'admin_bacs_cancel') {
-                $file->setStatus(AccessPayFile::STATUS_CANCELLED);
-                $paymentRepo = $dm->getRepository(BacsPayment::class);
-
-                $message = sprintf('Bacs file %s is marked as cancelled', $file->getFileName());
+                $bacsService->bacsFileCancelled($file);
+                $message = sprintf(
+                    'Bacs file %s is marked as cancelled. Remember to update payment serial numbers',
+                    $file->getFileName()
+                );
             } elseif ($request->get('_route') == 'admin_bacs_update_serial_number') {
-                $paymentRepo = $dm->getRepository(BacsPayment::class);
-                $payments = $paymentRepo->findBy([
-                    'serialNumber' => $file->getSerialNumber(),
-                    'status' => BacsPayment::STATUS_GENERATED
-                ]);
-                foreach ($payments as $payment) {
-                    $payment->setSerialNumber($request->get('serialNumber'));
-                }
-
-                $file->setSerialNumber($request->get('serialNumber'));
-                $metadata = $file->getMetadata();
-                $metadata['serial-number'] = $file->getSerialNumber();
-                $file->setMetadata($metadata);
+                $bacsService->bacsFileUpdateSerialNumber($file, $request->get('serialNumber'));
                 $message = sprintf('Bacs file %s serial number updated', $file->getFileName());
             } else {
                 throw new \Exception('Unknown route');

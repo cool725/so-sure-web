@@ -95,7 +95,7 @@ $('#serialNumberModal').on('show.bs.modal', function (event) {
                     { title: 'Monthly Payment', data: 'monthly_day' }
                 ]
             });
-            modal.find('.modal-title').text('Serial Number ' + serial);
+            modal.find('.modal-title').text('Mandates With Serial Number ' + serial);
         }
     });
 });

@@ -5,6 +5,7 @@ namespace AppBundle\Repository;
 use AppBundle\Document\Address;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
+use AppBundle\Document\DateTrait;
 use AppBundle\Document\User;
 use AppBundle\Document\PhoneTrait;
 use Doctrine\ODM\MongoDB\DocumentRepository;
@@ -12,6 +13,7 @@ use AppBundle\Document\JudoPaymentMethod;
 
 class UserRepository extends DocumentRepository
 {
+    use DateTrait;
     use PhoneTrait;
 
     public function findUsersInRole($role)
@@ -145,10 +147,17 @@ class UserRepository extends DocumentRepository
             ->execute();
     }
 
-    public function findPendingMandates()
+    public function findPendingMandates(\DateTime $date = null)
     {
+        if (!$date) {
+            $date = new \DateTime();
+        }
+        $date = $this->endOfDay($date);
+
         $qb = $this->createQueryBuilder()
-            ->field('paymentMethod.bankAccount.mandateStatus')->equals(BankAccount::MANDATE_PENDING_APPROVAL);
+            ->field('paymentMethod.bankAccount.mandateStatus')->equals(BankAccount::MANDATE_PENDING_APPROVAL)
+            ->field('paymentMethod.bankAccount.initialPaymentSubmissionDate')->lt($date)
+        ;
 
         return $qb;
     }
