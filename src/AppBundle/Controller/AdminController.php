@@ -810,10 +810,10 @@ class AdminController extends BaseController
         $payment = $paymentRepo->find($id);
         if ($payment) {
             $message = 'Unknown';
-            if ($request->get('_route') == 'admin_bacs_approve') {
+            if ($request->get('_route') == 'admin_bacs_payment_approve') {
                 $payment->approve();
                 $message = 'Payment is approved';
-            } elseif ($request->get('_route') == 'admin_bacs_reject') {
+            } elseif ($request->get('_route') == 'admin_bacs_payment_reject') {
                 $payment->reject();
                 $message = 'Payment is rejected';
             } elseif ($request->get('_route') == 'admin_bacs_payment_serial') {
