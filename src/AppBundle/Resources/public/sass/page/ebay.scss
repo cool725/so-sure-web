@@ -4,222 +4,8 @@
 @import "../mixins";
 @import "../common/paletteNew";
 
-$protectyourbubble: #383570;
-$loveitcoverit: #CD355E;
-$gadgetcover: #E8C955;
-
 .navbar {
     background-color: $white;
-}
-
-.table {
-
-    &__comparison {
-        max-width: 800px;
-        margin: 25px auto;
-        background-color: $white;
-        box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.1);
-
-        > tbody {
-            > tr {
-                > td {
-                    vertical-align: middle;
-                    border-top: 0;
-                }
-            }
-        }
-
-        thead {
-            > tr {
-                > th {
-                    vertical-align: middle;
-                }
-            }
-            th {
-                text-align: center;
-                padding-top: 25px !important;
-                padding-bottom: 25px !important;
-                border-bottom: 0 !important;
-                position: relative;
-
-                @include breakpoint(tablet){
-                    &:after {
-                        width: 0; height: 0;
-                        content: '';
-                        position: absolute;
-                        z-index: 100;
-                        top: 100%; left: 50%;
-                        margin-left: -10px;
-                        border-left: 10px solid transparent;
-                        border-right: 10px solid transparent;
-                        border-top: 10px solid;
-                    }
-                }
-
-                &:first-of-type {
-                    &:after {
-                        border: none;
-                    }
-                }
-            }
-
-            th.border-left-right {
-                border-left: 2px solid $primary-blue;
-                border-right: 2px solid $primary-blue;
-            }
-            th.border-left-right-bottom {
-                border-left: 2px solid $primary-blue;
-                border-right: 2px solid $primary-blue;
-                border-bottom: 2px solid $primary-blue;
-            }
-
-            .so-sure {
-                background-color: $primary-blue;
-
-                &:after {
-                    border-top: 10px solid $primary-blue;
-                }
-            }
-            .protectyourbubble {
-                background-color: $protectyourbubble;
-
-                &:after {
-                    border-top: 10px solid $protectyourbubble;
-                }
-            }
-            .loveitcoverit {
-                background-color: $lightest-blue;
-
-                &:after {
-                    border-top: 10px solid $lightest-blue;
-                }
-            }
-            .gadgetcover {
-                background-color: $gadgetcover;
-
-                &:after {
-                    border-top: 10px solid $gadgetcover;
-                }
-            }
-        }
-
-        .fa.protectyourbubble {
-            color: $protectyourbubble;
-        }
-        .fa.loveitcoverit {
-            color: $loveitcoverit;
-        }
-        .fa.gadgetcover {
-            color: $gadgetcover;
-        }
-
-        tbody {
-            td {
-                padding-top: 25px !important;
-                padding-bottom: 25px !important;
-            }
-
-            td.border-left-right {
-                border-left: 2px solid $primary-blue;
-                border-right: 2px solid $primary-blue;
-
-                font-weight: bold;
-            }
-            td.border-left-right-bottom {
-                border-left: 2px solid $primary-blue;
-                border-right: 2px solid $primary-blue;
-                border-bottom: 2px solid $primary-blue;
-
-                font-weight: bold;
-            }
-        }
-    }
-}
-
-.comparison {
-
-    &__container {
-        .left {
-            padding-right: 0;
-        }
-
-        .right {
-            padding-left: 0;
-        }
-    }
-
-    &__list {
-        text-align: center;
-        margin: 0 0 25px;
-
-        &_border {
-            border-right: 1px solid $pale-grey;
-        }
-
-        li {
-            vertical-align: middle;
-            padding: 15px;
-            position: relative;
-
-            &:first-of-type {
-                height: 90px;
-                line-height: 55px;
-                // padding: 30px 15px;
-            }
-
-            &:nth-child(even) {
-                background-color: $off-white;
-            }
-
-            .fa {
-                margin-bottom: 5px;
-            }
-        }
-
-        li.so-sure {
-            background-color: $primary-blue;
-        }
-
-        li.protectyourbubble {
-            background-color: $protectyourbubble;
-            color: $white;
-        }
-
-        .fa.protectyourbubble {
-            color: $protectyourbubble;
-        }
-
-        li.loveitcoverit {
-            background-color: $lightest-blue;
-            color: $white;
-        }
-
-        .fa.loveitcoverit {
-            color: $loveitcoverit;
-        }
-
-        li.gadgetcover {
-            background-color: $gadgetcover;
-            color: $white;
-        }
-
-        .fa.gadgetcover {
-            color: $gadgetcover;
-        }
-    }
-}
-
-.comparison__controls {
-    position: absolute;
-    top: 20px;
-
-    &_left {
-        left: 10px;
-    }
-
-    &_right {
-        right: 10px;
-    }
 }
 
 .speech-bubble {
@@ -227,7 +13,6 @@ $gadgetcover: #E8C955;
     position: relative;
     font-size: 18px;
     margin: 50px 0;
-    // @include border-radius(20px);
 
     @include breakpoint(tablet) {
         font-size: 24px;
@@ -246,36 +31,11 @@ $gadgetcover: #E8C955;
         content: open-quote;
         top: -10px; left: 50%;
         margin-left: -20px;
-
-        // @include breakpoint(tablet) {
-        //     top: 10px; left: -35px;
-        //     margin: 0;
-        // }
     }
 
     &:after {
         display: none;
         content: close-quote;
-
-        // @include breakpoint(tablet) {
-        //     display: block;
-        //     bottom: 10px; right: -35pxy
-        // }
-    }
-}
-
-.table-responsive {
-    border: none;
-
-    > .fixed-column {
-        width: auto;
-        position: absolute;
-        display: inline-block;
-        z-index: 10;
-
-        @include breakpoint(tablet) {
-            display: none;
-        }
     }
 }
 
