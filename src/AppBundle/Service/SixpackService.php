@@ -46,17 +46,11 @@ class SixpackService
     const EXPERIMENT_HOMEPAGE_AA_V2 = 'homepage-aa-v2';
     const EXPERIMENT_APP_SHARE_METHOD = 'app-share-method';
     const EXPERIMENT_APP_PICSURE_LOCATION = 'app-picsure-location';
-    const EXPERIMENT_SAVE_QUOTE_24HOURS = 'save-quote-24-hours';
-    // const EXPERIMENT_USER_WELCOME_MODAL = 'welcome-modal';
-    const EXPERIMENT_QUOTE_INTERCOM_PURCHASE = 'quote-intercom-purchase';
-    //const EXPERIMENT_MONEY_UNBOUNCE = 'money-unbounce';
-    //const EXPERIMENT_MOBILE_SEARCH_DROPDOWN = 'mobile-dropdown-search';
     const EXPERIMENT_STEP_3 = 'step-3-payment-new';
     const EXPERIMENT_PURCHASE_FLOW_BACS = 'purchase-flow-bacs';
     const EXPERIMENT_CPC_QUOTE_HOMEPAGE = 'cpc-quote-or-homepage';
     const EXPERIMENT_DOB = 'purchase-funnel-dob-dropdown';
     const EXPERIMENT_72_REPLACEMENT = 'seventytwo-hours';
-    const EXPERIMENT_MONEY_LANDING = 'money-landing';
     const EXPERIMENT_PICSURE_SECTION = 'picsure-redesign';
     const EXPERIMENT_EBAY_LANDING = 'ebay-landing';
     const EXPERIMENT_EBAY_LANDING_1 = 'ebay-landing-1';
@@ -91,14 +85,11 @@ class SixpackService
 
     public static $unauthExperiments = [
         self::EXPERIMENT_HOMEPAGE_AA_V2,
-        self::EXPERIMENT_SAVE_QUOTE_24HOURS,
-        self::EXPERIMENT_QUOTE_INTERCOM_PURCHASE,
         self::EXPERIMENT_STEP_3,
         self::EXPERIMENT_PURCHASE_FLOW_BACS,
         self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
         self::EXPERIMENT_DOB,
         self::EXPERIMENT_72_REPLACEMENT,
-        self::EXPERIMENT_MONEY_LANDING,
         self::EXPERIMENT_PICSURE_SECTION,
         self::EXPERIMENT_EBAY_LANDING,
         self::EXPERIMENT_EBAY_LANDING_1,
@@ -144,7 +135,6 @@ class SixpackService
         self::EXPERIMENT_STEP_3,
         self::EXPERIMENT_PURCHASE_FLOW_BACS,
         self::EXPERIMENT_72_REPLACEMENT,
-        self::EXPERIMENT_MONEY_LANDING,
         self::EXPERIMENT_PICSURE_SECTION,
         self::EXPERIMENT_EBAY_LANDING,
         self::EXPERIMENT_EBAY_LANDING_1,
@@ -165,7 +155,6 @@ class SixpackService
      * @var array
      */
     public static $purchaseConversionKpi = [
-        self::EXPERIMENT_QUOTE_INTERCOM_PURCHASE,
         self::EXPERIMENT_HOMEPAGE_AA_V2,
         self::EXPERIMENT_DOB,
         self::EXPERIMENT_TRUSTPILOT_REVIEW,
