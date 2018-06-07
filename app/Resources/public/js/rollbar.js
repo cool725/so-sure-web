@@ -6,7 +6,6 @@ var _rollbarConfig = {
         environment: document.getElementById('ss-root').getAttribute('data-environment')
     },
     ignoredMessages: [
-        "Can't find Clippy.bmp. The end is nigh.",
         "(unknown)"
     ]
 };
