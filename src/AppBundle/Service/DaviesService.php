@@ -45,6 +45,12 @@ class DaviesService extends S3EmailService
     {
         $this->mailer = $mailer;
     }
+
+    public function setMailerMailer($mailer)
+    {
+        $this->mailer->setMailer($mailer);
+    }
+
     public function setFeature($featureService)
     {
         $this->featureService = $featureService;
@@ -329,6 +335,12 @@ class DaviesService extends S3EmailService
         $this->postValidateClaimDetails($claim, $daviesClaim);
 
         $this->claimsService->processClaim($claim);
+
+        if ($daviesClaim->miStatus === DaviesClaim::MISTATUS_REPUDIATED)
+        {
+            $body = sprintf('Check %s / %s', $claim->getPolicy()->getPolicyNumber(), $claim->getPolicy()->getId());
+            $this->mailer->send('Cancel Policy','support@wearesosure.com', $body);
+        }
 
         return count($errors) == 0;
     }
