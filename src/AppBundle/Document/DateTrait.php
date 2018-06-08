@@ -72,6 +72,9 @@ trait DateTrait
         if ($startMonth == new \DateTime('2018-04-01 00:00:00', new \DateTimeZone(SoSure::TIMEZONE))) {
             $startMonth = new \DateTime('2018-04-01 01:00:00', new \DateTimeZone(SoSure::TIMEZONE));
         }
+        if ($startMonth == new \DateTime('2018-05-01 00:00:00', new \DateTimeZone(SoSure::TIMEZONE))) {
+            $startMonth = new \DateTime('2018-05-01 01:00:00', new \DateTimeZone(SoSure::TIMEZONE));
+        }
 
         return $startMonth;
     }
@@ -110,6 +113,12 @@ trait DateTrait
                 new \DateTimeZone($tz)
             );
         }
+
+        // due to change from UTC to Europe/London reporting in Apr 2018, screwup for May end of month figures
+        if ($nextMonth == new \DateTime('2018-05-01 00:00:00', new \DateTimeZone(SoSure::TIMEZONE))) {
+            $nextMonth = new \DateTime('2018-05-01 01:00:00', new \DateTimeZone(SoSure::TIMEZONE));
+        }
+
         return $nextMonth;
     }
 
