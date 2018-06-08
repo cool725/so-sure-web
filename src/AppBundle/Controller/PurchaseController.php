@@ -936,8 +936,12 @@ class PurchaseController extends BaseController
     private function notifyRemainderRecevied(Policy $policy)
     {
         $this->get('app.stats')->increment(Stats::KPI_CANCELLED_AND_PAYMENT_PAID);
+
+        $lastCredit = $policy->getLastSuccessfulUserPaymentCredit();
+
         $body = sprintf(
-            'Remainder (likely) payment was received. Policy %s (Total payments received £%0.2f of £%0.2f).',
+            'Remainder (likely) payment of amount %0.2f was received . Policy %s (Total payments received £%0.2f of £%0.2f).',
+            $lastCredit->getAmount(),
             $policy->getPolicyNumber(),
             $policy->getPremiumPaid(),
             $policy->getPremium()->getYearlyPremiumPrice()
