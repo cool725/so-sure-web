@@ -368,7 +368,7 @@
                                 <th width="25%">Payment Amount</th>
                                 <th width="25%">Bacs Report Amount</th>
                             </tr>
-                            {% for file in files %}
+                            {% for file in files if file.status != 'cancelled' %}
                                 <tr>
                                     <td width="25%">
                                         {{ file.serialNumber }}
@@ -398,7 +398,7 @@
                                     <td width="25%">
                                         {% set reportAmount = 0 %}
                                         {% for inputFile in input %}
-                                            {%  if inputFile.metadata and inputFile.metadata['serial-number'] == file.serialNumber %}
+                                            {%  if inputFile.metadata and ("S-" ~ inputFile.metadata['serial-number']) == file.serialNumber %}
                                                 {% set reportAmount = reportAmount + inputFile.metadata['debit-accepted-value'] %}
                                             {% endif %}
                                         {% endfor %}
