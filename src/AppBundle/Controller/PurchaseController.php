@@ -939,13 +939,16 @@ class PurchaseController extends BaseController
 
         $lastCredit = $policy->getLastSuccessfulUserPaymentCredit();
 
+        // @codingStandardsIgnoreStart
         $body = sprintf(
-            'Remainder (likely) payment of amount %0.2f was received . Policy %s (Total payments received £%0.2f of £%0.2f).',
+            'Remainder (likely) payment of £%0.2f was received . Policy %s (Total payments received £%0.2f of £%0.2f).',
             $lastCredit->getAmount(),
             $policy->getPolicyNumber(),
             $policy->getPremiumPaid(),
             $policy->getPremium()->getYearlyPremiumPrice()
         );
+        // @codingStandardsIgnoreEnd
+
         $message = \Swift_Message::newInstance()
             ->setSubject('Remainder Payment received')
             ->setFrom('tech@so-sure.com')
