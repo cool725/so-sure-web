@@ -87,6 +87,7 @@
             <li role="presentation" class="active"><a href="#dddc">Debits/Credits <span class="badge" title="Actionable Files">{{ dailyCount }}</span></a></li>
             <li role="presentation"><a href="#payments">Payments <span class="badge" title="Actionable Payments">{{ paymentsCount }}</span></a></li>
             <li role="presentation"><a href="#reports">Bacs Reports</a></li>
+            <li role="presentation"><a href="#reconciliation">Reconciliation</a></li>
         </ul>
         <div class="tab-content">
             <div role="tabpanel" class="tab-pane active" id="dddc">
@@ -97,13 +98,13 @@
                     <table class="table table-striped">
                         <tr>
                             <th width="30%">File name</th>
-                            <th width="50%">Details</th>
-                            <th width="10%">Submitted to BACS</th>
+                            <th width="45%">Details</th>
+                            <th width="15%">Submitted to BACS</th>
                             <th width="10%">Edit</th>
                         </tr>
                         {% for file in files %}
                             <tr>
-                                <td width="40%">
+                                <td width="30%">
                                     {{ file.key }}
                                     <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank"><i class="fa fa-download"></i></a>
                                     <br>
@@ -111,15 +112,17 @@
                                        data-details-url="{{ path('admin_bacs_serial_number_details', {'serial': file.serialNumber} ) }}">
                                         {{ file.serialNumber }}
                                     </a>
+                                    (Generated: {{  file.date|date('d M Y H:i', 'Europe/London')  }})
                                 </td>
-                                <td width="50%">
+                                <td width="45%">
                                     {{ file.metadata|json_encode }}
                                 </td>
-                                <td width="10%">
+                                <td width="15%">
                                     {% if file.isActioned %}
                                         {{ file.status }}
                                         {% if file.status == 'submitted' %}
-                                            <i class="fa fa-check text-success"></i>
+                                            <i class="fa fa-check text-success"></i><br>
+                                            {{  file.submittedDate|date('d M Y H:i', 'Europe/London')  }}
                                         {% elseif file.status == 'cancelled' %}
                                             <i class="fa fa-minus text-danger"></i>
                                         {% endif %}
@@ -351,7 +354,65 @@
                     {% endfor %}
                     </table>
                 {% endif %}
+                </div>
 
+                <div role="tabpanel" class="tab-pane active" id="reconciliation">
+                    <h2>Reconciliation</h2>
+                    {% if files|length == 0 %}
+                        <p>No data present</p>
+                    {% else %}
+                        <table class="table table-striped">
+                            <tr>
+                                <th width="25%">Serial Number</th>
+                                <th width="25%">Debit Amount</th>
+                                <th width="25%">Payment Amount</th>
+                                <th width="25%">Bacs Report Amount</th>
+                            </tr>
+                            {% for file in files %}
+                                <tr>
+                                    <td width="25%">
+                                        {{ file.serialNumber }}
+                                    </td>
+                                    <td width="25%">
+                                        <span title="{{ file.metadata|json_encode }}">
+                                        {% if file.metadata %}
+                                            {{ file.metadata['debit-amount'] }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                        </span>
+                                    </td>
+                                    <td width="25%">
+                                        {% set paymentAmount = 0 %}
+                                        {% for payment in payments if payment.serialNumber %}
+                                            {% if payment.serialNumber == file.serialNumber %}
+                                                {% set paymentAmount = paymentAmount + payment.amount %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if paymentAmount > 0 %}
+                                            {{ paymentAmount|number_format(2, '.', ',') }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td width="25%">
+                                        {% set reportAmount = 0 %}
+                                        {% for inputFile in input %}
+                                            {%  if inputFile.metadata and inputFile.metadata['serial-number'] == file.serialNumber %}
+                                                {% set reportAmount = reportAmount + inputFile.metadata['debit-accepted-value'] %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if reportAmount > 0 %}
+                                            {{ reportAmount }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>

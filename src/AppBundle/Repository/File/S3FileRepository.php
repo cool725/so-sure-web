@@ -24,6 +24,7 @@ class S3FileRepository extends DocumentRepository
         }
 
         return $qb
+            ->sort('date', 'desc')
             ->getQuery()
             ->execute();
     }
