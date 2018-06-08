@@ -2,6 +2,7 @@
 
 namespace AppBundle\Tests\Document;
 
+use AppBundle\Classes\SoSure;
 use AppBundle\Document\DateTrait;
 
 /**
@@ -35,6 +36,42 @@ class DateTraitTest extends \PHPUnit\Framework\TestCase
         );
     }
 
+    public function testStartOfMonthTimezone()
+    {
+        // what we expect
+        // UTC times
+        // 1/3 00:00 - 31/3 23:59
+        // 1/4 00:00 - 30/4 23:59
+        // 1/5 00:00 - 31/5 22:59
+        // 31/5 23:00 - 30/6 22:59
+
+        // Europe/London times
+        // 1/3 00:00 - 1/4 00:59 (timechange)
+        // 1/4 01:00 - 1/5 00:59
+        // 1/5 01:00 - 31/5 23:59
+        // 1/6 00:00 - 30/6 23:59
+
+        $this->assertEquals(
+            new \DateTime('2018-03-01 00:00'),
+            $this->startOfMonth(new \DateTime('2018-03-12 15:00'))
+        );
+
+        $this->assertEquals(
+            new \DateTime('2018-04-01 01:00', new \DateTimeZone(SoSure::TIMEZONE)),
+            $this->startOfMonth(new \DateTime('2018-04-12 15:00'))
+        );
+
+        $this->assertEquals(
+            new \DateTime('2018-05-01 01:00', new \DateTimeZone(SoSure::TIMEZONE)),
+            $this->startOfMonth(new \DateTime('2018-05-12 15:00'))
+        );
+
+        $this->assertEquals(
+            new \DateTime('2018-06-01 00:00', new \DateTimeZone(SoSure::TIMEZONE)),
+            $this->startOfMonth(new \DateTime('2018-06-12 15:00'))
+        );
+    }
+
     public function testEndOfMonth()
     {
         $this->assertEquals(
@@ -50,6 +87,49 @@ class DateTraitTest extends \PHPUnit\Framework\TestCase
             $this->endOfMonth(new \DateTime('2016-12-12 15:00'))
         );
     }
+
+
+    public function testEndOfMonthTimezone()
+    {
+        // what we expect
+        // UTC times
+        // 1/3 00:00 - 31/3 23:59
+        // 1/4 00:00 - 30/4 23:59
+        // 1/5 00:00 - 31/5 22:59
+        // 31/5 23:00 - 30/6 22:59
+
+        // Europe/London times
+        // 1/3 00:00 - 1/4 00:59 (timechange)
+        // 1/4 01:00 - 1/5 00:59
+        // 1/5 01:00 - 31/5 23:59
+        // 1/6 00:00 - 30/6 23:59
+
+        $this->assertEquals(
+            new \DateTime('2018-03-01 00:00'),
+            $this->endOfMonth(new \DateTime('2018-02-12 15:00'))
+        );
+
+        $this->assertEquals(
+            new \DateTime('2018-04-01 00:00'),
+            $this->endOfMonth(new \DateTime('2018-03-12 15:00'))
+        );
+
+        $this->assertEquals(
+            new \DateTime('2018-05-01 01:00', new \DateTimeZone(SoSure::TIMEZONE)),
+            $this->endOfMonth(new \DateTime('2018-04-12 15:00'))
+        );
+
+        $this->assertEquals(
+            new \DateTime('2018-06-01 00:00', new \DateTimeZone(SoSure::TIMEZONE)),
+            $this->endOfMonth(new \DateTime('2018-05-12 15:00'))
+        );
+
+        $this->assertEquals(
+            new \DateTime('2018-07-01 00:00', new \DateTimeZone(SoSure::TIMEZONE)),
+            $this->endOfMonth(new \DateTime('2018-06-12 15:00'))
+        );
+    }
+
 
     public function testStartOfDay()
     {
@@ -175,6 +255,5 @@ class DateTraitTest extends \PHPUnit\Framework\TestCase
             new \DateTime('2018-03-29 00:00'),
             $this->getNextBusinessDay(new \DateTime('2018-03-22 00:00'), $now)
         );
-
     }
 }
