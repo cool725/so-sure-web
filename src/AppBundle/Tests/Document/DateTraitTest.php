@@ -41,14 +41,14 @@ class DateTraitTest extends \PHPUnit\Framework\TestCase
         // what we expect
         // UTC times
         // 1/3 00:00 - 31/3 23:59
-        // 1/4 00:00 - 30/4 23:59
-        // 1/5 00:00 - 31/5 22:59
+        // 1/4 00:00 - 30/4 22:59
+        // 30/4 23:00 - 31/5 22:59
         // 31/5 23:00 - 30/6 22:59
 
         // Europe/London times
         // 1/3 00:00 - 1/4 00:59 (timechange)
         // 1/4 01:00 - 1/5 00:59
-        // 1/5 01:00 - 31/5 23:59
+        // 1/5 00:00 - 31/5 23:59
         // 1/6 00:00 - 30/6 23:59
 
         $this->assertEquals(
@@ -62,7 +62,7 @@ class DateTraitTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->assertEquals(
-            new \DateTime('2018-05-01 01:00', new \DateTimeZone(SoSure::TIMEZONE)),
+            new \DateTime('2018-05-01 00:00', new \DateTimeZone(SoSure::TIMEZONE)),
             $this->startOfMonth(new \DateTime('2018-05-12 15:00'))
         );
 
@@ -94,14 +94,14 @@ class DateTraitTest extends \PHPUnit\Framework\TestCase
         // what we expect
         // UTC times
         // 1/3 00:00 - 31/3 23:59
-        // 1/4 00:00 - 30/4 23:59
-        // 1/5 00:00 - 31/5 22:59
+        // 1/4 00:00 - 30/4 22:59
+        // 30/4 23:00 - 31/5 22:59
         // 31/5 23:00 - 30/6 22:59
 
         // Europe/London times
         // 1/3 00:00 - 1/4 00:59 (timechange)
-        // 1/4 01:00 - 1/5 00:59
-        // 1/5 01:00 - 31/5 23:59
+        // 1/4 01:00 - 30/4 23:59
+        // 1/5 00:00 - 31/5 23:59
         // 1/6 00:00 - 30/6 23:59
 
         $this->assertEquals(
@@ -115,7 +115,7 @@ class DateTraitTest extends \PHPUnit\Framework\TestCase
         );
 
         $this->assertEquals(
-            new \DateTime('2018-05-01 01:00', new \DateTimeZone(SoSure::TIMEZONE)),
+            new \DateTime('2018-05-01 00:00', new \DateTimeZone(SoSure::TIMEZONE)),
             $this->endOfMonth(new \DateTime('2018-04-12 15:00'))
         );
 
