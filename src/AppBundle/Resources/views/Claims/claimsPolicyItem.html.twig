@@ -474,7 +474,7 @@
                                     data-toggle="modal" data-target="#notesModal"
                                 data-update="{{ path('claims_notes', {'id': claim.id}) }}"
                                 data-notes="{{ claim.notes }}"><i class="fa fa-edit"></i></button>
-                              {% if is_granted('ROLE_ADMIN') %}
+                              {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
                             <button title="Flags" type="button" class="btn btn-primary"
                                     data-toggle="modal" data-target="#flagsModal"
                                     data-flags="{{ claim.ignoreWarningFlags|json_encode }}"
@@ -897,6 +897,8 @@
                         {% endif %}
                     </td>
                 </tr>
+                {% endif %}
+                {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
                 <tr>
                     <td><i class="fa fa-lock" title="Admin only"></i> Pay Policy</td>
                     <td>
