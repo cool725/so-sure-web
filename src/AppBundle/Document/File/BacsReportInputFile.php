@@ -25,7 +25,7 @@ class BacsReportInputFile extends UploadFile
      */
     protected $file;
 
-   /**
+    /**
      * @return string
      */
     public function getS3FileName()
@@ -38,5 +38,14 @@ class BacsReportInputFile extends UploadFile
             $this->getDate()->format('m'),
             $now->format('U')
         );
+    }
+
+    public function getFormattedSerialNumber()
+    {
+        if ($this->getMetadata() && isset($this->getMetadata()['serial-number'])) {
+            return AccessPayFile::formatSerialNumber($this->getMetadata()['serial-number']);
+        }
+
+        return null;
     }
 }

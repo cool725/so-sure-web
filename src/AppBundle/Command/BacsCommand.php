@@ -138,7 +138,7 @@ class BacsCommand extends BaseCommand
         /** @var SequenceService $sequenceService */
         $sequenceService = $this->getContainer()->get('app.sequence');
         $serialNumber = $sequenceService->getSequenceId(SequenceService::SEQUENCE_BACS_SERIAL_NUMBER);
-        $serialNumber = sprintf("S-%06d", $serialNumber);
+        $serialNumber = AccessPayFile::formatSerialNumber($serialNumber);
         $output->writeln(sprintf('Using serial number %s', $serialNumber));
 
         $data = [
@@ -211,7 +211,7 @@ class BacsCommand extends BaseCommand
         /** @var SequenceService $sequenceService */
         $sequenceService = $this->getContainer()->get('app.sequence');
         $serialNumber = $sequenceService->getSequenceId(SequenceService::SEQUENCE_BACS_SERIAL_NUMBER);
-        $serialNumber = sprintf("S-%06d", $serialNumber);
+        $serialNumber = AccessPayFile::formatSerialNumber($serialNumber);
         $output->writeln(sprintf('Using serial number %s', $serialNumber));
 
         $data = [

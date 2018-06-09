@@ -202,20 +202,39 @@ class BacsService
         return $files;
     }
 
+    private function getAccessPayFileDate($serialNumber)
+    {
+        $repo = $this->dm->getRepository(AccessPayFile::class);
+        /** @var AccessPayFile $file */
+        $file = $repo->findOneBy(['serialNumber' => $serialNumber]);
+        if ($file && $file->getDate()) {
+            return clone $file->getDate();
+        }
+
+        return null;
+    }
+
     public function processUpload(UploadedFile $file)
     {
         $tmpFile = $file->move(sys_get_temp_dir());
         $uploadFile = null;
         $metadata = null;
+        $date = null;
         if (mb_stripos($file->getClientOriginalName(), "ADDACS") !== false) {
             $metadata = $this->addacs($tmpFile);
             $uploadFile = new BacsReportAddacsFile();
         } elseif (mb_stripos($file->getClientOriginalName(), "AUDDIS") !== false) {
             $metadata = $this->auddis($tmpFile);
             $uploadFile = new BacsReportAuddisFile();
+            if (isset($metadata['serial-number'])) {
+                $date = $this->getAccessPayFileDate(AccessPayFile::formatSerialNumber($metadata['serial-number']));
+            }
         } elseif (mb_stripos($file->getClientOriginalName(), "INPUT") !== false) {
             $metadata = $this->input($tmpFile);
             $uploadFile = new BacsReportInputFile();
+            if (isset($metadata['serial-number'])) {
+                $date = $this->getAccessPayFileDate(AccessPayFile::formatSerialNumber($metadata['serial-number']));
+            }
         } elseif (mb_stripos($file->getClientOriginalName(), "ARUDD") !== false) {
             $metadata = $this->arudd($tmpFile);
             $uploadFile = new BacsReportAruddFile();
@@ -229,7 +248,7 @@ class BacsService
         }
 
         if ($uploadFile) {
-            $this->uploadS3($tmpFile, $file->getClientOriginalName(), $uploadFile, null, $metadata);
+            $this->uploadS3($tmpFile, $file->getClientOriginalName(), $uploadFile, $date, $metadata);
         }
 
         return true;
@@ -297,7 +316,7 @@ class BacsService
         }
 
         $serialNumber = $this->sequenceService->getSequenceId(SequenceService::SEQUENCE_BACS_SERIAL_NUMBER);
-        $serialNumber = sprintf("S-%06d", $serialNumber);
+        $serialNumber = AccessPayFile::formatSerialNumber($serialNumber);
         $metadata['serial-number'] = $serialNumber;
 
         $uploadFile = new AccessPayFile();

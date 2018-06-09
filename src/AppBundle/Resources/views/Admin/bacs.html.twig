@@ -383,7 +383,7 @@
 
                                 {% set reportAmount = 0 %}
                                 {% for inputFile in input %}
-                                    {%  if inputFile.metadata and ("S-" ~ inputFile.metadata['serial-number']) == file.serialNumber %}
+                                    {%  if inputFile.metadata and inputFile.getFormattedSerialNumber == file.serialNumber %}
                                         {% set reportAmount = reportAmount + inputFile.metadata['debit-accepted-value'] %}
                                     {% endif %}
                                 {% endfor %}
