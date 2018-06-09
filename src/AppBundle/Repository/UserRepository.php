@@ -35,7 +35,7 @@ class UserRepository extends DocumentRepository
             ->execute();
     }
 
-    public function existsUser($email, $facebookId = null, $mobileNumber = null)
+    public function existsUser($email, $facebookId = null, $mobileNumber = null, $googleId = null)
     {
         $qb = $this->createQueryBuilder();
         $qb->addOr($qb->expr()->field('emailCanonical')->equals(mb_strtolower($email)));
@@ -45,6 +45,9 @@ class UserRepository extends DocumentRepository
         if ($mobileNumber) {
             $qb->addOr($qb->expr()->field('mobileNumber')->equals($this->normalizeUkMobile($mobileNumber)));
         }
+        if ($googleId) {
+            $qb->addOr($qb->expr()->field('googleId')->equals(trim($googleId)));
+        }
 
         return $qb
                 ->getQuery()
@@ -52,8 +55,13 @@ class UserRepository extends DocumentRepository
                 ->count() > 0;
     }
 
-    public function getDuplicateUsers(User $user = null, $email = null, $facebookId = null, $mobileNumber = null)
-    {
+    public function getDuplicateUsers(
+        User $user = null,
+        $email = null,
+        $facebookId = null,
+        $mobileNumber = null,
+        $googleId = null
+    ) {
         // If there's nothing to query, then another user doesn't exist
         if (!$email && !$facebookId && !$mobileNumber) {
             return null;
@@ -73,15 +81,23 @@ class UserRepository extends DocumentRepository
         if ($mobileNumber) {
             $qb->addOr($qb->expr()->field('mobileNumber')->equals($this->normalizeUkMobile($mobileNumber)));
         }
+        if ($googleId) {
+            $qb->addOr($qb->expr()->field('googleId')->equals(trim($googleId)));
+        }
 
         return $qb
             ->getQuery()
             ->execute();
     }
 
-    public function existsAnotherUser(User $user = null, $email = null, $facebookId = null, $mobileNumber = null)
-    {
-        if ($duplicate = $this->getDuplicateUsers($user, $email, $facebookId, $mobileNumber)) {
+    public function existsAnotherUser(
+        User $user = null,
+        $email = null,
+        $facebookId = null,
+        $mobileNumber = null,
+        $googleId = null
+    ) {
+        if ($duplicate = $this->getDuplicateUsers($user, $email, $facebookId, $mobileNumber, $googleId)) {
             return $duplicate->count() > 0;
         }
 

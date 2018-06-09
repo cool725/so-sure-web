@@ -51,6 +51,9 @@ parameters:
     google_apikey:
     google_analytics:
     ga_tag_manager_env: '&gtm_auth=&gtm_preview=env-4&gtm_cookies_win=x'
+    google_clientauth_id: 'changeme'
+    google_clientauth_secret: 'changeme'
+    google_clientid: 'changeme'
 
     rollbar_access_token:
     rollbar_client_access_token:

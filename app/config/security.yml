@@ -49,6 +49,7 @@ security:
             oauth:
                 resource_owners:
                     facebook:           "/login/check-facebook"
+                    google:             "/login/check-google"
                     starling:           "/login/check-starling"
                     accountkit:         "/login/check-accountkit"
                 login_path:        /login

@@ -81,6 +81,10 @@
 	@include btn($facebook, $white, $white);
 }
 
+.btn-google {
+	@include btn($google, $white, $white);
+}
+
 .btn-starling {
 	@include btn($starling, $white, $white);
 }
@@ -179,6 +183,25 @@
 	cursor: not-allowed !important;
 }
 
-// .btn-30 + .btn-30 {
-// 	margin-bottom: 15px;
-// }
+
+// Custom Buttons
+.btn-google-login {
+    width: 191px; height: 46px;
+    display: inline-block;
+    background-image: url('#{$cdn_url}/images/login/google_sign_in_sprite.svg');
+    background-repeat: no-repeat;
+    // background-size: 196px;
+
+    &:hover,
+    &:focus {
+        background-position: -191px 0px;
+    }
+
+    &:active {
+        background-position: -382px 0px;
+    }
+
+    &:disabled {
+        background-position: -573px 0px;
+    }
+}
