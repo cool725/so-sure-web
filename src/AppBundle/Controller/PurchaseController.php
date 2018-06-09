@@ -937,12 +937,13 @@ class PurchaseController extends BaseController
     {
         $this->get('app.stats')->increment(Stats::KPI_CANCELLED_AND_PAYMENT_PAID);
 
+        /** @var Payment $lastCredit */
         $lastCredit = $policy->getLastSuccessfulUserPaymentCredit();
 
         // @codingStandardsIgnoreStart
         $body = sprintf(
             'Remainder (likely) payment of £%0.2f was received . Policy %s (Total payments received £%0.2f of £%0.2f).',
-            $lastCredit->getAmount(),
+            $lastCredit ? $lastCredit->getAmount() : 0,
             $policy->getPolicyNumber(),
             $policy->getPremiumPaid(),
             $policy->getPremium()->getYearlyPremiumPrice()
