@@ -76,14 +76,14 @@ class MarketingController extends BaseController
             SixpackService::LOG_MIXPANEL_CONVERSION,
             null,
             1,
-            'next-day'
+            'next-working-day'
         );
 
         return new RedirectResponse($this->generateUrl('homepage'));
     }
 
     /**
-     * @Route("/replacement-72", name="replacement_24_landing")
+     * @Route("/replacement-72", name="replacement_72_landing")
      */
     public function replacement72Action(Request $request)
     {
@@ -94,7 +94,7 @@ class MarketingController extends BaseController
             SixpackService::LOG_MIXPANEL_CONVERSION,
             null,
             1,
-            'seventy-two-hours'
+            'seventytwo-hours'
         );
 
         return new RedirectResponse($this->generateUrl('homepage'));
