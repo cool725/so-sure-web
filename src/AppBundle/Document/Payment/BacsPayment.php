@@ -145,6 +145,7 @@ class BacsPayment extends Payment
         if (!$date) {
             $date = new \DateTime();
         }
+        $this->setDate($date);
         $this->setSubmittedDate($date);
         $this->setBacsCreditDate($this->addBusinessDays($date, self::DAYS_CREDIT));
         $this->setBacsReversedDate($this->addBusinessDays($date, self::DAYS_REVERSE));

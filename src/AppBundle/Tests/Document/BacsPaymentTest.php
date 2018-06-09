@@ -35,6 +35,7 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
     {
         $bacs = new BacsPayment();
         $bacs->submit(new \DateTime('2018-01-01'));
+        $this->assertEquals(new \DateTime('2018-01-01'), $bacs->getDate());
         $this->assertEquals(new \DateTime('2018-01-01'), $bacs->getSubmittedDate());
         $this->assertEquals(new \DateTime('2018-01-03'), $bacs->getBacsCreditDate());
         $this->assertEquals(new \DateTime('2018-01-08'), $bacs->getBacsReversedDate());
