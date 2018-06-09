@@ -94,8 +94,11 @@ class DefaultController extends BaseController
 
         $replacement = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_72_REPLACEMENT,
-            ['next-working-day', 'seventytwo-hours']
+            SixpackService::EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT,
+            ['default', 'next-working-day', 'seventytwo-hours'],
+            SixpackService::LOG_MIXPANEL_CONVERSION,
+            null,
+            0.000000001
         );
 
         $picsure = $this->sixpack(

@@ -63,4 +63,40 @@ class MarketingController extends BaseController
 
         return $this->render('AppBundle:Default:indexV2.html.twig', $data);
     }
+
+    /**
+     * @Route("/replacement-24", name="replacement_24_landing")
+     */
+    public function replacement24Action(Request $request)
+    {
+        $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT,
+            ['default', 'next-working-day', 'seventytwo-hours'],
+            SixpackService::LOG_MIXPANEL_CONVERSION,
+            null,
+            1,
+            'next-day'
+        );
+
+        return new RedirectResponse($this->generateUrl('homepage'));
+    }
+
+    /**
+     * @Route("/replacement-72", name="replacement_24_landing")
+     */
+    public function replacement72Action(Request $request)
+    {
+        $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT,
+            ['default', 'next-working-day', 'seventytwo-hours'],
+            SixpackService::LOG_MIXPANEL_CONVERSION,
+            null,
+            1,
+            'seventy-two-hours'
+        );
+
+        return new RedirectResponse($this->generateUrl('homepage'));
+    }
 }

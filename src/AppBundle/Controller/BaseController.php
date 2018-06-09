@@ -996,9 +996,17 @@ abstract class BaseController extends Controller
         $options,
         $logMixpanel = SixpackService::LOG_MIXPANEL_CONVERSION,
         $clientId = null,
-        $trafficFraction = 1
+        $trafficFraction = 1,
+        $force = null
     ) {
-        $exp = $this->get('app.sixpack')->participate($name, $options, $logMixpanel, $trafficFraction, $clientId);
+        $exp = $this->get('app.sixpack')->participate(
+            $name,
+            $options,
+            $logMixpanel,
+            $trafficFraction,
+            $clientId,
+            $force
+        );
         if ($request->get('force')) {
             $exp = $request->get('force');
         }
