@@ -401,9 +401,7 @@ class DefaultController extends BaseController
     public function loginRedirectAction()
     {
         if ($this->getUser()) {
-            if ($this->isGranted('ROLE_ADMIN')) {
-                return $this->redirectToRoute('admin_home');
-            } elseif ($this->isGranted('ROLE_EMPLOYEE')) {
+            if ($this->isGranted(User::ROLE_EMPLOYEE)) {
                 return $this->redirectToRoute('admin_home');
             } elseif ($this->isGranted('ROLE_CLAIMS')) {
                 return $this->redirectToRoute('claims_policies');

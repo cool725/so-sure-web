@@ -7,8 +7,9 @@ security:
 
     # WARNING! see AppBundle\Document\User::has*Role() and maintain parity
     role_hierarchy:
-        ROLE_EMPLOYEE:    ROLE_USER,ROLE_CLAIMS
-        ROLE_ADMIN:       ROLE_USER,ROLE_CLAIMS,ROLE_EMPLOYEE
+        ROLE_EMPLOYEE:           ROLE_USER,ROLE_CLAIMS
+        ROLE_CUSTOMER_SERVICES:  ROLE_USER,ROLE_CLAIMS,ROLE_EMPLOYEE
+        ROLE_ADMIN:              ROLE_USER,ROLE_CLAIMS,ROLE_EMPLOYEE,ROLE_CUSTOMER_SERVICES
 
     access_decision_manager:
         strategy: unanimous
@@ -64,7 +65,7 @@ security:
                 secret:   '%secret%'
                 lifetime: 43200 # 12 hours in seconds
                 path:     /
-            switch_user: { role: ROLE_ADMIN, parameter: _impersonate }
+            switch_user: { role: ROLE_CUSTOMER_SERVICES, parameter: _impersonate }
 
     access_control:
         - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }

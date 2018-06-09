@@ -43,6 +43,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     const ROLE_CLAIMS = 'ROLE_CLAIMS';
     const ROLE_EMPLOYEE = 'ROLE_EMPLOYEE';
+    const ROLE_CUSTOMER_SERVICES = 'ROLE_CUSTOMER_SERVICES';
     const ROLE_ADMIN = 'ROLE_ADMIN';
 
     /**
@@ -742,7 +743,9 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     public function hasEmployeeRole()
     {
-        return $this->hasRole(self::ROLE_EMPLOYEE) || $this->hasRole(self::ROLE_ADMIN);
+        return $this->hasRole(self::ROLE_EMPLOYEE) ||
+            $this->hasRole(self::ROLE_ADMIN) ||
+            $this->hasRole(self::ROLE_CUSTOMER_SERVICES);
     }
 
     public function hasClaimsRole()

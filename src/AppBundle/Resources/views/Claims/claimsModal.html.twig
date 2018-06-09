@@ -28,7 +28,7 @@
                                   <option value="{{ type }}">{{ type }}</option>
                               {% endfor %}
                           </select>
-                          {% if is_granted('ROLE_ADMIN') %}
+                          {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
                           <label>(change)</label>
                           <input type="checkbox" id="change-claim-type" name="change-claim-type"></td>
                           {% endif %}
@@ -83,7 +83,7 @@
                                     <option value="{{ phone.id }}">{{ phone }}</option>
                                 {% endfor %}
                             </select>
-                            {% if is_granted('ROLE_ADMIN') %}
+                            {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
                             <label>(change)</label>
                             <input type="checkbox" name='update-replacement-phone' id="update-replacement-phone"/>
                             {% endif %}
@@ -114,7 +114,7 @@
                     </td>
                         <td>
                             <input type="text" name="approved-date" readonly="readonly" id="claims-detail-approved"/>
-                            {% if is_granted('ROLE_ADMIN') %}
+                            {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
                             <label>(change)</label>
                             <input type="checkbox" id="change-approved-date" name="change-approved-date">
                             {% endif %}
@@ -163,7 +163,7 @@
                     <td>Incurred</td>
                     <td id='claims-detail-incurred'></td>
                 </tr>
-                {% if is_granted('ROLE_ADMIN') %}
+                {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
                 <tr id="update-button-row">
                     <td>
                         <button id="delete-button" id="delete-claim"  type="button" class="btn btn-danger">Delete Claim</button>
@@ -178,7 +178,7 @@
           <div class="modal-footer">
               <button type="button" class="btn-xs btn-black-hollow" data-dismiss="modal">Close</button>
         </form>
-            {% if is_granted('ROLE_ADMIN') %}
+            {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
             <form id="delete-claim-form" method="POST" action="{{ path('admin_claims_delete_claim') }}">
                 <input type="hidden" name="id" id="claims-detail-delete-id"></input>
                 <input type="hidden" name="token" value="{{  csrf_token('default') }}"></input>

@@ -2,6 +2,7 @@
 
 namespace AppBundle\Form\Type;
 
+use AppBundle\Document\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -21,9 +22,12 @@ class UserRoleType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('roles', ChoiceType::class, array(
-            'choices'   => array('ROLE_ADMIN' => 'ROLE_ADMIN',
-                                 'ROLE_CLAIM' => 'ROLE_CLAIM',
-                                 'ROLE_EMPLOYEE' => 'ROLE_EMPLOYEE'),
+            'choices'   => [
+                User::ROLE_CLAIMS => User::ROLE_CLAIMS,
+                User::ROLE_EMPLOYEE => User::ROLE_EMPLOYEE,
+                User::ROLE_CUSTOMER_SERVICES => User::ROLE_CUSTOMER_SERVICES,
+                User::ROLE_ADMIN => User::ROLE_ADMIN,
+            ],
             'required'  => true,
             'multiple'  => true
         ))
