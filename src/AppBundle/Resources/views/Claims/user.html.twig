@@ -39,7 +39,7 @@
                 <tr>
                     <td>Name</td>
                     <td>{{ user.name }}
-                        {% if is_granted('ROLE_ADMIN') %}
+                        {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
                             <a href="{{ path('user_home', {'id': user.id, '_impersonate': user.username}) }}">Login as user</a>
                         {% endif %}
                     </td>
