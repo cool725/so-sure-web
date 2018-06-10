@@ -1250,7 +1250,7 @@ class BacsService
                     $this->logger->warning($msg);
                 }
 
-                $rescheduled = $scheduledPayment-reschedule($scheduledDate);
+                $rescheduled = $scheduledPayment->reschedule($scheduledDate);
                 $scheduledPayment->getPolicy()->addScheduledPayment($rescheduled);
                 $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
@@ -1264,7 +1264,7 @@ class BacsService
                 );
                 $this->logger->error($msg);
 
-                $rescheduled = $scheduledPayment-reschedule($scheduledDate);
+                $rescheduled = $scheduledPayment->reschedule($scheduledDate);
                 $scheduledPayment->getPolicy()->addScheduledPayment($rescheduled);
                 $this->dm->flush(null, array('w' => 'majority', 'j' => true));
 
