@@ -469,8 +469,11 @@ class AdminController extends BaseController
         $uploadForm = $this->get('form.factory')
             ->createNamedBuilder('upload', BacsUploadFileType::class)
             ->getForm();
-        $uploadSubmissionForm = $this->get('form.factory')
-            ->createNamedBuilder('uploadSubmission', BacsUploadFileType::class)
+        $uploadDebitForm = $this->get('form.factory')
+            ->createNamedBuilder('uploadDebit', BacsUploadFileType::class)
+            ->getForm();
+        $uploadCreditForm = $this->get('form.factory')
+            ->createNamedBuilder('uploadCredit', BacsUploadFileType::class)
             ->getForm();
         $mandatesForm = $this->get('form.factory')
             ->createNamedBuilder('mandates', BacsMandatesType::class)
@@ -502,14 +505,35 @@ class AdminController extends BaseController
                         'month' => $month
                     ]));
                 }
-            } elseif ($request->request->has('uploadSubmission')) {
-                $uploadSubmissionForm->handleRequest($request);
-                if ($uploadSubmissionForm->isSubmitted() && $uploadSubmissionForm->isValid()) {
-                    $file = $uploadSubmissionForm->getData()['file'];
+            } elseif ($request->request->has('uploadDebit')) {
+                $uploadDebitForm->handleRequest($request);
+                if ($uploadDebitForm->isSubmitted() && $uploadDebitForm->isValid()) {
+                    $file = $uploadDebitForm->getData()['file'];
                     if ($bacs->processSubmissionUpload($file)) {
                         $this->addFlash(
                             'success',
-                            'Successfully uploaded & submitted bacs submission file'
+                            'Successfully uploaded & submitted bacs debit file'
+                        );
+                    } else {
+                        $this->addFlash(
+                            'error',
+                            'Unable to process file - see rollbar error message'
+                        );
+                    }
+
+                    return new RedirectResponse($this->generateUrl('admin_bacs_date', [
+                        'year' => $year,
+                        'month' => $month
+                    ]));
+                }
+            } elseif ($request->request->has('uploadCredit')) {
+                $uploadCreditForm->handleRequest($request);
+                if ($uploadCreditForm->isSubmitted() && $uploadCreditForm->isValid()) {
+                    $file = $uploadCreditForm->getData()['file'];
+                    if ($bacs->processSubmissionUpload($file, false)) {
+                        $this->addFlash(
+                            'success',
+                            'Successfully uploaded & submitted bacs credit file'
                         );
                     } else {
                         $this->addFlash(
@@ -579,7 +603,8 @@ class AdminController extends BaseController
             'input' => $s3FileRepo->getAllFiles($date, 'bacsReportInput'),
             'payments' => $paymentsRepo->findPayments($date),
             'uploadForm' => $uploadForm->createView(),
-            'uploadSubmissionForm' => $uploadSubmissionForm->createView(),
+            'uploadDebitForm' => $uploadDebitForm->createView(),
+            'uploadCreditForm' => $uploadCreditForm->createView(),
             'mandatesForm' => $mandatesForm->createView(),
             'sequenceForm' => $sequenceForm->createView(),
             'currentSequence' => $currentSequence,
