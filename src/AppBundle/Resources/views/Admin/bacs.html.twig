@@ -24,8 +24,8 @@
 <div class="container" style="margin-bottom: 50px">
 
     <div class="row">
-        <div class="col-md-5">
-            <h1>so-sure Bacs for {{ month }} / {{ year }}</h1>
+        <div class="col-md-4">
+            <h1>so-sure Bacs <br> {{ month }} / {{ year }}</h1>
         </div>
         <form class="month-form form-inline" method="POST" autocomplete="off">
             <div class="col-md-3">
@@ -43,7 +43,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-5">
                 <div class="form-group" style="padding-top: 15px;">
                     <div class="btn-group">
                         <button type="button" class="btn btn-info" data-toggle="modal" data-target="#uploadModal"
@@ -55,16 +55,18 @@
                     > Approve Mandates <span class="badge" title="Actionable Mandates">{{ outstandingMandates }}</span></button>
                 </div>
                 <div class="form-group" style="padding-top: 15px;">
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#uploadSubmissionModal"
-                        > Upload Bacs File</button>
-                    </div>
-                </div>
-                <div class="form-group" style="padding-top: 15px;">
                     <button class="btn btn-success bacs-serial-edit" type="button"
                             data-toggle="modal" data-target="#editSequenceSerialNumberModal">
                         <span title="Current Sequence File">{{ currentSequence.seq }}</span> <i class="fa fa-edit"></i>
                     </button>
+                </div>
+                <div class="form-group" style="padding-top: 15px;">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#uploadDebitModal"
+                        > Upload Bacs Debit</button>
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#uploadCreditModal"
+                        > Upload Bacs Credit</button>
+                    </div>
                 </div>
             </div>
         </form>
@@ -462,24 +464,47 @@
         </div>
     </div>
 
-    <div class="modal fade" id="uploadSubmissionModal" tabindex="-1" role="dialog">
+    <div class="modal fade" id="uploadDebitModal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Bacs Submission File Upload</h4>
+                    <h4 class="modal-title">Bacs Debit (Payments from Customers) File Upload</h4>
                 </div>
                 <div class="modal-body">
-                    {{ form_start(uploadSubmissionForm) }}
+                    {{ form_start(uploadDebitForm) }}
                     <div class="form-group">
-                        {{ form_label(uploadSubmissionForm.file, 'File') }}
-                        {{ form_errors(uploadSubmissionForm.file) }}
-                        {{ form_widget(uploadSubmissionForm.file) }}
+                        {{ form_label(uploadDebitForm.file, 'File') }}
+                        {{ form_errors(uploadDebitForm.file) }}
+                        {{ form_widget(uploadDebitForm.file) }}
                     </div>
                     <div class="form-group">
-                        {{ form_widget(uploadSubmissionForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-danger'}}) }}
+                        {{ form_widget(uploadDebitForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-danger'}}) }}
                     </div>
-                    {{ form_end(uploadSubmissionForm) }}
+                    {{ form_end(uploadDebitForm) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="uploadCreditModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Bacs Credit (Refunds to Customers) File Upload</h4>
+                </div>
+                <div class="modal-body">
+                    {{ form_start(uploadCreditForm) }}
+                    <div class="form-group">
+                        {{ form_label(uploadCreditForm.file, 'File') }}
+                        {{ form_errors(uploadCreditForm.file) }}
+                        {{ form_widget(uploadCreditForm.file) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_widget(uploadCreditForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-danger'}}) }}
+                    </div>
+                    {{ form_end(uploadCreditForm) }}
                 </div>
             </div>
         </div>
