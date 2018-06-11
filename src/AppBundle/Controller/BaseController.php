@@ -1007,8 +1007,9 @@ abstract class BaseController extends Controller
             $clientId,
             $force
         );
-        if ($request->get('force')) {
-            $exp = $request->get('force');
+        $override = $request->get('force');
+        if ($override && in_array($override, $options)) {
+            $exp = $override;
         }
 
         return $exp;

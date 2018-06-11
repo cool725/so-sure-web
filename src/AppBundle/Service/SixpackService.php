@@ -267,7 +267,7 @@ class SixpackService
             ];
             if ($force) {
                 $data['force'] = $force;
-                $data['record_force'] = true;
+                $data['record_force'] = "true";
             }
             $query = http_build_query($data);
             foreach ($alternatives as $alternative) {

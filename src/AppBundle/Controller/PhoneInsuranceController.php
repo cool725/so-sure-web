@@ -507,7 +507,7 @@ class PhoneInsuranceController extends BaseController
             ['default', 'next-working-day', 'seventytwo-hours'],
             SixpackService::LOG_MIXPANEL_CONVERSION,
             null,
-            0.000000001
+            "0.00000001"
         );
 
         $moneyBackGuarantee = $this->sixpack(
