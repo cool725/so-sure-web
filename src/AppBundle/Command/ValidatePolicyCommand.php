@@ -267,7 +267,7 @@ class ValidatePolicyCommand extends BaseCommand
                 $lines[] = "Not Paid To Date";
                 $lines[] = sprintf(
                     'Next attempt: %s.',
-                    $policy->getNextScheduledPayment() ?
+                    $policy->getNextScheduledPayment() && $policy->getNextScheduledPayment()->getScheduled() ?
                         $policy->getNextScheduledPayment()->getScheduled()->format(\DateTime::ATOM) :
                         'unknown'
                 );

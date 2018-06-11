@@ -92,7 +92,9 @@ class ScheduledPaymentTest extends \PHPUnit\Framework\TestCase
         $scheduledPayment->setScheduled(new \DateTime('2017-06-15 00:00', new \DateTimeZone('Europe/London')));
         $this->assertTrue($scheduledPayment->hasCorrectBillingDay());
 
-        $scheduledPayment->getScheduled()->setTimezone(new \DateTimeZone('UTC'));
+        if ($scheduledPayment->getScheduled()) {
+            $scheduledPayment->getScheduled()->setTimezone(new \DateTimeZone('UTC'));
+        }
         $this->assertTrue($scheduledPayment->hasCorrectBillingDay());
     }
 

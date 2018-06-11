@@ -8,7 +8,7 @@ use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Document\File\ReconciliationFile;
 use AppBundle\Document\Sequence;
 use AppBundle\Form\Type\BacsMandatesType;
-use AppBundle\Form\Type\BacsUploadFileType;
+use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\ReconciliationFileType;
 use AppBundle\Form\Type\SequenceType;
 use AppBundle\Repository\BacsPaymentRepository;
