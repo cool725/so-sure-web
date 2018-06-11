@@ -734,6 +734,7 @@ class PolicyService
         // Try cancellating scheduled payments until amount matches
         while (!$policy->arePolicyScheduledPaymentsCorrect() &&
             ($scheduledPayment = $policy->getNextScheduledPayment()) !== null) {
+            /** @var ScheduledPayment $scheduledPayment */
             $scheduledPayments[] = $scheduledPayment;
             $scheduledPayment->cancel();
             $log[] = sprintf(

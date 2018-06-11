@@ -140,7 +140,7 @@ class ScheduledPaymentCommand extends BaseCommand
             $scheduledPayment->getPolicy()->getPolicyNumber(),
             $scheduledPayment->getStatus(),
             $scheduledPayment->getId(),
-            $scheduledPayment->getScheduled()->format(\DateTime::ATOM),
+            $scheduledPayment->getScheduled() ? $scheduledPayment->getScheduled()->format(\DateTime::ATOM) : '?',
             $scheduledPayment->getAmount(),
             $scheduledPayment->getPayment() ? $scheduledPayment->getPayment()->getResult() : 'n/a',
             $scheduledPayment->getPayment() ? $scheduledPayment->getPayment()->getAmount() : '-'

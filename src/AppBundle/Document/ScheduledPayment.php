@@ -142,7 +142,7 @@ class ScheduledPayment
 
     public function getScheduledDay()
     {
-        return $this->getScheduled()->format('j');
+        return $this->getScheduled() ? $this->getScheduled()->format('j') : null;
     }
 
     public function setPayment(Payment $payment)
@@ -245,7 +245,7 @@ class ScheduledPayment
             throw new \Exception(sprintf(
                 'Scheduled payment %s can not yet be run (scheduled: %s)',
                 $this->getId(),
-                $this->getScheduled()->format('Y-m-d H:i:s')
+                $this->getScheduled() ? $this->getScheduled()->format('Y-m-d H:i:s') : '?'
             ));
         }
 
@@ -259,7 +259,7 @@ class ScheduledPayment
 
     public function hasCorrectBillingDay()
     {
-        if ($this->getType() == self::TYPE_RESCHEDULED) {
+        if ($this->getType() == self::TYPE_RESCHEDULED || !$this->getScheduled()) {
             return null;
         }
 
