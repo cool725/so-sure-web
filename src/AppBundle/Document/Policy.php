@@ -2643,7 +2643,7 @@ abstract class Policy
         return true;
     }
 
-    public function isWithinCooloffPeriod($date = null)
+    public function isWithinCooloffPeriod($date = null, $extended = true)
     {
         if (!$this->isPolicy() || !$this->getStart()) {
             return null;
@@ -2653,7 +2653,11 @@ abstract class Policy
             $date = new \DateTime();
         }
 
-        return $this->getStart()->diff($date)->days < 14;
+        if ($extended) {
+            return $this->getStart()->diff($date)->days < 30;
+        } else {
+            return $this->getStart()->diff($date)->days < 14;
+        }
     }
 
     public function hasEndedInLast30Days($date = null)
