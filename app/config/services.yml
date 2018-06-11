@@ -946,7 +946,12 @@ services:
             - { name: form.type }
 
     app.form.type.bacsuploadfile:
-        class: AppBundle\Form\Type\BacsUploadFileType
+        class: AppBundle\Form\Type\UploadFileType
+        tags:
+            - { name: form.type }
+
+    app.form.type.paymentrequestuploadfile:
+        class: AppBundle\Form\Type\PaymentRequestUploadFileType
         tags:
             - { name: form.type }
 

@@ -1284,15 +1284,20 @@ class BacsService
 
                 continue;
             }
-            if (!$bankAccount->allowedProcessing($scheduledDate)) {
-                $msg = sprintf(
-                    'Skipping scheduled payment %s as processing date is not allowed (%s / initial: %s)',
-                    $scheduledPayment->getId(),
-                    $scheduledDate->format('d/m/y'),
-                    $bankAccount->isFirstPayment() ? 'yes' : 'no'
-                );
-                $this->logger->error($msg);
-                continue;
+
+            // If admin has rescheduled, then notify to user will have been performed and so no need to check
+            // processing date
+            if ($scheduledPayment->getType() != ScheduledPayment::TYPE_ADMIN) {
+                if (!$bankAccount->allowedProcessing($scheduledDate)) {
+                    $msg = sprintf(
+                        'Skipping scheduled payment %s as processing date is not allowed (%s / initial: %s)',
+                        $scheduledPayment->getId(),
+                        $scheduledDate->format('d/m/y'),
+                        $bankAccount->isFirstPayment() ? 'yes' : 'no'
+                    );
+                    $this->logger->error($msg);
+                    continue;
+                }
             }
 
             $payment = $this->bacsPayment(

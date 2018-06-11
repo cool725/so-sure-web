@@ -8,7 +8,7 @@ use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Document\File\ReconciliationFile;
 use AppBundle\Document\Sequence;
 use AppBundle\Form\Type\BacsMandatesType;
-use AppBundle\Form\Type\BacsUploadFileType;
+use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\ReconciliationFileType;
 use AppBundle\Form\Type\SequenceType;
 use AppBundle\Repository\BacsPaymentRepository;
@@ -467,13 +467,13 @@ class AdminController extends BaseController
         /** @var BacsService $bacs */
         $bacs = $this->get('app.bacs');
         $uploadForm = $this->get('form.factory')
-            ->createNamedBuilder('upload', BacsUploadFileType::class)
+            ->createNamedBuilder('upload', UploadFileType::class)
             ->getForm();
         $uploadDebitForm = $this->get('form.factory')
-            ->createNamedBuilder('uploadDebit', BacsUploadFileType::class)
+            ->createNamedBuilder('uploadDebit', UploadFileType::class)
             ->getForm();
         $uploadCreditForm = $this->get('form.factory')
-            ->createNamedBuilder('uploadCredit', BacsUploadFileType::class)
+            ->createNamedBuilder('uploadCredit', UploadFileType::class)
             ->getForm();
         $mandatesForm = $this->get('form.factory')
             ->createNamedBuilder('mandates', BacsMandatesType::class)

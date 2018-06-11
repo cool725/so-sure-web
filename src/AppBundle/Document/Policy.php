@@ -1498,6 +1498,9 @@ abstract class Policy
         $this->scheduledPayments[] = $scheduledPayment;
     }
 
+    /**
+     * @return ScheduledPayment|null
+     */
     public function getNextScheduledPayment()
     {
         $next = null;

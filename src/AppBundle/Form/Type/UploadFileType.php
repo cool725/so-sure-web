@@ -13,7 +13,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Phone;
 
-class BacsUploadFileType extends AbstractType
+class UploadFileType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {

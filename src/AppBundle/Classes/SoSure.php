@@ -16,6 +16,9 @@ class SoSure
     const POLICY_START = "2016-09-01";
     const TIMEZONE = "Europe/London";
 
+    const S3_BUCKET_ADMIN = 'admin.so-sure.com';
+    const S3_BUCKET_POLICY = 'policy.so-sure.com';
+
     public static function hasSoSureEmail($email)
     {
         return mb_stripos($email, '@so-sure.com') !== false;

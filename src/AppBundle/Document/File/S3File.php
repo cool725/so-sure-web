@@ -34,7 +34,8 @@ use AppBundle\Validator\Constraints as AppAssert;
  *      "bacsReportArudd"="BacsReportAruddFile",
  *      "bacsReportDdic"="BacsReportDdicFile",
  *      "bacsReportInput"="BacsReportInputFile",
- *      "ddNotification"="DirectDebitNotificationFile"
+ *      "ddNotification"="DirectDebitNotificationFile",
+ *      "paymentRequest"="PaymentRequestUploadFile"
  * })
  * @Gedmo\Loggable
  */
