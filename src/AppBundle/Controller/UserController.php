@@ -1403,6 +1403,69 @@ class UserController extends BaseController
     }
 
     /**
+     * @Route("/claim/login/{tokenId}", name="claim_login")
+     * @Route("/claim/{policyId}", name="claim_policy")
+     * @Template
+     */
+    public function claimAction(Request $request, $tokenId = null, $policyId = null)
+    {
+        $user = $this->getUser();
+        $claimFnol = new ClaimFnol();
+
+        if ($policyId) {
+            $repo = $this->getManager()->getRepository(Policy::class);
+            $policy = $repo->find($policyId);
+            $claimFnol->setPolicy($policy);
+        } elseif ($user) {
+            $claimFnol->setUser($user);
+        }
+
+        $claimForm = $this->get('form.factory')
+            ->createNamedBuilder('claim_form', ClaimFnolType::class, $claimFnol)
+            ->getForm();
+
+        if ('POST' === $request->getMethod()) {
+            if ($request->request->has('claim_form')) {
+                $claimForm->handleRequest($request);
+                if ($claimForm->isValid()) {
+                    $mailer = $this->get('app.mailer');
+                    $subject = sprintf(
+                        'New Claim from %s/%s',
+                        $claimFnol->getName(),
+                        $claimFnol->getPolicyNumber()
+                    );
+                    $mailer->sendTemplate(
+                        $subject,
+                        'new-claim@wearesosure.com',
+                        'AppBundle:Email:claim/fnolToClaims.html.twig',
+                        ['data' => $claimFnol]
+                    );
+
+                    $mailer->sendTemplate(
+                        'Your claim with so-sure',
+                        $claimFnol->getEmail(),
+                        'AppBundle:Email:claim/fnolResponse.html.twig',
+                        ['data' => $claimFnol],
+                        'AppBundle:Email:claim/fnolResponse.txt.twig',
+                        ['data' => $claimFnol]
+                    );
+
+                    $this->addFlash(
+                        'success',
+                        "Thanks. We'll be in touch shortly"
+                    );
+
+                    return $this->redirectToRoute('claim');
+                }
+            }
+        }
+
+        return [
+            'claim_form' => $claimForm->createView(),
+        ];
+    }
+
+    /**
      * @Route("/fb", name="user_facebook")
      * @Template
      */

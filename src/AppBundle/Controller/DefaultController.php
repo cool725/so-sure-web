@@ -37,10 +37,12 @@ use AppBundle\Form\Type\RegisterUserType;
 use AppBundle\Form\Type\PhoneMakeType;
 use AppBundle\Form\Type\PhoneType;
 use AppBundle\Form\Type\SmsAppLinkType;
+use AppBundle\Form\Type\ClaimFnolEmailType;
 use AppBundle\Form\Type\ClaimFnolType;
 
 use AppBundle\Document\Form\Register;
 use AppBundle\Document\Form\PhoneMake;
+use AppBundle\Document\Form\ClaimFnolEmail;
 use AppBundle\Document\Form\ClaimFnol;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
@@ -513,64 +515,56 @@ class DefaultController extends BaseController
 
     /**
      * @Route("/claim", name="claim")
-     * @Route("/claim/{policyId}", name="claim_policy")
      * @Template
      */
-    public function claimAction(Request $request, $policyId = null)
+    public function claimAction(Request $request)
     {
-        $user = $this->getUser();
-        $claimFnol = new ClaimFnol();
+        $claimFnolEmail = new ClaimFnolEmail();
 
-        if ($policyId) {
-            $repo = $this->getManager()->getRepository(Policy::class);
-            $policy = $repo->find($policyId);
-            $claimFnol->setPolicy($policy);
-        } elseif ($user) {
-            $claimFnol->setUser($user);
-        }
-
-        $claimForm = $this->get('form.factory')
-            ->createNamedBuilder('claim_form', ClaimFnolType::class, $claimFnol)
+        $claimEmailForm = $this->get('form.factory')
+            ->createNamedBuilder('claim_email_form', ClaimFnolEmailType::class, $claimFnolEmail)
             ->getForm();
 
         if ('POST' === $request->getMethod()) {
-            if ($request->request->has('claim_form')) {
-                $claimForm->handleRequest($request);
-                if ($claimForm->isValid()) {
-                    $mailer = $this->get('app.mailer');
-                    $subject = sprintf(
-                        'New Claim from %s/%s',
-                        $claimFnol->getName(),
-                        $claimFnol->getPolicyNumber()
-                    );
-                    $mailer->sendTemplate(
-                        $subject,
-                        'new-claim@wearesosure.com',
-                        'AppBundle:Email:claim/fnolToClaims.html.twig',
-                        ['data' => $claimFnol]
-                    );
+            if ($request->request->has('claim_email_form')) {
+                $claimEmailForm->handleRequest($request);
+                if ($claimEmailForm->isValid()) {
+                    $repo = $this->getManager()->getRepository(User::class);
+                    $user = $repo->findOneBy(['email' => $claimFnolEmail->getEmail()]);
 
-                    $mailer->sendTemplate(
-                        'Your claim with so-sure',
-                        $claimFnol->getEmail(),
-                        'AppBundle:Email:claim/fnolResponse.html.twig',
-                        ['data' => $claimFnol],
-                        'AppBundle:Email:claim/fnolResponse.txt.twig',
-                        ['data' => $claimFnol]
-                    );
-
-                    $this->addFlash(
-                        'success',
-                        "Thanks. We'll be in touch shortly"
-                    );
-
-                    return $this->redirectToRoute('claim');
+                    if ($user === null) {
+                        $this->addFlash(
+                            'error',
+                            "Sorry, your email address could not be associated with an active policy. Please check the email address you have created your policy under and try again."
+                        );
+                    } else {
+                        if ($user->hasActivePolicy()) {
+                            /** @var ClaimsService $claimsService */
+                            $claimsService = $this->get('app.claims');
+                            if ($claimsService->sendUniqueLoginLink($user)) {
+                                $this->addFlash(
+                                    'success',
+                                    "Thank you. An email with further instructions on how to proceed with your claim has been sent to your email address. Please check it now and follow the instructions to start the process."
+                                );
+                            } else {
+                                $this->addFlash(
+                                    'error',
+                                    "Sorry, there was an error with your submission, please try again."
+                                );
+                            }
+                        } else {
+                            $this->addFlash(
+                                'error',
+                                "Sorry, your email address could not be associated with an active policy. Please check the email address you have created your policy under and try again."
+                            );
+                        }
+                    }
                 }
             }
         }
 
         return [
-            'claim_form' => $claimForm->createView(),
+            'claim_email_form' => $claimEmailForm->createView(),
         ];
     }
 

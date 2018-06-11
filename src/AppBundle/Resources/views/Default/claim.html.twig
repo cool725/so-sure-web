@@ -25,9 +25,7 @@
         <div class="corporate-hero-inner">
             <h1 class="text-blue">Don't worry. We’ve got you covered.</h1>
             <p class="lead">Let us guide you through the process so we can get your claim approved and a replacement phone to you ASAP.</p>
-            <a href="#"
-               class="btn btn-green btn-lg scroll-to"
-               data-scroll-to-anchor="#claim-form-container">Make a claim</a>
+            <p class="lead">If you had your phone stolen or lost, please call your network to block your phone and get a crime reference number from your local police station. For loss you can also declare online <a href="https://www.reportmyloss.com/uk/register" target="_blank">Report My Loss</a>.</p>
         </div>
     </section>
 
@@ -56,23 +54,33 @@
         </div>
     </section>
 
-    <section class="section--pad background-lightest-blue">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-10 col-md-offset-1">
-                    <p class="h3">If you had your phone stolen or lost, please call your network to block your phone and get a crime reference number from your local police station. For loss you can also declare online <a href="https://www.reportmyloss.com/uk/register" target="_blank">Report My Loss</a>.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <section id="claim-form-container" class="section-corporate section-corporate-form section-corporate-pad section-corporate-pad-both">
         <div class="container">
             <div class="row">
                 <div class="col-md-8 col-md-offset-2">
 
-                    <h2 class="text-blue text-center">Let's Get Started</h2>
+                    <h2 class="text-blue text-center">Please enter your email address to start your claims process.</h2>
 
+                    {{ form_start(claim_email_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'id':'claim-email-form', 'data-client-validation': form_client_validation }}) }}
+                        <div class="row">
+                            <div class="col-md-12 text-center">
+                                <div class="form-group {% if form_errors(claim_email_form.email) %}has-error{% endif %}">
+                                    <label for="">Email <span class="req">*</span></label>
+                                    {{ form_widget(claim_email_form.email, { 'attr': {'class': 'form-control', 'placeholder': 'Same email as your account'}}) }}
+                                    <div class="help-block with-errors">{{ form_errors(claim_email_form.email) }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 text-center">
+                                <div class="form-group">
+                                    {{ form_widget(claim_email_form.submit, { 'label': 'Continue', 'attr': {'class': 'btn btn-blue btn-lg'}}) }}
+                                </div>
+                            </div>
+                        </div>
+                    {{ form_end(claim_email_form) }}
+
+                    <!--
                     {{ form_start(claim_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'id':'claim-form', 'data-client-validation': form_client_validation }}) }}
                         <div class="row">
                             <div class="col-sm-12 text-center">
@@ -173,6 +181,7 @@
                             </div>
                         </div>
                     {{ form_end(claim_form) }}
+                    -->
 
                 </div>
             </div>

@@ -23,6 +23,9 @@ class ClaimsService
     /** @var MailerService */
     protected $mailer;
 
+    /** @var Client */
+    protected $redis;
+
     /** @var string */
     protected $environment;
 
@@ -30,6 +33,7 @@ class ClaimsService
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
      * @param MailerService   $mailer
+     * @param Client          $redis
      * @param string          $environment
      */
     public function __construct(
@@ -219,8 +223,48 @@ class ClaimsService
             $this->logger->error("Error in notifyPolicyShouldBeCancelled.", ['exception' => $e]);
         }
     }
+
     public function setMailerMailer($mailer)
     {
         $this->mailer->setMailer($mailer);
     }
+
+    public function sendUniqueLoginLink(User $user) {
+        try {
+            $token = md5(sprintf('%s%s', time(), $user->getEmail()));
+            $this->redis->setex($token, 900, $user->getId());
+
+            $this->mailer->sendTemplate(
+                'Your link to proceed with your claim',
+                $user()->getEmail(),
+                "AppBundle:Email:claim/loginLink.html.twig",
+                [
+                    'username' => $user->getName(),
+                    'tokenUrl' => $this->router->generate(
+                        'claim_login',
+                        ['tokenId' => $token],
+                        UrlGeneratorInterface::ABSOLUTE_URL
+                    ),
+                    'tokenValid' => 15
+                ],
+                "AppBundle:Email:claim/loginLink.txt.twig",
+                [
+                    'username' => $user->getName(),
+                    'tokenUrl' => $this->router->generate(
+                        'claim_login',
+                        ['tokenId' => $token],
+                        UrlGeneratorInterface::ABSOLUTE_URL
+                    ),
+                    'tokenValid' => 15
+                ]
+            );
+
+            return true;
+        } catch (\Exception $e) {
+            $this->logger->error("Error in sendUniqueLoginLink.", ['exception' => $e]);
+        }
+
+        return false;
+    }
+
 }

@@ -1,0 +1,14 @@
+{% extends 'AppBundle:Email:base.txt.twig' %}
+{% block body %}
+Your link to proceed with your claim.
+
+**
+------------------------------------------------------------
+Hi {{ username }},
+
+Please visit the following link to proceed with your claim: {{ tokenUrl }}.
+
+Note that the link will only be valid for {{ tokenValid }} minutes.
+
+Thanks for using so-sure.
+{% endblock body %}

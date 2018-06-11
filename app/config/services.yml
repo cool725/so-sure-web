@@ -178,6 +178,7 @@ services:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
             - "@app.mailer"
+            - "@snc_redis.default"
             - "%kernel.environment%"
 
     app.shortlink:
@@ -958,6 +959,11 @@ services:
     app.form.type.mandates:
         class: AppBundle\Form\Type\BacsMandatesType
         arguments: ["@doctrine_mongodb.odm.default_document_manager"]
+        tags:
+            - { name: form.type }
+
+    app.form.type.claimfnolemail:
+        class: AppBundle\Form\Type\ClaimFnolEmailType
         tags:
             - { name: form.type }
 
