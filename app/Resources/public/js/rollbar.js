@@ -6,7 +6,7 @@ var _rollbarConfig = {
         environment: document.getElementById('ss-root').getAttribute('data-environment')
     },
     ignoredMessages: [
-        "(unknown)"
+        "Script error."
     ]
 };
 // Rollbar Snippet
