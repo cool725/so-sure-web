@@ -180,7 +180,8 @@
     }
 
     &__why {
-        background-color: $off-white ;
+        @include linear-gradient(#3883FB, #24ADFC);
+        color: $white;
     }
 
     &_feedback {
