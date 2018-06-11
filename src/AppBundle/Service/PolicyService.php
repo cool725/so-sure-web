@@ -744,7 +744,7 @@ class PolicyService
                 'For Policy %s, cancelled scheduled payment %s on %s for £%0.2f',
                 $policy->getPolicyNumber(),
                 $scheduledPayment->getId(),
-                $scheduledPayment->getScheduled()->format(\DateTime::ATOM),
+                $scheduledPayment->getScheduled() ? $scheduledPayment->getScheduled()->format(\DateTime::ATOM) : '?',
                 $scheduledPayment->getAmount()
             );
         }
