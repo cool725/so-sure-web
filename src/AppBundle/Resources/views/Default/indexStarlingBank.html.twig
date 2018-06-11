@@ -42,12 +42,12 @@
                 {% endif %}
                 {% if phone is defined and phone %}
                     {{ render(controller(select_template, {
-                        'type': 'ebay',
+                        'type': 'starling',
                         'id': phone.id
                     })) }}
                 {% else %}
                     {{ render(controller(select_template, {
-                        'type': 'ebay',
+                        'type': 'starling',
                     })) }}
                 {% endif %}
                 {# End Phone Search #}
