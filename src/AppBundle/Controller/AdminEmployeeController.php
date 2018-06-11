@@ -1001,15 +1001,12 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
                         $this->getManager()->flush();
 
-                        $this->addFlash(
-                            'success',
-                            sprintf(
-                                'Rescheduled scheduled payment for %s',
-                              $scheduledPayment->getScheduled() ?
+                        $this->addFlash('success', sprintf(
+                            'Rescheduled scheduled payment for %s',
+                            $scheduledPayment->getScheduled() ?
                                     $scheduledPayment->getScheduled()->format('d M Y') :
                                     '?'
-                            )
-                        );
+                        ));
                     }
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
