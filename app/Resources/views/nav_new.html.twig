@@ -20,6 +20,11 @@
             <a class="navbar-brand" href="/">
                 <div class="so-sure-logo so-sure-logo-blue-flat"></div>
             </a>
+            {% if starling_logo is defined and starling_logo == 1 %}
+                <a class="navbar-brand" href="/">
+                    <div class="tarling-logo"></div>
+                </a>
+            {% endif %}
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             {% if distraction_free is defined and distraction_free == 1 %}
