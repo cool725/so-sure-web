@@ -2079,7 +2079,7 @@ class PhonePolicyTest extends WebTestCase
         $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
         $this->assertTrue($policy->canCancel(Policy::CANCELLED_COOLOFF, new \DateTime("2016-01-01")));
-        $this->assertFalse($policy->canCancel(Policy::CANCELLED_COOLOFF, new \DateTime("2016-01-15")));
+        $this->assertFalse($policy->canCancel(Policy::CANCELLED_COOLOFF, new \DateTime("2016-01-31")));
         $this->assertTrue($policy->canCancel(Policy::CANCELLED_USER_REQUESTED, new \DateTime("2016-01-15")));
         $this->assertFalse($policy->canCancel(Policy::CANCELLED_BADRISK));
 
@@ -2105,8 +2105,8 @@ class PhonePolicyTest extends WebTestCase
         $policy->init($user, static::getLatestPolicyTerms(self::$dm));
         $policy->create(rand(1, 999999), null, null, rand(1, 9999));
         $policy->setStart(new \DateTime("2016-01-01"));
-        $this->assertFalse($policy->canCancel(Policy::CANCELLED_COOLOFF, new \DateTime("2016-01-15")));
-        $policy->cancel(Policy::CANCELLED_COOLOFF, new \DateTime("2016-01-15"));
+        $this->assertFalse($policy->canCancel(Policy::CANCELLED_COOLOFF, new \DateTime("2016-01-31")));
+        $policy->cancel(Policy::CANCELLED_COOLOFF, new \DateTime("2016-01-31"));
     }
 
     /**
