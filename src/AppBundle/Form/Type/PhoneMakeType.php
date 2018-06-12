@@ -40,7 +40,7 @@ class PhoneMakeType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $isAndroid = $this->requestService->getDeviceOS() == RequestService::DEVICE_OS_ANDROID;
+        $isAndroid = $this->requestService->isDeviceOsAndroid();
         $make = $builder->getData()->getMake();
         $models = [];
         $phonePlaceholder = 'Select your phone make first';
