@@ -270,6 +270,10 @@ class RequestService
             return true;
         }
 
+        if ($this->isExcludedPreviewPrefetch()) {
+            return true;
+        }
+
         if ($this->environment == 'prod' &&
             ($this->isSoSureEmployee() ||
             $this->isExcludedAnalyticsIp())) {
@@ -290,6 +294,23 @@ class RequestService
                 '217.158.0.52', // davies
                 // '10.0.2.2', // for debugging - vagrant
             ]);
+        }
+
+        return false;
+    }
+
+    public function isExcludedPreviewPrefetch()
+    {
+        if ($request = $this->requestStack->getCurrentRequest()) {
+            $purpose = $request->headers->get('x-purpose');
+            if ($purpose == 'preview') {
+                return true;
+            }
+
+            $moz = $request->headers->get('x-moz');
+            if ($moz == 'prefetch') {
+                return true;
+            }
         }
 
         return false;
