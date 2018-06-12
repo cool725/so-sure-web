@@ -8,6 +8,7 @@ use AppBundle\Repository\PhoneRepository;
 use AppBundle\Repository\PolicyRepository;
 use AppBundle\Repository\SCodeRepository;
 use AppBundle\Repository\UserRepository;
+use AppBundle\Service\RequestService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -98,6 +99,24 @@ class OpsController extends BaseController
     public function exceptionDeniedAction()
     {
         throw new HttpException(503);
+    }
+
+    /**
+     * @Route("/preview-prefetch", name="ops_preview_prefetch")
+     */
+    public function previewPrefetchAction()
+    {
+        /** @var RequestService $requestService */
+        $requestService = $this->get('app.request');
+        if ($requestService->isExcludedPreviewPrefetch()) {
+            throw new HttpException(503);
+        }
+
+        $response = new JsonResponse([
+            'status' => 'Ok',
+        ]);
+
+        return $response;
     }
 
     /**
