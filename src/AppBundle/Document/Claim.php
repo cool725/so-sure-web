@@ -43,6 +43,77 @@ class Claim
     const WARNING_FLAG_IGNORE_USER_DECLINED = 'ignore-user-declined';
     const WARNING_FLAG_IGNORE_POLICY_EXPIRE_CLAIM_WAIT = 'ignore-policy-expire-claim-wait';
 
+    const NETWORK_ = "";
+
+    const NETWORK_1PMOBILE = "1pMobile";
+    const NETWORK_360COMS_TELECOM = "360Coms Telecom";
+    const NETWORK_AFRIMOBILE = "AfriMobile";
+    const NETWORK_AGE_UK_MY_PHONE = "Age UK My Phone";
+    const NETWORK_AIRWAVE_SMART_MOBILE = "Airwave Smart Mobile";
+    const NETWORK_ALWAYSONLINE_WIRELESS = "AlwaysOnline Wireless";
+    const NETWORK_ANYWHERE_SIM = "Anywhere Sim";
+    const NETWORK_ASDA_MOBILE = "Asda Mobile";
+    const NETWORK_AURACALL_TRAVEL_TALK = "Auracall Travel Talk";
+    const NETWORK_AXIS_TELECOM = "Axis Telecom";
+    const NETWORK_BT_MOBILE = "BT Mobile";
+    const NETWORK_C4C_MOBILE = "C4C Mobile";
+    const NETWORK_CALL_GIVE = "Call & Give";
+    const NETWORK_CHAMPIONS_MOBILE = "Champions Mobile";
+    const NETWORK_CHATSIM = "ChatSim";
+    const NETWORK_CUNIQ = "CUniq";
+    const NETWORK_CMLINK = "CMLink";
+    const NETWORK_CTEXCEL = "CTExcel";
+    const NETWORK_CTRL_MOBILE = "Ctrl Mobile";
+    const NETWORK_ECONET_MOBILE = "Econet Mobile";
+    const NETWORK_ECONOMY_MOBILE = "Economy Mobile";
+    const NETWORK_ECOTALK = "Ecotalk";
+    const NETWORK_EE = "EE";
+    const NETWORK_ETS_MOBILE = "ETS Mobile";
+    const NETWORK_FREEDOMPOP = "FreedomPop";
+    const NETWORK_FONOME_MOBILE = "Fonome Mobile";
+    const NETWORK_GAMMA_TELECOM = "Gamma Telecom";
+    const NETWORK_GIFFGAFF = "giffgaff";
+    const NETWORK_GLOBALGIG = "Globalgig";
+    const NETWORK_HP_MOBILE_CONNECT = "HP Mobile Connect";
+    const NETWORK_ID_MOBILE = "iD Mobile";
+    const NETWORK_JOI_TELECOM = "JOi Telecom";
+    const NETWORK_JUMP = "Jump";
+    const NETWORK_KC_MOBILE = "KC Mobile";
+    const NETWORK_LEBARA_MOBILE = "Lebara Mobile";
+    const NETWORK_LYCAMOBILE = "Lycamobile";
+    const NETWORK_MEEM_MOBILE = "Meem Mobile";
+    const NETWORK_NORDTELEKOM = "NordTelekom";
+    const NETWORK_NOW_PAYG = "Now PAYG";
+    const NETWORK_O2 = "O2";
+    const NETWORK_PEBBLE_MOBILE_NETWORK = "Pebble Mobile Network";
+    const NETWORK_PIRANHA_MOBILE = "Piranha Mobile";
+    const NETWORK_PLUSNET_MOBILE = "Plusnet Mobile";
+    const NETWORK_ROK_MOBILE = "Rok Mobile";
+    const NETWORK_RWG_MOBILE = "RWG Mobile";
+    const NETWORK_SKY_MOBILE = "Sky Mobile";
+    const NETWORK_SMARTY = "SMARTY";
+    const NETWORK_TALK_HOME_MOBILE = "Talk Home Mobile";
+    const NETWORK_TALKMOBILE = "Talkmobile";
+    const NETWORK_TALKTALK_MOBILE = "TalkTalk Mobile";
+    const NETWORK_TALKXTRA_MOBILE = "TalkXtra Mobile";
+    const NETWORK_TELECOM_PLUS = "Telecom Plus";
+    const NETWORK_TELFONI = "Telfoni";
+    const NETWORK_TESCO_MOBILE = "Tesco Mobile";
+    const NETWORK_THE_PEOPLES_OPERATOR = "The People's Operator";
+    const NETWORK_THE_PHONE_COOP = "The Phone Co-op";
+    const NETWORK_THREE = "Three";
+    const NETWORK_TORICA_MOBILE = "Torica Mobile";
+    const NETWORK_TOGGLE_MOBILE = "Toggle Mobile";
+    const NETWORK_TRUPHONE = "Truphone";
+    const NETWORK_U2I_MOBILE = "U2i Mobile";
+    const NETWORK_VECTONE_MOBILE = "Vectone Mobile";
+    const NETWORK_VIRGIN_MOBILE = "Virgin Mobile";
+    const NETWORK_VIVIO = "Vivio";
+    const NETWORK_VODAFONE = "Vodafone";
+    const NETWORK_VOXI = "VOXI";
+    const NETWORK_WHITE_MOBILE = "White Mobile";
+    const NETWORK_WORLDSIM = "WorldSim";
+
     public static $warningFlags = [
         self::WARNING_FLAG_DAVIES_NAME_MATCH => self::WARNING_FLAG_DAVIES_NAME_MATCH,
         self::WARNING_FLAG_DAVIES_POSTCODE => self::WARNING_FLAG_DAVIES_POSTCODE,
@@ -60,6 +131,77 @@ class Claim
         self::TYPE_EXTENDED_WARRANTY,
         self::TYPE_WARRANTY,
         self::TYPE_LOSS
+    ];
+
+    public static $networks = [
+        self::NETWORK_1PMOBILE => self::NETWORK_1PMOBILE,
+        self::NETWORK_360COMS_TELECOM => self::NETWORK_360COMS_TELECOM,
+        self::NETWORK_AFRIMOBILE => self::NETWORK_AFRIMOBILE,
+        self::NETWORK_AGE_UK_MY_PHONE => self::NETWORK_AGE_UK_MY_PHONE,
+        self::NETWORK_AIRWAVE_SMART_MOBILE => self::NETWORK_AIRWAVE_SMART_MOBILE,
+        self::NETWORK_ALWAYSONLINE_WIRELESS => self::NETWORK_ALWAYSONLINE_WIRELESS,
+        self::NETWORK_ANYWHERE_SIM => self::NETWORK_ANYWHERE_SIM,
+        self::NETWORK_ASDA_MOBILE => self::NETWORK_ASDA_MOBILE,
+        self::NETWORK_AURACALL_TRAVEL_TALK => self::NETWORK_AURACALL_TRAVEL_TALK,
+        self::NETWORK_AXIS_TELECOM => self::NETWORK_AXIS_TELECOM,
+        self::NETWORK_BT_MOBILE => self::NETWORK_BT_MOBILE,
+        self::NETWORK_C4C_MOBILE => self::NETWORK_C4C_MOBILE,
+        self::NETWORK_CALL_GIVE => self::NETWORK_CALL_GIVE,
+        self::NETWORK_CHAMPIONS_MOBILE => self::NETWORK_CHAMPIONS_MOBILE,
+        self::NETWORK_CHATSIM => self::NETWORK_CHATSIM,
+        self::NETWORK_CUNIQ => self::NETWORK_CUNIQ,
+        self::NETWORK_CMLINK => self::NETWORK_CMLINK,
+        self::NETWORK_CTEXCEL => self::NETWORK_CTEXCEL,
+        self::NETWORK_CTRL_MOBILE => self::NETWORK_CTRL_MOBILE,
+        self::NETWORK_ECONET_MOBILE => self::NETWORK_ECONET_MOBILE,
+        self::NETWORK_ECONOMY_MOBILE => self::NETWORK_ECONOMY_MOBILE,
+        self::NETWORK_ECOTALK => self::NETWORK_ECOTALK,
+        self::NETWORK_EE => self::NETWORK_EE,
+        self::NETWORK_ETS_MOBILE => self::NETWORK_ETS_MOBILE,
+        self::NETWORK_FREEDOMPOP => self::NETWORK_FREEDOMPOP,
+        self::NETWORK_FONOME_MOBILE => self::NETWORK_FONOME_MOBILE,
+        self::NETWORK_GAMMA_TELECOM => self::NETWORK_GAMMA_TELECOM,
+        self::NETWORK_GIFFGAFF => self::NETWORK_GIFFGAFF,
+        self::NETWORK_GLOBALGIG => self::NETWORK_GLOBALGIG,
+        self::NETWORK_HP_MOBILE_CONNECT => self::NETWORK_HP_MOBILE_CONNECT,
+        self::NETWORK_ID_MOBILE => self::NETWORK_ID_MOBILE,
+        self::NETWORK_JOI_TELECOM => self::NETWORK_JOI_TELECOM,
+        self::NETWORK_JUMP => self::NETWORK_JUMP,
+        self::NETWORK_KC_MOBILE => self::NETWORK_KC_MOBILE,
+        self::NETWORK_LEBARA_MOBILE => self::NETWORK_LEBARA_MOBILE,
+        self::NETWORK_LYCAMOBILE => self::NETWORK_LYCAMOBILE,
+        self::NETWORK_MEEM_MOBILE => self::NETWORK_MEEM_MOBILE,
+        self::NETWORK_NORDTELEKOM => self::NETWORK_NORDTELEKOM,
+        self::NETWORK_NOW_PAYG => self::NETWORK_NOW_PAYG,
+        self::NETWORK_O2 => self::NETWORK_O2,
+        self::NETWORK_PEBBLE_MOBILE_NETWORK => self::NETWORK_PEBBLE_MOBILE_NETWORK,
+        self::NETWORK_PIRANHA_MOBILE => self::NETWORK_PIRANHA_MOBILE,
+        self::NETWORK_PLUSNET_MOBILE => self::NETWORK_PLUSNET_MOBILE,
+        self::NETWORK_ROK_MOBILE => self::NETWORK_ROK_MOBILE,
+        self::NETWORK_RWG_MOBILE => self::NETWORK_RWG_MOBILE,
+        self::NETWORK_SKY_MOBILE => self::NETWORK_SKY_MOBILE,
+        self::NETWORK_SMARTY => self::NETWORK_SMARTY,
+        self::NETWORK_TALK_HOME_MOBILE => self::NETWORK_TALK_HOME_MOBILE,
+        self::NETWORK_TALKMOBILE => self::NETWORK_TALKMOBILE,
+        self::NETWORK_TALKTALK_MOBILE => self::NETWORK_TALKTALK_MOBILE,
+        self::NETWORK_TALKXTRA_MOBILE => self::NETWORK_TALKXTRA_MOBILE,
+        self::NETWORK_TELECOM_PLUS => self::NETWORK_TELECOM_PLUS,
+        self::NETWORK_TELFONI => self::NETWORK_TELFONI,
+        self::NETWORK_TESCO_MOBILE => self::NETWORK_TESCO_MOBILE,
+        self::NETWORK_THE_PEOPLES_OPERATOR => self::NETWORK_THE_PEOPLES_OPERATOR,
+        self::NETWORK_THE_PHONE_COOP => self::NETWORK_THE_PHONE_COOP,
+        self::NETWORK_THREE => self::NETWORK_THREE,
+        self::NETWORK_TORICA_MOBILE => self::NETWORK_TORICA_MOBILE,
+        self::NETWORK_TOGGLE_MOBILE => self::NETWORK_TOGGLE_MOBILE,
+        self::NETWORK_TRUPHONE => self::NETWORK_TRUPHONE,
+        self::NETWORK_U2I_MOBILE => self::NETWORK_U2I_MOBILE,
+        self::NETWORK_VECTONE_MOBILE => self::NETWORK_VECTONE_MOBILE,
+        self::NETWORK_VIRGIN_MOBILE => self::NETWORK_VIRGIN_MOBILE,
+        self::NETWORK_VIVIO => self::NETWORK_VIVIO,
+        self::NETWORK_VODAFONE => self::NETWORK_VODAFONE,
+        self::NETWORK_VOXI => self::NETWORK_VOXI,
+        self::NETWORK_WHITE_MOBILE => self::NETWORK_WHITE_MOBILE,
+        self::NETWORK_WORLDSIM => self::NETWORK_WORLDSIM
     ];
 
     /**
@@ -1161,5 +1303,9 @@ class Claim
         }
 
         throw new \Exception(sprintf('Unknown claim type %s', $type));
+    }
+
+    public static function getNetworks() {
+        return self::$networks;
     }
 }

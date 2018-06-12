@@ -4,6 +4,7 @@ namespace AppBundle\Document\Form;
 
 use AppBundle\Document\Policy;
 use AppBundle\Document\User;
+use AppBundle\Document\Claim;
 use AppBundle\Document\DateTrait;
 use Symfony\Component\Validator\Constraints as Assert;
 use AppBundle\Validator\Constraints as AppAssert;
@@ -56,7 +57,7 @@ class ClaimFnol
     protected $type;
 
     /**
-     * @Assert\Choice({"loss", "theft", "damage", "warranty", "extended-warranty"}, strict=true)
+     * @Assert\Choice(callback="getNetworks", strict=true)
      */
     protected $network;
 
@@ -234,5 +235,9 @@ class ClaimFnol
     public function setWhere($where)
     {
         $this->where = $where;
+    }
+
+    public static function getNetworks() {
+        return Claim::$networks;
     }
 }

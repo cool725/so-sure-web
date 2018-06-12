@@ -37,8 +37,8 @@ class ClaimFnolType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('email', EmailType::class)
-            ->add('name', TextType::class)
+            ->add('email', EmailType::class, ['disabled' => true])
+            ->add('name', TextType::class, ['disabled' => true])
             ->add('phone', TextType::class)
             ->add('when', DateType::class, [
                   'required' => $this->required,
@@ -64,11 +64,7 @@ class ClaimFnolType extends AbstractType
             ->add('network', ChoiceType::class, [
                 'required' => true,
                 'placeholder' => 'My network operator is ...',
-                'choices' => [
-                    'Lost' => Claim::TYPE_LOSS,
-                    'Stolen' => Claim::TYPE_THEFT,
-                    'Damaged or not working' => Claim::TYPE_DAMAGE,
-                ],
+                'choices' => Claim::$networks,
             ])
             ->add('message', TextareaType::class)
             ->add('submit', SubmitType::class)

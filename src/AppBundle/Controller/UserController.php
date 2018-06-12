@@ -1441,13 +1441,22 @@ class UserController extends BaseController
         $claimForm = $this->get('form.factory')
             ->createNamedBuilder('claim_form', ClaimFnolType::class, $claimFnol)
             ->getForm();
+        $claimConfirmForm = $this->get('form.factory')
+            ->createNamedBuilder('claim_confirm_form', ClaimFnolConfirmType::class, $claimFnol)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('claim_form')) {
                 $claimForm->handleRequest($request);
                 if ($claimForm->isValid()) {
 
-                    return $this->redirectToRoute('claim');
+                    
+                }
+            } elseif ($request->request->has('claim_confirm_form')) {
+                $claimConfirmForm->handleRequest($request);
+                if ($claimConfirmForm->isValid()) {
+
+                    
                 }
             }
         }
@@ -1455,6 +1464,7 @@ class UserController extends BaseController
         $data = [
             'username' => $user->getName(),
             'claim_form' => $claimForm->createView(),
+            'claim_confirm_form' => $claimConfirmForm->createView(),
         ];
 
         return $this->render('AppBundle:User:claim.html.twig', $data);
