@@ -14,9 +14,12 @@ class RequestServiceTest extends WebTestCase
     use \AppBundle\Tests\UserClassTrait;
     protected static $container;
     protected static $requestService;
+    protected static $client;
 
     public static function setUpBeforeClass()
     {
+        self::$client = self::createClient();
+
          //start the symfony kernel
          $kernel = static::createKernel();
          $kernel->boot();
@@ -61,6 +64,44 @@ class RequestServiceTest extends WebTestCase
     public function testIsExcludedAnalyticsUserAgentBlank()
     {
         $this->assertFalse(self::$requestService->isExcludedAnalyticsUserAgent(''));
+    }
+
+    public function testIsExcludedPreviewPrefetch()
+    {
+        $crawler =  static::$client->request(
+            "GET",
+            "/ops/preview-prefetch"
+        );
+        $this->verifyResponse(200);
+
+        $crawler =  static::$client->request(
+            "GET",
+            "/ops/preview-prefetch",
+            array(),
+            array(),
+            array(
+                "HTTP_X-PURPOSE" => "preview"
+            ),
+            []
+        );
+        $this->verifyResponse(503);
+
+        $crawler =  static::$client->request(
+            "GET",
+            "/ops/preview-prefetch",
+            array(),
+            array(),
+            array(
+                "HTTP_X-MOZ" => "prefetch"
+            ),
+            []
+        );
+        $this->verifyResponse(503);
+    }
+
+    protected function verifyResponse($statusCode)
+    {
+        $this->assertEquals($statusCode, self::$client->getResponse()->getStatusCode());
     }
 
     public function testIsExcludedAnalyticsUserAgentTrue()
