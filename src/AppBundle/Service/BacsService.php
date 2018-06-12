@@ -202,20 +202,39 @@ class BacsService
         return $files;
     }
 
+    private function getAccessPayFileDate($serialNumber)
+    {
+        $repo = $this->dm->getRepository(AccessPayFile::class);
+        /** @var AccessPayFile $file */
+        $file = $repo->findOneBy(['serialNumber' => $serialNumber]);
+        if ($file && $file->getDate()) {
+            return clone $file->getDate();
+        }
+
+        return null;
+    }
+
     public function processUpload(UploadedFile $file)
     {
         $tmpFile = $file->move(sys_get_temp_dir());
         $uploadFile = null;
         $metadata = null;
+        $date = null;
         if (mb_stripos($file->getClientOriginalName(), "ADDACS") !== false) {
             $metadata = $this->addacs($tmpFile);
             $uploadFile = new BacsReportAddacsFile();
         } elseif (mb_stripos($file->getClientOriginalName(), "AUDDIS") !== false) {
             $metadata = $this->auddis($tmpFile);
             $uploadFile = new BacsReportAuddisFile();
+            if (isset($metadata['serial-number'])) {
+                $date = $this->getAccessPayFileDate(AccessPayFile::formatSerialNumber($metadata['serial-number']));
+            }
         } elseif (mb_stripos($file->getClientOriginalName(), "INPUT") !== false) {
             $metadata = $this->input($tmpFile);
             $uploadFile = new BacsReportInputFile();
+            if (isset($metadata['serial-number'])) {
+                $date = $this->getAccessPayFileDate(AccessPayFile::formatSerialNumber($metadata['serial-number']));
+            }
         } elseif (mb_stripos($file->getClientOriginalName(), "ARUDD") !== false) {
             $metadata = $this->arudd($tmpFile);
             $uploadFile = new BacsReportAruddFile();
@@ -229,7 +248,7 @@ class BacsService
         }
 
         if ($uploadFile) {
-            $this->uploadS3($tmpFile, $file->getClientOriginalName(), $uploadFile, null, $metadata);
+            $this->uploadS3($tmpFile, $file->getClientOriginalName(), $uploadFile, $date, $metadata);
         }
 
         return true;
@@ -297,7 +316,7 @@ class BacsService
         }
 
         $serialNumber = $this->sequenceService->getSequenceId(SequenceService::SEQUENCE_BACS_SERIAL_NUMBER);
-        $serialNumber = sprintf("S-%06d", $serialNumber);
+        $serialNumber = AccessPayFile::formatSerialNumber($serialNumber);
         $metadata['serial-number'] = $serialNumber;
 
         $uploadFile = new AccessPayFile();
@@ -1218,9 +1237,23 @@ class BacsService
             }
 
             $bankAccount = $bacs->getBankAccount();
-            if ($bankAccount->getMandateStatus() != BankAccount::MANDATE_SUCCESS) {
+            if (in_array($bankAccount->getMandateStatus(), [
+                BankAccount::MANDATE_CANCELLED,
+                BankAccount::MANDATE_FAILURE
+            ])) {
                 $msg = sprintf(
-                    'Skipping scheduled payment %s as mandate is not enabled (%s)',
+                    'Cancelling scheduled payment %s as mandate is %s',
+                    $scheduledPayment->getId(),
+                    $bankAccount->getMandateStatus()
+                );
+                $this->logger->warning($msg);
+                $scheduledPayment->cancel();
+                $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
+                continue;
+            } elseif ($bankAccount->getMandateStatus() != BankAccount::MANDATE_SUCCESS) {
+                $msg = sprintf(
+                    'Skipping scheduled payment %s as mandate is not enabled (%s) [Rescheduled]',
                     $scheduledPayment->getId(),
                     $bankAccount->getMandateStatus()
                 );
@@ -1230,26 +1263,41 @@ class BacsService
                 } else {
                     $this->logger->warning($msg);
                 }
+
+                $rescheduled = $scheduledPayment->reschedule($scheduledDate);
+                $scheduledPayment->getPolicy()->addScheduledPayment($rescheduled);
+                $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
                 continue;
             }
             if (!$bankAccount->allowedSubmission()) {
                 $msg = sprintf(
-                    'Skipping payment %s as submission is not yet allowed (must be at least %s)',
+                    'Skipping payment %s as submission is not yet allowed (must be at least %s) [Rescheduled]',
                     $scheduledPayment->getId(),
                     $bankAccount->getInitialPaymentSubmissionDate()->format('d/m/y')
                 );
                 $this->logger->error($msg);
+
+                $rescheduled = $scheduledPayment->reschedule($scheduledDate);
+                $scheduledPayment->getPolicy()->addScheduledPayment($rescheduled);
+                $this->dm->flush(null, array('w' => 'majority', 'j' => true));
+
                 continue;
             }
-            if (!$bankAccount->allowedProcessing($scheduledDate)) {
-                $msg = sprintf(
-                    'Skipping scheduled payment %s as processing date is not allowed (%s / initial: %s)',
-                    $scheduledPayment->getId(),
-                    $scheduledDate->format('d/m/y'),
-                    $bankAccount->isFirstPayment() ? 'yes' : 'no'
-                );
-                $this->logger->error($msg);
-                continue;
+
+            // If admin has rescheduled, then notify to user will have been performed and so no need to check
+            // processing date
+            if ($scheduledPayment->getType() != ScheduledPayment::TYPE_ADMIN) {
+                if (!$bankAccount->allowedProcessing($scheduledDate)) {
+                    $msg = sprintf(
+                        'Skipping scheduled payment %s as processing date is not allowed (%s / initial: %s)',
+                        $scheduledPayment->getId(),
+                        $scheduledDate->format('d/m/y'),
+                        $bankAccount->isFirstPayment() ? 'yes' : 'no'
+                    );
+                    $this->logger->error($msg);
+                    continue;
+                }
             }
 
             $payment = $this->bacsPayment(

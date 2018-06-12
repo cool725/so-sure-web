@@ -1,11 +1,35 @@
+var sosure = sosure || {};
+
+sosure.validaters = (function() {
+    var self = {};
+
+    self.removeAccents = function(text) {
+        var accents    = 'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËèéêëðÇçÐÌÍÎÏìíîïÙÚÛÜùúûüÑñŠšŸÿýŽž',
+            accentsOut = "AAAAAAaaaaaaOOOOOOOooooooEEEEeeeeeCcDIIIIiiiiUUUUuuuuNnSsYyyZz",
+            textNoAccents = [];
+
+        for (var i in text) {
+            var idx = accents.indexOf(text[i]);
+            if (idx != -1)
+                textNoAccents[i] = accentsOut.substr(idx, 1);
+            else
+                textNoAccents[i] = text[i];
+        }
+
+        return textNoAccents.join('');
+    }
+
+    return self;
+})();
+
+
 $(function(){
     // Extend Validation Rules
 
     // Full name
     jQuery.validator.addMethod('fullName', function(value, element) {
 
-        // Strip accent marks
-        value = value.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        value = sosure.validaters.removeAccents(value);
 
         return this.optional(element) || value.match(/\w+\s+\w+/);
 

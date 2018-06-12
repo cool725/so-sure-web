@@ -996,11 +996,20 @@ abstract class BaseController extends Controller
         $options,
         $logMixpanel = SixpackService::LOG_MIXPANEL_CONVERSION,
         $clientId = null,
-        $trafficFraction = 1
+        $trafficFraction = 1,
+        $force = null
     ) {
-        $exp = $this->get('app.sixpack')->participate($name, $options, $logMixpanel, $trafficFraction, $clientId);
-        if ($request->get('force')) {
-            $exp = $request->get('force');
+        $exp = $this->get('app.sixpack')->participate(
+            $name,
+            $options,
+            $logMixpanel,
+            $trafficFraction,
+            $clientId,
+            $force
+        );
+        $override = $request->get('force');
+        if ($override && in_array($override, $options)) {
+            $exp = $override;
         }
 
         return $exp;

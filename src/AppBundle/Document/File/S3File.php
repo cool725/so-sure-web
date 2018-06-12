@@ -26,6 +26,7 @@ use AppBundle\Validator\Constraints as AppAssert;
  *      "screenUpload"="ScreenUploadFile",
  *      "imeiUpload"="ImeiUploadFile",
  *      "brightstar"="BrightstarFile",
+ *      "imei"="ImeiFile",
  *      "picsure"="PicSureFile",
  *      "accesspay"="AccessPayFile",
  *      "bacsReportAddacs"="BacsReportAddacsFile",
@@ -33,7 +34,8 @@ use AppBundle\Validator\Constraints as AppAssert;
  *      "bacsReportArudd"="BacsReportAruddFile",
  *      "bacsReportDdic"="BacsReportDdicFile",
  *      "bacsReportInput"="BacsReportInputFile",
- *      "ddNotification"="DirectDebitNotificationFile"
+ *      "ddNotification"="DirectDebitNotificationFile",
+ *      "paymentRequest"="PaymentRequestUploadFile"
  * })
  * @Gedmo\Loggable
  */

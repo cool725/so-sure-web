@@ -10,9 +10,10 @@ services:
 
     app.user:
         class: AppBundle\Security\FOSUBUserProvider
-        arguments: ["@fos_user.user_manager",{facebook: facebookId, starling: starlingId, accountkit: id}]
+        arguments: ["@fos_user.user_manager",{facebook: facebookId, google: googleId, starling: starlingId, accountkit: id}]
         calls:
             - [setFacebook, ['@app.facebook']]
+            - [setGoogle, ['@app.google']]
             - [setRequestStack, ['@request_stack']]
             - [setEncoderFactory, ["@security.encoder_factory"]]
             - [setAuthService, ["@security.authorization_checker"]]
@@ -49,6 +50,12 @@ services:
             - "%fb_appid%"
             - "%fb_secret%"
             - "%account_kit_secret%"
+
+    app.google:
+        class: AppBundle\Service\GoogleService
+        arguments:
+            - "@logger"
+            - "%google_clientid%"
 
     app.mailchimp.prelaunch:
         class: AppBundle\Service\MailchimpService
@@ -939,7 +946,12 @@ services:
             - { name: form.type }
 
     app.form.type.bacsuploadfile:
-        class: AppBundle\Form\Type\BacsUploadFileType
+        class: AppBundle\Form\Type\UploadFileType
+        tags:
+            - { name: form.type }
+
+    app.form.type.paymentrequestuploadfile:
+        class: AppBundle\Form\Type\PaymentRequestUploadFileType
         tags:
             - { name: form.type }
 

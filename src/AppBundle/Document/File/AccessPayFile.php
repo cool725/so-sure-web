@@ -110,4 +110,9 @@ class AccessPayFile extends UploadFile
             $now->format('U')
         );
     }
+
+    public static function formatSerialNumber($serialNumber)
+    {
+        return sprintf("S-%06d", $serialNumber);
+    }
 }

@@ -363,22 +363,12 @@ class PhoneInsuranceController extends BaseController
             ->add('claim_used', HiddenType::class)
             ->getForm();
 
-        $daysTest = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_SAVE_QUOTE_24HOURS,
-            ['7days', '24hours']
-        );
-
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('lead_form')) {
                 try {
                     $leadForm->handleRequest($request);
 
                     if ($leadForm->isValid()) {
-                        $this->get('app.sixpack')->convert(
-                            SixpackService::EXPERIMENT_SAVE_QUOTE_24HOURS
-                        );
-
                         $leadRepo = $dm->getRepository(Lead::class);
                         $existingLead = $leadRepo->findOneBy(['email' => mb_strtolower($lead->getEmail())]);
                         if (!$existingLead) {
@@ -388,7 +378,7 @@ class PhoneInsuranceController extends BaseController
                             $lead = $existingLead;
                         }
                         $days = new \DateTime();
-                        $days = $days->add(new \DateInterval(sprintf('P%dD', $daysTest == '7days' ? 7 : 1)));
+                        $days = $days->add(new \DateInterval(sprintf('P%dD', 7)));
                         $mailer = $this->get('app.mailer');
                         $mailer->sendTemplate(
                             sprintf('Your saved so-sure quote for %s', $phone),
@@ -402,14 +392,6 @@ class PhoneInsuranceController extends BaseController
                         $this->get('app.mixpanel')->queuePersonProperties([
                             '$email' => $lead->getEmail()
                         ], true);
-                        if ($daysTest == '7days') {
-                            $this->get('app.intercom')->queueLead($lead, IntercomService::QUEUE_EVENT_SAVE_QUOTE, [
-                                'quoteUrl' => $quoteUrl,
-                                'phone' => $phone->__toString(),
-                                'price' => $phone->getCurrentPhonePrice()->getMonthlyPremiumPrice(),
-                                'expires' => $days,
-                            ]);
-                        }
 
                         $this->addFlash('success', sprintf(
                             "Thanks! Your quote is guaranteed now and we'll send you an email confirmation."
@@ -441,8 +423,6 @@ class PhoneInsuranceController extends BaseController
                     }
                     $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
 
-                    $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_INTERCOM_PURCHASE);
-
                     // Multipolicy should skip user details
                     if ($this->getUser() && $this->getUser()->hasPolicy()) {
                         // don't check for partial partial as quote phone may be different from partial policy phone
@@ -464,8 +444,6 @@ class PhoneInsuranceController extends BaseController
                     }
                     $this->get('app.mixpanel')->queueTrack(MixpanelService::EVENT_BUY_BUTTON_CLICKED, $properties);
 
-                    $this->get('app.sixpack')->convert(SixpackService::EXPERIMENT_QUOTE_INTERCOM_PURCHASE);
-
                     // Multipolicy should skip user details
                     if ($this->getUser() && $this->getUser()->hasPolicy()) {
                         // don't check for partial partial as quote phone may be different from partial policy phone
@@ -486,12 +464,6 @@ class PhoneInsuranceController extends BaseController
 
         // only need to run this once - if its a post, then ignore
         if ('GET' === $request->getMethod() && $phone->getCurrentPhonePrice()) {
-            $expIntercom = $this->sixpack(
-                $request,
-                SixpackService::EXPERIMENT_QUOTE_INTERCOM_PURCHASE,
-                ['none', 'intercom']
-            );
-
             $event = MixpanelService::EVENT_QUOTE_PAGE;
             if (in_array($request->get('_route'), ['insure_make_model_memory', 'insure_make_model'])) {
                 $event = MixpanelService::EVENT_CPC_QUOTE_PAGE;
@@ -529,6 +501,15 @@ class PhoneInsuranceController extends BaseController
             ['no-trustpilot', 'trustpilot']
         );
 
+        $replacement = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT,
+            ['default', 'next-working-day', 'seventytwo-hours'],
+            SixpackService::LOG_MIXPANEL_CONVERSION,
+            null,
+            "0.00000001"
+        );
+
         $moneyBackGuarantee = $this->sixpack(
             $request,
             SixpackService::EXPERIMENT_MONEY_BACK_GUARANTEE,
@@ -557,11 +538,10 @@ class PhoneInsuranceController extends BaseController
             'comparision'     => $phone->getComparisions(),
             'comparision_max' => $maxComparision,
             'coming_soon'     => $phone->getCurrentPhonePrice() ? false : true,
-            'days_test'       => $daysTest,
             'slider_test'     => 'slide-me',
-            'intercom_test'   => $expIntercom,
-            'trustpilot'     => $trustpilot,
+            'trustpilot'      => $trustpilot,
             'moneyBackGuarantee' => $moneyBackGuarantee,
+            'replacement'     => $replacement,
         );
 
         // Adwords landingpage test

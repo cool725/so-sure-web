@@ -43,6 +43,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     const ROLE_CLAIMS = 'ROLE_CLAIMS';
     const ROLE_EMPLOYEE = 'ROLE_EMPLOYEE';
+    const ROLE_CUSTOMER_SERVICES = 'ROLE_CUSTOMER_SERVICES';
     const ROLE_ADMIN = 'ROLE_ADMIN';
 
     /**
@@ -156,6 +157,22 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
      * @MongoDB\Field(type="string")
      */
     protected $facebookAccessToken;
+
+    /**
+     * @AppAssert\Token()
+     * @Assert\Length(min="0", max="100")
+     * @MongoDB\Field(type="string")
+     * @MongoDB\Index(unique=true, sparse=true)
+     * @Gedmo\Versioned
+     */
+    protected $googleId;
+
+    /**
+     * @AppAssert\Token()
+     * @Assert\Length(min="0", max="2200")
+     * @MongoDB\Field(type="string")
+     */
+    protected $googleAccessToken;
 
     /**
      * @AppAssert\Token()
@@ -726,7 +743,9 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
 
     public function hasEmployeeRole()
     {
-        return $this->hasRole(self::ROLE_EMPLOYEE) || $this->hasRole(self::ROLE_ADMIN);
+        return $this->hasRole(self::ROLE_EMPLOYEE) ||
+            $this->hasRole(self::ROLE_ADMIN) ||
+            $this->hasRole(self::ROLE_CUSTOMER_SERVICES);
     }
 
     public function hasClaimsRole()
@@ -1270,6 +1289,32 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
     public function getFacebookId()
     {
         return $this->facebookId;
+    }
+
+    public function setGoogleId($googleId)
+    {
+        $this->googleId = $googleId;
+    }
+
+    public function getGoogleId()
+    {
+        return $this->googleId;
+    }
+
+    public function setGoogleAccessToken($googleAccessToken)
+    {
+        $this->googleAccessToken = $googleAccessToken;
+    }
+
+    public function getGoogleAccessToken()
+    {
+        return $this->googleAccessToken;
+    }
+
+    public function resetGoogle()
+    {
+        $this->setGoogleId(null);
+        $this->setGoogleAccessToken(null);
     }
 
     public function getMobileNumberVerified()
@@ -1821,6 +1866,7 @@ class User extends BaseUser implements TwoFactorInterface, TrustedComputerInterf
             'first_name' => $this->getFirstName(),
             'last_name' => $this->getLastName(),
             'facebook_id' => $this->getFacebookId(),
+            'google_id' => $this->getGoogleId(),
             'cognito_token' => [ 'id' => $identityId, 'token' => $token ],
             'user_token' => ['token' => $this->getToken()],
             'addresses' => $addresses,

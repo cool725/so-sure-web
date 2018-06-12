@@ -2,8 +2,11 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Document\File\PaymentRequestUploadFile;
 use AppBundle\Document\JudoPaymentMethod;
 use AppBundle\Form\Type\AdminEmailOptOutType;
+use AppBundle\Form\Type\PaymentRequestUploadFileType;
+use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Security\FOSUBUserProvider;
 use AppBundle\Service\FraudService;
 use AppBundle\Service\JudopayService;
@@ -527,6 +530,11 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             ->add('monthly', SubmitType::class)
             ->add('yearly', SubmitType::class)
             ->getForm();
+        $paymentRequestFile = new PaymentRequestUploadFile();
+        $paymentRequestFile->setPolicy($policy);
+        $runScheduledPaymentForm = $this->get('form.factory')
+            ->createNamedBuilder('run_scheduled_payment_form', PaymentRequestUploadFileType::class, $paymentRequestFile)
+            ->getForm();
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('cancel_form')) {
@@ -980,6 +988,29 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
 
                     return $this->redirectToRoute('admin_policy', ['id' => $id]);
                 }
+            } elseif ($request->request->has('run_scheduled_payment_form')) {
+                $runScheduledPaymentForm->handleRequest($request);
+                if ($runScheduledPaymentForm->isValid()) {
+                    $scheduledPayment = $policy->getNextScheduledPayment();
+                    if ($scheduledPayment && $paymentRequestFile) {
+                        $paymentRequestFile->setBucket(SoSure::S3_BUCKET_POLICY);
+                        $paymentRequestFile->setKeyFormat($this->getParameter('kernel.environment') . '/%s');
+
+                        $policy->addPolicyFile($paymentRequestFile);
+                        $scheduledPayment->adminReschedule();
+
+                        $this->getManager()->flush();
+
+                        $this->addFlash('success', sprintf(
+                            'Rescheduled scheduled payment for %s',
+                            $scheduledPayment->getScheduled() ?
+                                    $scheduledPayment->getScheduled()->format('d M Y') :
+                                    '?'
+                        ));
+                    }
+
+                    return $this->redirectToRoute('admin_policy', ['id' => $id]);
+                }
             }
         }
         $checks = $fraudService->runChecks($policy);
@@ -1010,6 +1041,7 @@ class AdminEmployeeController extends BaseController implements ContainerAwareIn
             'picsure_form' => $picsureForm->createView(),
             'swap_payment_plan_form' => $swapPaymentPlanForm->createView(),
             'pay_policy_form' => $payPolicyForm->createView(),
+            'run_scheduled_payment_form' => $runScheduledPaymentForm->createView(),
             'fraud' => $checks,
             'policy_route' => 'admin_policy',
             'policy_history' => $this->getSalvaPhonePolicyHistory($policy->getId()),

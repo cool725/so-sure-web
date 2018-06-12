@@ -8,7 +8,7 @@ use AppBundle\Document\File\AccessPayFile;
 use AppBundle\Document\File\ReconciliationFile;
 use AppBundle\Document\Sequence;
 use AppBundle\Form\Type\BacsMandatesType;
-use AppBundle\Form\Type\BacsUploadFileType;
+use AppBundle\Form\Type\UploadFileType;
 use AppBundle\Form\Type\ReconciliationFileType;
 use AppBundle\Form\Type\SequenceType;
 use AppBundle\Repository\BacsPaymentRepository;
@@ -292,12 +292,12 @@ class AdminController extends BaseController
         $dm = $this->getManager();
         $repo = $dm->getRepository(User::class);
 
-        $admins = $repo->findUsersInRole('ROLE_ADMIN');
-        $employees = $repo->findUsersInRole('ROLE_EMPLOYEE');
+        $customerServices = $repo->findUsersInRole(User::ROLE_CUSTOMER_SERVICES);
+        $employees = $repo->findUsersInRole(User::ROLE_EMPLOYEE);
+        $admins = $repo->findUsersInRole(User::ROLE_ADMIN);
 
         return [
-            'admins' => $admins,
-            'employees' => $employees,
+            'users' => array_merge($customerServices, $employees, $admins),
         ];
     }
 
@@ -362,115 +362,6 @@ class AdminController extends BaseController
             'enable_mfa_form' => $enableMFAForm->createView(),
             'mfa_image_url' => $mfaImageUrl
         ];
-    }
-
-    /**
-     * @Route("/claims/delete-claim", name="admin_claims_delete_claim")
-     * @Method({"POST"})
-     */
-    public function adminClaimsDeleteClaim(Request $request)
-    {
-        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
-            throw new \InvalidArgumentException('Invalid csrf token');
-        }
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Claim::class);
-        $claim = $repo->find($request->get('id'));
-        if (!$claim) {
-            throw $this->createNotFoundException('Claim not found');
-        }
-
-        $subject = sprintf("Claim %s has been manually deleted.", $claim->getNumber());
-        $mailer = $this->get('app.mailer');
-        $mailer->sendTemplate(
-            $subject,
-            'tech@so-sure.com',
-            'AppBundle:Email:claim/manuallyDeleted.html.twig',
-            ['claim' => $claim, 'policy' => $claim->getPolicy()]
-        );
-        foreach ($claim->getCharges() as $charge) {
-            $charge->setClaim(null);
-            $this->get('logger')->warning(sprintf(
-                'Charge %s for £%0.2f has been disassocated for deleted claim %s (%s)',
-                $charge->getId(),
-                $charge->getAmount(),
-                $claim->getNumber(),
-                $claim->getId()
-            ));
-        }
-        $dm->remove($claim);
-        $dm->flush();
-        $dm->clear();
-
-        return $this->redirectToRoute('admin_claims');
-    }
-
-    /**
-     * @Route("/claims/replacement-phone", name="admin_claims_replacement_phone")
-     * @Method({"POST"})
-     */
-    public function adminClaimsReplacementPhoneAction(Request $request)
-    {
-        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
-            throw new \InvalidArgumentException('Invalid csrf token');
-        }
-
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Claim::class);
-        $phoneRepo = $dm->getRepository(Phone::class);
-        $claim = $repo->find($request->get('id'));
-        if (!$claim) {
-            throw $this->createNotFoundException('Claim not found');
-        }
-
-        $phone = $phoneRepo->find($request->get('phone'));
-        if ($claim && $phone) {
-            $claim->setReplacementPhone($phone);
-            $dm->flush();
-        }
-        return $this->redirectToRoute('admin_claims');
-    }
-
-    /**
-     * @Route("/claims/update-claim/{route}", name="admin_claims_update_claim")
-     * @Route("/claims/update-claim/{route}/{policyId}", name="admin_claims_update_claim_policy")
-     * @Method({"POST"})
-     */
-    public function adminClaimsUpdateClaimAction(Request $request, $route = null, $policyId = null)
-    {
-        if (!$this->isCsrfTokenValid('default', $request->get('token'))) {
-            throw new \InvalidArgumentException('Invalid csrf token');
-        }
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Claim::class);
-        $claim = $repo->find($request->get('id'));
-        if (!$claim) {
-            throw $this->createNotFoundException('Claim not found');
-        }
-
-        if ($request->get('change-claim-type') && $request->get('claim-type')) {
-            $claim->setType($request->get('claim-type'), true);
-        }
-        if ($request->get('change-approved-date') && $request->get('approved-date')) {
-            $date = new \DateTime($request->get('approved-date'));
-            $claim->setApprovedDate($date);
-        }
-        if ($request->get('update-replacement-phone') && $request->get('replacement-phone')) {
-            $phoneRepo = $dm->getRepository(Phone::class);
-            $phone = $phoneRepo->find($request->get('replacement-phone'));
-            if ($phone) {
-                $claim->setReplacementPhone($phone);
-            }
-        }
-        $dm->flush();
-
-        if ($policyId) {
-            return $this->redirectToRoute($route, ['id' => $policyId]);
-        } elseif ($route) {
-            return $this->redirectToRoute($route);
-        } else {
-            return $this->redirectToRoute('admin_claims');
-        }
     }
 
     /**
@@ -576,10 +467,13 @@ class AdminController extends BaseController
         /** @var BacsService $bacs */
         $bacs = $this->get('app.bacs');
         $uploadForm = $this->get('form.factory')
-            ->createNamedBuilder('upload', BacsUploadFileType::class)
+            ->createNamedBuilder('upload', UploadFileType::class)
             ->getForm();
-        $uploadSubmissionForm = $this->get('form.factory')
-            ->createNamedBuilder('uploadSubmission', BacsUploadFileType::class)
+        $uploadDebitForm = $this->get('form.factory')
+            ->createNamedBuilder('uploadDebit', UploadFileType::class)
+            ->getForm();
+        $uploadCreditForm = $this->get('form.factory')
+            ->createNamedBuilder('uploadCredit', UploadFileType::class)
             ->getForm();
         $mandatesForm = $this->get('form.factory')
             ->createNamedBuilder('mandates', BacsMandatesType::class)
@@ -611,14 +505,35 @@ class AdminController extends BaseController
                         'month' => $month
                     ]));
                 }
-            } elseif ($request->request->has('uploadSubmission')) {
-                $uploadSubmissionForm->handleRequest($request);
-                if ($uploadSubmissionForm->isSubmitted() && $uploadSubmissionForm->isValid()) {
-                    $file = $uploadSubmissionForm->getData()['file'];
+            } elseif ($request->request->has('uploadDebit')) {
+                $uploadDebitForm->handleRequest($request);
+                if ($uploadDebitForm->isSubmitted() && $uploadDebitForm->isValid()) {
+                    $file = $uploadDebitForm->getData()['file'];
                     if ($bacs->processSubmissionUpload($file)) {
                         $this->addFlash(
                             'success',
-                            'Successfully uploaded & submitted bacs submission file'
+                            'Successfully uploaded & submitted bacs debit file'
+                        );
+                    } else {
+                        $this->addFlash(
+                            'error',
+                            'Unable to process file - see rollbar error message'
+                        );
+                    }
+
+                    return new RedirectResponse($this->generateUrl('admin_bacs_date', [
+                        'year' => $year,
+                        'month' => $month
+                    ]));
+                }
+            } elseif ($request->request->has('uploadCredit')) {
+                $uploadCreditForm->handleRequest($request);
+                if ($uploadCreditForm->isSubmitted() && $uploadCreditForm->isValid()) {
+                    $file = $uploadCreditForm->getData()['file'];
+                    if ($bacs->processSubmissionUpload($file, false)) {
+                        $this->addFlash(
+                            'success',
+                            'Successfully uploaded & submitted bacs credit file'
                         );
                     } else {
                         $this->addFlash(
@@ -688,7 +603,8 @@ class AdminController extends BaseController
             'input' => $s3FileRepo->getAllFiles($date, 'bacsReportInput'),
             'payments' => $paymentsRepo->findPayments($date),
             'uploadForm' => $uploadForm->createView(),
-            'uploadSubmissionForm' => $uploadSubmissionForm->createView(),
+            'uploadDebitForm' => $uploadDebitForm->createView(),
+            'uploadCreditForm' => $uploadCreditForm->createView(),
             'mandatesForm' => $mandatesForm->createView(),
             'sequenceForm' => $sequenceForm->createView(),
             'currentSequence' => $currentSequence,
@@ -810,10 +726,10 @@ class AdminController extends BaseController
         $payment = $paymentRepo->find($id);
         if ($payment) {
             $message = 'Unknown';
-            if ($request->get('_route') == 'admin_bacs_approve') {
+            if ($request->get('_route') == 'admin_bacs_payment_approve') {
                 $payment->approve();
                 $message = 'Payment is approved';
-            } elseif ($request->get('_route') == 'admin_bacs_reject') {
+            } elseif ($request->get('_route') == 'admin_bacs_payment_reject') {
                 $payment->reject();
                 $message = 'Payment is rejected';
             } elseif ($request->get('_route') == 'admin_bacs_payment_serial') {
@@ -1203,82 +1119,6 @@ class AdminController extends BaseController
         }
 
         return new RedirectResponse($this->generateUrl('admin_feature_flags'));
-    }
-
-    /**
-     * @Route("/claim/flag/{id}", name="admin_claim_flags")
-     * @Method({"POST"})
-     */
-    public function adminClaimFlagsAction(Request $request, $id)
-    {
-        $formData = $request->get('claimflags');
-        if (!isset($formData['_token'])) {
-            throw new \InvalidArgumentException('Missing parameters');
-        }
-        // TODO: Find default intent for forms. hack to add a second token with known intent
-        if (!$this->isCsrfTokenValid('flags', $request->get('_csrf_token'))) {
-            throw new \InvalidArgumentException('Invalid csrf token');
-        }
-
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Claim::class);
-        $claim = $repo->find($id);
-        if (!$claim) {
-            throw $this->createNotFoundException('Claim not found');
-        }
-
-        $formData = $request->get('claimflags');
-        $claim->clearIgnoreWarningFlags();
-        // may be empty if all unchecked
-        if (isset($formData['ignoreWarningFlags'])) {
-            foreach ($formData['ignoreWarningFlags'] as $flag) {
-                $claim->setIgnoreWarningFlags($flag);
-            }
-        }
-        $dm->flush();
-
-        $this->addFlash(
-            'success',
-            'Claim flags updated'
-        );
-
-        return new RedirectResponse($this->generateUrl('admin_policy', ['id' => $claim->getPolicy()->getId()]));
-    }
-
-    /**
-     * @Route("/claim/withdraw/{id}", name="admin_claim_withdraw")
-     * @Method({"POST"})
-     */
-    public function adminClaimWithdrawAction(Request $request, $id)
-    {
-        if (!$this->isCsrfTokenValid('default', $request->get('_token'))) {
-            throw new \InvalidArgumentException('Invalid csrf token');
-        }
-
-        $dm = $this->getManager();
-        $repo = $dm->getRepository(Claim::class);
-        $claim = $repo->find($id);
-        if (!$claim) {
-            throw $this->createNotFoundException('Claim not found');
-        }
-        if (!in_array($claim->getStatus(), [
-            Claim::STATUS_INREVIEW,
-            Claim::STATUS_PENDING_CLOSED,
-        ])) {
-            throw new \Exception(
-                'Claim can only be withdrawn if claim is in-review or pending-closed state'
-            );
-        }
-
-        $claim->setStatus(Claim::STATUS_WITHDRAWN);
-        $dm->flush();
-
-        $this->addFlash(
-            'success',
-            sprintf('Claim %s withdrawn', $claim->getNumber())
-        );
-
-        return new RedirectResponse($this->generateUrl('admin_policy', ['id' => $claim->getPolicy()->getId()]));
     }
 
     /**

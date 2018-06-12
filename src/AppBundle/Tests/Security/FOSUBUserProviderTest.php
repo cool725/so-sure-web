@@ -358,6 +358,31 @@ class FOSUBUserProviderTest extends WebTestCase
         $this->assertPolicyExists(self::$container, $policy);
     }
 
+    public function testResolveDuplicateUsersGoogle()
+    {
+        $email = static::generateEmail('testResolveDuplicateUsersGoogle', $this);
+        $emailOther = static::generateEmail('testResolveDuplicateUsersMobile-other', $this);
+        $user = static::createUser(
+            static::$userManager,
+            $email,
+            'bar',
+            static::$dm
+        );
+        $user->setGoogleId(rand(1, 999999));
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+
+        $this->assertTrue(static::$userService->resolveDuplicateUsers(
+            null,
+            $emailOther,
+            null,
+            null,
+            $user->getGoogleId()
+        ));
+        $updatedUser = $this->assertUserExists(self::$container, $user);
+        $this->assertNull($updatedUser->getGoogleId());
+        $this->assertPolicyExists(self::$container, $policy);
+    }
+
     public function testResolveDuplicateUsersEmailPolicy()
     {
         $email = static::generateEmail('testResolveDuplicateUsersEmailPolicy', $this);
@@ -426,6 +451,34 @@ class FOSUBUserProviderTest extends WebTestCase
             $emailOther,
             null,
             $user->getFacebookId()
+        ));
+        $this->assertUserExists(self::$container, $user);
+        $this->assertPolicyExists(self::$container, $policy);
+    }
+
+    public function testResolveDuplicateUsersGooglePolicy()
+    {
+        $email = static::generateEmail('testResolveDuplicateUsersGooglePolicy', $this);
+        $emailOther = static::generateEmail('testResolveDuplicateUsersFacebookPolicy-other', $this);
+        $user = static::createUser(
+            static::$userManager,
+            $email,
+            'bar',
+            static::$dm
+        );
+        $user->setGoogleId(rand(1, 999999));
+        $policy = static::initPolicy($user, static::$dm, $this->getRandomPhone(static::$dm), null, true);
+        static::$policyService->setEnvironment('prod');
+        static::$policyService->create($policy);
+        static::$policyService->setEnvironment('test');
+        $policy->setStatus(PhonePolicy::STATUS_ACTIVE);
+
+        $this->assertFalse(static::$userService->resolveDuplicateUsers(
+            null,
+            $emailOther,
+            null,
+            null,
+            $user->getGoogleId()
         ));
         $this->assertUserExists(self::$container, $user);
         $this->assertPolicyExists(self::$container, $policy);

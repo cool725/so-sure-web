@@ -72,6 +72,11 @@ trait DateTrait
         if ($startMonth == new \DateTime('2018-04-01 00:00:00', new \DateTimeZone(SoSure::TIMEZONE))) {
             $startMonth = new \DateTime('2018-04-01 01:00:00', new \DateTimeZone(SoSure::TIMEZONE));
         }
+        /*
+        if ($startMonth == new \DateTime('2018-05-01 00:00:00', new \DateTimeZone(SoSure::TIMEZONE))) {
+            $startMonth = new \DateTime('2018-05-01 01:00:00', new \DateTimeZone(SoSure::TIMEZONE));
+        }
+        */
 
         return $startMonth;
     }
@@ -110,6 +115,7 @@ trait DateTrait
                 new \DateTimeZone($tz)
             );
         }
+
         return $nextMonth;
     }
 

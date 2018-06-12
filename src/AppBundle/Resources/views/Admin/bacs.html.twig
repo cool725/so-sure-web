@@ -24,8 +24,8 @@
 <div class="container" style="margin-bottom: 50px">
 
     <div class="row">
-        <div class="col-md-5">
-            <h1>so-sure Bacs for {{ month }} / {{ year }}</h1>
+        <div class="col-md-4">
+            <h1>so-sure Bacs <br> {{ month }} / {{ year }}</h1>
         </div>
         <form class="month-form form-inline" method="POST" autocomplete="off">
             <div class="col-md-3">
@@ -43,7 +43,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-5">
                 <div class="form-group" style="padding-top: 15px;">
                     <div class="btn-group">
                         <button type="button" class="btn btn-info" data-toggle="modal" data-target="#uploadModal"
@@ -55,16 +55,18 @@
                     > Approve Mandates <span class="badge" title="Actionable Mandates">{{ outstandingMandates }}</span></button>
                 </div>
                 <div class="form-group" style="padding-top: 15px;">
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#uploadSubmissionModal"
-                        > Upload Bacs File</button>
-                    </div>
-                </div>
-                <div class="form-group" style="padding-top: 15px;">
                     <button class="btn btn-success bacs-serial-edit" type="button"
                             data-toggle="modal" data-target="#editSequenceSerialNumberModal">
                         <span title="Current Sequence File">{{ currentSequence.seq }}</span> <i class="fa fa-edit"></i>
                     </button>
+                </div>
+                <div class="form-group" style="padding-top: 15px;">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#uploadDebitModal"
+                        > Upload Bacs Debit</button>
+                        <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#uploadCreditModal"
+                        > Upload Bacs Credit</button>
+                    </div>
                 </div>
             </div>
         </form>
@@ -87,6 +89,7 @@
             <li role="presentation" class="active"><a href="#dddc">Debits/Credits <span class="badge" title="Actionable Files">{{ dailyCount }}</span></a></li>
             <li role="presentation"><a href="#payments">Payments <span class="badge" title="Actionable Payments">{{ paymentsCount }}</span></a></li>
             <li role="presentation"><a href="#reports">Bacs Reports</a></li>
+            <li role="presentation"><a href="#reconciliation">Reconciliation</a></li>
         </ul>
         <div class="tab-content">
             <div role="tabpanel" class="tab-pane active" id="dddc">
@@ -97,13 +100,13 @@
                     <table class="table table-striped">
                         <tr>
                             <th width="30%">File name</th>
-                            <th width="50%">Details</th>
-                            <th width="10%">Submitted to BACS</th>
+                            <th width="45%">Details</th>
+                            <th width="15%">Submitted to BACS</th>
                             <th width="10%">Edit</th>
                         </tr>
                         {% for file in files %}
                             <tr>
-                                <td width="40%">
+                                <td width="30%">
                                     {{ file.key }}
                                     <a href="{{ path('admin_bacs_file', {'id': file.id }) }}" target="_blank"><i class="fa fa-download"></i></a>
                                     <br>
@@ -111,15 +114,17 @@
                                        data-details-url="{{ path('admin_bacs_serial_number_details', {'serial': file.serialNumber} ) }}">
                                         {{ file.serialNumber }}
                                     </a>
+                                    (Generated: {{  file.date|date('d M Y H:i', 'Europe/London')  }})
                                 </td>
-                                <td width="50%">
+                                <td width="45%">
                                     {{ file.metadata|json_encode }}
                                 </td>
-                                <td width="10%">
+                                <td width="15%">
                                     {% if file.isActioned %}
                                         {{ file.status }}
                                         {% if file.status == 'submitted' %}
-                                            <i class="fa fa-check text-success"></i>
+                                            <i class="fa fa-check text-success"></i><br>
+                                            {{  file.submittedDate|date('d M Y H:i', 'Europe/London')  }}
                                         {% elseif file.status == 'cancelled' %}
                                             <i class="fa fa-minus text-danger"></i>
                                         {% endif %}
@@ -351,7 +356,86 @@
                     {% endfor %}
                     </table>
                 {% endif %}
+                </div>
 
+                <div role="tabpanel" class="tab-pane" id="reconciliation">
+                    <h2>Reconciliation</h2>
+                    {% if files|length == 0 %}
+                        <p>No data present</p>
+                    {% else %}
+                        <table class="table table-striped">
+                            <tr>
+                                <th width="25%">Serial Number</th>
+                                <th width="25%">Debit Amount</th>
+                                <th width="25%">Payment Amount</th>
+                                <th width="25%">Bacs Report Amount</th>
+                            </tr>
+                            {% for file in files if file.status != 'cancelled' %}
+                                {% set debitAmount = 0 %}
+                                {%  if file and file.metadata %}
+                                    {% set debitAmount = file.metadata['debit-amount'] %}
+                                {% endif %}
+
+                                {% set paymentAmount = 0 %}
+                                {% for payment in payments if payment.serialNumber %}
+                                    {% if payment.serialNumber == file.serialNumber %}
+                                        {% set paymentAmount = paymentAmount + payment.amount %}
+                                    {% endif %}
+                                {% endfor %}
+
+                                {% set reportAmount = 0 %}
+                                {% for inputFile in input %}
+                                    {%  if inputFile.metadata and inputFile.getFormattedSerialNumber == file.serialNumber %}
+                                        {% set reportAmount = reportAmount + inputFile.metadata['debit-accepted-value'] %}
+                                    {% endif %}
+                                {% endfor %}
+
+                                <tr>
+                                    <td width="25%">
+                                        {{ file.serialNumber }}
+                                    </td>
+                                    <td width="25%">
+                                        <span title="{{ file.metadata|json_encode }}">
+                                        {% if file.metadata %}
+                                            {{ debitAmount|number_format(2, '.', ',') }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                        </span>
+                                    </td>
+
+                                    {% set color = '' %}
+                                    {% if equal_to_two_dp(debitAmount, paymentAmount) %}
+                                        {% set color = 'success' %}
+                                    {% else %}
+                                        {% set color = 'danger' %}
+                                    {% endif %}
+                                    <td class="{{ color }}" width="25%">
+                                        {% if paymentAmount > 0 %}
+                                            {{ paymentAmount|number_format(2, '.', ',') }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+
+                                    {% set color = '' %}
+                                    {% if equal_to_two_dp(debitAmount, reportAmount) and equal_to_two_dp(paymentAmount, reportAmount)  %}
+                                        {% set color = 'success' %}
+                                    {% else %}
+                                        {% set color = 'danger' %}
+                                    {% endif %}
+                                    <td class="{{ color }}" width="25%">
+                                        {% if reportAmount > 0 %}
+                                            {{ reportAmount|number_format(2, '.', ',') }}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
@@ -380,24 +464,47 @@
         </div>
     </div>
 
-    <div class="modal fade" id="uploadSubmissionModal" tabindex="-1" role="dialog">
+    <div class="modal fade" id="uploadDebitModal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Bacs Submission File Upload</h4>
+                    <h4 class="modal-title">Bacs Debit (Payments from Customers) File Upload</h4>
                 </div>
                 <div class="modal-body">
-                    {{ form_start(uploadSubmissionForm) }}
+                    {{ form_start(uploadDebitForm) }}
                     <div class="form-group">
-                        {{ form_label(uploadSubmissionForm.file, 'File') }}
-                        {{ form_errors(uploadSubmissionForm.file) }}
-                        {{ form_widget(uploadSubmissionForm.file) }}
+                        {{ form_label(uploadDebitForm.file, 'File') }}
+                        {{ form_errors(uploadDebitForm.file) }}
+                        {{ form_widget(uploadDebitForm.file) }}
                     </div>
                     <div class="form-group">
-                        {{ form_widget(uploadSubmissionForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-danger'}}) }}
+                        {{ form_widget(uploadDebitForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-danger'}}) }}
                     </div>
-                    {{ form_end(uploadSubmissionForm) }}
+                    {{ form_end(uploadDebitForm) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="uploadCreditModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Bacs Credit (Refunds to Customers) File Upload</h4>
+                </div>
+                <div class="modal-body">
+                    {{ form_start(uploadCreditForm) }}
+                    <div class="form-group">
+                        {{ form_label(uploadCreditForm.file, 'File') }}
+                        {{ form_errors(uploadCreditForm.file) }}
+                        {{ form_widget(uploadCreditForm.file) }}
+                    </div>
+                    <div class="form-group">
+                        {{ form_widget(uploadCreditForm.upload, {'label': 'Upload', 'attr': {'class': 'btn btn-danger'}}) }}
+                    </div>
+                    {{ form_end(uploadCreditForm) }}
                 </div>
             </div>
         </div>

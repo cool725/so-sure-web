@@ -50,7 +50,7 @@ class ClaimsController extends BaseController
      */
     public function claimsPoliciesAction(Request $request)
     {
-        if ($this->get('security.authorization_checker')->isGranted('ROLE_EMPLOYEE')) {
+        if ($this->get('security.authorization_checker')->isGranted(User::ROLE_EMPLOYEE)) {
             $this->addFlash('warning', 'Redirected to Admin Site');
 
             return $this->redirectToRoute('admin_policies');
@@ -86,7 +86,7 @@ class ClaimsController extends BaseController
      */
     public function userAction($id)
     {
-        if ($this->get('security.authorization_checker')->isGranted('ROLE_EMPLOYEE')) {
+        if ($this->get('security.authorization_checker')->isGranted(User::ROLE_EMPLOYEE)) {
             $this->addFlash('warning', 'Redirected to Admin Site');
 
             return $this->redirectToRoute('admin_user', ['id' => $id]);
@@ -111,7 +111,7 @@ class ClaimsController extends BaseController
      */
     public function claimsPolicyAction(Request $request, $id)
     {
-        if ($this->get('security.authorization_checker')->isGranted('ROLE_EMPLOYEE')) {
+        if ($this->get('security.authorization_checker')->isGranted(User::ROLE_EMPLOYEE)) {
             $this->addFlash('warning', 'Redirected to Admin Site');
 
             return $this->redirectToRoute('admin_policy', ['id' => $id]);

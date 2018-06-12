@@ -27,7 +27,7 @@ class CancelPolicyType extends AbstractType
         $data = $this->addCancellationReason($data, $policy, Policy::CANCELLED_UPGRADE, 'Upgrade');
 
         $preferred = [];
-        if ($policy->isWithinCooloffPeriod() && !$policy->hasMonetaryClaimed(true)) {
+        if ($policy->isWithinCooloffPeriod(null, false) && !$policy->hasMonetaryClaimed(true)) {
             // if requested cancellation reason has already been set by the user, just allow cooloff
             // however, if not set, then allow subcategories
             if ($policy->getRequestedCancellationReason()) {
@@ -38,6 +38,26 @@ class CancelPolicyType extends AbstractType
                     $value = Cancel::getEncodedCooloffReason($cooloff);
                     $data = $this->addCancellationReason($data, $policy, Policy::CANCELLED_COOLOFF, $value, $value);
                     $preferred[] = $value;
+                }
+            }
+        } elseif ($policy->isWithinCooloffPeriod(null, true) && !$policy->hasMonetaryClaimed(true)) {
+            $data = $this->addCancellationReason($data, $policy, Policy::CANCELLED_USER_REQUESTED, 'User Requested');
+            $preferred[] = Policy::CANCELLED_USER_REQUESTED;
+
+            // if requested cancellation reason has already been set by the user, just allow cooloff
+            // however, if not set, then allow subcategories
+            if ($policy->getRequestedCancellationReason()) {
+                $data = $this->addCancellationReason($data, $policy, Policy::CANCELLED_COOLOFF, 'Cooloff (Extended)');
+            } else {
+                foreach (Policy::$cooloffReasons as $cooloff) {
+                    $value = Cancel::getEncodedCooloffReason($cooloff);
+                    $data = $this->addCancellationReason(
+                        $data,
+                        $policy,
+                        Policy::CANCELLED_COOLOFF,
+                        sprintf('%s (Extended)', $value),
+                        $value
+                    );
                 }
             }
         } else {

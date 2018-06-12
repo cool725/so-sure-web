@@ -13,7 +13,7 @@ window.fbAsyncInit = function() {
   FB.init({
     appId: document.getElementById('ss-root').getAttribute('data-fb-id'),
     xfbml: true,
-    version: 'v2.5',
+    version: 'v2.12',
     status     : true
   });
 };
@@ -109,7 +109,7 @@ $(function() {
     $('#swap-login').on('click', function(e) {
         e.preventDefault();
         $('.login-email, .login-account-kit').toggle();
-        $(this).find('span').toggleText('mobile', 'email');
+        $(this).find('span').toggleText('SMS', 'email');
         $('.error-text').hide();
     });
 

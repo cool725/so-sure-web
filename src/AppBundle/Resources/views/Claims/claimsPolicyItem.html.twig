@@ -72,6 +72,20 @@
                             <td>{{ policy.imei }}
                             </td>
                         </tr>
+                        <tr>
+                            <td>
+                                IMEI Circumvention
+                            </td>
+                            <td>
+                                {% if policy.imeiCircumvention is null %}
+                                    <span> Pre Anti-fraud check</span>
+                                {% elseif policy.imeiCircumvention == true %}
+                                    <span class="fa fa-exclamation-triangle"> Possible Fraud <span class="fa fa-exclamation-triangle"></span></span>
+                                {% elseif policy.imeiCircumvention == false %}
+                                    <span class="fa fa-thumbs-up"> No Fraud Detected <span class="fa fa-thumbs-up"></span></span>
+                                {% endif %}
+                            </td>
+                        </tr>
                         {% endif %}
                         <tr>
                             <td>Policy Status</td>
@@ -460,7 +474,7 @@
                                     data-toggle="modal" data-target="#notesModal"
                                 data-update="{{ path('claims_notes', {'id': claim.id}) }}"
                                 data-notes="{{ claim.notes }}"><i class="fa fa-edit"></i></button>
-                              {% if is_granted('ROLE_ADMIN') %}
+                              {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
                             <button title="Flags" type="button" class="btn btn-primary"
                                     data-toggle="modal" data-target="#flagsModal"
                                     data-flags="{{ claim.ignoreWarningFlags|json_encode }}"
@@ -883,6 +897,8 @@
                         {% endif %}
                     </td>
                 </tr>
+                {% endif %}
+                {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
                 <tr>
                     <td><i class="fa fa-lock" title="Admin only"></i> Pay Policy</td>
                     <td>
@@ -1075,6 +1091,8 @@
                       <th>Date</th>
                       <th>Amount</th>
                       <th>Status</th>
+                      <th>Payment Status</th>
+                      <th>Actions</th>
                   </tr>
                   {% for scheduledPayment in policy.scheduledPayments %}
                     <tr>
@@ -1097,6 +1115,26 @@
                         </td>
                         <td>
                             {{ scheduledPayment.status }}
+                        </td>
+                        <td>
+                            {% if scheduledPayment.payment %}
+                                {{ scheduledPayment.payment.status }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
+                                {% if policy.nextScheduledPayment and policy.nextScheduledPayment.id == scheduledPayment.id %}
+                                    <button title="Run Scheduled Payment" type="button" class="btn btn-warning"
+                                            data-toggle="modal" data-target="#runScheduledPaymentModal"
+                                            ><i class="fa fa-play"></i> Run</button>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            {% else %}
+                                -
+                            {% endif %}
                         </td>
                     </tr>
                   {% endfor %}
@@ -1130,7 +1168,7 @@
       </div>
     </div>
 
-    {% if is_granted('ROLE_ADMIN') %}
+    {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
     <div class="modal fade" id="flagsModal" tabindex="-1" role="dialog">
       <div class="modal-dialog" role="document" style="width: 60%;">
         <div class="modal-content">
@@ -1158,6 +1196,40 @@
         </div>
       </div>
     </div>
+    {% endif %}
+
+    {% if is_granted('ROLE_CUSTOMER_SERVICES') %}
+        <div class="modal fade" id="runScheduledPaymentModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document" style="width: 60%;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Run Scheduled Payment (Only if user has requested/confirmed)</h4>
+                    </div>
+                    {{ form_start(run_scheduled_payment_form )}}
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h4>This will reschedule the payment for the next working day</h4>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    Upload an image (intercom/email) of the request by the user to re-scheduled the payment
+                                    {{ form_errors(run_scheduled_payment_form.file) }}
+                                    {{ form_widget(run_scheduled_payment_form.file) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        {{ form_widget(run_scheduled_payment_form.upload, {'label': 'Reschedule', 'attr': {'class': 'btn btn-success'}}) }}
+                    </div>
+                    {{ form_end(run_scheduled_payment_form )}}
+                </div>
+            </div>
+        </div>
     {% endif %}
 
     {% include 'AppBundle::Claims/claimsModal.html.twig' with {'route': 'admin_policy', 'policyId': policy.id  } %}

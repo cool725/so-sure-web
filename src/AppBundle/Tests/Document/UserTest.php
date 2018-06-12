@@ -205,13 +205,13 @@ class UserTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($user->isCredentialsNonExpired());
 
         $user = new User();
-        $user->addRole('ROLE_EMPLOYEE');
+        $user->addRole(User::ROLE_EMPLOYEE);
         $user->passwordChange('a', 'b', new \DateTime('2011-01-01'));
         $this->assertTrue($user->isPasswordChangeRequired());
         $this->assertFalse($user->isCredentialsNonExpired());
 
         $user = new User();
-        $user->addRole('ROLE_CLAIMS');
+        $user->addRole(User::ROLE_CLAIMS);
         $user->passwordChange('a', 'b', new \DateTime('2011-01-01'));
         $this->assertTrue($user->isPasswordChangeRequired());
         $this->assertFalse($user->isCredentialsNonExpired());
@@ -578,7 +578,7 @@ class UserTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldDeleteRoles()
     {
-        foreach ([User::ROLE_CLAIMS, User::ROLE_EMPLOYEE, User::ROLE_ADMIN] as $role) {
+        foreach ([User::ROLE_CLAIMS, User::ROLE_EMPLOYEE, User::ROLE_CUSTOMER_SERVICES, User::ROLE_ADMIN] as $role) {
             $user = new User();
             $user->setCreated(new \DateTime('2016-01-01'));
             $this->assertTrue($user->shouldDelete(new \DateTime('2017-07-03')));

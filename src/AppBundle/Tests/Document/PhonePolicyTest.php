@@ -1248,6 +1248,9 @@ class PhonePolicyTest extends WebTestCase
         $policyF->setStatus(SalvaPhonePolicy::STATUS_UNPAID);
         $policyF->cancel(SalvaPhonePolicy::CANCELLED_UNPAID);
         $this->assertTrue($policyF->isCancelledWithUserDeclined());
+
+        $claimF->setIgnoreWarningFlags(Claim::WARNING_FLAG_IGNORE_USER_DECLINED);
+        $this->assertFalse($policyF->isCancelledWithUserDeclined());
     }
 
     public function testCancelPolicyPolicyDeclined()
@@ -2228,7 +2231,8 @@ class PhonePolicyTest extends WebTestCase
         $policy->setStart(new \DateTime("2016-01-01"));
         $this->assertTrue($policy->isWithinCooloffPeriod(new \DateTime("2016-01-01")));
         $this->assertTrue($policy->isWithinCooloffPeriod(new \DateTime("2016-01-14 23:59:59")));
-        $this->assertFalse($policy->isWithinCooloffPeriod(new \DateTime("2016-01-15")));
+        $this->assertFalse($policy->isWithinCooloffPeriod(new \DateTime("2016-01-15"), false));
+        $this->assertFalse($policy->isWithinCooloffPeriod(new \DateTime("2016-01-31"), true));
     }
 
     public function testActiveSCode()
@@ -3572,6 +3576,7 @@ class PhonePolicyTest extends WebTestCase
     public function testDisplayRepurchase()
     {
         $policy = $this->getPolicy(static::generateEmail('testDisplayRepurchase', $this));
+        $policy2 = $this->getPolicy(static::generateEmail('testDisplayRepurchase2', $this));
 
         $this->assertFalse($policy->displayRepurchase());
 
@@ -3613,6 +3618,17 @@ class PhonePolicyTest extends WebTestCase
         $policy->addClaim($claim);
         $this->assertFalse($policy->isCancelledWithUserDeclined());
         $this->assertTrue($policy->displayRepurchase());
+
+        $policy2->setStatus(SalvaPhonePolicy::STATUS_CANCELLED);
+        $policy2->setCancelledReason(SalvaPhonePolicy::CANCELLED_UNPAID);
+        $this->assertTrue($policy2->displayRepurchase());
+
+        $claim2 = new Claim();
+        $claim2->setStatus(Claim::STATUS_WITHDRAWN);
+        $claim2->setIgnoreWarningFlags(Claim::WARNING_FLAG_IGNORE_USER_DECLINED);
+        $policy2->addClaim($claim2);
+        $this->assertFalse($policy2->isCancelledWithUserDeclined());
+        $this->assertTrue($policy2->displayRepurchase());
     }
 
     public function testCreateRepurchase()

@@ -1,0 +1,22 @@
+// login.scss
+
+@import "../mixins";
+@import "../common/palette";
+@import "../common/paletteNew";
+@import "../common/type";
+
+body {
+    background-color: $off-white;
+}
+
+.navbar {
+    background-color: $white;
+}
+
+.login {
+    &__panel {
+        max-width: 390px;
+        margin: 0 auto;
+    }
+}
+

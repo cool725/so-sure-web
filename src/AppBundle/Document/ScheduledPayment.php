@@ -15,6 +15,7 @@ use AppBundle\Classes\SoSure;
  */
 class ScheduledPayment
 {
+    use DateTrait;
     use CurrencyTrait;
 
     const STATUS_SCHEDULED = 'scheduled';
@@ -127,6 +128,9 @@ class ScheduledPayment
         $this->scheduled = $scheduled;
     }
 
+    /**
+     * @return \DateTime|null
+     */
     public function getScheduled()
     {
         if ($this->scheduled) {
@@ -138,7 +142,7 @@ class ScheduledPayment
 
     public function getScheduledDay()
     {
-        return $this->getScheduled()->format('j');
+        return $this->getScheduled() ? $this->getScheduled()->format('j') : null;
     }
 
     public function setPayment(Payment $payment)
@@ -185,6 +189,19 @@ class ScheduledPayment
         return $rescheduled;
     }
 
+    public function adminReschedule(\DateTime $date = null)
+    {
+        if (!$date) {
+            $date = new \DateTime();
+            $date = $this->addBusinessDays($date, 1);
+        } else {
+            $date = clone $date;
+        }
+
+        $this->setScheduled($date);
+        $this->setType(self::TYPE_ADMIN);
+    }
+
     public function isBillable()
     {
         // Admin should ignore billable status to allow an expired policy to be billed
@@ -228,7 +245,7 @@ class ScheduledPayment
             throw new \Exception(sprintf(
                 'Scheduled payment %s can not yet be run (scheduled: %s)',
                 $this->getId(),
-                $this->getScheduled()->format('Y-m-d H:i:s')
+                $this->getScheduled() ? $this->getScheduled()->format('Y-m-d H:i:s') : '?'
             ));
         }
 
@@ -242,7 +259,7 @@ class ScheduledPayment
 
     public function hasCorrectBillingDay()
     {
-        if ($this->getType() == self::TYPE_RESCHEDULED) {
+        if ($this->getType() == self::TYPE_RESCHEDULED || !$this->getScheduled()) {
             return null;
         }
 

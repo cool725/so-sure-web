@@ -62,6 +62,8 @@ class DefaultController extends BaseController
 
     /**
      * @Route("/", name="homepage", options={"sitemap"={"priority":"1.0","changefreq":"daily"}})
+     * @Route("/replacement-24", name="replacement_24_landing")
+     * @Route("/replacement-72", name="replacement_72_landing")
      */
     public function indexAction(Request $request)
     {
@@ -92,10 +94,24 @@ class DefaultController extends BaseController
             ['no-trustpilot', 'trustpilot']
         );
 
+        $force = null;
+        $trafficFraction = '0.0000001';
+        if ($request->get('_route') == 'replacement_24_landing') {
+            $force = 'next-working-day';
+            $trafficFraction = 1;
+        } elseif ($request->get('_route') == 'replacement_72_landing') {
+            $force = 'seventytwo-hours';
+            $trafficFraction = 1;
+        }
+
         $replacement = $this->sixpack(
             $request,
-            SixpackService::EXPERIMENT_72_REPLACEMENT,
-            ['next-working-day', 'seventytwo-hours']
+            SixpackService::EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT,
+            ['default', 'next-working-day', 'seventytwo-hours'],
+            SixpackService::LOG_MIXPANEL_CONVERSION,
+            null,
+            $trafficFraction,
+            $force
         );
 
         $picsure = $this->sixpack(
@@ -134,24 +150,9 @@ class DefaultController extends BaseController
     /**
      * @Route("/money", name="money")
      */
-    public function moneyLanding(Request $request)
+    public function moneyLanding()
     {
-        /** @var RequestService $requestService */
-        $requestService = $this->get('app.request');
-        if ($requestService->getDeviceCategory() == RequestService::DEVICE_CATEGORY_MOBILE) {
-            $exp = $this->sixpack(
-                $request,
-                SixpackService::EXPERIMENT_MONEY_LANDING,
-                ['homepage', 'money']
-            );
-            if ($exp == 'money') {
-                return $this->render('AppBundle:Default:indexMoney.html.twig');
-            } else {
-                return $this->redirectToRoute('homepage');
-            }
-        } else {
-            return $this->render('AppBundle:Default:indexMoney.html.twig');
-        }
+        return $this->render('AppBundle:Default:indexMoney.html.twig');
     }
 
     /**
@@ -435,9 +436,7 @@ class DefaultController extends BaseController
     public function loginRedirectAction()
     {
         if ($this->getUser()) {
-            if ($this->isGranted('ROLE_ADMIN')) {
-                return $this->redirectToRoute('admin_home');
-            } elseif ($this->isGranted('ROLE_EMPLOYEE')) {
+            if ($this->isGranted(User::ROLE_EMPLOYEE)) {
                 return $this->redirectToRoute('admin_home');
             } elseif ($this->isGranted('ROLE_CLAIMS')) {
                 return $this->redirectToRoute('claims_policies');
