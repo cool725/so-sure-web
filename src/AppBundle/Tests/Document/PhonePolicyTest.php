@@ -3576,6 +3576,7 @@ class PhonePolicyTest extends WebTestCase
     public function testDisplayRepurchase()
     {
         $policy = $this->getPolicy(static::generateEmail('testDisplayRepurchase', $this));
+        $policy2 = $this->getPolicy(static::generateEmail('testDisplayRepurchase2', $this));
 
         $this->assertFalse($policy->displayRepurchase());
 
@@ -3617,6 +3618,17 @@ class PhonePolicyTest extends WebTestCase
         $policy->addClaim($claim);
         $this->assertFalse($policy->isCancelledWithUserDeclined());
         $this->assertTrue($policy->displayRepurchase());
+
+        $policy2->setStatus(SalvaPhonePolicy::STATUS_CANCELLED);
+        $policy2->setCancelledReason(SalvaPhonePolicy::CANCELLED_UNPAID);
+        $this->assertTrue($policy2->displayRepurchase());
+
+        $claim2 = new Claim();
+        $claim2->setStatus(Claim::STATUS_WITHDRAWN);
+        $claim2->setIgnoreWarningFlags(Claim::WARNING_FLAG_IGNORE_USER_DECLINED);
+        $policy2->addClaim($claim2);
+        $this->assertFalse($policy2->isCancelledWithUserDeclined());
+        $this->assertTrue($policy2->displayRepurchase());
     }
 
     public function testCreateRepurchase()
