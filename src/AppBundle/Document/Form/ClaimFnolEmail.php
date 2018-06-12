@@ -24,15 +24,4 @@ class ClaimFnolEmail
         $this->email = $email;
     }
 
-/*
-    public function populateFromUser($user)
-    {
-        $this->setEmail($user->getEmail());
-    }
-
-    public function populateUser($user)
-    {
-        $user->setEmail($this->getEmail());
-    }
-    */
 }

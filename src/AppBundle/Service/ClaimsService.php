@@ -23,6 +23,9 @@ class ClaimsService
     /** @var MailerService */
     protected $mailer;
 
+    /** @var RouterService */
+    protected $routerService;
+
     /** @var Client */
     protected $redis;
 
@@ -33,6 +36,7 @@ class ClaimsService
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
      * @param MailerService   $mailer
+     * @param RouterService   $routerService
      * @param Client          $redis
      * @param string          $environment
      */
@@ -40,11 +44,15 @@ class ClaimsService
         DocumentManager $dm,
         LoggerInterface $logger,
         MailerService $mailer,
+        RouterService $routerService,
+        $redis,
         $environment
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
         $this->mailer = $mailer;
+        $this->routerService = $routerService;
+        $this->redis = $redis;
         $this->environment = $environment;
     }
 
@@ -234,29 +242,25 @@ class ClaimsService
             $token = md5(sprintf('%s%s', time(), $user->getEmail()));
             $this->redis->setex($token, 900, $user->getId());
 
+            $data = [
+                'username' => $user->getName(),
+                'tokenUrl' => $this->routerService->generate(
+                    'claim_login',
+                    ['tokenId' => $token],
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                ),
+                'tokenValid' => 15
+            ];
+
+            var_dump($data);
+
             $this->mailer->sendTemplate(
                 'Your link to proceed with your claim',
-                $user()->getEmail(),
+                $user->getEmail(),
                 "AppBundle:Email:claim/loginLink.html.twig",
-                [
-                    'username' => $user->getName(),
-                    'tokenUrl' => $this->router->generate(
-                        'claim_login',
-                        ['tokenId' => $token],
-                        UrlGeneratorInterface::ABSOLUTE_URL
-                    ),
-                    'tokenValid' => 15
-                ],
+                $data,
                 "AppBundle:Email:claim/loginLink.txt.twig",
-                [
-                    'username' => $user->getName(),
-                    'tokenUrl' => $this->router->generate(
-                        'claim_login',
-                        ['tokenId' => $token],
-                        UrlGeneratorInterface::ABSOLUTE_URL
-                    ),
-                    'tokenValid' => 15
-                ]
+                $data
             );
 
             return true;
@@ -265,6 +269,11 @@ class ClaimsService
         }
 
         return false;
+    }
+
+    public function getUserIdFromLoginLinkToken($tokenId)
+    {
+        return $this->redis->get($tokenId);
     }
 
 }

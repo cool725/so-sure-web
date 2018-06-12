@@ -176,8 +176,14 @@ class ClaimFnol
         }
     }
 
+    public function getUser()
+    {
+        return $this->user;
+    }
+
     public function setUser(User $user)
     {
+        $this->user = $user;
         if ($user) {
             $this->name = $user->getName();
             $this->email = $user->getEmail();

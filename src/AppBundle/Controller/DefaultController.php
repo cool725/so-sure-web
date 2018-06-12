@@ -43,7 +43,6 @@ use AppBundle\Form\Type\ClaimFnolType;
 use AppBundle\Document\Form\Register;
 use AppBundle\Document\Form\PhoneMake;
 use AppBundle\Document\Form\ClaimFnolEmail;
-use AppBundle\Document\Form\ClaimFnol;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
 use AppBundle\Document\Lead;
@@ -515,10 +514,39 @@ class DefaultController extends BaseController
 
     /**
      * @Route("/claim", name="claim")
+     * @Route("/claim/login/{tokenId}", name="claim_login")
      * @Template
      */
-    public function claimAction(Request $request)
+    public function claimAction(Request $request, $tokenId = null)
     {
+        $user = $this->getUser();
+
+        if ($request->get('_route') == 'claim_login') {
+            if (!$user && $tokenId) {
+                /** @var ClaimsService $claimsService */
+                $claimsService = $this->get('app.claims');
+                $userId = $claimsService->getUserIdFromLoginLinkToken($tokenId);
+                if (!$userId) {
+                    throw $this->createNotFoundException('Invalid link');
+                }
+
+                $dm = $this->getManager();
+                $userRepo = $dm->getRepository(User::class);
+                $user = $userRepo->find($userId);
+            }
+
+            if ($user) {
+                $this->get('fos_user.security.login_manager')->loginUser(
+                    $this->getParameter('fos_user.firewall_name'),
+                    $user
+                );
+
+                return $this->redirectToRoute('claim_policy');                
+            }
+
+            throw $this->createNotFoundException('Invalid link');
+        }
+
         $claimFnolEmail = new ClaimFnolEmail();
 
         $claimEmailForm = $this->get('form.factory')

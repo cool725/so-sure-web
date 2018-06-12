@@ -27,6 +27,7 @@ use AppBundle\Document\BankAccount;
 use AppBundle\Document\Form\Renew;
 use AppBundle\Document\Form\RenewCashback;
 use AppBundle\Document\Form\Bacs;
+use AppBundle\Document\Form\ClaimFnol;
 use AppBundle\Form\Type\BacsType;
 use AppBundle\Form\Type\BacsConfirmType;
 use AppBundle\Form\Type\PhoneType;
@@ -43,6 +44,7 @@ use AppBundle\Form\Type\RenewConnectionsType;
 use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Form\BillingDay;
 use AppBundle\Form\Type\BillingDayType;
+use AppBundle\Form\Type\ClaimFnolType;
 
 use AppBundle\Service\FacebookService;
 use AppBundle\Security\InvitationVoter;
@@ -1403,18 +1405,34 @@ class UserController extends BaseController
     }
 
     /**
-     * @Route("/claim/login/{tokenId}", name="claim_login")
      * @Route("/claim/{policyId}", name="claim_policy")
      * @Template
      */
-    public function claimAction(Request $request, $tokenId = null, $policyId = null)
+    public function claimAction(Request $request, $policyId = null)
     {
         $user = $this->getUser();
-        $claimFnol = new ClaimFnol();
+
+        $this->denyAccessUnlessGranted(UserVoter::VIEW, $user);
+
+        if (!$user->hasActivePolicy()) {
+            throw $this->createNotFoundException('No active policy found');
+        }
+
+        $dm = $this->getManager();
+        $policyRepo = $dm->getRepository(Policy::class);
+        $policy = null;
 
         if ($policyId) {
-            $repo = $this->getManager()->getRepository(Policy::class);
-            $policy = $repo->find($policyId);
+            $policy = $policyRepo->find($id);
+            if (!$policy) {
+                throw $this->createNotFoundException('Policy not found');
+            }
+            $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
+        }
+
+        $claimFnol = new ClaimFnol();
+
+        if ($policy) {
             $claimFnol->setPolicy($policy);
         } elseif ($user) {
             $claimFnol->setUser($user);
@@ -1428,41 +1446,18 @@ class UserController extends BaseController
             if ($request->request->has('claim_form')) {
                 $claimForm->handleRequest($request);
                 if ($claimForm->isValid()) {
-                    $mailer = $this->get('app.mailer');
-                    $subject = sprintf(
-                        'New Claim from %s/%s',
-                        $claimFnol->getName(),
-                        $claimFnol->getPolicyNumber()
-                    );
-                    $mailer->sendTemplate(
-                        $subject,
-                        'new-claim@wearesosure.com',
-                        'AppBundle:Email:claim/fnolToClaims.html.twig',
-                        ['data' => $claimFnol]
-                    );
-
-                    $mailer->sendTemplate(
-                        'Your claim with so-sure',
-                        $claimFnol->getEmail(),
-                        'AppBundle:Email:claim/fnolResponse.html.twig',
-                        ['data' => $claimFnol],
-                        'AppBundle:Email:claim/fnolResponse.txt.twig',
-                        ['data' => $claimFnol]
-                    );
-
-                    $this->addFlash(
-                        'success',
-                        "Thanks. We'll be in touch shortly"
-                    );
 
                     return $this->redirectToRoute('claim');
                 }
             }
         }
 
-        return [
+        $data = [
+            'username' => $user->getName(),
             'claim_form' => $claimForm->createView(),
         ];
+
+        return $this->render('AppBundle:User:claim.html.twig', $data);
     }
 
     /**

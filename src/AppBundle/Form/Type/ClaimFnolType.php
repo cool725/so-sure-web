@@ -39,7 +39,6 @@ class ClaimFnolType extends AbstractType
         $builder
             ->add('email', EmailType::class)
             ->add('name', TextType::class)
-            ->add('policyNumber', TextType::class)
             ->add('phone', TextType::class)
             ->add('when', DateType::class, [
                   'required' => $this->required,
@@ -65,6 +64,25 @@ class ClaimFnolType extends AbstractType
             ->add('message', TextareaType::class)
             ->add('submit', SubmitType::class)
         ;
+
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            $form = $event->getForm();
+            $data = $event->getData();
+
+            $policies = array();
+            $userPolicies = $data->getUser()->getValidPolicies(true);
+            foreach ($userPolicies as $policy) {
+                $userPolicies[$policy->getId()] = $policy->getPolicyNumber();
+            }
+
+            $form->add('policyNumber', ChoiceType::class, [
+                'required' => true,
+                'expanded' => false,
+                'multiple' => false,
+                'choices' => $userPolicies
+            ]);
+        });
     }
 
     public function configureOptions(OptionsResolver $resolver)

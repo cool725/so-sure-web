@@ -178,6 +178,7 @@ services:
             - "@doctrine_mongodb.odm.default_document_manager"
             - "@logger"
             - "@app.mailer"
+            - "@app.router"
             - "@snc_redis.default"
             - "%kernel.environment%"
 
