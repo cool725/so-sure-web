@@ -1499,7 +1499,7 @@ class DaviesServiceTest extends WebTestCase
     public function testSaveClaimsRepudiatedEmailTest()
     {
         $policy = static::createUserPolicy(true);
-        $policy->getUser()->setEmail(static::generateEmail('testSaveClaimsReplacementDate', $this));
+        $policy->getUser()->setEmail(static::generateEmail('testSaveClaimsRepudiatedEmailTest', $this));
         $claim = new Claim();
         $claim->setNumber(rand(1, 999999));
         $claim->setType(Claim::TYPE_LOSS);
