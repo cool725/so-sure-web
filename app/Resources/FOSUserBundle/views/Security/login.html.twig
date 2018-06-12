@@ -1,17 +1,5 @@
 {% extends "FOSUserBundle::layout.html.twig" %}
 
-{# Set vars #}
-{% set new_stylesheet = 1 %}
-{% set distraction_free = 1 %}
-{% set new_footer = 1 %}
-
-{% block stylesheets %}
-    {{ parent() }}
-    {% stylesheets output='css/*.css'
-    '@AppBundle/Resources/public/sass/page/login.scss'
- %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
-{% endblock %}
-
 {% block fos_user_content %}
     <div class="panel login__panel">
         <div class="panel-body">
@@ -125,14 +113,3 @@
         <input type="hidden" id="accountkit-csrf" name="csrf">
     </form>
 {% endblock fos_user_content %}
-
-{% block javascripts %}
-    {{ parent() }}
-    {% javascripts
-        'components/jquery-validation/jquery.validate.js'
-        '../app/Resources/public/js/login.js'
-    %}
-    <script src="{{ asset_url }}"></script>
-    {% endjavascripts %}
-    <script src="https://sdk.accountkit.com/en_US/sdk.js"></script>
-{% endblock %}

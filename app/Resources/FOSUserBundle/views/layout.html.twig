@@ -1,19 +1,40 @@
-{% set exclude_remote_scripts = true %}
-
 {% extends '::base.html.twig' %}
+
+{# Set vars #}
+{% set exclude_remote_scripts = true %}
+{% set new_stylesheet = 1 %}
+{% set distraction_free = 1 %}
+{% set new_footer = 1 %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets output='css/*.css'
+    '@AppBundle/Resources/public/sass/page/login.scss'
+ %}<link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
 {% block body %}
+    <section class="section--pad login">
+        <div class="container text-center">
+            <div class="row">
+                <div class="col-md-12">
 
-<section class="section--pad login">
-    <div class="container text-center">
-        <div class="row">
-            <div class="col-md-12">
+                    {% block fos_user_content %}
+                    {% endblock fos_user_content %}
 
-                {% block fos_user_content %}
-                {% endblock fos_user_content %}
-
+                </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
+{% endblock %}
 
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+        'components/jquery-validation/jquery.validate.js'
+        '../app/Resources/public/js/login.js'
+    %}
+    <script src="{{ asset_url }}"></script>
+    {% endjavascripts %}
+    <script src="https://sdk.accountkit.com/en_US/sdk.js"></script>
 {% endblock %}

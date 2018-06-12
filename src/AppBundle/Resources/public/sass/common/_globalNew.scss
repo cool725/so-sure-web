@@ -222,16 +222,6 @@ mark.mgreen {
 	    display: none !important;
 	}
 
-	.login-box {
-		min-height: 250px;
-		max-width: 345px;
-		margin: 0 auto;
-
-		&--controls {
-			min-height: 0;
-		}
-	}
-
 // Google Maps
 .google-map {
     position: relative;
