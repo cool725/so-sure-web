@@ -56,6 +56,11 @@ class ClaimFnol
     protected $type;
 
     /**
+     * @Assert\Choice({"loss", "theft", "damage", "warranty", "extended-warranty"}, strict=true)
+     */
+    protected $network;
+
+    /**
      * @Assert\Length(min="50", max="1000")
      */
     protected $message;
@@ -140,6 +145,16 @@ class ClaimFnol
     public function setType($type)
     {
         $this->type = $type;
+    }
+
+    public function getNetwork()
+    {
+        return $this->network;
+    }
+    
+    public function setNetwork($network)
+    {
+        $this->network = $network;
     }
     
     public function getMessage()

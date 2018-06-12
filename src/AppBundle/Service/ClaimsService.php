@@ -252,7 +252,7 @@ class ClaimsService
                 'tokenValid' => 15
             ];
 
-            var_dump($data);
+            //var_dump($data);
 
             $this->mailer->sendTemplate(
                 'Your link to proceed with your claim',

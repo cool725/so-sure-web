@@ -56,9 +56,18 @@ class ClaimFnolType extends AbstractType
                 'required' => true,
                 'placeholder' => 'My phone is...',
                 'choices' => [
-                    'My phone is lost' => Claim::TYPE_LOSS,
-                    'My phone was stolen' => Claim::TYPE_THEFT,
-                    'My phone is damaged or not working' => Claim::TYPE_DAMAGE,
+                    'Lost' => Claim::TYPE_LOSS,
+                    'Stolen' => Claim::TYPE_THEFT,
+                    'Damaged or not working' => Claim::TYPE_DAMAGE,
+                ],
+            ])
+            ->add('network', ChoiceType::class, [
+                'required' => true,
+                'placeholder' => 'My network operator is ...',
+                'choices' => [
+                    'Lost' => Claim::TYPE_LOSS,
+                    'Stolen' => Claim::TYPE_THEFT,
+                    'Damaged or not working' => Claim::TYPE_DAMAGE,
                 ],
             ])
             ->add('message', TextareaType::class)
@@ -73,14 +82,14 @@ class ClaimFnolType extends AbstractType
             $policies = array();
             $userPolicies = $data->getUser()->getValidPolicies(true);
             foreach ($userPolicies as $policy) {
-                $userPolicies[$policy->getId()] = $policy->getPolicyNumber();
+                $policies[$policy->getPolicyNumber()] = $policy->getId();
             }
 
             $form->add('policyNumber', ChoiceType::class, [
                 'required' => true,
                 'expanded' => false,
                 'multiple' => false,
-                'choices' => $userPolicies
+                'choices' => $policies
             ]);
         });
     }

@@ -1423,7 +1423,7 @@ class UserController extends BaseController
         $policy = null;
 
         if ($policyId) {
-            $policy = $policyRepo->find($id);
+            $policy = $policyRepo->find($policyId);
             if (!$policy) {
                 throw $this->createNotFoundException('Policy not found');
             }
