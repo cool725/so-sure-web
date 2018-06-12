@@ -215,7 +215,6 @@ abstract class Payment
     {
         $this->created = new \DateTime();
         $this->date = new \DateTime();
-        $this->scheduledPayments = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     public function getId()
