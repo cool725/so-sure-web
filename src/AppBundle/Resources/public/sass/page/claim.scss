@@ -21,6 +21,11 @@
 
     &__loss {
         background-color: $lightest-blue;
+
+        .img-center {
+            display: inline-block;
+            margin-bottom: 25px;
+        }
     }
 
 
