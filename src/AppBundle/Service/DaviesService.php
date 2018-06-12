@@ -336,10 +336,17 @@ class DaviesService extends S3EmailService
 
         $this->claimsService->processClaim($claim);
 
-        if ($daviesClaim->miStatus === DaviesClaim::MISTATUS_REPUDIATED)
-        {
-            $body = sprintf('Check %s / %s', $claim->getPolicy()->getPolicyNumber(), $claim->getPolicy()->getId());
-            $this->mailer->send('Cancel Policy','support@wearesosure.com', $body);
+        if ($daviesClaim->miStatus === DaviesClaim::MISTATUS_REPUDIATED) {
+            $body = sprintf(
+                'Verify that policy %s / %s has a rejected claim and if so, policy should be cancelled',
+                $claim->getPolicy()->getPolicyNumber(),
+                $claim->getPolicy()->getId()
+            );
+            $this->mailer->send(
+                'Please cancel Policy',
+                'support@wearesosure.com',
+                $body
+            );
         }
 
         return count($errors) == 0;
