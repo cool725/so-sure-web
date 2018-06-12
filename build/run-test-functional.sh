@@ -16,13 +16,17 @@ SKIP_PHING=0
 SKIP_FLUSH_REDIS=0
 COVER=0
 FUNCTIONAL_TEST="test:functional"
-while getopts ":snpdhcClr" opt; do
+DEBUG=""
+while getopts ":snpdDhcClr" opt; do
   case $opt in
     s)
       SKIP_POLICY=0
       ;;
     d)
       SKIP_DB=1
+      ;;
+    D)
+      DEBUG="--debug"
       ;;
     l)
       SKIP_PHING=1
@@ -45,7 +49,7 @@ while getopts ":snpdhcClr" opt; do
       FUNCTIONAL_TEST="test:functional:paid"
       ;;
     h)
-      echo "Usage: $0 [-d skip db refresh] [-s populate sample policy data] [-n no network test | -p run paid test | -c run coverage | -C run coverage no network] [-l keep logs (skip force:cs check)] [-r do not flush redis after running] [filter e.g. (::Method or namespace - use \\)"
+      echo "Usage: $0 [-d skip db refresh] [-D debug] [-s populate sample policy data] [-n no network test | -p run paid test | -c run coverage | -C run coverage no network] [-l keep logs (skip force:cs check)] [-r do not flush redis after running] [filter e.g. (::Method or namespace - use \\)"
       ;;
   esac
 done
@@ -98,8 +102,8 @@ if [ "$RUN_FILTER" == "" ]; then
   ./vendor/phing/phing/bin/phing -f build/test.xml $FUNCTIONAL_TEST
 else
   ./vendor/phing/phing/bin/phing -f build/test.xml test:unit
-  echo ./build/phpunit.sh --filter "$RUN_FILTER" --bootstrap vendor/autoload.php src/AppBundle/    
-  ./build/phpunit.sh --filter "$RUN_FILTER" --bootstrap vendor/autoload.php src/AppBundle/
+  echo ./build/phpunit.sh $DEBUG --filter "$RUN_FILTER" --bootstrap vendor/autoload.php src/AppBundle/
+  ./build/phpunit.sh $DEBUG --filter "$RUN_FILTER" --bootstrap vendor/autoload.php src/AppBundle/
 fi
 if [ "$SKIP_FLUSH_REDIS" == "0" ]; then
   app/console --env=test redis:flushdb -n
