@@ -342,6 +342,7 @@ class DoctrineUserListenerTest extends WebTestCase
 
     private function createBacsEventListener($bankAccount, $id, $count, $eventType)
     {
+        \AppBundle\Classes\NoOp::ignore([$eventType]);
         $event = new BacsEvent($bankAccount, $id);
 
         $dispatcher = $this->getMockBuilder('EventDispatcherInterface')
