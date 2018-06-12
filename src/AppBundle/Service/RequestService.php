@@ -20,6 +20,7 @@ class RequestService
 
     const DEVICE_OS_ANDROID = 'Android';
     const DEVICE_OS_IPHONE = 'iPhone';
+    const DEVICE_OS_IOS = 'iOS';
 
     /** @var RequestStack */
     protected $requestStack;
@@ -205,6 +206,21 @@ class RequestService
 
         return null;
         */
+    }
+
+    public function isDeviceOsAndroid($userAgent = null)
+    {
+        return in_array($this->getDeviceOS($userAgent), [
+            self::DEVICE_OS_ANDROID,
+        ]);
+    }
+
+    public function isDeviceOsIOS($userAgent = null)
+    {
+        return in_array($this->getDeviceOS($userAgent), [
+            self::DEVICE_OS_IPHONE,
+            self::DEVICE_OS_IOS,
+        ]);
     }
 
     public function getTrackingId()
