@@ -4314,23 +4314,33 @@ abstract class Policy
             return true;
         }
 
-        if ($this->getStatus() == self::STATUS_CANCELLED && in_array($this->getCancelledReason(), [
-            self::CANCELLED_COOLOFF,
-            self::CANCELLED_USER_REQUESTED,
-        ])) {
-            return true;
-        }
+        // Cancelled policy - should account for isCancelledWithUserDeclined logic
+        if ($this->getStatus() == self::STATUS_CANCELLED) {
+            if (in_array($this->getCancelledReason(), [
+                self::CANCELLED_COOLOFF,
+                self::CANCELLED_USER_REQUESTED,
+            ])) {
+                return true;
+            }
 
-        // For the rare case where a policy is cancelled for another reason (e.g. unpaid)
-        // but we want to allow repurchase, so we set the flag to igore the claim
-        if ($this->getStatus() == self::STATUS_CANCELLED && count($this->getApprovedClaims()) > 0 &&
-            count($this->getApprovedClaims(true, true, true)) == 0) {
-            return true;
-        }
+            // For the rare case where a policy is cancelled for another reason (e.g. unpaid)
+            // but we want to allow repurchase, so we set the flag to ignore the claim
+            if (count($this->getApprovedClaims()) > 0 &&
+                count($this->getApprovedClaims(true, true, true)) == 0) {
+                return true;
+            }
 
-        // If user forgot to pay and doesn't have a claim we will allow re-purchase
-        if ($this->getStatus() == self::STATUS_CANCELLED && count($this->getClaims()) == 0) {
-            return true;
+            // For the rare case where a policy is cancelled for another reason (e.g. unpaid)
+            // but we want to allow repurchase, so we set the flag to ignore the claim
+            if (count($this->getWithdrawnDeclinedClaims()) > 0 &&
+                count($this->getWithdrawnDeclinedClaims(true, true)) == 0) {
+                return true;
+            }
+
+            // If user forgot to pay and doesn't have a claim we will allow re-purchase
+            if (count($this->getClaims()) == 0) {
+                return true;
+            }
         }
 
         return false;
