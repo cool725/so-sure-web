@@ -3,6 +3,7 @@
 {# Set vars #}
 {% set new_stylesheet = 1 %}
 {% set new_footer = 1 %}
+{% set distraction_free = 1 %}
 
 {% block title %}so-sure - Make a claim
 {% endblock %}
@@ -10,8 +11,7 @@
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets output='css/*.css'
-    '@AppBundle/Resources/public/sass/page/homepage.scss'
-    '@AppBundle/Resources/public/sass/page/corporate.scss'
+    '@AppBundle/Resources/public/sass/page/claim.scss'
     %}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
@@ -20,53 +20,69 @@
 
 {% block body %}
 
-
-    <section class="corporate-hero" id="hero-welcome">
-        <div class="corporate-hero-inner">
-            <h1 class="text-blue">Don't worry. We’ve got you covered.</h1>
-            <p class="lead">Let us guide you through the process so we can get your claim approved and a replacement phone to you ASAP.</p>
-            <p class="lead">If you had your phone stolen or lost, please call your network to block your phone and get a crime reference number from your local police station. For loss you can also declare online <a href="https://www.reportmyloss.com/uk/register" target="_blank">Report My Loss</a>.</p>
+    {# Claims Hero #}
+    <section class="section--pad claim__hero section--arrow">
+        <div class="container">
+            <h1 class="text-blue">Need to make a claim?</h1>
+            <p class="big-text">Let us guide you through the process so we can get your claim approved and your phone repaired or replaced ASAP.</p>
         </div>
     </section>
 
-    {# Claims procss #}
-    <section class="section--pad homepage--claims-process">
+    {# Claims Process #}
+    <section class="section--pad claim__process">
         <div class="container">
-            <h2 class="text-blue">Our hassle-free claims process</h2>
-            <p class="lead">When something bad happens to your phone:</p>
+            <h2 class="text-blue h1">Our claims process</h2>
             <div class="row">
                 <div class="col-md-4">
                     <span class="large-no large-no--arrow">1</span>
-                    <h4 class="h3 text-blue">Contact Claims Team</h4>
-                    <p class="text-left">Let us know what happened. You can do this by <a href="#" class="text-nowrap scroll-to" data-scroll-to-anchor="#claim-form">filling in the form below</a>, or calling our claims team on 0344 856 0852 <small>(local rates apply)</small></p>
+                    <h3 class="text-blue">Contact Claims Team</h3>
+                    <p class="text-left">Let us know what happened. You can do this by <a href="#" class="text-nowrap scroll-to h4 text-blue" data-scroll-to-anchor="#claim-email-form">filling in the form below</a>, or calling our claims team on <a href="tel:03448560852" class="h4 text-blue">0344 856 0852</a> <small>(local rates apply)</small>.</p>
                 </div>
                 <div class="col-md-4">
                     <span class="large-no large-no--arrow">2</span>
-                    <h4 class="h3 text-blue">Review Claim</h4>
+                    <h3 class="text-blue">Review Claim</h3>
                     <p class="text-left">Our UK based claims team will review your claim and reach out with a request for any further details or documents (if necessary). We aim to do this within a matter of hours during UK business hours.</p>
                 </div>
                 <div class="col-md-4">
                     <span class="large-no">3</span>
-                    <h4 class="h3 text-blue">Approve Claim</h4>
+                    <h3 class="text-blue">Approve Claim</h3>
                     <p class="text-left">Once your claim is approved, we take your excess payment over the phone and aim to get a replacement phone in the next working day. If you prefer to have your phone repaired, it may take more time.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="claim-form-container" class="section-corporate section-corporate-form section-corporate-pad section-corporate-pad-both">
+    {# Claims Report Loss #}
+    <section class="section--pad claim__loss">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-7 col-md-push-4">
+                    <h2 class="h-nom">Lost or stolen phone?</h2>
+                    <p class="h3 h-light">If you had your phone stolen or lost, please call your network to block your phone and get a crime reference number from your local police station.</p>
+                    <p class="h3 h-light">For loss you can also declare online at <a href="https://www.reportmyloss.com/uk/register" target="_blank" class=""><strong>Report My Loss</strong></a>.</p>
+                </div>
+                <div class="col-md-4 col-md-pull-7">
+                    <img src="{{ cdn_url }}/images/mobile_mike/so-sure_mobile_mike_loss_dark.png" width="240px" class="img-center img-circle" alt="">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Claims Form #}
+    <section class="section--pad claim__form" id="claim-form-container" >
         <div class="container">
             <div class="row">
                 <div class="col-md-8 col-md-offset-2">
 
-                    <h2 class="text-blue text-center">Please enter your email address to start your claims process.</h2>
+                    <h2>Get started with your claim...</h2>
+                    <p class="h3 h-light">Please enter your email address to start your claims process.</p>
 
                     {{ form_start(claim_email_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'id':'claim-email-form', 'data-client-validation': form_client_validation }}) }}
                         <div class="row">
-                            <div class="col-md-12 text-center">
+                            <div class="col-sm-8 col-sm-offset-2 text-center">
                                 <div class="form-group {% if form_errors(claim_email_form.email) %}has-error{% endif %}">
-                                    <label for="">Email <span class="req">*</span></label>
-                                    {{ form_widget(claim_email_form.email, { 'attr': {'class': 'form-control', 'placeholder': 'Same email as your account'}}) }}
+                                    {{ form_widget(claim_email_form.email, { 'attr': {'class': 'form-control', 'placeholder': 'Email Address'}}) }}
+                                    <div class="help-block"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> This is the email address associated with your so-sure policy</div>
                                     <div class="help-block with-errors">{{ form_errors(claim_email_form.email) }}</div>
                                 </div>
                             </div>
@@ -80,7 +96,7 @@
                         </div>
                     {{ form_end(claim_email_form) }}
 
-                    <!--
+                    {#
                     {{ form_start(claim_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'id':'claim-form', 'data-client-validation': form_client_validation }}) }}
                         <div class="row">
                             <div class="col-sm-12 text-center">
@@ -181,8 +197,8 @@
                             </div>
                         </div>
                     {{ form_end(claim_form) }}
-                    -->
 
+ #}
                 </div>
             </div>
         </div>

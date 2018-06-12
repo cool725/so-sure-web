@@ -1,0 +1,74 @@
+// claim.scss
+
+@import "../mixins";
+@import "../common/palette";
+@import "../common/paletteNew";
+@import "../common/type";
+
+.claim {
+
+    &__hero {
+        text-align: center;
+
+        @include breakpoint(tablet) {
+            padding-bottom: 100px;
+
+            h1 {
+                font-size: 46px;
+            }
+        }
+    }
+
+    &__loss {
+        background-color: $lightest-blue;
+    }
+
+
+    &__process {
+        background-color: $off-white;
+        text-align: center;
+
+        .large-no {
+            position: relative;
+            display: inline-block;
+            font-size: 128px;
+            font-family: $avenir-heavy;
+            line-height: 1;
+            color: $primary-blue;
+            margin-top: 20px;
+
+            &--arrow {
+
+                @include breakpoint(laptop) {
+                    &:after {
+                        width: 163px; height: 26px;
+                        content: '';
+                        position: absolute;
+                        right: -203px; top: 40px;
+                        background: transparent url('#{$cdn_url}/images/homepage/so-sure_arrow_right.svg') no-repeat center;
+                    }
+                }
+
+                @include breakpoint(desktop) {
+                    &:after {
+                        right: -233px;
+                    }
+                }
+            }
+        }
+
+        h4 {
+            margin: 0;
+        }
+
+        p {
+            max-width: 800px;
+            margin: 15px auto;
+        }
+    }
+
+    &__form {
+        background-color: $off-white;
+        text-align: center;
+    }
+}
