@@ -46,7 +46,7 @@ class SixpackService
     const EXPERIMENT_HOMEPAGE_AA_V2 = 'homepage-aa-v2';
     const EXPERIMENT_APP_SHARE_METHOD = 'app-share-method';
     const EXPERIMENT_APP_PICSURE_LOCATION = 'app-picsure-location';
-    const EXPERIMENT_STEP_3 = 'step-3-payment-new';
+    //const EXPERIMENT_STEP_3 = 'step-3-payment-new';
     const EXPERIMENT_PURCHASE_FLOW_BACS = 'purchase-flow-bacs';
     const EXPERIMENT_CPC_QUOTE_HOMEPAGE = 'cpc-quote-or-homepage';
     const EXPERIMENT_DOB = 'purchase-funnel-dob-dropdown';
@@ -91,7 +91,7 @@ class SixpackService
 
     public static $unauthExperiments = [
         self::EXPERIMENT_HOMEPAGE_AA_V2,
-        self::EXPERIMENT_STEP_3,
+        //self::EXPERIMENT_STEP_3,
         self::EXPERIMENT_PURCHASE_FLOW_BACS,
         self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
         self::EXPERIMENT_DOB,
@@ -145,7 +145,7 @@ class SixpackService
      */
     public static $purchaseConversionSimple = [
         self::EXPERIMENT_CPC_QUOTE_HOMEPAGE,
-        self::EXPERIMENT_STEP_3,
+        //self::EXPERIMENT_STEP_3,
         self::EXPERIMENT_PURCHASE_FLOW_BACS,
         self::EXPERIMENT_72_REPLACEMENT,
         self::EXPERIMENT_PICSURE_SECTION,
