@@ -1248,6 +1248,9 @@ class PhonePolicyTest extends WebTestCase
         $policyF->setStatus(SalvaPhonePolicy::STATUS_UNPAID);
         $policyF->cancel(SalvaPhonePolicy::CANCELLED_UNPAID);
         $this->assertTrue($policyF->isCancelledWithUserDeclined());
+
+        $claimF->setIgnoreWarningFlags(Claim::WARNING_FLAG_IGNORE_USER_DECLINED);
+        $this->assertFalse($policyF->isCancelledWithUserDeclined());
     }
 
     public function testCancelPolicyPolicyDeclined()

@@ -1358,17 +1358,31 @@ abstract class Policy
         return $claims;
     }
 
-    public function getWithdrawnDeclinedClaims($includeLinkedClaims = false)
+    public function getWithdrawnDeclinedClaims($includeLinkedClaims = false, $excludeIgnoreUserDeclined = false)
     {
         $claims = [];
         foreach ($this->getClaims() as $claim) {
+            $addClaim = false;
             if (in_array($claim->getStatus(), [Claim::STATUS_DECLINED, Claim::STATUS_WITHDRAWN])) {
+                $addClaim = true;
+            }
+            if ($excludeIgnoreUserDeclined && $claim->hasIgnoreUserDeclined()) {
+                $addClaim = false;
+            }
+            if ($addClaim) {
                 $claims[] = $claim;
             }
         }
         if ($includeLinkedClaims) {
             foreach ($this->getLinkedClaims() as $claim) {
+                $addClaim = false;
                 if (in_array($claim->getStatus(), [Claim::STATUS_DECLINED, Claim::STATUS_WITHDRAWN])) {
+                    $addClaim = true;
+                }
+                if ($excludeIgnoreUserDeclined && $claim->hasIgnoreUserDeclined()) {
+                    $addClaim = false;
+                }
+                if ($addClaim) {
                     $claims[] = $claim;
                 }
             }
@@ -2547,12 +2561,14 @@ abstract class Policy
         }
 
         // User has a cancelled policy for any reason w/approved claimed and policy was not paid in full
-        if (count($this->getApprovedClaims(true, true, true)) > 0 && !$this->isFullyPaid()) {
+        if (count($this->getApprovedClaims(true, true, true)) > 0 &&
+            !$this->isFullyPaid()) {
             return true;
         }
 
         // User has a withdrawn or declined claim and policy was cancelled/unpaid
-        if ($this->getCancelledReason() == self::CANCELLED_UNPAID && count($this->getWithdrawnDeclinedClaims()) > 0) {
+        if ($this->getCancelledReason() == self::CANCELLED_UNPAID &&
+            count($this->getWithdrawnDeclinedClaims(true, true)) > 0) {
             return true;
         }
 
