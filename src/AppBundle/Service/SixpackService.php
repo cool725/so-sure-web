@@ -70,6 +70,12 @@ class SixpackService
     // Exp 3
 
     // Exp 4
+    const EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT = 'phone-replacement-matching-advert';
+    // Exp 5
+
+    // Exp 6
+
+    // Exp 7
 
     const ALTERNATIVES_SHARE_MESSAGE_SIMPLE = 'simple';
     const ALTERNATIVES_APP_SHARE_METHOD_NATIVE = 'native';
@@ -108,6 +114,13 @@ class SixpackService
         // Exp 3
 
         // Exp 4
+        self::EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT,
+        // Exp 5
+
+        // Exp 6
+
+        // Exp 7
+
     ];
 
     public static $authExperiments = [
@@ -148,6 +161,13 @@ class SixpackService
         // Exp 3
 
         // Exp 4
+        self::EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT,
+        // Exp 5
+
+        // Exp 6
+
+        // Exp 7
+
     ];
 
     /**
@@ -169,6 +189,13 @@ class SixpackService
         // Exp 3
 
         // Exp 4
+
+        // Exp 5
+
+        // Exp 6
+
+        // Exp 7
+
     ];
 
     /** @var LoggerInterface */
@@ -211,7 +238,8 @@ class SixpackService
         $alternatives,
         $logMixpanel = self::LOG_MIXPANEL_NONE,
         $trafficFraction = 1,
-        $clientId = null
+        $clientId = null,
+        $force = null
     ) {
         // default to first option
         $result = $alternatives[0];
@@ -237,6 +265,10 @@ class SixpackService
                 'client_id' => $clientId,
                 'traffic_fraction' => $trafficFraction,
             ];
+            if ($force) {
+                $data['force'] = $force;
+                $data['record_force'] = "true";
+            }
             $query = http_build_query($data);
             foreach ($alternatives as $alternative) {
                 $query = sprintf("%s&alternatives=%s", $query, urlencode($alternative));
