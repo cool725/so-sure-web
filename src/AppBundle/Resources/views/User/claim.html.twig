@@ -3,6 +3,7 @@
 {# Set vars #}
 {% set new_stylesheet = 1 %}
 {% set new_footer = 1 %}
+{% set distraction_free = 1 %}
 
 {% block title %}so-sure - Make a claim
 {% endblock %}
@@ -10,50 +11,50 @@
 {% block stylesheets %}
     {{ parent() }}
     {% stylesheets output='css/*.css'
-    '@AppBundle/Resources/public/sass/page/homepage.scss'
-    '@AppBundle/Resources/public/sass/page/corporate.scss'
+    'components/animate.css/animate.min.css'
+    '@AppBundle/Resources/public/sass/page/claim.scss'
     %}
     <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
 {% endblock %}
+
 
 {# {% block nav %}{% endblock %} #}
 
 {% block body %}
 
-
-    <section class="corporate-hero" id="hero-welcome">
-        <div class="corporate-hero-inner">
-            <h1 class="text-blue">Let's Get Started</h1>
-            <p class="lead">Let us guide you through the process so we can get your claim approved and a replacement phone delivered to you as soon as possible.</p>
-        </div>
-    </section>
-
-    <section id="claim-form-container" class="section-corporate section-corporate-form section-corporate-pad section-corporate-pad-both">
+    <section id="claim-form-container" class="section--pad background-off-white">
         <div class="container">
             <div class="row">
                 <div class="col-md-8 col-md-offset-2">
+
+                    <h1 class="text-center">Make a claim</h1>
 
                     {{ form_start(claim_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'id':'claim-form', 'data-client-validation': form_client_validation }}) }}
                         <div class="row">
                             <div class="col-sm-12 text-center">
                                 <div class="form-group {% if form_errors(claim_form.signature) %}has-error{% endif %}">
-                                    <label for="">I {{ username }} am providing below all accurate and truthful information. I understand that failure to do so will invalidate my claim and could lead to me being prosecuted. <span class="req">*</span></label>
-                                    {{ form_widget(claim_form.signature, { 'attr': {'placeholder': 'Type in your full name', 'class': 'form-control'}}) }}
+                                    <p class="lead text-left">I <span class="h4">{{ username }}</span> am providing below all accurate and truthful information. I understand that failure to do so will invalidate my claim and could lead to me being prosecuted.<span class="text-blue">*</span></label></p>
+                                    {{ form_widget(claim_form.signature, { 'attr': {'placeholder': 'Type in your full name to sign this document', 'class': 'form-control'}}) }}
                                     <div class="help-block with-errors">{{ form_errors(claim_form.signature) }}</div>
                                 </div>
                             </div>
                         </div>
                         <div class="row">
+                            <div class="col-md-13">
+                                <h3 class="text-center">Continue with your claim details</h3>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group {% if form_errors(claim_form.name) %}has-error{% endif %}">
-                                    <label for="">Fullname <span class="req">*</span></label>
+                                    <label class="h4">Fullname <span class="req">*</span></label>
                                     {{ form_widget(claim_form.name, { 'attr': {'class': 'form-control', 'placeholder': 'First name Last name'}}) }}
                                     <div class="help-block with-errors">{{ form_errors(claim_form.name) }}</div>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group {% if form_errors(claim_form.email) %}has-error{% endif %}">
-                                    <label for="">Email address <span class="req">*</span></label>
+                                    <label class="h4">Email address <span class="req">*</span></label>
                                     {{ form_widget(claim_form.email, { 'attr': {'class': 'form-control', 'placeholder': 'Same email as your account'}}) }}
                                     <div class="help-block with-errors">{{ form_errors(claim_form.email) }}</div>
                                 </div>
@@ -62,7 +63,7 @@
                         <div class="row">
                             <div class="col-sm-12">
                                 <div class="form-group {% if form_errors(claim_form.policyNumber) %}has-error{% endif %}">
-                                    <label for="">Policy Number <span class="req">*</span></label>
+                                    <label class="h4">Policy Number <span class="req">*</span></label>
                                     {{ form_widget(claim_form.policyNumber, { 'attr': {'class': 'form-control', 'placeholder': 'e.g. Mob/2016/40000001'}}) }}
                                     <div class="help-block with-errors">{{ form_errors(claim_form.policyNumber) }}</div>
                                 </div>
@@ -71,14 +72,14 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group {% if form_errors(claim_form.phone) %}has-error{% endif %}">
-                                    <label for="">Phone Number we can reach you on <span class="req">*</span></label>
+                                    <label class="h4">Phone Number we can reach you on <span class="req">*</span></label>
                                     {{ form_widget(claim_form.phone, { 'attr': {'class': 'form-control', 'placeholder': 'Mobile or landline'}}) }}
                                     <div class="help-block with-errors">{{ form_errors(claim_form.phone) }}</div>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group {% if form_errors(claim_form.timeToReach) %}has-error{% endif %}">
-                                    <label for="">Best time to call you (UK business hours) <span class="req">*</span></label>
+                                    <label class="h4">Best time to call you (UK business hours) <span class="req">*</span></label>
                                     {{ form_widget(claim_form.timeToReach, { 'attr': {'class': 'form-control', 'placeholder': ''}}) }}
                                     <div class="help-block with-errors">{{ form_errors(claim_form.timeToReach) }}</div>
                                 </div>
@@ -87,14 +88,14 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group {% if form_errors(claim_form.type) %}has-error{% endif %}">
-                                    <label for="">My phone is <span class="req">*</span></label>
+                                    <label class="h4">My phone is <span class="req">*</span></label>
                                     {{ form_widget(claim_form.type, { 'attr': {'class': 'form-control'}}) }}
                                     <div class="help-block with-errors">{{ form_errors(claim_form.type) }}</div>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group {% if form_errors(claim_form.network) %}has-error{% endif %}">
-                                    <label for="">My network operator is <span class="req">*</span></label>
+                                    <label class="h4">My network operator is <span class="req">*</span></label>
                                     {{ form_widget(claim_form.network, { 'attr': {'class': 'form-control'}}) }}
                                     <div class="help-block with-errors">{{ form_errors(claim_form.network) }}</div>
                                 </div>
@@ -103,14 +104,14 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group {% if form_errors(claim_form.when) %}has-error{% endif %}">
-                                    <label for="">It happened on <span class="req">*</span></label>
+                                    <label class="h4">It happened on <span class="req">*</span></label>
                                     {{ form_widget(claim_form.when, { 'attr': {'class': 'form-control', 'placeholder': 'Date (DD/MM/YYYY)'}}) }}
                                     <div class="help-block with-errors">{{ form_errors(claim_form.when) }}</div>
                                 </div>
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group {% if form_errors(claim_form.time) %}has-error{% endif %}">
-                                    <label for="">At around <span class="req">*</span></label>
+                                    <label class="h4">At around <span class="req">*</span></label>
                                     {{ form_widget(claim_form.time, { 'attr': {'class': 'form-control', 'placeholder': 'As accurate as you be'}}) }}
                                     <div class="help-block with-errors">{{ form_errors(claim_form.time) }}</div>
                                 </div>
@@ -119,7 +120,7 @@
                         <div class="row">
                             <div class="col-sm-12">
                                 <div class="form-group {% if form_errors(claim_form.where) %}has-error{% endif %}">
-                                    <label for="">At a place? <span class="req">*</span></label>
+                                    <label class="h4 h-nom">At a place? <span class="req">*</span></label>
                                     {{ form_widget(claim_form.where, { 'attr': {'class': 'form-control', 'placeholder': ''}}) }}
                                     <div class="help-block with-errors">{{ form_errors(claim_form.where) }}</div>
                                 </div>
@@ -128,7 +129,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group {% if form_errors(claim_form.message) %}has-error{% endif %}">
-                                    <label for="">And this is, in as much detail as I remember and to the best of my knowledge, what has happened to my device: <span class="req">*</span></label>
+                                    <label class="h4 h-nom">And this is, in as much detail as I remember and to the best of my knowledge, what has happened to my device: <span class="req">*</span></label>
                                     {{ form_widget(claim_form.message, { 'attr': {'class': 'form-control', 'rows': '15'}}) }}
                                     <div class="help-block with-errors">{{ form_errors(claim_form.message) }}</div>
                                 </div>
@@ -137,7 +138,7 @@
                         <div class="row">
                             <div class="col-md-12 text-center">
                                 <div class="form-group">
-                                    {{ form_widget(claim_form.submit, { 'label': 'Start a claim', 'attr': {'class': 'btn btn-blue btn-lg'}}) }}
+                                    {{ form_widget(claim_form.submit, { 'label': 'Start my claim', 'attr': {'class': 'btn btn-blue btn-lg'}}) }}
                                 </div>
                             </div>
                         </div>
