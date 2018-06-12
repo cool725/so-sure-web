@@ -5,17 +5,17 @@
 	width: 130px; height: 30px;
 
 	&-dark {
-		background: transparent no-repeat center top url("#{$cdn_url}/logo/so-sure-logo-dark.svg");
+		background: transparent no-repeat center top url('#{$cdn_url}/logo/so-sure-logo-dark.svg');
 	    background-size: 130px;
 	}
 
 	&-light {
-		background: transparent no-repeat center top url("#{$cdn_url}/images/logo/so-sure_so-sure-full-logo-white-flat.svg");
+		background: transparent no-repeat center top url('#{$cdn_url}/images/logo/so-sure_so-sure-full-logo-white-flat.svg');
 		background-size: 130px;
 	}
 
     &-blue-flat {
-        background: transparent no-repeat center top url("#{$cdn_url}/images/logo/so-sure_so-sure-full-logo-blue-flat.svg");
+        background: transparent no-repeat center top url('#{$cdn_url}/images/logo/so-sure_so-sure-full-logo-blue-flat.svg');
         background-size: 130px;
     }
 }

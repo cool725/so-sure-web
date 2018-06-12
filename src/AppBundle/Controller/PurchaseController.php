@@ -592,15 +592,13 @@ class PurchaseController extends BaseController
             ['no-money-back-guarantee', 'money-back-guarantee']
         );
 
-        $exp = $this->sixpack(
-            $request,
-            SixpackService::EXPERIMENT_STEP_3,
-            ['step-3-payment-old', 'step-3-payment-new']
-        );
-
-        $template = 'AppBundle:Purchase:purchaseStepPhoneReview.html.twig';
-
-        if ($exp == 'step-3-payment-new') {
+        /** @var RequestService $requestService */
+        $requestService = $this->get('app.request');
+        $template = null;
+        // Might be better to just check the phone we're purchasing ($phone->getOs() == Phone::OS_IOS)
+        if ($requestService->isDeviceOsIOS()) {
+            $template = 'AppBundle:Purchase:purchaseStepPhoneReview.html.twig';
+        } else {
             $template = 'AppBundle:Purchase:purchaseStepPhoneReviewNew.html.twig';
         }
 

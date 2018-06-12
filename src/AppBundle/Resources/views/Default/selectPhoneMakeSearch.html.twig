@@ -27,6 +27,10 @@
     {% set formID = 'search-phone-form-homepage' %}
     {% set uid    = '-1' %}
     {% set placeholder = 'Find your phone to get a quote' %}
+{% elseif type is defined and type == 'starling' %}
+    {% set formID = 'search-phone-form-homepage' %}
+    {% set uid    = '-1' %}
+    {% set placeholder = 'Find your phone to get a quote' %}
 {% elseif type == 'purchase-select' %}
     {% set basePath = '/select-phone-search/purchase-select/' %}
 {% elseif type == 'purchase-change' %}

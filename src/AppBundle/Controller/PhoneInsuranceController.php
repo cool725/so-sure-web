@@ -501,6 +501,15 @@ class PhoneInsuranceController extends BaseController
             ['no-trustpilot', 'trustpilot']
         );
 
+        $replacement = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT,
+            ['default', 'next-working-day', 'seventytwo-hours'],
+            SixpackService::LOG_MIXPANEL_CONVERSION,
+            null,
+            "0.00000001"
+        );
+
         $moneyBackGuarantee = $this->sixpack(
             $request,
             SixpackService::EXPERIMENT_MONEY_BACK_GUARANTEE,
@@ -530,8 +539,9 @@ class PhoneInsuranceController extends BaseController
             'comparision_max' => $maxComparision,
             'coming_soon'     => $phone->getCurrentPhonePrice() ? false : true,
             'slider_test'     => 'slide-me',
-            'trustpilot'     => $trustpilot,
+            'trustpilot'      => $trustpilot,
             'moneyBackGuarantee' => $moneyBackGuarantee,
+            'replacement'     => $replacement,
         );
 
         // Adwords landingpage test

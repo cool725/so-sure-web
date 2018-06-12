@@ -19,6 +19,8 @@ class RequestService
     const DEVICE_CATEGORY_DESKTOP = 'Desktop';
 
     const DEVICE_OS_ANDROID = 'Android';
+    const DEVICE_OS_IPHONE = 'iPhone';
+    const DEVICE_OS_IOS = 'iOS';
 
     /** @var RequestStack */
     protected $requestStack;
@@ -206,6 +208,21 @@ class RequestService
         */
     }
 
+    public function isDeviceOsAndroid($userAgent = null)
+    {
+        return in_array($this->getDeviceOS($userAgent), [
+            self::DEVICE_OS_ANDROID,
+        ]);
+    }
+
+    public function isDeviceOsIOS($userAgent = null)
+    {
+        return in_array($this->getDeviceOS($userAgent), [
+            self::DEVICE_OS_IPHONE,
+            self::DEVICE_OS_IOS,
+        ]);
+    }
+
     public function getTrackingId()
     {
         if ($request = $this->requestStack->getCurrentRequest()) {
@@ -253,6 +270,10 @@ class RequestService
             return true;
         }
 
+        if ($this->isExcludedPreviewPrefetch()) {
+            return true;
+        }
+
         if ($this->environment == 'prod' &&
             ($this->isSoSureEmployee() ||
             $this->isExcludedAnalyticsIp())) {
@@ -273,6 +294,23 @@ class RequestService
                 '217.158.0.52', // davies
                 // '10.0.2.2', // for debugging - vagrant
             ]);
+        }
+
+        return false;
+    }
+
+    public function isExcludedPreviewPrefetch()
+    {
+        if ($request = $this->requestStack->getCurrentRequest()) {
+            $purpose = $request->headers->get('x-purpose');
+            if ($purpose == 'preview') {
+                return true;
+            }
+
+            $moz = $request->headers->get('x-moz');
+            if ($moz == 'prefetch') {
+                return true;
+            }
         }
 
         return false;

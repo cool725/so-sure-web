@@ -157,17 +157,25 @@
                             <div class="text-break text-grey">
                                 <div class="line"></div>OR<div class="line"></div>
                             </div>
-                            <a href="#"
-                               formnovalidate="formnovalidate"
-                               class="btn btn-facebook btn-block btn-pad facebook_login"
-                               {% if app.user %}disabled{% endif %}>
-                                <i class="fa fa-facebook-official"></i> &nbsp;Continue with Facebook
-                            </a>
-                            <a href="{{ path('hwi_oauth_service_redirect', {'service': 'google' }) }}"
-                               formnovalidate="formnovalidate"
-                               class="btn btn-google btn-pad btn-block"
-                               {% if app.user %}disabled{% endif %}>
-                               <i class="fa fa-google"></i>  &nbsp;Sign in with Google</a>
+                            {# Social Logins #}
+                            <div class="form-group text-center">
+                                <a href="#"
+                                   formnovalidate="formnovalidate"
+                                   class="btn btn-facebook btn-facebook-login facebook_login"
+                                   {% if app.user %}disabled{% endif %}>
+                                   <i class="fa fa-facebook-official fa-lg"></i>
+                                   &nbsp;Continue with Facebook
+                               </a>
+                            </div>
+                            <div class="form-group text-center">
+                                <a href="{{ path('hwi_oauth_service_redirect', {'service': 'google' }) }}"
+                                   class="btn-google-login"
+                                   formnovalidate="formnovalidate"
+                                   {% if app.user %}disabled{% endif %}>
+                                    <span class="sr-only">Sign in with Google</span>
+                                </a>
+                            </div>
+                            {# Starling #}
                             {% if feature_enabled('starling') and not starling %}
                                 <div class="text-break text-grey">
                                     <div class="line"></div>OR<div class="line"></div>
