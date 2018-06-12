@@ -88,8 +88,8 @@ class RequestServiceTest extends WebTestCase
         );
         $data = $this->verifyResponse(200);
         $this->assertTrue($data['excluded']);
-        $this->assertContains($data['headers'], 'preview');
-        $this->assertContains($data['headers'], 'bar');
+        $this->assertContains('preview', $data['headers']);
+        $this->assertContains('bar', $data['headers']);
 
         $crawler =  static::$client->request(
             "GET",
@@ -103,7 +103,7 @@ class RequestServiceTest extends WebTestCase
         );
         $data = $this->verifyResponse(200);
         $this->assertTrue($data['excluded']);
-        $this->assertContains($data['headers'], 'prefetch');
+        $this->assertContains('prefetch', $data['headers']);
     }
 
     protected function verifyResponse($statusCode)
