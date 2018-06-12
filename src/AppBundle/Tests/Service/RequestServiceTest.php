@@ -72,7 +72,8 @@ class RequestServiceTest extends WebTestCase
             "GET",
             "/ops/preview-prefetch"
         );
-        $this->verifyResponse(200);
+        $data = $this->verifyResponse(200);
+        $this->assertFalse($data['excluded']);
 
         $crawler =  static::$client->request(
             "GET",
@@ -80,11 +81,15 @@ class RequestServiceTest extends WebTestCase
             array(),
             array(),
             array(
-                "HTTP_X-PURPOSE" => "preview"
+                "HTTP_X-PURPOSE" => "preview",
+                "HTTP_X-FOO" => "bar"
             ),
             []
         );
-        $this->verifyResponse(503);
+        $data = $this->verifyResponse(200);
+        $this->assertTrue($data['excluded']);
+        $this->assertContains($data['headers'], 'preview');
+        $this->assertContains($data['headers'], 'bar');
 
         $crawler =  static::$client->request(
             "GET",
@@ -96,12 +101,17 @@ class RequestServiceTest extends WebTestCase
             ),
             []
         );
-        $this->verifyResponse(503);
+        $data = $this->verifyResponse(200);
+        $this->assertTrue($data['excluded']);
+        $this->assertContains($data['headers'], 'prefetch');
     }
 
     protected function verifyResponse($statusCode)
     {
         $this->assertEquals($statusCode, self::$client->getResponse()->getStatusCode());
+        $data = json_decode(self::$client->getResponse()->getContent(), true);
+
+        return $data;
     }
 
     public function testIsExcludedAnalyticsUserAgentTrue()

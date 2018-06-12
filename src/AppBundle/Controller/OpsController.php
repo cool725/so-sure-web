@@ -108,12 +108,11 @@ class OpsController extends BaseController
     {
         /** @var RequestService $requestService */
         $requestService = $this->get('app.request');
-        if ($requestService->isExcludedPreviewPrefetch()) {
-            throw new HttpException(503);
-        }
 
         $response = new JsonResponse([
             'status' => 'Ok',
+            'excluded' => $requestService->isExcludedPreviewPrefetch(),
+            'headers' => json_encode($requestService->getAllXHeaders()),
         ]);
 
         return $response;
