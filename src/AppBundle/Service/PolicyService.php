@@ -732,10 +732,12 @@ class PolicyService
 
         $scheduledPayments = [];
         // Try cancellating scheduled payments until amount matches
+        $i = 0;
         while (!$policy->arePolicyScheduledPaymentsCorrect()) {
             $scheduledPayment = $policy->getNextScheduledPayment();
-            if ($scheduledPayment === null) {
-                continue;
+            // shouldn't be more than 12 payments, use 24 just in case to prevent infinite loop
+            if ($scheduledPayment === null || $i > 24) {
+                break;
             }
 
             $scheduledPayments[] = $scheduledPayment;
@@ -747,6 +749,7 @@ class PolicyService
                 $scheduledPayment->getScheduled() ? $scheduledPayment->getScheduled()->format(\DateTime::ATOM) : '?',
                 $scheduledPayment->getAmount()
             );
+            $i++;
         }
 
         if ($policy->arePolicyScheduledPaymentsCorrect()) {
