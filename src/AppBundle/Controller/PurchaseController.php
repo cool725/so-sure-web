@@ -1141,7 +1141,7 @@ class PurchaseController extends BaseController
                         'We have passed your request to our policy team. You should receive a cancellation email once that is processed.'
                     );
                     // @codingStandardsIgnoreEnd
-                    return $this->redirectToRoute('homepage');
+                    return $this->redirectToRoute('purchase_cancel_requested', ['id' => $id]);
                 }
             }
         } else {
@@ -1161,10 +1161,10 @@ class PurchaseController extends BaseController
     }
 
     /**
-     * @Route("/cancel-policy/{id}", name="cancel_policy")
+     * @Route("/cancel/{id}/requested", name="purchase_cancel_requested")
      * @Template
      */
-    public function cancelPolicy(Request $request, $id)
+    public function cancelRequestedAction(Request $request, $id)
     {
         $dm = $this->getManager();
         $repo = $dm->getRepository(Policy::class);
@@ -1173,12 +1173,9 @@ class PurchaseController extends BaseController
             throw $this->createNotFoundException('Unable to see policy');
         }
 
-        $template = 'AppBundle:Purchase:cancelIntercom.html.twig';
-        $data = [
+        return [
             'policy' => $policy,
         ];
-
-        return $this->render($template, $data);
     }
 
     /**
