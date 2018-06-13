@@ -1204,6 +1204,7 @@ class BacsService
 
     public function exportPaymentsDebits($prefix, \DateTime $date, $serialNumber, &$metadata, $includeHeader = false)
     {
+        $accounts = [];
         $lines = [];
         if ($includeHeader) {
             $lines[] = $this->getHeader();
@@ -1329,6 +1330,14 @@ class BacsService
             if ($bankAccount->isFirstPayment()) {
                 $bankAccount->setFirstPayment(false);
             }
+            $accountData = sprintf('%s%s', $bankAccount->getSortCode(), $bankAccount->getAccountNumber());
+            if (in_array($accountData, $accounts)) {
+                $this->logger->warning(sprintf(
+                    'More than 1 payment for Policy %s is present in the bacs file',
+                    $scheduledPayment->getPolicy()->getId()
+                ));
+            }
+            $accounts[] = $accountData;
         }
 
         return $lines;
