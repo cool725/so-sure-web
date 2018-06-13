@@ -568,6 +568,11 @@ class MixpanelService
             $properties = array_merge($properties, ['time' => $now->getTimestamp()]);
         }
 
+        $xHeaders = $this->requestService->getAllXHeaders();
+        if ($xHeaders && count($xHeaders) > 0) {
+            $properties = array_merge($properties, ['xheaders' => $xHeaders]);
+        }
+
         $data = [
             'action' => $action,
             'userId' => $userId,
