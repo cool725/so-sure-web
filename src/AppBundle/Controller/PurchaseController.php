@@ -1161,6 +1161,27 @@ class PurchaseController extends BaseController
     }
 
     /**
+     * @Route("/cancel-policy/{id}", name="cancel_policy")
+     * @Template
+     */
+    public function cancelPolicy(Request $request, $id)
+    {
+        $dm = $this->getManager();
+        $repo = $dm->getRepository(Policy::class);
+        $policy = $repo->find($id);
+        if (!$policy) {
+            throw $this->createNotFoundException('Unable to see policy');
+        }
+
+        $template = 'AppBundle:Purchase:cancelIntercom.html.twig';
+        $data = [
+            'policy' => $policy,
+        ];
+
+        return $this->render($template, $data);
+    }
+
+    /**
      * @Route("/remainder/{id}", name="purchase_remainder_policy")
      * @Template
      */
