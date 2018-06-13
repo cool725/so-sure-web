@@ -145,6 +145,13 @@ class BacsPayment extends Payment
         if (!$date) {
             $date = new \DateTime();
         }
+
+        // if payment has already been scheduled for submission in the future (e.g. scheduled payment a few days in
+        // advance), then base off of that date instead
+        if ($this->getSubmittedDate() > $date) {
+            $date = $this->getSubmittedDate();
+        }
+
         $this->setDate($date);
         $this->setSubmittedDate($date);
         $this->setBacsCreditDate($this->addBusinessDays($date, self::DAYS_CREDIT));

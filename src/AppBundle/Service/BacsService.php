@@ -1323,6 +1323,7 @@ class BacsService
                 sprintf('"%s"', $scheduledPayment->getPolicy()->getId()),
                 sprintf('"SP-%s"', $scheduledPayment->getId()),
             ]);
+            $payment->setSubmittedDate($scheduledDate);
             $payment->setStatus(BacsPayment::STATUS_GENERATED);
             $payment->setSerialNumber($serialNumber);
             $scheduledPayment->setStatus(ScheduledPayment::STATUS_PENDING);
