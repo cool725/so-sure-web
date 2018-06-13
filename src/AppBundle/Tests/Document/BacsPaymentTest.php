@@ -47,6 +47,14 @@ class BacsPaymentTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(new \DateTime('2018-02-01'), $bacs->getSubmittedDate());
         $this->assertEquals(new \DateTime('2018-02-05'), $bacs->getBacsCreditDate());
         $this->assertEquals(new \DateTime('2018-02-08'), $bacs->getBacsReversedDate());
+
+        $bacs = new BacsPayment();
+        $bacs->setSubmittedDate(new \DateTime('2018-01-01'));
+        $bacs->submit(new \DateTime('2018-02-01'));
+        $this->assertEquals(new \DateTime('2018-02-01'), $bacs->getDate());
+        $this->assertEquals(new \DateTime('2018-02-01'), $bacs->getSubmittedDate());
+        $this->assertEquals(new \DateTime('2018-02-05'), $bacs->getBacsCreditDate());
+        $this->assertEquals(new \DateTime('2018-02-08'), $bacs->getBacsReversedDate());
     }
 
     public function testInProgress()
