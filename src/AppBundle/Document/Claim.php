@@ -325,6 +325,22 @@ class Claim
     protected $description;
 
     /**
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     * @Gedmo\Versioned
+     * @var \DateTime
+     */
+    protected $incidentDate;
+
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="4", max="100")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $incidentTime;
+
+    /**
      * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="1", max="250")
      * @MongoDB\Field(type="string")
@@ -499,6 +515,11 @@ class Claim
      * @MongoDB\Field(type="collection")
      */
     protected $ignoreWarningFlags = array();
+
+    /**
+     * @Assert\Choice(callback="getNetworks", strict=true)
+     */
+    protected $network;
 
     public function __construct()
     {
@@ -1153,6 +1174,16 @@ class Claim
     public function hasIgnoreUserDeclined()
     {
         return  $this->isIgnoreWarningFlagSet(self::WARNING_FLAG_IGNORE_USER_DECLINED);
+    }
+
+    public function getNetwork()
+    {
+        return $this->network;
+    }
+    
+    public function setNetwork($network)
+    {
+        $this->network = $network;
     }
 
     public static function sumClaims($claims)

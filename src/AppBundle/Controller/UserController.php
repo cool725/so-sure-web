@@ -45,6 +45,7 @@ use AppBundle\Document\Invitation\EmailInvitation;
 use AppBundle\Document\Form\BillingDay;
 use AppBundle\Form\Type\BillingDayType;
 use AppBundle\Form\Type\ClaimFnolType;
+use AppBundle\Form\Type\ClaimFnolConfirmType;
 
 use AppBundle\Service\FacebookService;
 use AppBundle\Security\InvitationVoter;
@@ -1405,10 +1406,10 @@ class UserController extends BaseController
     }
 
     /**
-     * @Route("/claim/{policyId}", name="claim_policy")
+     * @Route("/claim", name="claim_policy")
      * @Template
      */
-    public function claimAction(Request $request, $policyId = null)
+    public function claimAction(Request $request)
     {
         $user = $this->getUser();
 
@@ -1418,53 +1419,77 @@ class UserController extends BaseController
             throw $this->createNotFoundException('No active policy found');
         }
 
-        $dm = $this->getManager();
-        $policyRepo = $dm->getRepository(Policy::class);
         $policy = null;
-
-        if ($policyId) {
-            $policy = $policyRepo->find($policyId);
-            if (!$policy) {
-                throw $this->createNotFoundException('Policy not found');
-            }
-            $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
-        }
-
         $claimFnol = new ClaimFnol();
+        $claimFnolConfirm = new ClaimFnol();
 
-        if ($policy) {
-            $claimFnol->setPolicy($policy);
-        } elseif ($user) {
-            $claimFnol->setUser($user);
-        }
+        $claimFnol->setUser($user);
 
         $claimForm = $this->get('form.factory')
             ->createNamedBuilder('claim_form', ClaimFnolType::class, $claimFnol)
             ->getForm();
         $claimConfirmForm = $this->get('form.factory')
-            ->createNamedBuilder('claim_confirm_form', ClaimFnolConfirmType::class, $claimFnol)
+            ->createNamedBuilder('claim_confirm_form', ClaimFnolConfirmType::class, $claimFnolConfirm)
             ->getForm();
+
+        $current = 'claim';
 
         if ('POST' === $request->getMethod()) {
             if ($request->request->has('claim_form')) {
                 $claimForm->handleRequest($request);
                 if ($claimForm->isValid()) {
 
-                    
+                    $dm = $this->getManager();
+                    $policyRepo = $dm->getRepository(Policy::class);
+                    $policy = $policyRepo->find($claimForm->getData()->getPolicyNumber());
+                    if (!$policy) {
+                        throw $this->createNotFoundException('Policy not found');
+                    }
+                    $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
+
+                    $claimFnolConfirm->setPolicy($policy);
+                    $claimFnolConfirm = clone $claimFnolConfirm;
+                    $claimConfirmForm = $this->get('form.factory')
+                        ->createNamedBuilder('claim_confirm_form', ClaimFnolConfirmType::class, $claimFnolConfirm)
+                        ->getForm();
+
+                    $current = 'claim-confirm';
                 }
             } elseif ($request->request->has('claim_confirm_form')) {
                 $claimConfirmForm->handleRequest($request);
                 if ($claimConfirmForm->isValid()) {
 
+                    $claimsService = $this->get('app.claims');
+                    $claimsService->createClaim($claimConfirmForm->getData());
                     
                 }
             }
         }
 
+        $claimType = '';
+        switch ($claimForm->getData()->getType()) {
+            case 'damage':
+                $claimType = 'DAMAGED OR BROKEN DOWN';
+                break;
+            case 'loss':
+                $claimType = 'LOST';
+                break;
+            case 'theft':
+                $claimType = 'STOLEN';
+                break;
+            default:
+                $claimType = '';
+                break;
+        }
+
         $data = [
             'username' => $user->getName(),
+            'phone' => $policy ? sprintf("%s %s (IMEI %s)", $policy->getPhone()->getMake(), $policy->getPhone()->getModel(), $policy->getImei()) : '',
+            'claim_type' => $claimType,
+            'policy_date' => $policy ? $policy->getStart() : '',
             'claim_form' => $claimForm->createView(),
             'claim_confirm_form' => $claimConfirmForm->createView(),
+            'current' => $current,
         ];
 
         return $this->render('AppBundle:User:claim.html.twig', $data);

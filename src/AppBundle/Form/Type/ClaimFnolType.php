@@ -21,18 +21,6 @@ use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
 
 class ClaimFnolType extends AbstractType
 {
-    /**
-     * @var boolean
-     */
-    private $required;
-
-    /**
-     * @param boolean $required
-     */
-    public function __construct($required)
-    {
-        $this->required = $required;
-    }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -41,7 +29,7 @@ class ClaimFnolType extends AbstractType
             ->add('name', TextType::class, ['disabled' => true])
             ->add('phone', TextType::class)
             ->add('when', DateType::class, [
-                  'required' => $this->required,
+                  'required' => true,
                   'format'   => 'dd/MM/yyyy',
                   'widget' => 'single_text',
                   'placeholder' => array(

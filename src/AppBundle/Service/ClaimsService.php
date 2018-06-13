@@ -9,6 +9,7 @@ use AppBundle\Document\Claim;
 use AppBundle\Document\LostPhone;
 use AppBundle\Document\User;
 use AppBundle\Document\Connection\RewardConnection;
+use AppBundle\Document\Form\ClaimFnol;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
@@ -54,6 +55,17 @@ class ClaimsService
         $this->routerService = $routerService;
         $this->redis = $redis;
         $this->environment = $environment;
+    }
+
+    public function createClaim(ClaimFnol $claimFnol) {
+        $repo = $this->dm->getRepository(Claim::class);
+
+        $claim = new Claim();
+        $claim->setPolicy($claimFnol->getPolicy());
+        $claim->setType($claimFnol->getType());
+        $claim->setLocation($claimFnol->getWhere());
+        $claim->setDescription($claimFnol->getMessage());
+        $claim->setPolicy($claimFnol->getPolicy());
     }
 
     public function addClaim(Policy $policy, Claim $claim)

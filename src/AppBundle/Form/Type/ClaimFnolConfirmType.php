@@ -4,13 +4,8 @@ namespace AppBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ODM\MongoDB\DocumentRepository;
 use AppBundle\Document\Claim;
@@ -21,19 +16,7 @@ use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
 
 class ClaimFnolConfirmType extends AbstractType
 {
-    /**
-     * @var boolean
-     */
-    private $required;
-
-    /**
-     * @param boolean $required
-     */
-    public function __construct($required)
-    {
-        $this->required = $required;
-    }
-
+    
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
@@ -51,6 +34,12 @@ class ClaimFnolConfirmType extends AbstractType
             ->add('message', HiddenType::class, ['required' => true])
             ->add('submit', SubmitType::class)
         ;
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            $form = $event->getForm();
+            $data = $event->getData();
+
+        });
     }
 
     public function configureOptions(OptionsResolver $resolver)
