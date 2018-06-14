@@ -263,3 +263,20 @@ body {
         }
     }
 }
+
+.share {
+
+    &__box {
+        background-color: $lightest-blue;
+        padding: 30px;
+        margin-bottom: 25px;
+        @include border-radius(8px);
+        // box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+
+        ul {
+            li {
+                margin-bottom: 15px;
+            }
+        }
+    }
+}

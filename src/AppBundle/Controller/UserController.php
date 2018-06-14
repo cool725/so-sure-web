@@ -458,6 +458,12 @@ class UserController extends BaseController
             [$policy->getStandardSCode()->getShareLink(), $policy->getStandardSCode()->getCode()]
         );
 
+        $expShare = $this->sixpack(
+            $request,
+            SixpackService::EXPERIMENT_USER_SCODE_SHARE,
+            ['old-user-scode-sharing', 'user-scode-sharing']
+        );
+
         return array(
             'policy' => $policy,
             'email_form' => $emailInvitationForm->createView(),
@@ -467,6 +473,7 @@ class UserController extends BaseController
             'scode' => $scode,
             'unconnected_user_policy_form' => $unconnectedUserPolicyForm->createView(),
             'share_experiment_text' => $shareExperimentText,
+            'user_scode_sharing' => $expShare,
         );
     }
 

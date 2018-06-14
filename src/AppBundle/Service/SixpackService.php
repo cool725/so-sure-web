@@ -72,7 +72,7 @@ class SixpackService
     // Exp 4
     const EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT = 'phone-replacement-matching-advert';
     // Exp 5
-
+    const EXPERIMENT_USER_SCODE_SHARE = 'user-scode-sharing';
     // Exp 6
 
     // Exp 7
@@ -116,7 +116,7 @@ class SixpackService
         // Exp 4
         self::EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT,
         // Exp 5
-
+        self::EXPERIMENT_USER_SCODE_SHARE,
         // Exp 6
 
         // Exp 7
@@ -163,7 +163,7 @@ class SixpackService
         // Exp 4
         self::EXPERIMENT_PHONE_REPLACEMENT_MATCHING_ADVERT,
         // Exp 5
-
+        self::EXPERIMENT_USER_SCODE_SHARE,
         // Exp 6
 
         // Exp 7
