@@ -745,7 +745,7 @@
                                         -
                                     {% endif %}
                                 </td>
-                                <td>{% if sosure['dailyBacsTransaction'][day] is defined and lloyds['dailyBacs'][ymd] is defined %}
+                                <td>{% if sosure['dailyBacsTransaction'][day] is defined or lloyds['dailyBacs'][ymd] is defined %}
                                         £{{ cumulative|number_format(2, '.', ',') }}
                                     {% else %}
                                         -
