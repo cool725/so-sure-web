@@ -570,11 +570,19 @@
                                         {% set diff = barclays['dailyProcessed'][ymd] - lloyds['dailyProcessed'][ymd] %}
                                         {% set cumulative = cumulative + diff %}
                                         £{{ diff|number_format(2, '.', ',') }}
+                                    {% elseif barclays['dailyProcessed'][ymd] is defined %}
+                                        {% set diff = barclays['dailyProcessed'][ymd] %}
+                                        {% set cumulative = cumulative + diff %}
+                                        £{{ diff|number_format(2, '.', ',') }}
+                                    {% elseif lloyds['dailyProcessed'][ymd] is defined %}
+                                        {% set diff = 0 - lloyds['dailyProcessed'][ymd] %}
+                                        {% set cumulative = cumulative + diff %}
+                                        £{{ diff|number_format(2, '.', ',') }}
                                     {% else %}
                                         -
                                     {% endif %}
                                 </td>
-                                <td>{% if barclays['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined %}
+                                <td>{% if barclays['dailyProcessed'][ymd] is defined or lloyds['dailyProcessed'][ymd] is defined %}
                                         £{{ cumulative|number_format(2, '.', ',') }}
                                     {% else %}
                                         -
@@ -610,7 +618,7 @@
                                         -
                                     {% endif %}
                                 </td>
-                                <td>{% if barclays['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined %}
+                                <td>{% if barclays['dailyProcessed'][ymd] is defined or lloyds['dailyProcessed'][ymd] is defined %}
                                         £{{ cumulative|number_format(2, '.', ',') }}
                                     {% else %}
                                         -
@@ -725,11 +733,19 @@
                                         {% set diff = sosure['dailyBacsTransaction'][day] - lloyds['dailyBacs'][ymd] %}
                                         {% set cumulative = cumulative + diff %}
                                         £{{ diff|number_format(2, '.', ',') }}
+                                    {% elseif sosure['dailyBacsTransaction'][day] is defined %}
+                                        {% set diff = sosure['dailyBacsTransaction'][day] %}
+                                        {% set cumulative = cumulative + diff %}
+                                        £{{ diff|number_format(2, '.', ',') }}
+                                    {% elseif lloyds['dailyBacs'][ymd] is defined %}
+                                        {% set diff = 0 - lloyds['dailyBacs'][ymd] %}
+                                        {% set cumulative = cumulative + diff %}
+                                        £{{ diff|number_format(2, '.', ',') }}
                                     {% else %}
                                         -
                                     {% endif %}
                                 </td>
-                                <td>{% if sosure['dailyBacsTransaction'][day] is defined and lloyds['dailyBacs'][ymd] is defined %}
+                                <td>{% if sosure['dailyBacsTransaction'][day] is defined or lloyds['dailyBacs'][ymd] is defined %}
                                         £{{ cumulative|number_format(2, '.', ',') }}
                                     {% else %}
                                         -
