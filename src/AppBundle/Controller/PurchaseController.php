@@ -1182,7 +1182,7 @@ class PurchaseController extends BaseController
      * @Route("/remainder/{id}", name="purchase_remainder_policy")
      * @Template
      */
-    public function purchaseRemainderPolicyAction(Request $request, $id)
+    public function purchaseRemainderPolicyAction($id)
     {
         $policyRepo = $this->getManager()->getRepository(Policy::class);
         $policy = $policyRepo->find($id);
