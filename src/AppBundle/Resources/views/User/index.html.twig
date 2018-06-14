@@ -3,6 +3,7 @@
 {# Set vars #}
 {% set new_stylesheet = 1 %}
 {% set new_footer = 1 %}
+{% set include_emoji = 1 %}
 
 {% block javascripts %}
     {{ parent() }}
@@ -35,26 +36,26 @@
                     {% if user_scode_sharing is defined and user_scode_sharing == 'user-scode-sharing' %}
                         {% if policy.canInvite %}
                         <div class="share__box">
-                            <div class="row">
-                                <div class="col-sm-6">
-                                    <h3 class="text-blue">Sharing is... rewarding</h3>
-                                    <p class="lead">If you and your friends take good care of your phones and don’t need to claim, we’ll give you up to 80% of your premium back at the end of your policy year.</p>
-{#                                     <ul class="list-unstyled">
-                                        <li>
-                                            <span class="h3">Invite friends to so-sure</span><br>
-                                            You and your friends can save on your premium if you connect and don't claim at each year
-                                        </li>
-                                        <li>
-                                            <span class="h3">Your unique share code: <span class="text-blue">{{ policy.standardSCode.code }}</span></span><br>
-                                            Get £XX per friend connected
-                                        </li>
-                                        <li class="h4">Something</li>
-                                    </ul> #}
-                                </div>
-                                <div class="col-sm-6">
+                            <h2 class="h-nom text-center">💰 Sharing is... rewarding</h2>
+                            <p class="lead">If you and your friends take good care of your phones and don’t need to claim, we’ll give you up to 80% of your premium back at the end of your policy year.</p>
+                            <p class="lead">We've made it easy for you to get started, invite via email or share your unique sign-up link below.</p>
+                            <div class="row share col-b-b">
+                                <div class="col-md-6">
                                     {# Non-valid entry for autocomplete see: https://developer.mozilla.org/en-US/docs/Web/Security/Securing_your_site/Turning_off_form_autocompletion #}
+                                    <h3 class="text-center">✉️ Invite via email</h3>
+{#                                     {{ form_start(email_form, {'attr': {'autocomplete': 'nope'}}) }}
+                                        <div class="form-group">
+                                            {{ form_widget(email_form.email, {'attr': {'placeholder': 'Enter their email', 'class': 'form-control'}}) }}
+                                        </div>
+                                        <div class="help-block">
+                                            <a href="#">Add another <i class="fa fa-plus-circle" aria-hidden="true"></i></a>
+                                        </div>
+                                        <div class="form-group clearfix">
+                                            {{ form_widget(email_form.submit, {'label': 'Invite friend(s)', 'attr': {'class': 'btn btn-green btn-pad btn-block'}}) }}
+                                        </div>
+                                    {{ form_end(email_form) }} #}
                                     {{ form_start(email_form, {'attr': {'autocomplete': 'nope'}}) }}
-          {#                               <div class="form-group">
+                                        <div class="form-group">
                                             {{ form_errors(email_form.email) }}
                                             <div class="input-group">
                                                 {{ form_widget(email_form.email, {'attr': {'placeholder': 'Enter their email', 'class': 'form-control'}}) }}
@@ -62,14 +63,25 @@
                                                     {{ form_widget(email_form.submit, {'label': 'Invite', 'attr': {'class': 'btn btn-green btn-pad'}}) }}
                                                 </span>
                                             </div>
-                                        </div> #}
-                                        <div class="form-group">
-                                            {{ form_widget(email_form.email, {'attr': {'placeholder': 'Enter their email', 'class': 'form-control'}}) }}
-                                        </div>
-                                        <div class="form-group">
-                                            {{ form_widget(email_form.submit, {'label': 'Invite', 'attr': {'class': 'btn btn-green btn-pad'}}) }}
                                         </div>
                                     {{ form_end(email_form) }}
+                                </div>
+                                <div class="col-md-6">
+                                    <h3 class="text-center">🔗 Share this link</h3>
+                                    <form>
+                                        <div class="form-group">
+                                            <div class="input-group">
+                                                <input name="scode" id="scode" readonly="readonly" type="text" class="form-control" value="{{ policy.standardSCode.shareLink }}">
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-blue btn-pad btn-copy"
+                                                            data-clipboard-target="#scode"
+                                                            data-toggle="tooltip"
+                                                            data-placement="bottom"
+                                                            >Copy</button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
