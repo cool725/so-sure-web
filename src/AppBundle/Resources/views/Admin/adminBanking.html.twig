@@ -582,7 +582,7 @@
                                         -
                                     {% endif %}
                                 </td>
-                                <td>{% if barclays['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined %}
+                                <td>{% if barclays['dailyProcessed'][ymd] is defined or lloyds['dailyProcessed'][ymd] is defined %}
                                         £{{ cumulative|number_format(2, '.', ',') }}
                                     {% else %}
                                         -
@@ -618,7 +618,7 @@
                                         -
                                     {% endif %}
                                 </td>
-                                <td>{% if barclays['dailyProcessed'][ymd] is defined and lloyds['dailyProcessed'][ymd] is defined %}
+                                <td>{% if barclays['dailyProcessed'][ymd] is defined or lloyds['dailyProcessed'][ymd] is defined %}
                                         £{{ cumulative|number_format(2, '.', ',') }}
                                     {% else %}
                                         -
