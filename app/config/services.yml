@@ -974,6 +974,24 @@ services:
         tags:
             - { name: form.type }
 
+    app.form.type.claimfnolconfirm:
+        class: AppBundle\Form\Type\ClaimFnolConfirmType
+        arguments: ["%form_required%"]
+        tags:
+            - { name: form.type }
+
+    app.form.type.claimfnoldamage:
+        class: AppBundle\Form\Type\ClaimFnolDamageType
+        arguments: ["%form_required%"]
+        tags:
+            - { name: form.type }
+
+    app.form.type.claimfnoltheftloss:
+        class: AppBundle\Form\Type\ClaimFnolTheftLossType
+        arguments: ["%form_required%"]
+        tags:
+            - { name: form.type }
+
     app.form.type.phonesearch:
         class: AppBundle\Form\Type\PhoneSearchType
         arguments: ["@request_stack"]

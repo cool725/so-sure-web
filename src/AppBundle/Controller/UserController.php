@@ -24,10 +24,13 @@ use AppBundle\Document\Feature;
 use AppBundle\Document\User;
 use AppBundle\Document\BacsPaymentMethod;
 use AppBundle\Document\BankAccount;
+use AppBundle\Document\Claim;
 use AppBundle\Document\Form\Renew;
 use AppBundle\Document\Form\RenewCashback;
 use AppBundle\Document\Form\Bacs;
 use AppBundle\Document\Form\ClaimFnol;
+use AppBundle\Document\Form\ClaimFnolDamage;
+use AppBundle\Document\Form\ClaimFnolTheftLoss;
 use AppBundle\Form\Type\BacsType;
 use AppBundle\Form\Type\BacsConfirmType;
 use AppBundle\Form\Type\PhoneType;
@@ -46,6 +49,8 @@ use AppBundle\Document\Form\BillingDay;
 use AppBundle\Form\Type\BillingDayType;
 use AppBundle\Form\Type\ClaimFnolType;
 use AppBundle\Form\Type\ClaimFnolConfirmType;
+use AppBundle\Form\Type\ClaimFnolDamageType;
+use AppBundle\Form\Type\ClaimFnolTheftLossType;
 
 use AppBundle\Service\FacebookService;
 use AppBundle\Security\InvitationVoter;
@@ -1447,8 +1452,7 @@ class UserController extends BaseController
                     }
                     $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
 
-                    $claimFnolConfirm->setPolicy($policy);
-                    $claimFnolConfirm = clone $claimFnolConfirm;
+                    $claimFnolConfirm = clone $claimFnol;
                     $claimConfirmForm = $this->get('form.factory')
                         ->createNamedBuilder('claim_confirm_form', ClaimFnolConfirmType::class, $claimFnolConfirm)
                         ->getForm();
@@ -1459,9 +1463,23 @@ class UserController extends BaseController
                 $claimConfirmForm->handleRequest($request);
                 if ($claimConfirmForm->isValid()) {
 
+                    $dm = $this->getManager();
+                    $policyRepo = $dm->getRepository(Policy::class);
+                    $policy = $policyRepo->find($claimConfirmForm->getData()->getPolicyNumber());
+                    if (!$policy) {
+                        throw $this->createNotFoundException('Policy not found');
+                    }
+                    $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
+
+                    var_dump($claimConfirmForm->getData());
+
                     $claimsService = $this->get('app.claims');
-                    $claimsService->createClaim($claimConfirmForm->getData());
-                    
+                    $claim = $claimsService->createClaim($claimConfirmForm->getData());
+                    $claim->setPolicy($policy);
+                    $policy->addClaim($claim);
+                    $dm->flush();
+
+                    return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
                 }
             }
         }
@@ -1493,6 +1511,78 @@ class UserController extends BaseController
         ];
 
         return $this->render('AppBundle:User:claim.html.twig', $data);
+    }
+
+    /**
+     * @Route("/claim/{policyId}", name="claimed_policy")
+     * @Template
+     */
+    public function claimPolicyAction(Request $request, $policyId)
+    {
+        $user = $this->getUser();
+        $dm = $this->getManager();
+        $policyRepo = $dm->getRepository(Policy::class);
+        $policy = $policyRepo->find($policyId);
+
+        $this->denyAccessUnlessGranted(PolicyVoter::EDIT, $policy);
+
+        $claim = $policy->getLatestClaim();
+
+        if ($claim === null) {
+            return $this->redirectToRoute('claim_policy');
+        }
+
+        if ($claim->getType() == Claim::TYPE_DAMAGE) {
+            $claimFnolDamage = new ClaimFnolDamage();
+            $claimFnolDamage->setClaim($claim);
+
+            $claimDamageForm = $this->get('form.factory')
+                ->createNamedBuilder('claim_damage_form', ClaimFnolDamageType::class, $claimFnolDamage)
+                ->getForm();
+
+            if ('POST' === $request->getMethod()) {
+                if ($request->request->has('claim_damage_form')) {
+                    $claimDamageForm->handleRequest($request);
+                    if ($claimDamageForm->isValid()) {
+
+                    }
+                }
+            }
+
+            $data = [
+                'username' => $user->getName(),
+                'claim_form' => $claimDamageForm->createView(),
+            ];
+            return $this->render('AppBundle:User:claimDamage.html.twig', $data);
+        }
+        elseif ($claim->getType() == Claim::TYPE_THEFT || $claim->getType() == Claim::TYPE_LOSS) {
+            $claimFnolTheftLoss = new ClaimFnolTheftLoss();
+            $claimFnolTheftLoss->setClaim($claim);
+
+            $claimTheftLossForm = $this->get('form.factory')
+                ->createNamedBuilder('claim_theftloss_form', ClaimFnolTheftLossType::class, $claimFnolTheftLoss)
+                ->getForm();
+
+            if ('POST' === $request->getMethod()) {
+                if ($request->request->has('claim_theftloss_form')) {
+                    $claimTheftLossForm->handleRequest($request);
+                    if ($claimTheftLossForm->isValid()) {
+
+                    }
+                }
+            }
+
+            $data = [
+                'username' => $user->getName(),
+                'claimType' => $claim->getType(),
+                'network' => $claim->getNetwork(),
+                'claim_form' => $claimTheftLossForm->createView(),
+            ];
+            return $this->render('AppBundle:User:claimTheftLoss.html.twig', $data);
+        }
+        else {
+
+        }
     }
 
     /**

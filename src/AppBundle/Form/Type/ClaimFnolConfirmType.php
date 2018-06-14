@@ -5,6 +5,7 @@ namespace AppBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ODM\MongoDB\DocumentRepository;
@@ -16,6 +17,19 @@ use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
 
 class ClaimFnolConfirmType extends AbstractType
 {
+
+    /**
+     * @var boolean
+     */
+    private $required;
+ 
+    /**
+     * @param boolean $required
+     */
+    public function __construct($required)
+    {
+        $this->required = $required;
+    }
     
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -24,7 +38,14 @@ class ClaimFnolConfirmType extends AbstractType
             ->add('name', HiddenType::class, ['required' => true])
             ->add('phone', HiddenType::class, ['required' => true])
             ->add('policyNumber', HiddenType::class, ['required' => true])
-            ->add('when', HiddenType::class, ['required' => true])
+            ->add('when', DateType::class, [
+                  'required' => $this->required,
+                  'format'   => 'dd/MM/yyyy',
+                  'widget' => 'single_text',
+                  'placeholder' => array(
+                      'year' => 'YYYY', 'month' => 'MM', 'day' => 'DD',
+                  ),
+            ])
             ->add('time', HiddenType::class, ['required' => true])
             ->add('where', HiddenType::class, ['required' => true])
             ->add('timeToReach', HiddenType::class, ['required' => true])
@@ -34,12 +55,6 @@ class ClaimFnolConfirmType extends AbstractType
             ->add('message', HiddenType::class, ['required' => true])
             ->add('submit', SubmitType::class)
         ;
-
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
-            $form = $event->getForm();
-            $data = $event->getData();
-
-        });
     }
 
     public function configureOptions(OptionsResolver $resolver)

@@ -114,6 +114,18 @@ class Claim
     const NETWORK_WHITE_MOBILE = "White Mobile";
     const NETWORK_WORLDSIM = "WorldSim";
 
+    const DAMAGE_BROKEN_SCREEN = "broken-screen";
+    const DAMAGE_WATER = "water-damage";
+    const DAMAGE_OUT_OF_WARRANTY = "out-of-warranty-breakdown";
+    const DAMAGE_OTHER = "other";
+
+    const PHONE_STATUS_NEW = "new";
+    const PHONE_STATUS_REFURBISHED = "refurbished";
+    const PHONE_STATUS_SECOND_HAND = "second-hand";
+
+    const REPORT_POLICE_STATION = "police-station";
+    const REPORT_ONLINE = "online";
+
     public static $warningFlags = [
         self::WARNING_FLAG_DAVIES_NAME_MATCH => self::WARNING_FLAG_DAVIES_NAME_MATCH,
         self::WARNING_FLAG_DAVIES_POSTCODE => self::WARNING_FLAG_DAVIES_POSTCODE,
@@ -521,6 +533,17 @@ class Claim
      */
     protected $network;
 
+    /**
+     * @AppAssert\PhoneNumber(message="Please enter a valid phone number")
+     */
+    protected $phoneToReach;
+
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="4", max="100")
+     */
+    protected $timeToReach;
+
     public function __construct()
     {
         $this->recordedDate = new \DateTime();
@@ -787,6 +810,26 @@ class Claim
     public function setDescription($description)
     {
         $this->description = $description;
+    }
+
+    public function getIncidentDate()
+    {
+        return $this->incidentDate;
+    }
+
+    public function setIncidentDate($incidentDate)
+    {
+        $this->incidentDate = $incidentDate;
+    }
+
+    public function getIncidentTime()
+    {
+        return $this->incidentTime;
+    }
+
+    public function setIncidentTime($incidentTime)
+    {
+        $this->incidentTime = $incidentTime;
     }
 
     public function getLocation()
@@ -1184,6 +1227,26 @@ class Claim
     public function setNetwork($network)
     {
         $this->network = $network;
+    }
+
+    public function getPhoneToReach()
+    {
+        return $this->phoneToReach;
+    }
+    
+    public function setPhoneToReach($phoneToReach)
+    {
+        $this->phoneToReach = $phoneToReach;
+    }
+
+    public function getTimeToReach()
+    {
+        return $this->timeToReach;
+    }
+    
+    public function setTimeToReach($timeToReach)
+    {
+        $this->timeToReach = $timeToReach;
     }
 
     public static function sumClaims($claims)

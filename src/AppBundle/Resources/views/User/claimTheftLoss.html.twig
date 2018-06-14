@@ -1,0 +1,119 @@
+{% extends 'base.html.twig' %}
+
+{# Set vars #}
+{% set new_stylesheet = 1 %}
+{% set new_footer = 1 %}
+{% set distraction_free = 1 %}
+
+{% block title %}so-sure - Make a claim
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets output='css/*.css'
+    'components/animate.css/animate.min.css'
+    '@AppBundle/Resources/public/sass/page/claim.scss'
+    %}
+    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+
+{# {% block nav %}{% endblock %} #}
+
+{% block body %}
+
+    <section id="claim-form-container" class="section--pad background-off-white">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2">
+
+                    <h1 class="text-center">Complete your claim</h1>
+
+                    {{ form_start(claim_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'id':'claim-form', 'data-client-validation': form_client_validation }}) }}
+
+                    <p>I, {{ username }} am making a claim for {{ claimType }}.</p>
+
+                    <p>I {{ form_widget(claim_form.hasContacted, { 'attr': {'class': 'form-control', 'placeholder': 'Please select'}}) }} <span class="help-block with-errors">{{ form_errors(claim_form.hasContacted) }}</span> the place where I last had my phone, which was {{ form_widget(claim_form.contactedPlace, { 'attr': {'class': 'form-control', 'placeholder': ''}}) }} <span class="help-block with-errors">{{ form_errors(claim_form.contactedPlace) }}</span>.</p>
+
+                    <p>I reported the phone {{ claimType }} to {{ network }} and asked them to block my phone on {{ form_widget(claim_form.blockedDate, { 'attr': {'class': 'form-control', 'placeholder': 'Date (DD/MM/YYYY)'}}) }} <span class="help-block with-errors">{{ form_errors(claim_form.blockedDate) }}</span></p>
+
+                    <p>I reported the {{ claimType }} to the police on {{ form_widget(claim_form.reportedDate, { 'attr': {'class': 'form-control', 'placeholder': 'Date (DD/MM/YYYY)'}}) }} <span class="help-block with-errors">{{ form_errors(claim_form.reportedDate) }}</span> at the {{ form_widget(claim_form.reportType, { 'attr': {'class': 'form-control', 'placeholder': 'Please select'}}) }} <span class="help-block with-errors">{{ form_errors(claim_form.reportType) }}</span>.</p>
+
+                    <p>Please upload the following required documents to process your claim. Once they have been uploaded, we will call within a few hours (during business hours 9-5.30pm).</p>
+
+                    <div class="row">
+                        <div class="col-sm-12 text-center">
+                                <div class="form-group {% if form_errors(claim_form.proofOfUsage) %}has-error{% endif %}">
+                                    <label class="h4">Proof of usage <span class="req">*</span></label>
+                                    {{ form_widget(claim_form.proofOfUsage, { 'attr': {'class': 'form-control'}}) }}
+                                    <div class="help-block with-errors">{{ form_errors(claim_form.proofOfUsage) }}</div>
+                                </div>
+                        </div>
+                    </div>    
+                    <div class="row">
+                        <div class="col-sm-12 text-center">
+                                <div class="form-group {% if form_errors(claim_form.proofOfBarring) %}has-error{% endif %}">
+                                    <label class="h4">Proof of barring <span class="req">*</span></label>
+                                    {{ form_widget(claim_form.proofOfBarring, { 'attr': {'class': 'form-control'}}) }}
+                                    <div class="help-block with-errors">{{ form_errors(claim_form.proofOfBarring) }}</div>
+                                </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 text-center">
+                                <div class="form-group {% if form_errors(claim_form.proofOfPurchase) %}has-error{% endif %}">
+                                    <label class="h4">Proof of purchase <span class="req">*</span></label>
+                                    {{ form_widget(claim_form.proofOfPurchase, { 'attr': {'class': 'form-control'}}) }}
+                                    <div class="help-block with-errors">{{ form_errors(claim_form.proofOfPurchase) }}</div>
+                                </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 text-center">
+                                <div class="form-group {% if form_errors(claim_form.crimeReferenceNumber) %}has-error{% endif %}">
+                                    <label class="h4">Proof of usage <span class="req">*</span></label>
+                                    {{ form_widget(claim_form.crimeReferenceNumber, { 'attr': {'class': 'form-control'}}) }}
+                                    <div class="help-block with-errors">{{ form_errors(claim_form.crimeReferenceNumber) }}</div>
+                                </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 text-center">
+                                <div class="form-group {% if form_errors(claim_form.policeLossReport) %}has-error{% endif %}">
+                                    <label class="h4">Proof of usage <span class="req">*</span></label>
+                                    {{ form_widget(claim_form.policeLossReport, { 'attr': {'class': 'form-control'}}) }}
+                                    <div class="help-block with-errors">{{ form_errors(claim_form.policeLossReport) }}</div>
+                                </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 text-center">
+                                <p>I confirm that I have attached the requested documents and that all of the above is true.</p>
+                                <div class="form-group">
+                                    {{ form_widget(claim_form.confirm, { 'label': 'Confirm', 'attr': {'class': 'btn btn-blue btn-lg'}}) }}
+                                </div>
+                        </div>
+                    </div>
+
+                    </div>
+                    {{ form_end(claim_form) }}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Page Modals #}
+    {# End Page Modals #}
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    'components/moment/moment.min.js'
+    'components/jquery-mask-plugin/jquery.mask.min.js'
+    'components/jquery-validation/jquery.validate.min.js'
+    '@AppBundle/Resources/public/js/Default/jqueryValidatorMethods.js'
+    '@AppBundle/Resources/public/js/Default/claim.js' %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}

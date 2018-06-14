@@ -541,7 +541,7 @@ class DefaultController extends BaseController
                     $user
                 );
 
-                return $this->redirectToRoute('claim_policy');                
+                return $this->redirectToRoute('claim_policy');
             }
 
             throw $this->createNotFoundException('Invalid link');

@@ -23,5 +23,4 @@ class ClaimFnolEmail
     {
         $this->email = $email;
     }
-
 }

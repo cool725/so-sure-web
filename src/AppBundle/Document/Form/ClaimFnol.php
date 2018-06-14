@@ -2,7 +2,6 @@
 
 namespace AppBundle\Document\Form;
 
-use AppBundle\Document\Policy;
 use AppBundle\Document\User;
 use AppBundle\Document\Claim;
 use AppBundle\Document\DateTrait;
@@ -12,11 +11,6 @@ use AppBundle\Validator\Constraints as AppAssert;
 class ClaimFnol
 {
     use DateTrait;
-
-    /**
-     * @var Policy
-     */
-    protected $policy;
 
     /**
      * @var User
@@ -176,20 +170,6 @@ class ClaimFnol
     public function setTimeToReach($timeToReach)
     {
         $this->timeToReach = $timeToReach;
-    }
-
-    public function getPolicy()
-    {
-        return $this->policy;
-    }
-
-    public function setPolicy(Policy $policy)
-    {
-        $this->policy = $policy;
-        if ($policy) {
-            $this->policyNumber = $policy->getPolicyNumber();
-            $this->setUser($policy->getUser());
-        }
     }
 
     public function getUser()

@@ -58,14 +58,18 @@ class ClaimsService
     }
 
     public function createClaim(ClaimFnol $claimFnol) {
-        $repo = $this->dm->getRepository(Claim::class);
-
         $claim = new Claim();
-        $claim->setPolicy($claimFnol->getPolicy());
+        
         $claim->setType($claimFnol->getType());
+        $claim->setIncidentDate($claimFnol->getWhen());
+        $claim->setIncidentTime($claimFnol->getTime());
         $claim->setLocation($claimFnol->getWhere());
         $claim->setDescription($claimFnol->getMessage());
-        $claim->setPolicy($claimFnol->getPolicy());
+        $claim->setNetwork($claimFnol->getNetwork());
+        $claim->setPhoneToReach($claimFnol->getPhone());
+        $claim->setTimeToReach($claimFnol->getTimeToReach());
+
+        return $claim;
     }
 
     public function addClaim(Policy $policy, Claim $claim)

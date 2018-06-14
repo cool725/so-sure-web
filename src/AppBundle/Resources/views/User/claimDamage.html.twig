@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+
+{# Set vars #}
+{% set new_stylesheet = 1 %}
+{% set new_footer = 1 %}
+{% set distraction_free = 1 %}
+
+{% block title %}so-sure - Make a claim
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets output='css/*.css'
+    'components/animate.css/animate.min.css'
+    '@AppBundle/Resources/public/sass/page/claim.scss'
+    %}
+    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+
+{# {% block nav %}{% endblock %} #}
+
+{% block body %}
+
+    <section id="claim-form-container" class="section--pad background-off-white">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2">
+
+                    <h1 class="text-center">Complete your claim</h1>
+
+                    {{ form_start(claim_form, {'attr': {'data-toggle': 'validator', 'class': 'validate-form', 'id':'claim-form', 'data-client-validation': form_client_validation }}) }}
+                    <div class="row">
+                        <div class="col-sm-12 text-center">
+                            <p>I, {{ username }} am making a claim for {{ form_widget(claim_form.typeDetails, { 'attr': {'class': 'form-control', 'placeholder': 'Please select'}}) }} <span class="help-block with-errors">{{ form_errors(claim_form.typeDetails) }}</span>.{{ form_widget(claim_form.typeDetailsOther, { 'attr': {'class': 'form-control', 'placeholder': ''}}) }}<span class="help-block with-errors">{{ form_errors(claim_form.typeDetailsOther) }}</span></p>
+
+                            <p>I bought this phone on {{ form_widget(claim_form.monthOfPurchase, { 'attr': {'class': 'form-control', 'placeholder': 'Month'}}) }}<span class="help-block with-errors">{{ form_errors(claim_form.monthOfPurchase) }}</span> {{ form_widget(claim_form.yearOfPurchase, { 'attr': {'class': 'form-control', 'placeholder': 'Year'}}) }}<span class="help-block with-errors">{{ form_errors(claim_form.yearOfPurchase) }}</span> and it was {{ form_widget(claim_form.phoneStatus, { 'attr': {'class': 'form-control', 'placeholder': 'Please select'}}) }}<span class="help-block with-errors">{{ form_errors(claim_form.phoneStatus) }}</span> and my phone {{ form_widget(claim_form.policyNumber, { 'attr': {'class': 'form-control', 'placeholder': 'Please select'}}) }}<span class="help-block with-errors">{{ form_errors(claim_form.isUnderWarranty) }}</span> under warranty.</p>
+
+                            <p>vPlease upload the following required documents to process your claim. Once they have been uploaded, we will call within a few hours (during business hours 9-5.30pm):</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 text-center">
+                                <div class="form-group {% if form_errors(claim_form.name) %}has-error{% endif %}">
+                                    <label class="h4">Proof of usage <span class="req">*</span></label>
+                                    {{ form_widget(claim_form.proofOfUsage, { 'attr': {'class': 'form-control'}}) }}
+                                    <div class="help-block with-errors">{{ form_errors(claim_form.proofOfUsage) }}</div>
+                                </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 text-center">
+                                <div class="form-group {% if form_errors(claim_form.name) %}has-error{% endif %}">
+                                    <label class="h4">Picture of damaged phone <span class="req">*</span></label>
+                                    {{ form_widget(claim_form.pictureOfPhone, { 'attr': {'class': 'form-control'}}) }}
+                                    <div class="help-block with-errors">{{ form_errors(claim_form.pictureOfPhone) }}</div>
+                                </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 text-center">
+                                <p>I confirm that I have attached the requested documents and that all of the above is true.</p>
+                                <div class="form-group">
+                                    {{ form_widget(claim_form.confirm, { 'label': 'Confirm', 'attr': {'class': 'btn btn-blue btn-lg'}}) }}
+                                </div>
+                        </div>
+                    </div>
+                    {{ form_end(claim_form) }}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Page Modals #}
+    {# End Page Modals #}
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    'components/moment/moment.min.js'
+    'components/jquery-mask-plugin/jquery.mask.min.js'
+    'components/jquery-validation/jquery.validate.min.js'
+    '@AppBundle/Resources/public/js/Default/jqueryValidatorMethods.js'
+    '@AppBundle/Resources/public/js/Default/claim.js' %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}
