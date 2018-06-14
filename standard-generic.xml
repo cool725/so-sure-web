@@ -38,7 +38,7 @@
 </rule>
 <rule ref="Generic.PHP.ForbiddenFunctions">
   <properties>
-    <property name="forbiddenFunctions" type="array" value="sizeof=>count,delete=>unset,print=>null,print_r=>null,is_null=>null,create_function=>null"/>
+    <property name="forbiddenFunctions" type="array" value="sizeof=>count,delete=>unset,print=>null,print_r=>null,var_dump=>null,is_null=>null,create_function=>null"/>
   </properties>
 </rule>
  </ruleset>

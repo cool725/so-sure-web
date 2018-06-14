@@ -86,7 +86,7 @@ class LloydsService
                     // 09/11/2016,CHG,'XX-XX-XX,XXXXXXXX,RETURNED D/D ,35.00,,39.08
                     // 11/10/2016,TFR,'XX-XX-XX,XXXXXXXX,FORGN PYT293483577 ,164.10,,460.51
                     // 20/10/2017,FPO,'XX-XX-XX,XXXXXXXX, NAME XXXXX SO-SURE REWARD POT,45.00,,4996.16
-                    if (in_array($line['Transaction Type'], ['PAY', 'BP', 'CHG', '', 'FPO'])) {
+                    if (in_array($line['Transaction Type'], ['PAY', 'BP', 'CHG', 'FPO'])) {
                         $this->logger->info(sprintf(
                             'Skipping line as payment/interest. %s',
                             implode($line)
@@ -143,6 +143,24 @@ class LloydsService
                         } elseif (trim($line['Transaction Description']) == 'BACS') {
                             $processedDate = \DateTime::createFromFormat("d/m/Y", $line['Transaction Date']);
                             $paymentType = self::PAYMENT_TYPE_BACS;
+                        }
+                    } elseif (in_array($line['Transaction Type'], [''])) {
+                        // can be interest or Unpaid DD
+                        if (mb_stripos($line['Transaction Description'], 'Unpaid D/D') !== false) {
+                            $processedDate = \DateTime::createFromFormat("d/m/Y", $line['Transaction Date']);
+                            $paymentType = self::PAYMENT_TYPE_BACS;
+                        } elseif (mb_stripos($line['Transaction Description'], 'INTEREST') !== false) {
+                            $this->logger->info(sprintf(
+                                'Skipping line as payment/interest. %s',
+                                implode($line)
+                            ));
+                            continue;
+                        } else {
+                            $this->logger->warning(sprintf(
+                                'Skipping line as unknown description for empty type. %s',
+                                implode($line)
+                            ));
+                            continue;
                         }
                     }
 

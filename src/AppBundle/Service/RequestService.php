@@ -299,6 +299,20 @@ class RequestService
         return false;
     }
 
+    public function getAllXHeaders()
+    {
+        $headers = [];
+        if ($request = $this->requestStack->getCurrentRequest()) {
+            foreach ($request->headers->all() as $key => $value) {
+                if (mb_stripos($key, 'x-') === 0) {
+                    $headers[$key] = $value;
+                }
+            }
+        }
+
+        return $headers;
+    }
+
     public function isExcludedPreviewPrefetch()
     {
         if ($request = $this->requestStack->getCurrentRequest()) {

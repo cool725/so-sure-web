@@ -1481,14 +1481,11 @@ class DaviesServiceTest extends WebTestCase
         $daviesClaim->replacementMake = 'Apple';
         $daviesClaim->replacementModel = 'iPhone 4';
 
-
         $mailer = $this->getMockBuilder('Swift_Mailer')
             ->disableOriginalConstructor()
             ->getMock();
         $mailer->expects($this->never())->method('send');
         self::$daviesService->setMailerMailer($mailer);
-
-
 
         static::$daviesService->saveClaim($daviesClaim, false);
         $this->assertNotNull($claim->getApprovedDate());
@@ -1499,6 +1496,8 @@ class DaviesServiceTest extends WebTestCase
     public function testSaveClaimsRepudiatedEmailTest()
     {
         $policy = static::createUserPolicy(true);
+        $policy->setStatus(Policy::STATUS_UNPAID);
+
         $policy->getUser()->setEmail(static::generateEmail('testSaveClaimsRepudiatedEmailTest', $this));
         $claim = new Claim();
         $claim->setNumber(rand(1, 999999));
@@ -1527,6 +1526,73 @@ class DaviesServiceTest extends WebTestCase
             ->disableOriginalConstructor()
             ->getMock();
         $mailer->expects($this->once())->method('send');
+        self::$daviesService->setMailerMailer($mailer);
+
+        static::$daviesService->saveClaim($daviesClaim, false);
+        $this->assertNotNull($claim->getApprovedDate());
+        $this->assertEquals(new \DateTime('2016-01-01'), $claim->getApprovedDate());
+
+        // cancelled should not trigger
+        $policy->setStatus(Policy::STATUS_CANCELLED);
+        $mailer = $this->getMockBuilder('Swift_Mailer')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mailer->expects($this->never())->method('send');
+        self::$daviesService->setMailerMailer($mailer);
+
+        static::$daviesService->saveClaim($daviesClaim, false);
+        $this->assertNotNull($claim->getApprovedDate());
+        $this->assertEquals(new \DateTime('2016-01-01'), $claim->getApprovedDate());
+
+        // damaged should not trigger
+        $daviesClaim->lossType = DaviesClaim::TYPE_DAMAGE;
+        $claim->setType(Claim::TYPE_DAMAGE);
+        $policy->setStatus(Policy::STATUS_ACTIVE);
+        $mailer = $this->getMockBuilder('Swift_Mailer')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mailer->expects($this->never())->method('send');
+        self::$daviesService->setMailerMailer($mailer);
+
+        static::$daviesService->saveClaim($daviesClaim, false);
+        $this->assertNotNull($claim->getApprovedDate());
+        $this->assertEquals(new \DateTime('2016-01-01'), $claim->getApprovedDate());
+    }
+
+
+    public function testSaveClaimsRepudiatedEmailDamageTest()
+    {
+        $policy = static::createUserPolicy(true);
+        $policy->setStatus(Policy::STATUS_UNPAID);
+
+        $policy->getUser()->setEmail(static::generateEmail('testSaveClaimsRepudiatedEmailDamageTest', $this));
+        $claim = new Claim();
+        $claim->setNumber(rand(1, 999999));
+        $claim->setType(Claim::TYPE_DAMAGE);
+        $claim->setStatus(Claim::STATUS_INREVIEW);
+        $policy->addClaim($claim);
+        static::$dm->persist($policy->getUser());
+        static::$dm->persist($policy);
+        static::$dm->persist($claim);
+        static::$dm->flush();
+
+        $daviesClaim = new DaviesClaim();
+        $daviesClaim->claimNumber = (string) $claim->getNumber();
+        $daviesClaim->incurred = 0;
+        $daviesClaim->reserved = 0;
+        $daviesClaim->policyNumber = $policy->getPolicyNumber();
+        $daviesClaim->insuredName = 'Mr foo bar';
+        $daviesClaim->status = DaviesClaim::STATUS_OPEN;
+        $daviesClaim->lossType = DaviesClaim::TYPE_DAMAGE;
+        $daviesClaim->replacementReceivedDate = new \DateTime('2016-01-02');
+        $daviesClaim->replacementMake = 'Apple';
+        $daviesClaim->replacementModel = 'iPhone 4';
+        $daviesClaim->miStatus = DaviesClaim::MISTATUS_REPUDIATED;
+
+        $mailer = $this->getMockBuilder('Swift_Mailer')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mailer->expects($this->never())->method('send');
         self::$daviesService->setMailerMailer($mailer);
 
         static::$daviesService->saveClaim($daviesClaim, false);
