@@ -181,6 +181,7 @@ services:
             - "@app.router"
             - "@snc_redis.default"
             - "%kernel.environment%"
+            - "@oneup_flysystem.mount_manager"
 
     app.shortlink:
         class: AppBundle\Service\ShortLinkService
@@ -982,13 +983,13 @@ services:
 
     app.form.type.claimfnoldamage:
         class: AppBundle\Form\Type\ClaimFnolDamageType
-        arguments: ["%form_required%"]
+        arguments: ["@app.claims"]
         tags:
             - { name: form.type }
 
     app.form.type.claimfnoltheftloss:
         class: AppBundle\Form\Type\ClaimFnolTheftLossType
-        arguments: ["%form_required%"]
+        arguments: ["%form_required%", "@app.claims"]
         tags:
             - { name: form.type }
 

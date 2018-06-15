@@ -71,7 +71,7 @@
                     <div class="row">
                         <div class="col-sm-12 text-center">
                                 <div class="form-group {% if form_errors(claim_form.crimeReferenceNumber) %}has-error{% endif %}">
-                                    <label class="h4">Proof of usage <span class="req">*</span></label>
+                                    <label class="h4">Crime reference number  <span class="req">*</span></label>
                                     {{ form_widget(claim_form.crimeReferenceNumber, { 'attr': {'class': 'form-control'}}) }}
                                     <div class="help-block with-errors">{{ form_errors(claim_form.crimeReferenceNumber) }}</div>
                                 </div>
@@ -80,7 +80,7 @@
                     <div class="row">
                         <div class="col-sm-12 text-center">
                                 <div class="form-group {% if form_errors(claim_form.policeLossReport) %}has-error{% endif %}">
-                                    <label class="h4">Proof of usage <span class="req">*</span></label>
+                                    <label class="h4">Police loss report <span class="req">*</span></label>
                                     {{ form_widget(claim_form.policeLossReport, { 'attr': {'class': 'form-control'}}) }}
                                     <div class="help-block with-errors">{{ form_errors(claim_form.policeLossReport) }}</div>
                                 </div>

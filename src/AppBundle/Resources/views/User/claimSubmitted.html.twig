@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{# Set vars #}
+{% set new_stylesheet = 1 %}
+{% set new_footer = 1 %}
+{% set distraction_free = 1 %}
+
+{% block title %}so-sure - Make a claim
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {% stylesheets output='css/*.css'
+    'components/animate.css/animate.min.css'
+    '@AppBundle/Resources/public/sass/page/claim.scss'
+    %}
+    <link rel="stylesheet" href="{{ asset_url }}">{% endstylesheets %}
+{% endblock %}
+
+
+{# {% block nav %}{% endblock %} #}
+
+{% block body %}
+
+    <section id="claim-form-container" class="section--pad background-off-white">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2">
+
+<p>Thank you for submitting your claim for {{ claim.type }} for your [Make, model, memory] with IMEI [IMEI number]. We will get in touch with you on the [number] {in the next 3 hours, tomorrow/Monday morning}</p>
+
+[Get back to your account]
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Page Modals #}
+    {# End Page Modals #}
+
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {% javascripts
+    'components/moment/moment.min.js'
+    'components/jquery-mask-plugin/jquery.mask.min.js'
+    'components/jquery-validation/jquery.validate.min.js'
+    '@AppBundle/Resources/public/js/Default/jqueryValidatorMethods.js'
+    '@AppBundle/Resources/public/js/Default/claim.js' %}
+    <script src="{{ asset_url }}"></script>{% endjavascripts %}
+{% endblock %}

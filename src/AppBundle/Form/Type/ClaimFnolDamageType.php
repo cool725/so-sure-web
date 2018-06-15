@@ -8,16 +8,32 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ODM\MongoDB\DocumentRepository;
+use AppBundle\Document\Policy;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Claim;
-use AppBundle\Service\ReceperioService;
+use AppBundle\Service\ClaimService;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
 
 class ClaimFnolDamageType extends AbstractType
 {
+
+    /**
+     * @var ClaimService
+     */
+    private $claimService;
+
+    /**
+     * @param ClaimService $claimService
+     */
+    public function __construct($claimService)
+    {
+        $this->claimService = $claimService;
+    }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
@@ -37,7 +53,7 @@ class ClaimFnolDamageType extends AbstractType
             ->add('yearOfPurchase', TextType::class, ['required' => true])
             ->add('phoneStatus', ChoiceType::class, [
                 'required' => true,
-                'placeholder' => 'status',
+                'placeholder' => '',
                 'choices' => [
                     'New' => Claim::PHONE_STATUS_NEW,
                     'Refurbished' => Claim::PHONE_STATUS_REFURBISHED,
@@ -46,14 +62,12 @@ class ClaimFnolDamageType extends AbstractType
             ])
             ->add('isUnderWarranty', ChoiceType::class, [
                 'required' => true,
-                'placeholder' => 'warranty',
+                'placeholder' => '',
                 'choices' => [
-                    'is' => 1,
-                    'is not' => 0
+                    'is' => true,
+                    'is not' => false
                 ],
             ])
-            ->add('proofOfUsage', FileType::class)
-            ->add('pictureOfPhone', FileType::class)
             ->add('confirm', SubmitType::class)
         ;
 
@@ -61,6 +75,43 @@ class ClaimFnolDamageType extends AbstractType
             $form = $event->getForm();
             $claim = $event->getData()->getClaim();
 
+            if ($claim->getPolicy()->getRisk() == Policy::RISK_LEVEL_LOW) {
+                $form->add('proofOfUsage', HiddenType::class);
+            } else {
+                $form->add('proofOfUsage', FileType::class, ['required' => true]);
+            }
+            if ($claim->getPolicy()->getPicSureStatus() == PhonePolicy::PICSURE_STATUS_APPROVED) {
+                $form->add('pictureOfPhone', HiddenType::class);
+            } else {
+                $form->add('pictureOfPhone', FileType::class, ['required' => true]);
+            }
+        });
+
+        $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
+            $form = $event->getForm();
+            $data = $event->getData();
+
+            $now = new \DateTime();
+            $timestamp = $now->format('U');
+
+            if ($filename = $data->getProofOfUsage()) {
+                $$s3key = $this->claimService->saveFile(
+                    $filename,
+                    sprintf('proof-of-usage-%s', $timestamp),
+                    $data->getClaim()->getPolicy()->getUser()->getId(),
+                    $filename->guessExtension()
+                );
+                $data->setProofOfUsage($s3key);
+            }
+            if ($filename = $data->getPictureOfPhone()) {
+                $$s3key = $this->claimService->saveFile(
+                    $filename,
+                    sprintf('picture-of-phone-%s', $timestamp),
+                    $data->getClaim()->getPolicy()->getUser()->getId(),
+                    $filename->guessExtension()
+                );
+                $data->setPictureOfPhone($s3key);
+            }
         });
     }
 

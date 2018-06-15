@@ -11,10 +11,12 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Doctrine\ODM\MongoDB\DocumentRepository;
+use AppBundle\Document\Policy;
+use AppBundle\Document\PhonePolicy;
 use AppBundle\Document\Claim;
-use AppBundle\Service\ReceperioService;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 use Doctrine\Bundle\MongoDBBundle\Form\Type\DocumentType;
@@ -27,12 +29,19 @@ class ClaimFnolTheftLossType extends AbstractType
      */
     private $required;
  
+     /**
+     * @var ClaimService
+     */
+    private $claimService;
+
     /**
      * @param boolean $required
+     * @param ClaimService $claimService
      */
-    public function __construct($required)
+    public function __construct($required, $claimService)
     {
         $this->required = $required;
+        $this->claimService = $claimService;
     }
 
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -42,8 +51,8 @@ class ClaimFnolTheftLossType extends AbstractType
                 'required' => true,
                 'placeholder' => '',
                 'choices' => [
-                    'contacted' => 1,
-                    'did not contact' => 0,
+                    'contacted' => true,
+                    'did not contact' => false,
                 ],
             ])
             ->add('contactedPlace', TextType::class, ['required' => true])
@@ -71,11 +80,7 @@ class ClaimFnolTheftLossType extends AbstractType
                     'online' => Claim::REPORT_ONLINE,
                 ],
             ])
-            ->add('proofOfUsage', FileType::class)
             ->add('proofOfBarring', FileType::class)
-            ->add('proofOfPurchase', FileType::class)
-            ->add('crimeReferenceNumber', TextType::class, ['required' => true])
-            ->add('policeLossReport', TextType::class, ['required' => true])
             ->add('confirm', SubmitType::class)
         ;
 
@@ -83,6 +88,59 @@ class ClaimFnolTheftLossType extends AbstractType
             $form = $event->getForm();
             $claim = $event->getData()->getClaim();
 
+            if ($claim->getPolicy()->getRisk() == Policy::RISK_LEVEL_LOW) {
+                $form->add('proofOfUsage', HiddenType::class);
+            } else {
+                $form->add('proofOfUsage', FileType::class, ['required' => true]);
+            }
+            if ($claim->getPolicy()->getRisk() != Policy::RISK_LEVEL_HIGH && $claim->getPolicy()->getPicSureStatus() == PhonePolicy::PICSURE_STATUS_APPROVED) {
+                $form->add('proofOfPurchase', HiddenType::class);
+            } else {
+                $form->add('proofOfPurchase', FileType::class, ['required' => true]);
+            }
+            if ($claim->getType() == Claim::TYPE_THEFT) {
+                $form->add('crimeReferenceNumber', TextType::class, ['required' => true]);
+                $form->add('policeLossReport', HiddenType::class);
+            } else {
+                $form->add('crimeReferenceNumber', HiddenType::class);
+                $form->add('policeLossReport', TextType::class, ['required' => true]);
+            }
+        });
+
+        $builder->addEventListener(FormEvents::SUBMIT, function (FormEvent $event) {
+            $form = $event->getForm();
+            $data = $event->getData();
+
+            $now = new \DateTime();
+            $timestamp = $now->format('U');
+
+            if ($filename = $data->getProofOfUsage()) {
+                $s3key = $this->claimService->saveFile(
+                    $filename,
+                    sprintf('proof-of-usage-%s', $timestamp),
+                    $data->getClaim()->getPolicy()->getUser()->getId(),
+                    $filename->guessExtension()
+                );
+                $data->setProofOfUsage($s3key);
+            }
+            if ($filename = $data->getProofOfBarring()) {
+                $s3key = $this->claimService->saveFile(
+                    $filename,
+                    sprintf('proof-of-barring-%s', $timestamp),
+                    $data->getClaim()->getPolicy()->getUser()->getId(),
+                    $filename->guessExtension()
+                );
+                $data->setProofOfBarring($s3key);
+            }
+            if ($filename = $data->getProofOfPurchase()) {
+                $s3key = $this->claimService->saveFile(
+                    $filename,
+                    sprintf('proof-of-purchase-%s', $timestamp),
+                    $data->getClaim()->getPolicy()->getUser()->getId(),
+                    $filename->guessExtension()
+                );
+                $data->setProofOfPurchase($s3key);
+            }
         });
     }
 

@@ -10,11 +10,21 @@ use AppBundle\Document\LostPhone;
 use AppBundle\Document\User;
 use AppBundle\Document\Connection\RewardConnection;
 use AppBundle\Document\Form\ClaimFnol;
+use AppBundle\Document\Form\ClaimFnolDamage;
+use AppBundle\Document\Form\ClaimFnolTheftLoss;
+use AppBundle\Document\File\ProofOfUsageFile;
+use AppBundle\Document\File\DamagePictureFile;
+use AppBundle\Document\File\ProofOfBarringFile;
+use AppBundle\Document\File\ProofOfPurchaseFile;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use League\Flysystem\MountManager;
 
 class ClaimsService
 {
+
+    const S3_CLAIMS_FOLDER = 'claim-documents';
+
     /** @var LoggerInterface */
     protected $logger;
 
@@ -33,6 +43,9 @@ class ClaimsService
     /** @var string */
     protected $environment;
 
+    /** @var MountManager */
+    protected $filesystem;
+
     /**
      * @param DocumentManager $dm
      * @param LoggerInterface $logger
@@ -40,6 +53,7 @@ class ClaimsService
      * @param RouterService   $routerService
      * @param Client          $redis
      * @param string          $environment
+     * @param MountManager    $filesystem
      */
     public function __construct(
         DocumentManager $dm,
@@ -47,7 +61,8 @@ class ClaimsService
         MailerService $mailer,
         RouterService $routerService,
         $redis,
-        $environment
+        $environment,
+        MountManager $filesystem
     ) {
         $this->dm = $dm;
         $this->logger = $logger;
@@ -55,6 +70,7 @@ class ClaimsService
         $this->routerService = $routerService;
         $this->redis = $redis;
         $this->environment = $environment;
+        $this->filesystem = $filesystem;
     }
 
     public function createClaim(ClaimFnol $claimFnol) {
@@ -70,6 +86,57 @@ class ClaimsService
         $claim->setTimeToReach($claimFnol->getTimeToReach());
 
         return $claim;
+    }
+
+    public function updateDamageDocuments(Claim $claim, ClaimFnolDamage $claimDamage) {
+        $claim->setTypeDetails($claimDamage->getTypeDetails());
+        $claim->setTypeDetailsOther($claimDamage->getTypeDetailsOther());
+        $claim->setMonthOfPurchase($claimDamage->getMonthOfPurchase());
+        $claim->setYearOfPurchase($claimDamage->getYearOfPurchase());
+        $claim->setPhoneStatus($claimDamage->getPhoneStatus());
+        $claim->setIsUnderWarranty($claimDamage->getIsUnderWarranty());
+
+        if ($claimDamage->getProofOfUsage()) {
+            $proofOfUsage = new ProofOfUsageFile();
+            $proofOfUsage->setBucket('policy.so-sure.com');
+            $proofOfUsage->setKey($claimDamage->getProofOfUsage());
+            $claim->getPolicy()->addPolicyFile($proofOfUsage);
+        }
+        if ($claimDamage->getPictureOfPhone()) {
+            $pictureOfPhone = new DamagePictureFile();
+            $pictureOfPhone->setBucket('policy.so-sure.com');
+            $pictureOfPhone->setKey($claimDamage->getPictureOfPhone());
+            $claim->getPolicy()->addPolicyFile($PictureOfPhone);
+        }
+    }
+
+    public function updateTheftLossDocuments(Claim $claim, ClaimFnolTheftLoss $claimTheftLoss) {
+        $claim->setHasContacted($claimTheftLoss->getHasContacted());
+        $claim->setContactedPlace($claimTheftLoss->getContactedPlace());
+        $claim->setBlockedDate($claimTheftLoss->getBlockedDate());
+        $claim->setReportedDate($claimTheftLoss->getReportedDate());
+        $claim->setReportType($claimTheftLoss->getReportType());
+        $claim->setCrimeRef($claimTheftLoss->getCrimeReferenceNumber());
+        $claim->setPoliceLossReport($claimTheftLoss->getPoliceLossReport());
+
+        if ($claimTheftLoss->getProofOfUsage()) {
+            $proofOfUsage = new ProofOfUsageFile();
+            $proofOfUsage->setBucket('policy.so-sure.com');
+            $proofOfUsage->setKey($claimTheftLoss->getProofOfUsage());
+            $claim->getPolicy()->addPolicyFile($proofOfUsage);
+        }
+
+        $proofOfBarring = new ProofOfBarringFile();
+        $proofOfBarring->setBucket('policy.so-sure.com');
+        $proofOfBarring->setKey($claimTheftLoss->getProofOfBarring());
+        $claim->getPolicy()->addPolicyFile($proofOfBarring);
+
+        if ($claimTheftLoss->getProofOfPurchase()) {
+            $proofOfPurchase = new ProofOfPurchaseFile();
+            $proofOfPurchase->setBucket('policy.so-sure.com');
+            $proofOfPurchase->setKey($claimTheftLoss->getProofOfPurchase());
+            $claim->getPolicy()->addPolicyFile($proofOfPurchase);
+        }
     }
 
     public function addClaim(Policy $policy, Claim $claim)
@@ -292,4 +359,25 @@ class ClaimsService
         return $this->redis->get($tokenId);
     }
 
+    public function saveFile($filename, $s3filename, $userId, $extension)
+    {
+        /** @var Filesystem $fs */
+        $fs = $this->filesystem->getFilesystem('s3policy_fs');
+        /** @var AwsS3Adapter $s3Adapater */
+        $s3Adapater = $fs->getAdapter();
+        $bucket = $s3Adapater->getBucket();
+        $pathPrefix = $s3Adapater->getPathPrefix();
+        $key = sprintf(
+            '%s/%s/%s.%s',
+            self::S3_CLAIMS_FOLDER,
+            $userId,
+            $s3filename,
+            $extension
+        );
+        $stream = fopen($filename, 'r+');
+        $fs->writeStream($key, $stream);
+        fclose($stream);
+
+        return $key;
+    }
 }

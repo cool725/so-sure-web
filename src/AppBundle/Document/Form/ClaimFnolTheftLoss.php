@@ -50,13 +50,13 @@ class ClaimFnolTheftLoss
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
-     * @Assert\Length(min="50", max="100")
+     * @Assert\Length(min="1", max="50")
      */
     protected $crimeReferenceNumber;
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
-     * @Assert\Length(min="50", max="100")
+     * @Assert\Length(min="1", max="50")
      */
     protected $policeLossReport;
 

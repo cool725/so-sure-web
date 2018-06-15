@@ -1532,6 +1532,13 @@ class UserController extends BaseController
             return $this->redirectToRoute('claim_policy');
         }
 
+        if ($claim->isSubmitted()) {
+            $data = [
+                'claim' => $claim,
+            ];
+            return $this->render('AppBundle:User:claimSubmitted.html.twig', $data);
+        }
+
         if ($claim->getType() == Claim::TYPE_DAMAGE) {
             $claimFnolDamage = new ClaimFnolDamage();
             $claimFnolDamage->setClaim($claim);
@@ -1544,7 +1551,11 @@ class UserController extends BaseController
                 if ($request->request->has('claim_damage_form')) {
                     $claimDamageForm->handleRequest($request);
                     if ($claimDamageForm->isValid()) {
-
+                        $claimsService = $this->get('app.claims');
+                        $claimsService->updateDamageDocuments($claim, $claimDamageForm->getData());
+                        $claim->setSubmissionDate(new \DateTime());
+                        $dm->flush();
+                        return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
                     }
                 }
             }
@@ -1567,7 +1578,11 @@ class UserController extends BaseController
                 if ($request->request->has('claim_theftloss_form')) {
                     $claimTheftLossForm->handleRequest($request);
                     if ($claimTheftLossForm->isValid()) {
-
+                        $claimsService = $this->get('app.claims');
+                        $claimsService->updateTheftLossDocuments($claim, $claimTheftLossForm->getData());
+                        $claim->setSubmissionDate(new \DateTime());
+                        $dm->flush();
+                        return $this->redirectToRoute('claimed_policy', ['policyId' => $policy->getId()]);
                     }
                 }
             }

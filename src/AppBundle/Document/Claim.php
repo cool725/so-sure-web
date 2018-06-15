@@ -278,6 +278,14 @@ class Claim
      * @Gedmo\Versioned
      * @var \DateTime
      */
+    protected $submissionDate;
+
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     * @Gedmo\Versioned
+     * @var \DateTime
+     */
     protected $lossDate;
 
     /**
@@ -530,19 +538,116 @@ class Claim
 
     /**
      * @Assert\Choice(callback="getNetworks", strict=true)
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
      */
     protected $network;
 
     /**
      * @AppAssert\PhoneNumber(message="Please enter a valid phone number")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
      */
     protected $phoneToReach;
 
     /**
      * @AppAssert\AlphanumericSpaceDot()
      * @Assert\Length(min="4", max="100")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
      */
     protected $timeToReach;
+
+    /**
+     * @Assert\Choice({"broken-screen", "water-damage", "out-of-warranty-breakdown", "other"}, strict=true)
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $typeDetails;
+
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="10", max="200")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $typeDetailsOther;
+
+    /**
+     * @Assert\Length(min="1", max="2")
+     * @Assert\Range(min="1", max="12")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $monthOfPurchase;
+
+    /**
+     * @Assert\Length(min="4", max="4")
+     * @Assert\Range(min="2015", max="2050")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $yearOfPurchase;
+
+    /**
+     * @Assert\Choice({"new", "refurbished", "second-hand"}, strict=true)
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $phoneStatus;
+
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
+    protected $isUnderWarranty;
+
+    /**
+     * @Assert\Type("bool")
+     * @MongoDB\Field(type="boolean")
+     * @Gedmo\Versioned
+     */
+    protected $hasContacted;
+
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="50", max="100")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $contactedPlace;
+
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     * @Gedmo\Versioned
+     * @var \DateTime
+     */
+    protected $blockedDate;
+
+    /**
+     * @Assert\DateTime()
+     * @MongoDB\Field(type="date")
+     * @Gedmo\Versioned
+     * @var \DateTime
+     */
+    protected $reportedDate;
+
+    /**
+     * @Assert\Choice({"police-station", "online"}, strict=true)
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $reportType;
+
+    /**
+     * @AppAssert\AlphanumericSpaceDot()
+     * @Assert\Length(min="1", max="50")
+     * @MongoDB\Field(type="string")
+     * @Gedmo\Versioned
+     */
+    protected $policeLossReport;
 
     public function __construct()
     {
@@ -562,6 +667,20 @@ class Claim
     public function setRecordedDate($recordedDate)
     {
         $this->recordedDate = $recordedDate;
+    }
+
+    public function getSubmissionDate()
+    {
+        return $this->submissionDate;
+    }
+
+    public function setSubmissionDate($submissionDate)
+    {
+        $this->submissionDate = $submissionDate;
+    }
+
+    public function isSubmitted() {
+        return $this->submissionDate() != null;
     }
 
     public function isWithin30Days($date)
@@ -1248,6 +1367,132 @@ class Claim
     {
         $this->timeToReach = $timeToReach;
     }
+
+    public function getTypeDetails()
+    {
+        return $this->typeDetails;
+    }
+    
+    public function setTypeDetails($typeDetails)
+    {
+        $this->typeDetails = $typeDetails;
+    }
+
+    public function getTypeDetailsOther()
+    {
+        return $this->typeDetailsOther;
+    }
+    
+    public function setTypeDetailsOther($typeDetailsOther)
+    {
+        $this->typeDetailsOther = $typeDetailsOther;
+    }
+
+    public function getMonthOfPurchase()
+    {
+        return $this->monthOfPurchase;
+    }
+    
+    public function setMonthOfPurchase($monthOfPurchase)
+    {
+        $this->monthOfPurchase = $monthOfPurchase;
+    }
+
+    public function getYearOfPurchase()
+    {
+        return $this->yearOfPurchase;
+    }
+    
+    public function setYearOfPurchase($yearOfPurchase)
+    {
+        $this->yearOfPurchase = $yearOfPurchase;
+    }
+
+    public function getPhoneStatus()
+    {
+        return $this->phoneStatus;
+    }
+    
+    public function setPhoneStatus($phoneStatus)
+    {
+        $this->phoneStatus = $phoneStatus;
+    }
+
+    public function getIsUnderWarranty()
+    {
+        return $this->isUnderWarranty;
+    }
+    
+    public function setIsUnderWarranty($isUnderWarranty)
+    {
+        $this->isUnderWarranty = $isUnderWarranty;
+    }
+
+    public function getHasContacted()
+    {
+        return $this->hasContacted;
+    }
+    
+    public function setHasContacted($hasContacted)
+    {
+        $this->hasContacted = $hasContacted;
+    }
+
+    public function getContactedPlace()
+    {
+        return $this->contactedPlace;
+    }
+    
+    public function setContactedPlace($contactedPlace)
+    {
+        $this->contactedPlace = $contactedPlace;
+    }
+
+    public function getBlockedDateh()
+    {
+        return $this->blockedDate;
+    }
+    
+    public function setBlockedDate($blockedDate)
+    {
+        $this->blockedDate = $blockedDate;
+    }
+
+    public function getReportedDate()
+    {
+        return $this->reportedDate;
+    }
+    
+    public function setReportedDate($reportedDate)
+    {
+        $this->reportedDate = $reportedDate;
+    }
+
+    public function getReportType()
+    {
+        return $this->reportType;
+    }
+    
+    public function setReportType($reportType)
+    {
+        $this->reportType = $reportType;
+    }
+
+    public function getPoliceLossReport()
+    {
+        return $this->policeLossReport;
+    }
+    
+    public function setPoliceLossReport($policeLossReport)
+    {
+        $this->policeLossReport = $policeLossReport;
+    }
+
+
+
+
+
+
 
     public static function sumClaims($claims)
     {
